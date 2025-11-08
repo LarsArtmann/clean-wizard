@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/LarsArtmann/clean-wizard/internal/pkg/scan"
-	"github.com/LarsArtmann/clean-wizard/internal/pkg/types"
 )
 
 // TestOutput captures stdout and stderr for testing
