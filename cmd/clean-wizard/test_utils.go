@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"os"
 	"sync"
@@ -95,7 +96,7 @@ func (tr *TestRunner) Restore() {
 	}
 }
 
-// GetOutput returns the captured output
+// GetOutput returns captured output
 func (tr *TestRunner) GetOutput() TestOutput {
 	tr.mu.Lock()
 	defer tr.mu.Unlock()
@@ -125,44 +126,21 @@ func (tr *TestRunner) Reset() {
 	tr.output = TestOutput{}
 }
 
-// SetupTestWithMockScanner sets up a test with a mock scanner
-func SetupTestWithMockScanner(mockScanner *scan.MockScanner) *TestRunner {
-	// Set up mock scanner
-	setMockScannerForTesting(mockScanner)
-
-	// Create test runner
-	tr := NewTestRunner()
-	if err := tr.Setup(); err != nil {
-		panic(err)
-	}
-
-	return tr
-}
-
-// CleanupTest cleans up after a test
-func CleanupTest(tr *TestRunner) {
-	// Restore original scanner
-	resetToRealScannerForTesting()
-
-	// Restore stdout/stderr
-	tr.Restore()
-
-	// Reset the test runner
-	tr.Reset()
-}
-
 // RunCommandWithMock runs a command with a mock scanner and returns output
 func RunCommandWithMock(args []string, mockScanner *scan.MockScanner) TestOutput {
-	tr := SetupTestWithMockScanner(mockScanner)
-	defer CleanupTest(tr)
+	// Create context with mock scanner for dependency injection
+	ctx := ContextWithScanner(context.Background(), mockScanner)
+	
+	tr := NewTestRunner()
+	tr.Setup()
+	defer tr.Restore()
 
 	// Create root command and set arguments
 	rootCmd := NewRootCmd()
 	rootCmd.SetArgs(args)
-
-	// Execute command
-	err := rootCmd.Execute()
-	if err != nil {
+	
+	// Execute command with context
+	if err := rootCmd.ExecuteContext(ctx); err != nil {
 		tr.SetExitCode(1)
 	} else {
 		tr.SetExitCode(0)

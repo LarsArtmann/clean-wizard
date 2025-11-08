@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -80,10 +81,10 @@ func TestScanCommandWithMock(t *testing.T) {
 	t.Run("scan with dry run", func(t *testing.T) {
 		// Create a mock scanner
 		mockScanner := CreateDefaultMockScanner()
-		
+
 		// Run command with mock scanner
 		output := RunCommandWithMock([]string{"scan", "--dry-run"}, mockScanner)
-		
+
 		// Verify results
 		assert.True(t, AssertOutputContains(output, "🔍 Scanning system..."))
 		assert.True(t, AssertOutputContains(output, "✅ Scan completed!"))
@@ -94,10 +95,10 @@ func TestScanCommandWithMock(t *testing.T) {
 	t.Run("scan with verbose", func(t *testing.T) {
 		// Create a mock scanner
 		mockScanner := CreateDefaultMockScanner()
-		
+
 		// Run command with mock scanner
 		output := RunCommandWithMock([]string{"scan", "--dry-run", "--verbose"}, mockScanner)
-		
+
 		// Verify results
 		assert.True(t, AssertOutputContains(output, "🔍 Scanning system..."))
 		assert.True(t, AssertOutputContains(output, "✅ Scan completed!"))
@@ -107,10 +108,10 @@ func TestScanCommandWithMock(t *testing.T) {
 	t.Run("scan with profile", func(t *testing.T) {
 		// Create a mock scanner
 		mockScanner := CreateDefaultMockScanner()
-		
+
 		// Run command with mock scanner
 		output := RunCommandWithMock([]string{"scan", "--dry-run", "--profile", "daily"}, mockScanner)
-		
+
 		// Verify results
 		assert.True(t, AssertOutputContains(output, "🔍 Scanning system..."))
 		assert.True(t, AssertOutputContains(output, "✅ Scan completed!"))
@@ -129,15 +130,17 @@ func TestScanCommandWithMock(t *testing.T) {
 		assert.True(t, AssertOutputContains(output, "✅ Scan completed!"))
 		assert.True(t, AssertOutputContains(output, "🎉 Your system is already clean!"))
 		assert.True(t, AssertExitCode(output, 0))
+	})		assert.True(t, AssertOutputContains(output, "🎉 Your system is already clean!"))
+		assert.True(t, AssertExitCode(output, 0))
 	})
 
 	t.Run("scan with error", func(t *testing.T) {
 		// Create a mock scanner that returns an error
 		mockScanner := CreateErrorMockScanner(assert.AnError)
-		
+
 		// Run command with mock scanner
 		output := RunCommandWithMock([]string{"scan", "--dry-run"}, mockScanner)
-		
+
 		// Verify results
 		assert.True(t, AssertExitCode(output, 1))
 	})
@@ -145,10 +148,10 @@ func TestScanCommandWithMock(t *testing.T) {
 	t.Run("scan with cancellable mock", func(t *testing.T) {
 		// Create a mock scanner that checks for cancellation
 		mockScanner := CreateCancellableMockScanner()
-		
+
 		// Run command with mock scanner
 		output := RunCommandWithMock([]string{"scan", "--dry-run"}, mockScanner)
-		
+
 		// Verify results
 		assert.True(t, AssertOutputContains(output, "🔍 Scanning system..."))
 		assert.True(t, AssertOutputContains(output, "✅ Scan completed!"))

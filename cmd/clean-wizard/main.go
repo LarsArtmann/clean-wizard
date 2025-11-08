@@ -117,7 +117,7 @@ func newScanCommand() *cobra.Command {
 			}()
 
 			// Create scanner
-			scanner := createScanner(verbose)
+			scanner := createScannerForContext(ctx, verbose)
 
 			// Perform scan
 			results, err := scanner.Scan(ctx)
