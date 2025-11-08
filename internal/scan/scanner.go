@@ -11,13 +11,13 @@ import (
 type Scanner interface {
 	// Scan performs system scan with type-safe result
 	Scan(ctx context.Context) result.Result[types.ScanResult]
-	
+
 	// ScanType returns what type of scanner this is
 	ScanType() types.CleanType
-	
+
 	// Name returns human-readable name
 	Name() string
-	
+
 	// IsEnabled checks if scanner is enabled for this system
 	IsEnabled() bool
 }
@@ -27,7 +27,7 @@ type MockScanner struct {
 	scanType types.CleanType
 	name     string
 	results  types.ScanResult
-	err       error
+	err      error
 }
 
 // NewMockScanner creates a mock scanner with default data
@@ -57,7 +57,7 @@ func NewEmptyMockScanner() *MockScanner {
 			CleanableItems: 0,
 			TotalBytes:     0,
 			ScanTime:       0,
-			Items:         []types.ScanItem{},
+			Items:          []types.ScanItem{},
 		},
 	}
 }
@@ -67,7 +67,7 @@ func NewErrorMockScanner(err error) *MockScanner {
 	return &MockScanner{
 		scanType: types.CleanTypeTempFiles,
 		name:     "Error Mock Scanner",
-		err:       err,
+		err:      err,
 	}
 }
 

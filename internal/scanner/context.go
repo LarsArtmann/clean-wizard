@@ -33,7 +33,7 @@ func CreateScannerForContext(ctx context.Context, verbose bool) (scan.Scanner, e
 	if scanner := ScannerFromContext(ctx); scanner != nil {
 		return scanner, nil
 	}
-	
+
 	// Fallback to real scanner
 	// TODO: Replace with proper factory pattern
 	return scan.NewNixScanner(verbose), nil
