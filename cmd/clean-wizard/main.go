@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/pkg/config"
-	"github.com/LarsArtmann/clean-wizard/internal/pkg/scan"
 	"github.com/LarsArtmann/clean-wizard/internal/pkg/types"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -24,6 +23,25 @@ var (
 )
 
 func main() {
+	rootCmd := NewRootCmd()
+
+	// Set up logging
+	logrus.SetOutput(os.Stderr)
+	if verbose {
+		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.InfoLevel)
+	}
+
+	// Execute command
+	if err := rootCmd.Execute(); err != nil {
+		logrus.WithError(err).Error("Command failed")
+		os.Exit(1)
+	}
+}
+
+// NewRootCmd creates and returns the root command
+func NewRootCmd() *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:     "clean-wizard",
 		Short:   "Interactive system cleaning wizard",
@@ -43,19 +61,7 @@ func main() {
 	rootCmd.AddCommand(newCleanCommand())
 	rootCmd.AddCommand(newConfigCommand())
 
-	// Set up logging
-	logrus.SetOutput(os.Stderr)
-	if verbose {
-		logrus.SetLevel(logrus.DebugLevel)
-	} else {
-		logrus.SetLevel(logrus.InfoLevel)
-	}
-
-	// Execute command
-	if err := rootCmd.Execute(); err != nil {
-		logrus.WithError(err).Error("Command failed")
-		os.Exit(1)
-	}
+	return rootCmd
 }
 
 func newInitCommand() *cobra.Command {
@@ -111,7 +117,7 @@ func newScanCommand() *cobra.Command {
 			}()
 
 			// Create scanner
-			scanner := scan.NewScanner(verbose)
+			scanner := createScanner(verbose)
 
 			// Perform scan
 			results, err := scanner.Scan(ctx)

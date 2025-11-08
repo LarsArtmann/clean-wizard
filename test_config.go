@@ -10,16 +10,16 @@ import (
 
 func main() {
 	fmt.Println("Testing config loading...")
-	
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
-	
+
 	fmt.Printf("Config loaded successfully:\n")
 	fmt.Printf("Protected paths: %v\n", cfg.Protected)
 	fmt.Printf("Profiles count: %d\n", len(cfg.Profiles))
-	
+
 	// Try to marshal back to see the structure
 	fmt.Printf("\nConfig structure:\n")
 	fmt.Printf("Version: %s\n", cfg.Version)
@@ -30,7 +30,7 @@ func main() {
 	fmt.Printf("MaxDiskUsage: %d\n", cfg.MaxDiskUsage)
 	fmt.Printf("Protected: %v\n", cfg.Protected)
 	fmt.Printf("Profiles: %d\n", len(cfg.Profiles))
-	
+
 	// Test with a minimal config
 	minimalCfg := &types.Config{
 		Version:      "test",
@@ -55,19 +55,19 @@ func main() {
 			},
 		},
 	}
-	
+
 	fmt.Printf("\nTesting minimal config validation...\n")
 	err = config.Save(minimalCfg)
 	if err != nil {
 		log.Fatalf("Failed to save minimal config: %v", err)
 	}
-	
+
 	// Now try to load it again
 	cfg2, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to reload config: %v", err)
 	}
-	
+
 	fmt.Printf("Reloaded config successfully:\n")
 	fmt.Printf("Protected paths: %v\n", cfg2.Protected)
 	fmt.Printf("Profiles count: %d\n", len(cfg2.Profiles))

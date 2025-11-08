@@ -20,11 +20,11 @@ const (
 // Load loads the configuration from file or creates default
 func Load() (*types.Config, error) {
 	v := viper.New()
-	
+
 	// Set configuration file properties
 	v.SetConfigName(configName)
 	v.SetConfigType(configType)
-	
+
 	// Add configuration paths
 	configPaths := []string{
 		"$HOME",
@@ -32,14 +32,14 @@ func Load() (*types.Config, error) {
 		".",
 		"/etc/clean-wizard",
 	}
-	
+
 	for _, path := range configPaths {
 		v.AddConfigPath(path)
 	}
-	
+
 	// Set defaults
 	setDefaults(v)
-	
+
 	// Try to read configuration file
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -48,10 +48,10 @@ func Load() (*types.Config, error) {
 		}
 		return nil, errors.ConfigLoadError(err)
 	}
-	
+
 	// Unmarshal configuration
 	var config types.Config
-	
+
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
 	config.SafeMode = v.GetBool("safe_mode")
@@ -60,33 +60,33 @@ func Load() (*types.Config, error) {
 	config.Backup = v.GetBool("backup")
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
 	config.Protected = v.GetStringSlice("protected_paths")
-	
+
 	// Unmarshal profiles section
 	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
 		logrus.WithError(err).Error("Failed to unmarshal profiles")
 		return nil, errors.ConfigLoadError(err)
 	}
-	
+
 	// Validate configuration
 	if err := validate(&config); err != nil {
 		return nil, errors.ConfigValidateError(err.Error())
 	}
-	
+
 	return &config, nil
 }
 
 // Save saves the configuration to file
 func Save(config *types.Config) error {
 	v := viper.New()
-	
+
 	// Set configuration file properties
 	v.SetConfigName(configName)
 	v.SetConfigType(configType)
-	
+
 	// Set configuration path
 	configPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 	v.SetConfigFile(configPath)
-	
+
 	// Set all values from config
 	v.Set("version", config.Version)
 	v.Set("safe_mode", config.SafeMode)
@@ -95,14 +95,14 @@ func Save(config *types.Config) error {
 	v.Set("backup", config.Backup)
 	v.Set("max_disk_usage_percent", config.MaxDiskUsage)
 	v.Set("protected_paths", config.Protected)
-	
+
 	// Set profiles
 	for name, profile := range config.Profiles {
 		v.Set("profiles."+name+".name", profile.Name)
 		v.Set("profiles."+name+".description", profile.Description)
 		v.Set("profiles."+name+".created_at", profile.CreatedAt)
 		v.Set("profiles."+name+".updated_at", profile.UpdatedAt)
-		
+
 		for i, op := range profile.Operations {
 			opKey := fmt.Sprintf("profiles.%s.operations.%d", name, i)
 			v.Set(opKey+".name", op.Name)
@@ -114,18 +114,18 @@ func Save(config *types.Config) error {
 			}
 		}
 	}
-	
+
 	// Ensure config directory exists
 	configDir := filepath.Dir(configPath)
 	if err := os.MkdirAll(configDir, 0755); err != nil {
 		return errors.ConfigSaveError(err)
 	}
-	
+
 	// Write configuration file
 	if err := v.WriteConfig(); err != nil {
 		return errors.ConfigSaveError(err)
 	}
-	
+
 	return nil
 }
 
@@ -143,7 +143,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("verbose", false)
 	v.SetDefault("backup", true)
 	v.SetDefault("max_disk_usage_percent", 90)
-	
+
 	// Protected paths
 	v.SetDefault("protected_paths", []string{
 		"/nix/store",
@@ -152,7 +152,7 @@ func setDefaults(v *viper.Viper) {
 		"/Applications",
 		"/Library",
 	})
-	
+
 	// Default profiles
 	v.SetDefault("profiles.daily.name", "daily")
 	v.SetDefault("profiles.daily.description", "Quick daily cleanup")
@@ -172,7 +172,7 @@ func setDefaults(v *viper.Viper) {
 			"settings":    map[string]any{"autoremove": true, "prune": "recent"},
 		},
 	})
-	
+
 	v.SetDefault("profiles.comprehensive.name", "comprehensive")
 	v.SetDefault("profiles.comprehensive.description", "Complete system cleanup")
 	v.SetDefault("profiles.comprehensive.operations", []map[string]any{
@@ -198,7 +198,7 @@ func setDefaults(v *viper.Viper) {
 			"settings":    map[string]any{"go": true, "npm": true, "cargo": true},
 		},
 	})
-	
+
 	v.SetDefault("profiles.aggressive.name", "aggressive")
 	v.SetDefault("profiles.aggressive.description", "Nuclear option - everything")
 	v.SetDefault("profiles.aggressive.operations", []map[string]any{
@@ -229,7 +229,7 @@ func setDefaults(v *viper.Viper) {
 // getDefaultConfig returns the default configuration
 func getDefaultConfig() *types.Config {
 	now := time.Now()
-	
+
 	return &types.Config{
 		Version:      "dev",
 		SafeMode:     true,
@@ -334,15 +334,15 @@ func validate(config *types.Config) error {
 	if config.MaxDiskUsage < 0 || config.MaxDiskUsage > 100 {
 		return fmt.Errorf("max_disk_usage_percent must be between 0 and 100")
 	}
-	
+
 	if len(config.Protected) == 0 {
 		return fmt.Errorf("at least one protected path must be specified")
 	}
-	
+
 	if len(config.Profiles) == 0 {
 		return fmt.Errorf("at least one profile must be specified")
 	}
-	
+
 	for name, profile := range config.Profiles {
 		if profile.Name == "" {
 			return fmt.Errorf("profile %s must have a name", name)
@@ -354,7 +354,7 @@ func validate(config *types.Config) error {
 			return fmt.Errorf("profile %s must have at least one operation", name)
 		}
 	}
-	
+
 	return nil
 }
 
