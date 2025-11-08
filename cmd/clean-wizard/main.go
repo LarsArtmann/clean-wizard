@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/pkg/config"
-	"github.com/LarsArtmann/clean-wizard/internal/pkg/types"
+	"github.com/LarsArtmann/clean-wizard/internal/config"
+	"github.com/LarsArtmann/clean-wizard/internal/types"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -103,7 +103,7 @@ func newScanCommand() *cobra.Command {
 			ctx := cmd.Context()
 
 			// Create scanner with context-based dependency injection
-			scanner := createScannerForContext(ctx, verbose)
+			scanner := internalscanner.CreateScannerForContext(ctx, verbose)
 
 			// Perform scan
 			results, err := scanner.Scan(ctx)
