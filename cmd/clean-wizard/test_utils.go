@@ -130,7 +130,7 @@ func (tr *TestRunner) Reset() {
 func RunCommandWithMock(args []string, mockScanner *scan.MockScanner) TestOutput {
 	// Create context with mock scanner for dependency injection
 	ctx := ContextWithScanner(context.Background(), mockScanner)
-	
+
 	tr := NewTestRunner()
 	tr.Setup()
 	defer tr.Restore()
@@ -138,7 +138,7 @@ func RunCommandWithMock(args []string, mockScanner *scan.MockScanner) TestOutput
 	// Create root command and set arguments
 	rootCmd := NewRootCmd()
 	rootCmd.SetArgs(args)
-	
+
 	// Execute command with context
 	if err := rootCmd.ExecuteContext(ctx); err != nil {
 		tr.SetExitCode(1)
@@ -194,9 +194,8 @@ func AssertExitCode(output TestOutput, expected int) bool {
 
 // contains is a helper function to check if a string contains another string
 func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || 
-		len(s) > len(substr) && (
-			(s[:len(substr)] == substr) ||
+	return len(s) >= len(substr) && (s == substr ||
+		len(s) > len(substr) && ((s[:len(substr)] == substr) ||
 			(s[len(s)-len(substr):] == substr) ||
 			(len(s) > len(substr)+1 && findSubstring(s, substr))))
 }

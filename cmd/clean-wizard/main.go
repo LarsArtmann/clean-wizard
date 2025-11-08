@@ -1,11 +1,8 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/pkg/config"
@@ -40,7 +37,7 @@ func main() {
 	}
 }
 
-// NewRootCmd creates and returns the root command
+// NewRootCmd creates and returns root command
 func NewRootCmd() *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:     "clean-wizard",
@@ -71,7 +68,7 @@ func newInitCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("🧹 Clean Wizard Setup")
 			fmt.Println("======================")
-			fmt.Println("Let's create the perfect cleaning configuration for your system!")
+			fmt.Println("Let's create perfect cleaning configuration for your system!")
 			fmt.Println()
 
 			// Load or create default config
@@ -99,31 +96,20 @@ func newScanCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "scan",
 		Short: "Scan system for cleanable items",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("🔍 Scanning system...")
 
-			// Create context with cancellation
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
+			// Get command context
+			ctx := cmd.Context()
 
-			// Set up signal handling
-			sigChan := make(chan os.Signal, 1)
-			signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-			go func() {
-				<-sigChan
-				cancel()
-				fmt.Println("\n⚠️  Scan cancelled by user")
-				os.Exit(1)
-			}()
-
-			// Create scanner
+			// Create scanner with context-based dependency injection
 			scanner := createScannerForContext(ctx, verbose)
 
 			// Perform scan
 			results, err := scanner.Scan(ctx)
 			if err != nil {
 				logrus.WithError(err).Error("Scan failed")
-				os.Exit(1)
+				return fmt.Errorf("scan failed: %w", err)
 			}
 
 			// Display results
@@ -142,6 +128,8 @@ func newScanCommand() *cobra.Command {
 			} else {
 				fmt.Println("🎉 Your system is already clean!")
 			}
+
+			return nil
 		},
 	}
 }
