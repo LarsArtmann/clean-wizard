@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -74,12 +75,12 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	return nc.adapter.ListGenerations(ctx)
 }
 
-// CleanOldGenerations removes old Nix generations with proper type safety
+// CleanOldGenerations removes old Nix generations using centralized conversions
 func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) result.Result[domain.CleanResult] {
 	// Get generations first
 	genResult := nc.ListGenerations(ctx)
 	if genResult.IsErr() {
-		return result.Err[domain.CleanResult](genResult.Error())
+		return conversions.ToCleanResultFromError(genResult.Error())
 	}
 
 	generations := genResult.Value()
@@ -88,20 +89,18 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	toRemove := countOldGenerations(generations, keepCount)
 	
 	if nc.dryRun {
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   int64(toRemove * 50 * 1024 * 1024), // 50MB per generation
-			ItemsRemoved: toRemove,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     "DRY RUN",
-		})
+		// Use centralized conversion for dry-run
+		estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // 50MB per generation
+		cleanResult := conversions.NewCleanResult("DRY RUN", toRemove, estimatedBytes)
+		return result.Ok(cleanResult)
 	}
 
 	// Real cleaning implementation
 	if !nc.dryRun && toRemove > 0 {
 		// Remove old generations individually to track what's cleaned
-		totalFreed := int64(0)
+		results := make([]domain.CleanResult, 0, toRemove)
+		start := time.Now()
+		
 		for i := len(generations) - toRemove; i < len(generations); i++ {
 			// Skip current generation
 			if generations[i].Current {
@@ -111,39 +110,32 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 			// Remove this generation
 			cleanResult := nc.adapter.RemoveGeneration(ctx, generations[i].ID)
 			if cleanResult.IsErr() {
-				return result.Err[domain.CleanResult](cleanResult.Error())
+				return conversions.ToCleanResultFromError(cleanResult.Error())
 			}
 			
-			totalFreed += cleanResult.Value().FreedBytes
+			results = append(results, cleanResult.Value())
 		}
 		
 		// Run garbage collection to clean up references
 		gcResult := nc.adapter.CollectGarbage(ctx)
 		if gcResult.IsErr() {
-			return result.Err[domain.CleanResult](gcResult.Error())
+			return conversions.ToCleanResultFromError(gcResult.Error())
 		}
 		
-		totalFreed += gcResult.Value().FreedBytes
+		results = append(results, gcResult.Value())
 		
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   totalFreed,
-			ItemsRemoved: toRemove,
-			ItemsFailed:  0,
-			CleanTime:    time.Since(time.Now()),
-			CleanedAt:    time.Now(),
-			Strategy:     "NIX CLEANUP",
-		})
+		// Combine all results using centralized function
+		combinedResult := conversions.CombineCleanResults(results)
+		combinedResult.CleanTime = time.Since(start)
+		combinedResult.Strategy = "NIX CLEANUP"
+		
+		return result.Ok(combinedResult)
 	}
 
-	// Dry-run or no generations to remove
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   int64(toRemove * 50 * 1024 * 1024), // Estimated
-		ItemsRemoved: toRemove,
-		ItemsFailed:  0,
-		CleanTime:    time.Since(time.Now()),
-		CleanedAt:    time.Now(),
-		Strategy:     "DRY RUN",
-	})
+	// Dry-run or no generations to remove - use centralized conversion
+	estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Estimated
+	cleanResult := conversions.NewCleanResult("DRY RUN", toRemove, estimatedBytes)
+	return result.Ok(cleanResult)
 }
 
 // countOldGenerations counts generations to remove (keeping current + N others)

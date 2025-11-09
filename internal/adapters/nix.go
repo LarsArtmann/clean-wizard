@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -103,25 +104,25 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	return result.Ok(size)
 }
 
-// CollectGarbage removes old Nix generations with real byte calculation
+// CollectGarbage removes old Nix generations using centralized conversion
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
 	// Get store size before garbage collection
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get pre-gc store size: %w", err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get pre-gc store size: %w", err))
 	}
 
 	// Run actual nix-collect-garbage command
 	cmd := exec.CommandContext(ctx, "nix-collect-garbage", "-d")
 	err = cmd.Run()
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to collect garbage: %w", err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to collect garbage: %w", err))
 	}
 
 	// Get store size after garbage collection
 	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get post-gc store size: %w", err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-gc store size: %w", err))
 	}
 
 	bytesFreed := beforeSize - afterSize
@@ -129,14 +130,9 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		bytesFreed = 0 // Shouldn't happen but guard against it
 	}
 
-	return result.Ok(domain.CleanResult{
-		ItemsRemoved: 1,
-		FreedBytes:   bytesFreed,
-		ItemsFailed:  0,
-		CleanTime:    time.Since(time.Now()),
-		CleanedAt:    time.Now(),
-		Strategy:     "NIX_GC",
-	})
+	// Use centralized conversion with proper timing
+	cleanResult := conversions.NewCleanResultWithTiming("NIX_GC", 1, bytesFreed, time.Since(time.Now()))
+	return result.Ok(cleanResult)
 }
 
 // getActualStoreSize helper function to get real store size
@@ -155,25 +151,25 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 	return strconv.ParseInt(fields[0], 10, 64)
 }
 
-// RemoveGeneration removes specific Nix generation with real byte calculation
+// RemoveGeneration removes specific Nix generation using centralized conversion
 func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[domain.CleanResult] {
 	// Get store size before removal
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get pre-remove store size: %w", err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get pre-remove store size: %w", err))
 	}
 
 	// Remove the specific generation
 	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", fmt.Sprintf("%d", genID))
 	err = cmd.Run()
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to remove generation %d: %w", genID, err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to remove generation %d: %w", genID, err))
 	}
 
 	// Get store size after removal
 	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get post-remove store size: %w", err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-remove store size: %w", err))
 	}
 
 	bytesFreed := beforeSize - afterSize
@@ -181,14 +177,9 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 		bytesFreed = 0 // Guard against negative values
 	}
 
-	return result.Ok(domain.CleanResult{
-		ItemsRemoved: 1,
-		FreedBytes:   bytesFreed,
-		ItemsFailed:  0,
-		CleanTime:    time.Since(time.Now()),
-		CleanedAt:    time.Now(),
-		Strategy:     "REMOVE_GENERATION",
-	})
+	// Use centralized conversion with proper timing
+	cleanResult := conversions.NewCleanResultWithTiming("REMOVE_GENERATION", 1, bytesFreed, time.Since(time.Now()))
+	return result.Ok(cleanResult)
 }
 
 // ParseGeneration parses generation line from nix-env output
