@@ -71,6 +71,19 @@ func (rl RiskLevel) Icon() string {
 	}
 }
 
+// NixGeneration represents Nix store generation
+type NixGeneration struct {
+	ID      int       `json:"id"`
+	Path    string    `json:"path"`
+	Date    time.Time `json:"date"`
+	Current bool      `json:"current"`
+}
+
+// IsValid validates generation
+func (g NixGeneration) IsValid() bool {
+	return g.ID > 0 && g.Path != "" && !g.Date.IsZero()
+}
+
 // ScanRequest represents scanning command
 type ScanRequest struct {
 	Type      ScanType `json:"type"`
@@ -80,11 +93,11 @@ type ScanRequest struct {
 
 // ScanResult represents successful scan outcome
 type ScanResult struct {
-	TotalBytes     int64       `json:"total_bytes"`
-	TotalItems     int         `json:"total_items"`
-	ScannedPaths   []string    `json:"scanned_paths"`
+	TotalBytes     int64         `json:"total_bytes"`
+	TotalItems     int           `json:"total_items"`
+	ScannedPaths   []string      `json:"scanned_paths"`
 	ScanTime       time.Duration `json:"scan_time"`
-	ScannedAt      time.Time   `json:"scanned_at"`
+	ScannedAt      time.Time     `json:"scanned_at"`
 }
 
 // ScanItem represents single scannable item

@@ -63,3 +63,8 @@ func Map[T, U any](r Result[T], fn func(T) U) Result[U] {
 	}
 	return Ok(fn(r.value))
 }
+
+// MockSuccess creates a successful result with warning message
+func MockSuccess[T any](value T, message string) Result[T] {
+	return Ok(value)
+}

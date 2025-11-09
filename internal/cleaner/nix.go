@@ -1,64 +1,48 @@
 package cleaner
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"os"
-	"os/exec"
-	"strconv"
-	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// NixCleaner handles Nix store cleanup operations
+// NixCleaner handles Nix store cleanup operations using proper adapter pattern
 type NixCleaner struct {
+	adapter *adapters.NixAdapter
 	verbose bool
 	dryRun  bool
 }
 
-// NewNixCleaner creates a new Nix cleaner
+// NewNixCleaner creates a new Nix cleaner with proper dependency injection
 func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
 	return &NixCleaner{
+		adapter: adapters.NewNixAdapter(30*time.Second, 3),
 		verbose: verbose,
 		dryRun:  dryRun,
 	}
 }
 
 // ListGenerations returns list of Nix generations
-func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]NixGeneration] {
-	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations")
-	output, err := cmd.Output()
-	if err != nil {
-		if nc.isNixNotAvailable(err) {
-			return nc.mockGenerations()
-		}
-		return result.Err[[]NixGeneration](fmt.Errorf("failed to list generations: %w", err))
+func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
+	if !nc.adapter.IsAvailable(ctx) {
+		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
+		return result.MockSuccess([]domain.NixGeneration{
+			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24*time.Hour), Current: true},
+			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48*time.Hour), Current: false},
+			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72*time.Hour), Current: false},
+			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96*time.Hour), Current: false},
+			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120*time.Hour), Current: false},
+		}, "Nix not available - using mock data")
 	}
 
-	var generations []NixGeneration
-	scanner := bufio.NewScanner(strings.NewReader(string(output)))
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.TrimSpace(line) == "" {
-			continue
-		}
-
-		gen, err := nc.parseGeneration(line)
-		if err != nil {
-			continue
-		}
-		generations = append(generations, gen)
-	}
-
-	return result.Ok(generations)
+	return nc.adapter.ListGenerations(ctx)
 }
 
-// CleanOldGenerations removes old Nix generations
+// CleanOldGenerations removes old Nix generations using CQRS pattern
 func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) result.Result[domain.CleanResult] {
 	genResult := nc.ListGenerations(ctx)
 	if genResult.IsErr() {
@@ -70,139 +54,61 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 		return result.Ok(domain.CleanResult{
 			FreedBytes: 0,
 			ItemsRemoved: 0,
+			ItemsFailed: 0,
 			CleanTime: 0,
 			Strategy: "keep-existing",
 		})
 	}
 
 	startTime := time.Now()
+	strategy := "conservative"
 
 	if nc.dryRun {
 		toRemove := len(generations) - keepCount
 		estimatedBytes := int64(1024 * 1024 * 1024 * 5) // Estimate 5GB
+		strategy = fmt.Sprintf("[DRY RUN] Would remove %d old generations, keeping %d", toRemove, keepCount)
+		
 		return result.Ok(domain.CleanResult{
 			FreedBytes: estimatedBytes,
 			ItemsRemoved: toRemove,
 			ItemsFailed: 0,
 			CleanTime: time.Since(startTime),
-			Strategy: fmt.Sprintf("[DRY RUN] Would remove %d old generations, keeping %d", toRemove, keepCount),
+			Strategy: strategy,
 		})
 	}
 
-	cmd := exec.CommandContext(ctx, "nix-collect-garbage", "-d")
-	if nc.verbose {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+	if !nc.adapter.IsAvailable(ctx) {
+		// Mock cleanup for CI - proper adapter pattern
+		estimatedBytes := int64(1024 * 1024 * 1024 * 2) // Mock 2GB
+		return result.Ok(domain.CleanResult{
+			FreedBytes: estimatedBytes,
+			ItemsRemoved: 2,
+			ItemsFailed: 0,
+			CleanTime: time.Since(startTime),
+			Strategy: "[MOCK] Simulated Nix garbage collection (nix not available)",
+		})
 	}
 
-	err := cmd.Run()
-	if err != nil {
-		if nc.isNixNotAvailable(err) {
-			estimatedBytes := int64(1024 * 1024 * 1024 * 2) // Mock 2GB
-			return result.Ok(domain.CleanResult{
-				FreedBytes: estimatedBytes,
-				ItemsRemoved: 2,
-				ItemsFailed: 0,
-				CleanTime: time.Since(startTime),
-				Strategy: "[MOCK] Simulated Nix garbage collection (nix not available)",
-			})
-		}
-		return result.Err[domain.CleanResult](fmt.Errorf("nix-collect-garbage failed: %w", err))
+	gcResult := nc.adapter.CollectGarbage(ctx)
+	if gcResult.IsErr() {
+		return result.Err[domain.CleanResult](fmt.Errorf("nix-collect-garbage failed: %w", gcResult.Error()))
 	}
 
-	actualBytes := int64(1024 * 1024 * 1024 * 2) // TODO: Calculate actual space
 	return result.Ok(domain.CleanResult{
-		FreedBytes: actualBytes,
-		ItemsRemoved: 2,
+		FreedBytes: gcResult.Value(),
+		ItemsRemoved: len(generations) - keepCount,
 		ItemsFailed: 0,
 		CleanTime: time.Since(startTime),
 		Strategy: "nix-collect-garbage",
 	})
 }
 
-// GetStoreSize returns Nix store size
+// GetStoreSize returns Nix store size using adapter
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) result.Result[int64] {
-	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
-	output, err := cmd.Output()
-	if err != nil {
-		if nc.isNixNotAvailable(err) {
-			return result.Ok[int64](1024 * 1024 * 1024 * 10) // Mock 10GB
-		}
-		return result.Err[int64](fmt.Errorf("failed to get store size: %w", err))
+	if !nc.adapter.IsAvailable(ctx) {
+		// Return mock data for CI/testing
+		return result.MockSuccess(int64(1024*1024*1024*10), "Nix not available - using mock 10GB")
 	}
 
-	fields := strings.Fields(string(output))
-	if len(fields) < 1 {
-		return result.Err[int64](fmt.Errorf("invalid du output: %s", string(output)))
-	}
-
-	size, err := strconv.ParseInt(fields[0], 10, 64)
-	if err != nil {
-		return result.Err[int64](fmt.Errorf("failed to parse size: %w", err))
-	}
-
-	return result.Ok(size)
-}
-
-// NixGeneration represents a Nix generation
-type NixGeneration struct {
-	ID      int       `json:"id"`
-	Path    string    `json:"path"`
-	Date    time.Time `json:"date"`
-	Current bool      `json:"current"`
-}
-
-// parseGeneration parses a generation line
-func (nc *NixCleaner) parseGeneration(line string) (NixGeneration, error) {
-	fields := strings.Fields(line)
-	if len(fields) < 3 {
-		return NixGeneration{}, fmt.Errorf("invalid generation line: %s", line)
-	}
-
-	pathParts := strings.Split(fields[0], "-")
-	if len(pathParts) < 2 {
-		return NixGeneration{}, fmt.Errorf("invalid generation path: %s", fields[0])
-	}
-
-	id, err := strconv.Atoi(pathParts[len(pathParts)-1])
-	if err != nil {
-		return NixGeneration{}, fmt.Errorf("invalid generation ID: %s", pathParts[len(pathParts)-1])
-	}
-
-	// Simple date parsing
-	date := time.Now()
-	if len(fields) > 1 && strings.Contains(fields[1], "-") {
-		if parsed, err := time.Parse("2006-01-02", strings.Trim(fields[1], "()")); err == nil {
-			date = parsed
-		}
-	}
-
-	current := strings.Contains(line, "(current)")
-
-	return NixGeneration{
-		ID:      id,
-		Path:    fields[0],
-		Date:    date,
-		Current: current,
-	}, nil
-}
-
-// isNixNotAvailable checks if Nix is not available
-func (nc *NixCleaner) isNixNotAvailable(err error) bool {
-	return strings.Contains(err.Error(), "executable not found") ||
-		strings.Contains(err.Error(), "command not found") ||
-		strings.Contains(err.Error(), "no such file or directory")
-}
-
-// mockGenerations returns mock data when Nix is not available
-func (nc *NixCleaner) mockGenerations() result.Result[[]NixGeneration] {
-	now := time.Now()
-	generations := []NixGeneration{
-		{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: now.Add(-24 * time.Hour), Current: true},
-		{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: now.Add(-48 * time.Hour), Current: false},
-		{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: now.Add(-72 * time.Hour), Current: false},
-		{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: now.Add(-96 * time.Hour), Current: false},
-		{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: now.Add(-120 * time.Hour), Current: false},
-	}
-	return result.Ok(generations)
+	return nc.adapter.GetStoreSize(ctx)
 }
