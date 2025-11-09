@@ -162,10 +162,17 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 	}, nil
 }
 
-// IsAvailable checks if Nix is available
+// IsAvailable checks if Nix is available and accessible
 func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
-	cmd := exec.CommandContext(ctx, "nix", "--version")
-	err := cmd.Run()
+	// First check if nix command exists
+	versionCmd := exec.CommandContext(ctx, "nix", "--version")
+	if err := versionCmd.Run(); err != nil {
+		return false
+	}
+
+	// Then check if we can access profiles (the actual operation we need)
+	listCmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
+	err := listCmd.Run()
 	return err == nil
 }
 
