@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/pkg/scan"
-	"github.com/LarsArtmann/clean-wizard/pkg/scanner"
+	"github.com/LarsArtmann/clean-wizard/internal/scan"
+	"github.com/LarsArtmann/clean-wizard/internal/scanner"
 	"github.com/stretchr/testify/assert"
 )
 

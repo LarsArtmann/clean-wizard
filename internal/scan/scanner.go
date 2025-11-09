@@ -11,13 +11,13 @@ import (
 type Scanner interface {
 	// Scan performs system scan with type-safe result
 	Scan(ctx context.Context) result.Result[types.ScanResult]
-
+	
 	// ScanType returns what type of scanner this is
 	ScanType() types.CleanType
-
+	
 	// Name returns human-readable name
 	Name() string
-
+	
 	// IsEnabled checks if scanner is enabled for this system
 	IsEnabled() bool
 }
@@ -92,4 +92,27 @@ func (m *MockScanner) Name() string {
 // IsEnabled implements Scanner interface
 func (m *MockScanner) IsEnabled() bool {
 	return true
+}
+
+// NewScanner creates a real scanner based on clean type
+func NewScanner(scanType types.CleanType, verbose bool) (Scanner, error) {
+	// TODO: Implement real scanners
+	switch scanType {
+	case types.CleanTypeTempFiles:
+		return NewMockScanner(), nil
+	case types.CleanTypePackageCache:
+		return NewMockScanner(), nil
+	case types.CleanTypeNixStore:
+		return NewMockScanner(), nil
+	case types.CleanTypeHomebrew:
+		return NewMockScanner(), nil
+	default:
+		return NewMockScanner(), nil
+	}
+}
+
+// NewNixScanner creates a Nix scanner
+func NewNixScanner(verbose bool) Scanner {
+	// TODO: Implement real Nix scanner
+	return NewMockScanner()
 }

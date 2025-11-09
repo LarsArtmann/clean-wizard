@@ -97,37 +97,33 @@ func newScanCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "scan",
 		Short: "Scan system for cleanable items",
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
-		fmt.Println("📊 Demo: 100MB found")
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println("🔍 Scanning system...")
+
+			// Get command context
+			ctx := cmd.Context()
+
+			// Create scanner with context-based dependency injection
+			scanner, err := scanner.CreateScannerForContext(ctx, verbose)
+			if err != nil {
+				logrus.WithError(err).Error("Scanner creation failed")
+				return fmt.Errorf("scanner creation failed: %w", err)
+			}
+
+			// Perform scan
+			result, err := scanner.Scan(ctx)
+			if err != nil {
+				logrus.WithError(err).Error("Scan failed")
+				return fmt.Errorf("scan failed: %w", err)
+			}
+
+			// Extract scan results
+			results := result.Value()				fmt.Printf("📦 %s: %s\n", result.Name, types.FormatSize(result.SizeGB))
+				fmt.Printf("   %s\n", result.Description)
+			}
+
+			if results.TotalSizeGB > 0 {
+				fmt.Println()
 				fmt.Println("💡 Run 'clean-wizard clean' to start cleaning")
 			} else {
 				fmt.Println("🎉 Your system is already clean!")

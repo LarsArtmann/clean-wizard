@@ -3,7 +3,7 @@ package bdd
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/pkg/scan"
+	"github.com/LarsArtmann/clean-wizard/internal/scan"
 	"github.com/stretchr/testify/assert"
 )
 
