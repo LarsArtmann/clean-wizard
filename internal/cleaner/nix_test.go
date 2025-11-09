@@ -74,12 +74,7 @@ func TestNixCleaner_GetStoreSize(t *testing.T) {
 	ctx := context.Background()
 
 	size := cleaner.GetStoreSize(ctx)
-
-	if size.IsErr() {
-		t.Logf("Get store size failed (expected in CI): %v", size.Error())
-	} else {
-		t.Logf("Store size: %d bytes", size.Value())
-	}
+	t.Logf("Store size: %d bytes", size)
 }
 
 func TestNixCleaner_ParseGeneration(t *testing.T) {

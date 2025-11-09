@@ -135,7 +135,7 @@ func (ctx *BDDTestContext) runCommand(command string) error {
 	case "clean-wizard scan nix":
 		return ctx.runScanCommand()
 	case "clean-wizard clean --keep 3":
-		return ctx.runCleanCommand(3, false)
+		return ctx.runCleanCommand(3, ctx.dryRun) // Use test context dry-run
 	default:
 		return fmt.Errorf("unknown command: %s", command)
 	}
