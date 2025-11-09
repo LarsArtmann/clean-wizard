@@ -5,28 +5,6 @@ import (
 	"time"
 )
 
-// TODO: Make invalid states unrepresentable through strong typing
-
-// ScanType represents different scanning domains
-type ScanType string
-
-const (
-	ScanTypeNixStore ScanType = "nix_store"
-	ScanTypeHomebrew ScanType = "homebrew"
-	ScanTypeSystem   ScanType = "system"
-	ScanTypeTemp     ScanType = "temp_files"
-)
-
-// IsValid validates ScanType
-func (st ScanType) IsValid() bool {
-	switch st {
-	case ScanTypeNixStore, ScanTypeHomebrew, ScanTypeSystem, ScanTypeTemp:
-		return true
-	default:
-		return false
-	}
-}
-
 // RiskLevel represents operation risk with type safety
 type RiskLevel string
 
@@ -44,38 +22,6 @@ func (rl RiskLevel) IsValid() bool {
 		return true
 	default:
 		return false
-	}
-}
-
-// String returns string representation
-func (rl RiskLevel) String() string {
-	switch rl {
-	case RiskLow:
-		return "LOW"
-	case RiskMedium:
-		return "MEDIUM"
-	case RiskHigh:
-		return "HIGH"
-	case RiskCritical:
-		return "CRITICAL"
-	default:
-		return "UNKNOWN"
-	}
-}
-
-// Icon returns emoji for risk level
-func (rl RiskLevel) Icon() string {
-	switch rl {
-	case RiskLow:
-		return "🟢"
-	case RiskMedium:
-		return "🟡"
-	case RiskHigh:
-		return "🟠"
-	case RiskCritical:
-		return "🔴"
-	default:
-		return "⚪"
 	}
 }
 
@@ -106,11 +52,69 @@ func (g NixGeneration) Validate() error {
 	return nil
 }
 
+// TODO: Make invalid states unrepresentable through strong typing
+
+// ScanType represents different scanning domains
+type ScanType string
+
+const (
+	ScanTypeNixStore ScanType = "nix_store"
+	ScanTypeHomebrew ScanType = "homebrew"
+	ScanTypeSystem   ScanType = "system"
+	ScanTypeTemp     ScanType = "temp_files"
+)
+
+// IsValid validates ScanType
+func (st ScanType) IsValid() bool {
+	switch st {
+	case ScanTypeNixStore, ScanTypeHomebrew, ScanTypeSystem, ScanTypeTemp:
+		return true
+	default:
+		return false
+	}
+}
+
 // ScanRequest represents scanning command
 type ScanRequest struct {
 	Type      ScanType `json:"type"`
 	Recursive bool     `json:"recursive"`
 	Limit     int      `json:"limit"`
+}
+
+// Validate returns errors for invalid scan request
+func (sr ScanRequest) Validate() error {
+	if !sr.Type.IsValid() {
+		return fmt.Errorf("Invalid scan type: %s", sr.Type)
+	}
+	if sr.Limit < 0 {
+		return fmt.Errorf("Limit cannot be negative, got: %d", sr.Limit)
+	}
+	return nil
+}
+
+// ScanItem represents item found during scanning
+type ScanItem struct {
+	Path      string    `json:"path"`
+	Size      int64     `json:"size"`
+	Created   time.Time `json:"created"`
+	ScanType  ScanType  `json:"scan_type"`
+}
+
+// CleanRequest represents cleaning command
+type CleanRequest struct {
+	Items    []ScanItem `json:"items"`
+	Strategy string     `json:"strategy"` // "aggressive", "conservative", "dry-run"
+}
+
+// Validate returns errors for invalid clean request
+func (cr CleanRequest) Validate() error {
+	if cr.Strategy != "aggressive" && cr.Strategy != "conservative" && cr.Strategy != "dry-run" {
+		return fmt.Errorf("Invalid strategy: %s", cr.Strategy)
+	}
+	if len(cr.Items) == 0 {
+		return fmt.Errorf("Items cannot be empty")
+	}
+	return nil
 }
 
 // ScanResult represents successful scan outcome
@@ -122,19 +126,26 @@ type ScanResult struct {
 	ScannedAt    time.Time     `json:"scanned_at"`
 }
 
-// ScanItem represents single scannable item
-type ScanItem struct {
-	Path         string    `json:"path"`
-	Size         int64     `json:"size"`
-	Type         ScanType  `json:"type"`
-	LastAccessed time.Time `json:"last_accessed"`
-	Protectable  bool      `json:"protectable"`
+// IsValid checks if scan result is valid
+func (sr ScanResult) IsValid() bool {
+	return sr.TotalBytes >= 0 && sr.TotalItems >= 0 && sr.ScanTime >= 0 && !sr.ScannedAt.IsZero()
 }
 
-// CleanRequest represents cleaning command
-type CleanRequest struct {
-	Items    []ScanItem `json:"items"`
-	Strategy string     `json:"strategy"` // "aggressive", "conservative", "dry-run"
+// Validate returns errors for invalid scan result
+func (sr ScanResult) Validate() error {
+	if sr.TotalBytes < 0 {
+		return fmt.Errorf("TotalBytes cannot be negative, got: %d", sr.TotalBytes)
+	}
+	if sr.TotalItems < 0 {
+		return fmt.Errorf("TotalItems cannot be negative, got: %d", sr.TotalItems)
+	}
+	if sr.ScanTime < 0 {
+		return fmt.Errorf("ScanTime cannot be negative, got: %d", sr.ScanTime)
+	}
+	if sr.ScannedAt.IsZero() {
+		return fmt.Errorf("ScannedAt cannot be zero")
+	}
+	return nil
 }
 
 // CleanResult represents successful clean outcome

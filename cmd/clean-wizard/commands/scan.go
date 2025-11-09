@@ -100,9 +100,9 @@ func displayScanResults(generations []domain.NixGeneration, verbose bool, nixCle
 	fmt.Printf("   • Cleanable generations: %d\n", cleanableCount)
 
 	// Get store size
-	storeResult := nixCleaner.GetStoreSize(ctx)
-	if storeResult.IsOk() {
-		fmt.Printf("   • Store size: %s\n", format.Bytes(storeResult.Value()))
+	storeSize := nixCleaner.GetStoreSize(ctx)
+	if storeSize > 0 {
+		fmt.Printf("   • Store size: %s\n", format.Bytes(storeSize))
 	}
 
 	// Show detailed generation info
