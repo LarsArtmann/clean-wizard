@@ -10,7 +10,6 @@ import (
 
 	"github.com/cucumber/godog"
 
-	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -20,7 +19,7 @@ import (
 type BDDTestContext struct {
 	ctx          context.Context
 	nixCleaner   *cleaner.NixCleaner
-	generations  result.Result[[]cleaner.NixGeneration]
+	generations  result.Result[[]domain.NixGeneration]
 	cleanResult  result.Result[domain.CleanResult]
 	storeSize    result.Result[int64]
 	output       *bytes.Buffer
@@ -64,14 +63,14 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Then(`^each generation should have an ID$`, testCtx.eachGenerationShouldHaveID)
 	ctx.Then(`^each generation should have a creation date$`, testCtx.eachGenerationShouldHaveDate)
 	ctx.Then(`^total store size should be displayed$`, testCtx.shouldSeeStoreSize)
-	ctx.Then(`^command should complete successfully$`, testCtx.shouldCompleteSuccessfully)
+	ctx.Then(`^the command should complete successfully$`, testCtx.shouldCompleteSuccessfully)
 	ctx.Then(`^I should see what would be cleaned$`, testCtx.shouldSeeWhatWouldBeCleaned)
 	ctx.Then(`^I should see estimated space freed$`, testCtx.shouldSeeEstimatedSpace)
 	ctx.Then(`^I should see how many generations would be removed$`, testCtx.shouldSeeGenerationsCount)
 	ctx.Then(`^no actual cleaning should be performed$`, testCtx.shouldNotPerformCleaning)
 	ctx.Then(`^old generations should be removed$`, testCtx.shouldRemoveOldGenerations)
 	ctx.Then(`^disk space should be freed$`, testCtx.shouldFreeDiskSpace)
-	ctx.Then(`^the last (\d+) generations should remain$`, testCtx.shouldKeepGenerations)
+	ctx.Then(`^last (\d+) generations should remain$`, testCtx.shouldKeepGenerations)
 	ctx.Then(`^I should see a helpful error message$`, testCtx.shouldSeeHelpfulError)
 	ctx.Then(`^command should fail gracefully$`, testCtx.shouldFailGracefully)
 	ctx.Then(`^I should not see a stack trace$`, testCtx.shouldNotSeeStackTrace)
@@ -102,7 +101,7 @@ func (ctx *BDDTestContext) ensureMultipleGenerations() error {
 	ctx.generations = ctx.nixCleaner.ListGenerations(ctx.ctx)
 	if ctx.generations.IsErr() {
 		// Mock data for CI environment
-		ctx.generations = result.Ok([]cleaner.NixGeneration{
+		ctx.generations = result.Ok([]domain.NixGeneration{
 			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24*time.Hour), Current: true},
 			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48*time.Hour), Current: false},
 			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72*time.Hour), Current: false},
