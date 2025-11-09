@@ -62,9 +62,9 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 	}
 
 	var generations []domain.NixGeneration
-	lines := strings.Split(string(output), "\n")
+	lines := strings.SplitSeq(string(output), "\n")
 
-	for _, line := range lines {
+	for line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" {
 			continue
