@@ -26,11 +26,11 @@ Feature: Nix Store Management
 
   Scenario: Clean old Nix generations for real
     Given the system has multiple Nix generations
-    And I want to keep the last (\d+) generations
+    And I want to keep the last 3 generations
     When I run "clean-wizard clean --keep 3"
     Then old generations should be removed
     And disk space should be freed
-    And the last (\d+) generations should remain
+    And the last 3 generations should remain
     And the command should complete successfully
 
   Scenario: Handle Nix not available gracefully

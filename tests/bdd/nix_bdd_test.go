@@ -58,12 +58,12 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Given(`^Nix package manager is not installed$`, testCtx.nixNotInstalled)
 	ctx.Given(`^the system has multiple Nix generations$`, testCtx.ensureMultipleGenerations)
 	ctx.Given(`^I want to keep the last (\d+) generations$`, testCtx.wantToKeepGenerations)
-	ctx.Given(`^I want to keep the last ([0-9]+) generations$`, testCtx.wantToKeepGenerations)
 	ctx.When(`^I run "([^"]*)"$`, testCtx.runCommand)
 	ctx.When(`^I run \"([^"]*)" with dry-run$`, testCtx.runDryRunCommand)
 	ctx.Then(`^I should see a list of Nix generations$`, testCtx.shouldSeeGenerationsList)
 	ctx.Then(`^each generation should have an ID$`, testCtx.eachGenerationShouldHaveID)
 	ctx.Then(`^each generation should have a creation date$`, testCtx.eachGenerationShouldHaveDate)
+	ctx.Then(`^total store size should be displayed$`, testCtx.shouldSeeStoreSize)
 	ctx.Then(`^the total store size should be displayed$`, testCtx.shouldSeeStoreSize)
 	ctx.Then(`^the command should complete successfully$`, testCtx.shouldCompleteSuccessfully)
 	ctx.Then(`^I should see what would be cleaned$`, testCtx.shouldSeeWhatWouldBeCleaned)
@@ -73,7 +73,6 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Then(`^old generations should be removed$`, testCtx.shouldRemoveOldGenerations)
 	ctx.Then(`^disk space should be freed$`, testCtx.shouldFreeDiskSpace)
 	ctx.Then(`^the last (\d+) generations should remain$`, testCtx.shouldKeepGenerations)
-	ctx.Then(`^the last ([0-9]+) generations should remain$`, testCtx.shouldKeepGenerations)
 	ctx.Then(`^I should see a helpful error message$`, testCtx.shouldSeeHelpfulError)
 	ctx.Then(`^the command should fail gracefully$`, testCtx.shouldFailGracefully)
 	ctx.Then(`^I should not see a stack trace$`, testCtx.shouldNotSeeStackTrace)
@@ -155,9 +154,10 @@ func (ctx *BDDTestContext) runScanCommand() error {
 	if !ctx.generations.IsErr() {
 		ctx.generations = ctx.nixCleaner.ListGenerations(ctx.ctx)
 	}
-	if !ctx.storeSize.IsErr() {
-		ctx.storeSize = ctx.nixCleaner.GetStoreSize(ctx.ctx)
-	}
+	
+	storeSize := ctx.nixCleaner.GetStoreSize(ctx.ctx)
+	ctx.storeSize = result.Ok(storeSize)
+	
 	return nil
 }
 
