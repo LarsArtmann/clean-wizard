@@ -58,65 +58,112 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 	return result.Ok(generations)
 }
 
-// GetStoreSize returns Nix store size with domain types
-func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[domain.CleanResult] {
+// GetStoreSize returns Nix store size as bytes
+func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
 	output, err := cmd.Output()
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get store size: %w", err))
+		return result.Err[int64](fmt.Errorf("failed to get store size: %w", err))
 	}
 
 	fields := strings.Fields(string(output))
 	if len(fields) < 1 {
-		return result.Err[domain.CleanResult](fmt.Errorf("invalid du output: %s", string(output)))
+		return result.Err[int64](fmt.Errorf("invalid du output: %s", string(output)))
 	}
 
 	size, err := strconv.ParseInt(fields[0], 10, 64)
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to parse size: %w", err))
+		return result.Err[int64](fmt.Errorf("failed to parse size: %w", err))
 	}
 
-	return result.Ok(domain.CleanResult{
-		ItemsRemoved: 0,
-		FreedBytes:   size,
-		ItemsFailed:  0,
-		Strategy:     "STORE_SIZE",
-		CleanTime:    time.Since(time.Now()),
-	})
+	return result.Ok(size)
 }
 
-// CollectGarbage removes old Nix generations with domain types
+// CollectGarbage removes old Nix generations with real byte calculation
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
+	// Get store size before garbage collection
+	beforeSize, err := n.getActualStoreSize(ctx)
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get pre-gc store size: %w", err))
+	}
+
+	// Run actual nix-collect-garbage command
 	cmd := exec.CommandContext(ctx, "nix-collect-garbage", "-d")
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("failed to collect garbage: %w", err))
 	}
 
-	// Calculate bytes freed (mock implementation)
-	return result.Ok(domain.CleanResult{
-		ItemsRemoved: 1,
-		FreedBytes:   0, // Calculate from before/after
-		ItemsFailed:  0,
-		Strategy:     "NIX_GC",
-		CleanTime:    time.Since(time.Now()),
-	})
-}
-
-// RemoveGeneration removes specific Nix generation
-func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[domain.CleanResult] {
-	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", fmt.Sprintf("%d", genID))
-	err := cmd.Run()
+	// Get store size after garbage collection
+	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to remove generation %d: %w", genID, err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get post-gc store size: %w", err))
+	}
+
+	bytesFreed := beforeSize - afterSize
+	if bytesFreed < 0 {
+		bytesFreed = 0 // Shouldn't happen but guard against it
 	}
 
 	return result.Ok(domain.CleanResult{
 		ItemsRemoved: 1,
-		FreedBytes:   0, // Calculate from before/after
+		FreedBytes:   bytesFreed,
 		ItemsFailed:  0,
-		Strategy:     "REMOVE_GENERATION",
 		CleanTime:    time.Since(time.Now()),
+		CleanedAt:    time.Now(),
+		Strategy:     "NIX_GC",
+	})
+}
+
+// getActualStoreSize helper function to get real store size
+func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
+	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, err
+	}
+
+	fields := strings.Fields(string(output))
+	if len(fields) < 1 {
+		return 0, fmt.Errorf("invalid du output: %s", string(output))
+	}
+
+	return strconv.ParseInt(fields[0], 10, 64)
+}
+
+// RemoveGeneration removes specific Nix generation with real byte calculation
+func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[domain.CleanResult] {
+	// Get store size before removal
+	beforeSize, err := n.getActualStoreSize(ctx)
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get pre-remove store size: %w", err))
+	}
+
+	// Remove the specific generation
+	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", fmt.Sprintf("%d", genID))
+	err = cmd.Run()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to remove generation %d: %w", genID, err))
+	}
+
+	// Get store size after removal
+	afterSize, err := n.getActualStoreSize(ctx)
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get post-remove store size: %w", err))
+	}
+
+	bytesFreed := beforeSize - afterSize
+	if bytesFreed < 0 {
+		bytesFreed = 0 // Guard against negative values
+	}
+
+	return result.Ok(domain.CleanResult{
+		ItemsRemoved: 1,
+		FreedBytes:   bytesFreed,
+		ItemsFailed:  0,
+		CleanTime:    time.Since(time.Now()),
+		CleanedAt:    time.Now(),
+		Strategy:     "REMOVE_GENERATION",
 	})
 }
 

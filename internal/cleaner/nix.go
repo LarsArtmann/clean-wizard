@@ -41,7 +41,7 @@ func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	if storeSizeResult.IsErr() {
 		return 0
 	}
-	return storeSizeResult.Value().FreedBytes
+	return storeSizeResult.Value()
 }
 
 // ValidateSettings validates Nix cleaner settings
@@ -96,14 +96,51 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 		})
 	}
 
-	// Real cleaning logic would be implemented here
+	// Real cleaning implementation
+	if !nc.dryRun && toRemove > 0 {
+		// Remove old generations individually to track what's cleaned
+		totalFreed := int64(0)
+		for i := len(generations) - toRemove; i < len(generations); i++ {
+			// Skip current generation
+			if generations[i].Current {
+				continue
+			}
+			
+			// Remove this generation
+			cleanResult := nc.adapter.RemoveGeneration(ctx, generations[i].ID)
+			if cleanResult.IsErr() {
+				return result.Err[domain.CleanResult](cleanResult.Error())
+			}
+			
+			totalFreed += cleanResult.Value().FreedBytes
+		}
+		
+		// Run garbage collection to clean up references
+		gcResult := nc.adapter.CollectGarbage(ctx)
+		if gcResult.IsErr() {
+			return result.Err[domain.CleanResult](gcResult.Error())
+		}
+		
+		totalFreed += gcResult.Value().FreedBytes
+		
+		return result.Ok(domain.CleanResult{
+			FreedBytes:   totalFreed,
+			ItemsRemoved: toRemove,
+			ItemsFailed:  0,
+			CleanTime:    time.Since(time.Now()),
+			CleanedAt:    time.Now(),
+			Strategy:     "NIX CLEANUP",
+		})
+	}
+
+	// Dry-run or no generations to remove
 	return result.Ok(domain.CleanResult{
-		FreedBytes:   int64(toRemove * 50 * 1024 * 1024),
+		FreedBytes:   int64(toRemove * 50 * 1024 * 1024), // Estimated
 		ItemsRemoved: toRemove,
 		ItemsFailed:  0,
 		CleanTime:    time.Since(time.Now()),
 		CleanedAt:    time.Now(),
-		Strategy:     "NIX CLEANUP",
+		Strategy:     "DRY RUN",
 	})
 }
 
