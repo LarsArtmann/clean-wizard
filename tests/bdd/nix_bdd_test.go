@@ -51,18 +51,18 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	})
 
 	// Background steps
-	ctx.Given(`^system has Nix package manager installed$`, testCtx.ensureNixInstalled)
-	ctx.Given(`^clean-wizard tool is available$`, testCtx.ensureToolAvailable)
+	ctx.Given(`^the system has Nix package manager installed$`, testCtx.ensureNixInstalled)
+	ctx.Given(`^the clean-wizard tool is available$`, testCtx.ensureToolAvailable)
 
 	// Feature: Nix Store Management scenarios
-	ctx.Given(`^system has multiple Nix generations$`, testCtx.ensureMultipleGenerations)
+	ctx.Given(`^the system has multiple Nix generations$`, testCtx.ensureMultipleGenerations)
 	ctx.Given(`^I want to keep the last (\d+) generations$`, testCtx.wantToKeepGenerations)
-	ctx.When(`^I run "([^"]*)"$`, testCtx.runCommand)
-	ctx.When(`^I run "([^"]*)" with dry-run$`, testCtx.runDryRunCommand)
+	ctx.When(`^I run \"([^"]*)"$`, testCtx.runCommand)
+	ctx.When(`^I run \"([^"]*)" with dry-run$`, testCtx.runDryRunCommand)
 	ctx.Then(`^I should see a list of Nix generations$`, testCtx.shouldSeeGenerationsList)
 	ctx.Then(`^each generation should have an ID$`, testCtx.eachGenerationShouldHaveID)
 	ctx.Then(`^each generation should have a creation date$`, testCtx.eachGenerationShouldHaveDate)
-	ctx.Then(`^total store size should be displayed$`, testCtx.shouldSeeStoreSize)
+	ctx.Then(`^the total store size should be displayed$`, testCtx.shouldSeeStoreSize)
 	ctx.Then(`^the command should complete successfully$`, testCtx.shouldCompleteSuccessfully)
 	ctx.Then(`^I should see what would be cleaned$`, testCtx.shouldSeeWhatWouldBeCleaned)
 	ctx.Then(`^I should see estimated space freed$`, testCtx.shouldSeeEstimatedSpace)
@@ -72,7 +72,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Then(`^disk space should be freed$`, testCtx.shouldFreeDiskSpace)
 	ctx.Then(`^last (\d+) generations should remain$`, testCtx.shouldKeepGenerations)
 	ctx.Then(`^I should see a helpful error message$`, testCtx.shouldSeeHelpfulError)
-	ctx.Then(`^command should fail gracefully$`, testCtx.shouldFailGracefully)
+	ctx.Then(`^the command should fail gracefully$`, testCtx.shouldFailGracefully)
 	ctx.Then(`^I should not see a stack trace$`, testCtx.shouldNotSeeStackTrace)
 }
 
