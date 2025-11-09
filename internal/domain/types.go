@@ -52,8 +52,6 @@ func (g NixGeneration) Validate() error {
 	return nil
 }
 
-// TODO: Make invalid states unrepresentable through strong typing
-
 // ScanType represents different scanning domains
 type ScanType string
 

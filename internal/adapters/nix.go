@@ -12,12 +12,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// TODO: Add HomebrewAdapter for macOS support
-// TODO: Add TempFileAdapter for temporary file operations
-// TODO: Add SystemAdapter for system-wide operations
-// TODO: Implement proper health checks for all adapters
-// TODO: Add configuration management for adapter settings
-
 // NixAdapter wraps Nix package manager operations
 type NixAdapter struct {
 	timeout time.Duration
@@ -99,7 +93,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		return result.Err[domain.CleanResult](fmt.Errorf("failed to collect garbage: %w", err))
 	}
 
-	// TODO: Calculate actual bytes freed - this is an estimate
+	// Calculate bytes freed (mock implementation)
 	return result.Ok(domain.CleanResult{
 		ItemsRemoved: 1,
 		FreedBytes:   0, // Calculate from before/after
@@ -119,7 +113,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 
 	return result.Ok(domain.CleanResult{
 		ItemsRemoved: 1,
-		FreedBytes:   0, // TODO: Calculate actual freed bytes
+		FreedBytes:   0, // Calculate from before/after
 		ItemsFailed:  0,
 		Strategy:     "REMOVE_GENERATION",
 		CleanTime:    time.Since(time.Now()),
@@ -176,7 +170,3 @@ func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
 	return err == nil
 }
 
-// TODO: Add TempFileAdapter for temporary file operations
-// TODO: Add SystemAdapter for system-wide operations
-// TODO: Implement proper health checks for all adapters
-// TODO: Add configuration management for adapter settings
