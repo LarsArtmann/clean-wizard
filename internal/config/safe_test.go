@@ -83,9 +83,9 @@ func TestRiskLevel_IsValid(t *testing.T) {
 
 func TestCleanType_IsValid(t *testing.T) {
 	tests := []struct {
-		name     string
+		name      string
 		cleanType CleanType
-		expected bool
+		expected  bool
 	}{
 		{"nix store", CleanTypeNixStore, true},
 		{"homebrew", CleanTypeHomebrew, true},

@@ -129,7 +129,7 @@ func TestNixCleaner_ParseGeneration(t *testing.T) {
 func TestNixCleaner_IsNixNotAvailable(t *testing.T) {
 	cleaner := NewNixCleaner(false, false)
 
-	// Test basic functionality  
+	// Test basic functionality
 	result := cleaner.isNixNotAvailable(errors.New("nix-env: command not found"))
 	if !result {
 		t.Error("expected true for 'command not found' error")

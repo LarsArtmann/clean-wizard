@@ -61,20 +61,20 @@ func TestResult_IsErr(t *testing.T) {
 
 func TestResult_Value(t *testing.T) {
 	tests := []struct {
-		name     string
-		result   Result[int]
-		expected int
+		name      string
+		result    Result[int]
+		expected  int
 		wantPanic bool
 	}{
 		{
-			name:     "ok result",
-			result:   Ok(42),
-			expected: 42,
+			name:      "ok result",
+			result:    Ok(42),
+			expected:  42,
 			wantPanic: false,
 		},
 		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
+			name:      "error result",
+			result:    Err[int](errors.New("test error")),
 			wantPanic: true,
 		},
 	}
@@ -103,20 +103,20 @@ func TestResult_Value(t *testing.T) {
 
 func TestResult_Error(t *testing.T) {
 	tests := []struct {
-		name     string
-		result   Result[int]
-		expected string
+		name      string
+		result    Result[int]
+		expected  string
 		wantPanic bool
 	}{
 		{
-			name:     "ok result",
-			result:   Ok(42),
+			name:      "ok result",
+			result:    Ok(42),
 			wantPanic: true,
 		},
 		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			expected: "test error",
+			name:      "error result",
+			result:    Err[int](errors.New("test error")),
+			expected:  "test error",
 			wantPanic: false,
 		},
 	}
@@ -198,13 +198,13 @@ func TestResult_Map(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mapped := Map(tt.result, tt.fn)
-			
+
 			// Check if both are Ok
 			if mapped.IsOk() != tt.expected.IsOk() {
 				t.Errorf("Map() IsOk() = %v, want %v", mapped.IsOk(), tt.expected.IsOk())
 				return
 			}
-			
+
 			// If both are Ok, check values
 			if mapped.IsOk() {
 				if mapped.Value() != tt.expected.Value() {
