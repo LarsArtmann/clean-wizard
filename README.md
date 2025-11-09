@@ -1,7 +1,9 @@
-<!-- ⚠️ PROJECT ORIGIN -->
-<!-- This project originated from: https://github.com/LarsArtmann/Setup-Mac -->
-<!-- GitHub Issue: https://github.com/LarsArtmann/Setup-Mac/issues/111 -->
-<!-- ⚠️ PROJECT ORIGIN -->
+> 🚨 **PROJECT ORIGIN**
+> 
+> This project originated from: [Setup-Mac](https://github.com/LarsArtmann/Setup-Mac)
+> 
+> **GitHub Issue:** [Setup-Mac #111](https://github.com/LarsArtmann/Setup-Mac/issues/111)
+>
 # Clean Wizard
 
 [![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)](https://golang.org)
