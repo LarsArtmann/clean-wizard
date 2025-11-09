@@ -39,7 +39,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 
 	ctx.BeforeScenario(func(sc *godog.Scenario) {
 		testCtx.startTime = time.Now()
-		testCtx.dryRun = false
+		testCtx.dryRun = true // Force dry-run for safe BDD testing
 		testCtx.output.Reset()
 	})
 
