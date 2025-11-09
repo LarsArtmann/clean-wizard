@@ -8,6 +8,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
+	"github.com/LarsArtmann/clean-wizard/internal/middleware"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +21,21 @@ func NewScanCommand(verbose bool) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("🔍 Analyzing system state...")
 			ctx := context.Background()
+			
+			// Create scan request
+			scanReq := domain.ScanRequest{
+				Type:      domain.ScanTypeNixStore,
+				Recursive: true,
+				Limit:     100,
+			}
+			
+			// Validate scan request
+			validator := middleware.NewValidationMiddleware()
+			validatedReq := validator.ValidateScanRequest(ctx, scanReq)
+			if validatedReq.IsErr() {
+				return fmt.Errorf("scan validation failed: %w", validatedReq.Error())
+			}
+			
 			nixCleaner := cleaner.NewNixCleaner(verbose, true) // dry-run for safety
 
 			// Get Nix generations

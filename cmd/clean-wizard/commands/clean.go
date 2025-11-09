@@ -8,6 +8,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
+	"github.com/LarsArtmann/clean-wizard/internal/middleware"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +26,17 @@ func NewCleanCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("🧹 Starting system cleanup...")
 			ctx := context.Background()
+			
+			// Validate cleaner settings
 			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, cleanDryRun)
+			settings := map[string]any{"generations": 3}
+			
+			validator := middleware.NewValidationMiddleware()
+			validatedSettings := validator.ValidateCleanerSettings(ctx, nixCleaner, settings)
+			if validatedSettings.IsErr() {
+				return fmt.Errorf("cleaner validation failed: %w", validatedSettings.Error())
+			}
+			
 			startTime := time.Now()
 
 			if cleanDryRun {
