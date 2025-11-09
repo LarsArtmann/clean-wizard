@@ -177,7 +177,6 @@ graph TD
     class RESEARCH_PROGRESS,RESEARCH_TABLES research
     class G11,G12,G4,G5,G2,G3,G7,G6,G10 issue
     class SUCCESS_ARCH,SUCCESS_TYPE,SUCCESS_TEST,SUCCESS_UX success
-end
 ```
 
 ---

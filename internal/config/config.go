@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/errors"
-	"github.com/LarsArtmann/clean-wizard/internal/types"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -18,7 +18,7 @@ const (
 )
 
 // Load loads the configuration from file or creates default
-func Load() (*types.Config, error) {
+func Load() (*domain.Config, error) {
 	v := viper.New()
 
 	// Set configuration file properties
@@ -46,11 +46,11 @@ func Load() (*types.Config, error) {
 			// Config file not found, return default config
 			return getDefaultConfig(), nil
 		}
-		return nil, errors.ConfigLoadError(err)
+		return nil, pkgerrors.HandleConfigError("Load", err)
 	}
 
 	// Unmarshal configuration
-	var config types.Config
+	var config domain.Config
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
@@ -64,19 +64,19 @@ func Load() (*types.Config, error) {
 	// Unmarshal profiles section
 	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
 		logrus.WithError(err).Error("Failed to unmarshal profiles")
-		return nil, errors.ConfigLoadError(err)
+		return nil, pkgerrors.HandleConfigError("Load", err)
 	}
 
 	// Validate configuration
 	if err := validate(&config); err != nil {
-		return nil, errors.ConfigValidateError(err.Error())
+		return nil, pkgerrors.HandleConfigError("Validate", err)
 	}
 
 	return &config, nil
 }
 
 // Save saves the configuration to file
-func Save(config *types.Config) error {
+func Save(config *domain.Config) error {
 	v := viper.New()
 
 	// Set configuration file properties
@@ -118,12 +118,12 @@ func Save(config *types.Config) error {
 	// Ensure config directory exists
 	configDir := filepath.Dir(configPath)
 	if err := os.MkdirAll(configDir, 0755); err != nil {
-		return errors.ConfigSaveError(err)
+		return pkgerrors.HandleConfigError("Save", err)
 	}
 
 	// Write configuration file
 	if err := v.WriteConfig(); err != nil {
-		return errors.ConfigSaveError(err)
+		return pkgerrors.HandleConfigError("Save", err)
 	}
 
 	return nil
@@ -227,10 +227,10 @@ func setDefaults(v *viper.Viper) {
 }
 
 // getDefaultConfig returns the default configuration
-func getDefaultConfig() *types.Config {
+func getDefaultConfig() *domain.Config {
 	now := time.Now()
 
-	return &types.Config{
+	return &domain.Config{
 		Version:      "dev",
 		SafeMode:     true,
 		DryRun:       true,
@@ -244,22 +244,22 @@ func getDefaultConfig() *types.Config {
 			"/Applications",
 			"/Library",
 		},
-		Profiles: map[string]types.Profile{
+		Profiles: map[string]domain.Profile{
 			"daily": {
 				Name:        "daily",
 				Description: "Quick daily cleanup",
-				Operations: []types.CleanupOperation{
+				Operations: []domain.CleanupOperation{
 					{
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
-						RiskLevel:   types.RiskLow,
+						RiskLevel:   domain.RiskLow,
 						Enabled:     true,
 						Settings:    map[string]any{"generations": 1, "optimize": false},
 					},
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean Homebrew caches",
-						RiskLevel:   types.RiskLow,
+						RiskLevel:   domain.RiskLow,
 						Enabled:     true,
 						Settings:    map[string]any{"autoremove": true, "prune": "recent"},
 					},
@@ -270,25 +270,25 @@ func getDefaultConfig() *types.Config {
 			"comprehensive": {
 				Name:        "comprehensive",
 				Description: "Complete system cleanup",
-				Operations: []types.CleanupOperation{
+				Operations: []domain.CleanupOperation{
 					{
 						Name:        "nix-store",
 						Description: "Clean Nix store and optimize",
-						RiskLevel:   types.RiskLow,
+						RiskLevel:   domain.RiskLow,
 						Enabled:     true,
 						Settings:    map[string]any{"generations": 1, "optimize": true},
 					},
 					{
 						Name:        "homebrew-full",
 						Description: "Full Homebrew cleanup",
-						RiskLevel:   types.RiskLow,
+						RiskLevel:   domain.RiskLow,
 						Enabled:     true,
 						Settings:    map[string]any{"autoremove": true, "prune": "all"},
 					},
 					{
 						Name:        "package-caches",
 						Description: "Clean package manager caches",
-						RiskLevel:   types.RiskLow,
+						RiskLevel:   domain.RiskLow,
 						Enabled:     true,
 						Settings:    map[string]any{"go": true, "npm": true, "cargo": true},
 					},
@@ -299,25 +299,25 @@ func getDefaultConfig() *types.Config {
 			"aggressive": {
 				Name:        "aggressive",
 				Description: "Nuclear option - everything",
-				Operations: []types.CleanupOperation{
+				Operations: []domain.CleanupOperation{
 					{
 						Name:        "nix-nuclear",
 						Description: "Remove all Nix generations",
-						RiskLevel:   types.RiskHigh,
+						RiskLevel:   domain.RiskHigh,
 						Enabled:     true,
 						Settings:    map[string]any{"generations": 0, "optimize": true},
 					},
 					{
 						Name:        "language-versions",
 						Description: "Clean all language version managers",
-						RiskLevel:   types.RiskHigh,
+						RiskLevel:   domain.RiskHigh,
 						Enabled:     true,
 						Settings:    map[string]any{"node": true, "python": true, "ruby": true},
 					},
 					{
 						Name:        "all-caches",
 						Description: "Clean all caches",
-						RiskLevel:   types.RiskMedium,
+						RiskLevel:   domain.RiskMedium,
 						Enabled:     true,
 						Settings:    map[string]any{"all": true},
 					},
@@ -330,7 +330,7 @@ func getDefaultConfig() *types.Config {
 }
 
 // validate validates the configuration
-func validate(config *types.Config) error {
+func validate(config *domain.Config) error {
 	if config.MaxDiskUsage < 0 || config.MaxDiskUsage > 100 {
 		return fmt.Errorf("max_disk_usage_percent must be between 0 and 100")
 	}

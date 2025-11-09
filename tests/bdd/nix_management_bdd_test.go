@@ -15,6 +15,7 @@ func TestNixManagementBDD(t *testing.T) {
 		Options: &godog.Options{
 			Format: "cucumber",
 			Paths:  []string{"nix_management.feature"},
+			Strict: true, // Enable strict mode for better error reporting
 		},
 	}.Run()
 

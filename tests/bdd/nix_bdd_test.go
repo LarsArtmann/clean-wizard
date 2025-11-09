@@ -55,9 +55,10 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Given(`^the clean-wizard tool is available$`, testCtx.ensureToolAvailable)
 
 	// Feature: Nix Store Management scenarios
+	ctx.Given(`^Nix package manager is not installed$`, testCtx.nixNotInstalled)
 	ctx.Given(`^the system has multiple Nix generations$`, testCtx.ensureMultipleGenerations)
 	ctx.Given(`^I want to keep the last (\d+) generations$`, testCtx.wantToKeepGenerations)
-	ctx.When(`^I run \"([^"]*)"$`, testCtx.runCommand)
+	ctx.When(`^I run "([^"]*)"$`, testCtx.runCommand)
 	ctx.When(`^I run \"([^"]*)" with dry-run$`, testCtx.runDryRunCommand)
 	ctx.Then(`^I should see a list of Nix generations$`, testCtx.shouldSeeGenerationsList)
 	ctx.Then(`^each generation should have an ID$`, testCtx.eachGenerationShouldHaveID)
@@ -70,7 +71,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Then(`^no actual cleaning should be performed$`, testCtx.shouldNotPerformCleaning)
 	ctx.Then(`^old generations should be removed$`, testCtx.shouldRemoveOldGenerations)
 	ctx.Then(`^disk space should be freed$`, testCtx.shouldFreeDiskSpace)
-	ctx.Then(`^last (\d+) generations should remain$`, testCtx.shouldKeepGenerations)
+	ctx.Then(`^the last (\d+) generations should remain$`, testCtx.shouldKeepGenerations)
 	ctx.Then(`^I should see a helpful error message$`, testCtx.shouldSeeHelpfulError)
 	ctx.Then(`^the command should fail gracefully$`, testCtx.shouldFailGracefully)
 	ctx.Then(`^I should not see a stack trace$`, testCtx.shouldNotSeeStackTrace)
@@ -93,6 +94,18 @@ func (ctx *BDDTestContext) ensureToolAvailable() error {
 		return fmt.Errorf("clean-wizard tool not found at %s", toolPath)
 	}
 
+	return nil
+}
+
+func (ctx *BDDTestContext) nixNotInstalled() error {
+	// Override cleaner to simulate Nix not being available
+	ctx.nixCleaner = cleaner.NewNixCleaner(true, false) // Mock mode only
+	
+	// Force operations to fail when Nix not available
+	ctx.generations = result.Err[[]domain.NixGeneration](fmt.Errorf("Nix is not available"))
+	ctx.storeSize = result.Err[int64](fmt.Errorf("Nix is not available"))
+	ctx.cleanResult = result.Err[domain.CleanResult](fmt.Errorf("Nix is not available"))
+	
 	return nil
 }
 

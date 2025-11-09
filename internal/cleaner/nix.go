@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -95,8 +96,8 @@ func (nc *NixCleaner) GetStoreSize(ctx context.Context) result.Result[int64] {
 		return result.Err[int64](storeResult.Error())
 	}
 
-	// Extract size from CleanResult
-	return result.Ok(storeResult.Value().FreedBytes)
+	// Extract size from CleanResult using centralized conversion
+	return conversions.ExtractBytesFromCleanResult(storeResult)
 }
 
 // Helper functions
