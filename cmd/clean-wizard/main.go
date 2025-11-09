@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -16,44 +18,59 @@ var (
 	profileName string
 )
 
-func main() {
-	rootCmd := NewRootCmd()
-
-	// Set up logging
-	logrus.SetOutput(os.Stderr)
-	if verbose {
-		logrus.SetLevel(logrus.DebugLevel)
-	} else {
-		logrus.SetLevel(logrus.InfoLevel)
+// colorize adds color to output based on type
+func colorize(text, color string) string {
+	colors := map[string]string{
+		"red":    "\033[31m",
+		"green":  "\033[32m",
+		"yellow": "\033[33m",
+		"blue":   "\033[34m",
+		"purple": "\033[35m",
+		"cyan":   "\033[36m",
+		"reset":  "\033[0m",
 	}
+	
+	if !strings.Contains(os.Getenv("NO_COLOR"), "1") {
+		return colors[color] + text + colors["reset"]
+	}
+	return text
+}
 
-	// Execute command
-	if err := rootCmd.Execute(); err != nil {
-		logrus.WithError(err).Error("Command failed")
-		os.Exit(1)
+func init() {
+	// Configure zerolog with colorful output
+	log.Logger = log.Output(
+		zerolog.ConsoleWriter{
+			Out:        os.Stderr,
+			NoColor:    false,
+			TimeFormat: "2006-01-02 15:04:05",
+		},
+	).With().Timestamp().Caller().Logger()
+
+	// Set global log level based on verbosity
+	if verbose {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 }
 
-// NewRootCmd creates and returns root command
-func NewRootCmd() *cobra.Command {
-	var rootCmd = &cobra.Command{
-		Use:     "clean-wizard",
-		Short:   "Interactive system cleaning wizard",
-		Long:    "A comprehensive CLI/TUI tool for system cleanup",
-		Version: version,
+func main() {
+	rootCmd := commands.NewRootCmd()
+
+	// Add subcommands
+	rootCmd.AddCommand(
+		commands.NewScanCommand(false),
+		commands.NewCleanCommand(),
+	)
+
+	// Handle command execution with proper error handling
+	if err := rootCmd.Execute(); err != nil {
+		// Log fatal errors with context
+		if verbose {
+			log.Fatal().Err(err).Msg(colorize("Command execution failed", "red"))
+		} else {
+			fmt.Println(colorize(fmt.Sprintf("❌ Error: %s", err), "red"))
+			os.Exit(1)
+		}
 	}
-
-	// Global flags
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Show verbose output")
-	rootCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "Show what would be done without doing it")
-	rootCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Skip confirmation prompts")
-	rootCmd.PersistentFlags().StringVarP(&profileName, "profile", "p", "comprehensive", "Cleaning profile to use")
-
-	// Add commands
-	rootCmd.AddCommand(commands.NewInitCommand())
-	rootCmd.AddCommand(commands.NewScanCommand(verbose))
-	rootCmd.AddCommand(commands.NewCleanCommand())
-	rootCmd.AddCommand(commands.NewConfigCommand())
-
-	return rootCmd
 }
