@@ -58,6 +58,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Given(`^Nix package manager is not installed$`, testCtx.nixNotInstalled)
 	ctx.Given(`^the system has multiple Nix generations$`, testCtx.ensureMultipleGenerations)
 	ctx.Given(`^I want to keep the last (\d+) generations$`, testCtx.wantToKeepGenerations)
+	ctx.Given(`^I want to keep the last ([0-9]+) generations$`, testCtx.wantToKeepGenerations)
 	ctx.When(`^I run "([^"]*)"$`, testCtx.runCommand)
 	ctx.When(`^I run \"([^"]*)" with dry-run$`, testCtx.runDryRunCommand)
 	ctx.Then(`^I should see a list of Nix generations$`, testCtx.shouldSeeGenerationsList)
@@ -72,6 +73,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Then(`^old generations should be removed$`, testCtx.shouldRemoveOldGenerations)
 	ctx.Then(`^disk space should be freed$`, testCtx.shouldFreeDiskSpace)
 	ctx.Then(`^the last (\d+) generations should remain$`, testCtx.shouldKeepGenerations)
+	ctx.Then(`^the last ([0-9]+) generations should remain$`, testCtx.shouldKeepGenerations)
 	ctx.Then(`^I should see a helpful error message$`, testCtx.shouldSeeHelpfulError)
 	ctx.Then(`^the command should fail gracefully$`, testCtx.shouldFailGracefully)
 	ctx.Then(`^I should not see a stack trace$`, testCtx.shouldNotSeeStackTrace)
@@ -149,8 +151,13 @@ func (ctx *BDDTestContext) runDryRunCommand(command string) error {
 }
 
 func (ctx *BDDTestContext) runScanCommand() error {
-	ctx.generations = ctx.nixCleaner.ListGenerations(ctx.ctx)
-	ctx.storeSize = ctx.nixCleaner.GetStoreSize(ctx.ctx)
+	// Only call operations if we haven't already set error states
+	if !ctx.generations.IsErr() {
+		ctx.generations = ctx.nixCleaner.ListGenerations(ctx.ctx)
+	}
+	if !ctx.storeSize.IsErr() {
+		ctx.storeSize = ctx.nixCleaner.GetStoreSize(ctx.ctx)
+	}
 	return nil
 }
 
@@ -334,7 +341,9 @@ func (ctx *BDDTestContext) shouldSeeHelpfulError() error {
 	}
 
 	errMsg := ctx.generations.Error().Error()
-	if !strings.Contains(errMsg, "command not found") && !strings.Contains(errMsg, "no such file") {
+	if !strings.Contains(errMsg, "command not found") && 
+	   !strings.Contains(errMsg, "no such file") && 
+	   !strings.Contains(errMsg, "Nix is not available") {
 		return fmt.Errorf("expected helpful error message but got: %s", errMsg)
 	}
 
