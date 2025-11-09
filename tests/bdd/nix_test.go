@@ -3,6 +3,7 @@ package bdd
 import (
 	"context"
 	"os/exec"
+	"strings"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestNixCleaningBDD(t *testing.T) {
 		t.Log("✅ Given I have Nix installed")
 
 		// When I run "clean-wizard scan"
-		cmd := exec.CommandContext(context.Background(), "go", "run", "./cmd/clean-wizard", "scan")
+		cmd := exec.CommandContext(context.Background(), "go", "run", "../../cmd/clean-wizard", "scan")
 		output, err := cmd.CombinedOutput()
 
 		// Then I should see generation numbers and dates
@@ -35,7 +36,7 @@ func TestNixCleaningBDD(t *testing.T) {
 		t.Log("✅ Given I have multiple Nix generations")
 
 		// When I run "clean-wizard clean --dry-run"
-		cmd := exec.CommandContext(context.Background(), "go", "run", "./cmd/clean-wizard", "clean", "--dry-run")
+		cmd := exec.CommandContext(context.Background(), "go", "run", "../../cmd/clean-wizard", "clean", "--dry-run")
 		output, err := cmd.CombinedOutput()
 
 		// Then I should see which generations would be deleted
@@ -55,18 +56,5 @@ func TestNixCleaningBDD(t *testing.T) {
 
 // contains helper function
 func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr ||
-		(len(s) > len(substr) &&
-			(s[:len(substr)] == substr ||
-				s[len(s)-len(substr):] == substr ||
-				containsSubstring(s, substr))))
-}
-
-func containsSubstring(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
+	return strings.Contains(s, substr)
 }

@@ -40,7 +40,26 @@ func (r Result[T]) Value() T {
 	return r.value
 }
 
-// Error returns error (nil if success)
+// Error returns error (panics on success)
 func (r Result[T]) Error() error {
+	if r.err == nil {
+		panic("attempted to get error from success result")
+	}
 	return r.err
+}
+
+// UnwrapOr returns value or default if error
+func (r Result[T]) UnwrapOr(default_ T) T {
+	if r.err != nil {
+		return default_
+	}
+	return r.value
+}
+
+// Map applies function to value if successful, passes through error
+func Map[T, U any](r Result[T], fn func(T) U) Result[U] {
+	if r.err != nil {
+		return Err[U](r.err)
+	}
+	return Ok(fn(r.value))
 }
