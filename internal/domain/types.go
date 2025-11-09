@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // TODO: Make invalid states unrepresentable through strong typing
 
@@ -25,18 +28,23 @@ func (st ScanType) IsValid() bool {
 }
 
 // RiskLevel represents operation risk with type safety
-type RiskLevel int
+type RiskLevel string
 
 const (
-	RiskLow RiskLevel = iota
-	RiskMedium
-	RiskHigh
-	RiskCritical
+	RiskLow      RiskLevel = "LOW"
+	RiskMedium   RiskLevel = "MEDIUM"
+	RiskHigh     RiskLevel = "HIGH"
+	RiskCritical RiskLevel = "CRITICAL"
 )
 
 // IsValid checks if risk level is valid
 func (rl RiskLevel) IsValid() bool {
-	return rl >= RiskLow && rl <= RiskCritical
+	switch rl {
+	case RiskLow, RiskMedium, RiskHigh, RiskCritical:
+		return true
+	default:
+		return false
+	}
 }
 
 // String returns string representation
@@ -84,6 +92,20 @@ func (g NixGeneration) IsValid() bool {
 	return g.ID > 0 && g.Path != "" && !g.Date.IsZero()
 }
 
+// Validate returns errors for invalid generation
+func (g NixGeneration) Validate() error {
+	if g.ID <= 0 {
+		return fmt.Errorf("Generation ID must be positive, got: %d", g.ID)
+	}
+	if g.Path == "" {
+		return fmt.Errorf("Generation path cannot be empty")
+	}
+	if g.Date.IsZero() {
+		return fmt.Errorf("Generation date cannot be zero")
+	}
+	return nil
+}
+
 // ScanRequest represents scanning command
 type ScanRequest struct {
 	Type      ScanType `json:"type"`
@@ -123,4 +145,23 @@ type CleanResult struct {
 	CleanTime    time.Duration `json:"clean_time"`
 	CleanedAt    time.Time     `json:"cleaned_at"`
 	Strategy     string        `json:"strategy"`
+}
+
+// IsValid checks if clean result is valid
+func (cr CleanResult) IsValid() bool {
+	return cr.FreedBytes >= 0 && cr.ItemsRemoved >= 0 && cr.CleanedAt.IsZero() == false
+}
+
+// Validate returns errors for invalid clean result
+func (cr CleanResult) Validate() error {
+	if cr.FreedBytes < 0 {
+		return fmt.Errorf("FreedBytes cannot be negative, got: %d", cr.FreedBytes)
+	}
+	if cr.ItemsRemoved < 0 {
+		return fmt.Errorf("ItemsRemoved cannot be negative, got: %d", cr.ItemsRemoved)
+	}
+	if cr.CleanedAt.IsZero() {
+		return fmt.Errorf("CleanedAt cannot be zero")
+	}
+	return nil
 }
