@@ -41,11 +41,11 @@ func NewMockScanner() *MockScanner {
 		scanType: domain.ScanTypeTemp,
 		name:     "Mock Scanner",
 		results: domain.ScanResult{
-			TotalBytes:     1024 * 1024 * 100, // 100MB
-			TotalItems:     3,
-			ScannedPaths:   []string{"/tmp"},
-			ScanTime:       0,
-			ScannedAt:      time.Now(),
+			TotalBytes:   1024 * 1024 * 100, // 100MB
+			TotalItems:   3,
+			ScannedPaths: []string{"/tmp"},
+			ScanTime:     0,
+			ScannedAt:    time.Now(),
 		},
 	}
 }

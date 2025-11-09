@@ -9,9 +9,9 @@ type ScanType string
 
 const (
 	ScanTypeNixStore ScanType = "nix_store"
-	ScanTypeHomebrew  ScanType = "homebrew"
-	ScanTypeSystem    ScanType = "system"
-	ScanTypeTemp      ScanType = "temp_files"
+	ScanTypeHomebrew ScanType = "homebrew"
+	ScanTypeSystem   ScanType = "system"
+	ScanTypeTemp     ScanType = "temp_files"
 )
 
 // IsValid validates ScanType
@@ -87,17 +87,17 @@ func (g NixGeneration) IsValid() bool {
 // ScanRequest represents scanning command
 type ScanRequest struct {
 	Type      ScanType `json:"type"`
-	Recursive bool      `json:"recursive"`
-	Limit     int       `json:"limit"`
+	Recursive bool     `json:"recursive"`
+	Limit     int      `json:"limit"`
 }
 
 // ScanResult represents successful scan outcome
 type ScanResult struct {
-	TotalBytes     int64         `json:"total_bytes"`
-	TotalItems     int           `json:"total_items"`
-	ScannedPaths   []string      `json:"scanned_paths"`
-	ScanTime       time.Duration `json:"scan_time"`
-	ScannedAt      time.Time     `json:"scanned_at"`
+	TotalBytes   int64         `json:"total_bytes"`
+	TotalItems   int           `json:"total_items"`
+	ScannedPaths []string      `json:"scanned_paths"`
+	ScanTime     time.Duration `json:"scan_time"`
+	ScannedAt    time.Time     `json:"scanned_at"`
 }
 
 // ScanItem represents single scannable item
@@ -117,10 +117,10 @@ type CleanRequest struct {
 
 // CleanResult represents successful clean outcome
 type CleanResult struct {
-	FreedBytes    int64         `json:"freed_bytes"`
-	ItemsRemoved  int            `json:"items_removed"`
-	ItemsFailed   int            `json:"items_failed"`
-	CleanTime     time.Duration  `json:"clean_time"`
-	CleanedAt     time.Time      `json:"cleaned_at"`
-	Strategy      string         `json:"strategy"`
+	FreedBytes   int64         `json:"freed_bytes"`
+	ItemsRemoved int           `json:"items_removed"`
+	ItemsFailed  int           `json:"items_failed"`
+	CleanTime    time.Duration `json:"clean_time"`
+	CleanedAt    time.Time     `json:"cleaned_at"`
+	Strategy     string        `json:"strategy"`
 }

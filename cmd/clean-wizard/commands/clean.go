@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +16,7 @@ var (
 	cleanVerbose bool
 )
 
-// NewCleanCommand creates clean command with user-friendly error messages
+// NewCleanCommand creates clean command with proper domain types
 func NewCleanCommand() *cobra.Command {
 	cleanCmd := &cobra.Command{
 		Use:   "clean",
@@ -56,7 +57,7 @@ func handleCleanError(err error, isDryRun bool) error {
 	if isDryRun {
 		return fmt.Errorf("❌ Dry-run failed: %s\n\n💡 Suggestions:\n   • Ensure Nix is installed and accessible\n   • Check if you have permission to read Nix profiles", err.Error())
 	}
-	
+
 	return fmt.Errorf("❌ Cleanup failed: %s\n\n💡 Suggestions:\n   • Ensure you have sufficient permissions\n   • Try running with --verbose for more details\n   • Consider using --dry-run first", err.Error())
 }
 
@@ -66,15 +67,15 @@ func displayCleanResults(operation domain.CleanResult, duration time.Duration, i
 	fmt.Printf("📊 Results Summary:\n")
 	fmt.Printf("   • Items processed: %d\n", operation.ItemsRemoved+operation.ItemsFailed)
 	fmt.Printf("   • Items cleaned: %d\n", operation.ItemsRemoved)
-	
+
 	if operation.FreedBytes > 0 {
 		fmt.Printf("   • Space freed: %s\n", format.Bytes(operation.FreedBytes))
 	}
-	
+
 	if operation.ItemsFailed > 0 {
 		fmt.Printf("   ⚠️  Items failed: %d\n", operation.ItemsFailed)
 	}
-	
+
 	fmt.Printf("   • Time taken: %s\n", format.Duration(duration))
 	fmt.Printf("   • Strategy used: %s\n", operation.Strategy)
 

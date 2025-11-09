@@ -12,11 +12,11 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// TODO: Implement proper adapter pattern for external tools
-// TODO: Add circuit breaker pattern for external calls
-// TODO: Implement retry policies with exponential backoff
-// TODO: Add comprehensive logging and observability
-// TODO: Implement proper rate limiting for external calls
+// TODO: Add HomebrewAdapter for macOS support
+// TODO: Add TempFileAdapter for temporary file operations
+// TODO: Add SystemAdapter for system-wide operations
+// TODO: Implement proper health checks for all adapters
+// TODO: Add configuration management for adapter settings
 
 // NixAdapter wraps Nix package manager operations
 type NixAdapter struct {
@@ -24,7 +24,7 @@ type NixAdapter struct {
 	retries int
 }
 
-// NewNixAdapter creates a new Nix adapter
+// NewNixAdapter creates Nix adapter with configuration
 func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter {
 	return &NixAdapter{
 		timeout: timeout,
@@ -32,30 +32,13 @@ func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter {
 	}
 }
 
-// GetStoreSize returns Nix store size using du command
-func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
-	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
-	output, err := cmd.Output()
-	if err != nil {
-		return result.Err[int64](fmt.Errorf("failed to get store size: %w", err))
-	}
-
-	fields := strings.Fields(string(output))
-	if len(fields) < 1 {
-		return result.Err[int64](fmt.Errorf("invalid du output: %s", string(output)))
-	}
-
-	size, err := strconv.ParseInt(fields[0], 10, 64)
-	if err != nil {
-		return result.Err[int64](fmt.Errorf("failed to parse size: %w", err))
-	}
-
-	return result.Ok(size)
-}
-
-// ListGenerations lists all Nix generations
+// ListGenerations lists Nix generations with domain types
 func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
-	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations")
+	if !n.IsAvailable(ctx) {
+		return result.Err[[]domain.NixGeneration](fmt.Errorf("nix not available"))
+	}
+
+	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
 	output, err := cmd.Output()
 	if err != nil {
 		return result.Err[[]domain.NixGeneration](fmt.Errorf("failed to list generations: %w", err))
@@ -81,25 +64,66 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 	return result.Ok(generations)
 }
 
-// CollectGarbage removes old Nix generations
-func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[int64] {
+// GetStoreSize returns Nix store size with domain types
+func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[domain.CleanResult] {
+	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
+	output, err := cmd.Output()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get store size: %w", err))
+	}
+
+	fields := strings.Fields(string(output))
+	if len(fields) < 1 {
+		return result.Err[domain.CleanResult](fmt.Errorf("invalid du output: %s", string(output)))
+	}
+
+	size, err := strconv.ParseInt(fields[0], 10, 64)
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to parse size: %w", err))
+	}
+
+	return result.Ok(domain.CleanResult{
+		ItemsRemoved: 0,
+		FreedBytes:   size,
+		ItemsFailed:  0,
+		Strategy:     "STORE_SIZE",
+		CleanTime:    time.Since(time.Now()),
+	})
+}
+
+// CollectGarbage removes old Nix generations with domain types
+func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
 	cmd := exec.CommandContext(ctx, "nix-collect-garbage", "-d")
 	err := cmd.Run()
 	if err != nil {
-		return result.Err[int64](fmt.Errorf("failed to collect garbage: %w", err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to collect garbage: %w", err))
 	}
 
-	// TODO: Implement actual size calculation
-	estimatedFreed := int64(1024 * 1024 * 1024 * 2) // 2GB estimate
-
-	return result.Ok(estimatedFreed)
+	// TODO: Calculate actual bytes freed - this is an estimate
+	return result.Ok(domain.CleanResult{
+		ItemsRemoved: 1,
+		FreedBytes:   0, // Calculate from before/after
+		ItemsFailed:  0,
+		Strategy:     "NIX_GC",
+		CleanTime:    time.Since(time.Now()),
+	})
 }
 
 // RemoveGeneration removes specific Nix generation
-func (n *NixAdapter) RemoveGeneration(ctx context.Context, profilePath string) result.Result[int64] {
-	// TODO: Implement actual generation removal
-	// This would involve removing the generation link and potentially running GC
-	return result.Ok[int64](0)
+func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[domain.CleanResult] {
+	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", fmt.Sprintf("%d", genID))
+	err := cmd.Run()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to remove generation %d: %w", genID, err))
+	}
+
+	return result.Ok(domain.CleanResult{
+		ItemsRemoved: 1,
+		FreedBytes:   0, // TODO: Calculate actual freed bytes
+		ItemsFailed:  0,
+		Strategy:     "REMOVE_GENERATION",
+		CleanTime:    time.Since(time.Now()),
+	})
 }
 
 // ParseGeneration parses generation line from nix-env output
@@ -122,8 +146,11 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 	// Simple date parsing
 	date := time.Now()
 	if len(fields) > 1 && strings.Contains(fields[1], "-") {
-		if parsed, err := time.Parse("2006-01-02", strings.Trim(fields[1], "()")); err == nil {
-			date = parsed
+		parts := strings.Split(fields[1], "-")
+		if len(parts) == 3 {
+			if parsed, err := time.Parse("2006-01-02", strings.Join(parts, "-")); err == nil {
+				date = parsed
+			}
 		}
 	}
 
@@ -142,7 +169,6 @@ func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
 	return err == nil
 }
 
-// TODO: Add HomebrewAdapter for macOS package management
 // TODO: Add TempFileAdapter for temporary file operations
 // TODO: Add SystemAdapter for system-wide operations
 // TODO: Implement proper health checks for all adapters

@@ -61,7 +61,7 @@ func FormatSize(sizeGB float64) string {
 }
 
 // FormatDuration formats a duration to a human-readable string
-// TODO: Move to internal/format package  
+// TODO: Move to internal/format package
 func FormatDuration(d time.Duration) string {
 	if d < time.Second {
 		return fmt.Sprintf("%dms", d.Milliseconds())

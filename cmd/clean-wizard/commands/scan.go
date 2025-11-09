@@ -6,11 +6,12 @@ import (
 	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/spf13/cobra"
 )
 
-// NewScanCommand creates scan command with user-friendly error messages
+// NewScanCommand creates scan command with proper domain types
 func NewScanCommand(verbose bool) *cobra.Command {
 	return &cobra.Command{
 		Use:   "scan",
@@ -37,7 +38,7 @@ func NewScanCommand(verbose bool) *cobra.Command {
 // handleScanError provides user-friendly error messages for scanning
 func handleScanError(err error) error {
 	errMsg := strings.ToLower(err.Error())
-	
+
 	switch {
 	case strings.Contains(errMsg, "command not found"):
 		return fmt.Errorf(`❌ Nix package manager not found
@@ -47,7 +48,7 @@ func handleScanError(err error) error {
    • Or try other cleanup targets if you don't use Nix
    
 📚 Learn more: https://nixos.org/`)
-	
+
 	case strings.Contains(errMsg, "permission"):
 		return fmt.Errorf(`❌ Permission denied while scanning
 
@@ -55,7 +56,7 @@ func handleScanError(err error) error {
    • Try running with sudo: sudo clean-wizard scan
    • Check if you have read access to Nix profiles
    • Verify Nix is properly installed`)
-	
+
 	case strings.Contains(errMsg, "no such file"):
 		return fmt.Errorf(`❌ Cannot find Nix profiles directory
 
@@ -65,7 +66,7 @@ func handleScanError(err error) error {
    • You're on a system where Nix works differently
    
 🔧 Try: nix-env --version to check installation`)
-	
+
 	default:
 		return fmt.Errorf(`❌ System scan failed: %s
 
@@ -80,7 +81,7 @@ func handleScanError(err error) error {
 // displayScanResults shows user-friendly scan results
 func displayScanResults(generations []domain.NixGeneration, verbose bool, nixCleaner *cleaner.NixCleaner, ctx context.Context) {
 	fmt.Println("\n📊 Scan Results:")
-	
+
 	if len(generations) == 0 {
 		fmt.Println("   🎉 No Nix generations found - your system is clean!")
 		return
@@ -126,7 +127,7 @@ func displayScanResults(generations []domain.NixGeneration, verbose bool, nixCle
 	}
 }
 
-// getCurrentGeneration finds the current generation
+// getCurrentGeneration finds current generation
 func getCurrentGeneration(generations []domain.NixGeneration) string {
 	for _, gen := range generations {
 		if gen.Current {

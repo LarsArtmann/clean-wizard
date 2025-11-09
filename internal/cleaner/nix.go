@@ -2,7 +2,6 @@ package cleaner
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
@@ -10,24 +9,25 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// NixCleaner handles Nix store cleanup operations using proper adapter pattern
+// NixCleaner handles Nix package manager cleanup with proper type safety
 type NixCleaner struct {
-	adapter *adapters.NixAdapter
-	verbose bool
-	dryRun  bool
+	adapter  *adapters.NixAdapter
+	verbose  bool
+	dryRun   bool
 }
 
-// NewNixCleaner creates a new Nix cleaner with proper dependency injection
-func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
+// NewNixCleaner creates Nix cleaner with proper configuration
+func NewNixCleaner(verbose bool, dryRun bool) *NixCleaner {
 	return &NixCleaner{
-		adapter: adapters.NewNixAdapter(30*time.Second, 3),
-		verbose: verbose,
-		dryRun:  dryRun,
+		adapter:  adapters.NewNixAdapter(0, 0),
+		verbose:  verbose,
+		dryRun:   dryRun,
 	}
 }
 
-// ListGenerations returns list of Nix generations
+// ListGenerations lists Nix generations with proper type safety
 func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
+	// Check availability first
 	if !nc.adapter.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]domain.NixGeneration{
@@ -39,76 +39,88 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 		}, "Nix not available - using mock data")
 	}
 
+	// Only call adapter if available
 	return nc.adapter.ListGenerations(ctx)
 }
 
-// CleanOldGenerations removes old Nix generations using CQRS pattern
+// CleanOldGenerations removes old Nix generations with proper type safety
 func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) result.Result[domain.CleanResult] {
+	// Get generations first
 	genResult := nc.ListGenerations(ctx)
 	if genResult.IsErr() {
 		return result.Err[domain.CleanResult](genResult.Error())
 	}
 
 	generations := genResult.Value()
-	if len(generations) <= keepCount {
-		return result.Ok(domain.CleanResult{
-			FreedBytes: 0,
-			ItemsRemoved: 0,
-			ItemsFailed: 0,
-			CleanTime: 0,
-			Strategy: "keep-existing",
-		})
-	}
-
-	startTime := time.Now()
-	strategy := "conservative"
-
+	
+	// Count and remove old generations
+	toRemove := countOldGenerations(generations, keepCount)
+	
 	if nc.dryRun {
-		toRemove := len(generations) - keepCount
-		estimatedBytes := int64(1024 * 1024 * 1024 * 5) // Estimate 5GB
-		strategy = fmt.Sprintf("[DRY RUN] Would remove %d old generations, keeping %d", toRemove, keepCount)
-		
 		return result.Ok(domain.CleanResult{
-			FreedBytes: estimatedBytes,
-			ItemsRemoved: toRemove,
-			ItemsFailed: 0,
-			CleanTime: time.Since(startTime),
-			Strategy: strategy,
+			ItemsRemoved: 0,
+			FreedBytes:   estimateSpaceToFree(toRemove),
+			ItemsFailed:  0,
+			Strategy:     "DRY RUN",
+			CleanTime:    time.Since(time.Now()),
 		})
 	}
 
-	if !nc.adapter.IsAvailable(ctx) {
-		// Mock cleanup for CI - proper adapter pattern
-		estimatedBytes := int64(1024 * 1024 * 1024 * 2) // Mock 2GB
-		return result.Ok(domain.CleanResult{
-			FreedBytes: estimatedBytes,
-			ItemsRemoved: 2,
-			ItemsFailed: 0,
-			CleanTime: time.Since(startTime),
-			Strategy: "[MOCK] Simulated Nix garbage collection (nix not available)",
-		})
+	// Call adapter only if we have real Nix
+	if nc.adapter.IsAvailable(ctx) {
+		return nc.adapter.CollectGarbage(ctx)
 	}
 
-	gcResult := nc.adapter.CollectGarbage(ctx)
-	if gcResult.IsErr() {
-		return result.Err[domain.CleanResult](fmt.Errorf("nix-collect-garbage failed: %w", gcResult.Error()))
-	}
-
-	return result.Ok(domain.CleanResult{
-		FreedBytes: gcResult.Value(),
-		ItemsRemoved: len(generations) - keepCount,
-		ItemsFailed: 0,
-		CleanTime: time.Since(startTime),
-		Strategy: "nix-collect-garbage",
-	})
+	// Mock result for CI
+	return result.MockSuccess(domain.CleanResult{
+		ItemsRemoved: len(toRemove),
+		FreedBytes:   estimateSpaceToFree(toRemove),
+		ItemsFailed:  0,
+		Strategy:     "MOCK CLEANUP",
+		CleanTime:    time.Since(time.Now()),
+	}, "Mock cleanup - Nix not available")
 }
 
-// GetStoreSize returns Nix store size using adapter
+// GetStoreSize gets Nix store size with proper type handling
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) result.Result[int64] {
+	// Check availability first
 	if !nc.adapter.IsAvailable(ctx) {
-		// Return mock data for CI/testing
-		return result.MockSuccess(int64(1024*1024*1024*10), "Nix not available - using mock 10GB")
+		// Return mock size for CI
+		return result.MockSuccess(int64(1024*1024*1024*10), "Mock store size - Nix not available")
 	}
 
-	return nc.adapter.GetStoreSize(ctx)
+	// Get result from adapter (returns CleanResult)
+	storeResult := nc.adapter.GetStoreSize(ctx)
+	if storeResult.IsErr() {
+		return result.Err[int64](storeResult.Error())
+	}
+
+	// Extract size from CleanResult
+	return result.Ok(storeResult.Value().FreedBytes)
+}
+
+// Helper functions
+func countOldGenerations(generations []domain.NixGeneration, keepCount int) []domain.NixGeneration {
+	var old []domain.NixGeneration
+	currentCount := 0
+	
+	for _, gen := range generations {
+		if gen.Current {
+			currentCount++
+		} else {
+			old = append(old, gen)
+		}
+	}
+	
+	// Keep last 'keepCount' generations (including current)
+	if len(old)+currentCount > keepCount {
+		return old[:(len(old)+currentCount-keepCount)]
+	}
+	
+	return []domain.NixGeneration{}
+}
+
+func estimateSpaceToFree(generations []domain.NixGeneration) int64 {
+	// Estimate ~100MB per old generation
+	return int64(len(generations)) * 100 * 1024 * 1024
 }

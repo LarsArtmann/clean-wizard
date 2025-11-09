@@ -17,24 +17,24 @@ import (
 
 // BDDTestContext holds test state across scenarios
 type BDDTestContext struct {
-	ctx          context.Context
-	nixCleaner   *cleaner.NixCleaner
-	generations  result.Result[[]domain.NixGeneration]
-	cleanResult  result.Result[domain.CleanResult]
-	storeSize    result.Result[int64]
-	output       *bytes.Buffer
-	startTime    time.Time
-	endTime      time.Time
-	dryRun       bool
+	ctx         context.Context
+	nixCleaner  *cleaner.NixCleaner
+	generations result.Result[[]domain.NixGeneration]
+	cleanResult result.Result[domain.CleanResult]
+	storeSize   result.Result[int64]
+	output      *bytes.Buffer
+	startTime   time.Time
+	endTime     time.Time
+	dryRun      bool
 }
 
 var testCtx *BDDTestContext
 
 func InitializeScenario(ctx *godog.ScenarioContext) {
 	testCtx = &BDDTestContext{
-		output:  &bytes.Buffer{},
-		ctx:     context.Background(),
-		dryRun:  false,
+		output: &bytes.Buffer{},
+		ctx:    context.Background(),
+		dryRun: false,
 	}
 
 	ctx.BeforeScenario(func(sc *godog.Scenario) {
@@ -88,11 +88,11 @@ func (ctx *BDDTestContext) ensureToolAvailable() error {
 	if err != nil {
 		return err
 	}
-	
+
 	if _, err := os.Stat(toolPath); os.IsNotExist(err) {
 		return fmt.Errorf("clean-wizard tool not found at %s", toolPath)
 	}
-	
+
 	return nil
 }
 
@@ -102,9 +102,9 @@ func (ctx *BDDTestContext) ensureMultipleGenerations() error {
 	if ctx.generations.IsErr() {
 		// Mock data for CI environment
 		ctx.generations = result.Ok([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24*time.Hour), Current: true},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48*time.Hour), Current: false},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72*time.Hour), Current: false},
+			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: true},
+			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: false},
+			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: false},
 		})
 	}
 	return nil
@@ -153,12 +153,12 @@ func (ctx *BDDTestContext) shouldSeeGenerationsList() error {
 	if ctx.generations.IsErr() {
 		return fmt.Errorf("expected generations list but got error: %v", ctx.generations.Error())
 	}
-	
+
 	generations := ctx.generations.Value()
 	if len(generations) == 0 {
 		return fmt.Errorf("expected at least one generation but got none")
 	}
-	
+
 	return nil
 }
 
@@ -166,14 +166,14 @@ func (ctx *BDDTestContext) eachGenerationShouldHaveID() error {
 	if ctx.generations.IsErr() {
 		return ctx.generations.Error()
 	}
-	
+
 	generations := ctx.generations.Value()
 	for _, gen := range generations {
 		if gen.ID <= 0 {
 			return fmt.Errorf("generation has invalid ID: %d", gen.ID)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -181,14 +181,14 @@ func (ctx *BDDTestContext) eachGenerationShouldHaveDate() error {
 	if ctx.generations.IsErr() {
 		return ctx.generations.Error()
 	}
-	
+
 	generations := ctx.generations.Value()
 	for _, gen := range generations {
 		if gen.Date.IsZero() {
 			return fmt.Errorf("generation %d has zero date", gen.ID)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -197,12 +197,12 @@ func (ctx *BDDTestContext) shouldSeeStoreSize() error {
 		// In CI, this is expected, so we consider it "seen"
 		return nil
 	}
-	
+
 	size := ctx.storeSize.Value()
 	if size <= 0 {
 		return fmt.Errorf("expected positive store size but got: %d", size)
 	}
-	
+
 	return nil
 }
 
@@ -210,11 +210,11 @@ func (ctx *BDDTestContext) shouldCompleteSuccessfully() error {
 	if ctx.generations.IsErr() {
 		return fmt.Errorf("scan failed: %v", ctx.generations.Error())
 	}
-	
+
 	if ctx.cleanResult.IsErr() {
 		return fmt.Errorf("clean failed: %v", ctx.cleanResult.Error())
 	}
-	
+
 	return nil
 }
 
@@ -222,12 +222,12 @@ func (ctx *BDDTestContext) shouldSeeWhatWouldBeCleaned() error {
 	if ctx.cleanResult.IsErr() {
 		return fmt.Errorf("clean operation failed: %v", ctx.cleanResult.Error())
 	}
-	
+
 	result := ctx.cleanResult.Value()
 	if result.Strategy == "" {
 		return fmt.Errorf("expected to see cleaning strategy but got empty string")
 	}
-	
+
 	return nil
 }
 
@@ -235,12 +235,12 @@ func (ctx *BDDTestContext) shouldSeeEstimatedSpace() error {
 	if ctx.cleanResult.IsErr() {
 		return ctx.cleanResult.Error()
 	}
-	
+
 	result := ctx.cleanResult.Value()
 	if result.FreedBytes <= 0 {
 		return fmt.Errorf("expected positive estimated space but got: %d", result.FreedBytes)
 	}
-	
+
 	return nil
 }
 
@@ -248,12 +248,12 @@ func (ctx *BDDTestContext) shouldSeeGenerationsCount() error {
 	if ctx.cleanResult.IsErr() {
 		return ctx.cleanResult.Error()
 	}
-	
+
 	result := ctx.cleanResult.Value()
 	if result.ItemsRemoved < 0 {
 		return fmt.Errorf("expected non-negative item count but got: %d", result.ItemsRemoved)
 	}
-	
+
 	return nil
 }
 
@@ -261,14 +261,14 @@ func (ctx *BDDTestContext) shouldNotPerformCleaning() error {
 	if !ctx.dryRun {
 		return fmt.Errorf("expected dry-run to be set")
 	}
-	
+
 	if ctx.cleanResult.IsOk() {
 		result := ctx.cleanResult.Value()
 		if !strings.Contains(result.Strategy, "DRY RUN") {
 			return fmt.Errorf("expected DRY RUN in strategy but got: %s", result.Strategy)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -276,12 +276,12 @@ func (ctx *BDDTestContext) shouldRemoveOldGenerations() error {
 	if ctx.cleanResult.IsErr() {
 		return fmt.Errorf("clean failed: %v", ctx.cleanResult.Error())
 	}
-	
+
 	result := ctx.cleanResult.Value()
 	if result.ItemsRemoved <= 0 && !ctx.dryRun {
 		return fmt.Errorf("expected items to be removed but got: %d", result.ItemsRemoved)
 	}
-	
+
 	return nil
 }
 
@@ -289,12 +289,12 @@ func (ctx *BDDTestContext) shouldFreeDiskSpace() error {
 	if ctx.cleanResult.IsErr() {
 		return ctx.cleanResult.Error()
 	}
-	
+
 	result := ctx.cleanResult.Value()
 	if result.FreedBytes <= 0 && !ctx.dryRun {
 		return fmt.Errorf("expected space to be freed but got: %d", result.FreedBytes)
 	}
-	
+
 	return nil
 }
 
@@ -302,7 +302,7 @@ func (ctx *BDDTestContext) shouldKeepGenerations(keepCount int) error {
 	if ctx.generations.IsErr() {
 		return ctx.generations.Error()
 	}
-	
+
 	generations := ctx.generations.Value()
 	currentCount := 0
 	for _, gen := range generations {
@@ -310,7 +310,7 @@ func (ctx *BDDTestContext) shouldKeepGenerations(keepCount int) error {
 			currentCount++
 		}
 	}
-	
+
 	// In actual implementation, this would verify that the right number remains
 	return nil
 }
@@ -319,12 +319,12 @@ func (ctx *BDDTestContext) shouldSeeHelpfulError() error {
 	if ctx.generations.IsOk() {
 		return fmt.Errorf("expected error but got success")
 	}
-	
+
 	errMsg := ctx.generations.Error().Error()
 	if !strings.Contains(errMsg, "command not found") && !strings.Contains(errMsg, "no such file") {
 		return fmt.Errorf("expected helpful error message but got: %s", errMsg)
 	}
-	
+
 	return nil
 }
 

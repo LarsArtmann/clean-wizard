@@ -84,7 +84,7 @@ func TestNixCleaner_GetStoreSize(t *testing.T) {
 
 func TestNixCleaner_ParseGeneration(t *testing.T) {
 	adapter := adapters.NewNixAdapter(0, 0)
-	
+
 	// Test parsing valid generation line
 	gen, err := adapter.ParseGeneration("   1234  (2023-01-01)   /nix/var/nix/profiles/system-1234-link   current")
 	if err != nil {
@@ -100,10 +100,10 @@ func TestNixCleaner_ParseGeneration(t *testing.T) {
 }
 
 func TestNixCleaner_IsNixNotAvailable(t *testing.T) {
-	// Test basic functionality  
+	// Test basic functionality
 	err := errors.New("nix-env: command not found")
 	isNotAvailable := strings.Contains(err.Error(), "command not found")
-	
+
 	if !isNotAvailable {
 		t.Error("expected true for 'command not found' error")
 	}

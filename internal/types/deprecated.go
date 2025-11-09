@@ -15,11 +15,11 @@ type LegacyScanResult struct {
 	Cleanable   bool    `json:"cleanable" yaml:"cleanable"`
 }
 
-// DEPRECATED: Use internal/domain package instead  
+// DEPRECATED: Use internal/domain package instead
 type LegacyScanResults struct {
-	TotalSizeGB float64        `json:"total_size_gb" yaml:"total_size_gb"`
+	TotalSizeGB float64            `json:"total_size_gb" yaml:"total_size_gb"`
 	Results     []LegacyScanResult `json:"results" yaml:"results"`
-	Timestamp   time.Time       `json:"timestamp" yaml:"timestamp"`
+	Timestamp   time.Time          `json:"timestamp" yaml:"timestamp"`
 }
 
 // DEPRECATED: Use domain.CleanRequest instead
