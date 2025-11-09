@@ -16,6 +16,7 @@ import (
 type NixAdapter struct {
 	timeout time.Duration
 	retries int
+	dryRun  bool
 }
 
 // NewNixAdapter creates Nix adapter with configuration
@@ -26,12 +27,29 @@ func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter {
 	}
 }
 
-// ListGenerations lists Nix generations with domain types
+// SetDryRun configures dry-run mode for the adapter
+func (n *NixAdapter) SetDryRun(dryRun bool) {
+	n.dryRun = dryRun
+}
+
+// ListGenerations lists Nix generations with dry-run isolation
 func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
 	if !n.IsAvailable(ctx) {
 		return result.Err[[]domain.NixGeneration](fmt.Errorf("nix not available"))
 	}
 
+	// If dry-run, return mock data without system calls
+	if n.dryRun {
+		return result.Ok([]domain.NixGeneration{
+			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24*time.Hour), Current: true},
+			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48*time.Hour), Current: false},
+			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72*time.Hour), Current: false},
+			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96*time.Hour), Current: false},
+			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120*time.Hour), Current: false},
+		})
+	}
+
+	// Real system call for production mode
 	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
 	output, err := cmd.Output()
 	if err != nil {
@@ -58,8 +76,14 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 	return result.Ok(generations)
 }
 
-// GetStoreSize returns Nix store size as bytes
+// GetStoreSize returns Nix store size with dry-run isolation
 func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
+	// If dry-run, return estimated size without system calls
+	if n.dryRun {
+		return result.Ok(int64(50 * 1024 * 1024 * 1024)) // 50GB estimate
+	}
+
+	// Real system call for production mode
 	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
 	output, err := cmd.Output()
 	if err != nil {

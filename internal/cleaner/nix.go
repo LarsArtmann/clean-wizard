@@ -19,11 +19,13 @@ type NixCleaner struct {
 
 // NewNixCleaner creates Nix cleaner with proper configuration
 func NewNixCleaner(verbose bool, dryRun bool) *NixCleaner {
-	return &NixCleaner{
+	nc := &NixCleaner{
 		adapter:  adapters.NewNixAdapter(0, 0),
 		verbose:  verbose,
 		dryRun:   dryRun,
 	}
+	nc.adapter.SetDryRun(dryRun) // Pass dry-run to adapter
+	return nc
 }
 
 // IsAvailable checks if Nix cleaner is available
