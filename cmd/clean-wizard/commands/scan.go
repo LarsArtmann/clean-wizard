@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/scan"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/spf13/cobra"
 )
 
@@ -16,28 +16,43 @@ func NewScanCommand(verbose bool) *cobra.Command {
 		Short: "Scan system for cleanable items",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("🔍 Scanning system...")
+			ctx := context.Background()
+			nixCleaner := cleaner.NewNixCleaner(verbose, true) // dry-run
+			startTime := time.Now()
 
-			scanner := scan.NewMockScanner()
-			result := scanner.Scan(context.Background())
-
-			if !result.IsOk() {
-				return fmt.Errorf("scan failed: %w", result.Error())
+			// Get generations
+			genResult := nixCleaner.ListGenerations(ctx)
+			if genResult.IsErr() {
+				return fmt.Errorf("scan failed: %w", genResult.Error())
 			}
 
-			scanResults := result.Value()
-			duration := time.Duration(0)
+			generations := genResult.Value()
+			duration := time.Since(startTime)
 
+			// Calculate stats
+			var cleanableCount int
+			for _, gen := range generations {
+				if !gen.Current {
+					cleanableCount++
+				}
+			}
+
+			// Display results
 			fmt.Println("✅ Scan completed!")
-			fmt.Printf("📊 Total cleanable: %d items\n", scanResults.CleanableItems)
-			fmt.Printf("📦 Found: %d items\n", len(scanResults.Items))
+			fmt.Printf("📊 Total generations: %d\n", len(generations))
+			fmt.Printf("📦 Cleanable: %d\n", cleanableCount)
 			fmt.Printf("⏱️  Scan time: %s\n", duration)
 			fmt.Println()
 
-			for _, item := range scanResults.Items {
-				fmt.Printf("📦 %s: %s\n", item.Type, formatSize(item.Size))
+			for _, gen := range generations {
+				status := "✅ Current"
+				if !gen.Current {
+					status = "🗑️  Cleanable"
+				}
+				fmt.Printf("%s Generation %d (%s)\n", status, gen.ID, gen.Date.Format("2006-01-02"))
 			}
 
-			if scanResults.CleanableItems > 0 {
+			if cleanableCount > 0 {
 				fmt.Println()
 				fmt.Println("💡 Run 'clean-wizard clean' to start cleaning")
 			} else {
@@ -47,17 +62,4 @@ func NewScanCommand(verbose bool) *cobra.Command {
 			return nil
 		},
 	}
-}
-
-func formatSize(bytes int64) string {
-	const unit = 1024
-	if bytes < unit {
-		return fmt.Sprintf("%d B", bytes)
-	}
-	div, exp := int64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }
