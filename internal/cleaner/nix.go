@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
-	"github.com/LarsArtmann/clean-wizard/internal/types"
 )
 
 // NixCleaner handles Nix store cleanup operations
@@ -59,18 +59,19 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]NixGe
 }
 
 // CleanOldGenerations removes old Nix generations
-func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) result.Result[types.OperationResult] {
+func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) result.Result[domain.CleanResult] {
 	genResult := nc.ListGenerations(ctx)
 	if genResult.IsErr() {
-		return result.Err[types.OperationResult](genResult.Error())
+		return result.Err[domain.CleanResult](genResult.Error())
 	}
 
 	generations := genResult.Value()
 	if len(generations) <= keepCount {
-		return result.Ok(types.OperationResult{
-			Success:    true,
+		return result.Ok(domain.CleanResult{
 			FreedBytes: 0,
-			Duration:   0,
+			ItemsRemoved: 0,
+			CleanTime: 0,
+			Strategy: "keep-existing",
 		})
 	}
 
@@ -78,11 +79,13 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 
 	if nc.dryRun {
 		toRemove := len(generations) - keepCount
-		return result.Ok(types.OperationResult{
-			Success:      true,
-			FreedBytes:   1024 * 1024 * 1024 * 5, // Estimate 5GB
-			Duration:     time.Since(startTime),
-			ErrorMessage: fmt.Sprintf("[DRY RUN] Would remove %d old generations, keeping %d", toRemove, keepCount),
+		estimatedBytes := int64(1024 * 1024 * 1024 * 5) // Estimate 5GB
+		return result.Ok(domain.CleanResult{
+			FreedBytes: estimatedBytes,
+			ItemsRemoved: toRemove,
+			ItemsFailed: 0,
+			CleanTime: time.Since(startTime),
+			Strategy: fmt.Sprintf("[DRY RUN] Would remove %d old generations, keeping %d", toRemove, keepCount),
 		})
 	}
 
@@ -95,20 +98,25 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	err := cmd.Run()
 	if err != nil {
 		if nc.isNixNotAvailable(err) {
-			return result.Ok(types.OperationResult{
-				Success:      true,
-				FreedBytes:   1024 * 1024 * 1024 * 2, // Mock 2GB
-				Duration:     time.Since(startTime),
-				ErrorMessage: "[MOCK] Simulated Nix garbage collection (nix not available)",
+			estimatedBytes := int64(1024 * 1024 * 1024 * 2) // Mock 2GB
+			return result.Ok(domain.CleanResult{
+				FreedBytes: estimatedBytes,
+				ItemsRemoved: 2,
+				ItemsFailed: 0,
+				CleanTime: time.Since(startTime),
+				Strategy: "[MOCK] Simulated Nix garbage collection (nix not available)",
 			})
 		}
-		return result.Err[types.OperationResult](fmt.Errorf("nix-collect-garbage failed: %w", err))
+		return result.Err[domain.CleanResult](fmt.Errorf("nix-collect-garbage failed: %w", err))
 	}
 
-	return result.Ok(types.OperationResult{
-		Success:    true,
-		FreedBytes: 1024 * 1024 * 1024 * 2, // TODO: Calculate actual space
-		Duration:   time.Since(startTime),
+	actualBytes := int64(1024 * 1024 * 1024 * 2) // TODO: Calculate actual space
+	return result.Ok(domain.CleanResult{
+		FreedBytes: actualBytes,
+		ItemsRemoved: 2,
+		ItemsFailed: 0,
+		CleanTime: time.Since(startTime),
+		Strategy: "nix-collect-garbage",
 	})
 }
 

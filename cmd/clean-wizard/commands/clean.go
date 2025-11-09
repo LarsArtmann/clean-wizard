@@ -38,12 +38,15 @@ func NewCleanCommand() *cobra.Command {
 
 			// Display results
 			fmt.Println("✅ Cleanup completed!")
+			fmt.Printf("🗑️  Items removed: %d\n", operation.ItemsRemoved)
 			fmt.Printf("🗑️  Space freed: %s\n", format.Size(operation.FreedBytes))
+			fmt.Printf("🗑️  Items failed: %d\n", operation.ItemsFailed)
 			fmt.Printf("⏱️  Duration: %s\n", format.Duration(duration))
+			fmt.Printf("🗑️  Strategy: %s\n", operation.Strategy)
 			fmt.Println()
 
-			if operation.ErrorMessage != "" {
-				fmt.Printf("ℹ️  Note: %s\n", operation.ErrorMessage)
+			if operation.ItemsFailed > 0 {
+				fmt.Printf("⚠️  %d items failed to clean\n", operation.ItemsFailed)
 			}
 
 			fmt.Println("💡 Run 'clean-wizard scan' to see current system state")

@@ -81,12 +81,11 @@ func TestNixCleaner_CleanOldGenerations(t *testing.T) {
 	if result.IsOk() {
 		opResult := result.Value()
 		t.Logf("Operation completed successfully")
-		t.Logf("Success: %t", opResult.Success)
+		t.Logf("Items removed: %d", opResult.ItemsRemoved)
 		t.Logf("Freed bytes: %d", opResult.FreedBytes)
-		t.Logf("Duration: %v", opResult.Duration)
-		if opResult.ErrorMessage != "" {
-			t.Logf("Error message: %s", opResult.ErrorMessage)
-		}
+		t.Logf("Items failed: %d", opResult.ItemsFailed)
+		t.Logf("Clean time: %v", opResult.CleanTime)
+		t.Logf("Strategy: %s", opResult.Strategy)
 	}
 }
 
