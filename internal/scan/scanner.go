@@ -11,13 +11,13 @@ import (
 type Scanner interface {
 	// Scan performs system scan with type-safe result
 	Scan(ctx context.Context) result.Result[types.ScanResult]
-	
+
 	// ScanType returns what type of scanner this is
 	ScanType() types.CleanType
-	
+
 	// Name returns human-readable name
 	Name() string
-	
+
 	// IsEnabled checks if scanner is enabled for this system
 	IsEnabled() bool
 }

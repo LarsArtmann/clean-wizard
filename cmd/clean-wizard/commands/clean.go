@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/spf13/cobra"
 )
 
@@ -37,8 +38,8 @@ func NewCleanCommand() *cobra.Command {
 
 			// Display results
 			fmt.Println("✅ Cleanup completed!")
-			fmt.Printf("🗑️  Space freed: %s\n", formatSize(operation.FreedBytes))
-			fmt.Printf("⏱️  Duration: %s\n", duration)
+			fmt.Printf("🗑️  Space freed: %s\n", format.Size(operation.FreedBytes))
+			fmt.Printf("⏱️  Duration: %s\n", format.Duration(duration))
 			fmt.Println()
 
 			if operation.ErrorMessage != "" {
@@ -55,18 +56,4 @@ func NewCleanCommand() *cobra.Command {
 	cleanCmd.Flags().BoolVar(&cleanVerbose, "verbose", false, "Show detailed output")
 
 	return cleanCmd
-}
-
-// formatSize formats bytes for human reading
-func formatSize(bytes int64) string {
-	const unit = 1024
-	if bytes < unit {
-		return fmt.Sprintf("%d B", bytes)
-	}
-	div, exp := int64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }

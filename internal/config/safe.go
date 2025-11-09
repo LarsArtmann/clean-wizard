@@ -7,12 +7,12 @@ import (
 
 // SafeConfig represents a validated cleaning configuration
 type SafeConfig struct {
-	safeMode   bool
-	dryRun     bool
-	backup     bool
-	maxRisk    RiskLevel
-	profiles   []SafeProfile
-	created    time.Time
+	safeMode bool
+	dryRun   bool
+	backup   bool
+	maxRisk  RiskLevel
+	profiles []SafeProfile
+	created  time.Time
 }
 
 // SafeProfile represents a validated cleaning profile
@@ -139,7 +139,7 @@ func (scb *SafeConfigBuilder) AddProfile(name, description string) *SafeProfileB
 	if scb.err != nil {
 		return &SafeProfileBuilder{err: scb.err}
 	}
-	
+
 	return &SafeProfileBuilder{
 		name:        name,
 		description: description,
@@ -154,15 +154,15 @@ func (scb *SafeConfigBuilder) Build() (SafeConfig, error) {
 	if scb.err != nil {
 		return SafeConfig{}, scb.err
 	}
-	
+
 	if len(scb.profiles) == 0 {
 		return SafeConfig{}, fmt.Errorf("config must have at least one profile")
 	}
-	
+
 	if !scb.maxRisk.IsValid() {
 		return SafeConfig{}, fmt.Errorf("invalid risk level: %d", scb.maxRisk)
 	}
-	
+
 	return SafeConfig{
 		safeMode: scb.safeMode,
 		dryRun:   scb.dryRun,
@@ -188,34 +188,34 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk RiskLevel) *S
 	if spb.err != nil {
 		return spb
 	}
-	
+
 	if !opType.IsValid() {
 		spb.err = fmt.Errorf("invalid clean type: %s", opType)
 		return spb
 	}
-	
+
 	if !risk.IsValid() {
 		spb.err = fmt.Errorf("invalid risk level: %d", risk)
 		return spb
 	}
-	
+
 	if risk > RiskHigh && spb.err == nil {
 		spb.err = fmt.Errorf("cannot add critical risk operation to profile")
 		return spb
 	}
-	
+
 	op := SafeOperation{
 		name:    opType,
 		risk:    risk,
 		enabled: true,
 		backup:  risk >= RiskMedium,
 	}
-	
+
 	spb.operations = append(spb.operations, op)
 	if risk > spb.maxRisk {
 		spb.maxRisk = risk
 	}
-	
+
 	return spb
 }
 
@@ -225,28 +225,28 @@ func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 		spb.config.err = spb.err
 		return spb.config
 	}
-	
+
 	if len(spb.operations) == 0 {
 		spb.config.err = fmt.Errorf("profile must have at least one operation")
 		return spb.config
 	}
-	
+
 	if spb.maxRisk > RiskHigh {
 		spb.config.err = fmt.Errorf("profile risk level cannot exceed HIGH")
 		return spb.config
 	}
-	
+
 	profile := SafeProfile{
 		name:        spb.name,
 		description: spb.description,
 		operations:  spb.operations,
 		maxRisk:     spb.maxRisk,
 	}
-	
+
 	spb.config.profiles = append(spb.config.profiles, profile)
 	if spb.maxRisk > spb.config.maxRisk {
 		spb.config.maxRisk = spb.maxRisk
 	}
-	
+
 	return spb.config
 }

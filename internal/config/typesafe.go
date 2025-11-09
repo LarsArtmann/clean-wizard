@@ -14,11 +14,11 @@ type SafeProfile struct {
 
 // SafeOperation represents a validated cleaning operation
 type SafeOperation struct {
-	name      CleanType
-	risk      RiskLevel
-	enabled   bool
-	backup    bool
-	dryRun    bool
+	name    CleanType
+	risk    RiskLevel
+	enabled bool
+	backup  bool
+	dryRun  bool
 }
 
 // RiskLevel represents operation risk with type safety
@@ -88,7 +88,7 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk RiskLevel) *S
 		spb.err = fmt.Errorf("cannot add critical risk operation to profile")
 		return spb
 	}
-	
+
 	op := SafeOperation{
 		name:    opType,
 		risk:    risk,
@@ -96,12 +96,12 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk RiskLevel) *S
 		backup:  risk >= RiskMedium,
 		dryRun:  risk >= RiskHigh,
 	}
-	
+
 	spb.operations = append(spb.operations, op)
 	if risk > spb.maxRisk {
 		spb.maxRisk = risk
 	}
-	
+
 	return spb
 }
 
@@ -110,15 +110,15 @@ func (spb *SafeProfileBuilder) Build() (SafeProfile, error) {
 	if spb.err != nil {
 		return SafeProfile{}, spb.err
 	}
-	
+
 	if len(spb.operations) == 0 {
 		return SafeProfile{}, fmt.Errorf("profile must have at least one operation")
 	}
-	
+
 	if spb.maxRisk > RiskHigh {
 		return SafeProfile{}, fmt.Errorf("profile risk level cannot exceed HIGH")
 	}
-	
+
 	return SafeProfile{
 		name:        spb.name,
 		description: spb.description,

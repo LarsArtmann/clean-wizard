@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/types"
 	"github.com/LarsArtmann/clean-wizard/internal/errors"
+	"github.com/LarsArtmann/clean-wizard/internal/types"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )

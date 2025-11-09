@@ -41,13 +41,13 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]NixGe
 
 	var generations []NixGeneration
 	scanner := bufio.NewScanner(strings.NewReader(string(output)))
-	
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
-		
+
 		gen, err := nc.parseGeneration(line)
 		if err != nil {
 			continue
@@ -64,7 +64,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	if genResult.IsErr() {
 		return result.Err[types.OperationResult](genResult.Error())
 	}
-	
+
 	generations := genResult.Value()
 	if len(generations) <= keepCount {
 		return result.Ok(types.OperationResult{
@@ -75,7 +75,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	}
 
 	startTime := time.Now()
-	
+
 	if nc.dryRun {
 		toRemove := len(generations) - keepCount
 		return result.Ok(types.OperationResult{
@@ -91,14 +91,14 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
-	
+
 	err := cmd.Run()
 	if err != nil {
 		if nc.isNixNotAvailable(err) {
 			return result.Ok(types.OperationResult{
-				Success:    true,
-				FreedBytes: 1024 * 1024 * 1024 * 2, // Mock 2GB
-				Duration:   time.Since(startTime),
+				Success:      true,
+				FreedBytes:   1024 * 1024 * 1024 * 2, // Mock 2GB
+				Duration:     time.Since(startTime),
 				ErrorMessage: "[MOCK] Simulated Nix garbage collection (nix not available)",
 			})
 		}
@@ -138,10 +138,10 @@ func (nc *NixCleaner) GetStoreSize(ctx context.Context) result.Result[int64] {
 
 // NixGeneration represents a Nix generation
 type NixGeneration struct {
-	ID        int       `json:"id"`
-	Path      string    `json:"path"`
-	Date      time.Time `json:"date"`
-	Current   bool      `json:"current"`
+	ID      int       `json:"id"`
+	Path    string    `json:"path"`
+	Date    time.Time `json:"date"`
+	Current bool      `json:"current"`
 }
 
 // parseGeneration parses a generation line
@@ -155,7 +155,7 @@ func (nc *NixCleaner) parseGeneration(line string) (NixGeneration, error) {
 	if len(pathParts) < 2 {
 		return NixGeneration{}, fmt.Errorf("invalid generation path: %s", fields[0])
 	}
-	
+
 	id, err := strconv.Atoi(pathParts[len(pathParts)-1])
 	if err != nil {
 		return NixGeneration{}, fmt.Errorf("invalid generation ID: %s", pathParts[len(pathParts)-1])
@@ -181,9 +181,9 @@ func (nc *NixCleaner) parseGeneration(line string) (NixGeneration, error) {
 
 // isNixNotAvailable checks if Nix is not available
 func (nc *NixCleaner) isNixNotAvailable(err error) bool {
-	return strings.Contains(err.Error(), "executable not found") || 
-		   strings.Contains(err.Error(), "command not found") ||
-		   strings.Contains(err.Error(), "no such file or directory")
+	return strings.Contains(err.Error(), "executable not found") ||
+		strings.Contains(err.Error(), "command not found") ||
+		strings.Contains(err.Error(), "no such file or directory")
 }
 
 // mockGenerations returns mock data when Nix is not available

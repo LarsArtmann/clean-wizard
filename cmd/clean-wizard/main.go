@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	version = "dev"
-	verbose bool
-	dryRun  bool
-	force   bool
+	version     = "dev"
+	verbose     bool
+	dryRun      bool
+	force       bool
 	profileName string
 )
 

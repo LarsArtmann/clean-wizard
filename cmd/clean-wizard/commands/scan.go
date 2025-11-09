@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/spf13/cobra"
 )
 
@@ -39,9 +40,9 @@ func NewScanCommand(verbose bool) *cobra.Command {
 
 			// Display results
 			fmt.Println("✅ Scan completed!")
-			fmt.Printf("📊 Total generations: %d\n", len(generations))
-			fmt.Printf("📦 Cleanable: %d\n", cleanableCount)
-			fmt.Printf("⏱️  Scan time: %s\n", duration)
+			fmt.Printf("📊 Total generations: %s\n", fmt.Sprintf("%d", len(generations)))
+			fmt.Printf("📦 Cleanable: %s\n", fmt.Sprintf("%d", cleanableCount))
+			fmt.Printf("⏱️  Scan time: %s\n", format.Duration(duration))
 			fmt.Println()
 
 			for _, gen := range generations {
@@ -49,7 +50,7 @@ func NewScanCommand(verbose bool) *cobra.Command {
 				if !gen.Current {
 					status = "🗑️  Cleanable"
 				}
-				fmt.Printf("%s Generation %d (%s)\n", status, gen.ID, gen.Date.Format("2006-01-02"))
+				fmt.Printf("%s Generation %s (%s)\n", status, fmt.Sprintf("%d", gen.ID), format.DateTime(gen.Date))
 			}
 
 			if cleanableCount > 0 {
