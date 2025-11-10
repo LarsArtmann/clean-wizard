@@ -497,9 +497,6 @@ func TestValidationMiddleware_ValidateConfigChange(t *testing.T) {
 		},
 	}
 
-	t.Logf("DEBUG: current.SafeMode = %v", current.SafeMode)
-	t.Logf("DEBUG: proposed.SafeMode = %v", proposed.SafeMode)
-
 	result := middleware.ValidateConfigChange(nil, current, proposed)
 	if result == nil || !result.IsValid {
 		if result != nil {
@@ -510,10 +507,9 @@ func TestValidationMiddleware_ValidateConfigChange(t *testing.T) {
 		return
 	}
 
-	// Debug: Print what changes were detected
-	t.Logf("Detected %d changes:", len(result.Changes))
-	for i, change := range result.Changes {
-		t.Logf("  %d: %s (%s): %v -> %v", i, change.Field, change.Operation, change.OldValue, change.NewValue)
+	// Verify expected changes were detected
+	if len(result.Changes) < 3 { // Should have at least 3 changes (safe_mode, max_disk_usage, protected)
+		t.Errorf("Expected at least 3 changes, got %d", len(result.Changes))
 	}
 
 	// Check that changes were detected

@@ -130,10 +130,9 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 	// Level 5: Security validation
 	cv.validateSecurityConstraints(cfg, result)
 
-	// Sanitize configuration
-	if cv.sanitizer != nil {
-		cv.sanitizer.SanitizeConfig(cfg, result)
-	}
+	// NOTE: Sanitization is NOT applied here to preserve original values
+	// Sanitization should be applied separately after validation succeeds
+	// This prevents state mutation during verification
 
 	result.Duration = time.Since(start)
 	result.IsValid = len(result.Errors) == 0
