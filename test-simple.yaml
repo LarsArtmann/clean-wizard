@@ -1,0 +1,31 @@
+# Clean-wizard basic configuration
+# Generated with: clean-wizard generate simple
+
+version: "1.0.0"
+safe_mode: true
+max_disk_usage: 50
+
+# Protected system paths (never cleaned)
+protected:
+  - "/System"
+  - "/Library"
+  - "/Applications"
+  - "/usr"
+  - "/etc"
+  - "/var"
+  - "/bin"
+  - "/sbin"
+
+# Cleanup profiles
+profiles:
+  daily:
+    name: "daily"
+    description: "Daily cleanup for routine maintenance"
+    enabled: true
+    operations:
+      - name: "nix-generations"
+        description: "Clean old Nix generations"
+        risk_level: "LOW"
+        enabled: true
+        settings:
+          keep_count: 3

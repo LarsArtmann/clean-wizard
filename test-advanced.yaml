@@ -1,0 +1,83 @@
+# Clean-wizard advanced production configuration
+# Generated with: clean-wizard generate advanced
+
+version: "1.0.0"
+safe_mode: true
+max_disk_usage: 70
+
+# Protected system paths (never cleaned)
+protected:
+  - "/"
+  - "/System"
+  - "/Library"
+  - "/Applications"
+  - "/usr"
+  - "/usr/local"
+  - "/etc"
+  - "/var"
+  - "/bin"
+  - "/sbin"
+  - "/opt"
+
+# User-defined protected paths
+user_protected:
+  - "/Users/Documents"
+  - "/Users/Downloads/Important"
+  - "/home/user/projects"
+
+# Cleanup profiles
+profiles:
+  daily:
+    name: "daily"
+    description: "Daily cleanup for routine maintenance"
+    enabled: true
+    operations:
+      - name: "nix-generations"
+        description: "Clean old Nix generations"
+        risk_level: "LOW"
+        enabled: true
+        settings:
+          keep_count: 3
+          keep_current: true
+  
+  weekly:
+    name: "weekly"
+    description: "Weekly cleanup for deeper maintenance"
+    enabled: true
+    operations:
+      - name: "package-caches"
+        description: "Clean package manager caches"
+        risk_level: "MEDIUM"
+        enabled: true
+        settings:
+          keep_recent: true
+          max_age_days: 30
+  
+  monthly:
+    name: "monthly"
+    description: "Monthly cleanup for deep maintenance"
+    enabled: false
+    operations:
+      - name: "temp-files"
+        description: "Clean temporary files"
+        risk_level: "MEDIUM"
+        enabled: true
+        settings:
+          max_age_days: 7
+          exclude_patterns: ["*.log", "*.tmp"]
+      
+      - name: "logs"
+        description: "Clean old log files"
+        risk_level: "MEDIUM"
+        enabled: true
+        settings:
+          max_age_days: 14
+          keep_critical: true
+
+# Configuration settings
+settings:
+  dry_run_default: true
+  confirm_before_delete: true
+  backup_important_files: true
+  log_cleanup_operations: true
+  max_cleanup_time_minutes: 60

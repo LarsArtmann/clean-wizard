@@ -86,6 +86,7 @@ func main() {
 	rootCmd.AddCommand(
 		commands.NewScanCommand(verbose, parseValidationLevel(validationLevel)),
 		commands.NewCleanCommand(parseValidationLevel(validationLevel)),
+		commands.NewGenerateCommand(),
 	)
 
 	// Handle command execution with proper error handling
