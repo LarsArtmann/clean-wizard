@@ -43,18 +43,18 @@ type SanitizationRules struct {
 
 // SanitizationResult contains sanitization outcomes
 type SanitizationResult struct {
-	SanitizedFields []string               `json:"sanitized_fields"`
-	Warnings        []SanitizationWarning  `json:"warnings"`
-	Changes         map[string]interface{} `json:"changes"`
-	Timestamp       time.Time              `json:"timestamp"`
+	SanitizedFields []string              `json:"sanitized_fields"`
+	Warnings        []SanitizationWarning `json:"warnings"`
+	Changes         map[string]any        `json:"changes"`
+	Timestamp       time.Time             `json:"timestamp"`
 }
 
 // SanitizationWarning represents a sanitization warning
 type SanitizationWarning struct {
-	Field     string      `json:"field"`
-	Original  interface{} `json:"original"`
-	Sanitized interface{} `json:"sanitized"`
-	Reason    string      `json:"reason"`
+	Field     string `json:"field"`
+	Original  any    `json:"original"`
+	Sanitized any    `json:"sanitized"`
+	Reason    string `json:"reason"`
 }
 
 // NewConfigSanitizer creates a configuration sanitizer with default rules
@@ -76,7 +76,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 	result := &SanitizationResult{
 		SanitizedFields: []string{},
 		Warnings:        []SanitizationWarning{},
-		Changes:         make(map[string]interface{}),
+		Changes:         make(map[string]any),
 		Timestamp:       time.Now(),
 	}
 
@@ -96,7 +96,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 
 	// Update validation result with sanitization info
 	if validationResult != nil {
-		validationResult.Sanitized = map[string]interface{}{
+		validationResult.Sanitized = map[string]any{
 			"sanitized_fields": result.SanitizedFields,
 			"warnings":         result.Warnings,
 			"changes":          result.Changes,
@@ -300,7 +300,7 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix string, setting
 				}
 			}
 
-		case []interface{}:
+		case []any:
 			if key == "excludes" {
 				sanitized := cs.sanitizeStringArray(v)
 				if !cs.arraysEqual(v, sanitized) {
@@ -392,9 +392,9 @@ func (cs *ConfigSanitizer) applyOperationDefaults(fieldPrefix string, opName str
 
 // Helper methods
 
-func (r *SanitizationResult) addChange(field string, original, sanitized interface{}, reason string) {
+func (r *SanitizationResult) addChange(field string, original, sanitized any, reason string) {
 	r.SanitizedFields = append(r.SanitizedFields, field)
-	r.Changes[field] = map[string]interface{}{
+	r.Changes[field] = map[string]any{
 		"original":  original,
 		"sanitized": sanitized,
 		"reason":    reason,
@@ -402,7 +402,7 @@ func (r *SanitizationResult) addChange(field string, original, sanitized interfa
 	}
 }
 
-func (r *SanitizationResult) addWarning(field string, original, sanitized interface{}, reason string) {
+func (r *SanitizationResult) addWarning(field string, original, sanitized any, reason string) {
 	r.Warnings = append(r.Warnings, SanitizationWarning{
 		Field:     field,
 		Original:  original,
@@ -436,8 +436,8 @@ func (cs *ConfigSanitizer) sortStrings(slice []string) {
 	}
 }
 
-func (cs *ConfigSanitizer) sanitizeStringArray(arr []interface{}) []interface{} {
-	result := make([]interface{}, len(arr))
+func (cs *ConfigSanitizer) sanitizeStringArray(arr []any) []any {
+	result := make([]any, len(arr))
 	for i, item := range arr {
 		if str, ok := item.(string); ok {
 			result[i] = strings.TrimSpace(str)
@@ -448,7 +448,7 @@ func (cs *ConfigSanitizer) sanitizeStringArray(arr []interface{}) []interface{} 
 	return result
 }
 
-func (cs *ConfigSanitizer) arraysEqual(a, b []interface{}) bool {
+func (cs *ConfigSanitizer) arraysEqual(a, b []any) bool {
 	if len(a) != len(b) {
 		return false
 	}

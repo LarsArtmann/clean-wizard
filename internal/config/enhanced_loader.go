@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -207,7 +208,7 @@ type SchemaType struct {
 	Required    bool                   `json:"required"`
 	Properties  map[string]*SchemaType `json:"properties,omitempty"`
 	Items       *SchemaType            `json:"items,omitempty"`
-	Enum        []interface{}          `json:"enum,omitempty"`
+	Enum        []any                  `json:"enum,omitempty"`
 	Pattern     string                 `json:"pattern,omitempty"`
 	Minimum     *float64               `json:"minimum,omitempty"`
 	Maximum     *float64               `json:"maximum,omitempty"`
@@ -371,12 +372,7 @@ func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *domain.Config
 }
 
 func (ecl *EnhancedConfigLoader) isPathProtected(protected []string, target string) bool {
-	for _, path := range protected {
-		if path == target {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(protected, target)
 }
 
 func (ecl *EnhancedConfigLoader) shouldRetry(err error) bool {
@@ -392,10 +388,7 @@ func (ecl *EnhancedConfigLoader) shouldRetry(err error) bool {
 func (ecl *EnhancedConfigLoader) calculateDelay(attempt int) time.Duration {
 	delay := ecl.retryPolicy.InitialDelay
 	for i := 1; i < attempt; i++ {
-		delay = time.Duration(float64(delay) * ecl.retryPolicy.BackoffFactor)
-		if delay > ecl.retryPolicy.MaxDelay {
-			delay = ecl.retryPolicy.MaxDelay
-		}
+		delay = min(time.Duration(float64(delay)*ecl.retryPolicy.BackoffFactor), ecl.retryPolicy.MaxDelay)
 	}
 	return delay
 }

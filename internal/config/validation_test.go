@@ -27,7 +27,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			Pattern:  "^[a-zA-Z0-9_-]+$",
 			Message:  "Profile names must be alphanumeric with underscores and hyphens",
 		},
-		UniquePaths:   true,
+		UniquePaths:    true,
 		UniqueProfiles: true,
 		ProtectedSystemPaths: []string{ // Reduced for tests
 			"/",
@@ -35,8 +35,8 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			"/Library",
 		},
 		RequireSafeMode: true,
-		MaxRiskLevel:   domain.RiskHigh,
-		BackupRequired: domain.RiskMedium,
+		MaxRiskLevel:    domain.RiskHigh,
+		BackupRequired:  domain.RiskMedium,
 	}
 	validator := NewConfigValidatorWithRules(testRules)
 
@@ -197,7 +197,7 @@ func TestConfigValidator_ValidateField(t *testing.T) {
 	tests := []struct {
 		name        string
 		field       string
-		value       interface{}
+		value       any
 		expectError bool
 	}{
 		{
@@ -350,7 +350,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 				IsValid:   true,
 				Errors:    []ValidationError{},
 				Warnings:  []ValidationWarning{},
-				Sanitized: make(map[string]interface{}),
+				Sanitized: make(map[string]any),
 			}
 
 			sanitizer.SanitizeConfig(tt.config, validationResult)
@@ -419,7 +419,7 @@ func TestValidationMiddleware_ValidateConfigChange(t *testing.T) {
 			Pattern:  "^[a-zA-Z0-9_-]+$",
 			Message:  "Profile names must be alphanumeric with underscores and hyphens",
 		},
-		UniquePaths:   true,
+		UniquePaths:    true,
 		UniqueProfiles: true,
 		ProtectedSystemPaths: []string{ // Reduced for tests
 			"/",
@@ -427,10 +427,10 @@ func TestValidationMiddleware_ValidateConfigChange(t *testing.T) {
 			"/Library",
 		},
 		RequireSafeMode: true,
-		MaxRiskLevel:   domain.RiskHigh,
-		BackupRequired: domain.RiskMedium,
+		MaxRiskLevel:    domain.RiskHigh,
+		BackupRequired:  domain.RiskMedium,
 	}
-	
+
 	// Create middleware with custom validator that doesn't sanitize for change detection
 	validator := NewConfigValidatorWithRules(testRules)
 	validator.sanitizer = nil // Disable sanitization during validation for change detection
@@ -464,8 +464,8 @@ func TestValidationMiddleware_ValidateConfigChange(t *testing.T) {
 
 	proposed := &domain.Config{
 		Version:      "1.0.1",
-		SafeMode:     false,                                                    // Changed
-		MaxDiskUsage: 60,                                                        // Changed
+		SafeMode:     false,                                                                                     // Changed
+		MaxDiskUsage: 60,                                                                                        // Changed
 		Protected:    []string{"/System", "/Library", "/Applications", "/usr", "/etc", "/var", "/bin", "/sbin"}, // Added
 		Profiles: map[string]*domain.Profile{
 			"daily": {

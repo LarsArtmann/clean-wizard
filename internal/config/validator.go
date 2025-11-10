@@ -52,31 +52,31 @@ type ValidationRule[T comparable] struct {
 
 // ValidationResult contains validation results with detailed error information
 type ValidationResult struct {
-	IsValid   bool                   `json:"is_valid"`
-	Errors    []ValidationError      `json:"errors,omitempty"`
-	Warnings  []ValidationWarning    `json:"warnings,omitempty"`
-	Sanitized map[string]interface{} `json:"sanitized,omitempty"`
-	Duration  time.Duration          `json:"duration"`
-	Timestamp time.Time              `json:"timestamp"`
+	IsValid   bool                `json:"is_valid"`
+	Errors    []ValidationError   `json:"errors,omitempty"`
+	Warnings  []ValidationWarning `json:"warnings,omitempty"`
+	Sanitized map[string]any      `json:"sanitized,omitempty"`
+	Duration  time.Duration       `json:"duration"`
+	Timestamp time.Time           `json:"timestamp"`
 }
 
 // ValidationError represents a specific validation error
 type ValidationError struct {
-	Field      string                 `json:"field"`
-	Rule       string                 `json:"rule"`
-	Value      interface{}            `json:"value"`
-	Message    string                 `json:"message"`
-	Severity   ValidationSeverity     `json:"severity"`
-	Suggestion string                 `json:"suggestion,omitempty"`
-	Context    map[string]interface{} `json:"context,omitempty"`
+	Field      string             `json:"field"`
+	Rule       string             `json:"rule"`
+	Value      any                `json:"value"`
+	Message    string             `json:"message"`
+	Severity   ValidationSeverity `json:"severity"`
+	Suggestion string             `json:"suggestion,omitempty"`
+	Context    map[string]any     `json:"context,omitempty"`
 }
 
 // ValidationWarning represents a non-critical validation issue
 type ValidationWarning struct {
-	Field      string                 `json:"field"`
-	Message    string                 `json:"message"`
-	Suggestion string                 `json:"suggestion,omitempty"`
-	Context    map[string]interface{} `json:"context,omitempty"`
+	Field      string         `json:"field"`
+	Message    string         `json:"message"`
+	Suggestion string         `json:"suggestion,omitempty"`
+	Context    map[string]any `json:"context,omitempty"`
 }
 
 // ValidationSeverity represents error severity levels
@@ -111,7 +111,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 		IsValid:   true,
 		Errors:    []ValidationError{},
 		Warnings:  []ValidationWarning{},
-		Sanitized: make(map[string]interface{}),
+		Sanitized: make(map[string]any),
 		Timestamp: time.Now(),
 	}
 
@@ -141,7 +141,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 }
 
 // ValidateField validates a specific configuration field
-func (cv *ConfigValidator) ValidateField(field string, value interface{}) error {
+func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	switch field {
 	case "max_disk_usage":
 		return cv.validateMaxDiskUsage(value)
@@ -204,7 +204,7 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 			Message:    err.Error(),
 			Severity:   SeverityError,
 			Suggestion: "Set max_disk_usage between 10 and 95",
-			Context: map[string]interface{}{
+			Context: map[string]any{
 				"min": 10,
 				"max": 95,
 			},
@@ -246,7 +246,7 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 				Field:      "safe_mode",
 				Message:    "Safe mode is disabled but critical risk operations exist",
 				Suggestion: "Enable safe mode or remove critical risk operations",
-				Context: map[string]interface{}{
+				Context: map[string]any{
 					"max_risk": string(maxRisk),
 				},
 			})
@@ -301,7 +301,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 				Message:    fmt.Sprintf("Critical system path not protected: %s", systemPath),
 				Severity:   SeverityError,
 				Suggestion: fmt.Sprintf("Add '%s' to protected paths", systemPath),
-				Context: map[string]interface{}{
+				Context: map[string]any{
 					"system_path": systemPath,
 				},
 			})
@@ -324,7 +324,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 }
 
 // validateMaxDiskUsage validates max disk usage percentage
-func (cv *ConfigValidator) validateMaxDiskUsage(value interface{}) error {
+func (cv *ConfigValidator) validateMaxDiskUsage(value any) error {
 	usage, ok := value.(int)
 	if !ok {
 		return fmt.Errorf("max_disk_usage must be an integer, got %T", value)
@@ -343,7 +343,7 @@ func (cv *ConfigValidator) validateMaxDiskUsage(value interface{}) error {
 }
 
 // validateProtectedPaths validates protected paths array
-func (cv *ConfigValidator) validateProtectedPaths(value interface{}) error {
+func (cv *ConfigValidator) validateProtectedPaths(value any) error {
 	paths, ok := value.([]string)
 	if !ok {
 		return fmt.Errorf("protected must be a string array, got %T", value)
@@ -363,7 +363,7 @@ func (cv *ConfigValidator) validateProtectedPaths(value interface{}) error {
 }
 
 // validateProfiles validates profiles map
-func (cv *ConfigValidator) validateProfiles(value interface{}) error {
+func (cv *ConfigValidator) validateProfiles(value any) error {
 	profiles, ok := value.(map[string]*domain.Profile)
 	if !ok {
 		return fmt.Errorf("profiles must be a map of profiles, got %T", value)

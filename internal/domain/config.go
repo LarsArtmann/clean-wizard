@@ -7,13 +7,14 @@ import (
 
 // Config represents application configuration with type safety
 type Config struct {
-	Version      string              `json:"version" yaml:"version"`
-	SafeMode     bool                `json:"safe_mode" yaml:"safe_mode"`
-	MaxDiskUsage int                 `json:"max_disk_usage" yaml:"max_disk_usage"`
-	Protected    []string            `json:"protected" yaml:"protected"`
-	Profiles     map[string]*Profile `json:"profiles" yaml:"profiles"`
-	LastClean    time.Time           `json:"last_clean" yaml:"last_clean"`
-	Updated      time.Time           `json:"updated" yaml:"updated"`
+	Version        string              `json:"version" yaml:"version"`
+	SafeMode       bool                `json:"safe_mode" yaml:"safe_mode"`
+	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"`
+	Protected      []string            `json:"protected" yaml:"protected"`
+	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`
+	CurrentProfile string              `json:"current_profile,omitempty" yaml:"current_profile,omitempty"`
+	LastClean      time.Time           `json:"last_clean" yaml:"last_clean"`
+	Updated        time.Time           `json:"updated" yaml:"updated"`
 }
 
 // IsValid validates configuration

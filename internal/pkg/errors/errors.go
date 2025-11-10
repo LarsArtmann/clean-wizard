@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"maps"
 	"runtime"
 	"strings"
 	"time"
@@ -243,9 +244,7 @@ func (e *CleanWizardError) Log() {
 	}
 
 	if e.Details != nil {
-		for key, value := range e.Details {
-			fields[key] = value
-		}
+		maps.Copy(fields, e.Details)
 	}
 
 	entry := logrus.WithFields(fields)

@@ -42,12 +42,12 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	v.SetDefault("safe_mode", false)
 	v.SetDefault("max_disk_usage_percent", 50)
 	v.SetDefault("protected", []string{"/System", "/Library"}) // Basic protection
-	v.SetDefault("profiles", map[string]interface{}{
-		"daily": map[string]interface{}{
+	v.SetDefault("profiles", map[string]any{
+		"daily": map[string]any{
 			"name":        "daily",
 			"description": "Daily cleanup",
 			"enabled":     true,
-			"operations": []map[string]interface{}{
+			"operations": []map[string]any{
 				{
 					"name":        "nix-generations",
 					"description": "Clean Nix generations",
@@ -93,7 +93,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			// Convert string risk level to RiskLevel enum
 			var riskLevelStr string
 			v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr)
-			
+
 			switch strings.ToUpper(riskLevelStr) {
 			case "LOW":
 				op.RiskLevel = domain.RiskLow
@@ -174,7 +174,7 @@ func Save(config *domain.Config) error {
 	}
 
 	// Write configuration file
-	if err := v.WriteConfig(); err != nil {
+	if err := v.WriteConfigAs(configPath); err != nil {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
 
@@ -182,9 +182,14 @@ func Save(config *domain.Config) error {
 	return nil
 }
 
+// GetCurrentTime returns current time (helper for testing)
+func GetCurrentTime() time.Time {
+	return time.Now()
+}
+
 // getDefaultConfig returns the default configuration
 func getDefaultConfig() *domain.Config {
-	now := time.Now()
+	now := GetCurrentTime()
 
 	return &domain.Config{
 		Version:      "1.0.0",

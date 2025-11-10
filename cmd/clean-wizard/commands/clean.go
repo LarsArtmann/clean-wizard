@@ -22,6 +22,8 @@ var (
 // NewCleanCommand creates clean command with proper domain types
 func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 	var configFile string
+	var profileName string
+	
 	cleanCmd := &cobra.Command{
 		Use:   "clean",
 		Short: "Perform system cleanup",
@@ -33,15 +35,20 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			// Parse validation level from flag
 			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
 			validationLevel := ParseValidationLevel(validationLevelStr)
+			
+			// Parse profile name from flag
+			profileName, _ = cmd.Flags().GetString("profile")
 
 			// Load and validate configuration if provided
+			var loadedCfg *domain.Config
 			if configFile != "" {
 				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
 				
 				// Set config file path using environment variable
 				os.Setenv("CONFIG_PATH", configFile)
 				
-				loadedCfg, err := config.LoadWithContext(ctx)
+				var err error
+				loadedCfg, err = config.LoadWithContext(ctx)
 				if err != nil {
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
@@ -74,23 +81,62 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 
 				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n", 
 					loadedCfg.SafeMode, len(loadedCfg.Profiles))
+			} else {
+				// Load default configuration to get profile information
+				var err error
+				loadedCfg, err = config.LoadWithContext(ctx)
+				if err != nil {
+					fmt.Printf("⚠️  Could not load default configuration: %v\n", err)
+					// Continue without profile support
+				} else {
+					fmt.Printf("📋 Using configuration from ~/.clean-wizard.yaml\n")
+				}
+			}
+			
+			// Apply profile if specified
+			var usedProfile *domain.Profile
+			if loadedCfg != nil && profileName != "" {
+				profile, exists := loadedCfg.Profiles[profileName]
+				if !exists {
+					return fmt.Errorf("profile '%s' not found in configuration", profileName)
+				}
 				
-				// Apply config values to clean operation
-				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists {
+				if !profile.Enabled {
+					return fmt.Errorf("profile '%s' is disabled", profileName)
+				}
+				
+				fmt.Printf("🏷️  Using profile: %s (%s)\n", profileName, profile.Description)
+				usedProfile = profile
+			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
+				// Use current profile from config
+				profile := loadedCfg.Profiles[loadedCfg.CurrentProfile]
+				if profile != nil && profile.Enabled {
+					fmt.Printf("🏷️  Using current profile: %s (%s)\n", loadedCfg.CurrentProfile, profile.Description)
+					usedProfile = profile
+				}
+			} else if loadedCfg != nil {
+				// Default to daily profile if available
+				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled {
 					fmt.Printf("📋 Using daily profile configuration\n")
-					// Extract clean parameters from profile
-					for _, op := range dailyProfile.Operations {
-						if op.Name == "nix-generations" && op.Enabled {
-							fmt.Printf("🔧 Configuring Nix generations cleanup\n")
-							// Could extract settings like keep count from op.Settings
-							break
+					usedProfile = dailyProfile
+				}
+			}
+			
+			// Extract settings from profile if available
+			var settings map[string]any = map[string]any{"generations": 3}
+			if usedProfile != nil {
+				for _, op := range usedProfile.Operations {
+					if op.Name == "nix-generations" && op.Enabled {
+						fmt.Printf("🔧 Configuring Nix generations cleanup\n")
+						if op.Settings != nil {
+							settings = op.Settings
 						}
+						break
 					}
 				}
 			}
 
 			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, cleanDryRun)
-			settings := map[string]any{"generations": 3}
 
 			validator := middleware.NewValidationMiddleware()
 			validatedSettings := validator.ValidateCleanerSettings(ctx, nixCleaner, settings)

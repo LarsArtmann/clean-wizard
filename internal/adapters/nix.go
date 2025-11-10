@@ -125,10 +125,9 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-gc store size: %w", err))
 	}
 
-	bytesFreed := beforeSize - afterSize
-	if bytesFreed < 0 {
-		bytesFreed = 0 // Shouldn't happen but guard against it
-	}
+	bytesFreed := max(beforeSize-afterSize,
+		// Shouldn't happen but guard against it
+		0)
 
 	// Use centralized conversion with proper timing
 	cleanResult := conversions.NewCleanResultWithTiming("NIX_GC", 1, bytesFreed, time.Since(time.Now()))
@@ -172,10 +171,9 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-remove store size: %w", err))
 	}
 
-	bytesFreed := beforeSize - afterSize
-	if bytesFreed < 0 {
-		bytesFreed = 0 // Guard against negative values
-	}
+	bytesFreed := max(beforeSize-afterSize,
+		// Guard against negative values
+		0)
 
 	// Use centralized conversion with proper timing
 	cleanResult := conversions.NewCleanResultWithTiming("REMOVE_GENERATION", 1, bytesFreed, time.Since(time.Now()))

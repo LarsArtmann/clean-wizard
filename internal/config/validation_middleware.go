@@ -211,11 +211,11 @@ type ConfigChangeResult struct {
 
 // ConfigChange represents a single configuration change
 type ConfigChange struct {
-	Field     string      `json:"field"`
-	OldValue  interface{} `json:"old_value"`
-	NewValue  interface{} `json:"new_value"`
-	Operation string      `json:"operation"` // "added", "removed", "modified"
-	Risk      string      `json:"risk"`      // "low", "medium", "high", "critical"
+	Field     string `json:"field"`
+	OldValue  any    `json:"old_value"`
+	NewValue  any    `json:"new_value"`
+	Operation string `json:"operation"` // "added", "removed", "modified"
+	Risk      string `json:"risk"`      // "low", "medium", "high", "critical"
 }
 
 // ProfileOperationResult represents profile operation validation result
@@ -453,7 +453,7 @@ func (vm *ValidationMiddleware) formatValidationErrors(errors []ValidationError)
 	return message
 }
 
-func (vm *ValidationMiddleware) getChangeOperation(old, new interface{}) string {
+func (vm *ValidationMiddleware) getChangeOperation(old, new any) string {
 	if old == nil && new != nil {
 		return "added"
 	}
@@ -463,7 +463,7 @@ func (vm *ValidationMiddleware) getChangeOperation(old, new interface{}) string 
 	return "modified"
 }
 
-func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new interface{}) string {
+func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) string {
 	switch field {
 	case "safe_mode":
 		if old == true && new == false {

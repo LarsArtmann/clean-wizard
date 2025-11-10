@@ -28,7 +28,7 @@ func (rl RiskLevel) IsValid() bool {
 }
 
 // MarshalYAML implements yaml.Marshaler interface
-func (rl RiskLevel) MarshalYAML() (interface{}, error) {
+func (rl RiskLevel) MarshalYAML() (any, error) {
 	return string(rl), nil
 }
 
@@ -38,7 +38,7 @@ func (rl *RiskLevel) UnmarshalYAML(value *yaml.Node) error {
 	if err := value.Decode(&s); err != nil {
 		return err
 	}
-	
+
 	switch strings.ToUpper(s) {
 	case "LOW":
 		*rl = RiskLow

@@ -84,6 +84,7 @@ func main() {
 
 	// Add subcommands
 	rootCmd.AddCommand(
+		commands.NewProfileCommand(),
 		commands.NewScanCommand(verbose, parseValidationLevel(validationLevel)),
 		commands.NewCleanCommand(parseValidationLevel(validationLevel)),
 		commands.NewGenerateCommand(),

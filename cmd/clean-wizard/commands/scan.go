@@ -17,6 +17,8 @@ import (
 // NewScanCommand creates scan command with proper domain types
 func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra.Command {
 	var configFile string
+	var profileName string
+	
 	cmd := &cobra.Command{
 		Use:   "scan",
 		Short: "Scan system for cleanable items",
@@ -28,6 +30,9 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			// Parse validation level from flag
 			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
 			validationLevel = ParseValidationLevel(validationLevelStr)
+			
+			// Parse profile name from flag
+			profileName, _ = cmd.Flags().GetString("profile")
 
 			// Determine scan parameters from configuration
 			scanType := domain.ScanTypeNixStore
@@ -58,27 +63,69 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 							return fmt.Errorf("basic validation failed: protected paths cannot be empty")
 						}
 					}
-					
-					if validationLevel >= config.ValidationLevelComprehensive {
-						// Comprehensive validation
-						if err := loadedCfg.Validate(); err != nil {
-							return fmt.Errorf("comprehensive validation failed: %w", err)
-						}
+				}
+			} else {
+				// Load default configuration to get profile information
+				var err error
+				loadedCfg, err = config.LoadWithContext(ctx)
+				if err != nil {
+					fmt.Printf("⚠️  Could not load default configuration: %v\n", err)
+					// Continue without profile support
+				} else {
+					fmt.Printf("📋 Using configuration from ~/.clean-wizard.yaml\n")
+				}
+			}
+			
+			// Apply validation if we have loaded configuration
+			if loadedCfg != nil && validationLevel > config.ValidationLevelNone {
+				fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
+				
+				if validationLevel >= config.ValidationLevelBasic {
+					// Basic validation
+					if len(loadedCfg.Protected) == 0 {
+						return fmt.Errorf("basic validation failed: protected paths cannot be empty")
 					}
+				}
 					
-					if validationLevel >= config.ValidationLevelStrict {
-						// Strict validation
-						if !loadedCfg.SafeMode {
-							return fmt.Errorf("strict validation failed: safe_mode must be enabled")
-						}
+				if validationLevel >= config.ValidationLevelComprehensive {
+					// Comprehensive validation
+					if err := loadedCfg.Validate(); err != nil {
+						return fmt.Errorf("comprehensive validation failed: %w", err)
+					}
+				}
+					
+				if validationLevel >= config.ValidationLevelStrict {
+					// Strict validation
+					if !loadedCfg.SafeMode {
+						return fmt.Errorf("strict validation failed: safe_mode must be enabled")
 					}
 				}
 
 				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n", 
 					loadedCfg.SafeMode, len(loadedCfg.Profiles))
+			}
+			
+			// Apply profile if specified
+			if loadedCfg != nil && profileName != "" {
+				profile, exists := loadedCfg.Profiles[profileName]
+				if !exists {
+					return fmt.Errorf("profile '%s' not found in configuration", profileName)
+				}
 				
-				// Apply config values to scan request
-				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists {
+				if !profile.Enabled {
+					return fmt.Errorf("profile '%s' is disabled", profileName)
+				}
+				
+				fmt.Printf("🏷️  Using profile: %s (%s)\n", profileName, profile.Description)
+			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
+				// Use current profile from config
+				profile := loadedCfg.Profiles[loadedCfg.CurrentProfile]
+				if profile != nil && profile.Enabled {
+					fmt.Printf("🏷️  Using current profile: %s (%s)\n", loadedCfg.CurrentProfile, profile.Description)
+				}
+			} else if loadedCfg != nil {
+				// Default to daily profile if available
+				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled {
 					fmt.Printf("📋 Using daily profile configuration\n")
 					// Extract scan parameters from profile
 					for _, op := range dailyProfile.Operations {
