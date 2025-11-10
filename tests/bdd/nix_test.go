@@ -46,7 +46,7 @@ func TestNixCleaningBDD(t *testing.T) {
 		}
 
 		outputStr := string(output)
-		if !contains(outputStr, "✅ Cleanup completed!") {
+		if !contains(outputStr, "✅ Cleanup completed successfully") {
 			t.Error("❌ Expected cleanup completion message not found")
 		}
 

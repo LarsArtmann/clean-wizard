@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -14,22 +13,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/middleware"
 	"github.com/spf13/cobra"
 )
-
-// parseValidationLevel converts string to ValidationLevel
-func parseValidationLevel(level string) config.ValidationLevel {
-	switch strings.ToLower(level) {
-	case "none":
-		return config.ValidationLevelNone
-	case "basic":
-		return config.ValidationLevelBasic
-	case "comprehensive":
-		return config.ValidationLevelComprehensive
-	case "strict":
-		return config.ValidationLevelStrict
-	default:
-		return config.ValidationLevelBasic // Safe default
-	}
-}
 
 var (
 	cleanDryRun  bool
@@ -49,7 +32,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 
 			// Parse validation level from flag
 			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
-			validationLevel := parseValidationLevel(validationLevelStr)
+			validationLevel := ParseValidationLevel(validationLevelStr)
 
 			// Load and validate configuration if provided
 			if configFile != "" {
@@ -184,7 +167,9 @@ func displayCleanResults(result domain.CleanResult, verbose bool, duration time.
 	if isDryRun {
 		fmt.Printf("\n💡 This was a dry run - no files were actually deleted\n")
 		fmt.Printf("   🏃 Run 'clean-wizard clean' without --dry-run to perform cleanup\n")
-	} else {
+	}
+	
+	if result.IsValid() {
 		fmt.Printf("\n✅ Cleanup completed successfully\n")
 	}
 }

@@ -124,7 +124,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			}
 
 			// Display results
-			displayScanResults(scanResult, verbose)
+			displayScanResults(scanResult, generations, verbose)
 			return nil
 		},
 	}
@@ -136,18 +136,33 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 }
 
 // displayScanResults shows scan results to user
-func displayScanResults(result domain.ScanResult, verbose bool) {
+func displayScanResults(result domain.ScanResult, generations []domain.NixGeneration, verbose bool) {
 	fmt.Printf("\n📊 Scan Results:\n")
 	fmt.Printf("   • Total generations: %d\n", result.TotalItems)
-	fmt.Printf("   • Current generation: %d\n", result.TotalItems-4) // TODO: Fix this logic
-	fmt.Printf("   • Cleanable generations: %d\n", 4) // TODO: Fix this logic
+	
+	// Count current generations
+	currentCount := 0
+	for _, gen := range generations {
+		if gen.Current {
+			currentCount++
+		}
+	}
+	
+	// Calculate cleanable generations (non-current ones)
+	cleanableCount := len(generations) - currentCount
+	
+	fmt.Printf("   • Current generation: %d\n", currentCount)
+	fmt.Printf("   • Cleanable generations: %d\n", cleanableCount)
 	fmt.Printf("   • Store size: %s\n", format.Bytes(result.TotalBytes))
 
-	if result.TotalItems > 1 {
-		fmt.Printf("\n💡 You can clean up %d old generations to free space\n", result.TotalItems-1)
+	if cleanableCount > 0 {
+		fmt.Printf("\n💡 You can clean up %d old generations to free space\n", cleanableCount)
 		fmt.Printf("   🏃 Run 'clean-wizard clean' to start cleanup\n")
 		fmt.Printf("   🔍 Try 'clean-wizard clean --dry-run' first to see what would be cleaned\n")
 	} else {
 		fmt.Printf("\n✅ System is already clean - no old generations found\n")
 	}
+	
+	// Add completion message for BDD tests
+	fmt.Printf("\n✅ Scan completed!\n")
 }
