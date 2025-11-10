@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -13,6 +14,22 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/middleware"
 	"github.com/spf13/cobra"
 )
+
+// parseValidationLevel converts string to ValidationLevel
+func parseValidationLevel(level string) config.ValidationLevel {
+	switch strings.ToLower(level) {
+	case "none":
+		return config.ValidationLevelNone
+	case "basic":
+		return config.ValidationLevelBasic
+	case "comprehensive":
+		return config.ValidationLevelComprehensive
+	case "strict":
+		return config.ValidationLevelStrict
+	default:
+		return config.ValidationLevelBasic // Safe default
+	}
+}
 
 var (
 	cleanDryRun  bool
@@ -30,6 +47,10 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			fmt.Println("🧹 Starting system cleanup...")
 			ctx := context.Background()
 
+			// Parse validation level from flag
+			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
+			validationLevel := parseValidationLevel(validationLevelStr)
+
 			// Load and validate configuration if provided
 			if configFile != "" {
 				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
@@ -42,7 +63,32 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
 
-				// Apply configuration validation (basic only)
+				// Apply validation based on level
+				if validationLevel > config.ValidationLevelNone {
+					fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
+					
+					if validationLevel >= config.ValidationLevelBasic {
+						// Basic validation
+						if len(loadedCfg.Protected) == 0 {
+							return fmt.Errorf("basic validation failed: protected paths cannot be empty")
+						}
+					}
+					
+					if validationLevel >= config.ValidationLevelComprehensive {
+						// Comprehensive validation
+						if err := loadedCfg.Validate(); err != nil {
+							return fmt.Errorf("comprehensive validation failed: %w", err)
+						}
+					}
+					
+					if validationLevel >= config.ValidationLevelStrict {
+						// Strict validation
+						if !loadedCfg.SafeMode {
+							return fmt.Errorf("strict validation failed: safe_mode must be enabled")
+						}
+					}
+				}
+
 				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n", 
 					loadedCfg.SafeMode, len(loadedCfg.Profiles))
 				

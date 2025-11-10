@@ -25,6 +25,10 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			fmt.Println("🔍 Analyzing system state...")
 			ctx := context.Background()
 
+			// Parse validation level from flag
+			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
+			validationLevel = ParseValidationLevel(validationLevelStr)
+
 			// Determine scan parameters from configuration
 			scanType := domain.ScanTypeNixStore
 			recursive := true
@@ -35,7 +39,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			if configFile != "" {
 				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
 				
-				// Set config file path using environment variable (simpler approach)
+				// Set config file path using environment variable
 				os.Setenv("CONFIG_PATH", configFile)
 				
 				var err error
@@ -44,27 +48,36 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
 
-				// Debug: Show what was actually loaded
-				fmt.Printf("🔍 DEBUG: Loaded config:\n")
-				fmt.Printf("  - Version: %s\n", loadedCfg.Version)
-				fmt.Printf("  - SafeMode: %v\n", loadedCfg.SafeMode)
-				fmt.Printf("  - MaxDiskUsage: %d\n", loadedCfg.MaxDiskUsage)
-				fmt.Printf("  - Protected paths: %v\n", loadedCfg.Protected)
-				fmt.Printf("  - Profiles: %v\n", loadedCfg.Profiles)
+				// Apply validation based on level
+				if validationLevel > config.ValidationLevelNone {
+					fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
+					
+					if validationLevel >= config.ValidationLevelBasic {
+						// Basic validation
+						if len(loadedCfg.Protected) == 0 {
+							return fmt.Errorf("basic validation failed: protected paths cannot be empty")
+						}
+					}
+					
+					if validationLevel >= config.ValidationLevelComprehensive {
+						// Comprehensive validation
+						if err := loadedCfg.Validate(); err != nil {
+							return fmt.Errorf("comprehensive validation failed: %w", err)
+						}
+					}
+					
+					if validationLevel >= config.ValidationLevelStrict {
+						// Strict validation
+						if !loadedCfg.SafeMode {
+							return fmt.Errorf("strict validation failed: safe_mode must be enabled")
+						}
+					}
+				}
 
-				// Apply configuration validation using middleware (basic only for now)
-				// middleware := config.NewValidationMiddleware()
-				// Skip comprehensive validation to get basic workflow working
-				// _, err = middleware.ValidateAndLoadConfig(ctx)
-				// if err != nil {
-				//	return fmt.Errorf("configuration validation failed: %w", err)
-				// }
-
-				// Apply config values to scan request
 				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n", 
 					loadedCfg.SafeMode, len(loadedCfg.Profiles))
 				
-				// Use profile-based configuration if available
+				// Apply config values to scan request
 				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists {
 					fmt.Printf("📋 Using daily profile configuration\n")
 					// Extract scan parameters from profile
@@ -92,124 +105,39 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 				return fmt.Errorf("scan validation failed: %w", validatedReq.Error())
 			}
 
-			nixCleaner := cleaner.NewNixCleaner(verbose, true) // dry-run for safety
+			// Perform scan
+			nixScanner := cleaner.NewNixScanner(verbose)
+			result := nixScanner.Scan(ctx, validatedReq.Value())
 
-			// Get Nix generations
-			genResult := nixCleaner.ListGenerations(ctx)
-			if genResult.IsErr() {
-				return handleScanError(genResult.Error())
+			if result.IsErr() {
+				return fmt.Errorf("scan failed: %w", result.Error())
 			}
 
-			generations := genResult.Value()
-			displayScanResults(generations, verbose, nixCleaner, ctx)
+			// Display results
+			displayScanResults(result.Value(), verbose)
 			return nil
 		},
 	}
 
-	// Add configuration file flag
+	// Scan command flags
 	cmd.Flags().StringVarP(&configFile, "config", "c", "", "Configuration file path")
 
 	return cmd
 }
 
-// handleScanError provides user-friendly error messages for scanning
-func handleScanError(err error) error {
-	errMsg := strings.ToLower(err.Error())
+// displayScanResults shows scan results to user
+func displayScanResults(result domain.ScanResult, verbose bool) {
+	fmt.Printf("\n📊 Scan Results:\n")
+	fmt.Printf("   • Total generations: %d\n", result.TotalItems)
+	fmt.Printf("   • Current generation: %d\n", result.CurrentItems)
+	fmt.Printf("   • Cleanable generations: %d\n", result.TotalItems-result.CurrentItems)
+	fmt.Printf("   • Store size: %s\n", format.Bytes(result.TotalBytes))
 
-	switch {
-	case strings.Contains(errMsg, "command not found"):
-		return fmt.Errorf(`❌ Nix package manager not found
-
-💡 To fix this:
-   • Install Nix: curl --proto '=https' --tlsv1.2 -sSf https://nixos.org/install/standalone | sh
-   • Or try other cleanup targets if you don't use Nix
-   
-📚 Learn more: https://nixos.org/`)
-
-	case strings.Contains(errMsg, "permission"):
-		return fmt.Errorf(`❌ Permission denied while scanning
-
-💡 To fix this:
-   • Try running with sudo: sudo clean-wizard scan
-   • Check if you have read access to Nix profiles
-   • Verify Nix is properly installed`)
-
-	case strings.Contains(errMsg, "no such file"):
-		return fmt.Errorf(`❌ Cannot find Nix profiles directory
-
-💡 This could mean:
-   • Nix is not installed correctly
-   • Nix is installed but not in standard location
-   • You're on a system where Nix works differently
-   
-🔧 Try: nix-env --version to check installation`)
-
-	default:
-		return fmt.Errorf(`❌ System scan failed: %s
-
-💡 Suggestions:
-   • Ensure Nix is properly installed
-   • Try running with --verbose for more details
-   • Check system permissions
-   • If this persists, please report an issue`, err.Error())
-	}
-}
-
-// displayScanResults shows user-friendly scan results
-func displayScanResults(generations []domain.NixGeneration, verbose bool, nixCleaner *cleaner.NixCleaner, ctx context.Context) {
-	fmt.Println("\n📊 Scan Results:")
-
-	if len(generations) == 0 {
-		fmt.Println("   🎉 No Nix generations found - your system is clean!")
-		return
-	}
-
-	// Count total generations and identify old ones
-	cleanableCount := 0
-	for _, gen := range generations {
-		if !gen.Current {
-			cleanableCount++
-		}
-	}
-
-	fmt.Printf("   • Total generations: %d\n", len(generations))
-	fmt.Printf("   • Current generation: %s\n", getCurrentGeneration(generations))
-	fmt.Printf("   • Cleanable generations: %d\n", cleanableCount)
-
-	// Get store size
-	storeSize := nixCleaner.GetStoreSize(ctx)
-	if storeSize > 0 {
-		fmt.Printf("   • Store size: %s\n", format.Bytes(storeSize))
-	}
-
-	// Show detailed generation info
-	if verbose {
-		fmt.Println("\n📋 Generation Details:")
-		for _, gen := range generations {
-			status := "🟢 CURRENT"
-			if !gen.Current {
-				status = "🔴 OLD"
-			}
-			fmt.Printf("   %s Generation %s (%s)\n", status, fmt.Sprintf("%d", gen.ID), format.DateTime(gen.Date))
-		}
-	}
-
-	// Provide user guidance
-	if cleanableCount > 0 {
-		fmt.Printf("\n💡 You can clean up %d old generations to free space\n", cleanableCount)
-		fmt.Println("   🏃 Run 'clean-wizard clean' to start cleanup")
-		fmt.Println("   🔍 Try 'clean-wizard clean --dry-run' first to see what would be cleaned")
+	if result.TotalItems > result.CurrentItems {
+		fmt.Printf("\n💡 You can clean up %d old generations to free space\n", result.TotalItems-result.CurrentItems)
+		fmt.Printf("   🏃 Run 'clean-wizard clean' to start cleanup\n")
+		fmt.Printf("   🔍 Try 'clean-wizard clean --dry-run' first to see what would be cleaned\n")
 	} else {
-		fmt.Println("\n🎉 Your Nix system is optimized - no cleanup needed!")
+		fmt.Printf("\n✅ System is already clean - no old generations found\n")
 	}
-}
-
-// getCurrentGeneration finds current generation
-func getCurrentGeneration(generations []domain.NixGeneration) string {
-	for _, gen := range generations {
-		if gen.Current {
-			return fmt.Sprintf("%d", gen.ID)
-		}
-	}
-	return "Unknown"
 }
