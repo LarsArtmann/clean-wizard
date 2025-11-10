@@ -53,7 +53,7 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 	vm.logger.LogValidation(validationResult)
 
 	if !validationResult.IsValid {
-		return nil, errors.ValidationError("configuration validation failed", validationResult.Errors)
+		return nil, errors.ValidationError("configuration validation failed", convertValidationErrors(validationResult.Errors))
 	}
 
 	// Apply sanitization
@@ -89,8 +89,8 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 
 	if !validationResult.IsValid {
 		vm.logger.LogError("config", "save", 
-			errors.ValidationError("configuration validation failed", validationResult.Errors))
-		return nil, errors.ValidationError("configuration validation failed", validationResult.Errors)
+			errors.ValidationError("configuration validation failed", convertValidationErrors(validationResult.Errors)))
+		return nil, errors.ValidationError("configuration validation failed", convertValidationErrors(validationResult.Errors))
 	}
 
 	// Apply sanitization
@@ -123,8 +123,6 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 
 // ValidateConfigChange validates configuration changes
 func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, current, proposed *domain.Config) *ConfigChangeResult {
-	start := time.Now()
-	
 	result := &ConfigChangeResult{
 		IsValid:   true,
 		Changes:   []ConfigChange{},
@@ -157,8 +155,6 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 
 // ValidateProfileOperation validates profile operation
 func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, profileName, operationName string, settings *domain.OperationSettings) *ProfileOperationResult {
-	start := time.Now()
-	
 	result := &ProfileOperationResult{
 		IsValid:    true,
 		Operation:  operationName,
@@ -437,11 +433,6 @@ func (vm *ValidationMiddleware) loadConfigWithValidation(ctx context.Context) (*
 }
 
 // saveConfig saves configuration (needed for enhanced_loader)
-func (vm *ValidationMiddleware) saveConfig(ctx context.Context, cfg *domain.Config) error {
-	_, err := vm.ValidateAndSaveConfig(ctx, cfg)
-	return err
-}
-
 // convertValidationErrors converts []ValidationError to []any
 func convertValidationErrors(validationErrors []ValidationError) []any {
 	converted := make([]any, len(validationErrors))

@@ -48,7 +48,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 				os.Setenv("CONFIG_PATH", configFile)
 				
 				var err error
-				loadedCfg, err = config.LoadWithContext(ctx)
+				loadedCfg, err = config.LoadConfigWithContext(ctx)
 				if err != nil {
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
@@ -67,7 +67,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			} else {
 				// Load default configuration to get profile information
 				var err error
-				loadedCfg, err = config.LoadWithContext(ctx)
+				loadedCfg, err = config.LoadConfigWithContext(ctx)
 				if err != nil {
 					fmt.Printf("⚠️  Could not load default configuration: %v\n", err)
 					// Continue without profile support

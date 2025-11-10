@@ -51,6 +51,16 @@ run: build
 ci: build test
     @echo "✅ CI pipeline completed successfully"
 
+# Find code duplicates
+find-duplicates:
+    @echo "🔍 Finding code duplicates..."
+    dupl -t 50 -v ./...
+
+# Find code duplicates (alternative with golangci-lint)
+find-duplicates-lint:
+    @echo "🔍 Finding code duplicates with golangci-lint..."
+    golangci-lint run --enable-only=dupl
+
 # Default recipe
 default:
     @just --list

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -63,7 +64,7 @@ func NewProfileInfoCommand() *cobra.Command {
 
 // runProfileList lists all available profiles
 func runProfileList(cmd *cobra.Command, args []string) error {
-	cfg, err := config.Load()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -128,7 +129,7 @@ func runProfileList(cmd *cobra.Command, args []string) error {
 func runProfileSelect(cmd *cobra.Command, args []string) error {
 	profileName := args[0]
 
-	cfg, err := config.Load()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -153,10 +154,10 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 
 	// Update current profile in config
 	cfg.CurrentProfile = profileName
-	cfg.Updated = config.GetCurrentTime()
+	cfg.Updated = time.Now()
 
 	// Save configuration
-	if err := config.Save(cfg); err != nil {
+	if err := config.SaveConfig(cfg); err != nil {
 		return fmt.Errorf("failed to save configuration: %w", err)
 	}
 
@@ -168,7 +169,7 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 
 // runProfileInfo shows detailed information about a profile
 func runProfileInfo(cmd *cobra.Command, args []string) error {
-	cfg, err := config.Load()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -236,11 +237,8 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 			fmt.Printf("     Risk Level: %s%s\n", riskColor, string(op.RiskLevel))
 
 			// Show settings if any
-			if len(op.Settings) > 0 {
-				fmt.Printf("     Settings:\n")
-				for key, value := range op.Settings {
-					fmt.Printf("       • %s: %v\n", key, value)
-				}
+			if op.Settings != nil {
+				fmt.Printf("     Settings: Configured operation settings\n")
 			}
 
 			if i < len(profile.Operations)-1 {

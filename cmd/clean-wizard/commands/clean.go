@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"reflect"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -48,7 +49,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 				os.Setenv("CONFIG_PATH", configFile)
 				
 				var err error
-				loadedCfg, err = config.LoadWithContext(ctx)
+				loadedCfg, err = config.LoadConfigWithContext(ctx)
 				if err != nil {
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
@@ -84,7 +85,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			} else {
 				// Load default configuration to get profile information
 				var err error
-				loadedCfg, err = config.LoadWithContext(ctx)
+				loadedCfg, err = config.LoadConfigWithContext(ctx)
 				if err != nil {
 					fmt.Printf("⚠️  Could not load default configuration: %v\n", err)
 					// Continue without profile support
@@ -129,7 +130,8 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					if op.Name == "nix-generations" && op.Enabled {
 						fmt.Printf("🔧 Configuring Nix generations cleanup\n")
 						if op.Settings != nil {
-							settings = op.Settings
+							// Convert OperationSettings to map[string]any for compatibility
+							settings = convertOperationSettingsToMap(op.Settings)
 						}
 						break
 					}
@@ -218,4 +220,46 @@ func displayCleanResults(result domain.CleanResult, verbose bool, duration time.
 	if result.IsValid() {
 		fmt.Printf("\n✅ Cleanup completed successfully\n")
 	}
+}
+
+// convertOperationSettingsToMap converts OperationSettings to map[string]any for compatibility
+func convertOperationSettingsToMap(settings *domain.OperationSettings) map[string]any {
+	if settings == nil {
+		return map[string]any{}
+	}
+	
+	result := make(map[string]any)
+	v := reflect.ValueOf(settings)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	
+	t := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+		
+		// Convert struct fields to map entries
+		if field.Type.Kind() == reflect.Struct {
+			if fieldVal := value.Interface(); fieldVal != nil {
+				switch val := fieldVal.(type) {
+				case domain.NixStoreSettings:
+					result["nix_store"] = val
+				case domain.HomebrewSettings:
+					result["homebrew"] = val
+				case domain.PackageCacheSettings:
+					result["package_cache"] = val
+				case domain.TempFilesSettings:
+					result["temp_files"] = val
+				default:
+					// For unknown types, include as-is
+					result["settings"] = val
+				}
+			}
+		} else {
+			result[field.Name] = value.Interface()
+		}
+	}
+	
+	return result
 }

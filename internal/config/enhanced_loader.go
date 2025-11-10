@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
 	"slices"
 	"time"
 
@@ -520,4 +521,49 @@ func getDefaultRetryPolicy() *RetryPolicy {
 		MaxDelay:      5 * time.Second,
 		BackoffFactor: 2.0,
 	}
+}
+
+// Convenience functions for command compatibility
+
+// LoadConfig loads configuration with default options
+func LoadConfig() (*domain.Config, error) {
+	ctx := context.Background()
+	loader := NewEnhancedConfigLoader()
+	return loader.LoadConfig(ctx, getDefaultLoadOptions())
+}
+
+// LoadConfigWithContext loads configuration with context
+func LoadConfigWithContext(ctx context.Context) (*domain.Config, error) {
+	loader := NewEnhancedConfigLoader()
+	return loader.LoadConfig(ctx, getDefaultLoadOptions())
+}
+
+// SaveConfig saves configuration with default options
+func SaveConfig(cfg *domain.Config) error {
+	ctx := context.Background()
+	loader := NewEnhancedConfigLoader()
+	_, err := loader.SaveConfig(ctx, cfg, getDefaultSaveOptions())
+	return err
+}
+
+// GetConfigPath returns the configuration file path from environment or default
+func GetConfigPath() string {
+	if path := os.Getenv("CONFIG_PATH"); path != "" {
+		return path
+	}
+	return getDefaultConfigPath()
+}
+
+// getCurrentTime returns current time (for config compatibility)
+func getCurrentTime() time.Time {
+	return time.Now()
+}
+
+// getDefaultConfigPath returns the default configuration file path
+func getDefaultConfigPath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "/tmp/clean-wizard.json"
+	}
+	return home + "/.config/clean-wizard/config.json"
 }

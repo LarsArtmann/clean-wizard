@@ -2,8 +2,6 @@ package config
 
 import (
 	"time"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // ConfigChangeResult represents configuration change validation result

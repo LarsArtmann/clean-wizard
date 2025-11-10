@@ -49,7 +49,7 @@ func (cm *ConfigMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.
 	cm.logger.LogValidation(validationResult)
 
 	if !validationResult.IsValid {
-		return nil, errors.ValidationError("configuration validation failed", validationResult.Errors)
+		return nil, errors.ValidationError("configuration validation failed", convertConfigValidationErrors(validationResult.Errors))
 	}
 
 	// Apply sanitization if configured
@@ -84,8 +84,8 @@ func (cm *ConfigMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *doma
 
 	if !validationResult.IsValid {
 		cm.logger.LogError("config", "save", 
-			errors.ValidationError("configuration validation failed", validationResult.Errors))
-		return nil, errors.ValidationError("configuration validation failed", validationResult.Errors)
+			errors.ValidationError("configuration validation failed", convertConfigValidationErrors(validationResult.Errors)))
+		return nil, errors.ValidationError("configuration validation failed", convertConfigValidationErrors(validationResult.Errors))
 	}
 
 	// Apply sanitization
@@ -131,7 +131,19 @@ func (cm *ConfigMiddleware) loadConfigWithValidation(ctx context.Context) (*doma
 
 // saveConfig saves configuration
 func (cm *ConfigMiddleware) saveConfig(ctx context.Context, cfg *domain.Config) error {
-	// This would save to file, database, etc.
-	// For now, just log
+	savedConfig, err := cm.ValidateAndSaveConfig(ctx, cfg)
+	if err != nil {
+		return err
+	}
+	_ = savedConfig
 	return nil
+}
+
+// convertConfigValidationErrors converts []ValidationError to []any
+func convertConfigValidationErrors(validationErrors []ValidationError) []any {
+	converted := make([]any, len(validationErrors))
+	for i, err := range validationErrors {
+		converted[i] = err
+	}
+	return converted
 }
