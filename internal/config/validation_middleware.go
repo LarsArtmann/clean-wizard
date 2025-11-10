@@ -229,6 +229,16 @@ func (vm *ValidationMiddleware) analyzeConfigChanges(current, proposed *domain.C
 		})
 	}
 
+	if current.MaxDiskUsage != proposed.MaxDiskUsage {
+		changes = append(changes, ConfigChange{
+			Field:     "max_disk_usage",
+			Operation: "modified",
+			OldValue:  current.MaxDiskUsage,
+			NewValue:  proposed.MaxDiskUsage,
+			Risk:      "low",
+		})
+	}
+
 	// Analyze protected paths changes
 	pathChanges := vm.analyzePathChanges("protected", current.Protected, proposed.Protected)
 	changes = append(changes, pathChanges...)
