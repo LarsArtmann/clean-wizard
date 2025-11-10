@@ -125,7 +125,11 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 
 	// Apply sanitization if enabled
 	if options.EnableSanitization {
-		ecl.sanitizer.SanitizeConfig(config, validationResult)
+		sanitizationResult := ecl.sanitizer.SanitizeConfig(config)
+		validationResult.Sanitized = map[string]any{
+			"sanitized": sanitizationResult.Sanitized,
+			"changes":   sanitizationResult.Changes,
+		}
 	}
 
 	// Update cache
@@ -157,7 +161,11 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 
 	// Apply sanitization if enabled
 	if options.EnableSanitization {
-		ecl.sanitizer.SanitizeConfig(config, validationResult)
+		sanitizationResult := ecl.sanitizer.SanitizeConfig(config)
+		validationResult.Sanitized = map[string]any{
+			"sanitized": sanitizationResult.Sanitized,
+			"changes":   sanitizationResult.Changes,
+		}
 	}
 
 	// Save with retry

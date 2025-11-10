@@ -353,7 +353,11 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 				Sanitized: make(map[string]any),
 			}
 
-			sanitizer.SanitizeConfig(tt.config, validationResult)
+			sanitizationResult := sanitizer.SanitizeConfig(tt.config)
+			validationResult.Sanitized = map[string]any{
+				"sanitized": sanitizationResult.Sanitized,
+				"changes":   sanitizationResult.Changes,
+			}
 
 			// Check expected changes
 			sanitizedFields, ok := validationResult.Sanitized["sanitized_fields"].([]string)
@@ -376,10 +380,10 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 				}
 			}
 
-			// Check warnings count
-			if warnings, ok := validationResult.Sanitized["warnings"].([]SanitizationWarning); ok {
-				if len(warnings) != tt.expectedWarnings {
-					t.Errorf("Expected %d warnings, got %d", tt.expectedWarnings, len(warnings))
+			// Check changes count
+			if changes, ok := validationResult.Sanitized["changes"].([]SanitizationChange); ok {
+				if len(changes) != tt.expectedWarnings {
+					t.Errorf("Expected %d changes, got %d", tt.expectedWarnings, len(changes))
 				}
 			}
 		})
@@ -433,7 +437,6 @@ func TestValidationMiddleware_ValidateConfigChange(t *testing.T) {
 
 	// Create middleware with custom validator that doesn't sanitize for change detection
 	validator := NewConfigValidatorWithRules(testRules)
-	validator.sanitizer = nil // Disable sanitization during validation for change detection
 	middleware := &ValidationMiddleware{
 		validator: validator,
 		sanitizer: NewConfigSanitizer(),

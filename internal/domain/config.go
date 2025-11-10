@@ -71,10 +71,11 @@ func (c *Config) Validate() error {
 
 // Profile represents cleanup profile
 type Profile struct {
-	Name        string             `json:"name" yaml:"name"`
-	Description string             `json:"description" yaml:"description"`
-	Operations  []CleanupOperation `json:"operations" yaml:"operations"`
-	Enabled     bool               `json:"enabled" yaml:"enabled"`
+	Name         string             `json:"name" yaml:"name"`
+	Description  string             `json:"description" yaml:"description"`
+	Operations   []CleanupOperation `json:"operations" yaml:"operations"`
+	Enabled      bool               `json:"enabled" yaml:"enabled"`
+	MaxRiskLevel RiskLevel          `json:"max_risk_level" yaml:"max_risk_level"`
 }
 
 // IsValid validates profile
