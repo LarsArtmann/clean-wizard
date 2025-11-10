@@ -58,7 +58,7 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.Given(`^configuration includes a daily profile$`, func() error {
 		return nil // Default configs include daily profile
 	})
-	sc.And(`^the profiles include "([^"]+)" and "([^"]+)"$`, func(profile1, profile2 string) error {
+	sc.Given(`^the profiles include "([^"]+)" and "([^"]+)"$`, func(profile1, profile2 string) error {
 		return nil // Multi-profile configs include both profiles
 	})
 	sc.Then(`^scan results should reflect daily profile settings$`, context.shouldSeeScanResultsReflectingDailyProfile)
