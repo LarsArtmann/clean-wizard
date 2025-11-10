@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"time"
+	
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // SafeConfig represents a validated cleaning configuration
@@ -10,7 +12,7 @@ type SafeConfig struct {
 	safeMode bool
 	dryRun   bool
 	backup   bool
-	maxRisk  RiskLevel
+	maxRisk  domain.RiskLevel
 	profiles []SafeProfile
 	created  time.Time
 }
@@ -20,63 +22,22 @@ type SafeProfile struct {
 	name        string
 	description string
 	operations  []SafeOperation
-	maxRisk     RiskLevel
+	maxRisk     domain.RiskLevel
 }
 
 // SafeOperation represents a validated cleaning operation
 type SafeOperation struct {
 	name    CleanType
-	risk    RiskLevel
+	risk    domain.RiskLevel
 	enabled bool
 	backup  bool
 }
 
-// RiskLevel represents operation risk with type safety
-type RiskLevel int
+// String returns string representation (removed - use domain.RiskLevel methods)
 
-const (
-	RiskLow RiskLevel = iota
-	RiskMedium
-	RiskHigh
-	RiskCritical
-)
+// Icon returns emoji for risk level - moved to domain package
 
-// String returns string representation
-func (rl RiskLevel) String() string {
-	switch rl {
-	case RiskLow:
-		return "LOW"
-	case RiskMedium:
-		return "MEDIUM"
-	case RiskHigh:
-		return "HIGH"
-	case RiskCritical:
-		return "CRITICAL"
-	default:
-		return "UNKNOWN"
-	}
-}
 
-// Icon returns emoji for risk level
-func (rl RiskLevel) Icon() string {
-	switch rl {
-	case RiskLow:
-		return "🟢"
-	case RiskMedium:
-		return "🟡"
-	case RiskHigh:
-		return "🟠"
-	case RiskCritical:
-		return "🔴"
-	default:
-		return "⚪"
-	}
-}
-
-// IsValid checks if risk level is valid
-func (rl RiskLevel) IsValid() bool {
-	return rl >= RiskLow && rl <= RiskCritical
-}
 
 // CleanType represents type-safe cleaning types
 type CleanType string
@@ -102,7 +63,7 @@ func (ct CleanType) IsValid() bool {
 func NewSafeConfigBuilder() *SafeConfigBuilder {
 	return &SafeConfigBuilder{
 		profiles: []SafeProfile{},
-		maxRisk:  RiskLow,
+		maxRisk:  domain.RiskLow,
 	}
 }
 
@@ -111,7 +72,7 @@ type SafeConfigBuilder struct {
 	safeMode bool
 	dryRun   bool
 	backup   bool
-	maxRisk  RiskLevel
+	maxRisk  domain.RiskLevel
 	profiles []SafeProfile
 	err      error
 }
@@ -145,7 +106,7 @@ func (scb *SafeConfigBuilder) AddProfile(name, description string) *SafeProfileB
 		description: description,
 		config:      scb,
 		operations:  []SafeOperation{},
-		maxRisk:     RiskLow,
+		maxRisk:     domain.RiskLow,
 	}
 }
 
@@ -160,7 +121,7 @@ func (scb *SafeConfigBuilder) Build() (SafeConfig, error) {
 	}
 
 	if !scb.maxRisk.IsValid() {
-		return SafeConfig{}, fmt.Errorf("invalid risk level: %d", scb.maxRisk)
+		return SafeConfig{}, fmt.Errorf("invalid risk level: %s", scb.maxRisk)
 	}
 
 	return SafeConfig{
@@ -179,12 +140,12 @@ type SafeProfileBuilder struct {
 	description string
 	config      *SafeConfigBuilder
 	operations  []SafeOperation
-	maxRisk     RiskLevel
+	maxRisk     domain.RiskLevel
 	err         error
 }
 
 // AddOperation adds a safe operation
-func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk RiskLevel) *SafeProfileBuilder {
+func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLevel) *SafeProfileBuilder {
 	if spb.err != nil {
 		return spb
 	}
@@ -195,11 +156,11 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk RiskLevel) *S
 	}
 
 	if !risk.IsValid() {
-		spb.err = fmt.Errorf("invalid risk level: %d", risk)
+		spb.err = fmt.Errorf("invalid risk level: %s", risk)
 		return spb
 	}
 
-	if risk > RiskHigh && spb.err == nil {
+	if risk.IsHigherThan(domain.RiskHigh) && spb.err == nil {
 		spb.err = fmt.Errorf("cannot add critical risk operation to profile")
 		return spb
 	}
@@ -208,11 +169,11 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk RiskLevel) *S
 		name:    opType,
 		risk:    risk,
 		enabled: true,
-		backup:  risk >= RiskMedium,
+		backup:  risk.IsHigherOrEqualThan(domain.RiskMedium),
 	}
 
 	spb.operations = append(spb.operations, op)
-	if risk > spb.maxRisk {
+	if risk.IsHigherThan(spb.maxRisk) {
 		spb.maxRisk = risk
 	}
 
@@ -231,7 +192,7 @@ func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 		return spb.config
 	}
 
-	if spb.maxRisk > RiskHigh {
+	if spb.maxRisk.IsHigherThan(domain.RiskHigh) {
 		spb.config.err = fmt.Errorf("profile risk level cannot exceed HIGH")
 		return spb.config
 	}

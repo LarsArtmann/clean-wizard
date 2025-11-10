@@ -87,10 +87,10 @@ func FuzzResultErrorHandling(f *testing.F) {
 		
 		// Error methods should not panic
 		if errResult.IsErr() {
-			error := errResult.Error()
+			errorMsg := errResult.Error().Error()
 			// Error message should be reasonable
-			if len(error) > 10000 { // Reasonable limit
-				t.Logf("Very long error message: %d chars", len(error))
+			if len(errorMsg) > 10000 { // Reasonable limit
+				t.Logf("Very long error message: %d chars", len(errorMsg))
 			}
 		}
 		

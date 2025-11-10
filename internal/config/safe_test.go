@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+	
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // contains helper function
@@ -14,19 +16,19 @@ func contains(s, substr string) bool {
 func TestRiskLevel_String(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    RiskLevel
+		level    domain.RiskLevel
 		expected string
 	}{
-		{"low risk", RiskLow, "LOW"},
-		{"medium risk", RiskMedium, "MEDIUM"},
-		{"high risk", RiskHigh, "HIGH"},
-		{"critical risk", RiskCritical, "CRITICAL"},
-		{"unknown risk", RiskLevel(999), "UNKNOWN"},
+		{"low risk", domain.RiskLow, "LOW"},
+		{"medium risk", domain.RiskMedium, "MEDIUM"},
+		{"high risk", domain.RiskHigh, "HIGH"},
+		{"critical risk", domain.RiskCritical, "CRITICAL"},
+		{"unknown risk", domain.RiskLevel("UNKNOWN"), "UNKNOWN"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := tt.level.String()
+			result := string(tt.level)
 			if result != tt.expected {
 				t.Errorf("String() = %v, want %v", result, tt.expected)
 			}
@@ -37,14 +39,14 @@ func TestRiskLevel_String(t *testing.T) {
 func TestRiskLevel_Icon(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    RiskLevel
+		level    domain.RiskLevel
 		expected string
 	}{
-		{"low risk", RiskLow, "🟢"},
-		{"medium risk", RiskMedium, "🟡"},
-		{"high risk", RiskHigh, "🟠"},
-		{"critical risk", RiskCritical, "🔴"},
-		{"unknown risk", RiskLevel(999), "⚪"},
+		{"low risk", domain.RiskLow, "🟢"},
+		{"medium risk", domain.RiskMedium, "🟡"},
+		{"high risk", domain.RiskHigh, "🟠"},
+		{"critical risk", domain.RiskCritical, "🔴"},
+		{"unknown risk", domain.RiskLevel("UNKNOWN"), "⚪"},
 	}
 
 	for _, tt := range tests {
@@ -60,15 +62,16 @@ func TestRiskLevel_Icon(t *testing.T) {
 func TestRiskLevel_IsValid(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    RiskLevel
+		level    domain.RiskLevel
 		expected bool
 	}{
-		{"low risk", RiskLow, true},
-		{"medium risk", RiskMedium, true},
-		{"high risk", RiskHigh, true},
-		{"critical risk", RiskCritical, true},
-		{"negative risk", RiskLevel(-1), false},
-		{"too high risk", RiskLevel(100), false},
+		{"low risk", domain.RiskLow, true},
+		{"medium risk", domain.RiskMedium, true},
+		{"high risk", domain.RiskHigh, true},
+		{"critical risk", domain.RiskCritical, true},
+		{"unknown risk", domain.RiskLevel("UNKNOWN"), false},
+		{"negative risk", domain.RiskLevel("-1"), false},
+		{"too high risk", domain.RiskLevel("100"), false},
 	}
 
 	for _, tt := range tests {
@@ -117,7 +120,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, RiskLow).
+					AddOperation(CleanTypeNixStore, domain.RiskLow).
 					Done()
 			},
 			expectError: false,
@@ -131,18 +134,25 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			errorMsg:    "config must have at least one profile",
 		},
 		{
-			name: "build config with invalid risk level",
+			name: "build config with valid risk level only",
 			builderFunc: func() *SafeConfigBuilder {
-				builder := NewSafeConfigBuilder().
+				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, RiskLow).
+					AddOperation(CleanTypeNixStore, domain.RiskLow).
 					Done()
-				// Force invalid risk level
-				builder.maxRisk = RiskLevel(999)
-				return builder
+			},
+			expectError: false,
+		},
+		{
+			name: "build config with critical risk operation should fail",
+			builderFunc: func() *SafeConfigBuilder {
+				return NewSafeConfigBuilder().
+					AddProfile("test", "test profile").
+					AddOperation(CleanTypeNixStore, domain.RiskCritical).
+					Done()
 			},
 			expectError: true,
-			errorMsg:    "invalid risk level: 999",
+			errorMsg:    "cannot add critical risk operation to profile",
 		},
 	}
 
@@ -185,7 +195,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, RiskLow)
+					AddOperation(CleanTypeNixStore, domain.RiskLow)
 			},
 			expectError: false,
 		},
@@ -199,14 +209,13 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			errorMsg:    "profile must have at least one operation",
 		},
 		{
-			name: "build profile with critical risk",
+			name: "build profile with high risk (valid)",
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, RiskCritical)
+					AddOperation(CleanTypeNixStore, domain.RiskHigh)
 			},
-			expectError: true,
-			errorMsg:    "cannot add critical risk operation to profile",
+			expectError: false,
 		},
 	}
 

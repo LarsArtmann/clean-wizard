@@ -388,7 +388,12 @@ func (ecl *EnhancedConfigLoader) shouldRetry(err error) bool {
 func (ecl *EnhancedConfigLoader) calculateDelay(attempt int) time.Duration {
 	delay := ecl.retryPolicy.InitialDelay
 	for i := 1; i < attempt; i++ {
-		delay = min(time.Duration(float64(delay)*ecl.retryPolicy.BackoffFactor), ecl.retryPolicy.MaxDelay)
+		calculatedDelay := time.Duration(float64(delay) * ecl.retryPolicy.BackoffFactor)
+		if calculatedDelay < ecl.retryPolicy.MaxDelay {
+			delay = calculatedDelay
+		} else {
+			delay = ecl.retryPolicy.MaxDelay
+		}
 	}
 	return delay
 }

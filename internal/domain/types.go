@@ -27,6 +27,46 @@ func (rl RiskLevel) IsValid() bool {
 	}
 }
 
+// Icon returns emoji for risk level
+func (rl RiskLevel) Icon() string {
+	switch rl {
+	case RiskLow:
+		return "🟢"
+	case RiskMedium:
+		return "🟡"
+	case RiskHigh:
+		return "🟠"
+	case RiskCritical:
+		return "🔴"
+	default:
+		return "⚪"
+	}
+}
+
+// IsHigherThan returns true if this risk level is higher than the comparison
+func (rl RiskLevel) IsHigherThan(other RiskLevel) bool {
+	riskOrder := map[RiskLevel]int{
+		RiskLow:      1,
+		RiskMedium:   2,
+		RiskHigh:     3,
+		RiskCritical: 4,
+	}
+	
+	return riskOrder[rl] > riskOrder[other]
+}
+
+// IsHigherOrEqualThan returns true if this risk level is higher or equal than the comparison
+func (rl RiskLevel) IsHigherOrEqualThan(other RiskLevel) bool {
+	riskOrder := map[RiskLevel]int{
+		RiskLow:      1,
+		RiskMedium:   2,
+		RiskHigh:     3,
+		RiskCritical: 4,
+	}
+	
+	return riskOrder[rl] >= riskOrder[other]
+}
+
 // MarshalYAML implements yaml.Marshaler interface
 func (rl RiskLevel) MarshalYAML() (any, error) {
 	return string(rl), nil

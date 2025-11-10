@@ -110,20 +110,20 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		}
 	}
 
-	// DEBUG: Skip profile validation temporarily to focus on getting configuration loading working
-	// if err := config.Validate(); err != nil {
-	//	return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
-	// }
+	// Enable comprehensive validation - CRITICAL for production safety
+	if err := config.Validate(); err != nil {
+		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+	}
 
-	// Apply comprehensive validation if available (validation temporarily disabled for testing)
+	// Apply comprehensive validation with strict enforcement
 	if validator := NewConfigValidator(); validator != nil {
 		validationResult := validator.ValidateConfig(&config)
 		if !validationResult.IsValid {
-			// Log validation errors but don't fail for backwards compatibility
+			// CRITICAL: Fail fast on validation errors for production safety
 			for _, err := range validationResult.Errors {
-				logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation warning")
+				logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation error")
 			}
-			// Don't fail loading for now, just log warnings
+			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
 		}
 	}
 
@@ -145,7 +145,7 @@ func Save(config *domain.Config) error {
 	v.Set("version", config.Version)
 	v.Set("safe_mode", config.SafeMode)
 	v.Set("max_disk_usage_percent", config.MaxDiskUsage)
-	v.Set("protected_paths", config.Protected)
+	v.Set("protected", config.Protected)
 	v.Set("last_clean", config.LastClean)
 	v.Set("updated", config.Updated)
 
