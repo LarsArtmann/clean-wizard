@@ -430,3 +430,23 @@ func (vm *ValidationMiddleware) getChangeOperation(old, new any) string {
 	}
 	return "modified"
 }
+
+// loadConfigWithValidation loads configuration with validation (needed for enhanced_loader)
+func (vm *ValidationMiddleware) loadConfigWithValidation(ctx context.Context) (*domain.Config, error) {
+	return vm.ValidateAndLoadConfig(ctx)
+}
+
+// saveConfig saves configuration (needed for enhanced_loader)
+func (vm *ValidationMiddleware) saveConfig(ctx context.Context, cfg *domain.Config) error {
+	_, err := vm.ValidateAndSaveConfig(ctx, cfg)
+	return err
+}
+
+// convertValidationErrors converts []ValidationError to []any
+func convertValidationErrors(validationErrors []ValidationError) []any {
+	converted := make([]any, len(validationErrors))
+	for i, err := range validationErrors {
+		converted[i] = err
+	}
+	return converted
+}

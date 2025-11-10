@@ -228,6 +228,7 @@ type ConfigSaveOptions struct {
 	BackupEnabled      bool            `json:"backup_enabled"`
 	ValidationLevel    ValidationLevel `json:"validation_level"`
 	CreateBackup       bool            `json:"create_backup"`
+	Timeout           time.Duration   `json:"timeout"`
 }
 
 // Internal methods
@@ -245,7 +246,8 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, option
 			}
 		}
 
-		// Use basic load function
+		// Use basic load function with timeout
+		timeoutCtx, cancel := context.WithTimeout(ctx, options.Timeout)
 		config, err := ecl.middleware.loadConfigWithValidation(timeoutCtx)
 		cancel()
 
@@ -277,7 +279,9 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config
 			}
 		}
 
+		timeoutCtx, cancel := context.WithTimeout(ctx, options.Timeout)
 		err := ecl.middleware.saveConfig(timeoutCtx, config)
+		cancel()
 		if err == nil {
 			return nil
 		}
