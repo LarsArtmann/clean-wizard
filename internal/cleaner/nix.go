@@ -13,17 +13,17 @@ import (
 
 // NixCleaner handles Nix package manager cleanup with proper type safety
 type NixCleaner struct {
-	adapter  *adapters.NixAdapter
-	verbose  bool
-	dryRun   bool
+	adapter *adapters.NixAdapter
+	verbose bool
+	dryRun  bool
 }
 
 // NewNixCleaner creates Nix cleaner with proper configuration
 func NewNixCleaner(verbose bool, dryRun bool) *NixCleaner {
 	nc := &NixCleaner{
-		adapter:  adapters.NewNixAdapter(0, 0),
-		verbose:  verbose,
-		dryRun:   dryRun,
+		adapter: adapters.NewNixAdapter(0, 0),
+		verbose: verbose,
+		dryRun:  dryRun,
 	}
 	nc.adapter.SetDryRun(dryRun) // Pass dry-run to adapter
 	return nc
@@ -63,11 +63,11 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	if !nc.adapter.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24*time.Hour), Current: true},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48*time.Hour), Current: false},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72*time.Hour), Current: false},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96*time.Hour), Current: false},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120*time.Hour), Current: false},
+			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: true},
+			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: false},
+			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: false},
+			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Current: false},
+			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Current: false},
 		}, "Nix not available - using mock data")
 	}
 
@@ -87,7 +87,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 
 	// Count and remove old generations
 	toRemove := countOldGenerations(generations, keepCount)
-	
+
 	if nc.dryRun {
 		// Use centralized conversion for dry-run
 		estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // 50MB per generation
@@ -100,35 +100,35 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 		// Remove old generations individually to track what's cleaned
 		results := make([]domain.CleanResult, 0, toRemove)
 		start := time.Now()
-		
+
 		for i := len(generations) - toRemove; i < len(generations); i++ {
 			// Skip current generation
 			if generations[i].Current {
 				continue
 			}
-			
+
 			// Remove this generation
 			cleanResult := nc.adapter.RemoveGeneration(ctx, generations[i].ID)
 			if cleanResult.IsErr() {
 				return conversions.ToCleanResultFromError(cleanResult.Error())
 			}
-			
+
 			results = append(results, cleanResult.Value())
 		}
-		
+
 		// Run garbage collection to clean up references
 		gcResult := nc.adapter.CollectGarbage(ctx)
 		if gcResult.IsErr() {
 			return conversions.ToCleanResultFromError(gcResult.Error())
 		}
-		
+
 		results = append(results, gcResult.Value())
-		
+
 		// Combine all results using centralized function
 		combinedResult := conversions.CombineCleanResults(results)
 		combinedResult.CleanTime = time.Since(start)
 		combinedResult.Strategy = "NIX CLEANUP"
-		
+
 		return result.Ok(combinedResult)
 	}
 

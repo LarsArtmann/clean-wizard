@@ -21,6 +21,7 @@ import (
 //   - domain.CleanResult: A fully initialized CleanResult with current timestamp
 //
 // Example:
+//
 //	result := NewCleanResult("NIX_GC", 5, 1024*1024*100)
 //	fmt.Printf("Freed %d bytes", result.FreedBytes)
 func NewCleanResult(strategy string, itemsRemoved int, freedBytes int64) domain.CleanResult {
@@ -49,6 +50,7 @@ func NewCleanResult(strategy string, itemsRemoved int, freedBytes int64) domain.
 //   - domain.CleanResult: A fully initialized CleanResult with timing data
 //
 // Example:
+//
 //	startTime := time.Now()
 //	// ... perform cleaning ...
 //	cleanTime := time.Since(startTime)
@@ -80,6 +82,7 @@ func NewCleanResultWithTiming(strategy string, itemsRemoved int, freedBytes int6
 //   - domain.CleanResult: A fully initialized CleanResult with failure tracking
 //
 // Example:
+//
 //	result := NewCleanResultWithFailures("NIX_CLEANUP", 5, 2, 1024*1024*100, time.Second*30)
 //	fmt.Printf("Success: %d, Failed: %d", result.ItemsRemoved, result.ItemsFailed)
 func NewCleanResultWithFailures(strategy string, itemsRemoved, itemsFailed int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
@@ -108,6 +111,7 @@ func NewCleanResultWithFailures(strategy string, itemsRemoved, itemsFailed int, 
 //   - domain.ScanResult: A fully initialized ScanResult with current timestamp
 //
 // Example:
+//
 //	paths := []string{"/nix/store", "/tmp"}
 //	result := NewScanResult(1024*1024*500, 1000, paths, time.Second*10)
 //	fmt.Printf("Scanned %d items in %v", result.TotalItems, result.ScanTime)
@@ -135,6 +139,7 @@ func NewScanResult(totalBytes int64, totalItems int, scannedPaths []string, scan
 //   - result.Result[domain.CleanResult]: Converted result with default strategy
 //
 // Example:
+//
 //	bytesResult := adapter.GetStoreSize(ctx)
 //	cleanResult := ToCleanResult(bytesResult)
 //	if cleanResult.IsOk() {
@@ -157,6 +162,7 @@ func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanR
 //   - result.Result[domain.CleanResult]: Converted result with specified strategy
 //
 // Example:
+//
 //	bytesResult := adapter.CollectGarbage(ctx)
 //	cleanResult := ToCleanResultWithStrategy(bytesResult, "NIX_GC")
 func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy string) result.Result[domain.CleanResult] {
@@ -183,10 +189,11 @@ func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy string
 //   - result.Result[domain.CleanResult]: Converted result with items and bytes data
 //
 // Example:
+//
 //	bytesResult := adapter.CollectGarbage(ctx)
 //	cleanResult := ToCleanResultFromItems(5, bytesResult, "NIX_GC")
 //	if cleanResult.IsOk() {
-//		fmt.Printf("Removed %d items, freed %d bytes", 
+//		fmt.Printf("Removed %d items, freed %d bytes",
 //			cleanResult.Value().ItemsRemoved, cleanResult.Value().FreedBytes)
 //	}
 func ToCleanResultFromItems(itemsRemoved int, bytesResult result.Result[int64], strategy string) result.Result[domain.CleanResult] {

@@ -101,12 +101,12 @@ func (ctx *BDDTestContext) ensureToolAvailable() error {
 func (ctx *BDDTestContext) nixNotInstalled() error {
 	// Override cleaner to simulate Nix not being available
 	ctx.nixCleaner = cleaner.NewNixCleaner(true, false) // Mock mode only
-	
+
 	// Force operations to fail when Nix not available
 	ctx.generations = result.Err[[]domain.NixGeneration](fmt.Errorf("Nix is not available"))
 	ctx.storeSize = result.Err[int64](fmt.Errorf("Nix is not available"))
 	ctx.cleanResult = result.Err[domain.CleanResult](fmt.Errorf("Nix is not available"))
-	
+
 	return nil
 }
 
@@ -154,10 +154,10 @@ func (ctx *BDDTestContext) runScanCommand() error {
 	if !ctx.generations.IsErr() {
 		ctx.generations = ctx.nixCleaner.ListGenerations(ctx.ctx)
 	}
-	
+
 	storeSize := ctx.nixCleaner.GetStoreSize(ctx.ctx)
 	ctx.storeSize = result.Ok(storeSize)
-	
+
 	return nil
 }
 
@@ -341,9 +341,9 @@ func (ctx *BDDTestContext) shouldSeeHelpfulError() error {
 	}
 
 	errMsg := ctx.generations.Error().Error()
-	if !strings.Contains(errMsg, "command not found") && 
-	   !strings.Contains(errMsg, "no such file") && 
-	   !strings.Contains(errMsg, "Nix is not available") {
+	if !strings.Contains(errMsg, "command not found") &&
+		!strings.Contains(errMsg, "no such file") &&
+		!strings.Contains(errMsg, "Nix is not available") {
 		return fmt.Errorf("expected helpful error message but got: %s", errMsg)
 	}
 

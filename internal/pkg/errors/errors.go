@@ -19,17 +19,17 @@ const (
 	ErrNotFound
 	ErrPermissionDenied
 	ErrTimeout
-	
+
 	// Configuration errors
 	ErrConfigLoad
 	ErrConfigSave
 	ErrConfigValidation
-	
+
 	// Nix-specific errors
 	ErrNixNotAvailable
 	ErrNixCommandFailed
 	ErrNixStoreCorrupted
-	
+
 	// Cleaning errors
 	ErrCleaningFailed
 	ErrCleaningTimeout
@@ -114,13 +114,13 @@ func (e *CleanWizardError) Error() string {
 	if e.Details == nil {
 		return fmt.Sprintf("[%s] %s: %s", e.Level.String(), e.Code.String(), e.Message)
 	}
-	
+
 	details := make([]string, 0, len(e.Details))
 	for key, value := range e.Details {
 		details = append(details, fmt.Sprintf("%s=%v", key, value))
 	}
-	
-	return fmt.Sprintf("[%s] %s: %s (details: %s)", 
+
+	return fmt.Sprintf("[%s] %s: %s (details: %s)",
 		e.Level.String(), e.Code.String(), e.Message, strings.Join(details, ", "))
 }
 
@@ -163,12 +163,12 @@ func NewErrorWithDetails(code ErrorCode, message string, details map[string]any)
 		Timestamp: time.Now(),
 		Stack:     captureStack(),
 	}
-	
+
 	// Add automatic details
 	if err.Details == nil {
 		err.Details = make(map[string]any)
 	}
-	
+
 	return err
 }
 
@@ -236,20 +236,20 @@ func (e *CleanWizardError) IsUserFriendly() bool {
 // Log logs error with appropriate level
 func (e *CleanWizardError) Log() {
 	fields := logrus.Fields{
-		"code":       e.Code.String(),
-		"level":      e.Level.String(),
-		"operation":  e.Operation,
-		"timestamp":  e.Timestamp,
+		"code":      e.Code.String(),
+		"level":     e.Level.String(),
+		"operation": e.Operation,
+		"timestamp": e.Timestamp,
 	}
-	
+
 	if e.Details != nil {
 		for key, value := range e.Details {
 			fields[key] = value
 		}
 	}
-	
+
 	entry := logrus.WithFields(fields)
-	
+
 	switch e.Level {
 	case LevelInfo:
 		entry.Info(e.Message)

@@ -119,7 +119,7 @@ func TestToCleanResult(t *testing.T) {
 	if cleanResult.IsErr() {
 		t.Errorf("Expected Ok result, got error: %v", cleanResult.Error())
 	}
-	
+
 	value := cleanResult.Value()
 	if value.FreedBytes != bytes {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
@@ -138,7 +138,7 @@ func TestToCleanResultWithError(t *testing.T) {
 	if cleanResult.IsOk() {
 		t.Error("Expected error result, got Ok")
 	}
-	
+
 	if cleanResult.Error().Error() != expectedErr.Error() {
 		t.Errorf("Expected error '%s', got '%s'", expectedErr.Error(), cleanResult.Error().Error())
 	}
@@ -154,7 +154,7 @@ func TestToCleanResultWithStrategy(t *testing.T) {
 	if cleanResult.IsErr() {
 		t.Errorf("Expected Ok result, got error: %v", cleanResult.Error())
 	}
-	
+
 	value := cleanResult.Value()
 	if value.FreedBytes != bytes {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
@@ -175,7 +175,7 @@ func TestToCleanResultFromItems(t *testing.T) {
 	if cleanResult.IsErr() {
 		t.Errorf("Expected Ok result, got error: %v", cleanResult.Error())
 	}
-	
+
 	value := cleanResult.Value()
 	if value.ItemsRemoved != itemsRemoved {
 		t.Errorf("Expected items removed %d, got %d", itemsRemoved, value.ItemsRemoved)
@@ -199,7 +199,7 @@ func TestToTimedCleanResult(t *testing.T) {
 	if cleanResult.IsErr() {
 		t.Errorf("Expected Ok result, got error: %v", cleanResult.Error())
 	}
-	
+
 	value := cleanResult.Value()
 	if value.FreedBytes != bytes {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
@@ -237,9 +237,9 @@ func TestToScanResult(t *testing.T) {
 func TestCombineCleanResults(t *testing.T) {
 	result1 := NewCleanResult("strategy1", 3, int64(1024))
 	result2 := NewCleanResult("strategy2", 5, int64(2048))
-	
+
 	results := []domain.CleanResult{result1, result2}
-	
+
 	combined := CombineCleanResults(results)
 
 	if combined.ItemsRemoved != 8 { // 3 + 5
@@ -262,9 +262,9 @@ func TestCombineCleanResults(t *testing.T) {
 func TestCombineCleanResultsWithFailures(t *testing.T) {
 	result1 := NewCleanResultWithFailures("strategy1", 3, 1, int64(1024), time.Second)
 	result2 := NewCleanResultWithFailures("strategy2", 5, 2, int64(2048), 2*time.Second)
-	
+
 	results := []domain.CleanResult{result1, result2}
-	
+
 	combined := CombineCleanResults(results)
 
 	if combined.ItemsRemoved != 8 { // 3 + 5
@@ -283,7 +283,7 @@ func TestCombineCleanResultsWithFailures(t *testing.T) {
 
 func TestCombineCleanResultsEmpty(t *testing.T) {
 	results := []domain.CleanResult{}
-	
+
 	combined := CombineCleanResults(results)
 
 	if combined.ItemsRemoved != 0 {
@@ -306,7 +306,7 @@ func TestExtractBytesFromCleanResult(t *testing.T) {
 	if extracted.IsErr() {
 		t.Errorf("Expected Ok result, got error: %v", extracted.Error())
 	}
-	
+
 	if extracted.Value() != bytes {
 		t.Errorf("Expected bytes %d, got %d", bytes, extracted.Value())
 	}
@@ -321,7 +321,7 @@ func TestExtractBytesFromCleanResultWithError(t *testing.T) {
 	if extracted.IsOk() {
 		t.Error("Expected error result, got Ok")
 	}
-	
+
 	if extracted.Error().Error() != expectedErr.Error() {
 		t.Errorf("Expected error '%s', got '%s'", expectedErr.Error(), extracted.Error().Error())
 	}
@@ -329,13 +329,13 @@ func TestExtractBytesFromCleanResultWithError(t *testing.T) {
 
 func TestToCleanResultFromError(t *testing.T) {
 	expectedErr := fmt.Errorf("test error")
-	
+
 	cleanResult := ToCleanResultFromError(expectedErr)
 
 	if cleanResult.IsOk() {
 		t.Error("Expected error result, got Ok")
 	}
-	
+
 	if cleanResult.Error().Error() != expectedErr.Error() {
 		t.Errorf("Expected error '%s', got '%s'", expectedErr.Error(), cleanResult.Error().Error())
 	}
@@ -343,7 +343,7 @@ func TestToCleanResultFromError(t *testing.T) {
 
 func TestValidateAndConvertCleanResult(t *testing.T) {
 	validResult := NewCleanResult("test", 1, 1024)
-	
+
 	result := ValidateAndConvertCleanResult(validResult)
 
 	if result.IsErr() {
@@ -354,16 +354,16 @@ func TestValidateAndConvertCleanResult(t *testing.T) {
 func TestValidateAndConvertCleanResultInvalid(t *testing.T) {
 	invalidResult := domain.CleanResult{
 		FreedBytes: -1, // Invalid negative bytes
-		CleanedAt: time.Now(),
-		Strategy:  "test",
+		CleanedAt:  time.Now(),
+		Strategy:   "test",
 	}
-	
+
 	result := ValidateAndConvertCleanResult(invalidResult)
 
 	if result.IsOk() {
 		t.Error("Expected error result, got Ok")
 	}
-	
+
 	if !strings.Contains(result.Error().Error(), "invalid CleanResult") {
 		t.Errorf("Expected 'invalid CleanResult' in error, got %s", result.Error().Error())
 	}

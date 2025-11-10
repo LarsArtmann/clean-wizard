@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -19,6 +20,11 @@ const (
 
 // Load loads the configuration from file or creates default
 func Load() (*domain.Config, error) {
+	return LoadWithContext(context.Background())
+}
+
+// LoadWithContext loads configuration with context support
+func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	v := viper.New()
 	v.SetConfigName(configName)
 	v.SetConfigType(configType)
@@ -31,17 +37,22 @@ func Load() (*domain.Config, error) {
 	v.SetDefault("max_disk_usage_percent", 50)
 
 	// Try to read configuration file
-	if err := v.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found, return default config
-			return getDefaultConfig(), nil
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		if err := v.ReadInConfig(); err != nil {
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+				// Config file not found, return default config
+				return getDefaultConfig(), nil
+			}
+			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
-		return nil, pkgerrors.HandleConfigError("Load", err)
 	}
 
 	// Unmarshal profiles section
 	var config domain.Config
-	
+
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
 	config.SafeMode = v.GetBool("safe_mode")
@@ -51,12 +62,23 @@ func Load() (*domain.Config, error) {
 	// Unmarshal profiles section
 	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
 		logrus.WithError(err).Error("Failed to unmarshal profiles")
-		return nil, pkgerrors.HandleConfigError("Load", err)
+		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
 	// Validate configuration
 	if err := config.Validate(); err != nil {
-		return nil, pkgerrors.HandleConfigError("Load", err)
+		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+	}
+
+	// Apply comprehensive validation if available
+	if validator := NewConfigValidator(); validator != nil {
+		validationResult := validator.ValidateConfig(&config)
+		if !validationResult.IsValid {
+			// Log validation errors but don't fail for backwards compatibility
+			for _, err := range validationResult.Errors {
+				logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation warning")
+			}
+		}
 	}
 
 	return &config, nil
@@ -86,7 +108,7 @@ func Save(config *domain.Config) error {
 		v.Set("profiles."+name+".name", profile.Name)
 		v.Set("profiles."+name+".description", profile.Description)
 		v.Set("profiles."+name+".enabled", profile.Enabled)
-		
+
 		for i, op := range profile.Operations {
 			opKey := fmt.Sprintf("profiles.%s.operations.%d", name, i)
 			v.Set(opKey+".name", op.Name)
@@ -117,14 +139,14 @@ func Save(config *domain.Config) error {
 // getDefaultConfig returns the default configuration
 func getDefaultConfig() *domain.Config {
 	now := time.Now()
-	
+
 	return &domain.Config{
 		Version:      "1.0.0",
 		SafeMode:     true, // Default to safe mode
 		MaxDiskUsage: 50,
 		Protected: []string{
 			"/System",
-			"/Applications", 
+			"/Applications",
 			"/Library",
 		},
 		Profiles: map[string]*domain.Profile{
@@ -147,7 +169,7 @@ func getDefaultConfig() *domain.Config {
 						Settings:    map[string]any{"older_than": "7d", "excludes": []string{"/tmp/keep"}},
 					},
 				},
-				Enabled:     true,
+				Enabled: true,
 			},
 			"aggressive": {
 				Name:        "aggressive",
@@ -168,7 +190,7 @@ func getDefaultConfig() *domain.Config {
 						Settings:    map[string]any{"unused_only": true},
 					},
 				},
-				Enabled:     true,
+				Enabled: true,
 			},
 			"comprehensive": {
 				Name:        "comprehensive",
@@ -196,10 +218,10 @@ func getDefaultConfig() *domain.Config {
 						Settings:    map[string]any{"paths": []string{"/tmp", "/var/tmp"}, "older_than": "30d"},
 					},
 				},
-				Enabled:     true,
+				Enabled: true,
 			},
 		},
 		LastClean: now,
-		Updated:  now,
+		Updated:   now,
 	}
 }

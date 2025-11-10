@@ -29,7 +29,7 @@ func colorize(text, color string) string {
 		"cyan":   "\033[36m",
 		"reset":  "\033[0m",
 	}
-	
+
 	if !strings.Contains(os.Getenv("NO_COLOR"), "1") {
 		return colors[color] + text + colors["reset"]
 	}
