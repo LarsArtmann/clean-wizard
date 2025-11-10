@@ -37,6 +37,21 @@ func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddl
 	}
 }
 
+// Helper function to eliminate duplication
+func (vm *ValidationMiddleware) logValidationSuccess(result *SanitizationResult, duration time.Duration) {
+	vm.logger.LogValidation(&ValidationResult{
+		IsValid:  true,
+		Errors:   []ValidationError{},
+		Warnings: []ValidationWarning{},
+		Sanitized: map[string]any{
+			"sanitized": result.Sanitized,
+			"changes":   result.Changes,
+		},
+		Duration:  duration,
+		Timestamp: time.Now(),
+	})
+}
+
 // ValidateAndLoadConfig validates and loads configuration
 func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.Config, error) {
 	start := time.Now()
@@ -63,17 +78,7 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 	// Log success
 	duration := time.Since(start)
 	if vm.logger.(*DefaultValidationLogger).enableDetailedLogging {
-		vm.logger.LogValidation(&ValidationResult{
-			IsValid:  true,
-			Errors:   []ValidationError{},
-			Warnings: []ValidationWarning{},
-			Sanitized: map[string]any{
-				"sanitized": sanitizationResult.Sanitized,
-				"changes":   sanitizationResult.Changes,
-			},
-			Duration:  duration,
-			Timestamp: time.Now(),
-		})
+		vm.logValidationSuccess(sanitizationResult, duration)
 	}
 
 	return config, nil

@@ -33,6 +33,21 @@ func NewConfigMiddlewareWithLogger(logger ValidationLogger) *ConfigMiddleware {
 	}
 }
 
+// Helper function to eliminate duplication
+func (cm *ConfigMiddleware) logValidationSuccess(result *SanitizationResult, duration time.Duration) {
+	cm.logger.LogValidation(&ValidationResult{
+		IsValid:  true,
+		Errors:   []ValidationError{},
+		Warnings: []ValidationWarning{},
+		Sanitized: map[string]any{
+			"sanitized": result.Sanitized,
+			"changes":   result.Changes,
+		},
+		Duration:  duration,
+		Timestamp: time.Now(),
+	})
+}
+
 // ValidateAndLoadConfig validates and loads configuration
 func (cm *ConfigMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.Config, error) {
 	start := time.Now()
@@ -58,17 +73,8 @@ func (cm *ConfigMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.
 
 	duration := time.Since(start)
 	if cm.logger.(*DefaultValidationLogger).enableDetailedLogging {
-		cm.logger.LogValidation(&ValidationResult{
-			IsValid:  true,
-			Errors:   []ValidationError{},
-			Warnings: []ValidationWarning{},
-			Sanitized: map[string]any{
-				"sanitized": sanitizationResult.Sanitized,
-				"changes":   sanitizationResult.Changes,
-			},
-			Duration:  duration,
-			Timestamp: time.Now(),
-		})
+		// Log successful validation
+	cm.logValidationSuccess(sanitizationResult, duration)
 	}
 
 	return config, nil
@@ -100,17 +106,8 @@ func (cm *ConfigMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *doma
 
 	duration := time.Since(start)
 	if cm.logger.(*DefaultValidationLogger).enableDetailedLogging {
-		cm.logger.LogValidation(&ValidationResult{
-			IsValid:  true,
-			Errors:   []ValidationError{},
-			Warnings: []ValidationWarning{},
-			Sanitized: map[string]any{
-				"sanitized": sanitizationResult.Sanitized,
-				"changes":   sanitizationResult.Changes,
-			},
-			Duration:  duration,
-			Timestamp: time.Now(),
-		})
+		// Log successful validation
+	cm.logValidationSuccess(sanitizationResult, duration)
 	}
 
 	return cfg, nil

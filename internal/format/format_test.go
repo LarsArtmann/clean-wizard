@@ -5,6 +5,52 @@ import (
 	"time"
 )
 
+// Helper to eliminate test table iteration duplication
+func runSizeTests(t *testing.T, testCases []struct {
+	name     string
+	bytes    int64
+	expected string
+}) {
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			result := Size(tt.bytes)
+			if result != tt.expected {
+				t.Errorf("Size(%d) = %v, want %v", tt.bytes, result, tt.expected)
+			}
+		})
+	}
+}
+
+func runDurationTests(t *testing.T, testCases []struct {
+	name     string
+	duration time.Duration
+	expected string
+}) {
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			result := Duration(tt.duration)
+			if result != tt.expected {
+				t.Errorf("Duration(%v) = %v, want %v", tt.duration, result, tt.expected)
+			}
+		})
+	}
+}
+
+func runDateTests(t *testing.T, testCases []struct {
+	name     string
+	t        time.Time
+	expected string
+}) {
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			result := Date(tt.t)
+			if result != tt.expected {
+				t.Errorf("Date(%v) = %v, want %v", tt.t, result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestSize(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -22,14 +68,7 @@ func TestSize(t *testing.T) {
 		{"negative", -1024, "-1024 B"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Size(tt.bytes)
-			if result != tt.expected {
-				t.Errorf("Size(%d) = %v, want %v", tt.bytes, result, tt.expected)
-			}
-		})
-	}
+	runSizeTests(t, tests)
 }
 
 func TestDuration(t *testing.T) {
@@ -47,14 +86,7 @@ func TestDuration(t *testing.T) {
 		{"zero", 0, "0 ns"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Duration(tt.duration)
-			if result != tt.expected {
-				t.Errorf("Duration(%v) = %v, want %v", tt.duration, result, tt.expected)
-			}
-		})
-	}
+	runDurationTests(t, tests)
 }
 
 func TestDate(t *testing.T) {
@@ -68,14 +100,7 @@ func TestDate(t *testing.T) {
 		{"unix epoch", time.Unix(0, 0), "1970-01-01"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Date(tt.t)
-			if result != tt.expected {
-				t.Errorf("Date(%v) = %v, want %v", tt.t, result, tt.expected)
-			}
-		})
-	}
+	runDateTests(t, tests)
 }
 
 func TestDateTime(t *testing.T) {

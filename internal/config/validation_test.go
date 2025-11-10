@@ -8,6 +8,44 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// Test helpers to eliminate code duplication
+
+func createTestNixOperation(name, description string, riskLevel domain.RiskLevel) domain.CleanupOperation {
+	return domain.CleanupOperation{
+		Name:        name,
+		Description: description,
+		RiskLevel:   riskLevel,
+		Enabled:     true,
+		Settings: &domain.OperationSettings{
+			Type: domain.OperationTypeNixStore,
+			NixStore: &domain.NixStoreSettings{
+				KeepGenerations: 3,
+				MinAge:          time.Hour * 24,
+				DryRun:          true,
+			},
+		},
+	}
+}
+
+func createTestProfile(name, description string, operations []domain.CleanupOperation) *domain.Profile {
+	return &domain.Profile{
+		Name:        name,
+		Description: description,
+		Operations:  operations,
+		Enabled:     true,
+	}
+}
+
+func createTestConfig(version string, safeMode bool, maxDiskUsage int, protected []string, profiles map[string]*domain.Profile) *domain.Config {
+	return &domain.Config{
+		Version:      version,
+		SafeMode:     safeMode,
+		MaxDiskUsage:  maxDiskUsage,
+		Protected:    protected,
+		Profiles:     profiles,
+	}
+}
+
 func TestConfigValidator_ValidateConfig(t *testing.T) {
 	// Use less strict rules for testing
 	testRules := &ConfigValidationRules{
