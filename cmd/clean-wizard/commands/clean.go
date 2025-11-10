@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/middleware"
@@ -19,6 +20,7 @@ var (
 
 // NewCleanCommand creates clean command with proper domain types
 func NewCleanCommand() *cobra.Command {
+	var configFile string
 	cleanCmd := &cobra.Command{
 		Use:   "clean",
 		Short: "Perform system cleanup",
@@ -26,6 +28,29 @@ func NewCleanCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("🧹 Starting system cleanup...")
 			ctx := context.Background()
+
+			// Load configuration if provided
+			if configFile != "" {
+				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
+				
+				// Set config file path for loader
+				ctx = context.WithValue(ctx, "config_file", configFile)
+				
+				loader := config.NewEnhancedConfigLoader()
+				loadedCfg, err := loader.LoadConfig(ctx, &config.ConfigLoadOptions{
+					ValidationLevel: config.ValidationLevelBasic,
+					EnableCache:    true,
+					EnableSanitization: true,
+					Timeout:       30 * time.Second, // Reasonable timeout
+				})
+				if err != nil {
+					return fmt.Errorf("failed to load configuration: %w", err)
+				}
+
+				// Apply config values
+				fmt.Printf("✅ Configuration validated and loaded: %+v\n", loadedCfg)
+				// TODO: Use config values instead of hardcoded settings
+			}
 
 			// Validate cleaner settings
 			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, cleanDryRun)
@@ -59,6 +84,7 @@ func NewCleanCommand() *cobra.Command {
 	// Clean command flags
 	cleanCmd.Flags().BoolVar(&cleanDryRun, "dry-run", false, "Show what would be cleaned without doing it")
 	cleanCmd.Flags().BoolVar(&cleanVerbose, "verbose", false, "Show detailed output")
+	cleanCmd.Flags().StringVarP(&configFile, "config", "c", "", "Configuration file path")
 
 	return cleanCmd
 }

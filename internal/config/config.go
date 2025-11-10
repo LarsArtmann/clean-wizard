@@ -31,6 +31,11 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	v.AddConfigPath("$HOME")
 	v.AddConfigPath("/etc/clean-wizard")
 
+	// Check for CONFIG_PATH environment variable
+	if configPath := os.Getenv("CONFIG_PATH"); configPath != "" {
+		v.SetConfigFile(configPath)
+	}
+
 	// Set defaults
 	v.SetDefault("version", "1.0.0")
 	v.SetDefault("safe_mode", false)

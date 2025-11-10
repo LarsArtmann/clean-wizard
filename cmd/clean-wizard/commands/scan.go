@@ -3,9 +3,11 @@ package commands
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/middleware"
@@ -14,13 +16,38 @@ import (
 
 // NewScanCommand creates scan command with proper domain types
 func NewScanCommand(verbose bool) *cobra.Command {
-	return &cobra.Command{
+	var configFile string
+	cmd := &cobra.Command{
 		Use:   "scan",
 		Short: "Scan system for cleanable items",
 		Long:  `Analyze your system to identify old files, package caches, and temporary data that can be safely cleaned.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("🔍 Analyzing system state...")
 			ctx := context.Background()
+
+			// Load and validate configuration if provided
+			if configFile != "" {
+				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
+				
+				// Set config file path using environment variable (simpler approach)
+				os.Setenv("CONFIG_PATH", configFile)
+				
+				loadedCfg, err := config.LoadWithContext(ctx)
+				if err != nil {
+					return fmt.Errorf("failed to load configuration: %w", err)
+				}
+
+				// Apply configuration validation using middleware
+				middleware := config.NewValidationMiddleware()
+				_, err = middleware.ValidateAndLoadConfig(ctx)
+				if err != nil {
+					return fmt.Errorf("configuration validation failed: %w", err)
+				}
+
+				// Apply config values to scan request
+				fmt.Printf("✅ Configuration validated and loaded: %+v\n", loadedCfg)
+				// TODO: Use config values instead of hardcoded request
+			}
 
 			// Create scan request
 			scanReq := domain.ScanRequest{
@@ -49,6 +76,11 @@ func NewScanCommand(verbose bool) *cobra.Command {
 			return nil
 		},
 	}
+
+	// Add configuration file flag
+	cmd.Flags().StringVarP(&configFile, "config", "c", "", "Configuration file path")
+
+	return cmd
 }
 
 // handleScanError provides user-friendly error messages for scanning
