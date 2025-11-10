@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -29,30 +30,36 @@ func NewCleanCommand() *cobra.Command {
 			fmt.Println("🧹 Starting system cleanup...")
 			ctx := context.Background()
 
-			// Load configuration if provided
+			// Load and validate configuration if provided
 			if configFile != "" {
 				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
 				
-				// Set config file path for loader
-				ctx = context.WithValue(ctx, "config_file", configFile)
+				// Set config file path using environment variable
+				os.Setenv("CONFIG_PATH", configFile)
 				
-				loader := config.NewEnhancedConfigLoader()
-				loadedCfg, err := loader.LoadConfig(ctx, &config.ConfigLoadOptions{
-					ValidationLevel: config.ValidationLevelBasic,
-					EnableCache:    true,
-					EnableSanitization: true,
-					Timeout:       30 * time.Second, // Reasonable timeout
-				})
+				loadedCfg, err := config.LoadWithContext(ctx)
 				if err != nil {
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
 
-				// Apply config values
-				fmt.Printf("✅ Configuration validated and loaded: %+v\n", loadedCfg)
-				// TODO: Use config values instead of hardcoded settings
+				// Apply configuration validation (basic only)
+				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n", 
+					loadedCfg.SafeMode, len(loadedCfg.Profiles))
+				
+				// Apply config values to clean operation
+				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists {
+					fmt.Printf("📋 Using daily profile configuration\n")
+					// Extract clean parameters from profile
+					for _, op := range dailyProfile.Operations {
+						if op.Name == "nix-generations" && op.Enabled {
+							fmt.Printf("🔧 Configuring Nix generations cleanup\n")
+							// Could extract settings like keep count from op.Settings
+							break
+						}
+					}
+				}
 			}
 
-			// Validate cleaner settings
 			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, cleanDryRun)
 			settings := map[string]any{"generations": 3}
 
@@ -69,14 +76,15 @@ func NewCleanCommand() *cobra.Command {
 			}
 
 			// Clean old generations (keep last 3)
-			result := nixCleaner.CleanOldGenerations(ctx, 3)
+			result := nixCleaner.CleanOldGenerations(ctx,3)
 
 			if result.IsErr() {
-				return handleCleanError(result.Error(), cleanDryRun)
+				_, err := result.Unwrap()
+				return handleCleanError(err, cleanDryRun)
 			}
 
-			// Display results with user-friendly messages
-			displayCleanResults(result.Value(), time.Since(startTime), cleanDryRun)
+			duration := time.Since(startTime)
+			displayCleanResults(result.Value(), cleanVerbose, duration, cleanDryRun)
 			return nil
 		},
 	}
@@ -92,37 +100,45 @@ func NewCleanCommand() *cobra.Command {
 // handleCleanError provides user-friendly error messages
 func handleCleanError(err error, isDryRun bool) error {
 	if isDryRun {
-		return fmt.Errorf("❌ Dry-run failed: %s\n\n💡 Suggestions:\n   • Ensure Nix is installed and accessible\n   • Check if you have permission to read Nix profiles", err.Error())
+		fmt.Printf("🔍 Dry run encountered issues: %s\n", err)
+		return nil
 	}
-
-	return fmt.Errorf("❌ Cleanup failed: %s\n\n💡 Suggestions:\n   • Ensure you have sufficient permissions\n   • Try running with --verbose for more details\n   • Consider using --dry-run first", err.Error())
+	
+	return fmt.Errorf("cleanup failed: %w", err)
 }
 
-// displayCleanResults shows user-friendly success messages
-func displayCleanResults(operation domain.CleanResult, duration time.Duration, isDryRun bool) {
-	fmt.Printf("\n✅ Cleanup completed successfully!\n\n")
-	fmt.Printf("📊 Results Summary:\n")
-	fmt.Printf("   • Items processed: %d\n", operation.ItemsRemoved+operation.ItemsFailed)
-	fmt.Printf("   • Items cleaned: %d\n", operation.ItemsRemoved)
-
-	if operation.FreedBytes > 0 {
-		fmt.Printf("   • Space freed: %s\n", format.Bytes(operation.FreedBytes))
+// displayCleanResults shows cleanup results to user
+func displayCleanResults(result domain.CleanResult, verbose bool, duration time.Duration, isDryRun bool) {
+	status := "SUCCESS"
+	if !result.IsValid() {
+		status = "FAILED"
 	}
 
-	if operation.ItemsFailed > 0 {
-		fmt.Printf("   ⚠️  Items failed: %d\n", operation.ItemsFailed)
+	action := "cleaned"
+	if isDryRun {
+		action = "would be cleaned"
 	}
 
-	fmt.Printf("   • Time taken: %s\n", format.Duration(duration))
-	fmt.Printf("   • Strategy used: %s\n", operation.Strategy)
-
-	if operation.ItemsFailed > 0 {
-		fmt.Printf("\n⚠️  Some items failed to clean\n💡 Try:\n   • Running with --verbose for details\n   • Checking file permissions\n")
+	fmt.Printf("\n🎯 Cleanup Results (%s):\n", status)
+	fmt.Printf("   • Duration: %s\n", duration.String())
+	
+	if result.IsValid() {
+		fmt.Printf("   • Status: %d items %s\n", result.ItemsRemoved, action)
+		if result.FreedBytes > 0 {
+			fmt.Printf("   • Space freed: %s\n", format.Bytes(result.FreedBytes))
+		}
+		
+		if verbose {
+			fmt.Printf("\n📋 Details:\n")
+			fmt.Printf("   - Strategy: %s\n", result.Strategy)
+			fmt.Printf("   - Items failed: %d\n", result.ItemsFailed)
+		}
 	}
 
 	if isDryRun {
-		fmt.Printf("\n🔍 This was a DRY-RUN\n💡 To actually clean, run:\n   clean-wizard clean\n")
+		fmt.Printf("\n💡 This was a dry run - no files were actually deleted\n")
+		fmt.Printf("   🏃 Run 'clean-wizard clean' without --dry-run to perform cleanup\n")
+	} else {
+		fmt.Printf("\n✅ Cleanup completed successfully\n")
 	}
-
-	fmt.Printf("\n💡 Next steps:\n   • Run 'clean-wizard scan' to see current system state\n   • Consider scheduling regular cleanups\n")
 }

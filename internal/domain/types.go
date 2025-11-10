@@ -2,6 +2,8 @@ package domain
 
 import (
 	"fmt"
+	"gopkg.in/yaml.v3"
+	"strings"
 	"time"
 )
 
@@ -23,6 +25,33 @@ func (rl RiskLevel) IsValid() bool {
 	default:
 		return false
 	}
+}
+
+// MarshalYAML implements yaml.Marshaler interface
+func (rl RiskLevel) MarshalYAML() (interface{}, error) {
+	return string(rl), nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler interface
+func (rl *RiskLevel) UnmarshalYAML(value *yaml.Node) error {
+	var s string
+	if err := value.Decode(&s); err != nil {
+		return err
+	}
+	
+	switch strings.ToUpper(s) {
+	case "LOW":
+		*rl = RiskLow
+	case "MEDIUM":
+		*rl = RiskMedium
+	case "HIGH":
+		*rl = RiskHigh
+	case "CRITICAL":
+		*rl = RiskCritical
+	default:
+		return fmt.Errorf("invalid risk level: %s", s)
+	}
+	return nil
 }
 
 // NixGeneration represents Nix store generation

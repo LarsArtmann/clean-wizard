@@ -1,0 +1,25 @@
+version: "1.0.0"
+safe_mode: true
+max_disk_usage: 50
+protected: 
+  - "/"
+  - "/System"
+  - "/Library"
+  - "/Applications"
+  - "/usr"
+  - "/etc"
+  - "/var"
+  - "/bin"
+  - "/sbin"
+profiles:
+  daily:
+    name: "daily"
+    description: "Daily cleanup"
+    enabled: true
+    operations:
+      - name: "nix-generations"
+        description: "Clean Nix generations"
+        risk_level: "LOW"
+        enabled: true
+        settings:
+          keep_count: 3
