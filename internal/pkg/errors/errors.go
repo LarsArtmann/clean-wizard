@@ -260,3 +260,13 @@ func (e *CleanWizardError) Log() {
 		entry.Fatal(e.Message)
 	}
 }
+
+// ValidationError creates a validation error with validation details
+func ValidationError(message string, validationErrors []any) *CleanWizardError {
+	details := map[string]any{
+		"validation_errors": validationErrors,
+		"error_type":      "validation",
+	}
+	
+	return NewErrorWithDetails(ErrConfigValidation, message, details)
+}

@@ -88,8 +88,8 @@ func (bv *BusinessValidator) validateProfileOperations(profileName string, opera
 		seen[op.Name] = true
 
 		// Validate operation has required settings
-		if len(op.Settings) == 0 {
-			return fmt.Errorf("operation '%s' in profile '%s' has no settings", op.Name, profileName)
+		if op.Settings == nil || !op.Settings.IsValid() {
+			return fmt.Errorf("operation '%s' in profile '%s' has invalid settings", op.Name, profileName)
 		}
 	}
 

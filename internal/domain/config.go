@@ -122,11 +122,11 @@ func (p *Profile) Validate(name string) error {
 
 // CleanupOperation represents single cleanup operation
 type CleanupOperation struct {
-	Name        string         `json:"name" yaml:"name"`
-	Description string         `json:"description" yaml:"description"`
-	RiskLevel   RiskLevel      `json:"risk_level" yaml:"risk_level"`
-	Enabled     bool           `json:"enabled" yaml:"enabled"`
-	Settings    map[string]any `json:"settings,omitempty" yaml:"settings,omitempty"`
+	Name        string            `json:"name" yaml:"name"`
+	Description string            `json:"description" yaml:"description"`
+	RiskLevel   RiskLevel         `json:"risk_level" yaml:"risk_level"`
+	Enabled     bool              `json:"enabled" yaml:"enabled"`
+	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }
 
 
