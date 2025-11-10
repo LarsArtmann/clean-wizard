@@ -74,7 +74,7 @@ func (cm *ConfigMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.
 	duration := time.Since(start)
 	if cm.logger.(*DefaultValidationLogger).enableDetailedLogging {
 		// Log successful validation
-	cm.logValidationSuccess(sanitizationResult, duration)
+		cm.logValidationSuccess(sanitizationResult, duration)
 	}
 
 	return config, nil
@@ -107,7 +107,7 @@ func (cm *ConfigMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *doma
 	duration := time.Since(start)
 	if cm.logger.(*DefaultValidationLogger).enableDetailedLogging {
 		// Log successful validation
-	cm.logValidationSuccess(sanitizationResult, duration)
+		cm.logValidationSuccess(sanitizationResult, duration)
 	}
 
 	return cfg, nil

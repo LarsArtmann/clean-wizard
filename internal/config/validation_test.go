@@ -40,7 +40,7 @@ func createTestConfig(version string, safeMode bool, maxDiskUsage int, protected
 	return &domain.Config{
 		Version:      version,
 		SafeMode:     safeMode,
-		MaxDiskUsage:  maxDiskUsage,
+		MaxDiskUsage: maxDiskUsage,
 		Protected:    protected,
 		Profiles:     profiles,
 	}
@@ -553,8 +553,8 @@ func TestValidationMiddleware_ValidateConfigChange(t *testing.T) {
 
 	proposed := &domain.Config{
 		Version:      "1.0.1",
-		SafeMode:     true,                                                                                      // Keep enabled for security
-		MaxDiskUsage: 60,                                                                                        // Changed
+		SafeMode:     true,                                                                                           // Keep enabled for security
+		MaxDiskUsage: 60,                                                                                             // Changed
 		Protected:    []string{"/", "/System", "/Library", "/Applications", "/usr", "/etc", "/var", "/bin", "/sbin"}, // Added root
 		Profiles: map[string]*domain.Profile{
 			"daily": {
