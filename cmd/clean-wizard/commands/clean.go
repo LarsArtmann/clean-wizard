@@ -20,7 +20,7 @@ var (
 )
 
 // NewCleanCommand creates clean command with proper domain types
-func NewCleanCommand() *cobra.Command {
+func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 	var configFile string
 	cleanCmd := &cobra.Command{
 		Use:   "clean",

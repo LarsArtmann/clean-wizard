@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -16,6 +17,7 @@ var (
 	dryRun      bool
 	force       bool
 	profileName string
+	validationLevel string
 )
 
 // colorize adds color to output based on type
@@ -34,6 +36,22 @@ func colorize(text, color string) string {
 		return colors[color] + text + colors["reset"]
 	}
 	return text
+}
+
+// parseValidationLevel converts string to ValidationLevel
+func parseValidationLevel(level string) config.ValidationLevel {
+	switch strings.ToLower(level) {
+	case "none":
+		return config.ValidationLevelNone
+	case "basic":
+		return config.ValidationLevelBasic
+	case "comprehensive":
+		return config.ValidationLevelComprehensive
+	case "strict":
+		return config.ValidationLevelStrict
+	default:
+		return config.ValidationLevelBasic // Safe default
+	}
 }
 
 func init() {
@@ -57,10 +75,17 @@ func init() {
 func main() {
 	rootCmd := commands.NewRootCmd()
 
+	// Add global flags
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
+	rootCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "Show what would be deleted without actually deleting")
+	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "Force cleanup without confirmation")
+	rootCmd.PersistentFlags().StringVar(&profileName, "profile", "daily", "Configuration profile to use")
+	rootCmd.PersistentFlags().StringVar(&validationLevel, "validation-level", "basic", "Validation level: none, basic, comprehensive, strict")
+
 	// Add subcommands
 	rootCmd.AddCommand(
-		commands.NewScanCommand(false),
-		commands.NewCleanCommand(),
+		commands.NewScanCommand(verbose, parseValidationLevel(validationLevel)),
+		commands.NewCleanCommand(parseValidationLevel(validationLevel)),
 	)
 
 	// Handle command execution with proper error handling

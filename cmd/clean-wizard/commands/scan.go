@@ -15,7 +15,7 @@ import (
 )
 
 // NewScanCommand creates scan command with proper domain types
-func NewScanCommand(verbose bool) *cobra.Command {
+func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra.Command {
 	var configFile string
 	cmd := &cobra.Command{
 		Use:   "scan",
