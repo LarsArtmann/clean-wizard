@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
+	"github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 )
 
 // ConfigMiddleware provides core configuration validation and loading
@@ -49,7 +49,7 @@ func (cm *ConfigMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.
 	cm.logger.LogValidation(validationResult)
 
 	if !validationResult.IsValid {
-		return nil, pkgerrors.NewValidationError("configuration validation failed", validationResult.Errors)
+		return nil, errors.ValidationError("configuration validation failed", validationResult.Errors)
 	}
 
 	// Apply sanitization if configured
@@ -84,8 +84,8 @@ func (cm *ConfigMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *doma
 
 	if !validationResult.IsValid {
 		cm.logger.LogError("config", "save", 
-			pkgerrors.NewValidationError("configuration validation failed", validationResult.Errors))
-		return nil, pkgerrors.NewValidationError("configuration validation failed", validationResult.Errors)
+			errors.ValidationError("configuration validation failed", validationResult.Errors))
+		return nil, errors.ValidationError("configuration validation failed", validationResult.Errors)
 	}
 
 	// Apply sanitization

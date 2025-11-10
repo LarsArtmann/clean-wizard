@@ -245,9 +245,8 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, option
 			}
 		}
 
-		// Use existing Load function with timeout context
-		timeoutCtx, cancel := context.WithTimeout(ctx, options.Timeout)
-		config, err := LoadWithContext(timeoutCtx)
+		// Use basic load function
+		config, err := ecl.middleware.loadConfigWithValidation(timeoutCtx)
 		cancel()
 
 		if err == nil {
@@ -278,7 +277,7 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config
 			}
 		}
 
-		err := Save(config)
+		err := ecl.middleware.saveConfig(timeoutCtx, config)
 		if err == nil {
 			return nil
 		}

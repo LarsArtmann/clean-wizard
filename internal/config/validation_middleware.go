@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
+	"github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 )
 
 // ValidationMiddleware provides comprehensive validation for configuration operations
@@ -53,7 +53,7 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 	vm.logger.LogValidation(validationResult)
 
 	if !validationResult.IsValid {
-		return nil, pkgerrors.NewValidationError("configuration validation failed", validationResult.Errors)
+		return nil, errors.ValidationError("configuration validation failed", validationResult.Errors)
 	}
 
 	// Apply sanitization
@@ -89,8 +89,8 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 
 	if !validationResult.IsValid {
 		vm.logger.LogError("config", "save", 
-			pkgerrors.NewValidationError("configuration validation failed", validationResult.Errors))
-		return nil, pkgerrors.NewValidationError("configuration validation failed", validationResult.Errors)
+			errors.ValidationError("configuration validation failed", validationResult.Errors))
+		return nil, errors.ValidationError("configuration validation failed", validationResult.Errors)
 	}
 
 	// Apply sanitization
@@ -131,7 +131,7 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 		Errors:    []string{},
 		Warnings:  []string{},
 		Risk:      "unknown",
-		Timestamp:  time.Now(),
+		Timestamp: time.Now(),
 	}
 
 	// Analyze changes
@@ -152,7 +152,6 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 	// Assess overall risk
 	result.Risk = vm.assessChangeRisk(changes)
 
-	result.Duration = time.Since(start)
 	return result
 }
 
@@ -187,7 +186,6 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, pr
 	// Assess risk
 	result.Risk = vm.assessOperationRisk(operation)
 
-	result.Duration = time.Since(start)
 	return result
 }
 
@@ -377,7 +375,7 @@ func (vm *ValidationMiddleware) assessChangeRisk(changes []ConfigChange) string 
 
 // assessOperationRisk assesses operation risk
 func (vm *ValidationMiddleware) assessOperationRisk(op *domain.CleanupOperation) string {
-	// Use the operation's risk level
+	// Use operation's risk level
 	return string(op.RiskLevel)
 }
 
