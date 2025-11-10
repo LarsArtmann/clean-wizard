@@ -9,9 +9,9 @@ import (
 
 // ConfigValidator provides comprehensive type-safe configuration validation
 type ConfigValidator struct {
-	rules            *ConfigValidationRules
-	basicValidator   *BasicValidator
-	fieldValidator   *FieldValidator
+	rules             *ConfigValidationRules
+	basicValidator    *BasicValidator
+	fieldValidator    *FieldValidator
 	businessValidator *BusinessValidator
 	securityValidator *SecurityValidator
 }
@@ -20,9 +20,9 @@ type ConfigValidator struct {
 func NewConfigValidator() *ConfigValidator {
 	rules := GetDefaultValidationRules()
 	return &ConfigValidator{
-		rules:            rules,
-		basicValidator:   NewBasicValidator(rules),
-		fieldValidator:   NewFieldValidator(rules),
+		rules:             rules,
+		basicValidator:    NewBasicValidator(rules),
+		fieldValidator:    NewFieldValidator(rules),
 		businessValidator: NewBusinessValidator(rules),
 		securityValidator: NewSecurityValidator(rules),
 	}
@@ -31,9 +31,9 @@ func NewConfigValidator() *ConfigValidator {
 // NewConfigValidatorWithRules creates a validator with custom rules
 func NewConfigValidatorWithRules(rules *ConfigValidationRules) *ConfigValidator {
 	return &ConfigValidator{
-		rules:            rules,
-		basicValidator:   NewBasicValidator(rules),
-		fieldValidator:   NewFieldValidator(rules),
+		rules:             rules,
+		basicValidator:    NewBasicValidator(rules),
+		fieldValidator:    NewFieldValidator(rules),
 		businessValidator: NewBusinessValidator(rules),
 		securityValidator: NewSecurityValidator(rules),
 	}

@@ -16,10 +16,10 @@ type ConfigSanitizer struct {
 
 // SanitizationRules defines sanitization constraints
 type SanitizationRules struct {
-	TrimWhitespace     bool `json:"trim_whitespace"`
-	NormalizePaths     bool `json:"normalize_paths"`
-	AddDefaults        bool `json:"add_defaults"`
-	DefaultBackup     bool `json:"default_backup"`
+	TrimWhitespace bool `json:"trim_whitespace"`
+	NormalizePaths bool `json:"normalize_paths"`
+	AddDefaults    bool `json:"add_defaults"`
+	DefaultBackup  bool `json:"default_backup"`
 }
 
 // NewConfigSanitizer creates a configuration sanitizer
@@ -42,7 +42,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config) *SanitizationResul
 		Original:  make(map[string]any),
 		Sanitized: make(map[string]any),
 		Changes:   []SanitizationChange{},
-		Timestamp:  time.Now(),
+		Timestamp: time.Now(),
 	}
 
 	// Store original
@@ -153,6 +153,12 @@ func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *Sanitiza
 					cs.addChange(result, fmt.Sprintf("profiles.%s.operations[%d].name", name, i), op.Name, trimmed, "trimmed whitespace")
 					op.Name = trimmed
 				}
+
+				trimmedDesc := strings.TrimSpace(op.Description)
+				if trimmedDesc != op.Description {
+					cs.addChange(result, fmt.Sprintf("profiles.%s.operations[%d].description", name, i), op.Description, trimmedDesc, "trimmed whitespace")
+					op.Description = trimmedDesc
+				}
 			}
 		}
 	}
@@ -171,6 +177,15 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 		cs.addChange(result, "max_disk_usage", 0, 50, "applied default max disk usage")
 		cfg.MaxDiskUsage = 50
 	}
+
+	// Clamp max disk usage to reasonable range (5-95)
+	if cfg.MaxDiskUsage > 95 {
+		cs.addChange(result, "max_disk_usage", cfg.MaxDiskUsage, 95, "clamped to maximum allowed")
+		cfg.MaxDiskUsage = 95
+	} else if cfg.MaxDiskUsage < 5 && cfg.MaxDiskUsage > 0 {
+		cs.addChange(result, "max_disk_usage", cfg.MaxDiskUsage, 5, "clamped to minimum allowed")
+		cfg.MaxDiskUsage = 5
+	}
 }
 
 // addChange records a sanitization change
@@ -187,9 +202,9 @@ func (cs *ConfigSanitizer) addChange(result *SanitizationResult, field string, o
 // getDefaultSanitizationRules returns default sanitization rules
 func getDefaultSanitizationRules() *SanitizationRules {
 	return &SanitizationRules{
-		TrimWhitespace:  true,
-		NormalizePaths:  true,
-		AddDefaults:     true,
-		DefaultBackup:   true,
+		TrimWhitespace: true,
+		NormalizePaths: true,
+		AddDefaults:    true,
+		DefaultBackup:  true,
 	}
 }

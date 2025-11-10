@@ -10,52 +10,52 @@ import (
 type OperationType string
 
 const (
-	OperationTypeNixStore       OperationType = "nix-store"
-	OperationTypeHomebrew      OperationType = "homebrew"
-	OperationTypePackageCache   OperationType = "package-cache"
-	OperationTypeTempFiles     OperationType = "temp-files"
+	OperationTypeNixStore     OperationType = "nix-store"
+	OperationTypeHomebrew     OperationType = "homebrew"
+	OperationTypePackageCache OperationType = "package-cache"
+	OperationTypeTempFiles    OperationType = "temp-files"
 )
 
 // NixStoreSettings represents Nix store operation settings
 type NixStoreSettings struct {
 	KeepGenerations int           `json:"keep_generations" yaml:"keep_generations"`
-	MinAge         time.Duration `json:"min_age" yaml:"min_age"`
+	MinAge          time.Duration `json:"min_age" yaml:"min_age"`
 	IncludeProfiles bool          `json:"include_profiles" yaml:"include_profiles"`
-	DryRun         bool          `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
+	DryRun          bool          `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
 // HomebrewSettings represents Homebrew operation settings
 type HomebrewSettings struct {
-	KeepLatest     int           `json:"keep_latest" yaml:"keep_latest"`
-	CleanupCaches  bool          `json:"cleanup_caches" yaml:"cleanup_caches"`
-	MinAge         time.Duration `json:"min_age" yaml:"min_age"`
-	DryRun         bool          `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
+	KeepLatest    int           `json:"keep_latest" yaml:"keep_latest"`
+	CleanupCaches bool          `json:"cleanup_caches" yaml:"cleanup_caches"`
+	MinAge        time.Duration `json:"min_age" yaml:"min_age"`
+	DryRun        bool          `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
 // PackageCacheSettings represents package cache operation settings
 type PackageCacheSettings struct {
-	MaxAge      time.Duration `json:"max_age" yaml:"max_age"`
-	MaxSize      int64        `json:"max_size,omitempty" yaml:"max_size,omitempty"`
-	IncludeTypes []string     `json:"include_types" yaml:"include_types"`
+	MaxAge       time.Duration `json:"max_age" yaml:"max_age"`
+	MaxSize      int64         `json:"max_size,omitempty" yaml:"max_size,omitempty"`
+	IncludeTypes []string      `json:"include_types" yaml:"include_types"`
 	DryRun       bool          `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
 // TempFilesSettings represents temporary files operation settings
 type TempFilesSettings struct {
-	MaxAge      time.Duration `json:"max_age" yaml:"max_age"`
-	Paths        []string     `json:"paths,omitempty" yaml:"paths,omitempty"`
-	Patterns     []string     `json:"patterns,omitempty" yaml:"patterns,omitempty"`
-	ExcludePaths []string     `json:"exclude_paths,omitempty" yaml:"exclude_paths,omitempty"`
+	MaxAge       time.Duration `json:"max_age" yaml:"max_age"`
+	Paths        []string      `json:"paths,omitempty" yaml:"paths,omitempty"`
+	Patterns     []string      `json:"patterns,omitempty" yaml:"patterns,omitempty"`
+	ExcludePaths []string      `json:"exclude_paths,omitempty" yaml:"exclude_paths,omitempty"`
 	DryRun       bool          `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
 // OperationSettings represents strongly typed operation settings
 type OperationSettings struct {
-	Type      OperationType       `json:"type" yaml:"type"`
-	NixStore  *NixStoreSettings  `json:"nix_store,omitempty" yaml:"nix_store,omitempty"`
-	Homebrew   *HomebrewSettings   `json:"homebrew,omitempty" yaml:"homebrew,omitempty"`
-	Package    *PackageCacheSettings `json:"package,omitempty" yaml:"package,omitempty"`
-	TempFiles  *TempFilesSettings   `json:"temp_files,omitempty" yaml:"temp_files,omitempty"`
+	Type      OperationType         `json:"type" yaml:"type"`
+	NixStore  *NixStoreSettings     `json:"nix_store,omitempty" yaml:"nix_store,omitempty"`
+	Homebrew  *HomebrewSettings     `json:"homebrew,omitempty" yaml:"homebrew,omitempty"`
+	Package   *PackageCacheSettings `json:"package,omitempty" yaml:"package,omitempty"`
+	TempFiles *TempFilesSettings    `json:"temp_files,omitempty" yaml:"temp_files,omitempty"`
 }
 
 // MarshalJSON implements custom JSON marshaling for backward compatibility

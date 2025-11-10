@@ -24,7 +24,7 @@ var (
 func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 	var configFile string
 	var profileName string
-	
+
 	cleanCmd := &cobra.Command{
 		Use:   "clean",
 		Short: "Perform system cleanup",
@@ -36,7 +36,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			// Parse validation level from flag
 			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
 			validationLevel := ParseValidationLevel(validationLevelStr)
-			
+
 			// Parse profile name from flag
 			profileName, _ = cmd.Flags().GetString("profile")
 
@@ -44,10 +44,10 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			var loadedCfg *domain.Config
 			if configFile != "" {
 				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
-				
+
 				// Set config file path using environment variable
 				os.Setenv("CONFIG_PATH", configFile)
-				
+
 				var err error
 				loadedCfg, err = config.LoadConfigWithContext(ctx)
 				if err != nil {
@@ -57,21 +57,21 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 				// Apply validation based on level
 				if validationLevel > config.ValidationLevelNone {
 					fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
-					
+
 					if validationLevel >= config.ValidationLevelBasic {
 						// Basic validation
 						if len(loadedCfg.Protected) == 0 {
 							return fmt.Errorf("basic validation failed: protected paths cannot be empty")
 						}
 					}
-					
+
 					if validationLevel >= config.ValidationLevelComprehensive {
 						// Comprehensive validation
 						if err := loadedCfg.Validate(); err != nil {
 							return fmt.Errorf("comprehensive validation failed: %w", err)
 						}
 					}
-					
+
 					if validationLevel >= config.ValidationLevelStrict {
 						// Strict validation
 						if !loadedCfg.SafeMode {
@@ -80,7 +80,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					}
 				}
 
-				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n", 
+				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n",
 					loadedCfg.SafeMode, len(loadedCfg.Profiles))
 			} else {
 				// Load default configuration to get profile information
@@ -93,7 +93,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					fmt.Printf("📋 Using configuration from ~/.clean-wizard.yaml\n")
 				}
 			}
-			
+
 			// Apply profile if specified
 			var usedProfile *domain.Profile
 			if loadedCfg != nil && profileName != "" {
@@ -101,11 +101,11 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 				if !exists {
 					return fmt.Errorf("profile '%s' not found in configuration", profileName)
 				}
-				
+
 				if !profile.Enabled {
 					return fmt.Errorf("profile '%s' is disabled", profileName)
 				}
-				
+
 				fmt.Printf("🏷️  Using profile: %s (%s)\n", profileName, profile.Description)
 				usedProfile = profile
 			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
@@ -122,7 +122,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					usedProfile = dailyProfile
 				}
 			}
-			
+
 			// Extract settings from profile if available
 			var settings map[string]any = map[string]any{"generations": 3}
 			if usedProfile != nil {
@@ -153,7 +153,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			}
 
 			// Clean old generations (keep last 3)
-			result := nixCleaner.CleanOldGenerations(ctx,3)
+			result := nixCleaner.CleanOldGenerations(ctx, 3)
 
 			if result.IsErr() {
 				_, err := result.Unwrap()
@@ -180,7 +180,7 @@ func handleCleanError(err error, isDryRun bool) error {
 		fmt.Printf("🔍 Dry run encountered issues: %s\n", err)
 		return nil
 	}
-	
+
 	return fmt.Errorf("cleanup failed: %w", err)
 }
 
@@ -198,13 +198,13 @@ func displayCleanResults(result domain.CleanResult, verbose bool, duration time.
 
 	fmt.Printf("\n🎯 Cleanup Results (%s):\n", status)
 	fmt.Printf("   • Duration: %s\n", duration.String())
-	
+
 	if result.IsValid() {
 		fmt.Printf("   • Status: %d items %s\n", result.ItemsRemoved, action)
 		if result.FreedBytes > 0 {
 			fmt.Printf("   • Space freed: %s\n", format.Bytes(result.FreedBytes))
 		}
-		
+
 		if verbose {
 			fmt.Printf("\n📋 Details:\n")
 			fmt.Printf("   - Strategy: %s\n", result.Strategy)
@@ -216,7 +216,7 @@ func displayCleanResults(result domain.CleanResult, verbose bool, duration time.
 		fmt.Printf("\n💡 This was a dry run - no files were actually deleted\n")
 		fmt.Printf("   🏃 Run 'clean-wizard clean' without --dry-run to perform cleanup\n")
 	}
-	
+
 	if result.IsValid() {
 		fmt.Printf("\n✅ Cleanup completed successfully\n")
 	}
@@ -227,18 +227,18 @@ func convertOperationSettingsToMap(settings *domain.OperationSettings) map[strin
 	if settings == nil {
 		return map[string]any{}
 	}
-	
+
 	result := make(map[string]any)
 	v := reflect.ValueOf(settings)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	
+
 	t := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
-		
+
 		// Convert struct fields to map entries
 		if field.Type.Kind() == reflect.Struct {
 			if fieldVal := value.Interface(); fieldVal != nil {
@@ -260,6 +260,6 @@ func convertOperationSettingsToMap(settings *domain.OperationSettings) map[strin
 			result[field.Name] = value.Interface()
 		}
 	}
-	
+
 	return result
 }

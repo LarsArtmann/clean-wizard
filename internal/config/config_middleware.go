@@ -36,7 +36,7 @@ func NewConfigMiddlewareWithLogger(logger ValidationLogger) *ConfigMiddleware {
 // ValidateAndLoadConfig validates and loads configuration
 func (cm *ConfigMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.Config, error) {
 	start := time.Now()
-	
+
 	// Load configuration with validation
 	config, err := cm.loadConfigWithValidation(ctx)
 	if err != nil {
@@ -59,9 +59,9 @@ func (cm *ConfigMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.
 	duration := time.Since(start)
 	if cm.logger.(*DefaultValidationLogger).enableDetailedLogging {
 		cm.logger.LogValidation(&ValidationResult{
-			IsValid:   true,
-			Errors:    []ValidationError{},
-			Warnings:  []ValidationWarning{},
+			IsValid:  true,
+			Errors:   []ValidationError{},
+			Warnings: []ValidationWarning{},
 			Sanitized: map[string]any{
 				"sanitized": sanitizationResult.Sanitized,
 				"changes":   sanitizationResult.Changes,
@@ -83,7 +83,7 @@ func (cm *ConfigMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *doma
 	cm.logger.LogValidation(validationResult)
 
 	if !validationResult.IsValid {
-		cm.logger.LogError("config", "save", 
+		cm.logger.LogError("config", "save",
 			errors.ValidationError("configuration validation failed", convertConfigValidationErrors(validationResult.Errors)))
 		return nil, errors.ValidationError("configuration validation failed", convertConfigValidationErrors(validationResult.Errors))
 	}
@@ -101,9 +101,9 @@ func (cm *ConfigMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *doma
 	duration := time.Since(start)
 	if cm.logger.(*DefaultValidationLogger).enableDetailedLogging {
 		cm.logger.LogValidation(&ValidationResult{
-			IsValid:   true,
-			Errors:    []ValidationError{},
-			Warnings:  []ValidationWarning{},
+			IsValid:  true,
+			Errors:   []ValidationError{},
+			Warnings: []ValidationWarning{},
 			Sanitized: map[string]any{
 				"sanitized": sanitizationResult.Sanitized,
 				"changes":   sanitizationResult.Changes,
@@ -121,11 +121,11 @@ func (cm *ConfigMiddleware) loadConfigWithValidation(ctx context.Context) (*doma
 	// This would load from file, database, etc.
 	// For now, return a basic configuration
 	return &domain.Config{
-		Version:    "1.0.0",
-		SafeMode:   true,
+		Version:      "1.0.0",
+		SafeMode:     true,
 		MaxDiskUsage: 50,
-		Protected:  []string{"/", "/System", "/Library", "/usr", "/etc"},
-		Profiles:   map[string]*domain.Profile{},
+		Protected:    []string{"/", "/System", "/Library", "/usr", "/etc"},
+		Profiles:     map[string]*domain.Profile{},
 	}, nil
 }
 

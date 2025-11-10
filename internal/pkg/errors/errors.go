@@ -265,8 +265,8 @@ func (e *CleanWizardError) Log() {
 func ValidationError(message string, validationErrors []any) *CleanWizardError {
 	details := map[string]any{
 		"validation_errors": validationErrors,
-		"error_type":      "validation",
+		"error_type":        "validation",
 	}
-	
+
 	return NewErrorWithDetails(ErrConfigValidation, message, details)
 }

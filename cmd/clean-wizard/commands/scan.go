@@ -18,7 +18,7 @@ import (
 func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra.Command {
 	var configFile string
 	var profileName string
-	
+
 	cmd := &cobra.Command{
 		Use:   "scan",
 		Short: "Scan system for cleanable items",
@@ -30,7 +30,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			// Parse validation level from flag
 			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
 			validationLevel = ParseValidationLevel(validationLevelStr)
-			
+
 			// Parse profile name from flag
 			profileName, _ = cmd.Flags().GetString("profile")
 
@@ -43,10 +43,10 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			// Load and validate configuration if provided
 			if configFile != "" {
 				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
-				
+
 				// Set config file path using environment variable
 				os.Setenv("CONFIG_PATH", configFile)
-				
+
 				var err error
 				loadedCfg, err = config.LoadConfigWithContext(ctx)
 				if err != nil {
@@ -56,7 +56,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 				// Apply validation based on level
 				if validationLevel > config.ValidationLevelNone {
 					fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
-					
+
 					if validationLevel >= config.ValidationLevelBasic {
 						// Basic validation
 						if len(loadedCfg.Protected) == 0 {
@@ -75,25 +75,25 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 					fmt.Printf("📋 Using configuration from ~/.clean-wizard.yaml\n")
 				}
 			}
-			
+
 			// Apply validation if we have loaded configuration
 			if loadedCfg != nil && validationLevel > config.ValidationLevelNone {
 				fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
-				
+
 				if validationLevel >= config.ValidationLevelBasic {
 					// Basic validation
 					if len(loadedCfg.Protected) == 0 {
 						return fmt.Errorf("basic validation failed: protected paths cannot be empty")
 					}
 				}
-					
+
 				if validationLevel >= config.ValidationLevelComprehensive {
 					// Comprehensive validation
 					if err := loadedCfg.Validate(); err != nil {
 						return fmt.Errorf("comprehensive validation failed: %w", err)
 					}
 				}
-					
+
 				if validationLevel >= config.ValidationLevelStrict {
 					// Strict validation
 					if !loadedCfg.SafeMode {
@@ -101,21 +101,21 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 					}
 				}
 
-				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n", 
+				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n",
 					loadedCfg.SafeMode, len(loadedCfg.Profiles))
 			}
-			
+
 			// Apply profile if specified
 			if loadedCfg != nil && profileName != "" {
 				profile, exists := loadedCfg.Profiles[profileName]
 				if !exists {
 					return fmt.Errorf("profile '%s' not found in configuration", profileName)
 				}
-				
+
 				if !profile.Enabled {
 					return fmt.Errorf("profile '%s' is disabled", profileName)
 				}
-				
+
 				fmt.Printf("🏷️  Using profile: %s (%s)\n", profileName, profile.Description)
 			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
 				// Use current profile from config
@@ -155,7 +155,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			// Perform scan
 			nixCleaner := cleaner.NewNixCleaner(verbose, false)
 			result := nixCleaner.ListGenerations(ctx)
-			
+
 			if result.IsErr() {
 				return fmt.Errorf("scan failed: %w", result.Error())
 			}
@@ -186,7 +186,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 func displayScanResults(result domain.ScanResult, generations []domain.NixGeneration, verbose bool) {
 	fmt.Printf("\n📊 Scan Results:\n")
 	fmt.Printf("   • Total generations: %d\n", result.TotalItems)
-	
+
 	// Count current generations
 	currentCount := 0
 	for _, gen := range generations {
@@ -194,10 +194,10 @@ func displayScanResults(result domain.ScanResult, generations []domain.NixGenera
 			currentCount++
 		}
 	}
-	
+
 	// Calculate cleanable generations (non-current ones)
 	cleanableCount := len(generations) - currentCount
-	
+
 	fmt.Printf("   • Current generation: %d\n", currentCount)
 	fmt.Printf("   • Cleanable generations: %d\n", cleanableCount)
 	fmt.Printf("   • Store size: %s\n", format.Bytes(result.TotalBytes))
@@ -209,7 +209,7 @@ func displayScanResults(result domain.ScanResult, generations []domain.NixGenera
 	} else {
 		fmt.Printf("\n✅ System is already clean - no old generations found\n")
 	}
-	
+
 	// Add completion message for BDD tests
 	fmt.Printf("\n✅ Scan completed!\n")
 }

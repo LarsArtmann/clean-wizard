@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -162,10 +163,8 @@ func (ov *OperationValidator) validateTempFilesSettings(settings *domain.TempFil
 	}
 
 	// Security validation
-	for _, excludePath := range settings.ExcludePaths {
-		if excludePath == "" {
-			return fmt.Errorf("exclude paths cannot contain empty strings")
-		}
+	if slices.Contains(settings.ExcludePaths, "") {
+		return fmt.Errorf("exclude paths cannot contain empty strings")
 	}
 
 	return nil

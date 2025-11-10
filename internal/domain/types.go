@@ -51,7 +51,7 @@ func (rl RiskLevel) IsHigherThan(other RiskLevel) bool {
 		RiskHigh:     3,
 		RiskCritical: 4,
 	}
-	
+
 	return riskOrder[rl] > riskOrder[other]
 }
 
@@ -63,7 +63,7 @@ func (rl RiskLevel) IsHigherOrEqualThan(other RiskLevel) bool {
 		RiskHigh:     3,
 		RiskCritical: 4,
 	}
-	
+
 	return riskOrder[rl] >= riskOrder[other]
 }
 

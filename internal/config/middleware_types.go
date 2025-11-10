@@ -6,32 +6,32 @@ import (
 
 // ConfigChangeResult represents configuration change validation result
 type ConfigChangeResult struct {
-	IsValid bool           `json:"is_valid"`
-	Changes []ConfigChange  `json:"changes"`
-	Errors  []string       `json:"errors"`
-	Warnings []string      `json:"warnings"`
-	Risk    string         `json:"risk"`
-	Timestamp time.Time    `json:"timestamp"`
+	IsValid   bool           `json:"is_valid"`
+	Changes   []ConfigChange `json:"changes"`
+	Errors    []string       `json:"errors"`
+	Warnings  []string       `json:"warnings"`
+	Risk      string         `json:"risk"`
+	Timestamp time.Time      `json:"timestamp"`
 }
 
 // ConfigChange represents a configuration change
 type ConfigChange struct {
-	Field     string      `json:"field"`
-	Operation string      `json:"operation"`
-	OldValue  interface{} `json:"old_value"`
-	NewValue  interface{} `json:"new_value"`
-	Risk      string      `json:"risk"`
+	Field     string `json:"field"`
+	Operation string `json:"operation"`
+	OldValue  any    `json:"old_value"`
+	NewValue  any    `json:"new_value"`
+	Risk      string `json:"risk"`
 }
 
 // ProfileOperationResult represents profile operation validation result
 type ProfileOperationResult struct {
-	IsValid    bool   `json:"is_valid"`
-	Operation  string `json:"operation"`
-	Profile    string `json:"profile"`
-	Risk       string `json:"risk"`
-	Suggestions []string `json:"suggestions"`
-	Errors     []string `json:"errors"`
-	Timestamp  time.Time `json:"timestamp"`
+	IsValid     bool      `json:"is_valid"`
+	Operation   string    `json:"operation"`
+	Profile     string    `json:"profile"`
+	Risk        string    `json:"risk"`
+	Suggestions []string  `json:"suggestions"`
+	Errors      []string  `json:"errors"`
+	Timestamp   time.Time `json:"timestamp"`
 }
 
 // AddError adds an error to the result

@@ -52,7 +52,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 				Version:      "1.0.0",
 				SafeMode:     true,
 				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin"},
+				Protected:    []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin", "/"},
 				Profiles: map[string]*domain.Profile{
 					"daily": {
 						Name:        "daily",
@@ -63,6 +63,14 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
 								Enabled:     true,
+								Settings: &domain.OperationSettings{
+									Type: domain.OperationTypeNixStore,
+									NixStore: &domain.NixStoreSettings{
+										KeepGenerations: 3,
+										MinAge:          time.Hour * 24,
+										DryRun:          true,
+									},
+								},
 							},
 						},
 						Enabled: true,
@@ -88,6 +96,14 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
 								Enabled:     true,
+								Settings: &domain.OperationSettings{
+									Type: domain.OperationTypeNixStore,
+									NixStore: &domain.NixStoreSettings{
+										KeepGenerations: 3,
+										MinAge:          time.Hour * 24,
+										DryRun:          true,
+									},
+								},
 							},
 						},
 						Enabled: true,
@@ -114,6 +130,14 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
 								Enabled:     true,
+								Settings: &domain.OperationSettings{
+									Type: domain.OperationTypeNixStore,
+									NixStore: &domain.NixStoreSettings{
+										KeepGenerations: 3,
+										MinAge:          time.Hour * 24,
+										DryRun:          true,
+									},
+								},
 							},
 						},
 						Enabled: true,
@@ -140,6 +164,14 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
 								Enabled:     true,
+								Settings: &domain.OperationSettings{
+									Type: domain.OperationTypeNixStore,
+									NixStore: &domain.NixStoreSettings{
+										KeepGenerations: 3,
+										MinAge:          time.Hour * 24,
+										DryRun:          true,
+									},
+								},
 							},
 						},
 						Enabled: true,
@@ -306,6 +338,14 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
 								Enabled:     true,
+								Settings: &domain.OperationSettings{
+									Type: domain.OperationTypeNixStore,
+									NixStore: &domain.NixStoreSettings{
+										KeepGenerations: 3,
+										MinAge:          time.Hour * 24,
+										DryRun:          true,
+									},
+								},
 							},
 						},
 						Enabled: true,
@@ -332,6 +372,14 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
 								Enabled:     true,
+								Settings: &domain.OperationSettings{
+									Type: domain.OperationTypeNixStore,
+									NixStore: &domain.NixStoreSettings{
+										KeepGenerations: 3,
+										MinAge:          time.Hour * 24,
+										DryRun:          true,
+									},
+								},
 							},
 						},
 						Enabled: true,
@@ -360,30 +408,30 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			}
 
 			// Check expected changes
-			sanitizedFields, ok := validationResult.Sanitized["sanitized_fields"].([]string)
-			if ok && len(sanitizedFields) == 0 && len(tt.expectedChanges) > 0 {
-				t.Errorf("Expected %d sanitized fields, got none", len(tt.expectedChanges))
+			changes, ok := validationResult.Sanitized["changes"].([]SanitizationChange)
+			if !ok && len(tt.expectedChanges) > 0 {
+				t.Errorf("Expected changes but got no changes array")
 			}
 
-			for _, expectedChange := range tt.expectedChanges {
-				found := false
-				if ok {
-					for _, field := range sanitizedFields {
-						if field == expectedChange || len(field) > len(expectedChange) && field[len(field)-len(expectedChange):] == expectedChange {
+			if ok {
+				for _, expectedChange := range tt.expectedChanges {
+					found := false
+					for _, change := range changes {
+						if change.Field == expectedChange || len(change.Field) > len(expectedChange) && change.Field[len(change.Field)-len(expectedChange):] == expectedChange {
 							found = true
 							break
 						}
 					}
-				}
-				if !found {
-					t.Errorf("Expected change for field '%s', not found in: %v", expectedChange, sanitizedFields)
+					if !found {
+						t.Errorf("Expected change for field '%s', not found in: %v", expectedChange, changes)
+					}
 				}
 			}
 
 			// Check changes count
-			if changes, ok := validationResult.Sanitized["changes"].([]SanitizationChange); ok {
-				if len(changes) != tt.expectedWarnings {
-					t.Errorf("Expected %d changes, got %d", tt.expectedWarnings, len(changes))
+			if ok {
+				if len(changes) != len(tt.expectedChanges) {
+					t.Errorf("Expected %d changes, got %d", len(tt.expectedChanges), len(changes))
 				}
 			}
 		})

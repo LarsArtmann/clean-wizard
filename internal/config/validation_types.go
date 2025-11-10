@@ -53,12 +53,12 @@ type ValidationWarning struct {
 
 // ValidationResult represents the complete validation result
 type ValidationResult struct {
-	IsValid   bool                        `json:"is_valid"`
-	Errors    []ValidationError            `json:"errors"`
-	Warnings  []ValidationWarning           `json:"warnings"`
-	Sanitized map[string]any              `json:"sanitized,omitempty"`
-	Duration  time.Duration               `json:"duration"`
-	Timestamp time.Time                   `json:"timestamp"`
+	IsValid   bool                `json:"is_valid"`
+	Errors    []ValidationError   `json:"errors"`
+	Warnings  []ValidationWarning `json:"warnings"`
+	Sanitized map[string]any      `json:"sanitized,omitempty"`
+	Duration  time.Duration       `json:"duration"`
+	Timestamp time.Time           `json:"timestamp"`
 }
 
 // AddError adds an error to the validation result
@@ -129,18 +129,18 @@ func (vr *ValidationResult) GetWarningsByField(field string) []ValidationWarning
 
 // SanitizationResult represents sanitization results
 type SanitizationResult struct {
-	Original  map[string]any `json:"original"`
-	Sanitized map[string]any `json:"sanitized"`
+	Original  map[string]any       `json:"original"`
+	Sanitized map[string]any       `json:"sanitized"`
 	Changes   []SanitizationChange `json:"changes"`
-	Timestamp time.Time        `json:"timestamp"`
+	Timestamp time.Time            `json:"timestamp"`
 }
 
 // SanitizationChange represents a single sanitization change
 type SanitizationChange struct {
-	Field    string      `json:"field"`
-	OldValue any         `json:"old_value"`
-	NewValue any         `json:"new_value"`
-	Reason   string      `json:"reason"`
+	Field    string `json:"field"`
+	OldValue any    `json:"old_value"`
+	NewValue any    `json:"new_value"`
+	Reason   string `json:"reason"`
 }
 
 // HasChanges returns true if sanitization made changes

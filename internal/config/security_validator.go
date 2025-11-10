@@ -93,17 +93,17 @@ func (sv *SecurityValidator) pathMatches(protected, systemPath string) bool {
 
 // isParentPath checks if parent is a parent of child path
 func (sv *SecurityValidator) isParentPath(parent, child string) bool {
-	return len(child) > len(parent) && 
-		   child[:len(parent)] == parent && 
-		   (parent[len(parent)-1] == '/' || child[len(parent)] == '/')
+	return len(child) > len(parent) &&
+		child[:len(parent)] == parent &&
+		(parent[len(parent)-1] == '/' || child[len(parent)] == '/')
 }
 
 // isPathTraversal checks for path traversal patterns
 func (sv *SecurityValidator) isPathTraversal(path string) bool {
-	return filepath.Clean(path) != path || 
-		   len(path) > 0 && path[0] != '/' && 
-		   (filepath.Clean("../"+path) == filepath.Clean(path) || 
-		    filepath.Clean(path+"../") != filepath.Clean(path))
+	return filepath.Clean(path) != path ||
+		len(path) > 0 && path[0] != '/' &&
+			(filepath.Clean("../"+path) == filepath.Clean(path) ||
+				filepath.Clean(path+"../") != filepath.Clean(path))
 }
 
 // validateProfileSecurity validates security constraints for a profile

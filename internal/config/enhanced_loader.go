@@ -229,7 +229,7 @@ type ConfigSaveOptions struct {
 	BackupEnabled      bool            `json:"backup_enabled"`
 	ValidationLevel    ValidationLevel `json:"validation_level"`
 	CreateBackup       bool            `json:"create_backup"`
-	Timeout           time.Duration   `json:"timeout"`
+	Timeout            time.Duration   `json:"timeout"`
 }
 
 // Internal methods

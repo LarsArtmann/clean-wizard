@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"slices"
 )
 
 // ConfigValidationRules defines all validation constraints
@@ -48,16 +49,10 @@ func (vr *ValidationRule[T]) IsSatisfiedBy(value T) bool {
 
 	// For now, skip range constraints due to type limitations
 	// In a real implementation, we'd use reflection or type-specific methods
-	
+
 	// Check enum constraints
 	if len(vr.Enum) > 0 {
-		found := false
-		for _, enum := range vr.Enum {
-			if value == enum {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(vr.Enum, value)
 		if !found {
 			return false
 		}
@@ -123,7 +118,7 @@ func GetDefaultValidationRules() *ConfigValidationRules {
 // GetStrictValidationRules returns stricter validation rules for production
 func GetStrictValidationRules() *ConfigValidationRules {
 	rules := GetDefaultValidationRules()
-	
+
 	// Make rules stricter
 	minUsage := 20
 	maxUsage := 80
@@ -145,7 +140,7 @@ func GetStrictValidationRules() *ConfigValidationRules {
 // GetDevelopmentValidationRules returns relaxed rules for development
 func GetDevelopmentValidationRules() *ConfigValidationRules {
 	rules := GetDefaultValidationRules()
-	
+
 	// Relax rules for development
 	rules.RequireSafeMode = false
 	rules.UniqueProfiles = false

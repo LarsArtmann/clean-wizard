@@ -54,12 +54,19 @@ ci: build test
 # Find code duplicates
 find-duplicates:
     @echo "🔍 Finding code duplicates..."
-    dupl -t 50 -v ./...
+    dupl -t 50 -v .
 
 # Find code duplicates (alternative with golangci-lint)
 find-duplicates-lint:
     @echo "🔍 Finding code duplicates with golangci-lint..."
     golangci-lint run --enable-only=dupl
+
+# Lint code
+lint:
+    @echo "🎨 Running linters..."
+    go fmt ./...
+    go vet ./...
+    @echo "✅ Linting complete"
 
 # Default recipe
 default:

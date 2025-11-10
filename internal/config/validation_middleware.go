@@ -11,18 +11,18 @@ import (
 
 // ValidationMiddleware provides comprehensive validation for configuration operations
 type ValidationMiddleware struct {
-	validator           *ConfigValidator
-	sanitizer           *ConfigSanitizer
-	logger              ValidationLogger
-	operationValidator   *OperationValidator
+	validator          *ConfigValidator
+	sanitizer          *ConfigSanitizer
+	logger             ValidationLogger
+	operationValidator *OperationValidator
 }
 
 // NewValidationMiddleware creates a new validation middleware
 func NewValidationMiddleware() *ValidationMiddleware {
 	return &ValidationMiddleware{
-		validator:         NewConfigValidator(),
-		sanitizer:         NewConfigSanitizer(),
-		logger:            NewDefaultValidationLogger(false),
+		validator:          NewConfigValidator(),
+		sanitizer:          NewConfigSanitizer(),
+		logger:             NewDefaultValidationLogger(false),
 		operationValidator: NewOperationValidator(false),
 	}
 }
@@ -30,9 +30,9 @@ func NewValidationMiddleware() *ValidationMiddleware {
 // NewValidationMiddlewareWithLogger creates middleware with custom logger
 func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddleware {
 	return &ValidationMiddleware{
-		validator:         NewConfigValidator(),
-		sanitizer:         NewConfigSanitizer(),
-		logger:            logger,
+		validator:          NewConfigValidator(),
+		sanitizer:          NewConfigSanitizer(),
+		logger:             logger,
 		operationValidator: NewOperationValidator(false),
 	}
 }
@@ -40,7 +40,7 @@ func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddl
 // ValidateAndLoadConfig validates and loads configuration
 func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.Config, error) {
 	start := time.Now()
-	
+
 	// Load configuration (implementation depends on your storage)
 	config, err := vm.loadConfig(ctx)
 	if err != nil {
@@ -64,9 +64,9 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 	duration := time.Since(start)
 	if vm.logger.(*DefaultValidationLogger).enableDetailedLogging {
 		vm.logger.LogValidation(&ValidationResult{
-			IsValid:   true,
-			Errors:    []ValidationError{},
-			Warnings:  []ValidationWarning{},
+			IsValid:  true,
+			Errors:   []ValidationError{},
+			Warnings: []ValidationWarning{},
 			Sanitized: map[string]any{
 				"sanitized": sanitizationResult.Sanitized,
 				"changes":   sanitizationResult.Changes,
@@ -88,7 +88,7 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 	vm.logger.LogValidation(validationResult)
 
 	if !validationResult.IsValid {
-		vm.logger.LogError("config", "save", 
+		vm.logger.LogError("config", "save",
 			errors.ValidationError("configuration validation failed", convertValidationErrors(validationResult.Errors)))
 		return nil, errors.ValidationError("configuration validation failed", convertValidationErrors(validationResult.Errors))
 	}
@@ -106,9 +106,9 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 	duration := time.Since(start)
 	if vm.logger.(*DefaultValidationLogger).enableDetailedLogging {
 		vm.logger.LogValidation(&ValidationResult{
-			IsValid:   true,
-			Errors:    []ValidationError{},
-			Warnings:  []ValidationWarning{},
+			IsValid:  true,
+			Errors:   []ValidationError{},
+			Warnings: []ValidationWarning{},
 			Sanitized: map[string]any{
 				"sanitized": sanitizationResult.Sanitized,
 				"changes":   sanitizationResult.Changes,
@@ -156,13 +156,13 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 // ValidateProfileOperation validates profile operation
 func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, profileName, operationName string, settings *domain.OperationSettings) *ProfileOperationResult {
 	result := &ProfileOperationResult{
-		IsValid:    true,
-		Operation:  operationName,
-		Profile:    profileName,
-		Risk:       "unknown",
+		IsValid:     true,
+		Operation:   operationName,
+		Profile:     profileName,
+		Risk:        "unknown",
 		Suggestions: []string{},
-		Errors:     []string{},
-		Timestamp:  time.Now(),
+		Errors:      []string{},
+		Timestamp:   time.Now(),
 	}
 
 	// Create temporary operation for validation
@@ -190,11 +190,11 @@ func (vm *ValidationMiddleware) loadConfig(ctx context.Context) (*domain.Config,
 	// This would load from file, database, etc.
 	// For now, return a basic configuration
 	return &domain.Config{
-		Version:    "1.0.0",
-		SafeMode:   true,
+		Version:      "1.0.0",
+		SafeMode:     true,
 		MaxDiskUsage: 50,
-		Protected:  []string{"/", "/System", "/Library", "/usr", "/etc"},
-		Profiles:   map[string]*domain.Profile{},
+		Protected:    []string{"/", "/System", "/Library", "/usr", "/etc"},
+		Profiles:     map[string]*domain.Profile{},
 	}, nil
 }
 
@@ -408,7 +408,7 @@ func (vm *ValidationMiddleware) formatValidationErrors(errors []ValidationError)
 	if len(errors) == 0 {
 		return ""
 	}
-	
+
 	result := "Validation errors:\n"
 	for _, err := range errors {
 		result += fmt.Sprintf("  - %s: %s\n", err.Field, err.Message)
