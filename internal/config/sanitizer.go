@@ -96,10 +96,13 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 
 	// Update validation result with sanitization info
 	if validationResult != nil {
-		validationResult.Sanitized = map[string]any{
-			"sanitized_fields": result.SanitizedFields,
-			"warnings":         result.Warnings,
-			"changes":          result.Changes,
+		validationResult.Sanitized = &ValidationSanitizedData{
+			FieldsModified: result.SanitizedFields,
+			RulesApplied: []string{"basic_sanitization", "default_values"},
+			Metadata: map[string]string{
+				"sanitized_count": fmt.Sprintf("%d", len(result.SanitizedFields)),
+				"warnings_count":  fmt.Sprintf("%d", len(result.Warnings)),
+			},
 		}
 	}
 }

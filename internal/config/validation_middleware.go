@@ -51,8 +51,8 @@ func (l *DefaultValidationLogger) LogValidation(result *ValidationResult) {
 
 // LogSanitization logs sanitization results
 func (l *DefaultValidationLogger) LogSanitization(result *SanitizationResult) {
-	if l.enableDetailedLogging && result.Original != nil && len(result.Original.FieldsModified) > 0 {
-		fmt.Printf("🔧 Configuration sanitized %d fields\n", len(result.Original.FieldsModified))
+	if l.enableDetailedLogging && len(result.SanitizedFields) > 0 {
+		fmt.Printf("🔧 Configuration sanitized %d fields\n", len(result.SanitizedFields))
 	}
 }
 

@@ -123,7 +123,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 		IsValid:   true,
 		Errors:    []ValidationError{},
 		Warnings:  []ValidationWarning{},
-		Sanitized: make(map[string]any),
+		Sanitized: nil, // Initialize as nil, will be set by sanitizer if needed
 		Timestamp: time.Now(),
 	}
 
