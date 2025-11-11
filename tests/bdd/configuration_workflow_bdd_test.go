@@ -3,6 +3,7 @@ package bdd
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -82,9 +83,36 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 }
 
 func (c *ConfigurationWorkflowContext) cleanWizardAvailable() error {
+	// Get project root directory by looking for go.mod file
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+	
+	// Find project root by looking for go.mod
+	projectDir := cwd
+	for {
+		if _, err := os.Stat(filepath.Join(projectDir, "go.mod")); err == nil {
+			break // Found project root
+		}
+		parent := filepath.Dir(projectDir)
+		if parent == projectDir {
+			break // Reached filesystem root
+		}
+		projectDir = parent
+	}
+	
 	// Verify clean-wizard is available in PATH or local
 	cmd := exec.Command("go", "run", "./cmd/clean-wizard", "--help")
-	return cmd.Run()
+	cmd.Dir = projectDir // Ensure we're in project root
+	
+	// Capture output for debugging
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to run clean-wizard: %w\nOutput: %s", err, string(output))
+	}
+	
+	return nil
 }
 
 func (c *ConfigurationWorkflowContext) setupWorkingDirectory() error {
@@ -233,10 +261,29 @@ func (c *ConfigurationWorkflowContext) runCommand(commandStr string) error {
 	commandStr = strings.ReplaceAll(commandStr, "incomplete-config.yaml", filepath.Join(c.tempDir, "incomplete-config.yaml"))
 	commandStr = strings.ReplaceAll(commandStr, "multi-profile-config.yaml", filepath.Join(c.tempDir, "multi-profile-config.yaml"))
 
-	// Change to project directory for go run
-	projectDir, _ := filepath.Abs("../../../")
+	// Replace clean-wizard command with go run command
+	commandStr = strings.ReplaceAll(commandStr, "clean-wizard", "go run ./cmd/clean-wizard")
 
+	// Change to project directory for go run
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current working directory: %w", err)
+	}
+	
+	// Navigate to project root based on current directory
+	var projectDir string
+	if strings.Contains(cwd, "tests/bdd") {
+		projectDir = filepath.Join(cwd, "../../../")
+	} else if strings.Contains(cwd, "tests") {
+		projectDir = filepath.Join(cwd, "../..")
+	} else {
+		projectDir = cwd
+	}
+	
+	// Ensure we're running from project root
 	cmd := exec.Command("bash", "-c", fmt.Sprintf("cd %s && %s", projectDir, commandStr))
+	cmd.Dir = projectDir
+	
 	output, err := cmd.CombinedOutput()
 
 	c.commandOutput = string(output)

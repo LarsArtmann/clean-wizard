@@ -86,148 +86,47 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 	}{
 		{
 			name: "valid config",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin", "/"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-								Settings: &domain.OperationSettings{
-									Type: domain.OperationTypeNixStore,
-									NixStore: &domain.NixStoreSettings{
-										KeepGenerations: 3,
-										MinAge:          time.Hour * 24,
-										DryRun:          true,
-									},
-								},
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: createTestConfig("1.0.0", true, 50, []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin", "/"},
+				map[string]*domain.Profile{
+					"daily": createTestProfile("daily", "Daily cleanup",
+						[]domain.CleanupOperation{createTestNixOperation("nix-generations", "Clean Nix generations", domain.RiskLow)}),
+				}),
 			expectValid: true,
 		},
 		{
 			name: "invalid max disk usage",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage: 150, // Invalid: > 95
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-								Settings: &domain.OperationSettings{
-									Type: domain.OperationTypeNixStore,
-									NixStore: &domain.NixStoreSettings{
-										KeepGenerations: 3,
-										MinAge:          time.Hour * 24,
-										DryRun:          true,
-									},
-								},
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: createTestConfig("1.0.0", true, 150, []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
+				map[string]*domain.Profile{
+					"daily": createTestProfile("daily", "Daily cleanup",
+						[]domain.CleanupOperation{createTestNixOperation("nix-generations", "Clean Nix generations", domain.RiskLow)}),
+				}),
 			expectValid: false,
 			expectError: "max_disk_usage",
 		},
 		{
 			name: "missing version",
-			config: &domain.Config{
-				Version:      "", // Missing
-				SafeMode:     true,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-								Settings: &domain.OperationSettings{
-									Type: domain.OperationTypeNixStore,
-									NixStore: &domain.NixStoreSettings{
-										KeepGenerations: 3,
-										MinAge:          time.Hour * 24,
-										DryRun:          true,
-									},
-								},
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: createTestConfig("", true, 50, []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
+				map[string]*domain.Profile{
+					"daily": createTestProfile("daily", "Daily cleanup",
+						[]domain.CleanupOperation{createTestNixOperation("nix-generations", "Clean Nix generations", domain.RiskLow)}),
+				}),
 			expectValid: false,
 			expectError: "version",
 		},
 		{
 			name: "empty protected paths",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage: 50,
-				Protected:    []string{}, // Empty
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-								Settings: &domain.OperationSettings{
-									Type: domain.OperationTypeNixStore,
-									NixStore: &domain.NixStoreSettings{
-										KeepGenerations: 3,
-										MinAge:          time.Hour * 24,
-										DryRun:          true,
-									},
-								},
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: createTestConfig("1.0.0", true, 50, []string{},
+				map[string]*domain.Profile{
+					"daily": createTestProfile("daily", "Daily cleanup",
+						[]domain.CleanupOperation{createTestNixOperation("nix-generations", "Clean Nix generations", domain.RiskLow)}),
+				}),
 			expectValid: false,
 			expectError: "protected",
 		},
 		{
 			name: "no profiles",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles:     map[string]*domain.Profile{}, // Empty
-			},
+			config: createTestConfig("1.0.0", true, 50, []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
+				map[string]*domain.Profile{}), // Empty profiles
 			expectValid: false,
 			expectError: "profiles",
 		},
@@ -335,95 +234,31 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 	}{
 		{
 			name: "whitespace cleanup",
-			config: &domain.Config{
-				Version:      "  1.0.0  ",
-				SafeMode:     true,
-				MaxDiskUsage: 52,
-				Protected:    []string{"/System", "  /Library  "},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "  daily  ",
-						Description: "  Daily cleanup  ",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "  Clean Nix generations  ",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: createTestConfig("  1.0.0  ", true, 52, []string{"/System", "  /Library  "},
+				map[string]*domain.Profile{
+					"daily": createTestProfile("  daily  ", "  Daily cleanup  ",
+						[]domain.CleanupOperation{createTestNixOperation("nix-generations", "  Clean Nix generations  ", domain.RiskLow)}),
+				}),
 			expectedChanges:  []string{"version", "protected[1]", "profiles.daily.name", "profiles.daily.description", "profiles.daily.operations[0].description"},
 			expectedWarnings: 0,
 		},
 		{
 			name: "max disk usage clamping",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage: 150, // Will be clamped to 95
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-								Settings: &domain.OperationSettings{
-									Type: domain.OperationTypeNixStore,
-									NixStore: &domain.NixStoreSettings{
-										KeepGenerations: 3,
-										MinAge:          time.Hour * 24,
-										DryRun:          true,
-									},
-								},
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: createTestConfig("1.0.0", true, 150, []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
+				map[string]*domain.Profile{
+					"daily": createTestProfile("daily", "Daily cleanup",
+						[]domain.CleanupOperation{createTestNixOperation("nix-generations", "Clean Nix generations", domain.RiskLow)}),
+				}),
 			expectedChanges:  []string{"max_disk_usage"},
 			expectedWarnings: 1, // Warning about clamping
 		},
 		{
 			name: "duplicate paths",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library", "/System"}, // Duplicate /System
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-								Settings: &domain.OperationSettings{
-									Type: domain.OperationTypeNixStore,
-									NixStore: &domain.NixStoreSettings{
-										KeepGenerations: 3,
-										MinAge:          time.Hour * 24,
-										DryRun:          true,
-									},
-								},
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: createTestConfig("1.0.0", true, 50, []string{"/System", "/Library", "/System"}, // Duplicate /System
+				map[string]*domain.Profile{
+					"daily": createTestProfile("daily", "Daily cleanup",
+						[]domain.CleanupOperation{createTestNixOperation("nix-generations", "Clean Nix generations", domain.RiskLow)}),
+				}),
 			expectedChanges:  []string{"protected"}, // Duplicate paths removed
 			expectedWarnings: 0,
 		},
