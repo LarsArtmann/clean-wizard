@@ -3,6 +3,7 @@ package bdd
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -68,7 +69,7 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.When(`^I run "([^"]+)" with exit code (\d+)$`, context.runCommandWithExitCode)
 
 	// Verification steps
-	// Verification steps - CRITICAL: Specific patterns before general ones
+	// Verification steps - CRITICAL: Most specific patterns first
 	sc.Then(`^I should see "Applying validation level: ([^"]+)"$`, context.shouldSeeValidationLevel)
 	sc.Then(`^I should see "Using daily profile configuration"$`, context.shouldSeeDailyProfile)
 	sc.Then(`^I should see "Running in DRY-RUN mode"$`, context.shouldSeeDryRunMode)
@@ -80,24 +81,49 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.Then(`^command should fail with an error$`, context.shouldFailWithError)
 	sc.Then(`^command should fail with validation error$`, context.shouldFailWithError)
 	
-	// Specific patterns for configuration output
+	// Specific patterns for configuration output - must come before general patterns
+	sc.Then(`^I should see "failed to load configuration"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Loading configuration from"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Configuration applied:"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Store size:"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Total generations:"`, context.shouldSeeOutput)
-	sc.Then(`^I should see "failed to load configuration"`, context.shouldSeeOutput)
 	
-	// General profile pattern - more specific to avoid conflicts
+	// Most generic patterns - must come last
 	sc.Then(`^I should see "([^"]+) profile configuration"`, context.shouldSeeOutput)
-	
-	// Final fallback pattern - most generic
 	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
 }
 
 func (c *ConfigurationWorkflowContext) cleanWizardAvailable() error {
+	// Get project root directory by looking for go.mod file
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+	
+	// Find project root by looking for go.mod
+	projectDir := cwd
+	for {
+		if _, err := os.Stat(filepath.Join(projectDir, "go.mod")); err == nil {
+			break // Found project root
+		}
+		parent := filepath.Dir(projectDir)
+		if parent == projectDir {
+			break // Reached filesystem root
+		}
+		projectDir = parent
+	}
+	
 	// Verify clean-wizard is available in PATH or local
 	cmd := exec.Command("go", "run", "./cmd/clean-wizard", "--help")
-	return cmd.Run()
+	cmd.Dir = projectDir // Ensure we're in project root
+	
+	// Capture output for debugging
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to run clean-wizard: %w\nOutput: %s", err, string(output))
+	}
+	
+	return nil
 }
 
 func (c *ConfigurationWorkflowContext) setupWorkingDirectory() error {
