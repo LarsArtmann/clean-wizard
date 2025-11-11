@@ -68,17 +68,30 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.When(`^I run "([^"]+)" with exit code (\d+)$`, context.runCommandWithExitCode)
 
 	// Verification steps
-	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
-	sc.Then(`^I should see scan results with generations$`, context.shouldSeeScanResults)
-	sc.Then(`^I should see cleanup results with items cleaned$`, context.shouldSeeCleanResults)
+	// Verification steps - CRITICAL: Specific patterns before general ones
+	sc.Then(`^I should see "Applying validation level: ([^"]+)"$`, context.shouldSeeValidationLevel)
 	sc.Then(`^I should see "Using daily profile configuration"$`, context.shouldSeeDailyProfile)
 	sc.Then(`^I should see "Running in DRY-RUN mode"$`, context.shouldSeeDryRunMode)
-	sc.Then(`^I should see "Applying validation level: ([^"]+)"$`, context.shouldSeeValidationLevel)
 	sc.Then(`^I should see "([^"]+)" validation error$`, context.shouldSeeValidationError)
+	sc.Then(`^I should see scan results with generations$`, context.shouldSeeScanResults)
+	sc.Then(`^I should see cleanup results with items cleaned$`, context.shouldSeeCleanResults)
 	sc.Then(`^I should not see any validation errors$`, context.shouldNotSeeValidationErrors)
 	sc.Then(`^command should complete successfully$`, context.shouldCompleteSuccessfully)
 	sc.Then(`^command should fail with an error$`, context.shouldFailWithError)
 	sc.Then(`^command should fail with validation error$`, context.shouldFailWithError)
+	
+	// Specific patterns for configuration output
+	sc.Then(`^I should see "Loading configuration from"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "Configuration applied:"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "Store size:"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "Total generations:"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "failed to load configuration"`, context.shouldSeeOutput)
+	
+	// General profile pattern - more specific to avoid conflicts
+	sc.Then(`^I should see "([^"]+) profile configuration"`, context.shouldSeeOutput)
+	
+	// Final fallback pattern - most generic
+	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
 }
 
 func (c *ConfigurationWorkflowContext) cleanWizardAvailable() error {
