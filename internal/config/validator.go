@@ -55,9 +55,21 @@ type ValidationResult struct {
 	IsValid   bool                `json:"is_valid"`
 	Errors    []ValidationError   `json:"errors,omitempty"`
 	Warnings  []ValidationWarning `json:"warnings,omitempty"`
-	Sanitized map[string]any      `json:"sanitized,omitempty"`
+	Sanitized *ValidationSanitizedData `json:"sanitized,omitempty"`
 	Duration  time.Duration       `json:"duration"`
 	Timestamp time.Time           `json:"timestamp"`
+}
+
+// ValidationSanitizedData provides type-safe configuration data
+// FIXED: Removed map[string]any to improve type safety
+type ValidationSanitizedData struct {
+	FieldsModified []string          `json:"fields_modified,omitempty"`
+	RulesApplied  []string          `json:"rules_applied,omitempty"`
+	Metadata      map[string]string `json:"metadata,omitempty"`
+	// Type-safe configuration instead of dynamic data
+	ConfigVersion    string   `json:"config_version,omitempty"`
+	ValidationLevel  string   `json:"validation_level,omitempty"`
+	AppliedProfiles  []string `json:"applied_profiles,omitempty"`
 }
 
 // ValidationError represents a specific validation error
