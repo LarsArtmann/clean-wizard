@@ -39,18 +39,18 @@ func NewConfigSanitizerWithRules(rules *SanitizationRules) *ConfigSanitizer {
 // SanitizeConfig performs comprehensive configuration sanitization
 func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config) *SanitizationResult {
 	result := &SanitizationResult{
-		Original:  make(map[string]any),
-		Sanitized: make(map[string]any),
+		Original:  &ValidationSanitizedData{Data: make(map[string]any)},
+		Sanitized: &ValidationSanitizedData{Data: make(map[string]any)},
 		Changes:   []SanitizationChange{},
 		Timestamp: time.Now(),
 	}
 
 	// Store original
-	result.Original["version"] = cfg.Version
-	result.Original["safe_mode"] = cfg.SafeMode
-	result.Original["max_disk_usage"] = cfg.MaxDiskUsage
-	result.Original["protected"] = cfg.Protected
-	result.Original["profiles"] = cfg.Profiles
+	result.Original.Data["version"] = cfg.Version
+	result.Original.Data["safe_mode"] = cfg.SafeMode
+	result.Original.Data["max_disk_usage"] = cfg.MaxDiskUsage
+	result.Original.Data["protected"] = cfg.Protected
+	result.Original.Data["profiles"] = cfg.Profiles
 
 	// Sanitize basic fields
 	cs.sanitizeBasicFields(cfg, result)

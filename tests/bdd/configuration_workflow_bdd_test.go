@@ -56,6 +56,7 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 
 	// Configuration content steps
 	sc.Given(`^configuration includes:$`, context.configIncludes)
+	sc.Given(`^And configuration includes:$`, context.configIncludes)
 	sc.Given(`^configuration includes a daily profile$`, func() error {
 		return nil // Default configs include daily profile
 	})
@@ -68,18 +69,22 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.When(`^I run "([^"]+)"$`, context.runCommand)
 	sc.When(`^I run "([^"]+)" with exit code (\d+)$`, context.runCommandWithExitCode)
 
-	// Verification steps
-	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
-	sc.Then(`^I should see scan results with generations$`, context.shouldSeeScanResults)
-	sc.Then(`^I should see cleanup results with items cleaned$`, context.shouldSeeCleanResults)
+	// Verification steps - CRITICAL: Specific patterns before general ones
+	sc.Then(`^I should see "Applying validation level: ([^"]+)"$`, context.shouldSeeValidationLevel)
 	sc.Then(`^I should see "Using daily profile configuration"$`, context.shouldSeeDailyProfile)
 	sc.Then(`^I should see "Running in DRY-RUN mode"$`, context.shouldSeeDryRunMode)
-	sc.Then(`^I should see "Applying validation level: ([^"]+)"$`, context.shouldSeeValidationLevel)
 	sc.Then(`^I should see "([^"]+)" validation error$`, context.shouldSeeValidationError)
+	// TODO: Make general pattern more restrictive to avoid ambiguity
+	// Verification steps - TODO: Known ambiguity with specific patterns, keep general patterns at end
+	sc.Then(`^I should see scan results with generations$`, context.shouldSeeScanResults)
+	sc.Then(`^I should see cleanup results with items cleaned$`, context.shouldSeeCleanResults)
 	sc.Then(`^I should not see any validation errors$`, context.shouldNotSeeValidationErrors)
 	sc.Then(`^command should complete successfully$`, context.shouldCompleteSuccessfully)
 	sc.Then(`^command should fail with an error$`, context.shouldFailWithError)
 	sc.Then(`^command should fail with validation error$`, context.shouldFailWithError)
+	
+	// General patterns (known ambiguity with specific patterns above)
+	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
 }
 
 func (c *ConfigurationWorkflowContext) cleanWizardAvailable() error {

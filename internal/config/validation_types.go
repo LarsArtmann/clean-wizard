@@ -51,14 +51,23 @@ type ValidationWarning struct {
 	Timestamp  time.Time      `json:"timestamp"`
 }
 
-// ValidationResult represents the complete validation result
+// TODO: Create type-safe sanitized data structure - COMPROMISE: Use any for flexibility
+type ValidationSanitizedData struct {
+	FieldsModified []string          `json:"fields_modified,omitempty"`
+	RulesApplied  []string          `json:"rules_applied,omitempty"`
+	Metadata      map[string]string `json:"metadata,omitempty"`
+	// COMPROMISE: Preserve flexibility for complex data
+	Data          map[string]any    `json:"data,omitempty"`
+}
+
+// ValidationResult represents complete validation result with type-safe sanitized data
 type ValidationResult struct {
-	IsValid   bool                `json:"is_valid"`
-	Errors    []ValidationError   `json:"errors"`
-	Warnings  []ValidationWarning `json:"warnings"`
-	Sanitized map[string]any      `json:"sanitized,omitempty"`
-	Duration  time.Duration       `json:"duration"`
-	Timestamp time.Time           `json:"timestamp"`
+	IsValid   bool                     `json:"is_valid"`
+	Errors    []ValidationError           `json:"errors"`
+	Warnings  []ValidationWarning         `json:"warnings"`
+	Sanitized *ValidationSanitizedData   `json:"sanitized,omitempty"`
+	Duration  time.Duration             `json:"duration"`
+	Timestamp time.Time                `json:"timestamp"`
 }
 
 // AddError adds an error to the validation result
@@ -127,10 +136,10 @@ func (vr *ValidationResult) GetWarningsByField(field string) []ValidationWarning
 	return warnings
 }
 
-// SanitizationResult represents sanitization results
+// SanitizationResult represents sanitization results with type-safe data
 type SanitizationResult struct {
-	Original  map[string]any       `json:"original"`
-	Sanitized map[string]any       `json:"sanitized"`
+	Original  *ValidationSanitizedData `json:"original"`
+	Sanitized *ValidationSanitizedData `json:"sanitized"`
 	Changes   []SanitizationChange `json:"changes"`
 	Timestamp time.Time            `json:"timestamp"`
 }
