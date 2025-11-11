@@ -39,9 +39,11 @@ func (cm *ConfigMiddleware) logValidationSuccess(result *SanitizationResult, dur
 		IsValid:  true,
 		Errors:   []ValidationError{},
 		Warnings: []ValidationWarning{},
-		Sanitized: map[string]any{
-			"sanitized": result.Sanitized,
-			"changes":   result.Changes,
+		Sanitized: &ValidationSanitizedData{
+			Data: map[string]any{
+				"sanitized": result.Sanitized,
+				"changes":   result.Changes,
+			},
 		},
 		Duration:  duration,
 		Timestamp: time.Now(),

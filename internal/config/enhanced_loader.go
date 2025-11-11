@@ -127,9 +127,11 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 	// Apply sanitization if enabled
 	if options.EnableSanitization {
 		sanitizationResult := ecl.sanitizer.SanitizeConfig(config)
-		validationResult.Sanitized = map[string]any{
-			"sanitized": sanitizationResult.Sanitized,
-			"changes":   sanitizationResult.Changes,
+		validationResult.Sanitized = &ValidationSanitizedData{
+			Data: map[string]any{
+				"sanitized": sanitizationResult.Sanitized,
+				"changes":   sanitizationResult.Changes,
+			},
 		}
 	}
 
@@ -163,9 +165,11 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 	// Apply sanitization if enabled
 	if options.EnableSanitization {
 		sanitizationResult := ecl.sanitizer.SanitizeConfig(config)
-		validationResult.Sanitized = map[string]any{
-			"sanitized": sanitizationResult.Sanitized,
-			"changes":   sanitizationResult.Changes,
+		validationResult.Sanitized = &ValidationSanitizedData{
+			Data: map[string]any{
+				"sanitized": sanitizationResult.Sanitized,
+				"changes":   sanitizationResult.Changes,
+			},
 		}
 	}
 

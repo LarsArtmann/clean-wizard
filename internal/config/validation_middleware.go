@@ -45,9 +45,11 @@ func (vm *ValidationMiddleware) logValidationSuccess(result *SanitizationResult,
 		IsValid:  true,
 		Errors:   []ValidationError{},
 		Warnings: []ValidationWarning{},
-		Sanitized: map[string]any{
-			"sanitized": result.Sanitized,
-			"changes":   result.Changes,
+		Sanitized: &ValidationSanitizedData{
+			Data: map[string]any{
+				"sanitized": result.Sanitized,
+				"changes":   result.Changes,
+			},
 		},
 		Duration:  duration,
 		Timestamp: time.Now(),
@@ -116,9 +118,11 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 			IsValid:  true,
 			Errors:   []ValidationError{},
 			Warnings: []ValidationWarning{},
-			Sanitized: map[string]any{
-				"sanitized": sanitizationResult.Sanitized,
-				"changes":   sanitizationResult.Changes,
+			Sanitized: &ValidationSanitizedData{
+				Data: map[string]any{
+					"sanitized": sanitizationResult.Sanitized,
+					"changes":   sanitizationResult.Changes,
+				},
 			},
 			Duration:  duration,
 			Timestamp: time.Now(),

@@ -46,7 +46,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 		IsValid:   true,
 		Errors:    []ValidationError{},
 		Warnings:  []ValidationWarning{},
-		Sanitized: make(map[string]any),
+		Sanitized: &ValidationSanitizedData{Data: make(map[string]any)},
 		Timestamp: time.Now(),
 	}
 

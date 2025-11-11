@@ -22,7 +22,7 @@ func (bv *BasicValidator) ValidateStructure(cfg *domain.Config) *ValidationResul
 		IsValid:   true,
 		Errors:    []ValidationError{},
 		Warnings:  []ValidationWarning{},
-		Sanitized: make(map[string]any),
+		Sanitized: &ValidationSanitizedData{Data: make(map[string]any)},
 		Timestamp: time.Now(),
 	}
 
