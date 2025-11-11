@@ -1,0 +1,24 @@
+version: "1.0.0"
+safe_mode: true
+max_disk_usage: 50
+protected:
+  - "/"
+  - "/System"
+  - "/Library"
+profiles:
+  daily:
+    name: "daily"
+    description: "Daily cleanup"
+    enabled: true
+    max_risk_level: "LOW"
+    operations:
+      - name: "nix-generations"
+        description: "Clean Nix generations"
+        risk_level: "LOW"
+        enabled: true
+        settings:
+          type: "nix-store"
+          nix_store:
+            keep_generations: 3
+            min_age: "24h"
+            dry_run: false

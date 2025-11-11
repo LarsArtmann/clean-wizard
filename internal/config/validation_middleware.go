@@ -3,10 +3,12 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 // ValidationMiddleware provides comprehensive validation for configuration operations
@@ -192,15 +194,49 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, pr
 
 // Helper methods
 func (vm *ValidationMiddleware) loadConfig(ctx context.Context) (*domain.Config, error) {
-	// This would load from file, database, etc.
-	// For now, return a basic configuration
-	return &domain.Config{
-		Version:      "1.0.0",
-		SafeMode:     true,
-		MaxDiskUsage: 50,
-		Protected:    []string{"/", "/System", "/Library", "/usr", "/etc"},
-		Profiles:     map[string]*domain.Profile{},
-	}, nil
+	// CRITICAL FIX: Actually load configuration from file
+	configPath := vm.getConfigPath()
+	
+	// Read configuration file
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		vm.logger.LogError("config", "read", err)
+		return nil, fmt.Errorf("failed to read config file %s: %w", configPath, err)
+	}
+	
+	// Parse YAML
+	config := &domain.Config{}
+	if err := yaml.Unmarshal(data, config); err != nil {
+		vm.logger.LogError("config", "parse", err)
+		return nil, fmt.Errorf("failed to parse config file %s: %w", configPath, err)
+	}
+	
+	// Successfully loaded and parsed
+	return config, nil
+}
+
+func (vm *ValidationMiddleware) getConfigPath() string {
+	if path := os.Getenv("CONFIG_PATH"); path != "" {
+		return path
+	}
+	
+	// Default config paths to try
+	defaultPaths := []string{
+		"clean-wizard.yaml",
+		"working-config.yaml", 
+		"config.yaml",
+		"clean-wizard.yml",
+		"config.yml",
+	}
+	
+	for _, path := range defaultPaths {
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	
+	// Fallback to working-config.yaml
+	return "working-config.yaml"
 }
 
 func (vm *ValidationMiddleware) saveConfig(ctx context.Context, cfg *domain.Config) error {
