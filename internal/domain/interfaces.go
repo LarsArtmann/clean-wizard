@@ -2,11 +2,11 @@ package domain
 
 import "context"
 
-// Cleaner interface for all cleaning operations
+// Cleaner interface for all cleaning operations with type-safe settings
 type Cleaner interface {
 	IsAvailable(ctx context.Context) bool
 	GetStoreSize(ctx context.Context) int64
-	ValidateSettings(settings map[string]any) error
+	ValidateSettings(settings *OperationSettings) error
 }
 
 // Cleaner interface for generation-based cleaners (Nix)
@@ -20,7 +20,7 @@ type GenerationCleaner interface {
 type PackageCleaner interface {
 	Cleaner
 	ListPackages(ctx context.Context) []string
-	CleanOldPackages(ctx context.Context, settings map[string]any) CleanResult
+	CleanOldPackages(ctx context.Context, settings *OperationSettings) CleanResult
 }
 
 // Scanner interface for all scanning operations

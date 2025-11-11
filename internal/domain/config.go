@@ -119,13 +119,13 @@ func (p *Profile) Validate(name string) error {
 	return nil
 }
 
-// CleanupOperation represents single cleanup operation
+// CleanupOperation represents single cleanup operation with type-safe settings
 type CleanupOperation struct {
-	Name        string         `json:"name" yaml:"name"`
-	Description string         `json:"description" yaml:"description"`
-	RiskLevel   RiskLevel      `json:"risk_level" yaml:"risk_level"`
-	Enabled     bool           `json:"enabled" yaml:"enabled"`
-	Settings    map[string]any `json:"settings,omitempty" yaml:"settings,omitempty"`
+	Name        string           `json:"name" yaml:"name"`
+	Description string           `json:"description" yaml:"description"`
+	RiskLevel   RiskLevel        `json:"risk_level" yaml:"risk_level"`
+	Enabled     bool             `json:"enabled" yaml:"enabled"`
+	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }
 
 
@@ -153,10 +153,13 @@ func (op CleanupOperation) Validate() error {
 		return fmt.Errorf("Operation description cannot be empty")
 	}
 	
-	// Validate risk level (temporarily disabled)
-	// riskLevel := op.GetRiskLevel()
-	// if !riskLevel.IsValid() {
-	//	return fmt.Errorf("Invalid risk level: %s", riskLevel)
-	// }
+	// Validate settings if present
+	if op.Settings != nil {
+		opType := GetOperationType(op.Name)
+		if err := op.Settings.ValidateSettings(opType); err != nil {
+			return fmt.Errorf("Operation settings validation failed: %w", err)
+		}
+	}
+	
 	return nil
 }

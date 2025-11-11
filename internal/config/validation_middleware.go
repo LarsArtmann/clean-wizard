@@ -159,8 +159,8 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 	return changeResult
 }
 
-// ValidateProfileOperation validates a specific profile operation
-func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, profileName, operationName string, settings map[string]any) *ProfileOperationResult {
+// ValidateProfileOperation validates a specific profile operation with type safety
+func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, profileName, operationName string, settings *domain.OperationSettings) *ProfileOperationResult {
 	result := &ProfileOperationResult{
 		IsValid:   true,
 		Timestamp: time.Now(),
@@ -190,7 +190,7 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, pr
 	}
 
 	// Validate operation-specific settings
-	if err := vm.validateOperationSettings(operationName, settings); err != nil {
+	if err := vm.validateOperationSettings(operationName, tempOp); err != nil {
 		result.IsValid = false
 		result.Error = err
 		return result
@@ -373,19 +373,15 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 	return nil
 }
 
-// validateOperationSettings validates operation-specific settings
-func (vm *ValidationMiddleware) validateOperationSettings(operationName string, settings map[string]any) error {
-	switch operationName {
-	case "nix-generations":
-		return vm.validateNixGenerationsSettings(settings)
-	case "temp-files":
-		return vm.validateTempFilesSettings(settings)
-	case "homebrew-cleanup":
-		return vm.validateHomebrewSettings(settings)
-	default:
-		// Unknown operation - be permissive but warn
-		return nil
+// validateOperationSettings validates operation-specific settings with type safety
+func (vm *ValidationMiddleware) validateOperationSettings(operationName string, op domain.CleanupOperation) error {
+	// Use the already-validated settings from the operation
+	if op.Settings == nil {
+		return nil // Settings are optional
 	}
+	
+	opType := domain.GetOperationType(operationName)
+	return op.Settings.ValidateSettings(opType)
 }
 
 // validateNixGenerationsSettings validates Nix generations operation settings

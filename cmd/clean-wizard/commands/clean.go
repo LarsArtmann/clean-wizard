@@ -123,13 +123,15 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			}
 			
 			// Extract settings from profile if available
-			var settings map[string]any = map[string]any{"generations": 3}
+			var settings *domain.OperationSettings
 			if usedProfile != nil {
 				for _, op := range usedProfile.Operations {
 					if op.Name == "nix-generations" && op.Enabled {
 						fmt.Printf("🔧 Configuring Nix generations cleanup\n")
 						if op.Settings != nil {
 							settings = op.Settings
+						} else {
+							settings = domain.DefaultSettings(domain.OperationTypeNixGenerations)
 						}
 						break
 					}
