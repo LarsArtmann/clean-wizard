@@ -83,7 +83,15 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.Then(`^command should fail with an error$`, context.shouldFailWithError)
 	sc.Then(`^command should fail with validation error$`, context.shouldFailWithError)
 	
-	// General patterns (known ambiguity with specific patterns above)
+	// General patterns - CRITICAL: Exclude known conflicting strings
+	sc.Then(`^I should see "Loading configuration from"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "Configuration applied:"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "Using.*profile configuration"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "Store size:"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "Total generations:"`, context.shouldSeeOutput)
+	sc.Then(`^I should see "failed to load configuration"`, context.shouldSeeOutput)
+	// Final fallback pattern - KNOWN AMBIGUITY: Accept minimal conflicts
+	// TODO: Create step registry system to eliminate all ambiguity
 	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
 }
 
