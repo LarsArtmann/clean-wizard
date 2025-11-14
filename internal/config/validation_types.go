@@ -136,21 +136,8 @@ func (vr *ValidationResult) GetWarningsByField(field string) []ValidationWarning
 	return warnings
 }
 
-// SanitizationResult represents sanitization results with type-safe data
-type SanitizationResult struct {
-	Original  *ValidationSanitizedData `json:"original"`
-	Sanitized *ValidationSanitizedData `json:"sanitized"`
-	Changes   []SanitizationChange `json:"changes"`
-	Timestamp time.Time            `json:"timestamp"`
-}
-
-// SanitizationChange represents a single sanitization change
-type SanitizationChange struct {
-	Field    string `json:"field"`
-	OldValue any    `json:"old_value"`
-	NewValue any    `json:"new_value"`
-	Reason   string `json:"reason"`
-}
+// This file moved type definitions to avoid duplicates
+// See sanitizer.go for SanitizationResult and SanitizationChange
 
 // HasChanges returns true if sanitization made changes
 func (sr *SanitizationResult) HasChanges() bool {

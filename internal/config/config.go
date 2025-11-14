@@ -1,8 +1,6 @@
 package config
 
 import (
-	"time"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -35,11 +33,11 @@ func GetDefaultConfig() *domain.Config {
 						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 					},
 				},
-				Enabled: true,
 			},
 			"aggressive": {
 				Name:        "aggressive",
 				Description: "Deep aggressive cleanup",
+				Enabled:     true,
 				Operations: []domain.CleanupOperation{
 					{
 						Name:        "nix-generations",
@@ -56,11 +54,11 @@ func GetDefaultConfig() *domain.Config {
 						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 					},
 				},
-				Enabled: true,
 			},
 			"comprehensive": {
 				Name:        "comprehensive",
 				Description: "Complete system cleanup",
+				Enabled:     true,
 				Operations: []domain.CleanupOperation{
 					{
 						Name:        "nix-generations",
@@ -84,7 +82,6 @@ func GetDefaultConfig() *domain.Config {
 						Settings:    domain.DefaultSettings(domain.OperationTypeSystemTemp),
 					},
 				},
-				Enabled: true,
 			},
 		},
 	}

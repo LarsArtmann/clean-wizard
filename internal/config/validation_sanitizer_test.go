@@ -7,8 +7,6 @@ import (
 )
 
 func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
-	sanitizer := NewConfigSanitizer()
-
 	tests := []struct {
 		name             string
 		config           *domain.Config
@@ -97,19 +95,12 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create validation result to capture sanitization
-			validationResult := &ValidationResult{
-				IsValid:   true,
-				Errors:    []ValidationError{},
-				Warnings:  []ValidationWarning{},
-				Sanitized: nil,
-			}
-
-			sanitizer.SanitizeConfig(tt.config, validationResult)
+			sanitizer := NewConfigSanitizer()
+			sanitizationResult := sanitizer.SanitizeConfig(tt.config)
 
 			// Check expected changes
-			if validationResult.Sanitized != nil {
-				sanitizedFields := validationResult.Sanitized.FieldsModified
+			if sanitizationResult.Sanitized != nil {
+				sanitizedFields := sanitizationResult.Sanitized.FieldsModified
 				if len(sanitizedFields) == 0 && len(tt.expectedChanges) > 0 {
 					t.Errorf("Expected %d sanitized fields, got none", len(tt.expectedChanges))
 				}

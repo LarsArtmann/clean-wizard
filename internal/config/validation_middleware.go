@@ -13,29 +13,26 @@ import (
 
 // ValidationMiddleware provides comprehensive validation for configuration operations
 type ValidationMiddleware struct {
-	validator          *ConfigValidator
-	sanitizer          *ConfigSanitizer
-	logger             ValidationLogger
-	operationValidator *OperationValidator
+	validator *ConfigValidator
+	sanitizer *ConfigSanitizer
+	logger    ValidationLogger
 }
 
 // NewValidationMiddleware creates a new validation middleware
 func NewValidationMiddleware() *ValidationMiddleware {
 	return &ValidationMiddleware{
-		validator:          NewConfigValidator(),
-		sanitizer:          NewConfigSanitizer(),
-		logger:             NewDefaultValidationLogger(false),
-		operationValidator: NewOperationValidator(false),
+		validator: NewConfigValidator(),
+		sanitizer: NewConfigSanitizer(),
+		logger:    NewDefaultValidationLogger(false),
 	}
 }
 
 // NewValidationMiddlewareWithLogger creates middleware with custom logger
 func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddleware {
 	return &ValidationMiddleware{
-		validator:          NewConfigValidator(),
-		sanitizer:          NewConfigSanitizer(),
-		logger:             logger,
-		operationValidator: NewOperationValidator(false),
+		validator: NewConfigValidator(),
+		sanitizer: NewConfigSanitizer(),
+		logger:    logger,
 	}
 }
 
@@ -186,15 +183,8 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, pr
 	}
 
 	// Validate operation settings
-	if err := vm.operationValidator.ValidateOperationSettings(operation); err != nil {
+	if err := vm.validateOperationSettings(operationName, *operation); err != nil {
 		result.AddError(err.Error())
-	}
-
-	// Validate operation-specific settings
-	if err := vm.validateOperationSettings(operationName, tempOp); err != nil {
-		result.IsValid = false
-		result.Error = err
-		return result
 	}
 
 	return result
@@ -405,12 +395,6 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 	return nil
 }
 
-<<<<<<< HEAD
-// assessChangeRisk assesses overall change risk
-func (vm *ValidationMiddleware) assessChangeRisk(changes []ConfigChange) string {
-	highRiskCount := 0
-	mediumRiskCount := 0
-=======
 // validateOperationSettings validates operation-specific settings with type safety
 func (vm *ValidationMiddleware) validateOperationSettings(operationName string, op domain.CleanupOperation) error {
 	// Use the already-validated settings from the operation
@@ -420,25 +404,6 @@ func (vm *ValidationMiddleware) validateOperationSettings(operationName string, 
 	
 	opType := domain.GetOperationType(operationName)
 	return op.Settings.ValidateSettings(opType)
-}
->>>>>>> master
-
-	for _, change := range changes {
-		switch change.Risk {
-		case "high":
-			highRiskCount++
-		case "medium":
-			mediumRiskCount++
-		}
-	}
-
-	if highRiskCount > 0 {
-		return "high"
-	}
-	if mediumRiskCount > 2 {
-		return "medium"
-	}
-	return "low"
 }
 
 // assessOperationRisk assesses operation risk
@@ -512,4 +477,27 @@ func convertValidationErrors(validationErrors []ValidationError) []any {
 		converted[i] = err
 	}
 	return converted
+}
+
+// assessChangeRisk assesses overall change risk
+func (vm *ValidationMiddleware) assessChangeRisk(changes []ConfigChange) string {
+	highRiskCount := 0
+	mediumRiskCount := 0
+
+	for _, change := range changes {
+		switch change.Risk {
+		case "high":
+			highRiskCount++
+		case "medium":
+			mediumRiskCount++
+		}
+	}
+
+	if highRiskCount > 0 {
+		return "high"
+	}
+	if mediumRiskCount > 2 {
+		return "medium"
+	}
+	return "low"
 }

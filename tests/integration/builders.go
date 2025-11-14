@@ -130,16 +130,37 @@ protected:
 `, op.Name, op.Description, op.RiskLevel, op.Enabled)
 
 			if op.Settings != nil {
-				yaml += fmt.Sprintf(`        settings:
-          type: "%s"
-`, op.Settings.Type)
-
-				if op.Settings.NixStore != nil {
-					yaml += fmt.Sprintf(`          nix_store:
-            keep_generations: %d
-            min_age: "%s"
-            dry_run: %t
-`, op.Settings.NixStore.KeepGenerations, op.Settings.NixStore.MinAge.String(), op.Settings.NixStore.DryRun)
+				yaml += fmt.Sprintf(`        settings:`)
+				
+				if op.Settings.NixGenerations != nil {
+					yaml += fmt.Sprintf(`
+          nix_generations:
+            generations: %d
+            optimize: %t`, op.Settings.NixGenerations.Generations, op.Settings.NixGenerations.Optimize)
+				}
+				if op.Settings.TempFiles != nil {
+					yaml += fmt.Sprintf(`
+          temp_files:
+            older_than: "%s"`, op.Settings.TempFiles.OlderThan)
+					if len(op.Settings.TempFiles.Excludes) > 0 {
+						yaml += fmt.Sprintf(`
+            excludes: %v`, op.Settings.TempFiles.Excludes)
+					}
+				}
+				if op.Settings.Homebrew != nil {
+					yaml += fmt.Sprintf(`
+          homebrew:
+            unused_only: %t`, op.Settings.Homebrew.UnusedOnly)
+					if op.Settings.Homebrew.Prune != "" {
+						yaml += fmt.Sprintf(`
+            prune: "%s"`, op.Settings.Homebrew.Prune)
+					}
+				}
+				if op.Settings.SystemTemp != nil {
+					yaml += fmt.Sprintf(`
+          system_temp:
+            paths: %v
+            older_than: "%s"`, op.Settings.SystemTemp.Paths, op.Settings.SystemTemp.OlderThan)
 				}
 			}
 
@@ -184,11 +205,9 @@ func (b *TestProfileBuilder) WithNixOperation(name, description string, riskLeve
 		RiskLevel:   riskLevel,
 		Enabled:     true,
 		Settings: &domain.OperationSettings{
-			Type: domain.OperationTypeNixStore,
-			NixStore: &domain.NixStoreSettings{
-				KeepGenerations: 3,
-				MinAge:          0, // Would use time.Duration
-				DryRun:          true,
+			NixGenerations: &domain.NixGenerationsSettings{
+				Generations: 3,
+				Optimize:    false,
 			},
 		},
 	}

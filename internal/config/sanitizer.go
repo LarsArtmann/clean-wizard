@@ -263,12 +263,14 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 
 func (r *SanitizationResult) addChange(field string, original, sanitized any, reason string) {
 	r.SanitizedFields = append(r.SanitizedFields, field)
-	r.Changes[field] = map[string]any{
-		"original":  original,
-		"sanitized": sanitized,
-		"reason":    reason,
-		"timestamp": time.Now(),
+	change := SanitizationChange{
+		Field:    field,
+		OldValue: original,
+		NewValue: sanitized,
+		Reason:    reason,
+		Time:     time.Now(),
 	}
+	r.Changes = append(r.Changes, change)
 }
 
 func (r *SanitizationResult) addWarning(field string, original, sanitized any, reason string) {
