@@ -35,8 +35,10 @@ func (sv *SecurityValidator) ValidateSecurityConstraints(cfg *domain.Config) *Va
 				Message:    fmt.Sprintf("Critical system path not protected: %s", systemPath),
 				Severity:   SeverityError,
 				Suggestion: fmt.Sprintf("Add '%s' to protected paths", systemPath),
-				Context: map[string]any{
-					"system_path": systemPath,
+				Context: &ValidationContext{
+					Metadata: map[string]string{
+						"system_path": systemPath,
+					},
 				},
 			})
 		}

@@ -30,34 +30,65 @@ func (s Severity) String() string {
 	}
 }
 
+// ValidationContext represents typed validation context
+type ValidationContext struct {
+	Profile      string            `json:"profile,omitempty"`
+	Operation    string            `json:"operation,omitempty"`
+	Field        string            `json:"field,omitempty"`
+	ErrorCode    string            `json:"error_code,omitempty"`
+	Suggestion   string            `json:"suggestion,omitempty"`
+	Metadata     map[string]string `json:"metadata,omitempty"`
+}
+
 // ValidationError represents a specific validation error
 type ValidationError struct {
-	Field      string         `json:"field"`
-	Rule       string         `json:"rule"`
-	Value      any            `json:"value"`
-	Message    string         `json:"message"`
-	Severity   Severity       `json:"severity"`
-	Suggestion string         `json:"suggestion,omitempty"`
-	Context    map[string]any `json:"context,omitempty"`
-	Timestamp  time.Time      `json:"timestamp"`
+	Field      string              `json:"field"`
+	Rule       string              `json:"rule"`
+	Value      any                 `json:"value"`
+	Message    string              `json:"message"`
+	Severity   Severity            `json:"severity"`
+	Suggestion string              `json:"suggestion,omitempty"`
+	Context    *ValidationContext  `json:"context,omitempty"`
+	Timestamp  time.Time          `json:"timestamp"`
 }
 
 // ValidationWarning represents a specific validation warning
 type ValidationWarning struct {
-	Field      string         `json:"field"`
-	Message    string         `json:"message"`
-	Suggestion string         `json:"suggestion,omitempty"`
-	Context    map[string]any `json:"context,omitempty"`
-	Timestamp  time.Time      `json:"timestamp"`
+	Field      string              `json:"field"`
+	Message    string              `json:"message"`
+	Suggestion string              `json:"suggestion,omitempty"`
+	Context    *ValidationContext  `json:"context,omitempty"`
+	Timestamp  time.Time          `json:"timestamp"`
 }
 
-// TODO: Create type-safe sanitized data structure - COMPROMISE: Use any for flexibility
+// ValidationSanitizedData represents fully type-safe sanitized data
 type ValidationSanitizedData struct {
-	FieldsModified []string          `json:"fields_modified,omitempty"`
-	RulesApplied  []string          `json:"rules_applied,omitempty"`
+	FieldsModified []string       `json:"fields_modified,omitempty"`
+	RulesApplied  []string       `json:"rules_applied,omitempty"`
 	Metadata      map[string]string `json:"metadata,omitempty"`
-	// COMPROMISE: Preserve flexibility for complex data
-	Data          map[string]any    `json:"data,omitempty"`
+	// Type-safe configuration data
+	Config        *ConfigContext    `json:"config,omitempty"`
+	Operations    []*OperationContext `json:"operations,omitempty"`
+	// COMPROMISE: Maintain backward compatibility for serialization
+	Data          map[string]any `json:"data,omitempty"`
+}
+
+// ConfigContext represents sanitized configuration
+type ConfigContext struct {
+	Version      string   `json:"version"`
+	SafeMode     bool     `json:"safe_mode"`
+	MaxDiskUsage int      `json:"max_disk_usage"`
+	Protected    []string `json:"protected"`
+	Profiles     []string `json:"profiles,omitempty"`
+}
+
+// OperationContext represents sanitized operation data
+type OperationContext struct {
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	RiskLevel   string            `json:"risk_level"`
+	Enabled     bool              `json:"enabled"`
+	Settings    map[string]string `json:"settings,omitempty"`
 }
 
 // ValidationResult represents complete validation result with type-safe sanitized data
