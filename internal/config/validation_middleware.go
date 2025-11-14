@@ -164,7 +164,7 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 	return result
 }
 
-// ValidateProfileOperation validates profile operation
+// ValidateProfileOperation validates a specific profile operation with type safety
 func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, profileName, operationName string, settings *domain.OperationSettings) *ProfileOperationResult {
 	result := &ProfileOperationResult{
 		IsValid:     true,
@@ -190,8 +190,12 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, pr
 		result.AddError(err.Error())
 	}
 
-	// Assess risk
-	result.Risk = vm.assessOperationRisk(operation)
+	// Validate operation-specific settings
+	if err := vm.validateOperationSettings(operationName, tempOp); err != nil {
+		result.IsValid = false
+		result.Error = err
+		return result
+	}
 
 	return result
 }
@@ -401,10 +405,23 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 	return nil
 }
 
+<<<<<<< HEAD
 // assessChangeRisk assesses overall change risk
 func (vm *ValidationMiddleware) assessChangeRisk(changes []ConfigChange) string {
 	highRiskCount := 0
 	mediumRiskCount := 0
+=======
+// validateOperationSettings validates operation-specific settings with type safety
+func (vm *ValidationMiddleware) validateOperationSettings(operationName string, op domain.CleanupOperation) error {
+	// Use the already-validated settings from the operation
+	if op.Settings == nil {
+		return nil // Settings are optional
+	}
+	
+	opType := domain.GetOperationType(operationName)
+	return op.Settings.ValidateSettings(opType)
+}
+>>>>>>> master
 
 	for _, change := range changes {
 		switch change.Risk {

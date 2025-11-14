@@ -21,74 +21,70 @@ func GetDefaultConfig() *domain.Config {
 				Enabled:      true,
 				Operations: []domain.CleanupOperation{
 					{
-						Name:        "nix-store-cleanup",
-						Description: "Clean Nix store",
+						Name:        "nix-generations",
+						Description: "Clean old Nix generations",
 						RiskLevel:   domain.RiskLow,
 						Enabled:     true,
-						Settings: &domain.OperationSettings{
-							Type: domain.OperationTypeNixStore,
-							NixStore: &domain.NixStoreSettings{
-								KeepGenerations: 3,
-								MinAge:          24 * time.Hour,
-								IncludeProfiles: false,
-								DryRun:          false,
-							},
-						},
+						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 					{
-						Name:        "temp-files-cleanup",
+						Name:        "temp-files",
 						Description: "Clean temporary files",
 						RiskLevel:   domain.RiskLow,
 						Enabled:     true,
-						Settings: &domain.OperationSettings{
-							Type: domain.OperationTypeTempFiles,
-							TempFiles: &domain.TempFilesSettings{
-								MaxAge:       7 * 24 * time.Hour,
-								Paths:        []string{"/tmp", "/var/tmp"},
-								ExcludePaths: []string{"/tmp/keep"},
-								DryRun:       false,
-							},
-						},
+						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 					},
 				},
+				Enabled: true,
 			},
 			"aggressive": {
-				Name:         "aggressive",
-				Description:  "Deep aggressive cleanup",
-				MaxRiskLevel: domain.RiskHigh,
-				Enabled:      false,
+				Name:        "aggressive",
+				Description: "Deep aggressive cleanup",
 				Operations: []domain.CleanupOperation{
 					{
-						Name:        "nix-store-deep-cleanup",
-						Description: "Deep Nix store cleanup",
+						Name:        "nix-generations",
+						Description: "Deep Nix generations cleanup",
 						RiskLevel:   domain.RiskHigh,
 						Enabled:     true,
-						Settings: &domain.OperationSettings{
-							Type: domain.OperationTypeNixStore,
-							NixStore: &domain.NixStoreSettings{
-								KeepGenerations: 1,
-								MinAge:          12 * time.Hour,
-								IncludeProfiles: true,
-								DryRun:          false,
-							},
-						},
+						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 					{
-						Name:        "package-cache-cleanup",
-						Description: "Clean package caches",
+						Name:        "homebrew-cleanup",
+						Description: "Clean Homebrew packages",
 						RiskLevel:   domain.RiskMedium,
 						Enabled:     true,
-						Settings: &domain.OperationSettings{
-							Type: domain.OperationTypePackageCache,
-							Package: &domain.PackageCacheSettings{
-								MaxAge:       24 * time.Hour,
-								MaxSize:      1024 * 1024 * 1024, // 1GB
-								IncludeTypes: []string{"brew", "npm", "cargo"},
-								DryRun:       false,
-							},
-						},
+						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 					},
 				},
+				Enabled: true,
+			},
+			"comprehensive": {
+				Name:        "comprehensive",
+				Description: "Complete system cleanup",
+				Operations: []domain.CleanupOperation{
+					{
+						Name:        "nix-generations",
+						Description: "Clean old Nix generations",
+						RiskLevel:   domain.RiskCritical,
+						Enabled:     true,
+						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+					},
+					{
+						Name:        "homebrew-cleanup",
+						Description: "Clean old Homebrew packages",
+						RiskLevel:   domain.RiskMedium,
+						Enabled:     true,
+						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
+					},
+					{
+						Name:        "system-temp",
+						Description: "Clean system temporary files",
+						RiskLevel:   domain.RiskMedium,
+						Enabled:     true,
+						Settings:    domain.DefaultSettings(domain.OperationTypeSystemTemp),
+					},
+				},
+				Enabled: true,
 			},
 		},
 	}
@@ -113,14 +109,7 @@ func GetTestConfig() *domain.Config {
 						Description: "Test operation",
 						RiskLevel:   domain.RiskLow,
 						Enabled:     true,
-						Settings: &domain.OperationSettings{
-							Type: domain.OperationTypeTempFiles,
-							TempFiles: &domain.TempFilesSettings{
-								MaxAge: 1 * time.Hour,
-								Paths:  []string{"/tmp/test"},
-								DryRun: true,
-							},
-						},
+						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 					},
 				},
 			},

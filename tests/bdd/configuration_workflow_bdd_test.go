@@ -69,13 +69,16 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.When(`^I run "([^"]+)"$`, context.runCommand)
 	sc.When(`^I run "([^"]+)" with exit code (\d+)$`, context.runCommandWithExitCode)
 
-	// Verification steps - CRITICAL: Specific patterns before general ones
+	// Verification steps - CRITICAL: Most specific patterns first
 	sc.Then(`^I should see "Applying validation level: ([^"]+)"$`, context.shouldSeeValidationLevel)
 	sc.Then(`^I should see "Using daily profile configuration"$`, context.shouldSeeDailyProfile)
 	sc.Then(`^I should see "Running in DRY-RUN mode"$`, context.shouldSeeDryRunMode)
 	sc.Then(`^I should see "([^"]+)" validation error$`, context.shouldSeeValidationError)
+<<<<<<< HEAD
 	// TODO: Make general pattern more restrictive to avoid ambiguity
 	// Verification steps - TODO: Known ambiguity with specific patterns, keep general patterns at end
+=======
+>>>>>>> master
 	sc.Then(`^I should see scan results with generations$`, context.shouldSeeScanResults)
 	sc.Then(`^I should see cleanup results with items cleaned$`, context.shouldSeeCleanResults)
 	sc.Then(`^I should not see any validation errors$`, context.shouldNotSeeValidationErrors)
@@ -83,15 +86,15 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.Then(`^command should fail with an error$`, context.shouldFailWithError)
 	sc.Then(`^command should fail with validation error$`, context.shouldFailWithError)
 	
-	// General patterns - CRITICAL: Exclude known conflicting strings
+	// Specific patterns for configuration output - must come before general patterns
+	sc.Then(`^I should see "failed to load configuration"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Loading configuration from"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Configuration applied:"`, context.shouldSeeOutput)
-	sc.Then(`^I should see "Using.*profile configuration"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Store size:"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Total generations:"`, context.shouldSeeOutput)
-	sc.Then(`^I should see "failed to load configuration"`, context.shouldSeeOutput)
-	// Final fallback pattern - KNOWN AMBIGUITY: Accept minimal conflicts
-	// TODO: Create step registry system to eliminate all ambiguity
+	
+	// Most generic patterns - must come last
+	sc.Then(`^I should see "([^"]+) profile configuration"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
 }
 

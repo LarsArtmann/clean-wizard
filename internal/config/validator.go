@@ -7,6 +7,40 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// ConfigValidationRules defines all validation constraints
+type ConfigValidationRules struct {
+	// Numeric Constraints
+	MaxDiskUsage      *ValidationRule[int] `json:"max_disk_usage"`
+	MinProtectedPaths *ValidationRule[int] `json:"min_protected_paths"`
+	MaxProfiles       *ValidationRule[int] `json:"max_profiles"`
+	MaxOperations     *ValidationRule[int] `json:"max_operations"`
+
+	// String Constraints
+	ProfileNamePattern *ValidationRule[string] `json:"profile_name_pattern"`
+	PathPattern        *ValidationRule[string] `json:"path_pattern"`
+
+	// Array Constraints
+	UniquePaths    bool `json:"unique_paths"`
+	UniqueProfiles bool `json:"unique_profiles"`
+
+	// Safety Constraints
+	ProtectedSystemPaths []string `json:"protected_system_paths"`
+	RequireSafeMode      bool     `json:"require_safe_mode"`
+
+	// Risk Constraints
+	MaxRiskLevel   domain.RiskLevel `json:"max_risk_level"`
+	BackupRequired domain.RiskLevel `json:"backup_required"`
+}
+
+// ValidationRule represents a validation constraint for a specific type
+type ValidationRule[T comparable] struct {
+	Required bool   `json:"required"`
+	Min      *T     `json:"min,omitempty"`
+	Max      *T     `json:"max,omitempty"`
+	Pattern  string `json:"pattern,omitempty"`
+	Values   []T    `json:"values,omitempty"`
+}
+
 // ConfigValidator provides comprehensive type-safe configuration validation
 type ConfigValidator struct {
 	rules             *ConfigValidationRules
@@ -16,15 +50,14 @@ type ConfigValidator struct {
 	securityValidator *SecurityValidator
 }
 
-// NewConfigValidator creates a new configuration validator
+// NewConfigValidator creates a new configuration validator with default rules
 func NewConfigValidator() *ConfigValidator {
-	rules := GetDefaultValidationRules()
 	return &ConfigValidator{
-		rules:             rules,
-		basicValidator:    NewBasicValidator(rules),
-		fieldValidator:    NewFieldValidator(rules),
-		businessValidator: NewBusinessValidator(rules),
-		securityValidator: NewSecurityValidator(rules),
+		rules:             getDefaultValidationRules(),
+		basicValidator:    NewBasicValidator(),
+		fieldValidator:    NewFieldValidator(),
+		businessValidator: NewBusinessValidator(),
+		securityValidator: NewSecurityValidator(),
 	}
 }
 
@@ -32,10 +65,10 @@ func NewConfigValidator() *ConfigValidator {
 func NewConfigValidatorWithRules(rules *ConfigValidationRules) *ConfigValidator {
 	return &ConfigValidator{
 		rules:             rules,
-		basicValidator:    NewBasicValidator(rules),
-		fieldValidator:    NewFieldValidator(rules),
-		businessValidator: NewBusinessValidator(rules),
-		securityValidator: NewSecurityValidator(rules),
+		basicValidator:    NewBasicValidator(),
+		fieldValidator:    NewFieldValidator(),
+		businessValidator: NewBusinessValidator(),
+		securityValidator: NewSecurityValidator(),
 	}
 }
 
@@ -46,129 +79,152 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 		IsValid:   true,
 		Errors:    []ValidationError{},
 		Warnings:  []ValidationWarning{},
-		Sanitized: &ValidationSanitizedData{Data: make(map[string]any)},
-		Timestamp: time.Now(),
+		Sanitized: &ValidationSanitizedData{
+			FieldsModified: []string{},
+			RulesApplied:  []string{"basic_validation", "field_validation", "business_validation", "security_validation"},
+			Metadata: map[string]string{
+				"validation_level": "comprehensive",
+				"timestamp":       start.Format(time.RFC3339),
+			},
+			Data: make(map[string]any),
+		},
+		Timestamp: start,
 	}
 
-	// Level 1: Basic structure validation
-	basicResult := cv.basicValidator.ValidateStructure(cfg)
-	result.Errors = append(result.Errors, basicResult.Errors...)
-	result.Warnings = append(result.Warnings, basicResult.Warnings...)
+	// Basic structure validation
+	cv.basicValidator.ValidateBasicStructure(cfg, result)
 
-	// Level 2: Field-level validation with rules
-	fieldResult := cv.fieldValidator.ValidateFieldConstraints(cfg)
-	result.Errors = append(result.Errors, fieldResult.Errors...)
-	result.Warnings = append(result.Warnings, fieldResult.Warnings...)
+	// Field-level validation
+	cv.fieldValidator.ValidateFields(cfg, cv.rules, result)
 
-	// Level 3: Cross-field validation
-	cv.validateCrossFieldConstraints(cfg, result)
+	// Business logic validation
+	cv.businessValidator.ValidateBusinessRules(cfg, cv.rules, result)
 
-	// Level 4: Business logic validation
-	businessResult := cv.businessValidator.ValidateBusinessLogic(cfg)
-	result.Errors = append(result.Errors, businessResult.Errors...)
-	result.Warnings = append(result.Warnings, businessResult.Warnings...)
-
-	// Level 5: Security validation
-	securityResult := cv.securityValidator.ValidateSecurityConstraints(cfg)
-	result.Errors = append(result.Errors, securityResult.Errors...)
-	result.Warnings = append(result.Warnings, securityResult.Warnings...)
-
-	// NOTE: Sanitization is NOT applied here to preserve original values
-	// Sanitization should be applied separately after validation succeeds
-	// This prevents state mutation during verification
+	// Security validation
+	cv.securityValidator.ValidateSecurity(cfg, cv.rules, result)
 
 	result.Duration = time.Since(start)
-	result.IsValid = len(result.Errors) == 0
-
 	return result
 }
 
-// ValidateField validates a specific configuration field
-func (cv *ConfigValidator) ValidateField(field string, value any) error {
-	return cv.fieldValidator.ValidateField(field, value)
-}
-
-// validateProfileName validates a profile name
-func (cv *ConfigValidator) validateProfileName(profileName string) error {
-	if cv.rules.ProfileNamePattern != nil && cv.rules.ProfileNamePattern.Pattern != "" {
-		// Basic validation - can be enhanced with regex
-		if len(profileName) == 0 {
-			return fmt.Errorf("profile name cannot be empty")
-		}
-		if len(profileName) > 50 {
-			return fmt.Errorf("profile name too long")
-		}
-	}
-	return nil
-}
-
-// validateCrossFieldConstraints validates constraints between multiple fields
-func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, result *ValidationResult) {
-	// Check for duplicate protected paths
-	if cv.rules.UniquePaths {
-		seen := make(map[string]bool)
-		for _, path := range cfg.Protected {
-			if seen[path] {
-				result.AddWarning(
-					"protected",
-					"Duplicate protected path found",
-					"Remove duplicate paths from configuration",
-				)
-			}
-			seen[path] = true
-		}
+// ValidateProfile performs profile-specific validation
+func (cv *ConfigValidator) ValidateProfile(profileName string, profile *domain.Profile) *ValidationResult {
+	start := time.Now()
+	result := &ValidationResult{
+		IsValid:   true,
+		Errors:    []ValidationError{},
+		Warnings:  []ValidationWarning{},
+		Sanitized: &ValidationSanitizedData{
+			FieldsModified: []string{},
+			RulesApplied:  []string{"profile_validation"},
+			Metadata: map[string]string{
+				"profile": profileName,
+			},
+			Data: make(map[string]any),
+		},
+		Timestamp: start,
 	}
 
-	// Check for duplicate profile names
-	if cv.rules.UniqueProfiles {
-		seen := make(map[string]bool)
-		for name := range cfg.Profiles {
-			if seen[name] {
-				result.AddError(
-					"profiles",
-					"duplicate_name",
-					name,
-					"Duplicate profile name found",
-					"Rename one of the profiles",
-					SeverityError,
-				)
-			}
-			seen[name] = true
+	// Validate profile name
+	if profile.Name == "" {
+		result.AddError("name", "required", "", "Profile name is required", "Set a descriptive name", SeverityError)
+	} else if profile.Name != profileName {
+		result.AddWarning("name", fmt.Sprintf("Profile name mismatch: config key '%s' vs profile name '%s'", profileName, profile.Name))
+	}
+
+	// Validate description
+	if profile.Description == "" {
+		result.AddWarning("description", "Profile description is recommended for clarity")
+	}
+
+	// Validate operations
+	if len(profile.Operations) == 0 {
+		result.AddError("operations", "required", "", "At least one operation is required", "Add cleanup operations", SeverityError)
+	} else {
+		for i, op := range profile.Operations {
+			cv.validateOperation(&op, fmt.Sprintf("operations[%d]", i), result)
 		}
 	}
 
-	// Check if safe mode is required but not enabled
-	if cv.rules.RequireSafeMode && !cfg.SafeMode {
-		result.AddError(
-			"safe_mode",
-			"required",
-			cfg.SafeMode,
-			"Safe mode is required by policy",
-			"Enable safe mode in configuration",
-			SeverityError,
-		)
+	// Validate risk level
+	if profile.MaxRiskLevel != "" && !profile.MaxRiskLevel.IsValid() {
+		result.AddError("max_risk_level", "enum", profile.MaxRiskLevel, "Invalid risk level", "Use: LOW, MEDIUM, HIGH, CRITICAL", SeverityError)
 	}
 
-	// Check disk usage vs protected paths balance
-	if len(cfg.Protected) > 10 && cfg.MaxDiskUsage > 80 {
-		result.AddWarning(
-			"max_disk_usage",
-			"Consider lowering max disk usage with many protected paths",
-			"Balance protection with cleanup effectiveness",
-		)
+	result.Duration = time.Since(start)
+	return result
+}
+
+// validateOperation validates individual operations
+func (cv *ConfigValidator) validateOperation(op *domain.CleanupOperation, fieldPrefix string, result *ValidationResult) {
+	// Validate operation name
+	if op.Name == "" {
+		result.AddError(fieldPrefix+".name", "required", "", "Operation name is required", "Set operation name", SeverityError)
+	}
+
+	// Validate description
+	if op.Description == "" {
+		result.AddWarning(fieldPrefix+".description", "Operation description is recommended")
+	}
+
+	// Validate risk level
+	if !op.RiskLevel.IsValid() {
+		result.AddError(fieldPrefix+".risk_level", "enum", op.RiskLevel, "Invalid risk level", "Use: LOW, MEDIUM, HIGH, CRITICAL", SeverityError)
+	}
+
+	// Validate settings
+	if op.Settings != nil {
+		opType := domain.GetOperationType(op.Name)
+		if err := op.Settings.ValidateSettings(opType); err != nil {
+			result.AddError(fieldPrefix+".settings", "validation", op.Settings, err.Error(), "Fix operation settings", SeverityError)
+		}
 	}
 }
 
-// GetRules returns the current validation rules
-func (cv *ConfigValidator) GetRules() *ConfigValidationRules {
-	return cv.rules
+// getDefaultValidationRules returns default validation rules
+func getDefaultValidationRules() *ConfigValidationRules {
+	return &ConfigValidationRules{
+		MaxDiskUsage: &ValidationRule[int]{
+			Required: true,
+			Min:      intPtr(1),
+			Max:      intPtr(95),
+		},
+		MinProtectedPaths: &ValidationRule[int]{
+			Required: true,
+			Min:      intPtr(1),
+		},
+		MaxProfiles: &ValidationRule[int]{
+			Required: false,
+			Max:      intPtr(10),
+		},
+		MaxOperations: &ValidationRule[int]{
+			Required: false,
+			Max:      intPtr(20),
+		},
+		ProfileNamePattern: &ValidationRule[string]{
+			Required: true,
+			Pattern:  "^[a-z][a-z0-9-_]*$",
+		},
+		PathPattern: &ValidationRule[string]{
+			Required: true,
+			Pattern:  "^/.*",
+		},
+		UniquePaths:    true,
+		UniqueProfiles: true,
+		ProtectedSystemPaths: []string{
+			"/", "/System", "/Library", "/usr", "/etc", "/bin", "/sbin",
+		},
+		RequireSafeMode: true,
+		MaxRiskLevel:   domain.RiskCritical,
+		BackupRequired: domain.RiskHigh,
+	}
 }
 
-// UpdateRules updates the validation rules
-func (cv *ConfigValidator) UpdateRules(rules *ConfigValidationRules) {
-	cv.rules = rules
-	cv.basicValidator = NewBasicValidator(rules)
-	cv.fieldValidator = NewFieldValidator(rules)
-	cv.businessValidator = NewBusinessValidator(rules)
-	cv.securityValidator = NewSecurityValidator(rules)
+// Helper functions
+func intPtr(i int) *int {
+	return &i
+}
+
+func stringPtr(s string) *string {
+	return &s
 }

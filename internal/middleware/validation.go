@@ -32,10 +32,10 @@ func (vm *ValidationMiddleware) ValidateCleanRequest(ctx context.Context, req do
 	return result.Ok(req)
 }
 
-// ValidateCleanerSettings validates cleaner settings
-func (vm *ValidationMiddleware) ValidateCleanerSettings(ctx context.Context, cleaner domain.Cleaner, settings map[string]any) result.Result[map[string]any] {
+// ValidateCleanerSettings validates cleaner settings with type safety
+func (vm *ValidationMiddleware) ValidateCleanerSettings(ctx context.Context, cleaner domain.Cleaner, settings *domain.OperationSettings) result.Result[*domain.OperationSettings] {
 	if err := cleaner.ValidateSettings(settings); err != nil {
-		return result.Err[map[string]any](fmt.Errorf("invalid cleaner settings: %w", err))
+		return result.Err[*domain.OperationSettings](fmt.Errorf("invalid cleaner settings: %w", err))
 	}
 	return result.Ok(settings)
 }

@@ -47,13 +47,20 @@ func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	return storeSizeResult.Value()
 }
 
-// ValidateSettings validates Nix cleaner settings
-func (nc *NixCleaner) ValidateSettings(settings map[string]any) error {
-	if keep, ok := settings["generations"].(int); ok {
-		if keep < 1 {
-			return fmt.Errorf("Generations to keep must be at least 1, got: %d", keep)
-		}
+// ValidateSettings validates Nix cleaner settings with type safety
+func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+	if settings == nil || settings.NixGenerations == nil {
+		return nil // Settings are optional
 	}
+	
+	if settings.NixGenerations.Generations < 1 {
+		return fmt.Errorf("Generations to keep must be at least 1, got: %d", settings.NixGenerations.Generations)
+	}
+	
+	if settings.NixGenerations.Generations > 10 {
+		return fmt.Errorf("Generations to keep must not exceed 10, got: %d", settings.NixGenerations.Generations)
+	}
+	
 	return nil
 }
 

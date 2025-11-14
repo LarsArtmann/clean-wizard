@@ -238,7 +238,24 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 
 			// Show settings if any
 			if op.Settings != nil {
-				fmt.Printf("     Settings: Configured operation settings\n")
+				fmt.Printf("     Settings:\n")
+				if op.Settings.NixGenerations != nil {
+					fmt.Printf("       • generations: %d\n", op.Settings.NixGenerations.Generations)
+					fmt.Printf("       • optimize: %t\n", op.Settings.NixGenerations.Optimize)
+				}
+				if op.Settings.TempFiles != nil {
+					fmt.Printf("       • older_than: %s\n", op.Settings.TempFiles.OlderThan)
+					if len(op.Settings.TempFiles.Excludes) > 0 {
+						fmt.Printf("       • excludes: %v\n", op.Settings.TempFiles.Excludes)
+					}
+				}
+				if op.Settings.Homebrew != nil {
+					fmt.Printf("       • unused_only: %t\n", op.Settings.Homebrew.UnusedOnly)
+				}
+				if op.Settings.SystemTemp != nil {
+					fmt.Printf("       • paths: %v\n", op.Settings.SystemTemp.Paths)
+					fmt.Printf("       • older_than: %s\n", op.Settings.SystemTemp.OlderThan)
+				}
 			}
 
 			if i < len(profile.Operations)-1 {
