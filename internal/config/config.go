@@ -4,6 +4,17 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// createCleanupOperation creates a standardized cleanup operation
+func createCleanupOperation(name, description string, riskLevel domain.RiskLevel, opType domain.OperationType) domain.CleanupOperation {
+	return domain.CleanupOperation{
+		Name:        name,
+		Description: description,
+		RiskLevel:   riskLevel,
+		Enabled:     true,
+		Settings:    domain.DefaultSettings(opType),
+	}
+}
+
 // GetDefaultConfig returns a default configuration
 func GetDefaultConfig() *domain.Config {
 	return &domain.Config{
@@ -18,20 +29,8 @@ func GetDefaultConfig() *domain.Config {
 				MaxRiskLevel: domain.RiskMedium,
 				Enabled:      true,
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "temp-files",
-						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
-					},
+					createCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLow, domain.OperationTypeNixGenerations),
+					createCleanupOperation("temp-files", "Clean temporary files", domain.RiskLow, domain.OperationTypeTempFiles),
 				},
 			},
 			"aggressive": {
@@ -39,20 +38,8 @@ func GetDefaultConfig() *domain.Config {
 				Description: "Deep aggressive cleanup",
 				Enabled:     true,
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Deep Nix generations cleanup",
-						RiskLevel:   domain.RiskHigh,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "homebrew-cleanup",
-						Description: "Clean Homebrew packages",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
-					},
+					createCleanupOperation("nix-generations", "Deep Nix generations cleanup", domain.RiskHigh, domain.OperationTypeNixGenerations),
+					createCleanupOperation("homebrew-cleanup", "Clean Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
 				},
 			},
 			"comprehensive": {
@@ -74,13 +61,7 @@ func GetDefaultConfig() *domain.Config {
 						Enabled:     true,
 						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 					},
-					{
-						Name:        "system-temp",
-						Description: "Clean system temporary files",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeSystemTemp),
-					},
+					createCleanupOperation("system-temp", "Clean system temporary files", domain.RiskMedium, domain.OperationTypeSystemTemp),
 				},
 			},
 		},
@@ -101,13 +82,7 @@ func GetTestConfig() *domain.Config {
 				MaxRiskLevel: domain.RiskCritical,
 				Enabled:      true,
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "test-operation",
-						Description: "Test operation",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
-					},
+					createCleanupOperation("test-operation", "Test operation", domain.RiskLow, domain.OperationTypeTempFiles),
 				},
 			},
 		},
