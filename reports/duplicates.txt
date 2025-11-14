@@ -1,4 +1,26 @@
-2025/11/14 05:27:22 Building suffix tree
-2025/11/14 05:27:22 Searching for clones
+2025/11/14 05:31:13 Building suffix tree
+2025/11/14 05:31:13 Searching for clones
+found 2 clones:
+  tests/bdd/nix_bdd_test.go:254,265
+  tests/bdd/nix_bdd_test.go:267,278
+found 2 clones:
+  internal/config/validation_middleware.go:40,54
+  internal/config/validation_middleware.go:113,127
+found 2 clones:
+  internal/conversions/conversions.go:276,281
+  internal/conversions/conversions.go:284,289
+found 3 clones:
+  internal/format/format_test.go:14,21
+  internal/format/format_test.go:30,37
+  internal/format/format_test.go:155,162
+found 2 clones:
+  internal/format/format_test.go:13,22
+  internal/format/format_test.go:29,38
+found 2 clones:
+  internal/format/format_test.go:95,103
+  internal/format/format_test.go:109,121
+found 2 clones:
+  internal/config/config.go:20,35
+  internal/config/config.go:41,56
 
-Found total 0 clone groups.
+Found total 7 clone groups.

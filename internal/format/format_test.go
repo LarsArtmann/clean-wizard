@@ -21,19 +21,28 @@ func runSizeTests(t *testing.T, testCases []struct {
 	}
 }
 
+// runTests is a generic test runner for functions with input T and string output
+func runTests[T any](t *testing.T, testCases []struct {
+	name     string
+	input    T
+	expected string
+}, testFunc func(T) string) {
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			result := testFunc(tt.input)
+			if result != tt.expected {
+				t.Errorf("TestFunc(%v) = %v, want %v", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
 func runDurationTests(t *testing.T, testCases []struct {
 	name     string
 	duration time.Duration
 	expected string
 }) {
-	for _, tt := range testCases {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Duration(tt.duration)
-			if result != tt.expected {
-				t.Errorf("Duration(%v) = %v, want %v", tt.duration, result, tt.expected)
-			}
-		})
-	}
+	runTests(t, testCases, Duration)
 }
 
 func runDateTests(t *testing.T, testCases []struct {
@@ -41,14 +50,7 @@ func runDateTests(t *testing.T, testCases []struct {
 	t        time.Time
 	expected string
 }) {
-	for _, tt := range testCases {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Date(tt.t)
-			if result != tt.expected {
-				t.Errorf("Date(%v) = %v, want %v", tt.t, result, tt.expected)
-			}
-		})
-	}
+	runTests(t, testCases, Date)
 }
 
 func TestSize(t *testing.T) {
