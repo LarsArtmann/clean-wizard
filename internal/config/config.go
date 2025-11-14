@@ -19,7 +19,7 @@ func createCleanupOperation(name, description string, riskLevel domain.RiskLevel
 func GetDefaultConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
-		SafeMode:     true,
+		SafeMode:     domain.SafetyLevelEnabled,
 		MaxDiskUsage: 50,
 		Protected:    []string{"/", "/System", "/Library", "/usr", "/etc"},
 		Profiles: map[string]*domain.Profile{
@@ -72,7 +72,7 @@ func GetDefaultConfig() *domain.Config {
 func GetTestConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "test",
-		SafeMode:     false,
+		SafeMode:     domain.SafetyLevelDisabled,
 		MaxDiskUsage: 75,
 		Protected:    []string{"/", "/System"},
 		Profiles: map[string]*domain.Profile{

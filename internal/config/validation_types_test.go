@@ -73,7 +73,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 // createTestConfig creates a test config with common default values
 func createTestConfig() *domain.Config {
 	return &domain.Config{
-		SafeMode:     true,
+		SafeMode:     domain.SafetyLevelEnabled,
 		MaxDiskUsage:  50,
 		Protected:    []string{"/System", "/Library"},
 		Profiles: map[string]*domain.Profile{
