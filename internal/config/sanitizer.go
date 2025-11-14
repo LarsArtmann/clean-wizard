@@ -113,6 +113,17 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 		cs.addChange(result, "version", cfg.Version, "1.0.0", "applied default version")
 		cfg.Version = "1.0.0"
 	}
+
+	// Clamp MaxDiskUsage to reasonable range (0-95)
+	if cfg.MaxDiskUsage > 95 {
+		clamped := 95
+		cs.addChange(result, "max_disk_usage", cfg.MaxDiskUsage, clamped, "clamped to maximum")
+		cfg.MaxDiskUsage = clamped
+	} else if cfg.MaxDiskUsage < 0 {
+		clamped := 0
+		cs.addChange(result, "max_disk_usage", cfg.MaxDiskUsage, clamped, "clamped to minimum")
+		cfg.MaxDiskUsage = clamped
+	}
 }
 
 // sanitizeProtectedPaths sanitizes protected paths
@@ -317,6 +328,12 @@ func (cs *ConfigSanitizer) addChange(result *SanitizationResult, field string, o
 		Time:     time.Now(),
 	}
 	result.Changes = append(result.Changes, change)
+	
+	// Also track field in sanitized data for test compatibility
+	if result.Sanitized.FieldsModified == nil {
+		result.Sanitized.FieldsModified = []string{}
+	}
+	result.Sanitized.FieldsModified = append(result.Sanitized.FieldsModified, field)
 }
 
 // getDefaultSanitizationRules returns default sanitization rules

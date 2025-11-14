@@ -115,7 +115,7 @@ func GetSanitizationTestCases() []TestSanitizationTestCase {
 				cfg.Protected = []string{"/System", "/Library", "/System"} // Duplicate /System
 				return cfg
 			}(),
-			expectedChanges:  []string{"profiles.daily.operations[0].settings"}, // Settings sanitized
+			expectedChanges:  []string{"protected"}, // Duplicate paths removed
 			expectedWarnings: 0,
 		},
 	}
