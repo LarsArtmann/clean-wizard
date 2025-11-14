@@ -2,8 +2,6 @@ package config
 
 import (
 	"testing"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 func TestConfigSanitizer_SanitizeConfig(t *testing.T) {

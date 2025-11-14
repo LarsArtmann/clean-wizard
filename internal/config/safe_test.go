@@ -13,10 +13,42 @@ func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }
 
+// runBoolTests runs generic tests for functions returning bool
+func runBoolTests[T any](t *testing.T, testCases []struct {
+	name     string
+	input    T
+	expected bool
+}, testFunc func(T) bool) {
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			result := testFunc(tt.input)
+			if result != tt.expected {
+				t.Errorf("TestFunc(%v) = %v, want %v", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+// runStringTests runs generic tests for functions returning string
+func runStringTests[T any](t *testing.T, testCases []struct {
+	name     string
+	input    T
+	expected string
+}, testFunc func(T) string) {
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			result := testFunc(tt.input)
+			if result != tt.expected {
+				t.Errorf("TestFunc(%v) = %v, want %v", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestRiskLevel_String(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    domain.RiskLevel
+		input    domain.RiskLevel
 		expected string
 	}{
 		{"low risk", domain.RiskLow, "LOW"},
@@ -26,14 +58,7 @@ func TestRiskLevel_String(t *testing.T) {
 		{"unknown risk", domain.RiskLevel("UNKNOWN"), "UNKNOWN"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := string(tt.level)
-			if result != tt.expected {
-				t.Errorf("String() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	runStringTests(t, tests, func(r domain.RiskLevel) string { return string(r) })
 }
 
 func TestRiskLevel_Icon(t *testing.T) {
@@ -62,7 +87,7 @@ func TestRiskLevel_Icon(t *testing.T) {
 func TestRiskLevel_IsValid(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    domain.RiskLevel
+		input    domain.RiskLevel
 		expected bool
 	}{
 		{"low risk", domain.RiskLow, true},
@@ -74,20 +99,13 @@ func TestRiskLevel_IsValid(t *testing.T) {
 		{"too high risk", domain.RiskLevel("100"), false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.level.IsValid()
-			if result != tt.expected {
-				t.Errorf("IsValid() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	runBoolTests(t, tests, func(r domain.RiskLevel) bool { return r.IsValid() })
 }
 
 func TestCleanType_IsValid(t *testing.T) {
 	tests := []struct {
-		name      string
-		cleanType CleanType
+		name     string
+		input    CleanType
 		expected  bool
 	}{
 		{"nix store", CleanTypeNixStore, true},
@@ -98,14 +116,7 @@ func TestCleanType_IsValid(t *testing.T) {
 		{"empty type", CleanType(""), false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.cleanType.IsValid()
-			if result != tt.expected {
-				t.Errorf("IsValid() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	runBoolTests(t, tests, func(c CleanType) bool { return c.IsValid() })
 }
 
 func TestSafeConfigBuilder_Build(t *testing.T) {

@@ -23,8 +23,27 @@ type TestValidationLevelTestCase struct {
 	expectErrors int
 }
 
+// createTestProfile creates a standard test profile for reuse across all test configs
+func createTestProfile() *domain.Profile {
+	return &domain.Profile{
+		Name:        "daily",
+		Description: "Daily cleanup",
+		Operations: []domain.CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Clean Nix generations",
+				RiskLevel:   domain.RiskLow,
+				Enabled:     true,
+			},
+		},
+		Enabled: true,
+	}
+}
+
 // CreateTestConfigurations creates test configurations for validation testing
 func CreateTestConfigurations() map[string]*domain.Config {
+	testProfile := createTestProfile()
+	
 	return map[string]*domain.Config{
 		"valid": {
 			Version:      "1.0.0",
@@ -32,19 +51,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 			MaxDiskUsage: 50,
 			Protected:    []string{"/System", "/Library", "/Applications"},
 			Profiles: map[string]*domain.Profile{
-				"daily": {
-					Name:        "daily",
-					Description: "Daily cleanup",
-					Operations: []domain.CleanupOperation{
-						{
-							Name:        "nix-generations",
-							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLow,
-							Enabled:     true,
-						},
-					},
-					Enabled: true,
-				},
+				"daily": testProfile,
 			},
 			LastClean: time.Now(),
 			Updated:   time.Now(),
@@ -55,19 +62,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 			MaxDiskUsage: 150, // Invalid: too high
 			Protected:    []string{"/System"},
 			Profiles: map[string]*domain.Profile{
-				"daily": {
-					Name:        "daily",
-					Description: "Daily cleanup",
-					Operations: []domain.CleanupOperation{
-						{
-							Name:        "nix-generations",
-							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLow,
-							Enabled:     true,
-						},
-					},
-					Enabled: true,
-				},
+				"daily": testProfile,
 			},
 			LastClean: time.Now(),
 			Updated:   time.Now(),
@@ -82,19 +77,7 @@ func createTestConfig() *domain.Config {
 		MaxDiskUsage:  50,
 		Protected:    []string{"/System", "/Library"},
 		Profiles: map[string]*domain.Profile{
-			"daily": {
-				Name:        "daily",
-				Description: "Daily cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
-					},
-				},
-				Enabled: true,
-			},
+			"daily": createTestProfile(),
 		},
 	}
 }

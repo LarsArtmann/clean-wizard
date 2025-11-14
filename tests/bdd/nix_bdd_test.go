@@ -258,7 +258,7 @@ func validateCleanResult(ctx *BDDTestContext, validator func(*domain.CleanResult
 	}
 
 	result := ctx.cleanResult.Value()
-	return validator(result)
+	return validator(&result)
 }
 
 func (ctx *BDDTestContext) shouldSeeEstimatedSpace() error {

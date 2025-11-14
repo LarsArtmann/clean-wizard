@@ -1,20 +1,153 @@
-2025/11/14 06:08:45 Building suffix tree
-2025/11/14 06:08:46 Searching for clones
+2025/11/14 06:24:14 Building suffix tree
+2025/11/14 06:24:14 Searching for clones
+found 4 clones:
+  tests/bdd/configuration_workflow_bdd_test.go:331,336
+  tests/bdd/configuration_workflow_bdd_test.go:345,350
+  tests/bdd/configuration_workflow_bdd_test.go:352,357
+  tests/bdd/configuration_workflow_bdd_test.go:395,400
+found 2 clones:
+  tests/integration/executor.go:37,45
+  tests/integration/executor.go:58,66
+found 4 clones:
+  tests/bdd/configuration_workflow_bdd_test.go:177,194
+  tests/bdd/configuration_workflow_bdd_test.go:196,208
+  tests/bdd/configuration_workflow_bdd_test.go:210,217
+  tests/bdd/configuration_workflow_bdd_test.go:219,245
+found 3 clones:
+  tests/bdd/configuration_workflow_bdd_test.go:177,208
+  tests/bdd/configuration_workflow_bdd_test.go:196,217
+  tests/bdd/configuration_workflow_bdd_test.go:210,245
+found 2 clones:
+  internal/config/safe_test.go:49,59
+  internal/config/safe_test.go:65,75
+found 2 clones:
+  tests/integration/builders.go:63,71
+  tests/integration/builders.go:74,82
 found 2 clones:
   internal/middleware/validation.go:20,25
   internal/middleware/validation.go:28,33
+found 2 clones:
+  tests/bdd/configuration_workflow_bdd_test.go:139,165
+  tests/bdd/configuration_workflow_bdd_test.go:167,175
+found 2 clones:
+  internal/config/basic_validator.go:30,51
+  internal/config/basic_validator.go:42,63
 found 3 clones:
-  internal/format/format_test.go:14,21
-  internal/format/format_test.go:30,37
-  internal/format/format_test.go:155,162
+  internal/conversions/conversions_test.go:142,144
+  internal/conversions/conversions_test.go:325,327
+  internal/conversions/conversions_test.go:339,341
 found 2 clones:
-  internal/format/format_test.go:13,22
-  internal/format/format_test.go:29,38
+  internal/config/validation_middleware.go:244,262
+  internal/config/validation_middleware.go:254,272
 found 2 clones:
-  internal/format/format_test.go:95,103
-  internal/format/format_test.go:109,121
+  internal/config/validation_middleware.go:293,303
+  internal/config/validation_middleware.go:306,316
+found 2 clones:
+  tests/integration/builders.go:135,140
+  tests/integration/builders.go:159,164
+found 2 clones:
+  internal/config/safe_test.go:204,212
+  internal/config/safe_test.go:222,230
+found 2 clones:
+  internal/config/sanitizer.go:159,165
+  internal/config/sanitizer.go:168,174
+found 2 clones:
+  internal/config/field_validator.go:76,78
+  internal/config/field_validator.go:79,81
+found 2 clones:
+  internal/result/type_test.go:66,76
+  internal/result/type_test.go:108,118
+found 3 clones:
+  internal/config/validation_middleware.go:244,252
+  internal/config/validation_middleware.go:254,262
+  internal/config/validation_middleware.go:264,272
+found 2 clones:
+  internal/config/safe_test.go:129,138
+  internal/config/safe_test.go:147,156
+found 4 clones:
+  internal/config/enhanced_loader.go:60,73
+  internal/config/validation_types.go:18,31
+  internal/domain/types.go:31,44
+  internal/pkg/errors/errors.go:87,100
+found 2 clones:
+  internal/config/validation_types.go:118,126
+  internal/config/validation_types.go:129,137
+found 2 clones:
+  tests/integration/context.go:121,125
+  tests/integration/context.go:135,139
+found 2 clones:
+  tests/integration/executor.go:70,79
+  tests/integration/executor.go:76,85
+found 2 clones:
+  internal/config/sanitizer.go:187,193
+  internal/config/sanitizer.go:196,202
+found 3 clones:
+  internal/config/basic_validator.go:30,39
+  internal/config/basic_validator.go:42,51
+  internal/config/basic_validator.go:54,63
+found 2 clones:
+  tests/integration/filesystem.go:51,66
+  tests/integration/filesystem.go:57,72
+found 2 clones:
+  cmd/clean-wizard/commands/util.go:9,22
+  cmd/clean-wizard/main.go:42,55
+found 2 clones:
+  cmd/clean-wizard/commands/profile.go:44,52
+  cmd/clean-wizard/commands/profile.go:55,63
+found 3 clones:
+  tests/integration/executor.go:70,73
+  tests/integration/executor.go:76,79
+  tests/integration/executor.go:82,85
+found 2 clones:
+  internal/config/validation_middleware.go:354,362
+  internal/config/validation_middleware.go:363,371
+found 2 clones:
+  internal/pkg/errors/errors.go:134,143
+  internal/pkg/errors/errors.go:146,155
+found 2 clones:
+  cmd/clean-wizard/commands/clean.go:84,94
+  cmd/clean-wizard/commands/scan.go:67,77
+found 2 clones:
+  tests/bdd/nix_bdd_test.go:264,271
+  tests/bdd/nix_bdd_test.go:273,280
+found 4 clones:
+  tests/integration/filesystem.go:51,54
+  tests/integration/filesystem.go:57,60
+  tests/integration/filesystem.go:63,66
+  tests/integration/filesystem.go:69,72
+found 2 clones:
+  tests/bdd/configuration_workflow_bdd_test.go:177,217
+  tests/bdd/configuration_workflow_bdd_test.go:196,245
+found 2 clones:
+  internal/config/enhanced_loader.go:128,136
+  internal/config/enhanced_loader.go:166,174
+found 2 clones:
+  tests/bdd/configuration_workflow_bdd_test.go:25,35
+  tests/bdd/nix_management_bdd_test.go:10,20
+found 2 clones:
+  tests/integration/executor.go:111,113
+  tests/integration/executor.go:116,118
+found 2 clones:
+  internal/domain/types.go:47,56
+  internal/domain/types.go:59,68
+found 3 clones:
+  internal/config/safe_test.go:17,30
+  internal/config/safe_test.go:33,46
+  internal/format/format_test.go:18,31
+found 2 clones:
+  internal/format/format_test.go:88,96
+  internal/format/format_test.go:102,114
+found 2 clones:
+  cmd/clean-wizard/commands/profile.go:242,245
+  cmd/clean-wizard/commands/profile.go:255,258
 found 2 clones:
   internal/config/config.go:20,35
   internal/config/config.go:41,56
+found 2 clones:
+  cmd/clean-wizard/commands/profile.go:139,148
+  cmd/clean-wizard/commands/profile.go:188,196
+found 2 clones:
+  internal/format/format_test.go:33,39
+  internal/format/format_test.go:41,47
 
-Found total 5 clone groups.
+Found total 45 clone groups.

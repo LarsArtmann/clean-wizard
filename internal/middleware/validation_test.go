@@ -60,7 +60,12 @@ func TestValidationMiddleware(t *testing.T) {
 
 	t.Run("ValidCleanerSettings", func(t *testing.T) {
 		cleaner := &mockCleaner{}
-		settings := map[string]any{"generations": 3}
+		settings := &domain.OperationSettings{
+			NixGenerations: &domain.NixGenerationsSettings{
+				Generations: 3,
+				Optimize:    false,
+			},
+		}
 
 		result := validator.ValidateCleanerSettings(ctx, cleaner, settings)
 		assert.True(t, result.IsOk())
@@ -68,7 +73,12 @@ func TestValidationMiddleware(t *testing.T) {
 
 	t.Run("InvalidCleanerSettings", func(t *testing.T) {
 		cleaner := &mockCleaner{}
-		settings := map[string]any{"generations": -1}
+		settings := &domain.OperationSettings{
+			NixGenerations: &domain.NixGenerationsSettings{
+				Generations: -1,
+				Optimize:    false,
+			},
+		}
 
 		result := validator.ValidateCleanerSettings(ctx, cleaner, settings)
 		assert.True(t, result.IsErr())
@@ -87,9 +97,11 @@ func (m *mockCleaner) GetStoreSize(ctx context.Context) int64 {
 	return 1000
 }
 
-func (m *mockCleaner) ValidateSettings(settings map[string]any) error {
-	if gen, ok := settings["generations"].(int); ok && gen < 1 {
-		return fmt.Errorf("Generations to keep must be at least 1, got: %d", gen)
+func (m *mockCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+	if settings != nil && settings.NixGenerations != nil {
+		if settings.NixGenerations.Generations < 1 {
+			return fmt.Errorf("Generations to keep must be at least 1, got: %d", settings.NixGenerations.Generations)
+		}
 	}
 	return nil
 }

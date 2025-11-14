@@ -8,17 +8,10 @@ import (
 // Helper to eliminate test table iteration duplication
 func runSizeTests(t *testing.T, testCases []struct {
 	name     string
-	bytes    int64
+	input    int64
 	expected string
 }) {
-	for _, tt := range testCases {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Size(tt.bytes)
-			if result != tt.expected {
-				t.Errorf("Size(%d) = %v, want %v", tt.bytes, result, tt.expected)
-			}
-		})
-	}
+	runTests(t, testCases, Size)
 }
 
 // runTests is a generic test runner for functions with input T and string output
@@ -39,7 +32,7 @@ func runTests[T any](t *testing.T, testCases []struct {
 
 func runDurationTests(t *testing.T, testCases []struct {
 	name     string
-	duration time.Duration
+	input    time.Duration
 	expected string
 }) {
 	runTests(t, testCases, Duration)
@@ -47,7 +40,7 @@ func runDurationTests(t *testing.T, testCases []struct {
 
 func runDateTests(t *testing.T, testCases []struct {
 	name     string
-	t        time.Time
+	input    time.Time
 	expected string
 }) {
 	runTests(t, testCases, Date)
@@ -56,7 +49,7 @@ func runDateTests(t *testing.T, testCases []struct {
 func TestSize(t *testing.T) {
 	tests := []struct {
 		name     string
-		bytes    int64
+		input    int64
 		expected string
 	}{
 		{"bytes", 512, "512 B"},
@@ -76,7 +69,7 @@ func TestSize(t *testing.T) {
 func TestDuration(t *testing.T) {
 	tests := []struct {
 		name     string
-		duration time.Duration
+		input    time.Duration
 		expected string
 	}{
 		{"nanoseconds", 500 * time.Nanosecond, "500 ns"},
@@ -94,7 +87,7 @@ func TestDuration(t *testing.T) {
 func TestDate(t *testing.T) {
 	tests := []struct {
 		name     string
-		t        time.Time
+		input    time.Time
 		expected string
 	}{
 		{"valid date", time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC), "2023-12-25"},
@@ -139,7 +132,7 @@ func TestDateTime(t *testing.T) {
 func TestNumber(t *testing.T) {
 	tests := []struct {
 		name     string
-		n        int64
+		input    int64
 		expected string
 	}{
 		{"small number", 42, "42"},
@@ -152,12 +145,5 @@ func TestNumber(t *testing.T) {
 		{"hundreds", 999, "999"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Number(tt.n)
-			if result != tt.expected {
-				t.Errorf("Number(%d) = %v, want %v", tt.n, result, tt.expected)
-			}
-		})
-	}
+	runTests(t, tests, Number)
 }

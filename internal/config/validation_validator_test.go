@@ -46,52 +46,23 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 	}{
 		{
 			name: "valid config",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage:  50,
-				Protected:    []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: func() *domain.Config {
+				cfg := createTestConfig()
+				cfg.Version = "1.0.0"
+				cfg.Protected = []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin"}
+				return cfg
+			}(),
 			expectValid: true,
 		},
 		{
 			name: "invalid max disk usage",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage:  150, // Invalid: > 95
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: func() *domain.Config {
+				cfg := createTestConfig()
+				cfg.Version = "1.0.0"
+				cfg.MaxDiskUsage = 150 // Invalid: > 95
+				cfg.Protected = []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"}
+				return cfg
+			}(),
 			expectValid: false,
 			expectError: "max_disk_usage",
 		},
@@ -122,39 +93,24 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 		},
 		{
 			name: "empty protected paths",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage:  50,
-				Protected:    []string{},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
-							},
-						},
-						Enabled: true,
-					},
-				},
-			},
+			config: func() *domain.Config {
+				cfg := createTestConfig()
+				cfg.Version = "1.0.0"
+				cfg.Protected = []string{}
+				return cfg
+			}(),
 			expectValid: false,
 			expectError: "protected",
 		},
 		{
 			name: "no profiles",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     true,
-				MaxDiskUsage:  50,
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles:     map[string]*domain.Profile{},
-			},
+			config: func() *domain.Config {
+				cfg := createTestConfig()
+				cfg.Version = "1.0.0"
+				cfg.Protected = []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"}
+				cfg.Profiles = map[string]*domain.Profile{}
+				return cfg
+			}(),
 			expectValid: false,
 			expectError: "profiles",
 		},
