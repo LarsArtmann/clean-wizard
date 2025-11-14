@@ -2,6 +2,8 @@ package config
 
 import (
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // Severity represents validation error severity
@@ -63,32 +65,12 @@ type ValidationWarning struct {
 
 // ValidationSanitizedData represents fully type-safe sanitized data
 type ValidationSanitizedData struct {
+	*domain.Config // EMBED domain config directly - NO SPLIT BRAINS
 	FieldsModified []string       `json:"fields_modified,omitempty"`
 	RulesApplied  []string       `json:"rules_applied,omitempty"`
 	Metadata      map[string]string `json:"metadata,omitempty"`
-	// Type-safe configuration data
-	Config        *ConfigContext    `json:"config,omitempty"`
-	Operations    []*OperationContext `json:"operations,omitempty"`
-	// COMPROMISE: Maintain backward compatibility for serialization
+	// Use domain types directly, no duplicates needed
 	Data          map[string]any `json:"data,omitempty"`
-}
-
-// ConfigContext represents sanitized configuration
-type ConfigContext struct {
-	Version      string   `json:"version"`
-	SafeMode     bool     `json:"safe_mode"`
-	MaxDiskUsage int      `json:"max_disk_usage"`
-	Protected    []string `json:"protected"`
-	Profiles     []string `json:"profiles,omitempty"`
-}
-
-// OperationContext represents sanitized operation data
-type OperationContext struct {
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	RiskLevel   string            `json:"risk_level"`
-	Enabled     bool              `json:"enabled"`
-	Settings    map[string]string `json:"settings,omitempty"`
 }
 
 // ValidationResult represents complete validation result with type-safe sanitized data

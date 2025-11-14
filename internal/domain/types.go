@@ -27,6 +27,11 @@ func (rl RiskLevel) IsValid() bool {
 	}
 }
 
+// String returns string representation
+func (rl RiskLevel) String() string {
+	return string(rl)
+}
+
 // Icon returns emoji for risk level
 func (rl RiskLevel) Icon() string {
 	switch rl {

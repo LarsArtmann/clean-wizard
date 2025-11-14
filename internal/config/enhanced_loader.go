@@ -233,6 +233,7 @@ type ConfigSaveOptions struct {
 	BackupEnabled      bool            `json:"backup_enabled"`
 	ValidationLevel    ValidationLevel `json:"validation_level"`
 	CreateBackup       bool            `json:"create_backup"`
+	Path              string          `json:"path"`              // Add missing Path field
 	Timeout            time.Duration   `json:"timeout"`
 }
 
@@ -285,7 +286,7 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config
 		}
 
 		timeoutCtx, cancel := context.WithTimeout(ctx, options.Timeout)
-		err := ecl.middleware.saveConfig(timeoutCtx, config)
+		err := ecl.middleware.saveConfig(timeoutCtx, config, options.Path)
 		cancel()
 		if err == nil {
 			return nil
@@ -515,6 +516,7 @@ func getDefaultSaveOptions() *ConfigSaveOptions {
 		BackupEnabled:      true,
 		ValidationLevel:    ValidationLevelComprehensive,
 		CreateBackup:       false,
+		Path:              "",  // Default empty path, caller should set
 	}
 }
 
