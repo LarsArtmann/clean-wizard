@@ -36,21 +36,26 @@ func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddl
 	}
 }
 
-// Helper function to eliminate duplication
-func (vm *ValidationMiddleware) logValidationSuccess(result *SanitizationResult, duration time.Duration) {
-	vm.logger.LogValidation(&ValidationResult{
+// createValidationResult creates a validation result with sanitized data
+func createValidationResult(sanitizedData *SanitizationResult, duration time.Duration) *ValidationResult {
+	return &ValidationResult{
 		IsValid:  true,
 		Errors:   []ValidationError{},
 		Warnings: []ValidationWarning{},
 		Sanitized: &ValidationSanitizedData{
 			Data: map[string]any{
-				"sanitized": result.Sanitized,
-				"changes":   result.Changes,
+				"sanitized": sanitizedData.Sanitized,
+				"changes":   sanitizedData.Changes,
 			},
 		},
 		Duration:  duration,
 		Timestamp: time.Now(),
-	})
+	}
+}
+
+// Helper function to eliminate duplication
+func (vm *ValidationMiddleware) logValidationSuccess(result *SanitizationResult, duration time.Duration) {
+	vm.logger.LogValidation(createValidationResult(result, duration))
 }
 
 // ValidateAndLoadConfig validates and loads configuration
@@ -111,19 +116,7 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 
 	duration := time.Since(start)
 	if vm.logger.(*DefaultValidationLogger).enableDetailedLogging {
-		vm.logger.LogValidation(&ValidationResult{
-			IsValid:  true,
-			Errors:   []ValidationError{},
-			Warnings: []ValidationWarning{},
-			Sanitized: &ValidationSanitizedData{
-				Data: map[string]any{
-					"sanitized": sanitizationResult.Sanitized,
-					"changes":   sanitizationResult.Changes,
-				},
-			},
-			Duration:  duration,
-			Timestamp: time.Now(),
-		})
+		vm.logger.LogValidation(createValidationResult(sanitizationResult, duration))
 	}
 
 	return cfg, nil
