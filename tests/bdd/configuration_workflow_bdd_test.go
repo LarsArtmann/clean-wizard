@@ -21,6 +21,14 @@ type ConfigurationWorkflowContext struct {
 	exitCode      int
 }
 
+// assertOutputContains is a generic BDD assertion helper
+func (c *ConfigurationWorkflowContext) assertOutputContains(expectedText, errorMsg string) error {
+	if !strings.Contains(c.commandOutput, expectedText) {
+		return fmt.Errorf("%s, but got:\n%s", errorMsg, c.commandOutput)
+	}
+	return nil
+}
+
 func TestConfigurationWorkflowBDD(t *testing.T) {
 	suite := godog.TestSuite{
 		Name: "Configuration Workflow",
@@ -329,46 +337,31 @@ func (c *ConfigurationWorkflowContext) shouldSeeOutput(expectedText string) erro
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeScanResults() error {
-	if !strings.Contains(c.commandOutput, "Total generations:") {
-		return fmt.Errorf("expected scan results with generations, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("Total generations:", "expected scan results with generations")
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeCleanResults() error {
-	if !strings.Contains(c.commandOutput, "items") && !strings.Contains(c.commandOutput, "would be cleaned") {
-		return fmt.Errorf("expected clean results with items, but got:\n%s", c.commandOutput)
+	if strings.Contains(c.commandOutput, "items") || strings.Contains(c.commandOutput, "would be cleaned") {
+		return nil
 	}
-	return nil
+	return fmt.Errorf("expected clean results with items, but got:\n%s", c.commandOutput)
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeDailyProfile() error {
-	if !strings.Contains(c.commandOutput, "Using daily profile configuration") {
-		return fmt.Errorf("expected to see daily profile usage, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("Using daily profile configuration", "expected to see daily profile usage")
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeDryRunMode() error {
-	if !strings.Contains(c.commandOutput, "DRY-RUN mode") {
-		return fmt.Errorf("expected to see dry-run mode, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("DRY-RUN mode", "expected to see dry-run mode")
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeValidationLevel(expectedLevel string) error {
 	expectedText := fmt.Sprintf("Applying validation level: %s", expectedLevel)
-	if !strings.Contains(c.commandOutput, expectedText) {
-		return fmt.Errorf("expected to see validation level %s, but got:\n%s", expectedLevel, c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains(expectedText, fmt.Sprintf("expected to see validation level %s", expectedLevel))
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeValidationError(errorType string) error {
-	if !strings.Contains(c.commandOutput, "validation failed") {
-		return fmt.Errorf("expected to see validation error, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("validation failed", "expected to see validation error")
 }
 
 func (c *ConfigurationWorkflowContext) shouldNotSeeValidationErrors() error {
@@ -393,8 +386,5 @@ func (c *ConfigurationWorkflowContext) shouldFailWithError() error {
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeScanResultsReflectingDailyProfile() error {
-	if !strings.Contains(c.commandOutput, "Using daily profile configuration") {
-		return fmt.Errorf("expected scan results to reflect daily profile, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("Using daily profile configuration", "expected scan results to reflect daily profile")
 }

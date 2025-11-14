@@ -1,29 +1,15 @@
-2025/11/14 06:44:22 Building suffix tree
-2025/11/14 06:44:23 Searching for clones
-found 5 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:331,336
-  tests/bdd/configuration_workflow_bdd_test.go:345,350
-  tests/bdd/configuration_workflow_bdd_test.go:352,357
-  tests/bdd/configuration_workflow_bdd_test.go:367,372
-  tests/bdd/configuration_workflow_bdd_test.go:395,400
+2025/11/14 06:58:58 Building suffix tree
+2025/11/14 06:58:58 Searching for clones
 found 3 clones:
   internal/config/safe.go:79,82
   internal/config/safe.go:85,88
   internal/config/safe.go:91,94
-found 4 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:331,336
-  tests/bdd/configuration_workflow_bdd_test.go:345,350
-  tests/bdd/configuration_workflow_bdd_test.go:352,357
-  tests/bdd/configuration_workflow_bdd_test.go:395,400
-found 8 clones:
-  internal/config/config.go:21,27
-  internal/config/config.go:28,34
-  internal/config/config.go:42,48
-  internal/config/config.go:49,55
-  internal/config/config.go:63,69
-  internal/config/config.go:70,76
-  internal/config/config.go:77,83
-  internal/config/config.go:104,110
+found 2 clones:
+  tests/bdd/configuration_workflow_bdd_test.go:25,30
+  tests/bdd/configuration_workflow_bdd_test.go:332,337
+found 2 clones:
+  internal/config/config.go:50,56
+  internal/config/config.go:57,63
 found 3 clones:
   internal/config/safe.go:51,58
   internal/domain/types.go:21,28
@@ -32,10 +18,10 @@ found 2 clones:
   tests/integration/executor.go:37,45
   tests/integration/executor.go:58,66
 found 4 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:177,194
-  tests/bdd/configuration_workflow_bdd_test.go:196,208
-  tests/bdd/configuration_workflow_bdd_test.go:210,217
-  tests/bdd/configuration_workflow_bdd_test.go:219,245
+  tests/bdd/configuration_workflow_bdd_test.go:185,202
+  tests/bdd/configuration_workflow_bdd_test.go:204,216
+  tests/bdd/configuration_workflow_bdd_test.go:218,225
+  tests/bdd/configuration_workflow_bdd_test.go:227,253
 found 2 clones:
   internal/config/config_validator.go:61,63
   internal/config/config_validator.go:66,68
@@ -48,9 +34,9 @@ found 7 clones:
   internal/config/security_validator.go:16,18
   tests/integration/filesystem.go:16,18
 found 3 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:177,208
-  tests/bdd/configuration_workflow_bdd_test.go:196,217
-  tests/bdd/configuration_workflow_bdd_test.go:210,245
+  tests/bdd/configuration_workflow_bdd_test.go:185,216
+  tests/bdd/configuration_workflow_bdd_test.go:204,225
+  tests/bdd/configuration_workflow_bdd_test.go:218,253
 found 2 clones:
   internal/config/safe_test.go:49,59
   internal/config/safe_test.go:65,75
@@ -80,8 +66,8 @@ found 5 clones:
   tests/bdd/nix_bdd_test.go:242,244
   tests/bdd/nix_bdd_test.go:298,300
 found 2 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:139,165
-  tests/bdd/configuration_workflow_bdd_test.go:167,175
+  tests/bdd/configuration_workflow_bdd_test.go:147,173
+  tests/bdd/configuration_workflow_bdd_test.go:175,183
 found 2 clones:
   internal/config/middleware_types.go:38,51
   internal/config/middleware_types.go:64,77
@@ -128,13 +114,6 @@ found 2 clones:
   tests/bdd/nix_bdd_test.go:303,305
   tests/bdd/nix_bdd_test.go:316,318
 found 6 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:332,334
-  tests/bdd/configuration_workflow_bdd_test.go:346,348
-  tests/bdd/configuration_workflow_bdd_test.go:353,355
-  tests/bdd/configuration_workflow_bdd_test.go:368,370
-  tests/bdd/configuration_workflow_bdd_test.go:396,398
-  tests/bdd/nix_bdd_test.go:289,291
-found 6 clones:
   internal/testdata/nix.go:11,12
   internal/testdata/nix.go:12,13
   internal/testdata/nix.go:13,14
@@ -166,6 +145,9 @@ found 2 clones:
   internal/config/sanitizer.go:232,235
   internal/config/sanitizer.go:238,241
 found 2 clones:
+  internal/config/config.go:31,34
+  internal/config/config.go:40,43
+found 2 clones:
   tests/integration/context.go:121,125
   tests/integration/context.go:135,139
 found 2 clones:
@@ -181,6 +163,11 @@ found 3 clones:
   internal/config/basic_validator.go:30,39
   internal/config/basic_validator.go:42,51
   internal/config/basic_validator.go:54,63
+found 4 clones:
+  tests/bdd/configuration_workflow_bdd_test.go:339,341
+  tests/bdd/configuration_workflow_bdd_test.go:350,352
+  tests/bdd/configuration_workflow_bdd_test.go:354,356
+  tests/bdd/configuration_workflow_bdd_test.go:388,390
 found 2 clones:
   internal/config/sanitizer.go:277,283
   internal/config/sanitizer.go:323,329
@@ -243,9 +230,6 @@ found 2 clones:
   tests/bdd/nix_bdd_test.go:264,271
   tests/bdd/nix_bdd_test.go:273,280
 found 2 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:325,327
-  tests/bdd/configuration_workflow_bdd_test.go:361,363
-found 2 clones:
   internal/result/type_test.go:32,34
   internal/result/type_test.go:37,39
 found 3 clones:
@@ -258,13 +242,13 @@ found 4 clones:
   tests/integration/filesystem.go:63,66
   tests/integration/filesystem.go:69,72
 found 2 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:177,217
-  tests/bdd/configuration_workflow_bdd_test.go:196,245
+  tests/bdd/configuration_workflow_bdd_test.go:185,225
+  tests/bdd/configuration_workflow_bdd_test.go:204,253
 found 2 clones:
   internal/format/format.go:40,45
   internal/format/format.go:48,53
 found 2 clones:
-  tests/bdd/configuration_workflow_bdd_test.go:25,35
+  tests/bdd/configuration_workflow_bdd_test.go:33,43
   tests/bdd/nix_management_bdd_test.go:10,20
 found 2 clones:
   internal/config/middleware_types.go:49,56
@@ -326,11 +310,6 @@ found 8 clones:
 found 2 clones:
   internal/config/business_validator.go:41,41
   internal/config/business_validator.go:65,65
-found 4 clones:
-  internal/config/config.go:21,34
-  internal/config/config.go:42,55
-  internal/config/config.go:63,76
-  internal/config/config.go:70,83
 found 2 clones:
   internal/pkg/errors/errors.go:198,200
   internal/pkg/errors/errors.go:203,205
@@ -338,4 +317,4 @@ found 2 clones:
   internal/format/format_test.go:33,39
   internal/format/format_test.go:41,47
 
-Found total 90 clone groups.
+Found total 88 clone groups.
