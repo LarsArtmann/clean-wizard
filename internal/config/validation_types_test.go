@@ -47,7 +47,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 	return map[string]*domain.Config{
 		"valid": {
 			Version:      "1.0.0",
-			SafeMode:     true,
+			SafeMode:     domain.SafetyLevelEnabled,
 			MaxDiskUsage: 50,
 			Protected:    []string{"/System", "/Library", "/Applications"},
 			Profiles: map[string]*domain.Profile{
@@ -58,7 +58,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 		},
 		"invalid_high_disk": {
 			Version:      "1.0.0",
-			SafeMode:     true,
+			SafeMode:     domain.SafetyLevelEnabled,
 			MaxDiskUsage: 150, // Invalid: too high
 			Protected:    []string{"/System"},
 			Profiles: map[string]*domain.Profile{
