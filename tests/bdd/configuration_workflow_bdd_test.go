@@ -74,11 +74,6 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.Then(`^I should see "Using daily profile configuration"$`, context.shouldSeeDailyProfile)
 	sc.Then(`^I should see "Running in DRY-RUN mode"$`, context.shouldSeeDryRunMode)
 	sc.Then(`^I should see "([^"]+)" validation error$`, context.shouldSeeValidationError)
-<<<<<<< HEAD
-	// TODO: Make general pattern more restrictive to avoid ambiguity
-	// Verification steps - TODO: Known ambiguity with specific patterns, keep general patterns at end
-=======
->>>>>>> master
 	sc.Then(`^I should see scan results with generations$`, context.shouldSeeScanResults)
 	sc.Then(`^I should see cleanup results with items cleaned$`, context.shouldSeeCleanResults)
 	sc.Then(`^I should not see any validation errors$`, context.shouldNotSeeValidationErrors)

@@ -52,9 +52,10 @@ ci: build test
     @echo "✅ CI pipeline completed successfully"
 
 # Find code duplicates
-find-duplicates:
-    @echo "🔍 Finding code duplicates..."
-    dupl -t 50 -v .
+find-duplicates threshold:
+    @echo "🔍 Finding code duplicates with threshold {{threshold}}..."
+    dupl -t {{threshold}} -v . > reports/duplicates.txt 2>&1 || true
+    @echo "📊 Report saved to reports/duplicates.txt"
 
 # Find code duplicates (alternative with golangci-lint)
 find-duplicates-lint:
