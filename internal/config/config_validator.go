@@ -57,6 +57,13 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 		result.AddError("version", "required", "", "Version is required", "Set configuration version", SeverityError)
 	}
 
+	// Validate MaxDiskUsage using direct logic
+	if cfg.MaxDiskUsage < 1 || cfg.MaxDiskUsage > 95 {
+		result.AddError("max_disk_usage", "range", cfg.MaxDiskUsage, 
+			"MaxDiskUsage must be between 1 and 95", 
+			"Set MaxDiskUsage to valid range", SeverityError)
+	}
+
 	// Validate protected paths
 	if len(cfg.Protected) == 0 {
 		result.AddError("protected", "required", "", "Protected paths cannot be empty", "Add system paths to protect", SeverityError)

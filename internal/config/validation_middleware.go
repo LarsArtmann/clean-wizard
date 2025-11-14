@@ -78,39 +78,82 @@ func (vm *ValidationMiddleware) loadConfig(configPath string) (*domain.Config, e
 
 // createUnifiedResult creates unified validation and sanitization result
 func (vm *ValidationMiddleware) createUnifiedResult(validationResult *ValidationResult, sanitizationResult *SanitizationResult, duration time.Duration) *ValidationResult {
+	// Ensure sanitized data has embedded domain config
+	if sanitizationResult.Sanitized.Config == nil {
+		sanitizationResult.Sanitized.Config = sanitizationResult.Original.Config
+	}
+
 	return &ValidationResult{
 		IsValid:   validationResult.IsValid,
-		Errors:    append(validationResult.Errors, vm.convertErrors(sanitizationResult)...),
-		Warnings:  append(validationResult.Warnings, vm.convertWarnings(sanitizationResult)...),
+		Errors:    append(validationResult.Errors, vm.convertSanitizationErrors(sanitizationResult)...),
+		Warnings:  append(validationResult.Warnings, vm.convertSanitizationWarnings(sanitizationResult)...),
 		Sanitized: sanitizationResult.Sanitized,
 		Duration:  duration,
 		Timestamp: time.Now(),
 	}
 }
 
-// convertErrors converts sanitization errors to validation errors
-func (vm *ValidationMiddleware) convertErrors(result *SanitizationResult) []ValidationError {
-	// Implementation depends on actual sanitization error structure
-	return []ValidationError{}
+// convertSanitizationErrors converts real sanitization errors to validation errors
+func (vm *ValidationMiddleware) convertSanitizationErrors(result *SanitizationResult) []ValidationError {
+	errors := []ValidationError{}
+	for _, change := range result.Changes {
+		if change.OldValue != change.NewValue {
+			errors = append(errors, ValidationError{
+				Field:   change.Field,
+				Rule:    "sanitization",
+				Value:   change.OldValue,
+				Message: fmt.Sprintf("Field %s was modified during sanitization", change.Field),
+				Severity: SeverityWarning,
+				Context: &ValidationContext{
+					Metadata: map[string]string{
+						"old_value": fmt.Sprintf("%v", change.OldValue),
+						"new_value": fmt.Sprintf("%v", change.NewValue),
+						"reason":    change.Reason,
+					},
+				},
+				Timestamp: time.Now(),
+			})
+		}
+	}
+	return errors
 }
 
-// convertWarnings converts sanitization warnings to validation warnings
-func (vm *ValidationMiddleware) convertWarnings(result *SanitizationResult) []ValidationWarning {
-	// Implementation depends on actual sanitization warning structure
-	return []ValidationWarning{}
+// convertSanitizationWarnings converts real sanitization warnings to validation warnings
+func (vm *ValidationMiddleware) convertSanitizationWarnings(result *SanitizationResult) []ValidationWarning {
+	warnings := []ValidationWarning{}
+	for _, warning := range result.Warnings {
+		warnings = append(warnings, ValidationWarning{
+			Field:   warning.Field,
+			Message: warning.Message,
+			Context: &ValidationContext{
+				Metadata: map[string]string{
+					"warning_type": fmt.Sprintf("%v", warning.Original),
+					"suggestion":  warning.Reason,
+				},
+			},
+			Timestamp: time.Now(),
+		})
+	}
+	return warnings
 }
 
-// loadConfigWithValidation loads and validates configuration
-func (vm *ValidationMiddleware) loadConfigWithValidation(ctx context.Context) (*domain.Config, error) {
-	// Basic implementation - could be enhanced with different sources
-	// For now, use default config
-	return &domain.Config{
-		Version:      "1.0.0",
-		SafeMode:     true,
-		MaxDiskUsage:  50,
-		Protected:    []string{"/", "/System", "/Library"},
-		Profiles:     map[string]*domain.Profile{},
-	}, nil
+// loadConfigWithValidation loads configuration from file with path validation
+func (vm *ValidationMiddleware) loadConfigWithValidation(ctx context.Context, path string) (*domain.Config, error) {
+	if path == "" {
+		return nil, errors.NewError(errors.ErrConfigValidation, "Configuration path cannot be empty")
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, errors.NewError(errors.ErrConfigLoad, fmt.Sprintf("Failed to read configuration file: %s", err))
+	}
+
+	var config domain.Config
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return nil, errors.NewError(errors.ErrConfigValidation, fmt.Sprintf("Failed to parse configuration file: %s", err))
+	}
+
+	return &config, nil
 }
 
 // saveConfig saves configuration to file

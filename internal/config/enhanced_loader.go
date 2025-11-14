@@ -43,6 +43,7 @@ type ConfigLoadOptions struct {
 	EnableCache        bool            `json:"enable_cache"`
 	EnableSanitization bool            `json:"enable_sanitization"`
 	ValidationLevel    ValidationLevel `json:"validation_level"`
+	Path              string          `json:"path"`              // Add missing Path field
 	Timeout            time.Duration   `json:"timeout"`
 }
 
@@ -254,7 +255,7 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, option
 
 		// Use basic load function with timeout
 		timeoutCtx, cancel := context.WithTimeout(ctx, options.Timeout)
-		config, err := ecl.middleware.loadConfigWithValidation(timeoutCtx)
+		config, err := ecl.middleware.loadConfigWithValidation(timeoutCtx, options.Path)
 		cancel()
 
 		if err == nil {
