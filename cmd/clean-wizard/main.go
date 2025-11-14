@@ -5,18 +5,18 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands"
+	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 var (
-	version     = "dev"
-	verbose     bool
-	dryRun      bool
-	force       bool
-	profileName string
+	version         = "dev"
+	verbose         bool
+	dryRun          bool
+	force           bool
+	profileName     string
 	validationLevel string
 )
 

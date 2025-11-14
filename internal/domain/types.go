@@ -27,6 +27,11 @@ func (rl RiskLevel) IsValid() bool {
 	}
 }
 
+// String returns string representation
+func (rl RiskLevel) String() string {
+	return string(rl)
+}
+
 // Icon returns emoji for risk level
 func (rl RiskLevel) Icon() string {
 	switch rl {
@@ -51,7 +56,7 @@ func (rl RiskLevel) IsHigherThan(other RiskLevel) bool {
 		RiskHigh:     3,
 		RiskCritical: 4,
 	}
-	
+
 	return riskOrder[rl] > riskOrder[other]
 }
 
@@ -63,7 +68,7 @@ func (rl RiskLevel) IsHigherOrEqualThan(other RiskLevel) bool {
 		RiskHigh:     3,
 		RiskCritical: 4,
 	}
-	
+
 	return riskOrder[rl] >= riskOrder[other]
 }
 

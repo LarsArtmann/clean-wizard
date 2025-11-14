@@ -1,251 +1,51 @@
 package config
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
-const (
-	configName = ".clean-wizard"
-	configType = "yaml"
-)
-
-// Load loads the configuration from file or creates default
-func Load() (*domain.Config, error) {
-	return LoadWithContext(context.Background())
+// createCleanupOperation creates a standardized cleanup operation
+func createCleanupOperation(name, description string, riskLevel domain.RiskLevel, opType domain.OperationType) domain.CleanupOperation {
+	return domain.CleanupOperation{
+		Name:        name,
+		Description: description,
+		RiskLevel:   riskLevel,
+		Enabled:     true,
+		Settings:    domain.DefaultSettings(opType),
+	}
 }
 
-// LoadWithContext loads configuration with context support
-func LoadWithContext(ctx context.Context) (*domain.Config, error) {
-	v := viper.New()
-	v.SetConfigName(configName)
-	v.SetConfigType(configType)
-	v.AddConfigPath("$HOME")
-	v.AddConfigPath("/etc/clean-wizard")
-
-	// Check for CONFIG_PATH environment variable
-	if configPath := os.Getenv("CONFIG_PATH"); configPath != "" {
-		v.SetConfigFile(configPath)
-	}
-
-	// Set defaults
-	v.SetDefault("version", "1.0.0")
-	v.SetDefault("safe_mode", false)
-	v.SetDefault("max_disk_usage_percent", 50)
-	v.SetDefault("protected", []string{"/System", "/Library"}) // Basic protection
-	v.SetDefault("profiles", map[string]any{
-		"daily": map[string]any{
-			"name":        "daily",
-			"description": "Daily cleanup",
-			"enabled":     true,
-			"operations": []map[string]any{
-				{
-					"name":        "nix-generations",
-					"description": "Clean Nix generations",
-					"risk_level":  "low",
-					"enabled":     true,
-				},
-			},
-		},
-	})
-
-	// Try to read configuration file
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	default:
-		if err := v.ReadInConfig(); err != nil {
-			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-				// Config file not found, return default config
-				return getDefaultConfig(), nil
-			}
-			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
-		}
-	}
-
-	// Unmarshal profiles section
-	var config domain.Config
-
-	// Manually unmarshal fields to avoid YAML tag issues
-	config.Version = v.GetString("version")
-	config.SafeMode = v.GetBool("safe_mode")
-	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
-	config.Protected = v.GetStringSlice("protected")
-
-	// Unmarshal profiles section
-	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
-		logrus.WithError(err).Error("Failed to unmarshal profiles")
-		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
-	}
-
-	// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)
-	for name, profile := range config.Profiles {
-		for i, op := range profile.Operations {
-			// Convert string risk level to RiskLevel enum
-			var riskLevelStr string
-			v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr)
-
-			switch strings.ToUpper(riskLevelStr) {
-			case "LOW":
-				op.RiskLevel = domain.RiskLow
-			case "MEDIUM":
-				op.RiskLevel = domain.RiskMedium
-			case "HIGH":
-				op.RiskLevel = domain.RiskHigh
-			case "CRITICAL":
-				op.RiskLevel = domain.RiskCritical
-			default:
-				logrus.WithField("risk_level", riskLevelStr).Warn("Invalid risk level, defaulting to LOW")
-				op.RiskLevel = domain.RiskLow
-			}
-		}
-	}
-
-	// Enable comprehensive validation - CRITICAL for production safety
-	if err := config.Validate(); err != nil {
-		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
-	}
-
-	// Apply comprehensive validation with strict enforcement
-	if validator := NewConfigValidator(); validator != nil {
-		validationResult := validator.ValidateConfig(&config)
-		if !validationResult.IsValid {
-			// CRITICAL: Fail fast on validation errors for production safety
-			for _, err := range validationResult.Errors {
-				logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation error")
-			}
-			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
-		}
-	}
-
-	return &config, nil
-}
-
-// Save saves the configuration to file
-func Save(config *domain.Config) error {
-	v := viper.New()
-
-	// Set configuration file properties
-	v.SetConfigName(configName)
-	v.SetConfigType(configType)
-
-	// Set configuration path
-	configPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
-
-	// Set configuration values
-	v.Set("version", config.Version)
-	v.Set("safe_mode", config.SafeMode)
-	v.Set("max_disk_usage_percent", config.MaxDiskUsage)
-	v.Set("protected", config.Protected)
-	v.Set("last_clean", config.LastClean)
-	v.Set("updated", config.Updated)
-
-	// Set profiles
-	for name, profile := range config.Profiles {
-		v.Set("profiles."+name+".name", profile.Name)
-		v.Set("profiles."+name+".description", profile.Description)
-		v.Set("profiles."+name+".enabled", profile.Enabled)
-
-		for i, op := range profile.Operations {
-			opKey := fmt.Sprintf("profiles.%s.operations.%d", name, i)
-			v.Set(opKey+".name", op.Name)
-			v.Set(opKey+".description", op.Description)
-			v.Set(opKey+".risk_level", op.RiskLevel)
-			v.Set(opKey+".enabled", op.Enabled)
-			if op.Settings != nil {
-				v.Set(opKey+".settings", op.Settings)
-			}
-		}
-	}
-
-	// Ensure config directory exists
-	configDir := filepath.Dir(configPath)
-	if err := os.MkdirAll(configDir, 0755); err != nil {
-		return pkgerrors.HandleConfigError("Save", err)
-	}
-
-	// Write configuration file
-	if err := v.WriteConfigAs(configPath); err != nil {
-		return pkgerrors.HandleConfigError("Save", err)
-	}
-
-	logrus.WithField("config_path", configPath).Info("Configuration saved successfully")
-	return nil
-}
-
-// GetCurrentTime returns current time (helper for testing)
-func GetCurrentTime() time.Time {
-	return time.Now()
-}
-
-// getDefaultConfig returns the default configuration
-func getDefaultConfig() *domain.Config {
-	now := GetCurrentTime()
-
+// GetDefaultConfig returns a default configuration
+func GetDefaultConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
-		SafeMode:     true, // Default to safe mode
+		SafeMode:     domain.SafetyLevelEnabled,
 		MaxDiskUsage: 50,
-		Protected: []string{
-			"/System",
-			"/Applications",
-			"/Library",
-		},
+		Protected:    []string{"/", "/System", "/Library", "/usr", "/etc"},
 		Profiles: map[string]*domain.Profile{
 			"daily": {
-				Name:        "daily",
-				Description: "Quick daily cleanup",
+				Name:         "daily",
+				Description:  "Daily cleanup profile",
+				MaxRiskLevel: domain.RiskMedium,
+				Enabled:      true,
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "temp-files",
-						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
-					},
+					createCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLow, domain.OperationTypeNixGenerations),
+					createCleanupOperation("temp-files", "Clean temporary files", domain.RiskLow, domain.OperationTypeTempFiles),
 				},
-				Enabled: true,
 			},
 			"aggressive": {
 				Name:        "aggressive",
 				Description: "Deep aggressive cleanup",
+				Enabled:     true,
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskHigh,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "homebrew-cleanup",
-						Description: "Clean old Homebrew packages",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
-					},
+					createCleanupOperation("nix-generations", "Deep Nix generations cleanup", domain.RiskHigh, domain.OperationTypeNixGenerations),
+					createCleanupOperation("homebrew-cleanup", "Clean Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
 				},
-				Enabled: true,
 			},
 			"comprehensive": {
 				Name:        "comprehensive",
 				Description: "Complete system cleanup",
+				Enabled:     true,
 				Operations: []domain.CleanupOperation{
 					{
 						Name:        "nix-generations",
@@ -261,18 +61,66 @@ func getDefaultConfig() *domain.Config {
 						Enabled:     true,
 						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 					},
-					{
-						Name:        "system-temp",
-						Description: "Clean system temporary files",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
-						Settings:    domain.DefaultSettings(domain.OperationTypeSystemTemp),
-					},
+					createCleanupOperation("system-temp", "Clean system temporary files", domain.RiskMedium, domain.OperationTypeSystemTemp),
 				},
-				Enabled: true,
 			},
 		},
-		LastClean: now,
-		Updated:   now,
 	}
+}
+
+// GetTestConfig returns a configuration for testing
+func GetTestConfig() *domain.Config {
+	return &domain.Config{
+		Version:      "test",
+		SafeMode:     domain.SafetyLevelDisabled,
+		MaxDiskUsage: 75,
+		Protected:    []string{"/", "/System"},
+		Profiles: map[string]*domain.Profile{
+			"test": {
+				Name:         "test",
+				Description:  "Test profile",
+				MaxRiskLevel: domain.RiskCritical,
+				Enabled:      true,
+				Operations: []domain.CleanupOperation{
+					createCleanupOperation("test-operation", "Test operation", domain.RiskLow, domain.OperationTypeTempFiles),
+				},
+			},
+		},
+	}
+}
+
+// ValidateConfigStructure validates basic configuration structure
+func ValidateConfigStructure(cfg *domain.Config) []string {
+	errors := []string{}
+
+	if cfg.Version == "" {
+		errors = append(errors, "version is required")
+	}
+
+	if len(cfg.Protected) == 0 {
+		errors = append(errors, "protected paths cannot be empty")
+	}
+
+	if len(cfg.Profiles) == 0 {
+		errors = append(errors, "at least one profile is required")
+	}
+
+	for name, profile := range cfg.Profiles {
+		if profile.Name == "" {
+			errors = append(errors, "profile name is required")
+		}
+		if len(profile.Operations) == 0 {
+			errors = append(errors, "profile '"+name+"' must have at least one operation")
+		}
+		for _, op := range profile.Operations {
+			if op.Name == "" {
+				errors = append(errors, "operation name is required")
+			}
+			if op.Settings == nil {
+				errors = append(errors, "operation settings are required")
+			}
+		}
+	}
+
+	return errors
 }

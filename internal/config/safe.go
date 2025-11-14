@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"time"
-	
+
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -36,8 +36,6 @@ type SafeOperation struct {
 // String returns string representation (removed - use domain.RiskLevel methods)
 
 // Icon returns emoji for risk level - moved to domain package
-
-
 
 // CleanType represents type-safe cleaning types
 type CleanType string
