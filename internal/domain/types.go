@@ -94,6 +94,69 @@ func (rl *RiskLevel) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+// CleanStrategy represents cleaning strategy with type safety
+type CleanStrategy string
+
+const (
+	StrategyAggressive   CleanStrategy = "aggressive"
+	StrategyConservative CleanStrategy = "conservative"
+	StrategyDryRun       CleanStrategy = "dry-run"
+)
+
+// IsValid checks if clean strategy is valid
+func (cs CleanStrategy) IsValid() bool {
+	switch cs {
+	case StrategyAggressive, StrategyConservative, StrategyDryRun:
+		return true
+	default:
+		return false
+	}
+}
+
+// Icon returns emoji for clean strategy
+func (cs CleanStrategy) Icon() string {
+	switch cs {
+	case StrategyAggressive:
+		return "🔥"
+	case StrategyConservative:
+		return "🛡️"
+	case StrategyDryRun:
+		return "🔍"
+	default:
+		return "❓"
+	}
+}
+
+// String returns string representation
+func (cs CleanStrategy) String() string {
+	return string(cs)
+}
+
+// MarshalYAML implements yaml.Marshaler interface
+func (cs CleanStrategy) MarshalYAML() (any, error) {
+	return string(cs), nil
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler interface
+func (cs *CleanStrategy) UnmarshalYAML(value *yaml.Node) error {
+	var s string
+	if err := value.Decode(&s); err != nil {
+		return err
+	}
+
+	switch strings.ToLower(s) {
+	case "aggressive":
+		*cs = StrategyAggressive
+	case "conservative":
+		*cs = StrategyConservative
+	case "dry-run", "dryrun":
+		*cs = StrategyDryRun
+	default:
+		return fmt.Errorf("invalid clean strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", s)
+	}
+	return nil
+}
+
 // NixGeneration represents Nix store generation
 type NixGeneration struct {
 	ID      int       `json:"id"`
@@ -169,14 +232,14 @@ type ScanItem struct {
 
 // CleanRequest represents cleaning command
 type CleanRequest struct {
-	Items    []ScanItem `json:"items"`
-	Strategy string     `json:"strategy"` // "aggressive", "conservative", "dry-run"
+	Items    []ScanItem    `json:"items"`
+	Strategy CleanStrategy `json:"strategy"`
 }
 
 // Validate returns errors for invalid clean request
 func (cr CleanRequest) Validate() error {
-	if cr.Strategy != "aggressive" && cr.Strategy != "conservative" && cr.Strategy != "dry-run" {
-		return fmt.Errorf("Invalid strategy: %s", cr.Strategy)
+	if !cr.Strategy.IsValid() {
+		return fmt.Errorf("Invalid strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", cr.Strategy)
 	}
 	if len(cr.Items) == 0 {
 		return fmt.Errorf("Items cannot be empty")
@@ -222,7 +285,7 @@ type CleanResult struct {
 	ItemsFailed  int           `json:"items_failed"`
 	CleanTime    time.Duration `json:"clean_time"`
 	CleanedAt    time.Time     `json:"cleaned_at"`
-	Strategy     string        `json:"strategy"`
+	Strategy     CleanStrategy `json:"strategy"`
 }
 
 // IsValid checks if clean result is valid

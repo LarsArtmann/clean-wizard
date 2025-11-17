@@ -124,8 +124,8 @@ func TestToCleanResult(t *testing.T) {
 	if value.FreedBytes != bytes {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
-	if value.Strategy != "default" {
-		t.Errorf("Expected strategy 'default', got %s", value.Strategy)
+	if value.Strategy != domain.StrategyConservative {
+		t.Errorf("Expected strategy 'conservative', got %s", value.Strategy)
 	}
 }
 
@@ -235,8 +235,8 @@ func TestToScanResult(t *testing.T) {
 }
 
 func TestCombineCleanResults(t *testing.T) {
-	result1 := NewCleanResult("strategy1", 3, int64(1024))
-	result2 := NewCleanResult("strategy2", 5, int64(2048))
+	result1 := NewCleanResult(domain.StrategyAggressive, 3, int64(1024))
+	result2 := NewCleanResult(domain.StrategyConservative, 5, int64(2048))
 
 	results := []domain.CleanResult{result1, result2}
 
@@ -251,17 +251,15 @@ func TestCombineCleanResults(t *testing.T) {
 	if combined.ItemsFailed != 0 {
 		t.Errorf("Expected items failed 0, got %d", combined.ItemsFailed)
 	}
-	if !strings.Contains(combined.Strategy, "strategy1") {
-		t.Errorf("Expected combined strategy to contain 'strategy1', got %s", combined.Strategy)
-	}
-	if !strings.Contains(combined.Strategy, "strategy2") {
-		t.Errorf("Expected combined strategy to contain 'strategy2', got %s", combined.Strategy)
+	// When combining different strategies, should default to conservative
+	if combined.Strategy != domain.StrategyConservative {
+		t.Errorf("Expected combined strategy to be 'conservative' for mixed strategies, got %s", combined.Strategy)
 	}
 }
 
 func TestCombineCleanResultsWithFailures(t *testing.T) {
-	result1 := NewCleanResultWithFailures("strategy1", 3, 1, int64(1024), time.Second)
-	result2 := NewCleanResultWithFailures("strategy2", 5, 2, int64(2048), 2*time.Second)
+	result1 := NewCleanResultWithFailures(domain.StrategyAggressive, 3, 1, int64(1024), time.Second)
+	result2 := NewCleanResultWithFailures(domain.StrategyConservative, 5, 2, int64(2048), 2*time.Second)
 
 	results := []domain.CleanResult{result1, result2}
 
@@ -292,14 +290,14 @@ func TestCombineCleanResultsEmpty(t *testing.T) {
 	if combined.FreedBytes != int64(0) {
 		t.Errorf("Expected freed bytes 0, got %d", combined.FreedBytes)
 	}
-	if combined.Strategy != "combined" {
-		t.Errorf("Expected strategy 'combined', got %s", combined.Strategy)
+	if combined.Strategy != domain.StrategyConservative {
+		t.Errorf("Expected strategy 'conservative' (default for empty results), got %s", combined.Strategy)
 	}
 }
 
 func TestExtractBytesFromCleanResult(t *testing.T) {
 	bytes := int64(4096)
-	cleanResult := result.Ok(NewCleanResult("test", 1, bytes))
+	cleanResult := result.Ok(NewCleanResult(domain.StrategyConservative, 1, bytes))
 
 	extracted := ExtractBytesFromCleanResult(cleanResult)
 
@@ -342,7 +340,7 @@ func TestToCleanResultFromError(t *testing.T) {
 }
 
 func TestValidateAndConvertCleanResult(t *testing.T) {
-	validResult := NewCleanResult("test", 1, 1024)
+	validResult := NewCleanResult(domain.StrategyConservative, 1, 1024)
 
 	result := ValidateAndConvertCleanResult(validResult)
 
