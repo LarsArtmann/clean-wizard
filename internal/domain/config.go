@@ -5,10 +5,57 @@ import (
 	"time"
 )
 
+// SafetyLevel represents configuration safety mode with type safety
+type SafetyLevel string
+
+const (
+	SafetyLevelDisabled SafetyLevel = "DISABLED"
+	SafetyLevelEnabled  SafetyLevel = "ENABLED"
+	SafetyLevelStrict   SafetyLevel = "STRICT"
+	SafetyLevelParanoid SafetyLevel = "PARANOID"
+)
+
+// IsValid checks if safety level is valid
+func (sl SafetyLevel) IsValid() bool {
+	switch sl {
+	case SafetyLevelDisabled, SafetyLevelEnabled, SafetyLevelStrict, SafetyLevelParanoid:
+		return true
+	default:
+		return false
+	}
+}
+
+// Icon returns emoji for safety level
+func (sl SafetyLevel) Icon() string {
+	switch sl {
+	case SafetyLevelDisabled:
+		return "⚠️"
+	case SafetyLevelEnabled:
+		return "🔒"
+	case SafetyLevelStrict:
+		return "🛡️"
+	case SafetyLevelParanoid:
+		return "🔐"
+	default:
+		return "❓"
+	}
+}
+
+// IsMoreRestrictive checks if this level is more restrictive than another
+func (sl SafetyLevel) IsMoreRestrictive(than SafetyLevel) bool {
+	levelOrder := map[SafetyLevel]int{
+		SafetyLevelDisabled: 0,
+		SafetyLevelEnabled:  1,
+		SafetyLevelStrict:   2,
+		SafetyLevelParanoid: 3,
+	}
+	return levelOrder[sl] > levelOrder[than]
+}
+
 // Config represents application configuration with type safety
 type Config struct {
 	Version        string              `json:"version" yaml:"version"`
-	SafeMode       bool                `json:"safe_mode" yaml:"safe_mode"`
+	SafeMode       SafetyLevel         `json:"safe_mode" yaml:"safe_mode"`
 	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"`
 	Protected      []string            `json:"protected" yaml:"protected"`
 	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`
@@ -71,10 +118,11 @@ func (c *Config) Validate() error {
 
 // Profile represents cleanup profile
 type Profile struct {
-	Name        string             `json:"name" yaml:"name"`
-	Description string             `json:"description" yaml:"description"`
-	Operations  []CleanupOperation `json:"operations" yaml:"operations"`
-	Enabled     bool               `json:"enabled" yaml:"enabled"`
+	Name         string             `json:"name" yaml:"name"`
+	Description  string             `json:"description" yaml:"description"`
+	Operations   []CleanupOperation `json:"operations" yaml:"operations"`
+	Enabled      bool               `json:"enabled" yaml:"enabled"`
+	MaxRiskLevel RiskLevel          `json:"max_risk_level" yaml:"max_risk_level"`
 }
 
 // IsValid validates profile
@@ -121,14 +169,12 @@ func (p *Profile) Validate(name string) error {
 
 // CleanupOperation represents single cleanup operation with type-safe settings
 type CleanupOperation struct {
-	Name        string           `json:"name" yaml:"name"`
-	Description string           `json:"description" yaml:"description"`
-	RiskLevel   RiskLevel        `json:"risk_level" yaml:"risk_level"`
-	Enabled     bool             `json:"enabled" yaml:"enabled"`
+	Name        string             `json:"name" yaml:"name"`
+	Description string             `json:"description" yaml:"description"`
+	RiskLevel   RiskLevel          `json:"risk_level" yaml:"risk_level"`
+	Enabled     bool               `json:"enabled" yaml:"enabled"`
 	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }
-
-
 
 // IsValid validates cleanup operation
 func (op CleanupOperation) IsValid() bool {
@@ -152,7 +198,7 @@ func (op CleanupOperation) Validate() error {
 	if op.Description == "" {
 		return fmt.Errorf("Operation description cannot be empty")
 	}
-	
+
 	// Validate settings if present
 	if op.Settings != nil {
 		opType := GetOperationType(op.Name)
@@ -160,6 +206,6 @@ func (op CleanupOperation) Validate() error {
 			return fmt.Errorf("Operation settings validation failed: %w", err)
 		}
 	}
-	
+
 	return nil
 }

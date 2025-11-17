@@ -2,9 +2,10 @@ package domain
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 // RiskLevel represents operation risk with type safety
@@ -25,6 +26,11 @@ func (rl RiskLevel) IsValid() bool {
 	default:
 		return false
 	}
+}
+
+// String returns string representation
+func (rl RiskLevel) String() string {
+	return string(rl)
 }
 
 // Icon returns emoji for risk level
@@ -51,7 +57,7 @@ func (rl RiskLevel) IsHigherThan(other RiskLevel) bool {
 		RiskHigh:     3,
 		RiskCritical: 4,
 	}
-	
+
 	return riskOrder[rl] > riskOrder[other]
 }
 
@@ -63,7 +69,7 @@ func (rl RiskLevel) IsHigherOrEqualThan(other RiskLevel) bool {
 		RiskHigh:     3,
 		RiskCritical: 4,
 	}
-	
+
 	return riskOrder[rl] >= riskOrder[other]
 }
 

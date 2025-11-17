@@ -9,6 +9,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/LarsArtmann/clean-wizard/internal/testdata"
 )
 
 // NixCleaner handles Nix package manager cleanup with proper type safety
@@ -19,7 +20,7 @@ type NixCleaner struct {
 }
 
 // NewNixCleaner creates Nix cleaner with proper configuration
-func NewNixCleaner(verbose bool, dryRun bool) *NixCleaner {
+func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
 	nc := &NixCleaner{
 		adapter: adapters.NewNixAdapter(0, 0),
 		verbose: verbose,
@@ -52,15 +53,15 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 	if settings == nil || settings.NixGenerations == nil {
 		return nil // Settings are optional
 	}
-	
+
 	if settings.NixGenerations.Generations < 1 {
 		return fmt.Errorf("Generations to keep must be at least 1, got: %d", settings.NixGenerations.Generations)
 	}
-	
+
 	if settings.NixGenerations.Generations > 10 {
 		return fmt.Errorf("Generations to keep must not exceed 10, got: %d", settings.NixGenerations.Generations)
 	}
-	
+
 	return nil
 }
 
@@ -69,13 +70,7 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	// Check availability first
 	if !nc.adapter.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
-		return result.MockSuccess([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: true},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: false},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: false},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Current: false},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Current: false},
-		}, "Nix not available - using mock data")
+		return result.MockSuccess(testdata.MockNixGenerations, "Nix not available - using mock data")
 	}
 
 	// Only call adapter if available

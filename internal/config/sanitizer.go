@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -10,54 +9,48 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// ConfigSanitizer provides configuration sanitization and normalization
+// ConfigSanitizer provides comprehensive configuration sanitization
 type ConfigSanitizer struct {
 	rules *SanitizationRules
 }
 
-// SanitizationRules defines how to sanitize different configuration aspects
+// SanitizationRules defines sanitization constraints
 type SanitizationRules struct {
-	// Path sanitization
-	NormalizePaths bool `json:"normalize_paths"`
-	ExpandHomeDir  bool `json:"expand_home_dir"`
-	ValidateExists bool `json:"validate_exists"`
-
-	// Numeric sanitization
-	ClampValues      bool `json:"clamp_values"`
-	RoundPercentages bool `json:"round_percentages"`
-
-	// String sanitization
 	TrimWhitespace bool `json:"trim_whitespace"`
-	NormalizeCase  bool `json:"normalize_case"`
-
-	// Structural sanitization
-	SortArrays       bool `json:"sort_arrays"`
-	RemoveDuplicates bool `json:"remove_duplicates"`
-	AddDefaults      bool `json:"add_defaults"`
-
-	// Safety defaults
-	DefaultSafeMode     bool          `json:"default_safe_mode"`
-	DefaultMaxDiskUsage int           `json:"default_max_disk_usage"`
-	DefaultBackup       time.Duration `json:"default_backup"`
+	NormalizePaths bool `json:"normalize_paths"`
+	AddDefaults    bool `json:"add_defaults"`
+	DefaultBackup  bool `json:"default_backup"`
 }
 
-// SanitizationResult contains sanitization outcomes
+// SanitizationResult represents the result of configuration sanitization
 type SanitizationResult struct {
-	SanitizedFields []string              `json:"sanitized_fields"`
-	Warnings        []SanitizationWarning `json:"warnings"`
-	Changes         map[string]any        `json:"changes"`
-	Timestamp       time.Time             `json:"timestamp"`
+	Original        *ValidationSanitizedData `json:"original"`
+	Sanitized       *ValidationSanitizedData `json:"sanitized"`
+	SanitizedFields []string                 `json:"sanitized_fields"`
+	Warnings        []SanitizationWarning    `json:"warnings"`
+	Changes         []SanitizationChange     `json:"changes"`
+	Timestamp       time.Time                `json:"timestamp"`
+}
+
+// SanitizationChange represents a single sanitization change
+type SanitizationChange struct {
+	Field    string    `json:"field"`
+	OldValue any       `json:"old_value"`
+	NewValue any       `json:"new_value"`
+	Reason   string    `json:"reason"`
+	Time     time.Time `json:"time"`
 }
 
 // SanitizationWarning represents a sanitization warning
 type SanitizationWarning struct {
 	Field     string `json:"field"`
+	Message   string `json:"message"`
 	Original  any    `json:"original"`
 	Sanitized any    `json:"sanitized"`
 	Reason    string `json:"reason"`
 }
 
-// NewConfigSanitizer creates a configuration sanitizer with default rules
+// NewConfigSanitizer creates a configuration sanitizer
 func NewConfigSanitizer() *ConfigSanitizer {
 	return &ConfigSanitizer{
 		rules: getDefaultSanitizationRules(),
@@ -72,13 +65,20 @@ func NewConfigSanitizerWithRules(rules *SanitizationRules) *ConfigSanitizer {
 }
 
 // SanitizeConfig performs comprehensive configuration sanitization
-func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *ValidationResult) {
+func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config) *SanitizationResult {
 	result := &SanitizationResult{
-		SanitizedFields: []string{},
-		Warnings:        []SanitizationWarning{},
-		Changes:         make(map[string]any),
-		Timestamp:       time.Now(),
+		Original:  &ValidationSanitizedData{Data: make(map[string]any)},
+		Sanitized: &ValidationSanitizedData{Data: make(map[string]any)},
+		Changes:   []SanitizationChange{},
+		Timestamp: time.Now(),
 	}
+
+	// Store original
+	result.Original.Data["version"] = cfg.Version
+	result.Original.Data["safe_mode"] = cfg.SafeMode
+	result.Original.Data["max_disk_usage"] = cfg.MaxDiskUsage
+	result.Original.Data["protected"] = cfg.Protected
+	result.Original.Data["profiles"] = cfg.Profiles
 
 	// Sanitize basic fields
 	cs.sanitizeBasicFields(cfg, result)
@@ -94,148 +94,93 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 		cs.applyDefaults(cfg, result)
 	}
 
-	// Update validation result with sanitization info
-	if validationResult != nil {
-		validationResult.Sanitized = &ValidationSanitizedData{
-			FieldsModified: result.SanitizedFields,
-			RulesApplied: []string{"basic_sanitization", "default_values"},
-			Metadata: map[string]string{
-				"sanitized_count": fmt.Sprintf("%d", len(result.SanitizedFields)),
-				"warnings_count":  fmt.Sprintf("%d", len(result.Warnings)),
-			},
-		}
-	}
+	return result
 }
 
 // sanitizeBasicFields sanitizes basic configuration fields
 func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *SanitizationResult) {
 	// Sanitize version
 	if cs.rules.TrimWhitespace {
-		original := cfg.Version
-		cfg.Version = strings.TrimSpace(cfg.Version)
-		if original != cfg.Version {
-			result.addChange("version", original, cfg.Version, "trimmed whitespace")
+		trimmed := strings.TrimSpace(cfg.Version)
+		if trimmed != cfg.Version {
+			cs.addChange(result, "version", cfg.Version, trimmed, "trimmed whitespace")
+			cfg.Version = trimmed
 		}
 	}
 
-	if cs.rules.NormalizeCase {
-		original := cfg.Version
-		cfg.Version = strings.ToLower(cfg.Version)
-		if original != cfg.Version {
-			result.addChange("version", original, cfg.Version, "normalized to lowercase")
-		}
+	// Ensure version is not empty
+	if cfg.Version == "" {
+		cs.addChange(result, "version", cfg.Version, "1.0.0", "applied default version")
+		cfg.Version = "1.0.0"
 	}
 
-	// Sanitize max_disk_usage
-	if cs.rules.ClampValues {
-		original := cfg.MaxDiskUsage
-		if cfg.MaxDiskUsage < 10 {
-			cfg.MaxDiskUsage = 10
-			result.addWarning("max_disk_usage", original, cfg.MaxDiskUsage, "clamped to minimum value")
-		} else if cfg.MaxDiskUsage > 95 {
-			cfg.MaxDiskUsage = 95
-			result.addWarning("max_disk_usage", original, cfg.MaxDiskUsage, "clamped to maximum value")
-		}
-	}
-
-	if cs.rules.RoundPercentages {
-		original := cfg.MaxDiskUsage
-		cfg.MaxDiskUsage = int(float64(cfg.MaxDiskUsage+5)/10) * 10 // Round to nearest 10
-		if original != cfg.MaxDiskUsage {
-			result.addChange("max_disk_usage", original, cfg.MaxDiskUsage, "rounded to nearest 10%")
-		}
-	}
-
-	// Ensure safe mode defaults
-	if cs.rules.DefaultSafeMode && !cfg.SafeMode {
-		original := cfg.SafeMode
-		cfg.SafeMode = true
-		result.addChange("safe_mode", original, cfg.SafeMode, "enabled safe mode for security")
+	// Clamp MaxDiskUsage to reasonable range (0-95)
+	if cfg.MaxDiskUsage > 95 {
+		clamped := 95
+		cs.addChange(result, "max_disk_usage", cfg.MaxDiskUsage, clamped, "clamped to maximum")
+		cfg.MaxDiskUsage = clamped
+	} else if cfg.MaxDiskUsage < 0 {
+		clamped := 0
+		cs.addChange(result, "max_disk_usage", cfg.MaxDiskUsage, clamped, "clamped to minimum")
+		cfg.MaxDiskUsage = clamped
 	}
 }
 
-// sanitizeProtectedPaths sanitizes protected paths array
+// sanitizeProtectedPaths sanitizes protected paths
 func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *domain.Config, result *SanitizationResult) {
-	sanitizedPaths := make([]string, 0, len(cfg.Protected))
-
 	for i, path := range cfg.Protected {
-		original := path
-
-		// Trim whitespace
-		if cs.rules.TrimWhitespace {
-			path = strings.TrimSpace(path)
-		}
-
-		// Expand home directory
-		if cs.rules.ExpandHomeDir {
-			if strings.HasPrefix(path, "~/") {
-				home, err := os.UserHomeDir()
-				if err == nil {
-					path = filepath.Join(home, path[2:])
-				}
-			}
-		}
-
-		// Normalize path
 		if cs.rules.NormalizePaths {
-			path = filepath.Clean(path)
-		}
-
-		// Ensure absolute path
-		if !filepath.IsAbs(path) {
-			path = "/" + path
-		}
-
-		// Validate existence if enabled
-		if cs.rules.ValidateExists {
-			if _, err := os.Stat(path); os.IsNotExist(err) {
-				result.Warnings = append(result.Warnings, SanitizationWarning{
-					Field:     fmt.Sprintf("protected[%d]", i),
-					Original:  original,
-					Sanitized: path,
-					Reason:    "path does not exist but will be protected",
-				})
+			cleaned := filepath.Clean(path)
+			if cleaned != path {
+				cs.addChange(result, fmt.Sprintf("protected[%d]", i), path, cleaned, "normalized path")
+				cfg.Protected[i] = cleaned
 			}
 		}
 
-		if original != path {
-			result.addChange(fmt.Sprintf("protected[%d]", i), original, path, "path normalized")
+		if cs.rules.TrimWhitespace {
+			trimmed := strings.TrimSpace(cfg.Protected[i])
+			if trimmed != cfg.Protected[i] {
+				cs.addChange(result, fmt.Sprintf("protected[%d]", i), cfg.Protected[i], trimmed, "trimmed whitespace")
+				cfg.Protected[i] = trimmed
+			}
 		}
-
-		sanitizedPaths = append(sanitizedPaths, path)
 	}
 
-	// Remove duplicates
-	if cs.rules.RemoveDuplicates {
-		sanitizedPaths = cs.removeDuplicates(sanitizedPaths)
+	// Remove duplicate paths
+	if len(cfg.Protected) > 1 {
+		seen := make(map[string]bool)
+		unique := []string{}
+		for _, path := range cfg.Protected {
+			if !seen[path] {
+				seen[path] = true
+				unique = append(unique, path)
+			}
+		}
+		if len(unique) != len(cfg.Protected) {
+			cs.addChange(result, "protected", cfg.Protected, unique, "removed duplicates")
+			cfg.Protected = unique
+		}
 	}
-
-	// Sort paths
-	if cs.rules.SortArrays {
-		cs.sortStrings(sanitizedPaths)
-	}
-
-	cfg.Protected = sanitizedPaths
 }
 
-// sanitizeProfiles sanitizes profiles and their operations
+// sanitizeProfiles sanitizes profile configurations
 func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *SanitizationResult) {
 	for name, profile := range cfg.Profiles {
 		// Sanitize profile name
 		if cs.rules.TrimWhitespace {
-			original := profile.Name
-			profile.Name = strings.TrimSpace(profile.Name)
-			if original != profile.Name {
-				result.addChange(fmt.Sprintf("profiles.%s.name", name), original, profile.Name, "trimmed whitespace")
+			trimmed := strings.TrimSpace(profile.Name)
+			if trimmed != profile.Name {
+				cs.addChange(result, fmt.Sprintf("profiles.%s.name", name), profile.Name, trimmed, "trimmed whitespace")
+				profile.Name = trimmed
 			}
 		}
 
 		// Sanitize profile description
 		if cs.rules.TrimWhitespace {
-			original := profile.Description
-			profile.Description = strings.TrimSpace(profile.Description)
-			if original != profile.Description {
-				result.addChange(fmt.Sprintf("profiles.%s.description", name), original, profile.Description, "trimmed whitespace")
+			trimmed := strings.TrimSpace(profile.Description)
+			if trimmed != profile.Description {
+				cs.addChange(result, fmt.Sprintf("profiles.%s.description", name), profile.Description, trimmed, "trimmed whitespace")
+				profile.Description = trimmed
 			}
 		}
 
@@ -291,7 +236,7 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 
 	// Set default max disk usage
 	if cfg.MaxDiskUsage == 0 {
-		cfg.MaxDiskUsage = cs.rules.DefaultMaxDiskUsage
+		cfg.MaxDiskUsage = 50
 		result.addChange("max_disk_usage", 0, cfg.MaxDiskUsage, "applied default max disk usage")
 	}
 
@@ -316,46 +261,11 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 		// Apply defaults to operations
 		for i, op := range profile.Operations {
 			fieldPrefix := fmt.Sprintf("profiles.%s.operations[%d]", name, i)
-
 			if op.Settings == nil {
 				opType := domain.GetOperationType(op.Name)
 				op.Settings = domain.DefaultSettings(opType)
 				result.addChange(fieldPrefix+".settings", nil, op.Settings, "initialized type-safe settings")
 			}
-
-			// Apply operation-specific defaults - TODO: Update for type safety
-			// cs.applyOperationDefaults(fieldPrefix, op.Name, op.Settings, result)
-		}
-	}
-}
-
-// applyOperationDefaults applies operation-specific default settings
-func (cs *ConfigSanitizer) applyOperationDefaults(fieldPrefix string, opName string, settings map[string]any, result *SanitizationResult) {
-	switch opName {
-	case "nix-generations":
-		if _, exists := settings["generations"]; !exists {
-			settings["generations"] = 1
-			result.addChange(fieldPrefix+".settings.generations", nil, 1, "applied default generations")
-		}
-		if _, exists := settings["optimize"]; !exists {
-			settings["optimize"] = false
-			result.addChange(fieldPrefix+".settings.optimize", nil, false, "applied default optimize")
-		}
-
-	case "temp-files":
-		if _, exists := settings["older_than"]; !exists {
-			settings["older_than"] = "7d"
-			result.addChange(fieldPrefix+".settings.older_than", nil, "7d", "applied default older_than")
-		}
-		if _, exists := settings["excludes"]; !exists {
-			settings["excludes"] = []string{"/tmp/keep"}
-			result.addChange(fieldPrefix+".settings.excludes", nil, []string{"/tmp/keep"}, "applied default excludes")
-		}
-
-	case "homebrew-cleanup":
-		if _, exists := settings["unused_only"]; !exists {
-			settings["unused_only"] = true
-			result.addChange(fieldPrefix+".settings.unused_only", nil, true, "applied default unused_only")
 		}
 	}
 }
@@ -364,12 +274,14 @@ func (cs *ConfigSanitizer) applyOperationDefaults(fieldPrefix string, opName str
 
 func (r *SanitizationResult) addChange(field string, original, sanitized any, reason string) {
 	r.SanitizedFields = append(r.SanitizedFields, field)
-	r.Changes[field] = map[string]any{
-		"original":  original,
-		"sanitized": sanitized,
-		"reason":    reason,
-		"timestamp": time.Now(),
+	change := SanitizationChange{
+		Field:    field,
+		OldValue: original,
+		NewValue: sanitized,
+		Reason:   reason,
+		Time:     time.Now(),
 	}
+	r.Changes = append(r.Changes, change)
 }
 
 func (r *SanitizationResult) addWarning(field string, original, sanitized any, reason string) {
@@ -406,45 +318,30 @@ func (cs *ConfigSanitizer) sortStrings(slice []string) {
 	}
 }
 
-func (cs *ConfigSanitizer) sanitizeStringArray(arr []any) []any {
-	result := make([]any, len(arr))
-	for i, item := range arr {
-		if str, ok := item.(string); ok {
-			result[i] = strings.TrimSpace(str)
-		} else {
-			result[i] = item
-		}
+// addChange records a sanitization change
+func (cs *ConfigSanitizer) addChange(result *SanitizationResult, field string, oldValue, newValue any, reason string) {
+	change := SanitizationChange{
+		Field:    field,
+		OldValue: oldValue,
+		NewValue: newValue,
+		Reason:   reason,
+		Time:     time.Now(),
 	}
-	return result
+	result.Changes = append(result.Changes, change)
+
+	// Also track field in sanitized data for test compatibility
+	if result.Sanitized.FieldsModified == nil {
+		result.Sanitized.FieldsModified = []string{}
+	}
+	result.Sanitized.FieldsModified = append(result.Sanitized.FieldsModified, field)
 }
 
-func (cs *ConfigSanitizer) arraysEqual(a, b []any) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
-// getDefaultSanitizationRules returns default sanitization configuration
+// getDefaultSanitizationRules returns default sanitization rules
 func getDefaultSanitizationRules() *SanitizationRules {
 	return &SanitizationRules{
-		NormalizePaths:      true,
-		ExpandHomeDir:       true,
-		ValidateExists:      false, // Don't validate exists by default as paths may not exist yet
-		ClampValues:         true,
-		RoundPercentages:    true,
-		TrimWhitespace:      true,
-		NormalizeCase:       false, // Preserve case for paths and names
-		SortArrays:          true,
-		RemoveDuplicates:    true,
-		AddDefaults:         true,
-		DefaultSafeMode:     true,
-		DefaultMaxDiskUsage: 50,
-		DefaultBackup:       24 * time.Hour,
+		TrimWhitespace: true,
+		NormalizePaths: true,
+		AddDefaults:    true,
+		DefaultBackup:  true,
 	}
 }

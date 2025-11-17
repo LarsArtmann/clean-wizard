@@ -16,7 +16,6 @@ func TestNixCleaningBDD(t *testing.T) {
 		// When I run "clean-wizard scan"
 		cmd := exec.CommandContext(context.Background(), "go", "run", "../../cmd/clean-wizard", "scan")
 		output, err := cmd.CombinedOutput()
-
 		// Then I should see generation numbers and dates
 		if err != nil {
 			t.Logf("ℹ️  Scan failed (expected in CI): %v\nOutput: %s", err, string(output))
@@ -38,7 +37,6 @@ func TestNixCleaningBDD(t *testing.T) {
 		// When I run "clean-wizard clean --dry-run"
 		cmd := exec.CommandContext(context.Background(), "go", "run", "../../cmd/clean-wizard", "clean", "--dry-run")
 		output, err := cmd.CombinedOutput()
-
 		// Then I should see which generations would be deleted
 		if err != nil {
 			t.Logf("ℹ️  Clean failed (expected in CI): %v\nOutput: %s", err, string(output))

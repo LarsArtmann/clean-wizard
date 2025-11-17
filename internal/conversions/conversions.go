@@ -272,18 +272,20 @@ func ToScanResultFromError(err error) result.Result[domain.ScanResult] {
 
 // VALIDATION HELPERS
 
+// validateAndConvert is a generic helper for validating domain types
+func validateAndConvert[T interface{ Validate() error }](item T, typeName string) result.Result[T] {
+	if err := item.Validate(); err != nil {
+		return result.Err[T](fmt.Errorf("invalid %s: %w", typeName, err))
+	}
+	return result.Ok(item)
+}
+
 // ValidateAndConvertCleanResult ensures CleanResult is valid before returning
 func ValidateAndConvertCleanResult(cleanResult domain.CleanResult) result.Result[domain.CleanResult] {
-	if err := cleanResult.Validate(); err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("invalid CleanResult: %w", err))
-	}
-	return result.Ok(cleanResult)
+	return validateAndConvert(cleanResult, "CleanResult")
 }
 
 // ValidateAndConvertScanResult ensures ScanResult is valid before returning
 func ValidateAndConvertScanResult(scanResult domain.ScanResult) result.Result[domain.ScanResult] {
-	if err := scanResult.Validate(); err != nil {
-		return result.Err[domain.ScanResult](fmt.Errorf("invalid ScanResult: %w", err))
-	}
-	return result.Ok(scanResult)
+	return validateAndConvert(scanResult, "ScanResult")
 }

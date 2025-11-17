@@ -5,55 +5,37 @@ import (
 	"testing"
 )
 
-func TestResult_Ok(t *testing.T) {
+func TestResult_BoolMethods(t *testing.T) {
 	tests := []struct {
-		name     string
-		result   Result[int]
-		expected bool
+		name        string
+		result      Result[int]
+		expectedOk  bool
+		expectedErr bool
 	}{
 		{
-			name:     "ok result",
-			result:   Ok(42),
-			expected: true,
+			name:        "ok result",
+			result:      Ok(42),
+			expectedOk:  true,
+			expectedErr: false,
 		},
 		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			expected: false,
+			name:        "error result",
+			result:      Err[int](errors.New("test error")),
+			expectedOk:  false,
+			expectedErr: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.result.IsOk() != tt.expected {
-				t.Errorf("IsOk() = %v, want %v", tt.result.IsOk(), tt.expected)
+			// Test IsOk method
+			if tt.result.IsOk() != tt.expectedOk {
+				t.Errorf("IsOk() = %v, want %v", tt.result.IsOk(), tt.expectedOk)
 			}
-		})
-	}
-}
 
-func TestResult_IsErr(t *testing.T) {
-	tests := []struct {
-		name     string
-		result   Result[int]
-		expected bool
-	}{
-		{
-			name:     "ok result",
-			result:   Ok(42),
-			expected: false,
-		},
-		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			expected: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.result.IsErr() != tt.expected {
-				t.Errorf("IsErr() = %v, want %v", tt.result.IsErr(), tt.expected)
+			// Test IsErr method
+			if tt.result.IsErr() != tt.expectedErr {
+				t.Errorf("IsErr() = %v, want %v", tt.result.IsErr(), tt.expectedErr)
 			}
 		})
 	}

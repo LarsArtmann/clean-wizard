@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -63,7 +64,7 @@ func NewProfileInfoCommand() *cobra.Command {
 
 // runProfileList lists all available profiles
 func runProfileList(cmd *cobra.Command, args []string) error {
-	cfg, err := config.Load()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -128,7 +129,7 @@ func runProfileList(cmd *cobra.Command, args []string) error {
 func runProfileSelect(cmd *cobra.Command, args []string) error {
 	profileName := args[0]
 
-	cfg, err := config.Load()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -142,7 +143,7 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 			names = append(names, name)
 		}
 		sort.Strings(names)
-		return fmt.Errorf("profile '%s' not found. Available profiles: %s", 
+		return fmt.Errorf("profile '%s' not found. Available profiles: %s",
 			profileName, strings.Join(names, ", "))
 	}
 
@@ -153,10 +154,10 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 
 	// Update current profile in config
 	cfg.CurrentProfile = profileName
-	cfg.Updated = config.GetCurrentTime()
+	cfg.Updated = time.Now()
 
 	// Save configuration
-	if err := config.Save(cfg); err != nil {
+	if err := config.SaveConfig(cfg); err != nil {
 		return fmt.Errorf("failed to save configuration: %w", err)
 	}
 
@@ -168,7 +169,7 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 
 // runProfileInfo shows detailed information about a profile
 func runProfileInfo(cmd *cobra.Command, args []string) error {
-	cfg, err := config.Load()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -190,7 +191,7 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 			names = append(names, name)
 		}
 		sort.Strings(names)
-		return fmt.Errorf("profile '%s' not found. Available profiles: %s", 
+		return fmt.Errorf("profile '%s' not found. Available profiles: %s",
 			profileName, strings.Join(names, ", "))
 	}
 
@@ -279,14 +280,14 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 func getRiskColor(level domain.RiskLevel) string {
 	switch level {
 	case domain.RiskLow:
-		return "🟢 "  // Green
+		return "🟢 " // Green
 	case domain.RiskMedium:
-		return "🟡 "  // Yellow  
+		return "🟡 " // Yellow
 	case domain.RiskHigh:
-		return "🟠 "  // Orange
+		return "🟠 " // Orange
 	case domain.RiskCritical:
-		return "🔴 "  // Red
+		return "🔴 " // Red
 	default:
-		return "⚪ "  // White
+		return "⚪ " // White
 	}
 }

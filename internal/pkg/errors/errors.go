@@ -2,7 +2,6 @@ package errors
 
 import (
 	"fmt"
-	"maps"
 	"runtime"
 	"strings"
 	"time"
@@ -99,13 +98,23 @@ func (e ErrorLevel) String() string {
 	}
 }
 
+// ErrorDetails represents typed error details
+type ErrorDetails struct {
+	Field      string            `json:"field,omitempty"`
+	Rule       string            `json:"rule,omitempty"`
+	Value      any               `json:"value,omitempty"`
+	Context    map[string]string `json:"context,omitempty"`
+	Suggestion string            `json:"suggestion,omitempty"`
+	Recovery   string            `json:"recovery,omitempty"`
+}
+
 // CleanWizardError represents structured error with context
 type CleanWizardError struct {
 	Code      ErrorCode
 	Level     ErrorLevel
 	Message   string
 	Operation string
-	Details   map[string]any
+	Details   *ErrorDetails
 	Timestamp time.Time
 	Stack     string
 }
@@ -116,9 +125,18 @@ func (e *CleanWizardError) Error() string {
 		return fmt.Sprintf("[%s] %s: %s", e.Level.String(), e.Code.String(), e.Message)
 	}
 
-	details := make([]string, 0, len(e.Details))
-	for key, value := range e.Details {
-		details = append(details, fmt.Sprintf("%s=%v", key, value))
+	details := []string{}
+	if e.Details.Field != "" {
+		details = append(details, fmt.Sprintf("field=%s", e.Details.Field))
+	}
+	if e.Details.Rule != "" {
+		details = append(details, fmt.Sprintf("rule=%s", e.Details.Rule))
+	}
+	if e.Details.Suggestion != "" {
+		details = append(details, fmt.Sprintf("suggestion=%s", e.Details.Suggestion))
+	}
+	if e.Details.Recovery != "" {
+		details = append(details, fmt.Sprintf("recovery=%s", e.Details.Recovery))
 	}
 
 	return fmt.Sprintf("[%s] %s: %s (details: %s)",
@@ -136,7 +154,7 @@ func NewError(code ErrorCode, message string) *CleanWizardError {
 		Code:      code,
 		Level:     LevelError,
 		Message:   message,
-		Details:   make(map[string]any),
+		Details:   &ErrorDetails{},
 		Timestamp: time.Now(),
 		Stack:     captureStack(),
 	}
@@ -148,14 +166,14 @@ func NewErrorWithLevel(code ErrorCode, level ErrorLevel, message string) *CleanW
 		Code:      code,
 		Level:     level,
 		Message:   message,
-		Details:   make(map[string]any),
+		Details:   &ErrorDetails{},
 		Timestamp: time.Now(),
 		Stack:     captureStack(),
 	}
 }
 
-// NewErrorWithDetails creates new CleanWizardError with context details
-func NewErrorWithDetails(code ErrorCode, message string, details map[string]any) *CleanWizardError {
+// NewErrorWithDetails creates new CleanWizardError with typed context details
+func NewErrorWithDetails(code ErrorCode, message string, details *ErrorDetails) *CleanWizardError {
 	err := &CleanWizardError{
 		Code:      code,
 		Level:     LevelError,
@@ -165,9 +183,9 @@ func NewErrorWithDetails(code ErrorCode, message string, details map[string]any)
 		Stack:     captureStack(),
 	}
 
-	// Add automatic details
+	// Ensure details is not nil
 	if err.Details == nil {
-		err.Details = make(map[string]any)
+		err.Details = &ErrorDetails{}
 	}
 
 	return err
@@ -182,9 +200,39 @@ func (e *CleanWizardError) WithOperation(operation string) *CleanWizardError {
 // WithDetail adds single detail to error
 func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 	if e.Details == nil {
-		e.Details = make(map[string]any)
+		e.Details = &ErrorDetails{
+			Context: make(map[string]string),
+		}
 	}
-	e.Details[key] = value
+
+	// Map known keys to typed fields
+	switch key {
+	case "field":
+		if strVal, ok := value.(string); ok {
+			e.Details.Field = strVal
+		}
+	case "rule":
+		if strVal, ok := value.(string); ok {
+			e.Details.Rule = strVal
+		}
+	case "suggestion":
+		if strVal, ok := value.(string); ok {
+			e.Details.Suggestion = strVal
+		}
+	case "recovery":
+		if strVal, ok := value.(string); ok {
+			e.Details.Recovery = strVal
+		}
+	default:
+		// Store in context map for unknown keys
+		if e.Details.Context == nil {
+			e.Details.Context = make(map[string]string)
+		}
+		if strVal, ok := value.(string); ok {
+			e.Details.Context[key] = strVal
+		}
+	}
+
 	return e
 }
 
@@ -244,7 +292,21 @@ func (e *CleanWizardError) Log() {
 	}
 
 	if e.Details != nil {
-		maps.Copy(fields, e.Details)
+		if e.Details.Field != "" {
+			fields["field"] = e.Details.Field
+		}
+		if e.Details.Rule != "" {
+			fields["rule"] = e.Details.Rule
+		}
+		if e.Details.Suggestion != "" {
+			fields["suggestion"] = e.Details.Suggestion
+		}
+		if e.Details.Recovery != "" {
+			fields["recovery"] = e.Details.Recovery
+		}
+		for key, value := range e.Details.Context {
+			fields["context_"+key] = value
+		}
 	}
 
 	entry := logrus.WithFields(fields)
@@ -259,4 +321,16 @@ func (e *CleanWizardError) Log() {
 	case LevelFatal:
 		entry.Fatal(e.Message)
 	}
+}
+
+// ValidationError creates a validation error with validation details
+func ValidationError(message string, validationErrors []any) *CleanWizardError {
+	details := &ErrorDetails{
+		Context: map[string]string{
+			"validation_errors": fmt.Sprintf("%v", validationErrors),
+			"error_type":        "validation",
+		},
+	}
+
+	return NewErrorWithDetails(ErrConfigValidation, message, details)
 }

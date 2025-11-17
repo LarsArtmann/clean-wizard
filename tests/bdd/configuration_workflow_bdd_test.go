@@ -14,11 +14,19 @@ import (
 
 // Configuration workflow BDD test contexts
 type ConfigurationWorkflowContext struct {
-	tempDir      string
+	tempDir       string
 	configFiles   map[string]string
 	commandOutput string
 	commandError  error
 	exitCode      int
+}
+
+// assertOutputContains is a generic BDD assertion helper
+func (c *ConfigurationWorkflowContext) assertOutputContains(expectedText, errorMsg string) error {
+	if !strings.Contains(c.commandOutput, expectedText) {
+		return fmt.Errorf("%s, but got:\n%s", errorMsg, c.commandOutput)
+	}
+	return nil
 }
 
 func TestConfigurationWorkflowBDD(t *testing.T) {
@@ -56,6 +64,7 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 
 	// Configuration content steps
 	sc.Given(`^configuration includes:$`, context.configIncludes)
+	sc.Given(`^And configuration includes:$`, context.configIncludes)
 	sc.Given(`^configuration includes a daily profile$`, func() error {
 		return nil // Default configs include daily profile
 	})
@@ -68,7 +77,6 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.When(`^I run "([^"]+)"$`, context.runCommand)
 	sc.When(`^I run "([^"]+)" with exit code (\d+)$`, context.runCommandWithExitCode)
 
-	// Verification steps
 	// Verification steps - CRITICAL: Most specific patterns first
 	sc.Then(`^I should see "Applying validation level: ([^"]+)"$`, context.shouldSeeValidationLevel)
 	sc.Then(`^I should see "Using daily profile configuration"$`, context.shouldSeeDailyProfile)
@@ -80,14 +88,14 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.Then(`^command should complete successfully$`, context.shouldCompleteSuccessfully)
 	sc.Then(`^command should fail with an error$`, context.shouldFailWithError)
 	sc.Then(`^command should fail with validation error$`, context.shouldFailWithError)
-	
+
 	// Specific patterns for configuration output - must come before general patterns
 	sc.Then(`^I should see "failed to load configuration"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Loading configuration from"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Configuration applied:"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Store size:"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Total generations:"`, context.shouldSeeOutput)
-	
+
 	// Most generic patterns - must come last
 	sc.Then(`^I should see "([^"]+) profile configuration"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
@@ -99,7 +107,7 @@ func (c *ConfigurationWorkflowContext) cleanWizardAvailable() error {
 	if err != nil {
 		return fmt.Errorf("failed to get current directory: %w", err)
 	}
-	
+
 	// Find project root by looking for go.mod
 	projectDir := cwd
 	for {
@@ -112,17 +120,17 @@ func (c *ConfigurationWorkflowContext) cleanWizardAvailable() error {
 		}
 		projectDir = parent
 	}
-	
+
 	// Verify clean-wizard is available in PATH or local
 	cmd := exec.Command("go", "run", "./cmd/clean-wizard", "--help")
 	cmd.Dir = projectDir // Ensure we're in project root
-	
+
 	// Capture output for debugging
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to run clean-wizard: %w\nOutput: %s", err, string(output))
 	}
-	
+
 	return nil
 }
 
@@ -159,9 +167,9 @@ profiles:
         description: "Clean Nix generations"
         risk_level: "LOW"
         enabled: true`
-	
+
 	configPath := filepath.Join(c.tempDir, filename)
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveInvalidConfigFile(filename string) error {
@@ -169,9 +177,9 @@ func (c *ConfigurationWorkflowContext) haveInvalidConfigFile(filename string) er
 safe_mode: true
 invalid_field: true
 profiles: []`
-	
+
 	configPath := filepath.Join(c.tempDir, filename)
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveUnsafeConfigFile() error {
@@ -188,9 +196,9 @@ profiles:
       - name: "nix-generations"
         risk_level: "LOW"
         enabled: true`
-	
+
 	configPath := filepath.Join(c.tempDir, "unsafe-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveBasicConfigFile() error {
@@ -202,18 +210,18 @@ profiles:
   daily:
     name: "daily"
     enabled: true`
-	
+
 	configPath := filepath.Join(c.tempDir, "basic-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveIncompleteConfigFile() error {
 	configContent := `version: "1.0.0"
 safe_mode: true
 protected: []`
-	
+
 	configPath := filepath.Join(c.tempDir, "incomplete-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveMultiProfileConfigFile() error {
@@ -239,18 +247,18 @@ profiles:
       - name: "package-caches"
         risk_level: "MEDIUM"
         enabled: true`
-	
+
 	configPath := filepath.Join(c.tempDir, "multi-profile-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) configIncludes(table *godog.Table) error {
 	configContent := "version: \"1.0.0\"\nsafe_mode: true\n"
-	
+
 	for _, row := range table.Rows {
 		field := row.Cells[0].Value
 		value := row.Cells[1].Value
-		
+
 		switch field {
 		case "max_disk_usage":
 			configContent += fmt.Sprintf("max_disk_usage: %s\n", value)
@@ -258,9 +266,9 @@ func (c *ConfigurationWorkflowContext) configIncludes(table *godog.Table) error 
 			configContent += fmt.Sprintf("%s: %s\n", field, value)
 		}
 	}
-	
+
 	configPath := filepath.Join(c.tempDir, "table-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) runCommand(commandStr string) error {
@@ -271,16 +279,35 @@ func (c *ConfigurationWorkflowContext) runCommand(commandStr string) error {
 	commandStr = strings.ReplaceAll(commandStr, "basic-config.yaml", filepath.Join(c.tempDir, "basic-config.yaml"))
 	commandStr = strings.ReplaceAll(commandStr, "incomplete-config.yaml", filepath.Join(c.tempDir, "incomplete-config.yaml"))
 	commandStr = strings.ReplaceAll(commandStr, "multi-profile-config.yaml", filepath.Join(c.tempDir, "multi-profile-config.yaml"))
-	
+
+	// Replace clean-wizard command with go run command
+	commandStr = strings.ReplaceAll(commandStr, "clean-wizard", "go run ./cmd/clean-wizard")
+
 	// Change to project directory for go run
-	projectDir, _ := filepath.Abs("../../../")
-	
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current working directory: %w", err)
+	}
+
+	// Navigate to project root based on current directory
+	var projectDir string
+	if strings.Contains(cwd, "tests/bdd") {
+		projectDir = filepath.Join(cwd, "../../../")
+	} else if strings.Contains(cwd, "tests") {
+		projectDir = filepath.Join(cwd, "../..")
+	} else {
+		projectDir = cwd
+	}
+
+	// Ensure we're running from project root
 	cmd := exec.Command("bash", "-c", fmt.Sprintf("cd %s && %s", projectDir, commandStr))
+	cmd.Dir = projectDir
+
 	output, err := cmd.CombinedOutput()
-	
+
 	c.commandOutput = string(output)
 	c.commandError = err
-	
+
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			c.exitCode = exitError.ExitCode()
@@ -290,7 +317,7 @@ func (c *ConfigurationWorkflowContext) runCommand(commandStr string) error {
 	} else {
 		c.exitCode = 0
 	}
-	
+
 	return nil
 }
 
@@ -310,46 +337,31 @@ func (c *ConfigurationWorkflowContext) shouldSeeOutput(expectedText string) erro
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeScanResults() error {
-	if !strings.Contains(c.commandOutput, "Total generations:") {
-		return fmt.Errorf("expected scan results with generations, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("Total generations:", "expected scan results with generations")
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeCleanResults() error {
-	if !strings.Contains(c.commandOutput, "items") && !strings.Contains(c.commandOutput, "would be cleaned") {
-		return fmt.Errorf("expected clean results with items, but got:\n%s", c.commandOutput)
+	if strings.Contains(c.commandOutput, "items") || strings.Contains(c.commandOutput, "would be cleaned") {
+		return nil
 	}
-	return nil
+	return fmt.Errorf("expected clean results with items, but got:\n%s", c.commandOutput)
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeDailyProfile() error {
-	if !strings.Contains(c.commandOutput, "Using daily profile configuration") {
-		return fmt.Errorf("expected to see daily profile usage, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("Using daily profile configuration", "expected to see daily profile usage")
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeDryRunMode() error {
-	if !strings.Contains(c.commandOutput, "DRY-RUN mode") {
-		return fmt.Errorf("expected to see dry-run mode, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("DRY-RUN mode", "expected to see dry-run mode")
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeValidationLevel(expectedLevel string) error {
 	expectedText := fmt.Sprintf("Applying validation level: %s", expectedLevel)
-	if !strings.Contains(c.commandOutput, expectedText) {
-		return fmt.Errorf("expected to see validation level %s, but got:\n%s", expectedLevel, c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains(expectedText, fmt.Sprintf("expected to see validation level %s", expectedLevel))
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeValidationError(errorType string) error {
-	if !strings.Contains(c.commandOutput, "validation failed") {
-		return fmt.Errorf("expected to see validation error, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("validation failed", "expected to see validation error")
 }
 
 func (c *ConfigurationWorkflowContext) shouldNotSeeValidationErrors() error {
@@ -374,8 +386,5 @@ func (c *ConfigurationWorkflowContext) shouldFailWithError() error {
 }
 
 func (c *ConfigurationWorkflowContext) shouldSeeScanResultsReflectingDailyProfile() error {
-	if !strings.Contains(c.commandOutput, "Using daily profile configuration") {
-		return fmt.Errorf("expected scan results to reflect daily profile, but got:\n%s", c.commandOutput)
-	}
-	return nil
+	return c.assertOutputContains("Using daily profile configuration", "expected scan results to reflect daily profile")
 }
