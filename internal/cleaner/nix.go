@@ -98,7 +98,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	if nc.dryRun {
 		// Use centralized conversion for dry-run
 		estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // 50MB per generation
-		cleanResult := conversions.NewCleanResult("DRY RUN", toRemove, estimatedBytes)
+		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, toRemove, estimatedBytes)
 		return result.Ok(cleanResult)
 	}
 
@@ -134,14 +134,14 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 		// Combine all results using centralized function
 		combinedResult := conversions.CombineCleanResults(results)
 		combinedResult.CleanTime = time.Since(start)
-		combinedResult.Strategy = "NIX CLEANUP"
+		combinedResult.Strategy = domain.StrategyAggressive
 
 		return result.Ok(combinedResult)
 	}
 
 	// Dry-run or no generations to remove - use centralized conversion
 	estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Estimated
-	cleanResult := conversions.NewCleanResult("DRY RUN", toRemove, estimatedBytes)
+	cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, toRemove, estimatedBytes)
 	return result.Ok(cleanResult)
 }
 

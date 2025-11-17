@@ -244,8 +244,8 @@ func (ctx *BDDTestContext) shouldSeeWhatWouldBeCleaned() error {
 	}
 
 	result := ctx.cleanResult.Value()
-	if result.Strategy == "" {
-		return fmt.Errorf("expected to see cleaning strategy but got empty string")
+	if !result.Strategy.IsValid() {
+		return fmt.Errorf("expected to see valid cleaning strategy but got: %s", result.Strategy)
 	}
 
 	return nil

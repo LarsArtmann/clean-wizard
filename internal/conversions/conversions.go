@@ -13,7 +13,7 @@ import (
 // NewCleanResult creates a valid CleanResult with basic strategy and metrics.
 //
 // Parameters:
-//   - strategy: The cleaning strategy used (e.g., "NIX_GC", "DRY RUN")
+//   - strategy: The cleaning strategy used (e.g., StrategyAggressive, StrategyDryRun)
 //   - itemsRemoved: Number of items successfully removed
 //   - freedBytes: Total bytes freed by the operation
 //
@@ -22,9 +22,9 @@ import (
 //
 // Example:
 //
-//	result := NewCleanResult("NIX_GC", 5, 1024*1024*100)
+//	result := NewCleanResult(domain.StrategyAggressive, 5, 1024*1024*100)
 //	fmt.Printf("Freed %d bytes", result.FreedBytes)
-func NewCleanResult(strategy string, itemsRemoved int, freedBytes int64) domain.CleanResult {
+func NewCleanResult(strategy domain.CleanStrategy, itemsRemoved int, freedBytes int64) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   freedBytes,
 		ItemsRemoved: itemsRemoved,
@@ -54,8 +54,8 @@ func NewCleanResult(strategy string, itemsRemoved int, freedBytes int64) domain.
 //	startTime := time.Now()
 //	// ... perform cleaning ...
 //	cleanTime := time.Since(startTime)
-//	result := NewCleanResultWithTiming("NIX_GC", 5, 1024*1024*100, cleanTime)
-func NewCleanResultWithTiming(strategy string, itemsRemoved int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
+//	result := NewCleanResultWithTiming(domain.StrategyAggressive, 5, 1024*1024*100, cleanTime)
+func NewCleanResultWithTiming(strategy domain.CleanStrategy, itemsRemoved int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   freedBytes,
 		ItemsRemoved: itemsRemoved,
@@ -83,9 +83,9 @@ func NewCleanResultWithTiming(strategy string, itemsRemoved int, freedBytes int6
 //
 // Example:
 //
-//	result := NewCleanResultWithFailures("NIX_CLEANUP", 5, 2, 1024*1024*100, time.Second*30)
+//	result := NewCleanResultWithFailures(domain.StrategyConservative, 5, 2, 1024*1024*100, time.Second*30)
 //	fmt.Printf("Success: %d, Failed: %d", result.ItemsRemoved, result.ItemsFailed)
-func NewCleanResultWithFailures(strategy string, itemsRemoved, itemsFailed int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
+func NewCleanResultWithFailures(strategy domain.CleanStrategy, itemsRemoved, itemsFailed int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   freedBytes,
 		ItemsRemoved: itemsRemoved,
@@ -127,16 +127,16 @@ func NewScanResult(totalBytes int64, totalItems int, scannedPaths []string, scan
 
 // GENERIC CONVERSION FUNCTIONS - Centralized primitive→domain transformations
 
-// ToCleanResult converts primitive Result[int64] to domain Result[domain.CleanResult] with default strategy.
+// ToCleanResult converts primitive Result[int64] to domain Result[domain.CleanResult] with conservative strategy.
 //
-// This is the simplest conversion function that automatically uses "default" strategy.
+// This is the simplest conversion function that automatically uses conservative strategy.
 // Use this when you don't need custom strategy information.
 //
 // Parameters:
 //   - bytesResult: Result[int64] containing bytes freed from primitive operation
 //
 // Returns:
-//   - result.Result[domain.CleanResult]: Converted result with default strategy
+//   - result.Result[domain.CleanResult]: Converted result with conservative strategy
 //
 // Example:
 //
@@ -146,7 +146,7 @@ func NewScanResult(totalBytes int64, totalItems int, scannedPaths []string, scan
 //		fmt.Printf("Freed %d bytes", cleanResult.Value().FreedBytes)
 //	}
 func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanResult] {
-	return ToCleanResultWithStrategy(bytesResult, "default")
+	return ToCleanResultWithStrategy(bytesResult, domain.StrategyConservative)
 }
 
 // ToCleanResultWithStrategy converts primitive Result[int64] to domain.Result[domain.CleanResult] with custom strategy.
@@ -156,7 +156,7 @@ func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanR
 //
 // Parameters:
 //   - bytesResult: Result[int64] containing bytes freed from primitive operation
-//   - strategy: String identifier for the cleaning strategy (e.g., "NIX_GC", "REMOVE_GENERATION")
+//   - strategy: CleanStrategy enum value (e.g., StrategyAggressive, StrategyConservative, StrategyDryRun)
 //
 // Returns:
 //   - result.Result[domain.CleanResult]: Converted result with specified strategy
@@ -164,8 +164,8 @@ func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanR
 // Example:
 //
 //	bytesResult := adapter.CollectGarbage(ctx)
-//	cleanResult := ToCleanResultWithStrategy(bytesResult, "NIX_GC")
-func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy string) result.Result[domain.CleanResult] {
+//	cleanResult := ToCleanResultWithStrategy(bytesResult, domain.StrategyAggressive)
+func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy domain.CleanStrategy) result.Result[domain.CleanResult] {
 	if bytesResult.IsErr() {
 		return result.Err[domain.CleanResult](bytesResult.Error())
 	}
@@ -183,7 +183,7 @@ func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy string
 // Parameters:
 //   - itemsRemoved: Number of items successfully removed
 //   - bytesResult: Result[int64] containing bytes freed from operation
-//   - strategy: String identifier for the cleaning strategy
+//   - strategy: CleanStrategy enum value for the cleaning strategy
 //
 // Returns:
 //   - result.Result[domain.CleanResult]: Converted result with items and bytes data
@@ -191,12 +191,12 @@ func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy string
 // Example:
 //
 //	bytesResult := adapter.CollectGarbage(ctx)
-//	cleanResult := ToCleanResultFromItems(5, bytesResult, "NIX_GC")
+//	cleanResult := ToCleanResultFromItems(5, bytesResult, domain.StrategyAggressive)
 //	if cleanResult.IsOk() {
 //		fmt.Printf("Removed %d items, freed %d bytes",
 //			cleanResult.Value().ItemsRemoved, cleanResult.Value().FreedBytes)
 //	}
-func ToCleanResultFromItems(itemsRemoved int, bytesResult result.Result[int64], strategy string) result.Result[domain.CleanResult] {
+func ToCleanResultFromItems(itemsRemoved int, bytesResult result.Result[int64], strategy domain.CleanStrategy) result.Result[domain.CleanResult] {
 	if bytesResult.IsErr() {
 		return result.Err[domain.CleanResult](bytesResult.Error())
 	}
@@ -207,7 +207,7 @@ func ToCleanResultFromItems(itemsRemoved int, bytesResult result.Result[int64], 
 }
 
 // ToTimedCleanResult creates a timed CleanResult from bytes and duration
-func ToTimedCleanResult(bytesResult result.Result[int64], strategy string, cleanTime time.Duration) result.Result[domain.CleanResult] {
+func ToTimedCleanResult(bytesResult result.Result[int64], strategy domain.CleanStrategy, cleanTime time.Duration) result.Result[domain.CleanResult] {
 	if bytesResult.IsErr() {
 		return result.Err[domain.CleanResult](bytesResult.Error())
 	}
@@ -227,14 +227,17 @@ func ToScanResult(totalBytes int64, totalItems int, scannedPaths []string, scanD
 // CombineCleanResults combines multiple CleanResults into one
 func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	if len(results) == 0 {
-		return NewCleanResult("combined", 0, 0)
+		return NewCleanResult(domain.StrategyConservative, 0, 0)
 	}
 
 	totalItems := 0
 	totalFailed := 0
 	totalBytes := int64(0)
 	maxTime := time.Duration(0)
-	strategies := make([]string, 0, len(results))
+
+	// Track strategies to determine combined strategy
+	firstStrategy := results[0].Strategy
+	allSameStrategy := true
 
 	for _, result := range results {
 		totalItems += result.ItemsRemoved
@@ -243,10 +246,18 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 		if result.CleanTime > maxTime {
 			maxTime = result.CleanTime
 		}
-		strategies = append(strategies, result.Strategy)
+		if result.Strategy != firstStrategy {
+			allSameStrategy = false
+		}
 	}
 
-	combinedStrategy := fmt.Sprintf("combined(%v)", strategies)
+	// If all strategies are the same, use that strategy
+	// Otherwise, use conservative as the safest default for mixed operations
+	combinedStrategy := firstStrategy
+	if !allSameStrategy {
+		combinedStrategy = domain.StrategyConservative
+	}
+
 	return NewCleanResultWithFailures(combinedStrategy, totalItems, totalFailed, totalBytes, maxTime)
 }
 

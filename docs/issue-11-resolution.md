@@ -56,8 +56,8 @@ func (c *Cleaner) Clean() Result[CleanResult] {
         return conversions.ToCleanResultFromError(bytesResult.Error())
     }
     
-    // ✅ CLEAN & CENTRALIZED:
-    return conversions.ToCleanResultWithStrategy(bytesResult, "NIX_GC")
+    // ✅ CLEAN & CENTRALIZED with type-safe enum:
+    return conversions.ToCleanResultWithStrategy(bytesResult, domain.StrategyAggressive)
 }
 ```
 
