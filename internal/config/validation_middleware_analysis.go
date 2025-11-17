@@ -56,8 +56,8 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 				Field:     field,
 				OldValue:  nil,
 				NewValue:  path,
-				Operation: "added",
-				Risk:      "low",
+				Operation: OperationAdded,
+				Risk:      domain.RiskLow,
 			})
 		}
 	}
@@ -69,8 +69,8 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 				Field:     field,
 				OldValue:  path,
 				NewValue:  nil,
-				Operation: "removed",
-				Risk:      "high", // Removing protected paths is risky
+				Operation: OperationRemoved,
+				Risk:      domain.RiskHigh, // Removing protected paths is risky
 			})
 		}
 	}
@@ -89,7 +89,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 				Field:     fmt.Sprintf("profiles.%s", name),
 				OldValue:  nil,
 				NewValue:  profile.Name,
-				Operation: "added",
+				Operation: OperationAdded,
 				Risk:      vm.assessProfileRisk(profile),
 			})
 		}
@@ -102,8 +102,8 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 				Field:     fmt.Sprintf("profiles.%s", name),
 				OldValue:  profile.Name,
 				NewValue:  nil,
-				Operation: "removed",
-				Risk:      "low", // Removing profiles is generally safe
+				Operation: OperationRemoved,
+				Risk:      domain.RiskLow, // Removing profiles is generally safe
 			})
 		}
 	}
@@ -118,7 +118,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 					Field:     fmt.Sprintf("profiles.%s", name),
 					OldValue:  currentProfile.Name,
 					NewValue:  proposedProfile.Name,
-					Operation: "modified",
+					Operation: OperationModified,
 					Risk:      vm.assessProfileRisk(proposedProfile),
 				})
 			}
@@ -130,43 +130,43 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 
 // Helper methods for change analysis
 
-func (vm *ValidationMiddleware) getChangeOperation(old, new any) string {
+func (vm *ValidationMiddleware) getChangeOperation(old, new any) ChangeOperation {
 	if old == nil && new != nil {
-		return "added"
+		return OperationAdded
 	}
 	if old != nil && new == nil {
-		return "removed"
+		return OperationRemoved
 	}
-	return "modified"
+	return OperationModified
 }
 
-func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) string {
+func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) domain.RiskLevel {
 	switch field {
 	case "safe_mode":
 		if old == true && new == false {
-			return "high"
+			return domain.RiskHigh
 		}
-		return "low"
+		return domain.RiskLow
 	case "max_disk_usage":
 		if old.(int) < new.(int) {
-			return "medium"
+			return domain.RiskMedium
 		}
-		return "low"
+		return domain.RiskLow
 	case "protected":
 		if new == nil {
-			return "critical"
+			return domain.RiskCritical
 		}
-		return "low"
+		return domain.RiskLow
 	default:
-		return "low"
+		return domain.RiskLow
 	}
 }
 
-func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) string {
+func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domain.RiskLevel {
 	maxRisk := domain.RiskLow
 	for _, op := range profile.Operations {
 		if op.RiskLevel == domain.RiskCritical {
-			return "critical"
+			return domain.RiskCritical
 		}
 		if op.RiskLevel == domain.RiskHigh {
 			maxRisk = domain.RiskHigh
@@ -174,7 +174,7 @@ func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) strin
 			maxRisk = domain.RiskMedium
 		}
 	}
-	return string(maxRisk)
+	return maxRisk
 }
 
 func (vm *ValidationMiddleware) makeStringSet(slice []string) map[string]bool {
