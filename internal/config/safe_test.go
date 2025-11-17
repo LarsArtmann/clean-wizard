@@ -18,7 +18,8 @@ func runBoolTests[T any](t *testing.T, testCases []struct {
 	name     string
 	input    T
 	expected bool
-}, testFunc func(T) bool) {
+}, testFunc func(T) bool,
+) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			result := testFunc(tt.input)
@@ -34,7 +35,8 @@ func runStringTests[T any](t *testing.T, testCases []struct {
 	name     string
 	input    T
 	expected string
-}, testFunc func(T) string) {
+}, testFunc func(T) string,
+) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			result := testFunc(tt.input)
@@ -106,7 +108,7 @@ func TestCleanType_IsValid(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    CleanType
-		expected  bool
+		expected bool
 	}{
 		{"nix store", CleanTypeNixStore, true},
 		{"homebrew", CleanTypeHomebrew, true},

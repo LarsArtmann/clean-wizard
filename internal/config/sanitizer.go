@@ -26,10 +26,10 @@ type SanitizationRules struct {
 type SanitizationResult struct {
 	Original        *ValidationSanitizedData `json:"original"`
 	Sanitized       *ValidationSanitizedData `json:"sanitized"`
-	SanitizedFields []string                `json:"sanitized_fields"`
-	Warnings        []SanitizationWarning   `json:"warnings"`
-	Changes         []SanitizationChange   `json:"changes"`
-	Timestamp       time.Time               `json:"timestamp"`
+	SanitizedFields []string                 `json:"sanitized_fields"`
+	Warnings        []SanitizationWarning    `json:"warnings"`
+	Changes         []SanitizationChange     `json:"changes"`
+	Timestamp       time.Time                `json:"timestamp"`
 }
 
 // SanitizationChange represents a single sanitization change
@@ -278,7 +278,7 @@ func (r *SanitizationResult) addChange(field string, original, sanitized any, re
 		Field:    field,
 		OldValue: original,
 		NewValue: sanitized,
-		Reason:    reason,
+		Reason:   reason,
 		Time:     time.Now(),
 	}
 	r.Changes = append(r.Changes, change)
@@ -328,7 +328,7 @@ func (cs *ConfigSanitizer) addChange(result *SanitizationResult, field string, o
 		Time:     time.Now(),
 	}
 	result.Changes = append(result.Changes, change)
-	
+
 	// Also track field in sanitized data for test compatibility
 	if result.Sanitized.FieldsModified == nil {
 		result.Sanitized.FieldsModified = []string{}

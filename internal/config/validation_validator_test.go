@@ -70,7 +70,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			name: "missing version",
 			config: &domain.Config{
 				SafeMode:     domain.SafetyLevelEnabled,
-				MaxDiskUsage:  50,
+				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles: map[string]*domain.Profile{
 					"daily": {

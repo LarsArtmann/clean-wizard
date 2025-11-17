@@ -39,7 +39,7 @@ Available templates:
 }
 
 // generateConfigTemplate generates the specified configuration template
-func generateConfigTemplate(template string, outputFile string) error {
+func generateConfigTemplate(template, outputFile string) error {
 	var content string
 
 	switch template {
@@ -56,7 +56,7 @@ func generateConfigTemplate(template string, outputFile string) error {
 	}
 
 	// Write to file
-	err := os.WriteFile(outputFile, []byte(content), 0644)
+	err := os.WriteFile(outputFile, []byte(content), 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to write configuration file: %w", err)
 	}

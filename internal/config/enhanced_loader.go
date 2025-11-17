@@ -43,7 +43,7 @@ type ConfigLoadOptions struct {
 	EnableCache        bool            `json:"enable_cache"`
 	EnableSanitization bool            `json:"enable_sanitization"`
 	ValidationLevel    ValidationLevel `json:"validation_level"`
-	Path              string          `json:"path"`              // Add missing Path field
+	Path               string          `json:"path"` // Add missing Path field
 	Timeout            time.Duration   `json:"timeout"`
 }
 
@@ -234,7 +234,7 @@ type ConfigSaveOptions struct {
 	BackupEnabled      bool            `json:"backup_enabled"`
 	ValidationLevel    ValidationLevel `json:"validation_level"`
 	CreateBackup       bool            `json:"create_backup"`
-	Path              string          `json:"path"`              // Add missing Path field
+	Path               string          `json:"path"` // Add missing Path field
 	Timeout            time.Duration   `json:"timeout"`
 }
 
@@ -407,11 +407,7 @@ func (ecl *EnhancedConfigLoader) calculateDelay(attempt int) time.Duration {
 	delay := ecl.retryPolicy.InitialDelay
 	for i := 1; i < attempt; i++ {
 		calculatedDelay := time.Duration(float64(delay) * ecl.retryPolicy.BackoffFactor)
-		if calculatedDelay < ecl.retryPolicy.MaxDelay {
-			delay = calculatedDelay
-		} else {
-			delay = ecl.retryPolicy.MaxDelay
-		}
+		delay = min(calculatedDelay, ecl.retryPolicy.MaxDelay)
 	}
 	return delay
 }
@@ -517,7 +513,7 @@ func getDefaultSaveOptions() *ConfigSaveOptions {
 		BackupEnabled:      true,
 		ValidationLevel:    ValidationLevelComprehensive,
 		CreateBackup:       false,
-		Path:              "",  // Default empty path, caller should set
+		Path:               "", // Default empty path, caller should set
 	}
 }
 

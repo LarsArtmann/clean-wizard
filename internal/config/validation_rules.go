@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"slices"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // ConfigValidationRules defines all validation constraints

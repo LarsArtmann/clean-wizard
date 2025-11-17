@@ -96,7 +96,7 @@ func (b *TestConfigurationBuilder) Build() *domain.Config {
 func (b *TestConfigurationBuilder) BuildAsFile(ctx *IntegrationTestContext, filename string) string {
 	config := b.Build()
 	yamlContent := b.toYAML(config) // Simplified - would use proper YAML marshaling
-	
+
 	return ctx.TempFile(filename, yamlContent)
 }
 
@@ -131,7 +131,7 @@ protected:
 
 			if op.Settings != nil {
 				yaml += fmt.Sprintf(`        settings:`)
-				
+
 				if op.Settings.NixGenerations != nil {
 					yaml += fmt.Sprintf(`
           nix_generations:

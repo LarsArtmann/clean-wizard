@@ -31,17 +31,17 @@ func (e *CommandExecutor) RunCommand(t *testing.T, args []string) *CommandResult
 
 	cmd := exec.CommandContext(ctx.Context(), "go", append([]string{"run", "./cmd/clean-wizard"}, args...)...)
 	cmd.Dir = e.projectRoot
-	
+
 	output, err := cmd.CombinedOutput()
-	
+
 	return &CommandResult{
-		Command:    "go run ./cmd/clean-wizard " + strings.Join(args, " "),
-		Args:       args,
-		Output:     string(output),
-		Error:      err,
-		ExitCode:   getExitCode(err),
-		Duration:   time.Since(time.Now()), // Placeholder - would need proper timing
-		Success:    err == nil,
+		Command:  "go run ./cmd/clean-wizard " + strings.Join(args, " "),
+		Args:     args,
+		Output:   string(output),
+		Error:    err,
+		ExitCode: getExitCode(err),
+		Duration: time.Since(time.Now()), // Placeholder - would need proper timing
+		Success:  err == nil,
 	}
 }
 
@@ -52,17 +52,17 @@ func (e *CommandExecutor) RunCommandWithTimeout(t *testing.T, args []string, tim
 
 	cmd := exec.CommandContext(testCtx, "go", append([]string{"run", "./cmd/clean-wizard"}, args...)...)
 	cmd.Dir = e.projectRoot
-	
+
 	output, err := cmd.CombinedOutput()
-	
+
 	return &CommandResult{
-		Command:    "go run ./cmd/clean-wizard " + strings.Join(args, " "),
-		Args:       args,
-		Output:     string(output),
-		Error:      err,
-		ExitCode:   getExitCode(err),
-		Duration:   time.Since(time.Now()), // Placeholder - would need proper timing
-		Success:    err == nil,
+		Command:  "go run ./cmd/clean-wizard " + strings.Join(args, " "),
+		Args:     args,
+		Output:   string(output),
+		Error:    err,
+		ExitCode: getExitCode(err),
+		Duration: time.Since(time.Now()), // Placeholder - would need proper timing
+		Success:  err == nil,
 	}
 }
 
@@ -127,11 +127,11 @@ func getExitCode(err error) int {
 	if err == nil {
 		return 0
 	}
-	
+
 	if exitErr, ok := err.(*exec.ExitError); ok {
 		return exitErr.ExitCode()
 	}
-	
+
 	return 1 // Default exit code for other errors
 }
 

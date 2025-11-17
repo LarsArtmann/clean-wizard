@@ -34,52 +34,52 @@ func (s Severity) String() string {
 
 // ValidationContext represents typed validation context
 type ValidationContext struct {
-	Profile      string            `json:"profile,omitempty"`
-	Operation    string            `json:"operation,omitempty"`
-	Field        string            `json:"field,omitempty"`
-	ErrorCode    string            `json:"error_code,omitempty"`
-	Suggestion   string            `json:"suggestion,omitempty"`
-	Metadata     map[string]string `json:"metadata,omitempty"`
+	Profile    string            `json:"profile,omitempty"`
+	Operation  string            `json:"operation,omitempty"`
+	Field      string            `json:"field,omitempty"`
+	ErrorCode  string            `json:"error_code,omitempty"`
+	Suggestion string            `json:"suggestion,omitempty"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
 // ValidationError represents a specific validation error
 type ValidationError struct {
-	Field      string              `json:"field"`
-	Rule       string              `json:"rule"`
-	Value      any                 `json:"value"`
-	Message    string              `json:"message"`
-	Severity   Severity            `json:"severity"`
-	Suggestion string              `json:"suggestion,omitempty"`
-	Context    *ValidationContext  `json:"context,omitempty"`
+	Field      string             `json:"field"`
+	Rule       string             `json:"rule"`
+	Value      any                `json:"value"`
+	Message    string             `json:"message"`
+	Severity   Severity           `json:"severity"`
+	Suggestion string             `json:"suggestion,omitempty"`
+	Context    *ValidationContext `json:"context,omitempty"`
 	Timestamp  time.Time          `json:"timestamp"`
 }
 
 // ValidationWarning represents a specific validation warning
 type ValidationWarning struct {
-	Field      string              `json:"field"`
-	Message    string              `json:"message"`
-	Suggestion string              `json:"suggestion,omitempty"`
-	Context    *ValidationContext  `json:"context,omitempty"`
+	Field      string             `json:"field"`
+	Message    string             `json:"message"`
+	Suggestion string             `json:"suggestion,omitempty"`
+	Context    *ValidationContext `json:"context,omitempty"`
 	Timestamp  time.Time          `json:"timestamp"`
 }
 
 // ValidationSanitizedData represents fully type-safe sanitized data
 type ValidationSanitizedData struct {
-	*domain.Config // EMBED domain config directly - NO SPLIT BRAINS
-	FieldsModified []string       `json:"fields_modified,omitempty"`
-	RulesApplied  []string       `json:"rules_applied,omitempty"`
-	Metadata      map[string]string `json:"metadata,omitempty"`
+	*domain.Config                   // EMBED domain config directly - NO SPLIT BRAINS
+	FieldsModified []string          `json:"fields_modified,omitempty"`
+	RulesApplied   []string          `json:"rules_applied,omitempty"`
+	Metadata       map[string]string `json:"metadata,omitempty"`
 	// Use domain types directly, no duplicates needed
-	Data          map[string]any `json:"data,omitempty"`
+	Data map[string]any `json:"data,omitempty"`
 }
 
 // ValidationResult represents complete validation result with type-safe sanitized data
 type ValidationResult struct {
 	IsValid   bool                     `json:"is_valid"`
-	Errors    []ValidationError           `json:"errors"`
-	Warnings  []ValidationWarning         `json:"warnings"`
-	Sanitized *ValidationSanitizedData   `json:"sanitized,omitempty"`
-	Duration  time.Duration             `json:"duration"`
+	Errors    []ValidationError        `json:"errors"`
+	Warnings  []ValidationWarning      `json:"warnings"`
+	Sanitized *ValidationSanitizedData `json:"sanitized,omitempty"`
+	Duration  time.Duration            `json:"duration"`
 	Timestamp time.Time                `json:"timestamp"`
 }
 

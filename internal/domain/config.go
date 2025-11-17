@@ -11,7 +11,7 @@ type SafetyLevel string
 const (
 	SafetyLevelDisabled SafetyLevel = "DISABLED"
 	SafetyLevelEnabled  SafetyLevel = "ENABLED"
-	SafetyLevelStrict    SafetyLevel = "STRICT"
+	SafetyLevelStrict   SafetyLevel = "STRICT"
 	SafetyLevelParanoid SafetyLevel = "PARANOID"
 )
 
@@ -44,10 +44,10 @@ func (sl SafetyLevel) Icon() string {
 // IsMoreRestrictive checks if this level is more restrictive than another
 func (sl SafetyLevel) IsMoreRestrictive(than SafetyLevel) bool {
 	levelOrder := map[SafetyLevel]int{
-		SafetyLevelDisabled:  0,
-		SafetyLevelEnabled:   1,
-		SafetyLevelStrict:    2,
-		SafetyLevelParanoid:  3,
+		SafetyLevelDisabled: 0,
+		SafetyLevelEnabled:  1,
+		SafetyLevelStrict:   2,
+		SafetyLevelParanoid: 3,
 	}
 	return levelOrder[sl] > levelOrder[than]
 }
@@ -55,7 +55,7 @@ func (sl SafetyLevel) IsMoreRestrictive(than SafetyLevel) bool {
 // Config represents application configuration with type safety
 type Config struct {
 	Version        string              `json:"version" yaml:"version"`
-	SafeMode       SafetyLevel        `json:"safe_mode" yaml:"safe_mode"`
+	SafeMode       SafetyLevel         `json:"safe_mode" yaml:"safe_mode"`
 	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"`
 	Protected      []string            `json:"protected" yaml:"protected"`
 	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`
@@ -198,7 +198,7 @@ func (op CleanupOperation) Validate() error {
 	if op.Description == "" {
 		return fmt.Errorf("Operation description cannot be empty")
 	}
-	
+
 	// Validate settings if present
 	if op.Settings != nil {
 		opType := GetOperationType(op.Name)
@@ -206,6 +206,6 @@ func (op CleanupOperation) Validate() error {
 			return fmt.Errorf("Operation settings validation failed: %w", err)
 		}
 	}
-	
+
 	return nil
 }

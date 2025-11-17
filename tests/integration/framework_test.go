@@ -36,7 +36,7 @@ func TestIntegrationFramework(t *testing.T) {
 
 		projectRoot := ctx.ProjectRoot()
 		require.NotEmpty(t, projectRoot)
-		
+
 		// Verify go.mod exists in project root
 		ctx.AssertFileExists(filepath.Join(projectRoot, "go.mod"))
 	})
@@ -46,7 +46,7 @@ func TestIntegrationFramework(t *testing.T) {
 		defer ctx.Cleanup()
 
 		executor := CreateTestExecutor(ctx)
-		
+
 		// Test help command (should always succeed)
 		result := executor.RunCommand(t, []string{"--help"})
 		result.AssertSuccess(t)

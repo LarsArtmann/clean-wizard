@@ -9,13 +9,13 @@ import (
 type OperationSettings struct {
 	// Nix Generations Settings
 	NixGenerations *NixGenerationsSettings `json:"nix_generations,omitempty"`
-	
-	// Temp Files Settings  
+
+	// Temp Files Settings
 	TempFiles *TempFilesSettings `json:"temp_files,omitempty"`
-	
+
 	// Homebrew Settings
 	Homebrew *HomebrewSettings `json:"homebrew,omitempty"`
-	
+
 	// System Temp Settings
 	SystemTemp *SystemTempSettings `json:"system_temp,omitempty"`
 }

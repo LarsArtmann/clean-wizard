@@ -13,14 +13,14 @@ func createRealBenchmarkConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
 		SafeMode:     domain.SafetyLevelEnabled,
-		MaxDiskUsage:  50,
+		MaxDiskUsage: 50,
 		Protected:    []string{"/", "/System", "/Library"},
 		Profiles: map[string]*domain.Profile{
 			"benchmark-profile": {
-				Name:        "benchmark-profile",
-				Description: "Profile for performance testing",
+				Name:         "benchmark-profile",
+				Description:  "Profile for performance testing",
 				MaxRiskLevel: domain.RiskMedium,
-				Enabled:     true,
+				Enabled:      true,
 				Operations: []domain.CleanupOperation{
 					{
 						Name:        "benchmark-operation",
@@ -38,9 +38,8 @@ func createRealBenchmarkConfig() *domain.Config {
 func BenchmarkConfigValidator(b *testing.B) {
 	validator := config.NewConfigValidator()
 	testConfig := createRealBenchmarkConfig()
-	
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		result := validator.ValidateConfig(testConfig)
 		if !result.IsValid {
 			b.Fatal("Expected valid config")
@@ -52,9 +51,8 @@ func BenchmarkConfigValidator(b *testing.B) {
 func BenchmarkConfigSanitizer(b *testing.B) {
 	sanitizer := config.NewConfigSanitizer()
 	testConfig := createRealBenchmarkConfig()
-	
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		result := sanitizer.SanitizeConfig(testConfig)
 		if result == nil {
 			b.Fatal("Expected sanitization result")
@@ -65,11 +63,10 @@ func BenchmarkConfigSanitizer(b *testing.B) {
 // BenchmarkValidationMiddleware benchmarks validation middleware performance with real data
 func BenchmarkValidationMiddleware(b *testing.B) {
 	middleware := config.NewValidationMiddleware()
-	
+
 	ctx := context.Background()
-	
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		result, err := middleware.ValidateAndSanitize(ctx, "dummy-path")
 		if err != nil {
 			// Expected for dummy path, we're just benchmarking the validation logic

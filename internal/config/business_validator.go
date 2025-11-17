@@ -91,7 +91,7 @@ func (bv *BusinessValidator) validateProfileOperations(profileName string, opera
 		if op.Settings == nil {
 			return fmt.Errorf("operation '%s' in profile '%s' has invalid settings", op.Name, profileName)
 		}
-		
+
 		// Validate settings for operation type
 		opType := domain.GetOperationType(op.Name)
 		if err := op.Settings.ValidateSettings(opType); err != nil {

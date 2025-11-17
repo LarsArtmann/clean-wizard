@@ -10,7 +10,8 @@ func runSizeTests(t *testing.T, testCases []struct {
 	name     string
 	input    int64
 	expected string
-}) {
+},
+) {
 	runTests(t, testCases, Size)
 }
 
@@ -19,7 +20,8 @@ func runTests[T any](t *testing.T, testCases []struct {
 	name     string
 	input    T
 	expected string
-}, testFunc func(T) string) {
+}, testFunc func(T) string,
+) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			result := testFunc(tt.input)
@@ -34,7 +36,8 @@ func runDurationTests(t *testing.T, testCases []struct {
 	name     string
 	input    time.Duration
 	expected string
-}) {
+},
+) {
 	runTests(t, testCases, Duration)
 }
 
@@ -42,7 +45,8 @@ func runDateTests(t *testing.T, testCases []struct {
 	name     string
 	input    time.Time
 	expected string
-}) {
+},
+) {
 	runTests(t, testCases, Date)
 }
 

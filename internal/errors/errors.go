@@ -35,6 +35,6 @@ func SafetyError(message string) error {
 }
 
 // InputValidationError creates an input validation error
-func InputValidationError(field string, value string) error {
+func InputValidationError(field, value string) error {
 	return fmt.Errorf("invalid input for field '%s': %s", field, value)
 }

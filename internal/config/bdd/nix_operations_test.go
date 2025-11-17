@@ -22,7 +22,7 @@ func TestNixGenerationsCleanup_BDD(t *testing.T) {
 	givenConfig := &domain.Config{
 		Version:      "1.0.0",
 		SafeMode:     domain.SafetyLevelEnabled,
-		MaxDiskUsage:  50,
+		MaxDiskUsage: 50,
 		Protected:    []string{"/", "/System", "/Library", "/nix/store"},
 		Profiles: map[string]*domain.Profile{
 			"nix-cleanup": {
@@ -46,7 +46,7 @@ func TestNixGenerationsCleanup_BDD(t *testing.T) {
 
 	// THEN: Configuration should be valid
 	assert.True(t, whenResult.IsValid, "Nix cleanup configuration should be valid")
-	
+
 	// AND: No validation errors should exist
 	assert.Empty(t, whenResult.Errors, "Should have no validation errors")
 }
@@ -57,14 +57,14 @@ func TestMaxDiskUsageEnforcement_BDD(t *testing.T) {
 	givenConfig := &domain.Config{
 		Version:      "1.0.0",
 		SafeMode:     domain.SafetyLevelEnabled,
-		MaxDiskUsage:  150, // Invalid: > 95
+		MaxDiskUsage: 150, // Invalid: > 95
 		Protected:    []string{"/", "/System"},
 		Profiles: map[string]*domain.Profile{
 			"test": {
 				Name:        "test",
 				Description: "Test profile",
 				Enabled:     true,
-				Operations: []domain.CleanupOperation{},
+				Operations:  []domain.CleanupOperation{},
 			},
 		},
 	}
@@ -74,7 +74,7 @@ func TestMaxDiskUsageEnforcement_BDD(t *testing.T) {
 
 	// THEN: Configuration should be invalid
 	assert.False(t, whenResult.IsValid, "MaxDiskUsage >95 should be invalid")
-	
+
 	// AND: Should have specific error about max_disk_usage
 	foundError := false
 	for _, err := range whenResult.Errors {
@@ -93,7 +93,7 @@ func TestSafetyLevelRestrictions_BDD(t *testing.T) {
 	givenConfig := &domain.Config{
 		Version:      "1.0.0",
 		SafeMode:     domain.SafetyLevelStrict,
-		MaxDiskUsage:  50,
+		MaxDiskUsage: 50,
 		Protected:    []string{"/", "/System"},
 		Profiles: map[string]*domain.Profile{
 			"risky": {
@@ -118,7 +118,7 @@ func TestSafetyLevelRestrictions_BDD(t *testing.T) {
 
 	// THEN: Configuration should be valid (risk levels are validated in operations)
 	assert.True(t, whenResult.IsValid, "Configuration should be valid")
-	
+
 	// AND: No validation errors should exist (RiskLevelCritical is valid)
 	assert.Empty(t, whenResult.Errors, "Should have no validation errors")
 }
@@ -128,11 +128,11 @@ func TestConfigurationFileRoundTrip_BDD(t *testing.T) {
 	// GIVEN: A temporary directory for testing
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "test-config.yaml")
-	
+
 	givenConfig := &domain.Config{
 		Version:      "1.0.0",
 		SafeMode:     domain.SafetyLevelStrict,
-		MaxDiskUsage:  75,
+		MaxDiskUsage: 75,
 		Protected:    []string{"/", "/System", "/Library", "/usr"},
 		Profiles: map[string]*domain.Profile{
 			"comprehensive": {
@@ -161,10 +161,10 @@ func TestConfigurationFileRoundTrip_BDD(t *testing.T) {
 	// WHEN: Configuration is saved to file
 	whenLoader := config.NewEnhancedConfigLoader()
 	whenSaveOptions := &config.ConfigSaveOptions{
-		Path:              configPath,
+		Path:               configPath,
 		EnableSanitization: true,
 		ValidationLevel:    config.ValidationLevelComprehensive,
-		Timeout:           5 * time.Second,
+		Timeout:            5 * time.Second,
 	}
 	whenSaveConfig, whenSaveErr := whenLoader.SaveConfig(context.Background(), givenConfig, whenSaveOptions)
 	require.NoError(t, whenSaveErr, "Should save configuration without error")
@@ -177,17 +177,17 @@ func TestConfigurationFileRoundTrip_BDD(t *testing.T) {
 
 	// AND: Configuration is loaded back
 	whenLoadOptions := &config.ConfigLoadOptions{
-		Path:              configPath,
+		Path:               configPath,
 		EnableSanitization: true,
 		ValidationLevel:    config.ValidationLevelComprehensive,
-		Timeout:           5 * time.Second,
+		Timeout:            5 * time.Second,
 	}
 	whenLoadedConfig, whenLoadErr := whenLoader.LoadConfig(context.Background(), whenLoadOptions)
 
 	// THEN: Configuration should load successfully
 	require.NoError(t, whenLoadErr, "Should load configuration without error")
 	require.NotNil(t, whenLoadedConfig, "Should return configuration")
-	
+
 	// AND: Values should match original
 	assert.Equal(t, givenConfig.Version, whenLoadedConfig.Version, "Version should match")
 	assert.Equal(t, givenConfig.SafeMode, whenLoadedConfig.SafeMode, "SafeMode should match")

@@ -65,28 +65,28 @@ func (c *IntegrationTestContext) TempDir() string {
 // TempFile creates a temporary file with the given content
 func (c *IntegrationTestContext) TempFile(name, content string) string {
 	path := filepath.Join(c.tempDir, name)
-	err := ioutil.WriteFile(path, []byte(content), 0644)
+	err := ioutil.WriteFile(path, []byte(content), 0o644)
 	require.NoError(c.t, err)
-	
+
 	// Add cleanup
 	c.cleanup = append(c.cleanup, func() error {
 		return os.Remove(path)
 	})
-	
+
 	return path
 }
 
 // TempDir creates a temporary subdirectory
 func (c *IntegrationTestContext) TempSubdir(name string) string {
 	path := filepath.Join(c.tempDir, name)
-	err := os.MkdirAll(path, 0755)
+	err := os.MkdirAll(path, 0o755)
 	require.NoError(c.t, err)
-	
+
 	// Add cleanup
 	c.cleanup = append(c.cleanup, func() error {
 		return os.RemoveAll(path)
 	})
-	
+
 	return path
 }
 
@@ -94,7 +94,7 @@ func (c *IntegrationTestContext) TempSubdir(name string) string {
 func (c *IntegrationTestContext) ProjectRoot() string {
 	dir, err := os.Getwd()
 	require.NoError(c.t, err)
-	
+
 	// Find project root by looking for go.mod
 	for {
 		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
@@ -106,7 +106,7 @@ func (c *IntegrationTestContext) ProjectRoot() string {
 		}
 		dir = parent
 	}
-	
+
 	c.t.Fatal("Could not find project root")
 	return ""
 }

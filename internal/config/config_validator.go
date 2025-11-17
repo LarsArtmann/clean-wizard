@@ -31,15 +31,15 @@ func NewConfigValidatorWithRules(rules *ConfigValidationRules) *ConfigValidator 
 func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult {
 	start := time.Now()
 	result := &ValidationResult{
-		IsValid:   true,
-		Errors:    []ValidationError{},
-		Warnings:  []ValidationWarning{},
+		IsValid:  true,
+		Errors:   []ValidationError{},
+		Warnings: []ValidationWarning{},
 		Sanitized: &ValidationSanitizedData{
 			FieldsModified: []string{},
-			RulesApplied:  []string{"comprehensive_validation"},
+			RulesApplied:   []string{"comprehensive_validation"},
 			Metadata: map[string]string{
 				"validation_level": "comprehensive",
-				"timestamp":       start.Format(time.RFC3339),
+				"timestamp":        start.Format(time.RFC3339),
 			},
 			Data: make(map[string]any),
 		},
@@ -59,8 +59,8 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 
 	// Validate MaxDiskUsage using direct logic
 	if cfg.MaxDiskUsage < 1 || cfg.MaxDiskUsage > 95 {
-		result.AddError("max_disk_usage", "range", cfg.MaxDiskUsage, 
-			"MaxDiskUsage must be between 1 and 95", 
+		result.AddError("max_disk_usage", "range", cfg.MaxDiskUsage,
+			"MaxDiskUsage must be between 1 and 95",
 			"Set MaxDiskUsage to valid range", SeverityError)
 	}
 
@@ -82,7 +82,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 		if len(profile.Operations) == 0 {
 			result.AddError(fmt.Sprintf("profiles.%s.operations", name), "required", "", "At least one operation is required", "Add cleanup operations", SeverityError)
 		}
-		
+
 		// Validate operations
 		for i, op := range profile.Operations {
 			fieldPrefix := fmt.Sprintf("profiles.%s.operations[%d]", name, i)
@@ -92,7 +92,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 			if !op.RiskLevel.IsValid() {
 				result.AddError(fieldPrefix+".risk_level", "enum", op.RiskLevel, "Invalid risk level", "Use: LOW, MEDIUM, HIGH, CRITICAL", SeverityError)
 			}
-			
+
 			// Validate settings
 			if op.Settings != nil {
 				opType := domain.GetOperationType(op.Name)
@@ -141,8 +141,8 @@ func getDefaultValidationRules() *ConfigValidationRules {
 			"/", "/System", "/Library", "/usr", "/etc", "/bin", "/sbin",
 		},
 		RequireSafeMode: true,
-		MaxRiskLevel:   domain.RiskCritical,
-		BackupRequired: domain.RiskHigh,
+		MaxRiskLevel:    domain.RiskCritical,
+		BackupRequired:  domain.RiskHigh,
 	}
 }
 

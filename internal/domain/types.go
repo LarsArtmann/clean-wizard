@@ -2,9 +2,10 @@ package domain
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 // RiskLevel represents operation risk with type safety

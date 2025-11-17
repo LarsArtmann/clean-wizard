@@ -39,25 +39,25 @@ func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddl
 // ValidateAndSanitize performs complete validation and sanitization
 func (vm *ValidationMiddleware) ValidateAndSanitize(ctx context.Context, configPath string) (*ValidationResult, error) {
 	start := time.Now()
-	
+
 	// Load configuration
 	config, err := vm.loadConfig(configPath)
 	if err != nil {
 		return nil, errors.NewError(errors.ErrConfigLoad, fmt.Sprintf("Failed to load configuration from %s: %v", configPath, err))
 	}
-	
+
 	// Validate configuration
 	validationResult := vm.validator.ValidateConfig(config)
-	
+
 	// Sanitize configuration
 	sanitizationResult := vm.sanitizer.SanitizeConfig(config)
-	
+
 	// Create unified result
 	result := vm.createUnifiedResult(validationResult, sanitizationResult, time.Since(start))
-	
+
 	// Log validation
 	vm.logger.LogValidation(result)
-	
+
 	return result, nil
 }
 
@@ -67,12 +67,12 @@ func (vm *ValidationMiddleware) loadConfig(configPath string) (*domain.Config, e
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var config domain.Config
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		return nil, err
 	}
-	
+
 	return &config, nil
 }
 
@@ -99,10 +99,10 @@ func (vm *ValidationMiddleware) convertSanitizationErrors(result *SanitizationRe
 	for _, change := range result.Changes {
 		if change.OldValue != change.NewValue {
 			errors = append(errors, ValidationError{
-				Field:   change.Field,
-				Rule:    "sanitization",
-				Value:   change.OldValue,
-				Message: fmt.Sprintf("Field %s was modified during sanitization", change.Field),
+				Field:    change.Field,
+				Rule:     "sanitization",
+				Value:    change.OldValue,
+				Message:  fmt.Sprintf("Field %s was modified during sanitization", change.Field),
 				Severity: SeverityWarning,
 				Context: &ValidationContext{
 					Metadata: map[string]string{
@@ -128,7 +128,7 @@ func (vm *ValidationMiddleware) convertSanitizationWarnings(result *Sanitization
 			Context: &ValidationContext{
 				Metadata: map[string]string{
 					"warning_type": fmt.Sprintf("%v", warning.Original),
-					"suggestion":  warning.Reason,
+					"suggestion":   warning.Reason,
 				},
 			},
 			Timestamp: time.Now(),
@@ -162,5 +162,5 @@ func (vm *ValidationMiddleware) saveConfig(ctx context.Context, config *domain.C
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, data, 0644)
+	return os.WriteFile(path, data, 0o644)
 }

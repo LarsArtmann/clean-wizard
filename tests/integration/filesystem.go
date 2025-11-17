@@ -20,7 +20,7 @@ func NewFileSystemTestHelper(ctx *IntegrationTestContext) *FileSystemTestHelper 
 // CreateFile creates a file with given content
 func (h *FileSystemTestHelper) CreateFile(path, content string) string {
 	fullPath := filepath.Join(h.ctx.TempDir(), path)
-	err := os.WriteFile(fullPath, []byte(content), 0644)
+	err := os.WriteFile(fullPath, []byte(content), 0o644)
 	require.NoError(h.ctx.t, err, "Failed to create file: %s", fullPath)
 	return fullPath
 }
@@ -28,7 +28,7 @@ func (h *FileSystemTestHelper) CreateFile(path, content string) string {
 // CreateDirectory creates a directory
 func (h *FileSystemTestHelper) CreateDirectory(path string) string {
 	fullPath := filepath.Join(h.ctx.TempDir(), path)
-	err := os.MkdirAll(fullPath, 0755)
+	err := os.MkdirAll(fullPath, 0o755)
 	require.NoError(h.ctx.t, err, "Failed to create directory: %s", fullPath)
 	return fullPath
 }
@@ -74,7 +74,7 @@ func (h *FileSystemTestHelper) AssertDirectoryNotExists(path string) {
 // Cleanup creates a temporary directory for testing files
 func (h *FileSystemTestHelper) Cleanup(name string) string {
 	tempDir := filepath.Join(h.ctx.TempDir(), name)
-	err := os.MkdirAll(tempDir, 0755)
+	err := os.MkdirAll(tempDir, 0o755)
 	require.NoError(h.ctx.t, err)
 	return tempDir
 }

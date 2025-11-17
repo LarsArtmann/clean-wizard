@@ -7,10 +7,10 @@ import (
 
 func TestResult_BoolMethods(t *testing.T) {
 	tests := []struct {
-		name          string
-		result        Result[int]
-		expectedOk    bool
-		expectedErr   bool
+		name        string
+		result      Result[int]
+		expectedOk  bool
+		expectedErr bool
 	}{
 		{
 			name:        "ok result",
@@ -32,7 +32,7 @@ func TestResult_BoolMethods(t *testing.T) {
 			if tt.result.IsOk() != tt.expectedOk {
 				t.Errorf("IsOk() = %v, want %v", tt.result.IsOk(), tt.expectedOk)
 			}
-			
+
 			// Test IsErr method
 			if tt.result.IsErr() != tt.expectedErr {
 				t.Errorf("IsErr() = %v, want %v", tt.result.IsErr(), tt.expectedErr)

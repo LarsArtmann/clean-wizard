@@ -105,7 +105,7 @@ type ErrorDetails struct {
 	Value      any               `json:"value,omitempty"`
 	Context    map[string]string `json:"context,omitempty"`
 	Suggestion string            `json:"suggestion,omitempty"`
-	Recovery  string            `json:"recovery,omitempty"`
+	Recovery   string            `json:"recovery,omitempty"`
 }
 
 // CleanWizardError represents structured error with context
@@ -204,7 +204,7 @@ func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 			Context: make(map[string]string),
 		}
 	}
-	
+
 	// Map known keys to typed fields
 	switch key {
 	case "field":
@@ -232,7 +232,7 @@ func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 			e.Details.Context[key] = strVal
 		}
 	}
-	
+
 	return e
 }
 

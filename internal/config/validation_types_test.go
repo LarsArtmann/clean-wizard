@@ -16,9 +16,9 @@ type TestSanitizationTestCase struct {
 
 // TestValidationLevelTestCase defines validation level test cases
 type TestValidationLevelTestCase struct {
-	name        string
+	name         string
 	config       *domain.Config
-	level       ValidationLevel
+	level        ValidationLevel
 	expectValid  bool
 	expectErrors int
 }
@@ -43,7 +43,7 @@ func createTestProfile() *domain.Profile {
 // CreateTestConfigurations creates test configurations for validation testing
 func CreateTestConfigurations() map[string]*domain.Config {
 	testProfile := createTestProfile()
-	
+
 	return map[string]*domain.Config{
 		"valid": {
 			Version:      "1.0.0",
@@ -74,7 +74,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 func createTestConfig() *domain.Config {
 	return &domain.Config{
 		SafeMode:     domain.SafetyLevelEnabled,
-		MaxDiskUsage:  50,
+		MaxDiskUsage: 50,
 		Protected:    []string{"/System", "/Library"},
 		Profiles: map[string]*domain.Profile{
 			"daily": createTestProfile(),
