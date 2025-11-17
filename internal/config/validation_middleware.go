@@ -9,6 +9,30 @@ import (
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 )
 
+// ChangeOperation represents type of configuration change with type safety
+type ChangeOperation string
+
+const (
+	OperationAdded    ChangeOperation = "added"
+	OperationRemoved  ChangeOperation = "removed"
+	OperationModified ChangeOperation = "modified"
+)
+
+// IsValid checks if change operation is valid
+func (co ChangeOperation) IsValid() bool {
+	switch co {
+	case OperationAdded, OperationRemoved, OperationModified:
+		return true
+	default:
+		return false
+	}
+}
+
+// String returns string representation
+func (co ChangeOperation) String() string {
+	return string(co)
+}
+
 // ValidationMiddleware provides comprehensive validation for configuration operations
 type ValidationMiddleware struct {
 	validator *ConfigValidator
@@ -39,11 +63,11 @@ type ConfigChangeResult struct {
 
 // ConfigChange represents a single configuration change
 type ConfigChange struct {
-	Field     string `json:"field"`
-	OldValue  any    `json:"old_value"`
-	NewValue  any    `json:"new_value"`
-	Operation string `json:"operation"` // "added", "removed", "modified"
-	Risk      string `json:"risk"`      // "low", "medium", "high", "critical"
+	Field     string           `json:"field"`
+	OldValue  any              `json:"old_value"`
+	NewValue  any              `json:"new_value"`
+	Operation ChangeOperation  `json:"operation"`
+	Risk      domain.RiskLevel `json:"risk"`
 }
 
 // ProfileOperationResult represents profile operation validation result
