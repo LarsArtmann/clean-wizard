@@ -136,18 +136,18 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 	// Sanitize max_disk_usage
 	if cs.rules.ClampValues {
 		original := cfg.MaxDiskUsage
-		if cfg.MaxDiskUsage < 10 {
-			cfg.MaxDiskUsage = 10
+		if cfg.MaxDiskUsage < MinDiskUsagePercent {
+			cfg.MaxDiskUsage = MinDiskUsagePercent
 			result.addWarning("max_disk_usage", original, cfg.MaxDiskUsage, "clamped to minimum value")
-		} else if cfg.MaxDiskUsage > 95 {
-			cfg.MaxDiskUsage = 95
+		} else if cfg.MaxDiskUsage > MaxDiskUsagePercent {
+			cfg.MaxDiskUsage = MaxDiskUsagePercent
 			result.addWarning("max_disk_usage", original, cfg.MaxDiskUsage, "clamped to maximum value")
 		}
 	}
 
 	if cs.rules.RoundPercentages {
 		original := cfg.MaxDiskUsage
-		cfg.MaxDiskUsage = int(float64(cfg.MaxDiskUsage+5)/10) * 10 // Round to nearest 10
+		cfg.MaxDiskUsage = int(float64(cfg.MaxDiskUsage+RoundingIncrement/2)/RoundingIncrement) * RoundingIncrement // Round to nearest increment
 		if original != cfg.MaxDiskUsage {
 			result.addChange("max_disk_usage", original, cfg.MaxDiskUsage, "rounded to nearest 10%")
 		}

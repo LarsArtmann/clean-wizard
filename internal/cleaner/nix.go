@@ -37,7 +37,7 @@ func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
 // GetStoreSize gets Nix store size with type safety
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	if !nc.adapter.IsAvailable(ctx) {
-		return int64(1024 * 1024 * 300) // 300GB mock
+		return int64(MockStoreSizeGB * 1024 * 1024 * 1024) // Mock store size
 	}
 
 	storeSizeResult := nc.adapter.GetStoreSize(ctx)
