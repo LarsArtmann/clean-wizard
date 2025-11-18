@@ -172,7 +172,7 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 				Message:    "Safe mode is disabled but critical risk operations exist",
 				Suggestion: "Enable safe mode or remove critical risk operations",
 				Context: map[string]any{
-					"max_risk": string(maxRisk),
+					"max_risk": maxRisk.String(),
 				},
 			})
 		}

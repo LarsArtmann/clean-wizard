@@ -2,160 +2,40 @@ package domain
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
-	"strings"
 	"time"
 )
 
-// RiskLevel represents operation risk with type safety
-type RiskLevel string
+// Backward compatibility aliases - delegate to type-safe enums
+type RiskLevel = RiskLevelType
+type ValidationLevel = ValidationLevelType
+type ChangeOperation = ChangeOperationType
 
-const (
-	RiskLow      RiskLevel = "LOW"
-	RiskMedium   RiskLevel = "MEDIUM"
-	RiskHigh     RiskLevel = "HIGH"
-	RiskCritical RiskLevel = "CRITICAL"
+// Backward compatibility constants - point to type-safe enums
+var (
+	RiskLow      = RiskLevelType(RiskLevelLowType)
+	RiskMedium   = RiskLevelType(RiskLevelMediumType)
+	RiskHigh     = RiskLevelType(RiskLevelHighType)
+	RiskCritical = RiskLevelType(RiskLevelCriticalType)
+	
+	ValidationLevelNone          = ValidationLevelType(ValidationLevelNoneType)
+	ValidationLevelBasic         = ValidationLevelType(ValidationLevelBasicType)
+	ValidationLevelComprehensive = ValidationLevelType(ValidationLevelComprehensiveType)
+	ValidationLevelStrict        = ValidationLevelType(ValidationLevelStrictType)
+	
+	OperationAdded    = ChangeOperationType(ChangeOperationAddedType)
+	OperationRemoved  = ChangeOperationType(ChangeOperationRemovedType)
+	OperationModified = ChangeOperationType(ChangeOperationModifiedType)
 )
-
-// IsValid checks if risk level is valid
-func (rl RiskLevel) IsValid() bool {
-	switch rl {
-	case RiskLow, RiskMedium, RiskHigh, RiskCritical:
-		return true
-	default:
-		return false
-	}
-}
-
-// Icon returns emoji for risk level
-func (rl RiskLevel) Icon() string {
-	switch rl {
-	case RiskLow:
-		return "🟢"
-	case RiskMedium:
-		return "🟡"
-	case RiskHigh:
-		return "🟠"
-	case RiskCritical:
-		return "🔴"
-	default:
-		return "⚪"
-	}
-}
-
-// IsHigherThan returns true if this risk level is higher than the comparison
-func (rl RiskLevel) IsHigherThan(other RiskLevel) bool {
-	riskOrder := map[RiskLevel]int{
-		RiskLow:      1,
-		RiskMedium:   2,
-		RiskHigh:     3,
-		RiskCritical: 4,
-	}
-	
-	return riskOrder[rl] > riskOrder[other]
-}
-
-// IsHigherOrEqualThan returns true if this risk level is higher or equal than the comparison
-func (rl RiskLevel) IsHigherOrEqualThan(other RiskLevel) bool {
-	riskOrder := map[RiskLevel]int{
-		RiskLow:      1,
-		RiskMedium:   2,
-		RiskHigh:     3,
-		RiskCritical: 4,
-	}
-	
-	return riskOrder[rl] >= riskOrder[other]
-}
-
-// MarshalYAML implements yaml.Marshaler interface
-func (rl RiskLevel) MarshalYAML() (any, error) {
-	return string(rl), nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler interface
-func (rl *RiskLevel) UnmarshalYAML(value *yaml.Node) error {
-	var s string
-	if err := value.Decode(&s); err != nil {
-		return err
-	}
-
-	switch strings.ToUpper(s) {
-	case "LOW":
-		*rl = RiskLow
-	case "MEDIUM":
-		*rl = RiskMedium
-	case "HIGH":
-		*rl = RiskHigh
-	case "CRITICAL":
-		*rl = RiskCritical
-	default:
-		return fmt.Errorf("invalid risk level: %s", s)
-	}
-	return nil
-}
 
 // CleanStrategy represents cleaning strategy with type safety
-type CleanStrategy string
+type CleanStrategy = CleanStrategyType
 
-const (
-	StrategyAggressive   CleanStrategy = "aggressive"
-	StrategyConservative CleanStrategy = "conservative"
-	StrategyDryRun       CleanStrategy = "dry-run"
+// Backward compatibility constants - delegate to type-safe enums
+var (
+	StrategyAggressive   = CleanStrategyType(StrategyAggressiveType)
+	StrategyConservative = CleanStrategyType(StrategyConservativeType)
+	StrategyDryRun       = CleanStrategyType(StrategyDryRunType)
 )
-
-// IsValid checks if clean strategy is valid
-func (cs CleanStrategy) IsValid() bool {
-	switch cs {
-	case StrategyAggressive, StrategyConservative, StrategyDryRun:
-		return true
-	default:
-		return false
-	}
-}
-
-// Icon returns emoji for clean strategy
-func (cs CleanStrategy) Icon() string {
-	switch cs {
-	case StrategyAggressive:
-		return "🔥"
-	case StrategyConservative:
-		return "🛡️"
-	case StrategyDryRun:
-		return "🔍"
-	default:
-		return "❓"
-	}
-}
-
-// String returns string representation
-func (cs CleanStrategy) String() string {
-	return string(cs)
-}
-
-// MarshalYAML implements yaml.Marshaler interface
-func (cs CleanStrategy) MarshalYAML() (any, error) {
-	return string(cs), nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler interface
-func (cs *CleanStrategy) UnmarshalYAML(value *yaml.Node) error {
-	var s string
-	if err := value.Decode(&s); err != nil {
-		return err
-	}
-
-	switch strings.ToLower(s) {
-	case "aggressive":
-		*cs = StrategyAggressive
-	case "conservative":
-		*cs = StrategyConservative
-	case "dry-run", "dryrun":
-		*cs = StrategyDryRun
-	default:
-		return fmt.Errorf("invalid clean strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", s)
-	}
-	return nil
-}
 
 // NixGeneration represents Nix store generation
 type NixGeneration struct {
