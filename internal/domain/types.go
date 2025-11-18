@@ -173,9 +173,9 @@ func (sr ScanResult) Validate() error {
 
 // CleanResult represents successful clean outcome
 type CleanResult struct {
-	FreedBytes   int64         `json:"freed_bytes"`
-	ItemsRemoved int           `json:"items_removed"`
-	ItemsFailed  int           `json:"items_failed"`
+	FreedBytes   uint64        `json:"freed_bytes"`
+	ItemsRemoved uint           `json:"items_removed"`
+	ItemsFailed  uint           `json:"items_failed"`
 	CleanTime    time.Duration `json:"clean_time"`
 	CleanedAt    time.Time     `json:"cleaned_at"`
 	Strategy     CleanStrategy `json:"strategy"`
@@ -183,19 +183,27 @@ type CleanResult struct {
 
 // IsValid checks if clean result is valid
 func (cr CleanResult) IsValid() bool {
-	return cr.FreedBytes >= 0 &&
-		cr.ItemsRemoved >= 0 &&
-		cr.CleanedAt.IsZero() == false &&
-		cr.Strategy.IsValid()
+	// Cannot remove items without freeing bytes
+	if cr.ItemsRemoved > 0 && cr.FreedBytes == 0 {
+		return false
+	}
+	// Cannot fail items without any activity
+	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.FreedBytes == 0 {
+		return false
+	}
+	// Other validations
+	return cr.CleanedAt.IsZero() == false && cr.Strategy.IsValid()
 }
 
 // Validate returns errors for invalid clean result
 func (cr CleanResult) Validate() error {
-	if cr.FreedBytes < 0 {
-		return fmt.Errorf("FreedBytes cannot be negative, got: %d", cr.FreedBytes)
+	// Cannot remove items without freeing bytes
+	if cr.ItemsRemoved > 0 && cr.FreedBytes == 0 {
+		return fmt.Errorf("cannot have zero FreedBytes when ItemsRemoved is > 0")
 	}
-	if cr.ItemsRemoved < 0 {
-		return fmt.Errorf("ItemsRemoved cannot be negative, got: %d", cr.ItemsRemoved)
+	// Cannot fail items without any activity (removed or freed)
+	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.FreedBytes == 0 {
+		return fmt.Errorf("cannot have failed items when no items were processed")
 	}
 	if cr.CleanedAt.IsZero() {
 		return fmt.Errorf("CleanedAt cannot be zero")
