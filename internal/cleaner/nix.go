@@ -58,7 +58,7 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 	}
 
 	if settings.NixGenerations.Generations > 10 {
-		return fmt.Errorf("Generations to keep must not exceed 10, got: %d", settings.NixGenerations.Generations)
+		return fmt.Errorf("Generations to keep must not exceed %d, got: %d", MaxGenerations, settings.NixGenerations.Generations)
 	}
 
 	return nil
@@ -97,7 +97,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 
 	if nc.dryRun {
 		// Use centralized conversion for dry-run
-		estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // 50MB per generation
+		estimatedBytes := int64(toRemove * MockGenerationSizeMB * 1024 * 1024) // Use constant
 		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, toRemove, estimatedBytes)
 		return result.Ok(cleanResult)
 	}

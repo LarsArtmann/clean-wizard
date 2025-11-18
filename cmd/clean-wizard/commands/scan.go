@@ -162,8 +162,15 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 			// Convert generations to scan result for display
 			generations := result.Value()
+			
+			// Calculate total bytes from generations
+			var totalBytes int64
+			for _, gen := range generations {
+				totalBytes += gen.EstimateSize()
+			}
+			
 			scanResult := domain.ScanResult{
-				TotalBytes:   0, // TODO: Calculate from generations
+				TotalBytes:   totalBytes,
 				TotalItems:   len(generations),
 				ScannedPaths: []string{"/nix/store"},
 				ScanTime:     time.Duration(100 * time.Millisecond),
