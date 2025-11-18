@@ -2,36 +2,12 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 )
-
-// ConfigLoadOptions provides options for configuration loading
-type ConfigLoadOptions struct {
-	ForceRefresh       bool                    `json:"force_refresh"`
-	EnableCache        bool                    `json:"enable_cache"`
-	EnableSanitization bool                    `json:"enable_sanitization"`
-	ValidationLevel    domain.ValidationLevelType `json:"validation_level"`
-	Timeout            time.Duration           `json:"timeout"`
-}
-
-// ConfigSaveOptions provides options for configuration saving
-type ConfigSaveOptions struct {
-	EnableSanitization bool                    `json:"enable_sanitization"`
-	BackupEnabled      bool                    `json:"backup_enabled"`
-	ValidationLevel    domain.ValidationLevelType `json:"validation_level"`
-	CreateBackup       bool                    `json:"create_backup"`
-}
-
-// RetryPolicy defines retry behavior for configuration operations
-type RetryPolicy struct {
-	MaxRetries    int           `json:"max_retries"`
-	InitialDelay  time.Duration `json:"initial_delay"`
-	MaxDelay      time.Duration `json:"max_delay"`
-	BackoffFactor float64       `json:"backoff_factor"`
-}
 
 // LoadConfig loads configuration with comprehensive validation and caching
 func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *ConfigLoadOptions) (*domain.Config, error) {
@@ -51,14 +27,14 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 	// Load configuration with retry
 	config, err := ecl.loadConfigWithRetry(ctx, options)
 	if err != nil {
-		return nil, pkgerrors.HandleConfigError("LoadConfig", err)
+		return nil, err
 	}
 
 	// Apply validation based on level
-	validationResult := ecl.applyValidation(config, options.ValidationLevel)
+	validationResult := ecl.applyValidation(config, ValidationLevel(options.ValidationLevel))
 	if !validationResult.IsValid {
 		return nil, pkgerrors.HandleValidationError("LoadConfig",
-			pkgerrors.NewValidationError("validation failed", ecl.formatValidationErrors(validationResult.Errors)))
+			fmt.Errorf("validation failed: %s", ecl.formatValidationErrors(validationResult.Errors)))
 	}
 
 	// Apply sanitization if enabled
@@ -86,13 +62,6 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 		options = getDefaultSaveOptions()
 	}
 
-	// Validate before saving
-	validationResult := ecl.applyValidation(config, options.ValidationLevel)
-	if !validationResult.IsValid {
-		return nil, pkgerrors.HandleValidationError("SaveConfig",
-			pkgerrors.NewValidationError("validation failed", ecl.formatValidationErrors(validationResult.Errors)))
-	}
-
 	// Create backup if requested
 	if (options.CreateBackup || options.BackupEnabled) && ecl.enableMonitoring {
 		if err := ecl.createBackup(ctx, config); err != nil {
@@ -102,13 +71,14 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 
 	// Apply sanitization if enabled
 	if options.EnableSanitization {
+		validationResult := ecl.applyValidation(config, ValidationLevel(options.ValidationLevel))
 		ecl.sanitizer.SanitizeConfig(config, validationResult)
 	}
 
 	// Save with retry
 	err := ecl.saveConfigWithRetry(ctx, config, options)
 	if err != nil {
-		return nil, pkgerrors.HandleConfigError("SaveConfig", err)
+		return nil, err
 	}
 
 	// Update cache
@@ -123,5 +93,5 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 
 // ValidateConfig validates configuration at specified level
 func (ecl *EnhancedConfigLoader) ValidateConfig(ctx context.Context, config *domain.Config, level domain.ValidationLevelType) *ValidationResult {
-	return ecl.applyValidation(config, level)
+	return ecl.applyValidation(config, ValidationLevel(level))
 }

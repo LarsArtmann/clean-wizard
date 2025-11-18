@@ -23,12 +23,12 @@ func TestRiskLevel_String(t *testing.T) {
 		{"medium risk", domain.RiskMedium, "MEDIUM"},
 		{"high risk", domain.RiskHigh, "HIGH"},
 		{"critical risk", domain.RiskCritical, "CRITICAL"},
-		{"unknown risk", domain.RiskLevel("UNKNOWN"), "UNKNOWN"},
+		{"unknown risk", domain.RiskLevelType(99), "UNKNOWN"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := string(tt.level)
+			result := tt.level.String()
 			if result != tt.expected {
 				t.Errorf("String() = %v, want %v", result, tt.expected)
 			}
@@ -46,7 +46,7 @@ func TestRiskLevel_Icon(t *testing.T) {
 		{"medium risk", domain.RiskMedium, "🟡"},
 		{"high risk", domain.RiskHigh, "🟠"},
 		{"critical risk", domain.RiskCritical, "🔴"},
-		{"unknown risk", domain.RiskLevel("UNKNOWN"), "⚪"},
+		{"unknown risk", domain.RiskLevelType(99), "⚪"},
 	}
 
 	for _, tt := range tests {
@@ -69,9 +69,9 @@ func TestRiskLevel_IsValid(t *testing.T) {
 		{"medium risk", domain.RiskMedium, true},
 		{"high risk", domain.RiskHigh, true},
 		{"critical risk", domain.RiskCritical, true},
-		{"unknown risk", domain.RiskLevel("UNKNOWN"), false},
-		{"negative risk", domain.RiskLevel("-1"), false},
-		{"too high risk", domain.RiskLevel("100"), false},
+		{"unknown risk", domain.RiskLevelType(99), false},
+		{"negative risk", domain.RiskLevelType(-1), false},
+		{"too high risk", domain.RiskLevelType(100), false},
 	}
 
 	for _, tt := range tests {

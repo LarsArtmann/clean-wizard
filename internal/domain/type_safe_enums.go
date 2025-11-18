@@ -110,13 +110,7 @@ func (rl RiskLevelType) IsHigherOrEqualThan(other RiskLevelType) bool {
 	return rl >= other
 }
 
-// Convenience constants for backward compatibility
-var (
-	RiskLow      = RiskLevelType(RiskLevelLowType)
-	RiskMedium   = RiskLevelType(RiskLevelMediumType)
-	RiskHigh     = RiskLevelType(RiskLevelHighType)
-	RiskCritical = RiskLevelType(RiskLevelCriticalType)
-)
+// Convenience constants for backward compatibility are now in types.go
 
 // ValidationLevelType represents validation levels with compile-time safety
 type ValidationLevelType int
@@ -189,13 +183,7 @@ func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Convenience constants for backward compatibility
-var (
-	ValidationLevelNone          = ValidationLevelType(ValidationLevelNoneType)
-	ValidationLevelBasic         = ValidationLevelType(ValidationLevelBasicType)
-	ValidationLevelComprehensive = ValidationLevelType(ValidationLevelComprehensiveType)
-	ValidationLevelStrict        = ValidationLevelType(ValidationLevelStrictType)
-)
+// Convenience constants for backward compatibility are now in types.go
 
 // ChangeOperationType represents change operations with compile-time safety
 type ChangeOperationType int
@@ -262,9 +250,83 @@ func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Convenience constants for backward compatibility
-var (
-	OperationAdded    = ChangeOperationType(ChangeOperationAddedType)
-	OperationRemoved  = ChangeOperationType(ChangeOperationRemovedType)
-	OperationModified = ChangeOperationType(ChangeOperationModifiedType)
+// CleanStrategyType represents cleaning strategies with compile-time safety
+type CleanStrategyType int
+
+const (
+	StrategyAggressiveType CleanStrategyType = iota
+	StrategyConservativeType
+	StrategyDryRunType
 )
+
+// String returns string representation
+func (cs CleanStrategyType) String() string {
+	switch cs {
+	case StrategyAggressiveType:
+		return "aggressive"
+	case StrategyConservativeType:
+		return "conservative"
+	case StrategyDryRunType:
+		return "dry-run"
+	default:
+		return "unknown"
+	}
+}
+
+// IsValid checks if clean strategy is valid
+func (cs CleanStrategyType) IsValid() bool {
+	return cs >= StrategyAggressiveType && cs <= StrategyDryRunType
+}
+
+// Values returns all possible values
+func (cs CleanStrategyType) Values() []CleanStrategyType {
+	return []CleanStrategyType{
+		StrategyAggressiveType,
+		StrategyConservativeType,
+		StrategyDryRunType,
+	}
+}
+
+// MarshalJSON implements json.Marshaler
+func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
+	if !cs.IsValid() {
+		return nil, fmt.Errorf("invalid clean strategy: %d", cs)
+	}
+	return json.Marshal(cs.String())
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	
+	switch strings.ToLower(s) {
+	case "aggressive":
+		*cs = StrategyAggressiveType
+	case "conservative":
+		*cs = StrategyConservativeType
+	case "dry-run", "dryrun":
+		*cs = StrategyDryRunType
+	default:
+		return fmt.Errorf("invalid clean strategy: %s", s)
+	}
+	return nil
+}
+
+// Icon returns emoji for clean strategy
+func (cs CleanStrategyType) Icon() string {
+	switch cs {
+	case StrategyAggressiveType:
+		return "🔥"
+	case StrategyConservativeType:
+		return "🛡️"
+	case StrategyDryRunType:
+		return "🔍"
+	default:
+		return "❓"
+	}
+}
+
+// Convenience constants for backward compatibility are now in types.go
