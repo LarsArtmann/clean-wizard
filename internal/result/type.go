@@ -40,12 +40,26 @@ func (r Result[T]) Value() T {
 	return r.value
 }
 
+// SafeValue returns value and error (never panics)
+func (r Result[T]) SafeValue() (T, error) {
+	if r.err != nil {
+		var zero T
+		return zero, r.err
+	}
+	return r.value, nil
+}
+
 // Error returns error (panics on success)
 func (r Result[T]) Error() error {
 	if r.err == nil {
 		panic("attempted to get error from success result")
 	}
 	return r.err
+}
+
+// SafeError returns error and ok boolean (never panics)
+func (r Result[T]) SafeError() (error, bool) {
+	return r.err, r.err != nil
 }
 
 // UnwrapOr returns value or default if error
