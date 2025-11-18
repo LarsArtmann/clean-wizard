@@ -45,10 +45,13 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 
 	// Validate successful mapping
 	if domainConfigResult.IsErr() {
-		t.Fatalf("Expected successful mapping, got error: %v", domainConfigResult.Unwrap())
+		t.Fatalf("Expected successful mapping, got error: %v", domainConfigResult.UnwrapErr())
 	}
 
-	domainConfig := domainConfigResult.Unwrap()
+	domainConfig, err := domainConfigResult.Unwrap()
+	if err != nil {
+		t.Fatalf("Expected successful unwrap, got error: %v", err)
+	}
 
 	// Validate mapped values
 	if domainConfig.Version != publicConfig.Version {

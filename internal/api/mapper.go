@@ -139,46 +139,65 @@ func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOpera
 		return nil
 	}
 
+	// Map complex operation settings to simplified public API settings
+	publicSettings := MapOperationSettingsToPublic(domainOperation.Settings)
+
 	return &PublicOperation{
 		Name:        domainOperation.Name,
 		Description: domainOperation.Description,
 		RiskLevel:   MapRiskLevelToPublic(domainOperation.RiskLevel),
 		Enabled:     domainOperation.Enabled,
-		Settings: OperationSettings{
-			DryRun:             domainOperation.Settings.DryRun,
-			Verbose:            domainOperation.Settings.Verbose,
-			TimeoutSeconds:     int32(domainOperation.Settings.Timeout.Seconds()),
-			ConfirmBeforeDelete: domainOperation.Settings.ConfirmBeforeDelete,
-		},
+		Settings:    publicSettings,
 	}
+}
+
+// MapOperationSettingsToPublic converts complex domain settings to simplified public API settings
+func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationSettings {
+	// Default values for simplified public API
+	publicSettings := OperationSettings{
+		DryRun:             true, // Safe default
+		Verbose:            false,
+		TimeoutSeconds:     300, // 5 minutes
+		ConfirmBeforeDelete: false,
+	}
+
+	// Extract relevant values from domain-specific settings
+	if settings.NixGenerations != nil {
+		publicSettings.DryRun = false // Nix operations default to false
+		if settings.NixGenerations.Optimize {
+			publicSettings.Verbose = true
+		}
+	}
+
+	return publicSettings
 }
 
 // MapRiskLevelToDomain converts public risk level string to domain enum
 func MapRiskLevelToDomain(publicRisk PublicRiskLevel) (domain.RiskLevelType, error) {
 	switch publicRisk {
 	case PublicRiskLow:
-		return domain.RiskLowType, nil
+		return domain.RiskLow, nil
 	case PublicRiskMedium:
-		return domain.RiskMediumType, nil
+		return domain.RiskMedium, nil
 	case PublicRiskHigh:
-		return domain.RiskHighType, nil
+		return domain.RiskHigh, nil
 	case PublicRiskCritical:
-		return domain.RiskCriticalType, nil
+		return domain.RiskCritical, nil
 	default:
-		return domain.RiskLowType, fmt.Errorf("unknown risk level: %s", publicRisk)
+		return domain.RiskLow, fmt.Errorf("unknown risk level: %s", publicRisk)
 	}
 }
 
 // MapRiskLevelToPublic converts domain risk level enum to public string
 func MapRiskLevelToPublic(domainRisk domain.RiskLevelType) PublicRiskLevel {
 	switch domainRisk {
-	case domain.RiskLowType:
+	case domain.RiskLow:
 		return PublicRiskLow
-	case domain.RiskMediumType:
+	case domain.RiskMedium:
 		return PublicRiskMedium
-	case domain.RiskHighType:
+	case domain.RiskHigh:
 		return PublicRiskHigh
-	case domain.RiskCriticalType:
+	case domain.RiskCritical:
 		return PublicRiskCritical
 	default:
 		return PublicRiskLow // Default fallback
@@ -212,11 +231,11 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 // MapStrategyToPublic converts domain strategy enum to public string
 func MapStrategyToPublic(domainStrategy domain.CleanStrategyType) PublicStrategy {
 	switch domainStrategy {
-	case domain.StrategyAggressiveType:
+	case domain.StrategyAggressive:
 		return PublicStrategyAggressive
-	case domain.StrategyConservativeType:
+	case domain.StrategyConservative:
 		return PublicStrategyConservative
-	case domain.StrategyDryRunType:
+	case domain.StrategyDryRun:
 		return PublicStrategyDryRun
 	default:
 		return PublicStrategyDryRun // Safe default
