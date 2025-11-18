@@ -179,10 +179,10 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 	}
 
 	// Check profile count limits
-	if cv.rules.MaxProfiles != nil && len(cfg.Profiles) > *cv.rules.MaxProfiles.Min {
+	if cv.rules.MaxProfiles != nil && cv.rules.MaxProfiles.Max != nil && len(cfg.Profiles) > *cv.rules.MaxProfiles.Max {
 		result.Warnings = append(result.Warnings, ValidationWarning{
 			Field:      "profiles",
-			Message:    fmt.Sprintf("Profile count (%d) exceeds recommended limit (%d)", len(cfg.Profiles), *cv.rules.MaxProfiles.Min),
+			Message:    fmt.Sprintf("Profile count (%d) exceeds recommended limit (%d)", len(cfg.Profiles), *cv.rules.MaxProfiles.Max),
 			Suggestion: "Consider consolidating profiles to improve maintainability",
 		})
 	}
@@ -204,7 +204,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 		}
 
 		// Check operation count limits
-		if cv.rules.MaxOperations != nil && len(profile.Operations) > *cv.rules.MaxOperations.Min {
+		if cv.rules.MaxOperations != nil && cv.rules.MaxOperations.Max != nil && len(profile.Operations) > *cv.rules.MaxOperations.Max {
 			result.Warnings = append(result.Warnings, ValidationWarning{
 				Field:      fmt.Sprintf("profiles.%s.operations", name),
 				Message:    fmt.Sprintf("Profile '%s' has many operations (%d), consider simplifying", name, len(profile.Operations)),
