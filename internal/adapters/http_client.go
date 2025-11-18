@@ -15,13 +15,13 @@ type HTTPClient struct {
 // NewHTTPClient creates a new HTTP client with sensible defaults
 func NewHTTPClient() *HTTPClient {
 	client := resty.New()
-	
+
 	// Set sensible defaults
 	client.
-		SetTimeout(30 * time.Second).
+		SetTimeout(30*time.Second).
 		SetRetryCount(3).
-		SetRetryWaitTime(1 * time.Second).
-		SetRetryMaxWaitTime(10 * time.Second).
+		SetRetryWaitTime(1*time.Second).
+		SetRetryMaxWaitTime(10*time.Second).
 		SetHeader("User-Agent", "clean-wizard/1.0.0")
 
 	return &HTTPClient{
@@ -73,7 +73,7 @@ func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error
 }
 
 // Post performs HTTP POST request
-func (hc *HTTPClient) Post(ctx context.Context, url string, body interface{}) (*HTTPResponse, error) {
+func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResponse, error) {
 	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Post(url)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (hc *HTTPClient) Post(ctx context.Context, url string, body interface{}) (*
 }
 
 // Put performs HTTP PUT request
-func (hc *HTTPClient) Put(ctx context.Context, url string, body interface{}) (*HTTPResponse, error) {
+func (hc *HTTPClient) Put(ctx context.Context, url string, body any) (*HTTPResponse, error) {
 	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Put(url)
 	if err != nil {
 		return nil, err
@@ -116,10 +116,10 @@ func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, er
 
 // HTTPResponse wraps resty response
 type HTTPResponse struct {
-	StatusCode int                    `json:"status_code"`
-	Body       string                 `json:"body"`
-	Headers    map[string][]string    `json:"headers"`
-	Request    *resty.Request       `json:"request"`
+	StatusCode int                 `json:"status_code"`
+	Body       string              `json:"body"`
+	Headers    map[string][]string `json:"headers"`
+	Request    *resty.Request      `json:"request"`
 }
 
 // IsSuccess returns true if status code indicates success (2xx)

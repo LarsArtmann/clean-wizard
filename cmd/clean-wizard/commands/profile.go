@@ -233,7 +233,7 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 			fmt.Printf("  %d. %s\n", i+1, op.Name)
 			fmt.Printf("     Description: %s\n", op.Description)
 			fmt.Printf("     Status: %s\n", status)
-			fmt.Printf("     Risk Level: %s%s\n", riskColor, string(op.RiskLevel))
+			fmt.Printf("     Risk Level: %s%s\n", riskColor, op.RiskLevel.String())
 
 			// Show settings if any
 			if op.Settings != nil {

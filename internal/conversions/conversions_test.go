@@ -11,14 +11,14 @@ import (
 )
 
 func TestNewCleanResult(t *testing.T) {
-	strategy := "test-strategy"
+	strategy := domain.StrategyDryRun
 	items := 5
 	bytes := int64(1024)
 
 	cleanResult := NewCleanResult(strategy, items, bytes)
 
 	if cleanResult.Strategy != strategy {
-		t.Errorf("Expected strategy %s, got %s", strategy, cleanResult.Strategy)
+		t.Errorf("Expected strategy %s, got %s", strategy.String(), cleanResult.Strategy.String())
 	}
 	if cleanResult.ItemsRemoved != items {
 		t.Errorf("Expected items %d, got %d", items, cleanResult.ItemsRemoved)
@@ -38,7 +38,7 @@ func TestNewCleanResult(t *testing.T) {
 }
 
 func TestNewCleanResultWithTiming(t *testing.T) {
-	strategy := "test-strategy"
+	strategy := domain.StrategyDryRun
 	items := 3
 	bytes := int64(2048)
 	cleanTime := time.Duration(5) * time.Second
@@ -49,7 +49,7 @@ func TestNewCleanResultWithTiming(t *testing.T) {
 		t.Errorf("Expected clean time %v, got %v", cleanTime, cleanResult.CleanTime)
 	}
 	if cleanResult.Strategy != strategy {
-		t.Errorf("Expected strategy %s, got %s", strategy, cleanResult.Strategy)
+		t.Errorf("Expected strategy %s, got %s", strategy.String(), cleanResult.Strategy.String())
 	}
 	if cleanResult.ItemsRemoved != items {
 		t.Errorf("Expected items %d, got %d", items, cleanResult.ItemsRemoved)
@@ -60,7 +60,7 @@ func TestNewCleanResultWithTiming(t *testing.T) {
 }
 
 func TestNewCleanResultWithFailures(t *testing.T) {
-	strategy := "test-strategy"
+	strategy := domain.StrategyDryRun
 	itemsRemoved := 8
 	itemsFailed := 2
 	bytes := int64(4096)
@@ -69,7 +69,7 @@ func TestNewCleanResultWithFailures(t *testing.T) {
 	cleanResult := NewCleanResultWithFailures(strategy, itemsRemoved, itemsFailed, bytes, cleanTime)
 
 	if cleanResult.Strategy != strategy {
-		t.Errorf("Expected strategy %s, got %s", strategy, cleanResult.Strategy)
+		t.Errorf("Expected strategy %s, got %s", strategy.String(), cleanResult.Strategy.String())
 	}
 	if cleanResult.ItemsRemoved != itemsRemoved {
 		t.Errorf("Expected items removed %d, got %d", itemsRemoved, cleanResult.ItemsRemoved)
@@ -146,7 +146,7 @@ func TestToCleanResultWithError(t *testing.T) {
 
 func TestToCleanResultWithStrategy(t *testing.T) {
 	bytes := int64(2048)
-	strategy := "custom-strategy"
+	strategy := domain.StrategyDryRun
 	bytesResult := result.Ok(bytes)
 
 	cleanResult := ToCleanResultWithStrategy(bytesResult, strategy)
@@ -159,15 +159,15 @@ func TestToCleanResultWithStrategy(t *testing.T) {
 	if value.FreedBytes != bytes {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
-	if value.Strategy != strategy {
-		t.Errorf("Expected strategy '%s', got %s", strategy, value.Strategy)
+	if value.Strategy.String() != strategy.String() {
+		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
 	}
 }
 
 func TestToCleanResultFromItems(t *testing.T) {
 	itemsRemoved := 5
 	bytes := int64(4096)
-	strategy := "item-strategy"
+	strategy := domain.StrategyDryRun
 	bytesResult := result.Ok(bytes)
 
 	cleanResult := ToCleanResultFromItems(itemsRemoved, bytesResult, strategy)
@@ -183,14 +183,14 @@ func TestToCleanResultFromItems(t *testing.T) {
 	if value.FreedBytes != bytes {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
-	if value.Strategy != strategy {
-		t.Errorf("Expected strategy '%s', got %s", strategy, value.Strategy)
+	if value.Strategy.String() != strategy.String() {
+		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
 	}
 }
 
 func TestToTimedCleanResult(t *testing.T) {
 	bytes := int64(8192)
-	strategy := "timed-strategy"
+	strategy := domain.StrategyDryRun
 	cleanTime := time.Duration(7) * time.Second
 	bytesResult := result.Ok(bytes)
 
@@ -204,8 +204,8 @@ func TestToTimedCleanResult(t *testing.T) {
 	if value.FreedBytes != bytes {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
-	if value.Strategy != strategy {
-		t.Errorf("Expected strategy '%s', got %s", strategy, value.Strategy)
+	if value.Strategy.String() != strategy.String() {
+		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
 	}
 	if value.CleanTime != cleanTime {
 		t.Errorf("Expected clean time %v, got %v", cleanTime, value.CleanTime)
@@ -353,7 +353,7 @@ func TestValidateAndConvertCleanResultInvalid(t *testing.T) {
 	invalidResult := domain.CleanResult{
 		FreedBytes: -1, // Invalid negative bytes
 		CleanedAt:  time.Now(),
-		Strategy:   "test",
+		Strategy:   domain.StrategyDryRun,
 	}
 
 	result := ValidateAndConvertCleanResult(invalidResult)

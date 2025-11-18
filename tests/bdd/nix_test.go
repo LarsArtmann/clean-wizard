@@ -14,7 +14,7 @@ func TestNixCleaningBDD(t *testing.T) {
 		t.Log("✅ Given I have Nix installed")
 
 		// When I run "clean-wizard scan"
-		cmd := exec.CommandContext(context.Background(), "go", "run", "../../cmd/clean-wizard", "scan")
+		cmd := exec.CommandContext(context.Background(), "go", "run", "../../cmd/clean-wizard/main.go", "scan")
 		output, err := cmd.CombinedOutput()
 		// Then I should see generation numbers and dates
 		if err != nil {
