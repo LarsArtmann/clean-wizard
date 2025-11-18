@@ -11,9 +11,9 @@ import (
 // TestBDD_NixGenerationsValidation provides comprehensive BDD tests for Nix generations
 func TestBDD_NixGenerationsValidation(t *testing.T) {
 	feature := BDDFeature{
-		Name:       "Nix Generations Configuration Validation",
+		Name:        "Nix Generations Configuration Validation",
 		Description: "As a system administrator, I want to configure Nix generations cleanup with proper validation and constraints",
-		Background: "The system should validate all Nix generations settings against business rules and safety constraints",
+		Background:  "The system should validate all Nix generations settings against business rules and safety constraints",
 		Scenarios: []BDDScenario{
 			{
 				Name:        "Valid Nix generations within acceptable range",
@@ -23,10 +23,10 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "a configuration with valid Nix generations settings",
 						Setup: func() (*domain.Config, error) {
 							return &domain.Config{
-								Version:    "1.0.0",
-								SafeMode:   true,
+								Version:      "1.0.0",
+								SafeMode:     true,
 								MaxDiskUsage: 50,
-								Protected:  []string{"/System", "/Applications"},
+								Protected:    []string{"/System", "/Applications"},
 								Profiles: map[string]*domain.Profile{
 									"nix-cleanup": {
 										Name:        "Nix Cleanup",
@@ -90,10 +90,10 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "a configuration with Nix generations below minimum",
 						Setup: func() (*domain.Config, error) {
 							return &domain.Config{
-								Version:    "1.0.0",
-								SafeMode:   true,
+								Version:      "1.0.0",
+								SafeMode:     true,
 								MaxDiskUsage: 50,
-								Protected:  []string{"/System", "/Applications"},
+								Protected:    []string{"/System", "/Applications"},
 								Profiles: map[string]*domain.Profile{
 									"nix-cleanup": {
 										Name:        "Nix Cleanup",
@@ -173,10 +173,10 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "a configuration with Nix generations above maximum",
 						Setup: func() (*domain.Config, error) {
 							return &domain.Config{
-								Version:    "1.0.0",
-								SafeMode:   true,
+								Version:      "1.0.0",
+								SafeMode:     true,
 								MaxDiskUsage: 50,
-								Protected:  []string{"/System", "/Applications"},
+								Protected:    []string{"/System", "/Applications"},
 								Profiles: map[string]*domain.Profile{
 									"nix-cleanup": {
 										Name:        "Nix Cleanup",
@@ -256,10 +256,10 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "a configuration with critical Nix operation in unsafe mode",
 						Setup: func() (*domain.Config, error) {
 							return &domain.Config{
-								Version:    "1.0.0",
-								SafeMode:   false, // Unsafe mode
+								Version:      "1.0.0",
+								SafeMode:     false, // Unsafe mode
 								MaxDiskUsage: 50,
-								Protected:  []string{"/System", "/Applications"},
+								Protected:    []string{"/System", "/Applications"},
 								Profiles: map[string]*domain.Profile{
 									"critical-nix": {
 										Name:        "Critical Nix Cleanup",

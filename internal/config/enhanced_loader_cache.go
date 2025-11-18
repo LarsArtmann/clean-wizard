@@ -52,7 +52,7 @@ func (cc *ConfigCache) Get() *domain.Config {
 func (cc *ConfigCache) Set(config *domain.Config) {
 	cc.mu.Lock()
 	defer cc.mu.Unlock()
-	
+
 	cc.config = config
 	cc.loadedAt = time.Now()
 }

@@ -117,7 +117,7 @@ func TestParseCustomDuration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := ParseCustomDuration(tt.input)
-			
+
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("Expected error for input '%s', but got none", tt.input)
@@ -129,12 +129,12 @@ func TestParseCustomDuration(t *testing.T) {
 					t.Errorf("Unexpected error for input '%s': %v", tt.input, err)
 					return
 				}
-				
+
 				if result != tt.expected {
 					t.Errorf("Expected duration %v for input '%s', but got %v", tt.expected, tt.input, result)
 					return
 				}
-				
+
 				t.Logf("✓ Parsed '%s' to %v", tt.input, result)
 			}
 		})
@@ -173,17 +173,17 @@ func TestValidateCustomDuration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := ValidateCustomDuration(tt.input)
-			
+
 			if tt.expectError && err == nil {
 				t.Errorf("Expected error for input '%s', but got none", tt.input)
 				return
 			}
-			
+
 			if !tt.expectError && err != nil {
 				t.Errorf("Unexpected error for input '%s': %v", tt.input, err)
 				return
 			}
-			
+
 			if tt.expectError {
 				t.Logf("✓ Expected error for input '%s': %v", tt.input, err)
 			} else {
@@ -196,9 +196,8 @@ func TestValidateCustomDuration(t *testing.T) {
 // BenchmarkParseCustomDuration benchmarks custom duration parser performance
 func BenchmarkParseCustomDuration(b *testing.B) {
 	testInputs := []string{"1d", "7d", "24h", "30m", "1h30m", "15s"}
-	
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		for _, input := range testInputs {
 			_, _ = ParseCustomDuration(input)
 		}
@@ -208,9 +207,8 @@ func BenchmarkParseCustomDuration(b *testing.B) {
 // BenchmarkParseGoDuration benchmarks Go's native time.ParseDuration
 func BenchmarkParseGoDuration(b *testing.B) {
 	testInputs := []string{"24h", "30m", "1h30m", "15s"}
-	
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		for _, input := range testInputs {
 			_, _ = time.ParseDuration(input)
 		}

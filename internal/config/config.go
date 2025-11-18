@@ -169,7 +169,7 @@ func Save(config *domain.Config) error {
 
 	// Ensure config directory exists
 	configDir := filepath.Dir(configPath)
-	if err := os.MkdirAll(configDir, 0755); err != nil {
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
 

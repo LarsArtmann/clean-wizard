@@ -14,7 +14,7 @@ import (
 
 // Configuration workflow BDD test contexts
 type ConfigurationWorkflowContext struct {
-	tempDir      string
+	tempDir       string
 	configFiles   map[string]string
 	commandOutput string
 	commandError  error
@@ -80,14 +80,14 @@ func InitializeConfigurationWorkflowContext(sc *godog.ScenarioContext) {
 	sc.Then(`^command should complete successfully$`, context.shouldCompleteSuccessfully)
 	sc.Then(`^command should fail with an error$`, context.shouldFailWithError)
 	sc.Then(`^command should fail with validation error$`, context.shouldFailWithError)
-	
+
 	// Specific patterns for configuration output - must come before general patterns
 	sc.Then(`^I should see "failed to load configuration"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Loading configuration from"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Configuration applied:"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Store size:"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "Total generations:"`, context.shouldSeeOutput)
-	
+
 	// Most generic patterns - must come last
 	sc.Then(`^I should see "([^"]+) profile configuration"`, context.shouldSeeOutput)
 	sc.Then(`^I should see "([^"]+)"$`, context.shouldSeeOutput)
@@ -99,7 +99,7 @@ func (c *ConfigurationWorkflowContext) cleanWizardAvailable() error {
 	if err != nil {
 		return fmt.Errorf("failed to get current directory: %w", err)
 	}
-	
+
 	// Find project root by looking for go.mod
 	projectDir := cwd
 	for {
@@ -112,17 +112,17 @@ func (c *ConfigurationWorkflowContext) cleanWizardAvailable() error {
 		}
 		projectDir = parent
 	}
-	
+
 	// Verify clean-wizard is available in PATH or local
 	cmd := exec.Command("go", "run", "./cmd/clean-wizard", "--help")
 	cmd.Dir = projectDir // Ensure we're in project root
-	
+
 	// Capture output for debugging
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to run clean-wizard: %w\nOutput: %s", err, string(output))
 	}
-	
+
 	return nil
 }
 
@@ -159,9 +159,9 @@ profiles:
         description: "Clean Nix generations"
         risk_level: "LOW"
         enabled: true`
-	
+
 	configPath := filepath.Join(c.tempDir, filename)
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveInvalidConfigFile(filename string) error {
@@ -169,9 +169,9 @@ func (c *ConfigurationWorkflowContext) haveInvalidConfigFile(filename string) er
 safe_mode: true
 invalid_field: true
 profiles: []`
-	
+
 	configPath := filepath.Join(c.tempDir, filename)
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveUnsafeConfigFile() error {
@@ -188,9 +188,9 @@ profiles:
       - name: "nix-generations"
         risk_level: "LOW"
         enabled: true`
-	
+
 	configPath := filepath.Join(c.tempDir, "unsafe-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveBasicConfigFile() error {
@@ -202,18 +202,18 @@ profiles:
   daily:
     name: "daily"
     enabled: true`
-	
+
 	configPath := filepath.Join(c.tempDir, "basic-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveIncompleteConfigFile() error {
 	configContent := `version: "1.0.0"
 safe_mode: true
 protected: []`
-	
+
 	configPath := filepath.Join(c.tempDir, "incomplete-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) haveMultiProfileConfigFile() error {
@@ -239,18 +239,18 @@ profiles:
       - name: "package-caches"
         risk_level: "MEDIUM"
         enabled: true`
-	
+
 	configPath := filepath.Join(c.tempDir, "multi-profile-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) configIncludes(table *godog.Table) error {
 	configContent := "version: \"1.0.0\"\nsafe_mode: true\n"
-	
+
 	for _, row := range table.Rows {
 		field := row.Cells[0].Value
 		value := row.Cells[1].Value
-		
+
 		switch field {
 		case "max_disk_usage":
 			configContent += fmt.Sprintf("max_disk_usage: %s\n", value)
@@ -258,9 +258,9 @@ func (c *ConfigurationWorkflowContext) configIncludes(table *godog.Table) error 
 			configContent += fmt.Sprintf("%s: %s\n", field, value)
 		}
 	}
-	
+
 	configPath := filepath.Join(c.tempDir, "table-config.yaml")
-	return ioutil.WriteFile(configPath, []byte(configContent), 0644)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
 }
 
 func (c *ConfigurationWorkflowContext) runCommand(commandStr string) error {
@@ -271,16 +271,16 @@ func (c *ConfigurationWorkflowContext) runCommand(commandStr string) error {
 	commandStr = strings.ReplaceAll(commandStr, "basic-config.yaml", filepath.Join(c.tempDir, "basic-config.yaml"))
 	commandStr = strings.ReplaceAll(commandStr, "incomplete-config.yaml", filepath.Join(c.tempDir, "incomplete-config.yaml"))
 	commandStr = strings.ReplaceAll(commandStr, "multi-profile-config.yaml", filepath.Join(c.tempDir, "multi-profile-config.yaml"))
-	
+
 	// Change to project directory for go run
 	projectDir, _ := filepath.Abs("../../../")
-	
+
 	cmd := exec.Command("bash", "-c", fmt.Sprintf("cd %s && %s", projectDir, commandStr))
 	output, err := cmd.CombinedOutput()
-	
+
 	c.commandOutput = string(output)
 	c.commandError = err
-	
+
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			c.exitCode = exitError.ExitCode()
@@ -290,7 +290,7 @@ func (c *ConfigurationWorkflowContext) runCommand(commandStr string) error {
 	} else {
 		c.exitCode = 0
 	}
-	
+
 	return nil
 }
 

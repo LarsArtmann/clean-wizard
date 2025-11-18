@@ -25,9 +25,9 @@ func (cv *ConfigValidator) validateMaxDiskUsage(value any) error {
 }
 
 // getMaxDiskUsageBounds safely returns min and max bounds for max disk usage
-func (cv *ConfigValidator) getMaxDiskUsageBounds() (min int, max int) {
+func (cv *ConfigValidator) getMaxDiskUsageBounds() (min, max int) {
 	min, max = 0, 100 // Safe defaults
-	
+
 	if cv.rules.MaxDiskUsage != nil {
 		if cv.rules.MaxDiskUsage.Min != nil {
 			min = *cv.rules.MaxDiskUsage.Min

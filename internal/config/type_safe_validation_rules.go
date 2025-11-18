@@ -21,9 +21,9 @@ type TypeSafeValidationRules struct {
 	UniqueProfiles bool `json:"unique_profiles"`
 
 	// Safety Constraints - using typed domain values
-	ProtectedSystemPaths []string                    `json:"protected_system_paths"`
-	DefaultProtectedPaths []string                    `json:"default_protected_paths"`
-	RequireSafeMode      bool                        `json:"require_safe_mode"`
+	ProtectedSystemPaths  []string `json:"protected_system_paths"`
+	DefaultProtectedPaths []string `json:"default_protected_paths"`
+	RequireSafeMode       bool     `json:"require_safe_mode"`
 
 	// Risk Constraints - using type-safe enums
 	MaxRiskLevel   domain.RiskLevelType `json:"max_risk_level"`
@@ -32,9 +32,9 @@ type TypeSafeValidationRules struct {
 
 // NumericValidationRule provides type-safe numeric validation
 type NumericValidationRule struct {
-	Required bool `json:"required"`
-	Min      *int `json:"min,omitempty"`
-	Max      *int `json:"max,omitempty"`
+	Required bool   `json:"required"`
+	Min      *int   `json:"min,omitempty"`
+	Max      *int   `json:"max,omitempty"`
 	Message  string `json:"message,omitempty"`
 }
 
@@ -114,11 +114,11 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidationRules {
 	// Deep copy to prevent external modifications
 	copied := &TypeSafeValidationRules{
-		UniquePaths:    tsvr.UniquePaths,
-		UniqueProfiles: tsvr.UniqueProfiles,
+		UniquePaths:     tsvr.UniquePaths,
+		UniqueProfiles:  tsvr.UniqueProfiles,
 		RequireSafeMode: tsvr.RequireSafeMode,
-		MaxRiskLevel:   tsvr.MaxRiskLevel,
-		BackupRequired: tsvr.BackupRequired,
+		MaxRiskLevel:    tsvr.MaxRiskLevel,
+		BackupRequired:  tsvr.BackupRequired,
 	}
 
 	// Deep copy slices

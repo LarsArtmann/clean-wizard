@@ -13,21 +13,21 @@ import (
 func ParseCustomDuration(durationStr string) (time.Duration, error) {
 	// Trim whitespace first
 	durationStr = strings.TrimSpace(durationStr)
-	
+
 	if durationStr == "" {
 		return 0, fmt.Errorf("empty duration string")
 	}
-	
+
 	// Check if it's already a valid Go duration
 	if goDuration, err := time.ParseDuration(durationStr); err == nil {
 		return goDuration, nil
 	}
-	
+
 	// Custom parsing for "d" (days) unit
 	if strings.HasSuffix(durationStr, "d") {
 		return parseDaysDuration(durationStr)
 	}
-	
+
 	// Try other custom formats
 	return parseComplexDuration(durationStr)
 }
@@ -39,16 +39,16 @@ func parseDaysDuration(durationStr string) (time.Duration, error) {
 	if len(matches) != 2 {
 		return 0, fmt.Errorf("invalid days duration format: %s", durationStr)
 	}
-	
+
 	days, err := strconv.ParseFloat(matches[1], 64)
 	if err != nil {
 		return 0, fmt.Errorf("invalid days value: %v", err)
 	}
-	
+
 	// Convert days to hours (24 hours per day)
 	hours := days * 24
 	goDurationStr := fmt.Sprintf("%.0fh", hours)
-	
+
 	return time.ParseDuration(goDurationStr)
 }
 
@@ -64,7 +64,7 @@ func ValidateCustomDuration(durationStr string) error {
 	if durationStr == "" {
 		return fmt.Errorf("duration cannot be empty")
 	}
-	
+
 	_, err := ParseCustomDuration(durationStr)
 	return err
 }

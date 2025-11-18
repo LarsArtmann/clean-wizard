@@ -68,7 +68,7 @@ func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	
+
 	switch strings.ToUpper(s) {
 	case "LOW":
 		*rl = RiskLevelLowType
@@ -167,7 +167,7 @@ func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	
+
 	switch strings.ToUpper(s) {
 	case "NONE":
 		*vl = ValidationLevelNoneType
@@ -236,7 +236,7 @@ func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	
+
 	switch strings.ToUpper(s) {
 	case "ADDED":
 		*co = ChangeOperationAddedType
@@ -301,7 +301,7 @@ func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	
+
 	switch strings.ToLower(s) {
 	case "aggressive":
 		*cs = StrategyAggressiveType

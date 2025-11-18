@@ -8,7 +8,7 @@ import (
 
 // NewConfigCommand creates config command
 func NewConfigCommand() *cobra.Command {
-	var configCmd = &cobra.Command{
+	configCmd := &cobra.Command{
 		Use:   "config",
 		Short: "Manage configuration",
 	}

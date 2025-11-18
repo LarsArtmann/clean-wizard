@@ -19,7 +19,7 @@ type NixCleaner struct {
 }
 
 // NewNixCleaner creates Nix cleaner with proper configuration
-func NewNixCleaner(verbose bool, dryRun bool) *NixCleaner {
+func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
 	nc := &NixCleaner{
 		adapter: adapters.NewNixAdapter(0, 0),
 		verbose: verbose,
@@ -52,15 +52,15 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 	if settings == nil || settings.NixGenerations == nil {
 		return nil // Settings are optional
 	}
-	
+
 	if settings.NixGenerations.Generations < 1 {
 		return fmt.Errorf("Generations to keep must be at least 1, got: %d", settings.NixGenerations.Generations)
 	}
-	
+
 	if settings.NixGenerations.Generations > 10 {
 		return fmt.Errorf("Generations to keep must not exceed 10, got: %d", settings.NixGenerations.Generations)
 	}
-	
+
 	return nil
 }
 

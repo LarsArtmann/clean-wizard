@@ -29,7 +29,7 @@ func (cv *ConfigValidator) validateProfileName(name string) error {
 	if name == "" {
 		return fmt.Errorf("profile name cannot be empty")
 	}
-	
+
 	// Use configured regex pattern if available
 	if cv.rules.ProfileNamePattern != nil {
 		if cv.rules.ProfileNamePattern.Pattern != "" {
@@ -50,7 +50,7 @@ func (cv *ConfigValidator) validateProfileName(name string) error {
 		// Pattern field exists but is empty - use default validation
 		return fmt.Errorf("profile name pattern is configured but empty")
 	}
-	
+
 	// No pattern rule configured - use reasonable default validation
 	// Only allow alphanumeric characters, underscores, and hyphens
 	for _, char := range name {

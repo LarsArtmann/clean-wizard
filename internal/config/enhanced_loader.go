@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"slices"
 	"time"
@@ -9,7 +10,7 @@ import (
 )
 
 // applyValidation applies validation at the specified level
-func (ecl *EnhancedConfigLoader) applyValidation(config *domain.Config, level ValidationLevel) *ValidationResult {
+func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *domain.Config, level ValidationLevel) *ValidationResult {
 	switch level {
 	case ValidationLevelNone:
 		return &ValidationResult{IsValid: true, Timestamp: time.Now()}
@@ -72,9 +73,12 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, re
 
 	// Require specific protected paths
 	requiredPaths := ecl.validator.rules.ProtectedSystemPaths
-	// Fallback to literals if rules slice is nil/empty
+	// Fallback to DefaultProtectedPaths if rules slice is nil/empty (maintaining consistency with sanitizer)
 	if len(requiredPaths) == 0 {
-		requiredPaths = []string{"/System", "/Library"}
+		requiredPaths = ecl.validator.rules.DefaultProtectedPaths
+		if len(requiredPaths) == 0 {
+			requiredPaths = []string{"/System", "/Library"} // Final fallback
+		}
 	}
 	for _, required := range requiredPaths {
 		if !ecl.isPathProtected(config.Protected, required) {
@@ -114,7 +118,7 @@ func (ecl *EnhancedConfigLoader) isPathProtected(protected []string, target stri
 // mapValidatorRulesToSchemaRules converts validator rules to stable schema rules
 func (ecl *EnhancedConfigLoader) mapValidatorRulesToSchemaRules() *ConfigValidationRules {
 	rules := ecl.validator.rules
-	
+
 	// Create a copy to prevent external modifications to internal state
 	schemaRules := &ConfigValidationRules{
 		// Numeric Constraints
@@ -122,27 +126,27 @@ func (ecl *EnhancedConfigLoader) mapValidatorRulesToSchemaRules() *ConfigValidat
 		MinProtectedPaths: rules.MinProtectedPaths,
 		MaxProfiles:       rules.MaxProfiles,
 		MaxOperations:     rules.MaxOperations,
-		
+
 		// String Constraints
 		ProfileNamePattern: rules.ProfileNamePattern,
 		PathPattern:        rules.PathPattern,
-		
+
 		// Array Constraints
 		UniquePaths:    rules.UniquePaths,
 		UniqueProfiles: rules.UniqueProfiles,
-		
+
 		// Safety Constraints
 		ProtectedSystemPaths: make([]string, len(rules.ProtectedSystemPaths)),
 		RequireSafeMode:      rules.RequireSafeMode,
-		
+
 		// Risk Constraints
 		MaxRiskLevel:   rules.MaxRiskLevel,
-		BackupRequired:  rules.BackupRequired,
+		BackupRequired: rules.BackupRequired,
 	}
-	
+
 	// Deep copy slice to prevent modifications
 	copy(schemaRules.ProtectedSystemPaths, rules.ProtectedSystemPaths)
-	
+
 	return schemaRules
 }
 
@@ -171,11 +175,11 @@ func (ecl *EnhancedConfigLoader) formatValidationErrors(errors []ValidationError
 	if len(errors) == 0 {
 		return "no errors"
 	}
-	
+
 	var messages []string
 	for _, err := range errors {
 		messages = append(messages, fmt.Sprintf("%s: %s", err.Field, err.Message))
 	}
-	
+
 	return fmt.Sprintf("%d validation errors: %s", len(errors), fmt.Sprintf("%v", messages))
 }

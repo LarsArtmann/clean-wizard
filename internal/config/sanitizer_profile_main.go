@@ -78,9 +78,9 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 		result.addChange("max_disk_usage", 0, cfg.MaxDiskUsage, "applied default max disk usage")
 	}
 
-	// Ensure default protected paths
+	// Ensure default protected paths using centralized source
 	if len(cfg.Protected) == 0 {
-		cfg.Protected = []string{"/System", "/Applications", "/Library"}
+		cfg.Protected = cs.rules.DefaultProtectedPaths
 		result.addChange("protected", []string{}, cfg.Protected, "applied default protected paths")
 	}
 

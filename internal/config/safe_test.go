@@ -4,8 +4,15 @@ import (
 	"strings"
 	"testing"
 	"time"
-	
+
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+)
+
+// Test constants for invalid risk levels to improve readability and maintainability
+const (
+	testInvalidRiskUnknown  = domain.RiskLevelType(99)  // Unknown risk value outside valid range
+	testInvalidRiskNegative = domain.RiskLevelType(-1)  // Negative risk value
+	testInvalidRiskTooHigh  = domain.RiskLevelType(100) // Risk value above maximum
 )
 
 // contains helper function
@@ -23,7 +30,7 @@ func TestRiskLevel_String(t *testing.T) {
 		{"medium risk", domain.RiskMedium, "MEDIUM"},
 		{"high risk", domain.RiskHigh, "HIGH"},
 		{"critical risk", domain.RiskCritical, "CRITICAL"},
-		{"unknown risk", domain.RiskLevelType(99), "UNKNOWN"},
+		{"unknown risk", testInvalidRiskUnknown, "UNKNOWN"},
 	}
 
 	for _, tt := range tests {
@@ -46,7 +53,7 @@ func TestRiskLevel_Icon(t *testing.T) {
 		{"medium risk", domain.RiskMedium, "🟡"},
 		{"high risk", domain.RiskHigh, "🟠"},
 		{"critical risk", domain.RiskCritical, "🔴"},
-		{"unknown risk", domain.RiskLevelType(99), "⚪"},
+		{"unknown risk", testInvalidRiskUnknown, "⚪"},
 	}
 
 	for _, tt := range tests {
@@ -69,9 +76,9 @@ func TestRiskLevel_IsValid(t *testing.T) {
 		{"medium risk", domain.RiskMedium, true},
 		{"high risk", domain.RiskHigh, true},
 		{"critical risk", domain.RiskCritical, true},
-		{"unknown risk", domain.RiskLevelType(99), false},
-		{"negative risk", domain.RiskLevelType(-1), false},
-		{"too high risk", domain.RiskLevelType(100), false},
+		{"unknown risk", testInvalidRiskUnknown, false},
+		{"negative risk", testInvalidRiskNegative, false},
+		{"too high risk", testInvalidRiskTooHigh, false},
 	}
 
 	for _, tt := range tests {
