@@ -38,6 +38,7 @@ type ValidationMiddleware struct {
 	validator *ConfigValidator
 	sanitizer *ConfigSanitizer
 	logger    ValidationLogger
+	options   *ValidationMiddlewareOptions
 }
 
 // ValidationLogger interface for validation logging
@@ -45,6 +46,13 @@ type ValidationLogger interface {
 	LogValidation(result *ValidationResult)
 	LogSanitization(result *SanitizationResult)
 	LogError(field, operation string, err error)
+}
+
+// ValidationMiddlewareOptions provides configuration for validation middleware
+type ValidationMiddlewareOptions struct {
+	RequireSafeModeConfirmation bool   `json:"require_safe_mode_confirmation"`
+	EnableDetailedLogging       bool   `json:"enable_detailed_logging"`
+	Environment                string `json:"environment"` // "development", "production", etc.
 }
 
 // DefaultValidationLogger provides default logging implementation
@@ -85,6 +93,27 @@ func NewDefaultValidationLogger(enableDetailed bool) *DefaultValidationLogger {
 	}
 }
 
+// WithRequireSafeModeConfirmation enables safe mode confirmation requirement
+func WithRequireSafeModeConfirmation(require bool) func(*ValidationMiddlewareOptions) {
+	return func(opts *ValidationMiddlewareOptions) {
+		opts.RequireSafeModeConfirmation = require
+	}
+}
+
+// WithEnvironment sets the environment for validation middleware
+func WithEnvironment(env string) func(*ValidationMiddlewareOptions) {
+	return func(opts *ValidationMiddlewareOptions) {
+		opts.Environment = env
+	}
+}
+
+// WithDetailedLogging enables detailed logging in validation middleware
+func WithDetailedLogging(enable bool) func(*ValidationMiddlewareOptions) {
+	return func(opts *ValidationMiddlewareOptions) {
+		opts.EnableDetailedLogging = enable
+	}
+}
+
 // LogValidation logs validation results
 func (l *DefaultValidationLogger) LogValidation(result *ValidationResult) {
 	if l.enableDetailedLogging {
@@ -113,10 +142,29 @@ func (l *DefaultValidationLogger) LogError(field, operation string, err error) {
 
 // NewValidationMiddleware creates comprehensive validation middleware
 func NewValidationMiddleware() *ValidationMiddleware {
+	return NewValidationMiddlewareWithOptions()
+}
+
+// NewValidationMiddlewareWithOptions creates middleware with custom options
+func NewValidationMiddlewareWithOptions(options ...func(*ValidationMiddlewareOptions)) *ValidationMiddleware {
+	opts := &ValidationMiddlewareOptions{
+		RequireSafeModeConfirmation: false,
+		EnableDetailedLogging:       true,
+		Environment:                "development",
+	}
+
+	for _, opt := range options {
+		opt(opts)
+	}
+
+	validator := NewConfigValidator()
+	logger := NewDefaultValidationLogger(opts.EnableDetailedLogging)
+
 	return &ValidationMiddleware{
-		validator: NewConfigValidator(),
+		validator: validator,
 		sanitizer: NewConfigSanitizer(),
-		logger:    NewDefaultValidationLogger(false),
+		logger:    logger,
+		options:   opts,
 	}
 }
 
@@ -126,6 +174,11 @@ func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddl
 		validator: NewConfigValidator(),
 		sanitizer: NewConfigSanitizer(),
 		logger:    logger,
+		options: &ValidationMiddlewareOptions{
+			RequireSafeModeConfirmation: false,
+			EnableDetailedLogging:       false,
+			Environment:                "development",
+		},
 	}
 }
 
