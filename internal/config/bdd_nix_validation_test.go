@@ -8,6 +8,99 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// Builder helpers for BDD test scenarios
+
+// newBaseNixConfig creates a common config skeleton for Nix tests
+func newBaseNixConfig(safeMode bool) *domain.Config {
+	return &domain.Config{
+		Version:      "1.0.0",
+		SafeMode:     safeMode,
+		MaxDiskUsage: 50,
+		Protected:    []string{"/System", "/Applications"},
+		Profiles: map[string]*domain.Profile{
+			"nix-cleanup": {
+				Name:        "Nix Cleanup",
+				Description: "Clean Nix generations",
+				Operations: []domain.CleanupOperation{
+					{
+						Name:        "nix-generations",
+						Description: "Clean old Nix generations",
+						RiskLevel:   domain.RiskLow,
+						Enabled:     true,
+						Settings: &domain.OperationSettings{
+							NixGenerations: &domain.NixGenerationsSettings{
+								Generations: 3,
+								Optimize:    true,
+							},
+						},
+					},
+				},
+				Enabled: true,
+			},
+		},
+	}
+}
+
+// withGenerations sets/updates the nix-generations operation Generations value
+func withGenerations(cfg *domain.Config, generations int) *domain.Config {
+	// Find the nix-cleanup profile and its nix-generations operation
+	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
+		for i, op := range profile.Operations {
+			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
+				profile.Operations[i].Settings.NixGenerations.Generations = generations
+				break
+			}
+		}
+	}
+	return cfg
+}
+
+// withRiskLevel adjusts the operation RiskLevel and Enabled flags
+func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Config {
+	// Find the nix-cleanup profile and its nix-generations operation
+	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
+		for i, op := range profile.Operations {
+			if op.Name == "nix-generations" {
+				profile.Operations[i].RiskLevel = level
+				// Auto-disable critical operations in unsafe mode
+				if level == domain.RiskCritical && !cfg.SafeMode {
+					profile.Operations[i].Enabled = false
+				}
+				break
+			}
+		}
+	}
+	return cfg
+}
+
+// withOptimize sets the Optimize flag for nix-generations
+func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
+	// Find the nix-cleanup profile and its nix-generations operation
+	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
+		for i, op := range profile.Operations {
+			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
+				profile.Operations[i].Settings.NixGenerations.Optimize = optimize
+				break
+			}
+		}
+	}
+	return cfg
+}
+
+// withEnabled sets the Enabled flag for nix-generations operation
+func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
+	// Find the nix-cleanup profile and its nix-generations operation
+	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
+		for i, op := range profile.Operations {
+			if op.Name == "nix-generations" {
+				profile.Operations[i].Enabled = enabled
+				break
+			}
+		}
+	}
+	return cfg
+}
+
 // TestBDD_NixGenerationsValidation provides comprehensive BDD tests for Nix generations
 func TestBDD_NixGenerationsValidation(t *testing.T) {
 	feature := BDDFeature{
@@ -22,33 +115,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 					{
 						Description: "a configuration with valid Nix generations settings",
 						Setup: func() (*domain.Config, error) {
-							return &domain.Config{
-								Version:      "1.0.0",
-								SafeMode:     true,
-								MaxDiskUsage: 50,
-								Protected:    []string{"/System", "/Applications"},
-								Profiles: map[string]*domain.Profile{
-									"nix-cleanup": {
-										Name:        "Nix Cleanup",
-										Description: "Clean Nix generations",
-										Operations: []domain.CleanupOperation{
-											{
-												Name:        "nix-generations",
-												Description: "Clean old Nix generations",
-												RiskLevel:   domain.RiskLow,
-												Enabled:     true,
-												Settings: &domain.OperationSettings{
-													NixGenerations: &domain.NixGenerationsSettings{
-														Generations: 3,
-														Optimize:    true,
-													},
-												},
-											},
-										},
-										Enabled: true,
-									},
-								},
-							}, nil
+							return newBaseNixConfig(true), nil
 						},
 					},
 				},
@@ -89,33 +156,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 					{
 						Description: "a configuration with Nix generations below minimum",
 						Setup: func() (*domain.Config, error) {
-							return &domain.Config{
-								Version:      "1.0.0",
-								SafeMode:     true,
-								MaxDiskUsage: 50,
-								Protected:    []string{"/System", "/Applications"},
-								Profiles: map[string]*domain.Profile{
-									"nix-cleanup": {
-										Name:        "Nix Cleanup",
-										Description: "Clean Nix generations",
-										Operations: []domain.CleanupOperation{
-											{
-												Name:        "nix-generations",
-												Description: "Clean old Nix generations",
-												RiskLevel:   domain.RiskLow,
-												Enabled:     true,
-												Settings: &domain.OperationSettings{
-													NixGenerations: &domain.NixGenerationsSettings{
-														Generations: 0, // Below minimum
-														Optimize:    true,
-													},
-												},
-											},
-										},
-										Enabled: true,
-									},
-								},
-							}, nil
+							return withGenerations(newBaseNixConfig(true), 0), nil
 						},
 					},
 				},
@@ -172,33 +213,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 					{
 						Description: "a configuration with Nix generations above maximum",
 						Setup: func() (*domain.Config, error) {
-							return &domain.Config{
-								Version:      "1.0.0",
-								SafeMode:     true,
-								MaxDiskUsage: 50,
-								Protected:    []string{"/System", "/Applications"},
-								Profiles: map[string]*domain.Profile{
-									"nix-cleanup": {
-										Name:        "Nix Cleanup",
-										Description: "Clean Nix generations",
-										Operations: []domain.CleanupOperation{
-											{
-												Name:        "nix-generations",
-												Description: "Clean old Nix generations",
-												RiskLevel:   domain.RiskLow,
-												Enabled:     true,
-												Settings: &domain.OperationSettings{
-													NixGenerations: &domain.NixGenerationsSettings{
-														Generations: 15, // Above maximum
-														Optimize:    true,
-													},
-												},
-											},
-										},
-										Enabled: true,
-									},
-								},
-							}, nil
+							return withGenerations(newBaseNixConfig(true), 15), nil
 						},
 					},
 				},
@@ -255,33 +270,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 					{
 						Description: "a configuration with critical Nix operation in unsafe mode",
 						Setup: func() (*domain.Config, error) {
-							return &domain.Config{
-								Version:      "1.0.0",
-								SafeMode:     false, // Unsafe mode
-								MaxDiskUsage: 50,
-								Protected:    []string{"/System", "/Applications"},
-								Profiles: map[string]*domain.Profile{
-									"critical-nix": {
-										Name:        "Critical Nix Cleanup",
-										Description: "Critical Nix generations cleanup",
-										Operations: []domain.CleanupOperation{
-											{
-												Name:        "nix-generations",
-												Description: "Critical Nix cleanup",
-												RiskLevel:   domain.RiskCritical, // Critical risk
-												Enabled:     true,
-												Settings: &domain.OperationSettings{
-													NixGenerations: &domain.NixGenerationsSettings{
-														Generations: 1,
-														Optimize:    false,
-													},
-												},
-											},
-										},
-										Enabled: true,
-									},
-								},
-							}, nil
+							return withRiskLevel(withGenerations(withOptimize(newBaseNixConfig(false), false), 1), domain.RiskCritical), nil
 						},
 					},
 				},
