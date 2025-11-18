@@ -40,12 +40,20 @@ type SanitizationRules struct {
 	DefaultProtectedPaths []string      `json:"default_protected_paths"`
 }
 
+// SanitizationChange represents a specific field change with context
+type SanitizationChange struct {
+	Original  any       `json:"original"`
+	Sanitized any       `json:"sanitized"`
+	Reason    string    `json:"reason"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
 // SanitizationResult contains sanitization outcomes
 type SanitizationResult struct {
-	SanitizedFields []string              `json:"sanitized_fields"`
-	Warnings        []SanitizationWarning `json:"warnings"`
-	Changes         map[string]any        `json:"changes"`
-	Timestamp       time.Time             `json:"timestamp"`
+	SanitizedFields []string                        `json:"sanitized_fields"`
+	Warnings        []SanitizationWarning           `json:"warnings"`
+	Changes         map[string]*SanitizationChange   `json:"changes"`
+	Timestamp       time.Time                        `json:"timestamp"`
 }
 
 // SanitizationWarning represents a sanitization warning
@@ -83,7 +91,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 	result := &SanitizationResult{
 		SanitizedFields: []string{},
 		Warnings:        []SanitizationWarning{},
-		Changes:         make(map[string]any),
+		Changes:         make(map[string]*SanitizationChange),
 		Timestamp:       time.Now(),
 	}
 
@@ -181,11 +189,11 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 
 func (r *SanitizationResult) addChange(field string, original, sanitized any, reason string) {
 	r.SanitizedFields = append(r.SanitizedFields, field)
-	r.Changes[field] = map[string]any{
-		"original":  original,
-		"sanitized": sanitized,
-		"reason":    reason,
-		"timestamp": time.Now(),
+	r.Changes[field] = &SanitizationChange{
+		Original:  original,
+		Sanitized: sanitized,
+		Reason:    reason,
+		Timestamp: time.Now(),
 	}
 }
 
