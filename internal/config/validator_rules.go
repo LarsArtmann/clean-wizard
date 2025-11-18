@@ -1,6 +1,9 @@
 package config
 
 import (
+	"regexp"
+	"sync"
+
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -38,6 +41,10 @@ type ValidationRule[T comparable] struct {
 	Enum     []T    `json:"enum,omitempty"`
 	Pattern  string `json:"pattern,omitempty"`
 	Message  string `json:"message,omitempty"`
+	
+	// Compiled regex for pattern validation (cached)
+	compiledRegex *regexp.Regexp
+	regexOnce     sync.Once
 }
 
 // ValidationSeverity represents error severity levels
@@ -48,6 +55,20 @@ const (
 	SeverityWarning ValidationSeverity = "warning"
 	SeverityInfo    ValidationSeverity = "info"
 )
+
+// GetCompiledRegex returns the compiled regex pattern, creating it once if needed
+func (vr *ValidationRule[T]) GetCompiledRegex() *regexp.Regexp {
+	vr.regexOnce.Do(func() {
+		if vr.Pattern != "" {
+			if compiled, err := regexp.Compile(vr.Pattern); err == nil {
+				vr.compiledRegex = compiled
+			}
+			// Note: If compilation fails, vr.compiledRegex remains nil
+			// and validation will fail gracefully in validateProfileName
+		}
+	})
+	return vr.compiledRegex
+}
 
 // getDefaultValidationRules returns default validation constraints
 func getDefaultValidationRules() *ConfigValidationRules {
