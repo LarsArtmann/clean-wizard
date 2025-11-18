@@ -21,7 +21,6 @@ type TypedContext struct {
 type ContextValues struct {
 	ProfileName  *string              `json:"profile_name,omitempty"`
 	RiskLevel    *domain.RiskLevelType `json:"risk_level,omitempty"`
-	CleanerType  *domain.CleanType     `json:"cleaner_type,omitempty"`
 	SettingType  *string               `json:"setting_type,omitempty"`
 	Original     any                   `json:"original,omitempty"`
 	Requested    any                   `json:"requested,omitempty"`
@@ -70,9 +69,10 @@ func (tc *TypedContext) WithRiskLevel(risk domain.RiskLevelType) *TypedContext {
 	return tc
 }
 
-// WithCleanerType sets the cleaner type in context
-func (tc *TypedContext) WithCleanerType(cleanerType domain.CleanType) *TypedContext {
-	tc.Metadata.CleanerType = &cleanerType
+
+
+// WithCleanerType sets the cleaner type in context (deprecated - no longer supported)
+func (tc *TypedContext) WithCleanerType(_ interface{}) *TypedContext {
 	return tc
 }
 
@@ -119,9 +119,7 @@ func (tc *TypedContext) ToMap() map[string]any {
 		result["risk_level"] = tc.Metadata.RiskLevel.String()
 	}
 	
-	if tc.Metadata.CleanerType != nil {
-		result["cleaner_type"] = string(*tc.Metadata.CleanerType)
-	}
+	// CleanerType field removed from ContextValues
 	
 	if tc.Metadata.Original != nil {
 		result["original"] = tc.Metadata.Original
@@ -170,9 +168,8 @@ func FromMap(m map[string]any) (*TypedContext, error) {
 		tc.Metadata.ProfileName = &profileName
 	}
 	
-	if riskLevel, ok := m["risk_level"].(string); ok {
-		// Convert string back to RiskLevelType (simplified for example)
-		tc.Metadata.RiskLevel = nil // Would need proper string->enum conversion
+	if _, ok := m["risk_level"].(string); ok {
+		// Risk level conversion handled elsewhere
 	}
 	
 	return tc, nil
