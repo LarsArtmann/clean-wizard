@@ -66,6 +66,17 @@ func (g NixGeneration) Validate() error {
 	return nil
 }
 
+// EstimateSize estimates the size of this generation in bytes
+// This is a rough estimate used when actual size calculation is not available
+func (g NixGeneration) EstimateSize() int64 {
+	// Rough estimate: 50MB per generation as baseline with adjustments
+	// Older generations tend to be larger, newer ones smaller
+	baseSize := int64(50 * 1024 * 1024) // 50MB base
+	age := time.Since(g.Date)
+	ageFactor := int64(age.Hours() / 24 / 30) // Age in months
+	return baseSize + (ageFactor * 10 * 1024 * 1024) // Add 10MB per month
+}
+
 // ScanType represents different scanning domains
 type ScanType string
 
