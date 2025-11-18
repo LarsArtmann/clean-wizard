@@ -128,9 +128,10 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 				}
 			}
 
-			// Check warnings count - warnings are tracked differently now
-			// TODO: Update test to check ValidationResult.Warnings instead
-			_ = tt.expectedWarnings // Suppress unused variable warning
+			// Check warnings count using ValidationResult.Warnings
+			if len(validationResult.Warnings) != tt.expectedWarnings {
+				t.Errorf("Expected %d warnings, got %d: %v", tt.expectedWarnings, len(validationResult.Warnings), validationResult.Warnings)
+			}
 		})
 	}
 }
