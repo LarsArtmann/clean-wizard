@@ -2,7 +2,7 @@ package errors
 
 import (
 	"fmt"
-	"maps"
+
 	"runtime"
 	"strings"
 	"time"
@@ -99,13 +99,27 @@ func (e ErrorLevel) String() string {
 	}
 }
 
+// ErrorDetails represents strongly-typed error context information
+type ErrorDetails struct {
+	Field       string `json:"field,omitempty"`
+	Value       string `json:"value,omitempty"`
+	Expected    string `json:"expected,omitempty"`
+	Actual      string `json:"actual,omitempty"`
+	Operation   string `json:"operation,omitempty"`
+	FilePath    string `json:"file_path,omitempty"`
+	LineNumber  int    `json:"line_number,omitempty"`
+	RetryCount  int    `json:"retry_count,omitempty"`
+	Duration    string `json:"duration,omitempty"`
+	Metadata    map[string]string `json:"metadata,omitempty"`
+}
+
 // CleanWizardError represents structured error with context
 type CleanWizardError struct {
 	Code      ErrorCode
 	Level     ErrorLevel
 	Message   string
 	Operation string
-	Details   map[string]any
+	Details   *ErrorDetails `json:"details,omitempty"`
 	Timestamp time.Time
 	Stack     string
 }
@@ -116,9 +130,38 @@ func (e *CleanWizardError) Error() string {
 		return fmt.Sprintf("[%s] %s: %s", e.Level.String(), e.Code.String(), e.Message)
 	}
 
-	details := make([]string, 0, len(e.Details))
-	for key, value := range e.Details {
-		details = append(details, fmt.Sprintf("%s=%v", key, value))
+	var details []string
+	if e.Details.Field != "" {
+		details = append(details, fmt.Sprintf("field=%s", e.Details.Field))
+	}
+	if e.Details.Value != "" {
+		details = append(details, fmt.Sprintf("value=%s", e.Details.Value))
+	}
+	if e.Details.Expected != "" {
+		details = append(details, fmt.Sprintf("expected=%s", e.Details.Expected))
+	}
+	if e.Details.Actual != "" {
+		details = append(details, fmt.Sprintf("actual=%s", e.Details.Actual))
+	}
+	if e.Details.Operation != "" {
+		details = append(details, fmt.Sprintf("operation=%s", e.Details.Operation))
+	}
+	if e.Details.FilePath != "" {
+		details = append(details, fmt.Sprintf("file=%s", e.Details.FilePath))
+	}
+	if e.Details.LineNumber > 0 {
+		details = append(details, fmt.Sprintf("line=%d", e.Details.LineNumber))
+	}
+	if e.Details.RetryCount > 0 {
+		details = append(details, fmt.Sprintf("retries=%d", e.Details.RetryCount))
+	}
+	if e.Details.Duration != "" {
+		details = append(details, fmt.Sprintf("duration=%s", e.Details.Duration))
+	}
+
+	// Add metadata details
+	for key, value := range e.Details.Metadata {
+		details = append(details, fmt.Sprintf("%s=%s", key, value))
 	}
 
 	return fmt.Sprintf("[%s] %s: %s (details: %s)",
@@ -136,7 +179,7 @@ func NewError(code ErrorCode, message string) *CleanWizardError {
 		Code:      code,
 		Level:     LevelError,
 		Message:   message,
-		Details:   make(map[string]any),
+		Details:   nil,
 		Timestamp: time.Now(),
 		Stack:     captureStack(),
 	}
@@ -148,14 +191,14 @@ func NewErrorWithLevel(code ErrorCode, level ErrorLevel, message string) *CleanW
 		Code:      code,
 		Level:     level,
 		Message:   message,
-		Details:   make(map[string]any),
+		Details:   nil,
 		Timestamp: time.Now(),
 		Stack:     captureStack(),
 	}
 }
 
 // NewErrorWithDetails creates new CleanWizardError with context details
-func NewErrorWithDetails(code ErrorCode, message string, details map[string]any) *CleanWizardError {
+func NewErrorWithDetails(code ErrorCode, message string, details *ErrorDetails) *CleanWizardError {
 	err := &CleanWizardError{
 		Code:      code,
 		Level:     LevelError,
@@ -163,11 +206,6 @@ func NewErrorWithDetails(code ErrorCode, message string, details map[string]any)
 		Details:   details,
 		Timestamp: time.Now(),
 		Stack:     captureStack(),
-	}
-
-	// Add automatic details
-	if err.Details == nil {
-		err.Details = make(map[string]any)
 	}
 
 	return err
@@ -182,9 +220,66 @@ func (e *CleanWizardError) WithOperation(operation string) *CleanWizardError {
 // WithDetail adds single detail to error
 func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 	if e.Details == nil {
-		e.Details = make(map[string]any)
+		e.Details = &ErrorDetails{
+			Metadata: make(map[string]string),
+		}
 	}
-	e.Details[key] = value
+
+	switch key {
+	case "field":
+		if v, ok := value.(string); ok {
+			e.Details.Field = v
+		}
+	case "value":
+		if v, ok := value.(string); ok {
+			e.Details.Value = v
+		} else {
+			e.Details.Value = fmt.Sprintf("%v", value)
+		}
+	case "expected":
+		if v, ok := value.(string); ok {
+			e.Details.Expected = v
+		} else {
+			e.Details.Expected = fmt.Sprintf("%v", value)
+		}
+	case "actual":
+		if v, ok := value.(string); ok {
+			e.Details.Actual = v
+		} else {
+			e.Details.Actual = fmt.Sprintf("%v", value)
+		}
+	case "operation":
+		if v, ok := value.(string); ok {
+			e.Details.Operation = v
+		}
+	case "file_path":
+		if v, ok := value.(string); ok {
+			e.Details.FilePath = v
+		}
+	case "line_number":
+		if v, ok := value.(int); ok {
+			e.Details.LineNumber = v
+		}
+	case "retry_count":
+		if v, ok := value.(int); ok {
+			e.Details.RetryCount = v
+		}
+	case "duration":
+		if v, ok := value.(string); ok {
+			e.Details.Duration = v
+		} else if d, ok := value.(time.Duration); ok {
+			e.Details.Duration = d.String()
+		} else {
+			e.Details.Duration = fmt.Sprintf("%v", value)
+		}
+	default:
+		// Store unknown keys in metadata
+		if e.Details.Metadata == nil {
+			e.Details.Metadata = make(map[string]string)
+		}
+		e.Details.Metadata[key] = fmt.Sprintf("%v", value)
+	}
+
 	return e
 }
 
@@ -244,7 +339,38 @@ func (e *CleanWizardError) Log() {
 	}
 
 	if e.Details != nil {
-		maps.Copy(fields, e.Details)
+		if e.Details.Field != "" {
+			fields["detail_field"] = e.Details.Field
+		}
+		if e.Details.Value != "" {
+			fields["detail_value"] = e.Details.Value
+		}
+		if e.Details.Expected != "" {
+			fields["detail_expected"] = e.Details.Expected
+		}
+		if e.Details.Actual != "" {
+			fields["detail_actual"] = e.Details.Actual
+		}
+		if e.Details.Operation != "" {
+			fields["detail_operation"] = e.Details.Operation
+		}
+		if e.Details.FilePath != "" {
+			fields["detail_file_path"] = e.Details.FilePath
+		}
+		if e.Details.LineNumber > 0 {
+			fields["detail_line_number"] = e.Details.LineNumber
+		}
+		if e.Details.RetryCount > 0 {
+			fields["detail_retry_count"] = e.Details.RetryCount
+		}
+		if e.Details.Duration != "" {
+			fields["detail_duration"] = e.Details.Duration
+		}
+
+		// Add metadata
+		for key, value := range e.Details.Metadata {
+			fields["meta_"+key] = value
+		}
 	}
 
 	entry := logrus.WithFields(fields)
