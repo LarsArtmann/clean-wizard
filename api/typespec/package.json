@@ -1,0 +1,22 @@
+{
+  "name": "@clean-wizard/api-spec",
+  "version": "1.0.0",
+  "description": "Clean Wizard Public API Specification",
+  "main": "clean-wizard.tsp",
+  "scripts": {
+    "build": "tsp compile . --output ./generated",
+    "emit": "tsp compile . --output ./generated --emit @typespec/http",
+    "validate": "tsp compile . --output ./generated --no-emit",
+    "docs": "tsp compile . --output ./generated --emit @typespec/openapi3"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest", 
+    "@typespec/rest": "latest",
+    "@typespec/openapi3": "latest",
+    "@typespec/versioning": "latest"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
