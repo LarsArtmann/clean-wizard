@@ -71,6 +71,14 @@ func NewConfigSanitizerWithRules(rules *SanitizationRules) *ConfigSanitizer {
 
 // SanitizeConfig performs comprehensive configuration sanitization
 func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *ValidationResult) {
+	start := time.Now()
+	defer func() {
+		// Update validation result duration if provided
+		if validationResult != nil {
+			validationResult.Duration += time.Since(start)
+		}
+	}()
+
 	result := &SanitizationResult{
 		SanitizedFields: []string{},
 		Warnings:        []SanitizationWarning{},

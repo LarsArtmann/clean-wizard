@@ -170,7 +170,10 @@ type CleanResult struct {
 
 // IsValid checks if clean result is valid
 func (cr CleanResult) IsValid() bool {
-	return cr.FreedBytes >= 0 && cr.ItemsRemoved >= 0 && cr.CleanedAt.IsZero() == false
+	return cr.FreedBytes >= 0 && 
+		   cr.ItemsRemoved >= 0 && 
+		   cr.CleanedAt.IsZero() == false && 
+		   cr.Strategy.IsValid()
 }
 
 // Validate returns errors for invalid clean result
@@ -183,6 +186,9 @@ func (cr CleanResult) Validate() error {
 	}
 	if cr.CleanedAt.IsZero() {
 		return fmt.Errorf("CleanedAt cannot be zero")
+	}
+	if !cr.Strategy.IsValid() {
+		return fmt.Errorf("Invalid strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", cr.Strategy)
 	}
 	return nil
 }

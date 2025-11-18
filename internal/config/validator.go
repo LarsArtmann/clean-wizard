@@ -114,7 +114,10 @@ func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	case "protected":
 		return cv.validateProtectedPaths(value)
 	case "profiles":
-		return cv.validateProfiles(value)
+		if cfg, ok := value.(*domain.Config); ok {
+			return cv.validateProfiles(cfg)
+		}
+		return fmt.Errorf("profiles validation requires *domain.Config, got %T", value)
 	default:
 		return fmt.Errorf("unknown field: %s", field)
 	}

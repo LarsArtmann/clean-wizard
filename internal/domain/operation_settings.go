@@ -1,9 +1,5 @@
 package domain
 
-import (
-	"time"
-)
-
 // OperationSettings provides type-safe configuration for different operation types
 // This eliminates map[string]any violations while maintaining flexibility
 type OperationSettings struct {
@@ -130,7 +126,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 				Value:   os.TempFiles.OlderThan,
 			}
 		}
-		if _, err := time.ParseDuration(os.TempFiles.OlderThan); err != nil {
+		if _, err := ParseCustomDuration(os.TempFiles.OlderThan); err != nil {
 			return &ValidationError{
 				Field:   "temp_files.older_than",
 				Message: "older_than must be a valid duration (e.g., '7d', '24h')",
