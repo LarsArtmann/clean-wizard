@@ -118,10 +118,12 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 				Field:     warning.Field,
 				Message:   warning.Reason,
 				Suggestion: fmt.Sprintf("Value was changed from %v to %v", warning.Original, warning.Sanitized),
-				Context: map[string]any{
-					"original":  warning.Original,
-					"sanitized": warning.Sanitized,
-					"field":     warning.Field,
+				Context: &ValidationContext{
+					Metadata: map[string]string{
+						"original":  fmt.Sprintf("%v", warning.Original),
+						"sanitized": fmt.Sprintf("%v", warning.Sanitized),
+						"field":     warning.Field,
+					},
 				},
 			})
 		}

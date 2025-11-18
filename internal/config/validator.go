@@ -35,6 +35,20 @@ type ValidationSanitizedData struct {
 	AppliedProfiles []string `json:"applied_profiles,omitempty"`
 }
 
+// ValidationContext provides strongly-typed validation context information
+type ValidationContext struct {
+	ConfigPath      string            `json:"config_path,omitempty"`
+	ValidationLevel string            `json:"validation_level,omitempty"`
+	Profile         string            `json:"profile,omitempty"`
+	Section         string            `json:"section,omitempty"`
+	MinValue        any               `json:"min_value,omitempty"`
+	MaxValue        any               `json:"max_value,omitempty"`
+	AllowedValues   []string          `json:"allowed_values,omitempty"`
+	ReferencedField string            `json:"referenced_field,omitempty"`
+	Constraints     map[string]string `json:"constraints,omitempty"`
+	Metadata        map[string]string `json:"metadata,omitempty"`
+}
+
 // ValidationError represents a specific validation error
 type ValidationError struct {
 	Field      string             `json:"field"`
@@ -43,15 +57,15 @@ type ValidationError struct {
 	Message    string             `json:"message"`
 	Severity   ValidationSeverity `json:"severity"`
 	Suggestion string             `json:"suggestion,omitempty"`
-	Context    map[string]any     `json:"context,omitempty"`
+	Context    *ValidationContext `json:"context,omitempty"`
 }
 
 // ValidationWarning represents a non-critical validation issue
 type ValidationWarning struct {
-	Field      string         `json:"field"`
-	Message    string         `json:"message"`
-	Suggestion string         `json:"suggestion,omitempty"`
-	Context    map[string]any `json:"context,omitempty"`
+	Field      string             `json:"field"`
+	Message    string             `json:"message"`
+	Suggestion string             `json:"suggestion,omitempty"`
+	Context    *ValidationContext `json:"context,omitempty"`
 }
 
 // NewConfigValidator creates a comprehensive configuration validator

@@ -25,9 +25,9 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 			Message:    err.Error(),
 			Severity:   SeverityError,
 			Suggestion: suggestion,
-			Context: map[string]any{
-				"min": minUsage,
-				"max": maxUsage,
+			Context: &ValidationContext{
+				MinValue: minUsage,
+				MaxValue: maxUsage,
 			},
 		})
 	}
@@ -76,9 +76,11 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 				Field:      "safe_mode",
 				Message:    "Critical risk operations enabled while safe_mode is false",
 				Suggestion: "Enable safe_mode or review critical risk operations",
-				Context: map[string]any{
-					"max_risk_level": maxRisk,
-					"safe_mode":      cfg.SafeMode,
+				Context: &ValidationContext{
+					Metadata: map[string]string{
+						"max_risk_level": maxRisk.String(),
+						"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode),
+					},
 				},
 			})
 		}
@@ -92,9 +94,11 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 					Field:      fmt.Sprintf("profiles.%s.operations", name),
 					Message:    fmt.Sprintf("Profile '%s' has %d operations, exceeding recommended limit (%d)", name, len(profile.Operations), *cv.rules.MaxOperations.Max),
 					Suggestion: "Consider splitting operations into multiple profiles",
-					Context: map[string]any{
-						"operation_count": len(profile.Operations),
-						"max_operations":  *cv.rules.MaxOperations.Max,
+					Context: &ValidationContext{
+						Metadata: map[string]string{
+							"operation_count": fmt.Sprintf("%d", len(profile.Operations)),
+							"max_operations":  fmt.Sprintf("%d", *cv.rules.MaxOperations.Max),
+						},
 					},
 				})
 			}
