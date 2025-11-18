@@ -10,6 +10,17 @@ import (
 // sanitizeProfiles sanitizes profiles and their operations
 func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *SanitizationResult) {
 	for name, profile := range cfg.Profiles {
+		// Check for nil profile to prevent panic
+		if profile == nil {
+			result.Warnings = append(result.Warnings, SanitizationWarning{
+				Field:     fmt.Sprintf("profiles.%s", name),
+				Original:  nil,
+				Sanitized: nil,
+				Reason:    fmt.Sprintf("Profile '%s' is nil, skipping sanitization", name),
+			})
+			continue
+		}
+
 		// Sanitize profile name
 		if cs.rules.TrimWhitespace {
 			original := profile.Name
@@ -86,6 +97,11 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 
 	// Apply defaults to profiles
 	for name, profile := range cfg.Profiles {
+		// Check for nil profile to prevent panic
+		if profile == nil {
+			continue
+		}
+
 		if profile.Name == "" {
 			profile.Name = name
 			result.addChange(fmt.Sprintf("profiles.%s.name", name), "", profile.Name, "applied default profile name")

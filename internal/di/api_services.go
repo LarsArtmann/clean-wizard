@@ -1,17 +1,8 @@
 package di
 
-import (
-	"context"
-	"encoding/json"
-	"net/http"
-
-	"github.com/LarsArtmann/clean-wizard/internal/api"
-	"github.com/LarsArtmann/clean-wizard/internal/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
-)
-
-// ConfigAPIService handles API operations for configuration
-// Replaces manual HTTP handling with proper service architecture
+// TODO: Implement API services when service types are defined
+/*
+// ConfigAPIService provides API operations for configuration management
 type ConfigAPIService struct {
 	configService     *config.Service
 	validationService *domain.ValidationService
@@ -47,81 +38,62 @@ func (s *ConfigAPIService) GetConfig(ctx context.Context) (*api.PublicConfig, er
 		return nil, err
 	}
 	
-	return publicConfig.Unwrap(), nil
+	return publicConfig, nil
 }
 
 // UpdateConfig updates configuration with validation
-// Accepts API format and converts to domain model
-func (s *ConfigAPIService) UpdateConfig(ctx context.Context, publicConfig *api.PublicConfig) (*api.PublicConfig, error) {
-	// Convert API config to domain model
+// Accepts API format and converts to domain format
+func (s *ConfigAPIService) UpdateConfig(ctx context.Context, publicConfig *api.PublicConfig) error {
+	// Convert to domain format
 	domainConfig, err := s.mapper.MapConfigToDomain(publicConfig)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	
-	// Validate updated configuration
-	if err := s.validationService.ValidateConfig(ctx, domainConfig.Unwrap()); err != nil {
-		return nil, err
+	// Validate configuration
+	if err := s.validationService.ValidateConfig(ctx, domainConfig); err != nil {
+		return err
 	}
 	
 	// Update configuration
-	updatedConfig, err := s.configService.UpdateConfig(ctx, domainConfig.Unwrap())
-	if err != nil {
-		return nil, err
-	}
-	
-	// Convert back to API format
-	returnPublicConfig, err := s.mapper.MapConfigToPublic(updatedConfig)
-	if err != nil {
-		return nil, err
-	}
-	
-	return returnPublicConfig.Unwrap(), nil
+	return s.configService.UpdateConfig(ctx, domainConfig)
 }
 
-// ScanConfig performs configuration scanning
-// Returns scan results in API format
-func (s *ConfigAPIService) ScanConfig(ctx context.Context, publicConfig *api.PublicConfig) (*api.PublicScanResult, error) {
-	// Convert API config to domain model
+// ValidateConfig validates configuration without updating
+// Returns validation result with detailed errors
+func (s *ConfigAPIService) ValidateConfig(ctx context.Context, publicConfig *api.PublicConfig) (*api.PublicValidationResult, error) {
+	// Convert to domain format
 	domainConfig, err := s.mapper.MapConfigToDomain(publicConfig)
 	if err != nil {
 		return nil, err
 	}
 	
 	// Validate configuration
-	if err := s.validationService.ValidateConfig(ctx, domainConfig.Unwrap()); err != nil {
+	result := s.validationService.ValidateConfig(ctx, domainConfig)
+	
+	// Convert validation result to API format
+	publicResult, err := s.mapper.MapValidationResultToPublic(result)
+	if err != nil {
 		return nil, err
 	}
 	
-	// Perform scan
-	scanResult, err := s.configService.ScanConfig(ctx, domainConfig.Unwrap())
+	return publicResult, nil
+}
+
+// GetScanResult returns latest scan result in API format
+func (s *ConfigAPIService) GetScanResult(ctx context.Context) (*api.PublicScanResult, error) {
+	// Get domain scan result
+	domainResult, err := s.configService.GetLatestScanResult(ctx)
 	if err != nil {
 		return nil, err
 	}
 	
 	// Convert to API format
-	publicScanResult := s.mapper.MapScanResultToPublic(scanResult)
-	return publicScanResult.Unwrap(), nil
-}
-
-// WriteJSONResponse is a utility for HTTP response writing
-// Will be replaced by gin middleware in the future
-func (s *ConfigAPIService) WriteJSONResponse(w http.ResponseWriter, status int, data interface{}) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(data)
-}
-
-// WriteErrorResponse is a utility for error response writing
-// Will be replaced by gin middleware in the future
-func (s *ConfigAPIService) WriteErrorResponse(w http.ResponseWriter, status int, err error) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	
-	errorResponse := map[string]interface{}{
-		"error": err.Error(),
-		"code":  status,
+	publicResult, err := s.mapper.MapScanResultToPublic(domainResult)
+	if err != nil {
+		return nil, err
 	}
 	
-	json.NewEncoder(w).Encode(errorResponse)
+	return publicResult, nil
 }
+*/

@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
@@ -68,26 +69,48 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 
 // validateCrossFieldConstraints validates relationships between fields
 func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, result *ValidationResult) {
-	// Safe mode vs risk level consistency
+	// Safe mode vs risk level consistency - only if no per-operation critical risk errors
 	if !cfg.SafeMode {
 		maxRisk := cv.findMaxRiskLevel(cfg)
 		if maxRisk == domain.RiskCritical {
-			result.Warnings = append(result.Warnings, ValidationWarning{
-				Field:      "safe_mode",
-				Message:    "Critical risk operations enabled while safe_mode is false",
-				Suggestion: "Enable safe_mode or review critical risk operations",
-				Context: &ValidationContext{
-					Metadata: map[string]string{
-						"max_risk_level": maxRisk.String(),
-						"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode),
+			// Check if we already have per-operation critical risk errors
+			hasCriticalRiskErrors := false
+			for _, err := range result.Errors {
+				if strings.Contains(err.Field, "risk_level") && strings.Contains(err.Message, "Critical risk operation") {
+					hasCriticalRiskErrors = true
+					break
+				}
+			}
+			
+			// Only add warning if no per-operation errors exist
+			if !hasCriticalRiskErrors {
+				result.Warnings = append(result.Warnings, ValidationWarning{
+					Field:      "safe_mode",
+					Message:    "Critical risk operations enabled while safe_mode is false",
+					Suggestion: "Enable safe_mode or review critical risk operations",
+					Context: &ValidationContext{
+						Metadata: map[string]string{
+							"max_risk_level": maxRisk.String(),
+							"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode),
+						},
 					},
-				},
-			})
+				})
+			}
 		}
 	}
 
 	// Validate operation count per profile
 	for name, profile := range cfg.Profiles {
+		// Check for nil profile to prevent panic
+		if profile == nil {
+			result.Warnings = append(result.Warnings, ValidationWarning{
+				Field:      fmt.Sprintf("profiles.%s", name),
+				Message:    fmt.Sprintf("Profile '%s' is nil", name),
+				Suggestion: "Remove or define the profile",
+			})
+			continue
+		}
+
 		if cv.rules.MaxOperations != nil && cv.rules.MaxOperations.Max != nil {
 			if len(profile.Operations) > *cv.rules.MaxOperations.Max {
 				result.Warnings = append(result.Warnings, ValidationWarning{

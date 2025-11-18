@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -12,13 +13,14 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName 
 
 	// Validate settings first
 	if err := settings.ValidateSettings(opType); err != nil {
-		// Convert validation errors to warnings since the result type doesn't have an Errors field
-		if validationErr, ok := err.(*domain.ValidationError); ok {
+		// Convert validation errors to warnings since we're in sanitization
+		var vErr *domain.ValidationError
+		if errors.As(err, &vErr) {
 			result.Warnings = append(result.Warnings, SanitizationWarning{
-				Field:     fieldPrefix + "." + validationErr.Field,
-				Original:  validationErr.Value,
-				Sanitized: validationErr.Value,
-				Reason:    validationErr.Message,
+				Field:     fieldPrefix + "." + vErr.Field,
+				Original:  vErr.Value,
+				Sanitized: vErr.Value,
+				Reason:    vErr.Message,
 			})
 		} else {
 			result.Warnings = append(result.Warnings, SanitizationWarning{

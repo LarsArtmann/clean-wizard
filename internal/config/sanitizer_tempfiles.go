@@ -15,18 +15,21 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, setting
 	}
 
 	// Sanitize older_than duration
+	originalOlderThan := settings.OlderThan
+	
 	if cs.rules.TrimWhitespace && settings.OlderThan != "" {
-		original := settings.OlderThan
 		settings.OlderThan = strings.TrimSpace(settings.OlderThan)
-		if original != settings.OlderThan {
-			result.addChange(fieldPrefix+".older_than", original, settings.OlderThan, "trimmed whitespace")
+		if originalOlderThan != settings.OlderThan {
+			result.addChange(fieldPrefix+".older_than", originalOlderThan, settings.OlderThan, "trimmed whitespace")
 		}
+	}
 
-		// Validate duration format using custom parser
+	// Always validate duration format if not empty (regardless of TrimWhitespace flag)
+	if settings.OlderThan != "" {
 		if _, err := domain.ParseCustomDuration(settings.OlderThan); err != nil {
 			result.Warnings = append(result.Warnings, SanitizationWarning{
 				Field:     fieldPrefix + ".older_than",
-				Original:  settings.OlderThan,
+				Original:  originalOlderThan, // Use original pre-trim value
 				Sanitized: settings.OlderThan,
 				Reason:    fmt.Sprintf("invalid duration format: %v", err),
 			})
@@ -45,6 +48,12 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, setting
 
 			if cs.rules.NormalizePaths {
 				exclude = filepath.Clean(exclude)
+			}
+
+			// Skip empty entries or entries that normalize to "." to avoid excluding current directory
+			if exclude == "" || exclude == "." {
+				result.addChange(fmt.Sprintf("%s.excludes[%d]", fieldPrefix, i), original, "", "removed empty or current directory reference")
+				continue
 			}
 
 			if original != exclude {

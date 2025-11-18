@@ -45,7 +45,8 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 
 	// Validate successful mapping
 	if domainConfigResult.IsErr() {
-		t.Fatalf("Expected successful mapping, got error: %v", domainConfigResult.UnwrapErr())
+		err, _ := domainConfigResult.SafeError()
+		t.Fatalf("Expected successful mapping, got error: %v", err)
 	}
 
 	domainConfig, err := domainConfigResult.Unwrap()
@@ -86,7 +87,7 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 		t.Errorf("Expected operation name 'nix-cleanup', got %s", operation.Name)
 	}
 
-	if operation.RiskLevel != domain.RiskLowType {
+	if operation.RiskLevel != domain.RiskLow {
 		t.Errorf("Expected risk level LOW, got %v", operation.RiskLevel)
 	}
 }
@@ -105,7 +106,7 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 					{
 						Name:        "test-op",
 						Description: "Test operation",
-						RiskLevel:   domain.RiskMediumType,
+						RiskLevel:   domain.RiskMedium,
 						Enabled:     true,
 						Settings: domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
@@ -119,10 +120,14 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 
 	// Validate successful mapping
 	if publicConfigResult.IsErr() {
-		t.Fatalf("Expected successful mapping, got error: %v", publicConfigResult.Unwrap())
+		err, _ := publicConfigResult.SafeError()
+		t.Fatalf("Expected successful mapping, got error: %v", err)
 	}
 
-	publicConfig := publicConfigResult.Unwrap()
+	publicConfig, err := publicConfigResult.Unwrap()
+	if err != nil {
+		t.Fatalf("Expected successful unwrap, got error: %v", err)
+	}
 
 	// Validate mapped values
 	if publicConfig.Version != domainConfig.Version {
@@ -161,10 +166,14 @@ func TestMapCleanResultToPublic_ValidResult(t *testing.T) {
 
 	// Validate successful mapping
 	if publicResultResult.IsErr() {
-		t.Fatalf("Expected successful mapping, got error: %v", publicResultResult.Unwrap())
+		err, _ := publicResultResult.SafeError()
+		t.Fatalf("Expected successful mapping, got error: %v", err)
 	}
 
-	publicResult := publicResultResult.Unwrap()
+	publicResult, err := publicResultResult.Unwrap()
+	if err != nil {
+		t.Fatalf("Expected successful unwrap, got error: %v", err)
+	}
 
 	// Validate mapped values
 	if !publicResult.Success {
@@ -194,10 +203,10 @@ func TestMapRiskLevel_Conversions(t *testing.T) {
 		public  PublicRiskLevel
 		domain  domain.RiskLevelType
 	}{
-		{PublicRiskLow, domain.RiskLowType},
-		{PublicRiskMedium, domain.RiskMediumType},
-		{PublicRiskHigh, domain.RiskHighType},
-		{PublicRiskCritical, domain.RiskCriticalType},
+		{PublicRiskLow, domain.RiskLow},
+		{PublicRiskMedium, domain.RiskMedium},
+		{PublicRiskHigh, domain.RiskHigh},
+		{PublicRiskCritical, domain.RiskCritical},
 	}
 
 	for _, tc := range testCases {

@@ -62,10 +62,7 @@ func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Confi
 		for i, op := range profile.Operations {
 			if op.Name == "nix-generations" {
 				profile.Operations[i].RiskLevel = level
-				// Auto-disable critical operations in unsafe mode
-				if level == domain.RiskCritical && !cfg.SafeMode {
-					profile.Operations[i].Enabled = false
-				}
+				// Note: Let validator handle critical risk + unsafe mode logic
 				break
 			}
 		}

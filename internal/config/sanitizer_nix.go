@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -10,14 +11,14 @@ func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(fieldPrefix string, se
 		return
 	}
 
-	// Sanitize generations range (ensure 1-10)
-	original := settings.Generations
-	if settings.Generations < 1 {
-		settings.Generations = 1
-		result.addChange(fieldPrefix+".generations", original, settings.Generations, "clamped to minimum value")
-	} else if settings.Generations > 10 {
-		settings.Generations = 10
-		result.addChange(fieldPrefix+".generations", original, settings.Generations, "clamped to maximum value")
+	// Validate generations range (ensure 1-1000)
+	if settings.Generations < 1 || settings.Generations > 1000 {
+		result.Warnings = append(result.Warnings, SanitizationWarning{
+			Field:     fieldPrefix + ".generations",
+			Original:  settings.Generations,
+			Sanitized: settings.Generations,
+			Reason:    fmt.Sprintf("Nix generations must be between 1 and 1000, got %d", settings.Generations),
+		})
 	}
 
 	result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".nix_generations")

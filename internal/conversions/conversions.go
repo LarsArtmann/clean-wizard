@@ -26,8 +26,8 @@ import (
 //	fmt.Printf("Freed %d bytes", result.FreedBytes)
 func NewCleanResult(strategy domain.CleanStrategy, itemsRemoved int, freedBytes int64) domain.CleanResult {
 	return domain.CleanResult{
-		FreedBytes:   freedBytes,
-		ItemsRemoved: itemsRemoved,
+		FreedBytes:   uint64(freedBytes),
+		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  0,
 		CleanTime:    0, // Will be set by caller
 		CleanedAt:    time.Now(),
@@ -57,8 +57,8 @@ func NewCleanResult(strategy domain.CleanStrategy, itemsRemoved int, freedBytes 
 //	result := NewCleanResultWithTiming(domain.StrategyAggressive, 5, 1024*1024*100, cleanTime)
 func NewCleanResultWithTiming(strategy domain.CleanStrategy, itemsRemoved int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
 	return domain.CleanResult{
-		FreedBytes:   freedBytes,
-		ItemsRemoved: itemsRemoved,
+		FreedBytes:   uint64(freedBytes),
+		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  0,
 		CleanTime:    cleanTime,
 		CleanedAt:    time.Now(),
@@ -87,9 +87,9 @@ func NewCleanResultWithTiming(strategy domain.CleanStrategy, itemsRemoved int, f
 //	fmt.Printf("Success: %d, Failed: %d", result.ItemsRemoved, result.ItemsFailed)
 func NewCleanResultWithFailures(strategy domain.CleanStrategy, itemsRemoved, itemsFailed int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
 	return domain.CleanResult{
-		FreedBytes:   freedBytes,
-		ItemsRemoved: itemsRemoved,
-		ItemsFailed:  itemsFailed,
+		FreedBytes:   uint64(freedBytes),
+		ItemsRemoved: uint(itemsRemoved),
+		ItemsFailed:  uint(itemsFailed),
 		CleanTime:    cleanTime,
 		CleanedAt:    time.Now(),
 		Strategy:     strategy,
@@ -240,9 +240,9 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	allSameStrategy := true
 
 	for _, result := range results {
-		totalItems += result.ItemsRemoved
-		totalFailed += result.ItemsFailed
-		totalBytes += result.FreedBytes
+		totalItems += int(result.ItemsRemoved)
+		totalFailed += int(result.ItemsFailed)
+		totalBytes += int64(result.FreedBytes)
 		if result.CleanTime > maxTime {
 			maxTime = result.CleanTime
 		}
@@ -268,7 +268,7 @@ func ExtractBytesFromCleanResult(cleanResult result.Result[domain.CleanResult]) 
 	}
 
 	cleanValue := cleanResult.Value()
-	return result.Ok(cleanValue.FreedBytes)
+	return result.Ok[int64](int64(cleanValue.FreedBytes))
 }
 
 // ToCleanResultFromError converts error to Result[domain.CleanResult]

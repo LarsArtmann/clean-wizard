@@ -7,9 +7,37 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// validateOperationRisk checks if an operation violates safe mode + critical risk rule
+func (cv *ConfigValidator) validateOperationRisk(cfg *domain.Config, profileName string, op domain.CleanupOperation) *ValidationError {
+	if op.RiskLevel == domain.RiskCritical && !cfg.SafeMode {
+		return &ValidationError{
+			Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", profileName, op.Name),
+			Rule:       "security",
+			Value:      op.RiskLevel,
+			Message:    fmt.Sprintf("Critical risk operation '%s' requires safe mode enabled", op.Name),
+			Severity:   SeverityError,
+			Suggestion: "Enable safe mode or remove critical risk operations",
+		}
+	}
+	return nil
+}
+
 // validateBusinessLogic validates business logic constraints
 func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *ValidationResult) {
 	for name, profile := range cfg.Profiles {
+		// Check for nil profile to prevent panic
+		if profile == nil {
+			result.Errors = append(result.Errors, ValidationError{
+				Field:      fmt.Sprintf("profiles.%s", name),
+				Rule:       "business_logic",
+				Value:      nil,
+				Message:    fmt.Sprintf("Profile '%s' is nil", name),
+				Severity:   SeverityError,
+				Suggestion: "Remove or define the profile",
+			})
+			continue
+		}
+
 		// Validate profile business logic
 		if len(profile.Operations) == 0 {
 			result.Errors = append(result.Errors, ValidationError{
@@ -24,16 +52,9 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 
 		// Validate operations within profile
 		for _, op := range profile.Operations {
-			// Validate risk vs safe mode
-			if !cfg.SafeMode && op.RiskLevel == domain.RiskCritical {
-				result.Errors = append(result.Errors, ValidationError{
-					Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", name, op.Name),
-					Rule:       "business_logic",
-					Value:      op.RiskLevel,
-					Message:    fmt.Sprintf("Critical risk operation '%s' not allowed in unsafe mode", op.Name),
-					Severity:   SeverityError,
-					Suggestion: "Enable safe mode or remove critical risk operation",
-				})
+			// Validate critical risk + safe mode constraint using helper
+			if err := cv.validateOperationRisk(cfg, name, op); err != nil {
+				result.Errors = append(result.Errors, *err)
 			}
 
 			// Validate operation settings
@@ -54,11 +75,16 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 	}
 
 	// Validate protected paths don't conflict with operation targets
-	for _, profile := range cfg.Profiles {
+	for profileKey, profile := range cfg.Profiles {
+		// Check for nil profile to prevent panic
+		if profile == nil {
+			continue
+		}
+
 		for _, op := range profile.Operations {
 			if err := cv.validateProtectedPathsConflict(cfg.Protected, op); err != nil {
 				result.Warnings = append(result.Warnings, ValidationWarning{
-					Field:      fmt.Sprintf("profiles.%s.operations.%s", profile.Name, op.Name),
+					Field:      fmt.Sprintf("profiles.%s.operations.%s", profileKey, op.Name),
 					Message:    fmt.Sprintf("Operation may affect protected paths: %v", err),
 					Suggestion: "Review operation scope and protected paths configuration",
 				})
@@ -99,16 +125,14 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 
 	// Validate no profiles have critical operations without explicit consent
 	for name, profile := range cfg.Profiles {
+		// Check for nil profile to prevent panic
+		if profile == nil {
+			continue
+		}
+
 		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskCritical && !cfg.SafeMode {
-				result.Errors = append(result.Errors, ValidationError{
-					Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", name, op.Name),
-					Rule:       "security",
-					Value:      op.RiskLevel,
-					Message:    fmt.Sprintf("Critical risk operation '%s' requires safe mode enabled", op.Name),
-					Severity:   SeverityError,
-					Suggestion: "Enable safe mode or remove critical risk operations",
-				})
+			if err := cv.validateOperationRisk(cfg, name, op); err != nil {
+				result.Errors = append(result.Errors, *err)
 			}
 		}
 	}
@@ -159,6 +183,11 @@ func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.Cleanu
 func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel {
 	maxRisk := domain.RiskLow
 	for _, profile := range cfg.Profiles {
+		// Check for nil profile to prevent panic
+		if profile == nil {
+			continue
+		}
+
 		for _, op := range profile.Operations {
 			if op.RiskLevel == domain.RiskCritical {
 				return domain.RiskCritical

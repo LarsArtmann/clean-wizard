@@ -62,9 +62,11 @@ func (vr *ValidationRule[T]) GetCompiledRegex() *regexp.Regexp {
 		if vr.Pattern != "" {
 			if compiled, err := regexp.Compile(vr.Pattern); err == nil {
 				vr.compiledRegex = compiled
+			} else {
+				// On compile error, use safe always-false regex fallback
+				// This regex never matches anything, ensuring safety
+				vr.compiledRegex, _ = regexp.Compile("(?!)")
 			}
-			// Note: If compilation fails, vr.compiledRegex remains nil
-			// and validation will fail gracefully in validateProfileName
 		}
 	})
 	return vr.compiledRegex
