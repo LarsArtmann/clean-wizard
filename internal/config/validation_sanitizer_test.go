@@ -20,7 +20,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			config: &domain.Config{
 				Version:      "  1.0.0  ",
 				SafeMode:     true,
-				MaxDiskUsage:  50,
+				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library"},
 				Profiles: map[string]*domain.Profile{
 					"daily": {
@@ -46,7 +46,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			config: &domain.Config{
 				Version:      "1.0.0",
 				SafeMode:     true,
-				MaxDiskUsage:  150, // Will be clamped to 95
+				MaxDiskUsage: 150, // Will be clamped to 95
 				Protected:    []string{"/System", "/Library"},
 				Profiles: map[string]*domain.Profile{
 					"daily": {
@@ -72,7 +72,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			config: &domain.Config{
 				Version:      "1.0.0",
 				SafeMode:     true,
-				MaxDiskUsage:  50,
+				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library", "/System"}, // Duplicate /System
 				Profiles: map[string]*domain.Profile{
 					"daily": {

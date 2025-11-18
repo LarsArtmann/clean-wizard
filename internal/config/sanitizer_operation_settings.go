@@ -7,9 +7,9 @@ import (
 )
 
 // sanitizeOperationSettings sanitizes operation settings with type safety
-func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix string, operationName string, settings *domain.OperationSettings, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName string, settings *domain.OperationSettings, result *SanitizationResult) {
 	opType := domain.GetOperationType(operationName)
-	
+
 	// Validate settings first
 	if err := settings.ValidateSettings(opType); err != nil {
 		// Convert validation errors to warnings since the result type doesn't have an Errors field
@@ -35,16 +35,16 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix string, operati
 	switch opType {
 	case domain.OperationTypeNixGenerations:
 		cs.sanitizeNixGenerationsSettings(fieldPrefix, settings.NixGenerations, result)
-		
+
 	case domain.OperationTypeTempFiles:
 		cs.sanitizeTempFilesSettings(fieldPrefix, settings.TempFiles, result)
-		
+
 	case domain.OperationTypeHomebrew:
 		cs.sanitizeHomebrewSettings(fieldPrefix, settings.Homebrew, result)
-		
+
 	case domain.OperationTypeSystemTemp:
 		cs.sanitizeSystemTempSettings(fieldPrefix, settings.SystemTemp, result)
-		
+
 	default:
 		// For custom operation types, just record that they were processed
 		result.Warnings = append(result.Warnings, SanitizationWarning{

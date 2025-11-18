@@ -81,7 +81,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 				},
 			})
 		}
-		
+
 		// Check for suspicious path patterns
 		if strings.Contains(path, "..") {
 			result.Errors = append(result.Errors, ValidationError{
@@ -94,7 +94,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 			})
 		}
 	}
-	
+
 	// Validate no profiles have critical operations without explicit consent
 	for name, profile := range cfg.Profiles {
 		for _, op := range profile.Operations {

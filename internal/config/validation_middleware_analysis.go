@@ -183,7 +183,7 @@ func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domai
 	if profile == nil {
 		return domain.RiskHigh
 	}
-	
+
 	maxRisk := domain.RiskLow
 	for _, op := range profile.Operations {
 		if op.RiskLevel == domain.RiskCritical {

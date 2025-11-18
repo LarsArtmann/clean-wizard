@@ -1,8 +1,9 @@
 package commands
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"strings"
+
+	"github.com/LarsArtmann/clean-wizard/internal/config"
 )
 
 // ParseValidationLevel converts string to ValidationLevel

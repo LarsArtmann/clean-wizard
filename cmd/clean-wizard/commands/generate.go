@@ -11,7 +11,7 @@ import (
 func NewGenerateCommand() *cobra.Command {
 	var outputFile string
 	var template string
-	
+
 	generateCmd := &cobra.Command{
 		Use:   "generate",
 		Short: "Generate configuration templates",
@@ -26,7 +26,7 @@ Available templates:
 			if len(args) > 0 {
 				template = args[0]
 			}
-			
+
 			return generateConfigTemplate(template, outputFile)
 		},
 	}
@@ -39,9 +39,9 @@ Available templates:
 }
 
 // generateConfigTemplate generates the specified configuration template
-func generateConfigTemplate(template string, outputFile string) error {
+func generateConfigTemplate(template, outputFile string) error {
 	var content string
-	
+
 	switch template {
 	case "simple":
 		content = getSimpleTemplate()
@@ -54,17 +54,17 @@ func generateConfigTemplate(template string, outputFile string) error {
 	default:
 		return fmt.Errorf("unknown template: %s. Available: simple, working, minimal, advanced", template)
 	}
-	
+
 	// Write to file
-	err := os.WriteFile(outputFile, []byte(content), 0644)
+	err := os.WriteFile(outputFile, []byte(content), 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to write configuration file: %w", err)
 	}
-	
+
 	fmt.Printf("✅ Configuration template '%s' generated: %s\n", template, outputFile)
 	fmt.Printf("💡 Edit the file to customize your cleanup strategy\n")
 	fmt.Printf("🏃 Run 'clean-wizard scan --config %s' to test configuration\n", outputFile)
-	
+
 	return nil
 }
 

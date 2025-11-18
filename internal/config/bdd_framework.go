@@ -9,7 +9,7 @@ import (
 // BDDFeature represents a BDD feature for behavior-driven development
 type BDDFeature struct {
 	Name        string
-	Description  string
+	Description string
 	Background  string
 	Scenarios   []BDDScenario
 }

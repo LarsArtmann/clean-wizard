@@ -34,9 +34,10 @@ type SanitizationRules struct {
 	AddDefaults      bool `json:"add_defaults"`
 
 	// Safety defaults
-	DefaultSafeMode     bool          `json:"default_safe_mode"`
-	DefaultMaxDiskUsage int           `json:"default_max_disk_usage"`
-	DefaultBackup       time.Duration `json:"default_backup"`
+	DefaultSafeMode       bool          `json:"default_safe_mode"`
+	DefaultMaxDiskUsage   int           `json:"default_max_disk_usage"`
+	DefaultBackup         time.Duration `json:"default_backup"`
+	DefaultProtectedPaths []string      `json:"default_protected_paths"`
 }
 
 // SanitizationResult contains sanitization outcomes
@@ -184,18 +185,19 @@ func (r *SanitizationResult) addWarning(field string, original, sanitized any, r
 // getDefaultSanitizationRules returns default sanitization configuration
 func getDefaultSanitizationRules() *SanitizationRules {
 	return &SanitizationRules{
-		NormalizePaths:      true,
-		ExpandHomeDir:       true,
-		ValidateExists:      false, // Don't validate exists by default as paths may not exist yet
-		ClampValues:         true,
-		RoundPercentages:    true,
-		TrimWhitespace:      true,
-		NormalizeCase:       false, // Preserve case for paths and names
-		SortArrays:          true,
-		RemoveDuplicates:    true,
-		AddDefaults:         true,
-		DefaultSafeMode:     true,
-		DefaultMaxDiskUsage: 50,
-		DefaultBackup:       24 * time.Hour,
+		NormalizePaths:        true,
+		ExpandHomeDir:         true,
+		ValidateExists:        false, // Don't validate exists by default as paths may not exist yet
+		ClampValues:           true,
+		RoundPercentages:      true,
+		TrimWhitespace:        true,
+		NormalizeCase:         false, // Preserve case for paths and names
+		SortArrays:            true,
+		RemoveDuplicates:      true,
+		AddDefaults:           true,
+		DefaultSafeMode:       true,
+		DefaultMaxDiskUsage:   50,
+		DefaultBackup:         24 * time.Hour,
+		DefaultProtectedPaths: []string{"/System", "/Applications", "/Library"},
 	}
 }

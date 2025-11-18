@@ -40,7 +40,7 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, option
 		}
 	}
 
-	return nil, fmt.Errorf("failed to load config after %d attempts: %w", ecl.retryPolicy.MaxRetries, lastErr)
+	return nil, fmt.Errorf("failed to load config after %d attempts: %w", ecl.retryPolicy.MaxRetries+1, lastErr)
 }
 
 // saveConfigWithRetry saves configuration with retry logic
@@ -69,27 +69,27 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config
 		}
 	}
 
-	return fmt.Errorf("failed to save config after %d attempts: %w", ecl.retryPolicy.MaxRetries, lastErr)
+	return fmt.Errorf("failed to save config after %d attempts: %w", ecl.retryPolicy.MaxRetries+1, lastErr)
 }
 
 // createBackup creates a backup of the current configuration
 func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domain.Config) error {
-	// Load current config to backup
-	currentConfig, err := LoadWithContext(ctx)
+	// Read current config file and copy to backup location
+	originalConfigPath := filepath.Join(os.Getenv("HOME"), ".clean-wizard.yaml")
+	backupPath := fmt.Sprintf("%s.backup.%d", originalConfigPath, time.Now().Unix())
+
+	// Read current config file
+	configData, err := os.ReadFile(originalConfigPath)
 	if err != nil {
-		return fmt.Errorf("failed to load current config for backup: %w", err)
+		return fmt.Errorf("failed to read current config for backup: %w", err)
 	}
-	
-	// Create backup path
-	configPath := filepath.Join(os.Getenv("HOME"), ".clean-wizard.yaml")
-	backupPath := fmt.Sprintf("%s.backup.%d", configPath, time.Now().Unix())
-	
-	// Save backup using standard Save
-	err = Save(currentConfig)
+
+	// Write backup copy
+	err = os.WriteFile(backupPath, configData, 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to create backup at %s: %w", backupPath, err)
 	}
-	
+
 	if ecl.enableMonitoring {
 		fmt.Printf("💾 Configuration backup created\n")
 	}
@@ -107,13 +107,13 @@ func (ecl *EnhancedConfigLoader) shouldRetry(err error) bool {
 
 // calculateDelay calculates exponential backoff delay
 func (ecl *EnhancedConfigLoader) calculateDelay(attempt int) time.Duration {
-	delay := float64(ecl.retryPolicy.InitialDelay) * 
-		float64(ecl.retryPolicy.BackoffFactor) * 
+	delay := float64(ecl.retryPolicy.InitialDelay) *
+		float64(ecl.retryPolicy.BackoffFactor) *
 		float64(attempt)
-	
+
 	if delay > float64(ecl.retryPolicy.MaxDelay) {
 		delay = float64(ecl.retryPolicy.MaxDelay)
 	}
-	
+
 	return time.Duration(delay)
 }

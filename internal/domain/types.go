@@ -6,9 +6,11 @@ import (
 )
 
 // Backward compatibility aliases - delegate to type-safe enums
-type RiskLevel = RiskLevelType
-type ValidationLevel = ValidationLevelType
-type ChangeOperation = ChangeOperationType
+type (
+	RiskLevel       = RiskLevelType
+	ValidationLevel = ValidationLevelType
+	ChangeOperation = ChangeOperationType
+)
 
 // Backward compatibility constants - point to type-safe enums
 var (
@@ -16,12 +18,12 @@ var (
 	RiskMedium   = RiskLevelType(RiskLevelMediumType)
 	RiskHigh     = RiskLevelType(RiskLevelHighType)
 	RiskCritical = RiskLevelType(RiskLevelCriticalType)
-	
+
 	ValidationLevelNone          = ValidationLevelType(ValidationLevelNoneType)
 	ValidationLevelBasic         = ValidationLevelType(ValidationLevelBasicType)
 	ValidationLevelComprehensive = ValidationLevelType(ValidationLevelComprehensiveType)
 	ValidationLevelStrict        = ValidationLevelType(ValidationLevelStrictType)
-	
+
 	OperationAdded    = ChangeOperationType(ChangeOperationAddedType)
 	OperationRemoved  = ChangeOperationType(ChangeOperationRemovedType)
 	OperationModified = ChangeOperationType(ChangeOperationModifiedType)
@@ -170,10 +172,10 @@ type CleanResult struct {
 
 // IsValid checks if clean result is valid
 func (cr CleanResult) IsValid() bool {
-	return cr.FreedBytes >= 0 && 
-		   cr.ItemsRemoved >= 0 && 
-		   cr.CleanedAt.IsZero() == false && 
-		   cr.Strategy.IsValid()
+	return cr.FreedBytes >= 0 &&
+		cr.ItemsRemoved >= 0 &&
+		cr.CleanedAt.IsZero() == false &&
+		cr.Strategy.IsValid()
 }
 
 // Validate returns errors for invalid clean result

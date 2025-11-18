@@ -49,7 +49,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			config: &domain.Config{
 				Version:      "1.0.0",
 				SafeMode:     true,
-				MaxDiskUsage:  50,
+				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles: map[string]*domain.Profile{
 					"daily": {
@@ -74,7 +74,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			config: &domain.Config{
 				Version:      "1.0.0",
 				SafeMode:     true,
-				MaxDiskUsage:  150, // Invalid: > 95
+				MaxDiskUsage: 150, // Invalid: > 95
 				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles: map[string]*domain.Profile{
 					"daily": {
@@ -99,7 +99,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			name: "missing version",
 			config: &domain.Config{
 				SafeMode:     true,
-				MaxDiskUsage:  50,
+				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles: map[string]*domain.Profile{
 					"daily": {
@@ -125,7 +125,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			config: &domain.Config{
 				Version:      "1.0.0",
 				SafeMode:     true,
-				MaxDiskUsage:  50,
+				MaxDiskUsage: 50,
 				Protected:    []string{},
 				Profiles: map[string]*domain.Profile{
 					"daily": {
@@ -151,7 +151,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			config: &domain.Config{
 				Version:      "1.0.0",
 				SafeMode:     true,
-				MaxDiskUsage:  50,
+				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles:     map[string]*domain.Profile{},
 			},

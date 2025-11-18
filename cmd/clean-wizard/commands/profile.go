@@ -142,7 +142,7 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 			names = append(names, name)
 		}
 		sort.Strings(names)
-		return fmt.Errorf("profile '%s' not found. Available profiles: %s", 
+		return fmt.Errorf("profile '%s' not found. Available profiles: %s",
 			profileName, strings.Join(names, ", "))
 	}
 
@@ -190,7 +190,7 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 			names = append(names, name)
 		}
 		sort.Strings(names)
-		return fmt.Errorf("profile '%s' not found. Available profiles: %s", 
+		return fmt.Errorf("profile '%s' not found. Available profiles: %s",
 			profileName, strings.Join(names, ", "))
 	}
 
@@ -279,14 +279,14 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 func getRiskColor(level domain.RiskLevel) string {
 	switch level {
 	case domain.RiskLow:
-		return "🟢 "  // Green
+		return "🟢 " // Green
 	case domain.RiskMedium:
-		return "🟡 "  // Yellow  
+		return "🟡 " // Yellow
 	case domain.RiskHigh:
-		return "🟠 "  // Orange
+		return "🟠 " // Orange
 	case domain.RiskCritical:
-		return "🔴 "  // Red
+		return "🔴 " // Red
 	default:
-		return "⚪ "  // White
+		return "⚪ " // White
 	}
 }

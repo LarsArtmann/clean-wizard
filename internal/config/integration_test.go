@@ -11,10 +11,10 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 	t.Run("Complete pipeline with complex configuration", func(t *testing.T) {
 		// Create complex configuration that exercises all validation paths
 		cfg := &domain.Config{
-			Version:    " 1.0.0  ", // Needs whitespace sanitization
-			SafeMode:   true,
+			Version:      " 1.0.0  ", // Needs whitespace sanitization
+			SafeMode:     true,
 			MaxDiskUsage: 85,
-			Protected:  []string{"/System", "/Library", "/Applications", "/System"}, // Duplicate /System
+			Protected:    []string{"/System", "/Library", "/Applications", "/System"}, // Duplicate /System
 			Profiles: map[string]*domain.Profile{
 				"daily": {
 					Name:        "  Daily Cleanup  ", // Needs whitespace sanitization
@@ -39,7 +39,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Enabled:     true,
 							Settings: &domain.OperationSettings{
 								TempFiles: &domain.TempFilesSettings{
-									OlderThan: " 7d  ", // Needs whitespace sanitization
+									OlderThan: " 7d  ",                                                 // Needs whitespace sanitization
 									Excludes:  []string{"/tmp/keep", "/var/tmp/preserve", "/tmp/keep"}, // Duplicate /tmp/keep
 								},
 							},

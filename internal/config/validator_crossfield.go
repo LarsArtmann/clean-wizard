@@ -11,13 +11,13 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	// MaxDiskUsage validation
 	if err := cv.validateMaxDiskUsage(cfg.MaxDiskUsage); err != nil {
 		minUsage, maxUsage := cv.getMaxDiskUsageBounds()
-		
+
 		// Create descriptive suggestion using actual rule values
 		suggestion := fmt.Sprintf("Set max_disk_usage between %d and %d", minUsage, maxUsage)
 		if cv.rules.MaxDiskUsage != nil && cv.rules.MaxDiskUsage.Message != "" {
 			suggestion = cv.rules.MaxDiskUsage.Message
 		}
-		
+
 		result.Errors = append(result.Errors, ValidationError{
 			Field:      "max_disk_usage",
 			Rule:       "range",

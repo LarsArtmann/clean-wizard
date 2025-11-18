@@ -65,7 +65,7 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settin
 			result.addChange(fieldPrefix+".older_than", original, settings.OlderThan, "trimmed whitespace")
 		}
 
-	// Validate duration format using custom parser
+		// Validate duration format using custom parser
 		if _, err := domain.ParseCustomDuration(settings.OlderThan); err != nil {
 			result.Warnings = append(result.Warnings, SanitizationWarning{
 				Field:     fieldPrefix + ".older_than",

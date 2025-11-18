@@ -24,9 +24,9 @@ type ConfigValidationRules struct {
 	UniqueProfiles bool `json:"unique_profiles"`
 
 	// Safety Constraints
-	ProtectedSystemPaths   []string `json:"protected_system_paths"`
-	DefaultProtectedPaths   []string `json:"default_protected_paths"`
-	RequireSafeMode        bool     `json:"require_safe_mode"`
+	ProtectedSystemPaths  []string `json:"protected_system_paths"`
+	DefaultProtectedPaths []string `json:"default_protected_paths"`
+	RequireSafeMode       bool     `json:"require_safe_mode"`
 
 	// Risk Constraints
 	MaxRiskLevel   domain.RiskLevel `json:"max_risk_level"`
@@ -41,7 +41,7 @@ type ValidationRule[T comparable] struct {
 	Enum     []T    `json:"enum,omitempty"`
 	Pattern  string `json:"pattern,omitempty"`
 	Message  string `json:"message,omitempty"`
-	
+
 	// Compiled regex for pattern validation (cached)
 	compiledRegex *regexp.Regexp
 	regexOnce     sync.Once

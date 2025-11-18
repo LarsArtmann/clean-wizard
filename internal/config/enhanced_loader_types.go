@@ -5,6 +5,11 @@ import (
 )
 
 // ValidationLevel defines validation strictness (backward compatibility)
+//
+// IMPORTANT: These integer values MUST remain in sync with domain.ValidationLevelType
+// See: internal/domain/type_safe_enums.go:116-123
+// When changing numeric values, update BOTH locations to prevent drift.
+// Consider aliasing the domain type directly to avoid duplication in the future.
 type ValidationLevel int
 
 const (
@@ -42,19 +47,20 @@ type EnhancedConfigLoader struct {
 
 // ConfigLoadOptions provides options for configuration loading
 type ConfigLoadOptions struct {
-	ForceRefresh       bool           `json:"force_refresh"`
-	EnableCache        bool           `json:"enable_cache"`
-	EnableSanitization bool           `json:"enable_sanitization"`
+	ForceRefresh       bool            `json:"force_refresh"`
+	EnableCache        bool            `json:"enable_cache"`
+	EnableSanitization bool            `json:"enable_sanitization"`
 	ValidationLevel    ValidationLevel `json:"validation_level"`
-	Timeout            time.Duration  `json:"timeout"`
+	Timeout            time.Duration   `json:"timeout"`
 }
 
 // ConfigSaveOptions provides options for configuration saving
 type ConfigSaveOptions struct {
-	EnableSanitization bool           `json:"enable_sanitization"`
-	BackupEnabled      bool           `json:"backup_enabled"`
+	EnableSanitization bool            `json:"enable_sanitization"`
+	BackupEnabled      bool            `json:"backup_enabled"`
 	ValidationLevel    ValidationLevel `json:"validation_level"`
-	CreateBackup       bool           `json:"create_backup"`
+	CreateBackup       bool            `json:"create_backup"`
+	ForceSave          bool            `json:"force_save"` // Override validation failures
 }
 
 // RetryPolicy defines retry behavior for configuration operations
@@ -97,6 +103,10 @@ func WithMonitoring(enabled bool) func(*EnhancedConfigLoader) {
 // WithRetryPolicy sets custom retry policy
 func WithRetryPolicy(policy *RetryPolicy) func(*EnhancedConfigLoader) {
 	return func(ecl *EnhancedConfigLoader) {
+		// Guard against nil policy to preserve defaults
+		if policy == nil {
+			return
+		}
 		ecl.retryPolicy = policy
 	}
 }

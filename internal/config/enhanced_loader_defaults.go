@@ -22,6 +22,7 @@ func getDefaultSaveOptions() *ConfigSaveOptions {
 		BackupEnabled:      true,
 		ValidationLevel:    ValidationLevelComprehensive,
 		CreateBackup:       false,
+		ForceSave:          false,
 	}
 }
 
