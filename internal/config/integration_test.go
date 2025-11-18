@@ -16,7 +16,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 			MaxDiskUsage: 85,
 			Protected:    []string{"/System", "/Library", "/Applications", "/System"}, // Duplicate /System
 			Profiles: map[string]*domain.Profile{
-				"daily": {
+				"daily": &domain.Profile{
 					Name:        "  Daily Cleanup  ", // Needs whitespace sanitization
 					Description: "Daily system cleanup operations",
 					Operations: []domain.CleanupOperation{
@@ -71,7 +71,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 					},
 					Enabled: true,
 				},
-				"weekly": {
+				"weekly": &domain.Profile{
 					Name:        "Weekly Deep Cleanup",
 					Description: "Weekly deep cleanup operations",
 					Operations: []domain.CleanupOperation{
@@ -177,10 +177,16 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 			}
 		}
 
+		// Calculate fields modified safely (guard against nil)
+		fieldsModified := 0
+		if sanitizationResult.Sanitized != nil {
+			fieldsModified = len(sanitizationResult.Sanitized.FieldsModified)
+		}
+
 		// Log successful integration
 		t.Logf("✓ Integration test passed - validation and sanitization pipeline working correctly")
 		t.Logf("  - Validation: %d errors, %d warnings", len(validationResult.Errors), len(validationResult.Warnings))
-		t.Logf("  - Sanitization: %d fields modified, %d warnings", len(sanitizationResult.Sanitized.FieldsModified), len(sanitizationResult.Warnings))
+		t.Logf("  - Sanitization: %d fields modified, %d warnings", fieldsModified, len(sanitizationResult.Warnings))
 		t.Logf("  - Post-validation: %d errors, %d warnings", len(postValidationResult.Errors), len(postValidationResult.Warnings))
 		t.Logf("  - Total duration: %v", validationResult.Duration+sanitizationResult.Duration)
 	})
