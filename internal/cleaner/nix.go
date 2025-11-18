@@ -37,7 +37,7 @@ func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
 // GetStoreSize gets Nix store size with type safety
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	if !nc.adapter.IsAvailable(ctx) {
-		return int64(MockStoreSizeGB * 1024 * 1024 * 1024) // Mock store size
+		return int64(300 * 1024 * 1024 * 1024) // Mock store size
 	}
 
 	storeSizeResult := nc.adapter.GetStoreSize(ctx)
@@ -58,7 +58,7 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 	}
 
 	if settings.NixGenerations.Generations > 10 {
-		return fmt.Errorf("Generations to keep must not exceed %d, got: %d", MaxGenerations, settings.NixGenerations.Generations)
+		return fmt.Errorf("Generations to keep must not exceed %d, got: %d", 10, settings.NixGenerations.Generations)
 	}
 
 	return nil
@@ -97,7 +97,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 
 	if nc.dryRun {
 		// Use centralized conversion for dry-run
-		estimatedBytes := int64(toRemove * MockGenerationSizeMB * 1024 * 1024) // Use constant
+		estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Use 50MB per generation
 		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, toRemove, estimatedBytes)
 		return result.Ok(cleanResult)
 	}

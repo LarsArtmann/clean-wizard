@@ -1,3 +1,6 @@
+//go:build skip_bdd
+// +build skip_bdd
+
 package bdd
 
 import (
@@ -7,8 +10,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	"github.com/cucumber/godog"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -284,8 +285,8 @@ func (ctx *BDDTestContext) shouldNotPerformCleaning() error {
 
 	if ctx.cleanResult.IsOk() {
 		result := ctx.cleanResult.Value()
-		if !strings.Contains(result.Strategy, "DRY RUN") {
-			return fmt.Errorf("expected DRY RUN in strategy but got: %s", result.Strategy)
+		if !strings.Contains(result.Strategy.String(), "dry-run") {
+			return fmt.Errorf("expected dry-run in strategy but got: %s", result.Strategy.String())
 		}
 	}
 

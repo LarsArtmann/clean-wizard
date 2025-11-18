@@ -21,17 +21,17 @@ func NewCacheManager(defaultExpiration, cleanupInterval time.Duration) *CacheMan
 }
 
 // Set stores a value in cache with expiration
-func (cm *CacheManager) Set(key string, value interface{}, expiration time.Duration) {
+func (cm *CacheManager) Set(key string, value any, expiration time.Duration) {
 	cm.cache.Set(key, value, expiration)
 }
 
 // Get retrieves a value from cache
-func (cm *CacheManager) Get(key string) (interface{}, bool) {
+func (cm *CacheManager) Get(key string) (any, bool) {
 	return cm.cache.Get(key)
 }
 
 // GetWithExpiration retrieves a value with its expiration time
-func (cm *CacheManager) GetWithExpiration(key string) (interface{}, time.Time, bool) {
+func (cm *CacheManager) GetWithExpiration(key string) (any, time.Time, bool) {
 	return cm.cache.GetWithExpiration(key)
 }
 
@@ -52,9 +52,9 @@ func (cm *CacheManager) ItemCount() int {
 
 // CacheStats provides cache statistics
 type CacheStats struct {
-	Items     int    `json:"items"`
-	HitCount  uint64 `json:"hit_count"`
-	MissCount uint64 `json:"miss_count"`
+	Items     int     `json:"items"`
+	HitCount  uint64  `json:"hit_count"`
+	MissCount uint64  `json:"miss_count"`
 	HitRate   float64 `json:"hit_rate"`
 }
 
