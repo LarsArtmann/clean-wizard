@@ -76,7 +76,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 	defer func() {
 		// Update validation result duration if provided
 		if validationResult != nil {
-			validationResult.Duration += time.Since(start)
+			validationResult.Duration = time.Since(start)
 		}
 	}()
 

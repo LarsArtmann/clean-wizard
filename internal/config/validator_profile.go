@@ -14,6 +14,11 @@ func (cv *ConfigValidator) validateProfiles(cfg *domain.Config) error {
 			return fmt.Errorf("profile %s: %w", name, err)
 		}
 
+		// Check for nil profile to prevent panic
+		if profile == nil {
+			return fmt.Errorf("profile %s: nil profile", name)
+		}
+
 		// Validate profile struct
 		if err := profile.Validate(name); err != nil {
 			return fmt.Errorf("profile %s: %w", name, err)

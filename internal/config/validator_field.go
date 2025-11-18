@@ -12,13 +12,12 @@ func (cv *ConfigValidator) validateMaxDiskUsage(value any) error {
 		return fmt.Errorf("max_disk_usage must be an integer, got %T", value)
 	}
 
-	if cv.rules.MaxDiskUsage != nil {
-		if cv.rules.MaxDiskUsage.Min != nil && usage < *cv.rules.MaxDiskUsage.Min {
-			return fmt.Errorf("max_disk_usage (%d) below minimum (%d)", usage, *cv.rules.MaxDiskUsage.Min)
-		}
-		if cv.rules.MaxDiskUsage.Max != nil && usage > *cv.rules.MaxDiskUsage.Max {
-			return fmt.Errorf("max_disk_usage (%d) above maximum (%d)", usage, *cv.rules.MaxDiskUsage.Max)
-		}
+	min, max := cv.getMaxDiskUsageBounds()
+	if usage < min {
+		return fmt.Errorf("max_disk_usage (%d) below minimum (%d)", usage, min)
+	}
+	if usage > max {
+		return fmt.Errorf("max_disk_usage (%d) above maximum (%d)", usage, max)
 	}
 
 	return nil
