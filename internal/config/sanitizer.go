@@ -111,6 +111,20 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 				"warnings_count":  fmt.Sprintf("%d", len(result.Warnings)),
 			},
 		}
+		
+		// Copy sanitization warnings to validation result
+		for _, warning := range result.Warnings {
+			validationResult.Warnings = append(validationResult.Warnings, ValidationWarning{
+				Field:     warning.Field,
+				Message:   warning.Reason,
+				Suggestion: fmt.Sprintf("Value was changed from %v to %v", warning.Original, warning.Sanitized),
+				Context: map[string]any{
+					"original":  warning.Original,
+					"sanitized": warning.Sanitized,
+					"field":     warning.Field,
+				},
+			})
+		}
 	}
 }
 
