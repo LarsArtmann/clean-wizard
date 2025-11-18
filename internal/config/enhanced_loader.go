@@ -3,6 +3,8 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -148,10 +150,17 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 	}
 
 	// Validate before saving
-	validationResult := ecl.applyValidation(config, ValidationLevelComprehensive)
+	validationResult := ecl.applyValidation(config, options.ValidationLevel)
 	if !validationResult.IsValid {
 		return nil, pkgerrors.HandleValidationError("SaveConfig",
 			fmt.Errorf("validation failed: %s", ecl.formatValidationErrors(validationResult.Errors)))
+	}
+
+	// Create backup if requested
+	if (options.CreateBackup || options.BackupEnabled) && ecl.enableMonitoring {
+		if err := ecl.createBackup(ctx, config); err != nil {
+			fmt.Printf("⚠️ Backup failed: %v\n", err) // Use printf instead of validation result
+		}
 	}
 
 	// Apply sanitization if enabled
@@ -241,6 +250,30 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config
 	}
 
 	return pkgerrors.HandleConfigError("SaveConfig", lastErr)
+}
+
+// createBackup creates a backup of the current configuration
+func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domain.Config) error {
+	// Load current config to backup
+	currentConfig, err := LoadWithContext(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to load current config for backup: %w", err)
+	}
+	
+	// Create backup path
+	configPath := filepath.Join(os.Getenv("HOME"), ".clean-wizard.yaml")
+	backupPath := fmt.Sprintf("%s.backup.%d", configPath, time.Now().Unix())
+	
+	// Save backup using standard Save
+	err = Save(currentConfig)
+	if err != nil {
+		return fmt.Errorf("failed to create backup at %s: %w", backupPath, err)
+	}
+	
+	if ecl.enableMonitoring {
+		fmt.Printf("💾 Configuration backup created\n")
+	}
+	return nil
 }
 
 // shouldRetry determines if an error should trigger a retry

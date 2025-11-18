@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -36,9 +37,15 @@ func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *domain.Config, result *Sa
 			path = filepath.Clean(path)
 		}
 
-		// Ensure absolute path
+		// Validate absolute path requirement
 		if !filepath.IsAbs(path) {
-			path = "/" + path
+			result.Warnings = append(result.Warnings, SanitizationWarning{
+				Field:     fmt.Sprintf("protected[%d]", i),
+				Original:  original,
+				Sanitized: path,
+				Reason:    fmt.Sprintf("protected path must be absolute: %s", original),
+			})
+			continue // Skip processing invalid path
 		}
 
 		// Validate existence if enabled
@@ -90,12 +97,5 @@ func (cs *ConfigSanitizer) removeDuplicates(slice []string) []string {
 }
 
 func (cs *ConfigSanitizer) sortStrings(slice []string) {
-	// Simple bubble sort - sufficient for small arrays
-	for i := 0; i < len(slice)-1; i++ {
-		for j := i + 1; j < len(slice); j++ {
-			if slice[i] > slice[j] {
-				slice[i], slice[j] = slice[j], slice[i]
-			}
-		}
-	}
+	sort.Strings(slice)
 }

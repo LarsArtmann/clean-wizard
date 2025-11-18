@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
@@ -85,6 +86,10 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 	// Check for added profiles
 	for name, profile := range proposed {
 		if current[name] == nil {
+			// Guard against nil profile before accessing fields
+			if profile == nil {
+				continue
+			}
 			changes = append(changes, ConfigChange{
 				Field:     fmt.Sprintf("profiles.%s", name),
 				OldValue:  nil,
@@ -111,9 +116,14 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 	// Check for modified profiles
 	for name, proposedProfile := range proposed {
 		if currentProfile := current[name]; currentProfile != nil {
+			// Guard against nil proposed profile
+			if proposedProfile == nil {
+				continue
+			}
+			// Deep comparison instead of just checking length
 			if currentProfile.Name != proposedProfile.Name ||
 				currentProfile.Description != proposedProfile.Description ||
-				len(currentProfile.Operations) != len(proposedProfile.Operations) {
+				!reflect.DeepEqual(currentProfile.Operations, proposedProfile.Operations) {
 				changes = append(changes, ConfigChange{
 					Field:     fmt.Sprintf("profiles.%s", name),
 					OldValue:  currentProfile.Name,
@@ -148,7 +158,13 @@ func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) dom
 		}
 		return domain.RiskLow
 	case "max_disk_usage":
-		if old.(int) < new.(int) {
+		// Safe type assertions
+		oldVal, oldOk := old.(int)
+		newVal, newOk := new.(int)
+		if !oldOk || !newOk {
+			return domain.RiskHigh // Conservative risk for unexpected types
+		}
+		if oldVal < newVal {
 			return domain.RiskMedium
 		}
 		return domain.RiskLow
@@ -163,6 +179,11 @@ func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) dom
 }
 
 func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domain.RiskLevel {
+	// Guard against nil profile
+	if profile == nil {
+		return domain.RiskHigh
+	}
+	
 	maxRisk := domain.RiskLow
 	for _, op := range profile.Operations {
 		if op.RiskLevel == domain.RiskCritical {
