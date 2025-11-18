@@ -39,24 +39,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Set defaults
 	v.SetDefault("version", "1.0.0")
-	v.SetDefault("safe_mode", false)
+	v.SetDefault("safe_mode", true)
 	v.SetDefault("max_disk_usage_percent", 50)
 	v.SetDefault("protected", []string{"/System", "/Library"}) // Basic protection
-	v.SetDefault("profiles", map[string]any{
-		"daily": map[string]any{
-			"name":        "daily",
-			"description": "Daily cleanup",
-			"enabled":     true,
-			"operations": []map[string]any{
-				{
-					"name":        "nix-generations",
-					"description": "Clean Nix generations",
-					"risk_level":  "low",
-					"enabled":     true,
-				},
-			},
-		},
-	})
 
 	// Try to read configuration file
 	select {
