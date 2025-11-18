@@ -75,6 +75,16 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 	b.t.Logf("Scenario: %s", scenario.Name)
 	b.t.Logf("Description: %s", scenario.Description)
 
+	// Guard checks for required steps
+	if len(scenario.Given) == 0 {
+		b.t.Errorf("scenario must define at least one Given step")
+		return
+	}
+	if len(scenario.When) == 0 {
+		b.t.Errorf("scenario must define at least one When step")
+		return
+	}
+
 	// Setup Given conditions
 	var cfg *domain.Config
 	var setupErr error
@@ -93,6 +103,12 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 		}
 	}
 
+	// Ensure config was created by Given steps
+	if cfg == nil {
+		b.t.Errorf("Given steps did not produce a config")
+		return
+	}
+
 	// Execute When actions
 	var result *ValidationResult
 	var actionErr error
@@ -109,6 +125,12 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 			b.t.Errorf("When action failed: %v", actionErr)
 			return
 		}
+	}
+
+	// Ensure result was created by When steps
+	if result == nil {
+		b.t.Errorf("When steps did not produce a result")
+		return
 	}
 
 	// Validate Then expectations
