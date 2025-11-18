@@ -130,7 +130,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		0)
 
 	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming("NIX_GC", 1, bytesFreed, time.Since(time.Now()))
+	cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyAggressive, 1, bytesFreed, time.Since(time.Now()))
 	return result.Ok(cleanResult)
 }
 
@@ -176,7 +176,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 		0)
 
 	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming("REMOVE_GENERATION", 1, bytesFreed, time.Since(time.Now()))
+	cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyConservative, 1, bytesFreed, time.Since(time.Now()))
 	return result.Ok(cleanResult)
 }
 
