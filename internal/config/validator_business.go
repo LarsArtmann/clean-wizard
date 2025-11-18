@@ -76,8 +76,10 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 				Field:      "protected",
 				Message:    "Protecting root directory '/' may prevent system operations",
 				Suggestion: "Consider protecting specific system directories instead",
-				Context: map[string]any{
-					"protected_path": path,
+				Context: &ValidationContext{
+					Metadata: map[string]string{
+						"protected_path": path,
+					},
 				},
 			})
 		}
