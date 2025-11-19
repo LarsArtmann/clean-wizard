@@ -34,7 +34,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			profileName, _ = cmd.Flags().GetString("profile")
 
 			// Determine scan parameters from configuration
-			scanType := domain.ScanTypeNixStore
+			scanType := domain.ScanTypeNixStoreType
 			recursive := true
 			limit := 100
 			var loadedCfg *domain.Config
@@ -69,13 +69,13 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 					if validationLevel >= config.ValidationLevelStrict {
 						// Strict validation
-						if !loadedCfg.SafeMode {
-							return fmt.Errorf("strict validation failed: safe_mode must be enabled")
+						if loadedCfg.SafetyLevel == domain.SafetyLevelDisabled {
+							return fmt.Errorf("strict validation failed: safety_level must be enabled")
 						}
 					}
 
-					fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n",
-						loadedCfg.SafeMode, len(loadedCfg.Profiles))
+					fmt.Printf("✅ Configuration applied: safety_level=%v, profiles=%d\n",
+						loadedCfg.SafetyLevel, len(loadedCfg.Profiles))
 				}
 			} else {
 				// Load default configuration to get profile information
@@ -109,13 +109,13 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 				if validationLevel >= config.ValidationLevelStrict {
 					// Strict validation
-					if !loadedCfg.SafeMode {
-						return fmt.Errorf("strict validation failed: safe_mode must be enabled")
+					if loadedCfg.SafetyLevel == domain.SafetyLevelDisabled {
+						return fmt.Errorf("strict validation failed: safety_level must be enabled")
 					}
 				}
 
-				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n",
-					loadedCfg.SafeMode, len(loadedCfg.Profiles))
+				fmt.Printf("✅ Configuration applied: safety_level=%v, profiles=%d\n",
+					loadedCfg.SafetyLevel, len(loadedCfg.Profiles))
 			}
 
 			// Apply profile if specified
@@ -125,7 +125,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 					return fmt.Errorf("profile '%s' not found in configuration", profileName)
 				}
 
-				if !profile.Enabled {
+				if profile.Status == domain.StatusDisabled {
 					return fmt.Errorf("profile '%s' is disabled", profileName)
 				}
 
@@ -133,16 +133,16 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
 				// Use current profile from config
 				profile := loadedCfg.Profiles[loadedCfg.CurrentProfile]
-				if profile != nil && profile.Enabled {
+				if profile != nil && profile.Status == domain.StatusEnabled {
 					fmt.Printf("🏷️  Using current profile: %s (%s)\n", loadedCfg.CurrentProfile, profile.Description)
 				}
 			} else if loadedCfg != nil {
 				// Default to daily profile if available
-				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled {
+				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Status == domain.StatusEnabled {
 					fmt.Printf("📋 Using daily profile configuration\n")
 					// Extract scan parameters from profile
 					for _, op := range dailyProfile.Operations {
-						if op.Name == "nix-generations" && op.Enabled {
+						if op.Name == "nix-generations" && op.Status == domain.StatusEnabled {
 							// Nix generations scanning
 							limit = 50 // Default for generations
 							break
@@ -152,9 +152,13 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			}
 
 			// Create scan request with applied configuration
+			recursionLevel := domain.RecursionLevelFull
+			if !recursive {
+				recursionLevel = domain.RecursionLevelNone
+			}
 			scanReq := domain.ScanRequest{
 				Type:      scanType,
-				Recursive: recursive,
+				Recursion: recursionLevel,
 				Limit:     limit,
 			}
 
@@ -210,7 +214,7 @@ func displayScanResults(result domain.ScanResult, generations []domain.NixGenera
 	// Count current generations
 	currentCount := 0
 	for _, gen := range generations {
-		if gen.Current {
+		if gen.Status == domain.SelectedStatusSelected {
 			currentCount++
 		}
 	}

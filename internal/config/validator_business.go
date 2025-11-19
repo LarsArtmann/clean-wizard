@@ -9,14 +9,14 @@ import (
 
 // validateOperationRisk checks if an operation violates safe mode + critical risk rule
 func (cv *ConfigValidator) validateOperationRisk(cfg *domain.Config, profileName string, op domain.CleanupOperation) *ValidationError {
-	if op.RiskLevel == domain.RiskCritical && !cfg.SafeMode {
+	if op.RiskLevel == domain.RiskCritical && cfg.SafetyLevel == domain.SafetyLevelDisabled {
 		return &ValidationError{
 			Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", profileName, op.Name),
 			Rule:       "security",
 			Value:      op.RiskLevel,
-			Message:    fmt.Sprintf("Critical risk operation '%s' requires safe mode enabled", op.Name),
+			Message:    fmt.Sprintf("Critical risk operation '%s' requires safety level enabled", op.Name),
 			Severity:   SeverityError,
-			Suggestion: "Enable safe mode or remove critical risk operations",
+			Suggestion: "Enable safety level or remove critical risk operations",
 		}
 	}
 	return nil
@@ -54,7 +54,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 		// Validate each operation
 		for _, op := range profile.Operations {
 			// Validate risk vs safe mode
-			if !cfg.SafeMode && op.RiskLevel == domain.RiskCritical {
+			if cfg.SafetyLevel == domain.SafetyLevelDisabled && op.RiskLevel == domain.RiskCritical {
 				result.Errors = append(result.Errors, ValidationError{
 					Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", name, op.Name),
 					Rule:       "business_logic",

@@ -219,7 +219,7 @@ func getDefaultSanitizationRules() *SanitizationRules {
 		SortArrays:            true,
 		RemoveDuplicates:      true,
 		AddDefaults:           true,
-		DefaultSafeMode:       true,
+		DefaultSafeMode:       true, // This will map to SafetyLevelEnabled
 		DefaultMaxDiskUsage:   50,
 		DefaultBackup:         24 * time.Hour,
 		DefaultProtectedPaths: []string{"/System", "/Applications", "/Library"},

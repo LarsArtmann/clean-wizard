@@ -85,7 +85,7 @@ func runProfileList(cmd *cobra.Command, args []string) error {
 	for _, name := range profileNames {
 		profile := cfg.Profiles[name]
 		status := "✅ Enabled"
-		if !profile.Enabled {
+		if profile.Status == domain.StatusDisabled {
 			status = "❌ Disabled"
 		}
 
@@ -147,7 +147,7 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 	}
 
 	// Check if profile is enabled
-	if !profile.Enabled {
+	if profile.Status == domain.StatusDisabled {
 		return fmt.Errorf("profile '%s' is disabled. Enable it first before selecting.", profileName)
 	}
 
@@ -199,7 +199,7 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 
 	// Basic info
 	status := "✅ Enabled"
-	if !profile.Enabled {
+	if profile.Status == domain.StatusDisabled {
 		status = "❌ Disabled"
 	}
 
@@ -225,7 +225,7 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 
 		for i, op := range profile.Operations {
 			status := "✅ Enabled"
-			if !op.Enabled {
+			if op.Status == domain.StatusDisabled {
 				status = "❌ Disabled"
 			}
 
@@ -240,7 +240,7 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 				fmt.Printf("     Settings:\n")
 				if op.Settings.NixGenerations != nil {
 					fmt.Printf("       • generations: %d\n", op.Settings.NixGenerations.Generations)
-					fmt.Printf("       • optimize: %t\n", op.Settings.NixGenerations.Optimize)
+					fmt.Printf("       • optimization: %s\n", op.Settings.NixGenerations.Optimization)
 				}
 				if op.Settings.TempFiles != nil {
 					fmt.Printf("       • older_than: %s\n", op.Settings.TempFiles.OlderThan)
@@ -249,7 +249,7 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 					}
 				}
 				if op.Settings.Homebrew != nil {
-					fmt.Printf("       • unused_only: %t\n", op.Settings.Homebrew.UnusedOnly)
+					fmt.Printf("       • file_selection_strategy: %s\n", op.Settings.Homebrew.FileSelectionStrategy)
 				}
 				if op.Settings.SystemTemp != nil {
 					fmt.Printf("       • paths: %v\n", op.Settings.SystemTemp.Paths)
@@ -266,9 +266,9 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 	fmt.Println()
 
 	// Usage hint
-	if !isCurrent && profile.Enabled {
+	if !isCurrent && profile.Status == domain.StatusEnabled {
 		fmt.Printf("💡 To use this profile: clean-wizard profile select %s\n", profileName)
-	} else if !profile.Enabled {
+	} else if profile.Status == domain.StatusDisabled {
 		fmt.Printf("⚠️  This profile is disabled. Enable it in the configuration to use it.\n")
 	}
 

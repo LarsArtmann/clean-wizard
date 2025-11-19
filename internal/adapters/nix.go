@@ -8,10 +8,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
+
+// Helper function for boolean to SelectedStatus conversion
+func boolToSelectedStatus(current bool) domain.SelectedStatusType {
+	if current {
+		return domain.SelectedStatusSelected
+	}
+	return domain.SelectedStatusNotSelected
+}
 
 // NixAdapter wraps Nix package manager operations
 type NixAdapter struct {
@@ -42,11 +49,11 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 	// If dry-run, return mock data without system calls
 	if n.dryRun {
 		return result.Ok([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: true},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: false},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: false},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Current: false},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Current: false},
+			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Status: domain.SelectedStatusSelected},
+			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Status: domain.SelectedStatusNotSelected},
+			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Status: domain.SelectedStatusNotSelected},
+			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Status: domain.SelectedStatusNotSelected},
+			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Status: domain.SelectedStatusNotSelected},
 		})
 	}
 
@@ -109,28 +116,35 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	// Get store size before garbage collection
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get pre-gc store size: %w", err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get pre-gc store size: %w", err))
 	}
 
 	// Run actual nix-collect-garbage command
 	cmd := exec.CommandContext(ctx, "nix-collect-garbage", "-d")
 	err = cmd.Run()
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to collect garbage: %w", err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to collect garbage: %w", err))
 	}
 
 	// Get store size after garbage collection
 	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-gc store size: %w", err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get post-gc store size: %w", err))
 	}
 
 	bytesFreed := max(beforeSize-afterSize,
 		// Shouldn't happen but guard against it
 		0)
 
-	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyAggressive, 1, bytesFreed, time.Since(time.Now()))
+	// Create clean result directly with proper timing
+	cleanResult := domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    time.Since(time.Now()),
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyAggressive,
+	}
 	return result.Ok(cleanResult)
 }
 
@@ -155,28 +169,35 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 	// Get store size before removal
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get pre-remove store size: %w", err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get pre-remove store size: %w", err))
 	}
 
 	// Remove the specific generation
 	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", fmt.Sprintf("%d", genID))
 	err = cmd.Run()
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to remove generation %d: %w", genID, err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to remove generation %d: %w", genID, err))
 	}
 
 	// Get store size after removal
 	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-remove store size: %w", err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get post-remove store size: %w", err))
 	}
 
 	bytesFreed := max(beforeSize-afterSize,
 		// Guard against negative values
 		0)
 
-	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyConservative, 1, bytesFreed, time.Since(time.Now()))
+	// Create clean result directly with proper timing
+	cleanResult := domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    time.Since(time.Now()),
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	}
 	return result.Ok(cleanResult)
 }
 
@@ -212,7 +233,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 		ID:      id,
 		Path:    fields[0],
 		Date:    date,
-		Current: strings.Contains(line, "current"),
+		Status:  boolToSelectedStatus(strings.Contains(line, "current")),
 	}, nil
 }
 

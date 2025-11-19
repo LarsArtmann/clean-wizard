@@ -37,7 +37,7 @@ func NewContainer(ctx context.Context) *Container {
 func getDefaultConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
-		SafeMode:     true,
+		SafetyLevel:  domain.SafetyLevelEnabled,
 		MaxDiskUsage:  50,
 		Protected:    []string{"/System", "/Library", "/Applications"},
 		Profiles:     getDefaultProfiles(),
@@ -55,16 +55,16 @@ func getDefaultProfiles() map[string]*domain.Profile {
 					Name:        "nix-generations",
 					Description: "Clean Nix generations",
 					RiskLevel:   domain.RiskLow,
-					Enabled:     true,
+					Status:      domain.StatusEnabled,
 					Settings: &domain.OperationSettings{
 						NixGenerations: &domain.NixGenerationsSettings{
 							Generations: 3,
-							Optimize:    true,
+							Optimization: domain.OptimizationLevelAggressive,
 						},
 					},
 				},
 			},
-			Enabled: true,
+			Status: domain.StatusEnabled,
 		},
 	}
 }

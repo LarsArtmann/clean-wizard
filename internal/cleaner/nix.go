@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
-	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -70,11 +69,11 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	if !nc.adapter.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: true},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: false},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: false},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Current: false},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Current: false},
+			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Status: domain.SelectedStatusSelected},
+			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Status: domain.SelectedStatusNotSelected},
+			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Status: domain.SelectedStatusNotSelected},
+			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Status: domain.SelectedStatusNotSelected},
+			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Status: domain.SelectedStatusNotSelected},
 		}, "Nix not available - using mock data")
 	}
 
@@ -87,7 +86,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	// Get generations first
 	genResult := nc.ListGenerations(ctx)
 	if genResult.IsErr() {
-		return conversions.ToCleanResultFromError(genResult.Error())
+		return result.Err[domain.CleanResult](genResult.Error())
 	}
 
 	generations := genResult.Value()
@@ -98,7 +97,15 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	if nc.dryRun {
 		// Use centralized conversion for dry-run
 		estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Use 50MB per generation
-		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, toRemove, estimatedBytes)
+		cleanResult := domain.CleanResult{
+			FreedBytes:   uint64(estimatedBytes),
+			ItemsRemoved: uint(toRemove),
+			ItemsFailed:  0,
+			CleanTime:    0,
+			CleanedAt:    time.Now(),
+			Strategy:     domain.StrategyDryRun,
+		}
+		return result.Ok(cleanResult)
 		return result.Ok(cleanResult)
 	}
 
@@ -110,14 +117,14 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 
 		for i := len(generations) - toRemove; i < len(generations); i++ {
 			// Skip current generation
-			if generations[i].Current {
+			if generations[i].Status == domain.SelectedStatusSelected {
 				continue
 			}
 
 			// Remove this generation
 			cleanResult := nc.adapter.RemoveGeneration(ctx, generations[i].ID)
 			if cleanResult.IsErr() {
-				return conversions.ToCleanResultFromError(cleanResult.Error())
+				return result.Err[domain.CleanResult](cleanResult.Error())
 			}
 
 			results = append(results, cleanResult.Value())
@@ -126,22 +133,42 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 		// Run garbage collection to clean up references
 		gcResult := nc.adapter.CollectGarbage(ctx)
 		if gcResult.IsErr() {
-			return conversions.ToCleanResultFromError(gcResult.Error())
+			return result.Err[domain.CleanResult](gcResult.Error())
 		}
 
 		results = append(results, gcResult.Value())
 
-		// Combine all results using centralized function
-		combinedResult := conversions.CombineCleanResults(results)
-		combinedResult.CleanTime = time.Since(start)
-		combinedResult.Strategy = domain.StrategyAggressive
+		// Combine all results manually
+		var totalFreed uint64
+		var totalRemoved, totalFailed uint
+		for _, res := range results {
+			totalFreed += res.FreedBytes
+			totalRemoved += res.ItemsRemoved
+			totalFailed += res.ItemsFailed
+		}
+		
+		combinedResult := domain.CleanResult{
+			FreedBytes:   totalFreed,
+			ItemsRemoved: totalRemoved,
+			ItemsFailed:  totalFailed,
+			CleanTime:    time.Since(start),
+			CleanedAt:    time.Now(),
+			Strategy:     domain.StrategyAggressive,
+		}
 
 		return result.Ok(combinedResult)
 	}
 
 	// Dry-run or no generations to remove - use centralized conversion
 	estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Estimated
-	cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, toRemove, estimatedBytes)
+	cleanResult := domain.CleanResult{
+		FreedBytes:   uint64(estimatedBytes),
+		ItemsRemoved: uint(toRemove),
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyDryRun,
+	}
 	return result.Ok(cleanResult)
 }
 

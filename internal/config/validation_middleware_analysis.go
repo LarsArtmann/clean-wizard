@@ -13,13 +13,13 @@ func (vm *ValidationMiddleware) analyzeConfigChanges(current, proposed *domain.C
 	changes := []ConfigChange{}
 
 	// Analyze basic fields
-	if current.SafeMode != proposed.SafeMode {
+	if current.SafetyLevel != proposed.SafetyLevel {
 		changes = append(changes, ConfigChange{
 			Field:     "safe_mode",
-			OldValue:  current.SafeMode,
-			NewValue:  proposed.SafeMode,
-			Operation: vm.getChangeOperation(current.SafeMode, proposed.SafeMode),
-			Risk:      vm.assessChangeRisk("safe_mode", current.SafeMode, proposed.SafeMode),
+			OldValue:  current.SafetyLevel,
+			NewValue:  proposed.SafetyLevel,
+			Operation: vm.getChangeOperation(current.SafetyLevel, proposed.SafetyLevel),
+			Risk:      vm.assessChangeRisk("safe_mode", current.SafetyLevel, proposed.SafetyLevel),
 		})
 	}
 

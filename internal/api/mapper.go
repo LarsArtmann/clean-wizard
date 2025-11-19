@@ -31,7 +31,7 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 	// Create domain config
 	config := &domain.Config{
 		Version:      publicConfig.Version,
-		SafeMode:     publicConfig.SafeMode,
+		SafetyLevel:  boolToSafetyLevel(publicConfig.SafeMode),
 		MaxDiskUsage: int(publicConfig.MaxDiskUsage),
 		Protected:    publicConfig.ProtectedPaths,
 		Profiles:     profiles,
@@ -60,7 +60,7 @@ func MapConfigToPublic(domainConfig *domain.Config) result.Result[*PublicConfig]
 
 	publicConfig := &PublicConfig{
 		Version:        domainConfig.Version,
-		SafeMode:       domainConfig.SafeMode,
+		SafeMode:       safetyLevelToBool(domainConfig.SafetyLevel),
 		MaxDiskUsage:   int32(domainConfig.MaxDiskUsage),
 		ProtectedPaths: domainConfig.Protected,
 		Profiles:       publicProfiles,
@@ -88,7 +88,7 @@ func MapProfileToDomain(publicProfile *PublicProfile) (*domain.Profile, error) {
 	return &domain.Profile{
 		Name:        publicProfile.Name,
 		Description: publicProfile.Description,
-		Enabled:     publicProfile.Enabled,
+		Status:      boolToStatus(publicProfile.Enabled),
 		Operations:  operations,
 	}, nil
 }
@@ -108,7 +108,7 @@ func MapProfileToPublic(domainProfile *domain.Profile) *PublicProfile {
 	return &PublicProfile{
 		Name:        domainProfile.Name,
 		Description: domainProfile.Description,
-		Enabled:     domainProfile.Enabled,
+		Enabled:     statusToBool(domainProfile.Status),
 		Operations:  publicOperations,
 	}
 }
@@ -151,7 +151,7 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 		Name:        publicOperation.Name,
 		Description: publicOperation.Description,
 		RiskLevel:   riskLevel,
-		Enabled:     publicOperation.Enabled,
+		Status:      boolToStatus(publicOperation.Enabled),
 		Settings:    settings,
 	}, nil
 }
@@ -169,7 +169,7 @@ func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOpera
 		Name:        domainOperation.Name,
 		Description: domainOperation.Description,
 		RiskLevel:   MapRiskLevelToPublic(domainOperation.RiskLevel),
-		Enabled:     domainOperation.Enabled,
+		Enabled:     statusToBool(domainOperation.Status),
 		Settings:    publicSettings,
 	}
 }
@@ -187,7 +187,7 @@ func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationS
 	// Extract relevant values from domain-specific settings
 	if settings.NixGenerations != nil {
 		publicSettings.DryRun = false // Nix operations default to false
-		if settings.NixGenerations.Optimize {
+		if settings.NixGenerations.Optimization != domain.OptimizationLevelNone {
 			publicSettings.Verbose = true
 		}
 	}
@@ -352,4 +352,32 @@ func MapValidationResultToPublic(domainResult any) result.Result[*PublicValidati
 	}
 
 	return result.Ok(publicResult)
+}
+
+// Helper functions for boolean-to-enum conversion
+
+// boolToSafetyLevel converts boolean SafeMode to SafetyLevelType
+func boolToSafetyLevel(safeMode bool) domain.SafetyLevelType {
+	if safeMode {
+		return domain.SafetyLevelEnabled
+	}
+	return domain.SafetyLevelDisabled
+}
+
+// safetyLevelToBool converts SafetyLevelType to boolean (backward compatibility)
+func safetyLevelToBool(level domain.SafetyLevelType) bool {
+	return level == domain.SafetyLevelEnabled || level == domain.SafetyLevelStrict || level == domain.SafetyLevelParanoid
+}
+
+// boolToStatus converts boolean Enabled to StatusType
+func boolToStatus(enabled bool) domain.StatusType {
+	if enabled {
+		return domain.StatusEnabled
+	}
+	return domain.StatusDisabled
+}
+
+// statusToBool converts StatusType to boolean (backward compatibility)
+func statusToBool(status domain.StatusType) bool {
+	return status == domain.StatusEnabled
 }

@@ -126,7 +126,7 @@ func getDefaultValidationRules() *ConfigValidationRules {
 			"/Applications",
 			"/Library",
 		},
-		RequireSafeMode: true,
+		RequireSafeMode: domain.EnforcementLevelError,
 		MaxRiskLevel:    domain.RiskHigh,
 		BackupRequired:  domain.RiskMedium,
 	}

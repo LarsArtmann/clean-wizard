@@ -35,7 +35,7 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 	}
 
 	// Safe mode vs risk level consistency
-	if !cfg.SafeMode {
+	if cfg.SafetyLevel == domain.SafetyLevelDisabled {
 		maxRisk := domain.RiskLow // Default
 		for _, profile := range cfg.Profiles {
 			if profile == nil {
@@ -56,7 +56,7 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 				Context: &ValidationContext{
 					Metadata: map[string]string{
 						"max_risk_level": maxRisk.String(),
-						"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode),
+						"safety_level": fmt.Sprintf("%v", cfg.SafetyLevel),
 					},
 				},
 			})
