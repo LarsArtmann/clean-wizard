@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -44,11 +43,8 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			if configFile != "" {
 				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
 
-				// Set config file path using environment variable
-				os.Setenv("CONFIG_PATH", configFile)
-
 				var err error
-				loadedCfg, err = config.LoadWithContext(ctx)
+				loadedCfg, err = config.LoadWithContextAndPath(ctx, configFile)
 				if err != nil {
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}

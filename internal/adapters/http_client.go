@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -45,10 +46,22 @@ func (hc *HTTPClient) WithRetry(count int, waitTime, maxWaitTime time.Duration) 
 
 // WithAuth sets authentication header
 func (hc *HTTPClient) WithAuth(authType, token string) *HTTPClient {
-	hc.client.SetAuthToken(token)
-	if authType == "Bearer" {
-		hc.client.SetAuthToken("Bearer " + token)
+	// Trim whitespace from inputs
+	authType = strings.TrimSpace(authType)
+	token = strings.TrimSpace(token)
+	
+	// Build authorization header value
+	var value string
+	if strings.EqualFold(authType, "Bearer") {
+		value = "Bearer " + token
+	} else if authType != "" {
+		value = authType + " " + token
+	} else {
+		value = token
 	}
+	
+	// Set header directly instead of using SetAuthToken to avoid double Bearer
+	hc.client.SetHeader("Authorization", value)
 	return hc
 }
 
@@ -64,9 +77,11 @@ func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error
 	if err != nil {
 		return nil, err
 	}
+	bodyBytes := resp.Body()
 	return &HTTPResponse{
 		StatusCode: resp.StatusCode(),
-		Body:       string(resp.Body()),
+		RawBody:    bodyBytes,
+		Body:       string(bodyBytes), // Keep for convenience
 		Headers:    resp.Header(),
 		Request:    resp.Request,
 	}, nil
@@ -78,9 +93,11 @@ func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResp
 	if err != nil {
 		return nil, err
 	}
+	bodyBytes := resp.Body()
 	return &HTTPResponse{
 		StatusCode: resp.StatusCode(),
-		Body:       string(resp.Body()),
+		RawBody:    bodyBytes,
+		Body:       string(bodyBytes), // Keep for convenience
 		Headers:    resp.Header(),
 		Request:    resp.Request,
 	}, nil
@@ -92,9 +109,11 @@ func (hc *HTTPClient) Put(ctx context.Context, url string, body any) (*HTTPRespo
 	if err != nil {
 		return nil, err
 	}
+	bodyBytes := resp.Body()
 	return &HTTPResponse{
 		StatusCode: resp.StatusCode(),
-		Body:       string(resp.Body()),
+		RawBody:    bodyBytes,
+		Body:       string(bodyBytes), // Keep for convenience
 		Headers:    resp.Header(),
 		Request:    resp.Request,
 	}, nil
@@ -106,9 +125,11 @@ func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, er
 	if err != nil {
 		return nil, err
 	}
+	bodyBytes := resp.Body()
 	return &HTTPResponse{
 		StatusCode: resp.StatusCode(),
-		Body:       string(resp.Body()),
+		RawBody:    bodyBytes,
+		Body:       string(bodyBytes), // Keep for convenience
 		Headers:    resp.Header(),
 		Request:    resp.Request,
 	}, nil
@@ -117,7 +138,8 @@ func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, er
 // HTTPResponse wraps resty response
 type HTTPResponse struct {
 	StatusCode int                 `json:"status_code"`
-	Body       string              `json:"body"`
+	RawBody    []byte              `json:"raw_body"`
+	Body       string              `json:"body,omitempty"` // Keep for convenience, marked as optional
 	Headers    map[string][]string `json:"headers"`
 	Request    *resty.Request      `json:"request"`
 }

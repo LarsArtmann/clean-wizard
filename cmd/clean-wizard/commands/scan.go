@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -44,11 +43,8 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			if configFile != "" {
 				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
 
-				// Set config file path using environment variable
-				os.Setenv("CONFIG_PATH", configFile)
-
 				var err error
-				loadedCfg, err = config.LoadWithContext(ctx)
+				loadedCfg, err = config.LoadWithContextAndPath(ctx, configFile)
 				if err != nil {
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
@@ -63,6 +59,23 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 							return fmt.Errorf("basic validation failed: protected paths cannot be empty")
 						}
 					}
+
+					if validationLevel >= config.ValidationLevelComprehensive {
+						// Comprehensive validation
+						if err := loadedCfg.Validate(); err != nil {
+							return fmt.Errorf("comprehensive validation failed: %w", err)
+						}
+					}
+
+					if validationLevel >= config.ValidationLevelStrict {
+						// Strict validation
+						if !loadedCfg.SafeMode {
+							return fmt.Errorf("strict validation failed: safe_mode must be enabled")
+						}
+					}
+
+					fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n",
+						loadedCfg.SafeMode, len(loadedCfg.Profiles))
 				}
 			} else {
 				// Load default configuration to get profile information

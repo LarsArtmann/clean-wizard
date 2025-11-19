@@ -118,6 +118,99 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	return &config, nil
 }
 
+// LoadWithContextAndPath loads configuration with context support and explicit file path
+func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Config, error) {
+	v := viper.New()
+	
+	// Use the provided path directly
+	if configPath != "" {
+		v.SetConfigFile(configPath)
+	} else {
+		// Fall back to default behavior if no path provided
+		return LoadWithContext(ctx)
+	}
+
+	// Set defaults
+	v.SetDefault("version", "1.0.0")
+	v.SetDefault("safe_mode", true)
+	v.SetDefault("max_disk_usage_percent", 50)
+	v.SetDefault("protected", []string{"/System", "/Library"}) // Basic protection
+
+	// Try to read configuration file
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		if err := v.ReadInConfig(); err != nil {
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+				// Config file not found, return default config
+				return getDefaultConfig(), nil
+			}
+			return nil, pkgerrors.HandleConfigError("LoadWithContextAndPath", err)
+		}
+	}
+
+	// Unmarshal profiles section
+	var config domain.Config
+
+	// Manually unmarshal fields to avoid YAML tag issues
+	config.Version = v.GetString("version")
+	config.SafeMode = v.GetBool("safe_mode")
+	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
+	config.Protected = v.GetStringSlice("protected")
+
+	// Unmarshal profiles section
+	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
+		log.Err(err).Msg("Failed to unmarshal profiles")
+		return nil, pkgerrors.HandleConfigError("LoadWithContextAndPath", err)
+	}
+
+	// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)
+	for name, profile := range config.Profiles {
+		for i, op := range profile.Operations {
+			// Convert string risk level to RiskLevel enum
+			var riskLevelStr string
+			v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr)
+
+			switch strings.ToUpper(riskLevelStr) {
+			case "LOW":
+				op.RiskLevel = domain.RiskLow
+			case "MEDIUM":
+				op.RiskLevel = domain.RiskMedium
+			case "HIGH":
+				op.RiskLevel = domain.RiskHigh
+			case "CRITICAL":
+				op.RiskLevel = domain.RiskCritical
+			default:
+				log.Warn().Str("risk_level", riskLevelStr).Msg("Invalid risk level, defaulting to LOW")
+				op.RiskLevel = domain.RiskLow
+			}
+		}
+	}
+
+	// Enable comprehensive validation - CRITICAL for production safety
+	if err := config.Validate(); err != nil {
+		return nil, pkgerrors.HandleConfigError("LoadWithContextAndPath", err)
+	}
+
+	// Apply comprehensive validation with strict enforcement
+	if validator := NewConfigValidator(); validator != nil {
+		validationResult := validator.ValidateConfig(&config)
+		if !validationResult.IsValid {
+			// CRITICAL: Fail fast on validation errors for production safety
+			for _, err := range validationResult.Errors {
+				log.Error().
+					Str("field", err.Field).
+					Err(fmt.Errorf("%s", err.Message)).
+					Msg("Configuration validation error")
+			}
+			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
+		}
+	}
+
+	return &config, nil
+}
+
 // Save saves the configuration to file
 func Save(config *domain.Config) error {
 	v := viper.New()
