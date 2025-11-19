@@ -13,6 +13,76 @@ type TypeSafeEnum[T any] interface {
 	Values() []T
 }
 
+// EnumHelper provides generic enum functionality to reduce code duplication
+type EnumHelper[T ~int] struct {
+	stringValues map[T]string
+	validRange   func(T) bool
+	allValues    func() []T
+	caseSensitive bool
+}
+
+// NewEnumHelper creates a new helper for enum type-safe operations
+func NewEnumHelper[T ~int](stringValues map[T]string, validRange func(T) bool, allValues func() []T, caseSensitive bool) *EnumHelper[T] {
+	return &EnumHelper[T]{
+		stringValues:   stringValues,
+		validRange:     validRange,
+		allValues:      allValues,
+		caseSensitive: caseSensitive,
+	}
+}
+
+// String returns string representation for enum value
+func (eh *EnumHelper[T]) String(value T) string {
+	if str, exists := eh.stringValues[value]; exists {
+		return str
+	}
+	return "UNKNOWN"
+}
+
+// IsValid checks if enum value is valid
+func (eh *EnumHelper[T]) IsValid(value T) bool {
+	return eh.validRange(value)
+}
+
+// Values returns all possible enum values
+func (eh *EnumHelper[T]) Values() []T {
+	return eh.allValues()
+}
+
+// MarshalJSON converts enum to JSON string
+func (eh *EnumHelper[T]) MarshalJSON(value T) ([]byte, error) {
+	if !eh.IsValid(value) {
+		return nil, fmt.Errorf("invalid enum value: %v", value)
+	}
+	return json.Marshal(eh.String(value))
+}
+
+// UnmarshalJSON converts JSON string to enum value
+func (eh *EnumHelper[T]) UnmarshalJSON(data []byte, valueSetter func(T)) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	
+	// Find matching enum value by string
+	for enumVal, strVal := range eh.stringValues {
+		compareValue := s
+		strToCompare := strVal
+		
+		if !eh.caseSensitive {
+			compareValue = strings.ToUpper(s)
+			strToCompare = strVal
+		}
+		
+		if compareValue == strToCompare {
+			valueSetter(enumVal)
+			return nil
+		}
+	}
+	
+	return fmt.Errorf("invalid enum value: %s", s)
+}
+
 // RiskLevelType represents the risk level enum with compile-time safety
 type RiskLevelType int
 
@@ -23,65 +93,48 @@ const (
 	RiskLevelCriticalType
 )
 
-// String returns the string representation
-func (rl RiskLevelType) String() string {
-	switch rl {
-	case RiskLevelLowType:
-		return "LOW"
-	case RiskLevelMediumType:
-		return "MEDIUM"
-	case RiskLevelHighType:
-		return "HIGH"
-	case RiskLevelCriticalType:
-		return "CRITICAL"
-	default:
-		return "UNKNOWN"
-	}
-}
-
-// IsValid checks if risk level is valid
-func (rl RiskLevelType) IsValid() bool {
+// riskLevelHelper provides shared functionality for RiskLevelType
+var riskLevelHelper = NewEnumHelper(map[RiskLevelType]string{
+	RiskLevelLowType:      "LOW",
+	RiskLevelMediumType:    "MEDIUM",
+	RiskLevelHighType:      "HIGH",
+	RiskLevelCriticalType:  "CRITICAL",
+}, func(rl RiskLevelType) bool {
 	return rl >= RiskLevelLowType && rl <= RiskLevelCriticalType
-}
-
-// Values returns all possible values
-func (rl RiskLevelType) Values() []RiskLevelType {
+}, func() []RiskLevelType {
 	return []RiskLevelType{
 		RiskLevelLowType,
 		RiskLevelMediumType,
 		RiskLevelHighType,
 		RiskLevelCriticalType,
 	}
+}, true) // case sensitive for risk levels
+
+// String returns the string representation
+func (rl RiskLevelType) String() string {
+	return riskLevelHelper.String(rl)
+}
+
+// IsValid checks if risk level is valid
+func (rl RiskLevelType) IsValid() bool {
+	return riskLevelHelper.IsValid(rl)
+}
+
+// Values returns all possible values
+func (rl RiskLevelType) Values() []RiskLevelType {
+	return riskLevelHelper.Values()
 }
 
 // MarshalJSON implements json.Marshaler
 func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
-	if !rl.IsValid() {
-		return nil, fmt.Errorf("invalid risk level: %d", rl)
-	}
-	return json.Marshal(rl.String())
+	return riskLevelHelper.MarshalJSON(rl)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToUpper(s) {
-	case "LOW":
-		*rl = RiskLevelLowType
-	case "MEDIUM":
-		*rl = RiskLevelMediumType
-	case "HIGH":
-		*rl = RiskLevelHighType
-	case "CRITICAL":
-		*rl = RiskLevelCriticalType
-	default:
-		return fmt.Errorf("invalid risk level: %s", s)
-	}
-	return nil
+	return riskLevelHelper.UnmarshalJSON(data, func(val RiskLevelType) {
+		*rl = val
+	})
 }
 
 // Icon returns emoji for risk level (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
