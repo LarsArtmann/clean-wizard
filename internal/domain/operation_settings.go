@@ -18,8 +18,8 @@ type OperationSettings struct {
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup
 type NixGenerationsSettings struct {
-	Generations int  `json:"generations"`
-	Optimize    bool `json:"optimize"`
+	Generations int                    `json:"generations"`
+	Optimization OptimizationLevelType `json:"optimization"`
 }
 
 // TempFilesSettings provides type-safe settings for temporary files cleanup
@@ -30,8 +30,8 @@ type TempFilesSettings struct {
 
 // HomebrewSettings provides type-safe settings for Homebrew cleanup
 type HomebrewSettings struct {
-	UnusedOnly bool   `json:"unused_only"`
-	Prune      string `json:"prune,omitempty"`
+	FileSelectionStrategy FileSelectionStrategyType `json:"file_selection_strategy"`
+	Prune              string                        `json:"prune,omitempty"`
 }
 
 // SystemTempSettings provides type-safe settings for system temp cleanup
@@ -73,7 +73,7 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 		return &OperationSettings{
 			NixGenerations: &NixGenerationsSettings{
 				Generations: 1,
-				Optimize:    false,
+				Optimization: OptimizationLevelNone,
 			},
 		}
 	case OperationTypeTempFiles:
@@ -86,7 +86,7 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 	case OperationTypeHomebrew:
 		return &OperationSettings{
 			Homebrew: &HomebrewSettings{
-				UnusedOnly: true,
+				FileSelectionStrategy: FileSelectionStrategyAll,
 			},
 		}
 	case OperationTypeSystemTemp:

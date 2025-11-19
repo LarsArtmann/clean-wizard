@@ -62,7 +62,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	config.SafeMode = v.GetBool("safe_mode")
+	config.SafetyLevel = domain.SafetyLevelEnabled
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
 	config.Protected = v.GetStringSlice("protected")
 
@@ -155,7 +155,7 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	config.SafeMode = v.GetBool("safe_mode")
+	config.SafetyLevel = domain.SafetyLevelEnabled
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
 	config.Protected = v.GetStringSlice("protected")
 
@@ -224,7 +224,7 @@ func Save(config *domain.Config) error {
 
 	// Set configuration values
 	v.Set("version", config.Version)
-	v.Set("safe_mode", config.SafeMode)
+	v.Set("safety_level", config.SafetyLevel.String())
 	v.Set("max_disk_usage_percent", config.MaxDiskUsage)
 	v.Set("protected", config.Protected)
 	v.Set("last_clean", config.LastClean)
@@ -234,14 +234,14 @@ func Save(config *domain.Config) error {
 	for name, profile := range config.Profiles {
 		v.Set("profiles."+name+".name", profile.Name)
 		v.Set("profiles."+name+".description", profile.Description)
-		v.Set("profiles."+name+".enabled", profile.Enabled)
+		v.Set("profiles."+name+".status", profile.Status.String())
 
 		for i, op := range profile.Operations {
 			opKey := fmt.Sprintf("profiles.%s.operations.%d", name, i)
 			v.Set(opKey+".name", op.Name)
 			v.Set(opKey+".description", op.Description)
 			v.Set(opKey+".risk_level", op.RiskLevel)
-			v.Set(opKey+".enabled", op.Enabled)
+			v.Set(opKey+".enabled", op.Status.String())
 			if op.Settings != nil {
 				v.Set(opKey+".settings", op.Settings)
 			}
@@ -274,7 +274,7 @@ func getDefaultConfig() *domain.Config {
 
 	return &domain.Config{
 		Version:      "1.0.0",
-		SafeMode:     true, // Default to safe mode
+		SafetyLevel: domain.SafetyLevelEnabled, // Default to safety enabled
 		MaxDiskUsage: 50,
 		Protected: []string{
 			"/System",
@@ -290,18 +290,18 @@ func getDefaultConfig() *domain.Config {
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 					},
 				},
-				Enabled: true,
+				Status: domain.StatusEnabled,
 			},
 			"aggressive": {
 				Name:        "aggressive",
@@ -311,18 +311,18 @@ func getDefaultConfig() *domain.Config {
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
 						RiskLevel:   domain.RiskHigh,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean old Homebrew packages",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 					},
 				},
-				Enabled: true,
+				Status: domain.StatusEnabled,
 			},
 			"comprehensive": {
 				Name:        "comprehensive",
@@ -332,25 +332,25 @@ func getDefaultConfig() *domain.Config {
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
 						RiskLevel:   domain.RiskCritical,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean old Homebrew packages",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 					},
 					{
 						Name:        "system-temp",
 						Description: "Clean system temporary files",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeSystemTemp),
 					},
 				},
-				Enabled: true,
+				Status: domain.StatusEnabled,
 			},
 		},
 		LastClean: now,

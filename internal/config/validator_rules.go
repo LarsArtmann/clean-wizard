@@ -24,9 +24,9 @@ type ConfigValidationRules struct {
 	UniqueProfiles bool `json:"unique_profiles"`
 
 	// Safety Constraints
-	ProtectedSystemPaths  []string `json:"protected_system_paths"`
-	DefaultProtectedPaths []string `json:"default_protected_paths"`
-	RequireSafeMode       bool     `json:"require_safe_mode"`
+	ProtectedSystemPaths  []string                `json:"protected_system_paths"`
+	DefaultProtectedPaths []string                `json:"default_protected_paths"`
+	RequireSafeMode       domain.EnforcementLevelType `json:"require_safe_mode"`
 
 	// Risk Constraints
 	MaxRiskLevel   domain.RiskLevel `json:"max_risk_level"`

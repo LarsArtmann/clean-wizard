@@ -41,10 +41,10 @@ var (
 
 // NixGeneration represents Nix store generation
 type NixGeneration struct {
-	ID      int       `json:"id"`
-	Path    string    `json:"path"`
-	Date    time.Time `json:"date"`
-	Current bool      `json:"current"`
+	ID      int             `json:"id"`
+	Path    string          `json:"path"`
+	Date    time.Time       `json:"date"`
+	Status  SelectedStatusType `json:"status"`
 }
 
 // IsValid validates generation
@@ -100,9 +100,9 @@ func (st ScanType) IsValid() bool {
 
 // ScanRequest represents scanning command
 type ScanRequest struct {
-	Type      ScanType `json:"type"`
-	Recursive bool     `json:"recursive"`
-	Limit     int      `json:"limit"`
+	Type      ScanTypeType     `json:"type"`
+	Recursion RecursionLevelType `json:"recursion"`
+	Limit     int              `json:"limit"`
 }
 
 // Validate returns errors for invalid scan request

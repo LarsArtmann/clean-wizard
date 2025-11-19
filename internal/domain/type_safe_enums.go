@@ -364,6 +364,298 @@ var scanTypeHelper = NewEnumHelper(map[ScanTypeType]string{
 	}
 }, false) // case insensitive for scan types (accept "nix-store", "nix_store", "temp", etc.)
 
+// StatusType represents enabled status of profiles and operations
+// Replaces boolean Enabled to eliminate invalid states
+type StatusType int
+
+const (
+	StatusDisabled StatusType = iota
+	StatusEnabled
+	StatusInherited
+)
+
+// statusTypeHelper provides shared functionality for StatusType
+var statusTypeHelper = NewEnumHelper(map[StatusType]string{
+	StatusDisabled:  "disabled",
+	StatusEnabled:   "enabled",
+	StatusInherited: "inherited",
+}, func(s StatusType) bool {
+	return s >= StatusDisabled && s <= StatusInherited
+}, func() []StatusType {
+	return []StatusType{StatusDisabled, StatusEnabled, StatusInherited}
+}, false)
+
+// String returns string representation
+func (s StatusType) String() string {
+	return statusTypeHelper.String(s)
+}
+
+// IsValid checks if status is valid
+func (s StatusType) IsValid() bool {
+	return statusTypeHelper.IsValid(s)
+}
+
+// Values returns all possible status values
+func (s StatusType) Values() []StatusType {
+	return statusTypeHelper.Values()
+}
+
+// MarshalJSON converts status to JSON string
+func (s StatusType) MarshalJSON() ([]byte, error) {
+	return statusTypeHelper.MarshalJSON(s)
+}
+
+// UnmarshalJSON converts JSON string to status
+func (s *StatusType) UnmarshalJSON(data []byte) error {
+	return statusTypeHelper.UnmarshalJSON(data, func(val StatusType) {
+		*s = val
+	})
+}
+
+// EnforcementLevelType represents validation strictness levels
+// Replaces boolean RequireSafeMode to eliminate invalid states
+type EnforcementLevelType int
+
+const (
+	EnforcementLevelNone EnforcementLevelType = iota
+	EnforcementLevelWarning
+	EnforcementLevelError
+	EnforcementLevelStrict
+)
+
+// enforcementLevelTypeHelper provides shared functionality for EnforcementLevelType
+var enforcementLevelTypeHelper = NewEnumHelper(map[EnforcementLevelType]string{
+	EnforcementLevelNone:    "none",
+	EnforcementLevelWarning: "warning",
+	EnforcementLevelError:   "error",
+	EnforcementLevelStrict:  "strict",
+}, func(el EnforcementLevelType) bool {
+	return el >= EnforcementLevelNone && el <= EnforcementLevelStrict
+}, func() []EnforcementLevelType {
+	return []EnforcementLevelType{EnforcementLevelNone, EnforcementLevelWarning, EnforcementLevelError, EnforcementLevelStrict}
+}, false)
+
+// String returns string representation
+func (el EnforcementLevelType) String() string {
+	return enforcementLevelTypeHelper.String(el)
+}
+
+// IsValid checks if enforcement level is valid
+func (el EnforcementLevelType) IsValid() bool {
+	return enforcementLevelTypeHelper.IsValid(el)
+}
+
+// Values returns all possible enforcement level values
+func (el EnforcementLevelType) Values() []EnforcementLevelType {
+	return enforcementLevelTypeHelper.Values()
+}
+
+// MarshalJSON converts enforcement level to JSON string
+func (el EnforcementLevelType) MarshalJSON() ([]byte, error) {
+	return enforcementLevelTypeHelper.MarshalJSON(el)
+}
+
+// UnmarshalJSON converts JSON string to enforcement level
+func (el *EnforcementLevelType) UnmarshalJSON(data []byte) error {
+	return enforcementLevelTypeHelper.UnmarshalJSON(data, func(val EnforcementLevelType) {
+		*el = val
+	})
+}
+
+// SelectedStatusType represents selection status of operations
+// Replaces boolean Current to eliminate invalid states
+type SelectedStatusType int
+
+const (
+	SelectedStatusNotSelected SelectedStatusType = iota
+	SelectedStatusSelected
+	SelectedStatusDefault
+)
+
+// selectedStatusTypeHelper provides shared functionality for SelectedStatusType
+var selectedStatusTypeHelper = NewEnumHelper(map[SelectedStatusType]string{
+	SelectedStatusNotSelected: "not_selected",
+	SelectedStatusSelected:   "selected",
+	SelectedStatusDefault:    "default",
+}, func(ss SelectedStatusType) bool {
+	return ss >= SelectedStatusNotSelected && ss <= SelectedStatusDefault
+}, func() []SelectedStatusType {
+	return []SelectedStatusType{SelectedStatusNotSelected, SelectedStatusSelected, SelectedStatusDefault}
+}, false)
+
+// String returns string representation
+func (ss SelectedStatusType) String() string {
+	return selectedStatusTypeHelper.String(ss)
+}
+
+// IsValid checks if selected status is valid
+func (ss SelectedStatusType) IsValid() bool {
+	return selectedStatusTypeHelper.IsValid(ss)
+}
+
+// Values returns all possible selected status values
+func (ss SelectedStatusType) Values() []SelectedStatusType {
+	return selectedStatusTypeHelper.Values()
+}
+
+// MarshalJSON converts selected status to JSON string
+func (ss SelectedStatusType) MarshalJSON() ([]byte, error) {
+	return selectedStatusTypeHelper.MarshalJSON(ss)
+}
+
+// UnmarshalJSON converts JSON string to selected status
+func (ss *SelectedStatusType) UnmarshalJSON(data []byte) error {
+	return selectedStatusTypeHelper.UnmarshalJSON(data, func(val SelectedStatusType) {
+		*ss = val
+	})
+}
+
+// RecursionLevelType represents recursion levels for scanning
+// Replaces boolean Recursive to eliminate invalid states
+type RecursionLevelType int
+
+const (
+	RecursionLevelNone RecursionLevelType = iota
+	RecursionLevelDirect
+	RecursionLevelFull
+	RecursionLevelInfinite
+)
+
+// recursionLevelTypeHelper provides shared functionality for RecursionLevelType
+var recursionLevelTypeHelper = NewEnumHelper(map[RecursionLevelType]string{
+	RecursionLevelNone:     "none",
+	RecursionLevelDirect:    "direct",
+	RecursionLevelFull:     "full",
+	RecursionLevelInfinite:  "infinite",
+}, func(rl RecursionLevelType) bool {
+	return rl >= RecursionLevelNone && rl <= RecursionLevelInfinite
+}, func() []RecursionLevelType {
+	return []RecursionLevelType{RecursionLevelNone, RecursionLevelDirect, RecursionLevelFull, RecursionLevelInfinite}
+}, false)
+
+// String returns string representation
+func (rl RecursionLevelType) String() string {
+	return recursionLevelTypeHelper.String(rl)
+}
+
+// IsValid checks if recursion level is valid
+func (rl RecursionLevelType) IsValid() bool {
+	return recursionLevelTypeHelper.IsValid(rl)
+}
+
+// Values returns all possible recursion level values
+func (rl RecursionLevelType) Values() []RecursionLevelType {
+	return recursionLevelTypeHelper.Values()
+}
+
+// MarshalJSON converts recursion level to JSON string
+func (rl RecursionLevelType) MarshalJSON() ([]byte, error) {
+	return recursionLevelTypeHelper.MarshalJSON(rl)
+}
+
+// UnmarshalJSON converts JSON string to recursion level
+func (rl *RecursionLevelType) UnmarshalJSON(data []byte) error {
+	return recursionLevelTypeHelper.UnmarshalJSON(data, func(val RecursionLevelType) {
+		*rl = val
+	})
+}
+
+// OptimizationLevelType represents optimization levels for operations
+// Replaces boolean Optimize to eliminate invalid states
+type OptimizationLevelType int
+
+const (
+	OptimizationLevelNone OptimizationLevelType = iota
+	OptimizationLevelConservative
+	OptimizationLevelAggressive
+)
+
+// optimizationLevelTypeHelper provides shared functionality for OptimizationLevelType
+var optimizationLevelTypeHelper = NewEnumHelper(map[OptimizationLevelType]string{
+	OptimizationLevelNone:         "none",
+	OptimizationLevelConservative: "conservative",
+	OptimizationLevelAggressive:  "aggressive",
+}, func(ol OptimizationLevelType) bool {
+	return ol >= OptimizationLevelNone && ol <= OptimizationLevelAggressive
+}, func() []OptimizationLevelType {
+	return []OptimizationLevelType{OptimizationLevelNone, OptimizationLevelConservative, OptimizationLevelAggressive}
+}, false)
+
+// String returns string representation
+func (ol OptimizationLevelType) String() string {
+	return optimizationLevelTypeHelper.String(ol)
+}
+
+// IsValid checks if optimization level is valid
+func (ol OptimizationLevelType) IsValid() bool {
+	return optimizationLevelTypeHelper.IsValid(ol)
+}
+
+// Values returns all possible optimization level values
+func (ol OptimizationLevelType) Values() []OptimizationLevelType {
+	return optimizationLevelTypeHelper.Values()
+}
+
+// MarshalJSON converts optimization level to JSON string
+func (ol OptimizationLevelType) MarshalJSON() ([]byte, error) {
+	return optimizationLevelTypeHelper.MarshalJSON(ol)
+}
+
+// UnmarshalJSON converts JSON string to optimization level
+func (ol *OptimizationLevelType) UnmarshalJSON(data []byte) error {
+	return optimizationLevelTypeHelper.UnmarshalJSON(data, func(val OptimizationLevelType) {
+		*ol = val
+	})
+}
+
+// FileSelectionStrategyType represents file selection strategies for cleanup
+// Replaces boolean UnusedOnly to eliminate invalid states
+type FileSelectionStrategyType int
+
+const (
+	FileSelectionStrategyAll FileSelectionStrategyType = iota
+	FileSelectionStrategyUnusedOnly
+	FileSelectionStrategyManual
+)
+
+// fileSelectionStrategyTypeHelper provides shared functionality for FileSelectionStrategyType
+var fileSelectionStrategyTypeHelper = NewEnumHelper(map[FileSelectionStrategyType]string{
+	FileSelectionStrategyAll:        "all",
+	FileSelectionStrategyUnusedOnly: "unused_only",
+	FileSelectionStrategyManual:    "manual",
+}, func(fss FileSelectionStrategyType) bool {
+	return fss >= FileSelectionStrategyAll && fss <= FileSelectionStrategyManual
+}, func() []FileSelectionStrategyType {
+	return []FileSelectionStrategyType{FileSelectionStrategyAll, FileSelectionStrategyUnusedOnly, FileSelectionStrategyManual}
+}, false)
+
+// String returns string representation
+func (fss FileSelectionStrategyType) String() string {
+	return fileSelectionStrategyTypeHelper.String(fss)
+}
+
+// IsValid checks if file selection strategy is valid
+func (fss FileSelectionStrategyType) IsValid() bool {
+	return fileSelectionStrategyTypeHelper.IsValid(fss)
+}
+
+// Values returns all possible file selection strategy values
+func (fss FileSelectionStrategyType) Values() []FileSelectionStrategyType {
+	return fileSelectionStrategyTypeHelper.Values()
+}
+
+// MarshalJSON converts file selection strategy to JSON string
+func (fss FileSelectionStrategyType) MarshalJSON() ([]byte, error) {
+	return fileSelectionStrategyTypeHelper.MarshalJSON(fss)
+}
+
+// UnmarshalJSON converts JSON string to file selection strategy
+func (fss *FileSelectionStrategyType) UnmarshalJSON(data []byte) error {
+	return fileSelectionStrategyTypeHelper.UnmarshalJSON(data, func(val FileSelectionStrategyType) {
+		*fss = val
+	})
+}
+
 // String returns string representation
 func (st ScanTypeType) String() string {
 	return scanTypeHelper.String(st)
@@ -402,6 +694,160 @@ func (st ScanTypeType) Icon() string {
 		return "💻"
 	case ScanTypeTempType:
 		return "🗑️"
+	default:
+		return "❓"
+	}
+}
+
+// StatusIcon returns emoji for status type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
+func (s StatusType) Icon() string {
+	switch s {
+	case StatusDisabled:
+		return "🔴"
+	case StatusEnabled:
+		return "🟢"
+	case StatusInherited:
+		return "🔵"
+	default:
+		return "❓"
+	}
+}
+
+// EnforcementLevelIcon returns emoji for enforcement level type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
+func (el EnforcementLevelType) Icon() string {
+	switch el {
+	case EnforcementLevelNone:
+		return "⚪"
+	case EnforcementLevelWarning:
+		return "🟡"
+	case EnforcementLevelError:
+		return "🔴"
+	case EnforcementLevelStrict:
+		return "🚫"
+	default:
+		return "❓"
+	}
+}
+
+// SelectedStatusIcon returns emoji for selected status type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
+func (ss SelectedStatusType) Icon() string {
+	switch ss {
+	case SelectedStatusNotSelected:
+		return "⭕"
+	case SelectedStatusSelected:
+		return "✅"
+	case SelectedStatusDefault:
+		return "🌟"
+	default:
+		return "❓"
+	}
+}
+
+// RecursionLevelIcon returns emoji for recursion level type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
+func (rl RecursionLevelType) Icon() string {
+	switch rl {
+	case RecursionLevelNone:
+		return "➡️"
+	case RecursionLevelDirect:
+		return "⬇️"
+	case RecursionLevelFull:
+		return "🔄"
+	case RecursionLevelInfinite:
+		return "♾️"
+	default:
+		return "❓"
+	}
+}
+
+// OptimizationLevelIcon returns emoji for optimization level type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
+func (ol OptimizationLevelType) Icon() string {
+	switch ol {
+	case OptimizationLevelNone:
+		return "⚪"
+	case OptimizationLevelConservative:
+		return "🟡"
+	case OptimizationLevelAggressive:
+		return "🔴"
+	default:
+		return "❓"
+	}
+}
+
+// FileSelectionStrategyIcon returns emoji for file selection strategy type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
+func (fss FileSelectionStrategyType) Icon() string {
+	switch fss {
+	case FileSelectionStrategyAll:
+		return "📁"
+	case FileSelectionStrategyUnusedOnly:
+		return "🗑️"
+	case FileSelectionStrategyManual:
+		return "✏️"
+	default:
+		return "❓"
+	}
+}
+
+// SafetyLevelType represents safety enforcement levels for configuration
+// Replaces boolean SafeMode to eliminate invalid states
+type SafetyLevelType int
+
+const (
+	SafetyLevelDisabled SafetyLevelType = iota
+	SafetyLevelEnabled
+	SafetyLevelStrict
+	SafetyLevelParanoid
+)
+
+// safetyLevelTypeHelper provides shared functionality for SafetyLevelType
+var safetyLevelTypeHelper = NewEnumHelper(map[SafetyLevelType]string{
+	SafetyLevelDisabled: "disabled",
+	SafetyLevelEnabled:  "enabled",
+	SafetyLevelStrict:   "strict",
+	SafetyLevelParanoid: "paranoid",
+}, func(sl SafetyLevelType) bool {
+	return sl >= SafetyLevelDisabled && sl <= SafetyLevelParanoid
+}, func() []SafetyLevelType {
+	return []SafetyLevelType{SafetyLevelDisabled, SafetyLevelEnabled, SafetyLevelStrict, SafetyLevelParanoid}
+}, false)
+
+// String returns string representation
+func (sl SafetyLevelType) String() string {
+	return safetyLevelTypeHelper.String(sl)
+}
+
+// IsValid checks if safety level is valid
+func (sl SafetyLevelType) IsValid() bool {
+	return safetyLevelTypeHelper.IsValid(sl)
+}
+
+// Values returns all possible safety level values
+func (sl SafetyLevelType) Values() []SafetyLevelType {
+	return safetyLevelTypeHelper.Values()
+}
+
+// MarshalJSON converts safety level to JSON string
+func (sl SafetyLevelType) MarshalJSON() ([]byte, error) {
+	return safetyLevelTypeHelper.MarshalJSON(sl)
+}
+
+// UnmarshalJSON converts JSON string to safety level
+func (sl *SafetyLevelType) UnmarshalJSON(data []byte) error {
+	return safetyLevelTypeHelper.UnmarshalJSON(data, func(val SafetyLevelType) {
+		*sl = val
+	})
+}
+
+// SafetyLevelIcon returns emoji for safety level type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
+func (sl SafetyLevelType) Icon() string {
+	switch sl {
+	case SafetyLevelDisabled:
+		return "🔴"
+	case SafetyLevelEnabled:
+		return "🟢"
+	case SafetyLevelStrict:
+		return "🟡"
+	case SafetyLevelParanoid:
+		return "🚫"
 	default:
 		return "❓"
 	}

@@ -8,7 +8,7 @@ import (
 // Config represents application configuration with type safety
 type Config struct {
 	Version        string              `json:"version" yaml:"version"`
-	SafeMode       bool                `json:"safe_mode" yaml:"safe_mode"`
+	SafetyLevel   SafetyLevelType     `json:"safety_level" yaml:"safety_level"`
 	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"`
 	Protected      []string            `json:"protected" yaml:"protected"`
 	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`
@@ -74,7 +74,7 @@ type Profile struct {
 	Name        string             `json:"name" yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
 	Operations  []CleanupOperation `json:"operations" yaml:"operations"`
-	Enabled     bool               `json:"enabled" yaml:"enabled"`
+	Status      StatusType          `json:"status" yaml:"status"`
 }
 
 // IsValid validates profile
@@ -93,6 +93,10 @@ func (p *Profile) IsValid(name string) bool {
 		if !op.IsValid() {
 			return false
 		}
+	}
+
+	if !p.Status.IsValid() {
+		return false
 	}
 
 	return true
@@ -116,6 +120,10 @@ func (p *Profile) Validate(name string) error {
 		}
 	}
 
+	if !p.Status.IsValid() {
+		return fmt.Errorf("Profile %s: invalid status: %s", name, p.Status.String())
+	}
+
 	return nil
 }
 
@@ -124,7 +132,7 @@ type CleanupOperation struct {
 	Name        string             `json:"name" yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
 	RiskLevel   RiskLevel          `json:"risk_level" yaml:"risk_level"`
-	Enabled     bool               `json:"enabled" yaml:"enabled"`
+	Status      StatusType          `json:"status" yaml:"status"`
 	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }
 
@@ -137,6 +145,9 @@ func (op CleanupOperation) IsValid() bool {
 		return false
 	}
 	if !op.RiskLevel.IsValid() {
+		return false
+	}
+	if !op.Status.IsValid() {
 		return false
 	}
 	return true

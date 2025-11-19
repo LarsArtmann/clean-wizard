@@ -177,11 +177,11 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 		}
 	}
 
-	// Ensure safe mode defaults
-	if cs.rules.DefaultSafeMode && !cfg.SafeMode {
-		original := cfg.SafeMode
-		cfg.SafeMode = true
-		result.addChange("safe_mode", original, cfg.SafeMode, "enabled safe mode for security")
+	// Ensure safety level defaults
+	if cs.rules.DefaultSafeMode && cfg.SafetyLevel == domain.SafetyLevelDisabled {
+		original := cfg.SafetyLevel
+		cfg.SafetyLevel = domain.SafetyLevelEnabled
+		result.addChange("safety_level", original.String(), cfg.SafetyLevel.String(), "enabled safety level for security")
 	}
 }
 
