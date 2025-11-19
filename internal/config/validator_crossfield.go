@@ -96,6 +96,23 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 					},
 				})
 			}
+=======
+	// Safe mode vs risk level consistency
+	if !cfg.SafeMode {
+		maxRisk := cv.findMaxRiskLevel(cfg)
+		if maxRisk == domain.RiskCritical {
+			result.Warnings = append(result.Warnings, ValidationWarning{
+				Field:      "safe_mode",
+				Message:    "Critical risk operations enabled while safe_mode is false",
+				Suggestion: "Enable safe_mode or review critical risk operations",
+				Context: &ValidationContext{
+					Metadata: map[string]string{
+						"max_risk_level": maxRisk.String(),
+						"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode),
+					},
+				},
+			})
+>>>>>>> master
 		}
 	}
 
