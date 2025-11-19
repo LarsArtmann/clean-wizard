@@ -19,7 +19,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			name: "whitespace cleanup",
 			config: &domain.Config{
 				Version:      "  1.0.0  ",
-				SafeMode:     true,
+				SafetyLevel:  domain.SafetyLevelEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library"},
 				Profiles: map[string]*domain.Profile{
@@ -31,10 +31,10 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
+								Status:      domain.StatusEnabled,
 							},
 						},
-						Enabled: true,
+						Status: domain.StatusEnabled,
 					},
 				},
 			},
@@ -45,7 +45,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			name: "max disk usage clamping",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode:     true,
+				SafetyLevel:  domain.SafetyLevelEnabled,
 				MaxDiskUsage: 150, // Will be clamped to 95
 				Protected:    []string{"/System", "/Library"},
 				Profiles: map[string]*domain.Profile{
@@ -57,10 +57,10 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
+								Status:      domain.StatusEnabled,
 							},
 						},
-						Enabled: true,
+						Status: domain.StatusEnabled,
 					},
 				},
 			},
@@ -71,7 +71,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			name: "duplicate paths",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode:     true,
+				SafetyLevel:  domain.SafetyLevelEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library", "/System"}, // Duplicate /System
 				Profiles: map[string]*domain.Profile{
@@ -83,10 +83,10 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
+								Status:      domain.StatusEnabled,
 							},
 						},
-						Enabled: true,
+						Status: domain.StatusEnabled,
 					},
 				},
 			},

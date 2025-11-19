@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -44,6 +45,8 @@ func TestRiskLevel_String(t *testing.T) {
 }
 
 func TestRiskLevel_Icon(t *testing.T) {
+	uiAdapter := adapters.NewUIAdapter()
+	
 	tests := []struct {
 		name     string
 		level    domain.RiskLevel
@@ -58,9 +61,9 @@ func TestRiskLevel_Icon(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := tt.level.Icon()
+			result := uiAdapter.RiskLevelIcon(tt.level)
 			if result != tt.expected {
-				t.Errorf("Icon() = %v, want %v", result, tt.expected)
+				t.Errorf("RiskLevelIcon() = %v, want %v", result, tt.expected)
 			}
 		})
 	}

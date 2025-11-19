@@ -12,30 +12,37 @@ import (
 
 // newBaseNixConfig creates a common config skeleton for Nix tests
 func newBaseNixConfig(safeMode bool) *domain.Config {
+	var safetyLevel domain.SafetyLevelType
+	if safeMode {
+		safetyLevel = domain.SafetyLevelEnabled
+	} else {
+		safetyLevel = domain.SafetyLevelDisabled
+	}
+	
 	return &domain.Config{
 		Version:      "1.0.0",
-		SafeMode:     safeMode,
+		SafetyLevel:  safetyLevel,
 		MaxDiskUsage: 50,
 		Protected:    []string{"/System", "/Applications"},
 		Profiles: map[string]*domain.Profile{
 			"nix-cleanup": {
 				Name:        "Nix Cleanup",
 				Description: "Clean Nix generations",
+				Status:      domain.StatusEnabled,
 				Operations: []domain.CleanupOperation{
 					{
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
-								Generations: 3,
-								Optimize:    true,
+								Generations:  3,
+								Optimization: domain.OptimizationLevelConservative,
 							},
 						},
 					},
 				},
-				Enabled: true,
 			},
 		},
 	}
@@ -71,12 +78,20 @@ func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Confi
 }
 
 // withOptimize sets the Optimize flag for nix-generations
+// withOptimize sets Optimization level for nix-generations
 func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
+	var optimizationLevel domain.OptimizationLevelType
+	if optimize {
+		optimizationLevel = domain.OptimizationLevelConservative
+	} else {
+		optimizationLevel = domain.OptimizationLevelNone
+	}
+	
 	// Find the nix-cleanup profile and its nix-generations operation
 	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
 		for i, op := range profile.Operations {
 			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
-				profile.Operations[i].Settings.NixGenerations.Optimize = optimize
+				profile.Operations[i].Settings.NixGenerations.Optimization = optimizationLevel
 				break
 			}
 		}
@@ -84,13 +99,20 @@ func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	return cfg
 }
 
-// withEnabled sets the Enabled flag for nix-generations operation
+// withEnabled sets the Status for nix-generations operation
 func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
+	var status domain.StatusType
+	if enabled {
+		status = domain.StatusEnabled
+	} else {
+		status = domain.StatusDisabled
+	}
+	
 	// Find the nix-cleanup profile and its nix-generations operation
 	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
 		for i, op := range profile.Operations {
 			if op.Name == "nix-generations" {
-				profile.Operations[i].Enabled = enabled
+				profile.Operations[i].Status = status
 				break
 			}
 		}

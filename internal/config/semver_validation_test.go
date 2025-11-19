@@ -44,7 +44,7 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 	cv := NewConfigValidator()
 	
 	t.Run("Valid semver version", func(t *testing.T) {
-		cfg := &domain.Config{
+			cfg := &domain.Config{
 			Version:  "1.2.3",
 			Profiles: map[string]*domain.Profile{
 				"test": {
@@ -54,10 +54,10 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 						Name:        "test-op",
 						Description: "Test operation",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
 					}},
-					Enabled:     true,
+					Status:      domain.StatusEnabled,
 				},
 			},
 			Protected: []string{"/System"},
@@ -80,10 +80,10 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 						Name:        "test-op",
 						Description: "Test operation",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
 					}},
-					Enabled:     true,
+					Status:      domain.StatusEnabled,
 				},
 			},
 			Protected: []string{"/System"},
@@ -118,10 +118,10 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 						Name:        "test-op",
 						Description: "Test operation",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
 					}},
-					Enabled:     true,
+					Status:      domain.StatusEnabled,
 				},
 			},
 			Protected: []string{"/System"},
