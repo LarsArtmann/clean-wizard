@@ -10,7 +10,7 @@ model PublicConfig {
   safeMode: boolean;
   maxDiskUsage: int32;
   protectedPaths: string[];
-  profiles: Dictionary<string, PublicProfile>;
+  profiles: Record<PublicProfile>;
 }
 
 model PublicProfile {
@@ -87,25 +87,25 @@ enum OperationType {
 @route("/api/v1")
 namespace CleanWizardAPI {
   @get
-  @path("/config")
+  @route("/config")
   op getConfig(): PublicConfig;
 
   @post
-  @path("/config")
+  @route("/config")
   op updateConfig(@body config: PublicConfig): PublicConfig;
 
   @post  
-  @path("/scan")
+  @route("/scan")
   op scanConfig(@body config: PublicConfig): PublicScanResult;
 
   @post
-  @path("/clean")
+  @route("/clean")
   op cleanSystem(@body request: CleanRequest): PublicCleanResult;
 }
 
 model CleanRequest {
   config: PublicConfig;
   strategy: CleanStrategy;
-  operations: string[]; // operation names to execute
+  operations: OperationType[]; // operations to execute
   dryRun?: boolean;
 }

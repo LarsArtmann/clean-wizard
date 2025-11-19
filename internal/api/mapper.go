@@ -228,6 +228,65 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 	return result.Ok(publicResult)
 }
 
+// MapCleanRequestToDomain converts public API clean request to domain model
+func MapCleanRequestToDomain(publicRequest *CleanRequest) result.Result[*domain.CleanRequest] {
+	if publicRequest == nil {
+		return result.Err[*domain.CleanRequest](fmt.Errorf("public clean request cannot be nil"))
+	}
+
+	// Map config to domain
+	domainConfigResult := MapConfigToDomain(&publicRequest.Config)
+	if domainConfigResult.IsErr() {
+		err, _ := domainConfigResult.SafeError()
+		return result.Err[*domain.CleanRequest](fmt.Errorf("failed to map config: %w", err))
+	}
+
+	// Map strategy
+	domainStrategy, err := MapStrategyToDomain(publicRequest.Strategy)
+	if err != nil {
+		return result.Err[*domain.CleanRequest](fmt.Errorf("invalid strategy: %w", err))
+	}
+
+	// Map operations to domain scan items
+	items := make([]domain.ScanItem, 0, len(publicRequest.Operations))
+	for _, opType := range publicRequest.Operations {
+		// Convert operation type to domain scan item
+		item := domain.ScanItem{
+			Path:     string(opType), // Use operation type as path identifier
+			ScanType: domain.ScanTypeTemp, // Use temp scan type for operations
+			Size:     0, // Will be calculated during scanning
+			Created:  time.Time{}, // Will be set during scanning
+		}
+		items = append(items, item)
+	}
+
+	domainRequest := &domain.CleanRequest{
+		Items:    items,
+		Strategy: domainStrategy,
+	}
+
+	// Validate domain request
+	if err := domainRequest.Validate(); err != nil {
+		return result.Err[*domain.CleanRequest](fmt.Errorf("domain clean request validation failed: %w", err))
+	}
+
+	return result.Ok(domainRequest)
+}
+
+// MapStrategyToDomain converts public strategy to domain enum
+func MapStrategyToDomain(publicStrategy PublicStrategy) (domain.CleanStrategyType, error) {
+	switch publicStrategy {
+	case PublicStrategyAggressive:
+		return domain.StrategyAggressive, nil
+	case PublicStrategyConservative:
+		return domain.StrategyConservative, nil
+	case PublicStrategyDryRun:
+		return domain.StrategyDryRun, nil
+	default:
+		return domain.StrategyDryRun, fmt.Errorf("unknown strategy: %s", publicStrategy)
+	}
+}
+
 // MapStrategyToPublic converts domain strategy enum to public string
 func MapStrategyToPublic(domainStrategy domain.CleanStrategyType) PublicStrategy {
 	switch domainStrategy {

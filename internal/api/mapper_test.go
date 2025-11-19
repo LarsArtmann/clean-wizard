@@ -197,6 +197,102 @@ func TestMapCleanResultToPublic_ValidResult(t *testing.T) {
 	}
 }
 
+func TestMapCleanRequestToDomain_ValidRequest(t *testing.T) {
+	// Create public clean request
+	publicRequest := &CleanRequest{
+		Config: PublicConfig{
+			Version:     "1.0.0",
+			SafeMode:    true,
+			MaxDiskUsage: 80,
+			ProtectedPaths: []string{"/System"},
+			Profiles: map[string]*PublicProfile{
+				"test": {
+					Name:        "test",
+					Description: "Test profile",
+					Enabled:     true,
+					Operations: []PublicOperation{
+						{
+							Name:        "temp-cleanup",
+							Description: "Clean temp files",
+							RiskLevel:   PublicRiskLow,
+							Enabled:     true,
+							Settings:    OperationSettings{},
+						},
+					},
+				},
+			},
+		},
+		Strategy:   PublicStrategyConservative,
+		Operations: []OperationType{OperationTypeTempFiles, OperationTypeCacheFiles},
+		DryRun:     boolPtr(true),
+	}
+
+	// Map to domain
+	domainRequestResult := MapCleanRequestToDomain(publicRequest)
+
+	// Validate successful mapping
+	if domainRequestResult.IsErr() {
+		err, _ := domainRequestResult.SafeError()
+		t.Fatalf("Expected successful mapping, got error: %v", err)
+	}
+
+	domainRequest, err := domainRequestResult.Unwrap()
+	if err != nil {
+		t.Fatalf("Expected successful unwrap, got error: %v", err)
+	}
+
+	// Validate mapped strategy
+	if domainRequest.Strategy != domain.StrategyConservative {
+		t.Errorf("Expected strategy Conservative, got %v", domainRequest.Strategy)
+	}
+
+	// Validate operations mapped to scan items
+	if len(domainRequest.Items) != 2 {
+		t.Errorf("Expected 2 items, got %d", len(domainRequest.Items))
+	}
+
+	// Check first operation
+	if domainRequest.Items[0].ScanType != domain.ScanTypeTemp {
+		t.Errorf("Expected ScanTypeTemp, got %v", domainRequest.Items[0].ScanType)
+	}
+
+	if domainRequest.Items[0].Path != string(OperationTypeTempFiles) {
+		t.Errorf("Expected temp-files path, got %s", domainRequest.Items[0].Path)
+	}
+}
+
+func TestMapStrategy_Conversions(t *testing.T) {
+	// Test all strategy conversions
+	testCases := []struct {
+		public  PublicStrategy
+		domain  domain.CleanStrategyType
+	}{
+		{PublicStrategyAggressive, domain.StrategyAggressive},
+		{PublicStrategyConservative, domain.StrategyConservative},
+		{PublicStrategyDryRun, domain.StrategyDryRun},
+	}
+
+	for _, tc := range testCases {
+		t.Run(string(tc.public), func(t *testing.T) {
+			// Test public to domain
+			domainStrategy, err := MapStrategyToDomain(tc.public)
+			if err != nil {
+				t.Errorf("Expected successful mapping, got error: %v", err)
+			}
+
+			if domainStrategy != tc.domain {
+				t.Errorf("Expected domain strategy %v, got %v", tc.domain, domainStrategy)
+			}
+
+			// Test domain to public
+			publicStrategy := MapStrategyToPublic(tc.domain)
+			if publicStrategy != tc.public {
+				t.Errorf("Expected public strategy %s, got %s", tc.public, publicStrategy)
+			}
+		})
+	}
+}
+
 func TestMapRiskLevel_Conversions(t *testing.T) {
 	// Test all risk level conversions
 	testCases := []struct {
@@ -228,4 +324,9 @@ func TestMapRiskLevel_Conversions(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Helper function to create bool pointer
+func boolPtr(b bool) *bool {
+	return &b
 }
