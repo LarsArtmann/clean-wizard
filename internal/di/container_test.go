@@ -24,7 +24,7 @@ func TestContainer_NewContainer(t *testing.T) {
 	// Test default config
 	config := container.GetConfig()
 	assert.Equal(t, "1.0.0", config.Version)
-	assert.True(t, config.SafeMode)
+	assert.Equal(t, domain.SafetyLevelEnabled, config.SafetyLevel)
 	assert.Equal(t, 50, config.MaxDiskUsage)
 	assert.Contains(t, config.Protected, "/System")
 	assert.Len(t, config.Profiles, 1)
@@ -41,7 +41,7 @@ func TestContainer_UpdateConfig(t *testing.T) {
 	// Update config
 	newConfig := &domain.Config{
 		Version:      "2.0.0",
-		SafeMode:     false,
+		SafetyLevel:  domain.SafetyLevelDisabled,
 		MaxDiskUsage: 80,
 		Protected:    []string{"/tmp"},
 		Profiles:     map[string]*domain.Profile{},
@@ -50,7 +50,7 @@ func TestContainer_UpdateConfig(t *testing.T) {
 	container.UpdateConfig(newConfig)
 	updatedConfig := container.GetConfig()
 	assert.Equal(t, "2.0.0", updatedConfig.Version)
-	assert.False(t, updatedConfig.SafeMode)
+	assert.Equal(t, domain.SafetyLevelDisabled, updatedConfig.SafetyLevel)
 	assert.Equal(t, 80, updatedConfig.MaxDiskUsage)
 }
 
@@ -92,16 +92,16 @@ func TestContainer_DefaultProfiles(t *testing.T) {
 	
 	assert.Equal(t, "Daily Cleanup", dailyProfile.Name)
 	assert.Equal(t, "Daily system cleanup operations", dailyProfile.Description)
-	assert.True(t, dailyProfile.Enabled)
+	assert.Equal(t, domain.StatusEnabled, dailyProfile.Status)
 	require.Len(t, dailyProfile.Operations, 1)
 	
 	operation := dailyProfile.Operations[0]
 	assert.Equal(t, "nix-generations", operation.Name)
 	assert.Equal(t, "Clean Nix generations", operation.Description)
 	assert.Equal(t, domain.RiskLow, operation.RiskLevel)
-	assert.True(t, operation.Enabled)
+	assert.Equal(t, domain.StatusEnabled, operation.Status)
 	require.NotNil(t, operation.Settings)
 	require.NotNil(t, operation.Settings.NixGenerations)
 	assert.Equal(t, 3, operation.Settings.NixGenerations.Generations)
-	assert.True(t, operation.Settings.NixGenerations.Optimize)
+	assert.Equal(t, domain.OptimizationLevelAggressive, operation.Settings.NixGenerations.Optimization)
 }

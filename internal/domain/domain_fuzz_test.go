@@ -21,7 +21,7 @@ func FuzzRiskLevelCreation(f *testing.F) {
 		_ = level.IsValid()
 
 		// Icon method should not panic
-		_ = level.Icon()
+		_ = level.String() // Use String() instead of Icon() to avoid UI concerns
 
 		// Should handle any string value gracefully
 		if level.IsValid() {
@@ -44,7 +44,7 @@ func FuzzNixGenerationCreation(f *testing.F) {
 			ID:      len(data), // Convert string length to ID
 			Path:    "/nix/store/" + data,
 			Date:    time.Time{},      // Zero value for fuzzing
-			Current: len(data)%2 == 0, // Random current status
+			Status:  SelectedStatusNotSelected,
 		}
 
 		// Should not panic on creation

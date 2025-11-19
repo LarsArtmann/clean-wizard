@@ -16,8 +16,8 @@ func TestValidationMiddleware(t *testing.T) {
 
 	t.Run("ValidScanRequest", func(t *testing.T) {
 		req := domain.ScanRequest{
-			Type:      domain.ScanTypeNixStore,
-			Recursive: true,
+			Type:      domain.ScanTypeNixStoreType,
+			Recursion: domain.RecursionLevelFull,
 			Limit:     100,
 		}
 
@@ -26,10 +26,12 @@ func TestValidationMiddleware(t *testing.T) {
 	})
 
 	t.Run("InvalidScanRequest", func(t *testing.T) {
+		// Create invalid scan request with out-of-range enum value
+		invalidType := domain.ScanTypeType(99) // Invalid enum value
 		req := domain.ScanRequest{
-			Type:      "invalid",
-			Recursive: true,
-			Limit:     -1,
+			Type:      invalidType,
+			Recursion: domain.RecursionLevelFull,
+			Limit:     100,
 		}
 
 		result := validator.ValidateScanRequest(ctx, req)

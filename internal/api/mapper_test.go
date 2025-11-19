@@ -59,8 +59,16 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 		t.Errorf("Expected version %s, got %s", publicConfig.Version, domainConfig.Version)
 	}
 
-	if domainConfig.SafeMode != publicConfig.SafeMode {
-		t.Errorf("Expected safeMode %v, got %v", publicConfig.SafeMode, domainConfig.SafeMode)
+	// Compare domain SafetyLevel enum with converted boolean value
+	expectedSafetyLevel := domain.SafetyLevelEnabled
+	if publicConfig.SafeMode {
+		expectedSafetyLevel = domain.SafetyLevelEnabled
+	} else {
+		expectedSafetyLevel = domain.SafetyLevelDisabled
+	}
+	
+	if domainConfig.SafetyLevel != expectedSafetyLevel {
+		t.Errorf("Expected safetyLevel %v, got %v", expectedSafetyLevel.String(), domainConfig.SafetyLevel.String())
 	}
 
 	if domainConfig.MaxDiskUsage != int(publicConfig.MaxDiskUsage) {
@@ -95,24 +103,27 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 	// Create domain config
 	domainConfig := &domain.Config{
-		Version:  "1.0.0",
-		SafeMode: true,
+		Version:      "1.0.0",
+		SafetyLevel:  domain.SafetyLevelEnabled,
+		MaxDiskUsage: 0, // Use default value since not testing this field
+		Protected:    []string{"/test"}, // Required for validation
 		Profiles: map[string]*domain.Profile{
 			"test": {
 				Name:        "test",
 				Description: "Test profile",
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Operations: []domain.CleanupOperation{
 					{
 						Name:        "test-op",
 						Description: "Test operation",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 				},
 			},
 		},
+		Updated: time.Now(), // Required for validation
 	}
 
 	// Map to public
