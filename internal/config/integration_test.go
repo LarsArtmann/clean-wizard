@@ -16,7 +16,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 			MaxDiskUsage: 85,
 			Protected:    []string{"/System", "/Library", "/Applications", "/System"}, // Duplicate /System
 			Profiles: map[string]*domain.Profile{
-				"daily": &domain.Profile{
+				"daily": {
 					Name:        "  Daily Cleanup  ", // Needs whitespace sanitization
 					Description: "Daily system cleanup operations",
 					Operations: []domain.CleanupOperation{
@@ -71,7 +71,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 					},
 					Enabled: true,
 				},
-				"weekly": &domain.Profile{
+				"weekly": {
 					Name:        "Weekly Deep Cleanup",
 					Description: "Weekly deep cleanup operations",
 					Operations: []domain.CleanupOperation{

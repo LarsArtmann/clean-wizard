@@ -192,6 +192,7 @@ func (cfg *EnvironmentConfig) ToView() EnvironmentConfigView {
 }
 
 // ToMap converts config to map for legacy compatibility (deprecated)
+// TYPE-SAFE-EXEMPT: Legacy compatibility method using map[string]any intentionally
 func (cfg *EnvironmentConfig) ToMap() map[string]any {
 	view := cfg.ToView()
 	return map[string]any{

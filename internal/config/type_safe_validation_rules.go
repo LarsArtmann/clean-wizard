@@ -51,8 +51,8 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 	minUsage := 10
 	maxUsage := 95
 	minPaths := 1
-	maxProfiles := 10
-	maxOps := 20
+	maxProfiles := MaxProfiles
+	maxOps := MaxOperations
 
 	return &TypeSafeValidationRules{
 		MaxDiskUsage: &NumericValidationRule{

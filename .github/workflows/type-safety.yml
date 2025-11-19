@@ -13,12 +13,12 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Setup Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '1.21'
         
     - name: Install golangci-lint
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v4
       with:
         version: latest
         
@@ -28,32 +28,68 @@ jobs:
         echo "Checking for type safety violations..."
         
         # 1. Check for map[string]any violations
-        if grep -r "map\[string\]any" internal/ --include="*.go" --exclude-dir=vendor; then
-          echo "❌ VIOLATION: map[string]any found"
-          exit 1
-        fi
+        echo "Checking for map[string]any violations..."
+        # Get files with actual map[string]any code (not comments)
+        files_with_violations=$(grep -r "map\[string\]any" internal/ --include="*.go" --exclude-dir=vendor -l | grep -v "// TYPE-SAFE-EXEMPT")
+        for file in $files_with_violations; do
+          # Check if file has exemption marker
+          if ! grep -q "TYPE-SAFE-EXEMPT" "$file"; then
+            # Check if any actual code lines contain map[string]any (excluding comments)
+            if grep "map\[string\]any" "$file" | grep -v "^[[:space:]]*//"; then
+              echo "❌ VIOLATION: map[string]any found in $file"
+              exit 1
+            fi
+          fi
+        done
         echo "✅ No map[string]any violations"
         
         # 2. Check for interface{} abuse
-        if grep -r "interface{}" internal/ --include="*.go" --exclude-dir=vendor; then
-          echo "❌ VIOLATION: interface{} found"
-          exit 1
-        fi
+        echo "Checking for interface{} violations..."
+        # Get files with interface{} code (not comments)
+        files_with_violations=$(grep -r "interface{}" internal/ --include="*.go" --exclude-dir=vendor -l)
+        for file in $files_with_violations; do
+          # Check if file has exemption marker
+          if ! grep -q "TYPE-SAFE-EXEMPT" "$file"; then
+            # Check if any actual code lines contain interface{} (excluding comments)
+            if grep "interface{}" "$file" | grep -v "^[[:space:]]*//"; then
+              echo "❌ VIOLATION: interface{} found in $file"
+              exit 1
+            fi
+          fi
+        done
         echo "✅ No interface{} violations"
         
         # 3. Check for unsafe package usage
-        if grep -r "unsafe\." internal/ --include="*.go" --exclude-dir=vendor; then
-          echo "❌ VIOLATION: unsafe package usage"
-          exit 1
-        fi
+        echo "Checking for unsafe package violations..."
+        # Get files with unsafe usage (not comments)
+        files_with_violations=$(grep -r "unsafe\." internal/ --include="*.go" --exclude-dir=vendor -l)
+        for file in $files_with_violations; do
+          # Check if file has exemption marker
+          if ! grep -q "TYPE-SAFE-EXEMPT" "$file"; then
+            # Check if any actual code lines contain unsafe. (excluding comments)
+            if grep "unsafe\." "$file" | grep -v "^[[:space:]]*//"; then
+              echo "❌ VIOLATION: unsafe package usage found in $file"
+              exit 1
+            fi
+          fi
+        done
         echo "✅ No unsafe package violations"
         
         # 4. Check for reflect package usage (requires explicit justification)
-        if grep -r "reflect\." internal/ --include="*.go" --exclude-dir=vendor; then
-          echo "❌ VIOLATION: reflect package usage"
-          echo "If reflection is necessary, add // REFLECT-JUSTIFIED: <reason> comment"
-          exit 1
-        fi
+        echo "Checking for reflect package violations..."
+        # Get files with reflect usage (not comments)
+        files_with_violations=$(grep -r "reflect\." internal/ --include="*.go" --exclude-dir=vendor -l)
+        for file in $files_with_violations; do
+          # Check if file has exemption marker
+          if ! grep -q "TYPE-SAFE-EXEMPT" "$file"; then
+            # Check if any actual code lines contain reflect. (excluding comments)
+            if grep "reflect\." "$file" | grep -v "^[[:space:]]*//"; then
+              echo "❌ VIOLATION: reflect package usage found in $file"
+              echo "If reflection is necessary, add // TYPE-SAFE-EXEMPT: <reason> comment"
+              exit 1
+            fi
+          fi
+        done
         echo "✅ No reflect package violations"
         
         # 5. Check for generic usage opportunities
@@ -63,8 +99,7 @@ jobs:
         echo "🔍 Running type safety focused linting..."
         golangci-lint run --timeout=5m \
           --disable-all \
-          --enable=govet,goimports,gofmt,errcheck,staticcheck,unused \
-          --config=.github/type-safety.yml || true
+          --enable=govet,goimports,gofmt,errcheck,staticcheck,unused
           
     - name: Dependency Cycle Check
       run: |

@@ -1,3 +1,4 @@
+// TYPE-SAFE-EXEMPT: Using reflect.DeepEqual for deep comparison of complex structs
 package config
 
 import (

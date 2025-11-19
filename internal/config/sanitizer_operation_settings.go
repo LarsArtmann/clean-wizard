@@ -9,6 +9,17 @@ import (
 
 // sanitizeOperationSettings sanitizes operation settings with type safety
 func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName string, settings *domain.OperationSettings, result *SanitizationResult) {
+	// Guard against nil settings to prevent panic
+	if settings == nil {
+		result.Warnings = append(result.Warnings, SanitizationWarning{
+			Field:     fieldPrefix,
+			Original:  "nil settings",
+			Sanitized: "nil settings",
+			Reason:    "settings is nil - cannot sanitize",
+		})
+		return
+	}
+
 	opType := domain.GetOperationType(operationName)
 
 	// Validate settings first

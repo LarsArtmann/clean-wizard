@@ -2,11 +2,12 @@ package errors
 
 import (
 	"fmt"
-
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/rs/zerolog/log"
 )
 
@@ -159,8 +160,14 @@ func (e *CleanWizardError) Error() string {
 		details = append(details, fmt.Sprintf("duration=%s", e.Details.Duration))
 	}
 
-	// Add metadata details
-	for key, value := range e.Details.Metadata {
+	// Add metadata details with sorted keys for deterministic output
+	var keys []string
+	for key := range e.Details.Metadata {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		value := e.Details.Metadata[key]
 		details = append(details, fmt.Sprintf("%s=%s", key, value))
 	}
 
@@ -268,9 +275,21 @@ func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 		if v, ok := value.(string); ok {
 			e.Details.Duration = v
 		} else if d, ok := value.(time.Duration); ok {
-			e.Details.Duration = d.String()
+			e.Details.Duration = format.Duration(d)
 		} else {
 			e.Details.Duration = fmt.Sprintf("%v", value)
+		}
+	case "line":
+		// Handle legacy "line" key, map to line_number
+		if v, ok := value.(int); ok {
+			e.Details.LineNumber = v
+		} else if v, ok := value.(float64); ok {
+			e.Details.LineNumber = int(v)
+		}
+	case "file":
+		// Handle legacy "file" key, map to file_path
+		if v, ok := value.(string); ok {
+			e.Details.FilePath = v
 		}
 	default:
 		// Store unknown keys in metadata
@@ -366,8 +385,14 @@ func (e *CleanWizardError) Log() {
 			event = event.Str("detail_duration", e.Details.Duration)
 		}
 
-		// Add metadata
-		for key, value := range e.Details.Metadata {
+		// Add metadata with sorted keys for deterministic output
+		var keys []string
+		for key := range e.Details.Metadata {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
+			value := e.Details.Metadata[key]
 			event = event.Str("meta_"+key, value)
 		}
 	}

@@ -82,19 +82,19 @@ type CleanRequest struct {
 
 // PublicValidationResult represents validation result
 type PublicValidationResult struct {
-	Valid  bool     `json:"valid"`
-	Errors []string `json:"errors"`
+	Valid    bool     `json:"valid"`
+	Errors   []string `json:"errors"`
 	Warnings []string `json:"warnings,omitempty"`
 }
 
 // PublicScanResult represents scan result
 type PublicScanResult struct {
-	Success     bool                         `json:"success"`
-	ScanTime    string                        `json:"scanTime"`
-	TotalSize   uint64                        `json:"totalSize"`
-	ItemCount   uint32                        `json:"itemCount"`
-	Items       []PublicScanItem              `json:"items"`
-	Errors      []string                      `json:"errors,omitempty"`
+	Success   bool             `json:"success"`
+	ScanTime  string           `json:"scanTime"`
+	TotalSize uint64           `json:"totalSize"`
+	ItemCount uint32           `json:"itemCount"`
+	Items     []PublicScanItem `json:"items"`
+	Errors    []string         `json:"errors,omitempty"`
 }
 
 // PublicScanItem represents a single scanned item

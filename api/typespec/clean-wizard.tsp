@@ -41,8 +41,8 @@ model PublicCleanResult {
   freedBytes: uint64;
   itemsRemoved: uint32;
   itemsFailed: uint32;
-  cleanTime: string; // ISO 8601 duration
-  cleanedAt: string;  // ISO 8601 timestamp
+  cleanTime: duration; // ISO 8601 duration
+  cleanedAt: utcDateTime;  // ISO 8601 timestamp
   strategy: CleanStrategy;
   errors?: string[];
 }
