@@ -107,9 +107,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			// CRITICAL: Fail fast on validation errors for production safety
 			for _, err := range validationResult.Errors {
 				log.Error().
-			Str("field", err.Field).
-			Err(fmt.Errorf("%s", err.Message)).
-			Msg("Configuration validation error")
+					Str("field", err.Field).
+					Err(fmt.Errorf("%s", err.Message)).
+					Msg("Configuration validation error")
 			}
 			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
 		}

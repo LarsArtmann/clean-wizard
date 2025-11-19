@@ -28,7 +28,20 @@ test-coverage:
 format:
     @echo "🎨 Formatting code..."
     go fmt ./...
-    goimports -w .
+    @command -v goimports >/dev/null 2>&1 && goimports -w . || echo "⚠️  goimports not available, run 'just install-tools'"
+
+# Install development tools
+install-tools:
+    @echo "🔧 Installing development tools..."
+    go install golang.org/x/tools/cmd/goimports@latest
+    @echo "✅ Tools installed"
+
+# Run linter (basic go vet + custom checks)
+lint:
+    @echo "🔍 Running linting..."
+    go vet ./...
+    goimports -l .
+    @echo "✅ Linting complete"
 
 # Clean everything (including caches)
 clean-all: clean

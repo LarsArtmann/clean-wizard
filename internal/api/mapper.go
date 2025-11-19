@@ -29,11 +29,11 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 
 	// Create domain config
 	config := &domain.Config{
-		Version:     publicConfig.Version,
-		SafeMode:    publicConfig.SafeMode,
+		Version:      publicConfig.Version,
+		SafeMode:     publicConfig.SafeMode,
 		MaxDiskUsage: int(publicConfig.MaxDiskUsage),
-		Protected:   publicConfig.ProtectedPaths,
-		Profiles:    profiles,
+		Protected:    publicConfig.ProtectedPaths,
+		Profiles:     profiles,
 	}
 
 	// Validate domain config
@@ -58,11 +58,11 @@ func MapConfigToPublic(domainConfig *domain.Config) result.Result[*PublicConfig]
 	}
 
 	publicConfig := &PublicConfig{
-		Version:      domainConfig.Version,
-		SafeMode:     domainConfig.SafeMode,
-		MaxDiskUsage:  int32(domainConfig.MaxDiskUsage),
+		Version:        domainConfig.Version,
+		SafeMode:       domainConfig.SafeMode,
+		MaxDiskUsage:   int32(domainConfig.MaxDiskUsage),
 		ProtectedPaths: domainConfig.Protected,
-		Profiles:      publicProfiles,
+		Profiles:       publicProfiles,
 	}
 
 	return result.Ok(publicConfig)
@@ -155,9 +155,9 @@ func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOpera
 func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationSettings {
 	// Default values for simplified public API
 	publicSettings := OperationSettings{
-		DryRun:             true, // Safe default
-		Verbose:            false,
-		TimeoutSeconds:     300, // 5 minutes
+		DryRun:              true, // Safe default
+		Verbose:             false,
+		TimeoutSeconds:      300, // 5 minutes
 		ConfirmBeforeDelete: false,
 	}
 
@@ -210,13 +210,13 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 	strategy := MapStrategyToPublic(domainResult.Strategy)
 
 	publicResult := &PublicCleanResult{
-		Success:     domainResult.IsValid(),
-		FreedBytes:  domainResult.FreedBytes,
+		Success:      domainResult.IsValid(),
+		FreedBytes:   domainResult.FreedBytes,
 		ItemsRemoved: uint32(domainResult.ItemsRemoved),
 		ItemsFailed:  uint32(domainResult.ItemsFailed),
-		CleanTime:   domainResult.CleanTime.String(),
-		CleanedAt:   domainResult.CleanedAt.Format(time.RFC3339),
-		Strategy:    strategy,
+		CleanTime:    domainResult.CleanTime.String(),
+		CleanedAt:    domainResult.CleanedAt.Format(time.RFC3339),
+		Strategy:     strategy,
 	}
 
 	// Add validation errors if any
@@ -252,10 +252,10 @@ func MapCleanRequestToDomain(publicRequest *CleanRequest) result.Result[*domain.
 	for _, opType := range publicRequest.Operations {
 		// Convert operation type to domain scan item
 		item := domain.ScanItem{
-			Path:     string(opType), // Use operation type as path identifier
+			Path:     string(opType),      // Use operation type as path identifier
 			ScanType: domain.ScanTypeTemp, // Use temp scan type for operations
-			Size:     0, // Will be calculated during scanning
-			Created:  time.Time{}, // Will be set during scanning
+			Size:     0,                   // Will be calculated during scanning
+			Created:  time.Time{},         // Will be set during scanning
 		}
 		items = append(items, item)
 	}
@@ -299,4 +299,34 @@ func MapStrategyToPublic(domainStrategy domain.CleanStrategyType) PublicStrategy
 	default:
 		return PublicStrategyDryRun // Safe default
 	}
+}
+
+// MapScanResultToPublic converts domain scan result to public API format
+func MapScanResultToPublic(domainResult *domain.ScanResult) result.Result[*PublicScanResult] {
+	if domainResult == nil {
+		return result.Err[*PublicScanResult](fmt.Errorf("domain scan result cannot be nil"))
+	}
+
+	publicResult := &PublicScanResult{
+		Success:   true, // Assuming success if result exists
+		ScanTime:  domainResult.ScannedAt.Format(time.RFC3339),
+		TotalSize:  uint64(domainResult.TotalBytes),
+		ItemCount:  uint32(domainResult.TotalItems),
+		Items:     make([]PublicScanItem, 0), // No individual items in ScanResult
+	}
+
+	return result.Ok(publicResult)
+}
+
+// MapValidationResultToPublic converts domain validation result to public API format  
+func MapValidationResultToPublic(domainResult interface{}) result.Result[*PublicValidationResult] {
+	// For now, return a simple valid result
+	// This would be implemented with actual domain validation result type
+	publicResult := &PublicValidationResult{
+		Valid:    true,
+		Errors:   []string{},
+		Warnings: []string{},
+	}
+
+	return result.Ok(publicResult)
 }

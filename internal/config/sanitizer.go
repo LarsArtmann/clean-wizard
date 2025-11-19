@@ -50,10 +50,10 @@ type SanitizationChange struct {
 
 // SanitizationResult contains sanitization outcomes
 type SanitizationResult struct {
-	SanitizedFields []string                        `json:"sanitized_fields"`
-	Warnings        []SanitizationWarning           `json:"warnings"`
-	Changes         map[string]*SanitizationChange   `json:"changes"`
-	Timestamp       time.Time                        `json:"timestamp"`
+	SanitizedFields []string                       `json:"sanitized_fields"`
+	Warnings        []SanitizationWarning          `json:"warnings"`
+	Changes         map[string]*SanitizationChange `json:"changes"`
+	Timestamp       time.Time                      `json:"timestamp"`
 }
 
 // SanitizationWarning represents a sanitization warning
@@ -119,12 +119,12 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 				"warnings_count":  fmt.Sprintf("%d", len(result.Warnings)),
 			},
 		}
-		
+
 		// Copy sanitization warnings to validation result
 		for _, warning := range result.Warnings {
 			validationResult.Warnings = append(validationResult.Warnings, ValidationWarning{
-				Field:     warning.Field,
-				Message:   warning.Reason,
+				Field:      warning.Field,
+				Message:    warning.Reason,
 				Suggestion: fmt.Sprintf("Value was changed from %v to %v", warning.Original, warning.Sanitized),
 				Context: &ValidationContext{
 					Metadata: map[string]string{

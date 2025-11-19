@@ -13,7 +13,7 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName 
 
 	// Validate settings first
 	if err := settings.ValidateSettings(opType); err != nil {
-	// Convert validation errors to warnings since we're in sanitization
+		// Convert validation errors to warnings since we're in sanitization
 		var vErr *domain.ValidationError
 		if errors.As(err, &vErr) {
 			result.Warnings = append(result.Warnings, SanitizationWarning{

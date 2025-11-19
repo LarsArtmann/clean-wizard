@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"path/filepath"
-	
+
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 

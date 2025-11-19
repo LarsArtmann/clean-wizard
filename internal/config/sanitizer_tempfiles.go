@@ -16,7 +16,7 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, setting
 
 	// Sanitize older_than duration
 	originalOlderThan := settings.OlderThan
-	
+
 	if cs.rules.TrimWhitespace && settings.OlderThan != "" {
 		settings.OlderThan = strings.TrimSpace(settings.OlderThan)
 		if originalOlderThan != settings.OlderThan {

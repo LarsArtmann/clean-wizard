@@ -48,7 +48,7 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 		for i, path := range cfg.Protected {
 			trimmedPath := strings.TrimSpace(path)
 			fieldName := fmt.Sprintf("protected[%d]", i)
-			
+
 			// Check for empty or whitespace-only paths
 			if trimmedPath == "" {
 				result.Errors = append(result.Errors, ValidationError{
@@ -61,7 +61,7 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 				})
 				continue
 			}
-			
+
 			// Validate basic path format (must start with "/")
 			if !strings.HasPrefix(trimmedPath, "/") {
 				result.Errors = append(result.Errors, ValidationError{

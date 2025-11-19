@@ -47,7 +47,7 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 				}
 			}
 		}
-		
+
 		if maxRisk == domain.RiskCritical {
 			result.Warnings = append(result.Warnings, ValidationWarning{
 				Field:      "safe_mode",

@@ -73,7 +73,7 @@ func (g NixGeneration) EstimateSize() int64 {
 	// Older generations tend to be larger, newer ones smaller
 	baseSize := int64(50 * 1024 * 1024) // 50MB base
 	age := time.Since(g.Date)
-	ageFactor := int64(age.Hours() / 24 / 30) // Age in months
+	ageFactor := int64(age.Hours() / 24 / 30)        // Age in months
 	return baseSize + (ageFactor * 10 * 1024 * 1024) // Add 10MB per month
 }
 
@@ -175,8 +175,8 @@ func (sr ScanResult) Validate() error {
 // CleanResult represents successful clean outcome
 type CleanResult struct {
 	FreedBytes   uint64        `json:"freed_bytes"`
-	ItemsRemoved uint           `json:"items_removed"`
-	ItemsFailed  uint           `json:"items_failed"`
+	ItemsRemoved uint          `json:"items_removed"`
+	ItemsFailed  uint          `json:"items_failed"`
 	CleanTime    time.Duration `json:"clean_time"`
 	CleanedAt    time.Time     `json:"cleaned_at"`
 	Strategy     CleanStrategy `json:"strategy"`

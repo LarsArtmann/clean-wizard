@@ -14,6 +14,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/cucumber/godog"
 )
 
 // BDDTestContext holds test state across scenarios

@@ -25,10 +25,10 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 			if vm.options != nil && vm.options.RequireSafeModeConfirmation {
 				return fmt.Errorf("disabling safe mode requires explicit confirmation (use --confirm-safe-mode-disable)")
 			}
-			
+
 			// Log warning in production environments
 			if vm.options != nil && vm.options.Environment == "production" {
-				vm.logger.LogError("safe_mode", "config_change", 
+				vm.logger.LogError("safe_mode", "config_change",
 					fmt.Errorf("safe mode disabled in production environment"))
 			}
 		}
