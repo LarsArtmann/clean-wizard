@@ -2,10 +2,28 @@ package config
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
+
+// isValidSemver validates semantic version format (MAJOR.MINOR.PATCH)
+func isValidSemver(version string) bool {
+	if version == "" {
+		return false
+	}
+	
+	// Semantic version regex: X.Y.Z where X,Y,Z are non-negative integers
+	// Allows optional pre-release and build metadata (e.g., "1.0.0-alpha+001")
+	semverPattern := `^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
+	matched, err := regexp.MatchString(semverPattern, version)
+	if err != nil {
+		return false
+	}
+	
+	return matched
+}
 
 // validateBasicStructure validates basic configuration structure
 func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *ValidationResult) {
@@ -18,6 +36,15 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 			Message:    "Configuration version is required",
 			Severity:   SeverityError,
 			Suggestion: "Add version field with semantic version (e.g., '1.0.0')",
+		})
+	} else if !isValidSemver(cfg.Version) {
+		result.Errors = append(result.Errors, ValidationError{
+			Field:      "version",
+			Rule:       "semver_format",
+			Value:      cfg.Version,
+			Message:    "Version must follow semantic version format (MAJOR.MINOR.PATCH)",
+			Severity:   SeverityError,
+			Suggestion: "Change version to valid semantic version (e.g., '1.0.0', '2.1.3', '1.0.0-alpha')",
 		})
 	}
 

@@ -63,7 +63,7 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 	}
 
 	// Create backup if requested (independent of monitoring)
-	if options.CreateBackup || options.BackupEnabled {
+	if options.CreateBackup {
 		if err := ecl.createBackup(ctx, config); err != nil {
 			if ecl.enableMonitoring {
 				fmt.Printf("⚠️ Backup failed: %v\n", err)

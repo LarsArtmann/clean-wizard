@@ -57,9 +57,8 @@ type ConfigLoadOptions struct {
 // ConfigSaveOptions provides options for configuration saving
 type ConfigSaveOptions struct {
 	EnableSanitization bool            `json:"enable_sanitization"`
-	BackupEnabled      bool            `json:"backup_enabled"`
+	CreateBackup       bool            `json:"create_backup"` // Whether to create a backup before saving
 	ValidationLevel    ValidationLevel `json:"validation_level"`
-	CreateBackup       bool            `json:"create_backup"`
 	ForceSave          bool            `json:"force_save"` // Override validation failures
 }
 

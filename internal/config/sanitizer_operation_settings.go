@@ -58,13 +58,7 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName 
 	case domain.OperationTypeSystemTemp:
 		cs.sanitizeSystemTempSettings(fieldPrefix, settings.SystemTemp, result)
 
-	default:
-		// For custom operation types, just record that they were processed
-		result.Warnings = append(result.Warnings, SanitizationWarning{
-			Field:     fieldPrefix,
-			Original:  "custom operation settings",
-			Sanitized: "custom operation settings",
-			Reason:    "custom operation type - no specific sanitization applied",
-		})
+	// For custom operation types, no specific sanitization is applied
+	// Let validation logic handle invalid operations elsewhere
 	}
 }
