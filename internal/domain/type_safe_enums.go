@@ -84,7 +84,7 @@ func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Icon returns emoji for risk level
+// Icon returns emoji for risk level (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
 func (rl RiskLevelType) Icon() string {
 	switch rl {
 	case RiskLevelLowType:
@@ -315,7 +315,7 @@ func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Icon returns emoji for clean strategy
+// Icon returns emoji for clean strategy (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
 func (cs CleanStrategyType) Icon() string {
 	switch cs {
 	case StrategyAggressiveType:
@@ -324,6 +324,93 @@ func (cs CleanStrategyType) Icon() string {
 		return "🛡️"
 	case StrategyDryRunType:
 		return "🔍"
+	default:
+		return "❓"
+	}
+}
+
+// ScanTypeType represents scanning domains with compile-time safety
+type ScanTypeType int
+
+const (
+	ScanTypeNixStoreType ScanTypeType = iota
+	ScanTypeHomebrewType
+	ScanTypeSystemType
+	ScanTypeTempType
+)
+
+// String returns string representation
+func (st ScanTypeType) String() string {
+	switch st {
+	case ScanTypeNixStoreType:
+		return "nix_store"
+	case ScanTypeHomebrewType:
+		return "homebrew"
+	case ScanTypeSystemType:
+		return "system"
+	case ScanTypeTempType:
+		return "temp_files"
+	default:
+		return "unknown"
+	}
+}
+
+// IsValid checks if scan type is valid
+func (st ScanTypeType) IsValid() bool {
+	return st >= ScanTypeNixStoreType && st <= ScanTypeTempType
+}
+
+// Values returns all possible values
+func (st ScanTypeType) Values() []ScanTypeType {
+	return []ScanTypeType{
+		ScanTypeNixStoreType,
+		ScanTypeHomebrewType,
+		ScanTypeSystemType,
+		ScanTypeTempType,
+	}
+}
+
+// MarshalJSON implements json.Marshaler
+func (st ScanTypeType) MarshalJSON() ([]byte, error) {
+	if !st.IsValid() {
+		return nil, fmt.Errorf("invalid scan type: %d", st)
+	}
+	return json.Marshal(st.String())
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (st *ScanTypeType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	switch strings.ToLower(s) {
+	case "nix_store", "nix-store":
+		*st = ScanTypeNixStoreType
+	case "homebrew":
+		*st = ScanTypeHomebrewType
+	case "system":
+		*st = ScanTypeSystemType
+	case "temp_files", "temp-files", "temp":
+		*st = ScanTypeTempType
+	default:
+		return fmt.Errorf("invalid scan type: %s", s)
+	}
+	return nil
+}
+
+// ScanTypeIcon returns emoji for scan type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
+func (st ScanTypeType) Icon() string {
+	switch st {
+	case ScanTypeNixStoreType:
+		return "📦"
+	case ScanTypeHomebrewType:
+		return "🍺"
+	case ScanTypeSystemType:
+		return "💻"
+	case ScanTypeTempType:
+		return "🗑️"
 	default:
 		return "❓"
 	}

@@ -77,7 +77,8 @@ func (g NixGeneration) EstimateSize() int64 {
 	return baseSize + (ageFactor * 10 * 1024 * 1024) // Add 10MB per month
 }
 
-// ScanType represents different scanning domains
+// DEPRECATED: Use ScanTypeType from type_safe_enums.go for type safety
+// ScanType represents different scanning domains (LEGACY - use ScanTypeType)
 type ScanType string
 
 const (
