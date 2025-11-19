@@ -93,21 +93,21 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 			},
 		}
 
-		// Step 1: Validation
-		validator := NewConfigValidator()
-		validationResult := validator.ValidateConfig(cfg)
-
-		if !validationResult.IsValid {
-			t.Errorf("Configuration should be valid, got errors: %v", validationResult.Errors)
-		}
-
-		// Step 2: Sanitization
+		// Step 1: Sanitization (run first to clean data)
 		sanitizer := NewConfigSanitizer()
 		var sanitizationResult ValidationResult
 		sanitizer.SanitizeConfig(cfg, &sanitizationResult)
 
 		if sanitizationResult.Duration <= 0 {
 			t.Errorf("Sanitization should take positive time, got: %v", sanitizationResult.Duration)
+		}
+
+		// Step 2: Validation (run after sanitization)
+		validator := NewConfigValidator()
+		validationResult := validator.ValidateConfig(cfg)
+
+		if !validationResult.IsValid {
+			t.Errorf("Configuration should be valid after sanitization, got errors: %v", validationResult.Errors)
 		}
 
 		// Step 3: Post-sanitization validation

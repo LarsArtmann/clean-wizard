@@ -70,8 +70,8 @@ func (eh *EnumHelper[T]) UnmarshalJSON(data []byte, valueSetter func(T)) error {
 		strToCompare := strVal
 		
 		if !eh.caseSensitive {
-			compareValue = strings.ToUpper(s)
-			strToCompare = strVal
+			compareValue = strings.ToLower(s)
+			strToCompare = strings.ToLower(strVal)
 		}
 		
 		if compareValue == strToCompare {
@@ -175,65 +175,48 @@ const (
 	ValidationLevelStrictType
 )
 
-// String returns the string representation
-func (vl ValidationLevelType) String() string {
-	switch vl {
-	case ValidationLevelNoneType:
-		return "NONE"
-	case ValidationLevelBasicType:
-		return "BASIC"
-	case ValidationLevelComprehensiveType:
-		return "COMPREHENSIVE"
-	case ValidationLevelStrictType:
-		return "STRICT"
-	default:
-		return "UNKNOWN"
-	}
-}
-
-// IsValid checks if validation level is valid
-func (vl ValidationLevelType) IsValid() bool {
+// validationLevelHelper provides shared functionality for ValidationLevelType
+var validationLevelHelper = NewEnumHelper(map[ValidationLevelType]string{
+	ValidationLevelNoneType:          "NONE",
+	ValidationLevelBasicType:         "BASIC",
+	ValidationLevelComprehensiveType: "COMPREHENSIVE",
+	ValidationLevelStrictType:        "STRICT",
+}, func(vl ValidationLevelType) bool {
 	return vl >= ValidationLevelNoneType && vl <= ValidationLevelStrictType
-}
-
-// Values returns all possible values
-func (vl ValidationLevelType) Values() []ValidationLevelType {
+}, func() []ValidationLevelType {
 	return []ValidationLevelType{
 		ValidationLevelNoneType,
 		ValidationLevelBasicType,
 		ValidationLevelComprehensiveType,
 		ValidationLevelStrictType,
 	}
+}, true) // case sensitive for validation levels
+
+// String returns the string representation
+func (vl ValidationLevelType) String() string {
+	return validationLevelHelper.String(vl)
+}
+
+// IsValid checks if validation level is valid
+func (vl ValidationLevelType) IsValid() bool {
+	return validationLevelHelper.IsValid(vl)
+}
+
+// Values returns all possible values
+func (vl ValidationLevelType) Values() []ValidationLevelType {
+	return validationLevelHelper.Values()
 }
 
 // MarshalJSON implements json.Marshaler
 func (vl ValidationLevelType) MarshalJSON() ([]byte, error) {
-	if !vl.IsValid() {
-		return nil, fmt.Errorf("invalid validation level: %d", vl)
-	}
-	return json.Marshal(vl.String())
+	return validationLevelHelper.MarshalJSON(vl)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToUpper(s) {
-	case "NONE":
-		*vl = ValidationLevelNoneType
-	case "BASIC":
-		*vl = ValidationLevelBasicType
-	case "COMPREHENSIVE":
-		*vl = ValidationLevelComprehensiveType
-	case "STRICT":
-		*vl = ValidationLevelStrictType
-	default:
-		return fmt.Errorf("invalid validation level: %s", s)
-	}
-	return nil
+	return validationLevelHelper.UnmarshalJSON(data, func(val ValidationLevelType) {
+		*vl = val
+	})
 }
 
 // Convenience constants for backward compatibility are now in types.go
@@ -247,60 +230,46 @@ const (
 	ChangeOperationModifiedType
 )
 
-// String returns the string representation
-func (co ChangeOperationType) String() string {
-	switch co {
-	case ChangeOperationAddedType:
-		return "ADDED"
-	case ChangeOperationRemovedType:
-		return "REMOVED"
-	case ChangeOperationModifiedType:
-		return "MODIFIED"
-	default:
-		return "UNKNOWN"
-	}
-}
-
-// IsValid checks if change operation is valid
-func (co ChangeOperationType) IsValid() bool {
+// changeOperationHelper provides shared functionality for ChangeOperationType
+var changeOperationHelper = NewEnumHelper(map[ChangeOperationType]string{
+	ChangeOperationAddedType:    "ADDED",
+	ChangeOperationRemovedType:  "REMOVED",
+	ChangeOperationModifiedType: "MODIFIED",
+}, func(co ChangeOperationType) bool {
 	return co >= ChangeOperationAddedType && co <= ChangeOperationModifiedType
-}
-
-// Values returns all possible values
-func (co ChangeOperationType) Values() []ChangeOperationType {
+}, func() []ChangeOperationType {
 	return []ChangeOperationType{
 		ChangeOperationAddedType,
 		ChangeOperationRemovedType,
 		ChangeOperationModifiedType,
 	}
+}, true) // case sensitive for change operations
+
+// String returns the string representation
+func (co ChangeOperationType) String() string {
+	return changeOperationHelper.String(co)
+}
+
+// IsValid checks if change operation is valid
+func (co ChangeOperationType) IsValid() bool {
+	return changeOperationHelper.IsValid(co)
+}
+
+// Values returns all possible values
+func (co ChangeOperationType) Values() []ChangeOperationType {
+	return changeOperationHelper.Values()
 }
 
 // MarshalJSON implements json.Marshaler
 func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
-	if !co.IsValid() {
-		return nil, fmt.Errorf("invalid change operation: %d", co)
-	}
-	return json.Marshal(co.String())
+	return changeOperationHelper.MarshalJSON(co)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToUpper(s) {
-	case "ADDED":
-		*co = ChangeOperationAddedType
-	case "REMOVED":
-		*co = ChangeOperationRemovedType
-	case "MODIFIED":
-		*co = ChangeOperationModifiedType
-	default:
-		return fmt.Errorf("invalid change operation: %s", s)
-	}
-	return nil
+	return changeOperationHelper.UnmarshalJSON(data, func(val ChangeOperationType) {
+		*co = val
+	})
 }
 
 // CleanStrategyType represents cleaning strategies with compile-time safety
@@ -312,60 +281,46 @@ const (
 	StrategyDryRunType
 )
 
-// String returns string representation
-func (cs CleanStrategyType) String() string {
-	switch cs {
-	case StrategyAggressiveType:
-		return "aggressive"
-	case StrategyConservativeType:
-		return "conservative"
-	case StrategyDryRunType:
-		return "dry-run"
-	default:
-		return "unknown"
-	}
-}
-
-// IsValid checks if clean strategy is valid
-func (cs CleanStrategyType) IsValid() bool {
+// cleanStrategyHelper provides shared functionality for CleanStrategyType
+var cleanStrategyHelper = NewEnumHelper(map[CleanStrategyType]string{
+	StrategyAggressiveType:   "aggressive",
+	StrategyConservativeType: "conservative", 
+	StrategyDryRunType:       "dry-run",
+}, func(cs CleanStrategyType) bool {
 	return cs >= StrategyAggressiveType && cs <= StrategyDryRunType
-}
-
-// Values returns all possible values
-func (cs CleanStrategyType) Values() []CleanStrategyType {
+}, func() []CleanStrategyType {
 	return []CleanStrategyType{
 		StrategyAggressiveType,
 		StrategyConservativeType,
 		StrategyDryRunType,
 	}
+}, false) // case insensitive for strategies (accept "dryrun", "dry-run")
+
+// String returns string representation
+func (cs CleanStrategyType) String() string {
+	return cleanStrategyHelper.String(cs)
+}
+
+// IsValid checks if clean strategy is valid
+func (cs CleanStrategyType) IsValid() bool {
+	return cleanStrategyHelper.IsValid(cs)
+}
+
+// Values returns all possible values
+func (cs CleanStrategyType) Values() []CleanStrategyType {
+	return cleanStrategyHelper.Values()
 }
 
 // MarshalJSON implements json.Marshaler
 func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
-	if !cs.IsValid() {
-		return nil, fmt.Errorf("invalid clean strategy: %d", cs)
-	}
-	return json.Marshal(cs.String())
+	return cleanStrategyHelper.MarshalJSON(cs)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToLower(s) {
-	case "aggressive":
-		*cs = StrategyAggressiveType
-	case "conservative":
-		*cs = StrategyConservativeType
-	case "dry-run", "dryrun":
-		*cs = StrategyDryRunType
-	default:
-		return fmt.Errorf("invalid clean strategy: %s", s)
-	}
-	return nil
+	return cleanStrategyHelper.UnmarshalJSON(data, func(val CleanStrategyType) {
+		*cs = val
+	})
 }
 
 // Icon returns emoji for clean strategy (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
@@ -392,65 +347,48 @@ const (
 	ScanTypeTempType
 )
 
-// String returns string representation
-func (st ScanTypeType) String() string {
-	switch st {
-	case ScanTypeNixStoreType:
-		return "nix_store"
-	case ScanTypeHomebrewType:
-		return "homebrew"
-	case ScanTypeSystemType:
-		return "system"
-	case ScanTypeTempType:
-		return "temp_files"
-	default:
-		return "unknown"
-	}
-}
-
-// IsValid checks if scan type is valid
-func (st ScanTypeType) IsValid() bool {
+// scanTypeHelper provides shared functionality for ScanTypeType
+var scanTypeHelper = NewEnumHelper(map[ScanTypeType]string{
+	ScanTypeNixStoreType: "nix_store",
+	ScanTypeHomebrewType: "homebrew",
+	ScanTypeSystemType:   "system",
+	ScanTypeTempType:     "temp_files",
+}, func(st ScanTypeType) bool {
 	return st >= ScanTypeNixStoreType && st <= ScanTypeTempType
-}
-
-// Values returns all possible values
-func (st ScanTypeType) Values() []ScanTypeType {
+}, func() []ScanTypeType {
 	return []ScanTypeType{
 		ScanTypeNixStoreType,
 		ScanTypeHomebrewType,
 		ScanTypeSystemType,
 		ScanTypeTempType,
 	}
+}, false) // case insensitive for scan types (accept "nix-store", "nix_store", "temp", etc.)
+
+// String returns string representation
+func (st ScanTypeType) String() string {
+	return scanTypeHelper.String(st)
+}
+
+// IsValid checks if scan type is valid
+func (st ScanTypeType) IsValid() bool {
+	return scanTypeHelper.IsValid(st)
+}
+
+// Values returns all possible values
+func (st ScanTypeType) Values() []ScanTypeType {
+	return scanTypeHelper.Values()
 }
 
 // MarshalJSON implements json.Marshaler
 func (st ScanTypeType) MarshalJSON() ([]byte, error) {
-	if !st.IsValid() {
-		return nil, fmt.Errorf("invalid scan type: %d", st)
-	}
-	return json.Marshal(st.String())
+	return scanTypeHelper.MarshalJSON(st)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (st *ScanTypeType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToLower(s) {
-	case "nix_store", "nix-store":
-		*st = ScanTypeNixStoreType
-	case "homebrew":
-		*st = ScanTypeHomebrewType
-	case "system":
-		*st = ScanTypeSystemType
-	case "temp_files", "temp-files", "temp":
-		*st = ScanTypeTempType
-	default:
-		return fmt.Errorf("invalid scan type: %s", s)
-	}
-	return nil
+	return scanTypeHelper.UnmarshalJSON(data, func(val ScanTypeType) {
+		*st = val
+	})
 }
 
 // ScanTypeIcon returns emoji for scan type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)

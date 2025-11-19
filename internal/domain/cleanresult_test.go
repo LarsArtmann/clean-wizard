@@ -107,7 +107,7 @@ func TestCleanResultValidation(t *testing.T) {
 			},
 			shouldValid: false,
 			shouldError: true,
-			errorMsg:    "Invalid strategy: unknown (must be 'aggressive', 'conservative', or 'dry-run')",
+			errorMsg:    "Invalid strategy: UNKNOWN (must be 'aggressive', 'conservative', or 'dry-run')",
 		},
 	}
 

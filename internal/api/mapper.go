@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -126,7 +127,7 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 
 	// Derive operation type from operation name
 	opType := domain.GetOperationType(publicOperation.Name)
-	
+
 	// Check if this is a known/standard operation type
 	knownTypes := []domain.OperationType{
 		domain.OperationTypeNixGenerations,
@@ -134,14 +135,8 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 		domain.OperationTypeHomebrew,
 		domain.OperationTypeSystemTemp,
 	}
-	isKnown := false
-	for _, known := range knownTypes {
-		if opType == known {
-			isKnown = true
-			break
-		}
-	}
-	
+	isKnown := slices.Contains(knownTypes, opType)
+
 	if !isKnown {
 		return nil, fmt.Errorf("unknown/unsupported operation type: %s", publicOperation.Name)
 	}
