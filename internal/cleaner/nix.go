@@ -11,6 +11,13 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// Nix Store Size Estimation Constants
+const (
+	// EstimatedBytesPerGeneration is the average size per Nix generation (50 MB)
+	// Used for dry-run estimations when actual size calculation would be expensive
+	EstimatedBytesPerGeneration = 50 * 1024 * 1024 // 50 MB in bytes
+)
+
 // NixCleaner handles Nix package manager cleanup with proper type safety
 type NixCleaner struct {
 	adapter *adapters.NixAdapter
@@ -140,7 +147,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	}
 
 	// Dry-run or no generations to remove - use centralized conversion
-	estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Estimated
+	estimatedBytes := int64(toRemove) * EstimatedBytesPerGeneration
 	cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, uint(toRemove), estimatedBytes)
 	return result.Ok(cleanResult)
 }

@@ -4,6 +4,23 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// Validation Constants - centralized magic numbers for maintainability
+const (
+	// Disk Usage Limits
+	MinDiskUsagePercent = 10  // Minimum allowed max_disk_usage percentage
+	MaxDiskUsagePercent = 95  // Maximum allowed max_disk_usage percentage
+
+	// Path Limits
+	MinProtectedPathsCount = 1  // At least one protected path required
+
+	// Profile Limits
+	MaxProfilesRecommended  = 10 // Recommended maximum number of profiles
+	MaxOperationsRecommended = 20 // Recommended maximum operations per profile
+
+	// Pattern Constants
+	ProfileNamePattern = "^[a-zA-Z0-9_-]+$" // Alphanumeric with underscores and hyphens
+)
+
 // ConfigValidationRules defines all validation constraints
 type ConfigValidationRules struct {
 	// Numeric Constraints
@@ -50,12 +67,12 @@ const (
 
 // getDefaultValidationRules returns default validation constraints
 func getDefaultValidationRules() *ConfigValidationRules {
-	// Magic numbers extracted to constants for maintainability
-	minUsage := 10
-	maxUsage := 95
-	minPaths := 1
-	maxProfiles := 10
-	maxOps := 20
+	// Use package-level constants for all validation rules
+	minUsage := MinDiskUsagePercent
+	maxUsage := MaxDiskUsagePercent
+	minPaths := MinProtectedPathsCount
+	maxProfiles := MaxProfilesRecommended
+	maxOps := MaxOperationsRecommended
 
 	return &ConfigValidationRules{
 		MaxDiskUsage: &ValidationRule[int]{
@@ -81,7 +98,7 @@ func getDefaultValidationRules() *ConfigValidationRules {
 		},
 		ProfileNamePattern: &ValidationRule[string]{
 			Required: true,
-			Pattern:  "^[a-zA-Z0-9_-]+$",
+			Pattern:  ProfileNamePattern,
 			Message:  "Profile names must be alphanumeric with underscores and hyphens",
 		},
 		UniquePaths:    true,
