@@ -124,12 +124,40 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 		return nil, fmt.Errorf("invalid risk level: %w", err)
 	}
 
+	// Derive operation type from operation name
+	opType := domain.GetOperationType(publicOperation.Name)
+	
+	// Check if this is a known/standard operation type
+	knownTypes := []domain.OperationType{
+		domain.OperationTypeNixGenerations,
+		domain.OperationTypeTempFiles,
+		domain.OperationTypeHomebrew,
+		domain.OperationTypeSystemTemp,
+	}
+	isKnown := false
+	for _, known := range knownTypes {
+		if opType == known {
+			isKnown = true
+			break
+		}
+	}
+	
+	if !isKnown {
+		return nil, fmt.Errorf("unknown/unsupported operation type: %s", publicOperation.Name)
+	}
+
+	// Get default settings for the specific operation type
+	settings := domain.DefaultSettings(opType)
+	if settings == nil {
+		return nil, fmt.Errorf("failed to get default settings for operation type: %s", opType)
+	}
+
 	return &domain.CleanupOperation{
 		Name:        publicOperation.Name,
 		Description: publicOperation.Description,
 		RiskLevel:   riskLevel,
 		Enabled:     publicOperation.Enabled,
-		Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations), // Simplified for PoC
+		Settings:    settings,
 	}, nil
 }
 
