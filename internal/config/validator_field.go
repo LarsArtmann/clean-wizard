@@ -3,66 +3,64 @@ package config
 import (
 	"fmt"
 	"path/filepath"
+	
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// validateMaxDiskUsage validates max disk usage percentage
-func (cv *ConfigValidator) validateMaxDiskUsage(value any) error {
-	usage, ok := value.(int)
-	if !ok {
-		return fmt.Errorf("max_disk_usage must be an integer, got %T", value)
+// validateFieldConstraints validates individual fields against rules
+func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *ValidationResult) {
+	// Validate max disk usage
+	if cfg.MaxDiskUsage < 0 || cfg.MaxDiskUsage > 100 {
+		result.Errors = append(result.Errors, ValidationError{
+			Field:      "max_disk_usage",
+			Rule:       "range",
+			Value:      cfg.MaxDiskUsage,
+			Message:    "Max disk usage must be between 0 and 100 percent",
+			Severity:   SeverityError,
+			Suggestion: "Set a reasonable disk usage percentage (e.g., 80)",
+		})
 	}
 
-	min, max := cv.getMaxDiskUsageBounds()
-	if usage < min {
-		return fmt.Errorf("max_disk_usage (%d) below minimum (%d)", usage, min)
-	}
-	if usage > max {
-		return fmt.Errorf("max_disk_usage (%d) above maximum (%d)", usage, max)
-	}
-
-	return nil
-}
-
-// getMaxDiskUsageBounds safely returns min and max bounds for max disk usage
-func (cv *ConfigValidator) getMaxDiskUsageBounds() (min, max int) {
-	min, max = 0, 100 // Safe defaults
-
-	if cv.rules.MaxDiskUsage != nil {
-		if cv.rules.MaxDiskUsage.Min != nil {
-			min = *cv.rules.MaxDiskUsage.Min
-		}
-		if cv.rules.MaxDiskUsage.Max != nil {
-			max = *cv.rules.MaxDiskUsage.Max
-		}
-	}
-	return min, max
-}
-
-// validateProtectedPaths validates protected paths array
-func (cv *ConfigValidator) validateProtectedPaths(value any) error {
-	paths, ok := value.([]string)
-	if !ok {
-		return fmt.Errorf("protected must be a string array, got %T", value)
-	}
-
-	// Explicitly reject empty arrays as required field
-	if len(paths) == 0 {
-		return fmt.Errorf("protected paths cannot be empty")
-	}
-
-	for i, path := range paths {
+	// Validate protected paths
+	for i, path := range cfg.Protected {
 		if path == "" {
-			return fmt.Errorf("protected[%d] cannot be empty", i)
-		}
-		if !filepath.IsAbs(path) {
-			return fmt.Errorf("protected[%d] must be absolute path: %s", i, path)
+			result.Errors = append(result.Errors, ValidationError{
+				Field:      fmt.Sprintf("protected[%d]", i),
+				Rule:       "required",
+				Value:      path,
+				Message:    "Protected path cannot be empty",
+				Severity:   SeverityError,
+				Suggestion: "Provide a valid absolute path",
+			})
+		} else if !filepath.IsAbs(path) {
+			result.Errors = append(result.Errors, ValidationError{
+				Field:      fmt.Sprintf("protected[%d]", i),
+				Rule:       "format",
+				Value:      path,
+				Message:    "Protected path must be absolute",
+				Severity:   SeverityError,
+				Suggestion: "Use absolute path (e.g., /System, /Applications)",
+			})
 		}
 	}
 
-	return nil
+	// Check for duplicate protected paths
+	duplicates := cv.findDuplicatePaths(cfg.Protected)
+	for _, path := range duplicates {
+		result.Warnings = append(result.Warnings, ValidationWarning{
+			Field:      "protected",
+			Message:    fmt.Sprintf("Duplicate protected path: %s", path),
+			Suggestion: "Remove duplicate entries from protected paths",
+			Context: &ValidationContext{
+				Metadata: map[string]string{
+					"duplicate_path": path,
+				},
+			},
+		})
+	}
 }
 
-// findDuplicatePaths finds duplicate paths in the given slice
+// findDuplicatePaths finds duplicate paths in given slice
 func (cv *ConfigValidator) findDuplicatePaths(paths []string) []string {
 	seen := make(map[string]bool)
 	duplicates := []string{}

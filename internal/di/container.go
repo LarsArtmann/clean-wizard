@@ -12,10 +12,10 @@ type Container struct {
 // Provides compile-time safety for all service dependencies
 func NewContainer() *Container {
 	container := do.New()
-	
+
 	// Configure core services with proper dependency injection
 	configureServices(container)
-	
+
 	return &Container{
 		container: container,
 	}
@@ -26,12 +26,12 @@ func configureServices(container *do.Injector) {
 	// TODO: Implement service configuration when service types are defined
 	// Configuration service - root of dependency tree
 	// do.Provide(container, NewConfigService)
-	
+
 	// Domain services
 	// do.Provide(container, NewValidationService)
 	// do.Provide(container, NewSanitizationService)
 	// do.Provide(container, NewCleanResultService)
-	
+
 	// API services (for future HTTP integration)
 	// do.Provide(container, NewConfigAPIService)
 	// do.Provide(container, NewValidationAPIService)
@@ -75,12 +75,12 @@ func NewValidationAPIService(validationService *domain.ValidationService) *Valid
 
 // MustInvoke is a convenience wrapper for do.MustInvoke
 // Provides compile-time safety and error handling
-func (c *Container) MustInvoke(service interface{}) interface{} {
-	return do.MustInvoke[interface{}](c.container)
+func (c *Container) MustInvoke(service any) any {
+	return do.MustInvoke[any](c.container)
 }
 
 // Invoke is a convenience wrapper for do.Invoke
 // Provides error handling for dependency resolution
-func (c *Container) Invoke(service interface{}) (interface{}, error) {
-	return do.Invoke[interface{}](c.container)
+func (c *Container) Invoke(service any) (any, error) {
+	return do.Invoke[any](c.container)
 }

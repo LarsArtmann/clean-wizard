@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 // ErrorCode represents standardized error codes
@@ -331,58 +331,55 @@ func (e *CleanWizardError) IsUserFriendly() bool {
 
 // Log logs error with appropriate level
 func (e *CleanWizardError) Log() {
-	fields := logrus.Fields{
-		"code":      e.Code.String(),
-		"level":     e.Level.String(),
-		"operation": e.Operation,
-		"timestamp": e.Timestamp,
-	}
+	event := log.Info().
+		Str("code", e.Code.String()).
+		Str("level", e.Level.String()).
+		Str("operation", e.Operation).
+		Time("timestamp", e.Timestamp)
 
 	if e.Details != nil {
 		if e.Details.Field != "" {
-			fields["detail_field"] = e.Details.Field
+			event = event.Str("detail_field", e.Details.Field)
 		}
 		if e.Details.Value != "" {
-			fields["detail_value"] = e.Details.Value
+			event = event.Str("detail_value", e.Details.Value)
 		}
 		if e.Details.Expected != "" {
-			fields["detail_expected"] = e.Details.Expected
+			event = event.Str("detail_expected", e.Details.Expected)
 		}
 		if e.Details.Actual != "" {
-			fields["detail_actual"] = e.Details.Actual
+			event = event.Str("detail_actual", e.Details.Actual)
 		}
 		if e.Details.Operation != "" {
-			fields["detail_operation"] = e.Details.Operation
+			event = event.Str("detail_operation", e.Details.Operation)
 		}
 		if e.Details.FilePath != "" {
-			fields["detail_file_path"] = e.Details.FilePath
+			event = event.Str("detail_file_path", e.Details.FilePath)
 		}
 		if e.Details.LineNumber > 0 {
-			fields["detail_line_number"] = e.Details.LineNumber
+			event = event.Int("detail_line_number", e.Details.LineNumber)
 		}
 		if e.Details.RetryCount > 0 {
-			fields["detail_retry_count"] = e.Details.RetryCount
+			event = event.Int("detail_retry_count", e.Details.RetryCount)
 		}
 		if e.Details.Duration != "" {
-			fields["detail_duration"] = e.Details.Duration
+			event = event.Str("detail_duration", e.Details.Duration)
 		}
 
 		// Add metadata
 		for key, value := range e.Details.Metadata {
-			fields["meta_"+key] = value
+			event = event.Str("meta_"+key, value)
 		}
 	}
 
-	entry := logrus.WithFields(fields)
-
 	switch e.Level {
 	case LevelInfo:
-		entry.Info(e.Message)
+		event.Msg(e.Message)
 	case LevelWarn:
-		entry.Warn(e.Message)
+		event.Msg(e.Message)
 	case LevelError:
-		entry.Error(e.Message)
+		event.Msg(e.Message)
 	case LevelFatal:
-		entry.Fatal(e.Message)
+		event.Msg(e.Message)
 	}
 }

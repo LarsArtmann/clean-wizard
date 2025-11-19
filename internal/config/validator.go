@@ -98,7 +98,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 	// Level 1: Basic structure validation
 	cv.validateBasicStructure(cfg, result)
 
-	// Level 2: Field-level validation with rules
+	// Level 2: Field-level validation
 	cv.validateFieldConstraints(cfg, result)
 
 	// Level 3: Cross-field validation
@@ -124,15 +124,33 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	switch field {
 	case "max_disk_usage":
-		return cv.validateMaxDiskUsage(value)
-	case "protected":
-		return cv.validateProtectedPaths(value)
-	case "profiles":
-		if cfg, ok := value.(*domain.Config); ok {
-			return cv.validateProfiles(cfg)
+		if intVal, ok := value.(int); ok {
+			rules := cv.rules.MaxDiskUsage
+			if rules != nil {
+				if rules.Min != nil && intVal < *rules.Min {
+					return fmt.Errorf("max_disk_usage must be at least %d, got %d", *rules.Min, intVal)
+				}
+				if rules.Max != nil && intVal > *rules.Max {
+					return fmt.Errorf("max_disk_usage must be at most %d, got %d", *rules.Max, intVal)
+				}
+			}
+		} else {
+			return fmt.Errorf("max_disk_usage must be an integer, got %T", value)
 		}
-		return fmt.Errorf("profiles validation requires *domain.Config, got %T", value)
+	case "protected":
+		if sliceVal, ok := value.([]string); ok {
+			rules := cv.rules.MinProtectedPaths
+			if rules != nil && rules.Min != nil && len(sliceVal) < *rules.Min {
+				return fmt.Errorf("protected paths must have at least %d items, got %d", *rules.Min, len(sliceVal))
+			}
+		} else {
+			return fmt.Errorf("protected must be a slice of strings, got %T", value)
+		}
+	case "profiles":
+		// Complex validation handled by validateBusinessLogic
+		return nil
 	default:
 		return fmt.Errorf("unknown field: %s", field)
 	}
+	return nil
 }

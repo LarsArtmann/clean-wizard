@@ -10,7 +10,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
@@ -68,7 +68,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Unmarshal profiles section
 	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
-		logrus.WithError(err).Error("Failed to unmarshal profiles")
+		log.Err(err).Msg("Failed to unmarshal profiles")
 		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
@@ -89,7 +89,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			case "CRITICAL":
 				op.RiskLevel = domain.RiskCritical
 			default:
-				logrus.WithField("risk_level", riskLevelStr).Warn("Invalid risk level, defaulting to LOW")
+				log.Warn().Str("risk_level", riskLevelStr).Msg("Invalid risk level, defaulting to LOW")
 				op.RiskLevel = domain.RiskLow
 			}
 		}
@@ -106,7 +106,10 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		if !validationResult.IsValid {
 			// CRITICAL: Fail fast on validation errors for production safety
 			for _, err := range validationResult.Errors {
-				logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation error")
+				log.Error().
+			Str("field", err.Field).
+			Err(fmt.Errorf("%s", err.Message)).
+			Msg("Configuration validation error")
 			}
 			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
 		}
@@ -163,7 +166,7 @@ func Save(config *domain.Config) error {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
 
-	logrus.WithField("config_path", configPath).Info("Configuration saved successfully")
+	log.Info().Str("config_path", configPath).Msg("Configuration saved successfully")
 	return nil
 }
 

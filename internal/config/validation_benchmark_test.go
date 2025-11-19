@@ -160,11 +160,14 @@ func BenchmarkValidation_OperationSettingsValidation(b *testing.B) {
 // BenchmarkValidation_MaxDiskUsageValidation tests max disk usage validation performance
 func BenchmarkValidation_MaxDiskUsageValidation(b *testing.B) {
 	validator := NewConfigValidator()
+	cfg := &domain.Config{}
+	result := NewValidationResult()
 	testValues := []int{10, 25, 50, 75, 95}
 
 	for b.Loop() {
 		for _, value := range testValues {
-			_ = validator.validateMaxDiskUsage(value)
+			cfg.MaxDiskUsage = value
+			validator.validateFieldConstraints(cfg, result)
 		}
 	}
 }

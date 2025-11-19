@@ -7,7 +7,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-<<<<<<< HEAD
 // validateOperationRisk checks if an operation violates safe mode + critical risk rule
 func (cv *ConfigValidator) validateOperationRisk(cfg *domain.Config, profileName string, op domain.CleanupOperation) *ValidationError {
 	if op.RiskLevel == domain.RiskCritical && !cfg.SafeMode {
@@ -34,19 +33,6 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 				Value:      nil,
 				Message:    fmt.Sprintf("Profile '%s' is nil", name),
 				Severity:   SeverityError,
-				Suggestion: "Remove or define the profile",
-			})
-			continue
-		}
-
-		// Check for nil profile to prevent panic
-		if profile == nil {
-			result.Errors = append(result.Errors, ValidationError{
-				Field:      fmt.Sprintf("profiles.%s", name),
-				Rule:       "business_logic",
-				Value:      nil,
-				Message:    fmt.Sprintf("Profile '%s' is nil", name),
-				Severity:   SeverityError,
 				Suggestion: "Remove or define profile",
 			})
 			continue
@@ -60,15 +46,13 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 				Value:      len(profile.Operations),
 				Message:    fmt.Sprintf("Profile '%s' must have at least one operation", name),
 				Severity:   SeverityError,
-				Suggestion: "Add at least one valid operation to profile",
+				Suggestion: "Add at least one operation to profile",
 			})
+			continue
 		}
 
-		// Validate operations within profile
+		// Validate each operation
 		for _, op := range profile.Operations {
-			// Validate critical risk + safe mode constraint using helper
-			if err := cv.validateOperationRisk(cfg, name, op); err != nil {
-				result.Errors = append(result.Errors, *err)
 			// Validate risk vs safe mode
 			if !cfg.SafeMode && op.RiskLevel == domain.RiskCritical {
 				result.Errors = append(result.Errors, ValidationError{
@@ -79,7 +63,12 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 					Severity:   SeverityError,
 					Suggestion: "Enable safe mode or remove critical risk operation",
 				})
->>>>>>> master
+				continue
+			}
+
+			// Validate critical risk + safe mode constraint using helper
+			if err := cv.validateOperationRisk(cfg, name, op); err != nil {
+				result.Errors = append(result.Errors, *err)
 			}
 
 			// Validate operation settings
@@ -95,24 +84,6 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 						Suggestion: "Fix operation settings according to validation rules",
 					})
 				}
-			}
-		}
-	}
-
-	// Validate protected paths don't conflict with operation targets
-	for profileKey, profile := range cfg.Profiles {
-		// Check for nil profile to prevent panic
-		if profile == nil {
-			continue
-		}
-
-		for _, op := range profile.Operations {
-			if err := cv.validateProtectedPathsConflict(cfg.Protected, op); err != nil {
-				result.Warnings = append(result.Warnings, ValidationWarning{
-					Field:      fmt.Sprintf("profiles.%s.operations.%s", profileKey, op.Name),
-					Message:    fmt.Sprintf("Operation may affect protected paths: %v", err),
-					Suggestion: "Review operation scope and protected paths configuration",
-				})
 			}
 		}
 	}
@@ -158,84 +129,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 		for _, op := range profile.Operations {
 			if err := cv.validateOperationRisk(cfg, name, op); err != nil {
 				result.Errors = append(result.Errors, *err)
-					Suggestion: "Enable safe mode or remove critical risk operations",
-				})
->>>>>>> master
 			}
 		}
 	}
-}
-
-// validateProtectedPathsConflict checks if operations might affect protected paths
-func (cv *ConfigValidator) validateProtectedPathsConflict(protected []string, op domain.CleanupOperation) error {
-	switch op.Name {
-	case "temp-files":
-		// Check if temp files cleanup might affect protected paths
-		return cv.checkTempFilesConflict(protected, op)
-	case "nix-generations":
-		// Check if nix cleanup might affect protected paths
-		return cv.checkNixConflict(protected, op)
-	default:
-		// Generic conflict check
-		return nil // Skip unknown operations
-	}
-}
-
-// checkTempFilesConflict checks for temp files conflicts
-func (cv *ConfigValidator) checkTempFilesConflict(protected []string, op domain.CleanupOperation) error {
-	if op.Settings != nil && op.Settings.TempFiles != nil {
-		for _, exclude := range op.Settings.TempFiles.Excludes {
-			for _, protectedPath := range protected {
-				if strings.HasPrefix(exclude, protectedPath) || strings.HasPrefix(protectedPath, exclude) {
-					return fmt.Errorf("temp files exclude '%s' conflicts with protected path '%s'", exclude, protectedPath)
-				}
-			}
-		}
-	}
-	return nil
-}
-
-// checkNixConflict checks for Nix conflicts
-func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.CleanupOperation) error {
-	// Nix operations typically affect /nix/store, check if protected paths overlap
-	nixStorePath := "/nix/store"
-	for _, protectedPath := range protected {
-		if strings.HasPrefix(protectedPath, nixStorePath) || strings.HasPrefix(nixStorePath, protectedPath) {
-			return fmt.Errorf("nix operations may conflict with protected path '%s'", protectedPath)
-		}
-	}
-	return nil
-}
-
-// findMaxRiskLevel finds the maximum risk level in configuration
-func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel {
-	maxRisk := domain.RiskLow
-	for _, profile := range cfg.Profiles {
-		// Check for nil profile to prevent panic
-		if profile == nil {
-			continue
-		}
-
-		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskCritical {
-				return domain.RiskCritical
-			}
-			if op.RiskLevel == domain.RiskHigh {
-				maxRisk = domain.RiskHigh
-			} else if op.RiskLevel == domain.RiskMedium && maxRisk == domain.RiskLow {
-				maxRisk = domain.RiskMedium
-			}
-		}
-	}
-	return maxRisk
-}
-
-// isPathProtected checks if a path is protected
-func (cv *ConfigValidator) isPathProtected(protected []string, targetPath string) bool {
-	for _, path := range protected {
-		if strings.HasPrefix(path, targetPath) || strings.HasPrefix(targetPath, path) {
-			return true
-		}
-	}
-	return false
 }
