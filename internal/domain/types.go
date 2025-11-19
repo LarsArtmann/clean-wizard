@@ -250,7 +250,7 @@ func (cr CleanRequest) Validate() error {
 // ScanResult represents successful scan outcome
 type ScanResult struct {
 	TotalBytes   int64         `json:"total_bytes"`
-	TotalItems   int           `json:"total_items"`
+	TotalItems   uint          `json:"total_items"` // uint enforces non-negative
 	ScannedPaths []string      `json:"scanned_paths"`
 	ScanTime     time.Duration `json:"scan_time"`
 	ScannedAt    time.Time     `json:"scanned_at"`
@@ -258,7 +258,8 @@ type ScanResult struct {
 
 // IsValid checks if scan result is valid
 func (sr ScanResult) IsValid() bool {
-	return sr.TotalBytes >= 0 && sr.TotalItems >= 0 && sr.ScanTime >= 0 && !sr.ScannedAt.IsZero()
+	// TotalItems is uint, can't be negative - type system enforces this
+	return sr.TotalBytes >= 0 && sr.ScanTime >= 0 && !sr.ScannedAt.IsZero()
 }
 
 // Validate returns errors for invalid scan result
@@ -266,9 +267,7 @@ func (sr ScanResult) Validate() error {
 	if sr.TotalBytes < 0 {
 		return fmt.Errorf("TotalBytes cannot be negative, got: %d", sr.TotalBytes)
 	}
-	if sr.TotalItems < 0 {
-		return fmt.Errorf("TotalItems cannot be negative, got: %d", sr.TotalItems)
-	}
+	// TotalItems is uint, can't be negative - type system enforces this
 	if sr.ScanTime < 0 {
 		return fmt.Errorf("ScanTime cannot be negative, got: %d", sr.ScanTime)
 	}
@@ -281,8 +280,8 @@ func (sr ScanResult) Validate() error {
 // CleanResult represents successful clean outcome
 type CleanResult struct {
 	FreedBytes   int64         `json:"freed_bytes"`
-	ItemsRemoved int           `json:"items_removed"`
-	ItemsFailed  int           `json:"items_failed"`
+	ItemsRemoved uint          `json:"items_removed"` // uint enforces non-negative
+	ItemsFailed  uint          `json:"items_failed"`  // uint enforces non-negative
 	CleanTime    time.Duration `json:"clean_time"`
 	CleanedAt    time.Time     `json:"cleaned_at"`
 	Strategy     CleanStrategy `json:"strategy"`
@@ -290,7 +289,8 @@ type CleanResult struct {
 
 // IsValid checks if clean result is valid
 func (cr CleanResult) IsValid() bool {
-	return cr.FreedBytes >= 0 && cr.ItemsRemoved >= 0 && cr.CleanedAt.IsZero() == false
+	// ItemsRemoved and ItemsFailed are uint, can't be negative - type system enforces this
+	return cr.FreedBytes >= 0 && !cr.CleanedAt.IsZero()
 }
 
 // Validate returns errors for invalid clean result
@@ -298,9 +298,7 @@ func (cr CleanResult) Validate() error {
 	if cr.FreedBytes < 0 {
 		return fmt.Errorf("FreedBytes cannot be negative, got: %d", cr.FreedBytes)
 	}
-	if cr.ItemsRemoved < 0 {
-		return fmt.Errorf("ItemsRemoved cannot be negative, got: %d", cr.ItemsRemoved)
-	}
+	// ItemsRemoved and ItemsFailed are uint, can't be negative - type system enforces this
 	if cr.CleanedAt.IsZero() {
 		return fmt.Errorf("CleanedAt cannot be zero")
 	}

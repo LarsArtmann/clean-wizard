@@ -22,8 +22,8 @@ type OperationSettings struct {
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup
 type NixGenerationsSettings struct {
-	Generations int  `json:"generations"`
-	Optimize    bool `json:"optimize"`
+	Generations uint8 `json:"generations"` // uint8 enforces non-negative, 0-255 range
+	Optimize    bool  `json:"optimize"`
 }
 
 // TempFilesSettings provides type-safe settings for temporary files cleanup

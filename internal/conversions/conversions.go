@@ -14,7 +14,7 @@ import (
 //
 // Parameters:
 //   - strategy: The cleaning strategy used (e.g., StrategyAggressive, StrategyDryRun)
-//   - itemsRemoved: Number of items successfully removed
+//   - itemsRemoved: Number of items successfully removed (uint enforces non-negative)
 //   - freedBytes: Total bytes freed by the operation
 //
 // Returns:
@@ -24,7 +24,7 @@ import (
 //
 //	result := NewCleanResult(domain.StrategyAggressive, 5, 1024*1024*100)
 //	fmt.Printf("Freed %d bytes", result.FreedBytes)
-func NewCleanResult(strategy domain.CleanStrategy, itemsRemoved int, freedBytes int64) domain.CleanResult {
+func NewCleanResult(strategy domain.CleanStrategy, itemsRemoved uint, freedBytes int64) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   freedBytes,
 		ItemsRemoved: itemsRemoved,
@@ -42,7 +42,7 @@ func NewCleanResult(strategy domain.CleanStrategy, itemsRemoved int, freedBytes 
 //
 // Parameters:
 //   - strategy: The cleaning strategy used
-//   - itemsRemoved: Number of items successfully removed
+//   - itemsRemoved: Number of items successfully removed (uint enforces non-negative)
 //   - freedBytes: Total bytes freed by the operation
 //   - cleanTime: Time duration of the cleaning operation
 //
@@ -55,7 +55,7 @@ func NewCleanResult(strategy domain.CleanStrategy, itemsRemoved int, freedBytes 
 //	// ... perform cleaning ...
 //	cleanTime := time.Since(startTime)
 //	result := NewCleanResultWithTiming(domain.StrategyAggressive, 5, 1024*1024*100, cleanTime)
-func NewCleanResultWithTiming(strategy domain.CleanStrategy, itemsRemoved int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
+func NewCleanResultWithTiming(strategy domain.CleanStrategy, itemsRemoved uint, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   freedBytes,
 		ItemsRemoved: itemsRemoved,
@@ -73,8 +73,8 @@ func NewCleanResultWithTiming(strategy domain.CleanStrategy, itemsRemoved int, f
 //
 // Parameters:
 //   - strategy: The cleaning strategy used
-//   - itemsRemoved: Number of items successfully removed
-//   - itemsFailed: Number of items that failed to remove
+//   - itemsRemoved: Number of items successfully removed (uint enforces non-negative)
+//   - itemsFailed: Number of items that failed to remove (uint enforces non-negative)
 //   - freedBytes: Total bytes freed by successful operations
 //   - cleanTime: Time duration of the cleaning operation
 //
@@ -85,7 +85,7 @@ func NewCleanResultWithTiming(strategy domain.CleanStrategy, itemsRemoved int, f
 //
 //	result := NewCleanResultWithFailures(domain.StrategyConservative, 5, 2, 1024*1024*100, time.Second*30)
 //	fmt.Printf("Success: %d, Failed: %d", result.ItemsRemoved, result.ItemsFailed)
-func NewCleanResultWithFailures(strategy domain.CleanStrategy, itemsRemoved, itemsFailed int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
+func NewCleanResultWithFailures(strategy domain.CleanStrategy, itemsRemoved, itemsFailed uint, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   freedBytes,
 		ItemsRemoved: itemsRemoved,
@@ -103,7 +103,7 @@ func NewCleanResultWithFailures(strategy domain.CleanStrategy, itemsRemoved, ite
 //
 // Parameters:
 //   - totalBytes: Total bytes found during scanning
-//   - totalItems: Total number of items discovered
+//   - totalItems: Total number of items discovered (uint enforces non-negative)
 //   - scannedPaths: List of paths that were scanned
 //   - scanDuration: Time taken to perform the scan
 //
@@ -115,7 +115,7 @@ func NewCleanResultWithFailures(strategy domain.CleanStrategy, itemsRemoved, ite
 //	paths := []string{"/nix/store", "/tmp"}
 //	result := NewScanResult(1024*1024*500, 1000, paths, time.Second*10)
 //	fmt.Printf("Scanned %d items in %v", result.TotalItems, result.ScanTime)
-func NewScanResult(totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration) domain.ScanResult {
+func NewScanResult(totalBytes int64, totalItems uint, scannedPaths []string, scanDuration time.Duration) domain.ScanResult {
 	return domain.ScanResult{
 		TotalBytes:   totalBytes,
 		TotalItems:   totalItems,
@@ -181,7 +181,7 @@ func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy domain
 // This provides more detailed metrics than just bytes conversion alone.
 //
 // Parameters:
-//   - itemsRemoved: Number of items successfully removed
+//   - itemsRemoved: Number of items successfully removed (uint enforces non-negative)
 //   - bytesResult: Result[int64] containing bytes freed from operation
 //   - strategy: CleanStrategy enum value for the cleaning strategy
 //
@@ -196,7 +196,7 @@ func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy domain
 //		fmt.Printf("Removed %d items, freed %d bytes",
 //			cleanResult.Value().ItemsRemoved, cleanResult.Value().FreedBytes)
 //	}
-func ToCleanResultFromItems(itemsRemoved int, bytesResult result.Result[int64], strategy domain.CleanStrategy) result.Result[domain.CleanResult] {
+func ToCleanResultFromItems(itemsRemoved uint, bytesResult result.Result[int64], strategy domain.CleanStrategy) result.Result[domain.CleanResult] {
 	if bytesResult.IsErr() {
 		return result.Err[domain.CleanResult](bytesResult.Error())
 	}
@@ -218,7 +218,7 @@ func ToTimedCleanResult(bytesResult result.Result[int64], strategy domain.CleanS
 }
 
 // ToScanResult converts primitive scanning results to domain.ScanResult
-func ToScanResult(totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration) domain.ScanResult {
+func ToScanResult(totalBytes int64, totalItems uint, scannedPaths []string, scanDuration time.Duration) domain.ScanResult {
 	return NewScanResult(totalBytes, totalItems, scannedPaths, scanDuration)
 }
 
@@ -230,8 +230,8 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 		return NewCleanResult(domain.StrategyConservative, 0, 0)
 	}
 
-	totalItems := 0
-	totalFailed := 0
+	var totalItems uint = 0
+	var totalFailed uint = 0
 	totalBytes := int64(0)
 	maxTime := time.Duration(0)
 
