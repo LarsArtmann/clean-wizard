@@ -263,7 +263,7 @@ func TestMapCleanRequestToDomain_ValidRequest(t *testing.T) {
 	}
 
 	// Check first operation
-	if domainRequest.Items[0].ScanType != domain.ScanTypeTemp {
+	if domainRequest.Items[0].ScanType != domain.ScanTypeTempType {
 		t.Errorf("Expected ScanTypeTemp, got %v", domainRequest.Items[0].ScanType)
 	}
 

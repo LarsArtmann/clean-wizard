@@ -276,7 +276,7 @@ func MapCleanRequestToDomain(publicRequest *CleanRequest) result.Result[*domain.
 		// Convert operation type to domain scan item
 		item := domain.ScanItem{
 			Path:     string(opType),      // Use operation type as path identifier
-			ScanType: domain.ScanTypeTemp, // Use temp scan type for operations
+			ScanType: domain.ScanTypeTempType, // Use temp scan type for operations
 			Size:     0,                   // Will be calculated during scanning
 			Created:  time.Time{},         // Will be set during scanning
 		}
