@@ -41,7 +41,7 @@ func TestValidationMiddleware(t *testing.T) {
 
 	t.Run("ValidCleanRequest", func(t *testing.T) {
 		req := domain.CleanRequest{
-			Items:    []domain.ScanItem{{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: domain.ScanTypeTemp}},
+			Items:    []domain.ScanItem{{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: domain.ScanTypeTempType}},
 			Strategy: domain.StrategyConservative,
 		}
 

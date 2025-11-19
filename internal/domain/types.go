@@ -118,10 +118,10 @@ func (sr ScanRequest) Validate() error {
 
 // ScanItem represents item found during scanning
 type ScanItem struct {
-	Path     string    `json:"path"`
-	Size     int64     `json:"size"`
-	Created  time.Time `json:"created"`
-	ScanType ScanType  `json:"scan_type"`
+	Path     string         `json:"path"`
+	Size     int64          `json:"size"`
+	Created  time.Time      `json:"created"`
+	ScanType ScanTypeType   `json:"scan_type"`
 }
 
 // CleanRequest represents cleaning command

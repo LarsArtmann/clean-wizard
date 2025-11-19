@@ -107,3 +107,114 @@ func (ui *UIAdapter) CleanStrategyDescription(strategy domain.CleanStrategyType)
 		return "Unknown cleaning strategy"
 	}
 }
+
+// StatusIcon returns appropriate emoji icon for status
+// UI CONCERN: Properly separated from domain layer
+func (ui *UIAdapter) StatusIcon(status domain.StatusType) string {
+	switch status {
+	case domain.StatusDisabled:
+		return "🔴"
+	case domain.StatusEnabled:
+		return "🟢"
+	case domain.StatusInherited:
+		return "🔵"
+	default:
+		return "⚪"
+	}
+}
+
+// EnforcementLevelIcon returns appropriate emoji icon for enforcement level
+// UI CONCERN: Properly separated from domain layer
+func (ui *UIAdapter) EnforcementLevelIcon(level domain.EnforcementLevelType) string {
+	switch level {
+	case domain.EnforcementLevelNone:
+		return "⚪"
+	case domain.EnforcementLevelWarning:
+		return "🟡"
+	case domain.EnforcementLevelError:
+		return "🔴"
+	case domain.EnforcementLevelStrict:
+		return "🚫"
+	default:
+		return "❓"
+	}
+}
+
+// SelectedStatusIcon returns appropriate emoji icon for selected status
+// UI CONCERN: Properly separated from domain layer
+func (ui *UIAdapter) SelectedStatusIcon(status domain.SelectedStatusType) string {
+	switch status {
+	case domain.SelectedStatusNotSelected:
+		return "⭕"
+	case domain.SelectedStatusSelected:
+		return "✅"
+	case domain.SelectedStatusDefault:
+		return "🌟"
+	default:
+		return "❓"
+	}
+}
+
+// RecursionLevelIcon returns appropriate emoji icon for recursion level
+// UI CONCERN: Properly separated from domain layer
+func (ui *UIAdapter) RecursionLevelIcon(level domain.RecursionLevelType) string {
+	switch level {
+	case domain.RecursionLevelNone:
+		return "➡️"
+	case domain.RecursionLevelDirect:
+		return "⬇️"
+	case domain.RecursionLevelFull:
+		return "🔄"
+	case domain.RecursionLevelInfinite:
+		return "♾️"
+	default:
+		return "❓"
+	}
+}
+
+// OptimizationLevelIcon returns appropriate emoji icon for optimization level
+// UI CONCERN: Properly separated from domain layer
+func (ui *UIAdapter) OptimizationLevelIcon(level domain.OptimizationLevelType) string {
+	switch level {
+	case domain.OptimizationLevelNone:
+		return "⚪"
+	case domain.OptimizationLevelConservative:
+		return "🟡"
+	case domain.OptimizationLevelAggressive:
+		return "🔴"
+	default:
+		return "❓"
+	}
+}
+
+// FileSelectionStrategyIcon returns appropriate emoji icon for file selection strategy
+// UI CONCERN: Properly separated from domain layer
+func (ui *UIAdapter) FileSelectionStrategyIcon(strategy domain.FileSelectionStrategyType) string {
+	switch strategy {
+	case domain.FileSelectionStrategyAll:
+		return "📁"
+	case domain.FileSelectionStrategyUnusedOnly:
+		return "🗑️"
+	case domain.FileSelectionStrategyManual:
+		return "✏️"
+	default:
+		return "❓"
+	}
+}
+
+// SafetyLevelIcon returns appropriate emoji icon for safety level
+// UI CONCERN: Properly separated from domain layer
+func (ui *UIAdapter) SafetyLevelIcon(level domain.SafetyLevelType) string {
+	switch level {
+	case domain.SafetyLevelDisabled:
+		return "🔴"
+	case domain.SafetyLevelEnabled:
+		return "🟢"
+	case domain.SafetyLevelStrict:
+		return "🟡"
+	case domain.SafetyLevelParanoid:
+		return "🚫"
+	default:
+		return "❓"
+	}
+}

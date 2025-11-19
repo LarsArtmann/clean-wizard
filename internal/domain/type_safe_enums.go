@@ -307,20 +307,6 @@ func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
 	})
 }
 
-// Icon returns emoji for clean strategy (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (cs CleanStrategyType) Icon() string {
-	switch cs {
-	case StrategyAggressiveType:
-		return "🔥"
-	case StrategyConservativeType:
-		return "🛡️"
-	case StrategyDryRunType:
-		return "🔍"
-	default:
-		return "❓"
-	}
-}
-
 // ScanTypeType represents scanning domains with compile-time safety
 type ScanTypeType int
 
@@ -667,110 +653,6 @@ func (st *ScanTypeType) UnmarshalJSON(data []byte) error {
 	})
 }
 
-// ScanTypeIcon returns emoji for scan type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (st ScanTypeType) Icon() string {
-	switch st {
-	case ScanTypeNixStoreType:
-		return "📦"
-	case ScanTypeHomebrewType:
-		return "🍺"
-	case ScanTypeSystemType:
-		return "💻"
-	case ScanTypeTempType:
-		return "🗑️"
-	default:
-		return "❓"
-	}
-}
-
-// StatusIcon returns emoji for status type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (s StatusType) Icon() string {
-	switch s {
-	case StatusDisabled:
-		return "🔴"
-	case StatusEnabled:
-		return "🟢"
-	case StatusInherited:
-		return "🔵"
-	default:
-		return "❓"
-	}
-}
-
-// EnforcementLevelIcon returns emoji for enforcement level type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (el EnforcementLevelType) Icon() string {
-	switch el {
-	case EnforcementLevelNone:
-		return "⚪"
-	case EnforcementLevelWarning:
-		return "🟡"
-	case EnforcementLevelError:
-		return "🔴"
-	case EnforcementLevelStrict:
-		return "🚫"
-	default:
-		return "❓"
-	}
-}
-
-// SelectedStatusIcon returns emoji for selected status type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (ss SelectedStatusType) Icon() string {
-	switch ss {
-	case SelectedStatusNotSelected:
-		return "⭕"
-	case SelectedStatusSelected:
-		return "✅"
-	case SelectedStatusDefault:
-		return "🌟"
-	default:
-		return "❓"
-	}
-}
-
-// RecursionLevelIcon returns emoji for recursion level type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (rl RecursionLevelType) Icon() string {
-	switch rl {
-	case RecursionLevelNone:
-		return "➡️"
-	case RecursionLevelDirect:
-		return "⬇️"
-	case RecursionLevelFull:
-		return "🔄"
-	case RecursionLevelInfinite:
-		return "♾️"
-	default:
-		return "❓"
-	}
-}
-
-// OptimizationLevelIcon returns emoji for optimization level type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (ol OptimizationLevelType) Icon() string {
-	switch ol {
-	case OptimizationLevelNone:
-		return "⚪"
-	case OptimizationLevelConservative:
-		return "🟡"
-	case OptimizationLevelAggressive:
-		return "🔴"
-	default:
-		return "❓"
-	}
-}
-
-// FileSelectionStrategyIcon returns emoji for file selection strategy type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (fss FileSelectionStrategyType) Icon() string {
-	switch fss {
-	case FileSelectionStrategyAll:
-		return "📁"
-	case FileSelectionStrategyUnusedOnly:
-		return "🗑️"
-	case FileSelectionStrategyManual:
-		return "✏️"
-	default:
-		return "❓"
-	}
-}
-
 // SafetyLevelType represents safety enforcement levels for configuration
 // Replaces boolean SafeMode to eliminate invalid states
 type SafetyLevelType int
@@ -819,22 +701,6 @@ func (sl *SafetyLevelType) UnmarshalJSON(data []byte) error {
 	return safetyLevelTypeHelper.UnmarshalJSON(data, func(val SafetyLevelType) {
 		*sl = val
 	})
-}
-
-// SafetyLevelIcon returns emoji for safety level type (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (sl SafetyLevelType) Icon() string {
-	switch sl {
-	case SafetyLevelDisabled:
-		return "🔴"
-	case SafetyLevelEnabled:
-		return "🟢"
-	case SafetyLevelStrict:
-		return "🟡"
-	case SafetyLevelParanoid:
-		return "🚫"
-	default:
-		return "❓"
-	}
 }
 
 // Convenience constants for backward compatibility are now in types.go
