@@ -137,22 +137,6 @@ func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 	})
 }
 
-// Icon returns emoji for risk level (UI CONCERN - SHOULD BE MOVED TO ADAPTER LAYER)
-func (rl RiskLevelType) Icon() string {
-	switch rl {
-	case RiskLevelLowType:
-		return "🟢"
-	case RiskLevelMediumType:
-		return "🟡"
-	case RiskLevelHighType:
-		return "🟠"
-	case RiskLevelCriticalType:
-		return "🔴"
-	default:
-		return "⚪"
-	}
-}
-
 // IsHigherThan returns true if this risk level is higher than comparison
 func (rl RiskLevelType) IsHigherThan(other RiskLevelType) bool {
 	return rl > other
