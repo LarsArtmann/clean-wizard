@@ -310,16 +310,16 @@ func MapScanResultToPublic(domainResult *domain.ScanResult) result.Result[*Publi
 	publicResult := &PublicScanResult{
 		Success:   true, // Assuming success if result exists
 		ScanTime:  domainResult.ScannedAt.Format(time.RFC3339),
-		TotalSize:  uint64(domainResult.TotalBytes),
-		ItemCount:  uint32(domainResult.TotalItems),
+		TotalSize: uint64(domainResult.TotalBytes),
+		ItemCount: uint32(domainResult.TotalItems),
 		Items:     make([]PublicScanItem, 0), // No individual items in ScanResult
 	}
 
 	return result.Ok(publicResult)
 }
 
-// MapValidationResultToPublic converts domain validation result to public API format  
-func MapValidationResultToPublic(domainResult interface{}) result.Result[*PublicValidationResult] {
+// MapValidationResultToPublic converts domain validation result to public API format
+func MapValidationResultToPublic(domainResult any) result.Result[*PublicValidationResult] {
 	// For now, return a simple valid result
 	// This would be implemented with actual domain validation result type
 	publicResult := &PublicValidationResult{

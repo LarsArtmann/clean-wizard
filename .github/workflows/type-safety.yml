@@ -1,5 +1,4 @@
 name: Type Safety Validation
-description: Ensure Type Safety First principles for all code changes
 
 on:
   pull_request:
