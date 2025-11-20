@@ -19,7 +19,7 @@ func getDefaultLoadOptions() *ConfigLoadOptions {
 func getDefaultSaveOptions() *ConfigSaveOptions {
 	return &ConfigSaveOptions{
 		EnableSanitization: true,
-		CreateBackup:       true,  // Create backup by default for safety
+		CreateBackup:       true, // Create backup by default for safety
 		ValidationLevel:    ValidationLevelComprehensive,
 		ForceSave:          false,
 	}

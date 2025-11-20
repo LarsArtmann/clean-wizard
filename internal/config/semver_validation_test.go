@@ -42,10 +42,10 @@ func TestIsValidSemver(t *testing.T) {
 
 func TestBasicStructureValidation_Semver(t *testing.T) {
 	cv := NewConfigValidator()
-	
+
 	t.Run("Valid semver version", func(t *testing.T) {
-			cfg := &domain.Config{
-			Version:  "1.2.3",
+		cfg := &domain.Config{
+			Version: "1.2.3",
 			Profiles: map[string]*domain.Profile{
 				"test": {
 					Name:        "test",
@@ -57,21 +57,21 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 						Status:      domain.StatusEnabled,
 						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
 					}},
-					Status:      domain.StatusEnabled,
+					Status: domain.StatusEnabled,
 				},
 			},
 			Protected: []string{"/System"},
 		}
-		
+
 		result := cv.ValidateConfig(cfg)
 		if len(result.Errors) != 0 {
 			t.Errorf("Expected no validation errors for valid semver, got: %v", result.Errors)
 		}
 	})
-	
+
 	t.Run("Invalid semver version", func(t *testing.T) {
 		cfg := &domain.Config{
-			Version:  "invalid.version.format",
+			Version: "invalid.version.format",
 			Profiles: map[string]*domain.Profile{
 				"test": {
 					Name:        "test",
@@ -83,17 +83,17 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 						Status:      domain.StatusEnabled,
 						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
 					}},
-					Status:      domain.StatusEnabled,
+					Status: domain.StatusEnabled,
 				},
 			},
 			Protected: []string{"/System"},
 		}
-		
+
 		result := cv.ValidateConfig(cfg)
 		if len(result.Errors) == 0 {
 			t.Error("Expected validation errors for invalid semver version")
 		}
-		
+
 		// Check if error is related to version format
 		foundVersionError := false
 		for _, err := range result.Errors {
@@ -106,10 +106,10 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 			t.Errorf("Expected semver_format error for version field, got errors: %v", result.Errors)
 		}
 	})
-	
+
 	t.Run("Missing version", func(t *testing.T) {
 		cfg := &domain.Config{
-			Version:  "",
+			Version: "",
 			Profiles: map[string]*domain.Profile{
 				"test": {
 					Name:        "test",
@@ -121,17 +121,17 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 						Status:      domain.StatusEnabled,
 						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
 					}},
-					Status:      domain.StatusEnabled,
+					Status: domain.StatusEnabled,
 				},
 			},
 			Protected: []string{"/System"},
 		}
-		
+
 		result := cv.ValidateConfig(cfg)
 		if len(result.Errors) == 0 {
 			t.Error("Expected validation errors for missing version")
 		}
-		
+
 		// Check if error is related to missing version
 		foundMissingError := false
 		for _, err := range result.Errors {

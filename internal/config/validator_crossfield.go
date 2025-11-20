@@ -56,7 +56,7 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 				Context: &ValidationContext{
 					Metadata: map[string]string{
 						"max_risk_level": maxRisk.String(),
-						"safety_level": fmt.Sprintf("%v", cfg.SafetyLevel),
+						"safety_level":   fmt.Sprintf("%v", cfg.SafetyLevel),
 					},
 				},
 			})

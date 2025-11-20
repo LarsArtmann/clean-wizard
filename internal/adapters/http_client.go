@@ -49,7 +49,7 @@ func (hc *HTTPClient) WithAuth(authType, token string) *HTTPClient {
 	// Trim whitespace from inputs
 	authType = strings.TrimSpace(authType)
 	token = strings.TrimSpace(token)
-	
+
 	// Build authorization header value
 	var value string
 	if strings.EqualFold(authType, "Bearer") {
@@ -59,7 +59,7 @@ func (hc *HTTPClient) WithAuth(authType, token string) *HTTPClient {
 	} else {
 		value = token
 	}
-	
+
 	// Set header directly instead of using SetAuthToken to avoid double Bearer
 	hc.client.SetHeader("Authorization", value)
 	return hc

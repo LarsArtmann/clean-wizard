@@ -230,10 +230,10 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 	}
 
 	return domain.NixGeneration{
-		ID:      id,
-		Path:    fields[0],
-		Date:    date,
-		Status:  boolToSelectedStatus(strings.Contains(line, "current")),
+		ID:     id,
+		Path:   fields[0],
+		Date:   date,
+		Status: boolToSelectedStatus(strings.Contains(line, "current")),
 	}, nil
 }
 

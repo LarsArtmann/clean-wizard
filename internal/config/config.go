@@ -121,7 +121,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 // LoadWithContextAndPath loads configuration with context support and explicit file path
 func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Config, error) {
 	v := viper.New()
-	
+
 	// Use the provided path directly
 	if configPath != "" {
 		v.SetConfigFile(configPath)
@@ -274,7 +274,7 @@ func getDefaultConfig() *domain.Config {
 
 	return &domain.Config{
 		Version:      "1.0.0",
-		SafetyLevel: domain.SafetyLevelEnabled, // Default to safety enabled
+		SafetyLevel:  domain.SafetyLevelEnabled, // Default to safety enabled
 		MaxDiskUsage: 50,
 		Protected: []string{
 			"/System",

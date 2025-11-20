@@ -146,7 +146,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 			totalRemoved += res.ItemsRemoved
 			totalFailed += res.ItemsFailed
 		}
-		
+
 		combinedResult := domain.CleanResult{
 			FreedBytes:   totalFreed,
 			ItemsRemoved: totalRemoved,

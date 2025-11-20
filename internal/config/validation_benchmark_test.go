@@ -11,7 +11,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 	// Create complex configuration for realistic testing
 	cfg := &domain.Config{
 		Version:      "1.0.0",
-		SafetyLevel: domain.SafetyLevelEnabled,
+		SafetyLevel:  domain.SafetyLevelEnabled,
 		MaxDiskUsage: 75,
 		Protected:    []string{"/System", "/Applications", "/Library", "/usr", "/etc", "/var"},
 		Profiles: map[string]*domain.Profile{
@@ -26,7 +26,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Status:      domain.StatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
-								Generations: 3,
+								Generations:  3,
 								Optimization: domain.OptimizationLevelConservative,
 							},
 						},
@@ -51,7 +51,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Settings: &domain.OperationSettings{
 							Homebrew: &domain.HomebrewSettings{
 								FileSelectionStrategy: domain.FileSelectionStrategyUnusedOnly,
-								Prune:      "30d",
+								Prune:                 "30d",
 							},
 						},
 					},
@@ -81,7 +81,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Status:      domain.StatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
-								Generations: 5,
+								Generations:  5,
 								Optimization: domain.OptimizationLevelConservative,
 							},
 						},
@@ -126,7 +126,7 @@ func BenchmarkValidation_ProfileNameValidation(b *testing.B) {
 func BenchmarkValidation_OperationSettingsValidation(b *testing.B) {
 	settings := &domain.OperationSettings{
 		NixGenerations: &domain.NixGenerationsSettings{
-			Generations: 3,
+			Generations:  3,
 			Optimization: domain.OptimizationLevelConservative,
 		},
 		TempFiles: &domain.TempFilesSettings{
@@ -135,7 +135,7 @@ func BenchmarkValidation_OperationSettingsValidation(b *testing.B) {
 		},
 		Homebrew: &domain.HomebrewSettings{
 			FileSelectionStrategy: domain.FileSelectionStrategyUnusedOnly,
-			Prune:      "30d",
+			Prune:                 "30d",
 		},
 		SystemTemp: &domain.SystemTempSettings{
 			Paths:     []string{"/tmp", "/var/tmp", "/tmp/.font-unix"},

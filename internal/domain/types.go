@@ -41,10 +41,10 @@ var (
 
 // NixGeneration represents Nix store generation
 type NixGeneration struct {
-	ID      int             `json:"id"`
-	Path    string          `json:"path"`
-	Date    time.Time       `json:"date"`
-	Status  SelectedStatusType `json:"status"`
+	ID     int                `json:"id"`
+	Path   string             `json:"path"`
+	Date   time.Time          `json:"date"`
+	Status SelectedStatusType `json:"status"`
 }
 
 // IsValid validates generation
@@ -77,32 +77,11 @@ func (g NixGeneration) EstimateSize() int64 {
 	return baseSize + (ageFactor * 10 * 1024 * 1024) // Add 10MB per month
 }
 
-// DEPRECATED: Use ScanTypeType from type_safe_enums.go for type safety
-// ScanType represents different scanning domains (LEGACY - use ScanTypeType)
-type ScanType string
-
-const (
-	ScanTypeNixStore ScanType = "nix_store"
-	ScanTypeHomebrew ScanType = "homebrew"
-	ScanTypeSystem   ScanType = "system"
-	ScanTypeTemp     ScanType = "temp_files"
-)
-
-// IsValid validates ScanType
-func (st ScanType) IsValid() bool {
-	switch st {
-	case ScanTypeNixStore, ScanTypeHomebrew, ScanTypeSystem, ScanTypeTemp:
-		return true
-	default:
-		return false
-	}
-}
-
 // ScanRequest represents scanning command
 type ScanRequest struct {
-	Type      ScanTypeType     `json:"type"`
+	Type      ScanTypeType       `json:"type"`
 	Recursion RecursionLevelType `json:"recursion"`
-	Limit     int              `json:"limit"`
+	Limit     int                `json:"limit"`
 }
 
 // Validate returns errors for invalid scan request
@@ -118,10 +97,10 @@ func (sr ScanRequest) Validate() error {
 
 // ScanItem represents item found during scanning
 type ScanItem struct {
-	Path     string         `json:"path"`
-	Size     int64          `json:"size"`
-	Created  time.Time      `json:"created"`
-	ScanType ScanTypeType   `json:"scan_type"`
+	Path     string       `json:"path"`
+	Size     int64        `json:"size"`
+	Created  time.Time    `json:"created"`
+	ScanType ScanTypeType `json:"scan_type"`
 }
 
 // CleanRequest represents cleaning command

@@ -11,16 +11,16 @@ import (
 
 func TestContainer_NewContainer(t *testing.T) {
 	ctx := context.Background()
-	
+
 	container := NewContainer(ctx)
 	require.NotNil(t, container)
-	
+
 	// Test basic dependencies
 	assert.NotNil(t, container.GetConfig())
 	assert.NotNil(t, container.GetLogger())
 	assert.NotNil(t, container.GetCleaner())
 	assert.NotNil(t, container.GetValidationMiddleware())
-	
+
 	// Test default config
 	config := container.GetConfig()
 	assert.Equal(t, "1.0.0", config.Version)
@@ -34,10 +34,10 @@ func TestContainer_NewContainer(t *testing.T) {
 func TestContainer_UpdateConfig(t *testing.T) {
 	ctx := context.Background()
 	container := NewContainer(ctx)
-	
+
 	originalConfig := container.GetConfig()
 	assert.Equal(t, "1.0.0", originalConfig.Version)
-	
+
 	// Update config
 	newConfig := &domain.Config{
 		Version:      "2.0.0",
@@ -46,7 +46,7 @@ func TestContainer_UpdateConfig(t *testing.T) {
 		Protected:    []string{"/tmp"},
 		Profiles:     map[string]*domain.Profile{},
 	}
-	
+
 	container.UpdateConfig(newConfig)
 	updatedConfig := container.GetConfig()
 	assert.Equal(t, "2.0.0", updatedConfig.Version)
@@ -57,14 +57,14 @@ func TestContainer_UpdateConfig(t *testing.T) {
 func TestContainer_GetCleaner(t *testing.T) {
 	ctx := context.Background()
 	container := NewContainer(ctx)
-	
+
 	cleaner := container.GetCleaner()
 	require.NotNil(t, cleaner)
-	
+
 	// Test cleaner is available (may be false in CI environment)
 	// We just ensure the method doesn't panic
 	_ = cleaner.IsAvailable(ctx)
-	
+
 	// Test store size (may return mock value)
 	storeSize := cleaner.GetStoreSize(ctx)
 	assert.GreaterOrEqual(t, storeSize, int64(0))
@@ -73,7 +73,7 @@ func TestContainer_GetCleaner(t *testing.T) {
 func TestContainer_Shutdown(t *testing.T) {
 	ctx := context.Background()
 	container := NewContainer(ctx)
-	
+
 	err := container.Shutdown(ctx)
 	assert.NoError(t, err)
 }
@@ -81,20 +81,20 @@ func TestContainer_Shutdown(t *testing.T) {
 func TestContainer_DefaultProfiles(t *testing.T) {
 	ctx := context.Background()
 	container := NewContainer(ctx)
-	
+
 	profiles := container.GetConfig().Profiles
 	require.NotNil(t, profiles)
 	require.Len(t, profiles, 1)
-	
+
 	dailyProfile, exists := profiles["daily"]
 	require.True(t, exists)
 	require.NotNil(t, dailyProfile)
-	
+
 	assert.Equal(t, "Daily Cleanup", dailyProfile.Name)
 	assert.Equal(t, "Daily system cleanup operations", dailyProfile.Description)
 	assert.Equal(t, domain.StatusEnabled, dailyProfile.Status)
 	require.Len(t, dailyProfile.Operations, 1)
-	
+
 	operation := dailyProfile.Operations[0]
 	assert.Equal(t, "nix-generations", operation.Name)
 	assert.Equal(t, "Clean Nix generations", operation.Description)

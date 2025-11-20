@@ -12,10 +12,10 @@ import (
 // Container holds all dependency injection configuration
 // Implements simple DI pattern without external libraries
 type Container struct {
-	logger          zerolog.Logger
-	config          *domain.Config
-	nixCleaner      domain.Cleaner
-	validation      *middleware.ValidationMiddleware
+	logger     zerolog.Logger
+	config     *domain.Config
+	nixCleaner domain.Cleaner
+	validation *middleware.ValidationMiddleware
 }
 
 // NewContainer creates new dependency injection container
@@ -24,7 +24,7 @@ func NewContainer(ctx context.Context) *Container {
 	config := getDefaultConfig()
 	nixCleaner := cleaner.NewNixCleaner(false, false)
 	validation := middleware.NewValidationMiddleware()
-	
+
 	return &Container{
 		logger:     logger,
 		config:     config,
@@ -38,7 +38,7 @@ func getDefaultConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
 		SafetyLevel:  domain.SafetyLevelEnabled,
-		MaxDiskUsage:  50,
+		MaxDiskUsage: 50,
 		Protected:    []string{"/System", "/Library", "/Applications"},
 		Profiles:     getDefaultProfiles(),
 	}
@@ -58,7 +58,7 @@ func getDefaultProfiles() map[string]*domain.Profile {
 					Status:      domain.StatusEnabled,
 					Settings: &domain.OperationSettings{
 						NixGenerations: &domain.NixGenerationsSettings{
-							Generations: 3,
+							Generations:  3,
 							Optimization: domain.OptimizationLevelAggressive,
 						},
 					},

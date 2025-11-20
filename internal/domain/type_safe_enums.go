@@ -15,18 +15,18 @@ type TypeSafeEnum[T any] interface {
 
 // EnumHelper provides generic enum functionality to reduce code duplication
 type EnumHelper[T ~int] struct {
-	stringValues map[T]string
-	validRange   func(T) bool
-	allValues    func() []T
+	stringValues  map[T]string
+	validRange    func(T) bool
+	allValues     func() []T
 	caseSensitive bool
 }
 
 // NewEnumHelper creates a new helper for enum type-safe operations
 func NewEnumHelper[T ~int](stringValues map[T]string, validRange func(T) bool, allValues func() []T, caseSensitive bool) *EnumHelper[T] {
 	return &EnumHelper[T]{
-		stringValues:   stringValues,
-		validRange:     validRange,
-		allValues:      allValues,
+		stringValues:  stringValues,
+		validRange:    validRange,
+		allValues:     allValues,
 		caseSensitive: caseSensitive,
 	}
 }
@@ -63,23 +63,23 @@ func (eh *EnumHelper[T]) UnmarshalJSON(data []byte, valueSetter func(T)) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	
+
 	// Find matching enum value by string
 	for enumVal, strVal := range eh.stringValues {
 		compareValue := s
 		strToCompare := strVal
-		
+
 		if !eh.caseSensitive {
 			compareValue = strings.ToLower(s)
 			strToCompare = strings.ToLower(strVal)
 		}
-		
+
 		if compareValue == strToCompare {
 			valueSetter(enumVal)
 			return nil
 		}
 	}
-	
+
 	return fmt.Errorf("invalid enum value: %s", s)
 }
 
@@ -96,9 +96,9 @@ const (
 // riskLevelHelper provides shared functionality for RiskLevelType
 var riskLevelHelper = NewEnumHelper(map[RiskLevelType]string{
 	RiskLevelLowType:      "LOW",
-	RiskLevelMediumType:    "MEDIUM",
-	RiskLevelHighType:      "HIGH",
-	RiskLevelCriticalType:  "CRITICAL",
+	RiskLevelMediumType:   "MEDIUM",
+	RiskLevelHighType:     "HIGH",
+	RiskLevelCriticalType: "CRITICAL",
 }, func(rl RiskLevelType) bool {
 	return rl >= RiskLevelLowType && rl <= RiskLevelCriticalType
 }, func() []RiskLevelType {
@@ -268,7 +268,7 @@ const (
 // cleanStrategyHelper provides shared functionality for CleanStrategyType
 var cleanStrategyHelper = NewEnumHelper(map[CleanStrategyType]string{
 	StrategyAggressiveType:   "aggressive",
-	StrategyConservativeType: "conservative", 
+	StrategyConservativeType: "conservative",
 	StrategyDryRunType:       "dry-run",
 }, func(cs CleanStrategyType) bool {
 	return cs >= StrategyAggressiveType && cs <= StrategyDryRunType
@@ -445,8 +445,8 @@ const (
 // selectedStatusTypeHelper provides shared functionality for SelectedStatusType
 var selectedStatusTypeHelper = NewEnumHelper(map[SelectedStatusType]string{
 	SelectedStatusNotSelected: "not_selected",
-	SelectedStatusSelected:   "selected",
-	SelectedStatusDefault:    "default",
+	SelectedStatusSelected:    "selected",
+	SelectedStatusDefault:     "default",
 }, func(ss SelectedStatusType) bool {
 	return ss >= SelectedStatusNotSelected && ss <= SelectedStatusDefault
 }, func() []SelectedStatusType {
@@ -494,9 +494,9 @@ const (
 // recursionLevelTypeHelper provides shared functionality for RecursionLevelType
 var recursionLevelTypeHelper = NewEnumHelper(map[RecursionLevelType]string{
 	RecursionLevelNone:     "none",
-	RecursionLevelDirect:    "direct",
+	RecursionLevelDirect:   "direct",
 	RecursionLevelFull:     "full",
-	RecursionLevelInfinite:  "infinite",
+	RecursionLevelInfinite: "infinite",
 }, func(rl RecursionLevelType) bool {
 	return rl >= RecursionLevelNone && rl <= RecursionLevelInfinite
 }, func() []RecursionLevelType {
@@ -544,7 +544,7 @@ const (
 var optimizationLevelTypeHelper = NewEnumHelper(map[OptimizationLevelType]string{
 	OptimizationLevelNone:         "none",
 	OptimizationLevelConservative: "conservative",
-	OptimizationLevelAggressive:  "aggressive",
+	OptimizationLevelAggressive:   "aggressive",
 }, func(ol OptimizationLevelType) bool {
 	return ol >= OptimizationLevelNone && ol <= OptimizationLevelAggressive
 }, func() []OptimizationLevelType {
@@ -592,7 +592,7 @@ const (
 var fileSelectionStrategyTypeHelper = NewEnumHelper(map[FileSelectionStrategyType]string{
 	FileSelectionStrategyAll:        "all",
 	FileSelectionStrategyUnusedOnly: "unused_only",
-	FileSelectionStrategyManual:    "manual",
+	FileSelectionStrategyManual:     "manual",
 }, func(fss FileSelectionStrategyType) bool {
 	return fss >= FileSelectionStrategyAll && fss <= FileSelectionStrategyManual
 }, func() []FileSelectionStrategyType {

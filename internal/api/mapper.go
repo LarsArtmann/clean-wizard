@@ -275,10 +275,10 @@ func MapCleanRequestToDomain(publicRequest *CleanRequest) result.Result[*domain.
 	for _, opType := range publicRequest.Operations {
 		// Convert operation type to domain scan item
 		item := domain.ScanItem{
-			Path:     string(opType),      // Use operation type as path identifier
+			Path:     string(opType),          // Use operation type as path identifier
 			ScanType: domain.ScanTypeTempType, // Use temp scan type for operations
-			Size:     0,                   // Will be calculated during scanning
-			Created:  time.Time{},         // Will be set during scanning
+			Size:     0,                       // Will be calculated during scanning
+			Created:  time.Time{},             // Will be set during scanning
 		}
 		items = append(items, item)
 	}

@@ -13,7 +13,7 @@ func isValidSemver(version string) bool {
 	if version == "" {
 		return false
 	}
-	
+
 	// Semantic version regex: X.Y.Z where X,Y,Z are non-negative integers
 	// Allows optional pre-release and build metadata (e.g., "1.0.0-alpha+001")
 	semverPattern := `^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
@@ -21,7 +21,7 @@ func isValidSemver(version string) bool {
 	if err != nil {
 		return false
 	}
-	
+
 	return matched
 }
 

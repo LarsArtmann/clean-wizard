@@ -18,7 +18,7 @@ func newBaseNixConfig(safeMode bool) *domain.Config {
 	} else {
 		safetyLevel = domain.SafetyLevelDisabled
 	}
-	
+
 	return &domain.Config{
 		Version:      "1.0.0",
 		SafetyLevel:  safetyLevel,
@@ -86,7 +86,7 @@ func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	} else {
 		optimizationLevel = domain.OptimizationLevelNone
 	}
-	
+
 	// Find the nix-cleanup profile and its nix-generations operation
 	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
 		for i, op := range profile.Operations {
@@ -107,7 +107,7 @@ func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
 	} else {
 		status = domain.StatusDisabled
 	}
-	
+
 	// Find the nix-cleanup profile and its nix-generations operation
 	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
 		for i, op := range profile.Operations {

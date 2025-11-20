@@ -53,7 +53,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Settings: &domain.OperationSettings{
 								Homebrew: &domain.HomebrewSettings{
 									FileSelectionStrategy: domain.FileSelectionStrategyUnusedOnly,
-									Prune:      " 30d  ", // Needs whitespace sanitization
+									Prune:                 " 30d  ", // Needs whitespace sanitization
 								},
 							},
 						},
@@ -82,7 +82,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Status:      domain.StatusEnabled,
 							Settings: &domain.OperationSettings{
 								NixGenerations: &domain.NixGenerationsSettings{
-									Generations: 5,
+									Generations:  5,
 									Optimization: domain.OptimizationLevelConservative,
 								},
 							},

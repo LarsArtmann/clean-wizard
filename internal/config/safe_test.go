@@ -46,7 +46,7 @@ func TestRiskLevel_String(t *testing.T) {
 
 func TestRiskLevel_Icon(t *testing.T) {
 	uiAdapter := adapters.NewUIAdapter()
-	
+
 	tests := []struct {
 		name     string
 		level    domain.RiskLevel

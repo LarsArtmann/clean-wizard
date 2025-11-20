@@ -66,7 +66,7 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 	} else {
 		expectedSafetyLevel = domain.SafetyLevelDisabled
 	}
-	
+
 	if domainConfig.SafetyLevel != expectedSafetyLevel {
 		t.Errorf("Expected safetyLevel %v, got %v", expectedSafetyLevel.String(), domainConfig.SafetyLevel.String())
 	}
@@ -105,7 +105,7 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 	domainConfig := &domain.Config{
 		Version:      "1.0.0",
 		SafetyLevel:  domain.SafetyLevelEnabled,
-		MaxDiskUsage: 0, // Use default value since not testing this field
+		MaxDiskUsage: 0,                 // Use default value since not testing this field
 		Protected:    []string{"/test"}, // Required for validation
 		Profiles: map[string]*domain.Profile{
 			"test": {
@@ -465,9 +465,9 @@ func TestMapConfigToDomain_DomainValidationFailure(t *testing.T) {
 	// Create public config that will pass mapping but fail domain validation
 	// (e.g., with invalid configuration values)
 	publicConfig := &PublicConfig{
-		Version:      "1.0.0",
-		SafeMode:     true,
-		MaxDiskUsage:  -10, // Invalid disk usage (negative)
+		Version:        "1.0.0",
+		SafeMode:       true,
+		MaxDiskUsage:   -10,        // Invalid disk usage (negative)
 		ProtectedPaths: []string{}, // Empty protected paths might be invalid
 		Profiles: map[string]*PublicProfile{
 			"test": {
@@ -515,7 +515,7 @@ func TestMapConfigToDomain_DomainValidationFailure(t *testing.T) {
 
 // Helper function to check if string contains substring
 func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || 
+	return len(s) >= len(substr) && (s == substr || len(substr) == 0 ||
 		(len(s) > len(substr) && findSubstring(s, substr)))
 }
 
@@ -532,11 +532,11 @@ func findSubstring(s, substr string) bool {
 
 func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 	testCases := []struct {
-		name           string
-		publicOp       PublicOperation
-		expectedType   string
-		shouldError    bool
-		errorContains  string
+		name          string
+		publicOp      PublicOperation
+		expectedType  string
+		shouldError   bool
+		errorContains string
 	}{
 		{
 			name: "Valid Nix Generations",
@@ -636,7 +636,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 					t.Errorf("Expected non-nil result, got nil")
 					return
 				}
-				
+
 				// Verify the operation name is preserved
 				if result.Name != tc.publicOp.Name {
 					t.Errorf("Expected name '%s', got '%s'", tc.publicOp.Name, result.Name)
