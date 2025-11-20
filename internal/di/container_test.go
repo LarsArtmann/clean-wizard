@@ -52,6 +52,8 @@ func TestContainer_UpdateConfig(t *testing.T) {
 	assert.Equal(t, "2.0.0", updatedConfig.Version)
 	assert.Equal(t, domain.SafetyLevelDisabled, updatedConfig.SafetyLevel)
 	assert.Equal(t, 80, updatedConfig.MaxDiskUsage)
+	assert.Equal(t, []string{"/tmp"}, updatedConfig.Protected)
+	assert.Equal(t, 0, len(updatedConfig.Profiles))
 }
 
 func TestContainer_GetCleaner(t *testing.T) {
