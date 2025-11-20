@@ -55,6 +55,7 @@ func BenchmarkEnumHelper_IsValid(b *testing.B) {
 // BenchmarkResult_Creation benchmarks result type creation
 func BenchmarkResult_Creation(b *testing.B) {
 	b.Run("CleanResult", func(b *testing.B) {
+		ts := time.Now() // Pre-compute timestamp outside the hot loop
 		b.ResetTimer()
 		for i := 0; b.Loop(); i++ {
 			_ = CleanResult{
@@ -62,7 +63,7 @@ func BenchmarkResult_Creation(b *testing.B) {
 				ItemsRemoved: uint(i),
 				ItemsFailed:  0,
 				CleanTime:    time.Duration(i),
-				CleanedAt:    time.Now(),
+				CleanedAt:    ts, // Use cached timestamp
 				Strategy:     StrategyAggressive,
 			}
 		}

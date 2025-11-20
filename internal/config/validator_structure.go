@@ -8,21 +8,17 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// Precompiled semver regex for performance optimization
+var semverRegex = regexp.MustCompile(`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`)
+
 // isValidSemver validates semantic version format (MAJOR.MINOR.PATCH)
 func isValidSemver(version string) bool {
 	if version == "" {
 		return false
 	}
-
-	// Semantic version regex: X.Y.Z where X,Y,Z are non-negative integers
-	// Allows optional pre-release and build metadata (e.g., "1.0.0-alpha+001")
-	semverPattern := `^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
-	matched, err := regexp.MatchString(semverPattern, version)
-	if err != nil {
-		return false
-	}
-
-	return matched
+	
+	// Use precompiled regex for better performance
+	return semverRegex.MatchString(version)
 }
 
 // validateBasicStructure validates basic configuration structure
