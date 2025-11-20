@@ -12,7 +12,6 @@ import (
 )
 
 var (
-	version         = "dev"
 	verbose         bool
 	dryRun          bool
 	force           bool

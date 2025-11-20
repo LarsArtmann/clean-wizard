@@ -59,7 +59,8 @@ func (cv *ConfigValidator) validateProfileName(name string) error {
 	// No pattern rule configured - use reasonable default validation
 	// Only allow alphanumeric characters, underscores, and hyphens
 	for _, char := range name {
-		if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '_' || char == '-') {
+		isValid := (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '_' || char == '-'
+		if !isValid {
 			return fmt.Errorf("profile name '%s' contains invalid character: %c (allowed: alphanumeric, underscore, hyphen)", name, char)
 		}
 	}

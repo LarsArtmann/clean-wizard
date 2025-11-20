@@ -24,7 +24,7 @@ func HandleCommandError(cmd *exec.Cmd, err error) *CleanWizardError {
 	if exitErr, ok := err.(*exec.ExitError); ok {
 		baseErr = baseErr.
 			WithDetail("exit_code", exitErr.ExitCode).
-			WithDetail("signal", exitErr.ProcessState.String())
+			WithDetail("signal", exitErr.String())
 	}
 
 	return baseErr

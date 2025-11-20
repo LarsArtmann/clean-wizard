@@ -66,7 +66,7 @@ func (vr *ValidationRule[T]) GetCompiledRegex() *regexp.Regexp {
 			} else {
 				// On compile error, use safe always-false regex fallback
 				// This regex never matches anything, ensuring safety
-				vr.compiledRegex, _ = regexp.Compile("(?!)")
+				vr.compiledRegex, _ = regexp.Compile("a^b") // Impossible pattern - can never match
 			}
 		}
 	})

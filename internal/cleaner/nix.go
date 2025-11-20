@@ -7,6 +7,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/mocks"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -68,13 +69,7 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	// Check availability first
 	if !nc.adapter.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
-		return result.MockSuccess([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Status: domain.SelectedStatusSelected},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Status: domain.SelectedStatusNotSelected},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Status: domain.SelectedStatusNotSelected},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Status: domain.SelectedStatusNotSelected},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Status: domain.SelectedStatusNotSelected},
-		}, "Nix not available - using mock data")
+		return mocks.MockNixGenerationsResultWithMessage("Nix not available - using mock data")
 	}
 
 	// Only call adapter if available

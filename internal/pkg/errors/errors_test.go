@@ -72,7 +72,7 @@ func TestErrorOutputDeterministic(t *testing.T) {
 	}
 
 	// Check deterministic ordering
-	if !(alphaIndex < betaIndex && betaIndex < zebraIndex) {
+	if alphaIndex >= betaIndex || betaIndex >= zebraIndex {
 		t.Errorf("Metadata keys not sorted: alpha=%d, beta=%d, zebra=%d", alphaIndex, betaIndex, zebraIndex)
 	}
 }

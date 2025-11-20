@@ -172,7 +172,7 @@ func (cr CleanResult) IsValid() bool {
 		return false
 	}
 	// Other validations
-	return cr.CleanedAt.IsZero() == false && cr.Strategy.IsValid()
+	return !cr.CleanedAt.IsZero() && cr.Strategy.IsValid()
 }
 
 // Validate returns errors for invalid clean result

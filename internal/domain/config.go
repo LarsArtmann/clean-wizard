@@ -95,11 +95,7 @@ func (p *Profile) IsValid(name string) bool {
 		}
 	}
 
-	if !p.Status.IsValid() {
-		return false
-	}
-
-	return true
+	return p.Status.IsValid()
 }
 
 // Validate returns errors for invalid profile

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/mocks"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -40,13 +41,7 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 
 	// If dry-run, return mock data without system calls
 	if n.dryRun {
-		return result.Ok([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Status: domain.SelectedStatusSelected},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Status: domain.SelectedStatusNotSelected},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Status: domain.SelectedStatusNotSelected},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Status: domain.SelectedStatusNotSelected},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Status: domain.SelectedStatusNotSelected},
-		})
+		return mocks.MockNixGenerationsResult()
 	}
 
 	// Real system call for production mode

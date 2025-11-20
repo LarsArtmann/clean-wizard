@@ -40,14 +40,14 @@ func (fsa *FileSystemErrorAdapter) Adapt(err error) *CleanWizardError {
 
 	// Handle specific OS errors
 	if pathErr, ok := err.(*os.PathError); ok {
-		switch {
-		case pathErr.Err == syscall.ENOENT || pathErr.Err == os.ErrNotExist:
+		switch pathErr.Err {
+		case syscall.ENOENT, os.ErrNotExist:
 			return NewError(ErrCodeFileNotFound,
 				"File not found: "+pathErr.Path).WithCause(err).WithCaller()
-		case pathErr.Err == syscall.EACCES || pathErr.Err == syscall.EPERM || pathErr.Err == os.ErrPermission:
+		case syscall.EACCES, syscall.EPERM, os.ErrPermission:
 			return NewError(ErrCodePermissionError,
 				"Permission denied: "+pathErr.Path).WithCause(err).WithCaller()
-		case pathErr.Err == syscall.ENOSPC:
+		case syscall.ENOSPC:
 			return NewError(ErrCodeDiskFull,
 				"Disk full: "+pathErr.Path).WithCause(err).WithCaller()
 		default:

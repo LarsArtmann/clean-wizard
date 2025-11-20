@@ -49,6 +49,8 @@ func BenchmarkGCPressure(b *testing.B) {
 		for range 10 {
 			objects = append(objects, make([]byte, 1024*10)) // 10KB each
 		}
+		// Keep objects alive to prevent optimization
+		runtime.KeepAlive(objects)
 		// Force GC occasionally
 		if i%100 == 0 {
 			runtime.GC()
@@ -73,16 +75,4 @@ func BenchmarkConcurrentOperations(b *testing.B) {
 	})
 }
 
-// establishPerformanceBaseline establishes a comprehensive performance baseline
-func establishPerformanceBaseline(b *testing.B) {
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
 
-	b.Logf("Performance baseline established:")
-	b.Logf("- Memory Alloc: %d bytes", m.Alloc)
-	b.Logf("- Heap System: %d bytes", m.HeapSys)
-	b.Logf("- Goroutines: %d", runtime.NumGoroutine())
-	b.Logf("- NumGC: %d", m.NumGC)
-	b.Logf("- CPU Info: %d CPUs, GoMaxProcs: %d",
-		runtime.NumCPU(), runtime.GOMAXPROCS(0))
-}
