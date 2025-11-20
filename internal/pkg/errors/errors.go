@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/format"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -350,61 +351,66 @@ func (e *CleanWizardError) IsUserFriendly() bool {
 
 // Log logs error with appropriate level
 func (e *CleanWizardError) Log() {
-	event := log.Info().
-		Str("code", e.Code.String()).
-		Str("level", e.Level.String()).
-		Str("operation", e.Operation).
-		Time("timestamp", e.Timestamp)
+	// Build the base event with common fields
+	buildEvent := func(event *zerolog.Event) *zerolog.Event {
+		event = event.
+			Str("code", e.Code.String()).
+			Str("level", e.Level.String()).
+			Str("operation", e.Operation).
+			Time("timestamp", e.Timestamp)
 
-	if e.Details != nil {
-		if e.Details.Field != "" {
-			event = event.Str("detail_field", e.Details.Field)
-		}
-		if e.Details.Value != "" {
-			event = event.Str("detail_value", e.Details.Value)
-		}
-		if e.Details.Expected != "" {
-			event = event.Str("detail_expected", e.Details.Expected)
-		}
-		if e.Details.Actual != "" {
-			event = event.Str("detail_actual", e.Details.Actual)
-		}
-		if e.Details.Operation != "" {
-			event = event.Str("detail_operation", e.Details.Operation)
-		}
-		if e.Details.FilePath != "" {
-			event = event.Str("detail_file_path", e.Details.FilePath)
-		}
-		if e.Details.LineNumber > 0 {
-			event = event.Int("detail_line_number", e.Details.LineNumber)
-		}
-		if e.Details.RetryCount > 0 {
-			event = event.Int("detail_retry_count", e.Details.RetryCount)
-		}
-		if e.Details.Duration != "" {
-			event = event.Str("detail_duration", e.Details.Duration)
-		}
+		if e.Details != nil {
+			if e.Details.Field != "" {
+				event = event.Str("detail_field", e.Details.Field)
+			}
+			if e.Details.Value != "" {
+				event = event.Str("detail_value", e.Details.Value)
+			}
+			if e.Details.Expected != "" {
+				event = event.Str("detail_expected", e.Details.Expected)
+			}
+			if e.Details.Actual != "" {
+				event = event.Str("detail_actual", e.Details.Actual)
+			}
+			if e.Details.Operation != "" {
+				event = event.Str("detail_operation", e.Details.Operation)
+			}
+			if e.Details.FilePath != "" {
+				event = event.Str("detail_file_path", e.Details.FilePath)
+			}
+			if e.Details.LineNumber > 0 {
+				event = event.Int("detail_line_number", e.Details.LineNumber)
+			}
+			if e.Details.RetryCount > 0 {
+				event = event.Int("detail_retry_count", e.Details.RetryCount)
+			}
+			if e.Details.Duration != "" {
+				event = event.Str("detail_duration", e.Details.Duration)
+			}
 
-		// Add metadata with sorted keys for deterministic output
-		var keys []string
-		for key := range e.Details.Metadata {
-			keys = append(keys, key)
+			// Add metadata with sorted keys for deterministic output
+			var keys []string
+			for key := range e.Details.Metadata {
+				keys = append(keys, key)
+			}
+			sort.Strings(keys)
+			for _, key := range keys {
+				value := e.Details.Metadata[key]
+				event = event.Str("meta_"+key, value)
+			}
 		}
-		sort.Strings(keys)
-		for _, key := range keys {
-			value := e.Details.Metadata[key]
-			event = event.Str("meta_"+key, value)
-		}
+		return event
 	}
 
+	// Select the appropriate log level first, then build and send the event
 	switch e.Level {
 	case LevelInfo:
-		event.Msg(e.Message)
+		buildEvent(log.Info()).Msg(e.Message)
 	case LevelWarn:
-		event.Msg(e.Message)
+		buildEvent(log.Warn()).Msg(e.Message)
 	case LevelError:
-		event.Msg(e.Message)
+		buildEvent(log.Error()).Msg(e.Message)
 	case LevelFatal:
-		event.Msg(e.Message)
+		buildEvent(log.Fatal()).Msg(e.Message)
 	}
 }
