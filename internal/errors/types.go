@@ -29,6 +29,7 @@ const (
 	ErrCodeDiskFull        ErrorCode = 3002
 	ErrCodeCorruption      ErrorCode = 3003
 	ErrCodePathInvalid     ErrorCode = 3004
+	ErrCodeFilesystem      ErrorCode = 3005 // Generic filesystem error
 
 	// Network errors (4000-4999)
 	ErrCodeConnectionFailed ErrorCode = 4000
