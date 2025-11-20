@@ -1,8 +1,6 @@
 package config
 
 import (
-	"time"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -16,55 +14,9 @@ type TestValidationLevelTestCase struct {
 }
 
 // CreateTestConfigurations creates test configurations for validation testing
+// Note: Delegates to shared factory in test_data.go to eliminate duplication
 func CreateTestConfigurations() map[string]*domain.Config {
-	return map[string]*domain.Config{
-		"valid": {
-			Version:      "1.0.0",
-			SafetyLevel:  domain.SafetyLevelEnabled,
-			MaxDiskUsage: 50,
-			Protected:    []string{"/System", "/Library", "/Applications"},
-			Profiles: map[string]*domain.Profile{
-				"daily": {
-					Name:        "daily",
-					Description: "Daily cleanup",
-					Operations: []domain.CleanupOperation{
-						{
-							Name:        "nix-generations",
-							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLow,
-							Status:      domain.StatusEnabled,
-						},
-					},
-					Status: domain.StatusEnabled,
-				},
-			},
-			LastClean: time.Now(),
-			Updated:   time.Now(),
-		},
-		"invalid_high_disk": {
-			Version:      "1.0.0",
-			SafetyLevel:  domain.SafetyLevelEnabled,
-			MaxDiskUsage: 150, // Invalid: too high
-			Protected:    []string{"/System"},
-			Profiles: map[string]*domain.Profile{
-				"daily": {
-					Name:        "daily",
-					Description: "Daily cleanup",
-					Operations: []domain.CleanupOperation{
-						{
-							Name:        "nix-generations",
-							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLow,
-							Status:      domain.StatusEnabled,
-						},
-					},
-					Status: domain.StatusEnabled,
-				},
-			},
-			LastClean: time.Now(),
-			Updated:   time.Now(),
-		},
-	}
+	return CreateValidationTestConfigs()
 }
 
 // GetSanitizationTestCases returns all sanitization test cases

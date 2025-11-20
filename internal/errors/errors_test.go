@@ -221,51 +221,40 @@ func TestDefaultErrorHandler_Handle(t *testing.T) {
 	})
 }
 
+// simulateInlineRecover simulates handler.Recover() logic inline for testing
+// Eliminates duplication from panic test scenarios
+func simulateInlineRecover(panicValue interface{}) *CleanWizardError {
+	var recovered *CleanWizardError
+	func() {
+		defer func() {
+			// Inline handler.Recover() logic (since recover() only works inline)
+			if r := recover(); r != nil {
+				var cause error
+				if err, ok := r.(error); ok {
+					cause = err
+				} else {
+					cause = NewErrorf(ErrCodeProcessFailed, "panic recovered: %v", r)
+				}
+				recovered = NewError(ErrCodeProcessFailed, "System panic occurred").
+					WithCause(cause).WithCaller()
+			}
+		}()
+		panic(panicValue)
+	}()
+	return recovered
+}
+
 func TestDefaultErrorHandler_Recover(t *testing.T) {
 	handler := NewErrorHandler()
 
 	t.Run("Error panic", func(t *testing.T) {
-		// Simulate handler.Recover() logic inline to test it properly
-		var recovered *CleanWizardError
-		func() {
-			defer func() {
-				// Inline handler.Recover() logic (since recover() only works inline)
-				if r := recover(); r != nil {
-					var cause error
-					if err, ok := r.(error); ok {
-						cause = err
-					} else {
-						cause = NewErrorf(ErrCodeProcessFailed, "panic recovered: %v", r)
-					}
-					recovered = NewError(ErrCodeProcessFailed, "System panic occurred").
-						WithCause(cause).WithCaller()
-				}
-			}()
-			panic(errors.New("test panic"))
-		}()
+		recovered := simulateInlineRecover(errors.New("test panic"))
 		require.NotNil(t, recovered)
 		assert.Equal(t, "test panic", recovered.Cause.Error())
 	})
 
 	t.Run("String panic", func(t *testing.T) {
-		// Simulate handler.Recover() logic inline to test it properly
-		var recovered *CleanWizardError
-		func() {
-			defer func() {
-				// Inline handler.Recover() logic (since recover() only works inline)
-				if r := recover(); r != nil {
-					var cause error
-					if err, ok := r.(error); ok {
-						cause = err
-					} else {
-						cause = NewErrorf(ErrCodeProcessFailed, "panic recovered: %v", r)
-					}
-					recovered = NewError(ErrCodeProcessFailed, "System panic occurred").
-						WithCause(cause).WithCaller()
-				}
-			}()
-			panic("test string panic")
-		}()
+		recovered := simulateInlineRecover("test string panic")
 		require.NotNil(t, recovered)
 		assert.Contains(t, recovered.Cause.Error(), "test string panic")
 	})

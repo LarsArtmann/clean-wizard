@@ -106,32 +106,12 @@ func newBaseNixConfig(t *testing.T, safeMode bool) *domain.Config {
 }
 
 // withGenerations sets/updates the nix-generations operation Generations value
+// Note: Uses shared helper from test_data.go to eliminate duplication
 func withGenerations(t *testing.T, cfg *domain.Config, generations int) *domain.Config {
 	t.Helper()
-
-	// Find the nix-cleanup profile and its nix-generations operation
-	profile, profileExists := cfg.Profiles["nix-cleanup"]
-	if !profileExists {
-		t.Fatalf("FAILED: 'nix-cleanup' profile not found in config")
-	}
-
-	operationFound := false
-	for i, op := range profile.Operations {
-		if op.Name == "nix-generations" {
-			if op.Settings == nil {
-				t.Fatalf("FAILED: nix-generations operation has nil Settings")
-			}
-			if op.Settings.NixGenerations == nil {
-				t.Fatalf("FAILED: nix-generations operation has nil NixGenerations")
-			}
-			profile.Operations[i].Settings.NixGenerations.Generations = generations
-			operationFound = true
-			break
-		}
-	}
-
-	if !operationFound {
-		t.Fatalf("FAILED: 'nix-generations' operation not found in nix-cleanup profile")
+	
+	if err := SetNixGenerationsCount(cfg, generations); err != nil {
+		t.Fatalf("FAILED: %v", err)
 	}
 	return cfg
 }
@@ -173,29 +153,8 @@ func withOptimize(t *testing.T, cfg *domain.Config, optimize bool) *domain.Confi
 		optimizationLevel = domain.OptimizationLevelNone
 	}
 
-	// Find the nix-cleanup profile and its nix-generations operation
-	profile, profileExists := cfg.Profiles["nix-cleanup"]
-	if !profileExists {
-		t.Fatalf("FAILED: 'nix-cleanup' profile not found in config")
-	}
-
-	operationFound := false
-	for i, op := range profile.Operations {
-		if op.Name == "nix-generations" {
-			if op.Settings == nil {
-				t.Fatalf("FAILED: nix-generations operation has nil Settings")
-			}
-			if op.Settings.NixGenerations == nil {
-				t.Fatalf("FAILED: nix-generations operation has nil NixGenerations")
-			}
-			profile.Operations[i].Settings.NixGenerations.Optimization = optimizationLevel
-			operationFound = true
-			break
-		}
-	}
-
-	if !operationFound {
-		t.Fatalf("FAILED: 'nix-generations' operation not found in nix-cleanup profile")
+	if err := SetNixGenerationsOptimization(cfg, optimizationLevel); err != nil {
+		t.Fatalf("FAILED: %v", err)
 	}
 	return cfg
 }

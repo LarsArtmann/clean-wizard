@@ -41,50 +41,16 @@ func TestIsValidSemver(t *testing.T) {
 }
 
 // createTestConfig creates a test configuration with the specified version
+// Note: Delegates to shared factory in test_data.go to eliminate duplication
 func createTestConfig(version string) *domain.Config {
-	return &domain.Config{
-		Version: version,
-		Profiles: map[string]*domain.Profile{
-			"test": {
-				Name:        "test",
-				Description: "Test profile",
-				Operations: []domain.CleanupOperation{{
-					Name:        "test-op",
-					Description: "Test operation",
-					RiskLevel:   domain.RiskLow,
-					Status:      domain.StatusEnabled,
-					Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
-				}},
-				Status: domain.StatusEnabled,
-			},
-		},
-		Protected: []string{"/System"},
-	}
+	return CreateSemverTestConfig(version)
 }
 
 func TestBasicStructureValidation_Semver(t *testing.T) {
 	cv := NewConfigValidator()
 
 	t.Run("Valid semver version", func(t *testing.T) {
-		cfg := &domain.Config{
-			Version: "1.2.3",
-			Profiles: map[string]*domain.Profile{
-				"test": {
-					Name:        "test",
-					Description: "Test profile",
-					Operations: []domain.CleanupOperation{{
-						Name:        "test-op",
-						Description: "Test operation",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
-					}},
-					Status: domain.StatusEnabled,
-				},
-			},
-			Protected: []string{"/System"},
-		}
-
+		cfg := CreateSemverTestConfig("1.2.3")
 		result := cv.ValidateConfig(cfg)
 		if len(result.Errors) != 0 {
 			t.Errorf("Expected no validation errors for valid semver, got: %v", result.Errors)
