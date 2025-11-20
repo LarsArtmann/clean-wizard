@@ -48,31 +48,25 @@ func testResultMethod(t *testing.T, methodName string, methodFunc func(Result[in
 	}
 }
 
-func TestResult_Ok(t *testing.T) {
-	testResultMethod(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, true, false)
-}
-
-func TestResult_IsErr(t *testing.T) {
-	testResultMethod(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, false, true)
-}
-
-func TestResult_Value(t *testing.T) {
+// testResultMethodWithPanic tests a method that may panic on Result type
+func testResultMethodWithPanic[T comparable](t *testing.T, methodName string, methodFunc func(Result[int]) T, okResult T, errResult T, okWantPanic, errWantPanic bool) {
 	tests := []struct {
 		name      string
 		result    Result[int]
-		expected  int
+		expected  T
 		wantPanic bool
 	}{
 		{
 			name:      "ok result",
 			result:    Ok(42),
-			expected:  42,
-			wantPanic: false,
+			expected:  okResult,
+			wantPanic: okWantPanic,
 		},
 		{
 			name:      "error result",
 			result:    Err[int](errors.New("test error")),
-			wantPanic: true,
+			expected:  errResult,
+			wantPanic: errWantPanic,
 		},
 	}
 
@@ -90,12 +84,24 @@ func TestResult_Value(t *testing.T) {
 				}
 			}()
 
-			value := tt.result.Value()
-			if !tt.wantPanic && value != tt.expected {
-				t.Errorf("Value() = %v, want %v", value, tt.expected)
+			result := methodFunc(tt.result)
+			if !tt.wantPanic && result != tt.expected {
+				t.Errorf("%s() = %v, want %v", methodName, result, tt.expected)
 			}
 		})
 	}
+}
+
+func TestResult_Ok(t *testing.T) {
+	testResultMethod(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, true, false)
+}
+
+func TestResult_IsErr(t *testing.T) {
+	testResultMethod(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, false, true)
+}
+
+func TestResult_Value(t *testing.T) {
+	testResultMethodWithPanic(t, "Value", func(r Result[int]) int { return r.Value() }, 42, 0, false, true)
 }
 
 func TestResult_Error(t *testing.T) {

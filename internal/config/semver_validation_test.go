@@ -46,6 +46,25 @@ func createTestConfig(version string) *domain.Config {
 	return CreateSemverTestConfig(version)
 }
 
+// assertValidationErrorForField asserts that validation contains a specific error for given field and rule
+func assertValidationErrorForField(t *testing.T, result *ValidationResult, expectedField, expectedRule string) {
+	if len(result.Errors) == 0 {
+		t.Error("Expected validation errors, got none")
+		return
+	}
+
+	foundError := false
+	for _, err := range result.Errors {
+		if err.Field == expectedField && err.Rule == expectedRule {
+			foundError = true
+			break
+		}
+	}
+	if !foundError {
+		t.Errorf("Expected %s error for %s field, got errors: %v", expectedRule, expectedField, result.Errors)
+	}
+}
+
 func TestBasicStructureValidation_Semver(t *testing.T) {
 	cv := NewConfigValidator()
 
@@ -58,44 +77,14 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 	})
 
 	t.Run("Invalid semver version", func(t *testing.T) {
-		cfg := createTestConfig("invalid.version.format")
-
+		cfg := CreateSemverTestConfig("invalid.version.format")
 		result := cv.ValidateConfig(cfg)
-		if len(result.Errors) == 0 {
-			t.Error("Expected validation errors for invalid semver version")
-		}
-
-		// Check if error is related to version format
-		foundVersionError := false
-		for _, err := range result.Errors {
-			if err.Field == "version" && err.Rule == "semver_format" {
-				foundVersionError = true
-				break
-			}
-		}
-		if !foundVersionError {
-			t.Errorf("Expected semver_format error for version field, got errors: %v", result.Errors)
-		}
+		assertValidationErrorForField(t, result, "version", "semver_format")
 	})
 
 	t.Run("Missing version", func(t *testing.T) {
-		cfg := createTestConfig("")
-
+		cfg := CreateSemverTestConfig("")
 		result := cv.ValidateConfig(cfg)
-		if len(result.Errors) == 0 {
-			t.Error("Expected validation errors for missing version")
-		}
-
-		// Check if error is related to missing version
-		foundMissingError := false
-		for _, err := range result.Errors {
-			if err.Field == "version" && err.Rule == "required" {
-				foundMissingError = true
-				break
-			}
-		}
-		if !foundMissingError {
-			t.Errorf("Expected required error for version field, got errors: %v", result.Errors)
-		}
+		assertValidationErrorForField(t, result, "version", "required")
 	})
 }

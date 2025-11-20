@@ -2,39 +2,11 @@ package config
 
 import (
 	"testing"
-	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // createWhitespacedConfigForSanitizer creates a test configuration with whitespace that needs cleaning
-// This is a sanitizer-specific version to avoid conflicts
-func createWhitespacedConfigForSanitizer() *domain.Config {
-	return &domain.Config{
-		Version:      "  1.0.0  ",
-		SafetyLevel:  domain.SafetyLevelEnabled,
-		MaxDiskUsage: 50,
-		Protected:    []string{"/System", "/Library"},
-		Profiles: map[string]*domain.Profile{
-			"daily": {
-				Name:        "  daily  ",
-				Description: "Daily cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-					},
-				},
-				Status: domain.StatusEnabled,
-			},
-		},
-		LastClean: time.Now(),
-		Updated:   time.Now(),
-	}
-}
-
 func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 	sanitizer := NewConfigSanitizer()
 

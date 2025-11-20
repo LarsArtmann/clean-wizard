@@ -2,96 +2,13 @@ package config
 
 import (
 	"testing"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // TestIntegration_ValidationSanitizationPipeline tests complete validation and sanitization workflow
 func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 	t.Run("Complete pipeline with complex configuration", func(t *testing.T) {
 		// Create complex configuration that exercises all validation paths
-		cfg := &domain.Config{
-			Version:      " 1.0.0  ", // Needs whitespace sanitization
-			SafetyLevel:  domain.SafetyLevelEnabled,
-			MaxDiskUsage: 85,
-			Protected:    []string{"/System", "/Library", "/Applications", "/System"}, // Duplicate /System
-			Profiles: map[string]*domain.Profile{
-				"daily": {
-					Name:        "  Daily Cleanup  ", // Needs whitespace sanitization
-					Description: "Daily system cleanup operations",
-					Status:      domain.StatusEnabled,
-					Operations: []domain.CleanupOperation{
-						{
-							Name:        "nix-generations",
-							Description: " Clean Nix generations ",
-							RiskLevel:   domain.RiskLow,
-							Status:      domain.StatusEnabled,
-							Settings: &domain.OperationSettings{
-								NixGenerations: &domain.NixGenerationsSettings{
-									Generations:  3,
-									Optimization: domain.OptimizationLevelConservative,
-								},
-							},
-						},
-						{
-							Name:        "temp-files",
-							Description: "Clean temporary files",
-							RiskLevel:   domain.RiskMedium,
-							Status:      domain.StatusEnabled,
-							Settings: &domain.OperationSettings{
-								TempFiles: &domain.TempFilesSettings{
-									OlderThan: " 7d  ",                                                 // Needs whitespace sanitization
-									Excludes:  []string{"/tmp/keep", "/var/tmp/preserve", "/tmp/keep"}, // Duplicate /tmp/keep
-								},
-							},
-						},
-						{
-							Name:        "homebrew-cleanup",
-							Description: "Clean Homebrew",
-							RiskLevel:   domain.RiskLow,
-							Status:      domain.StatusEnabled,
-							Settings: &domain.OperationSettings{
-								Homebrew: &domain.HomebrewSettings{
-									FileSelectionStrategy: domain.FileSelectionStrategyUnusedOnly,
-									Prune:                 " 30d  ", // Needs whitespace sanitization
-								},
-							},
-						},
-						{
-							Name:        "system-temp",
-							Description: "Clean system temp",
-							RiskLevel:   domain.RiskMedium,
-							Status:      domain.StatusEnabled,
-							Settings: &domain.OperationSettings{
-								SystemTemp: &domain.SystemTempSettings{
-									Paths:     []string{"/tmp", "/var/tmp", " /tmp/extra ", "/tmp"}, // Needs sanitization
-									OlderThan: "14d",
-								},
-							},
-						},
-					},
-				},
-				"weekly": {
-					Name:        "Weekly Deep Cleanup",
-					Description: "Weekly deep cleanup operations",
-					Operations: []domain.CleanupOperation{
-						{
-							Name:        "nix-generations",
-							Description: "Deep Nix cleanup",
-							RiskLevel:   domain.RiskMedium,
-							Status:      domain.StatusEnabled,
-							Settings: &domain.OperationSettings{
-								NixGenerations: &domain.NixGenerationsSettings{
-									Generations:  5,
-									Optimization: domain.OptimizationLevelConservative,
-								},
-							},
-						},
-					},
-					Status: domain.StatusEnabled,
-				},
-			},
-		}
+		cfg := CreateIntegrationConfig()
 
 		// Step 1: Sanitization (run first to clean data)
 		sanitizer := NewConfigSanitizer()

@@ -71,12 +71,18 @@ func (hc *HTTPClient) WithHeader(key, value string) *HTTPClient {
 	return hc
 }
 
-// Get performs HTTP GET request
-func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetContext(ctx).Get(url)
+// doRequest performs HTTP request and processes response consistently
+func (hc *HTTPClient) doRequest(ctx context.Context, method, url string, body any) (*HTTPResponse, error) {
+	request := hc.client.R().SetContext(ctx)
+	if body != nil {
+		request = request.SetBody(body)
+	}
+
+	resp, err := request.Execute(method, url)
 	if err != nil {
 		return nil, err
 	}
+	
 	bodyBytes := resp.Body()
 	return &HTTPResponse{
 		StatusCode: resp.StatusCode(),
@@ -85,54 +91,26 @@ func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error
 		Headers:    resp.Header(),
 		Request:    resp.Request,
 	}, nil
+}
+
+// Get performs HTTP GET request
+func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error) {
+	return hc.doRequest(ctx, "GET", url, nil)
 }
 
 // Post performs HTTP POST request
 func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Post(url)
-	if err != nil {
-		return nil, err
-	}
-	bodyBytes := resp.Body()
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		RawBody:    bodyBytes,
-		Body:       string(bodyBytes), // Keep for convenience
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
+	return hc.doRequest(ctx, "POST", url, body)
 }
 
 // Put performs HTTP PUT request
 func (hc *HTTPClient) Put(ctx context.Context, url string, body any) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Put(url)
-	if err != nil {
-		return nil, err
-	}
-	bodyBytes := resp.Body()
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		RawBody:    bodyBytes,
-		Body:       string(bodyBytes), // Keep for convenience
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
+	return hc.doRequest(ctx, "PUT", url, body)
 }
 
 // Delete performs HTTP DELETE request
 func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetContext(ctx).Delete(url)
-	if err != nil {
-		return nil, err
-	}
-	bodyBytes := resp.Body()
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		RawBody:    bodyBytes,
-		Body:       string(bodyBytes), // Keep for convenience
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
+	return hc.doRequest(ctx, "DELETE", url, nil)
 }
 
 // HTTPResponse wraps resty response
