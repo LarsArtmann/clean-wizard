@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -20,79 +19,7 @@ const (
 	configType = "yaml"
 )
 
-// parseSafetyLevelWithBackwardCompatibility parses safety level from viper with backward compatibility
-func parseSafetyLevelWithBackwardCompatibility(v *viper.Viper) domain.SafetyLevelType {
-	// Check for new safety_level key first
-	if v.IsSet("safety_level") {
-		safetyValue := v.Get("safety_level")
-		switch val := safetyValue.(type) {
-		case string:
-			// Handle string representation (e.g., "enabled", "disabled", "strict", "paranoid")
-			switch strings.ToLower(strings.TrimSpace(val)) {
-			case "disabled":
-				return domain.SafetyLevelDisabled
-			case "enabled":
-				return domain.SafetyLevelEnabled
-			case "strict":
-				return domain.SafetyLevelStrict
-			case "paranoid":
-				return domain.SafetyLevelParanoid
-			default:
-				log.Warn().Str("safety_level", val).Msg("Invalid safety_level string value, defaulting to enabled")
-				return domain.SafetyLevelEnabled
-			}
-		case int, int32, int64:
-			// Handle numeric representation (0, 1, 2, 3)
-			numVal := fmt.Sprintf("%v", val)
-			if numLevel, err := strconv.Atoi(numVal); err == nil {
-				switch domain.SafetyLevelType(numLevel) {
-				case domain.SafetyLevelDisabled:
-					return domain.SafetyLevelDisabled
-				case domain.SafetyLevelEnabled:
-					return domain.SafetyLevelEnabled
-				case domain.SafetyLevelStrict:
-					return domain.SafetyLevelStrict
-				case domain.SafetyLevelParanoid:
-					return domain.SafetyLevelParanoid
-				default:
-					log.Warn().Int("safety_level", numLevel).Msg("Invalid safety_level numeric value, defaulting to enabled")
-					return domain.SafetyLevelEnabled
-				}
-			}
-		case float64:
-			// Handle case where JSON unmarshaling produces float64
-			if numLevel := int(val); val == float64(numLevel) {
-				switch domain.SafetyLevelType(numLevel) {
-				case domain.SafetyLevelDisabled:
-					return domain.SafetyLevelDisabled
-				case domain.SafetyLevelEnabled:
-					return domain.SafetyLevelEnabled
-				case domain.SafetyLevelStrict:
-					return domain.SafetyLevelStrict
-				case domain.SafetyLevelParanoid:
-					return domain.SafetyLevelParanoid
-				default:
-					log.Warn().Int("safety_level", numLevel).Msg("Invalid safety_level numeric value, defaulting to enabled")
-					return domain.SafetyLevelEnabled
-				}
-			}
-		default:
-			log.Warn().Interface("safety_level", safetyValue).Msg("Unexpected safety_level type, defaulting to enabled")
-			return domain.SafetyLevelEnabled
-		}
-	}
 
-	// Fall back to legacy safe_mode boolean key
-	if v.IsSet("safe_mode") || v.GetBool("safe_mode") {
-		if v.GetBool("safe_mode") {
-			return domain.SafetyLevelEnabled
-		}
-		return domain.SafetyLevelDisabled
-	}
-
-	// Default fallback if neither key is present
-	return domain.SafetyLevelEnabled
-}
 
 // Load loads the configuration from file or creates default
 func Load() (*domain.Config, error) {
@@ -137,7 +64,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	config.SafetyLevel = parseSafetyLevelWithBackwardCompatibility(v)
+	// Apply safety configuration using type-safe domain logic
+	safetyConfig := domain.ParseSafetyConfig(v)
+	config.SafetyLevel = safetyConfig.ToSafetyLevel()
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
 	config.Protected = v.GetStringSlice("protected")
 
@@ -287,7 +216,9 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	config.SafetyLevel = parseSafetyLevelWithBackwardCompatibility(v)
+	// Apply safety configuration using type-safe domain logic
+	safetyConfig := domain.ParseSafetyConfig(v)
+	config.SafetyLevel = safetyConfig.ToSafetyLevel()
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
 	config.Protected = v.GetStringSlice("protected")
 

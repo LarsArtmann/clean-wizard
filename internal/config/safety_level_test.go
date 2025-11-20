@@ -144,8 +144,8 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			v := viper.New()
 			tt.setup(v)
-			result := parseSafetyLevelWithBackwardCompatibility(v)
-			assert.Equal(t, tt.expected, result)
+			result := domain.ParseSafetyConfig(v)
+			assert.Equal(t, tt.expected, result.ToSafetyLevel())
 		})
 	}
 }
