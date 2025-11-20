@@ -31,7 +31,7 @@ func (cs *ConfigSanitizer) sanitizeHomebrewSettings(fieldPrefix string, settings
 	}
 
 	originalSettings := *settings
-	
+
 	// Sanitize prune field
 	if cs.rules.TrimWhitespace && settings.Prune != "" {
 		original := settings.Prune

@@ -11,7 +11,9 @@ import (
 // Builder helpers for BDD test scenarios
 
 // newBaseNixConfig creates a common config skeleton for Nix tests
-func newBaseNixConfig(safeMode bool) *domain.Config {
+func newBaseNixConfig(t *testing.T, safeMode bool) *domain.Config {
+	t.Helper()
+
 	var safetyLevel domain.SafetyLevelType
 	if safeMode {
 		safetyLevel = domain.SafetyLevelEnabled
@@ -49,37 +51,66 @@ func newBaseNixConfig(safeMode bool) *domain.Config {
 }
 
 // withGenerations sets/updates the nix-generations operation Generations value
-func withGenerations(cfg *domain.Config, generations int) *domain.Config {
+func withGenerations(t *testing.T, cfg *domain.Config, generations int) *domain.Config {
+	t.Helper()
+
 	// Find the nix-cleanup profile and its nix-generations operation
-	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
-				profile.Operations[i].Settings.NixGenerations.Generations = generations
-				break
+	profile, profileExists := cfg.Profiles["nix-cleanup"]
+	if !profileExists {
+		t.Fatalf("FAILED: 'nix-cleanup' profile not found in config")
+	}
+
+	operationFound := false
+	for i, op := range profile.Operations {
+		if op.Name == "nix-generations" {
+			if op.Settings == nil {
+				t.Fatalf("FAILED: nix-generations operation has nil Settings")
 			}
+			if op.Settings.NixGenerations == nil {
+				t.Fatalf("FAILED: nix-generations operation has nil NixGenerations")
+			}
+			profile.Operations[i].Settings.NixGenerations.Generations = generations
+			operationFound = true
+			break
 		}
+	}
+
+	if !operationFound {
+		t.Fatalf("FAILED: 'nix-generations' operation not found in nix-cleanup profile")
 	}
 	return cfg
 }
 
 // withRiskLevel adjusts the operation RiskLevel and Enabled flags
-func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Config {
+func withRiskLevel(t *testing.T, cfg *domain.Config, level domain.RiskLevelType) *domain.Config {
+	t.Helper()
+
 	// Find the nix-cleanup profile and its nix-generations operation
-	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" {
-				profile.Operations[i].RiskLevel = level
-				// Note: Let validator handle critical risk + unsafe mode logic
-				break
-			}
+	profile, profileExists := cfg.Profiles["nix-cleanup"]
+	if !profileExists {
+		t.Fatalf("FAILED: 'nix-cleanup' profile not found in config")
+	}
+
+	operationFound := false
+	for i, op := range profile.Operations {
+		if op.Name == "nix-generations" {
+			profile.Operations[i].RiskLevel = level
+			operationFound = true
+			break
 		}
+	}
+
+	if !operationFound {
+		t.Fatalf("FAILED: 'nix-generations' operation not found in nix-cleanup profile")
 	}
 	return cfg
 }
 
 // withOptimize sets the Optimize flag for nix-generations
 // withOptimize sets Optimization level for nix-generations
-func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
+func withOptimize(t *testing.T, cfg *domain.Config, optimize bool) *domain.Config {
+	t.Helper()
+
 	var optimizationLevel domain.OptimizationLevelType
 	if optimize {
 		optimizationLevel = domain.OptimizationLevelConservative
@@ -88,19 +119,36 @@ func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	}
 
 	// Find the nix-cleanup profile and its nix-generations operation
-	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
-				profile.Operations[i].Settings.NixGenerations.Optimization = optimizationLevel
-				break
+	profile, profileExists := cfg.Profiles["nix-cleanup"]
+	if !profileExists {
+		t.Fatalf("FAILED: 'nix-cleanup' profile not found in config")
+	}
+
+	operationFound := false
+	for i, op := range profile.Operations {
+		if op.Name == "nix-generations" {
+			if op.Settings == nil {
+				t.Fatalf("FAILED: nix-generations operation has nil Settings")
 			}
+			if op.Settings.NixGenerations == nil {
+				t.Fatalf("FAILED: nix-generations operation has nil NixGenerations")
+			}
+			profile.Operations[i].Settings.NixGenerations.Optimization = optimizationLevel
+			operationFound = true
+			break
 		}
+	}
+
+	if !operationFound {
+		t.Fatalf("FAILED: 'nix-generations' operation not found in nix-cleanup profile")
 	}
 	return cfg
 }
 
 // withEnabled sets the Status for nix-generations operation
-func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
+func withEnabled(t *testing.T, cfg *domain.Config, enabled bool) *domain.Config {
+	t.Helper()
+
 	var status domain.StatusType
 	if enabled {
 		status = domain.StatusEnabled
@@ -109,13 +157,22 @@ func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
 	}
 
 	// Find the nix-cleanup profile and its nix-generations operation
-	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" {
-				profile.Operations[i].Status = status
-				break
-			}
+	profile, profileExists := cfg.Profiles["nix-cleanup"]
+	if !profileExists {
+		t.Fatalf("FAILED: 'nix-cleanup' profile not found in config")
+	}
+
+	operationFound := false
+	for i, op := range profile.Operations {
+		if op.Name == "nix-generations" {
+			profile.Operations[i].Status = status
+			operationFound = true
+			break
 		}
+	}
+
+	if !operationFound {
+		t.Fatalf("FAILED: 'nix-generations' operation not found in nix-cleanup profile")
 	}
 	return cfg
 }
@@ -133,8 +190,8 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with valid Nix generations settings",
-						Setup: func() (*domain.Config, error) {
-							return newBaseNixConfig(true), nil
+						Setup: func(t *testing.T) (*domain.Config, error) {
+							return newBaseNixConfig(t, true), nil
 						},
 					},
 				},
@@ -174,8 +231,8 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with Nix generations below minimum",
-						Setup: func() (*domain.Config, error) {
-							return withGenerations(newBaseNixConfig(true), 0), nil
+						Setup: func(t *testing.T) (*domain.Config, error) {
+							return withGenerations(t, newBaseNixConfig(t, true), 0), nil
 						},
 					},
 				},
@@ -231,8 +288,8 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with Nix generations above maximum",
-						Setup: func() (*domain.Config, error) {
-							return withGenerations(newBaseNixConfig(true), 15), nil
+						Setup: func(t *testing.T) (*domain.Config, error) {
+							return withGenerations(t, newBaseNixConfig(t, true), 15), nil
 						},
 					},
 				},
@@ -288,8 +345,8 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with critical Nix operation in unsafe mode",
-						Setup: func() (*domain.Config, error) {
-							return withRiskLevel(withGenerations(withOptimize(newBaseNixConfig(false), false), 1), domain.RiskCritical), nil
+						Setup: func(t *testing.T) (*domain.Config, error) {
+							return withRiskLevel(t, withGenerations(t, withOptimize(t, newBaseNixConfig(t, false), false), 1), domain.RiskCritical), nil
 						},
 					},
 				},

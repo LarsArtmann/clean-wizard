@@ -26,7 +26,7 @@ type BDDScenario struct {
 // BDDGiven represents the initial state in BDD
 type BDDGiven struct {
 	Description string
-	Setup       func() (*domain.Config, error)
+	Setup       func(*testing.T) (*domain.Config, error)
 }
 
 // BDDWhen represents the action in BDD
@@ -96,7 +96,7 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 			return
 		}
 
-		cfg, setupErr = given.Setup()
+		cfg, setupErr = given.Setup(b.t)
 		if setupErr != nil {
 			b.t.Errorf("Given setup failed: %v", setupErr)
 			return

@@ -49,7 +49,6 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
 
-				
 			} else {
 				// Load default configuration to get profile information
 				var err error

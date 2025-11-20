@@ -13,18 +13,18 @@ const (
 	// MaxDiskUsage validation
 	MinMaxDiskUsagePercent = 10
 	MaxMaxDiskUsagePercent = 95
-	
-	// MinDiskUsage validation  
-	MinDiskUsagePercent   = 0
-	MaxDiskUsagePercent   = 95
-	
+
+	// MinDiskUsage validation
+	MinDiskUsagePercent = 0
+	MaxDiskUsagePercent = 95
+
 	// RoundingIncrement validation
 	MinRoundingIncrement = 1
 	MaxRoundingIncrement = 50
-	
+
 	// NixGenerations bounds
-	MinNixGenerations    = 1
-	MaxNixGenerations    = 1000
+	MinNixGenerations = 1
+	MaxNixGenerations = 1000
 )
 
 // EnvironmentConfig holds environment-based configuration
@@ -178,7 +178,7 @@ func (cfg *EnvironmentConfig) ValidateEnvironmentConfig() error {
 
 	// NEW: Ensure MinDiskUsagePercent doesn't exceed MaxDiskUsagePercent
 	if cfg.MinDiskUsagePercent > cfg.MaxDiskUsagePercent {
-		return ErrInvalidConfig("min_disk_usage_percent (%d) cannot exceed max_disk_usage_percent (%d)", 
+		return ErrInvalidConfig("min_disk_usage_percent (%d) cannot exceed max_disk_usage_percent (%d)",
 			cfg.MinDiskUsagePercent, cfg.MaxDiskUsagePercent)
 	}
 

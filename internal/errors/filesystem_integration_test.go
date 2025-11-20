@@ -81,14 +81,14 @@ func TestFileSystemErrorAdapter_Integration(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				err := adapter.Adapt(tc.error)
 				require.NotNil(t, err)
-				
+
 				// Should use the new generic filesystem error code
-				assert.Equal(t, ErrCodeFilesystem, err.Code, 
+				assert.Equal(t, ErrCodeFilesystem, err.Code,
 					"Expected ErrCodeFilesystem for unknown filesystem error: %v", tc.error)
 				assert.Equal(t, ErrorTypeFileSystem, err.Type)
 				assert.Equal(t, tc.error, err.Cause)
 				assert.NotEmpty(t, err.Caller)
-				
+
 				// Verify message format includes both error and path
 				assert.Contains(t, err.Message, "File system error")
 				assert.Contains(t, err.Message, tc.error.(*os.PathError).Path)
@@ -100,14 +100,14 @@ func TestFileSystemErrorAdapter_Integration(t *testing.T) {
 		// Test os.IsNotExist and os.IsPermission cases using real errors
 		// For testing purposes, we'll simulate these characteristics
 		notExistErr := &os.PathError{Err: syscall.ENOENT, Path: "/tmp/test"}
-		
+
 		err := adapter.Adapt(notExistErr)
 		require.NotNil(t, err)
 		assert.Equal(t, ErrCodeFileNotFound, err.Code)
 		assert.Equal(t, ErrorTypeFileSystem, err.Type)
 
 		permissionErr := &os.PathError{Err: syscall.EPERM, Path: "/tmp/test"}
-		
+
 		err = adapter.Adapt(permissionErr)
 		require.NotNil(t, err)
 		assert.Equal(t, ErrCodePermissionError, err.Code)
