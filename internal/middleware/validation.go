@@ -8,6 +8,11 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// Validator defines interface for types that can validate themselves
+type Validator interface {
+	Validate() error
+}
+
 // ValidationMiddleware provides validation for all operations
 type ValidationMiddleware struct{}
 
@@ -16,20 +21,23 @@ func NewValidationMiddleware() *ValidationMiddleware {
 	return &ValidationMiddleware{}
 }
 
-// ValidateScanRequest validates scan request before processing
-func (vm *ValidationMiddleware) ValidateScanRequest(ctx context.Context, req domain.ScanRequest) result.Result[domain.ScanRequest] {
+// validateRequest performs common validation pattern for Validator types
+// TODO: Consider adding request type enum for better type safety
+func validateRequest[T Validator](req T, requestType string) result.Result[T] {
 	if err := req.Validate(); err != nil {
-		return result.Err[domain.ScanRequest](fmt.Errorf("invalid scan request: %w", err))
+		return result.Err[T](fmt.Errorf("invalid %s request: %w", requestType, err))
 	}
 	return result.Ok(req)
 }
 
+// ValidateScanRequest validates scan request before processing
+func (vm *ValidationMiddleware) ValidateScanRequest(ctx context.Context, req domain.ScanRequest) result.Result[domain.ScanRequest] {
+	return validateRequest(req, "scan")
+}
+
 // ValidateCleanRequest validates clean request before processing
 func (vm *ValidationMiddleware) ValidateCleanRequest(ctx context.Context, req domain.CleanRequest) result.Result[domain.CleanRequest] {
-	if err := req.Validate(); err != nil {
-		return result.Err[domain.CleanRequest](fmt.Errorf("invalid clean request: %w", err))
-	}
-	return result.Ok(req)
+	return validateRequest(req, "clean")
 }
 
 // ValidateCleanerSettings validates cleaner settings with type safety

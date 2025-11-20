@@ -68,34 +68,20 @@ func NewCleanCommand() *cobra.Command {
 				}
 			}
 
-			// Apply profile if specified
-			var usedProfile *domain.Profile
-			if loadedCfg != nil && profileName != "" {
-				profile, exists := loadedCfg.Profiles[profileName]
-				if !exists {
-					return fmt.Errorf("profile '%s' not found in configuration", profileName)
-				}
+		// Resolve profile to use
+		usedProfile, err := ResolveProfile(loadedCfg, profileName)
+		if err != nil && profileName != "" {
+			return err
+		}
 
-				if profile.Status == domain.StatusDisabled {
-					return fmt.Errorf("profile '%s' is disabled", profileName)
-				}
-
-				fmt.Printf("🏷️  Using profile: %s (%s)\n", profileName, profile.Description)
-				usedProfile = profile
-			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
-				// Use current profile from config
-				profile := loadedCfg.Profiles[loadedCfg.CurrentProfile]
-				if profile != nil && profile.Status == domain.StatusEnabled {
-					fmt.Printf("🏷️  Using current profile: %s (%s)\n", loadedCfg.CurrentProfile, profile.Description)
-					usedProfile = profile
-				}
-			} else if loadedCfg != nil {
-				// Default to daily profile if available
-				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Status == domain.StatusEnabled {
-					fmt.Printf("📋 Using daily profile configuration\n")
-					usedProfile = dailyProfile
-				}
+		// Fallback: try daily profile if ResolveProfile failed
+		if err != nil && loadedCfg != nil {
+			if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Status == domain.StatusEnabled {
+				fmt.Printf("📋 Using daily profile configuration\n")
+				usedProfile = dailyProfile
+				err = nil
 			}
+		}
 
 			// Extract settings from profile if available
 			var settings *domain.OperationSettings

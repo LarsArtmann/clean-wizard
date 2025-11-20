@@ -9,49 +9,88 @@
 	}
 </style>
 <h1>#1 found 2 clones</h1>
-<h2>internal/config/semver_validation_test.go:94</h2>
-<pre>t.Run("Invalid semver version", func(t *testing.T) {
-	cfg := createTestConfig("invalid.version.format")
-
-	result := cv.ValidateConfig(cfg)
-	if len(result.Errors) == 0 {
-		t.Error("Expected validation errors for invalid semver version")
-	}
-
-	// Check if error is related to version format
-	foundVersionError := false
-	for _, err := range result.Errors {
-		if err.Field == "version" && err.Rule == "semver_format" {
-			foundVersionError = true
-			break
-		}
-	}
-	if !foundVersionError {
-		t.Errorf("Expected semver_format error for version field, got errors: %v", result.Errors)
-	}
-})</pre>
-<h2>internal/config/semver_validation_test.go:115</h2>
-<pre>t.Run("Missing version", func(t *testing.T) {
-	cfg := createTestConfig("")
-
-	result := cv.ValidateConfig(cfg)
-	if len(result.Errors) == 0 {
-		t.Error("Expected validation errors for missing version")
-	}
-
-	// Check if error is related to missing version
-	foundMissingError := false
-	for _, err := range result.Errors {
-		if err.Field == "version" && err.Rule == "required" {
-			foundMissingError = true
-			break
-		}
-	}
-	if !foundMissingError {
-		t.Errorf("Expected required error for version field, got errors: %v", result.Errors)
-	}
-})</pre>
+<h2>internal/config/bdd_nix_validation_test.go:242</h2>
+<pre>{
+	Name:        "Invalid Nix generations below minimum",
+	Description: "Should reject Nix generations below minimum threshold",
+	Given: []BDDGiven{
+		{
+			Description: "a configuration with Nix generations below minimum",
+			Setup: func(t *testing.T) (*domain.Config, error) {
+				return withGenerations(t, newBaseNixConfig(t, true), 0), nil
+			},
+		},
+	},
+	When: []BDDWhen{
+		{
+			Description: "the configuration is validated",
+			Action:      whenConfigValidated,
+		},
+	},
+	Then: thenValidationFailsWithError("generations constraint"),
+}</pre>
+<h2>internal/config/bdd_nix_validation_test.go:261</h2>
+<pre>{
+	Name:        "Invalid Nix generations above maximum",
+	Description: "Should reject Nix generations above maximum threshold",
+	Given: []BDDGiven{
+		{
+			Description: "a configuration with Nix generations above maximum",
+			Setup: func(t *testing.T) (*domain.Config, error) {
+				return withGenerations(t, newBaseNixConfig(t, true), 15), nil
+			},
+		},
+	},
+	When: []BDDWhen{
+		{
+			Description: "the configuration is validated",
+			Action:      whenConfigValidated,
+		},
+	},
+	Then: thenValidationFailsWithError("generations constraint"),
+}</pre>
 <h1>#2 found 2 clones</h1>
+<h2>internal/config/test_data.go:38</h2>
+<pre>           {
+	baseConfig.Version = "  1.0.0  "
+	baseConfig.Protected = []string{"/System", "/Library"}
+	baseConfig.Profiles = map[string]*domain.Profile{
+		"daily": {
+			Name:        "  daily  ",
+			Description: "Daily cleanup",
+			Operations: []domain.CleanupOperation{
+				{
+					Name:        "nix-generations",
+					Description: "Clean Nix generations",
+					RiskLevel:   domain.RiskLow,
+					Status:      domain.StatusEnabled,
+				},
+			},
+			Status: domain.StatusEnabled,
+		},
+	}
+}</pre>
+<h2>internal/config/test_data.go:56</h2>
+<pre>       {
+	baseConfig.Version = " 1.0.0 " // Extra spaces
+	baseConfig.Protected = []string{"/System ", " /Library"} // Trailing/leading spaces
+	baseConfig.Profiles = map[string]*domain.Profile{
+		"daily": { // Normal key - the sanitizer should clean up the name field inside
+			Name:        " daily cleanup ", // Extra spaces
+			Description: " Daily cleanup ",
+			Operations: []domain.CleanupOperation{
+				{
+					Name:        " nix-generations ",
+					Description: " Clean Nix generations ",
+					RiskLevel:   domain.RiskLow,
+					Status:      domain.StatusEnabled,
+				},
+			},
+			Status: domain.StatusEnabled,
+		},
+	}
+}</pre>
+<h1>#3 found 2 clones</h1>
 <h2>internal/errors/errors_test.go:119</h2>
 <pre>t.Run("File not found", func(t *testing.T) {
 	err := &os.PathError{Err: os.ErrNotExist, Path: "/tmp/missing"}
@@ -76,88 +115,53 @@
 	assert.Contains(t, cwErr.Message, "/tmp/protected")
 	assert.Equal(t, err, cwErr.Cause)
 })</pre>
-<h1>#3 found 2 clones</h1>
-<h2>internal/adapters/http_client.go:75</h2>
-<pre>func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetContext(ctx).Get(url)
-	if err != nil {
-		return nil, err
-	}
-	bodyBytes := resp.Body()
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		RawBody:    bodyBytes,
-		Body:       string(bodyBytes), // Keep for convenience
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
-}</pre>
-<h2>internal/adapters/http_client.go:123</h2>
-<pre>func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetContext(ctx).Delete(url)
-	if err != nil {
-		return nil, err
-	}
-	bodyBytes := resp.Body()
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		RawBody:    bodyBytes,
-		Body:       string(bodyBytes), // Keep for convenience
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
-}</pre>
 <h1>#4 found 2 clones</h1>
-<h2>internal/config/test_data.go:18</h2>
-<pre>func createWhitespacedConfig() *domain.Config {
-	return &domain.Config{
-		Version:     " 1.0.0 ", // Extra spaces
-		SafetyLevel: domain.SafetyLevelEnabled, // Will be tested with whitespace parsing
-		MaxDiskUsage: 50,
-		Protected:   []string{"/System ", " /Library"}, // Trailing/leading spaces
-		Profiles: map[string]*domain.Profile{
-			" daily": { // Leading space
-				Name:        " daily cleanup ", // Extra spaces
-				Description: " Daily cleanup ",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        " nix-generations ",
-						Description: " Clean Nix generations ",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-					},
-				},
-				Status: domain.StatusEnabled,
+<h2>internal/config/config.go:165</h2>
+<pre>func createDailyProfile() *domain.Profile {
+	return &domain.Profile{
+		Name:        "daily",
+		Description: "Quick daily cleanup",
+		Operations: []domain.CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Clean old Nix generations",
+				RiskLevel:   domain.RiskLow,
+				Status:      domain.StatusEnabled,
+				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+			},
+			{
+				Name:        "temp-files",
+				Description: "Clean temporary files",
+				RiskLevel:   domain.RiskLow,
+				Status:      domain.StatusEnabled,
+				Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 			},
 		},
-		LastClean: time.Now(),
-		Updated:   time.Now(),
+		Status: domain.StatusEnabled,
 	}
 }</pre>
-<h2>internal/config/validation_sanitizer_test.go:12</h2>
-<pre>func createWhitespacedConfigForSanitizer() *domain.Config {
-	return &domain.Config{
-		Version:      "  1.0.0  ",
-		SafetyLevel:  domain.SafetyLevelEnabled,
-		MaxDiskUsage: 50,
-		Protected:    []string{"/System", "/Library"},
-		Profiles: map[string]*domain.Profile{
-			"daily": {
-				Name:        "  daily  ",
-				Description: "Daily cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-					},
-				},
-				Status: domain.StatusEnabled,
+<h2>internal/config/config.go:190</h2>
+<pre>func createAggressiveProfile() *domain.Profile {
+	return &domain.Profile{
+		Name:        "aggressive",
+		Description: "Deep aggressive cleanup",
+		Operations: []domain.CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Clean old Nix generations",
+				RiskLevel:   domain.RiskHigh,
+				Status:      domain.StatusEnabled,
+				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+			},
+			{
+				Name:        "homebrew-cleanup",
+				Description: "Clean old Homebrew packages",
+				RiskLevel:   domain.RiskMedium,
+				Status:      domain.StatusEnabled,
+				Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 			},
 		},
-		LastClean: time.Now(),
-		Updated:   time.Now(),
+		Status: domain.StatusEnabled,
 	}
 }</pre>
 <h1>#5 found 3 clones</h1>
@@ -207,37 +211,6 @@
 	}
 }</pre>
 <h1>#6 found 2 clones</h1>
-<h2>internal/adapters/http_client.go:91</h2>
-<pre>func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Post(url)
-	if err != nil {
-		return nil, err
-	}
-	bodyBytes := resp.Body()
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		RawBody:    bodyBytes,
-		Body:       string(bodyBytes), // Keep for convenience
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
-}</pre>
-<h2>internal/adapters/http_client.go:107</h2>
-<pre>func (hc *HTTPClient) Put(ctx context.Context, url string, body any) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Put(url)
-	if err != nil {
-		return nil, err
-	}
-	bodyBytes := resp.Body()
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		RawBody:    bodyBytes,
-		Body:       string(bodyBytes), // Keep for convenience
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
-}</pre>
-<h1>#7 found 2 clones</h1>
 <h2>internal/api/mapper_test.go:324</h2>
 <pre>for _, tc := range testCases {
 	t.Run(string(tc.public), func(t *testing.T) {
@@ -278,7 +251,7 @@
 		}
 	})
 }</pre>
-<h1>#8 found 2 clones</h1>
+<h1>#7 found 2 clones</h1>
 <h2>internal/errors/errors_test.go:167</h2>
 <pre>func TestConfigErrorAdapter(t *testing.T) {
 	adapter := &ConfigErrorAdapter{}
@@ -307,7 +280,77 @@
 	assert.Contains(t, cwErr.Message, "email field")
 	assert.Equal(t, originalErr, cwErr.Cause)
 }</pre>
-<h1>#9 found 4 clones</h1>
+<h1>#8 found 2 clones</h1>
+<h2>tests/bdd/nix_operations_test.go:373</h2>
+<pre>t.Run("Happy Path Nix Cleanup", func(t *testing.T) {
+	err := ctx.GivenValidNixInstallation()
+	require.NoError(t, err)
+
+	err = ctx.WhenRunningNixGenerationsCleanup()
+	require.NoError(t, err)
+
+	err = ctx.ThenRemoveOldGenerationsAndKeepCurrent()
+	require.NoError(t, err)
+
+	err = ctx.AndLogOperationsPerformed()
+	require.NoError(t, err)
+})</pre>
+<h2>tests/bdd/nix_operations_test.go:418</h2>
+<pre>t.Run("Error Recovery", func(t *testing.T) {
+	err := ctx.GivenCleanupOperationFailsMidway()
+	require.NoError(t, err)
+
+	err = ctx.WhenRunningCleanup()
+	require.NoError(t, err)
+
+	err = ctx.ThenRollbackChanges()
+	require.NoError(t, err)
+
+	err = ctx.AndReportErrorDetails()
+	require.NoError(t, err)
+})</pre>
+<h1>#9 found 2 clones</h1>
+<h2>internal/config/test_data.go:313</h2>
+<pre>       &domain.Profile{
+	Name:        "Weekly Cleanup",
+	Description: "Weekly deep cleanup",
+	Operations: []domain.CleanupOperation{
+		{
+			Name:        "nix-generations",
+			Description: "Deep Nix cleanup",
+			RiskLevel:   domain.RiskMedium,
+			Status:      domain.StatusEnabled,
+			Settings: &domain.OperationSettings{
+				NixGenerations: &domain.NixGenerationsSettings{
+					Generations:  5,
+					Optimization: domain.OptimizationLevelConservative,
+				},
+			},
+		},
+	},
+	Status: domain.StatusEnabled,
+}</pre>
+<h2>tests/bdd/nix_operations_test.go:85</h2>
+<pre>              &domain.Profile{
+	Name:        "nix-cleanup",
+	Description: "Nix generations cleanup profile",
+	Operations: []domain.CleanupOperation{
+		{
+			Name:        "nix-generations",
+			Description: "Clean old Nix generations",
+			RiskLevel:   domain.RiskLow,
+			Status:      domain.StatusEnabled,
+			Settings: &domain.OperationSettings{
+				NixGenerations: &domain.NixGenerationsSettings{
+					Generations:  3,
+					Optimization: domain.OptimizationLevelConservative,
+				},
+			},
+		},
+	},
+	Status: domain.StatusEnabled,
+}</pre>
+<h1>#10 found 4 clones</h1>
 <h2>internal/domain/enum_helper_test.go:47</h2>
 <pre>func TestValidationLevelType_Helper(t *testing.T) {
 	// Test String()
@@ -399,4 +442,50 @@
 	if len(values) != 4 {
 		t.Errorf("ScanTypeType.Values() = %d, want 4", len(values))
 	}
+}</pre>
+<h1>#11 found 2 clones</h1>
+<h2>internal/errors/adapters.go:10</h2>
+<pre>func isConfigurationError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	// Common indicators of configuration errors
+	configIndicators := []string{
+		"config", "configuration", "yaml", "json", "toml",
+		"parse", "invalid", "missing", "required",
+	}
+
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range configIndicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
+}</pre>
+<h2>internal/errors/adapters.go:114</h2>
+<pre>func isValidationError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	// Strong indicators of validation errors
+	validationIndicators := []string{
+		"validation failed", "validation error", "invalid format",
+		"invalid range", "required field", "constraint violation",
+		"unacceptable value", "validation rule", "invalid value",
+	}
+
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range validationIndicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
 }</pre>
