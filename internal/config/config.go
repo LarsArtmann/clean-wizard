@@ -52,37 +52,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	// Unmarshal profiles section
 	var config domain.Config
 
-	// Manually unmarshal fields to avoid YAML tag issues
-	config.Version = v.GetString(ConfigKeyVersion)
-	// Apply safety configuration using type-safe domain logic with proper dependency inversion
-	safetyConfig := domain.ParseSafetyConfig(v)
-	config.SafetyLevel = safetyConfig.ToSafetyLevel()
-	config.MaxDiskUsage = v.GetInt(ConfigKeyMaxDiskUsage)
-	config.Protected = v.GetStringSlice(ConfigKeyProtected)
-
-	// Unmarshal profiles section
-	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
-		log.Err(err).Msg("Failed to unmarshal profiles")
-		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
-	}
-
-	// Fix all configuration issues using consolidated ConfigFixer
-	fixer := NewConfigFixer(v)
-	fixer.FixAll(&config)
-
-	// Apply comprehensive validation with strict enforcement
-	if validator := NewConfigValidator(); validator != nil {
-		validationResult := validator.ValidateConfig(&config)
-		if !validationResult.IsValid {
-			// CRITICAL: Fail fast on validation errors for production safety
-			for _, err := range validationResult.Errors {
-				log.Error().
-					Str("field", err.Field).
-					Err(fmt.Errorf("%s", err.Message)).
-					Msg("Configuration validation error")
-			}
-			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
-		}
+	// Use common loading and validation logic
+	if err := loadAndValidateConfig(config, v, "LoadWithContext"); err != nil {
+		return nil, err
 	}
 
 	return &config, nil
@@ -123,37 +95,9 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 	// Unmarshal profiles section
 	var config domain.Config
 
-	// Manually unmarshal fields to avoid YAML tag issues
-	config.Version = v.GetString(ConfigKeyVersion)
-	// Apply safety configuration using type-safe domain logic with proper dependency inversion
-	safetyConfig := domain.ParseSafetyConfig(v)
-	config.SafetyLevel = safetyConfig.ToSafetyLevel()
-	config.MaxDiskUsage = v.GetInt(ConfigKeyMaxDiskUsage)
-	config.Protected = v.GetStringSlice(ConfigKeyProtected)
-
-	// Unmarshal profiles section
-	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
-		log.Err(err).Msg("Failed to unmarshal profiles")
-		return nil, pkgerrors.HandleConfigError("LoadWithContextAndPath", err)
-	}
-
-	// Fix all configuration issues using consolidated ConfigFixer
-	fixer := NewConfigFixer(v)
-	fixer.FixAll(&config)
-
-	// Apply comprehensive validation with strict enforcement
-	if validator := NewConfigValidator(); validator != nil {
-		validationResult := validator.ValidateConfig(&config)
-		if !validationResult.IsValid {
-			// CRITICAL: Fail fast on validation errors for production safety
-			for _, err := range validationResult.Errors {
-				log.Error().
-					Str("field", err.Field).
-					Err(fmt.Errorf("%s", err.Message)).
-					Msg("Configuration validation error")
-			}
-			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
-		}
+	// Use common loading and validation logic
+	if err := loadAndValidateConfig(config, v, "LoadWithContextAndPath"); err != nil {
+		return nil, err
 	}
 
 	// Apply comprehensive validation with strict enforcement
@@ -339,11 +283,11 @@ func loadAndValidateConfig(config *domain.Config, v *viper.Viper, functionName s
 
 	// Fix all configuration issues using consolidated ConfigFixer
 	fixer := NewConfigFixer(v)
-	fixer.FixAll(&config)
+	fixer.FixAll(config)
 
 	// Apply comprehensive validation with strict enforcement
 	if validator := NewConfigValidator(); validator != nil {
-		validationResult := validator.ValidateConfig(&config)
+		validationResult := validator.ValidateConfig(config)
 		if !validationResult.IsValid {
 			// CRITICAL: Fail fast on validation errors for production safety
 			for _, err := range validationResult.Errors {
