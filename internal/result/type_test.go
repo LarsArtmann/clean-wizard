@@ -6,58 +6,54 @@ import (
 	"testing"
 )
 
-func TestResult_Ok(t *testing.T) {
+// testResultMethod tests a boolean method on Result type with expected values
+func testResultMethod(t *testing.T, methodName string, methodFunc func(Result[int]) bool, okExpected, errExpected bool) {
+	testData := []struct {
+		name   string
+		result Result[int]
+	}{
+		{
+			name:   "ok result",
+			result: Ok(42),
+		},
+		{
+			name:   "error result",
+			result: Err[int](errors.New("test error")),
+		},
+	}
+
 	tests := []struct {
 		name     string
 		result   Result[int]
 		expected bool
 	}{
 		{
-			name:     "ok result",
-			result:   Ok(42),
-			expected: true,
+			name:     testData[0].name,
+			result:   testData[0].result,
+			expected: okExpected,
 		},
 		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			expected: false,
+			name:     testData[1].name,
+			result:   testData[1].result,
+			expected: errExpected,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.result.IsOk() != tt.expected {
-				t.Errorf("IsOk() = %v, want %v", tt.result.IsOk(), tt.expected)
+			if methodFunc(tt.result) != tt.expected {
+				t.Errorf("%s() = %v, want %v", methodName, methodFunc(tt.result), tt.expected)
 			}
 		})
 	}
 }
 
-func TestResult_IsErr(t *testing.T) {
-	tests := []struct {
-		name     string
-		result   Result[int]
-		expected bool
-	}{
-		{
-			name:     "ok result",
-			result:   Ok(42),
-			expected: false,
-		},
-		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			expected: true,
-		},
-	}
+func TestResult_Ok(t *testing.T) {
+	testResultMethod(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, true, false)
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.result.IsErr() != tt.expected {
-				t.Errorf("IsErr() = %v, want %v", tt.result.IsErr(), tt.expected)
-			}
-		})
-	}
+func TestResult_IsErr(t *testing.T) {
+	testResultMethod(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, false, true)
 }
 
 func TestResult_Value(t *testing.T) {

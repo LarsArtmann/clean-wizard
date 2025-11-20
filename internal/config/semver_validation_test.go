@@ -40,6 +40,28 @@ func TestIsValidSemver(t *testing.T) {
 	}
 }
 
+// createTestConfig creates a test configuration with the specified version
+func createTestConfig(version string) *domain.Config {
+	return &domain.Config{
+		Version: version,
+		Profiles: map[string]*domain.Profile{
+			"test": {
+				Name:        "test",
+				Description: "Test profile",
+				Operations: []domain.CleanupOperation{{
+					Name:        "test-op",
+					Description: "Test operation",
+					RiskLevel:   domain.RiskLow,
+					Status:      domain.StatusEnabled,
+					Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
+				}},
+				Status: domain.StatusEnabled,
+			},
+		},
+		Protected: []string{"/System"},
+	}
+}
+
 func TestBasicStructureValidation_Semver(t *testing.T) {
 	cv := NewConfigValidator()
 
@@ -70,24 +92,7 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 	})
 
 	t.Run("Invalid semver version", func(t *testing.T) {
-		cfg := &domain.Config{
-			Version: "invalid.version.format",
-			Profiles: map[string]*domain.Profile{
-				"test": {
-					Name:        "test",
-					Description: "Test profile",
-					Operations: []domain.CleanupOperation{{
-						Name:        "test-op",
-						Description: "Test operation",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
-					}},
-					Status: domain.StatusEnabled,
-				},
-			},
-			Protected: []string{"/System"},
-		}
+		cfg := createTestConfig("invalid.version.format")
 
 		result := cv.ValidateConfig(cfg)
 		if len(result.Errors) == 0 {
@@ -108,24 +113,7 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 	})
 
 	t.Run("Missing version", func(t *testing.T) {
-		cfg := &domain.Config{
-			Version: "",
-			Profiles: map[string]*domain.Profile{
-				"test": {
-					Name:        "test",
-					Description: "Test profile",
-					Operations: []domain.CleanupOperation{{
-						Name:        "test-op",
-						Description: "Test operation",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-						Settings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},
-					}},
-					Status: domain.StatusEnabled,
-				},
-			},
-			Protected: []string{"/System"},
-		}
+		cfg := createTestConfig("")
 
 		result := cv.ValidateConfig(cfg)
 		if len(result.Errors) == 0 {

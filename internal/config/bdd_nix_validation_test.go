@@ -11,6 +11,61 @@ import (
 // Builder helpers for BDD test scenarios
 
 // newBaseNixConfig creates a common config skeleton for Nix tests
+// BDD helper functions for common validation patterns
+func validateShouldFail(result *ValidationResult) error {
+	if result.IsValid {
+		return fmt.Errorf("expected invalid configuration")
+	}
+	return nil
+}
+
+func validateErrorsPresent(result *ValidationResult) error {
+	if len(result.Errors) == 0 {
+		return fmt.Errorf("expected validation errors")
+	}
+	return nil
+}
+
+func validateErrorContains(result *ValidationResult, expectedText string) error {
+	found := false
+	for _, err := range result.Errors {
+		if strings.Contains(err.Message, expectedText) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("expected error mentioning %s", expectedText)
+	}
+	return nil
+}
+
+// BDD validation helper for common "validation should fail with specific error" pattern
+func thenValidationFailsWithError(expectedErrorText string) []BDDThen {
+	return []BDDThen{
+		{
+			Description: "validation should fail",
+			Validate:    validateShouldFail,
+		},
+		{
+			Description: "validation errors should be present",
+			Validate:    validateErrorsPresent,
+		},
+		{
+			Description: fmt.Sprintf("error should mention %s", expectedErrorText),
+			Validate: func(result *ValidationResult) error {
+				return validateErrorContains(result, expectedErrorText)
+			},
+		},
+	}
+}
+
+// BDD action helper for common "validate configuration" pattern
+func whenConfigValidated(cfg *domain.Config) (*ValidationResult, error) {
+	validator := NewConfigValidator()
+	return validator.ValidateConfig(cfg), nil
+}
+
 func newBaseNixConfig(t *testing.T, safeMode bool) *domain.Config {
 	t.Helper()
 
@@ -239,48 +294,10 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				When: []BDDWhen{
 					{
 						Description: "the configuration is validated",
-						Action: func(cfg *domain.Config) (*ValidationResult, error) {
-							validator := NewConfigValidator()
-							return validator.ValidateConfig(cfg), nil
-						},
+						Action:      whenConfigValidated,
 					},
 				},
-				Then: []BDDThen{
-					{
-						Description: "validation should fail",
-						Validate: func(result *ValidationResult) error {
-							if result.IsValid {
-								return fmt.Errorf("expected invalid configuration")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "validation errors should be present",
-						Validate: func(result *ValidationResult) error {
-							if len(result.Errors) == 0 {
-								return fmt.Errorf("expected validation errors")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "error should mention generations constraint",
-						Validate: func(result *ValidationResult) error {
-							found := false
-							for _, err := range result.Errors {
-								if strings.Contains(err.Message, "generations") {
-									found = true
-									break
-								}
-							}
-							if !found {
-								return fmt.Errorf("expected error mentioning generations constraint")
-							}
-							return nil
-						},
-					},
-				},
+				Then: thenValidationFailsWithError("generations constraint"),
 			},
 			{
 				Name:        "Invalid Nix generations above maximum",
@@ -296,48 +313,10 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				When: []BDDWhen{
 					{
 						Description: "the configuration is validated",
-						Action: func(cfg *domain.Config) (*ValidationResult, error) {
-							validator := NewConfigValidator()
-							return validator.ValidateConfig(cfg), nil
-						},
+						Action:      whenConfigValidated,
 					},
 				},
-				Then: []BDDThen{
-					{
-						Description: "validation should fail",
-						Validate: func(result *ValidationResult) error {
-							if result.IsValid {
-								return fmt.Errorf("expected invalid configuration")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "validation errors should be present",
-						Validate: func(result *ValidationResult) error {
-							if len(result.Errors) == 0 {
-								return fmt.Errorf("expected validation errors")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "error should mention generations constraint",
-						Validate: func(result *ValidationResult) error {
-							found := false
-							for _, err := range result.Errors {
-								if strings.Contains(err.Message, "generations") {
-									found = true
-									break
-								}
-							}
-							if !found {
-								return fmt.Errorf("expected error mentioning generations constraint")
-							}
-							return nil
-						},
-					},
-				},
+				Then: thenValidationFailsWithError("generations constraint"),
 			},
 			{
 				Name:        "Critical Nix operation in unsafe mode",

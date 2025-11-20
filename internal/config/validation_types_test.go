@@ -79,28 +79,8 @@ func CreateTestConfigurations() map[string]*domain.Config {
 func GetSanitizationTestCases() []TestSanitizationTestCase {
 	return []TestSanitizationTestCase{
 		{
-			name: "whitespace cleanup",
-			config: &domain.Config{
-				Version:      "  1.0.0  ",
-				SafetyLevel:  domain.SafetyLevelEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "  daily  ",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Status:      domain.StatusEnabled,
-							},
-						},
-						Status: domain.StatusEnabled,
-					},
-				},
-			},
+			name:             "whitespace cleanup",
+			config:           createWhitespacedConfig(),
 			expectedChanges:  []string{"version", "profiles.daily.name"},
 			expectedWarnings: 0,
 		},

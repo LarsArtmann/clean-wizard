@@ -6,6 +6,31 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// createWhitespacedConfig creates a test configuration with whitespace that needs cleaning
+func createWhitespacedConfig() *domain.Config {
+	return &domain.Config{
+		Version:      "  1.0.0  ",
+		SafetyLevel:  domain.SafetyLevelEnabled,
+		MaxDiskUsage: 50,
+		Protected:    []string{"/System", "/Library"},
+		Profiles: map[string]*domain.Profile{
+			"daily": {
+				Name:        "  daily  ",
+				Description: "Daily cleanup",
+				Operations: []domain.CleanupOperation{
+					{
+						Name:        "nix-generations",
+						Description: "Clean Nix generations",
+						RiskLevel:   domain.RiskLow,
+						Status:      domain.StatusEnabled,
+					},
+				},
+				Status: domain.StatusEnabled,
+			},
+		},
+	}
+}
+
 func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 	sanitizer := NewConfigSanitizer()
 
@@ -16,28 +41,8 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 		expectedWarnings int
 	}{
 		{
-			name: "whitespace cleanup",
-			config: &domain.Config{
-				Version:      "  1.0.0  ",
-				SafetyLevel:  domain.SafetyLevelEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "  daily  ",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Status:      domain.StatusEnabled,
-							},
-						},
-						Status: domain.StatusEnabled,
-					},
-				},
-			},
+			name:             "whitespace cleanup",
+			config:           createWhitespacedConfig(),
 			expectedChanges:  []string{"version", "profiles.daily.name"},
 			expectedWarnings: 0,
 		},
