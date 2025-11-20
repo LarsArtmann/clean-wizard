@@ -61,7 +61,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			}
 
 			// Apply validation if we have loaded configuration
-			if loadedCfg != nil && validationLevel > config.ValidationLevelNone {
+			if loadedCfg != nil {
 				fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
 
 				if validationLevel >= config.ValidationLevelBasic {

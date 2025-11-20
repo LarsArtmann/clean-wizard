@@ -115,60 +115,7 @@ func (ecl *EnhancedConfigLoader) isPathProtected(protected []string, target stri
 	return slices.Contains(protected, target)
 }
 
-// mapValidatorRulesToSchemaRules converts validator rules to stable schema rules
-func (ecl *EnhancedConfigLoader) mapValidatorRulesToSchemaRules() *ConfigValidationRules {
-	rules := ecl.validator.rules
 
-	// Create a copy to prevent external modifications to internal state
-	schemaRules := &ConfigValidationRules{
-		// Numeric Constraints
-		MaxDiskUsage:      rules.MaxDiskUsage,
-		MinProtectedPaths: rules.MinProtectedPaths,
-		MaxProfiles:       rules.MaxProfiles,
-		MaxOperations:     rules.MaxOperations,
-
-		// String Constraints
-		ProfileNamePattern: rules.ProfileNamePattern,
-		PathPattern:        rules.PathPattern,
-
-		// Array Constraints
-		UniquePaths:    rules.UniquePaths,
-		UniqueProfiles: rules.UniqueProfiles,
-
-		// Safety Constraints
-		ProtectedSystemPaths: make([]string, len(rules.ProtectedSystemPaths)),
-		RequireSafeMode:      rules.RequireSafeMode,
-
-		// Risk Constraints
-		MaxRiskLevel:   rules.MaxRiskLevel,
-		BackupRequired: rules.BackupRequired,
-	}
-
-	// Deep copy slice to prevent modifications
-	copy(schemaRules.ProtectedSystemPaths, rules.ProtectedSystemPaths)
-
-	return schemaRules
-}
-
-// getSchemaMinimum returns the minimum value for max_disk_usage from rules
-func (ecl *EnhancedConfigLoader) getSchemaMinimum() *float64 {
-	if ecl.validator.rules.MaxDiskUsage != nil && ecl.validator.rules.MaxDiskUsage.Min != nil {
-		v := float64(*ecl.validator.rules.MaxDiskUsage.Min)
-		return &v
-	}
-	v := 10.0 // fallback to current literal
-	return &v
-}
-
-// getSchemaMaximum returns the maximum value for max_disk_usage from rules
-func (ecl *EnhancedConfigLoader) getSchemaMaximum() *float64 {
-	if ecl.validator.rules.MaxDiskUsage != nil && ecl.validator.rules.MaxDiskUsage.Max != nil {
-		v := float64(*ecl.validator.rules.MaxDiskUsage.Max)
-		return &v
-	}
-	v := 95.0 // fallback to current literal
-	return &v
-}
 
 // formatValidationErrors formats validation errors for display
 func (ecl *EnhancedConfigLoader) formatValidationErrors(errors []ValidationError) string {
