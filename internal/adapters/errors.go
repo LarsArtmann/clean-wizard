@@ -5,7 +5,10 @@ import (
 )
 
 // ErrInvalidConfig creates a configuration validation error
-func ErrInvalidConfig(message string) error {
+func ErrInvalidConfig(message string, args ...any) error {
+	if len(args) > 0 {
+		return fmt.Errorf("configuration error: %s", fmt.Sprintf(message, args...))
+	}
 	return fmt.Errorf("configuration error: %s", message)
 }
 

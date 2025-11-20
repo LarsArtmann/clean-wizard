@@ -8,6 +8,25 @@ import (
 	"github.com/caarlos0/env/v6"
 )
 
+// Constants for environment validation bounds
+const (
+	// MaxDiskUsage validation
+	MinMaxDiskUsagePercent = 10
+	MaxMaxDiskUsagePercent = 95
+	
+	// MinDiskUsage validation  
+	MinDiskUsagePercent   = 0
+	MaxDiskUsagePercent   = 95
+	
+	// RoundingIncrement validation
+	MinRoundingIncrement = 1
+	MaxRoundingIncrement = 50
+	
+	// NixGenerations bounds
+	MinNixGenerations    = 1
+	MaxNixGenerations    = 1000
+)
+
 // EnvironmentConfig holds environment-based configuration
 type EnvironmentConfig struct {
 	// Application settings
@@ -144,12 +163,28 @@ func (cfg *EnvironmentConfig) ValidateEnvironmentConfig() error {
 		return ErrInvalidConfig("rate_limit_rps must be positive")
 	}
 
-	if cfg.MaxNixGenerations <= 0 || cfg.MaxNixGenerations > 1000 {
-		return ErrInvalidConfig("max_nix_generations must be between 1 and 1000")
+	if cfg.MaxNixGenerations < MinNixGenerations || cfg.MaxNixGenerations > MaxNixGenerations {
+		return ErrInvalidConfig("max_nix_generations must be between %d and %d", MinNixGenerations, MaxNixGenerations)
 	}
 
-	if cfg.MaxDiskUsagePercent < 10 || cfg.MaxDiskUsagePercent > 95 {
-		return ErrInvalidConfig("max_disk_usage_percent must be between 10 and 95")
+	if cfg.MaxDiskUsagePercent < MinMaxDiskUsagePercent || cfg.MaxDiskUsagePercent > MaxMaxDiskUsagePercent {
+		return ErrInvalidConfig("max_disk_usage_percent must be between %d and %d", MinMaxDiskUsagePercent, MaxMaxDiskUsagePercent)
+	}
+
+	// NEW: Validate MinDiskUsagePercent
+	if cfg.MinDiskUsagePercent < MinDiskUsagePercent || cfg.MinDiskUsagePercent > MaxDiskUsagePercent {
+		return ErrInvalidConfig("min_disk_usage_percent must be between %d and %d", MinDiskUsagePercent, MaxDiskUsagePercent)
+	}
+
+	// NEW: Ensure MinDiskUsagePercent doesn't exceed MaxDiskUsagePercent
+	if cfg.MinDiskUsagePercent > cfg.MaxDiskUsagePercent {
+		return ErrInvalidConfig("min_disk_usage_percent (%d) cannot exceed max_disk_usage_percent (%d)", 
+			cfg.MinDiskUsagePercent, cfg.MaxDiskUsagePercent)
+	}
+
+	// NEW: Validate RoundingIncrement
+	if cfg.RoundingIncrement < MinRoundingIncrement || cfg.RoundingIncrement > MaxRoundingIncrement {
+		return ErrInvalidConfig("rounding_increment must be between %d and %d", MinRoundingIncrement, MaxRoundingIncrement)
 	}
 
 	return nil
