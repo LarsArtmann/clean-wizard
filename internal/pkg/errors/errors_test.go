@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -62,9 +63,9 @@ func TestErrorOutputDeterministic(t *testing.T) {
 	errorStr := err.Error()
 
 	// Should contain keys in sorted order (alpha, beta, zebra)
-	alphaIndex := findSubstring(errorStr, "alpha_key=")
-	betaIndex := findSubstring(errorStr, "beta_key=")
-	zebraIndex := findSubstring(errorStr, "zebra_key=")
+	alphaIndex := strings.Index(errorStr, "alpha_key=")
+	betaIndex := strings.Index(errorStr, "beta_key=")
+	zebraIndex := strings.Index(errorStr, "zebra_key=")
 
 	if alphaIndex == -1 || betaIndex == -1 || zebraIndex == -1 {
 		t.Error("Not all metadata keys found in error output")
@@ -74,13 +75,4 @@ func TestErrorOutputDeterministic(t *testing.T) {
 	if !(alphaIndex < betaIndex && betaIndex < zebraIndex) {
 		t.Errorf("Metadata keys not sorted: alpha=%d, beta=%d, zebra=%d", alphaIndex, betaIndex, zebraIndex)
 	}
-}
-
-func findSubstring(s, substr string) int {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return i
-		}
-	}
-	return -1
 }
