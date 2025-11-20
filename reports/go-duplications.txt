@@ -1,5 +1,18 @@
-2025/11/20 22:13:39 Building suffix tree
-2025/11/20 22:13:40 Searching for clones
+2025/11/20 22:28:16 Building suffix tree
+2025/11/20 22:28:16 Searching for clones
+found 2 clones:
+  internal/config/validation_middleware_analysis.go:16,24
+  internal/config/validation_middleware_analysis.go:26,34
+found 6 clones:
+  internal/domain/type_safe_enums.go:110,124
+  internal/domain/type_safe_enums.go:228,242
+  internal/domain/type_safe_enums.go:395,409
+  internal/domain/type_safe_enums.go:474,483
+  internal/domain/type_safe_enums.go:587,596
+  internal/domain/type_safe_enums.go:772,781
+found 2 clones:
+  tests/bdd/nix_bdd_test.go:255,266
+  tests/bdd/nix_bdd_test.go:268,279
 found 2 clones:
   internal/config/bdd_nix_validation_test.go:242,260
   internal/config/bdd_nix_validation_test.go:261,279
@@ -9,9 +22,22 @@ found 2 clones:
 found 2 clones:
   internal/errors/errors_test.go:119,129
   internal/errors/errors_test.go:131,141
+found 6 clones:
+  internal/domain/type_safe_enums.go:286,298
+  internal/domain/type_safe_enums.go:340,352
+  internal/domain/type_safe_enums.go:422,430
+  internal/domain/type_safe_enums.go:526,534
+  internal/domain/type_safe_enums.go:639,647
+  internal/domain/type_safe_enums.go:690,698
 found 2 clones:
   internal/config/config.go:165,187
   internal/config/config.go:190,212
+found 5 clones:
+  internal/config/semver_validation_test.go:33,40
+  internal/format/format_test.go:25,32
+  internal/format/format_test.go:50,57
+  internal/format/format_test.go:71,78
+  internal/format/format_test.go:128,135
 found 3 clones:
   internal/config/type_safe_validation_rules_test.go:127,140
   internal/config/type_safe_validation_rules_test.go:142,155
@@ -28,13 +54,26 @@ found 2 clones:
 found 2 clones:
   internal/config/test_data.go:313,331
   tests/bdd/nix_operations_test.go:85,103
+found 2 clones:
+  internal/format/format_test.go:61,69
+  internal/format/format_test.go:82,94
 found 4 clones:
   internal/domain/enum_helper_test.go:47,68
   internal/domain/enum_helper_test.go:70,91
   internal/domain/enum_helper_test.go:93,114
   internal/domain/enum_helper_test.go:116,137
 found 2 clones:
-  internal/errors/adapters.go:10,30
-  internal/errors/adapters.go:114,135
+  internal/errors/errors_test.go:292,299
+  internal/errors/errors_test.go:327,334
+found 3 clones:
+  internal/domain/benchmarks_test.go:11,17
+  internal/domain/benchmarks_test.go:27,33
+  internal/domain/benchmarks_test.go:38,44
+found 2 clones:
+  internal/config/sanitizer_nix.go:26,36
+  internal/config/sanitizer_nix.go:36,46
+found 2 clones:
+  internal/domain/benchmarks_test.go:11,25
+  internal/domain/benchmarks_test.go:38,52
 
-Found total 11 clone groups.
+Found total 20 clone groups.

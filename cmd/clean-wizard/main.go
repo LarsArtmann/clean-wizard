@@ -39,18 +39,7 @@ func colorize(text, color string) string {
 
 // parseValidationLevel converts string to ValidationLevel
 func parseValidationLevel(level string) config.ValidationLevel {
-	switch strings.ToLower(level) {
-	case "none":
-		return config.ValidationLevelNone
-	case "basic":
-		return config.ValidationLevelBasic
-	case "comprehensive":
-		return config.ValidationLevelComprehensive
-	case "strict":
-		return config.ValidationLevelStrict
-	default:
-		return config.ValidationLevelBasic // Safe default
-	}
+	return commands.ParseValidationLevel(level)
 }
 
 func init() {

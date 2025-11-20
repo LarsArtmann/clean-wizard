@@ -9,6 +9,136 @@
 	}
 </style>
 <h1>#1 found 2 clones</h1>
+<h2>internal/config/validation_middleware_analysis.go:16</h2>
+<pre>if current.SafetyLevel != proposed.SafetyLevel {
+	changes = append(changes, ConfigChange{
+		Field:     "safe_mode",
+		OldValue:  current.SafetyLevel,
+		NewValue:  proposed.SafetyLevel,
+		Operation: vm.getChangeOperation(current.SafetyLevel, proposed.SafetyLevel),
+		Risk:      vm.assessChangeRisk("safe_mode", current.SafetyLevel, proposed.SafetyLevel),
+	})
+}</pre>
+<h2>internal/config/validation_middleware_analysis.go:26</h2>
+<pre>if current.MaxDiskUsage != proposed.MaxDiskUsage {
+	changes = append(changes, ConfigChange{
+		Field:     "max_disk_usage",
+		OldValue:  current.MaxDiskUsage,
+		NewValue:  proposed.MaxDiskUsage,
+		Operation: vm.getChangeOperation(current.MaxDiskUsage, proposed.MaxDiskUsage),
+		Risk:      vm.assessChangeRisk("max_disk_usage", current.MaxDiskUsage, proposed.MaxDiskUsage),
+	})
+}</pre>
+<h1>#2 found 6 clones</h1>
+<h2>internal/domain/type_safe_enums.go:110</h2>
+<pre>var riskLevelHelper = NewEnumHelper(map[RiskLevelType]string{
+	RiskLevelLowType:      "LOW",
+	RiskLevelMediumType:   "MEDIUM",
+	RiskLevelHighType:     "HIGH",
+	RiskLevelCriticalType: "CRITICAL",
+}, func(rl RiskLevelType) bool {
+	return rl >= RiskLevelLowType && rl <= RiskLevelCriticalType
+}, func() []RiskLevelType {
+	return []RiskLevelType{
+		RiskLevelLowType,
+		RiskLevelMediumType,
+		RiskLevelHighType,
+		RiskLevelCriticalType,
+	}
+}, true)</pre>
+<h2>internal/domain/type_safe_enums.go:228</h2>
+<pre>var validationLevelHelper = NewEnumHelper(map[ValidationLevelType]string{
+	ValidationLevelNoneType:          "NONE",
+	ValidationLevelBasicType:         "BASIC",
+	ValidationLevelComprehensiveType: "COMPREHENSIVE",
+	ValidationLevelStrictType:        "STRICT",
+}, func(vl ValidationLevelType) bool {
+	return vl >= ValidationLevelNoneType && vl <= ValidationLevelStrictType
+}, func() []ValidationLevelType {
+	return []ValidationLevelType{
+		ValidationLevelNoneType,
+		ValidationLevelBasicType,
+		ValidationLevelComprehensiveType,
+		ValidationLevelStrictType,
+	}
+}, true)</pre>
+<h2>internal/domain/type_safe_enums.go:395</h2>
+<pre>var scanTypeHelper = NewEnumHelper(map[ScanTypeType]string{
+	ScanTypeNixStoreType: "nix_store",
+	ScanTypeHomebrewType: "homebrew",
+	ScanTypeSystemType:   "system",
+	ScanTypeTempType:     "temp_files",
+}, func(st ScanTypeType) bool {
+	return st >= ScanTypeNixStoreType && st <= ScanTypeTempType
+}, func() []ScanTypeType {
+	return []ScanTypeType{
+		ScanTypeNixStoreType,
+		ScanTypeHomebrewType,
+		ScanTypeSystemType,
+		ScanTypeTempType,
+	}
+}, false)</pre>
+<h2>internal/domain/type_safe_enums.go:474</h2>
+<pre>var enforcementLevelTypeHelper = NewEnumHelper(map[EnforcementLevelType]string{
+	EnforcementLevelNone:    "none",
+	EnforcementLevelWarning: "warning",
+	EnforcementLevelError:   "error",
+	EnforcementLevelStrict:  "strict",
+}, func(el EnforcementLevelType) bool {
+	return el >= EnforcementLevelNone && el <= EnforcementLevelStrict
+}, func() []EnforcementLevelType {
+	return []EnforcementLevelType{EnforcementLevelNone, EnforcementLevelWarning, EnforcementLevelError, EnforcementLevelStrict}
+}, false)</pre>
+<h2>internal/domain/type_safe_enums.go:587</h2>
+<pre>var recursionLevelTypeHelper = NewEnumHelper(map[RecursionLevelType]string{
+	RecursionLevelNone:     "none",
+	RecursionLevelDirect:   "direct",
+	RecursionLevelFull:     "full",
+	RecursionLevelInfinite: "infinite",
+}, func(rl RecursionLevelType) bool {
+	return rl >= RecursionLevelNone && rl <= RecursionLevelInfinite
+}, func() []RecursionLevelType {
+	return []RecursionLevelType{RecursionLevelNone, RecursionLevelDirect, RecursionLevelFull, RecursionLevelInfinite}
+}, false)</pre>
+<h2>internal/domain/type_safe_enums.go:772</h2>
+<pre>var safetyLevelTypeHelper = NewEnumHelper(map[SafetyLevelType]string{
+	SafetyLevelDisabled: "disabled",
+	SafetyLevelEnabled:  "enabled",
+	SafetyLevelStrict:   "strict",
+	SafetyLevelParanoid: "paranoid",
+}, func(sl SafetyLevelType) bool {
+	return sl >= SafetyLevelDisabled && sl <= SafetyLevelParanoid
+}, func() []SafetyLevelType {
+	return []SafetyLevelType{SafetyLevelDisabled, SafetyLevelEnabled, SafetyLevelStrict, SafetyLevelParanoid}
+}, false)</pre>
+<h1>#3 found 2 clones</h1>
+<h2>tests/bdd/nix_bdd_test.go:255</h2>
+<pre>func (ctx *BDDTestContext) shouldSeeEstimatedSpace() error {
+	if ctx.cleanResult.IsErr() {
+		return ctx.cleanResult.Error()
+	}
+
+	result := ctx.cleanResult.Value()
+	if result.FreedBytes <= 0 {
+		return fmt.Errorf("expected positive estimated space but got: %d", result.FreedBytes)
+	}
+
+	return nil
+}</pre>
+<h2>tests/bdd/nix_bdd_test.go:268</h2>
+<pre>func (ctx *BDDTestContext) shouldSeeGenerationsCount() error {
+	if ctx.cleanResult.IsErr() {
+		return ctx.cleanResult.Error()
+	}
+
+	result := ctx.cleanResult.Value()
+	if result.ItemsRemoved < 0 {
+		return fmt.Errorf("expected non-negative item count but got: %d", result.ItemsRemoved)
+	}
+
+	return nil
+}</pre>
+<h1>#4 found 2 clones</h1>
 <h2>internal/config/bdd_nix_validation_test.go:242</h2>
 <pre>{
 	Name:        "Invalid Nix generations below minimum",
@@ -49,7 +179,7 @@
 	},
 	Then: thenValidationFailsWithError("generations constraint"),
 }</pre>
-<h1>#2 found 2 clones</h1>
+<h1>#5 found 2 clones</h1>
 <h2>internal/config/test_data.go:38</h2>
 <pre>           {
 	baseConfig.Version = "  1.0.0  "
@@ -90,7 +220,7 @@
 		},
 	}
 }</pre>
-<h1>#3 found 2 clones</h1>
+<h1>#6 found 2 clones</h1>
 <h2>internal/errors/errors_test.go:119</h2>
 <pre>t.Run("File not found", func(t *testing.T) {
 	err := &os.PathError{Err: os.ErrNotExist, Path: "/tmp/missing"}
@@ -115,7 +245,76 @@
 	assert.Contains(t, cwErr.Message, "/tmp/protected")
 	assert.Equal(t, err, cwErr.Cause)
 })</pre>
-<h1>#4 found 2 clones</h1>
+<h1>#7 found 6 clones</h1>
+<h2>internal/domain/type_safe_enums.go:286</h2>
+<pre>var changeOperationHelper = NewEnumHelper(map[ChangeOperationType]string{
+	ChangeOperationAddedType:    "ADDED",
+	ChangeOperationRemovedType:  "REMOVED",
+	ChangeOperationModifiedType: "MODIFIED",
+}, func(co ChangeOperationType) bool {
+	return co >= ChangeOperationAddedType && co <= ChangeOperationModifiedType
+}, func() []ChangeOperationType {
+	return []ChangeOperationType{
+		ChangeOperationAddedType,
+		ChangeOperationRemovedType,
+		ChangeOperationModifiedType,
+	}
+}, true)</pre>
+<h2>internal/domain/type_safe_enums.go:340</h2>
+<pre>var cleanStrategyHelper = NewEnumHelper(map[CleanStrategyType]string{
+	StrategyAggressiveType:   "aggressive",
+	StrategyConservativeType: "conservative",
+	StrategyDryRunType:       "dry-run",
+}, func(cs CleanStrategyType) bool {
+	return cs >= StrategyAggressiveType && cs <= StrategyDryRunType
+}, func() []CleanStrategyType {
+	return []CleanStrategyType{
+		StrategyAggressiveType,
+		StrategyConservativeType,
+		StrategyDryRunType,
+	}
+}, false)</pre>
+<h2>internal/domain/type_safe_enums.go:422</h2>
+<pre>var statusTypeHelper = NewEnumHelper(map[StatusType]string{
+	StatusDisabled:  "disabled",
+	StatusEnabled:   "enabled",
+	StatusInherited: "inherited",
+}, func(s StatusType) bool {
+	return s >= StatusDisabled && s <= StatusInherited
+}, func() []StatusType {
+	return []StatusType{StatusDisabled, StatusEnabled, StatusInherited}
+}, false)</pre>
+<h2>internal/domain/type_safe_enums.go:526</h2>
+<pre>var selectedStatusTypeHelper = NewEnumHelper(map[SelectedStatusType]string{
+	SelectedStatusNotSelected: "not_selected",
+	SelectedStatusSelected:    "selected",
+	SelectedStatusDefault:     "default",
+}, func(ss SelectedStatusType) bool {
+	return ss >= SelectedStatusNotSelected && ss <= SelectedStatusDefault
+}, func() []SelectedStatusType {
+	return []SelectedStatusType{SelectedStatusNotSelected, SelectedStatusSelected, SelectedStatusDefault}
+}, false)</pre>
+<h2>internal/domain/type_safe_enums.go:639</h2>
+<pre>var optimizationLevelTypeHelper = NewEnumHelper(map[OptimizationLevelType]string{
+	OptimizationLevelNone:         "none",
+	OptimizationLevelConservative: "conservative",
+	OptimizationLevelAggressive:   "aggressive",
+}, func(ol OptimizationLevelType) bool {
+	return ol >= OptimizationLevelNone && ol <= OptimizationLevelAggressive
+}, func() []OptimizationLevelType {
+	return []OptimizationLevelType{OptimizationLevelNone, OptimizationLevelConservative, OptimizationLevelAggressive}
+}, false)</pre>
+<h2>internal/domain/type_safe_enums.go:690</h2>
+<pre>var fileSelectionStrategyTypeHelper = NewEnumHelper(map[FileSelectionStrategyType]string{
+	FileSelectionStrategyAll:        "all",
+	FileSelectionStrategyUnusedOnly: "unused_only",
+	FileSelectionStrategyManual:     "manual",
+}, func(fss FileSelectionStrategyType) bool {
+	return fss >= FileSelectionStrategyAll && fss <= FileSelectionStrategyManual
+}, func() []FileSelectionStrategyType {
+	return []FileSelectionStrategyType{FileSelectionStrategyAll, FileSelectionStrategyUnusedOnly, FileSelectionStrategyManual}
+}, false)</pre>
+<h1>#8 found 2 clones</h1>
 <h2>internal/config/config.go:165</h2>
 <pre>func createDailyProfile() *domain.Profile {
 	return &domain.Profile{
@@ -164,7 +363,53 @@
 		Status: domain.StatusEnabled,
 	}
 }</pre>
-<h1>#5 found 3 clones</h1>
+<h1>#9 found 5 clones</h1>
+<h2>internal/config/semver_validation_test.go:33</h2>
+<pre>for _, tt := range tests {
+	t.Run(tt.name, func(t *testing.T) {
+		result := isValidSemver(tt.version)
+		if result != tt.expected {
+			t.Errorf("isValidSemver(%q) = %v, want %v", tt.version, result, tt.expected)
+		}
+	})
+}</pre>
+<h2>internal/format/format_test.go:25</h2>
+<pre>for _, tt := range tests {
+	t.Run(tt.name, func(t *testing.T) {
+		result := Size(tt.bytes)
+		if result != tt.expected {
+			t.Errorf("Size(%d) = %v, want %v", tt.bytes, result, tt.expected)
+		}
+	})
+}</pre>
+<h2>internal/format/format_test.go:50</h2>
+<pre>for _, tt := range tests {
+	t.Run(tt.name, func(t *testing.T) {
+		result := Duration(tt.duration)
+		if result != tt.expected {
+			t.Errorf("Duration(%v) = %v, want %v", tt.duration, result, tt.expected)
+		}
+	})
+}</pre>
+<h2>internal/format/format_test.go:71</h2>
+<pre>for _, tt := range tests {
+	t.Run(tt.name, func(t *testing.T) {
+		result := Date(tt.t)
+		if result != tt.expected {
+			t.Errorf("Date(%v) = %v, want %v", tt.t, result, tt.expected)
+		}
+	})
+}</pre>
+<h2>internal/format/format_test.go:128</h2>
+<pre>for _, tt := range tests {
+	t.Run(tt.name, func(t *testing.T) {
+		result := Number(tt.n)
+		if result != tt.expected {
+			t.Errorf("Number(%d) = %v, want %v", tt.n, result, tt.expected)
+		}
+	})
+}</pre>
+<h1>#10 found 3 clones</h1>
 <h2>internal/config/type_safe_validation_rules_test.go:127</h2>
 <pre>if original.MaxDiskUsage != nil && copied.MaxDiskUsage != nil {
 	if original.MaxDiskUsage.Required == copied.MaxDiskUsage.Required {
@@ -210,7 +455,7 @@
 		t.Error("FAILED: modified copied.MaxProfiles.Message affected original")
 	}
 }</pre>
-<h1>#6 found 2 clones</h1>
+<h1>#11 found 2 clones</h1>
 <h2>internal/api/mapper_test.go:324</h2>
 <pre>for _, tc := range testCases {
 	t.Run(string(tc.public), func(t *testing.T) {
@@ -251,7 +496,7 @@
 		}
 	})
 }</pre>
-<h1>#7 found 2 clones</h1>
+<h1>#12 found 2 clones</h1>
 <h2>internal/errors/errors_test.go:167</h2>
 <pre>func TestConfigErrorAdapter(t *testing.T) {
 	adapter := &ConfigErrorAdapter{}
@@ -280,7 +525,7 @@
 	assert.Contains(t, cwErr.Message, "email field")
 	assert.Equal(t, originalErr, cwErr.Cause)
 }</pre>
-<h1>#8 found 2 clones</h1>
+<h1>#13 found 2 clones</h1>
 <h2>tests/bdd/nix_operations_test.go:373</h2>
 <pre>t.Run("Happy Path Nix Cleanup", func(t *testing.T) {
 	err := ctx.GivenValidNixInstallation()
@@ -309,7 +554,7 @@
 	err = ctx.AndReportErrorDetails()
 	require.NoError(t, err)
 })</pre>
-<h1>#9 found 2 clones</h1>
+<h1>#14 found 2 clones</h1>
 <h2>internal/config/test_data.go:313</h2>
 <pre>       &domain.Profile{
 	Name:        "Weekly Cleanup",
@@ -350,7 +595,32 @@
 	},
 	Status: domain.StatusEnabled,
 }</pre>
-<h1>#10 found 4 clones</h1>
+<h1>#15 found 2 clones</h1>
+<h2>internal/format/format_test.go:61</h2>
+<pre>tests := []struct {
+	name     string
+	t        time.Time
+	expected string
+}{
+	{"valid date", time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC), "2023-12-25"},
+	{"zero time", time.Time{}, "never"},
+	{"unix epoch", time.Unix(0, 0), "1970-01-01"},
+}</pre>
+<h2>internal/format/format_test.go:82</h2>
+<pre>tests := []struct {
+	name     string
+	t        time.Time
+	expected string
+}{
+	{
+		"valid datetime",
+		time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC),
+		"2023-12-25 15:30:45", // Note: depends on local timezone
+	},
+	{"zero time", time.Time{}, "never"},
+	{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
+}</pre>
+<h1>#16 found 4 clones</h1>
 <h2>internal/domain/enum_helper_test.go:47</h2>
 <pre>func TestValidationLevelType_Helper(t *testing.T) {
 	// Test String()
@@ -443,49 +713,105 @@
 		t.Errorf("ScanTypeType.Values() = %d, want 4", len(values))
 	}
 }</pre>
-<h1>#11 found 2 clones</h1>
-<h2>internal/errors/adapters.go:10</h2>
-<pre>func isConfigurationError(err error) bool {
-	if err == nil {
-		return false
-	}
+<h1>#17 found 2 clones</h1>
+<h2>internal/errors/errors_test.go:292</h2>
+<pre>t.Run("ValidationError", func(t *testing.T) {
+	err := ValidationError("email", "invalid format")
 
-	errStr := err.Error()
-	// Common indicators of configuration errors
-	configIndicators := []string{
-		"config", "configuration", "yaml", "json", "toml",
-		"parse", "invalid", "missing", "required",
-	}
+	require.NotNil(t, err)
+	assert.Equal(t, ErrCodeValidationFailed, err.Code)
+	assert.Contains(t, err.Message, "email")
+	assert.Contains(t, err.Message, "invalid format")
+})</pre>
+<h2>internal/errors/errors_test.go:327</h2>
+<pre>t.Run("SystemError", func(t *testing.T) {
+	err := SystemError("memory", "out of memory")
 
-	lowerErrStr := strings.ToLower(errStr)
-	for _, indicator := range configIndicators {
-		if strings.Contains(lowerErrStr, indicator) {
-			return true
-		}
+	require.NotNil(t, err)
+	assert.Equal(t, ErrCodeProcessFailed, err.Code)
+	assert.Contains(t, err.Message, "memory")
+	assert.Contains(t, err.Message, "out of memory")
+})</pre>
+<h1>#18 found 3 clones</h1>
+<h2>internal/domain/benchmarks_test.go:11</h2>
+<pre>b.Run("RiskLevel", func(b *testing.B) {
+	levels := []RiskLevelType{RiskLow, RiskMedium, RiskHigh, RiskCritical}
+	b.ResetTimer()
+	for i := 0; b.Loop(); i++ {
+		_ = levels[i%len(levels)].String()
 	}
-
-	return false
+})</pre>
+<h2>internal/domain/benchmarks_test.go:27</h2>
+<pre>b.Run("ScanType", func(b *testing.B) {
+	types := []ScanTypeType{ScanTypeNixStoreType, ScanTypeHomebrewType, ScanTypeSystemType, ScanTypeTempType}
+	b.ResetTimer()
+	for i := 0; b.Loop(); i++ {
+		_ = types[i%len(types)].String()
+	}
+})</pre>
+<h2>internal/domain/benchmarks_test.go:38</h2>
+<pre>b.Run("RiskLevel", func(b *testing.B) {
+	levels := []RiskLevelType{RiskLow, RiskMedium, RiskHigh, RiskCritical}
+	b.ResetTimer()
+	for i := 0; b.Loop(); i++ {
+		_ = levels[i%len(levels)].IsValid()
+	}
+})</pre>
+<h1>#19 found 2 clones</h1>
+<h2>internal/config/sanitizer_nix.go:26</h2>
+<pre>                                            {
+	settings.Generations = MinNixGenerations
+	result.Warnings = append(result.Warnings, SanitizationWarning{
+		Field:     fieldName,
+		Original:  original,
+		Sanitized: settings.Generations,
+		Reason:    fmt.Sprintf("Nix generations clamped to minimum %d", MinNixGenerations),
+	})
+	result.addChange(fieldName, original, settings.Generations, "clamped to minimum")
+	changed = true
 }</pre>
-<h2>internal/errors/adapters.go:114</h2>
-<pre>func isValidationError(err error) bool {
-	if err == nil {
-		return false
-	}
-
-	errStr := err.Error()
-	// Strong indicators of validation errors
-	validationIndicators := []string{
-		"validation failed", "validation error", "invalid format",
-		"invalid range", "required field", "constraint violation",
-		"unacceptable value", "validation rule", "invalid value",
-	}
-
-	lowerErrStr := strings.ToLower(errStr)
-	for _, indicator := range validationIndicators {
-		if strings.Contains(lowerErrStr, indicator) {
-			return true
-		}
-	}
-
-	return false
+<h2>internal/config/sanitizer_nix.go:36</h2>
+<pre>                                                   {
+	settings.Generations = MaxNixGenerations
+	result.Warnings = append(result.Warnings, SanitizationWarning{
+		Field:     fieldName,
+		Original:  original,
+		Sanitized: settings.Generations,
+		Reason:    fmt.Sprintf("Nix generations clamped to maximum %d", MaxNixGenerations),
+	})
+	result.addChange(fieldName, original, settings.Generations, "clamped to maximum")
+	changed = true
 }</pre>
+<h1>#20 found 2 clones</h1>
+<h2>internal/domain/benchmarks_test.go:11</h2>
+<pre>b.Run("RiskLevel", func(b *testing.B) {
+	levels := []RiskLevelType{RiskLow, RiskMedium, RiskHigh, RiskCritical}
+	b.ResetTimer()
+	for i := 0; b.Loop(); i++ {
+		_ = levels[i%len(levels)].String()
+	}
+})
+
+b.Run("CleanStrategy", func(b *testing.B) {
+	strategies := []CleanStrategyType{StrategyAggressive, StrategyConservative, StrategyDryRun}
+	b.ResetTimer()
+	for i := 0; b.Loop(); i++ {
+		_ = strategies[i%len(strategies)].String()
+	}
+})</pre>
+<h2>internal/domain/benchmarks_test.go:38</h2>
+<pre>b.Run("RiskLevel", func(b *testing.B) {
+	levels := []RiskLevelType{RiskLow, RiskMedium, RiskHigh, RiskCritical}
+	b.ResetTimer()
+	for i := 0; b.Loop(); i++ {
+		_ = levels[i%len(levels)].IsValid()
+	}
+})
+
+b.Run("CleanStrategy", func(b *testing.B) {
+	strategies := []CleanStrategyType{StrategyAggressive, StrategyConservative, StrategyDryRun}
+	b.ResetTimer()
+	for i := 0; b.Loop(); i++ {
+		_ = strategies[i%len(strategies)].IsValid()
+	}
+})</pre>

@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2025-11-20T21:13:41.798Z",
+    "detectionDate": "2025-11-20T21:28:17.673Z",
     "formats": {
       "css": {
         "sources": {
@@ -124,23 +124,23 @@
             "lines": 186,
             "tokens": 1394,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 11,
-            "duplicatedTokens": 107,
-            "percentage": 5.91,
-            "percentageTokens": 7.68,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "cmd/clean-wizard/commands/util.go": {
-            "lines": 29,
-            "tokens": 160,
-            "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
             "duplicatedTokens": 0,
             "percentage": 0,
             "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/util.go": {
+            "lines": 64,
+            "tokens": 446,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 15,
+            "duplicatedTokens": 95,
+            "percentage": 23.44,
+            "percentageTokens": 21.3,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -169,14 +169,14 @@
             "newClones": 0
           },
           "cmd/clean-wizard/commands/clean.go": {
-            "lines": 197,
-            "tokens": 1502,
+            "lines": 183,
+            "tokens": 1340,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 11,
-            "duplicatedTokens": 107,
-            "percentage": 5.58,
-            "percentageTokens": 7.12,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -364,11 +364,11 @@
             "lines": 174,
             "tokens": 1329,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 22,
+            "duplicatedTokens": 158,
+            "percentage": 12.64,
+            "percentageTokens": 11.89,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -421,8 +421,8 @@
             "newClones": 0
           },
           "internal/errors/adapters.go": {
-            "lines": 259,
-            "tokens": 1718,
+            "lines": 249,
+            "tokens": 1668,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -496,11 +496,11 @@
             "lines": 751,
             "tokens": 5514,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 24,
+            "duplicatedTokens": 182,
+            "percentage": 3.2,
+            "percentageTokens": 3.3,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -796,11 +796,11 @@
             "lines": 182,
             "tokens": 1206,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 20,
+            "duplicatedTokens": 98,
+            "percentage": 10.99,
+            "percentageTokens": 8.13,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -844,11 +844,11 @@
             "lines": 139,
             "tokens": 869,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 20,
+            "duplicatedTokens": 98,
+            "percentage": 14.39,
+            "percentageTokens": 11.28,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1144,11 +1144,11 @@
             "lines": 299,
             "tokens": 2296,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 22,
+            "duplicatedTokens": 166,
+            "percentage": 7.36,
+            "percentageTokens": 7.23,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1240,11 +1240,11 @@
             "lines": 100,
             "tokens": 905,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 11,
+            "duplicatedTokens": 93,
+            "percentage": 11,
+            "percentageTokens": 10.28,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1336,11 +1336,11 @@
             "lines": 444,
             "tokens": 3559,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 15,
-            "duplicatedTokens": 101,
-            "percentage": 3.38,
-            "percentageTokens": 2.84,
+            "clones": 2,
+            "duplicatedLines": 26,
+            "duplicatedTokens": 194,
+            "percentage": 5.86,
+            "percentageTokens": 5.45,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1348,24 +1348,24 @@
             "lines": 101,
             "tokens": 709,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 15,
+            "duplicatedTokens": 95,
+            "percentage": 14.85,
+            "percentageTokens": 13.4,
             "newDuplicatedLines": 0,
             "newClones": 0
           }
         },
         "total": {
-          "lines": 17112,
-          "tokens": 125224,
+          "lines": 17123,
+          "tokens": 125298,
           "sources": 108,
-          "clones": 7,
-          "duplicatedLines": 81,
-          "duplicatedTokens": 737,
-          "percentage": 0.47,
-          "percentageTokens": 0.59,
+          "clones": 12,
+          "duplicatedLines": 150,
+          "duplicatedTokens": 1169,
+          "percentage": 0.88,
+          "percentageTokens": 0.93,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -1437,8 +1437,8 @@
       "markup": {
         "sources": {
           "reports/html/index.html": {
-            "lines": 89,
-            "tokens": 3696,
+            "lines": 78,
+            "tokens": 3427,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -1449,8 +1449,8 @@
             "newClones": 0
           },
           "reports/go-duplications.html": {
-            "lines": 490,
-            "tokens": 3494,
+            "lines": 816,
+            "tokens": 6063,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -1462,8 +1462,8 @@
           }
         },
         "total": {
-          "lines": 579,
-          "tokens": 7190,
+          "lines": 894,
+          "tokens": 9490,
           "sources": 2,
           "clones": 0,
           "duplicatedLines": 0,
@@ -2385,8 +2385,8 @@
             "newClones": 0
           },
           "reports/go-duplications.txt": {
-            "lines": 39,
-            "tokens": 214,
+            "lines": 78,
+            "tokens": 416,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -2602,8 +2602,8 @@
           }
         },
         "total": {
-          "lines": 18958,
-          "tokens": 167387,
+          "lines": 18997,
+          "tokens": 167589,
           "sources": 80,
           "clones": 0,
           "duplicatedLines": 0,
@@ -2656,55 +2656,19 @@
       }
     },
     "total": {
-      "lines": 37431,
-      "tokens": 310273,
+      "lines": 37796,
+      "tokens": 312849,
       "sources": 209,
-      "clones": 7,
-      "duplicatedLines": 81,
-      "duplicatedTokens": 737,
-      "percentage": 0.22,
-      "percentageTokens": 0.24,
+      "clones": 12,
+      "duplicatedLines": 150,
+      "duplicatedTokens": 1169,
+      "percentage": 0.4,
+      "percentageTokens": 0.37,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
   },
   "duplicates": [
-    {
-      "format": "go",
-      "lines": 12,
-      "fragment": "if loadedCfg != nil && profileName != \"\" {\n\t\t\t\tprofile, exists := loadedCfg.Profiles[profileName]\n\t\t\t\tif !exists {\n\t\t\t\t\treturn fmt.Errorf(\"profile '%s' not found in configuration\", profileName)\n\t\t\t\t}\n\n\t\t\t\tif profile.Status == domain.StatusDisabled {\n\t\t\t\t\treturn fmt.Errorf(\"profile '%s' is disabled\", profileName)\n\t\t\t\t}\n\n\t\t\t\tfmt.Printf(\"🏷️  Using profile: %s (%s)\\n\", profileName, profile.Description)\n\t\t\t\tusedProfile",
-      "tokens": 0,
-      "firstFile": {
-        "name": "cmd/clean-wizard/commands/clean.go",
-        "start": 73,
-        "end": 84,
-        "startLoc": {
-          "line": 73,
-          "column": 4,
-          "position": 460
-        },
-        "endLoc": {
-          "line": 84,
-          "column": 12,
-          "position": 567
-        }
-      },
-      "secondFile": {
-        "name": "cmd/clean-wizard/commands/scan.go",
-        "start": 74,
-        "end": 85,
-        "startLoc": {
-          "line": 74,
-          "column": 4,
-          "position": 478
-        },
-        "endLoc": {
-          "line": 85,
-          "column": 2,
-          "position": 585
-        }
-      }
-    },
     {
       "format": "go",
       "lines": 6,
@@ -2779,6 +2743,78 @@
     },
     {
       "format": "go",
+      "lines": 12,
+      "fragment": "cleanResult := domain.CleanResult{\n\t\tFreedBytes:   uint64(estimatedBytes),\n\t\tItemsRemoved: uint(toRemove),\n\t\tItemsFailed:  0,\n\t\tCleanTime:    0,\n\t\tCleanedAt:    time.Now(),\n\t\tStrategy:     domain.StrategyDryRun,\n\t}\n\treturn result.Ok(cleanResult)\n}\n\n// countOldGenerations counts generations to remove (keeping current + N others)",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/cleaner/nix.go",
+        "start": 158,
+        "end": 169,
+        "startLoc": {
+          "line": 158,
+          "column": 2,
+          "position": 1192
+        },
+        "endLoc": {
+          "line": 169,
+          "column": 81,
+          "position": 1271
+        }
+      },
+      "secondFile": {
+        "name": "internal/cleaner/nix.go",
+        "start": 95,
+        "end": 106,
+        "startLoc": {
+          "line": 95,
+          "column": 3,
+          "position": 671
+        },
+        "endLoc": {
+          "line": 106,
+          "column": 32,
+          "position": 752
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 13,
+      "fragment": "PublicConfig{\n\t\tVersion:        \"1.0.0\",\n\t\tSafeMode:       true,\n\t\tMaxDiskUsage:   80,\n\t\tProtectedPaths: []string{\"/System\"},\n\t\tProfiles: map[string]*PublicProfile{\n\t\t\t\"test\": {\n\t\t\t\tName:        \"test\",\n\t\t\t\tDescription: \"Test profile\",\n\t\t\t\tEnabled:     true,\n\t\t\t\tOperations: []PublicOperation{\n\t\t\t\t\t{\n\t\t\t\t\t\tName:        \"test-op\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 404,
+        "end": 416,
+        "startLoc": {
+          "line": 404,
+          "column": 2,
+          "position": 3037
+        },
+        "endLoc": {
+          "line": 416,
+          "column": 10,
+          "position": 3128
+        }
+      },
+      "secondFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 244,
+        "end": 256,
+        "startLoc": {
+          "line": 244,
+          "column": 2,
+          "position": 1819
+        },
+        "endLoc": {
+          "line": 256,
+          "column": 13,
+          "position": 1910
+        }
+      }
+    },
+    {
+      "format": "go",
       "lines": 10,
       "fragment": "(version string, maxDiskUsage int, protected []string) *domain.Config {\n\treturn &domain.Config{\n\t\tVersion:      version,\n\t\tSafetyLevel:  domain.SafetyLevelEnabled,\n\t\tMaxDiskUsage: maxDiskUsage,\n\t\tProtected:    protected,\n\t\tProfiles: map[string]*domain.Profile{\n\t\t\t\"daily\": createStandardProfile(),\n\t\t},\n\t}",
       "tokens": 0,
@@ -2810,6 +2846,42 @@
           "line": 106,
           "column": 10,
           "position": 689
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 21,
+      "fragment": ",\n\t\t},\n\t\tUniquePaths:    true,\n\t\tUniqueProfiles: true,\n\t\tProtectedSystemPaths: []string{\n\t\t\t\"/\",\n\t\t\t\"/System\",\n\t\t\t\"/Applications\",\n\t\t\t\"/Library\",\n\t\t\t\"/usr\",\n\t\t\t\"/etc\",\n\t\t\t\"/var\",\n\t\t\t\"/bin\",\n\t\t\t\"/sbin\",\n\t\t},\n\t\tDefaultProtectedPaths: []string{\n\t\t\t\"/System\",\n\t\t\t\"/Applications\",\n\t\t\t\"/Library\",\n\t\t},\n\t\tRequireSafeMode: domain",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/validator_rules.go",
+        "start": 116,
+        "end": 136,
+        "startLoc": {
+          "line": 116,
+          "column": 66,
+          "position": 745
+        },
+        "endLoc": {
+          "line": 136,
+          "column": 7,
+          "position": 843
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/type_safe_validation_rules.go",
+        "start": 87,
+        "end": 107,
+        "startLoc": {
+          "line": 87,
+          "column": 45,
+          "position": 492
+        },
+        "endLoc": {
+          "line": 107,
+          "column": 5,
+          "position": 590
         }
       }
     },
@@ -2851,6 +2923,42 @@
     },
     {
       "format": "go",
+      "lines": 12,
+      "fragment": ",\n\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\tSettings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\tName:        \"homebrew-cleanup\",\n\t\t\t\t\t\tDescription: \"Clean old Homebrew packages\",\n\t\t\t\t\t\tRiskLevel:   domain.RiskMedium,\n\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\tSettings:    domain.DefaultSettings(domain.OperationTypeHomebrew),\n\t\t\t\t\t},\n\t\t\t\t\t{",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/config.go",
+        "start": 237,
+        "end": 248,
+        "startLoc": {
+          "line": 237,
+          "column": 13,
+          "position": 1789
+        },
+        "endLoc": {
+          "line": 248,
+          "column": 2,
+          "position": 1872
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/config.go",
+        "start": 198,
+        "end": 209,
+        "startLoc": {
+          "line": 198,
+          "column": 9,
+          "position": 1517
+        },
+        "endLoc": {
+          "line": 209,
+          "column": 2,
+          "position": 1600
+        }
+      }
+    },
+    {
+      "format": "go",
       "lines": 19,
       "fragment": ",\n\t\t},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tdefer func() {\n\t\t\t\tif r := recover(); r != nil {\n\t\t\t\t\tif !tt.wantPanic {\n\t\t\t\t\t\tt.Errorf(\"unexpected panic: %v\", r)\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tif tt.wantPanic {\n\t\t\t\t\t\tt.Error(\"expected panic but got none\")\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}()\n\n\t\t\terr",
       "tokens": 0,
@@ -2887,6 +2995,42 @@
     },
     {
       "format": "go",
+      "lines": 12,
+      "fragment": "type mockCleaner struct{}\n\nfunc (m *mockCleaner) IsAvailable(ctx context.Context) bool {\n\treturn true\n}\n\nfunc (m *mockCleaner) GetStoreSize(ctx context.Context) int64 {\n\treturn 1000\n}\n\nfunc (m *mockCleaner) ValidateSettings(settings *domain.OperationSettings) error {\n\treturn",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/bdd/nix_operations_test.go",
+        "start": 18,
+        "end": 29,
+        "startLoc": {
+          "line": 18,
+          "column": 1,
+          "position": 43
+        },
+        "endLoc": {
+          "line": 29,
+          "column": 7,
+          "position": 136
+        }
+      },
+      "secondFile": {
+        "name": "internal/middleware/validation_test.go",
+        "start": 86,
+        "end": 97,
+        "startLoc": {
+          "line": 86,
+          "column": 1,
+          "position": 755
+        },
+        "endLoc": {
+          "line": 97,
+          "column": 3,
+          "position": 848
+        }
+      }
+    },
+    {
+      "format": "go",
       "lines": 16,
       "fragment": ",\n\t\tOperations: []domain.CleanupOperation{\n\t\t\t{\n\t\t\t\tName:        \"nix-generations\",\n\t\t\t\tDescription: \"Clean old Nix generations\",\n\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\tSettings: &domain.OperationSettings{\n\t\t\t\t\tNixGenerations: &domain.NixGenerationsSettings{\n\t\t\t\t\t\tGenerations:  3,\n\t\t\t\t\t\tOptimization: domain.OptimizationLevelConservative,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t\tStatus",
       "tokens": 0,
@@ -2918,6 +3062,42 @@
           "line": 103,
           "column": 2,
           "position": 675
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 16,
+      "fragment": "(level string) config.ValidationLevel {\n\tswitch strings.ToLower(level) {\n\tcase \"none\":\n\t\treturn config.ValidationLevelNone\n\tcase \"basic\":\n\t\treturn config.ValidationLevelBasic\n\tcase \"comprehensive\":\n\t\treturn config.ValidationLevelComprehensive\n\tcase \"strict\":\n\t\treturn config.ValidationLevelStrict\n\tdefault:\n\t\treturn config.ValidationLevelBasic // Safe default\n\t}\n}\n\nfunc",
+      "tokens": 0,
+      "firstFile": {
+        "name": "cmd/clean-wizard/main.go",
+        "start": 41,
+        "end": 56,
+        "startLoc": {
+          "line": 41,
+          "column": 21,
+          "position": 205
+        },
+        "endLoc": {
+          "line": 56,
+          "column": 5,
+          "position": 300
+        }
+      },
+      "secondFile": {
+        "name": "cmd/clean-wizard/commands/util.go",
+        "start": 12,
+        "end": 27,
+        "startLoc": {
+          "line": 12,
+          "column": 21,
+          "position": 30
+        },
+        "endLoc": {
+          "line": 27,
+          "column": 86,
+          "position": 125
         }
       }
     }
