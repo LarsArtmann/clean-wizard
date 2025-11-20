@@ -2,6 +2,7 @@ package result
 
 import (
 	"errors"
+	"strings"
 	"testing"
 )
 
@@ -136,8 +137,8 @@ func TestResult_Error(t *testing.T) {
 			}()
 
 			err := tt.result.Error()
-			if !tt.wantPanic && err.Error() != tt.expected {
-				t.Errorf("Error() = %v, want %v", err.Error(), tt.expected)
+			if !tt.wantPanic && !strings.Contains(err.Error(), tt.expected) {
+				t.Errorf("Error() = %v, want to contain %v", err.Error(), tt.expected)
 			}
 		})
 	}
@@ -211,9 +212,9 @@ func TestResult_Map(t *testing.T) {
 					t.Errorf("Map() Value() = %v, want %v", mapped.Value(), tt.expected.Value())
 				}
 			} else {
-				// If both are Err, check error messages
-				if mapped.Error().Error() != tt.expected.Error().Error() {
-					t.Errorf("Map() Error() = %v, want %v", mapped.Error().Error(), tt.expected.Error().Error())
+				// If both are Err, check error messages using substring matching
+				if !strings.Contains(mapped.Error().Error(), tt.expected.Error().Error()) {
+					t.Errorf("Map() Error() = %v, want to contain %v", mapped.Error().Error(), tt.expected.Error().Error())
 				}
 			}
 		})

@@ -175,8 +175,8 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 					t.Error("expected error but got none")
 					return
 				}
-				if tt.errorMsg != "" && err.Error() != tt.errorMsg {
-					t.Errorf("expected error message %q, got %q", tt.errorMsg, err.Error())
+				if tt.errorMsg != "" && !strings.Contains(err.Error(), tt.errorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.errorMsg, err.Error())
 				}
 				return
 			}

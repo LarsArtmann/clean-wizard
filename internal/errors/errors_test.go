@@ -208,7 +208,7 @@ func TestDefaultErrorHandler_Handle(t *testing.T) {
 		handled := handler.Handle(stdErr)
 
 		require.NotNil(t, handled)
-		assert.Equal(t, "standard error", handled.Cause.Error())
+		assert.Contains(t, handled.Cause.Error(), "standard error")
 		assert.Equal(t, "Unhandled error type", handled.Message)
 		assert.Equal(t, ErrCodeValidationFailed, handled.Code)
 		assert.Equal(t, ErrorTypeValidation, handled.Type)

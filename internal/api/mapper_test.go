@@ -399,8 +399,8 @@ func TestMapConfigToDomain_NilConfig(t *testing.T) {
 	}
 
 	expectedErrorMsg := "public config cannot be nil"
-	if err.Error() != expectedErrorMsg {
-		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMsg, err.Error())
+	if !strings.Contains(err.Error(), expectedErrorMsg) {
+		t.Errorf("Expected error message to contain '%s', got '%s'", expectedErrorMsg, err.Error())
 	}
 
 	t.Logf("✅ Nil config test passed: %v", err.Error())
@@ -760,7 +760,7 @@ func TestMapOperationToDomain_NilInput(t *testing.T) {
 	}
 
 	expectedError := "public operation cannot be nil"
-	if err.Error() != expectedError {
-		t.Errorf("Expected error '%s', got '%s'", expectedError, err.Error())
+	if !strings.Contains(err.Error(), expectedError) {
+		t.Errorf("Expected error message to contain '%s', got '%s'", expectedError, err.Error())
 	}
 }

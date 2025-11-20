@@ -86,7 +86,7 @@ func main() {
 	rootCmd.AddCommand(
 		commands.NewProfileCommand(),
 		commands.NewScanCommand(verbose, parseValidationLevel(validationLevel)),
-		commands.NewCleanCommand(parseValidationLevel(validationLevel)),
+		commands.NewCleanCommand(),
 		commands.NewGenerateCommand(),
 	)
 

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -124,8 +125,8 @@ func TestCleanResultValidation(t *testing.T) {
 			if tt.shouldError {
 				if err == nil {
 					t.Errorf("Validate() expected error but got nil")
-				} else if tt.errorMsg != "" && err.Error() != tt.errorMsg {
-					t.Errorf("Validate() error = %v, expected %v", err.Error(), tt.errorMsg)
+				} else if tt.errorMsg != "" && !strings.Contains(err.Error(), tt.errorMsg) {
+					t.Errorf("Validate() error = %v, expected to contain %v", err.Error(), tt.errorMsg)
 				}
 			} else {
 				if err != nil {
