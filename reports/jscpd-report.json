@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2025-11-20T21:28:17.673Z",
+    "detectionDate": "2025-11-20T21:36:36.655Z",
     "formats": {
       "css": {
         "sources": {
@@ -64,11 +64,11 @@
             "lines": 415,
             "tokens": 3329,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 14,
+            "duplicatedTokens": 160,
+            "percentage": 3.37,
+            "percentageTokens": 4.81,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -124,11 +124,11 @@
             "lines": 186,
             "tokens": 1394,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 3,
+            "duplicatedLines": 27,
+            "duplicatedTokens": 205,
+            "percentage": 14.52,
+            "percentageTokens": 14.71,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -136,11 +136,11 @@
             "lines": 64,
             "tokens": 446,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 15,
-            "duplicatedTokens": 95,
-            "percentage": 23.44,
-            "percentageTokens": 21.3,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -148,11 +148,11 @@
             "lines": 291,
             "tokens": 2261,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 4,
+            "duplicatedLines": 30,
+            "duplicatedTokens": 280,
+            "percentage": 10.31,
+            "percentageTokens": 12.38,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -172,11 +172,11 @@
             "lines": 183,
             "tokens": 1340,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 3,
+            "duplicatedLines": 27,
+            "duplicatedTokens": 205,
+            "percentage": 14.75,
+            "percentageTokens": 15.3,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -208,11 +208,11 @@
             "lines": 359,
             "tokens": 2519,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 14,
+            "duplicatedLines": 90,
+            "duplicatedTokens": 812,
+            "percentage": 25.07,
+            "percentageTokens": 32.24,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -412,11 +412,11 @@
             "lines": 223,
             "tokens": 1632,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 7,
+            "duplicatedTokens": 81,
+            "percentage": 3.14,
+            "percentageTokens": 4.96,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -436,11 +436,11 @@
             "lines": 128,
             "tokens": 1128,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 10,
+            "duplicatedTokens": 102,
+            "percentage": 7.81,
+            "percentageTokens": 9.04,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -448,11 +448,11 @@
             "lines": 273,
             "tokens": 1728,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 4,
+            "duplicatedLines": 24,
+            "duplicatedTokens": 258,
+            "percentage": 8.79,
+            "percentageTokens": 14.93,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -460,11 +460,11 @@
             "lines": 407,
             "tokens": 4012,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 7,
+            "duplicatedTokens": 81,
+            "percentage": 1.72,
+            "percentageTokens": 2.02,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -496,11 +496,11 @@
             "lines": 751,
             "tokens": 5514,
             "sources": 1,
-            "clones": 2,
-            "duplicatedLines": 24,
-            "duplicatedTokens": 182,
-            "percentage": 3.2,
-            "percentageTokens": 3.3,
+            "clones": 12,
+            "duplicatedLines": 116,
+            "duplicatedTokens": 808,
+            "percentage": 15.45,
+            "percentageTokens": 14.65,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -520,11 +520,11 @@
             "lines": 135,
             "tokens": 1299,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 5,
+            "duplicatedLines": 25,
+            "duplicatedTokens": 250,
+            "percentage": 18.52,
+            "percentageTokens": 19.25,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -568,11 +568,11 @@
             "lines": 259,
             "tokens": 1789,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 22,
+            "duplicatedTokens": 136,
+            "percentage": 8.49,
+            "percentageTokens": 7.6,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -604,11 +604,11 @@
             "lines": 244,
             "tokens": 2127,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 18,
+            "duplicatedTokens": 140,
+            "percentage": 7.38,
+            "percentageTokens": 6.58,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -640,11 +640,11 @@
             "lines": 397,
             "tokens": 2932,
             "sources": 1,
-            "clones": 2,
-            "duplicatedLines": 18,
-            "duplicatedTokens": 184,
-            "percentage": 4.53,
-            "percentageTokens": 6.28,
+            "clones": 9,
+            "duplicatedLines": 86,
+            "duplicatedTokens": 659,
+            "percentage": 21.66,
+            "percentageTokens": 22.48,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -748,11 +748,11 @@
             "lines": 107,
             "tokens": 812,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 18,
+            "duplicatedTokens": 131,
+            "percentage": 16.82,
+            "percentageTokens": 16.13,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -772,11 +772,11 @@
             "lines": 118,
             "tokens": 892,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 16,
+            "duplicatedTokens": 156,
+            "percentage": 13.56,
+            "percentageTokens": 17.49,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -844,11 +844,11 @@
             "lines": 139,
             "tokens": 869,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 20,
-            "duplicatedTokens": 98,
-            "percentage": 14.39,
-            "percentageTokens": 11.28,
+            "clones": 2,
+            "duplicatedLines": 29,
+            "duplicatedTokens": 163,
+            "percentage": 20.86,
+            "percentageTokens": 18.76,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -892,11 +892,11 @@
             "lines": 100,
             "tokens": 719,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 3,
+            "duplicatedLines": 17,
+            "duplicatedTokens": 175,
+            "percentage": 17,
+            "percentageTokens": 24.34,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -916,11 +916,11 @@
             "lines": 79,
             "tokens": 626,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 7,
+            "duplicatedTokens": 67,
+            "percentage": 8.86,
+            "percentageTokens": 10.7,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -940,11 +940,11 @@
             "lines": 149,
             "tokens": 949,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 17,
+            "duplicatedTokens": 81,
+            "percentage": 11.41,
+            "percentageTokens": 8.54,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -988,11 +988,11 @@
             "lines": 183,
             "tokens": 1454,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 4,
+            "duplicatedLines": 27,
+            "duplicatedTokens": 224,
+            "percentage": 14.75,
+            "percentageTokens": 15.41,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1036,11 +1036,11 @@
             "lines": 89,
             "tokens": 771,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 3,
+            "duplicatedLines": 15,
+            "duplicatedTokens": 162,
+            "percentage": 16.85,
+            "percentageTokens": 21.01,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1048,11 +1048,11 @@
             "lines": 332,
             "tokens": 2407,
             "sources": 1,
-            "clones": 3,
-            "duplicatedLines": 45,
-            "duplicatedTokens": 321,
-            "percentage": 13.55,
-            "percentageTokens": 13.34,
+            "clones": 9,
+            "duplicatedLines": 106,
+            "duplicatedTokens": 752,
+            "percentage": 31.93,
+            "percentageTokens": 31.24,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1060,11 +1060,11 @@
             "lines": 275,
             "tokens": 2156,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 9,
+            "duplicatedLines": 61,
+            "duplicatedTokens": 518,
+            "percentage": 22.18,
+            "percentageTokens": 24.03,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1132,11 +1132,11 @@
             "lines": 35,
             "tokens": 191,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 7,
+            "duplicatedTokens": 73,
+            "percentage": 20,
+            "percentageTokens": 38.22,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1144,11 +1144,11 @@
             "lines": 299,
             "tokens": 2296,
             "sources": 1,
-            "clones": 2,
-            "duplicatedLines": 22,
-            "duplicatedTokens": 166,
-            "percentage": 7.36,
-            "percentageTokens": 7.23,
+            "clones": 3,
+            "duplicatedLines": 29,
+            "duplicatedTokens": 218,
+            "percentage": 9.7,
+            "percentageTokens": 9.49,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1204,11 +1204,11 @@
             "lines": 223,
             "tokens": 1938,
             "sources": 1,
-            "clones": 2,
-            "duplicatedLines": 36,
-            "duplicatedTokens": 276,
-            "percentage": 16.14,
-            "percentageTokens": 14.24,
+            "clones": 1,
+            "duplicatedLines": 18,
+            "duplicatedTokens": 141,
+            "percentage": 8.07,
+            "percentageTokens": 7.28,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1216,11 +1216,11 @@
             "lines": 100,
             "tokens": 643,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 17,
+            "duplicatedTokens": 81,
+            "percentage": 17,
+            "percentageTokens": 12.6,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1240,11 +1240,11 @@
             "lines": 100,
             "tokens": 905,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 11,
-            "duplicatedTokens": 93,
-            "percentage": 11,
-            "percentageTokens": 10.28,
+            "clones": 3,
+            "duplicatedLines": 23,
+            "duplicatedTokens": 187,
+            "percentage": 23,
+            "percentageTokens": 20.66,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1312,11 +1312,11 @@
             "lines": 361,
             "tokens": 2950,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 8,
+            "duplicatedLines": 50,
+            "duplicatedTokens": 458,
+            "percentage": 13.85,
+            "percentageTokens": 15.53,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1345,27 +1345,27 @@
             "newClones": 0
           },
           "cmd/clean-wizard/main.go": {
-            "lines": 101,
-            "tokens": 709,
+            "lines": 90,
+            "tokens": 639,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 15,
-            "duplicatedTokens": 95,
-            "percentage": 14.85,
-            "percentageTokens": 13.4,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
           }
         },
         "total": {
-          "lines": 17123,
-          "tokens": 125298,
+          "lines": 17112,
+          "tokens": 125228,
           "sources": 108,
-          "clones": 12,
-          "duplicatedLines": 150,
-          "duplicatedTokens": 1169,
-          "percentage": 0.88,
-          "percentageTokens": 0.93,
+          "clones": 63,
+          "duplicatedLines": 527,
+          "duplicatedTokens": 4296,
+          "percentage": 3.08,
+          "percentageTokens": 3.43,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -1376,11 +1376,11 @@
             "lines": 58,
             "tokens": 648,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 4,
+            "duplicatedLines": 20,
+            "duplicatedTokens": 292,
+            "percentage": 34.48,
+            "percentageTokens": 45.06,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1425,11 +1425,11 @@
           "lines": 208,
           "tokens": 2127,
           "sources": 4,
-          "clones": 0,
-          "duplicatedLines": 0,
-          "duplicatedTokens": 0,
-          "percentage": 0,
-          "percentageTokens": 0,
+          "clones": 2,
+          "duplicatedLines": 10,
+          "duplicatedTokens": 146,
+          "percentage": 4.81,
+          "percentageTokens": 6.86,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -1437,39 +1437,27 @@
       "markup": {
         "sources": {
           "reports/html/index.html": {
-            "lines": 78,
-            "tokens": 3427,
+            "lines": 318,
+            "tokens": 8836,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
-            "newDuplicatedLines": 0,
-            "newClones": 0
-          },
-          "reports/go-duplications.html": {
-            "lines": 816,
-            "tokens": 6063,
-            "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 22,
+            "duplicatedTokens": 124,
+            "percentage": 6.92,
+            "percentageTokens": 1.4,
             "newDuplicatedLines": 0,
             "newClones": 0
           }
         },
         "total": {
-          "lines": 894,
-          "tokens": 9490,
-          "sources": 2,
-          "clones": 0,
-          "duplicatedLines": 0,
-          "duplicatedTokens": 0,
-          "percentage": 0,
-          "percentageTokens": 0,
+          "lines": 318,
+          "tokens": 8836,
+          "sources": 1,
+          "clones": 1,
+          "duplicatedLines": 11,
+          "duplicatedTokens": 62,
+          "percentage": 3.46,
+          "percentageTokens": 0.7,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -1532,11 +1520,11 @@
             "lines": 22,
             "tokens": 117,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 2,
+            "duplicatedLines": 31,
+            "duplicatedTokens": 161,
+            "percentage": 140.91,
+            "percentageTokens": 137.61,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1544,11 +1532,11 @@
             "lines": 82,
             "tokens": 399,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 12,
+            "duplicatedTokens": 65,
+            "percentage": 14.63,
+            "percentageTokens": 16.29,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1556,11 +1544,11 @@
             "lines": 24,
             "tokens": 127,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 17,
+            "duplicatedTokens": 84,
+            "percentage": 70.83,
+            "percentageTokens": 66.14,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1568,11 +1556,11 @@
             "lines": 15,
             "tokens": 82,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 13,
+            "duplicatedTokens": 72,
+            "percentage": 86.67,
+            "percentageTokens": 87.8,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1580,11 +1568,11 @@
             "lines": 30,
             "tokens": 132,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 12,
+            "duplicatedTokens": 65,
+            "percentage": 40,
+            "percentageTokens": 49.24,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1604,11 +1592,11 @@
             "lines": 15,
             "tokens": 82,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 13,
+            "duplicatedTokens": 72,
+            "percentage": 86.67,
+            "percentageTokens": 87.8,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1616,11 +1604,11 @@
             "lines": 20,
             "tokens": 107,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 14,
+            "duplicatedTokens": 77,
+            "percentage": 70,
+            "percentageTokens": 71.96,
             "newDuplicatedLines": 0,
             "newClones": 0
           }
@@ -1629,11 +1617,11 @@
           "lines": 385,
           "tokens": 2276,
           "sources": 10,
-          "clones": 0,
-          "duplicatedLines": 0,
-          "duplicatedTokens": 0,
-          "percentage": 0,
-          "percentageTokens": 0,
+          "clones": 4,
+          "duplicatedLines": 56,
+          "duplicatedTokens": 298,
+          "percentage": 14.55,
+          "percentageTokens": 13.09,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -1704,11 +1692,11 @@
             "lines": 132,
             "tokens": 1275,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 9,
+            "duplicatedTokens": 63,
+            "percentage": 6.82,
+            "percentageTokens": 4.94,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -2016,11 +2004,11 @@
             "lines": 223,
             "tokens": 2496,
             "sources": 1,
-            "clones": 0,
-            "duplicatedLines": 0,
-            "duplicatedTokens": 0,
-            "percentage": 0,
-            "percentageTokens": 0,
+            "clones": 1,
+            "duplicatedLines": 9,
+            "duplicatedTokens": 63,
+            "percentage": 4.04,
+            "percentageTokens": 2.52,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -2385,8 +2373,8 @@
             "newClones": 0
           },
           "reports/go-duplications.txt": {
-            "lines": 78,
-            "tokens": 416,
+            "lines": 339,
+            "tokens": 1435,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -2602,14 +2590,14 @@
           }
         },
         "total": {
-          "lines": 18997,
-          "tokens": 167589,
+          "lines": 19258,
+          "tokens": 168608,
           "sources": 80,
-          "clones": 0,
-          "duplicatedLines": 0,
-          "duplicatedTokens": 0,
-          "percentage": 0,
-          "percentageTokens": 0,
+          "clones": 1,
+          "duplicatedLines": 9,
+          "duplicatedTokens": 63,
+          "percentage": 0.05,
+          "percentageTokens": 0.04,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -2656,19 +2644,415 @@
       }
     },
     "total": {
-      "lines": 37796,
-      "tokens": 312849,
-      "sources": 209,
-      "clones": 12,
-      "duplicatedLines": 150,
-      "duplicatedTokens": 1169,
-      "percentage": 0.4,
-      "percentageTokens": 0.37,
+      "lines": 37470,
+      "tokens": 313144,
+      "sources": 208,
+      "clones": 71,
+      "duplicatedLines": 613,
+      "duplicatedTokens": 4865,
+      "percentage": 1.64,
+      "percentageTokens": 1.55,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
   },
   "duplicates": [
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "var keys []string\n\t\t\tfor key := range e.Details.Metadata {\n\t\t\t\tkeys = append(keys, key)\n\t\t\t}\n\t\t\tsort.Strings(keys)\n\t\t\tfor _, key := range keys {\n\t\t\t\tvalue := e.Details.Metadata[key]\n\t\t\t\tevent",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/pkg/errors/errors.go",
+        "start": 392,
+        "end": 399,
+        "startLoc": {
+          "line": 392,
+          "column": 4,
+          "position": 3111
+        },
+        "endLoc": {
+          "line": 399,
+          "column": 6,
+          "position": 3191
+        }
+      },
+      "secondFile": {
+        "name": "internal/pkg/errors/errors.go",
+        "start": 165,
+        "end": 172,
+        "startLoc": {
+          "line": 165,
+          "column": 2,
+          "position": 1038
+        },
+        "endLoc": {
+          "line": 172,
+          "column": 8,
+          "position": 1118
+        }
+      }
+    },
+    {
+      "format": "gherkin",
+      "lines": 6,
+      "fragment": "Given the system has configuration\n    And with a \"nix_cleanup\" Nix profile\n    And with dry run mode\n    And the Nix system is available\n    And I list available Nix generations\n    And the system should have exactly",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/bdd/features/nix_generations.feature",
+        "start": 38,
+        "end": 43,
+        "startLoc": {
+          "line": 38,
+          "column": 5,
+          "position": 364
+        },
+        "endLoc": {
+          "line": 43,
+          "column": 8,
+          "position": 435
+        }
+      },
+      "secondFile": {
+        "name": "internal/bdd/features/nix_generations.feature",
+        "start": 26,
+        "end": 31,
+        "startLoc": {
+          "line": 26,
+          "column": 5,
+          "position": 215
+        },
+        "endLoc": {
+          "line": 31,
+          "column": 3,
+          "position": 286
+        }
+      }
+    },
+    {
+      "format": "gherkin",
+      "lines": 6,
+      "fragment": "Given the system has configuration\n    And with a \"nix_cleanup\" Nix profile\n    And with dry run mode\n    And the Nix system is available\n    And I list available Nix generations\n    And the system should have at least 1",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/bdd/features/nix_generations.feature",
+        "start": 50,
+        "end": 55,
+        "startLoc": {
+          "line": 50,
+          "column": 5,
+          "position": 507
+        },
+        "endLoc": {
+          "line": 55,
+          "column": 2,
+          "position": 582
+        }
+      },
+      "secondFile": {
+        "name": "internal/bdd/features/nix_generations.feature",
+        "start": 26,
+        "end": 31,
+        "startLoc": {
+          "line": 26,
+          "column": 5,
+          "position": 215
+        },
+        "endLoc": {
+          "line": 31,
+          "column": 2,
+          "position": 290
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": "(cmd *cobra.Command, args []string) error {\n\tcfg, err := config.Load()\n\tif err != nil {\n\t\treturn fmt.Errorf(\"failed to load configuration: %w\", err)\n\t}\n\n\tvar",
+      "tokens": 0,
+      "firstFile": {
+        "name": "cmd/clean-wizard/commands/profile.go",
+        "start": 170,
+        "end": 176,
+        "startLoc": {
+          "line": 170,
+          "column": 15,
+          "position": 1219
+        },
+        "endLoc": {
+          "line": 176,
+          "column": 4,
+          "position": 1282
+        }
+      },
+      "secondFile": {
+        "name": "cmd/clean-wizard/commands/profile.go",
+        "start": 65,
+        "end": 71,
+        "startLoc": {
+          "line": 65,
+          "column": 15,
+          "position": 333
+        },
+        "endLoc": {
+          "line": 71,
+          "column": 3,
+          "position": 396
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 10,
+      "fragment": "var names []string\n\t\tfor name := range cfg.Profiles {\n\t\t\tnames = append(names, name)\n\t\t}\n\t\tsort.Strings(names)\n\t\treturn fmt.Errorf(\"profile '%s' not found. Available profiles: %s\",\n\t\t\tprofileName, strings.Join(names, \", \"))\n\t}\n\n\tfmt",
+      "tokens": 0,
+      "firstFile": {
+        "name": "cmd/clean-wizard/commands/profile.go",
+        "start": 188,
+        "end": 197,
+        "startLoc": {
+          "line": 188,
+          "column": 3,
+          "position": 1379
+        },
+        "endLoc": {
+          "line": 197,
+          "column": 4,
+          "position": 1456
+        }
+      },
+      "secondFile": {
+        "name": "cmd/clean-wizard/commands/profile.go",
+        "start": 140,
+        "end": 149,
+        "startLoc": {
+          "line": 140,
+          "column": 3,
+          "position": 1006
+        },
+        "endLoc": {
+          "line": 149,
+          "column": 31,
+          "position": 1083
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 10,
+      "fragment": "if configFile != \"\" {\n\t\t\t\tfmt.Printf(\"📄 Loading configuration from %s...\\n\", configFile)\n\n\t\t\t\tvar err error\n\t\t\t\tloadedCfg, err = config.LoadWithContextAndPath(ctx, configFile)\n\t\t\t\tif err != nil {\n\t\t\t\t\treturn fmt.Errorf(\"failed to load configuration: %w\", err)\n\t\t\t\t}\n\n\t\t\t\t// Apply validation based on level",
+      "tokens": 0,
+      "firstFile": {
+        "name": "cmd/clean-wizard/commands/clean.go",
+        "start": 43,
+        "end": 52,
+        "startLoc": {
+          "line": 43,
+          "column": 4,
+          "position": 234
+        },
+        "endLoc": {
+          "line": 52,
+          "column": 35,
+          "position": 310
+        }
+      },
+      "secondFile": {
+        "name": "cmd/clean-wizard/commands/scan.go",
+        "start": 42,
+        "end": 51,
+        "startLoc": {
+          "line": 42,
+          "column": 4,
+          "position": 247
+        },
+        "endLoc": {
+          "line": 51,
+          "column": 2,
+          "position": 323
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": "(loadedCfg, validationLevel); err != nil {\n\t\t\t\t\treturn err\n\t\t\t\t}\n\n\t\t\t\tfmt.Printf(\"✅ Configuration applied: safety_level=%v, profiles=%d\\n\",\n\t\t\t\t\tloadedCfg.SafetyLevel, len(loadedCfg.Profiles))\n\t\t\t} else",
+      "tokens": 0,
+      "firstFile": {
+        "name": "cmd/clean-wizard/commands/clean.go",
+        "start": 53,
+        "end": 59,
+        "startLoc": {
+          "line": 53,
+          "column": 24,
+          "position": 320
+        },
+        "endLoc": {
+          "line": 59,
+          "column": 5,
+          "position": 370
+        }
+      },
+      "secondFile": {
+        "name": "cmd/clean-wizard/commands/scan.go",
+        "start": 65,
+        "end": 73,
+        "startLoc": {
+          "line": 65,
+          "column": 30,
+          "position": 423
+        },
+        "endLoc": {
+          "line": 73,
+          "column": 30,
+          "position": 475
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 13,
+      "fragment": "} else {\n\t\t\t\t// Load default configuration to get profile information\n\t\t\t\tvar err error\n\t\t\t\tloadedCfg, err = config.LoadWithContext(ctx)\n\t\t\t\tif err != nil {\n\t\t\t\t\tfmt.Printf(\"⚠️  Could not load default configuration: %v\\n\", err)\n\t\t\t\t\t// Continue without profile support\n\t\t\t\t} else {\n\t\t\t\t\tfmt.Printf(\"📋 Using configuration from ~/.clean-wizard.yaml\\n\")\n\t\t\t\t}\n\t\t\t}\n\n\t\t// Resolve profile to use",
+      "tokens": 0,
+      "firstFile": {
+        "name": "cmd/clean-wizard/commands/clean.go",
+        "start": 59,
+        "end": 71,
+        "startLoc": {
+          "line": 59,
+          "column": 4,
+          "position": 368
+        },
+        "endLoc": {
+          "line": 71,
+          "column": 26,
+          "position": 447
+        }
+      },
+      "secondFile": {
+        "name": "cmd/clean-wizard/commands/scan.go",
+        "start": 51,
+        "end": 63,
+        "startLoc": {
+          "line": 51,
+          "column": 4,
+          "position": 323
+        },
+        "endLoc": {
+          "line": 63,
+          "column": 52,
+          "position": 402
+        }
+      }
+    },
+    {
+      "format": "markup",
+      "lines": 12,
+      "fragment": ",\n\t\t\t\t\tDescription: &quot;Daily cleanup&quot;,\n\t\t\t\t\tOperations: []domain.CleanupOperation{\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tName:        &quot;nix-generations&quot;,\n\t\t\t\t\t\t\tDescription: &quot;Clean Nix generations&quot;,\n\t\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t\tStatus: domain.StatusEnabled,\n\t\t\t\t},",
+      "tokens": 0,
+      "firstFile": {
+        "name": "reports/html/index.html",
+        "start": 138,
+        "end": 149,
+        "startLoc": {
+          "line": 138,
+          "column": 7,
+          "position": 5127
+        },
+        "endLoc": {
+          "line": 149,
+          "column": 3,
+          "position": 5189
+        }
+      },
+      "secondFile": {
+        "name": "reports/html/index.html",
+        "start": 116,
+        "end": 127,
+        "startLoc": {
+          "line": 116,
+          "column": 2,
+          "position": 4684
+        },
+        "endLoc": {
+          "line": 127,
+          "column": 2,
+          "position": 4746
+        }
+      }
+    },
+    {
+      "format": "markdown",
+      "lines": 10,
+      "fragment": " deploy in current state\n- **DEVELOPER PRODUCTIVITY:** All progress stopped, only recovery work\n- **REPUTATION DAMAGE:** World-class standards failure\n\n### **RECOVERY PATH TO POSITIVE VALUE:**\n- **IMMEDIATE (15min)",
+      "tokens": 0,
+      "firstFile": {
+        "name": "docs/status/2025-11-20_20_07-COMPLETE_ARCHITECTURAL_RECOVERY.md",
+        "start": 146,
+        "end": 155,
+        "startLoc": {
+          "line": 146,
+          "column": 4,
+          "position": 1810
+        },
+        "endLoc": {
+          "line": 155,
+          "column": 3,
+          "position": 1873
+        }
+      },
+      "secondFile": {
+        "name": "docs/status/2025-11-20_20_03-CRITICAL_TYPE_SAFETY_FAILURE.md",
+        "start": 62,
+        "end": 69,
+        "startLoc": {
+          "line": 62,
+          "column": 4,
+          "position": 590
+        },
+        "endLoc": {
+          "line": 69,
+          "column": 3,
+          "position": 651
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": ",\n\t\t},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult :=",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 335,
+        "end": 341,
+        "startLoc": {
+          "line": 335,
+          "column": 12,
+          "position": 2303
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 3,
+          "position": 2354
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 113,
+        "end": 119,
+        "startLoc": {
+          "line": 113,
+          "column": 6,
+          "position": 732
+        },
+        "endLoc": {
+          "line": 119,
+          "column": 2,
+          "position": 782
+        }
+      }
+    },
     {
       "format": "go",
       "lines": 6,
@@ -2779,6 +3163,186 @@
     },
     {
       "format": "go",
+      "lines": 6,
+      "fragment": "{\n\t\t\tt.Run(tc.name, func(t *testing.T) {\n\t\t\t\terr := adapter.Adapt(tc.error)\n\t\t\t\trequire.NotNil(t, err)\n\n\t\t\t\t// Should use the new generic filesystem error code",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/errors/filesystem_integration_test.go",
+        "start": 80,
+        "end": 85,
+        "startLoc": {
+          "line": 80,
+          "column": 2,
+          "position": 633
+        },
+        "endLoc": {
+          "line": 85,
+          "column": 52,
+          "position": 684
+        }
+      },
+      "secondFile": {
+        "name": "internal/errors/filesystem_integration_test.go",
+        "start": 44,
+        "end": 48,
+        "startLoc": {
+          "line": 44,
+          "column": 2,
+          "position": 287
+        },
+        "endLoc": {
+          "line": 48,
+          "column": 7,
+          "position": 337
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": "code ErrorCode, message string) *CleanWizardError {\n\treturn &CleanWizardError{\n\t\tCode:      code,\n\t\tType:      inferErrorType(code),\n\t\tSeverity:  inferErrorSeverity(code),\n\t\tMessage:   message,\n\t\tCause",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/errors/types.go",
+        "start": 197,
+        "end": 203,
+        "startLoc": {
+          "line": 197,
+          "column": 2,
+          "position": 1185
+        },
+        "endLoc": {
+          "line": 203,
+          "column": 6,
+          "position": 1242
+        }
+      },
+      "secondFile": {
+        "name": "internal/errors/types.go",
+        "start": 175,
+        "end": 181,
+        "startLoc": {
+          "line": 175,
+          "column": 2,
+          "position": 1011
+        },
+        "endLoc": {
+          "line": 181,
+          "column": 10,
+          "position": 1068
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": "code ErrorCode, format string, args ...any) *CleanWizardError {\n\treturn &CleanWizardError{\n\t\tCode:      code,\n\t\tType:      inferErrorType(code),\n\t\tSeverity:  inferErrorSeverity(code),\n\t\tMessage:   fmt.Sprintf(format, args...),\n\t\tCause",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/errors/types.go",
+        "start": 209,
+        "end": 215,
+        "startLoc": {
+          "line": 209,
+          "column": 2,
+          "position": 1274
+        },
+        "endLoc": {
+          "line": 215,
+          "column": 6,
+          "position": 1346
+        }
+      },
+      "secondFile": {
+        "name": "internal/errors/types.go",
+        "start": 186,
+        "end": 192,
+        "startLoc": {
+          "line": 186,
+          "column": 2,
+          "position": 1088
+        },
+        "endLoc": {
+          "line": 192,
+          "column": 10,
+          "position": 1160
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "if r := recover(); r != nil {\n\t\t\t\tvar cause error\n\t\t\t\tif err, ok := r.(error); ok {\n\t\t\t\t\tcause = err\n\t\t\t\t} else {\n\t\t\t\t\tcause = NewErrorf(ErrCodeProcessFailed, \"panic recovered: %v\", r)\n\t\t\t\t}\n\t\t\t\trecovered",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/errors/errors_test.go",
+        "start": 231,
+        "end": 238,
+        "startLoc": {
+          "line": 231,
+          "column": 4,
+          "position": 2308
+        },
+        "endLoc": {
+          "line": 238,
+          "column": 10,
+          "position": 2389
+        }
+      },
+      "secondFile": {
+        "name": "internal/errors/centralized.go",
+        "start": 44,
+        "end": 51,
+        "startLoc": {
+          "line": 44,
+          "column": 2,
+          "position": 236
+        },
+        "endLoc": {
+          "line": 51,
+          "column": 7,
+          "position": 317
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": "},\n\t}\n\n\tfor _, tc := range testCases {\n\t\tt.Run(string(tc.public), func(t *testing.T) {\n\t\t\t// Test public to domain\n\t\t\tdomainLevel",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 354,
+        "end": 360,
+        "startLoc": {
+          "line": 354,
+          "column": 13,
+          "position": 2673
+        },
+        "endLoc": {
+          "line": 360,
+          "column": 12,
+          "position": 2725
+        }
+      },
+      "secondFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 321,
+        "end": 327,
+        "startLoc": {
+          "line": 321,
+          "column": 15,
+          "position": 2406
+        },
+        "endLoc": {
+          "line": 327,
+          "column": 15,
+          "position": 2458
+        }
+      }
+    },
+    {
+      "format": "go",
       "lines": 13,
       "fragment": "PublicConfig{\n\t\tVersion:        \"1.0.0\",\n\t\tSafeMode:       true,\n\t\tMaxDiskUsage:   80,\n\t\tProtectedPaths: []string{\"/System\"},\n\t\tProfiles: map[string]*PublicProfile{\n\t\t\t\"test\": {\n\t\t\t\tName:        \"test\",\n\t\t\t\tDescription: \"Test profile\",\n\t\t\t\tEnabled:     true,\n\t\t\t\tOperations: []PublicOperation{\n\t\t\t\t\t{\n\t\t\t\t\t\tName:        \"test-op\"",
       "tokens": 0,
@@ -2810,6 +3374,474 @@
           "line": 256,
           "column": 13,
           "position": 1910
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "publicConfig := &PublicConfig{\n\t\tVersion:        \"1.0.0\",\n\t\tSafeMode:       true,\n\t\tMaxDiskUsage:   80,\n\t\tProtectedPaths: []string{\"/System\"},\n\t\tProfiles: map[string]*PublicProfile{\n\t\t\t\"test\": {\n\t\t\t\tName:        \"\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 456,
+        "end": 463,
+        "startLoc": {
+          "line": 456,
+          "column": 2,
+          "position": 3364
+        },
+        "endLoc": {
+          "line": 463,
+          "column": 3,
+          "position": 3427
+        }
+      },
+      "secondFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 404,
+        "end": 251,
+        "startLoc": {
+          "line": 404,
+          "column": 2,
+          "position": 3032
+        },
+        "endLoc": {
+          "line": 251,
+          "column": 7,
+          "position": 1877
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "Profiles: map[string]*PublicProfile{\n\t\t\t\"test\": {\n\t\t\t\tName:        \"test\",\n\t\t\t\tDescription: \"Test profile\",\n\t\t\t\tEnabled:     true,\n\t\t\t\tOperations: []PublicOperation{\n\t\t\t\t\t{\n\t\t\t\t\t\tName:        \"nix-generations\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 505,
+        "end": 512,
+        "startLoc": {
+          "line": 505,
+          "column": 3,
+          "position": 3695
+        },
+        "endLoc": {
+          "line": 512,
+          "column": 18,
+          "position": 3749
+        }
+      },
+      "secondFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 249,
+        "end": 256,
+        "startLoc": {
+          "line": 249,
+          "column": 4,
+          "position": 1856
+        },
+        "endLoc": {
+          "line": 256,
+          "column": 13,
+          "position": 1910
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 14,
+      "fragment": "Enabled:     true,\n\t\t\t\t\t\tSettings:    OperationSettings{},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t}\n\n\t// Map to domain\n\tdomainConfigResult := MapConfigToDomain(publicConfig)\n\n\t// Validate error result\n\tif !domainConfigResult.IsErr() {\n\t\tt.Fatalf(\"Expected error for domain validation failure, got success\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 515,
+        "end": 528,
+        "startLoc": {
+          "line": 515,
+          "column": 7,
+          "position": 3769
+        },
+        "endLoc": {
+          "line": 528,
+          "column": 60,
+          "position": 3838
+        }
+      },
+      "secondFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 419,
+        "end": 432,
+        "startLoc": {
+          "line": 419,
+          "column": 7,
+          "position": 3151
+        },
+        "endLoc": {
+          "line": 432,
+          "column": 53,
+          "position": 3220
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 14,
+      "fragment": ")\n\t}\n\n\terr, hasError := domainConfigResult.SafeError()\n\tif !hasError {\n\t\tt.Fatalf(\"Expected SafeError to return error\")\n\t}\n\n\terrorMsg := err.Error()\n\tif errorMsg == \"\" {\n\t\tt.Fatalf(\"Expected non-empty error message\")\n\t}\n\n\t// Should mention validation failure",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 528,
+        "end": 541,
+        "startLoc": {
+          "line": 528,
+          "column": 60,
+          "position": 3839
+        },
+        "endLoc": {
+          "line": 541,
+          "column": 37,
+          "position": 3914
+        }
+      },
+      "secondFile": {
+        "name": "internal/api/mapper_test.go",
+        "start": 476,
+        "end": 489,
+        "startLoc": {
+          "line": 476,
+          "column": 61,
+          "position": 3506
+        },
+        "endLoc": {
+          "line": 489,
+          "column": 54,
+          "position": 3581
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": "},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := Size",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/format/format_test.go",
+        "start": 22,
+        "end": 27,
+        "startLoc": {
+          "line": 22,
+          "column": 10,
+          "position": 168
+        },
+        "endLoc": {
+          "line": 27,
+          "column": 5,
+          "position": 218
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 336,
+        "end": 341,
+        "startLoc": {
+          "line": 336,
+          "column": 3,
+          "position": 2306
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": "},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := Duration",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/format/format_test.go",
+        "start": 47,
+        "end": 52,
+        "startLoc": {
+          "line": 47,
+          "column": 7,
+          "position": 435
+        },
+        "endLoc": {
+          "line": 52,
+          "column": 9,
+          "position": 485
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 336,
+        "end": 341,
+        "startLoc": {
+          "line": 336,
+          "column": 3,
+          "position": 2306
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": "},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := Date",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/format/format_test.go",
+        "start": 68,
+        "end": 73,
+        "startLoc": {
+          "line": 68,
+          "column": 13,
+          "position": 658
+        },
+        "endLoc": {
+          "line": 73,
+          "column": 5,
+          "position": 708
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 336,
+        "end": 341,
+        "startLoc": {
+          "line": 336,
+          "column": 3,
+          "position": 2306
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": "},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := DateTime",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/format/format_test.go",
+        "start": 93,
+        "end": 98,
+        "startLoc": {
+          "line": 93,
+          "column": 22,
+          "position": 890
+        },
+        "endLoc": {
+          "line": 98,
+          "column": 9,
+          "position": 940
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 336,
+        "end": 341,
+        "startLoc": {
+          "line": 336,
+          "column": 3,
+          "position": 2306
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": "},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := Number",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/format/format_test.go",
+        "start": 125,
+        "end": 130,
+        "startLoc": {
+          "line": 125,
+          "column": 6,
+          "position": 1198
+        },
+        "endLoc": {
+          "line": 130,
+          "column": 7,
+          "position": 1248
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 336,
+        "end": 341,
+        "startLoc": {
+          "line": 336,
+          "column": 3,
+          "position": 2306
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 12,
+      "fragment": "); err != nil {\n\t\treturn nil, err\n\t}\n\n\tif err := cfg.ValidateEnvironmentConfig(); err != nil {\n\t\treturn nil, err\n\t}\n\n\treturn cfg, nil\n}\n\n// GetEnvWithDefault returns environment variable with default value",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/adapters/environment.go",
+        "start": 103,
+        "end": 114,
+        "startLoc": {
+          "line": 103,
+          "column": 2,
+          "position": 551
+        },
+        "endLoc": {
+          "line": 114,
+          "column": 69,
+          "position": 619
+        }
+      },
+      "secondFile": {
+        "name": "internal/adapters/environment.go",
+        "start": 86,
+        "end": 97,
+        "startLoc": {
+          "line": 86,
+          "column": 4,
+          "position": 423
+        },
+        "endLoc": {
+          "line": 97,
+          "column": 74,
+          "position": 491
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 10,
+      "fragment": "0)\n\n\t// Create clean result directly with proper timing\n\tcleanResult := domain.CleanResult{\n\t\tFreedBytes:   uint64(bytesFreed),\n\t\tItemsRemoved: 1,\n\t\tItemsFailed:  0,\n\t\tCleanTime:    time.Since(startTime),\n\t\tCleanedAt:    time.Now(),\n\t\tStrategy:     domain.StrategyConservative",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/adapters/nix.go",
+        "start": 183,
+        "end": 192,
+        "startLoc": {
+          "line": 183,
+          "column": 3,
+          "position": 1521
+        },
+        "endLoc": {
+          "line": 192,
+          "column": 21,
+          "position": 1591
+        }
+      },
+      "secondFile": {
+        "name": "internal/adapters/nix.go",
+        "start": 127,
+        "end": 136,
+        "startLoc": {
+          "line": 127,
+          "column": 3,
+          "position": 1008
+        },
+        "endLoc": {
+          "line": 136,
+          "column": 19,
+          "position": 1078
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 13,
+      "fragment": ",\n\t\tDescription: \"Daily cleanup\",\n\t\tOperations: []domain.CleanupOperation{\n\t\t\t{\n\t\t\t\tName:        \"nix-generations\",\n\t\t\t\tDescription: \"Clean Nix generations\",\n\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t},\n\t\t},\n\t\tStatus: domain.StatusEnabled,\n\t}\n}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/test_data.go",
+        "start": 82,
+        "end": 94,
+        "startLoc": {
+          "line": 82,
+          "column": 8,
+          "position": 514
+        },
+        "endLoc": {
+          "line": 94,
+          "column": 2,
+          "position": 589
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/test_data.go",
+        "start": 43,
+        "end": 54,
+        "startLoc": {
+          "line": 43,
+          "column": 12,
+          "position": 246
+        },
+        "endLoc": {
+          "line": 54,
+          "column": 2,
+          "position": 320
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": ",\n\t\tOperations: []domain.CleanupOperation{\n\t\t\t{\n\t\t\t\tName:        \"nix-generations\",\n\t\t\t\tDescription: \"Clean Nix generations\",\n\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\tSettings",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/test_data.go",
+        "start": 256,
+        "end": 263,
+        "startLoc": {
+          "line": 256,
+          "column": 23,
+          "position": 1823
+        },
+        "endLoc": {
+          "line": 263,
+          "column": 9,
+          "position": 1872
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/test_data.go",
+        "start": 44,
+        "end": 51,
+        "startLoc": {
+          "line": 44,
+          "column": 16,
+          "position": 253
+        },
+        "endLoc": {
+          "line": 51,
+          "column": 2,
+          "position": 302
         }
       }
     },
@@ -2851,6 +3883,78 @@
     },
     {
       "format": "go",
+      "lines": 14,
+      "fragment": "{\n\t\t\t\t\tName:        \"daily\",\n\t\t\t\t\tDescription: \"Daily cleanup\",\n\t\t\t\t\tOperations: []domain.CleanupOperation{\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tName:        \"nix-generations\",\n\t\t\t\t\t\t\tDescription: \"Clean Nix generations\",\n\t\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t\tStatus: domain.StatusEnabled,\n\t\t\t\t},\n\t\t\t},",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/validation_sanitizer_test.go",
+        "start": 50,
+        "end": 63,
+        "startLoc": {
+          "line": 50,
+          "column": 2,
+          "position": 326
+        },
+        "endLoc": {
+          "line": 63,
+          "column": 2,
+          "position": 411
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/test_data.go",
+        "start": 81,
+        "end": 56,
+        "startLoc": {
+          "line": 81,
+          "column": 8,
+          "position": 507
+        },
+        "endLoc": {
+          "line": 56,
+          "column": 2,
+          "position": 326
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 9,
+      "fragment": "{\n\tvar lastErr error\n\n\tfor attempt := 0; attempt <= ecl.retryPolicy.MaxRetries; attempt++ {\n\t\tif attempt > 0 {\n\t\t\tdelay := ecl.calculateDelay(attempt)\n\t\t\tselect {\n\t\t\tcase <-ctx.Done():\n\t\t\t\treturn ctx",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/enhanced_loader_private.go",
+        "start": 47,
+        "end": 55,
+        "startLoc": {
+          "line": 47,
+          "column": 2,
+          "position": 333
+        },
+        "endLoc": {
+          "line": 55,
+          "column": 4,
+          "position": 411
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/enhanced_loader_private.go",
+        "start": 14,
+        "end": 22,
+        "startLoc": {
+          "line": 14,
+          "column": 2,
+          "position": 67
+        },
+        "endLoc": {
+          "line": 22,
+          "column": 4,
+          "position": 145
+        }
+      }
+    },
+    {
+      "format": "go",
       "lines": 21,
       "fragment": ",\n\t\t},\n\t\tUniquePaths:    true,\n\t\tUniqueProfiles: true,\n\t\tProtectedSystemPaths: []string{\n\t\t\t\"/\",\n\t\t\t\"/System\",\n\t\t\t\"/Applications\",\n\t\t\t\"/Library\",\n\t\t\t\"/usr\",\n\t\t\t\"/etc\",\n\t\t\t\"/var\",\n\t\t\t\"/bin\",\n\t\t\t\"/sbin\",\n\t\t},\n\t\tDefaultProtectedPaths: []string{\n\t\t\t\"/System\",\n\t\t\t\"/Applications\",\n\t\t\t\"/Library\",\n\t\t},\n\t\tRequireSafeMode: domain",
       "tokens": 0,
@@ -2887,6 +3991,366 @@
     },
     {
       "format": "go",
+      "lines": 6,
+      "fragment": ") {\n\t\t\t\tresult.Warnings = append(result.Warnings, SanitizationWarning{\n\t\t\t\t\tField:     fmt.Sprintf(\"protected[%d]\", i),\n\t\t\t\t\tOriginal:  original,\n\t\t\t\t\tSanitized: path,\n\t\t\t\t\tReason:    \"path does not exist but will be protected\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/sanitizer_paths.go",
+        "start": 53,
+        "end": 58,
+        "startLoc": {
+          "line": 53,
+          "column": 4,
+          "position": 380
+        },
+        "endLoc": {
+          "line": 58,
+          "column": 44,
+          "position": 434
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/sanitizer_paths.go",
+        "start": 41,
+        "end": 46,
+        "startLoc": {
+          "line": 41,
+          "column": 5,
+          "position": 265
+        },
+        "endLoc": {
+          "line": 46,
+          "column": 4,
+          "position": 319
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "if cs.rules.NormalizePaths {\n\t\t\t\tpath = filepath.Clean(path)\n\t\t\t}\n\n\t\t\t// Validate absolute path requirement\n\t\t\tif !filepath.IsAbs(path) {\n\t\t\t\tresult.Warnings = append(result.Warnings, SanitizationWarning{\n\t\t\t\t\tField:     fmt.Sprintf(\"%s.paths[%d]\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/sanitizer_systemtemp.go",
+        "start": 27,
+        "end": 34,
+        "startLoc": {
+          "line": 27,
+          "column": 4,
+          "position": 173
+        },
+        "endLoc": {
+          "line": 34,
+          "column": 15,
+          "position": 240
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/sanitizer_paths.go",
+        "start": 36,
+        "end": 43,
+        "startLoc": {
+          "line": 36,
+          "column": 3,
+          "position": 227
+        },
+        "endLoc": {
+          "line": 43,
+          "column": 16,
+          "position": 294
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 10,
+      "fragment": ",\n\t\t},\n\t\tProfileNamePattern: &ValidationRule[string]{\n\t\t\tRequired: true,\n\t\t\tPattern:  \"^[a-zA-Z0-9_-]+$\",\n\t\t\tMessage:  \"Profile names must be alphanumeric with underscores and hyphens\",\n\t\t},\n\t\tUniquePaths:    true,\n\t\tUniqueProfiles: true,\n\t\tProtectedSystemPaths: []string{ // Reduced for tests",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/validation_validator_test.go",
+        "start": 21,
+        "end": 30,
+        "startLoc": {
+          "line": 21,
+          "column": 42,
+          "position": 187
+        },
+        "endLoc": {
+          "line": 30,
+          "column": 21,
+          "position": 252
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/validator_rules.go",
+        "start": 111,
+        "end": 121,
+        "startLoc": {
+          "line": 111,
+          "column": 70,
+          "position": 709
+        },
+        "endLoc": {
+          "line": 121,
+          "column": 4,
+          "position": 775
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": ",\n\t\t\tconfig: &domain.Config{\n\t\t\t\tVersion:      \"1.0.0\",\n\t\t\t\tSafetyLevel:  domain.SafetyLevelEnabled,\n\t\t\t\tMaxDiskUsage: 50,\n\t\t\t\tProtected:    []string{\"/System\", \"/usr\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/validation_validator_test.go",
+        "start": 71,
+        "end": 76,
+        "startLoc": {
+          "line": 71,
+          "column": 14,
+          "position": 595
+        },
+        "endLoc": {
+          "line": 76,
+          "column": 7,
+          "position": 641
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/validation_sanitizer_test.go",
+        "start": 43,
+        "end": 48,
+        "startLoc": {
+          "line": 43,
+          "column": 18,
+          "position": 253
+        },
+        "endLoc": {
+          "line": 48,
+          "column": 11,
+          "position": 299
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": ",\n\t\t},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := validator",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/validation_validator_test.go",
+        "start": 80,
+        "end": 86,
+        "startLoc": {
+          "line": 80,
+          "column": 11,
+          "position": 689
+        },
+        "endLoc": {
+          "line": 86,
+          "column": 10,
+          "position": 742
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 113,
+        "end": 341,
+        "startLoc": {
+          "line": 113,
+          "column": 6,
+          "position": 732
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": ",\n\t\t\texpectError: true,\n\t\t},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\terr := validator",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/validation_validator_test.go",
+        "start": 167,
+        "end": 174,
+        "startLoc": {
+          "line": 167,
+          "column": 10,
+          "position": 1302
+        },
+        "endLoc": {
+          "line": 174,
+          "column": 10,
+          "position": 1362
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 168,
+        "end": 175,
+        "startLoc": {
+          "line": 168,
+          "column": 5,
+          "position": 1107
+        },
+        "endLoc": {
+          "line": 175,
+          "column": 23,
+          "position": 1167
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": "},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := isValidSemver",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/semver_validation_test.go",
+        "start": 30,
+        "end": 35,
+        "startLoc": {
+          "line": 30,
+          "column": 6,
+          "position": 252
+        },
+        "endLoc": {
+          "line": 35,
+          "column": 14,
+          "position": 302
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 336,
+        "end": 341,
+        "startLoc": {
+          "line": 336,
+          "column": 3,
+          "position": 2306
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 11,
+      "fragment": ",\n\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\tSettings: &domain.OperationSettings{\n\t\t\t\t\t\t\tNixGenerations: &domain.NixGenerationsSettings{\n\t\t\t\t\t\t\t\tGenerations:  3,\n\t\t\t\t\t\t\t\tOptimization: domain.OptimizationLevelConservative,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/bdd_nix_validation_test.go",
+        "start": 92,
+        "end": 102,
+        "startLoc": {
+          "line": 92,
+          "column": 28,
+          "position": 602
+        },
+        "endLoc": {
+          "line": 102,
+          "column": 2,
+          "position": 671
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/test_data.go",
+        "start": 260,
+        "end": 270,
+        "startLoc": {
+          "line": 260,
+          "column": 24,
+          "position": 1851
+        },
+        "endLoc": {
+          "line": 270,
+          "column": 2,
+          "position": 1920
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 10,
+      "fragment": "// Find the nix-cleanup profile and its nix-generations operation\n\tprofile, profileExists := cfg.Profiles[\"nix-cleanup\"]\n\tif !profileExists {\n\t\tt.Fatalf(\"FAILED: 'nix-cleanup' profile not found in config\")\n\t}\n\n\toperationFound := false\n\tfor i, op := range profile.Operations {\n\t\tif op.Name == \"nix-generations\" {\n\t\t\tprofile.Operations[i].Status",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/bdd_nix_validation_test.go",
+        "start": 173,
+        "end": 182,
+        "startLoc": {
+          "line": 173,
+          "column": 2,
+          "position": 1180
+        },
+        "endLoc": {
+          "line": 182,
+          "column": 7,
+          "position": 1263
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/bdd_nix_validation_test.go",
+        "start": 123,
+        "end": 132,
+        "startLoc": {
+          "line": 123,
+          "column": 2,
+          "position": 824
+        },
+        "endLoc": {
+          "line": 132,
+          "column": 10,
+          "position": 907
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 14,
+      "fragment": "), nil\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tWhen: []BDDWhen{\n\t\t\t\t\t{\n\t\t\t\t\t\tDescription: \"the configuration is validated\",\n\t\t\t\t\t\tAction:      whenConfigValidated,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tThen: thenValidationFailsWithError(\"generations constraint\"),\n\t\t\t},\n\t\t\t{\n\t\t\t\tName:        \"Critical Nix operation in unsafe mode\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/bdd_nix_validation_test.go",
+        "start": 268,
+        "end": 281,
+        "startLoc": {
+          "line": 268,
+          "column": 3,
+          "position": 1914
+        },
+        "endLoc": {
+          "line": 281,
+          "column": 40,
+          "position": 1986
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/bdd_nix_validation_test.go",
+        "start": 249,
+        "end": 262,
+        "startLoc": {
+          "line": 249,
+          "column": 2,
+          "position": 1769
+        },
+        "endLoc": {
+          "line": 262,
+          "column": 40,
+          "position": 1841
+        }
+      }
+    },
+    {
+      "format": "go",
       "lines": 16,
       "fragment": "), nil\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tWhen: []BDDWhen{\n\t\t\t\t\t{\n\t\t\t\t\t\tDescription: \"the configuration is validated\",\n\t\t\t\t\t\tAction: func(cfg *domain.Config) (*ValidationResult, error) {\n\t\t\t\t\t\t\tvalidator := NewConfigValidator()\n\t\t\t\t\t\t\treturn validator.ValidateConfig(cfg), nil\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tThen: []BDDThen{\n\t\t\t\t\t{\n\t\t\t\t\t\tDescription: \"validation should fail with security error\"",
       "tokens": 0,
@@ -2918,6 +4382,330 @@
           "line": 223,
           "column": 28,
           "position": 1548
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": "},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := tt",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 34,
+        "end": 39,
+        "startLoc": {
+          "line": 34,
+          "column": 10,
+          "position": 225
+        },
+        "endLoc": {
+          "line": 39,
+          "column": 3,
+          "position": 275
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 336,
+        "end": 341,
+        "startLoc": {
+          "line": 336,
+          "column": 3,
+          "position": 2306
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": "},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := uiAdapter",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 59,
+        "end": 64,
+        "startLoc": {
+          "line": 59,
+          "column": 4,
+          "position": 448
+        },
+        "endLoc": {
+          "line": 64,
+          "column": 10,
+          "position": 498
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 336,
+        "end": 341,
+        "startLoc": {
+          "line": 336,
+          "column": 3,
+          "position": 2306
+        },
+        "endLoc": {
+          "line": 341,
+          "column": 15,
+          "position": 2356
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": ", false},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := tt.level.IsValid",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 84,
+        "end": 89,
+        "startLoc": {
+          "line": 84,
+          "column": 23,
+          "position": 681
+        },
+        "endLoc": {
+          "line": 89,
+          "column": 8,
+          "position": 738
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/semver_validation_test.go",
+        "start": 30,
+        "end": 39,
+        "startLoc": {
+          "line": 30,
+          "column": 10,
+          "position": 249
+        },
+        "endLoc": {
+          "line": 39,
+          "column": 7,
+          "position": 279
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 6,
+      "fragment": ", false},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tresult := tt.cleanType",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 108,
+        "end": 113,
+        "startLoc": {
+          "line": 108,
+          "column": 2,
+          "position": 900
+        },
+        "endLoc": {
+          "line": 113,
+          "column": 10,
+          "position": 955
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/semver_validation_test.go",
+        "start": 30,
+        "end": 39,
+        "startLoc": {
+          "line": 30,
+          "column": 10,
+          "position": 249
+        },
+        "endLoc": {
+          "line": 39,
+          "column": 6,
+          "position": 277
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 11,
+      "fragment": ",\n\t\t\tbuilderFunc: func() *SafeConfigBuilder {\n\t\t\t\treturn NewSafeConfigBuilder().\n\t\t\t\t\tAddProfile(\"test\", \"test profile\").\n\t\t\t\t\tAddOperation(CleanTypeNixStore, domain.RiskLow).\n\t\t\t\t\tDone()\n\t\t\t},\n\t\t\texpectError: false,\n\t\t},\n\t\t{\n\t\t\tname: \"build config with critical risk operation should fail\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 147,
+        "end": 157,
+        "startLoc": {
+          "line": 147,
+          "column": 42,
+          "position": 1190
+        },
+        "endLoc": {
+          "line": 157,
+          "column": 56,
+          "position": 1262
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 129,
+        "end": 139,
+        "startLoc": {
+          "line": 129,
+          "column": 21,
+          "position": 1065
+        },
+        "endLoc": {
+          "line": 139,
+          "column": 32,
+          "position": 1137
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": ",\n\t\t\texpectError: false,\n\t\t},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\t// Try to build the full config to test profile building",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 227,
+        "end": 234,
+        "startLoc": {
+          "line": 227,
+          "column": 2,
+          "position": 1803
+        },
+        "endLoc": {
+          "line": 234,
+          "column": 57,
+          "position": 1859
+        }
+      },
+      "secondFile": {
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 112,
+        "end": 119,
+        "startLoc": {
+          "line": 112,
+          "column": 5,
+          "position": 725
+        },
+        "endLoc": {
+          "line": 119,
+          "column": 7,
+          "position": 781
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "().Build()\n\n\t\t\tif tt.expectError {\n\t\t\t\tif err == nil {\n\t\t\t\t\tt.Error(\"expected error but got none\")\n\t\t\t\t\treturn\n\t\t\t\t}\n\t\t\t\tif tt.errorMsg != \"\" {",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 235,
+        "end": 242,
+        "startLoc": {
+          "line": 235,
+          "column": 5,
+          "position": 1876
+        },
+        "endLoc": {
+          "line": 242,
+          "column": 2,
+          "position": 1929
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/safe_test.go",
+        "start": 171,
+        "end": 178,
+        "startLoc": {
+          "line": 171,
+          "column": 12,
+          "position": 1388
+        },
+        "endLoc": {
+          "line": 178,
+          "column": 3,
+          "position": 1441
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "() []SanitizationTestCase {\n\tstandardCases := GetStandardTestCases()\n\tresult := make([]SanitizationTestCase, len(standardCases))\n\tfor i, tc := range standardCases {\n\t\tresult[i] = SanitizationTestCase(tc)\n\t}\n\treturn result\n}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/validation_types_test.go",
+        "start": 29,
+        "end": 36,
+        "startLoc": {
+          "line": 29,
+          "column": 34,
+          "position": 118
+        },
+        "endLoc": {
+          "line": 36,
+          "column": 2,
+          "position": 191
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/test_data.go",
+        "start": 138,
+        "end": 145,
+        "startLoc": {
+          "line": 138,
+          "column": 31,
+          "position": 898
+        },
+        "endLoc": {
+          "line": 145,
+          "column": 2,
+          "position": 971
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": ",\n\t\tOperations: []domain.CleanupOperation{\n\t\t\t{\n\t\t\t\tName:        \"nix-generations\",\n\t\t\t\tDescription: \"Clean old Nix generations\",\n\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\tSettings:    domain",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/config.go",
+        "start": 168,
+        "end": 175,
+        "startLoc": {
+          "line": 168,
+          "column": 22,
+          "position": 1306
+        },
+        "endLoc": {
+          "line": 175,
+          "column": 7,
+          "position": 1358
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/bdd_nix_validation_test.go",
+        "start": 88,
+        "end": 95,
+        "startLoc": {
+          "line": 88,
+          "column": 14,
+          "position": 574
+        },
+        "endLoc": {
+          "line": 95,
+          "column": 2,
+          "position": 626
         }
       }
     },
@@ -2960,7 +4748,7 @@
     {
       "format": "go",
       "lines": 19,
-      "fragment": ",\n\t\t},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tdefer func() {\n\t\t\t\tif r := recover(); r != nil {\n\t\t\t\t\tif !tt.wantPanic {\n\t\t\t\t\t\tt.Errorf(\"unexpected panic: %v\", r)\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tif tt.wantPanic {\n\t\t\t\t\t\tt.Error(\"expected panic but got none\")\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}()\n\n\t\t\terr",
+      "fragment": ": false,\n\t\t},\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\tdefer func() {\n\t\t\t\tif r := recover(); r != nil {\n\t\t\t\t\tif !tt.wantPanic {\n\t\t\t\t\t\tt.Errorf(\"unexpected panic: %v\", r)\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tif tt.wantPanic {\n\t\t\t\t\t\tt.Error(\"expected panic but got none\")\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}()\n\n\t\t\terr",
       "tokens": 0,
       "firstFile": {
         "name": "internal/result/type_test.go",
@@ -2968,8 +4756,8 @@
         "end": 141,
         "startLoc": {
           "line": 123,
-          "column": 6,
-          "position": 1031
+          "column": 10,
+          "position": 1028
         },
         "endLoc": {
           "line": 141,
@@ -2978,18 +4766,234 @@
         }
       },
       "secondFile": {
-        "name": "internal/result/type_test.go",
-        "start": 69,
+        "name": "internal/domain/duration_parser_test.go",
+        "start": 113,
         "end": 87,
         "startLoc": {
-          "line": 69,
-          "column": 13,
-          "position": 530
+          "line": 113,
+          "column": 12,
+          "position": 729
         },
         "endLoc": {
           "line": 87,
           "column": 7,
           "position": 668
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 18,
+      "fragment": "}\n\n\t\t// Should handle empty strings\n\t\tif data == \"\" {\n\t\t\treturn\n\t\t}\n\n\t\t// Should handle unicode characters\n\t\tfor i, r := range data {\n\t\t\tif i > 100 { // Prevent excessive loops\n\t\t\t\tbreak\n\t\t\t}\n\t\t\t_ = r // Should not panic on any unicode\n\t\t}\n\t})\n}\n\n// FuzzResultErrorHandling tests error handling with fuzzed inputs",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/result/simple_fuzz_test.go",
+        "start": 57,
+        "end": 74,
+        "startLoc": {
+          "line": 57,
+          "column": 3,
+          "position": 363
+        },
+        "endLoc": {
+          "line": 74,
+          "column": 67,
+          "position": 444
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/simple_fuzz_test.go",
+        "start": 82,
+        "end": 99,
+        "startLoc": {
+          "line": 82,
+          "column": 3,
+          "position": 555
+        },
+        "endLoc": {
+          "line": 99,
+          "column": 63,
+          "position": 636
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": ",\n\t\t\tRecursion: domain.RecursionLevelFull,\n\t\t\tLimit:     100,\n\t\t}\n\n\t\tresult := validator.ValidateScanRequest(ctx, req)\n\t\tassert.True(t, result.IsErr",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/middleware/validation_test.go",
+        "start": 32,
+        "end": 38,
+        "startLoc": {
+          "line": 32,
+          "column": 12,
+          "position": 212
+        },
+        "endLoc": {
+          "line": 38,
+          "column": 6,
+          "position": 259
+        }
+      },
+      "secondFile": {
+        "name": "internal/middleware/validation_test.go",
+        "start": 19,
+        "end": 25,
+        "startLoc": {
+          "line": 19,
+          "column": 21,
+          "position": 103
+        },
+        "endLoc": {
+          "line": 25,
+          "column": 5,
+          "position": 150
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "() error {\n\tif ctx.generations.IsErr() {\n\t\treturn ctx.generations.Error()\n\t}\n\n\tgenerations := ctx.generations.Value()\n\tfor _, gen := range generations {\n\t\tif gen.Date",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/bdd/nix_bdd_test.go",
+        "start": 201,
+        "end": 208,
+        "startLoc": {
+          "line": 201,
+          "column": 29,
+          "position": 1713
+        },
+        "endLoc": {
+          "line": 208,
+          "column": 5,
+          "position": 1782
+        }
+      },
+      "secondFile": {
+        "name": "tests/bdd/nix_bdd_test.go",
+        "start": 186,
+        "end": 193,
+        "startLoc": {
+          "line": 186,
+          "column": 27,
+          "position": 1596
+        },
+        "endLoc": {
+          "line": 193,
+          "column": 3,
+          "position": 1665
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": "() error {\n\tif ctx.cleanResult.IsErr() {\n\t\treturn ctx.cleanResult.Error()\n\t}\n\n\tresult := ctx.cleanResult.Value()\n\tif result.ItemsRemoved",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/bdd/nix_bdd_test.go",
+        "start": 268,
+        "end": 274,
+        "startLoc": {
+          "line": 268,
+          "column": 26,
+          "position": 2223
+        },
+        "endLoc": {
+          "line": 274,
+          "column": 13,
+          "position": 2276
+        }
+      },
+      "secondFile": {
+        "name": "tests/bdd/nix_bdd_test.go",
+        "start": 255,
+        "end": 261,
+        "startLoc": {
+          "line": 255,
+          "column": 24,
+          "position": 2125
+        },
+        "endLoc": {
+          "line": 261,
+          "column": 11,
+          "position": 2178
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": "() error {\n\tif ctx.cleanResult.IsErr() {\n\t\treturn ctx.cleanResult.Error()\n\t}\n\n\tresult := ctx.cleanResult.Value()\n\tif result.FreedBytes <= 0 &&",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/bdd/nix_bdd_test.go",
+        "start": 309,
+        "end": 315,
+        "startLoc": {
+          "line": 309,
+          "column": 20,
+          "position": 2557
+        },
+        "endLoc": {
+          "line": 315,
+          "column": 3,
+          "position": 2616
+        }
+      },
+      "secondFile": {
+        "name": "tests/bdd/nix_bdd_test.go",
+        "start": 255,
+        "end": 261,
+        "startLoc": {
+          "line": 255,
+          "column": 24,
+          "position": 2125
+        },
+        "endLoc": {
+          "line": 261,
+          "column": 2,
+          "position": 2184
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 7,
+      "fragment": ") error {\n\tif ctx.generations.IsErr() {\n\t\treturn ctx.generations.Error()\n\t}\n\n\tgenerations := ctx.generations.Value()\n\tcurrentCount",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/bdd/nix_bdd_test.go",
+        "start": 322,
+        "end": 328,
+        "startLoc": {
+          "line": 322,
+          "column": 4,
+          "position": 2666
+        },
+        "endLoc": {
+          "line": 328,
+          "column": 13,
+          "position": 2714
+        }
+      },
+      "secondFile": {
+        "name": "tests/bdd/nix_bdd_test.go",
+        "start": 186,
+        "end": 192,
+        "startLoc": {
+          "line": 186,
+          "column": 2,
+          "position": 1597
+        },
+        "endLoc": {
+          "line": 192,
+          "column": 4,
+          "position": 1645
         }
       }
     },
@@ -3066,38 +5070,146 @@
       }
     },
     {
-      "format": "go",
-      "lines": 16,
-      "fragment": "(level string) config.ValidationLevel {\n\tswitch strings.ToLower(level) {\n\tcase \"none\":\n\t\treturn config.ValidationLevelNone\n\tcase \"basic\":\n\t\treturn config.ValidationLevelBasic\n\tcase \"comprehensive\":\n\t\treturn config.ValidationLevelComprehensive\n\tcase \"strict\":\n\t\treturn config.ValidationLevelStrict\n\tdefault:\n\t\treturn config.ValidationLevelBasic // Safe default\n\t}\n}\n\nfunc",
+      "format": "yaml",
+      "lines": 18,
+      "fragment": "version: \"1.0.0\"\nsafe_mode: true\nmax_disk_usage: 50\nprotected: \n  - \"/\"\n  - \"/System\"\n  - \"/Library\"\n  - \"/Applications\"\n  - \"/usr\"\n  - \"/etc\"\n  - \"/var\"\n  - \"/bin\"\n  - \"/sbin\"\nprofiles:\n  daily:\n    name: \"daily\"\n    description: \"Daily cleanup\"\n    enabled",
       "tokens": 0,
       "firstFile": {
-        "name": "cmd/clean-wizard/main.go",
-        "start": 41,
-        "end": 56,
+        "name": "working-config.yaml",
+        "start": 1,
+        "end": 18,
         "startLoc": {
-          "line": 41,
-          "column": 21,
-          "position": 205
+          "line": 1,
+          "column": 1,
+          "position": 0
         },
         "endLoc": {
-          "line": 56,
-          "column": 5,
-          "position": 300
+          "line": 18,
+          "column": 8,
+          "position": 84
         }
       },
       "secondFile": {
-        "name": "cmd/clean-wizard/commands/util.go",
-        "start": 12,
-        "end": 27,
+        "name": "test-config.yaml",
+        "start": 1,
+        "end": 18,
         "startLoc": {
-          "line": 12,
-          "column": 21,
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 18,
+          "column": 11,
+          "position": 84
+        }
+      }
+    },
+    {
+      "format": "yaml",
+      "lines": 13,
+      "fragment": "# Cleanup profiles\nprofiles:\n  daily:\n    name: \"daily\"\n    description: \"Daily cleanup for routine maintenance\"\n    enabled: true\n    operations:\n      - name: \"nix-generations\"\n        description: \"Clean old Nix generations\"\n        risk_level: \"LOW\"\n        enabled: true\n        settings:\n          keep_count: 3",
+      "tokens": 0,
+      "firstFile": {
+        "name": "test-simple.yaml",
+        "start": 19,
+        "end": 31,
+        "startLoc": {
+          "line": 19,
+          "column": 1,
+          "position": 67
+        },
+        "endLoc": {
+          "line": 31,
+          "column": 2,
+          "position": 132
+        }
+      },
+      "secondFile": {
+        "name": "test-advanced.yaml",
+        "start": 28,
+        "end": 40,
+        "startLoc": {
+          "line": 28,
+          "column": 1,
+          "position": 103
+        },
+        "endLoc": {
+          "line": 40,
+          "column": 2,
+          "position": 168
+        }
+      }
+    },
+    {
+      "format": "yaml",
+      "lines": 14,
+      "fragment": "max_disk_usage: 50\nprotected: \n  - \"/System\"\n  - \"/Library\"\nprofiles:\n  daily:\n    name: \"daily\"\n    description: \"Daily cleanup\"\n    enabled: true\n    operations:\n      - name: \"nix-generations\"\n        description: \"Clean Nix generations\"\n        risk_level: \"LOW\"\n        enabled: true",
+      "tokens": 0,
+      "firstFile": {
+        "name": "test-unsafe-config.yaml",
+        "start": 3,
+        "end": 16,
+        "startLoc": {
+          "line": 3,
+          "column": 1,
+          "position": 10
+        },
+        "endLoc": {
+          "line": 16,
+          "column": 5,
+          "position": 82
+        }
+      },
+      "secondFile": {
+        "name": "simple-config.yaml",
+        "start": 3,
+        "end": 16,
+        "startLoc": {
+          "line": 3,
+          "column": 1,
+          "position": 10
+        },
+        "endLoc": {
+          "line": 16,
+          "column": 5,
+          "position": 82
+        }
+      }
+    },
+    {
+      "format": "yaml",
+      "lines": 15,
+      "fragment": "- \"/usr\"\n  - \"/etc\"\n  - \"/var\"\n  - \"/bin\"\n  - \"/sbin\"\nprofiles:\n  daily:\n    name: \"daily\"\n    description: \"Daily cleanup\"\n    operations:\n      - name: \"nix-generations\"\n        description: \"Clean Nix generations\"\n        risk_level: \"low\"\n        enabled: true\n    enabled: true",
+      "tokens": 0,
+      "firstFile": {
+        "name": "test-valid-config.yaml",
+        "start": 7,
+        "end": 21,
+        "startLoc": {
+          "line": 7,
+          "column": 3,
           "position": 30
         },
         "endLoc": {
-          "line": 27,
-          "column": 86,
-          "position": 125
+          "line": 21,
+          "column": 5,
+          "position": 107
+        }
+      },
+      "secondFile": {
+        "name": "test-config.yaml",
+        "start": 9,
+        "end": 23,
+        "startLoc": {
+          "line": 9,
+          "column": 3,
+          "position": 40
+        },
+        "endLoc": {
+          "line": 23,
+          "column": 5,
+          "position": 117
         }
       }
     }
