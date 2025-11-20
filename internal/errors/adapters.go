@@ -6,27 +6,31 @@ import (
 	"syscall"
 )
 
-// isConfigurationError checks if error is configuration-related
-func isConfigurationError(err error) bool {
+// isErrorType checks if error matches any of the provided indicator strings
+// Generic helper to eliminate duplication between error type detection functions
+func isErrorType(err error, indicators []string) bool {
 	if err == nil {
 		return false
 	}
 
 	errStr := err.Error()
-	// Common indicators of configuration errors
-	configIndicators := []string{
-		"config", "configuration", "yaml", "json", "toml",
-		"parse", "invalid", "missing", "required",
-	}
-
 	lowerErrStr := strings.ToLower(errStr)
-	for _, indicator := range configIndicators {
+	for _, indicator := range indicators {
 		if strings.Contains(lowerErrStr, indicator) {
 			return true
 		}
 	}
 
 	return false
+}
+
+// isConfigurationError checks if error is configuration-related
+func isConfigurationError(err error) bool {
+	configIndicators := []string{
+		"config", "configuration", "yaml", "json", "toml",
+		"parse", "invalid", "missing", "required",
+	}
+	return isErrorType(err, configIndicators)
 }
 
 // FileSystemErrorAdapter wraps file system errors with proper type safety
@@ -112,26 +116,12 @@ func (vea *ValidationErrorAdapter) Adapt(err error, field string) *CleanWizardEr
 
 // isValidationError checks if error is validation-related
 func isValidationError(err error) bool {
-	if err == nil {
-		return false
-	}
-
-	errStr := err.Error()
-	// Strong indicators of validation errors
 	validationIndicators := []string{
 		"validation failed", "validation error", "invalid format",
 		"invalid range", "required field", "constraint violation",
 		"unacceptable value", "validation rule", "invalid value",
 	}
-
-	lowerErrStr := strings.ToLower(errStr)
-	for _, indicator := range validationIndicators {
-		if strings.Contains(lowerErrStr, indicator) {
-			return true
-		}
-	}
-
-	return false
+	return isErrorType(err, validationIndicators)
 }
 
 // NetworkErrorAdapter wraps network errors with proper type safety
