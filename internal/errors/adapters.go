@@ -52,7 +52,7 @@ func (fsa *FileSystemErrorAdapter) Adapt(err error) *CleanWizardError {
 				"Disk full: "+pathErr.Path).WithCause(err).WithCaller()
 		default:
 			return NewError(ErrCodeFilesystem,
-				"File system error: "+pathErr.Err.Error()).WithCause(err).WithCaller()
+				"File system error: "+pathErr.Err.Error()+" ("+pathErr.Path+")").WithCause(err).WithCaller()
 		}
 	}
 

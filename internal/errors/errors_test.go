@@ -158,6 +158,7 @@ func TestFileSystemErrorAdapter(t *testing.T) {
 		assert.Equal(t, SeverityError, cwErr.Severity) // Filesystem errors are errors
 		assert.Contains(t, cwErr.Message, "File system error")
 		assert.Contains(t, cwErr.Message, "/tmp/unknown")
+		assert.Contains(t, cwErr.Message, "file already closed")
 		assert.Equal(t, err, cwErr.Cause)
 		assert.NotEmpty(t, cwErr.Caller) // Should include caller information
 	})
