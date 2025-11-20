@@ -6,15 +6,38 @@ import (
 )
 
 // Config represents application configuration with type safety
+// TODO: CRITICAL - Replace all primitive types with value types:
+// - MaxDiskUsage int -> MaxDiskUsage uint8
+// - CurrentProfile string -> ProfileName
+// - Protected []string -> ProtectedPaths type
+// - All profile fields with proper value types
 type Config struct {
 	Version        string              `json:"version" yaml:"version"`
 	SafetyLevel    SafetyLevelType     `json:"safety_level" yaml:"safety_level"`
-	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"`
-	Protected      []string            `json:"protected" yaml:"protected"`
+	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"` // TODO: Replace with MaxDiskUsage
+	Protected      []string            `json:"protected" yaml:"protected"`           // TODO: Replace with ProtectedPaths type
 	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`
-	CurrentProfile string              `json:"current_profile,omitempty" yaml:"current_profile,omitempty"`
+	CurrentProfile string              `json:"current_profile,omitempty" yaml:"current_profile,omitempty"` // TODO: Replace with ProfileName
 	LastClean      time.Time           `json:"last_clean" yaml:"last_clean"`
 	Updated        time.Time           `json:"updated" yaml:"updated"`
+}
+
+// TODO: Add type-safe constructor with validation
+func NewConfig(version string, safetyLevel SafetyLevelType, maxDiskUsage MaxDiskUsage) (*Config, error) {
+	if !maxDiskUsage.IsValid() {
+		return nil, fmt.Errorf("invalid max disk usage: %d", maxDiskUsage.Uint8())
+	}
+	
+	// TODO: Add complete validation for all fields
+	return &Config{
+		Version:      version,
+		SafetyLevel:  safetyLevel,
+		MaxDiskUsage: int(maxDiskUsage.Uint8()), // TODO: Remove type conversion
+		Protected:    []string{"/System", "/Applications", "/Library"}, // TODO: Use ProtectedPaths
+		Profiles:     make(map[string]*Profile),
+		LastClean:    time.Now(),
+		Updated:      time.Now(),
+	}, nil
 }
 
 // IsValid validates configuration

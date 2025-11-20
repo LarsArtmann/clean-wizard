@@ -29,6 +29,112 @@ var (
 	OperationModified = ChangeOperationType(ChangeOperationModifiedType)
 )
 
+// TODO: CRITICAL TYPE SAFETY IMPROVEMENTS NEEDED:
+// 1. Replace all primitive types in domain structs with these value types
+// 2. Add compile-time validation for all domain entities  
+// 3. Implement phantom types for state machines
+// 4. Make invalid states unrepresentable
+// 5. Add proper uint usage throughout codebase
+
+// Value Types with Type Safety and Domain Semantics
+// TODO: Expand these types throughout codebase to replace primitives
+
+// GenerationCount represents number of Nix generations to keep/remove
+type GenerationCount uint
+
+// NewGenerationCount creates a validated GenerationCount
+func NewGenerationCount(count uint) (GenerationCount, error) {
+	if count > 100 { // TODO: Make this configurable
+		return 0, fmt.Errorf("generation count %d exceeds maximum allowed (100)", count)
+	}
+	return GenerationCount(count), nil
+}
+
+// Uint returns the underlying uint value
+func (g GenerationCount) Uint() uint {
+	return uint(g)
+}
+
+// IsZero checks if the generation count is zero
+func (g GenerationCount) IsZero() bool {
+	return g.Uint() == 0
+}
+
+// IsValid checks if the generation count is within valid range
+func (g GenerationCount) IsValid() bool {
+	return g.Uint() <= 100
+}
+
+// DiskUsageBytes represents disk usage in bytes with type safety
+type DiskUsageBytes uint64
+
+// NewDiskUsageBytes creates a validated DiskUsageBytes
+func NewDiskUsageBytes(bytes uint64) (DiskUsageBytes, error) {
+	// TODO: Add reasonable bounds checking
+	return DiskUsageBytes(bytes), nil
+}
+
+// Uint64 returns the underlying uint64 value
+func (d DiskUsageBytes) Uint64() uint64 {
+	return uint64(d)
+}
+
+// IsZero checks if disk usage is zero
+func (d DiskUsageBytes) IsZero() bool {
+	return d.Uint64() == 0
+}
+
+// MaxDiskUsage represents maximum disk usage percentage
+type MaxDiskUsage uint8
+
+// NewMaxDiskUsage creates a validated MaxDiskUsage
+func NewMaxDiskUsage(percentage uint8) (MaxDiskUsage, error) {
+	if percentage > 100 {
+		return 0, fmt.Errorf("max disk usage percentage %d exceeds 100", percentage)
+	}
+	return MaxDiskUsage(percentage), nil
+}
+
+// Uint8 returns the underlying uint8 value
+func (m MaxDiskUsage) Uint8() uint8 {
+	return uint8(m)
+}
+
+// IsValid checks if the percentage is within valid range
+func (m MaxDiskUsage) IsValid() bool {
+	return m.Uint8() <= 100
+}
+
+// ProfileName represents a validated configuration profile name
+type ProfileName string
+
+// NewProfileName creates a validated ProfileName
+func NewProfileName(name string) (ProfileName, error) {
+	if len(name) == 0 {
+		return "", fmt.Errorf("profile name cannot be empty")
+	}
+	if len(name) > 50 { // TODO: Make this configurable
+		return "", fmt.Errorf("profile name '%s' exceeds maximum length (50)", name)
+	}
+	// TODO: Add character validation for allowed profile names
+	return ProfileName(name), nil
+}
+
+// String returns the underlying string value
+func (p ProfileName) String() string {
+	return string(p)
+}
+
+// IsEmpty checks if profile name is empty
+func (p ProfileName) IsEmpty() bool {
+	return p.String() == ""
+}
+
+// IsEqual checks if two profile names are equal
+func (p ProfileName) IsEqual(other ProfileName) bool {
+	return p.String() == other.String()
+}
+
 // CleanStrategy represents cleaning strategy with type safety
 type CleanStrategy = CleanStrategyType
 
