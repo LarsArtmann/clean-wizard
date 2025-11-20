@@ -51,7 +51,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		if err := v.ReadInConfig(); err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 				// Config file not found, return default config
-				return getDefaultConfig(), nil
+				return GetDefaultConfig(), nil
 			}
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
@@ -144,7 +144,7 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 		if err := v.ReadInConfig(); err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 				// Config file not found, return default config
-				return getDefaultConfig(), nil
+				return GetDefaultConfig(), nil
 			}
 			return nil, pkgerrors.HandleConfigError("LoadWithContextAndPath", err)
 		}

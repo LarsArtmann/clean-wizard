@@ -39,6 +39,26 @@ func (c *Container) UpdateConfig(config *domain.Config) {
 	c.config = config
 }
 
+// GetLogger returns logger instance
+func (c *Container) GetLogger() zerolog.Logger {
+	return c.logger
+}
+
+// GetConfig returns configuration instance
+func (c *Container) GetConfig() *domain.Config {
+	return c.config
+}
+
+// GetCleaner returns Nix cleaner instance
+func (c *Container) GetCleaner() domain.Cleaner {
+	return c.nixCleaner
+}
+
+// GetValidationMiddleware returns validation middleware instance
+func (c *Container) GetValidationMiddleware() *middleware.ValidationMiddleware {
+	return c.validation
+}
+
 // Shutdown gracefully shuts down of container
 func (c *Container) Shutdown(ctx context.Context) error {
 	c.logger.Info().Msg("Shutting down dependency injection container")
