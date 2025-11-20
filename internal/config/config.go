@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,6 +19,80 @@ const (
 	configName = ".clean-wizard"
 	configType = "yaml"
 )
+
+// parseSafetyLevelWithBackwardCompatibility parses safety level from viper with backward compatibility
+func parseSafetyLevelWithBackwardCompatibility(v *viper.Viper) domain.SafetyLevelType {
+	// Check for new safety_level key first
+	if v.IsSet("safety_level") {
+		safetyValue := v.Get("safety_level")
+		switch val := safetyValue.(type) {
+		case string:
+			// Handle string representation (e.g., "enabled", "disabled", "strict", "paranoid")
+			switch strings.ToLower(strings.TrimSpace(val)) {
+			case "disabled":
+				return domain.SafetyLevelDisabled
+			case "enabled":
+				return domain.SafetyLevelEnabled
+			case "strict":
+				return domain.SafetyLevelStrict
+			case "paranoid":
+				return domain.SafetyLevelParanoid
+			default:
+				log.Warn().Str("safety_level", val).Msg("Invalid safety_level string value, defaulting to enabled")
+				return domain.SafetyLevelEnabled
+			}
+		case int, int32, int64:
+			// Handle numeric representation (0, 1, 2, 3)
+			numVal := fmt.Sprintf("%v", val)
+			if numLevel, err := strconv.Atoi(numVal); err == nil {
+				switch domain.SafetyLevelType(numLevel) {
+				case domain.SafetyLevelDisabled:
+					return domain.SafetyLevelDisabled
+				case domain.SafetyLevelEnabled:
+					return domain.SafetyLevelEnabled
+				case domain.SafetyLevelStrict:
+					return domain.SafetyLevelStrict
+				case domain.SafetyLevelParanoid:
+					return domain.SafetyLevelParanoid
+				default:
+					log.Warn().Int("safety_level", numLevel).Msg("Invalid safety_level numeric value, defaulting to enabled")
+					return domain.SafetyLevelEnabled
+				}
+			}
+		case float64:
+			// Handle case where JSON unmarshaling produces float64
+			if numLevel := int(val); val == float64(numLevel) {
+				switch domain.SafetyLevelType(numLevel) {
+				case domain.SafetyLevelDisabled:
+					return domain.SafetyLevelDisabled
+				case domain.SafetyLevelEnabled:
+					return domain.SafetyLevelEnabled
+				case domain.SafetyLevelStrict:
+					return domain.SafetyLevelStrict
+				case domain.SafetyLevelParanoid:
+					return domain.SafetyLevelParanoid
+				default:
+					log.Warn().Int("safety_level", numLevel).Msg("Invalid safety_level numeric value, defaulting to enabled")
+					return domain.SafetyLevelEnabled
+				}
+			}
+		default:
+			log.Warn().Interface("safety_level", safetyValue).Msg("Unexpected safety_level type, defaulting to enabled")
+			return domain.SafetyLevelEnabled
+		}
+	}
+
+	// Fall back to legacy safe_mode boolean key
+	if v.IsSet("safe_mode") || v.GetBool("safe_mode") {
+		if v.GetBool("safe_mode") {
+			return domain.SafetyLevelEnabled
+		}
+		return domain.SafetyLevelDisabled
+	}
+
+	// Default fallback if neither key is present
+	return domain.SafetyLevelEnabled
+}
 
 // Load loads the configuration from file or creates default
 func Load() (*domain.Config, error) {
@@ -62,7 +137,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	config.SafetyLevel = domain.SafetyLevelEnabled
+	config.SafetyLevel = parseSafetyLevelWithBackwardCompatibility(v)
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
 	config.Protected = v.GetStringSlice("protected")
 
@@ -74,6 +149,34 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)
 	for name, profile := range config.Profiles {
+		// Convert boolean enabled to StatusType enum for profiles
+		var profileEnabled bool
+		if v.IsSet(fmt.Sprintf("profiles.%s.enabled", name)) {
+			v.UnmarshalKey(fmt.Sprintf("profiles.%s.enabled", name), &profileEnabled)
+			if profileEnabled {
+				profile.Status = domain.StatusEnabled
+			} else {
+				profile.Status = domain.StatusDisabled
+			}
+		} else {
+			// Fallback to string status parsing for backward compatibility
+			var profileStatusStr string
+			v.UnmarshalKey(fmt.Sprintf("profiles.%s.status", name), &profileStatusStr)
+			switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
+			case "DISABLED":
+				profile.Status = domain.StatusDisabled
+			case "ENABLED":
+				profile.Status = domain.StatusEnabled
+			case "INHERITED":
+				profile.Status = domain.StatusInherited
+			default:
+				if profileStatusStr != "" {
+					log.Warn().Str("profile", name).Str("status", profileStatusStr).Msg("Invalid profile status, defaulting to ENABLED")
+				}
+				profile.Status = domain.StatusEnabled
+			}
+		}
+
 		for i, op := range profile.Operations {
 			// Convert string risk level to RiskLevel enum
 			var riskLevelStr string
@@ -91,6 +194,35 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			default:
 				log.Warn().Str("risk_level", riskLevelStr).Msg("Invalid risk level, defaulting to LOW")
 				op.RiskLevel = domain.RiskLow
+			}
+
+			// Convert boolean enabled to StatusType enum for operations
+			operationEnabledKey := fmt.Sprintf("profiles.%s.operations.%d.enabled", name, i)
+			if v.IsSet(operationEnabledKey) {
+				var operationEnabled bool
+				v.UnmarshalKey(operationEnabledKey, &operationEnabled)
+				if operationEnabled {
+					op.Status = domain.StatusEnabled
+				} else {
+					op.Status = domain.StatusDisabled
+				}
+			} else {
+				// Fallback to string status parsing for backward compatibility
+				var opStatusStr string
+				v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.status", name, i), &opStatusStr)
+				switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
+				case "DISABLED":
+					op.Status = domain.StatusDisabled
+				case "ENABLED":
+					op.Status = domain.StatusEnabled
+				case "INHERITED":
+					op.Status = domain.StatusInherited
+				default:
+					if opStatusStr != "" {
+						log.Warn().Str("profile", name).Int("operation", i).Str("status", opStatusStr).Msg("Invalid operation status, defaulting to ENABLED")
+					}
+					op.Status = domain.StatusEnabled
+				}
 			}
 		}
 	}
@@ -155,7 +287,7 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	config.SafetyLevel = domain.SafetyLevelEnabled
+	config.SafetyLevel = parseSafetyLevelWithBackwardCompatibility(v)
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
 	config.Protected = v.GetStringSlice("protected")
 
@@ -167,6 +299,34 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 
 	// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)
 	for name, profile := range config.Profiles {
+		// Convert boolean enabled to StatusType enum for profiles
+		var profileEnabled bool
+		if v.IsSet(fmt.Sprintf("profiles.%s.enabled", name)) {
+			v.UnmarshalKey(fmt.Sprintf("profiles.%s.enabled", name), &profileEnabled)
+			if profileEnabled {
+				profile.Status = domain.StatusEnabled
+			} else {
+				profile.Status = domain.StatusDisabled
+			}
+		} else {
+			// Fallback to string status parsing for backward compatibility
+			var profileStatusStr string
+			v.UnmarshalKey(fmt.Sprintf("profiles.%s.status", name), &profileStatusStr)
+			switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
+			case "DISABLED":
+				profile.Status = domain.StatusDisabled
+			case "ENABLED":
+				profile.Status = domain.StatusEnabled
+			case "INHERITED":
+				profile.Status = domain.StatusInherited
+			default:
+				if profileStatusStr != "" {
+					log.Warn().Str("profile", name).Str("status", profileStatusStr).Msg("Invalid profile status, defaulting to ENABLED")
+				}
+				profile.Status = domain.StatusEnabled
+			}
+		}
+
 		for i, op := range profile.Operations {
 			// Convert string risk level to RiskLevel enum
 			var riskLevelStr string
@@ -184,6 +344,35 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 			default:
 				log.Warn().Str("risk_level", riskLevelStr).Msg("Invalid risk level, defaulting to LOW")
 				op.RiskLevel = domain.RiskLow
+			}
+
+			// Convert boolean enabled to StatusType enum for operations
+			operationEnabledKey := fmt.Sprintf("profiles.%s.operations.%d.enabled", name, i)
+			if v.IsSet(operationEnabledKey) {
+				var operationEnabled bool
+				v.UnmarshalKey(operationEnabledKey, &operationEnabled)
+				if operationEnabled {
+					op.Status = domain.StatusEnabled
+				} else {
+					op.Status = domain.StatusDisabled
+				}
+			} else {
+				// Fallback to string status parsing for backward compatibility
+				var opStatusStr string
+				v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.status", name, i), &opStatusStr)
+				switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
+				case "DISABLED":
+					op.Status = domain.StatusDisabled
+				case "ENABLED":
+					op.Status = domain.StatusEnabled
+				case "INHERITED":
+					op.Status = domain.StatusInherited
+				default:
+					if opStatusStr != "" {
+						log.Warn().Str("profile", name).Int("operation", i).Str("status", opStatusStr).Msg("Invalid operation status, defaulting to ENABLED")
+					}
+					op.Status = domain.StatusEnabled
+				}
 			}
 		}
 	}
