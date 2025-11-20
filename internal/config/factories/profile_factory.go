@@ -5,8 +5,8 @@ import (
 )
 
 // createStandardProfile creates a standard daily cleanup profile
-// Original location: internal/config/test_data.go lines 60-75
-func createStandardProfile() *domain.Profile {
+// Exported for test compatibility
+func CreateStandardProfile() *domain.Profile {
 	return &domain.Profile{
 		Name:        "daily",
 		Description: "Daily cleanup",

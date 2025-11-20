@@ -5,7 +5,6 @@ import (
 )
 
 // CreateBenchmarkConfig creates clean config for performance testing
-// Original location: internal/config/test_data.go lines 322-340
 func CreateBenchmarkConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
@@ -20,7 +19,6 @@ func CreateBenchmarkConfig() *domain.Config {
 }
 
 // CreateValidationTestConfigs creates test configurations specifically for validation testing
-// Original location: internal/config/test_data.go lines 180-200
 func CreateValidationTestConfigs() map[string]*domain.Config {
 	return map[string]*domain.Config{
 		"valid": createBaseConfig("1.0.0", 50, []string{"/System", "/Library", "/Applications"}),
@@ -29,7 +27,6 @@ func CreateValidationTestConfigs() map[string]*domain.Config {
 }
 
 // createBaseConfig creates a base configuration with standard settings
-// Original location: internal/config/test_data.go lines 76-90
 func createBaseConfig(version string, maxDiskUsage int, protected []string) *domain.Config {
 	return &domain.Config{
 		Version:      version,
@@ -37,7 +34,7 @@ func createBaseConfig(version string, maxDiskUsage int, protected []string) *dom
 		MaxDiskUsage: maxDiskUsage,
 		Protected:    protected,
 		Profiles: map[string]*domain.Profile{
-			"daily": createStandardProfile(),
+			"daily": CreateStandardProfile(),
 		},
 	}
 }

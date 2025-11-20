@@ -4,7 +4,11 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
 )
+
+// CreateBenchmarkConfig alias for test compatibility
+var CreateBenchmarkConfig = factories.CreateBenchmarkConfig
 
 // BenchmarkValidation_ConfigValidation tests full configuration validation performance
 func BenchmarkValidation_ConfigValidation(b *testing.B) {

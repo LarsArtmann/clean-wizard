@@ -2,7 +2,6 @@ package factories
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
@@ -85,7 +84,7 @@ func CreateValidationTestConfig(version string, maxDiskUsage int, protected []st
 		MaxDiskUsage: maxDiskUsage,
 		Protected:    protected,
 		Profiles: map[string]*domain.Profile{
-			"daily": createStandardProfile(),
+			"daily": CreateStandardProfile(),
 		},
 	}
 }
