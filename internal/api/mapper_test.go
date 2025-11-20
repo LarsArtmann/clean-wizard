@@ -1,6 +1,8 @@
 package api
 
 import (
+	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -95,8 +97,32 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 		t.Errorf("Expected operation name 'nix-generations', got %s", operation.Name)
 	}
 
+	// Assert risk-related fields are correctly mapped
 	if operation.RiskLevel != domain.RiskLow {
-		t.Errorf("Expected risk level LOW, got %v", operation.RiskLevel)
+		t.Errorf("Expected risk level %v, got %v", domain.RiskLow, operation.RiskLevel)
+	}
+
+	// Assert settings are not nil and round-trip correctly
+	if operation.Settings == nil {
+		t.Fatal("Expected operation settings to be non-nil")
+	}
+
+	// Verify key fields from domain.DefaultSettings round-trip for nix-generations
+	defaultSettings := domain.DefaultSettings(domain.OperationTypeNixGenerations)
+	if defaultSettings == nil || defaultSettings.NixGenerations == nil {
+		t.Fatal("Expected default nix-generations settings to be available")
+	}
+
+	if operation.Settings.NixGenerations == nil {
+		t.Error("Expected nix-generations settings to be present")
+	} else {
+		// Verify default settings are applied correctly
+		if operation.Settings.NixGenerations.Generations != defaultSettings.NixGenerations.Generations {
+			t.Errorf("Expected generations %d, got %d", defaultSettings.NixGenerations.Generations, operation.Settings.NixGenerations.Generations)
+		}
+		if operation.Settings.NixGenerations.Optimization != defaultSettings.NixGenerations.Optimization {
+			t.Errorf("Expected optimization %v, got %v", defaultSettings.NixGenerations.Optimization, operation.Settings.NixGenerations.Optimization)
+		}
 	}
 }
 
@@ -149,14 +175,19 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 		t.Errorf("Expected maxDiskUsage %d, got %d", domainConfig.MaxDiskUsage, publicConfig.MaxDiskUsage)
 	}
 
-	// Validate mapped profile
+	// Assert risk-related fields are correctly mapped in the domain -> public direction
 	profile, exists := publicConfig.Profiles["test"]
 	if !exists {
 		t.Fatalf("Expected profile 'test' to exist")
 	}
 
-	if profile.Name != "test" {
-		t.Errorf("Expected profile name 'test', got %s", profile.Name)
+	if len(profile.Operations) != 1 {
+		t.Fatalf("Expected 1 operation in profile 'test', got %d", len(profile.Operations))
+	}
+
+	operation := profile.Operations[0]
+	if operation.RiskLevel != PublicRiskMedium {
+		t.Errorf("Expected operation risk level %v, got %v", PublicRiskMedium, operation.RiskLevel)
 	}
 }
 
@@ -410,9 +441,9 @@ func TestMapConfigToDomain_InvalidRiskLevel(t *testing.T) {
 		t.Fatalf("Expected non-empty error message")
 	}
 
-	// Check if error mentions profile or validation
-	if !contains(errorMsg, "profile") && !contains(errorMsg, "validation") && !contains(errorMsg, "name") {
-		t.Errorf("Expected error to mention profile, validation, or name, got: %s", errorMsg)
+	// Check if error has mapping failure prefix (mapping phase failure)
+	if !strings.HasPrefix(errorMsg, "failed to map profile") {
+		t.Errorf("Expected error to start with 'failed to map profile', got: %s", errorMsg)
 	}
 
 	t.Logf("✅ Invalid risk level test passed: %v", errorMsg)
@@ -453,9 +484,9 @@ func TestMapConfigToDomain_ProfileMappingFailure(t *testing.T) {
 		t.Fatalf("Expected non-empty error message")
 	}
 
-	// Should mention profile, validation, or name (domain validation catches empty name)
-	if !contains(errorMsg, "profile") && !contains(errorMsg, "validation") && !contains(errorMsg, "name") {
-		t.Errorf("Expected error to mention profile, validation, or name, got: %s", errorMsg)
+	// Check if error has domain config validation prefix
+	if !strings.HasPrefix(errorMsg, "domain config validation failed: ") {
+		t.Errorf("Expected error to start with 'domain config validation failed: ', got: %s", errorMsg)
 	}
 
 	t.Logf("✅ Profile mapping failure test passed: %v", errorMsg)
@@ -505,27 +536,12 @@ func TestMapConfigToDomain_DomainValidationFailure(t *testing.T) {
 		t.Fatalf("Expected non-empty error message")
 	}
 
-	// Should mention mapping or validation failure
-	if !contains(errorMsg, "profile") && !contains(errorMsg, "map") && !contains(errorMsg, "validation") {
-		t.Errorf("Expected error to mention profile, map, or validation, got: %s", errorMsg)
+	// Should mention validation failure
+	if !strings.Contains(errorMsg, "validation") {
+		t.Errorf("Expected error to mention 'validation', got: %s", errorMsg)
 	}
 
 	t.Logf("✅ Domain validation failure test passed: %v", errorMsg)
-}
-
-// Helper function to check if string contains substring
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(substr) == 0 ||
-		(len(s) > len(substr) && findSubstring(s, substr)))
-}
-
-func findSubstring(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
 }
 
 // === OPERATION TYPE MAPPING TESTS ===
@@ -595,8 +611,20 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Enabled:     true,
 				Settings:    OperationSettings{},
 			},
-			shouldError:   true,
-			errorContains: "unknown/unsupported operation type",
+			expectedType: "unknown-operation",
+			shouldError:  false, // Should not error with custom operation support
+		},
+		{
+			name: "Custom Operation with hyphens",
+			publicOp: PublicOperation{
+				Name:        "my-custom-op",
+				Description: "My custom operation",
+				RiskLevel:   PublicRiskMedium,
+				Enabled:     true,
+				Settings:    OperationSettings{},
+			},
+			expectedType: "my-custom-op",
+			shouldError:  false, // Should not error with custom operation support
 		},
 		{
 			name: "Invalid Risk Level",
@@ -621,7 +649,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 					t.Errorf("Expected error containing '%s', got nil", tc.errorContains)
 					return
 				}
-				if !contains(err.Error(), tc.errorContains) {
+				if !strings.Contains(err.Error(), tc.errorContains) {
 					t.Errorf("Expected error to contain '%s', got '%s'", tc.errorContains, err.Error())
 				}
 				if result != nil {
@@ -642,9 +670,61 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 					t.Errorf("Expected name '%s', got '%s'", tc.publicOp.Name, result.Name)
 				}
 
+				// Verify mapped operation type matches expected type
+				actualOpType := domain.GetOperationType(result.Name)
+				if actualOpType != domain.OperationType(tc.expectedType) {
+					t.Errorf("Expected operation type '%s', got '%s'", tc.expectedType, actualOpType)
+				}
+
 				// Verify settings are not nil (should have default settings)
 				if result.Settings == nil {
 					t.Errorf("Expected non-nil settings for operation type '%s'", tc.expectedType)
+				} else {
+					// Verify concrete type/kind of result.Settings corresponds to expected default settings
+					expectedDefaultSettings := domain.DefaultSettings(actualOpType)
+					if expectedDefaultSettings == nil {
+						t.Errorf("Expected default settings for operation type '%s', got nil", actualOpType)
+					} else {
+						// Use reflect to compare settings structure types
+						resultType := reflect.TypeOf(result.Settings)
+						expectedType := reflect.TypeOf(expectedDefaultSettings)
+						if resultType != expectedType {
+							t.Errorf("Expected settings type %v, got %v for operation '%s'", expectedType, resultType, tc.expectedType)
+						}
+
+						// Verify specific settings field matches expected default
+						switch actualOpType {
+						case domain.OperationTypeNixGenerations:
+							if result.Settings.NixGenerations == nil {
+								t.Errorf("Expected NixGenerations settings to be present for nix-generations")
+							} else {
+								expectedNix := expectedDefaultSettings.NixGenerations
+								if result.Settings.NixGenerations.Generations != expectedNix.Generations {
+									t.Errorf("Expected NixGenerations.Generations %d, got %d", expectedNix.Generations, result.Settings.NixGenerations.Generations)
+								}
+								if result.Settings.NixGenerations.Optimization != expectedNix.Optimization {
+									t.Errorf("Expected NixGenerations.Optimization %v, got %v", expectedNix.Optimization, result.Settings.NixGenerations.Optimization)
+								}
+							}
+						case domain.OperationTypeTempFiles:
+							if result.Settings.TempFiles == nil {
+								t.Errorf("Expected TempFiles settings to be present for temp-files")
+							} else {
+								expectedTemp := expectedDefaultSettings.TempFiles
+								if result.Settings.TempFiles.OlderThan != expectedTemp.OlderThan {
+									t.Errorf("Expected TempFiles.OlderThan %s, got %s", expectedTemp.OlderThan, result.Settings.TempFiles.OlderThan)
+								}
+							}
+						case domain.OperationTypeHomebrew:
+							if result.Settings.Homebrew == nil {
+								t.Errorf("Expected Homebrew settings to be present for homebrew-cleanup")
+							}
+						case domain.OperationTypeSystemTemp:
+							if result.Settings.SystemTemp == nil {
+								t.Errorf("Expected SystemTemp settings to be present for system-temp")
+							}
+						}
+					}
 				}
 
 				// Verify risk level mapping

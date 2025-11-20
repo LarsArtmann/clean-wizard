@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"slices"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -128,20 +127,8 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 	// Derive operation type from operation name
 	opType := domain.GetOperationType(publicOperation.Name)
 
-	// Check if this is a known/standard operation type
-	knownTypes := []domain.OperationType{
-		domain.OperationTypeNixGenerations,
-		domain.OperationTypeTempFiles,
-		domain.OperationTypeHomebrew,
-		domain.OperationTypeSystemTemp,
-	}
-	isKnown := slices.Contains(knownTypes, opType)
-
-	if !isKnown {
-		return nil, fmt.Errorf("unknown/unsupported operation type: %s", publicOperation.Name)
-	}
-
 	// Get default settings for the specific operation type
+	// domain.DefaultSettings handles custom operations by returning empty settings
 	settings := domain.DefaultSettings(opType)
 	if settings == nil {
 		return nil, fmt.Errorf("failed to get default settings for operation type: %s", opType)
@@ -251,6 +238,23 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 	return result.Ok(publicResult)
 }
 
+// mapOperationTypeToScanType converts public operation type to domain scan type
+func mapOperationTypeToScanType(opType OperationType) domain.ScanTypeType {
+	switch opType {
+	case OperationTypeNixGenerations:
+		return domain.ScanTypeNixStoreType
+	case OperationTypeTempFiles:
+		return domain.ScanTypeTempType
+	case OperationTypeLogFiles:
+		return domain.ScanTypeSystemType
+	case OperationTypeCacheFiles:
+		return domain.ScanTypeTempType
+	default:
+		// Default to temp type for unknown operations
+		return domain.ScanTypeTempType
+	}
+}
+
 // MapCleanRequestToDomain converts public API clean request to domain model
 func MapCleanRequestToDomain(publicRequest *CleanRequest) result.Result[*domain.CleanRequest] {
 	if publicRequest == nil {
@@ -275,10 +279,10 @@ func MapCleanRequestToDomain(publicRequest *CleanRequest) result.Result[*domain.
 	for _, opType := range publicRequest.Operations {
 		// Convert operation type to domain scan item
 		item := domain.ScanItem{
-			Path:     string(opType),          // Use operation type as path identifier
-			ScanType: domain.ScanTypeTempType, // Use temp scan type for operations
-			Size:     0,                       // Will be calculated during scanning
-			Created:  time.Time{},             // Will be set during scanning
+			Path:     string(opType),                     // Use operation type as path identifier
+			ScanType: mapOperationTypeToScanType(opType),  // Map to correct scan type
+			Size:     0,                                   // Will be calculated during scanning
+			Created:  time.Time{},                         // Will be set during scanning
 		}
 		items = append(items, item)
 	}
@@ -306,7 +310,7 @@ func MapStrategyToDomain(publicStrategy PublicStrategy) (domain.CleanStrategyTyp
 	case PublicStrategyDryRun:
 		return domain.StrategyDryRun, nil
 	default:
-		return domain.StrategyDryRun, fmt.Errorf("unknown strategy: %s", publicStrategy)
+		return domain.CleanStrategyType(0), fmt.Errorf("unknown strategy: %s", publicStrategy)
 	}
 }
 
