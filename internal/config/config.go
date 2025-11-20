@@ -160,6 +160,57 @@ func GetCurrentTime() time.Time {
 }
 
 // fixConfigTypesAndEnums handles the conversion of string-based config values to proper enums and types
+
+// createDailyProfile creates daily cleanup profile for default config
+func createDailyProfile() *domain.Profile {
+	return &domain.Profile{
+		Name:        "daily",
+		Description: "Quick daily cleanup",
+		Operations: []domain.CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Clean old Nix generations",
+				RiskLevel:   domain.RiskLow,
+				Status:      domain.StatusEnabled,
+				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+			},
+			{
+				Name:        "temp-files",
+				Description: "Clean temporary files",
+				RiskLevel:   domain.RiskLow,
+				Status:      domain.StatusEnabled,
+				Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
+			},
+		},
+		Status: domain.StatusEnabled,
+	}
+}
+
+// createAggressiveProfile creates aggressive cleanup profile for default config
+func createAggressiveProfile() *domain.Profile {
+	return &domain.Profile{
+		Name:        "aggressive",
+		Description: "Deep aggressive cleanup",
+		Operations: []domain.CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Clean old Nix generations",
+				RiskLevel:   domain.RiskHigh,
+				Status:      domain.StatusEnabled,
+				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+			},
+			{
+				Name:        "homebrew-cleanup",
+				Description: "Clean old Homebrew packages",
+				RiskLevel:   domain.RiskMedium,
+				Status:      domain.StatusEnabled,
+				Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
+			},
+		},
+		Status: domain.StatusEnabled,
+	}
+}
+
 // GetDefaultConfig returns the default configuration
 func GetDefaultConfig() *domain.Config {
 	now := GetCurrentTime()
@@ -174,48 +225,8 @@ func GetDefaultConfig() *domain.Config {
 			"/Library",
 		},
 		Profiles: map[string]*domain.Profile{
-			"daily": {
-				Name:        "daily",
-				Description: "Quick daily cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "temp-files",
-						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
-					},
-				},
-				Status: domain.StatusEnabled,
-			},
-			"aggressive": {
-				Name:        "aggressive",
-				Description: "Deep aggressive cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskHigh,
-						Status:      domain.StatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "homebrew-cleanup",
-						Description: "Clean old Homebrew packages",
-						RiskLevel:   domain.RiskMedium,
-						Status:      domain.StatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
-					},
-				},
-				Status: domain.StatusEnabled,
-			},
+			"daily":      createDailyProfile(),
+			"aggressive": createAggressiveProfile(),
 			"comprehensive": {
 				Name:        "comprehensive",
 				Description: "Complete system cleanup",
