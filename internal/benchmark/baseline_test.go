@@ -9,8 +9,8 @@ import (
 
 // BenchmarkSystemMetrics benchmarks system metric collection performance
 func BenchmarkSystemMetrics(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		var m runtime.MemStats
 		runtime.ReadMemStats(&m)
 		_ = m
@@ -19,8 +19,8 @@ func BenchmarkSystemMetrics(b *testing.B) {
 
 // BenchmarkMemoryAllocation benchmarks memory allocation patterns
 func BenchmarkMemoryAllocation(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		// Allocate and release memory to simulate workload
 		data := make([][]byte, 100)
 		for j := range data {
@@ -32,8 +32,8 @@ func BenchmarkMemoryAllocation(b *testing.B) {
 
 // BenchmarkGoroutineCreation benchmarks goroutine creation/destruction
 func BenchmarkGoroutineCreation(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		done := make(chan bool)
 		go func() {
 			// Simulate minimal work
@@ -46,11 +46,11 @@ func BenchmarkGoroutineCreation(b *testing.B) {
 
 // BenchmarkGCPressure benchmarks memory allocation and garbage collection
 func BenchmarkGCPressure(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for i := 0; b.Loop(); i++ {
 		// Create memory pressure
 		var objects [][]byte
-		for j := 0; j < 10; j++ {
+		for range 10 {
 			objects = append(objects, make([]byte, 1024*10)) // 10KB each
 		}
 		// Force GC occasionally
@@ -62,31 +62,31 @@ func BenchmarkGCPressure(b *testing.B) {
 
 // BenchmarkConcurrentOperations benchmarks concurrent goroutine operations
 func BenchmarkConcurrentOperations(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		var wg sync.WaitGroup
-		for j := 0; j < 10; j++ {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				// Simulate work
-				time.Sleep(time.Nanosecond * 10)
-			}()
+	b.ReportAllocs()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			var wg sync.WaitGroup
+			for range 10 {
+				wg.Go(func() {
+					// Simulate work
+					time.Sleep(time.Nanosecond * 10)
+				})
+			}
+			wg.Wait()
 		}
-		wg.Wait()
-	}
+	})
 }
 
-// EstablishPerformanceBaseline establishes a comprehensive performance baseline
-func EstablishPerformanceBaseline(b *testing.B) {
+// establishPerformanceBaseline establishes a comprehensive performance baseline
+func establishPerformanceBaseline(b *testing.B) {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	
+
 	b.Logf("Performance baseline established:")
 	b.Logf("- Memory Alloc: %d bytes", m.Alloc)
 	b.Logf("- Heap System: %d bytes", m.HeapSys)
 	b.Logf("- Goroutines: %d", runtime.NumGoroutine())
 	b.Logf("- NumGC: %d", m.NumGC)
-	b.Logf("- CPU Info: %d CPUs, GoMaxProcs: %d", 
+	b.Logf("- CPU Info: %d CPUs, GoMaxProcs: %d",
 		runtime.NumCPU(), runtime.GOMAXPROCS(0))
 }
