@@ -18,16 +18,35 @@ func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(fieldPrefix string, se
 		return
 	}
 
-	// Validate generations range
-	if settings.Generations < MinNixGenerations || settings.Generations > MaxNixGenerations {
-		fieldName := fieldPrefix + ".nix_generations"
+	changed := false
+	original := settings.Generations
+	fieldName := fieldPrefix + ".nix_generations"
+
+	// Validate and clamp generations range
+	if settings.Generations < MinNixGenerations {
+		settings.Generations = MinNixGenerations
 		result.Warnings = append(result.Warnings, SanitizationWarning{
 			Field:     fieldName,
-			Original:  settings.Generations,
+			Original:  original,
 			Sanitized: settings.Generations,
-			Reason:    fmt.Sprintf("Nix generations must be between %d and %d, got %d", MinNixGenerations, MaxNixGenerations, settings.Generations),
+			Reason:    fmt.Sprintf("Nix generations clamped to minimum %d", MinNixGenerations),
 		})
+		result.addChange(fieldName, original, settings.Generations, "clamped to minimum")
+		changed = true
+	} else if settings.Generations > MaxNixGenerations {
+		settings.Generations = MaxNixGenerations
+		result.Warnings = append(result.Warnings, SanitizationWarning{
+			Field:     fieldName,
+			Original:  original,
+			Sanitized: settings.Generations,
+			Reason:    fmt.Sprintf("Nix generations clamped to maximum %d", MaxNixGenerations),
+		})
+		result.addChange(fieldName, original, settings.Generations, "clamped to maximum")
+		changed = true
 	}
 
-	result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".nix_generations")
+	// Only mark as sanitized if changes actually occurred
+	if changed || original != settings.Generations {
+		result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".nix_generations")
+	}
 }

@@ -8,6 +8,37 @@ import (
 	"time"
 )
 
+// FormatDuration converts time.Duration to normalized string format
+func FormatDuration(d time.Duration) string {
+	if d == 0 {
+		return "0"
+	}
+	
+	// Normalize to the most appropriate unit
+	if d < time.Minute {
+		return d.String()
+	}
+	
+	if d < time.Hour {
+		minutes := int(d.Minutes())
+		return fmt.Sprintf("%dm", minutes)
+	}
+	
+	if d < 24*time.Hour {
+		hours := int(d.Hours())
+		return fmt.Sprintf("%dh", hours)
+	}
+	
+	// For durations >= 24h, use days
+	days := int(d.Hours()) / 24
+	remainingHours := int(d.Hours()) % 24
+	
+	if remainingHours == 0 {
+		return fmt.Sprintf("%dd", days)
+	}
+	return fmt.Sprintf("%dd%dh", days, remainingHours)
+}
+
 // ParseCustomDuration parses human-readable duration formats like "7d", "24h", "30m"
 // and converts them to Go time.Duration
 func ParseCustomDuration(durationStr string) (time.Duration, error) {

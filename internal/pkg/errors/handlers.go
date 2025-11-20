@@ -50,7 +50,7 @@ func HandleConfigError(operation string, err error) *CleanWizardError {
 func HandleValidationError(operation string, err error) *CleanWizardError {
 	baseErr := NewError(ErrConfigValidation, fmt.Sprintf("Validation error: %s", err.Error()))
 	baseErr.Operation = operation
-	baseErr.WithDetail("validation_type", "comprehensive")
+	baseErr = baseErr.WithDetail("validation_type", "comprehensive")
 	return baseErr
 }
 

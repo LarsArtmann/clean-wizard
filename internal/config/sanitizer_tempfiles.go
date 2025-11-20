@@ -26,13 +26,20 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, setting
 
 	// Always validate duration format if not empty (regardless of TrimWhitespace flag)
 	if settings.OlderThan != "" {
-		if _, err := domain.ParseCustomDuration(settings.OlderThan); err != nil {
+		if parsedDuration, err := domain.ParseCustomDuration(settings.OlderThan); err != nil {
 			result.Warnings = append(result.Warnings, SanitizationWarning{
 				Field:     fieldPrefix + ".older_than",
 				Original:  originalOlderThan, // Use original pre-trim value
 				Sanitized: settings.OlderThan,
 				Reason:    fmt.Sprintf("invalid duration format: %v", err),
 			})
+		} else {
+			// Normalize the duration to canonical form
+			normalizedDuration := domain.FormatDuration(parsedDuration)
+			if strings.TrimSpace(originalOlderThan) != normalizedDuration {
+				settings.OlderThan = normalizedDuration
+				result.addChange(fieldPrefix+".older_than", originalOlderThan, normalizedDuration, "normalized duration")
+			}
 		}
 	}
 

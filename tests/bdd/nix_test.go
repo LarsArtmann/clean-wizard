@@ -35,7 +35,7 @@ func TestNixCleaningBDD(t *testing.T) {
 		t.Log("✅ Given I have multiple Nix generations")
 
 		// When I run "clean-wizard clean --dry-run"
-		cmd := exec.CommandContext(context.Background(), "go", "run", "../../cmd/clean-wizard", "clean", "--dry-run")
+		cmd := exec.CommandContext(context.Background(), "go", "run", "../../cmd/clean-wizard/main.go", "clean", "--dry-run")
 		output, err := cmd.CombinedOutput()
 		// Then I should see which generations would be deleted
 		if err != nil {

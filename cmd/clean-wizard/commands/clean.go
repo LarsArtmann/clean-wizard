@@ -19,7 +19,7 @@ var (
 )
 
 // NewCleanCommand creates clean command with proper domain types
-func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
+func NewCleanCommand() *cobra.Command {
 	var configFile string
 	var profileName string
 

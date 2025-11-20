@@ -68,6 +68,10 @@ func LoadEnvironmentConfig() (*EnvironmentConfig, error) {
 		return nil, err
 	}
 
+	if err := cfg.ValidateEnvironmentConfig(); err != nil {
+		return nil, err
+	}
+
 	return cfg, nil
 }
 
@@ -78,6 +82,10 @@ func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error) 
 	if err := env.Parse(cfg, env.Options{
 		Prefix: prefix,
 	}); err != nil {
+		return nil, err
+	}
+
+	if err := cfg.ValidateEnvironmentConfig(); err != nil {
 		return nil, err
 	}
 
