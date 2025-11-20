@@ -1,0 +1,2781 @@
+{
+  "statistics": {
+    "detectionDate": "2025-11-20T18:23:32.506Z",
+    "formats": {
+      "css": {
+        "sources": {
+          "reports/html/styles/prism.css": {
+            "lines": 7,
+            "tokens": 232,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 7,
+          "tokens": 232,
+          "sources": 1,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "javascript": {
+        "sources": {
+          "reports/html/js/prism.js": {
+            "lines": 15,
+            "tokens": 4580,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 15,
+          "tokens": 4580,
+          "sources": 1,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "go": {
+        "sources": {
+          "internal/pkg/errors/errors.go": {
+            "lines": 415,
+            "tokens": 3329,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/pkg/errors/handlers.go": {
+            "lines": 97,
+            "tokens": 751,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/pkg/errors/errors_test.go": {
+            "lines": 77,
+            "tokens": 615,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/root.go": {
+            "lines": 11,
+            "tokens": 58,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/init.go": {
+            "lines": 19,
+            "tokens": 111,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/scan.go": {
+            "lines": 205,
+            "tokens": 1542,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/util.go": {
+            "lines": 22,
+            "tokens": 116,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/profile.go": {
+            "lines": 291,
+            "tokens": 2261,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/clean.go": {
+            "lines": 218,
+            "tokens": 1656,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/config.go": {
+            "lines": 27,
+            "tokens": 157,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/commands/generate.go": {
+            "lines": 265,
+            "tokens": 506,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/duration_parser_test.go": {
+            "lines": 359,
+            "tokens": 2519,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/type_safe_enums.go": {
+            "lines": 752,
+            "tokens": 5036,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/benchmarks_test.go": {
+            "lines": 90,
+            "tokens": 832,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/operation_settings.go": {
+            "lines": 162,
+            "tokens": 966,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/duration_parser.go": {
+            "lines": 108,
+            "tokens": 748,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/types.go": {
+            "lines": 194,
+            "tokens": 1432,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/interfaces.go": {
+            "lines": 28,
+            "tokens": 180,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/config_loader.go": {
+            "lines": 131,
+            "tokens": 825,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/domain_fuzz_test.go": {
+            "lines": 62,
+            "tokens": 412,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/config.go": {
+            "lines": 169,
+            "tokens": 1206,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/cleanresult_test.go": {
+            "lines": 137,
+            "tokens": 959,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/domain/enum_helper_test.go": {
+            "lines": 185,
+            "tokens": 1400,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/cleaner/nix_test.go": {
+            "lines": 106,
+            "tokens": 806,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/cleaner/nix.go": {
+            "lines": 174,
+            "tokens": 1329,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/errors/errors.go": {
+            "lines": 39,
+            "tokens": 251,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/errors/centralized.go": {
+            "lines": 223,
+            "tokens": 1632,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/errors/adapters.go": {
+            "lines": 259,
+            "tokens": 1718,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/errors/filesystem_integration_test.go": {
+            "lines": 128,
+            "tokens": 1128,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/errors/types.go": {
+            "lines": 273,
+            "tokens": 1728,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/errors/errors_test.go": {
+            "lines": 418,
+            "tokens": 4121,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/api/mapper.go": {
+            "lines": 386,
+            "tokens": 2886,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/api/types.go": {
+            "lines": 106,
+            "tokens": 593,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/api/mapper_test.go": {
+            "lines": 751,
+            "tokens": 5514,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/format/format.go": {
+            "lines": 68,
+            "tokens": 561,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/format/format_test.go": {
+            "lines": 135,
+            "tokens": 1299,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/format/bytes_function.go": {
+            "lines": 5,
+            "tokens": 31,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/adapters/errors.go": {
+            "lines": 62,
+            "tokens": 412,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/adapters/ui_adapter.go": {
+            "lines": 219,
+            "tokens": 1275,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/adapters/environment.go": {
+            "lines": 259,
+            "tokens": 1789,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/adapters/rate_limiter.go": {
+            "lines": 51,
+            "tokens": 309,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/adapters/adapters_test.go": {
+            "lines": 218,
+            "tokens": 1889,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/adapters/nix.go": {
+            "lines": 244,
+            "tokens": 2127,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/adapters/cache_manager.go": {
+            "lines": 92,
+            "tokens": 608,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/adapters/http_client.go": {
+            "lines": 164,
+            "tokens": 1335,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validator_field.go": {
+            "lines": 76,
+            "tokens": 587,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/enhanced_loader_api.go": {
+            "lines": 119,
+            "tokens": 904,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validator_profile.go": {
+            "lines": 67,
+            "tokens": 576,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/sanitizer_homebrew.go": {
+            "lines": 47,
+            "tokens": 327,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/enhanced_loader_types.go": {
+            "lines": 110,
+            "tokens": 610,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/integration_test.go": {
+            "lines": 192,
+            "tokens": 1403,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/enhanced_loader.go": {
+            "lines": 184,
+            "tokens": 1432,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/enhanced_loader_defaults.go": {
+            "lines": 35,
+            "tokens": 201,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validation_sanitizer_test.go": {
+            "lines": 136,
+            "tokens": 1038,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 53,
+            "duplicatedTokens": 388,
+            "percentage": 38.97,
+            "percentageTokens": 37.38,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/enhanced_loader_cache.go": {
+            "lines": 57,
+            "tokens": 361,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/enhanced_loader_private.go": {
+            "lines": 118,
+            "tokens": 892,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/bdd_framework.go": {
+            "lines": 150,
+            "tokens": 1020,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/type_safe_validation_rules.go": {
+            "lines": 182,
+            "tokens": 1206,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validator_business.go": {
+            "lines": 134,
+            "tokens": 1138,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validator_crossfield.go": {
+            "lines": 64,
+            "tokens": 484,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validation_middleware.go": {
+            "lines": 316,
+            "tokens": 2186,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validator_rules.go": {
+            "lines": 139,
+            "tokens": 869,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/sanitizer_profile_main.go": {
+            "lines": 126,
+            "tokens": 1099,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validation_middleware_rules.go": {
+            "lines": 48,
+            "tokens": 380,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/safety_level_test.go": {
+            "lines": 344,
+            "tokens": 1885,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/sanitizer_paths.go": {
+            "lines": 100,
+            "tokens": 719,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validation_result_constructor.go": {
+            "lines": 15,
+            "tokens": 85,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/sanitizer_systemtemp.go": {
+            "lines": 79,
+            "tokens": 626,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/sanitizer_nix.go": {
+            "lines": 51,
+            "tokens": 389,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/simple_fuzz_test.go": {
+            "lines": 149,
+            "tokens": 949,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/constants.go": {
+            "lines": 73,
+            "tokens": 373,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/sanitizer_operation_settings.go": {
+            "lines": 63,
+            "tokens": 455,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/config_fixer.go": {
+            "lines": 167,
+            "tokens": 1534,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validation_validator_test.go": {
+            "lines": 262,
+            "tokens": 1979,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validation_middleware_analysis.go": {
+            "lines": 207,
+            "tokens": 1656,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/sanitizer_tempfiles.go": {
+            "lines": 84,
+            "tokens": 676,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validator_structure.go": {
+            "lines": 100,
+            "tokens": 710,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/semver_validation_test.go": {
+            "lines": 146,
+            "tokens": 1237,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 78,
+            "duplicatedTokens": 682,
+            "percentage": 53.42,
+            "percentageTokens": 55.13,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/bdd_nix_validation_test.go": {
+            "lines": 394,
+            "tokens": 2893,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 102,
+            "duplicatedTokens": 730,
+            "percentage": 25.89,
+            "percentageTokens": 25.23,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/safe_test.go": {
+            "lines": 275,
+            "tokens": 2156,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validator.go": {
+            "lines": 176,
+            "tokens": 1164,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validation_benchmark_test.go": {
+            "lines": 198,
+            "tokens": 1357,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/type_safe_validation_rules_test.go": {
+            "lines": 248,
+            "tokens": 2038,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/safe.go": {
+            "lines": 210,
+            "tokens": 1348,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/validation_types_test.go": {
+            "lines": 133,
+            "tokens": 898,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 53,
+            "duplicatedTokens": 388,
+            "percentage": 39.85,
+            "percentageTokens": 43.21,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/config.go": {
+            "lines": 508,
+            "tokens": 4592,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 252,
+            "duplicatedTokens": 2538,
+            "percentage": 49.61,
+            "percentageTokens": 55.27,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/config/sanitizer.go": {
+            "lines": 226,
+            "tokens": 1671,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/di/api_services.go": {
+            "lines": 3,
+            "tokens": 7,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/di/container.go": {
+            "lines": 66,
+            "tokens": 409,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/di/container_test.go": {
+            "lines": 110,
+            "tokens": 1030,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/result/type_test.go": {
+            "lines": 221,
+            "tokens": 1799,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/result/simple_fuzz_test.go": {
+            "lines": 100,
+            "tokens": 643,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/result/type.go": {
+            "lines": 83,
+            "tokens": 645,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/middleware/validation_test.go": {
+            "lines": 100,
+            "tokens": 905,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/middleware/validation.go": {
+            "lines": 40,
+            "tokens": 365,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/mocks/nix.go": {
+            "lines": 29,
+            "tokens": 345,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "internal/benchmark/baseline_test.go": {
+            "lines": 75,
+            "tokens": 509,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/bdd/configuration_workflow_bdd_test.go": {
+            "lines": 382,
+            "tokens": 2811,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/bdd/nix_test.go": {
+            "lines": 57,
+            "tokens": 404,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/bdd/nix_bdd_test.go": {
+            "lines": 361,
+            "tokens": 2950,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/bdd/nix_management_bdd_test.go": {
+            "lines": 26,
+            "tokens": 158,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/bdd/nix_operations_test.go": {
+            "lines": 444,
+            "tokens": 3559,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/clean-wizard/main.go": {
+            "lines": 101,
+            "tokens": 709,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 17110,
+          "tokens": 126309,
+          "sources": 103,
+          "clones": 5,
+          "duplicatedLines": 269,
+          "duplicatedTokens": 2363,
+          "percentage": 1.57,
+          "percentageTokens": 1.87,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "markup": {
+        "sources": {
+          "reports/html/index.html": {
+            "lines": 571,
+            "tokens": 8339,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 272,
+            "duplicatedTokens": 2402,
+            "percentage": 47.64,
+            "percentageTokens": 28.8,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "reports/go-duplications.html": {
+            "lines": 437,
+            "tokens": 3233,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 278,
+            "duplicatedTokens": 2086,
+            "percentage": 63.62,
+            "percentageTokens": 64.52,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 1008,
+          "tokens": 11572,
+          "sources": 2,
+          "clones": 4,
+          "duplicatedLines": 275,
+          "duplicatedTokens": 2244,
+          "percentage": 27.28,
+          "percentageTokens": 19.39,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "json": {
+        "sources": {
+          "api/typespec/package.json": {
+            "lines": 21,
+            "tokens": 127,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 21,
+          "tokens": 127,
+          "sources": 1,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "yaml": {
+        "sources": {
+          ".github/workflows/type-safety.yml": {
+            "lines": 122,
+            "tokens": 945,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "test-strict.yaml": {
+            "lines": 14,
+            "tokens": 77,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "test-config.yaml": {
+            "lines": 22,
+            "tokens": 117,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "test-advanced.yaml": {
+            "lines": 82,
+            "tokens": 399,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "working-config.yaml": {
+            "lines": 24,
+            "tokens": 127,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "simple-config.yaml": {
+            "lines": 15,
+            "tokens": 82,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "test-simple.yaml": {
+            "lines": 30,
+            "tokens": 132,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          ".golangci.yml": {
+            "lines": 41,
+            "tokens": 208,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "test-unsafe-config.yaml": {
+            "lines": 15,
+            "tokens": 82,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "test-valid-config.yaml": {
+            "lines": 20,
+            "tokens": 107,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 385,
+          "tokens": 2276,
+          "sources": 10,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "markdown": {
+        "sources": {
+          "docs/architecture/typespec-decision.md": {
+            "lines": 106,
+            "tokens": 779,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-20_08_49-CRITICAL_BUILD_FAILURE_STATUS_REPORT.md": {
+            "lines": 344,
+            "tokens": 3501,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_18_08-COMPREHENSIVE_STATUS.md": {
+            "lines": 372,
+            "tokens": 3986,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-18_11_42-config-refactor-update.md": {
+            "lines": 182,
+            "tokens": 1811,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-17_11_30-BRUTAL_HONEST_STATUS_REPORT.md": {
+            "lines": 924,
+            "tokens": 7146,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_20_21-CRITICAL_RECOVERY_STATUS.md": {
+            "lines": 287,
+            "tokens": 2690,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-18_18_28-CRITICAL_REFLECTION_IMPROVEMENT_PLAN.md": {
+            "lines": 386,
+            "tokens": 3290,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_10_30-ARCHITECTURAL_EXCELLENCE_STATUS.md": {
+            "lines": 219,
+            "tokens": 1748,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-20_08_25-CRITICAL_PATH_COMPLETE_STATUS_REPORT.md": {
+            "lines": 248,
+            "tokens": 2328,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-11_14_15-COMPREHENSIVE_FINAL_STATUS_REPORT.md": {
+            "lines": 535,
+            "tokens": 5165,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-18_11_59-type-safe-reform.md": {
+            "lines": 257,
+            "tokens": 2525,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_19_01-LIBRARY_EXCELLENCE_TRANSFORMATION_STATUS.md": {
+            "lines": 233,
+            "tokens": 2471,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-20_10-20-ARCHITECTURAL-REVIEW.md": {
+            "lines": 223,
+            "tokens": 2575,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-18_12_25-architectural-excellence.md": {
+            "lines": 249,
+            "tokens": 2534,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_07_01-COMPREHENSIVE_FINAL_STATUS.md": {
+            "lines": 166,
+            "tokens": 1868,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-20_07_51-COMPREHENSIVE_EXECUTION_STATUS.md": {
+            "lines": 169,
+            "tokens": 2106,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-18_19-52-COMPREHENSIVE-STATUS.md": {
+            "lines": 236,
+            "tokens": 2388,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/FINAL_EXECUTION_REPORT_2025-11-11.md": {
+            "lines": 194,
+            "tokens": 1751,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_05_19-COMPREHENSIVE_EXECUTION_STATUS.md": {
+            "lines": 351,
+            "tokens": 3429,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/COMPREHENSIVE_EXECUTION_COMPLETE_2025-11-19.md": {
+            "lines": 247,
+            "tokens": 2503,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-17_PHASE_2_PROGRESS_REPORT.md": {
+            "lines": 195,
+            "tokens": 1624,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-20_08_00-BRUTAL_HONESTY_ARCHITECTURE_CRISIS_RECOVERY.md": {
+            "lines": 281,
+            "tokens": 2685,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_04_42-COMPREHENSIVE_STATUS.md": {
+            "lines": 303,
+            "tokens": 2979,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_03_10-COMPREHENSIVE_ARCHITECTURAL_STATUS.md": {
+            "lines": 627,
+            "tokens": 3788,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-18_17_36-CLEAN_WIZARD_STATUS.md": {
+            "lines": 272,
+            "tokens": 2452,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-19_07_41-COMPREHENSIVE_FINAL_STATUS.md": {
+            "lines": 222,
+            "tokens": 2133,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-18_11_49-config-refactor-completed.md": {
+            "lines": 194,
+            "tokens": 1778,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-11_13_45-SYSTEMATIC_ARCHITECTURAL_RECOVERY_COMPLETE.md": {
+            "lines": 202,
+            "tokens": 1743,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-17_08_52-PHASE_1_CRITICAL_FILE_SPLITS_STATUS.md": {
+            "lines": 401,
+            "tokens": 3016,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-18_11_52-architectural-critique.md": {
+            "lines": 238,
+            "tokens": 2382,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-10_10_55-Production-Ready.md": {
+            "lines": 341,
+            "tokens": 3080,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-10_13_45-COMPREHENSIVE_GITHUB_ISSUES_EXECUTION_PLAN.md": {
+            "lines": 799,
+            "tokens": 3851,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-09_15-45-DETAILED_TASK_BREAKDOWN.md": {
+            "lines": 121,
+            "tokens": 1590,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-10_04-19-config-validation-architecture.md": {
+            "lines": 239,
+            "tokens": 1692,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-09_09-37-CRITICAL_ANALYSIS.md": {
+            "lines": 216,
+            "tokens": 1713,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-19_19_16-LIBRARY_EXCELLENCE_EXECUTION_PLAN.md": {
+            "lines": 282,
+            "tokens": 2130,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-09_09-37-EXECUTION_GRAPH.md": {
+            "lines": 332,
+            "tokens": 1542,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-19_17_06-MICRO_TASK_BREAKDOWN.md": {
+            "lines": 205,
+            "tokens": 3701,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-08_22-00-CRITICAL_EXECUTION_PLAN.md": {
+            "lines": 146,
+            "tokens": 1469,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-10_15-34-COMPREHENSIVE_ARCHITECTURAL_TODO_LIST.md": {
+            "lines": 271,
+            "tokens": 2105,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-09_15-45-EXECUTION_GRAPH.md": {
+            "lines": 266,
+            "tokens": 617,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-09_15-45-ARCHITECTURE_EXCELLENCE.md": {
+            "lines": 222,
+            "tokens": 1779,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-18_22_45-SUPERB_LIBRARY_INTEGRATION_PLAN.md": {
+            "lines": 599,
+            "tokens": 4287,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-20_08_07-PARETO_EXCELLENCE_EXECUTION_PLAN.md": {
+            "lines": 278,
+            "tokens": 2868,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-17_08_52-ARCHITECTURAL_EXCELLENCE_REFACTOR.md": {
+            "lines": 877,
+            "tokens": 8647,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-09_09-37-DETAILED_TASK_BREAKDOWN.md": {
+            "lines": 244,
+            "tokens": 4656,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-10_15-34-ARCHITECTURAL_EXECUTION_GRAPH.md": {
+            "lines": 289,
+            "tokens": 2007,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-19_17_06-LIBRARY_EXCELLENCE_COMPREHENSIVE_PLAN.md": {
+            "lines": 171,
+            "tokens": 1790,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/planning/2025-11-08_22-00-DETAILED_EXECUTION_PLAN.md": {
+            "lines": 157,
+            "tokens": 2355,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/research/enum_libraries_analysis.md": {
+            "lines": 94,
+            "tokens": 828,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "reports/go-duplications.txt": {
+            "lines": 15,
+            "tokens": 95,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          ".github/pull_request_template.md": {
+            "lines": 106,
+            "tokens": 1002,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/conversions.md": {
+            "lines": 16,
+            "tokens": 195,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/TYPE_SAFETY_EXEMPTIONS.md": {
+            "lines": 49,
+            "tokens": 516,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/domain.md": {
+            "lines": 43,
+            "tokens": 333,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/config.md": {
+            "lines": 77,
+            "tokens": 566,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/README.md": {
+            "lines": 355,
+            "tokens": 1410,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/middleware.md": {
+            "lines": 3,
+            "tokens": 17,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/adapters.md": {
+            "lines": 30,
+            "tokens": 241,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/cleaner.md": {
+            "lines": 3,
+            "tokens": 21,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/result.md": {
+            "lines": 6,
+            "tokens": 29,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/issue-11-resolution.md": {
+            "lines": 122,
+            "tokens": 881,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "issue_documentation.md": {
+            "lines": 72,
+            "tokens": 696,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "issue_39_update.md": {
+            "lines": 39,
+            "tokens": 432,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "issue_performance_monitoring.md": {
+            "lines": 71,
+            "tokens": 640,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "README.md": {
+            "lines": 306,
+            "tokens": 1852,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "IMPLEMENTATION_STATUS.md": {
+            "lines": 196,
+            "tokens": 1428,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "issue_40_update.md": {
+            "lines": 126,
+            "tokens": 1009,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 16647,
+          "tokens": 145244,
+          "sources": 68,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "gherkin": {
+        "sources": {
+          "tests/bdd/nix_cleaning.feature": {
+            "lines": 45,
+            "tokens": 428,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/bdd/configuration_workflow.feature": {
+            "lines": 66,
+            "tokens": 629,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/bdd/nix_management.feature": {
+            "lines": 39,
+            "tokens": 422,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 150,
+          "tokens": 1479,
+          "sources": 3,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "bash": {
+        "sources": {
+          "scripts/run_fuzz_tests.sh": {
+            "lines": 139,
+            "tokens": 1111,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "scripts/install-tools.sh": {
+            "lines": 7,
+            "tokens": 19,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 146,
+          "tokens": 1130,
+          "sources": 2,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 35489,
+      "tokens": 292949,
+      "sources": 191,
+      "clones": 9,
+      "duplicatedLines": 544,
+      "duplicatedTokens": 4607,
+      "percentage": 1.53,
+      "percentageTokens": 1.57,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "markup",
+      "lines": 50,
+      "fragment": "nil\n\t\t\t},\n\t\t},\n\t},\n\tWhen: []BDDWhen{\n\t\t{\n\t\t\tDescription: &quot;the configuration is validated&quot;,\n\t\t\tAction: func(cfg *domain.Config) (*ValidationResult, error) {\n\t\t\t\tvalidator := NewConfigValidator()\n\t\t\t\treturn validator.ValidateConfig(cfg), nil\n\t\t\t},\n\t\t},\n\t},\n\tThen: []BDDThen{\n\t\t{\n\t\t\tDescription: &quot;validation should fail&quot;,\n\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\tif result.IsValid {\n\t\t\t\t\treturn fmt.Errorf(&quot;expected invalid configuration&quot;)\n\t\t\t\t}\n\t\t\t\treturn nil\n\t\t\t},\n\t\t},\n\t\t{\n\t\t\tDescription: &quot;validation errors should be present&quot;,\n\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\tif len(result.Errors) == 0 {\n\t\t\t\t\treturn fmt.Errorf(&quot;expected validation errors&quot;)\n\t\t\t\t}\n\t\t\t\treturn nil\n\t\t\t},\n\t\t},\n\t\t{\n\t\t\tDescription: &quot;error should mention generations constraint&quot;,\n\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\tfound := false\n\t\t\t\tfor _, err := range result.Errors {\n\t\t\t\t\tif strings.Contains(err.Message, &quot;generations&quot;) {\n\t\t\t\t\t\tfound = true\n\t\t\t\t\t\tbreak\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tif !found {\n\t\t\t\t\treturn fmt.Errorf(&quot;expected error mentioning generations constraint&quot;)\n\t\t\t\t}\n\t\t\t\treturn nil\n\t\t\t},\n\t\t},\n\t},\n}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "reports/html/index.html",
+        "start": 425,
+        "end": 474,
+        "startLoc": {
+          "line": 425,
+          "column": 2,
+          "position": 6565
+        },
+        "endLoc": {
+          "line": 474,
+          "column": 2,
+          "position": 6888
+        }
+      },
+      "secondFile": {
+        "name": "reports/html/index.html",
+        "start": 40,
+        "end": 89,
+        "startLoc": {
+          "line": 40,
+          "column": 2,
+          "position": 2315
+        },
+        "endLoc": {
+          "line": 89,
+          "column": 3,
+          "position": 2639
+        }
+      }
+    },
+    {
+      "format": "markup",
+      "lines": 88,
+      "fragment": "for name, profile := range config.Profiles {\n\t// Convert boolean enabled to StatusType enum for profiles\n\tvar profileEnabled bool\n\tif v.IsSet(fmt.Sprintf(&quot;profiles.%s.enabled&quot;, name)) {\n\t\tif err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.enabled&quot;, name), &amp;profileEnabled); err != nil {\n\t\t\tlog.Warn().Err(err).Str(&quot;profile&quot;, name).Msg(&quot;Failed to unmarshal profile enabled flag&quot;)\n\t\t}\n\t\tif profileEnabled {\n\t\t\tprofile.Status = domain.StatusEnabled\n\t\t} else {\n\t\t\tprofile.Status = domain.StatusDisabled\n\t\t}\n\t} else {\n\t\t// Fallback to string status parsing for backward compatibility\n\t\tvar profileStatusStr string\n\t\tif err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.status&quot;, name), &amp;profileStatusStr); err != nil {\n\t\t\tlog.Warn().Err(err).Str(&quot;profile&quot;, name).Msg(&quot;Failed to unmarshal profile status&quot;)\n\t\t}\n\t\tswitch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {\n\t\tcase &quot;DISABLED&quot;:\n\t\t\tprofile.Status = domain.StatusDisabled\n\t\tcase &quot;ENABLED&quot;:\n\t\t\tprofile.Status = domain.StatusEnabled\n\t\tcase &quot;INHERITED&quot;:\n\t\t\tprofile.Status = domain.StatusInherited\n\t\tdefault:\n\t\t\tif profileStatusStr != &quot;&quot; {\n\t\t\t\tlog.Warn().Str(&quot;profile&quot;, name).Str(&quot;status&quot;, profileStatusStr).Msg(&quot;Invalid profile status, defaulting to ENABLED&quot;)\n\t\t\t}\n\t\t\tprofile.Status = domain.StatusEnabled\n\t\t}\n\t}\n\n\tfor i, op := range profile.Operations {\n\t\t// Convert string risk level to RiskLevel enum\n\t\tvar riskLevelStr string\n\t\tif err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.operations.%d.risk_level&quot;, name, i), &amp;riskLevelStr); err != nil {\n\t\t\tlog.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal risk level&quot;)\n\t\t}\n\n\t\tswitch strings.ToUpper(riskLevelStr) {\n\t\tcase &quot;LOW&quot;:\n\t\t\top.RiskLevel = domain.RiskLow\n\t\tcase &quot;MEDIUM&quot;:\n\t\t\top.RiskLevel = domain.RiskMedium\n\t\tcase &quot;HIGH&quot;:\n\t\t\top.RiskLevel = domain.RiskHigh\n\t\tcase &quot;CRITICAL&quot;:\n\t\t\top.RiskLevel = domain.RiskCritical\n\t\tdefault:\n\t\t\tlog.Warn().Str(&quot;risk_level&quot;, riskLevelStr).Msg(&quot;Invalid risk level, defaulting to LOW&quot;)\n\t\t\top.RiskLevel = domain.RiskLow\n\t\t}\n\n\t\t// Convert boolean enabled to StatusType enum for operations\n\t\toperationEnabledKey := fmt.Sprintf(&quot;profiles.%s.operations.%d.enabled&quot;, name, i)\n\t\tif v.IsSet(operationEnabledKey) {\n\t\t\tvar operationEnabled bool\n\t\t\tif err := v.UnmarshalKey(operationEnabledKey, &amp;operationEnabled); err != nil {\n\t\t\t\tlog.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal operation enabled flag&quot;)\n\t\t\t}\n\t\t\tif operationEnabled {\n\t\t\t\top.Status = domain.StatusEnabled\n\t\t\t} else {\n\t\t\t\top.Status = domain.StatusDisabled\n\t\t\t}\n\t\t} else {\n\t\t\t// Fallback to string status parsing for backward compatibility\n\t\t\tvar opStatusStr string\n\t\t\tif err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.operations.%d.status&quot;, name, i), &amp;opStatusStr); err != nil {\n\t\t\t\tlog.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal operation status&quot;)\n\t\t\t}\n\t\t\tswitch strings.ToUpper(strings.TrimSpace(opStatusStr)) {\n\t\t\tcase &quot;DISABLED&quot;:\n\t\t\t\top.Status = domain.StatusDisabled\n\t\t\tcase &quot;ENABLED&quot;:\n\t\t\t\top.Status = domain.StatusEnabled\n\t\t\tcase &quot;INHERITED&quot;:\n\t\t\t\top.Status = domain.StatusInherited\n\t\t\tdefault:\n\t\t\t\tif opStatusStr != &quot;&quot; {\n\t\t\t\t\tlog.Warn().Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Str(&quot;status&quot;, opStatusStr).Msg(&quot;Invalid operation status, defaulting to ENABLED&quot;)\n\t\t\t\t}\n\t\t\t\top.Status = domain.StatusEnabled\n\t\t\t}\n\t\t}\n\t}\n}&lt;",
+      "tokens": 0,
+      "firstFile": {
+        "name": "reports/html/index.html",
+        "start": 476,
+        "end": 563,
+        "startLoc": {
+          "line": 476,
+          "column": 5,
+          "position": 7057
+        },
+        "endLoc": {
+          "line": 563,
+          "column": 5,
+          "position": 7935
+        }
+      },
+      "secondFile": {
+        "name": "reports/html/index.html",
+        "start": 167,
+        "end": 256,
+        "startLoc": {
+          "line": 167,
+          "column": 2,
+          "position": 3651
+        },
+        "endLoc": {
+          "line": 256,
+          "column": 3,
+          "position": 4533
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 20,
+      "fragment": ",\n\t\t\tProfiles: map[string]*domain.Profile{\n\t\t\t\t\"test\": {\n\t\t\t\t\tName:        \"test\",\n\t\t\t\t\tDescription: \"Test profile\",\n\t\t\t\t\tOperations: []domain.CleanupOperation{{\n\t\t\t\t\t\tName:        \"test-op\",\n\t\t\t\t\t\tDescription: \"Test operation\",\n\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\tSettings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},\n\t\t\t\t\t}},\n\t\t\t\t\tStatus: domain.StatusEnabled,\n\t\t\t\t},\n\t\t\t},\n\t\t\tProtected: []string{\"/System\"},\n\t\t}\n\n\t\tresult := cv.ValidateConfig(cfg)\n\t\tif len(result.Errors) ==",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/semver_validation_test.go",
+        "start": 74,
+        "end": 93,
+        "startLoc": {
+          "line": 74,
+          "column": 25,
+          "position": 644
+        },
+        "endLoc": {
+          "line": 93,
+          "column": 3,
+          "position": 809
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/semver_validation_test.go",
+        "start": 48,
+        "end": 67,
+        "startLoc": {
+          "line": 48,
+          "column": 8,
+          "position": 416
+        },
+        "endLoc": {
+          "line": 67,
+          "column": 3,
+          "position": 581
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 21,
+      "fragment": ",\n\t\t\tProfiles: map[string]*domain.Profile{\n\t\t\t\t\"test\": {\n\t\t\t\t\tName:        \"test\",\n\t\t\t\t\tDescription: \"Test profile\",\n\t\t\t\t\tOperations: []domain.CleanupOperation{{\n\t\t\t\t\t\tName:        \"test-op\",\n\t\t\t\t\t\tDescription: \"Test operation\",\n\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\tSettings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},\n\t\t\t\t\t}},\n\t\t\t\t\tStatus: domain.StatusEnabled,\n\t\t\t\t},\n\t\t\t},\n\t\t\tProtected: []string{\"/System\"},\n\t\t}\n\n\t\tresult := cv.ValidateConfig(cfg)\n\t\tif len(result.Errors) == 0 {\n\t\t\tt.Error(\"Expected validation errors for missing version\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/semver_validation_test.go",
+        "start": 112,
+        "end": 132,
+        "startLoc": {
+          "line": 112,
+          "column": 3,
+          "position": 959
+        },
+        "endLoc": {
+          "line": 132,
+          "column": 49,
+          "position": 1135
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/semver_validation_test.go",
+        "start": 48,
+        "end": 94,
+        "startLoc": {
+          "line": 48,
+          "column": 8,
+          "position": 416
+        },
+        "endLoc": {
+          "line": 94,
+          "column": 56,
+          "position": 820
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 52,
+      "fragment": "), nil\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tWhen: []BDDWhen{\n\t\t\t\t\t{\n\t\t\t\t\t\tDescription: \"the configuration is validated\",\n\t\t\t\t\t\tAction: func(cfg *domain.Config) (*ValidationResult, error) {\n\t\t\t\t\t\t\tvalidator := NewConfigValidator()\n\t\t\t\t\t\t\treturn validator.ValidateConfig(cfg), nil\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tThen: []BDDThen{\n\t\t\t\t\t{\n\t\t\t\t\t\tDescription: \"validation should fail\",\n\t\t\t\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\t\t\t\tif result.IsValid {\n\t\t\t\t\t\t\t\treturn fmt.Errorf(\"expected invalid configuration\")\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\treturn nil\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\tDescription: \"validation errors should be present\",\n\t\t\t\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\t\t\t\tif len(result.Errors) == 0 {\n\t\t\t\t\t\t\t\treturn fmt.Errorf(\"expected validation errors\")\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\treturn nil\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\tDescription: \"error should mention generations constraint\",\n\t\t\t\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\t\t\t\tfound := false\n\t\t\t\t\t\t\tfor _, err := range result.Errors {\n\t\t\t\t\t\t\t\tif strings.Contains(err.Message, \"generations\") {\n\t\t\t\t\t\t\t\t\tfound = true\n\t\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tif !found {\n\t\t\t\t\t\t\t\treturn fmt.Errorf(\"expected error mentioning generations constraint\")\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\treturn nil\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t\t{\n\t\t\t\tName:        \"Critical Nix operation in unsafe mode\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/bdd_nix_validation_test.go",
+        "start": 292,
+        "end": 343,
+        "startLoc": {
+          "line": 292,
+          "column": 3,
+          "position": 2107
+        },
+        "endLoc": {
+          "line": 343,
+          "column": 40,
+          "position": 2472
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/bdd_nix_validation_test.go",
+        "start": 235,
+        "end": 286,
+        "startLoc": {
+          "line": 235,
+          "column": 2,
+          "position": 1669
+        },
+        "endLoc": {
+          "line": 286,
+          "column": 40,
+          "position": 2034
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 54,
+      "fragment": "{\n\t\t{\n\t\t\tname: \"whitespace cleanup\",\n\t\t\tconfig: &domain.Config{\n\t\t\t\tVersion:      \"  1.0.0  \",\n\t\t\t\tSafetyLevel:  domain.SafetyLevelEnabled,\n\t\t\t\tMaxDiskUsage: 50,\n\t\t\t\tProtected:    []string{\"/System\", \"/Library\"},\n\t\t\t\tProfiles: map[string]*domain.Profile{\n\t\t\t\t\t\"daily\": {\n\t\t\t\t\t\tName:        \"  daily  \",\n\t\t\t\t\t\tDescription: \"Daily cleanup\",\n\t\t\t\t\t\tOperations: []domain.CleanupOperation{\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName:        \"nix-generations\",\n\t\t\t\t\t\t\t\tDescription: \"Clean Nix generations\",\n\t\t\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t\tStatus: domain.StatusEnabled,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t\texpectedChanges:  []string{\"version\", \"profiles.daily.name\"},\n\t\t\texpectedWarnings: 0,\n\t\t},\n\t\t{\n\t\t\tname: \"max disk usage clamping\",\n\t\t\tconfig: &domain.Config{\n\t\t\t\tVersion:      \"1.0.0\",\n\t\t\t\tSafetyLevel:  domain.SafetyLevelEnabled,\n\t\t\t\tMaxDiskUsage: 150, // Will be clamped to 95\n\t\t\t\tProtected:    []string{\"/System\", \"/Library\"},\n\t\t\t\tProfiles: map[string]*domain.Profile{\n\t\t\t\t\t\"daily\": {\n\t\t\t\t\t\tName:        \"daily\",\n\t\t\t\t\t\tDescription: \"Daily cleanup\",\n\t\t\t\t\t\tOperations: []domain.CleanupOperation{\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName:        \"nix-generations\",\n\t\t\t\t\t\t\t\tDescription: \"Clean Nix generations\",\n\t\t\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t\tStatus: domain.StatusEnabled,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t\texpectedChanges:  []string{\"max_disk_usage\"},\n\t\t\texpectedWarnings: 1,\n\t\t},\n\t}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/validation_types_test.go",
+        "start": 80,
+        "end": 133,
+        "startLoc": {
+          "line": 80,
+          "column": 25,
+          "position": 508
+        },
+        "endLoc": {
+          "line": 133,
+          "column": 2,
+          "position": 896
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/validation_sanitizer_test.go",
+        "start": 17,
+        "end": 70,
+        "startLoc": {
+          "line": 17,
+          "column": 2,
+          "position": 81
+        },
+        "endLoc": {
+          "line": 70,
+          "column": 2,
+          "position": 469
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 127,
+      "fragment": ", err)\n\t}\n\n\t// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)\n\tfor name, profile := range config.Profiles {\n\t\t// Convert boolean enabled to StatusType enum for profiles\n\t\tvar profileEnabled bool\n\t\tif v.IsSet(fmt.Sprintf(\"profiles.%s.enabled\", name)) {\n\t\t\tif err := v.UnmarshalKey(fmt.Sprintf(\"profiles.%s.enabled\", name), &profileEnabled); err != nil {\n\t\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Msg(\"Failed to unmarshal profile enabled flag\")\n\t\t\t}\n\t\t\tif profileEnabled {\n\t\t\t\tprofile.Status = domain.StatusEnabled\n\t\t\t} else {\n\t\t\t\tprofile.Status = domain.StatusDisabled\n\t\t\t}\n\t\t} else {\n\t\t\t// Fallback to string status parsing for backward compatibility\n\t\t\tvar profileStatusStr string\n\t\t\tif err := v.UnmarshalKey(fmt.Sprintf(\"profiles.%s.status\", name), &profileStatusStr); err != nil {\n\t\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Msg(\"Failed to unmarshal profile status\")\n\t\t\t}\n\t\t\tswitch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {\n\t\t\tcase \"DISABLED\":\n\t\t\t\tprofile.Status = domain.StatusDisabled\n\t\t\tcase \"ENABLED\":\n\t\t\t\tprofile.Status = domain.StatusEnabled\n\t\t\tcase \"INHERITED\":\n\t\t\t\tprofile.Status = domain.StatusInherited\n\t\t\tdefault:\n\t\t\t\tif profileStatusStr != \"\" {\n\t\t\t\t\tlog.Warn().Str(\"profile\", name).Str(\"status\", profileStatusStr).Msg(\"Invalid profile status, defaulting to ENABLED\")\n\t\t\t\t}\n\t\t\t\tprofile.Status = domain.StatusEnabled\n\t\t\t}\n\t\t}\n\n\t\tfor i, op := range profile.Operations {\n\t\t\t// Convert string risk level to RiskLevel enum\n\t\t\tvar riskLevelStr string\n\t\t\tif err := v.UnmarshalKey(fmt.Sprintf(\"profiles.%s.operations.%d.risk_level\", name, i), &riskLevelStr); err != nil {\n\t\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Int(\"operation\", i).Msg(\"Failed to unmarshal risk level\")\n\t\t\t}\n\n\t\t\tswitch strings.ToUpper(riskLevelStr) {\n\t\t\tcase \"LOW\":\n\t\t\t\top.RiskLevel = domain.RiskLow\n\t\t\tcase \"MEDIUM\":\n\t\t\t\top.RiskLevel = domain.RiskMedium\n\t\t\tcase \"HIGH\":\n\t\t\t\top.RiskLevel = domain.RiskHigh\n\t\t\tcase \"CRITICAL\":\n\t\t\t\top.RiskLevel = domain.RiskCritical\n\t\t\tdefault:\n\t\t\t\tlog.Warn().Str(\"risk_level\", riskLevelStr).Msg(\"Invalid risk level, defaulting to LOW\")\n\t\t\t\top.RiskLevel = domain.RiskLow\n\t\t\t}\n\n\t\t\t// Convert boolean enabled to StatusType enum for operations\n\t\t\toperationEnabledKey := fmt.Sprintf(\"profiles.%s.operations.%d.enabled\", name, i)\n\t\t\tif v.IsSet(operationEnabledKey) {\n\t\t\t\tvar operationEnabled bool\n\t\t\t\tif err := v.UnmarshalKey(operationEnabledKey, &operationEnabled); err != nil {\n\t\t\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Int(\"operation\", i).Msg(\"Failed to unmarshal operation enabled flag\")\n\t\t\t\t}\n\t\t\t\tif operationEnabled {\n\t\t\t\t\top.Status = domain.StatusEnabled\n\t\t\t\t} else {\n\t\t\t\t\top.Status = domain.StatusDisabled\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\t// Fallback to string status parsing for backward compatibility\n\t\t\t\tvar opStatusStr string\n\t\t\t\tif err := v.UnmarshalKey(fmt.Sprintf(\"profiles.%s.operations.%d.status\", name, i), &opStatusStr); err != nil {\n\t\t\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Int(\"operation\", i).Msg(\"Failed to unmarshal operation status\")\n\t\t\t\t}\n\t\t\t\tswitch strings.ToUpper(strings.TrimSpace(opStatusStr)) {\n\t\t\t\tcase \"DISABLED\":\n\t\t\t\t\top.Status = domain.StatusDisabled\n\t\t\t\tcase \"ENABLED\":\n\t\t\t\t\top.Status = domain.StatusEnabled\n\t\t\t\tcase \"INHERITED\":\n\t\t\t\t\top.Status = domain.StatusInherited\n\t\t\t\tdefault:\n\t\t\t\t\tif opStatusStr != \"\" {\n\t\t\t\t\t\tlog.Warn().Str(\"profile\", name).Int(\"operation\", i).Str(\"status\", opStatusStr).Msg(\"Invalid operation status, defaulting to ENABLED\")\n\t\t\t\t\t}\n\t\t\t\t\top.Status = domain.StatusEnabled\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\t// Apply comprehensive validation with strict enforcement\n\tif validator := NewConfigValidator(); validator != nil {\n\t\tvalidationResult := validator.ValidateConfig(&config)\n\t\tif !validationResult.IsValid {\n\t\t\t// CRITICAL: Fail fast on validation errors for production safety\n\t\t\tfor _, err := range validationResult.Errors {\n\t\t\t\tlog.Error().\n\t\t\t\t\tStr(\"field\", err.Field).\n\t\t\t\t\tErr(fmt.Errorf(\"%s\", err.Message)).\n\t\t\t\t\tMsg(\"Configuration validation error\")\n\t\t\t}\n\t\t\treturn nil, fmt.Errorf(\"configuration validation failed with %d errors\", len(validationResult.Errors))\n\t\t}\n\t}\n\n\t// Apply comprehensive validation with strict enforcement\n\tif validator := NewConfigValidator(); validator != nil {\n\t\tvalidationResult := validator.ValidateConfig(&config)\n\t\tif !validationResult.IsValid {\n\t\t\t// CRITICAL: Fail fast on validation errors for production safety\n\t\t\tfor _, err := range validationResult.Errors {\n\t\t\t\tlog.Error().\n\t\t\t\t\tStr(\"field\", err.Field).\n\t\t\t\t\tErr(fmt.Errorf(\"%s\", err.Message)).\n\t\t\t\t\tMsg(\"Configuration validation error\")\n\t\t\t}\n\t\t\treturn nil, fmt.Errorf(\"configuration validation failed with %d errors\", len(validationResult.Errors))\n\t\t}\n\t}\n\n\treturn &config, nil\n}\n\n// Save saves the configuration to file",
+      "tokens": 0,
+      "firstFile": {
+        "name": "internal/config/config.go",
+        "start": 239,
+        "end": 365,
+        "startLoc": {
+          "line": 239,
+          "column": 25,
+          "position": 2115
+        },
+        "endLoc": {
+          "line": 365,
+          "column": 40,
+          "position": 3384
+        }
+      },
+      "secondFile": {
+        "name": "internal/config/config.go",
+        "start": 67,
+        "end": 193,
+        "startLoc": {
+          "line": 67,
+          "column": 18,
+          "position": 440
+        },
+        "endLoc": {
+          "line": 193,
+          "column": 90,
+          "position": 1709
+        }
+      }
+    },
+    {
+      "format": "markup",
+      "lines": 51,
+      "fragment": "nil\n\t\t\t},\n\t\t},\n\t},\n\tWhen: []BDDWhen{\n\t\t{\n\t\t\tDescription: \"the configuration is validated\",\n\t\t\tAction: func(cfg *domain.Config) (*ValidationResult, error) {\n\t\t\t\tvalidator := NewConfigValidator()\n\t\t\t\treturn validator.ValidateConfig(cfg), nil\n\t\t\t},\n\t\t},\n\t},\n\tThen: []BDDThen{\n\t\t{\n\t\t\tDescription: \"validation should fail\",\n\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\tif result.IsValid {\n\t\t\t\t\treturn fmt.Errorf(\"expected invalid configuration\")\n\t\t\t\t}\n\t\t\t\treturn nil\n\t\t\t},\n\t\t},\n\t\t{\n\t\t\tDescription: \"validation errors should be present\",\n\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\tif len(result.Errors) == 0 {\n\t\t\t\t\treturn fmt.Errorf(\"expected validation errors\")\n\t\t\t\t}\n\t\t\t\treturn nil\n\t\t\t},\n\t\t},\n\t\t{\n\t\t\tDescription: \"error should mention generations constraint\",\n\t\t\tValidate: func(result *ValidationResult) error {\n\t\t\t\tfound := false\n\t\t\t\tfor _, err := range result.Errors {\n\t\t\t\t\tif strings.Contains(err.Message, \"generations\") {\n\t\t\t\t\t\tfound = true\n\t\t\t\t\t\tbreak\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tif !found {\n\t\t\t\t\treturn fmt.Errorf(\"expected error mentioning generations constraint\")\n\t\t\t\t}\n\t\t\t\treturn nil\n\t\t\t},\n\t\t},\n\t},\n}</pre>\n<h1",
+      "tokens": 0,
+      "firstFile": {
+        "name": "reports/go-duplications.html",
+        "start": 78,
+        "end": 128,
+        "startLoc": {
+          "line": 78,
+          "column": 2,
+          "position": 554
+        },
+        "endLoc": {
+          "line": 128,
+          "column": 3,
+          "position": 856
+        }
+      },
+      "secondFile": {
+        "name": "reports/go-duplications.html",
+        "start": 20,
+        "end": 70,
+        "startLoc": {
+          "line": 20,
+          "column": 2,
+          "position": 161
+        },
+        "endLoc": {
+          "line": 70,
+          "column": 3,
+          "position": 463
+        }
+      }
+    },
+    {
+      "format": "markup",
+      "lines": 90,
+      "fragment": "</h2>\n<pre>for name, profile := range config.Profiles {\n\t// Convert boolean enabled to StatusType enum for profiles\n\tvar profileEnabled bool\n\tif v.IsSet(fmt.Sprintf(\"profiles.%s.enabled\", name)) {\n\t\tif err := v.UnmarshalKey(fmt.Sprintf(\"profiles.%s.enabled\", name), &profileEnabled); err != nil {\n\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Msg(\"Failed to unmarshal profile enabled flag\")\n\t\t}\n\t\tif profileEnabled {\n\t\t\tprofile.Status = domain.StatusEnabled\n\t\t} else {\n\t\t\tprofile.Status = domain.StatusDisabled\n\t\t}\n\t} else {\n\t\t// Fallback to string status parsing for backward compatibility\n\t\tvar profileStatusStr string\n\t\tif err := v.UnmarshalKey(fmt.Sprintf(\"profiles.%s.status\", name), &profileStatusStr); err != nil {\n\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Msg(\"Failed to unmarshal profile status\")\n\t\t}\n\t\tswitch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {\n\t\tcase \"DISABLED\":\n\t\t\tprofile.Status = domain.StatusDisabled\n\t\tcase \"ENABLED\":\n\t\t\tprofile.Status = domain.StatusEnabled\n\t\tcase \"INHERITED\":\n\t\t\tprofile.Status = domain.StatusInherited\n\t\tdefault:\n\t\t\tif profileStatusStr != \"\" {\n\t\t\t\tlog.Warn().Str(\"profile\", name).Str(\"status\", profileStatusStr).Msg(\"Invalid profile status, defaulting to ENABLED\")\n\t\t\t}\n\t\t\tprofile.Status = domain.StatusEnabled\n\t\t}\n\t}\n\n\tfor i, op := range profile.Operations {\n\t\t// Convert string risk level to RiskLevel enum\n\t\tvar riskLevelStr string\n\t\tif err := v.UnmarshalKey(fmt.Sprintf(\"profiles.%s.operations.%d.risk_level\", name, i), &riskLevelStr); err != nil {\n\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Int(\"operation\", i).Msg(\"Failed to unmarshal risk level\")\n\t\t}\n\n\t\tswitch strings.ToUpper(riskLevelStr) {\n\t\tcase \"LOW\":\n\t\t\top.RiskLevel = domain.RiskLow\n\t\tcase \"MEDIUM\":\n\t\t\top.RiskLevel = domain.RiskMedium\n\t\tcase \"HIGH\":\n\t\t\top.RiskLevel = domain.RiskHigh\n\t\tcase \"CRITICAL\":\n\t\t\top.RiskLevel = domain.RiskCritical\n\t\tdefault:\n\t\t\tlog.Warn().Str(\"risk_level\", riskLevelStr).Msg(\"Invalid risk level, defaulting to LOW\")\n\t\t\top.RiskLevel = domain.RiskLow\n\t\t}\n\n\t\t// Convert boolean enabled to StatusType enum for operations\n\t\toperationEnabledKey := fmt.Sprintf(\"profiles.%s.operations.%d.enabled\", name, i)\n\t\tif v.IsSet(operationEnabledKey) {\n\t\t\tvar operationEnabled bool\n\t\t\tif err := v.UnmarshalKey(operationEnabledKey, &operationEnabled); err != nil {\n\t\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Int(\"operation\", i).Msg(\"Failed to unmarshal operation enabled flag\")\n\t\t\t}\n\t\t\tif operationEnabled {\n\t\t\t\top.Status = domain.StatusEnabled\n\t\t\t} else {\n\t\t\t\top.Status = domain.StatusDisabled\n\t\t\t}\n\t\t} else {\n\t\t\t// Fallback to string status parsing for backward compatibility\n\t\t\tvar opStatusStr string\n\t\t\tif err := v.UnmarshalKey(fmt.Sprintf(\"profiles.%s.operations.%d.status\", name, i), &opStatusStr); err != nil {\n\t\t\t\tlog.Warn().Err(err).Str(\"profile\", name).Int(\"operation\", i).Msg(\"Failed to unmarshal operation status\")\n\t\t\t}\n\t\t\tswitch strings.ToUpper(strings.TrimSpace(opStatusStr)) {\n\t\t\tcase \"DISABLED\":\n\t\t\t\top.Status = domain.StatusDisabled\n\t\t\tcase \"ENABLED\":\n\t\t\t\top.Status = domain.StatusEnabled\n\t\t\tcase \"INHERITED\":\n\t\t\t\top.Status = domain.StatusInherited\n\t\t\tdefault:\n\t\t\t\tif opStatusStr != \"\" {\n\t\t\t\t\tlog.Warn().Str(\"profile\", name).Int(\"operation\", i).Str(\"status\", opStatusStr).Msg(\"Invalid operation status, defaulting to ENABLED\")\n\t\t\t\t}\n\t\t\t\top.Status = domain.StatusEnabled\n\t\t\t}\n\t\t}\n\t}\n}</pre>\n<h1",
+      "tokens": 0,
+      "firstFile": {
+        "name": "reports/go-duplications.html",
+        "start": 295,
+        "end": 384,
+        "startLoc": {
+          "line": 295,
+          "column": 30,
+          "position": 2157
+        },
+        "endLoc": {
+          "line": 384,
+          "column": 3,
+          "position": 2898
+        }
+      },
+      "secondFile": {
+        "name": "reports/go-duplications.html",
+        "start": 206,
+        "end": 295,
+        "startLoc": {
+          "line": 206,
+          "column": 29,
+          "position": 1413
+        },
+        "endLoc": {
+          "line": 295,
+          "column": 3,
+          "position": 2154
+        }
+      }
+    }
+  ]
+}

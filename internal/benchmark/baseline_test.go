@@ -74,5 +74,3 @@ func BenchmarkConcurrentOperations(b *testing.B) {
 		}
 	})
 }
-
-

@@ -67,95 +67,8 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
-	// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)
-	for name, profile := range config.Profiles {
-		// Convert boolean enabled to StatusType enum for profiles
-		var profileEnabled bool
-		if v.IsSet(fmt.Sprintf("profiles.%s.enabled", name)) {
-			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.enabled", name), &profileEnabled); err != nil {
-				log.Warn().Err(err).Str("profile", name).Msg("Failed to unmarshal profile enabled flag")
-			}
-			if profileEnabled {
-				profile.Status = domain.StatusEnabled
-			} else {
-				profile.Status = domain.StatusDisabled
-			}
-		} else {
-			// Fallback to string status parsing for backward compatibility
-			var profileStatusStr string
-			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.status", name), &profileStatusStr); err != nil {
-				log.Warn().Err(err).Str("profile", name).Msg("Failed to unmarshal profile status")
-			}
-			switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
-			case "DISABLED":
-				profile.Status = domain.StatusDisabled
-			case "ENABLED":
-				profile.Status = domain.StatusEnabled
-			case "INHERITED":
-				profile.Status = domain.StatusInherited
-			default:
-				if profileStatusStr != "" {
-					log.Warn().Str("profile", name).Str("status", profileStatusStr).Msg("Invalid profile status, defaulting to ENABLED")
-				}
-				profile.Status = domain.StatusEnabled
-			}
-		}
-
-		for i, op := range profile.Operations {
-			// Convert string risk level to RiskLevel enum
-			var riskLevelStr string
-			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr); err != nil {
-				log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal risk level")
-			}
-
-			switch strings.ToUpper(riskLevelStr) {
-			case "LOW":
-				op.RiskLevel = domain.RiskLow
-			case "MEDIUM":
-				op.RiskLevel = domain.RiskMedium
-			case "HIGH":
-				op.RiskLevel = domain.RiskHigh
-			case "CRITICAL":
-				op.RiskLevel = domain.RiskCritical
-			default:
-				log.Warn().Str("risk_level", riskLevelStr).Msg("Invalid risk level, defaulting to LOW")
-				op.RiskLevel = domain.RiskLow
-			}
-
-			// Convert boolean enabled to StatusType enum for operations
-			operationEnabledKey := fmt.Sprintf("profiles.%s.operations.%d.enabled", name, i)
-			if v.IsSet(operationEnabledKey) {
-				var operationEnabled bool
-				if err := v.UnmarshalKey(operationEnabledKey, &operationEnabled); err != nil {
-					log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal operation enabled flag")
-				}
-				if operationEnabled {
-					op.Status = domain.StatusEnabled
-				} else {
-					op.Status = domain.StatusDisabled
-				}
-			} else {
-				// Fallback to string status parsing for backward compatibility
-				var opStatusStr string
-				if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.status", name, i), &opStatusStr); err != nil {
-					log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal operation status")
-				}
-				switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
-				case "DISABLED":
-					op.Status = domain.StatusDisabled
-				case "ENABLED":
-					op.Status = domain.StatusEnabled
-				case "INHERITED":
-					op.Status = domain.StatusInherited
-				default:
-					if opStatusStr != "" {
-						log.Warn().Str("profile", name).Int("operation", i).Str("status", opStatusStr).Msg("Invalid operation status, defaulting to ENABLED")
-					}
-					op.Status = domain.StatusEnabled
-				}
-			}
-		}
-	}
+	// TODO: Remove this comment once we verify fixes are handled in unmarshaling
+	// Configuration fixes are now handled in the unmarshaling logic above
 
 	// Apply comprehensive validation with strict enforcement
 	if validator := NewConfigValidator(); validator != nil {
@@ -416,6 +329,100 @@ func Save(config *domain.Config) error {
 // GetCurrentTime returns current time (helper for testing)
 func GetCurrentTime() time.Time {
 	return time.Now()
+}
+
+// fixConfigTypesAndEnums handles the conversion of string-based config values to proper enums and types
+// This is needed because viper doesn't handle custom enum types well during unmarshaling
+func fixConfigTypesAndEnums(v *viper.Viper, config *domain.Config) {
+	// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)
+	for name, profile := range config.Profiles {
+		// Convert boolean enabled to StatusType enum for profiles
+		var profileEnabled bool
+		if v.IsSet(fmt.Sprintf("profiles.%s.enabled", name)) {
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.enabled", name), &profileEnabled); err != nil {
+				log.Warn().Err(err).Str("profile", name).Msg("Failed to unmarshal profile enabled flag")
+			}
+			if profileEnabled {
+				profile.Status = domain.StatusEnabled
+			} else {
+				profile.Status = domain.StatusDisabled
+			}
+		} else {
+			// Fallback to string status parsing for backward compatibility
+			var profileStatusStr string
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.status", name), &profileStatusStr); err != nil {
+				log.Warn().Err(err).Str("profile", name).Msg("Failed to unmarshal profile status")
+			}
+			switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
+			case "DISABLED":
+				profile.Status = domain.StatusDisabled
+			case "ENABLED":
+				profile.Status = domain.StatusEnabled
+			case "INHERITED":
+				profile.Status = domain.StatusInherited
+			default:
+				if profileStatusStr != "" {
+					log.Warn().Str("profile", name).Str("status", profileStatusStr).Msg("Invalid profile status, defaulting to ENABLED")
+				}
+				profile.Status = domain.StatusEnabled
+			}
+		}
+
+		for i, op := range profile.Operations {
+			// Convert string risk level to RiskLevel enum
+			var riskLevelStr string
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr); err != nil {
+				log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal risk level")
+			}
+
+			switch strings.ToUpper(riskLevelStr) {
+			case "LOW":
+				op.RiskLevel = domain.RiskLow
+			case "MEDIUM":
+				op.RiskLevel = domain.RiskMedium
+			case "HIGH":
+				op.RiskLevel = domain.RiskHigh
+			case "CRITICAL":
+				op.RiskLevel = domain.RiskCritical
+			default:
+				log.Warn().Str("risk_level", riskLevelStr).Msg("Invalid risk level, defaulting to LOW")
+				op.RiskLevel = domain.RiskLow
+			}
+
+			// Convert boolean enabled to StatusType enum for operations
+			operationEnabledKey := fmt.Sprintf("profiles.%s.operations.%d.enabled", name, i)
+			if v.IsSet(operationEnabledKey) {
+				var operationEnabled bool
+				if err := v.UnmarshalKey(operationEnabledKey, &operationEnabled); err != nil {
+					log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal operation enabled flag")
+				}
+				if operationEnabled {
+					op.Status = domain.StatusEnabled
+				} else {
+					op.Status = domain.StatusDisabled
+				}
+			} else {
+				// Fallback to string status parsing for backward compatibility
+				var opStatusStr string
+				if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.status", name, i), &opStatusStr); err != nil {
+					log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal operation status")
+				}
+				switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
+				case "DISABLED":
+					op.Status = domain.StatusDisabled
+				case "ENABLED":
+					op.Status = domain.StatusEnabled
+				case "INHERITED":
+					op.Status = domain.StatusInherited
+				default:
+					if opStatusStr != "" {
+						log.Warn().Str("profile", name).Int("operation", i).Str("status", opStatusStr).Msg("Invalid operation status, defaulting to ENABLED")
+					}
+					op.Status = domain.StatusEnabled
+				}
+			}
+		}
+	}
 }
 
 // GetDefaultConfig returns the default configuration

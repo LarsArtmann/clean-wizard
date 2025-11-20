@@ -1,0 +1,16 @@
+2025/11/20 19:23:31 Building suffix tree
+2025/11/20 19:23:31 Searching for clones
+found 2 clones:
+  internal/config/bdd_nix_validation_test.go:228,284
+  internal/config/bdd_nix_validation_test.go:285,341
+found 2 clones:
+  internal/config/semver_validation_test.go:72,108
+  internal/config/semver_validation_test.go:110,146
+found 2 clones:
+  internal/config/config.go:71,158
+  internal/config/config.go:243,330
+found 2 clones:
+  internal/result/type_test.go:9,34
+  internal/result/type_test.go:36,61
+
+Found total 4 clone groups.

@@ -1,0 +1,553 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Copy/Paste Detector Report</title><link href="styles/tailwind.css" rel="stylesheet"><link href="styles/prism.css" rel="stylesheet"></head><body class="bg-gray-100"><header class="bg-white shadow py-4"><div class="container mx-auto px-4"><h1 class="text-3xl font-semibold text-gray-800">jscpd - copy/paste report</h1></div></header><main class="container mx-auto my-8 p-4 bg-white shadow rounded"><section class="mb-8" id="dashboard"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Dashboard</h2><div class="grid grid-cols-4 gap-4"><div class="bg-blue-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-blue-800 mb-2">Total Files</h3><span class="text-4xl font-bold text-blue-800">191</span></div><div class="bg-green-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-green-800 mb-2">Total Lines of Code</h3><span class="text-4xl font-bold text-green-800">35489</span></div><div class="bg-yellow-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-yellow-800 mb-2">Number of Clones</h3><span class="text-4xl font-bold text-yellow-800">9</span></div><div class="bg-red-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-red-800 mb-2">Duplicated Lines</h3><span class="text-4xl font-bold text-red-800">544 (1.53%)</span></div></div></section><section class="mb-8" id="formats"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Formats with Duplications</h2><table class="w-full table-auto"><thead><tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Format</th><th class="py-3 px-6 text-left">Files</th><th class="py-3 px-6 text-left">Lines</th><th class="py-3 px-6 text-left">Clones</th><th class="py-3 px-6 text-left">Duplicated Lines</th><th class="py-3 px-6 text-left">Duplicated Tokens</th></tr></thead><tbody><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#css-clones">css</a></td><td class="py-3 px-6">1</td><td class="py-3 px-6">7</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#javascript-clones">javascript</a></td><td class="py-3 px-6">1</td><td class="py-3 px-6">15</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#go-clones">go</a></td><td class="py-3 px-6">103</td><td class="py-3 px-6">17110</td><td class="py-3 px-6">5</td><td class="py-3 px-6">269</td><td class="py-3 px-6">2363</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#markup-clones">markup</a></td><td class="py-3 px-6">2</td><td class="py-3 px-6">1008</td><td class="py-3 px-6">4</td><td class="py-3 px-6">275</td><td class="py-3 px-6">2244</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#json-clones">json</a></td><td class="py-3 px-6">1</td><td class="py-3 px-6">21</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#yaml-clones">yaml</a></td><td class="py-3 px-6">10</td><td class="py-3 px-6">385</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#markdown-clones">markdown</a></td><td class="py-3 px-6">68</td><td class="py-3 px-6">16647</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#gherkin-clones">gherkin</a></td><td class="py-3 px-6">3</td><td class="py-3 px-6">150</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#bash-clones">bash</a></td><td class="py-3 px-6">2</td><td class="py-3 px-6">146</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr></tbody></table></section><section class="mb-8" id="txt-clones"><a name="css-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">css</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="javascript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">javascript</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="go-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">go</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">internal/config/semver_validation_test.go (Line 74:25 - Line 93:3), internal/config/semver_validation_test.go (Line 48:8 - Line 67:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup2"><code class="language-go text-sm text-gray-800">,
+			Profiles: map[string]*domain.Profile{
+				&quot;test&quot;: {
+					Name:        &quot;test&quot;,
+					Description: &quot;Test profile&quot;,
+					Operations: []domain.CleanupOperation{{
+						Name:        &quot;test-op&quot;,
+						Description: &quot;Test operation&quot;,
+						RiskLevel:   domain.RiskLow,
+						Status:      domain.StatusEnabled,
+						Settings:    &amp;domain.OperationSettings{NixGenerations: &amp;domain.NixGenerationsSettings{Generations: 5}},
+					}},
+					Status: domain.StatusEnabled,
+				},
+			},
+			Protected: []string{&quot;/System&quot;},
+		}
+
+		result := cv.ValidateConfig(cfg)
+		if len(result.Errors) ==</code></pre></div><div class="py-4"><p class="text-gray-600">internal/config/semver_validation_test.go (Line 112:3 - Line 132:49), internal/config/semver_validation_test.go (Line 48:8 - Line 94:56)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup3"><code class="language-go text-sm text-gray-800">,
+			Profiles: map[string]*domain.Profile{
+				&quot;test&quot;: {
+					Name:        &quot;test&quot;,
+					Description: &quot;Test profile&quot;,
+					Operations: []domain.CleanupOperation{{
+						Name:        &quot;test-op&quot;,
+						Description: &quot;Test operation&quot;,
+						RiskLevel:   domain.RiskLow,
+						Status:      domain.StatusEnabled,
+						Settings:    &amp;domain.OperationSettings{NixGenerations: &amp;domain.NixGenerationsSettings{Generations: 5}},
+					}},
+					Status: domain.StatusEnabled,
+				},
+			},
+			Protected: []string{&quot;/System&quot;},
+		}
+
+		result := cv.ValidateConfig(cfg)
+		if len(result.Errors) == 0 {
+			t.Error(&quot;Expected validation errors for missing version&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">internal/config/bdd_nix_validation_test.go (Line 292:3 - Line 343:40), internal/config/bdd_nix_validation_test.go (Line 235:2 - Line 286:40)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup4"><code class="language-go text-sm text-gray-800">), nil
+						},
+					},
+				},
+				When: []BDDWhen{
+					{
+						Description: &quot;the configuration is validated&quot;,
+						Action: func(cfg *domain.Config) (*ValidationResult, error) {
+							validator := NewConfigValidator()
+							return validator.ValidateConfig(cfg), nil
+						},
+					},
+				},
+				Then: []BDDThen{
+					{
+						Description: &quot;validation should fail&quot;,
+						Validate: func(result *ValidationResult) error {
+							if result.IsValid {
+								return fmt.Errorf(&quot;expected invalid configuration&quot;)
+							}
+							return nil
+						},
+					},
+					{
+						Description: &quot;validation errors should be present&quot;,
+						Validate: func(result *ValidationResult) error {
+							if len(result.Errors) == 0 {
+								return fmt.Errorf(&quot;expected validation errors&quot;)
+							}
+							return nil
+						},
+					},
+					{
+						Description: &quot;error should mention generations constraint&quot;,
+						Validate: func(result *ValidationResult) error {
+							found := false
+							for _, err := range result.Errors {
+								if strings.Contains(err.Message, &quot;generations&quot;) {
+									found = true
+									break
+								}
+							}
+							if !found {
+								return fmt.Errorf(&quot;expected error mentioning generations constraint&quot;)
+							}
+							return nil
+						},
+					},
+				},
+			},
+			{
+				Name:        &quot;Critical Nix operation in unsafe mode&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">internal/config/validation_types_test.go (Line 80:25 - Line 133:2), internal/config/validation_sanitizer_test.go (Line 17:2 - Line 70:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup5"><code class="language-go text-sm text-gray-800">{
+		{
+			name: &quot;whitespace cleanup&quot;,
+			config: &amp;domain.Config{
+				Version:      &quot;  1.0.0  &quot;,
+				SafetyLevel:  domain.SafetyLevelEnabled,
+				MaxDiskUsage: 50,
+				Protected:    []string{&quot;/System&quot;, &quot;/Library&quot;},
+				Profiles: map[string]*domain.Profile{
+					&quot;daily&quot;: {
+						Name:        &quot;  daily  &quot;,
+						Description: &quot;Daily cleanup&quot;,
+						Operations: []domain.CleanupOperation{
+							{
+								Name:        &quot;nix-generations&quot;,
+								Description: &quot;Clean Nix generations&quot;,
+								RiskLevel:   domain.RiskLow,
+								Status:      domain.StatusEnabled,
+							},
+						},
+						Status: domain.StatusEnabled,
+					},
+				},
+			},
+			expectedChanges:  []string{&quot;version&quot;, &quot;profiles.daily.name&quot;},
+			expectedWarnings: 0,
+		},
+		{
+			name: &quot;max disk usage clamping&quot;,
+			config: &amp;domain.Config{
+				Version:      &quot;1.0.0&quot;,
+				SafetyLevel:  domain.SafetyLevelEnabled,
+				MaxDiskUsage: 150, // Will be clamped to 95
+				Protected:    []string{&quot;/System&quot;, &quot;/Library&quot;},
+				Profiles: map[string]*domain.Profile{
+					&quot;daily&quot;: {
+						Name:        &quot;daily&quot;,
+						Description: &quot;Daily cleanup&quot;,
+						Operations: []domain.CleanupOperation{
+							{
+								Name:        &quot;nix-generations&quot;,
+								Description: &quot;Clean Nix generations&quot;,
+								RiskLevel:   domain.RiskLow,
+								Status:      domain.StatusEnabled,
+							},
+						},
+						Status: domain.StatusEnabled,
+					},
+				},
+			},
+			expectedChanges:  []string{&quot;max_disk_usage&quot;},
+			expectedWarnings: 1,
+		},
+	}</code></pre></div><div class="py-4"><p class="text-gray-600">internal/config/config.go (Line 239:25 - Line 365:40), internal/config/config.go (Line 67:18 - Line 193:90)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup6"><code class="language-go text-sm text-gray-800">, err)
+	}
+
+	// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)
+	for name, profile := range config.Profiles {
+		// Convert boolean enabled to StatusType enum for profiles
+		var profileEnabled bool
+		if v.IsSet(fmt.Sprintf(&quot;profiles.%s.enabled&quot;, name)) {
+			if err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.enabled&quot;, name), &amp;profileEnabled); err != nil {
+				log.Warn().Err(err).Str(&quot;profile&quot;, name).Msg(&quot;Failed to unmarshal profile enabled flag&quot;)
+			}
+			if profileEnabled {
+				profile.Status = domain.StatusEnabled
+			} else {
+				profile.Status = domain.StatusDisabled
+			}
+		} else {
+			// Fallback to string status parsing for backward compatibility
+			var profileStatusStr string
+			if err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.status&quot;, name), &amp;profileStatusStr); err != nil {
+				log.Warn().Err(err).Str(&quot;profile&quot;, name).Msg(&quot;Failed to unmarshal profile status&quot;)
+			}
+			switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
+			case &quot;DISABLED&quot;:
+				profile.Status = domain.StatusDisabled
+			case &quot;ENABLED&quot;:
+				profile.Status = domain.StatusEnabled
+			case &quot;INHERITED&quot;:
+				profile.Status = domain.StatusInherited
+			default:
+				if profileStatusStr != &quot;&quot; {
+					log.Warn().Str(&quot;profile&quot;, name).Str(&quot;status&quot;, profileStatusStr).Msg(&quot;Invalid profile status, defaulting to ENABLED&quot;)
+				}
+				profile.Status = domain.StatusEnabled
+			}
+		}
+
+		for i, op := range profile.Operations {
+			// Convert string risk level to RiskLevel enum
+			var riskLevelStr string
+			if err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.operations.%d.risk_level&quot;, name, i), &amp;riskLevelStr); err != nil {
+				log.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal risk level&quot;)
+			}
+
+			switch strings.ToUpper(riskLevelStr) {
+			case &quot;LOW&quot;:
+				op.RiskLevel = domain.RiskLow
+			case &quot;MEDIUM&quot;:
+				op.RiskLevel = domain.RiskMedium
+			case &quot;HIGH&quot;:
+				op.RiskLevel = domain.RiskHigh
+			case &quot;CRITICAL&quot;:
+				op.RiskLevel = domain.RiskCritical
+			default:
+				log.Warn().Str(&quot;risk_level&quot;, riskLevelStr).Msg(&quot;Invalid risk level, defaulting to LOW&quot;)
+				op.RiskLevel = domain.RiskLow
+			}
+
+			// Convert boolean enabled to StatusType enum for operations
+			operationEnabledKey := fmt.Sprintf(&quot;profiles.%s.operations.%d.enabled&quot;, name, i)
+			if v.IsSet(operationEnabledKey) {
+				var operationEnabled bool
+				if err := v.UnmarshalKey(operationEnabledKey, &amp;operationEnabled); err != nil {
+					log.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal operation enabled flag&quot;)
+				}
+				if operationEnabled {
+					op.Status = domain.StatusEnabled
+				} else {
+					op.Status = domain.StatusDisabled
+				}
+			} else {
+				// Fallback to string status parsing for backward compatibility
+				var opStatusStr string
+				if err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.operations.%d.status&quot;, name, i), &amp;opStatusStr); err != nil {
+					log.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal operation status&quot;)
+				}
+				switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
+				case &quot;DISABLED&quot;:
+					op.Status = domain.StatusDisabled
+				case &quot;ENABLED&quot;:
+					op.Status = domain.StatusEnabled
+				case &quot;INHERITED&quot;:
+					op.Status = domain.StatusInherited
+				default:
+					if opStatusStr != &quot;&quot; {
+						log.Warn().Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Str(&quot;status&quot;, opStatusStr).Msg(&quot;Invalid operation status, defaulting to ENABLED&quot;)
+					}
+					op.Status = domain.StatusEnabled
+				}
+			}
+		}
+	}
+
+	// Apply comprehensive validation with strict enforcement
+	if validator := NewConfigValidator(); validator != nil {
+		validationResult := validator.ValidateConfig(&amp;config)
+		if !validationResult.IsValid {
+			// CRITICAL: Fail fast on validation errors for production safety
+			for _, err := range validationResult.Errors {
+				log.Error().
+					Str(&quot;field&quot;, err.Field).
+					Err(fmt.Errorf(&quot;%s&quot;, err.Message)).
+					Msg(&quot;Configuration validation error&quot;)
+			}
+			return nil, fmt.Errorf(&quot;configuration validation failed with %d errors&quot;, len(validationResult.Errors))
+		}
+	}
+
+	// Apply comprehensive validation with strict enforcement
+	if validator := NewConfigValidator(); validator != nil {
+		validationResult := validator.ValidateConfig(&amp;config)
+		if !validationResult.IsValid {
+			// CRITICAL: Fail fast on validation errors for production safety
+			for _, err := range validationResult.Errors {
+				log.Error().
+					Str(&quot;field&quot;, err.Field).
+					Err(fmt.Errorf(&quot;%s&quot;, err.Message)).
+					Msg(&quot;Configuration validation error&quot;)
+			}
+			return nil, fmt.Errorf(&quot;configuration validation failed with %d errors&quot;, len(validationResult.Errors))
+		}
+	}
+
+	return &amp;config, nil
+}
+
+// Save saves the configuration to file</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="markup-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">markup</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">reports/html/index.html (Line 425:2 - Line 474:2), reports/html/index.html (Line 40:2 - Line 89:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup0"><code class="language-markup text-sm text-gray-800">nil
+			},
+		},
+	},
+	When: []BDDWhen{
+		{
+			Description: &amp;quot;the configuration is validated&amp;quot;,
+			Action: func(cfg *domain.Config) (*ValidationResult, error) {
+				validator := NewConfigValidator()
+				return validator.ValidateConfig(cfg), nil
+			},
+		},
+	},
+	Then: []BDDThen{
+		{
+			Description: &amp;quot;validation should fail&amp;quot;,
+			Validate: func(result *ValidationResult) error {
+				if result.IsValid {
+					return fmt.Errorf(&amp;quot;expected invalid configuration&amp;quot;)
+				}
+				return nil
+			},
+		},
+		{
+			Description: &amp;quot;validation errors should be present&amp;quot;,
+			Validate: func(result *ValidationResult) error {
+				if len(result.Errors) == 0 {
+					return fmt.Errorf(&amp;quot;expected validation errors&amp;quot;)
+				}
+				return nil
+			},
+		},
+		{
+			Description: &amp;quot;error should mention generations constraint&amp;quot;,
+			Validate: func(result *ValidationResult) error {
+				found := false
+				for _, err := range result.Errors {
+					if strings.Contains(err.Message, &amp;quot;generations&amp;quot;) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					return fmt.Errorf(&amp;quot;expected error mentioning generations constraint&amp;quot;)
+				}
+				return nil
+			},
+		},
+	},
+}</code></pre></div><div class="py-4"><p class="text-gray-600">reports/html/index.html (Line 476:5 - Line 563:5), reports/html/index.html (Line 167:2 - Line 256:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup1"><code class="language-markup text-sm text-gray-800">for name, profile := range config.Profiles {
+	// Convert boolean enabled to StatusType enum for profiles
+	var profileEnabled bool
+	if v.IsSet(fmt.Sprintf(&amp;quot;profiles.%s.enabled&amp;quot;, name)) {
+		if err := v.UnmarshalKey(fmt.Sprintf(&amp;quot;profiles.%s.enabled&amp;quot;, name), &amp;amp;profileEnabled); err != nil {
+			log.Warn().Err(err).Str(&amp;quot;profile&amp;quot;, name).Msg(&amp;quot;Failed to unmarshal profile enabled flag&amp;quot;)
+		}
+		if profileEnabled {
+			profile.Status = domain.StatusEnabled
+		} else {
+			profile.Status = domain.StatusDisabled
+		}
+	} else {
+		// Fallback to string status parsing for backward compatibility
+		var profileStatusStr string
+		if err := v.UnmarshalKey(fmt.Sprintf(&amp;quot;profiles.%s.status&amp;quot;, name), &amp;amp;profileStatusStr); err != nil {
+			log.Warn().Err(err).Str(&amp;quot;profile&amp;quot;, name).Msg(&amp;quot;Failed to unmarshal profile status&amp;quot;)
+		}
+		switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
+		case &amp;quot;DISABLED&amp;quot;:
+			profile.Status = domain.StatusDisabled
+		case &amp;quot;ENABLED&amp;quot;:
+			profile.Status = domain.StatusEnabled
+		case &amp;quot;INHERITED&amp;quot;:
+			profile.Status = domain.StatusInherited
+		default:
+			if profileStatusStr != &amp;quot;&amp;quot; {
+				log.Warn().Str(&amp;quot;profile&amp;quot;, name).Str(&amp;quot;status&amp;quot;, profileStatusStr).Msg(&amp;quot;Invalid profile status, defaulting to ENABLED&amp;quot;)
+			}
+			profile.Status = domain.StatusEnabled
+		}
+	}
+
+	for i, op := range profile.Operations {
+		// Convert string risk level to RiskLevel enum
+		var riskLevelStr string
+		if err := v.UnmarshalKey(fmt.Sprintf(&amp;quot;profiles.%s.operations.%d.risk_level&amp;quot;, name, i), &amp;amp;riskLevelStr); err != nil {
+			log.Warn().Err(err).Str(&amp;quot;profile&amp;quot;, name).Int(&amp;quot;operation&amp;quot;, i).Msg(&amp;quot;Failed to unmarshal risk level&amp;quot;)
+		}
+
+		switch strings.ToUpper(riskLevelStr) {
+		case &amp;quot;LOW&amp;quot;:
+			op.RiskLevel = domain.RiskLow
+		case &amp;quot;MEDIUM&amp;quot;:
+			op.RiskLevel = domain.RiskMedium
+		case &amp;quot;HIGH&amp;quot;:
+			op.RiskLevel = domain.RiskHigh
+		case &amp;quot;CRITICAL&amp;quot;:
+			op.RiskLevel = domain.RiskCritical
+		default:
+			log.Warn().Str(&amp;quot;risk_level&amp;quot;, riskLevelStr).Msg(&amp;quot;Invalid risk level, defaulting to LOW&amp;quot;)
+			op.RiskLevel = domain.RiskLow
+		}
+
+		// Convert boolean enabled to StatusType enum for operations
+		operationEnabledKey := fmt.Sprintf(&amp;quot;profiles.%s.operations.%d.enabled&amp;quot;, name, i)
+		if v.IsSet(operationEnabledKey) {
+			var operationEnabled bool
+			if err := v.UnmarshalKey(operationEnabledKey, &amp;amp;operationEnabled); err != nil {
+				log.Warn().Err(err).Str(&amp;quot;profile&amp;quot;, name).Int(&amp;quot;operation&amp;quot;, i).Msg(&amp;quot;Failed to unmarshal operation enabled flag&amp;quot;)
+			}
+			if operationEnabled {
+				op.Status = domain.StatusEnabled
+			} else {
+				op.Status = domain.StatusDisabled
+			}
+		} else {
+			// Fallback to string status parsing for backward compatibility
+			var opStatusStr string
+			if err := v.UnmarshalKey(fmt.Sprintf(&amp;quot;profiles.%s.operations.%d.status&amp;quot;, name, i), &amp;amp;opStatusStr); err != nil {
+				log.Warn().Err(err).Str(&amp;quot;profile&amp;quot;, name).Int(&amp;quot;operation&amp;quot;, i).Msg(&amp;quot;Failed to unmarshal operation status&amp;quot;)
+			}
+			switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
+			case &amp;quot;DISABLED&amp;quot;:
+				op.Status = domain.StatusDisabled
+			case &amp;quot;ENABLED&amp;quot;:
+				op.Status = domain.StatusEnabled
+			case &amp;quot;INHERITED&amp;quot;:
+				op.Status = domain.StatusInherited
+			default:
+				if opStatusStr != &amp;quot;&amp;quot; {
+					log.Warn().Str(&amp;quot;profile&amp;quot;, name).Int(&amp;quot;operation&amp;quot;, i).Str(&amp;quot;status&amp;quot;, opStatusStr).Msg(&amp;quot;Invalid operation status, defaulting to ENABLED&amp;quot;)
+				}
+				op.Status = domain.StatusEnabled
+			}
+		}
+	}
+}&amp;lt;</code></pre></div><div class="py-4"><p class="text-gray-600">reports/go-duplications.html (Line 78:2 - Line 128:3), reports/go-duplications.html (Line 20:2 - Line 70:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup7"><code class="language-markup text-sm text-gray-800">nil
+			},
+		},
+	},
+	When: []BDDWhen{
+		{
+			Description: &quot;the configuration is validated&quot;,
+			Action: func(cfg *domain.Config) (*ValidationResult, error) {
+				validator := NewConfigValidator()
+				return validator.ValidateConfig(cfg), nil
+			},
+		},
+	},
+	Then: []BDDThen{
+		{
+			Description: &quot;validation should fail&quot;,
+			Validate: func(result *ValidationResult) error {
+				if result.IsValid {
+					return fmt.Errorf(&quot;expected invalid configuration&quot;)
+				}
+				return nil
+			},
+		},
+		{
+			Description: &quot;validation errors should be present&quot;,
+			Validate: func(result *ValidationResult) error {
+				if len(result.Errors) == 0 {
+					return fmt.Errorf(&quot;expected validation errors&quot;)
+				}
+				return nil
+			},
+		},
+		{
+			Description: &quot;error should mention generations constraint&quot;,
+			Validate: func(result *ValidationResult) error {
+				found := false
+				for _, err := range result.Errors {
+					if strings.Contains(err.Message, &quot;generations&quot;) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					return fmt.Errorf(&quot;expected error mentioning generations constraint&quot;)
+				}
+				return nil
+			},
+		},
+	},
+}&lt;/pre&gt;
+&lt;h1</code></pre></div><div class="py-4"><p class="text-gray-600">reports/go-duplications.html (Line 295:30 - Line 384:3), reports/go-duplications.html (Line 206:29 - Line 295:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup8"><code class="language-markup text-sm text-gray-800">&lt;/h2&gt;
+&lt;pre&gt;for name, profile := range config.Profiles {
+	// Convert boolean enabled to StatusType enum for profiles
+	var profileEnabled bool
+	if v.IsSet(fmt.Sprintf(&quot;profiles.%s.enabled&quot;, name)) {
+		if err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.enabled&quot;, name), &amp;profileEnabled); err != nil {
+			log.Warn().Err(err).Str(&quot;profile&quot;, name).Msg(&quot;Failed to unmarshal profile enabled flag&quot;)
+		}
+		if profileEnabled {
+			profile.Status = domain.StatusEnabled
+		} else {
+			profile.Status = domain.StatusDisabled
+		}
+	} else {
+		// Fallback to string status parsing for backward compatibility
+		var profileStatusStr string
+		if err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.status&quot;, name), &amp;profileStatusStr); err != nil {
+			log.Warn().Err(err).Str(&quot;profile&quot;, name).Msg(&quot;Failed to unmarshal profile status&quot;)
+		}
+		switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
+		case &quot;DISABLED&quot;:
+			profile.Status = domain.StatusDisabled
+		case &quot;ENABLED&quot;:
+			profile.Status = domain.StatusEnabled
+		case &quot;INHERITED&quot;:
+			profile.Status = domain.StatusInherited
+		default:
+			if profileStatusStr != &quot;&quot; {
+				log.Warn().Str(&quot;profile&quot;, name).Str(&quot;status&quot;, profileStatusStr).Msg(&quot;Invalid profile status, defaulting to ENABLED&quot;)
+			}
+			profile.Status = domain.StatusEnabled
+		}
+	}
+
+	for i, op := range profile.Operations {
+		// Convert string risk level to RiskLevel enum
+		var riskLevelStr string
+		if err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.operations.%d.risk_level&quot;, name, i), &amp;riskLevelStr); err != nil {
+			log.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal risk level&quot;)
+		}
+
+		switch strings.ToUpper(riskLevelStr) {
+		case &quot;LOW&quot;:
+			op.RiskLevel = domain.RiskLow
+		case &quot;MEDIUM&quot;:
+			op.RiskLevel = domain.RiskMedium
+		case &quot;HIGH&quot;:
+			op.RiskLevel = domain.RiskHigh
+		case &quot;CRITICAL&quot;:
+			op.RiskLevel = domain.RiskCritical
+		default:
+			log.Warn().Str(&quot;risk_level&quot;, riskLevelStr).Msg(&quot;Invalid risk level, defaulting to LOW&quot;)
+			op.RiskLevel = domain.RiskLow
+		}
+
+		// Convert boolean enabled to StatusType enum for operations
+		operationEnabledKey := fmt.Sprintf(&quot;profiles.%s.operations.%d.enabled&quot;, name, i)
+		if v.IsSet(operationEnabledKey) {
+			var operationEnabled bool
+			if err := v.UnmarshalKey(operationEnabledKey, &amp;operationEnabled); err != nil {
+				log.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal operation enabled flag&quot;)
+			}
+			if operationEnabled {
+				op.Status = domain.StatusEnabled
+			} else {
+				op.Status = domain.StatusDisabled
+			}
+		} else {
+			// Fallback to string status parsing for backward compatibility
+			var opStatusStr string
+			if err := v.UnmarshalKey(fmt.Sprintf(&quot;profiles.%s.operations.%d.status&quot;, name, i), &amp;opStatusStr); err != nil {
+				log.Warn().Err(err).Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Msg(&quot;Failed to unmarshal operation status&quot;)
+			}
+			switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
+			case &quot;DISABLED&quot;:
+				op.Status = domain.StatusDisabled
+			case &quot;ENABLED&quot;:
+				op.Status = domain.StatusEnabled
+			case &quot;INHERITED&quot;:
+				op.Status = domain.StatusInherited
+			default:
+				if opStatusStr != &quot;&quot; {
+					log.Warn().Str(&quot;profile&quot;, name).Int(&quot;operation&quot;, i).Str(&quot;status&quot;, opStatusStr).Msg(&quot;Invalid operation status, defaulting to ENABLED&quot;)
+				}
+				op.Status = domain.StatusEnabled
+			}
+		}
+	}
+}&lt;/pre&gt;
+&lt;h1</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="json-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">json</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="yaml-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">yaml</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="markdown-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">markdown</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="gherkin-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">gherkin</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="bash-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">bash</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div></section><!-- Add more sections for other formats and clone groups as needed--></main><footer class="bg-white shadow mt-8 py-4"><div class="container mx-auto px-4 text-center"><p class="text-sm text-gray-600">This report is generated by jscpd, an open-source copy/paste detector.</p><p class="text-sm text-gray-600">jscpd is licensed under the MIT License.</p><a class="text-blue-500 text-sm" href="https://github.com/kucherenko/jscpd" target="_blank" rel="noopener noreferrer">View jscpd on GitHub</a></div></footer><script src="js/prism.js"></script><script>function toggleCodeBlock(codeBlockId, expandBtnId, collapseBtnId) {
+  const codeBlock = document.getElementById(codeBlockId);
+  const expandBtn = document.getElementById(expandBtnId);
+  const collapseBtn = document.getElementById(collapseBtnId);
+
+  codeBlock.classList.toggle('hidden');
+  expandBtn.classList.toggle('hidden');
+  collapseBtn.classList.toggle('hidden');
+}</script></body></html>
