@@ -320,3 +320,41 @@ func GetDefaultConfig() *domain.Config {
 		Updated:   now,
 	}
 }
+
+// loadAndValidateConfig performs common config loading, fixing, and validation logic
+func loadAndValidateConfig(config *domain.Config, v *viper.Viper, functionName string) error {
+	// Manually unmarshal fields to avoid YAML tag issues
+	config.Version = v.GetString(ConfigKeyVersion)
+	// Apply safety configuration using type-safe domain logic with proper dependency inversion
+	safetyConfig := domain.ParseSafetyConfig(v)
+	config.SafetyLevel = safetyConfig.ToSafetyLevel()
+	config.MaxDiskUsage = v.GetInt(ConfigKeyMaxDiskUsage)
+	config.Protected = v.GetStringSlice(ConfigKeyProtected)
+
+	// Unmarshal profiles section
+	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
+		log.Err(err).Msg("Failed to unmarshal profiles")
+		return pkgerrors.HandleConfigError(functionName, err)
+	}
+
+	// Fix all configuration issues using consolidated ConfigFixer
+	fixer := NewConfigFixer(v)
+	fixer.FixAll(&config)
+
+	// Apply comprehensive validation with strict enforcement
+	if validator := NewConfigValidator(); validator != nil {
+		validationResult := validator.ValidateConfig(&config)
+		if !validationResult.IsValid {
+			// CRITICAL: Fail fast on validation errors for production safety
+			for _, err := range validationResult.Errors {
+				log.Error().
+					Str("field", err.Field).
+					Err(fmt.Errorf("%s", err.Message)).
+					Msg("Configuration validation error")
+			}
+			return fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
+		}
+	}
+
+	return nil
+}

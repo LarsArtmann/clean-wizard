@@ -18,7 +18,7 @@ type CommonTestConfiguration struct {
 func createWhitespacedConfig() *domain.Config {
 	return &domain.Config{
 		Version:     " 1.0.0 ", // Extra spaces
-		SafetyLevel: " enabled ", // Extra spaces
+		SafetyLevel: domain.SafetyLevelEnabled, // Will be tested with whitespace parsing
 		MaxDiskUsage: 50,
 		Protected:   []string{"/System ", " /Library"}, // Trailing/leading spaces
 		Profiles: map[string]*domain.Profile{
@@ -29,11 +29,11 @@ func createWhitespacedConfig() *domain.Config {
 					{
 						Name:        " nix-generations ",
 						Description: " Clean Nix generations ",
-						RiskLevel:   " low ",
-						Status:      " enabled ",
+						RiskLevel:   domain.RiskLow,
+						Status:      domain.StatusEnabled,
 					},
 				},
-				Status: " enabled ",
+				Status: domain.StatusEnabled,
 			},
 		},
 		LastClean: time.Now(),
