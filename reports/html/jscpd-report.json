@@ -1,6 +1,6 @@
 {
   "statistics": {
-    "detectionDate": "2025-11-20T19:12:37.915Z",
+    "detectionDate": "2025-11-20T19:23:49.081Z",
     "formats": {
       "css": {
         "sources": {
@@ -124,11 +124,11 @@
             "lines": 205,
             "tokens": 1532,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 23,
-            "duplicatedTokens": 173,
-            "percentage": 11.22,
-            "percentageTokens": 11.29,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -136,11 +136,11 @@
             "lines": 53,
             "tokens": 341,
             "sources": 1,
-            "clones": 1,
-            "duplicatedLines": 23,
-            "duplicatedTokens": 173,
-            "percentage": 43.4,
-            "percentageTokens": 50.73,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -362,7 +362,7 @@
           },
           "internal/bdd/bdd_test.go": {
             "lines": 28,
-            "tokens": 147,
+            "tokens": 134,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -373,8 +373,8 @@
             "newClones": 0
           },
           "internal/bdd/framework.go": {
-            "lines": 293,
-            "tokens": 2080,
+            "lines": 297,
+            "tokens": 2114,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -448,11 +448,11 @@
             "lines": 418,
             "tokens": 4121,
             "sources": 1,
-            "clones": 2,
-            "duplicatedLines": 34,
-            "duplicatedTokens": 320,
-            "percentage": 8.13,
-            "percentageTokens": 7.77,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -964,11 +964,11 @@
             "lines": 262,
             "tokens": 1979,
             "sources": 1,
-            "clones": 2,
-            "duplicatedLines": 36,
-            "duplicatedTokens": 292,
-            "percentage": 13.74,
-            "percentageTokens": 14.75,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1012,11 +1012,11 @@
             "lines": 134,
             "tokens": 1118,
             "sources": 1,
-            "clones": 2,
-            "duplicatedLines": 36,
-            "duplicatedTokens": 288,
-            "percentage": 26.87,
-            "percentageTokens": 25.76,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1120,11 +1120,11 @@
             "lines": 321,
             "tokens": 2564,
             "sources": 1,
-            "clones": 6,
-            "duplicatedLines": 116,
-            "duplicatedTokens": 960,
-            "percentage": 36.14,
-            "percentageTokens": 37.44,
+            "clones": 2,
+            "duplicatedLines": 44,
+            "duplicatedTokens": 348,
+            "percentage": 13.71,
+            "percentageTokens": 13.57,
             "newDuplicatedLines": 0,
             "newClones": 0
           },
@@ -1334,14 +1334,14 @@
           }
         },
         "total": {
-          "lines": 17199,
-          "tokens": 125986,
+          "lines": 17203,
+          "tokens": 126007,
           "sources": 106,
-          "clones": 8,
-          "duplicatedLines": 167,
-          "duplicatedTokens": 1343,
-          "percentage": 0.97,
-          "percentageTokens": 1.07,
+          "clones": 2,
+          "duplicatedLines": 55,
+          "duplicatedTokens": 414,
+          "percentage": 0.32,
+          "percentageTokens": 0.33,
           "newDuplicatedLines": 0,
           "newClones": 0
         }
@@ -1413,8 +1413,8 @@
       "markup": {
         "sources": {
           "reports/html/index.html": {
-            "lines": 63,
-            "tokens": 2758,
+            "lines": 175,
+            "tokens": 4634,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -1425,8 +1425,8 @@
             "newClones": 0
           },
           "reports/go-duplications.html": {
-            "lines": 111,
-            "tokens": 913,
+            "lines": 9,
+            "tokens": 53,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -1438,8 +1438,8 @@
           }
         },
         "total": {
-          "lines": 174,
-          "tokens": 3671,
+          "lines": 184,
+          "tokens": 4687,
           "sources": 2,
           "clones": 0,
           "duplicatedLines": 0,
@@ -1667,6 +1667,18 @@
           "docs/status/2025-11-20_20_03-CRITICAL_TYPE_SAFETY_FAILURE.md": {
             "lines": 132,
             "tokens": 1275,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "docs/status/2025-11-20_20-18-CRITICAL_RECOVERY_COMPLETE.md": {
+            "lines": 191,
+            "tokens": 1783,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -2108,6 +2120,18 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
+          "docs/planning/2025-11-20_20-21-CRITICAL_DOMAIN_TYPE_SYSTEM_RECOVERY.md": {
+            "lines": 274,
+            "tokens": 2463,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
           "docs/planning/2025-11-09_09-37-EXECUTION_GRAPH.md": {
             "lines": 332,
             "tokens": 1542,
@@ -2289,8 +2313,8 @@
             "newClones": 0
           },
           "reports/go-duplications.txt": {
-            "lines": 13,
-            "tokens": 94,
+            "lines": 3,
+            "tokens": 29,
             "sources": 1,
             "clones": 0,
             "duplicatedLines": 0,
@@ -2506,9 +2530,9 @@
           }
         },
         "total": {
-          "lines": 17882,
-          "tokens": 157215,
-          "sources": 74,
+          "lines": 18337,
+          "tokens": 161396,
+          "sources": 76,
           "clones": 0,
           "duplicatedLines": 0,
           "duplicatedTokens": 0,
@@ -2560,163 +2584,19 @@
       }
     },
     "total": {
-      "lines": 36037,
-      "tokens": 297344,
-      "sources": 201,
-      "clones": 8,
-      "duplicatedLines": 167,
-      "duplicatedTokens": 1343,
-      "percentage": 0.46,
-      "percentageTokens": 0.45,
+      "lines": 36506,
+      "tokens": 302562,
+      "sources": 203,
+      "clones": 2,
+      "duplicatedLines": 55,
+      "duplicatedTokens": 414,
+      "percentage": 0.15,
+      "percentageTokens": 0.14,
       "newDuplicatedLines": 0,
       "newClones": 0
     }
   },
   "duplicates": [
-    {
-      "format": "go",
-      "lines": 24,
-      "fragment": "{\n\t\tfmt.Printf(\"🔍 Applying validation level: %s\\n\", validationLevel.String())\n\n\t\tif validationLevel >= config.ValidationLevelBasic {\n\t\t\t// Basic validation\n\t\t\tif len(loadedCfg.Protected) == 0 {\n\t\t\t\treturn fmt.Errorf(\"basic validation failed: protected paths cannot be empty\")\n\t\t\t}\n\t\t}\n\n\t\tif validationLevel >= config.ValidationLevelComprehensive {\n\t\t\t// Comprehensive validation\n\t\t\tif err := loadedCfg.Validate(); err != nil {\n\t\t\t\treturn fmt.Errorf(\"comprehensive validation failed: %w\", err)\n\t\t\t}\n\t\t}\n\n\t\tif validationLevel >= config.ValidationLevelStrict {\n\t\t\t// Strict validation\n\t\t\tif loadedCfg.SafetyLevel == domain.SafetyLevelDisabled {\n\t\t\t\treturn fmt.Errorf(\"strict validation failed: safety_level must be enabled\")\n\t\t\t}\n\t\t}\n\t}",
-      "tokens": 0,
-      "firstFile": {
-        "name": "cmd/clean-wizard/commands/util.go",
-        "start": 29,
-        "end": 52,
-        "startLoc": {
-          "line": 29,
-          "column": 2,
-          "position": 161
-        },
-        "endLoc": {
-          "line": 52,
-          "column": 2,
-          "position": 334
-        }
-      },
-      "secondFile": {
-        "name": "cmd/clean-wizard/commands/scan.go",
-        "start": 64,
-        "end": 88,
-        "startLoc": {
-          "line": 64,
-          "column": 2,
-          "position": 413
-        },
-        "endLoc": {
-          "line": 88,
-          "column": 4,
-          "position": 587
-        }
-      }
-    },
-    {
-      "format": "go",
-      "lines": 18,
-      "fragment": ", func(t *testing.T) {\n\t\t// Simulate handler.Recover() logic inline to test it properly\n\t\tvar recovered *CleanWizardError\n\t\tfunc() {\n\t\t\tdefer func() {\n\t\t\t\t// Inline handler.Recover() logic (since recover() only works inline)\n\t\t\t\tif r := recover(); r != nil {\n\t\t\t\t\tvar cause error\n\t\t\t\t\tif err, ok := r.(error); ok {\n\t\t\t\t\t\tcause = err\n\t\t\t\t\t} else {\n\t\t\t\t\t\tcause = NewErrorf(ErrCodeProcessFailed, \"panic recovered: %v\", r)\n\t\t\t\t\t}\n\t\t\t\t\trecovered = NewError(ErrCodeProcessFailed, \"System panic occurred\").\n\t\t\t\t\t\tWithCause(cause).WithCaller()\n\t\t\t\t}\n\t\t\t}()\n\t\t\tpanic(\"test string panic\"",
-      "tokens": 0,
-      "firstFile": {
-        "name": "internal/errors/errors_test.go",
-        "start": 250,
-        "end": 267,
-        "startLoc": {
-          "line": 250,
-          "column": 15,
-          "position": 2505
-        },
-        "endLoc": {
-          "line": 267,
-          "column": 20,
-          "position": 2665
-        }
-      },
-      "secondFile": {
-        "name": "internal/errors/errors_test.go",
-        "start": 227,
-        "end": 244,
-        "startLoc": {
-          "line": 227,
-          "column": 14,
-          "position": 2290
-        },
-        "endLoc": {
-          "line": 244,
-          "column": 7,
-          "position": 2450
-        }
-      }
-    },
-    {
-      "format": "go",
-      "lines": 19,
-      "fragment": "Protected:    []string{\"/System\", \"/usr\", \"/etc\", \"/var\", \"/bin\", \"/sbin\"},\n\t\t\t\tProfiles: map[string]*domain.Profile{\n\t\t\t\t\t\"daily\": {\n\t\t\t\t\t\tName:        \"daily\",\n\t\t\t\t\t\tDescription: \"Daily cleanup\",\n\t\t\t\t\t\tOperations: []domain.CleanupOperation{\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName:        \"nix-generations\",\n\t\t\t\t\t\t\t\tDescription: \"Clean Nix generations\",\n\t\t\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t\tStatus: domain.StatusEnabled,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t\texpectValid: false,\n\t\t\texpectError: \"version\"",
-      "tokens": 0,
-      "firstFile": {
-        "name": "internal/config/validation_validator_test.go",
-        "start": 103,
-        "end": 121,
-        "startLoc": {
-          "line": 103,
-          "column": 5,
-          "position": 778
-        },
-        "endLoc": {
-          "line": 121,
-          "column": 10,
-          "position": 924
-        }
-      },
-      "secondFile": {
-        "name": "internal/config/validation_validator_test.go",
-        "start": 78,
-        "end": 96,
-        "startLoc": {
-          "line": 78,
-          "column": 5,
-          "position": 588
-        },
-        "endLoc": {
-          "line": 96,
-          "column": 17,
-          "position": 734
-        }
-      }
-    },
-    {
-      "format": "go",
-      "lines": 19,
-      "fragment": ",\n\t\t\tProfiles: map[string]*domain.Profile{\n\t\t\t\t\"test\": {\n\t\t\t\t\tName:        \"test\",\n\t\t\t\t\tDescription: \"Test profile\",\n\t\t\t\t\tOperations: []domain.CleanupOperation{{\n\t\t\t\t\t\tName:        \"test-op\",\n\t\t\t\t\t\tDescription: \"Test operation\",\n\t\t\t\t\t\tRiskLevel:   domain.RiskLow,\n\t\t\t\t\t\tStatus:      domain.StatusEnabled,\n\t\t\t\t\t\tSettings:    &domain.OperationSettings{NixGenerations: &domain.NixGenerationsSettings{Generations: 5}},\n\t\t\t\t\t}},\n\t\t\t\t\tStatus: domain.StatusEnabled,\n\t\t\t\t},\n\t\t\t},\n\t\t\tProtected: []string{\"/System\"},\n\t\t}\n\n\t\tresult",
-      "tokens": 0,
-      "firstFile": {
-        "name": "internal/config/semver_validation_test.go",
-        "start": 70,
-        "end": 88,
-        "startLoc": {
-          "line": 70,
-          "column": 8,
-          "position": 593
-        },
-        "endLoc": {
-          "line": 88,
-          "column": 7,
-          "position": 737
-        }
-      },
-      "secondFile": {
-        "name": "internal/config/semver_validation_test.go",
-        "start": 46,
-        "end": 63,
-        "startLoc": {
-          "line": 46,
-          "column": 8,
-          "position": 388
-        },
-        "endLoc": {
-          "line": 63,
-          "column": 2,
-          "position": 530
-        }
-      }
-    },
     {
       "format": "go",
       "lines": 34,
@@ -2755,42 +2635,6 @@
     },
     {
       "format": "go",
-      "lines": 19,
-      "fragment": ", err)\n\t\t}\n\t}\n\n\t// Unmarshal profiles section\n\tvar config domain.Config\n\n\t// Manually unmarshal fields to avoid YAML tag issues\n\tconfig.Version = v.GetString(ConfigKeyVersion)\n\t// Apply safety configuration using type-safe domain logic with proper dependency inversion\n\tsafetyConfig := domain.ParseSafetyConfig(v)\n\tconfig.SafetyLevel = safetyConfig.ToSafetyLevel()\n\tconfig.MaxDiskUsage = v.GetInt(ConfigKeyMaxDiskUsage)\n\tconfig.Protected = v.GetStringSlice(ConfigKeyProtected)\n\n\t// Unmarshal profiles section\n\tif err := v.UnmarshalKey(\"profiles\", &config.Profiles); err != nil {\n\t\tlog.Err(err).Msg(\"Failed to unmarshal profiles\")\n\t\treturn nil, pkgerrors.HandleConfigError(\"LoadWithContextAndPath\"",
-      "tokens": 0,
-      "firstFile": {
-        "name": "internal/config/config.go",
-        "start": 119,
-        "end": 137,
-        "startLoc": {
-          "line": 119,
-          "column": 25,
-          "position": 873
-        },
-        "endLoc": {
-          "line": 137,
-          "column": 25,
-          "position": 1027
-        }
-      },
-      "secondFile": {
-        "name": "internal/config/config.go",
-        "start": 48,
-        "end": 66,
-        "startLoc": {
-          "line": 48,
-          "column": 18,
-          "position": 282
-        },
-        "endLoc": {
-          "line": 66,
-          "column": 18,
-          "position": 436
-        }
-      }
-    },
-    {
-      "format": "go",
       "lines": 23,
       "fragment": ", err)\n\t}\n\n\t// Fix all configuration issues using consolidated ConfigFixer\n\tfixer := NewConfigFixer(v)\n\tfixer.FixAll(&config)\n\n\t// Apply comprehensive validation with strict enforcement\n\tif validator := NewConfigValidator(); validator != nil {\n\t\tvalidationResult := validator.ValidateConfig(&config)\n\t\tif !validationResult.IsValid {\n\t\t\t// CRITICAL: Fail fast on validation errors for production safety\n\t\t\tfor _, err := range validationResult.Errors {\n\t\t\t\tlog.Error().\n\t\t\t\t\tStr(\"field\", err.Field).\n\t\t\t\t\tErr(fmt.Errorf(\"%s\", err.Message)).\n\t\t\t\t\tMsg(\"Configuration validation error\")\n\t\t\t}\n\t\t\treturn nil, fmt.Errorf(\"configuration validation failed with %d errors\", len(validationResult.Errors))\n\t\t}\n\t}\n\n\t// Apply comprehensive validation with strict enforcement",
       "tokens": 0,
@@ -2822,42 +2666,6 @@
           "line": 88,
           "column": 7,
           "position": 611
-        }
-      }
-    },
-    {
-      "format": "go",
-      "lines": 19,
-      "fragment": "// Apply comprehensive validation with strict enforcement\n\tif validator := NewConfigValidator(); validator != nil {\n\t\tvalidationResult := validator.ValidateConfig(&config)\n\t\tif !validationResult.IsValid {\n\t\t\t// CRITICAL: Fail fast on validation errors for production safety\n\t\t\tfor _, err := range validationResult.Errors {\n\t\t\t\tlog.Error().\n\t\t\t\t\tStr(\"field\", err.Field).\n\t\t\t\t\tErr(fmt.Errorf(\"%s\", err.Message)).\n\t\t\t\t\tMsg(\"Configuration validation error\")\n\t\t\t}\n\t\t\treturn nil, fmt.Errorf(\"configuration validation failed with %d errors\", len(validationResult.Errors))\n\t\t}\n\t}\n\n\treturn &config, nil\n}\n\n// Save saves the configuration to file",
-      "tokens": 0,
-      "firstFile": {
-        "name": "internal/config/config.go",
-        "start": 159,
-        "end": 177,
-        "startLoc": {
-          "line": 159,
-          "column": 2,
-          "position": 1202
-        },
-        "endLoc": {
-          "line": 177,
-          "column": 40,
-          "position": 1354
-        }
-      },
-      "secondFile": {
-        "name": "internal/config/config.go",
-        "start": 73,
-        "end": 91,
-        "startLoc": {
-          "line": 73,
-          "column": 2,
-          "position": 470
-        },
-        "endLoc": {
-          "line": 91,
-          "column": 90,
-          "position": 622
         }
       }
     }

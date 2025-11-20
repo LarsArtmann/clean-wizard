@@ -76,39 +76,17 @@ func CreateTestConfigurations() map[string]*domain.Config {
 }
 
 // GetSanitizationTestCases returns all sanitization test cases
+// Note: This is now a wrapper around shared test data in test_data.go
 func GetSanitizationTestCases() []TestSanitizationTestCase {
-	return []TestSanitizationTestCase{
-		{
-			name:             "whitespace cleanup",
-			config:           createWhitespacedConfig(),
-			expectedChanges:  []string{"version", "profiles.daily.name"},
-			expectedWarnings: 0,
-		},
-		{
-			name: "max disk usage clamping",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafetyLevel:  domain.SafetyLevelEnabled,
-				MaxDiskUsage: 150, // Will be clamped to 95
-				Protected:    []string{"/System", "/Library"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Status:      domain.StatusEnabled,
-							},
-						},
-						Status: domain.StatusEnabled,
-					},
-				},
-			},
-			expectedChanges:  []string{"max_disk_usage"},
-			expectedWarnings: 1,
-		},
+	return GetStandardTestCasesWrapper()
+}
+
+// GetStandardTestCasesWrapper converts standard test cases to sanitization test cases
+func GetStandardTestCasesWrapper() []TestSanitizationTestCase {
+	standardCases := GetStandardTestCases()
+	result := make([]TestSanitizationTestCase, len(standardCases))
+	for i, tc := range standardCases {
+		result[i] = TestSanitizationTestCase(tc)
 	}
+	return result
 }
