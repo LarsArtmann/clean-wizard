@@ -140,9 +140,9 @@ func (e *CleanWizardError) IsCode(code ErrorCode) bool {
 	return e.Code == code
 }
 
-// IsSeverity checks if error has specific severity level or lower (less severe)
+// IsSeverity checks if error has specific severity level or higher (more severe)
 func (e *CleanWizardError) IsSeverity(severity ErrorSeverity) bool {
-	return e.Severity <= severity
+	return e.Severity >= severity
 }
 
 // WithCaller adds caller information to error
@@ -218,35 +218,51 @@ func WrapErrorf(cause error, code ErrorCode, format string, args ...interface{})
 
 // inferErrorType maps error codes to error types
 func inferErrorType(code ErrorCode) ErrorType {
-	switch {
-	case code >= 1000 && code < 2000:
-		return ErrorTypeDomain
-	case code >= 2000 && code < 3000:
-		return ErrorTypeConfig
-	case code >= 3000 && code < 4000:
-		return ErrorTypeFileSystem
-	case code >= 4000 && code < 5000:
-		return ErrorTypeNetwork
-	case code >= 5000 && code < 6000:
-		return ErrorTypeSystem
+	switch code {
+	case ErrCodeValidationFailed:
+		return ErrorTypeValidation
+	case ErrCodePermissionDenied, ErrCodePermissionError:
+		return ErrorTypePermission
 	default:
-		return ErrorTypeDomain
+		switch {
+		case code >= 1000 && code < 2000:
+			return ErrorTypeDomain
+		case code >= 2000 && code < 3000:
+			return ErrorTypeConfig
+		case code >= 3000 && code < 4000:
+			return ErrorTypeFileSystem
+		case code >= 4000 && code < 5000:
+			return ErrorTypeNetwork
+		case code >= 5000 && code < 6000:
+			return ErrorTypeSystem
+		default:
+			return ErrorTypeDomain
+		}
 	}
 }
 
 // inferErrorSeverity maps error codes to severity levels
 func inferErrorSeverity(code ErrorCode) ErrorSeverity {
-	switch {
-	case code >= 5000:
-		return SeverityCritical
-	case code >= 4000:
-		return SeverityError
-	case code >= 3000:
-		return SeverityWarning
-	case code >= 2000:
-		return SeverityInfo
+	switch code {
+	case ErrCodeFileNotFound:
+		return SeverityWarning // File not found is typically a warning
+	case ErrCodeValidationFailed:
+		return SeverityError // Validation errors are serious
+	case ErrCodeInvalidConfig:
+		return SeverityInfo // Config errors are typically info level
 	default:
-		return SeverityError
+		switch {
+		case code >= 5000:
+			return SeverityCritical
+		case code >= 4000:
+			return SeverityError
+		case code >= 3000:
+			return SeverityError // File system errors are typically errors
+		case code >= 2000:
+			return SeverityInfo // Config errors are typically info level
+		default:
+			return SeverityError
+		}
 	}
 }
 
