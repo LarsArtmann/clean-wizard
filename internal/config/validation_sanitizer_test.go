@@ -2,12 +2,14 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// createWhitespacedConfig creates a test configuration with whitespace that needs cleaning
-func createWhitespacedConfig() *domain.Config {
+// createWhitespacedConfigForSanitizer creates a test configuration with whitespace that needs cleaning
+// This is a sanitizer-specific version to avoid conflicts
+func createWhitespacedConfigForSanitizer() *domain.Config {
 	return &domain.Config{
 		Version:      "  1.0.0  ",
 		SafetyLevel:  domain.SafetyLevelEnabled,
@@ -28,6 +30,8 @@ func createWhitespacedConfig() *domain.Config {
 				Status: domain.StatusEnabled,
 			},
 		},
+		LastClean: time.Now(),
+		Updated:   time.Now(),
 	}
 }
 

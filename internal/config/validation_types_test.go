@@ -6,14 +6,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// TestSanitizationTestCase defines a single sanitization test case
-type TestSanitizationTestCase struct {
-	name             string
-	config           *domain.Config
-	expectedChanges  []string
-	expectedWarnings int
-}
-
 // TestValidationLevelTestCase defines validation level test cases
 type TestValidationLevelTestCase struct {
 	name         string
@@ -76,17 +68,17 @@ func CreateTestConfigurations() map[string]*domain.Config {
 }
 
 // GetSanitizationTestCases returns all sanitization test cases
-// Note: This is now a wrapper around shared test data in test_data.go
-func GetSanitizationTestCases() []TestSanitizationTestCase {
-	return GetStandardTestCasesWrapper()
+// Note: Delegates to shared test data in test_data.go
+func GetSanitizationTestCases() []SanitizationTestCase {
+	return GetStandardTestCasesCompatWrapper()
 }
 
-// GetStandardTestCasesWrapper converts standard test cases to sanitization test cases
-func GetStandardTestCasesWrapper() []TestSanitizationTestCase {
+// GetStandardTestCasesCompatWrapper converts standard test cases to sanitization test cases
+func GetStandardTestCasesCompatWrapper() []SanitizationTestCase {
 	standardCases := GetStandardTestCases()
-	result := make([]TestSanitizationTestCase, len(standardCases))
+	result := make([]SanitizationTestCase, len(standardCases))
 	for i, tc := range standardCases {
-		result[i] = TestSanitizationTestCase(tc)
+		result[i] = SanitizationTestCase(tc)
 	}
 	return result
 }

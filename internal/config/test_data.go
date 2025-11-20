@@ -79,20 +79,20 @@ func GetStandardTestCases() []CommonTestConfiguration {
 	}
 }
 
-// TestSanitizationTestCase defines a single sanitization test case (for backward compatibility)
-type TestSanitizationTestCase struct {
+// SanitizationTestCase defines a single sanitization test case (for backward compatibility)
+type SanitizationTestCase struct {
 	name             string
 	config           *domain.Config
 	expectedChanges  []string
 	expectedWarnings int
 }
 
-// GetSanitizationTestCases returns all sanitization test cases (wrapper for backward compatibility)
-func GetSanitizationTestCases() []TestSanitizationTestCase {
+// GetSanitizationTestCasesCompat returns all sanitization test cases (wrapper for backward compatibility)
+func GetSanitizationTestCasesCompat() []SanitizationTestCase {
 	standardCases := GetStandardTestCases()
-	result := make([]TestSanitizationTestCase, len(standardCases))
+	result := make([]SanitizationTestCase, len(standardCases))
 	for i, tc := range standardCases {
-		result[i] = TestSanitizationTestCase(tc)
+		result[i] = SanitizationTestCase(tc)
 	}
 	return result
 }
