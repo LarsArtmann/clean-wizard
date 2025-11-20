@@ -64,7 +64,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	// Apply safety configuration using type-safe domain logic
+	// Apply safety configuration using type-safe domain logic with proper dependency inversion
 	safetyConfig := domain.ParseSafetyConfig(v)
 	config.SafetyLevel = safetyConfig.ToSafetyLevel()
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
@@ -216,7 +216,7 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	// Apply safety configuration using type-safe domain logic
+	// Apply safety configuration using type-safe domain logic with proper dependency inversion
 	safetyConfig := domain.ParseSafetyConfig(v)
 	config.SafetyLevel = safetyConfig.ToSafetyLevel()
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")

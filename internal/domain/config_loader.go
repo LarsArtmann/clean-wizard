@@ -6,6 +6,15 @@ import (
 	"strings"
 )
 
+// ViperConfig interface for viper operations (enables testing and dependency inversion)
+type ViperConfig interface {
+	IsSet(key string) bool
+	Get(key string) interface{}
+	GetBool(key string) bool
+	GetString(key string) string
+	GetInt(key string) int
+}
+
 // SafetyConfig represents single source of truth for safety configuration
 // This type eliminates split brains by having only ONE representation
 type SafetyConfig struct {
@@ -102,15 +111,6 @@ func parseSafetyLevelNumeric(s string) (SafetyLevelType, bool) {
 		}
 	}
 	return SafetyLevelEnabled, false
-}
-
-// ViperConfig interface for viper operations (enables testing and dependency inversion)
-type ViperConfig interface {
-	IsSet(key string) bool
-	Get(key string) interface{}
-	GetBool(key string) bool
-	GetString(key string) string
-	GetInt(key string) int
 }
 
 // SafetyConfigValidationResult represents validation result for safety configuration
