@@ -1,3 +1,4 @@
+// TYPE-SAFE-EXEMPT: Test code using map[string]any for error details testing
 package errors
 
 import (
@@ -144,6 +145,21 @@ func TestFileSystemErrorAdapter(t *testing.T) {
 		cwErr := adapter.Adapt(nil)
 
 		assert.Nil(t, cwErr)
+	})
+
+	t.Run("Unknown filesystem error", func(t *testing.T) {
+		// Create a PathError with an unknown error type
+		err := &os.PathError{Err: os.ErrClosed, Path: "/tmp/unknown"}
+		cwErr := adapter.Adapt(err)
+
+		require.NotNil(t, cwErr)
+		assert.Equal(t, ErrCodeFilesystem, cwErr.Code) // Should use new generic code
+		assert.Equal(t, ErrorTypeFileSystem, cwErr.Type)
+		assert.Equal(t, SeverityError, cwErr.Severity) // Filesystem errors are errors
+		assert.Contains(t, cwErr.Message, "File system error")
+		assert.Contains(t, cwErr.Message, "/tmp/unknown")
+		assert.Equal(t, err, cwErr.Cause)
+		assert.NotEmpty(t, cwErr.Caller) // Should include caller information
 	})
 }
 
