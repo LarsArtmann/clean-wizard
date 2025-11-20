@@ -9,6 +9,49 @@
 	}
 </style>
 <h1>#1 found 2 clones</h1>
+<h2>internal/config/semver_validation_test.go:94</h2>
+<pre>t.Run("Invalid semver version", func(t *testing.T) {
+	cfg := createTestConfig("invalid.version.format")
+
+	result := cv.ValidateConfig(cfg)
+	if len(result.Errors) == 0 {
+		t.Error("Expected validation errors for invalid semver version")
+	}
+
+	// Check if error is related to version format
+	foundVersionError := false
+	for _, err := range result.Errors {
+		if err.Field == "version" && err.Rule == "semver_format" {
+			foundVersionError = true
+			break
+		}
+	}
+	if !foundVersionError {
+		t.Errorf("Expected semver_format error for version field, got errors: %v", result.Errors)
+	}
+})</pre>
+<h2>internal/config/semver_validation_test.go:115</h2>
+<pre>t.Run("Missing version", func(t *testing.T) {
+	cfg := createTestConfig("")
+
+	result := cv.ValidateConfig(cfg)
+	if len(result.Errors) == 0 {
+		t.Error("Expected validation errors for missing version")
+	}
+
+	// Check if error is related to missing version
+	foundMissingError := false
+	for _, err := range result.Errors {
+		if err.Field == "version" && err.Rule == "required" {
+			foundMissingError = true
+			break
+		}
+	}
+	if !foundMissingError {
+		t.Errorf("Expected required error for version field, got errors: %v", result.Errors)
+	}
+})</pre>
+<h1>#2 found 2 clones</h1>
 <h2>internal/errors/errors_test.go:119</h2>
 <pre>t.Run("File not found", func(t *testing.T) {
 	err := &os.PathError{Err: os.ErrNotExist, Path: "/tmp/missing"}
@@ -33,7 +76,91 @@
 	assert.Contains(t, cwErr.Message, "/tmp/protected")
 	assert.Equal(t, err, cwErr.Cause)
 })</pre>
-<h1>#2 found 3 clones</h1>
+<h1>#3 found 2 clones</h1>
+<h2>internal/adapters/http_client.go:75</h2>
+<pre>func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error) {
+	resp, err := hc.client.R().SetContext(ctx).Get(url)
+	if err != nil {
+		return nil, err
+	}
+	bodyBytes := resp.Body()
+	return &HTTPResponse{
+		StatusCode: resp.StatusCode(),
+		RawBody:    bodyBytes,
+		Body:       string(bodyBytes), // Keep for convenience
+		Headers:    resp.Header(),
+		Request:    resp.Request,
+	}, nil
+}</pre>
+<h2>internal/adapters/http_client.go:123</h2>
+<pre>func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, error) {
+	resp, err := hc.client.R().SetContext(ctx).Delete(url)
+	if err != nil {
+		return nil, err
+	}
+	bodyBytes := resp.Body()
+	return &HTTPResponse{
+		StatusCode: resp.StatusCode(),
+		RawBody:    bodyBytes,
+		Body:       string(bodyBytes), // Keep for convenience
+		Headers:    resp.Header(),
+		Request:    resp.Request,
+	}, nil
+}</pre>
+<h1>#4 found 2 clones</h1>
+<h2>internal/config/test_data.go:18</h2>
+<pre>func createWhitespacedConfig() *domain.Config {
+	return &domain.Config{
+		Version:     " 1.0.0 ", // Extra spaces
+		SafetyLevel: domain.SafetyLevelEnabled, // Will be tested with whitespace parsing
+		MaxDiskUsage: 50,
+		Protected:   []string{"/System ", " /Library"}, // Trailing/leading spaces
+		Profiles: map[string]*domain.Profile{
+			" daily": { // Leading space
+				Name:        " daily cleanup ", // Extra spaces
+				Description: " Daily cleanup ",
+				Operations: []domain.CleanupOperation{
+					{
+						Name:        " nix-generations ",
+						Description: " Clean Nix generations ",
+						RiskLevel:   domain.RiskLow,
+						Status:      domain.StatusEnabled,
+					},
+				},
+				Status: domain.StatusEnabled,
+			},
+		},
+		LastClean: time.Now(),
+		Updated:   time.Now(),
+	}
+}</pre>
+<h2>internal/config/validation_sanitizer_test.go:12</h2>
+<pre>func createWhitespacedConfigForSanitizer() *domain.Config {
+	return &domain.Config{
+		Version:      "  1.0.0  ",
+		SafetyLevel:  domain.SafetyLevelEnabled,
+		MaxDiskUsage: 50,
+		Protected:    []string{"/System", "/Library"},
+		Profiles: map[string]*domain.Profile{
+			"daily": {
+				Name:        "  daily  ",
+				Description: "Daily cleanup",
+				Operations: []domain.CleanupOperation{
+					{
+						Name:        "nix-generations",
+						Description: "Clean Nix generations",
+						RiskLevel:   domain.RiskLow,
+						Status:      domain.StatusEnabled,
+					},
+				},
+				Status: domain.StatusEnabled,
+			},
+		},
+		LastClean: time.Now(),
+		Updated:   time.Now(),
+	}
+}</pre>
+<h1>#5 found 3 clones</h1>
 <h2>internal/config/type_safe_validation_rules_test.go:127</h2>
 <pre>if original.MaxDiskUsage != nil && copied.MaxDiskUsage != nil {
 	if original.MaxDiskUsage.Required == copied.MaxDiskUsage.Required {
@@ -79,7 +206,7 @@
 		t.Error("FAILED: modified copied.MaxProfiles.Message affected original")
 	}
 }</pre>
-<h1>#3 found 2 clones</h1>
+<h1>#6 found 2 clones</h1>
 <h2>internal/adapters/http_client.go:91</h2>
 <pre>func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResponse, error) {
 	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Post(url)
@@ -109,4 +236,167 @@
 		Headers:    resp.Header(),
 		Request:    resp.Request,
 	}, nil
+}</pre>
+<h1>#7 found 2 clones</h1>
+<h2>internal/api/mapper_test.go:324</h2>
+<pre>for _, tc := range testCases {
+	t.Run(string(tc.public), func(t *testing.T) {
+		// Test public to domain
+		domainStrategy, err := MapStrategyToDomain(tc.public)
+		if err != nil {
+			t.Errorf("Expected successful mapping, got error: %v", err)
+		}
+
+		if domainStrategy != tc.domain {
+			t.Errorf("Expected domain strategy %v, got %v", tc.domain, domainStrategy)
+		}
+
+		// Test domain to public
+		publicStrategy := MapStrategyToPublic(tc.domain)
+		if publicStrategy != tc.public {
+			t.Errorf("Expected public strategy %s, got %s", tc.public, publicStrategy)
+		}
+	})
+}</pre>
+<h2>internal/api/mapper_test.go:357</h2>
+<pre>for _, tc := range testCases {
+	t.Run(string(tc.public), func(t *testing.T) {
+		// Test public to domain
+		domainLevel, err := MapRiskLevelToDomain(tc.public)
+		if err != nil {
+			t.Errorf("Expected successful mapping, got error: %v", err)
+		}
+
+		if domainLevel != tc.domain {
+			t.Errorf("Expected domain level %v, got %v", tc.domain, domainLevel)
+		}
+
+		// Test domain to public
+		publicLevel := MapRiskLevelToPublic(tc.domain)
+		if publicLevel != tc.public {
+			t.Errorf("Expected public level %s, got %s", tc.public, publicLevel)
+		}
+	})
+}</pre>
+<h1>#8 found 2 clones</h1>
+<h2>internal/errors/errors_test.go:167</h2>
+<pre>func TestConfigErrorAdapter(t *testing.T) {
+	adapter := &ConfigErrorAdapter{}
+	originalErr := errors.New("invalid config")
+
+	cwErr := adapter.Adapt(originalErr, "main configuration")
+
+	require.NotNil(t, cwErr)
+	assert.Equal(t, ErrCodeInvalidConfig, cwErr.Code)
+	assert.Equal(t, ErrorTypeConfig, cwErr.Type)
+	assert.Equal(t, SeverityInfo, cwErr.Severity)
+	assert.Contains(t, cwErr.Message, "main configuration")
+	assert.Equal(t, originalErr, cwErr.Cause)
+}</pre>
+<h2>internal/errors/errors_test.go:181</h2>
+<pre>func TestValidationErrorAdapter(t *testing.T) {
+	adapter := &ValidationErrorAdapter{}
+	originalErr := errors.New("invalid value")
+
+	cwErr := adapter.Adapt(originalErr, "email field")
+
+	require.NotNil(t, cwErr)
+	assert.Equal(t, ErrCodeValidationFailed, cwErr.Code)
+	assert.Equal(t, ErrorTypeValidation, cwErr.Type)
+	assert.Equal(t, SeverityError, cwErr.Severity)
+	assert.Contains(t, cwErr.Message, "email field")
+	assert.Equal(t, originalErr, cwErr.Cause)
+}</pre>
+<h1>#9 found 4 clones</h1>
+<h2>internal/domain/enum_helper_test.go:47</h2>
+<pre>func TestValidationLevelType_Helper(t *testing.T) {
+	// Test String()
+	if ValidationLevelStrictType.String() != "STRICT" {
+		t.Errorf("ValidationLevelStrictType.String() = %q, want %q", ValidationLevelStrictType.String(), "STRICT")
+	}
+
+	// Test IsValid()
+	if !ValidationLevelNoneType.IsValid() {
+		t.Error("ValidationLevelNoneType.IsValid() = false, want true")
+	}
+
+	level := ValidationLevelType(999)
+	if level.IsValid() {
+		t.Error("Invalid ValidationLevelType.IsValid() = true, want false")
+	}
+
+	// Test Values()
+	values := ValidationLevelNoneType.Values()
+	if len(values) != 4 {
+		t.Errorf("ValidationLevelType.Values() = %d, want 4", len(values))
+	}
+}</pre>
+<h2>internal/domain/enum_helper_test.go:70</h2>
+<pre>func TestChangeOperationType_Helper(t *testing.T) {
+	// Test String()
+	if ChangeOperationAddedType.String() != "ADDED" {
+		t.Errorf("ChangeOperationAddedType.String() = %q, want %q", ChangeOperationAddedType.String(), "ADDED")
+	}
+
+	// Test IsValid()
+	if !ChangeOperationRemovedType.IsValid() {
+		t.Error("ChangeOperationRemovedType.IsValid() = false, want true")
+	}
+
+	op := ChangeOperationType(999)
+	if op.IsValid() {
+		t.Error("Invalid ChangeOperationType.IsValid() = true, want false")
+	}
+
+	// Test Values()
+	values := ChangeOperationAddedType.Values()
+	if len(values) != 3 {
+		t.Errorf("ChangeOperationType.Values() = %d, want 3", len(values))
+	}
+}</pre>
+<h2>internal/domain/enum_helper_test.go:93</h2>
+<pre>func TestCleanStrategyType_Helper(t *testing.T) {
+	// Test String()
+	if StrategyAggressiveType.String() != "aggressive" {
+		t.Errorf("StrategyAggressiveType.String() = %q, want %q", StrategyAggressiveType.String(), "aggressive")
+	}
+
+	// Test IsValid()
+	if !StrategyDryRunType.IsValid() {
+		t.Error("StrategyDryRunType.IsValid() = false, want true")
+	}
+
+	strategy := CleanStrategyType(999)
+	if strategy.IsValid() {
+		t.Error("Invalid CleanStrategyType.IsValid() = true, want false")
+	}
+
+	// Test Values()
+	values := StrategyConservativeType.Values()
+	if len(values) != 3 {
+		t.Errorf("CleanStrategyType.Values() = %d, want 3", len(values))
+	}
+}</pre>
+<h2>internal/domain/enum_helper_test.go:116</h2>
+<pre>func TestScanTypeType_Helper(t *testing.T) {
+	// Test String()
+	if ScanTypeNixStoreType.String() != "nix_store" {
+		t.Errorf("ScanTypeNixStoreType.String() = %q, want %q", ScanTypeNixStoreType.String(), "nix_store")
+	}
+
+	// Test IsValid()
+	if !ScanTypeHomebrewType.IsValid() {
+		t.Error("ScanTypeHomebrewType.IsValid() = false, want true")
+	}
+
+	scan := ScanTypeType(999)
+	if scan.IsValid() {
+		t.Error("Invalid ScanTypeType.IsValid() = true, want false")
+	}
+
+	// Test Values()
+	values := ScanTypeSystemType.Values()
+	if len(values) != 4 {
+		t.Errorf("ScanTypeType.Values() = %d, want 4", len(values))
+	}
 }</pre>

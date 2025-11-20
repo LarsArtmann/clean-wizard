@@ -1,8 +1,17 @@
-2025/11/20 20:36:04 Building suffix tree
-2025/11/20 20:36:05 Searching for clones
+2025/11/20 20:52:33 Building suffix tree
+2025/11/20 20:52:33 Searching for clones
+found 2 clones:
+  internal/config/semver_validation_test.go:94,113
+  internal/config/semver_validation_test.go:115,134
 found 2 clones:
   internal/errors/errors_test.go:119,129
   internal/errors/errors_test.go:131,141
+found 2 clones:
+  internal/adapters/http_client.go:75,88
+  internal/adapters/http_client.go:123,136
+found 2 clones:
+  internal/config/test_data.go:18,42
+  internal/config/validation_sanitizer_test.go:12,36
 found 3 clones:
   internal/config/type_safe_validation_rules_test.go:127,140
   internal/config/type_safe_validation_rules_test.go:142,155
@@ -10,5 +19,16 @@ found 3 clones:
 found 2 clones:
   internal/adapters/http_client.go:91,104
   internal/adapters/http_client.go:107,120
+found 2 clones:
+  internal/api/mapper_test.go:324,342
+  internal/api/mapper_test.go:357,375
+found 2 clones:
+  internal/errors/errors_test.go:167,179
+  internal/errors/errors_test.go:181,193
+found 4 clones:
+  internal/domain/enum_helper_test.go:47,68
+  internal/domain/enum_helper_test.go:70,91
+  internal/domain/enum_helper_test.go:93,114
+  internal/domain/enum_helper_test.go:116,137
 
-Found total 3 clone groups.
+Found total 9 clone groups.
