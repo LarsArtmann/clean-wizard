@@ -113,30 +113,12 @@ func parseSafetyLevelNumeric(s string) (SafetyLevelType, bool) {
 	return SafetyLevelEnabled, false
 }
 
-// SafetyConfigValidationResult represents validation result for safety configuration
-type SafetyConfigValidationResult struct {
-	IsValid bool
-	Errors  []SafetyConfigValidationError
-}
-
-// SafetyConfigValidationError represents specific validation error
-type SafetyConfigValidationError struct {
-	Field   string
-	Message string
-	Value   any
-}
-
 // Validate validates the safety configuration
-func (sc SafetyConfig) Validate() SafetyConfigValidationResult {
-	var errors []SafetyConfigValidationError
-
-	// All safety configs are valid by design due to strong typing
-	// This prevents invalid states at compile time
-
-	return SafetyConfigValidationResult{
-		IsValid: true,
-		Errors:  errors,
-	}
+func (sc SafetyConfig) Validate() error {
+	// SafetyConfig uses strong typing which prevents invalid states at compile time
+	// The SafetyLevelType enum ensures only valid values can be assigned
+	// Currently, no runtime validation is needed for the existing fields
+	return nil
 }
 
 // ToSafetyLevel extracts the effective safety level
