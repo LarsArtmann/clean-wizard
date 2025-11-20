@@ -10,12 +10,12 @@ import (
 func TestTypeSafeSchemaRules_DeepCopy(t *testing.T) {
 	// Create original populated instance
 	original := &TypeSafeValidationRules{
-		UniquePaths:     true,
-		UniqueProfiles:  false,
-		RequireSafeMode: true,
-		MaxRiskLevel:    domain.RiskLevelHighType,
-		BackupRequired:  domain.RiskLevelCriticalType,
-		ProtectedSystemPaths: []string{"/System", "/Applications", "/Library"},
+		UniquePaths:           true,
+		UniqueProfiles:        false,
+		RequireSafeMode:       true,
+		MaxRiskLevel:          domain.RiskLevelHighType,
+		BackupRequired:        domain.RiskLevelCriticalType,
+		ProtectedSystemPaths:  []string{"/System", "/Applications", "/Library"},
 		DefaultProtectedPaths: []string{"/usr/local", "/opt"},
 		MaxDiskUsage: &NumericValidationRule{
 			Required: true,
@@ -57,7 +57,7 @@ func TestTypeSafeSchemaRules_DeepCopy(t *testing.T) {
 
 	// Test 1: Mutate boolean fields on copy
 	copied.UniquePaths = !original.UniquePaths
-	copied.UniqueProfiles = !original.UniqueProfiles  
+	copied.UniqueProfiles = !original.UniqueProfiles
 	copied.RequireSafeMode = !original.RequireSafeMode
 	copied.MaxRiskLevel = domain.RiskLevelLowType
 	copied.BackupRequired = domain.RiskLevelMediumType
@@ -80,11 +80,11 @@ func TestTypeSafeSchemaRules_DeepCopy(t *testing.T) {
 	}
 
 	// Test 2: Mutate slices on copy
-	if copied.ProtectedSystemPaths != nil {
+	if len(copied.ProtectedSystemPaths) > 0 {
 		copied.ProtectedSystemPaths[0] = "MODIFIED"
 		copied.ProtectedSystemPaths = append(copied.ProtectedSystemPaths, "NEW_PATH")
 	}
-	if copied.DefaultProtectedPaths != nil {
+	if len(copied.DefaultProtectedPaths) > 0 {
 		copied.DefaultProtectedPaths[0] = "MODIFIED_TOO"
 		copied.DefaultProtectedPaths = append(copied.DefaultProtectedPaths, "ANOTHER_NEW_PATH")
 	}
@@ -116,6 +116,12 @@ func TestTypeSafeSchemaRules_DeepCopy(t *testing.T) {
 		copied.MinProtectedPaths.Max = intPtr(666)
 		copied.MinProtectedPaths.Message = "MODIFIED MESSAGE TOO"
 	}
+	if copied.MaxProfiles != nil {
+		copied.MaxProfiles.Required = !original.MaxProfiles.Required
+		copied.MaxProfiles.Min = intPtr(555)
+		copied.MaxProfiles.Max = intPtr(444)
+		copied.MaxProfiles.Message = "MODIFIED MAX PROFILES MESSAGE"
+	}
 
 	// Verify original numeric rules unchanged
 	if original.MaxDiskUsage != nil && copied.MaxDiskUsage != nil {
@@ -133,6 +139,36 @@ func TestTypeSafeSchemaRules_DeepCopy(t *testing.T) {
 		}
 	}
 
+	if original.MinProtectedPaths != nil && copied.MinProtectedPaths != nil {
+		if original.MinProtectedPaths.Required == copied.MinProtectedPaths.Required {
+			t.Error("FAILED: modified copied.MinProtectedPaths.Required affected original")
+		}
+		if *original.MinProtectedPaths.Min == *copied.MinProtectedPaths.Min {
+			t.Error("FAILED: modified copied.MinProtectedPaths.Min affected original")
+		}
+		if *original.MinProtectedPaths.Max == *copied.MinProtectedPaths.Max {
+			t.Error("FAILED: modified copied.MinProtectedPaths.Max affected original")
+		}
+		if original.MinProtectedPaths.Message == copied.MinProtectedPaths.Message {
+			t.Error("FAILED: modified copied.MinProtectedPaths.Message affected original")
+		}
+	}
+
+	if original.MaxProfiles != nil && copied.MaxProfiles != nil {
+		if original.MaxProfiles.Required == copied.MaxProfiles.Required {
+			t.Error("FAILED: modified copied.MaxProfiles.Required affected original")
+		}
+		if *original.MaxProfiles.Min == *copied.MaxProfiles.Min {
+			t.Error("FAILED: modified copied.MaxProfiles.Min affected original")
+		}
+		if *original.MaxProfiles.Max == *copied.MaxProfiles.Max {
+			t.Error("FAILED: modified copied.MaxProfiles.Max affected original")
+		}
+		if original.MaxProfiles.Message == copied.MaxProfiles.Message {
+			t.Error("FAILED: modified copied.MaxProfiles.Message affected original")
+		}
+	}
+
 	// Test 4: Mutate string rules on copy
 	if copied.ProfileNamePattern != nil {
 		copied.ProfileNamePattern.Required = !original.ProfileNamePattern.Required
@@ -140,7 +176,7 @@ func TestTypeSafeSchemaRules_DeepCopy(t *testing.T) {
 		copied.ProfileNamePattern.Message = "MODIFIED STRING MESSAGE"
 	}
 	if copied.PathPattern != nil {
-		copied.PathPattern.Required = !original.PathPattern.Required  
+		copied.PathPattern.Required = !original.PathPattern.Required
 		copied.PathPattern.Pattern = "ANOTHER_MODIFIED_PATTERN"
 		copied.PathPattern.Message = "ANOTHER MESSAGE MODIFIED"
 	}
@@ -160,14 +196,14 @@ func TestTypeSafeSchemaRules_DeepCopy(t *testing.T) {
 
 	// Test 5: Nil field handling
 	originalWithNils := &TypeSafeValidationRules{
-		UniquePaths:     true,
-		MaxRiskLevel:    domain.RiskLevelHighType,
+		UniquePaths:  true,
+		MaxRiskLevel: domain.RiskLevelHighType,
 		// All pointer fields left as nil
 	}
 
 	copiedWithNils := originalWithNils.GetTypeSafeSchemaRules()
-	
-	// Should not panic and should handle nil correctly  
+
+	// Should not panic and should handle nil correctly
 	if copiedWithNils.MaxDiskUsage != nil {
 		t.Error("FAILED: nil MaxDiskUsage became non-nil in copy")
 	}

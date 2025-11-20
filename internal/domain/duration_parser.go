@@ -14,29 +14,37 @@ func FormatDuration(d time.Duration) string {
 		return "0"
 	}
 
-	// Normalize to the most appropriate unit
+	// Normalize to the most appropriate unit, but only for exact multiples
 	if d < time.Minute {
 		return d.String()
 	}
 
 	if d < time.Hour {
-		minutes := int(d.Minutes())
-		return fmt.Sprintf("%dm", minutes)
+		// Only format as "Xm" if exact multiple of minutes
+		if d%time.Minute == 0 {
+			minutes := int(d.Minutes())
+			return fmt.Sprintf("%dm", minutes)
+		}
+		return d.String()
 	}
 
 	if d < 24*time.Hour {
-		hours := int(d.Hours())
-		return fmt.Sprintf("%dh", hours)
+		// Only format as "Xh" if exact multiple of hours
+		if d%time.Hour == 0 {
+			hours := int(d.Hours())
+			return fmt.Sprintf("%dh", hours)
+		}
+		return d.String()
 	}
 
-	// For durations >= 24h, use days
-	days := int(d.Hours()) / 24
-	remainingHours := int(d.Hours()) % 24
-
-	if remainingHours == 0 {
+	// For durations >= 24h, only format as "Xd" if exact multiple of days
+	if d%(24*time.Hour) == 0 {
+		days := int(d.Hours()) / 24
 		return fmt.Sprintf("%dd", days)
 	}
-	return fmt.Sprintf("%dd%dh", days, remainingHours)
+
+	// Otherwise return exact string representation
+	return d.String()
 }
 
 // ParseCustomDuration parses human-readable duration formats like "7d", "24h", "30m"

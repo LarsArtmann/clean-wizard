@@ -12,6 +12,7 @@ type ConfigValidationRules struct {
 	// Numeric Constraints
 	MaxDiskUsage      *ValidationRule[int] `json:"max_disk_usage"`
 	MinProtectedPaths *ValidationRule[int] `json:"min_protected_paths"`
+	MaxProtectedPaths *ValidationRule[int] `json:"max_protected_paths"`
 	MaxProfiles       *ValidationRule[int] `json:"max_profiles"`
 	MaxOperations     *ValidationRule[int] `json:"max_operations"`
 
@@ -78,6 +79,7 @@ func getDefaultValidationRules() *ConfigValidationRules {
 	minUsage := 10
 	maxUsage := 95
 	minPaths := 1
+	maxPaths := 50
 	maxProfiles := 10
 	maxOps := 20
 
@@ -92,6 +94,11 @@ func getDefaultValidationRules() *ConfigValidationRules {
 			Required: true,
 			Min:      &minPaths,
 			Message:  "At least one protected path is required",
+		},
+		MaxProtectedPaths: &ValidationRule[int]{
+			Required: false,
+			Max:      &maxPaths,
+			Message:  "Protected paths should not exceed 50 for maintainability",
 		},
 		MaxProfiles: &ValidationRule[int]{
 			Required: false,

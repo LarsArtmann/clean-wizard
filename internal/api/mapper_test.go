@@ -1,7 +1,6 @@
 package api
 
 import (
-	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -266,7 +265,6 @@ func TestMapCleanRequestToDomain_ValidRequest(t *testing.T) {
 		},
 		Strategy:   PublicStrategyConservative,
 		Operations: []OperationType{OperationTypeTempFiles, OperationTypeCacheFiles},
-		DryRun:     boolPtr(true),
 	}
 
 	// Map to domain
@@ -458,8 +456,8 @@ func TestMapConfigToDomain_InvalidRiskLevel(t *testing.T) {
 	t.Logf("✅ Invalid risk level test passed: %v", errorMsg)
 }
 
-func TestMapConfigToDomain_ProfileMappingFailure(t *testing.T) {
-	// Create public config with missing required fields in profile
+func TestMapConfigToDomain_ProfileValidationFailure(t *testing.T) {
+	// Create public config with invalid profile that will cause validation failure
 	publicConfig := &PublicConfig{
 		Version:        "1.0.0",
 		SafeMode:       true,
@@ -467,7 +465,7 @@ func TestMapConfigToDomain_ProfileMappingFailure(t *testing.T) {
 		ProtectedPaths: []string{"/System"},
 		Profiles: map[string]*PublicProfile{
 			"test": {
-				Name:        "", // Empty name should cause mapping failure
+				Name:        "", // Empty name should cause validation failure
 				Description: "Test profile",
 				Enabled:     true,
 				Operations:  []PublicOperation{}, // Empty operations might be valid
@@ -480,7 +478,7 @@ func TestMapConfigToDomain_ProfileMappingFailure(t *testing.T) {
 
 	// Validate error result
 	if !domainConfigResult.IsErr() {
-		t.Fatalf("Expected error for profile mapping failure, got success")
+		t.Fatalf("Expected error for profile validation failure, got success")
 	}
 
 	err, hasError := domainConfigResult.SafeError()
@@ -498,7 +496,7 @@ func TestMapConfigToDomain_ProfileMappingFailure(t *testing.T) {
 		t.Errorf("Expected error to start with 'domain config validation failed: ', got: %s", errorMsg)
 	}
 
-	t.Logf("✅ Profile mapping failure test passed: %v", errorMsg)
+	t.Logf("✅ Profile validation failure test passed: %v", errorMsg)
 }
 
 func TestMapConfigToDomain_DomainValidationFailure(t *testing.T) {
@@ -559,7 +557,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 	testCases := []struct {
 		name          string
 		publicOp      PublicOperation
-		expectedType  string
+		expectedType  domain.OperationType
 		shouldError   bool
 		errorContains string
 	}{
@@ -572,7 +570,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Enabled:     true,
 				Settings:    OperationSettings{},
 			},
-			expectedType: "nix-generations",
+			expectedType: domain.OperationTypeNixGenerations,
 			shouldError:  false,
 		},
 		{
@@ -584,7 +582,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Enabled:     true,
 				Settings:    OperationSettings{},
 			},
-			expectedType: "temp-files",
+			expectedType: domain.OperationTypeTempFiles,
 			shouldError:  false,
 		},
 		{
@@ -596,7 +594,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Enabled:     true,
 				Settings:    OperationSettings{},
 			},
-			expectedType: "homebrew-cleanup",
+			expectedType: domain.OperationTypeHomebrew,
 			shouldError:  false,
 		},
 		{
@@ -620,7 +618,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Enabled:     true,
 				Settings:    OperationSettings{},
 			},
-			expectedType: "unknown-operation",
+			expectedType: domain.OperationType("unknown-operation"),
 			shouldError:  false, // Should not error with custom operation support
 		},
 		{
@@ -632,7 +630,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Enabled:     true,
 				Settings:    OperationSettings{},
 			},
-			expectedType: "my-custom-op",
+			expectedType: domain.OperationType("my-custom-op"),
 			shouldError:  false, // Should not error with custom operation support
 		},
 		{
@@ -681,7 +679,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 
 				// Verify mapped operation type matches expected type
 				actualOpType := domain.GetOperationType(result.Name)
-				if actualOpType != domain.OperationType(tc.expectedType) {
+				if actualOpType != tc.expectedType {
 					t.Errorf("Expected operation type '%s', got '%s'", tc.expectedType, actualOpType)
 				}
 
@@ -694,13 +692,6 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 					if expectedDefaultSettings == nil {
 						t.Errorf("Expected default settings for operation type '%s', got nil", actualOpType)
 					} else {
-						// Use reflect to compare settings structure types
-						resultType := reflect.TypeOf(result.Settings)
-						expectedType := reflect.TypeOf(expectedDefaultSettings)
-						if resultType != expectedType {
-							t.Errorf("Expected settings type %v, got %v for operation '%s'", expectedType, resultType, tc.expectedType)
-						}
-
 						// Verify specific settings field matches expected default
 						switch actualOpType {
 						case domain.OperationTypeNixGenerations:

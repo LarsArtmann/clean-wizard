@@ -198,7 +198,7 @@ func displayCleanResults(result domain.CleanResult, verbose bool, duration time.
 	if result.IsValid() {
 		fmt.Printf("   • Status: %d items %s\n", result.ItemsRemoved, action)
 		if result.FreedBytes > 0 {
-			fmt.Printf("   • Space freed: %s\n", format.Bytes(int64(result.FreedBytes)))
+			fmt.Printf("   • Space freed: %s\n", format.Bytes(result.FreedBytes))
 		}
 
 		if verbose {

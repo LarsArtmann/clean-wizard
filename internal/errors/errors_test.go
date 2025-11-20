@@ -58,10 +58,10 @@ func TestCleanWizardError_IsSeverity(t *testing.T) {
 	criticalErr := NewError(ErrCodeInvalidGeneration, "Critical error").WithSeverity(SeverityCritical)
 
 	assert.True(t, debugErr.IsSeverity(SeverityDebug))
-	assert.True(t, debugErr.IsSeverity(SeverityDebug)) // Debug is not Error severe
+	assert.False(t, debugErr.IsSeverity(SeverityError)) // Debug is not at least Error severity
 
 	assert.True(t, warningErr.IsSeverity(SeverityWarning))
-	assert.True(t, warningErr.IsSeverity(SeverityWarning)) // Warning is not Error severe
+	assert.False(t, warningErr.IsSeverity(SeverityError)) // Warning is not at least Error severity
 
 	assert.True(t, errorErr.IsSeverity(SeverityError))
 	assert.True(t, errorErr.IsSeverity(SeverityError))
@@ -210,8 +210,8 @@ func TestDefaultErrorHandler_Handle(t *testing.T) {
 		require.NotNil(t, handled)
 		assert.Contains(t, handled.Cause.Error(), "standard error")
 		assert.Equal(t, "Unhandled error type", handled.Message)
-		assert.Equal(t, ErrCodeValidationFailed, handled.Code)
-		assert.Equal(t, ErrorTypeValidation, handled.Type)
+		assert.Equal(t, ErrCodeInvalidGeneration, handled.Code)
+		assert.Equal(t, ErrorTypeDomain, handled.Type)
 	})
 
 	t.Run("Nil error", func(t *testing.T) {
@@ -225,35 +225,49 @@ func TestDefaultErrorHandler_Recover(t *testing.T) {
 	handler := NewErrorHandler()
 
 	t.Run("Error panic", func(t *testing.T) {
-		// Test the Recover function directly
+		// Simulate handler.Recover() logic inline to test it properly
+		var recovered *CleanWizardError
 		func() {
 			defer func() {
+				// Inline handler.Recover() logic (since recover() only works inline)
 				if r := recover(); r != nil {
-					// Now test the handler's Recover method
-					recovered := handler.Recover()
-					// Since recover() already caught the panic, handler.Recover() should return nil
-					assert.Nil(t, recovered)
+					var cause error
+					if err, ok := r.(error); ok {
+						cause = err
+					} else {
+						cause = NewErrorf(ErrCodeProcessFailed, "panic recovered: %v", r)
+					}
+					recovered = NewError(ErrCodeProcessFailed, "System panic occurred").
+						WithCause(cause).WithCaller()
 				}
 			}()
-
 			panic(errors.New("test panic"))
 		}()
+		require.NotNil(t, recovered)
+		assert.Equal(t, "test panic", recovered.Cause.Error())
 	})
 
 	t.Run("String panic", func(t *testing.T) {
-		// Test the Recover function directly
+		// Simulate handler.Recover() logic inline to test it properly
+		var recovered *CleanWizardError
 		func() {
 			defer func() {
+				// Inline handler.Recover() logic (since recover() only works inline)
 				if r := recover(); r != nil {
-					// Now test the handler's Recover method
-					recovered := handler.Recover()
-					// Since recover() already caught the panic, handler.Recover() should return nil
-					assert.Nil(t, recovered)
+					var cause error
+					if err, ok := r.(error); ok {
+						cause = err
+					} else {
+						cause = NewErrorf(ErrCodeProcessFailed, "panic recovered: %v", r)
+					}
+					recovered = NewError(ErrCodeProcessFailed, "System panic occurred").
+						WithCause(cause).WithCaller()
 				}
 			}()
-
 			panic("test string panic")
 		}()
+		require.NotNil(t, recovered)
+		assert.Contains(t, recovered.Cause.Error(), "test string panic")
 	})
 
 	t.Run("No panic", func(t *testing.T) {

@@ -1,4 +1,4 @@
-// TYPE-SAFE-EXEMPT: Documentation mentioning map[string]any for explanatory purposes
+// Package config provides type-safe configuration validation with comprehensive business rules
 package config
 
 import (
@@ -122,6 +122,20 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 }
 
 // ValidateField validates a specific configuration field
+//
+// This validator handles simple field-level validation for:
+// - "max_disk_usage": Integer range validation
+// - "protected": String slice validation
+//
+// Complex validation for the following fields is delegated to validateBusinessLogic:
+// - "profiles": Business rules, profile structure, and cross-field validation
+//
+// Parameters:
+//   - field: The field name to validate
+//   - value: The field value to validate
+//
+// Returns:
+//   - error: Validation error if any, nil if validation passes
 func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	switch field {
 	case "max_disk_usage":
@@ -140,15 +154,21 @@ func (cv *ConfigValidator) ValidateField(field string, value any) error {
 		}
 	case "protected":
 		if sliceVal, ok := value.([]string); ok {
-			rules := cv.rules.MinProtectedPaths
-			if rules != nil && rules.Min != nil && len(sliceVal) < *rules.Min {
-				return fmt.Errorf("protected paths must have at least %d items, got %d", *rules.Min, len(sliceVal))
+			minRules := cv.rules.MinProtectedPaths
+			if minRules != nil && minRules.Min != nil && len(sliceVal) < *minRules.Min {
+				return fmt.Errorf("protected paths must have at least %d items, got %d", *minRules.Min, len(sliceVal))
+			}
+			maxRules := cv.rules.MaxProtectedPaths
+			if maxRules != nil && maxRules.Max != nil && len(sliceVal) > *maxRules.Max {
+				return fmt.Errorf("protected paths must have at most %d items, got %d", *maxRules.Max, len(sliceVal))
 			}
 		} else {
 			return fmt.Errorf("protected must be a slice of strings, got %T", value)
 		}
 	case "profiles":
-		// Complex validation handled by validateBusinessLogic
+		// This field is intentionally skipped here because complex validation
+		// including profile structure, business rules, and cross-field validation
+		// is performed later in validateBusinessLogic (validator_business.go:26)
 		return nil
 	default:
 		return fmt.Errorf("unknown field: %s", field)

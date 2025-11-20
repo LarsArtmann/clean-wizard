@@ -16,7 +16,7 @@ func isValidSemver(version string) bool {
 	if version == "" {
 		return false
 	}
-	
+
 	// Use precompiled regex for better performance
 	return semverRegex.MatchString(version)
 }

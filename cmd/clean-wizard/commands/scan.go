@@ -35,7 +35,6 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 			// Determine scan parameters from configuration
 			scanType := domain.ScanTypeNixStoreType
-			recursive := true
 			limit := 100
 			var loadedCfg *domain.Config
 
@@ -124,13 +123,9 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			}
 
 			// Create scan request with applied configuration
-			recursionLevel := domain.RecursionLevelFull
-			if !recursive {
-				recursionLevel = domain.RecursionLevelNone
-			}
 			scanReq := domain.ScanRequest{
 				Type:      scanType,
-				Recursion: recursionLevel,
+				Recursion: domain.RecursionLevelFull,
 				Limit:     limit,
 			}
 
@@ -196,7 +191,7 @@ func displayScanResults(result domain.ScanResult, generations []domain.NixGenera
 
 	fmt.Printf("   • Current generation: %d\n", currentCount)
 	fmt.Printf("   • Cleanable generations: %d\n", cleanableCount)
-	fmt.Printf("   • Store size: %s\n", format.Bytes(result.TotalBytes))
+	fmt.Printf("   • Store size: %s\n", format.Bytes(uint64(result.TotalBytes)))
 
 	if cleanableCount > 0 {
 		fmt.Printf("\n💡 You can clean up %d old generations to free space\n", cleanableCount)

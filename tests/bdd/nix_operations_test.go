@@ -367,7 +367,7 @@ func (ctx *NixOperationsContext) AndShowAppropriateError() error {
 
 // Unit tests for BDD scenarios
 func TestNixOperationsBDD(t *testing.T) {
-	ctx := &NixOperationsContext{ctx: context.Background()}
+	ctx := &NixOperationsContext{}
 	ctx.InitializeContext(t)
 
 	t.Run("Happy Path Nix Cleanup", func(t *testing.T) {

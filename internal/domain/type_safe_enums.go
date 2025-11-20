@@ -43,9 +43,9 @@ func (eh *EnumHelper[T]) IsValid(value T) bool {
 // Values returns all possible enum values (cached for performance)
 func (eh *EnumHelper[T]) Values() []T {
 	eh.once.Do(func() {
-		eh.valuesCache = eh.allValues()
+		eh.valuesCache = append([]T(nil), eh.allValues()...)
 	})
-	return eh.valuesCache
+	return append([]T(nil), eh.valuesCache...)
 }
 
 // MarshalJSON converts enum to JSON string - REMOVED: Use individual type implementations
@@ -486,6 +486,15 @@ func (ss SelectedStatusType) IsValid() bool {
 // Values returns all possible selected status values
 func (ss SelectedStatusType) Values() []SelectedStatusType {
 	return selectedStatusTypeHelper.Values()
+}
+
+// FromBool converts a boolean to SelectedStatusType
+// true -> SelectedStatusSelected, false -> SelectedStatusNotSelected
+func FromBool(current bool) SelectedStatusType {
+	if current {
+		return SelectedStatusSelected
+	}
+	return SelectedStatusNotSelected
 }
 
 // MarshalJSON converts selected status to JSON string

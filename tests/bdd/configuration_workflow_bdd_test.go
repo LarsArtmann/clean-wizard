@@ -1,5 +1,4 @@
 //go:build skip_bdd
-// +build skip_bdd
 
 package bdd
 

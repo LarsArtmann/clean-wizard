@@ -14,100 +14,122 @@ import (
 
 func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 	tests := []struct {
-		name     string
-		setup    func(*viper.Viper)
-		expected domain.SafetyLevelType
+		name             string
+		setup            func(*viper.Viper)
+		expected         domain.SafetyLevelType
+		expectedExplicit bool
 	}{
 		{
 			name: "string enabled",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "enabled")
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "string disabled",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "disabled")
 			},
-			expected: domain.SafetyLevelDisabled,
+			expected:         domain.SafetyLevelDisabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "string strict",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "strict")
 			},
-			expected: domain.SafetyLevelStrict,
+			expected:         domain.SafetyLevelStrict,
+			expectedExplicit: true,
 		},
 		{
 			name: "string paranoid",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "paranoid")
 			},
-			expected: domain.SafetyLevelParanoid,
+			expected:         domain.SafetyLevelParanoid,
+			expectedExplicit: true,
 		},
 		{
 			name: "string with whitespace",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "  enabled  ")
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "string uppercase",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "ENABLED")
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "numeric 0",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 0)
 			},
-			expected: domain.SafetyLevelDisabled,
+			expected:         domain.SafetyLevelDisabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "numeric 1",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 1)
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "numeric 2",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 2)
 			},
-			expected: domain.SafetyLevelStrict,
+			expected:         domain.SafetyLevelStrict,
+			expectedExplicit: true,
 		},
 		{
 			name: "numeric 3",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 3)
 			},
-			expected: domain.SafetyLevelParanoid,
+			expected:         domain.SafetyLevelParanoid,
+			expectedExplicit: true,
 		},
 		{
 			name: "float64 1.0",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 1.0)
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
+		},
+		{
+			name: "float64 1.5 (invalid float)",
+			setup: func(v *viper.Viper) {
+				v.Set("safety_level", 1.5)
+			},
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "legacy safe_mode true",
 			setup: func(v *viper.Viper) {
 				v.Set("safe_mode", true)
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "legacy safe_mode false",
 			setup: func(v *viper.Viper) {
 				v.Set("safe_mode", false)
 			},
-			expected: domain.SafetyLevelDisabled,
+			expected:         domain.SafetyLevelDisabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "safety_level takes precedence over safe_mode",
@@ -115,28 +137,32 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 				v.Set("safety_level", "strict")
 				v.Set("safe_mode", false)
 			},
-			expected: domain.SafetyLevelStrict,
+			expected:         domain.SafetyLevelStrict,
+			expectedExplicit: true,
 		},
 		{
 			name: "invalid string defaults to enabled",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "invalid")
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "invalid numeric defaults to enabled",
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 999)
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: true,
 		},
 		{
 			name: "no safety config defaults to enabled",
 			setup: func(v *viper.Viper) {
 				// Don't set any safety-related keys
 			},
-			expected: domain.SafetyLevelEnabled,
+			expected:         domain.SafetyLevelEnabled,
+			expectedExplicit: false, // Only case where IsExplicit is false
 		},
 	}
 
@@ -146,6 +172,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			tt.setup(v)
 			result := domain.ParseSafetyConfig(v)
 			assert.Equal(t, tt.expected, result.ToSafetyLevel())
+			assert.Equal(t, tt.expectedExplicit, result.IsExplicit, "IsExplicit should match expectation")
 		})
 	}
 }
@@ -264,7 +291,7 @@ profiles:
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Write config file
-			err := os.WriteFile(configPath, []byte(tt.configContent), 0644)
+			err := os.WriteFile(configPath, []byte(tt.configContent), 0o644)
 			require.NoError(t, err)
 
 			// Set config path environment variable
@@ -304,7 +331,7 @@ profiles:
         enabled: true
 `
 
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	require.NoError(t, err)
 
 	// Load config with explicit path

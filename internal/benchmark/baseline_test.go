@@ -9,7 +9,6 @@ import (
 
 // BenchmarkSystemMetrics benchmarks system metric collection performance
 func BenchmarkSystemMetrics(b *testing.B) {
-
 	for b.Loop() {
 		var m runtime.MemStats
 		runtime.ReadMemStats(&m)
@@ -19,7 +18,6 @@ func BenchmarkSystemMetrics(b *testing.B) {
 
 // BenchmarkMemoryAllocation benchmarks memory allocation patterns
 func BenchmarkMemoryAllocation(b *testing.B) {
-
 	for b.Loop() {
 		// Allocate and release memory to simulate workload
 		data := make([][]byte, 100)
@@ -32,7 +30,6 @@ func BenchmarkMemoryAllocation(b *testing.B) {
 
 // BenchmarkGoroutineCreation benchmarks goroutine creation/destruction
 func BenchmarkGoroutineCreation(b *testing.B) {
-
 	for b.Loop() {
 		done := make(chan bool)
 		go func() {
@@ -46,7 +43,6 @@ func BenchmarkGoroutineCreation(b *testing.B) {
 
 // BenchmarkGCPressure benchmarks memory allocation and garbage collection
 func BenchmarkGCPressure(b *testing.B) {
-
 	for i := 0; b.Loop(); i++ {
 		// Create memory pressure
 		var objects [][]byte

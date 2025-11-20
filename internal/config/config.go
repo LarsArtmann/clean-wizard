@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-		"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -18,8 +18,6 @@ const (
 	configName = ".clean-wizard"
 	configType = "yaml"
 )
-
-
 
 // Load loads the configuration from file or creates default
 func Load() (*domain.Config, error) {
@@ -42,7 +40,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	// Set defaults
 	v.SetDefault(ConfigKeyVersion, "1.0.0")
 	v.SetDefault("safe_mode", DefaultSafeMode)
-	v.SetDefault(ConfigKeyMaxDiskUsage, DefaultMaxDiskUsage)
+	v.SetDefault(ConfigKeyMaxDiskUsage, DefaultDiskUsagePercent)
 	v.SetDefault(ConfigKeyProtected, []string{DefaultProtectedPathSystem, DefaultProtectedPathLibrary}) // Basic protection
 
 	// Try to read configuration file
@@ -204,7 +202,7 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 	// Set defaults
 	v.SetDefault(ConfigKeyVersion, "1.0.0")
 	v.SetDefault("safe_mode", DefaultSafeMode)
-	v.SetDefault(ConfigKeyMaxDiskUsage, DefaultMaxDiskUsage)
+	v.SetDefault(ConfigKeyMaxDiskUsage, DefaultDiskUsagePercent)
 	v.SetDefault(ConfigKeyProtected, []string{DefaultProtectedPathSystem, DefaultProtectedPathLibrary}) // Basic protection
 
 	// Try to read configuration file

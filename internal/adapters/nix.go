@@ -12,14 +12,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// Helper function for boolean to SelectedStatus conversion
-func boolToSelectedStatus(current bool) domain.SelectedStatusType {
-	if current {
-		return domain.SelectedStatusSelected
-	}
-	return domain.SelectedStatusNotSelected
-}
-
 // NixAdapter wraps Nix package manager operations
 type NixAdapter struct {
 	timeout time.Duration
@@ -239,7 +231,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 		ID:     id,
 		Path:   fields[0],
 		Date:   date,
-		Status: boolToSelectedStatus(strings.Contains(line, "current")),
+		Status: domain.FromBool(strings.Contains(line, "current")),
 	}, nil
 }
 

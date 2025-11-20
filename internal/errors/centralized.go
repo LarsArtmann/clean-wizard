@@ -95,7 +95,7 @@ func (deh *DefaultErrorHandler) handleByType(err error) *CleanWizardError {
 	}
 
 	// Default fallback
-	return WrapError(err, ErrCodeValidationFailed, "Unhandled error type").WithCaller()
+	return WrapError(err, ErrCodeInvalidGeneration, "Unhandled error type").WithCaller()
 }
 
 // Common convenience functions

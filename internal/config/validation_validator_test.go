@@ -235,6 +235,12 @@ func TestConfigValidator_ValidateField(t *testing.T) {
 			expectError: true,
 		},
 		{
+			name:        "invalid protected paths - too many (exceeds max)",
+			field:       "protected",
+			value:       make([]string, 60), // Exceeds default max of 50
+			expectError: true,
+		},
+		{
 			name:        "invalid protected paths - wrong type",
 			field:       "protected",
 			value:       "/System",

@@ -85,7 +85,7 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 
 	// Set default max disk usage
 	if cfg.MaxDiskUsage == 0 {
-		cfg.MaxDiskUsage = cs.rules.DefaultMaxDiskUsage
+		cfg.MaxDiskUsage = cs.rules.DefaultDiskUsagePercent
 		result.addChange("max_disk_usage", 0, cfg.MaxDiskUsage, "applied default max disk usage")
 	}
 
