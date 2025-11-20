@@ -51,7 +51,7 @@ func (fsa *FileSystemErrorAdapter) Adapt(err error) *CleanWizardError {
 			return NewError(ErrCodeDiskFull,
 				"Disk full: "+pathErr.Path).WithCause(err).WithCaller()
 		default:
-			return NewError(ErrCodeFileNotFound,
+			return NewError(ErrCodeFilesystem,
 				"File system error: "+pathErr.Err.Error()).WithCause(err).WithCaller()
 		}
 	}
@@ -143,8 +143,36 @@ func (nea *NetworkErrorAdapter) Adapt(err error, operation string) *CleanWizardE
 		return nil
 	}
 
+	// Only handle actual network errors
+	if !isNetworkError(err) {
+		return nil
+	}
+
 	return WrapError(err, ErrCodeConnectionFailed,
 		"Network operation failed: "+operation).WithCaller()
+}
+
+// isNetworkError checks if error is network-related
+func isNetworkError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	// Common indicators of network errors
+	networkIndicators := []string{
+		"connection", "timeout", "network", "dns", "host", "dial",
+		"refused", "unreachable", "network unreachable", "connection refused",
+	}
+
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range networkIndicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // SystemErrorAdapter wraps system-level errors with proper type safety
@@ -156,8 +184,37 @@ func (sea *SystemErrorAdapter) Adapt(err error, component string) *CleanWizardEr
 		return nil
 	}
 
+	// Only handle actual system errors
+	if !isSystemError(err) {
+		return nil
+	}
+
 	return WrapError(err, ErrCodeProcessFailed,
 		"System component failed: "+component).WithCaller()
+}
+
+// isSystemError checks if error is system-related
+func isSystemError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	// Common indicators of system errors
+	systemIndicators := []string{
+		"permission denied", "access denied", "operation not permitted",
+		"no such file", "file not found", "device", "resource", "memory",
+		"disk", "space", "quota", "limit", "system", "kernel",
+	}
+
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range systemIndicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // ExternalToolErrorAdapter wraps external tool errors with proper type safety
@@ -169,6 +226,35 @@ func (eta *ExternalToolErrorAdapter) Adapt(err error, tool string) *CleanWizardE
 		return nil
 	}
 
+	// Only handle actual external tool errors
+	if !isExternalToolError(err) {
+		return nil
+	}
+
 	return WrapError(err, ErrCodeCleanupFailed,
 		"External tool '"+tool+"' failed").WithCaller()
+}
+
+// isExternalToolError checks if error is external tool-related
+func isExternalToolError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	// Common indicators of external tool errors
+	externalToolIndicators := []string{
+		"nix", "brew", "docker", "kubectl", "git", "curl", "wget",
+		"command not found", "executable", "binary", "tool", "utility",
+		"external command", "subprocess", "child process", "fork",
+	}
+
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range externalToolIndicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
 }
