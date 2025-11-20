@@ -96,9 +96,8 @@ func TestFileSystemErrorAdapter_Integration(t *testing.T) {
 		}
 	})
 
-	t.Run("Non-PathError filesystem errors handled correctly", func(t *testing.T) {
-		// Test os.IsNotExist and os.IsPermission cases using real errors
-		// For testing purposes, we'll simulate these characteristics
+	t.Run("PathError with syscall ENOENT and EPERM handled correctly", func(t *testing.T) {
+		// Test PathError wrapping syscall.ENOENT and syscall.EPERM
 		notExistErr := &os.PathError{Err: syscall.ENOENT, Path: "/tmp/test"}
 
 		err := adapter.Adapt(notExistErr)
