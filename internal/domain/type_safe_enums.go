@@ -48,19 +48,22 @@ func (eh *EnumHelper[T]) Values() []T {
 	return eh.valuesCache
 }
 
-// MarshalJSON converts enum to JSON string
-func (eh *EnumHelper[T]) MarshalJSON(value T) ([]byte, error) {
+// MarshalJSON converts enum to JSON string - REMOVED: Use individual type implementations
+
+// MarshalJSONImpl converts enum to JSON string - internal implementation
+func (eh *EnumHelper[T]) MarshalJSONImpl(value T) ([]byte, error) {
 	if !eh.IsValid(value) {
 		return nil, fmt.Errorf("invalid enum value: %v", value)
 	}
 	return json.Marshal(eh.String(value))
 }
 
-// UnmarshalJSON converts JSON string to enum value
-func (eh *EnumHelper[T]) UnmarshalJSON(data []byte, valueSetter func(T)) error {
+// UnmarshalJSONImpl converts JSON string to enum value - internal implementation
+func (eh *EnumHelper[T]) UnmarshalJSONImpl(data []byte) (T, error) {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return err
+		var zero T
+		return zero, err
 	}
 
 	// Find matching enum value by string
@@ -74,12 +77,12 @@ func (eh *EnumHelper[T]) UnmarshalJSON(data []byte, valueSetter func(T)) error {
 		}
 
 		if compareValue == strToCompare {
-			valueSetter(enumVal)
-			return nil
+			return enumVal, nil
 		}
 	}
 
-	return fmt.Errorf("invalid enum value: %s", s)
+	var zero T
+	return zero, fmt.Errorf("invalid enum value: %s", s)
 }
 
 // RiskLevelType represents the risk level enum with compile-time safety
@@ -126,14 +129,17 @@ func (rl RiskLevelType) Values() []RiskLevelType {
 
 // MarshalJSON implements json.Marshaler
 func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
-	return riskLevelHelper.MarshalJSON(rl)
+	return riskLevelHelper.MarshalJSONImpl(rl)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
-	return riskLevelHelper.UnmarshalJSON(data, func(val RiskLevelType) {
-		*rl = val
-	})
+	val, err := riskLevelHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*rl = val
+	return nil
 }
 
 // IsHigherThan returns true if this risk level is higher than comparison
@@ -192,14 +198,17 @@ func (vl ValidationLevelType) Values() []ValidationLevelType {
 
 // MarshalJSON implements json.Marshaler
 func (vl ValidationLevelType) MarshalJSON() ([]byte, error) {
-	return validationLevelHelper.MarshalJSON(vl)
+	return validationLevelHelper.MarshalJSONImpl(vl)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
-	return validationLevelHelper.UnmarshalJSON(data, func(val ValidationLevelType) {
-		*vl = val
-	})
+	val, err := validationLevelHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*vl = val
+	return nil
 }
 
 // Convenience constants for backward compatibility are now in types.go
@@ -245,14 +254,17 @@ func (co ChangeOperationType) Values() []ChangeOperationType {
 
 // MarshalJSON implements json.Marshaler
 func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
-	return changeOperationHelper.MarshalJSON(co)
+	return changeOperationHelper.MarshalJSONImpl(co)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
-	return changeOperationHelper.UnmarshalJSON(data, func(val ChangeOperationType) {
-		*co = val
-	})
+	val, err := changeOperationHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*co = val
+	return nil
 }
 
 // CleanStrategyType represents cleaning strategies with compile-time safety
@@ -296,14 +308,17 @@ func (cs CleanStrategyType) Values() []CleanStrategyType {
 
 // MarshalJSON implements json.Marshaler
 func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
-	return cleanStrategyHelper.MarshalJSON(cs)
+	return cleanStrategyHelper.MarshalJSONImpl(cs)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
-	return cleanStrategyHelper.UnmarshalJSON(data, func(val CleanStrategyType) {
-		*cs = val
-	})
+	val, err := cleanStrategyHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*cs = val
+	return nil
 }
 
 // ScanTypeType represents scanning domains with compile-time safety
@@ -371,14 +386,17 @@ func (s StatusType) Values() []StatusType {
 
 // MarshalJSON converts status to JSON string
 func (s StatusType) MarshalJSON() ([]byte, error) {
-	return statusTypeHelper.MarshalJSON(s)
+	return statusTypeHelper.MarshalJSONImpl(s)
 }
 
 // UnmarshalJSON converts JSON string to status
 func (s *StatusType) UnmarshalJSON(data []byte) error {
-	return statusTypeHelper.UnmarshalJSON(data, func(val StatusType) {
-		*s = val
-	})
+	val, err := statusTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*s = val
+	return nil
 }
 
 // EnforcementLevelType represents validation strictness levels
@@ -421,14 +439,17 @@ func (el EnforcementLevelType) Values() []EnforcementLevelType {
 
 // MarshalJSON converts enforcement level to JSON string
 func (el EnforcementLevelType) MarshalJSON() ([]byte, error) {
-	return enforcementLevelTypeHelper.MarshalJSON(el)
+	return enforcementLevelTypeHelper.MarshalJSONImpl(el)
 }
 
 // UnmarshalJSON converts JSON string to enforcement level
 func (el *EnforcementLevelType) UnmarshalJSON(data []byte) error {
-	return enforcementLevelTypeHelper.UnmarshalJSON(data, func(val EnforcementLevelType) {
-		*el = val
-	})
+	val, err := enforcementLevelTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*el = val
+	return nil
 }
 
 // SelectedStatusType represents selection status of operations
@@ -469,14 +490,17 @@ func (ss SelectedStatusType) Values() []SelectedStatusType {
 
 // MarshalJSON converts selected status to JSON string
 func (ss SelectedStatusType) MarshalJSON() ([]byte, error) {
-	return selectedStatusTypeHelper.MarshalJSON(ss)
+	return selectedStatusTypeHelper.MarshalJSONImpl(ss)
 }
 
 // UnmarshalJSON converts JSON string to selected status
 func (ss *SelectedStatusType) UnmarshalJSON(data []byte) error {
-	return selectedStatusTypeHelper.UnmarshalJSON(data, func(val SelectedStatusType) {
-		*ss = val
-	})
+	val, err := selectedStatusTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*ss = val
+	return nil
 }
 
 // RecursionLevelType represents recursion levels for scanning
@@ -519,14 +543,17 @@ func (rl RecursionLevelType) Values() []RecursionLevelType {
 
 // MarshalJSON converts recursion level to JSON string
 func (rl RecursionLevelType) MarshalJSON() ([]byte, error) {
-	return recursionLevelTypeHelper.MarshalJSON(rl)
+	return recursionLevelTypeHelper.MarshalJSONImpl(rl)
 }
 
 // UnmarshalJSON converts JSON string to recursion level
 func (rl *RecursionLevelType) UnmarshalJSON(data []byte) error {
-	return recursionLevelTypeHelper.UnmarshalJSON(data, func(val RecursionLevelType) {
-		*rl = val
-	})
+	val, err := recursionLevelTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*rl = val
+	return nil
 }
 
 // OptimizationLevelType represents optimization levels for operations
@@ -567,14 +594,17 @@ func (ol OptimizationLevelType) Values() []OptimizationLevelType {
 
 // MarshalJSON converts optimization level to JSON string
 func (ol OptimizationLevelType) MarshalJSON() ([]byte, error) {
-	return optimizationLevelTypeHelper.MarshalJSON(ol)
+	return optimizationLevelTypeHelper.MarshalJSONImpl(ol)
 }
 
 // UnmarshalJSON converts JSON string to optimization level
 func (ol *OptimizationLevelType) UnmarshalJSON(data []byte) error {
-	return optimizationLevelTypeHelper.UnmarshalJSON(data, func(val OptimizationLevelType) {
-		*ol = val
-	})
+	val, err := optimizationLevelTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*ol = val
+	return nil
 }
 
 // FileSelectionStrategyType represents file selection strategies for cleanup
@@ -615,14 +645,17 @@ func (fss FileSelectionStrategyType) Values() []FileSelectionStrategyType {
 
 // MarshalJSON converts file selection strategy to JSON string
 func (fss FileSelectionStrategyType) MarshalJSON() ([]byte, error) {
-	return fileSelectionStrategyTypeHelper.MarshalJSON(fss)
+	return fileSelectionStrategyTypeHelper.MarshalJSONImpl(fss)
 }
 
 // UnmarshalJSON converts JSON string to file selection strategy
 func (fss *FileSelectionStrategyType) UnmarshalJSON(data []byte) error {
-	return fileSelectionStrategyTypeHelper.UnmarshalJSON(data, func(val FileSelectionStrategyType) {
-		*fss = val
-	})
+	val, err := fileSelectionStrategyTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*fss = val
+	return nil
 }
 
 // String returns string representation
@@ -642,14 +675,17 @@ func (st ScanTypeType) Values() []ScanTypeType {
 
 // MarshalJSON implements json.Marshaler
 func (st ScanTypeType) MarshalJSON() ([]byte, error) {
-	return scanTypeHelper.MarshalJSON(st)
+	return scanTypeHelper.MarshalJSONImpl(st)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (st *ScanTypeType) UnmarshalJSON(data []byte) error {
-	return scanTypeHelper.UnmarshalJSON(data, func(val ScanTypeType) {
-		*st = val
-	})
+	val, err := scanTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*st = val
+	return nil
 }
 
 // SafetyLevelType represents safety enforcement levels for configuration
@@ -692,14 +728,17 @@ func (sl SafetyLevelType) Values() []SafetyLevelType {
 
 // MarshalJSON converts safety level to JSON string
 func (sl SafetyLevelType) MarshalJSON() ([]byte, error) {
-	return safetyLevelTypeHelper.MarshalJSON(sl)
+	return safetyLevelTypeHelper.MarshalJSONImpl(sl)
 }
 
 // UnmarshalJSON converts JSON string to safety level
 func (sl *SafetyLevelType) UnmarshalJSON(data []byte) error {
-	return safetyLevelTypeHelper.UnmarshalJSON(data, func(val SafetyLevelType) {
-		*sl = val
-	})
+	val, err := safetyLevelTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*sl = val
+	return nil
 }
 
 // Convenience constants for backward compatibility are now in types.go

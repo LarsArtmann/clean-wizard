@@ -106,7 +106,6 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 			Strategy:     domain.StrategyDryRun,
 		}
 		return result.Ok(cleanResult)
-		return result.Ok(cleanResult)
 	}
 
 	// Real cleaning implementation
