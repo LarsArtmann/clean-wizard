@@ -39,66 +39,56 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 		config           *domain.Config
 		expectedChanges  []string
 		expectedWarnings int
-	}{
-		{
-			name:             "whitespace cleanup",
-			config:           createWhitespacedConfig(),
-			expectedChanges:  []string{"version", "profiles.daily.name"},
-			expectedWarnings: 0,
-		},
-		{
-			name: "max disk usage clamping",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafetyLevel:  domain.SafetyLevelEnabled,
-				MaxDiskUsage: 150, // Will be clamped to 95
-				Protected:    []string{"/System", "/Library"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Status:      domain.StatusEnabled,
-							},
-						},
-						Status: domain.StatusEnabled,
-					},
-				},
-			},
-			expectedChanges:  []string{"max_disk_usage"},
-			expectedWarnings: 1,
-		},
-		{
-			name: "duplicate paths",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafetyLevel:  domain.SafetyLevelEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library", "/System"}, // Duplicate /System
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Status:      domain.StatusEnabled,
-							},
-						},
-						Status: domain.StatusEnabled,
-					},
-				},
-			},
-			expectedChanges:  []string{"profiles.daily.operations[0].settings"}, // Settings sanitized
-			expectedWarnings: 0,
-		},
+	}{}
+
+	// Add standard test cases from shared test data
+	standardCases := GetStandardTestCases()
+	for _, tc := range standardCases {
+		tests = append(tests, struct {
+			name             string
+			config           *domain.Config
+			expectedChanges  []string
+			expectedWarnings int
+		}{
+			name:             tc.name,
+			config:           tc.config,
+			expectedChanges:  tc.expectedChanges,
+			expectedWarnings: tc.expectedWarnings,
+		})
 	}
+
+	// Add unique test case for this file
+	tests = append(tests, struct {
+		name             string
+		config           *domain.Config
+		expectedChanges  []string
+		expectedWarnings int
+	}{
+		name: "duplicate paths",
+		config: &domain.Config{
+			Version:      "1.0.0",
+			SafetyLevel:  domain.SafetyLevelEnabled,
+			MaxDiskUsage: 50,
+			Protected:    []string{"/System", "/Library", "/System"}, // Duplicate /System
+			Profiles: map[string]*domain.Profile{
+				"daily": {
+					Name:        "daily",
+					Description: "Daily cleanup",
+					Operations: []domain.CleanupOperation{
+						{
+							Name:        "nix-generations",
+							Description: "Clean Nix generations",
+							RiskLevel:   domain.RiskLow,
+							Status:      domain.StatusEnabled,
+						},
+					},
+					Status: domain.StatusEnabled,
+				},
+			},
+		},
+		expectedChanges:  []string{"profiles.daily.operations[0].settings"}, // Settings sanitized
+		expectedWarnings: 0,
+	})
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
