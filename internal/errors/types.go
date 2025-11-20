@@ -10,25 +10,25 @@ type ErrorCode int
 
 const (
 	// Domain errors (1000-1999)
-	ErrCodeInvalidGeneration ErrorCode = 1000
-	ErrCodeInvalidSettings   ErrorCode = 1001
+	ErrCodeInvalidGeneration  ErrorCode = 1000
+	ErrCodeInvalidSettings    ErrorCode = 1001
 	ErrCodeOptimizationFailed ErrorCode = 1002
-	ErrCodeCleanupFailed     ErrorCode = 1003
-	ErrCodeValidationFailed  ErrorCode = 1004
+	ErrCodeCleanupFailed      ErrorCode = 1003
+	ErrCodeValidationFailed   ErrorCode = 1004
 
 	// Configuration errors (2000-2999)
-	ErrCodeInvalidConfig      ErrorCode = 2000
-	ErrCodeMissingProfile     ErrorCode = 2001
-	ErrCodeInvalidOperation   ErrorCode = 2002
-	ErrCodeSafetyViolation   ErrorCode = 2003
-	ErrCodePermissionDenied  ErrorCode = 2004
+	ErrCodeInvalidConfig    ErrorCode = 2000
+	ErrCodeMissingProfile   ErrorCode = 2001
+	ErrCodeInvalidOperation ErrorCode = 2002
+	ErrCodeSafetyViolation  ErrorCode = 2003
+	ErrCodePermissionDenied ErrorCode = 2004
 
 	// File system errors (3000-3999)
 	ErrCodeFileNotFound    ErrorCode = 3000
 	ErrCodePermissionError ErrorCode = 3001
-	ErrCodeDiskFull       ErrorCode = 3002
-	ErrCodeCorruption     ErrorCode = 3003
-	ErrCodePathInvalid    ErrorCode = 3004
+	ErrCodeDiskFull        ErrorCode = 3002
+	ErrCodeCorruption      ErrorCode = 3003
+	ErrCodePathInvalid     ErrorCode = 3004
 
 	// Network errors (4000-4999)
 	ErrCodeConnectionFailed ErrorCode = 4000
@@ -36,8 +36,8 @@ const (
 	ErrCodeRateLimited      ErrorCode = 4002
 
 	// System errors (5000-5999)
-	ErrCodeOutOfMemory    ErrorCode = 5000
-	ErrCodeProcessFailed   ErrorCode = 5001
+	ErrCodeOutOfMemory       ErrorCode = 5000
+	ErrCodeProcessFailed     ErrorCode = 5001
 	ErrCodeResourceExhausted ErrorCode = 5002
 )
 
@@ -107,14 +107,14 @@ func (et ErrorType) String() string {
 
 // CleanWizardError represents structured error with type safety
 type CleanWizardError struct {
-	Code        ErrorCode     `json:"code"`
-	Type        ErrorType     `json:"type"`
-	Severity    ErrorSeverity  `json:"severity"`
-	Message     string        `json:"message"`
-	Details     interface{}   `json:"details,omitempty"`
-	Cause       error         `json:"cause,omitempty"`
-	Caller      string        `json:"caller,omitempty"`
-	Timestamp   int64         `json:"timestamp"`
+	Code      ErrorCode     `json:"code"`
+	Type      ErrorType     `json:"type"`
+	Severity  ErrorSeverity `json:"severity"`
+	Message   string        `json:"message"`
+	Details   any           `json:"details,omitempty"`
+	Cause     error         `json:"cause,omitempty"`
+	Caller    string        `json:"caller,omitempty"`
+	Timestamp int64         `json:"timestamp"`
 }
 
 // Error implements error interface
@@ -153,7 +153,7 @@ func (e *CleanWizardError) WithCaller() *CleanWizardError {
 }
 
 // WithDetails adds additional details to error
-func (e *CleanWizardError) WithDetails(details interface{}) *CleanWizardError {
+func (e *CleanWizardError) WithDetails(details any) *CleanWizardError {
 	e.Details = details
 	return e
 }
@@ -177,18 +177,18 @@ func NewError(code ErrorCode, message string) *CleanWizardError {
 		Type:      inferErrorType(code),
 		Severity:  inferErrorSeverity(code),
 		Message:   message,
-		Timestamp:  getCurrentTimestamp(),
+		Timestamp: getCurrentTimestamp(),
 	}
 }
 
 // NewErrorf creates a new structured error with formatted message
-func NewErrorf(code ErrorCode, format string, args ...interface{}) *CleanWizardError {
+func NewErrorf(code ErrorCode, format string, args ...any) *CleanWizardError {
 	return &CleanWizardError{
 		Code:      code,
 		Type:      inferErrorType(code),
 		Severity:  inferErrorSeverity(code),
 		Message:   fmt.Sprintf(format, args...),
-		Timestamp:  getCurrentTimestamp(),
+		Timestamp: getCurrentTimestamp(),
 	}
 }
 
@@ -200,19 +200,19 @@ func WrapError(cause error, code ErrorCode, message string) *CleanWizardError {
 		Severity:  inferErrorSeverity(code),
 		Message:   message,
 		Cause:     cause,
-		Timestamp:  getCurrentTimestamp(),
+		Timestamp: getCurrentTimestamp(),
 	}
 }
 
 // WrapErrorf wraps an existing error with formatted message
-func WrapErrorf(cause error, code ErrorCode, format string, args ...interface{}) *CleanWizardError {
+func WrapErrorf(cause error, code ErrorCode, format string, args ...any) *CleanWizardError {
 	return &CleanWizardError{
 		Code:      code,
 		Type:      inferErrorType(code),
 		Severity:  inferErrorSeverity(code),
 		Message:   fmt.Sprintf(format, args...),
 		Cause:     cause,
-		Timestamp:  getCurrentTimestamp(),
+		Timestamp: getCurrentTimestamp(),
 	}
 }
 

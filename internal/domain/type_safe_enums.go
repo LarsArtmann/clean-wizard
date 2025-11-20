@@ -13,8 +13,8 @@ type EnumHelper[T ~int] struct {
 	validRange    func(T) bool
 	allValues     func() []T
 	caseSensitive bool
-	valuesCache   []T     // Cache for Values()
-	once         sync.Once // For one-time initialization
+	valuesCache   []T       // Cache for Values()
+	once          sync.Once // For one-time initialization
 }
 
 // NewEnumHelper creates a new helper for enum type-safe operations

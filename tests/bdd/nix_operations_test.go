@@ -3,14 +3,15 @@ package bdd
 import (
 	"context"
 	"fmt"
+	"slices"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // mockCleaner implements domain.Cleaner interface for testing
@@ -31,7 +32,7 @@ func (m *mockCleaner) ValidateSettings(settings *domain.OperationSettings) error
 // NixOperationsContext holds state for BDD scenarios
 type NixOperationsContext struct {
 	ctx          context.Context
-	cleaner     domain.Cleaner
+	cleaner      domain.Cleaner
 	uiAdapter    *adapters.UIAdapter
 	config       *domain.Config
 	profile      *domain.Profile
@@ -43,7 +44,7 @@ type NixOperationsContext struct {
 	profiles     map[string]*domain.Profile
 	logMessages  []string
 	cleanupState CleanupState
-	t           *testing.T
+	t            *testing.T
 }
 
 // CleanupState represents state of cleanup operations
@@ -73,11 +74,11 @@ func (ctx *NixOperationsContext) InitializeContext(t *testing.T) {
 func (ctx *NixOperationsContext) GivenValidNixInstallation() error {
 	ctx.safetyLevel = domain.SafetyLevelEnabled
 	ctx.config = &domain.Config{
-		Version:     "1.0.0",
-		SafetyLevel: ctx.safetyLevel,
+		Version:      "1.0.0",
+		SafetyLevel:  ctx.safetyLevel,
 		MaxDiskUsage: 50,
-		Protected:   []string{"/System", "/Library", "/Applications"},
-		Profiles:    ctx.profiles,
+		Protected:    []string{"/System", "/Library", "/Applications"},
+		Profiles:     ctx.profiles,
 	}
 
 	// Create test profile for nix-generations
@@ -92,7 +93,7 @@ func (ctx *NixOperationsContext) GivenValidNixInstallation() error {
 				Status:      domain.StatusEnabled,
 				Settings: &domain.OperationSettings{
 					NixGenerations: &domain.NixGenerationsSettings{
-						Generations: 3,
+						Generations:  3,
 						Optimization: domain.OptimizationLevelConservative,
 					},
 				},
@@ -111,7 +112,7 @@ func (ctx *NixOperationsContext) WhenRunningNixGenerationsCleanup() error {
 
 	// Simulate cleanup operation
 	ctx.result = &domain.CleanResult{
-		FreedBytes:  1024 * 1024 * 250,
+		FreedBytes:   1024 * 1024 * 250,
 		ItemsRemoved: 2,
 		ItemsFailed:  0,
 		CleanTime:    time.Second * 5,
@@ -139,13 +140,7 @@ func (ctx *NixOperationsContext) AndLogOperationsPerformed() error {
 	}
 
 	for _, expectedLog := range expectedLogs {
-		found := false
-		for _, actualLog := range ctx.logMessages {
-			if actualLog == expectedLog {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(ctx.logMessages, expectedLog)
 		assert.True(ctx.t, found, "Expected log message not found: %s", expectedLog)
 	}
 
@@ -191,7 +186,7 @@ func (ctx *NixOperationsContext) WhenAttemptingCleanup() error {
 	}
 
 	ctx.result = &domain.CleanResult{
-		FreedBytes:  0,
+		FreedBytes:   0,
 		ItemsRemoved: 0,
 		ItemsFailed:  0,
 		CleanTime:    0,
@@ -209,13 +204,7 @@ func (ctx *NixOperationsContext) ThenPreventOperation() error {
 
 func (ctx *NixOperationsContext) AndShowRiskWarning() error {
 	expectedWarning := "Prevented high-risk operation: delete-system-files"
-	found := false
-	for _, log := range ctx.logMessages {
-		if log == expectedWarning {
-			found = true
-			break
-		}
-	}
+	found := slices.Contains(ctx.logMessages, expectedWarning)
 	assert.True(ctx.t, found, "Should log risk warning: %s", expectedWarning)
 	return nil
 }
@@ -254,7 +243,7 @@ func (ctx *NixOperationsContext) WhenRunningSpecificProfile(profileName string) 
 
 	// Execute only profile operations
 	ctx.result = &domain.CleanResult{
-		FreedBytes:  1024 * 1024 * 100,
+		FreedBytes:   1024 * 1024 * 100,
 		ItemsRemoved: uint(len(ctx.profile.Operations)),
 		ItemsFailed:  0,
 		CleanTime:    time.Second * 2,
@@ -371,13 +360,7 @@ func (ctx *NixOperationsContext) ThenPreventConcurrentExecution() error {
 
 func (ctx *NixOperationsContext) AndShowAppropriateError() error {
 	expectedLog := "Concurrent cleanup attempt prevented"
-	found := false
-	for _, log := range ctx.logMessages {
-		if log == expectedLog {
-			found = true
-			break
-		}
-	}
+	found := slices.Contains(ctx.logMessages, expectedLog)
 	assert.True(ctx.t, found, "Should log concurrent prevention: %s", expectedLog)
 	return nil
 }

@@ -268,8 +268,8 @@ func GetCurrentTime() time.Time {
 	return time.Now()
 }
 
-// getDefaultConfig returns the default configuration
-func getDefaultConfig() *domain.Config {
+// GetDefaultConfig returns the default configuration
+func GetDefaultConfig() *domain.Config {
 	now := GetCurrentTime()
 
 	return &domain.Config{

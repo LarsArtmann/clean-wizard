@@ -11,21 +11,21 @@ func isConfigurationError(err error) bool {
 	if err == nil {
 		return false
 	}
-	
+
 	errStr := err.Error()
 	// Common indicators of configuration errors
 	configIndicators := []string{
 		"config", "configuration", "yaml", "json", "toml",
 		"parse", "invalid", "missing", "required",
 	}
-	
+
 	lowerErrStr := strings.ToLower(errStr)
 	for _, indicator := range configIndicators {
 		if strings.Contains(lowerErrStr, indicator) {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -42,7 +42,7 @@ func (fsa *FileSystemErrorAdapter) Adapt(err error) *CleanWizardError {
 	if pathErr, ok := err.(*os.PathError); ok {
 		switch {
 		case pathErr.Err == syscall.ENOENT || pathErr.Err == os.ErrNotExist:
-			return NewError(ErrCodeFileNotFound, 
+			return NewError(ErrCodeFileNotFound,
 				"File not found: "+pathErr.Path).WithCause(err).WithCaller()
 		case pathErr.Err == syscall.EACCES || pathErr.Err == syscall.EPERM || pathErr.Err == os.ErrPermission:
 			return NewError(ErrCodePermissionError,
@@ -86,7 +86,7 @@ func (cea *ConfigErrorAdapter) Adapt(err error, context string) *CleanWizardErro
 		return WrapError(err, ErrCodeInvalidConfig,
 			"Configuration error: "+context).WithCaller()
 	}
-	
+
 	// Not a configuration error
 	return nil
 }
@@ -105,7 +105,7 @@ func (vea *ValidationErrorAdapter) Adapt(err error, field string) *CleanWizardEr
 		return WrapErrorf(err, ErrCodeValidationFailed,
 			"Validation failed for field '%s': %v", field, err).WithCaller()
 	}
-	
+
 	// Not a validation error
 	return nil
 }
@@ -115,7 +115,7 @@ func isValidationError(err error) bool {
 	if err == nil {
 		return false
 	}
-	
+
 	errStr := err.Error()
 	// Strong indicators of validation errors
 	validationIndicators := []string{
@@ -123,14 +123,14 @@ func isValidationError(err error) bool {
 		"invalid range", "required field", "constraint violation",
 		"unacceptable value", "validation rule", "invalid value",
 	}
-	
+
 	lowerErrStr := strings.ToLower(errStr)
 	for _, indicator := range validationIndicators {
 		if strings.Contains(lowerErrStr, indicator) {
 			return true
 		}
 	}
-	
+
 	return false
 }
 

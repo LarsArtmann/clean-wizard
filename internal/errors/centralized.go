@@ -91,7 +91,7 @@ func DomainError(code ErrorCode, message string) *CleanWizardError {
 }
 
 // DomainErrorf creates domain-level errors with formatting
-func DomainErrorf(code ErrorCode, format string, args ...interface{}) *CleanWizardError {
+func DomainErrorf(code ErrorCode, format string, args ...any) *CleanWizardError {
 	return NewErrorf(code, format, args...).WithCaller()
 }
 
@@ -101,7 +101,7 @@ func ConfigError(message string) *CleanWizardError {
 }
 
 // ConfigErrorf creates configuration errors with formatting
-func ConfigErrorf(format string, args ...interface{}) *CleanWizardError {
+func ConfigErrorf(format string, args ...any) *CleanWizardError {
 	return NewErrorf(ErrCodeInvalidConfig, format, args...).WithCaller()
 }
 
@@ -136,8 +136,8 @@ func SystemError(component, message string) *CleanWizardError {
 }
 
 // SystemErrorf creates system-level errors with formatting
-func SystemErrorf(component, format string, args ...interface{}) *CleanWizardError {
-	return NewErrorf(ErrCodeProcessFailed, "System component '%s': %s", component, 
+func SystemErrorf(component, format string, args ...any) *CleanWizardError {
+	return NewErrorf(ErrCodeProcessFailed, "System component '%s': %s", component,
 		fmt.Sprintf(format, args...)).WithCaller()
 }
 
@@ -180,13 +180,13 @@ func (eb *ErrorBuilder) WithMessage(message string) *ErrorBuilder {
 }
 
 // WithMessagef sets the error message with formatting
-func (eb *ErrorBuilder) WithMessagef(format string, args ...interface{}) *ErrorBuilder {
+func (eb *ErrorBuilder) WithMessagef(format string, args ...any) *ErrorBuilder {
 	eb.error.Message = fmt.Sprintf(format, args...)
 	return eb
 }
 
 // WithDetails adds additional details to the error
-func (eb *ErrorBuilder) WithDetails(details interface{}) *ErrorBuilder {
+func (eb *ErrorBuilder) WithDetails(details any) *ErrorBuilder {
 	eb.error.Details = details
 	return eb
 }
