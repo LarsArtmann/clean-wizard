@@ -62,27 +62,8 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 			// Apply validation if we have loaded configuration
 			if loadedCfg != nil {
-				fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
-
-				if validationLevel >= config.ValidationLevelBasic {
-					// Basic validation
-					if len(loadedCfg.Protected) == 0 {
-						return fmt.Errorf("basic validation failed: protected paths cannot be empty")
-					}
-				}
-
-				if validationLevel >= config.ValidationLevelComprehensive {
-					// Comprehensive validation
-					if err := loadedCfg.Validate(); err != nil {
-						return fmt.Errorf("comprehensive validation failed: %w", err)
-					}
-				}
-
-				if validationLevel >= config.ValidationLevelStrict {
-					// Strict validation
-					if loadedCfg.SafetyLevel == domain.SafetyLevelDisabled {
-						return fmt.Errorf("strict validation failed: safety_level must be enabled")
-					}
+				if err := ApplyValidationToConfigShared(loadedCfg, validationLevel); err != nil {
+					return err
 				}
 
 				fmt.Printf("✅ Configuration applied: safety_level=%v, profiles=%d\n",

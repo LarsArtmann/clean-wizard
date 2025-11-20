@@ -53,7 +53,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	var config domain.Config
 
 	// Use common loading and validation logic
-	if err := loadAndValidateConfig(config, v, "LoadWithContext"); err != nil {
+	if err := loadAndValidateConfig(&config, v, "LoadWithContext"); err != nil {
 		return nil, err
 	}
 
@@ -96,23 +96,8 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 	var config domain.Config
 
 	// Use common loading and validation logic
-	if err := loadAndValidateConfig(config, v, "LoadWithContextAndPath"); err != nil {
+	if err := loadAndValidateConfig(&config, v, "LoadWithContextAndPath"); err != nil {
 		return nil, err
-	}
-
-	// Apply comprehensive validation with strict enforcement
-	if validator := NewConfigValidator(); validator != nil {
-		validationResult := validator.ValidateConfig(&config)
-		if !validationResult.IsValid {
-			// CRITICAL: Fail fast on validation errors for production safety
-			for _, err := range validationResult.Errors {
-				log.Error().
-					Str("field", err.Field).
-					Err(fmt.Errorf("%s", err.Message)).
-					Msg("Configuration validation error")
-			}
-			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
-		}
 	}
 
 	return &config, nil

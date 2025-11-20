@@ -1,4 +1,14 @@
-2025/11/20 20:23:47 Building suffix tree
-2025/11/20 20:23:47 Searching for clones
+2025/11/20 20:36:04 Building suffix tree
+2025/11/20 20:36:05 Searching for clones
+found 2 clones:
+  internal/errors/errors_test.go:119,129
+  internal/errors/errors_test.go:131,141
+found 3 clones:
+  internal/config/type_safe_validation_rules_test.go:127,140
+  internal/config/type_safe_validation_rules_test.go:142,155
+  internal/config/type_safe_validation_rules_test.go:157,170
+found 2 clones:
+  internal/adapters/http_client.go:91,104
+  internal/adapters/http_client.go:107,120
 
-Found total 0 clone groups.
+Found total 3 clone groups.
