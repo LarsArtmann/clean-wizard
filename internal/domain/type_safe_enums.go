@@ -156,10 +156,10 @@ func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 // operationNameHelper provides shared functionality for OperationNameType
 var operationNameHelper = NewEnumHelper(map[OperationNameType]string{
 	OperationNameNixGenerations: "nix-generations",
-	OperationNameHomebrew:      "homebrew",
+	OperationNameHomebrew:       "homebrew",
 	OperationNamePackageCache:   "package-cache",
-	OperationNameTempFiles:       "temp-files",
-	OperationNameSystemTemp:      "system-temp",
+	OperationNameTempFiles:      "temp-files",
+	OperationNameSystemTemp:     "system-temp",
 }, func(on OperationNameType) bool {
 	return on >= OperationNameNixGenerations && on <= OperationNameSystemTemp
 }, func() []OperationNameType {
