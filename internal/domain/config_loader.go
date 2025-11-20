@@ -6,36 +6,30 @@ import (
 	"strings"
 )
 
-// SafetyConfig represents all possible safety configuration formats
-// This type eliminates split brains by providing a single source of truth
+// SafetyConfig represents single source of truth for safety configuration
+// This type eliminates split brains by having only ONE representation
 type SafetyConfig struct {
-	// Primary safety level (new format)
 	Level SafetyLevelType
-	
-	// Legacy boolean (for backward compatibility)  
-	SafeMode *bool
 	
 	// Whether this config was explicitly set by user
 	IsExplicit bool
 }
 
 // ParseSafetyConfig creates a SafetyConfig from viper configuration
-// This function centralizes all safety level parsing logic and eliminates type safety violations
+// This function centralizes all safety level parsing logic outside of domain
 func ParseSafetyConfig(v ViperConfig) SafetyConfig {
-	config := SafetyConfig{IsExplicit: false}
-	
 	// Check for new safety_level format first (highest priority)
 	if v.IsSet("safety_level") {
-		config.IsExplicit = true
 		safetyValue := v.Get("safety_level")
 		
 		if level, ok := parseSafetyLevelValue(safetyValue); ok {
-			config.Level = level
-			return config
+			return SafetyConfig{
+				Level:     level,
+				IsExplicit: true,
+			}
 		}
 		
-		// Invalid value - log warning and use default
-		// TODO: Replace with proper error handling instead of logging
+		// Invalid value - return default with explicit flag
 		return SafetyConfig{
 			Level:     SafetyLevelEnabled,
 			IsExplicit: true,
@@ -44,16 +38,18 @@ func ParseSafetyConfig(v ViperConfig) SafetyConfig {
 	
 	// Fall back to legacy safe_mode boolean
 	if v.IsSet("safe_mode") {
-		config.IsExplicit = true
 		safeMode := v.GetBool("safe_mode")
-		config.SafeMode = &safeMode
 		
 		if safeMode {
-			config.Level = SafetyLevelEnabled
-		} else {
-			config.Level = SafetyLevelDisabled
+			return SafetyConfig{
+				Level:     SafetyLevelEnabled,
+				IsExplicit: true,
+			}
 		}
-		return config
+		return SafetyConfig{
+			Level:     SafetyLevelDisabled,
+			IsExplicit: true,
+		}
 	}
 	
 	// Default when neither is present
@@ -148,15 +144,7 @@ func (sc SafetyConfig) ToSafetyLevel() SafetyLevelType {
 	return sc.Level
 }
 
-// IsLegacyMode returns true if configuration uses legacy safe_mode
-func (sc SafetyConfig) IsLegacyMode() bool {
-	return sc.SafeMode != nil
-}
-
 // String returns string representation
 func (sc SafetyConfig) String() string {
-	if sc.IsLegacyMode() {
-		return fmt.Sprintf("legacy(safe_mode=%v)->%s", *sc.SafeMode, sc.Level.String())
-	}
-	return fmt.Sprintf("modern(%s)", sc.Level.String())
+	return fmt.Sprintf("safety=%s", sc.Level.String())
 }

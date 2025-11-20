@@ -32,3 +32,37 @@ const (
 	MaxProfiles       = 50  // Maximum number of profiles allowed
 	MaxOperations     = 100 // Maximum number of operations per profile
 )
+
+// Configuration key constants to eliminate magic strings
+const (
+	// Top-level configuration keys
+	ConfigKeySafetyLevel = "safety_level"
+	ConfigKeySafeMode    = "safe_mode"
+	ConfigKeyVersion      = "version"
+	ConfigKeyMaxDiskUsage = "max_disk_usage_percent"
+	ConfigKeyProtected    = "protected"
+	ConfigKeyLastClean    = "last_clean"
+	ConfigKeyUpdated     = "updated"
+	ConfigKeyProfiles    = "profiles"
+	
+	// Profile field key templates
+	ProfileTemplateName     = "profiles.%s.name"
+	ProfileTemplateDesc     = "profiles.%s.description"
+	ProfileTemplateStatus  = "profiles.%s.status"
+	ProfileTemplateEnabled = "profiles.%s.enabled"
+	
+	// Operation field key templates
+	OperationTemplateName        = "profiles.%s.operations.%d.name"
+	OperationTemplateDesc        = "profiles.%s.operations.%d.description"
+	OperationTemplateRiskLevel   = "profiles.%s.operations.%d.risk_level"
+	OperationTemplateStatus      = "profiles.%s.operations.%d.status"
+	OperationTemplateEnabled     = "profiles.%s.operations.%d.enabled"
+)
+
+// Default configuration values
+const (
+	DefaultSafetyLevel   = 1  // SafetyLevelEnabled
+	DefaultSafeMode     = true
+	DefaultMaxDiskUsage  = 50
+	DefaultVersion      = "1.0.0"
+)
