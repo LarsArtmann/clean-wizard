@@ -95,6 +95,17 @@ const (
 	RiskLevelCriticalType
 )
 
+// OperationNameType represents operation names with compile-time safety
+type OperationNameType int
+
+const (
+	OperationNameNixGenerations OperationNameType = iota
+	OperationNameHomebrew
+	OperationNamePackageCache
+	OperationNameTempFiles
+	OperationNameSystemTemp
+)
+
 // riskLevelHelper provides shared functionality for RiskLevelType
 var riskLevelHelper = NewEnumHelper(map[RiskLevelType]string{
 	RiskLevelLowType:      "LOW",
@@ -139,6 +150,55 @@ func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*rl = val
+	return nil
+}
+
+// operationNameHelper provides shared functionality for OperationNameType
+var operationNameHelper = NewEnumHelper(map[OperationNameType]string{
+	OperationNameNixGenerations: "nix-generations",
+	OperationNameHomebrew:      "homebrew",
+	OperationNamePackageCache:   "package-cache",
+	OperationNameTempFiles:       "temp-files",
+	OperationNameSystemTemp:      "system-temp",
+}, func(on OperationNameType) bool {
+	return on >= OperationNameNixGenerations && on <= OperationNameSystemTemp
+}, func() []OperationNameType {
+	return []OperationNameType{
+		OperationNameNixGenerations,
+		OperationNameHomebrew,
+		OperationNamePackageCache,
+		OperationNameTempFiles,
+		OperationNameSystemTemp,
+	}
+}, true) // case sensitive for operation names
+
+// String returns string representation
+func (on OperationNameType) String() string {
+	return operationNameHelper.String(on)
+}
+
+// IsValid checks if operation name is valid
+func (on OperationNameType) IsValid() bool {
+	return operationNameHelper.IsValid(on)
+}
+
+// Values returns all possible values
+func (on OperationNameType) Values() []OperationNameType {
+	return operationNameHelper.Values()
+}
+
+// MarshalJSON implements json.Marshaler
+func (on OperationNameType) MarshalJSON() ([]byte, error) {
+	return operationNameHelper.MarshalJSONImpl(on)
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (on *OperationNameType) UnmarshalJSON(data []byte) error {
+	val, err := operationNameHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*on = val
 	return nil
 }
 

@@ -115,8 +115,6 @@ func (ecl *EnhancedConfigLoader) isPathProtected(protected []string, target stri
 	return slices.Contains(protected, target)
 }
 
-
-
 // formatValidationErrors formats validation errors for display
 func (ecl *EnhancedConfigLoader) formatValidationErrors(errors []ValidationError) string {
 	if len(errors) == 0 {

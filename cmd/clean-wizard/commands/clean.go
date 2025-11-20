@@ -49,12 +49,12 @@ func NewCleanCommand() *cobra.Command {
 					return fmt.Errorf("failed to load configuration: %w", err)
 				}
 
-			// Apply validation based on level
-			if err := ApplyValidationToConfig(loadedCfg, validationLevel); err != nil {
-				return err
-			}
+				// Apply validation based on level
+				if err := ApplyValidationToConfig(loadedCfg, validationLevel); err != nil {
+					return err
+				}
 
-			fmt.Printf("✅ Configuration applied: safety_level=%v, profiles=%d\n",
+				fmt.Printf("✅ Configuration applied: safety_level=%v, profiles=%d\n",
 					loadedCfg.SafetyLevel, len(loadedCfg.Profiles))
 			} else {
 				// Load default configuration to get profile information
