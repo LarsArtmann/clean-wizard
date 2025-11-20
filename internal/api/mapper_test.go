@@ -375,11 +375,6 @@ func TestMapRiskLevel_Conversions(t *testing.T) {
 	}
 }
 
-// Helper function to create bool pointer
-func boolPtr(b bool) *bool {
-	return &b
-}
-
 // === NEGATIVE CASE TESTS FOR MAPCONFIGTODOMAIN ===
 
 func TestMapConfigToDomain_NilConfig(t *testing.T) {

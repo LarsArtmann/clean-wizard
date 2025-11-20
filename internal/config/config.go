@@ -37,22 +37,15 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		v.SetConfigFile(configPath)
 	}
 
-	// Set defaults
-	v.SetDefault(ConfigKeyVersion, "1.0.0")
-	v.SetDefault("safe_mode", DefaultSafeMode)
-	v.SetDefault(ConfigKeyMaxDiskUsage, DefaultDiskUsagePercent)
-	v.SetDefault(ConfigKeyProtected, []string{DefaultProtectedPathSystem, DefaultProtectedPathLibrary}) // Basic protection
+	// Set defaults using helper function
+	setupDefaults(v)
 
-	// Try to read configuration file
+	// Try to read configuration file using helper function
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	default:
-		if err := v.ReadInConfig(); err != nil {
-			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-				// Config file not found, return default config
-				return GetDefaultConfig(), nil
-			}
+		if err := readConfigFile(v); err != nil {
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
 	}
