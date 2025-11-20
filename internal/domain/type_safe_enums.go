@@ -4,14 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 )
-
-// TypeSafeEnum provides compile-time guaranteed enums with JSON serialization
-type TypeSafeEnum[T any] interface {
-	String() string
-	IsValid() bool
-	Values() []T
-}
 
 // EnumHelper provides generic enum functionality to reduce code duplication
 type EnumHelper[T ~int] struct {
@@ -19,6 +13,8 @@ type EnumHelper[T ~int] struct {
 	validRange    func(T) bool
 	allValues     func() []T
 	caseSensitive bool
+	valuesCache   []T     // Cache for Values()
+	once         sync.Once // For one-time initialization
 }
 
 // NewEnumHelper creates a new helper for enum type-safe operations
@@ -44,9 +40,12 @@ func (eh *EnumHelper[T]) IsValid(value T) bool {
 	return eh.validRange(value)
 }
 
-// Values returns all possible enum values
+// Values returns all possible enum values (cached for performance)
 func (eh *EnumHelper[T]) Values() []T {
-	return eh.allValues()
+	eh.once.Do(func() {
+		eh.valuesCache = eh.allValues()
+	})
+	return eh.valuesCache
 }
 
 // MarshalJSON converts enum to JSON string
