@@ -15,9 +15,8 @@ func (fsa *FileSystemErrorAdapter) Adapt(err error) *CleanWizardError {
 	}
 
 	// Handle specific OS errors
-	var pathErr *os.PathError
-	if err, ok := err.(*os.PathError); ok {
-		switch err.Err {
+	if pathErr, ok := err.(*os.PathError); ok {
+		switch pathErr.Err {
 		case syscall.ENOENT:
 			return NewError(ErrCodeFileNotFound, 
 				"File not found: "+pathErr.Path).WithCause(err).WithCaller()
