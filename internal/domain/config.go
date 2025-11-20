@@ -47,17 +47,17 @@ func (c *Config) Validate() error {
 	}
 
 	if len(c.Protected) == 0 {
-		return fmt.Errorf("Protected paths cannot be empty")
+		return fmt.Errorf("protected paths cannot be empty")
 	}
 
 	for i, path := range c.Protected {
 		if path == "" {
-			return fmt.Errorf("Protected path %d cannot be empty", i)
+			return fmt.Errorf("protected path %d cannot be empty", i)
 		}
 	}
 
 	if len(c.Profiles) == 0 {
-		return fmt.Errorf("Configuration must have at least one profile")
+		return fmt.Errorf("configuration must have at least one profile")
 	}
 
 	for name, profile := range c.Profiles {

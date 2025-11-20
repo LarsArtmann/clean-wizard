@@ -79,7 +79,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		// Convert boolean enabled to StatusType enum for profiles
 		var profileEnabled bool
 		if v.IsSet(fmt.Sprintf("profiles.%s.enabled", name)) {
-			v.UnmarshalKey(fmt.Sprintf("profiles.%s.enabled", name), &profileEnabled)
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.enabled", name), &profileEnabled); err != nil {
+				log.Warn().Err(err).Str("profile", name).Msg("Failed to unmarshal profile enabled flag")
+			}
 			if profileEnabled {
 				profile.Status = domain.StatusEnabled
 			} else {
@@ -88,7 +90,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		} else {
 			// Fallback to string status parsing for backward compatibility
 			var profileStatusStr string
-			v.UnmarshalKey(fmt.Sprintf("profiles.%s.status", name), &profileStatusStr)
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.status", name), &profileStatusStr); err != nil {
+				log.Warn().Err(err).Str("profile", name).Msg("Failed to unmarshal profile status")
+			}
 			switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
 			case "DISABLED":
 				profile.Status = domain.StatusDisabled
@@ -107,7 +111,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		for i, op := range profile.Operations {
 			// Convert string risk level to RiskLevel enum
 			var riskLevelStr string
-			v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr)
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr); err != nil {
+				log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal risk level")
+			}
 
 			switch strings.ToUpper(riskLevelStr) {
 			case "LOW":
@@ -127,7 +133,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			operationEnabledKey := fmt.Sprintf("profiles.%s.operations.%d.enabled", name, i)
 			if v.IsSet(operationEnabledKey) {
 				var operationEnabled bool
-				v.UnmarshalKey(operationEnabledKey, &operationEnabled)
+				if err := v.UnmarshalKey(operationEnabledKey, &operationEnabled); err != nil {
+					log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal operation enabled flag")
+				}
 				if operationEnabled {
 					op.Status = domain.StatusEnabled
 				} else {
@@ -136,7 +144,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			} else {
 				// Fallback to string status parsing for backward compatibility
 				var opStatusStr string
-				v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.status", name, i), &opStatusStr)
+				if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.status", name, i), &opStatusStr); err != nil {
+					log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal operation status")
+				}
 				switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
 				case "DISABLED":
 					op.Status = domain.StatusDisabled
@@ -241,7 +251,9 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 		// Convert boolean enabled to StatusType enum for profiles
 		var profileEnabled bool
 		if v.IsSet(fmt.Sprintf("profiles.%s.enabled", name)) {
-			v.UnmarshalKey(fmt.Sprintf("profiles.%s.enabled", name), &profileEnabled)
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.enabled", name), &profileEnabled); err != nil {
+				log.Warn().Err(err).Str("profile", name).Msg("Failed to unmarshal profile enabled flag")
+			}
 			if profileEnabled {
 				profile.Status = domain.StatusEnabled
 			} else {
@@ -250,7 +262,9 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 		} else {
 			// Fallback to string status parsing for backward compatibility
 			var profileStatusStr string
-			v.UnmarshalKey(fmt.Sprintf("profiles.%s.status", name), &profileStatusStr)
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.status", name), &profileStatusStr); err != nil {
+				log.Warn().Err(err).Str("profile", name).Msg("Failed to unmarshal profile status")
+			}
 			switch strings.ToUpper(strings.TrimSpace(profileStatusStr)) {
 			case "DISABLED":
 				profile.Status = domain.StatusDisabled
@@ -269,7 +283,9 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 		for i, op := range profile.Operations {
 			// Convert string risk level to RiskLevel enum
 			var riskLevelStr string
-			v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr)
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr); err != nil {
+				log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal risk level")
+			}
 
 			switch strings.ToUpper(riskLevelStr) {
 			case "LOW":
@@ -289,7 +305,9 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 			operationEnabledKey := fmt.Sprintf("profiles.%s.operations.%d.enabled", name, i)
 			if v.IsSet(operationEnabledKey) {
 				var operationEnabled bool
-				v.UnmarshalKey(operationEnabledKey, &operationEnabled)
+				if err := v.UnmarshalKey(operationEnabledKey, &operationEnabled); err != nil {
+					log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal operation enabled flag")
+				}
 				if operationEnabled {
 					op.Status = domain.StatusEnabled
 				} else {
@@ -298,7 +316,9 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 			} else {
 				// Fallback to string status parsing for backward compatibility
 				var opStatusStr string
-				v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.status", name, i), &opStatusStr)
+				if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.status", name, i), &opStatusStr); err != nil {
+					log.Warn().Err(err).Str("profile", name).Int("operation", i).Msg("Failed to unmarshal operation status")
+				}
 				switch strings.ToUpper(strings.TrimSpace(opStatusStr)) {
 				case "DISABLED":
 					op.Status = domain.StatusDisabled

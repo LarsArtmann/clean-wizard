@@ -32,7 +32,7 @@ func FuzzResultCreationBasic(f *testing.F) {
 		okResult.Value()
 
 		// Error method should not panic
-		errResult.Error()
+		_ = errResult.Error()
 	})
 }
 

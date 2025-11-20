@@ -148,7 +148,7 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 
 	// Check if profile is enabled
 	if profile.Status == domain.StatusDisabled {
-		return fmt.Errorf("profile '%s' is disabled. Enable it first before selecting.", profileName)
+		return fmt.Errorf("profile '%s' is disabled. Enable it first before selecting", profileName)
 	}
 
 	// Update current profile in config

@@ -79,7 +79,7 @@ func WrapError(err error, code ErrorCode, operation string) *CleanWizardError {
 
 	cleanErr := NewError(code, err.Error())
 	cleanErr.Operation = operation
-	cleanErr.WithDetail("wrapped_error", err.Error())
+	cleanErr = cleanErr.WithDetail("wrapped_error", err.Error())
 
 	// If it's already a CleanWizardError, preserve details
 	if wizardErr, ok := err.(*CleanWizardError); ok {
