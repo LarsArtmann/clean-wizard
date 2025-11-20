@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+		"github.com/LarsArtmann/clean-wizard/internal/domain"
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -40,10 +40,10 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	}
 
 	// Set defaults
-	v.SetDefault("version", "1.0.0")
-	v.SetDefault("safe_mode", true)
-	v.SetDefault("max_disk_usage_percent", 50)
-	v.SetDefault("protected", []string{"/System", "/Library"}) // Basic protection
+	v.SetDefault(ConfigKeyVersion, "1.0.0")
+	v.SetDefault("safe_mode", DefaultSafeMode)
+	v.SetDefault(ConfigKeyMaxDiskUsage, DefaultMaxDiskUsage)
+	v.SetDefault(ConfigKeyProtected, []string{DefaultProtectedPathSystem, DefaultProtectedPathLibrary}) // Basic protection
 
 	// Try to read configuration file
 	select {
@@ -63,12 +63,12 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	var config domain.Config
 
 	// Manually unmarshal fields to avoid YAML tag issues
-	config.Version = v.GetString("version")
+	config.Version = v.GetString(ConfigKeyVersion)
 	// Apply safety configuration using type-safe domain logic with proper dependency inversion
 	safetyConfig := domain.ParseSafetyConfig(v)
 	config.SafetyLevel = safetyConfig.ToSafetyLevel()
-	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
-	config.Protected = v.GetStringSlice("protected")
+	config.MaxDiskUsage = v.GetInt(ConfigKeyMaxDiskUsage)
+	config.Protected = v.GetStringSlice(ConfigKeyProtected)
 
 	// Unmarshal profiles section
 	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
@@ -156,9 +156,19 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		}
 	}
 
-	// Enable comprehensive validation - CRITICAL for production safety
-	if err := config.Validate(); err != nil {
-		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+	// Apply comprehensive validation with strict enforcement
+	if validator := NewConfigValidator(); validator != nil {
+		validationResult := validator.ValidateConfig(&config)
+		if !validationResult.IsValid {
+			// CRITICAL: Fail fast on validation errors for production safety
+			for _, err := range validationResult.Errors {
+				log.Error().
+					Str("field", err.Field).
+					Err(fmt.Errorf("%s", err.Message)).
+					Msg("Configuration validation error")
+			}
+			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
+		}
 	}
 
 	// Apply comprehensive validation with strict enforcement
@@ -192,10 +202,10 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 	}
 
 	// Set defaults
-	v.SetDefault("version", "1.0.0")
-	v.SetDefault("safe_mode", true)
-	v.SetDefault("max_disk_usage_percent", 50)
-	v.SetDefault("protected", []string{"/System", "/Library"}) // Basic protection
+	v.SetDefault(ConfigKeyVersion, "1.0.0")
+	v.SetDefault("safe_mode", DefaultSafeMode)
+	v.SetDefault(ConfigKeyMaxDiskUsage, DefaultMaxDiskUsage)
+	v.SetDefault(ConfigKeyProtected, []string{DefaultProtectedPathSystem, DefaultProtectedPathLibrary}) // Basic protection
 
 	// Try to read configuration file
 	select {
@@ -215,12 +225,12 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 	var config domain.Config
 
 	// Manually unmarshal fields to avoid YAML tag issues
-	config.Version = v.GetString("version")
+	config.Version = v.GetString(ConfigKeyVersion)
 	// Apply safety configuration using type-safe domain logic with proper dependency inversion
 	safetyConfig := domain.ParseSafetyConfig(v)
 	config.SafetyLevel = safetyConfig.ToSafetyLevel()
-	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
-	config.Protected = v.GetStringSlice("protected")
+	config.MaxDiskUsage = v.GetInt(ConfigKeyMaxDiskUsage)
+	config.Protected = v.GetStringSlice(ConfigKeyProtected)
 
 	// Unmarshal profiles section
 	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
@@ -308,9 +318,19 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 		}
 	}
 
-	// Enable comprehensive validation - CRITICAL for production safety
-	if err := config.Validate(); err != nil {
-		return nil, pkgerrors.HandleConfigError("LoadWithContextAndPath", err)
+	// Apply comprehensive validation with strict enforcement
+	if validator := NewConfigValidator(); validator != nil {
+		validationResult := validator.ValidateConfig(&config)
+		if !validationResult.IsValid {
+			// CRITICAL: Fail fast on validation errors for production safety
+			for _, err := range validationResult.Errors {
+				log.Error().
+					Str("field", err.Field).
+					Err(fmt.Errorf("%s", err.Message)).
+					Msg("Configuration validation error")
+			}
+			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
+		}
 	}
 
 	// Apply comprehensive validation with strict enforcement
@@ -343,27 +363,26 @@ func Save(config *domain.Config) error {
 	configPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 
 	// Set configuration values
-	v.Set("version", config.Version)
+	v.Set(ConfigKeyVersion, config.Version)
 	v.Set("safety_level", config.SafetyLevel.String())
-	v.Set("max_disk_usage_percent", config.MaxDiskUsage)
-	v.Set("protected", config.Protected)
-	v.Set("last_clean", config.LastClean)
-	v.Set("updated", config.Updated)
+	v.Set(ConfigKeyMaxDiskUsage, config.MaxDiskUsage)
+	v.Set(ConfigKeyProtected, config.Protected)
+	v.Set(ConfigKeyLastClean, config.LastClean)
+	v.Set(ConfigKeyUpdated, config.Updated)
 
 	// Set profiles
 	for name, profile := range config.Profiles {
-		v.Set("profiles."+name+".name", profile.Name)
-		v.Set("profiles."+name+".description", profile.Description)
-		v.Set("profiles."+name+".status", profile.Status.String())
+		v.Set(fmt.Sprintf(ProfileTemplateName, name), profile.Name)
+		v.Set(fmt.Sprintf(ProfileTemplateDesc, name), profile.Description)
+		v.Set(fmt.Sprintf(ProfileTemplateStatus, name), profile.Status.String())
 
 		for i, op := range profile.Operations {
-			opKey := fmt.Sprintf("profiles.%s.operations.%d", name, i)
-			v.Set(opKey+".name", op.Name)
-			v.Set(opKey+".description", op.Description)
-			v.Set(opKey+".risk_level", op.RiskLevel)
-			v.Set(opKey+".enabled", op.Status.String())
+			v.Set(fmt.Sprintf(OperationTemplateName, name, i), op.Name)
+			v.Set(fmt.Sprintf(OperationTemplateDesc, name, i), op.Description)
+			v.Set(fmt.Sprintf(OperationTemplateRiskLevel, name, i), op.RiskLevel)
+			v.Set(fmt.Sprintf(OperationTemplateStatus, name, i), op.Status.String())
 			if op.Settings != nil {
-				v.Set(opKey+".settings", op.Settings)
+				v.Set(fmt.Sprintf("profiles.%s.operations.%d.settings", name, i), op.Settings)
 			}
 		}
 	}

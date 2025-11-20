@@ -57,6 +57,7 @@ const (
 	OperationTemplateRiskLevel   = "profiles.%s.operations.%d.risk_level"
 	OperationTemplateStatus      = "profiles.%s.operations.%d.status"
 	OperationTemplateEnabled     = "profiles.%s.operations.%d.enabled"
+	OperationTemplateSettings    = "profiles.%s.operations.%d.settings"
 )
 
 // Default configuration values
@@ -65,4 +66,9 @@ const (
 	DefaultSafeMode     = true
 	DefaultMaxDiskUsage  = 50
 	DefaultVersion      = "1.0.0"
+	
+	// Default protected paths
+	DefaultProtectedPathSystem     = "/System"
+	DefaultProtectedPathLibrary    = "/Library" 
+	DefaultProtectedPathApplications = "/Applications"
 )
