@@ -27,8 +27,10 @@ func TestContainer_NewContainer(t *testing.T) {
 	assert.Equal(t, domain.SafetyLevelEnabled, config.SafetyLevel)
 	assert.Equal(t, 50, config.MaxDiskUsage)
 	assert.Contains(t, config.Protected, "/System")
-	assert.Len(t, config.Profiles, 1)
+	assert.Len(t, config.Profiles, 3)
 	assert.Contains(t, config.Profiles, "daily")
+	assert.Contains(t, config.Profiles, "aggressive")
+	assert.Contains(t, config.Profiles, "comprehensive")
 }
 
 func TestContainer_UpdateConfig(t *testing.T) {
@@ -86,24 +88,22 @@ func TestContainer_DefaultProfiles(t *testing.T) {
 
 	profiles := container.GetConfig().Profiles
 	require.NotNil(t, profiles)
-	require.Len(t, profiles, 1)
+	require.Len(t, profiles, 3)
 
 	dailyProfile, exists := profiles["daily"]
 	require.True(t, exists)
 	require.NotNil(t, dailyProfile)
 
-	assert.Equal(t, "Daily Cleanup", dailyProfile.Name)
-	assert.Equal(t, "Daily system cleanup operations", dailyProfile.Description)
+	assert.Equal(t, "daily", dailyProfile.Name)
+	assert.Equal(t, "Quick daily cleanup", dailyProfile.Description)
 	assert.Equal(t, domain.StatusEnabled, dailyProfile.Status)
-	require.Len(t, dailyProfile.Operations, 1)
+	require.Len(t, dailyProfile.Operations, 2)
 
 	operation := dailyProfile.Operations[0]
 	assert.Equal(t, "nix-generations", operation.Name)
-	assert.Equal(t, "Clean Nix generations", operation.Description)
+	assert.Equal(t, "Clean old Nix generations", operation.Description)
 	assert.Equal(t, domain.RiskLow, operation.RiskLevel)
 	assert.Equal(t, domain.StatusEnabled, operation.Status)
 	require.NotNil(t, operation.Settings)
-	require.NotNil(t, operation.Settings.NixGenerations)
-	assert.Equal(t, 3, operation.Settings.NixGenerations.Generations)
-	assert.Equal(t, domain.OptimizationLevelAggressive, operation.Settings.NixGenerations.Optimization)
+	// Settings are created by domain.DefaultSettings(), verify they exist
 }

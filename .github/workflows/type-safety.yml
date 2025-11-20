@@ -30,7 +30,7 @@ jobs:
         # 1. Check for map[string]any violations
         echo "Checking for map[string]any violations..."
         # Get files with actual map[string]any code (not comments)
-        files_with_violations=$(grep -r "map\[string\]any" internal/ --include="*.go" --exclude-dir=vendor -l | grep -v "// TYPE-SAFE-EXEMPT")
+        files_with_violations=$(grep -r "map\[string\]any" internal/ --include="*.go" --exclude-dir=vendor -l)
         for file in $files_with_violations; do
           # Check if file has exemption marker
           if ! grep -q "TYPE-SAFE-EXEMPT" "$file"; then

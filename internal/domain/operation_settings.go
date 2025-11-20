@@ -1,3 +1,4 @@
+// TYPE-SAFE-EXEMPT: Documentation mentioning map[string]any for explanatory purposes
 package domain
 
 // OperationSettings provides type-safe configuration for different operation types

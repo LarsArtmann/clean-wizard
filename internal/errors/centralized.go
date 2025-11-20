@@ -69,6 +69,11 @@ func (deh *DefaultErrorHandler) handleByType(err error) *CleanWizardError {
 		return fsErr
 	}
 
+	networkAdapter := &NetworkErrorAdapter{}
+	if networkErr := networkAdapter.Adapt(err, "network operation"); networkErr != nil {
+		return networkErr
+	}
+
 	configAdapter := &ConfigErrorAdapter{}
 	if configErr := configAdapter.Adapt(err, "configuration"); configErr != nil {
 		return configErr
@@ -77,6 +82,16 @@ func (deh *DefaultErrorHandler) handleByType(err error) *CleanWizardError {
 	validationAdapter := &ValidationErrorAdapter{}
 	if validationErr := validationAdapter.Adapt(err, "field"); validationErr != nil {
 		return validationErr
+	}
+
+	externalToolAdapter := &ExternalToolErrorAdapter{}
+	if externalToolErr := externalToolAdapter.Adapt(err, "external tool"); externalToolErr != nil {
+		return externalToolErr
+	}
+
+	systemAdapter := &SystemErrorAdapter{}
+	if systemErr := systemAdapter.Adapt(err, "system component"); systemErr != nil {
+		return systemErr
 	}
 
 	// Default fallback
@@ -163,47 +178,47 @@ func GetCleanWizardError(err error) *CleanWizardError {
 
 // ErrorBuilder provides fluent error building
 type ErrorBuilder struct {
-	error *CleanWizardError
+	cwErr *CleanWizardError
 }
 
 // NewErrorBuilder creates a new error builder
 func NewErrorBuilder(code ErrorCode) *ErrorBuilder {
 	return &ErrorBuilder{
-		error: NewError(code, ""),
+		cwErr: NewError(code, ""),
 	}
 }
 
 // WithMessage sets the error message
 func (eb *ErrorBuilder) WithMessage(message string) *ErrorBuilder {
-	eb.error.Message = message
+	eb.cwErr.Message = message
 	return eb
 }
 
 // WithMessagef sets the error message with formatting
 func (eb *ErrorBuilder) WithMessagef(format string, args ...any) *ErrorBuilder {
-	eb.error.Message = fmt.Sprintf(format, args...)
+	eb.cwErr.Message = fmt.Sprintf(format, args...)
 	return eb
 }
 
 // WithDetails adds additional details to the error
 func (eb *ErrorBuilder) WithDetails(details any) *ErrorBuilder {
-	eb.error.Details = details
+	eb.cwErr.Details = details
 	return eb
 }
 
 // WithCause adds underlying cause to the error
 func (eb *ErrorBuilder) WithCause(cause error) *ErrorBuilder {
-	eb.error.Cause = cause
+	eb.cwErr.Cause = cause
 	return eb
 }
 
 // WithSeverity sets error severity
 func (eb *ErrorBuilder) WithSeverity(severity ErrorSeverity) *ErrorBuilder {
-	eb.error.Severity = severity
+	eb.cwErr.Severity = severity
 	return eb
 }
 
 // Build constructs the final error
 func (eb *ErrorBuilder) Build() *CleanWizardError {
-	return eb.error.WithCaller()
+	return eb.cwErr.WithCaller()
 }

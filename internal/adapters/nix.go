@@ -113,6 +113,9 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 
 // CollectGarbage removes old Nix generations using centralized conversion
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
+	// Capture start time before garbage-collection work begins
+	startTime := time.Now()
+
 	// Get store size before garbage collection
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
@@ -141,7 +144,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
-		CleanTime:    time.Since(time.Now()),
+		CleanTime:    time.Since(startTime),
 		CleanedAt:    time.Now(),
 		Strategy:     domain.StrategyAggressive,
 	}
@@ -166,6 +169,9 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 
 // RemoveGeneration removes specific Nix generation using centralized conversion
 func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[domain.CleanResult] {
+	// Capture start time before removal work begins
+	startTime := time.Now()
+
 	// Get store size before removal
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
@@ -194,7 +200,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
-		CleanTime:    time.Since(time.Now()),
+		CleanTime:    time.Since(startTime),
 		CleanedAt:    time.Now(),
 		Strategy:     domain.StrategyConservative,
 	}

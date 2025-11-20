@@ -301,6 +301,15 @@ func TestMapCleanRequestToDomain_ValidRequest(t *testing.T) {
 	if domainRequest.Items[0].Path != "temp-files" {
 		t.Errorf("Expected temp-files path, got %s", domainRequest.Items[0].Path)
 	}
+
+	// Check second operation
+	if domainRequest.Items[1].ScanType != domain.ScanTypeTempType {
+		t.Errorf("Expected ScanTypeTemp for cache-files, got %v", domainRequest.Items[1].ScanType)
+	}
+
+	if domainRequest.Items[1].Path != "cache-files" {
+		t.Errorf("Expected cache-files path, got %s", domainRequest.Items[1].Path)
+	}
 }
 
 func TestMapStrategy_Conversions(t *testing.T) {
