@@ -15,22 +15,22 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 	// Create public config
 	publicConfig := &PublicConfig{
 		Version:        "1.0.0",
-		SafeMode:       true,
+		SafetyLevel:    domain.SafetyLevelEnabled, // FIXED: Use SafetyLevel, not SafeMode
 		MaxDiskUsage:   80,
 		ProtectedPaths: []string{"/System", "/Library"},
 		Profiles: map[string]*PublicProfile{
 			"daily": {
 				Name:        "daily",
 				Description: "Daily cleanup",
-				Enabled:     true,
+				Status:      domain.StatusEnabled, // FIXED: Use Status, not Enabled
 				Operations: []PublicOperation{
 					{
 						Name:        "nix-generations",
 						Description: "Clean Nix generations",
 						RiskLevel:   PublicRiskLow,
-						Enabled:     true,
+						Status:      domain.StatusEnabled, // FIXED: Use Status, not Enabled
 						Settings: OperationSettings{
-							DryRun:              false,
+							ExecutionMode:       domain.ExecutionModeExecute, // FIXED: Use ExecutionMode, not DryRun
 							Verbose:             true,
 							TimeoutSeconds:      300,
 							ConfirmBeforeDelete: false,
@@ -60,13 +60,8 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 		t.Errorf("Expected version %s, got %s", publicConfig.Version, domainConfig.Version)
 	}
 
-	// Compare domain SafetyLevel enum with converted boolean value
-	expectedSafetyLevel := domain.SafetyLevelEnabled
-	if publicConfig.SafeMode {
-		expectedSafetyLevel = domain.SafetyLevelEnabled
-	} else {
-		expectedSafetyLevel = domain.SafetyLevelDisabled
-	}
+	// Compare domain SafetyLevel enum directly
+	expectedSafetyLevel := publicConfig.SafetyLevel // FIXED: Use SafetyLevel field directly
 
 	if domainConfig.SafetyLevel != expectedSafetyLevel {
 		t.Errorf("Expected safetyLevel %v, got %v", expectedSafetyLevel.String(), domainConfig.SafetyLevel.String())
@@ -243,20 +238,20 @@ func TestMapCleanRequestToDomain_ValidRequest(t *testing.T) {
 	publicRequest := &CleanRequest{
 		Config: PublicConfig{
 			Version:        "1.0.0",
-			SafeMode:       true,
+			SafetyLevel:    domain.SafetyLevelEnabled, // FIXED: Use SafetyLevel, not SafeMode
 			MaxDiskUsage:   80,
 			ProtectedPaths: []string{"/System"},
 			Profiles: map[string]*PublicProfile{
 				"test": {
 					Name:        "test",
 					Description: "Test profile",
-					Enabled:     true,
+					Status:      domain.StatusEnabled, // FIXED: Use Status, not Enabled
 					Operations: []PublicOperation{
 						{
 							Name:        "temp-files",
 							Description: "Clean temp files",
 							RiskLevel:   PublicRiskLow,
-							Enabled:     true,
+							Status:      domain.StatusEnabled, // FIXED: Use Status, not Enabled
 							Settings:    OperationSettings{},
 						},
 					},
@@ -403,20 +398,20 @@ func TestMapConfigToDomain_InvalidRiskLevel(t *testing.T) {
 	// Create public config with invalid risk level
 	publicConfig := &PublicConfig{
 		Version:        "1.0.0",
-		SafeMode:       true,
+		SafetyLevel:    domain.SafetyLevelEnabled,
 		MaxDiskUsage:   80,
 		ProtectedPaths: []string{"/System"},
 		Profiles: map[string]*PublicProfile{
 			"test": {
 				Name:        "test",
 				Description: "Test profile",
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Operations: []PublicOperation{
 					{
 						Name:        "test-op",
 						Description: "Test operation",
 						RiskLevel:   PublicRiskLevel("INVALID_RISK"), // Invalid risk level
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    OperationSettings{},
 					},
 				},
@@ -455,14 +450,14 @@ func TestMapConfigToDomain_ProfileValidationFailure(t *testing.T) {
 	// Create public config with invalid profile that will cause validation failure
 	publicConfig := &PublicConfig{
 		Version:        "1.0.0",
-		SafeMode:       true,
+		SafetyLevel:    domain.SafetyLevelEnabled,
 		MaxDiskUsage:   80,
 		ProtectedPaths: []string{"/System"},
 		Profiles: map[string]*PublicProfile{
 			"test": {
 				Name:        "", // Empty name should cause validation failure
 				Description: "Test profile",
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Operations:  []PublicOperation{}, // Empty operations might be valid
 			},
 		},
@@ -499,20 +494,20 @@ func TestMapConfigToDomain_DomainValidationFailure(t *testing.T) {
 	// (e.g., with invalid configuration values)
 	publicConfig := &PublicConfig{
 		Version:        "1.0.0",
-		SafeMode:       true,
+		SafetyLevel:    domain.SafetyLevelEnabled,
 		MaxDiskUsage:   -10,        // Invalid disk usage (negative)
 		ProtectedPaths: []string{}, // Empty protected paths might be invalid
 		Profiles: map[string]*PublicProfile{
 			"test": {
 				Name:        "test",
 				Description: "Test profile",
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Operations: []PublicOperation{
 					{
 						Name:        "nix-generations", // Valid operation type
 						Description: "Test operation",
 						RiskLevel:   PublicRiskLow,
-						Enabled:     true,
+						Status:      domain.StatusEnabled,
 						Settings:    OperationSettings{},
 					},
 				},
@@ -562,7 +557,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Name:        "nix-generations",
 				Description: "Clean Nix generations",
 				RiskLevel:   PublicRiskLow,
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Settings:    OperationSettings{},
 			},
 			expectedType: domain.OperationTypeNixGenerations,
@@ -574,7 +569,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Name:        "temp-files",
 				Description: "Clean temporary files",
 				RiskLevel:   PublicRiskMedium,
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Settings:    OperationSettings{},
 			},
 			expectedType: domain.OperationTypeTempFiles,
@@ -586,7 +581,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Name:        "homebrew-cleanup",
 				Description: "Clean Homebrew",
 				RiskLevel:   PublicRiskHigh,
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Settings:    OperationSettings{},
 			},
 			expectedType: domain.OperationTypeHomebrew,
@@ -598,7 +593,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Name:        "system-temp",
 				Description: "Clean system temp",
 				RiskLevel:   PublicRiskCritical,
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Settings:    OperationSettings{},
 			},
 			expectedType: "system-temp",
@@ -610,7 +605,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Name:        "unknown-operation",
 				Description: "Unknown operation",
 				RiskLevel:   PublicRiskLow,
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Settings:    OperationSettings{},
 			},
 			expectedType: domain.OperationType("unknown-operation"),
@@ -622,7 +617,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Name:        "my-custom-op",
 				Description: "My custom operation",
 				RiskLevel:   PublicRiskMedium,
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Settings:    OperationSettings{},
 			},
 			expectedType: domain.OperationType("my-custom-op"),
@@ -634,7 +629,7 @@ func TestMapOperationToDomain_OperationTypeMapping(t *testing.T) {
 				Name:        "nix-generations",
 				Description: "Clean Nix generations",
 				RiskLevel:   PublicRiskLevel("INVALID"),
-				Enabled:     true,
+				Status:      domain.StatusEnabled,
 				Settings:    OperationSettings{},
 			},
 			shouldError:   true,
