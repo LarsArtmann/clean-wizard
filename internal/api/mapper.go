@@ -59,7 +59,7 @@ func MapConfigToPublic(domainConfig *domain.Config) result.Result[*PublicConfig]
 
 	publicConfig := &PublicConfig{
 		Version:        domainConfig.Version,
-		SafeMode:       safetyLevelToBool(domainConfig.SafetyLevel),
+		SafetyLevel:    domainConfig.SafetyLevel, // FIXED: Use SafetyLevel field, not SafeMode
 		MaxDiskUsage:   int32(domainConfig.MaxDiskUsage),
 		ProtectedPaths: domainConfig.Protected,
 		Profiles:       publicProfiles,
@@ -107,7 +107,7 @@ func MapProfileToPublic(domainProfile *domain.Profile) *PublicProfile {
 	return &PublicProfile{
 		Name:        domainProfile.Name,
 		Description: domainProfile.Description,
-		Enabled:     statusToBool(domainProfile.Status),
+		Status:      domainProfile.Status, // FIXED: Use Status field, not Enabled
 		Operations:  publicOperations,
 	}
 }
@@ -156,7 +156,7 @@ func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOpera
 		Name:        domainOperation.Name,
 		Description: domainOperation.Description,
 		RiskLevel:   MapRiskLevelToPublic(domainOperation.RiskLevel),
-		Enabled:     statusToBool(domainOperation.Status),
+		Status:      domainOperation.Status, // FIXED: Use Status field, not Enabled
 		Settings:    publicSettings,
 	}
 }
@@ -165,7 +165,7 @@ func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOpera
 func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationSettings {
 	// Default values for simplified public API
 	publicSettings := OperationSettings{
-		DryRun:              true, // Safe default
+		ExecutionMode:       domain.ExecutionModeDryRun, // Safe default
 		Verbose:             false,
 		TimeoutSeconds:      300, // 5 minutes
 		ConfirmBeforeDelete: false,
@@ -173,7 +173,7 @@ func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationS
 
 	// Extract relevant values from domain-specific settings
 	if settings.NixGenerations != nil {
-		publicSettings.DryRun = false // Nix operations default to false
+		publicSettings.ExecutionMode = domain.ExecutionModeExecute // Nix operations default to execute
 		if settings.NixGenerations.Optimization != domain.OptimizationLevelNone {
 			publicSettings.Verbose = true
 		}

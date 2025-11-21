@@ -810,4 +810,57 @@ func (sl *SafetyLevelType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// ExecutionModeType represents operation execution modes with compile-time safety
+// Replaces boolean DryRun to eliminate invalid states
+type ExecutionModeType int
+
+const (
+	ExecutionModeDryRun ExecutionModeType = iota
+	ExecutionModeSimulate
+	ExecutionModeExecute
+	ExecutionModeForce
+)
+
+// executionModeTypeHelper provides shared functionality for ExecutionModeType
+var executionModeTypeHelper = NewEnumHelper(map[ExecutionModeType]string{
+	ExecutionModeDryRun:   "dry-run",
+	ExecutionModeSimulate: "simulate",
+	ExecutionModeExecute:  "execute",
+	ExecutionModeForce:    "force",
+}, func(em ExecutionModeType) bool {
+	return em >= ExecutionModeDryRun && em <= ExecutionModeForce
+}, func() []ExecutionModeType {
+	return []ExecutionModeType{ExecutionModeDryRun, ExecutionModeSimulate, ExecutionModeExecute, ExecutionModeForce}
+}, false)
+
+// String returns string representation
+func (em ExecutionModeType) String() string {
+	return executionModeTypeHelper.String(em)
+}
+
+// IsValid checks if execution mode is valid
+func (em ExecutionModeType) IsValid() bool {
+	return executionModeTypeHelper.IsValid(em)
+}
+
+// Values returns all possible execution mode values
+func (em ExecutionModeType) Values() []ExecutionModeType {
+	return executionModeTypeHelper.Values()
+}
+
+// MarshalJSON converts execution mode to JSON string
+func (em ExecutionModeType) MarshalJSON() ([]byte, error) {
+	return executionModeTypeHelper.MarshalJSONImpl(em)
+}
+
+// UnmarshalJSON converts JSON string to execution mode
+func (em *ExecutionModeType) UnmarshalJSON(data []byte) error {
+	val, err := executionModeTypeHelper.UnmarshalJSONImpl(data)
+	if err != nil {
+		return err
+	}
+	*em = val
+	return nil
+}
+
 // Convenience constants for backward compatibility are now in types.go
