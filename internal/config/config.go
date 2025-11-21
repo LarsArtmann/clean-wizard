@@ -40,6 +40,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	setupDefaults(v)
 
 	// Try to read configuration file using helper function
+	configExists := true
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -47,6 +48,31 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		if err := readConfigFile(v); err != nil {
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
+		
+		// Check if config file was actually found
+		if v.ConfigFileUsed() == "" {
+			configExists = false
+		}
+	}
+
+	// If no config exists, create default configuration
+	if !configExists {
+		log.Info().Msg("Configuration file not found, creating default configuration")
+		defaultConfig, err := domain.CreateDefaultConfig()
+		if err != nil {
+			return nil, fmt.Errorf("failed to create default config: %w", err)
+		}
+		
+		// Save default config for user
+		defaultConfigPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
+		if err := SaveConfigToFile(defaultConfig, defaultConfigPath); err != nil {
+			log.Warn().Err(err).Msg("Failed to save default configuration")
+			// Continue anyway - we have working config in memory
+		} else {
+			log.Info().Str("path", defaultConfigPath).Msg("Default configuration created successfully")
+		}
+		
+		return defaultConfig, nil
 	}
 
 	// Unmarshal profiles section
@@ -85,8 +111,23 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 	default:
 		if err := v.ReadInConfig(); err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-				// Config file not found, return default config
-				return GetDefaultConfig(), nil
+				// Config file not found, create and return working default config
+				log.Info().Msg("Configuration file not found, creating default configuration")
+				defaultConfig, err := domain.CreateDefaultConfig()
+				if err != nil {
+					return nil, fmt.Errorf("failed to create default config: %w", err)
+				}
+				
+				// Save default config for user
+				if configPath != "" {
+					if err := SaveConfigToFile(defaultConfig, configPath); err != nil {
+						log.Warn().Err(err).Msg("Failed to save default configuration")
+					} else {
+						log.Info().Str("path", configPath).Msg("Default configuration created successfully")
+					}
+				}
+				
+				return defaultConfig, nil
 			}
 			return nil, pkgerrors.HandleConfigError("LoadWithContextAndPath", err)
 		}
@@ -101,6 +142,27 @@ func LoadWithContextAndPath(ctx context.Context, configPath string) (*domain.Con
 	}
 
 	return &config, nil
+}
+
+// SaveConfigToFile saves configuration to a specific file path
+func SaveConfigToFile(config *domain.Config, configPath string) error {
+	v := viper.New()
+
+	// Set configuration file properties
+	v.SetConfigFile(configPath)
+
+	// Set configuration values
+	v.Set("version", config.Version)
+	v.Set("safety_level", config.SafetyLevel.String())
+	v.Set("max_disk_usage", config.MaxDiskUsage)
+	v.Set("protected", config.Protected)
+	v.Set("current_profile", config.CurrentProfile)
+	v.Set("last_clean", config.LastClean)
+	v.Set("updated", config.Updated)
+	v.Set("profiles", config.Profiles)
+
+	// Write configuration file
+	return v.WriteConfig()
 }
 
 // Save saves the configuration to file

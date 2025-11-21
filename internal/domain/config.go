@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -22,22 +23,135 @@ type Config struct {
 	Updated        time.Time           `json:"updated" yaml:"updated"`
 }
 
-// TODO: Add type-safe constructor with validation
-func NewConfig(version string, safetyLevel SafetyLevelType, maxDiskUsage MaxDiskUsage) (*Config, error) {
-	if !maxDiskUsage.IsValid() {
-		return nil, fmt.Errorf("invalid max disk usage: %d", maxDiskUsage.Uint8())
+// CreateDefaultConfig creates a working default configuration
+// This eliminates the #1 user barrier: manual configuration requirements
+func CreateDefaultConfig() (*Config, error) {
+	// Create type-safe values
+	maxDiskUsage, err := NewMaxDiskUsage(50) // Conservative 50% disk usage limit
+	if err != nil {
+		return nil, fmt.Errorf("failed to create max disk usage: %w", err)
 	}
 
-	// TODO: Add complete validation for all fields
-	return &Config{
-		Version:      version,
-		SafetyLevel:  safetyLevel,
-		MaxDiskUsage: int(maxDiskUsage.Uint8()),                        // TODO: Remove type conversion
-		Protected:    []string{"/System", "/Applications", "/Library"}, // TODO: Use ProtectedPaths
-		Profiles:     make(map[string]*Profile),
-		LastClean:    time.Now(),
-		Updated:      time.Now(),
-	}, nil
+	currentProfile, err := NewProfileName("daily")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create current profile name: %w", err)
+	}
+
+	quickProfile, err := NewProfileName("quick")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create quick profile name: %w", err)
+	}
+
+	comprehensiveProfile, err := NewProfileName("comprehensive")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create comprehensive profile name: %w", err)
+	}
+
+	config := &Config{
+		Version:      "1.0.0",
+		SafetyLevel:  SafetyLevelEnabled, // Safe by default
+		MaxDiskUsage: int(maxDiskUsage.Uint8()),
+		Protected: []string{
+			"/System",
+			"/Applications", 
+			"/Library",
+			"/usr/local",
+			"/Users/*/Documents",
+			"/Users/*/Desktop",
+		},
+		CurrentProfile: currentProfile.String(),
+		LastClean:      time.Now(),
+		Updated:        time.Now(),
+		Profiles: make(map[string]*Profile),
+	}
+
+	// Create default profiles with working operations
+	config.Profiles["quick"] = &Profile{
+		Name:        quickProfile.String(),
+		Description: "Quick daily cleanup (safe operations only)",
+		Status:      StatusEnabled,
+		Operations: []CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Remove old Nix store generations",
+				RiskLevel:   RiskLow,
+				Status:      StatusEnabled,
+			},
+			{
+				Name:        "temp-files", 
+				Description: "Clean temporary files from user directories",
+				RiskLevel:   RiskLow,
+				Status:      StatusEnabled,
+			},
+		},
+	}
+
+	config.Profiles["comprehensive"] = &Profile{
+		Name:        comprehensiveProfile.String(),
+		Description: "Comprehensive system cleanup with development tools",
+		Status:      StatusEnabled,
+		Operations: []CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Remove old Nix store generations", 
+				RiskLevel:   RiskLow,
+				Status:      StatusEnabled,
+			},
+			{
+				Name:        "homebrew",
+				Description: "Homebrew cleanup, autoremove and cache cleaning",
+				RiskLevel:   RiskMedium,
+				Status:      StatusEnabled,
+			},
+			{
+				Name:        "npm-cache",
+				Description: "Node.js npm cache cleanup",
+				RiskLevel:   RiskLow,
+				Status:      StatusEnabled,
+			},
+			{
+				Name:        "pnpm-store",
+				Description: "pnpm store cleanup",
+				RiskLevel:   RiskLow,
+				Status:      StatusEnabled,
+			},
+			{
+				Name:        "go-cache",
+				Description: "Go build and module cache cleanup", 
+				RiskLevel:   RiskLow,
+				Status:      StatusEnabled,
+			},
+			{
+				Name:        "cargo-cache",
+				Description: "Rust Cargo cache cleanup",
+				RiskLevel:   RiskLow,
+				Status:      StatusEnabled,
+			},
+			{
+				Name:        "temp-files",
+				Description: "System and user temporary file cleanup",
+				RiskLevel:   RiskLow,
+				Status:      StatusEnabled,
+			},
+			{
+				Name:        "docker",
+				Description: "Docker system cleanup (containers, images, volumes)",
+				RiskLevel:   RiskMedium,
+				Status:      StatusDisabled, // Disabled by default for safety
+			},
+		},
+	}
+
+	return config, nil
+}
+
+// ShouldCreateDefaultConfig determines if default config should be created
+func ShouldCreateDefaultConfig(configPath string) bool {
+	// Check if config file exists
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		return true
+	}
+	return false
 }
 
 // IsValid validates configuration
