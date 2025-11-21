@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/config"
+	"github.com/LarsArtmann/clean-wizard/internal/application/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/spf13/cobra"
 )

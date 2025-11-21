@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/config"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/cleaners"
+	"github.com/LarsArtmann/clean-wizard/internal/application/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/format"
-	"github.com/LarsArtmann/clean-wizard/internal/middleware"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/format"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/middleware"
 	"github.com/spf13/cobra"
 )
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands"
-	"github.com/LarsArtmann/clean-wizard/internal/config"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
