@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // TODO: CRITICAL - Continue migrating remaining functions to domain-specific factory files:
@@ -44,7 +44,7 @@ func createWhitespacedConfigForSanitizer() *domain.Config {
 // createWhitespacedConfigWithOptions creates a config with configurable whitespace issues
 func createWhitespacedConfigWithOptions(minimal bool) *domain.Config {
 	baseConfig := &domain.Config{
-		SafetyLevel: domain.SafetyLevelEnabled,
+		SafetyLevel:  domain.SafetyLevelEnabled,
 		MaxDiskUsage: 50,
 		LastClean:    time.Now(),
 		Updated:      time.Now(),
@@ -69,7 +69,7 @@ func createWhitespacedConfigWithOptions(minimal bool) *domain.Config {
 			},
 		}
 	} else {
-		baseConfig.Version = " 1.0.0 " // Extra spaces
+		baseConfig.Version = " 1.0.0 "                           // Extra spaces
 		baseConfig.Protected = []string{"/System ", " /Library"} // Trailing/leading spaces
 		baseConfig.Profiles = map[string]*domain.Profile{
 			"daily": { // Normal key - sanitizer should clean up name field inside
@@ -101,8 +101,8 @@ func GetStandardTestCases() []CommonTestConfiguration {
 			expectedWarnings: 0,
 		},
 		{
-			name: "max disk usage clamping",
-			config: factories.CreateValidationTestConfigs()["valid"],
+			name:             "max disk usage clamping",
+			config:           factories.CreateValidationTestConfigs()["invalid_high_disk"],
 			expectedChanges:  []string{"max_disk_usage"},
 			expectedWarnings: 1,
 		},

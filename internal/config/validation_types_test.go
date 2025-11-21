@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -16,7 +17,7 @@ type TestValidationLevelTestCase struct {
 // CreateTestConfigurations creates test configurations for validation testing
 // Note: Delegates to shared factory in test_data.go to eliminate duplication
 func CreateTestConfigurations() map[string]*domain.Config {
-	return CreateValidationTestConfigs()
+	return factories.CreateValidationTestConfigs()
 }
 
 // GetSanitizationTestCases returns all sanitization test cases

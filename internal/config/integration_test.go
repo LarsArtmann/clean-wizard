@@ -2,13 +2,15 @@ package config
 
 import (
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
 )
 
 // TestIntegration_ValidationSanitizationPipeline tests complete validation and sanitization workflow
 func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 	t.Run("Complete pipeline with complex configuration", func(t *testing.T) {
 		// Create complex configuration that exercises all validation paths
-		cfg := CreateIntegrationConfig()
+		cfg := factories.CreateIntegrationConfig()
 
 		// Step 1: Sanitization (run first to clean data)
 		sanitizer := NewConfigSanitizer()

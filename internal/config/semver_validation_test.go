@@ -3,6 +3,7 @@ package config
 import (
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -43,7 +44,7 @@ func TestIsValidSemver(t *testing.T) {
 // createTestConfig creates a test configuration with the specified version
 // Note: Delegates to shared factory in test_data.go to eliminate duplication
 func createTestConfig(version string) *domain.Config {
-	return CreateSemverTestConfig(version)
+	return factories.CreateSemverTestConfig(version)
 }
 
 // assertValidationErrorForField asserts that validation contains a specific error for given field and rule
@@ -69,7 +70,7 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 	cv := NewConfigValidator()
 
 	t.Run("Valid semver version", func(t *testing.T) {
-		cfg := CreateSemverTestConfig("1.2.3")
+		cfg := factories.CreateSemverTestConfig("1.2.3")
 		result := cv.ValidateConfig(cfg)
 		if len(result.Errors) != 0 {
 			t.Errorf("Expected no validation errors for valid semver, got: %v", result.Errors)
@@ -77,13 +78,13 @@ func TestBasicStructureValidation_Semver(t *testing.T) {
 	})
 
 	t.Run("Invalid semver version", func(t *testing.T) {
-		cfg := CreateSemverTestConfig("invalid.version.format")
+		cfg := factories.CreateSemverTestConfig("invalid.version.format")
 		result := cv.ValidateConfig(cfg)
 		assertValidationErrorForField(t, result, "version", "semver_format")
 	})
 
 	t.Run("Missing version", func(t *testing.T) {
-		cfg := CreateSemverTestConfig("")
+		cfg := factories.CreateSemverTestConfig("")
 		result := cv.ValidateConfig(cfg)
 		assertValidationErrorForField(t, result, "version", "required")
 	})

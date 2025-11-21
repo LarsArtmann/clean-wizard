@@ -51,8 +51,8 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 	minUsage := 10
 	maxUsage := 95
 	minPaths := 1
-	maxProfiles := MaxProfiles
-	maxOps := MaxOperations
+	maxProfiles := MaxProfiles // Use proper constant
+	maxOps := MaxOperations // Use proper constant
 
 	return &TypeSafeValidationRules{
 		MaxDiskUsage: &NumericValidationRule{
@@ -81,32 +81,6 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 			Pattern:  "^[a-zA-Z0-9_-]+$",
 			Message:  "Profile names must be alphanumeric with underscores and hyphens",
 		},
-		PathPattern: &StringValidationRule{
-			Required: true,
-			Pattern:  "^/.*",
-			Message:  "Paths must be absolute (starting with '/')",
-		},
-		UniquePaths:    true,
-		UniqueProfiles: true,
-		ProtectedSystemPaths: []string{
-			"/",
-			"/System",
-			"/Applications",
-			"/Library",
-			"/usr",
-			"/etc",
-			"/var",
-			"/bin",
-			"/sbin",
-		},
-		DefaultProtectedPaths: []string{
-			"/System",
-			"/Applications",
-			"/Library",
-		},
-		RequireSafeMode: true,
-		MaxRiskLevel:    domain.RiskHigh,
-		BackupRequired:  domain.RiskMedium,
 	}
 }
 
@@ -114,11 +88,19 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidationRules {
 	// Deep copy to prevent external modifications
 	copied := &TypeSafeValidationRules{
-		UniquePaths:     tsvr.UniquePaths,
-		UniqueProfiles:  tsvr.UniqueProfiles,
-		RequireSafeMode: tsvr.RequireSafeMode,
-		MaxRiskLevel:    tsvr.MaxRiskLevel,
-		BackupRequired:  tsvr.BackupRequired,
+		MaxDiskUsage:      tsvr.copyNumericRule(tsvr.MaxDiskUsage),
+		MinProtectedPaths: tsvr.copyNumericRule(tsvr.MinProtectedPaths),
+		MaxProfiles:       tsvr.copyNumericRule(tsvr.MaxProfiles),
+		MaxOperations:     tsvr.copyNumericRule(tsvr.MaxOperations),
+		ProfileNamePattern: tsvr.copyStringRule(tsvr.ProfileNamePattern),
+		PathPattern:        tsvr.copyStringRule(tsvr.PathPattern),
+		UniquePaths:       tsvr.UniquePaths,
+		UniqueProfiles:    tsvr.UniqueProfiles,
+		ProtectedSystemPaths:  make([]string, 0),
+		DefaultProtectedPaths: make([]string, 0),
+		RequireSafeMode:    tsvr.RequireSafeMode,
+		MaxRiskLevel:       tsvr.copyRiskLevel(tsvr.MaxRiskLevel),
+		BackupRequired:      tsvr.copyRiskLevel(tsvr.BackupRequired),
 	}
 
 	// Deep copy slices
@@ -132,33 +114,14 @@ func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidatio
 		copy(copied.DefaultProtectedPaths, tsvr.DefaultProtectedPaths)
 	}
 
-	// Deep copy numeric rules
-	if tsvr.MaxDiskUsage != nil {
-		copied.MaxDiskUsage = tsvr.copyNumericRule(tsvr.MaxDiskUsage)
-	}
-	if tsvr.MinProtectedPaths != nil {
-		copied.MinProtectedPaths = tsvr.copyNumericRule(tsvr.MinProtectedPaths)
-	}
-	if tsvr.MaxProfiles != nil {
-		copied.MaxProfiles = tsvr.copyNumericRule(tsvr.MaxProfiles)
-	}
-	if tsvr.MaxOperations != nil {
-		copied.MaxOperations = tsvr.copyNumericRule(tsvr.MaxOperations)
-	}
-
-	// Deep copy string rules
-	if tsvr.ProfileNamePattern != nil {
-		copied.ProfileNamePattern = tsvr.copyStringRule(tsvr.ProfileNamePattern)
-	}
-	if tsvr.PathPattern != nil {
-		copied.PathPattern = tsvr.copyStringRule(tsvr.PathPattern)
-	}
-
 	return copied
 }
 
 // Helper methods for deep copying
 func (tsvr *TypeSafeValidationRules) copyNumericRule(rule *NumericValidationRule) *NumericValidationRule {
+	if rule == nil {
+		return nil
+	}
 	copied := &NumericValidationRule{
 		Required: rule.Required,
 		Message:  rule.Message,
@@ -175,9 +138,16 @@ func (tsvr *TypeSafeValidationRules) copyNumericRule(rule *NumericValidationRule
 }
 
 func (tsvr *TypeSafeValidationRules) copyStringRule(rule *StringValidationRule) *StringValidationRule {
+	if rule == nil {
+		return nil
+	}
 	return &StringValidationRule{
 		Required: rule.Required,
 		Pattern:  rule.Pattern,
 		Message:  rule.Message,
 	}
+}
+
+func (tsvr *TypeSafeValidationRules) copyRiskLevel(level domain.RiskLevelType) domain.RiskLevelType {
+	return level
 }

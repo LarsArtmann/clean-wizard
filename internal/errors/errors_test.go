@@ -223,7 +223,7 @@ func TestDefaultErrorHandler_Handle(t *testing.T) {
 
 // simulateInlineRecover simulates handler.Recover() logic inline for testing
 // Eliminates duplication from panic test scenarios
-func simulateInlineRecover(panicValue interface{}) *CleanWizardError {
+func simulateInlineRecover(panicValue any) *CleanWizardError {
 	var recovered *CleanWizardError
 	func() {
 		defer func() {

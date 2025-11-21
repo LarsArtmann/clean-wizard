@@ -3,6 +3,7 @@ package config
 import (
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -45,25 +46,25 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 		expectError string
 	}{
 		{
-			name: "valid config",
-			config: CreateValidationTestConfig("1.0.0", 50, []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin"}),
+			name:        "valid config",
+			config:      factories.CreateValidationTestConfig("1.0.0", 50, []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin"}),
 			expectValid: true,
 		},
 		{
-			name: "invalid max disk usage",
-			config: CreateValidationTestConfig("1.0.0", 150, []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"}), // Invalid: > 95
+			name:        "invalid max disk usage",
+			config:      factories.CreateValidationTestConfig("1.0.0", 150, []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"}), // Invalid: > 95
 			expectValid: false,
 			expectError: "max_disk_usage",
 		},
 		{
-			name: "missing version",
-			config: CreateValidationTestConfig("", 50, []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"}),
+			name:        "missing version",
+			config:      factories.CreateValidationTestConfig("", 50, []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"}),
 			expectValid: false,
 			expectError: "version",
 		},
 		{
-			name: "empty protected paths",
-			config: CreateValidationTestConfig("1.0.0", 50, []string{}),
+			name:        "empty protected paths",
+			config:      factories.CreateValidationTestConfig("1.0.0", 50, []string{}),
 			expectValid: false,
 			expectError: "protected",
 		},

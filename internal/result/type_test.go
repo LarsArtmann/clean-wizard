@@ -48,8 +48,8 @@ func testResultMethod(t *testing.T, methodName string, methodFunc func(Result[in
 	}
 }
 
-// testResultMethodWithPanic tests a method that may panic on Result type
-func testResultMethodWithPanic[T comparable](t *testing.T, methodName string, methodFunc func(Result[int]) T, okResult T, errResult T, okWantPanic, errWantPanic bool) {
+// runMethodTestWithPanic tests a method that may panic on Result type
+func runMethodTestWithPanic[T comparable](t *testing.T, methodName string, methodFunc func(Result[int]) T, okResult, errResult T, okWantPanic, errWantPanic bool) {
 	tests := []struct {
 		name      string
 		result    Result[int]
@@ -92,6 +92,34 @@ func testResultMethodWithPanic[T comparable](t *testing.T, methodName string, me
 	}
 }
 
+// runMethodTest tests a simple method on Result type
+func runMethodTest[T comparable](t *testing.T, methodName string, methodFunc func(Result[int]) T, okResult, errResult T) {
+	tests := []struct {
+		name     string
+		result   Result[int]
+		expected T
+	}{
+		{
+			name:     "ok result",
+			result:   Ok(42),
+			expected: okResult,
+		},
+		{
+			name:     "error result",
+			result:   Err[int](errors.New("test error")),
+			expected: errResult,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if methodFunc(tt.result) != tt.expected {
+				t.Errorf("%s() = %v, want %v", methodName, methodFunc(tt.result), tt.expected)
+			}
+		})
+	}
+}
+
 func TestResult_Ok(t *testing.T) {
 	testResultMethod(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, true, false)
 }
@@ -101,7 +129,7 @@ func TestResult_IsErr(t *testing.T) {
 }
 
 func TestResult_Value(t *testing.T) {
-	testResultMethodWithPanic(t, "Value", func(r Result[int]) int { return r.Value() }, 42, 0, false, true)
+	runMethodTestWithPanic(t, "Value", func(r Result[int]) int { return r.Value() }, 42, 0, false, true)
 }
 
 func TestResult_Error(t *testing.T) {
@@ -141,6 +169,49 @@ func TestResult_Error(t *testing.T) {
 			err := tt.result.Error()
 			if !tt.wantPanic && !strings.Contains(err.Error(), tt.expected) {
 				t.Errorf("Error() = %v, want to contain %v", err.Error(), tt.expected)
+			}
+		})
+	}
+}
+
+// runErrorMethodTest tests the Error() method using common test scaffolding
+func runErrorMethodTest(t *testing.T, methodFunc func(Result[int]) string) {
+	tests := []struct {
+		name      string
+		result    Result[int]
+		expected  string
+		wantPanic bool
+	}{
+		{
+			name:      "ok result",
+			result:    Ok(42),
+			wantPanic: true,
+		},
+		{
+			name:      "error result",
+			result:    Err[int](errors.New("test error")),
+			expected:  "test error",
+			wantPanic: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r != nil {
+					if !tt.wantPanic {
+						t.Errorf("unexpected panic: %v", r)
+					}
+				} else {
+					if tt.wantPanic {
+						t.Error("expected panic but got none")
+					}
+				}
+			}()
+
+			result := methodFunc(tt.result)
+			if !tt.wantPanic && !strings.Contains(result, tt.expected) {
+				t.Errorf("Error() = %v, want to contain %v", result, tt.expected)
 			}
 		})
 	}

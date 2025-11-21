@@ -27,12 +27,12 @@ func NewConfig(version string, safetyLevel SafetyLevelType, maxDiskUsage MaxDisk
 	if !maxDiskUsage.IsValid() {
 		return nil, fmt.Errorf("invalid max disk usage: %d", maxDiskUsage.Uint8())
 	}
-	
+
 	// TODO: Add complete validation for all fields
 	return &Config{
 		Version:      version,
 		SafetyLevel:  safetyLevel,
-		MaxDiskUsage: int(maxDiskUsage.Uint8()), // TODO: Remove type conversion
+		MaxDiskUsage: int(maxDiskUsage.Uint8()),                        // TODO: Remove type conversion
 		Protected:    []string{"/System", "/Applications", "/Library"}, // TODO: Use ProtectedPaths
 		Profiles:     make(map[string]*Profile),
 		LastClean:    time.Now(),

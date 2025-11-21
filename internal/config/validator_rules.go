@@ -115,6 +115,11 @@ func getDefaultValidationRules() *ConfigValidationRules {
 			Pattern:  "^[a-zA-Z0-9_-]+$",
 			Message:  "Profile names must be alphanumeric with underscores and hyphens",
 		},
+		PathPattern: &ValidationRule[string]{
+			Required: true,
+			Pattern:  "^/.*",
+			Message:  "Paths must be absolute (starting with '/')",
+		},
 		UniquePaths:    true,
 		UniqueProfiles: true,
 		ProtectedSystemPaths: []string{

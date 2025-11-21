@@ -31,7 +31,7 @@ var (
 
 // TODO: CRITICAL TYPE SAFETY IMPROVEMENTS NEEDED:
 // 1. Replace all primitive types in domain structs with these value types
-// 2. Add compile-time validation for all domain entities  
+// 2. Add compile-time validation for all domain entities
 // 3. Implement phantom types for state machines
 // 4. Make invalid states unrepresentable
 // 5. Add proper uint usage throughout codebase

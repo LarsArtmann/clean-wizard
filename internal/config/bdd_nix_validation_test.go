@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -109,8 +110,8 @@ func newBaseNixConfig(t *testing.T, safeMode bool) *domain.Config {
 // Note: Uses shared helper from test_data.go to eliminate duplication
 func withGenerations(t *testing.T, cfg *domain.Config, generations int) *domain.Config {
 	t.Helper()
-	
-	if err := SetNixGenerationsCount(cfg, generations); err != nil {
+
+	if err := factories.SetNixGenerationsCount(cfg, generations); err != nil {
 		t.Fatalf("FAILED: %v", err)
 	}
 	return cfg
@@ -153,7 +154,7 @@ func withOptimize(t *testing.T, cfg *domain.Config, optimize bool) *domain.Confi
 		optimizationLevel = domain.OptimizationLevelNone
 	}
 
-	if err := SetNixGenerationsOptimization(cfg, optimizationLevel); err != nil {
+	if err := factories.SetNixGenerationsOptimization(cfg, optimizationLevel); err != nil {
 		t.Fatalf("FAILED: %v", err)
 	}
 	return cfg

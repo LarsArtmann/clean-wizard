@@ -68,20 +68,20 @@ func NewCleanCommand() *cobra.Command {
 				}
 			}
 
-		// Resolve profile to use
-		usedProfile, err := ResolveProfile(loadedCfg, profileName)
-		if err != nil && profileName != "" {
-			return err
-		}
-
-		// Fallback: try daily profile if ResolveProfile failed
-		if err != nil && loadedCfg != nil {
-			if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Status == domain.StatusEnabled {
-				fmt.Printf("📋 Using daily profile configuration\n")
-				usedProfile = dailyProfile
-				err = nil
+			// Resolve profile to use
+			usedProfile, err := ResolveProfile(loadedCfg, profileName)
+			if err != nil && profileName != "" {
+				return err
 			}
-		}
+
+			// Fallback: try daily profile if ResolveProfile failed
+			if err != nil && loadedCfg != nil {
+				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Status == domain.StatusEnabled {
+					fmt.Printf("📋 Using daily profile configuration\n")
+					usedProfile = dailyProfile
+					err = nil
+				}
+			}
 
 			// Extract settings from profile if available
 			var settings *domain.OperationSettings

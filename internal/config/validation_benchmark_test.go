@@ -3,8 +3,8 @@ package config
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // CreateBenchmarkConfig alias for test compatibility

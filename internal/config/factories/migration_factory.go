@@ -38,15 +38,15 @@ func CreateSemverTestConfig(version string) *domain.Config {
 	}
 }
 
-// CreateIntegrationConfig creates dirty config for sanitization testing  
+// CreateIntegrationConfig creates dirty config for sanitization testing
 // Original location: internal/config/test_data.go lines 342-390
 func CreateIntegrationConfig() *domain.Config {
 	cfg := CreateBenchmarkConfig()
 	// Add integration test specific modifications
 	cfg.MaxDiskUsage = 85
-	cfg.Version = " 1.0.0  " // whitespace for sanitization testing
+	cfg.Version = " 1.0.0  "                         // whitespace for sanitization testing
 	cfg.Protected = append(cfg.Protected, "/System") // duplicate for testing
-	
+
 	// Add whitespace to profile names for sanitization testing
 	if daily, exists := cfg.Profiles["daily"]; exists {
 		daily.Name = "  Daily Cleanup  "
@@ -66,27 +66,19 @@ func CreateIntegrationConfig() *domain.Config {
 			}
 		}
 	}
-	
+
 	if weekly, exists := cfg.Profiles["weekly"]; exists {
 		weekly.Name = "Weekly Deep Cleanup"
 		weekly.Description = "Weekly deep cleanup operations"
 	}
-	
+
 	return cfg
 }
 
 // CreateValidationTestConfig creates a standard test configuration for validation testing
 // Original location: internal/config/test_data.go lines 390-397
 func CreateValidationTestConfig(version string, maxDiskUsage int, protected []string) *domain.Config {
-	return &domain.Config{
-		Version:      version,
-		SafetyLevel:  domain.SafetyLevelEnabled,
-		MaxDiskUsage: maxDiskUsage,
-		Protected:    protected,
-		Profiles: map[string]*domain.Profile{
-			"daily": CreateStandardProfile(),
-		},
-	}
+	return CreateBaseConfig(version, maxDiskUsage, protected)
 }
 
 // ValidateNixGenerationsOperation validates nix-generations operation settings

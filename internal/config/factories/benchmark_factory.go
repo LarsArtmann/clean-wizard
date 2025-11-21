@@ -21,13 +21,13 @@ func CreateBenchmarkConfig() *domain.Config {
 // CreateValidationTestConfigs creates test configurations specifically for validation testing
 func CreateValidationTestConfigs() map[string]*domain.Config {
 	return map[string]*domain.Config{
-		"valid": createBaseConfig("1.0.0", 50, []string{"/System", "/Library", "/Applications"}),
-		"invalid_high_disk": createBaseConfig("1.0.0", 150, []string{"/System"}), // Invalid: too high
+		"valid":             CreateBaseConfig("1.0.0", 50, []string{"/System", "/Library", "/Applications"}),
+		"invalid_high_disk": CreateBaseConfig("1.0.0", 150, []string{"/System"}), // Invalid: too high
 	}
 }
 
-// createBaseConfig creates a base configuration with standard settings
-func createBaseConfig(version string, maxDiskUsage int, protected []string) *domain.Config {
+// CreateBaseConfig creates a base configuration with standard settings
+func CreateBaseConfig(version string, maxDiskUsage int, protected []string) *domain.Config {
 	return &domain.Config{
 		Version:      version,
 		SafetyLevel:  domain.SafetyLevelEnabled,

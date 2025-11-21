@@ -82,7 +82,7 @@ func (hc *HTTPClient) doRequest(ctx context.Context, method, url string, body an
 	if err != nil {
 		return nil, err
 	}
-	
+
 	bodyBytes := resp.Body()
 	return &HTTPResponse{
 		StatusCode: resp.StatusCode(),
