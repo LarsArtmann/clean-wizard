@@ -64,6 +64,11 @@ func (nc *NpmCleaner) GetCacheSize(ctx context.Context) int64 {
 	return 0
 }
 
+// GetStoreSize implements domain.Cleaner interface
+func (nc *NpmCleaner) GetStoreSize(ctx context.Context) int64 {
+	return nc.GetCacheSize(ctx)
+}
+
 // ValidateSettings validates npm cleaner settings with type safety
 func (nc *NpmCleaner) ValidateSettings(settings *domain.OperationSettings) error {
 	if settings == nil {

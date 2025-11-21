@@ -57,6 +57,11 @@ func (pc *PnpmCleaner) GetCacheSize(ctx context.Context) int64 {
 	return size
 }
 
+// GetStoreSize implements domain.Cleaner interface
+func (pc *PnpmCleaner) GetStoreSize(ctx context.Context) int64 {
+	return pc.GetCacheSize(ctx)
+}
+
 // ValidateSettings validates pnpm cleaner settings with type safety
 func (pc *PnpmCleaner) ValidateSettings(settings *domain.OperationSettings) error {
 	if settings == nil {

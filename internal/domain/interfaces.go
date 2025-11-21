@@ -1,12 +1,16 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
+)
 
 // Cleaner interface for all cleaning operations with type-safe settings
 type Cleaner interface {
 	IsAvailable(ctx context.Context) bool
 	GetStoreSize(ctx context.Context) int64
 	ValidateSettings(settings *OperationSettings) error
+	Cleanup(ctx context.Context, settings *OperationSettings) result.Result[CleanResult]
 }
 
 // Cleaner interface for generation-based cleaners (Nix)

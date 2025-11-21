@@ -76,6 +76,16 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	return nc.adapter.ListGenerations(ctx)
 }
 
+// Cleanup performs Nix cleanup using interface
+func (nc *NixCleaner) Cleanup(ctx context.Context, settings *domain.OperationSettings) result.Result[domain.CleanResult] {
+	// Use default keep count if not specified
+	keepCount := 3
+	if settings != nil && settings.NixGenerations != nil {
+		keepCount = settings.NixGenerations.Generations
+	}
+	return nc.CleanOldGenerations(ctx, keepCount)
+}
+
 // CleanOldGenerations removes old Nix generations using centralized conversions
 func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) result.Result[domain.CleanResult] {
 	// Get generations first

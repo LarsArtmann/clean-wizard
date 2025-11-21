@@ -53,6 +53,11 @@ func (tfc *TempFileCleaner) GetCacheSize(ctx context.Context) int64 {
 	return totalSize
 }
 
+// GetStoreSize implements domain.Cleaner interface
+func (tfc *TempFileCleaner) GetStoreSize(ctx context.Context) int64 {
+	return tfc.GetCacheSize(ctx)
+}
+
 // ValidateSettings validates temp file cleaner settings with type safety
 func (tfc *TempFileCleaner) ValidateSettings(settings *domain.OperationSettings) error {
 	if settings == nil {

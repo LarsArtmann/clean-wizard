@@ -48,6 +48,7 @@ const (
 	OperationTypeNixGenerations OperationType = "nix-generations"
 	OperationTypeTempFiles      OperationType = "temp-files"
 	OperationTypeHomebrew       OperationType = "homebrew-cleanup"
+	OperationTypePackageCache   OperationType = "package-cache"
 	OperationTypeSystemTemp     OperationType = "system-temp"
 )
 
@@ -58,8 +59,18 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeNixGenerations
 	case "temp-files":
 		return OperationTypeTempFiles
-	case "homebrew-cleanup":
+	case "homebrew", "homebrew-cleanup":
 		return OperationTypeHomebrew
+	case "npm-cache":
+		return OperationTypePackageCache
+	case "pnpm-store":
+		return OperationTypePackageCache
+	case "go-cache":
+		return OperationTypePackageCache
+	case "cargo-cache":
+		return OperationTypePackageCache
+	case "docker":
+		return OperationTypeSystemTemp
 	case "system-temp":
 		return OperationTypeSystemTemp
 	default:

@@ -61,6 +61,11 @@ func (hc *HomebrewCleaner) GetCacheSize(ctx context.Context) int64 {
 	return size
 }
 
+// GetStoreSize implements domain.Cleaner interface
+func (hc *HomebrewCleaner) GetStoreSize(ctx context.Context) int64 {
+	return hc.GetCacheSize(ctx)
+}
+
 // ValidateSettings validates Homebrew cleaner settings with type safety
 func (hc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings) error {
 	if settings == nil {

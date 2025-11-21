@@ -74,13 +74,13 @@ func CreateDefaultConfig() (*Config, error) {
 			{
 				Name:        "nix-generations",
 				Description: "Remove old Nix store generations",
-				RiskLevel:   RiskLow,
+				RiskLevel:   RiskLevelLowType,
 				Status:      StatusEnabled,
 			},
 			{
 				Name:        "temp-files", 
 				Description: "Clean temporary files from user directories",
-				RiskLevel:   RiskLow,
+				RiskLevel:   RiskLevelLowType,
 				Status:      StatusEnabled,
 			},
 		},
@@ -94,49 +94,49 @@ func CreateDefaultConfig() (*Config, error) {
 			{
 				Name:        "nix-generations",
 				Description: "Remove old Nix store generations", 
-				RiskLevel:   RiskLow,
+				RiskLevel:   RiskLevelLowType,
 				Status:      StatusEnabled,
 			},
 			{
 				Name:        "homebrew",
 				Description: "Homebrew cleanup, autoremove and cache cleaning",
-				RiskLevel:   RiskMedium,
+				RiskLevel:   RiskLevelMediumType,
 				Status:      StatusEnabled,
 			},
 			{
 				Name:        "npm-cache",
 				Description: "Node.js npm cache cleanup",
-				RiskLevel:   RiskLow,
+				RiskLevel:   RiskLevelLowType,
 				Status:      StatusEnabled,
 			},
 			{
 				Name:        "pnpm-store",
 				Description: "pnpm store cleanup",
-				RiskLevel:   RiskLow,
+				RiskLevel:   RiskLevelLowType,
 				Status:      StatusEnabled,
 			},
 			{
 				Name:        "go-cache",
 				Description: "Go build and module cache cleanup", 
-				RiskLevel:   RiskLow,
+				RiskLevel:   RiskLevelLowType,
 				Status:      StatusEnabled,
 			},
 			{
 				Name:        "cargo-cache",
 				Description: "Rust Cargo cache cleanup",
-				RiskLevel:   RiskLow,
+				RiskLevel:   RiskLevelLowType,
 				Status:      StatusEnabled,
 			},
 			{
 				Name:        "temp-files",
 				Description: "System and user temporary file cleanup",
-				RiskLevel:   RiskLow,
+				RiskLevel:   RiskLevelLowType,
 				Status:      StatusEnabled,
 			},
 			{
 				Name:        "docker",
 				Description: "Docker system cleanup (containers, images, volumes)",
-				RiskLevel:   RiskMedium,
+				RiskLevel:   RiskLevelMediumType,
 				Status:      StatusDisabled, // Disabled by default for safety
 			},
 		},
@@ -264,7 +264,7 @@ func (p *Profile) Validate(name string) error {
 type CleanupOperation struct {
 	Name        string             `json:"name" yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
-	RiskLevel   RiskLevel          `json:"risk_level" yaml:"risk_level"`
+	RiskLevel   RiskLevelType      `json:"risk_level" yaml:"risk_level"`
 	Status      StatusType         `json:"status" yaml:"status"`
 	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }

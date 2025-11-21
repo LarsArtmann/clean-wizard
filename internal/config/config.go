@@ -151,7 +151,7 @@ func SaveConfigToFile(config *domain.Config, configPath string) error {
 	// Set configuration file properties
 	v.SetConfigFile(configPath)
 
-	// Set configuration values
+	// Set configuration values with enum string conversions
 	v.Set("version", config.Version)
 	v.Set("safety_level", config.SafetyLevel.String())
 	v.Set("max_disk_usage", config.MaxDiskUsage)
@@ -159,7 +159,30 @@ func SaveConfigToFile(config *domain.Config, configPath string) error {
 	v.Set("current_profile", config.CurrentProfile)
 	v.Set("last_clean", config.LastClean)
 	v.Set("updated", config.Updated)
-	v.Set("profiles", config.Profiles)
+	
+	// Convert profiles with proper enum string conversions using interface{} to avoid struct marshaling
+	profiles := make(map[string]interface{})
+	for name, profile := range config.Profiles {
+		profileData := make(map[string]interface{})
+		profileData["name"] = profile.Name
+		profileData["description"] = profile.Description
+		profileData["status"] = profile.Status.String()
+		
+		// Convert operations with proper enum string conversions
+		operations := make([]interface{}, len(profile.Operations))
+		for i, op := range profile.Operations {
+			opData := make(map[string]interface{})
+			opData["name"] = op.Name
+			opData["description"] = op.Description
+			opData["risk_level"] = op.RiskLevel.String()
+			opData["status"] = op.Status.String()
+			opData["settings"] = op.Settings
+			operations[i] = opData
+		}
+		profileData["operations"] = operations
+		profiles[name] = profileData
+	}
+	v.Set("profiles", profiles)
 
 	// Write configuration file
 	return v.WriteConfig()
