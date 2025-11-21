@@ -30,7 +30,7 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 	// Create domain config
 	config := &domain.Config{
 		Version:      publicConfig.Version,
-		SafetyLevel:  publicConfig.SafetyLevel,  // FIXED: Direct enum usage, no conversion needed!
+		SafetyLevel:  publicConfig.SafetyLevel, // FIXED: Direct enum usage, no conversion needed!
 		MaxDiskUsage: int(publicConfig.MaxDiskUsage),
 		Protected:    publicConfig.ProtectedPaths,
 		Profiles:     profiles,
@@ -87,7 +87,7 @@ func MapProfileToDomain(publicProfile *PublicProfile) (*domain.Profile, error) {
 	return &domain.Profile{
 		Name:        publicProfile.Name,
 		Description: publicProfile.Description,
-		Status:      publicProfile.Status,  // FIXED: Direct enum usage, no conversion needed!
+		Status:      publicProfile.Status, // FIXED: Direct enum usage, no conversion needed!
 		Operations:  operations,
 	}, nil
 }
@@ -138,7 +138,7 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 		Name:        publicOperation.Name,
 		Description: publicOperation.Description,
 		RiskLevel:   riskLevel,
-		Status:      publicOperation.Status,  // FIXED: Direct enum usage, no conversion needed!
+		Status:      publicOperation.Status, // FIXED: Direct enum usage, no conversion needed!
 		Settings:    settings,
 	}, nil
 }

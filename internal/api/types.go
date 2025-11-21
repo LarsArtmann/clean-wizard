@@ -7,7 +7,7 @@ import "github.com/LarsArtmann/clean-wizard/internal/domain"
 
 type PublicConfig struct {
 	Version        string                    `json:"version"`
-	SafetyLevel    domain.SafetyLevelType   `json:"safetyLevel"`    // FIXED: bool → enum - invalid states UNREPRESENTABLE!
+	SafetyLevel    domain.SafetyLevelType    `json:"safetyLevel"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
 	MaxDiskUsage   int32                     `json:"maxDiskUsage"`
 	ProtectedPaths []string                  `json:"protectedPaths"`
 	Profiles       map[string]*PublicProfile `json:"profiles"`
@@ -16,7 +16,7 @@ type PublicConfig struct {
 type PublicProfile struct {
 	Name        string            `json:"name"`
 	Description string            `json:"description"`
-	Status      domain.StatusType  `json:"status"`      // FIXED: bool → enum - invalid states UNREPRESENTABLE!
+	Status      domain.StatusType `json:"status"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
 	Operations  []PublicOperation `json:"operations"`
 }
 
@@ -24,15 +24,15 @@ type PublicOperation struct {
 	Name        string            `json:"name"`
 	Description string            `json:"description"`
 	RiskLevel   PublicRiskLevel   `json:"riskLevel"`
-	Status      domain.StatusType  `json:"status"`      // FIXED: bool → enum - invalid states UNREPRESENTABLE!
+	Status      domain.StatusType `json:"status"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
 	Settings    OperationSettings `json:"settings"`
 }
 
 type OperationSettings struct {
-	ExecutionMode domain.ExecutionModeType `json:"executionMode"`  // FIXED: bool → enum - invalid states UNREPRESENTABLE!
-	Verbose             bool  `json:"verbose"`
-	TimeoutSeconds      int32 `json:"timeoutSeconds"`
-	ConfirmBeforeDelete bool  `json:"confirmBeforeDelete"`
+	ExecutionMode       domain.ExecutionModeType `json:"executionMode"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
+	Verbose             bool                     `json:"verbose"`
+	TimeoutSeconds      int32                    `json:"timeoutSeconds"`
+	ConfirmBeforeDelete bool                     `json:"confirmBeforeDelete"`
 }
 
 type PublicCleanResult struct {

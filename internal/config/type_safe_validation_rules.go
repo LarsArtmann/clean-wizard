@@ -52,7 +52,7 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 	maxUsage := 95
 	minPaths := 1
 	maxProfiles := MaxProfiles // Use proper constant
-	maxOps := MaxOperations // Use proper constant
+	maxOps := MaxOperations    // Use proper constant
 
 	return &TypeSafeValidationRules{
 		MaxDiskUsage: &NumericValidationRule{
@@ -88,19 +88,19 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidationRules {
 	// Deep copy to prevent external modifications
 	copied := &TypeSafeValidationRules{
-		MaxDiskUsage:      tsvr.copyNumericRule(tsvr.MaxDiskUsage),
-		MinProtectedPaths: tsvr.copyNumericRule(tsvr.MinProtectedPaths),
-		MaxProfiles:       tsvr.copyNumericRule(tsvr.MaxProfiles),
-		MaxOperations:     tsvr.copyNumericRule(tsvr.MaxOperations),
-		ProfileNamePattern: tsvr.copyStringRule(tsvr.ProfileNamePattern),
-		PathPattern:        tsvr.copyStringRule(tsvr.PathPattern),
-		UniquePaths:       tsvr.UniquePaths,
-		UniqueProfiles:    tsvr.UniqueProfiles,
+		MaxDiskUsage:          tsvr.copyNumericRule(tsvr.MaxDiskUsage),
+		MinProtectedPaths:     tsvr.copyNumericRule(tsvr.MinProtectedPaths),
+		MaxProfiles:           tsvr.copyNumericRule(tsvr.MaxProfiles),
+		MaxOperations:         tsvr.copyNumericRule(tsvr.MaxOperations),
+		ProfileNamePattern:    tsvr.copyStringRule(tsvr.ProfileNamePattern),
+		PathPattern:           tsvr.copyStringRule(tsvr.PathPattern),
+		UniquePaths:           tsvr.UniquePaths,
+		UniqueProfiles:        tsvr.UniqueProfiles,
 		ProtectedSystemPaths:  make([]string, 0),
 		DefaultProtectedPaths: make([]string, 0),
-		RequireSafeMode:    tsvr.RequireSafeMode,
-		MaxRiskLevel:       tsvr.copyRiskLevel(tsvr.MaxRiskLevel),
-		BackupRequired:      tsvr.copyRiskLevel(tsvr.BackupRequired),
+		RequireSafeMode:       tsvr.RequireSafeMode,
+		MaxRiskLevel:          tsvr.copyRiskLevel(tsvr.MaxRiskLevel),
+		BackupRequired:        tsvr.copyRiskLevel(tsvr.BackupRequired),
 	}
 
 	// Deep copy slices
