@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/mocks"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
 // NixCleaner handles Nix package manager cleanup with proper type safety
 type NixCleaner struct {
-	adapter *adapters.NixAdapter
+	adapter *system.NixAdapter
 	verbose bool
 	dryRun  bool
 }
@@ -21,7 +20,7 @@ type NixCleaner struct {
 // NewNixCleaner creates Nix cleaner with proper configuration
 func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
 	nc := &NixCleaner{
-		adapter: adapters.NewNixAdapter(0, 0),
+		adapter: system.NewNixAdapter(0, 0),
 		verbose: verbose,
 		dryRun:  dryRun,
 	}

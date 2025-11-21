@@ -1,4 +1,4 @@
-package domain
+package validation_test
 
 import (
 	"testing"

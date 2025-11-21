@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // Config represents application configuration with type safety
@@ -14,7 +16,7 @@ import (
 // - All profile fields with proper value types
 type Config struct {
 	Version        string              `json:"version" yaml:"version"`
-	SafetyLevel    SafetyLevelType     `json:"safety_level" yaml:"safety_level"`
+	SafetyLevel    shared.SafetyLevelType     `json:"safety_level" yaml:"safety_level"`
 	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"` // TODO: Replace with MaxDiskUsage
 	Protected      []string            `json:"protected" yaml:"protected"`           // TODO: Replace with ProtectedPaths type
 	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`

@@ -1,4 +1,4 @@
-package config
+package validation_test
 
 import (
 	"testing"

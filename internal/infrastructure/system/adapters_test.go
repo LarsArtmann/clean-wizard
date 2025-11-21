@@ -1,11 +1,11 @@
-package adapters_test
+package system_test
 
 import (
 	"context"
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

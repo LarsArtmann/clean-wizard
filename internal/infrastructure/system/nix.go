@@ -1,4 +1,4 @@
-package adapters
+package system
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/mocks"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/LarsArtmann/clean-wizard/test"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
 // NixAdapter wraps Nix package manager operations

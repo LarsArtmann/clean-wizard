@@ -1,7 +1,7 @@
 package factories
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
 )
 
 // CreateBenchmarkConfig creates clean config for performance testing

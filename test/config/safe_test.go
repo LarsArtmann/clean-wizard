@@ -1,11 +1,11 @@
-package config
+package config_test
 
 import (
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 

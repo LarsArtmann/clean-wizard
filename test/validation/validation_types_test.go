@@ -1,7 +1,7 @@
-package config
+package validation_test
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
+	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 

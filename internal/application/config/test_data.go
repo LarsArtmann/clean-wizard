@@ -3,7 +3,7 @@ package config
 import (
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
+	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 

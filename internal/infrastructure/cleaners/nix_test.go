@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 )
 
 func TestNixCleaner_ListGenerations(t *testing.T) {

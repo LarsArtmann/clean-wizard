@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/format"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/format"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

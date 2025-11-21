@@ -1,9 +1,9 @@
-package config
+package config_test
 
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
+	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
 )
 
 // TestIntegration_ValidationSanitizationPipeline tests complete validation and sanitization workflow

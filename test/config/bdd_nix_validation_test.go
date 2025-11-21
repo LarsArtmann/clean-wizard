@@ -1,11 +1,11 @@
-package config
+package config_test
 
 import (
 	"fmt"
 	"strings"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/config/factories"
+	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 

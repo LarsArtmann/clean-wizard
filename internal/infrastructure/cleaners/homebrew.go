@@ -6,14 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
 // HomebrewCleaner handles Homebrew package manager cleanup with proper type safety
 type HomebrewCleaner struct {
-	adapter *adapters.HTTPClient
+	adapter *system.HTTPClient
 	verbose bool
 	dryRun  bool
 }
@@ -21,7 +21,7 @@ type HomebrewCleaner struct {
 // NewHomebrewCleaner creates Homebrew cleaner with proper configuration
 func NewHomebrewCleaner(verbose, dryRun bool) *HomebrewCleaner {
 	return &HomebrewCleaner{
-		adapter: adapters.NewHTTPClient(),
+		adapter: system.NewHTTPClient(),
 		verbose: verbose,
 		dryRun:  dryRun,
 	}

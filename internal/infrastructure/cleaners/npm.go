@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
 // NpmCleaner handles npm package manager cleanup with proper type safety

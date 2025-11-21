@@ -3,7 +3,7 @@ package factories
 import (
 	"fmt"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
 )
 
 // TODO: Migrate these functions to proper domain files:

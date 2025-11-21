@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
 // Validator defines interface for types that can validate themselves

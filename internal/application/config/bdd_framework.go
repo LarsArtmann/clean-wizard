@@ -3,7 +3,8 @@ package config
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
 )
 
 // BDDFeature represents a BDD feature for behavior-driven development
@@ -26,13 +27,13 @@ type BDDScenario struct {
 // BDDGiven represents the initial state in BDD
 type BDDGiven struct {
 	Description string
-	Setup       func(*testing.T) (*domain.Config, error)
+	Setup       func(*testing.T) (*config.Config, error)
 }
 
 // BDDWhen represents the action in BDD
 type BDDWhen struct {
 	Description string
-	Action      func(*domain.Config) (*ValidationResult, error)
+	Action      func(*config.Config) (*ValidationResult, error)
 }
 
 // BDDThen represents the expected outcome in BDD
@@ -86,7 +87,7 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 	}
 
 	// Setup Given conditions
-	var cfg *domain.Config
+	var cfg *config.Config
 	var setupErr error
 
 	for i, given := range scenario.Given {

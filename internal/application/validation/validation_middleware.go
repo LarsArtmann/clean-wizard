@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
+	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/shared/utils/pkg/errors"
 )
 
 // ChangeOperation represents type of configuration change with type safety
