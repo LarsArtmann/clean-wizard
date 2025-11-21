@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<title>Duplicates</title>
+<style>
+	pre {
+		background-color: #FFD;
+		border: 1px solid #E2E2E2;
+		padding: 1ex;
+	}
+</style>
+<h1>#1 found 3 clones</h1>
+<h2>internal/infrastructure/cleaners/npm.go:83</h2>
+<pre>func (nc *NpmCleaner) Cleanup(ctx context.Context, settings *domain.OperationSettings) result.Result[domain.CleanResult] {
+	startTime := time.Now()
+
+	if !nc.IsAvailable(ctx) {
+		return result.Err[domain.CleanResult](fmt.Errorf("npm is not available"))
+	}
+
+	if nc.verbose {
+		fmt.Println("📦 Cleaning npm cache...")
+	}
+
+	cleanupCmdResult := nc.runCleanupCommand(ctx)
+	
+	// Create final result
+	cleanResult := domain.CleanResult{
+		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
+		ItemsRemoved: cleanupCmdResult.Value().ItemsRemoved,
+		ItemsFailed:  cleanupCmdResult.Value().ItemsFailed,
+		CleanTime:    time.Since(startTime),
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative, // npm cache cleanup is conservative
+	}
+
+	return result.Ok(cleanResult)
+}</pre>
+<h2>internal/infrastructure/cleaners/pnpm.go:76</h2>
+<pre>func (pc *PnpmCleaner) Cleanup(ctx context.Context, settings *domain.OperationSettings) result.Result[domain.CleanResult] {
+	startTime := time.Now()
+
+	if !pc.IsAvailable(ctx) {
+		return result.Err[domain.CleanResult](fmt.Errorf("pnpm is not available"))
+	}
+
+	if pc.verbose {
+		fmt.Println("📦 Cleaning pnpm store...")
+	}
+
+	cleanupCmdResult := pc.runCleanupCommand(ctx)
+	
+	// Create final result
+	cleanResult := domain.CleanResult{
+		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
+		ItemsRemoved: cleanupCmdResult.Value().ItemsRemoved,
+		ItemsFailed:  cleanupCmdResult.Value().ItemsFailed,
+		CleanTime:    time.Since(startTime),
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative, // pnpm store cleanup is conservative
+	}
+
+	return result.Ok(cleanResult)
+}</pre>
+<h2>internal/infrastructure/cleaners/temp_files.go:72</h2>
+<pre>func (tfc *TempFileCleaner) Cleanup(ctx context.Context, settings *domain.OperationSettings) result.Result[domain.CleanResult] {
+	startTime := time.Now()
+
+	if !tfc.IsAvailable(ctx) {
+		return result.Err[domain.CleanResult](fmt.Errorf("temp file cleaner is not available"))
+	}
+
+	if tfc.verbose {
+		fmt.Println("🗑️  Cleaning temporary files...")
+	}
+
+	cleanupCmdResult := tfc.runCleanupCommand(ctx)
+	
+	// Create final result
+	cleanResult := domain.CleanResult{
+		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
+		ItemsRemoved: cleanupCmdResult.Value().ItemsRemoved,
+		ItemsFailed:  cleanupCmdResult.Value().ItemsFailed,
+		CleanTime:    time.Since(startTime),
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative, // Temp file cleanup is conservative
+	}
+
+	return result.Ok(cleanResult)
+}</pre>

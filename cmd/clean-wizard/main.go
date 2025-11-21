@@ -6,13 +6,12 @@ import (
 	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands"
-	"github.com/LarsArtmann/clean-wizard/internal/config"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 var (
-	version         = "dev"
 	verbose         bool
 	dryRun          bool
 	force           bool
@@ -40,18 +39,7 @@ func colorize(text, color string) string {
 
 // parseValidationLevel converts string to ValidationLevel
 func parseValidationLevel(level string) config.ValidationLevel {
-	switch strings.ToLower(level) {
-	case "none":
-		return config.ValidationLevelNone
-	case "basic":
-		return config.ValidationLevelBasic
-	case "comprehensive":
-		return config.ValidationLevelComprehensive
-	case "strict":
-		return config.ValidationLevelStrict
-	default:
-		return config.ValidationLevelBasic // Safe default
-	}
+	return commands.ParseValidationLevel(level)
 }
 
 func init() {
@@ -86,7 +74,7 @@ func main() {
 	rootCmd.AddCommand(
 		commands.NewProfileCommand(),
 		commands.NewScanCommand(verbose, parseValidationLevel(validationLevel)),
-		commands.NewCleanCommand(parseValidationLevel(validationLevel)),
+		commands.NewCleanCommand(),
 		commands.NewGenerateCommand(),
 	)
 

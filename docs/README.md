@@ -173,7 +173,7 @@ if err != nil {
 }
 
 if resp.IsSuccess() {
-    fmt.Printf("Response: %s\n", resp.Body)
+    fmt.Printf("Response: %s\n", resp.Body) // Can also use string(resp.RawBody)
 }
 ```
 

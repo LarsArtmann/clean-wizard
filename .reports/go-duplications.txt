@@ -1,0 +1,8 @@
+2025/11/21 20:31:58 Building suffix tree
+2025/11/21 20:31:58 Searching for clones
+found 3 clones:
+  internal/infrastructure/cleaners/npm.go:83,107
+  internal/infrastructure/cleaners/pnpm.go:76,100
+  internal/infrastructure/cleaners/temp_files.go:72,96
+
+Found total 1 clone groups.
