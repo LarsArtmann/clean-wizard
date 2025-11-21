@@ -5,7 +5,7 @@ import (
 )
 
 // getDefaultLoadOptions returns default load options
-func getDefaultLoadOptions() *ConfigLoadOptions {
+func getDefaultLoadOptions() *config.ConfigLoadOptions {
 	return &ConfigLoadOptions{
 		ForceRefresh:       false,
 		EnableCache:        true,
@@ -16,7 +16,7 @@ func getDefaultLoadOptions() *ConfigLoadOptions {
 }
 
 // getDefaultSaveOptions returns default save options
-func getDefaultSaveOptions() *ConfigSaveOptions {
+func getDefaultSaveOptions() *config.ConfigSaveOptions {
 	return &ConfigSaveOptions{
 		EnableSanitization: true,
 		CreateBackup:       true, // Create backup by default for safety

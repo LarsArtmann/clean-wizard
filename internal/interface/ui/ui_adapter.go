@@ -1,7 +1,7 @@
 package adapters
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // UIAdapter provides UI-specific transformations of domain objects

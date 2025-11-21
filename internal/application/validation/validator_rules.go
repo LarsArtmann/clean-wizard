@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // ConfigValidationRules defines all validation constraints

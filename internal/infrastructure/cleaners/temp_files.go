@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
@@ -53,13 +53,13 @@ func (tfc *TempFileCleaner) GetCacheSize(ctx context.Context) int64 {
 	return totalSize
 }
 
-// GetStoreSize implements domain.Cleaner interface
+// GetStoreSize implements shared.Cleaner interface
 func (tfc *TempFileCleaner) GetStoreSize(ctx context.Context) int64 {
 	return tfc.GetCacheSize(ctx)
 }
 
 // ValidateSettings validates temp file cleaner settings with type safety
-func (tfc *TempFileCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (tfc *TempFileCleaner) ValidateSettings(settings *shared.OperationSettings) error {
 	if settings == nil {
 		return nil // Settings are optional
 	}
@@ -69,11 +69,11 @@ func (tfc *TempFileCleaner) ValidateSettings(settings *domain.OperationSettings)
 }
 
 // Cleanup performs temporary file cleanup
-func (tfc *TempFileCleaner) Cleanup(ctx context.Context, settings *domain.OperationSettings) result.Result[domain.CleanResult] {
+func (tfc *TempFileCleaner) Cleanup(ctx context.Context, settings *shared.OperationSettings) result.Result[shared.CleanResult] {
 	startTime := time.Now()
 
 	if !tfc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("temp file cleaner is not available"))
+		return result.Err[shared.CleanResult](fmt.Errorf("temp file cleaner is not available"))
 	}
 
 	if tfc.verbose {
@@ -83,20 +83,20 @@ func (tfc *TempFileCleaner) Cleanup(ctx context.Context, settings *domain.Operat
 	cleanupCmdResult := tfc.runCleanupCommand(ctx)
 	
 	// Create final result
-	cleanResult := domain.CleanResult{
+	cleanResult := shared.CleanResult{
 		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
 		ItemsRemoved: cleanupCmdResult.Value().ItemsRemoved,
 		ItemsFailed:  cleanupCmdResult.Value().ItemsFailed,
 		CleanTime:    time.Since(startTime),
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative, // Temp file cleanup is conservative
+		Strategy:     shared.StrategyConservative, // Temp file cleanup is conservative
 	}
 
 	return result.Ok(cleanResult)
 }
 
 // runCleanupCommand executes temporary file cleanup
-func (tfc *TempFileCleaner) runCleanupCommand(ctx context.Context) result.Result[domain.CleanResult] {
+func (tfc *TempFileCleaner) runCleanupCommand(ctx context.Context) result.Result[shared.CleanResult] {
 	if tfc.dryRun {
 		return tfc.simulateCleanupCommand()
 	}
@@ -127,20 +127,20 @@ func (tfc *TempFileCleaner) runCleanupCommand(ctx context.Context) result.Result
 		totalFailed += failed
 	}
 
-	cleanupCmdResult := domain.CleanResult{
+	cleanupCmdResult := shared.CleanResult{
 		FreedBytes:   totalFreed,
 		ItemsRemoved: totalRemoved,
 		ItemsFailed:  totalFailed,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     shared.StrategyConservative,
 	}
 
 	return result.Ok(cleanupCmdResult)
 }
 
 // simulateCleanupCommand simulates cleanup for dry-run mode
-func (tfc *TempFileCleaner) simulateCleanupCommand() result.Result[domain.CleanResult] {
+func (tfc *TempFileCleaner) simulateCleanupCommand() result.Result[shared.CleanResult] {
 	if tfc.verbose {
 		fmt.Println("🔍 DRY RUN: Temporary file cleanup")
 	}
@@ -149,13 +149,13 @@ func (tfc *TempFileCleaner) simulateCleanupCommand() result.Result[domain.CleanR
 	var itemsRemoved uint = 5 // Multiple temp files and directories
 	var bytesFreed uint64 = 250 * 1024 * 1024 // 250MB estimate
 
-	simulateResult := domain.CleanResult{
+	simulateResult := shared.CleanResult{
 		FreedBytes:   bytesFreed,
 		ItemsRemoved: itemsRemoved,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyDryRun,
+		Strategy:     shared.StrategyDryRun,
 	}
 
 	return result.Ok(simulateResult)

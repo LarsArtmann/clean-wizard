@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // ConfigValidator provides comprehensive type-safe configuration validation

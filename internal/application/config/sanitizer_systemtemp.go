@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // sanitizeSystemTempSettings sanitizes system temp settings
-func (cs *ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settings *domain.SystemTempSettings, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settings *shared.SystemTempSettings, result *SanitizationResult) {
 	if settings == nil {
 		return
 	}
@@ -66,7 +66,7 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settin
 		}
 
 		// Validate duration format using custom parser
-		if _, err := domain.ParseCustomDuration(settings.OlderThan); err != nil {
+		if _, err := shared.ParseCustomDuration(settings.OlderThan); err != nil {
 			result.Warnings = append(result.Warnings, SanitizationWarning{
 				Field:     fieldPrefix + ".older_than",
 				Original:  settings.OlderThan,

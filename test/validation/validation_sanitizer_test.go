@@ -3,7 +3,7 @@ package validation_test
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // createWhitespacedConfigForSanitizer creates a test configuration with whitespace that needs cleaning
@@ -12,7 +12,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		config           *domain.Config
+		config           *shared.Config
 		expectedChanges  []string
 		expectedWarnings int
 	}{}
@@ -22,7 +22,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 	for _, tc := range standardCases {
 		tests = append(tests, struct {
 			name             string
-			config           *domain.Config
+			config           *shared.Config
 			expectedChanges  []string
 			expectedWarnings int
 		}{
@@ -36,29 +36,29 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 	// Add unique test case for this file
 	tests = append(tests, struct {
 		name             string
-		config           *domain.Config
+		config           *shared.Config
 		expectedChanges  []string
 		expectedWarnings int
 	}{
 		name: "duplicate paths",
-		config: &domain.Config{
+		config: &shared.Config{
 			Version:      "1.0.0",
-			SafetyLevel:  domain.SafetyLevelEnabled,
+			SafetyLevel:  shared.SafetyLevelEnabled,
 			MaxDiskUsage: 50,
 			Protected:    []string{"/System", "/Library", "/System"}, // Duplicate /System
-			Profiles: map[string]*domain.Profile{
+			Profiles: map[string]*shared.Profile{
 				"daily": {
 					Name:        "daily",
 					Description: "Daily cleanup",
-					Operations: []domain.CleanupOperation{
+					Operations: []shared.CleanupOperation{
 						{
 							Name:        "nix-generations",
 							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLow,
-							Status:      domain.StatusEnabled,
+							RiskLevel:   shared.RiskLow,
+							Status:      shared.StatusEnabled,
 						},
 					},
-					Status: domain.StatusEnabled,
+					Status: shared.StatusEnabled,
 				},
 			},
 		},

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // TypeSafeValidationRules defines validation constraints with compile-time type safety

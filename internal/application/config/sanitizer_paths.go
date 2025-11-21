@@ -7,11 +7,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // sanitizeProtectedPaths sanitizes protected paths array
-func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *domain.Config, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeProtectedPaths(cfg *config.Config, result *SanitizationResult) {
 	sanitizedPaths := make([]string, 0, len(cfg.Protected))
 
 	for i, path := range cfg.Protected {
@@ -82,7 +82,7 @@ func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *domain.Config, result *Sa
 
 // Helper methods for path sanitization
 
-func (cs *ConfigSanitizer) removeDuplicates(slice []string) []string {
+func (cs *config.ConfigSanitizer) removeDuplicates(slice []string) []string {
 	seen := make(map[string]bool)
 	result := []string{}
 
@@ -96,6 +96,6 @@ func (cs *ConfigSanitizer) removeDuplicates(slice []string) []string {
 	return result
 }
 
-func (cs *ConfigSanitizer) sortStrings(slice []string) {
+func (cs *config.ConfigSanitizer) sortStrings(slice []string) {
 	sort.Strings(slice)
 }

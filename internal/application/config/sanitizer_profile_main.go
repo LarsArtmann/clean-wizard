@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // sanitizeProfiles sanitizes profiles and their operations
-func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeProfiles(cfg *config.Config, result *SanitizationResult) {
 	for name, profile := range cfg.Profiles {
 		// Check for nil profile to prevent panic
 		if profile == nil {
@@ -45,7 +45,7 @@ func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *Sanitiza
 }
 
 // sanitizeOperations sanitizes cleanup operations
-func (cs *ConfigSanitizer) sanitizeOperations(profileName string, operations []domain.CleanupOperation, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeOperations(profileName string, operations []ConfigCleanupOperation, result *SanitizationResult) {
 	for i := range operations {
 		op := &operations[i] // Get pointer to mutate slice element in place
 		fieldPrefix := fmt.Sprintf("profiles.%s.operations[%d]", profileName, i)
@@ -76,7 +76,7 @@ func (cs *ConfigSanitizer) sanitizeOperations(profileName string, operations []d
 }
 
 // applyDefaults applies default values to missing fields
-func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) applyDefaults(cfg *config.Config, result *SanitizationResult) {
 	// Set default version if empty
 	if cfg.Version == "" {
 		cfg.Version = "1.0.0"
@@ -118,8 +118,8 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 			fieldPrefix := fmt.Sprintf("profiles.%s.operations[%d]", name, i)
 
 			if op.Settings == nil {
-				opType := domain.GetOperationType(op.Name)
-				op.Settings = domain.DefaultSettings(opType)
+				opType := shared.GetOperationType(op.Name)
+				op.Settings = shared.DefaultSettings(opType)
 				result.addChange(fieldPrefix+".settings", nil, op.Settings, "initialized type-safe settings")
 			}
 		}

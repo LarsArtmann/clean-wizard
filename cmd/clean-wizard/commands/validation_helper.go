@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/LarsArtmann/clean-wizard/internal/application/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // ApplyValidationToConfigShared applies validation rules to a loaded configuration

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // ConfigSanitizer provides configuration sanitization and normalization
@@ -65,21 +65,21 @@ type SanitizationWarning struct {
 }
 
 // NewConfigSanitizer creates a configuration sanitizer with default rules
-func NewConfigSanitizer() *ConfigSanitizer {
+func NewConfigSanitizer() *config.ConfigSanitizer {
 	return &ConfigSanitizer{
 		rules: getDefaultSanitizationRules(),
 	}
 }
 
 // NewConfigSanitizerWithRules creates a sanitizer with custom rules
-func NewConfigSanitizerWithRules(rules *SanitizationRules) *ConfigSanitizer {
+func NewConfigSanitizerWithRules(rules *SanitizationRules) *config.ConfigSanitizer {
 	return &ConfigSanitizer{
 		rules: rules,
 	}
 }
 
 // SanitizeConfig performs comprehensive configuration sanitization
-func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *ValidationResult) {
+func (cs *config.ConfigSanitizer) SanitizeConfig(cfg *config.Config, validationResult *ValidationResult) {
 	start := time.Now()
 	defer func() {
 		// Update validation result duration if provided
@@ -139,7 +139,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 }
 
 // sanitizeBasicFields sanitizes basic configuration fields
-func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeBasicFields(cfg *config.Config, result *SanitizationResult) {
 	// Sanitize version
 	if cs.rules.TrimWhitespace {
 		original := cfg.Version
@@ -178,9 +178,9 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 	}
 
 	// Ensure safety level defaults
-	if cs.rules.DefaultSafeMode && cfg.SafetyLevel == domain.SafetyLevelDisabled {
+	if cs.rules.DefaultSafeMode && cfg.SafetyLevel == shared.SafetyLevelDisabled {
 		original := cfg.SafetyLevel
-		cfg.SafetyLevel = domain.SafetyLevelEnabled
+		cfg.SafetyLevel = shared.SafetyLevelEnabled
 		result.addChange("safety_level", original.String(), cfg.SafetyLevel.String(), "enabled safety level for security")
 	}
 }

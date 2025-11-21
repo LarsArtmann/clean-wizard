@@ -7,7 +7,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/cleaners"
 	"github.com/LarsArtmann/clean-wizard/internal/application/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/format"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/middleware"
 	"github.com/spf13/cobra"

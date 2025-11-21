@@ -6,11 +6,11 @@ import (
 	"slices"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // applyValidation applies validation at the specified level
-func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *domain.Config, level ValidationLevel) *ValidationResult {
+func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *config.Config, level ValidationLevel) *ValidationResult {
 	switch level {
 	case ValidationLevelNone:
 		return &ValidationResult{IsValid: true, Timestamp: time.Now()}
@@ -33,11 +33,11 @@ func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *do
 }
 
 // applyComprehensiveValidation applies comprehensive validation rules
-func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *domain.Config, result *ValidationResult) {
+func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *config.Config, result *ValidationResult) {
 	// Additional comprehensive validation rules
 
 	// Check for configuration consistency
-	if config.SafetyLevel >= domain.SafetyLevelEnabled && ecl.hasCriticalRiskOperations(config) {
+	if ConfigSafetyLevel >= shared.SafetyLevelEnabled && ecl.hasCriticalRiskOperations(config) {
 		result.Warnings = append(result.Warnings, ValidationWarning{
 			Field:      "safety_level",
 			Message:    "Safety level is enabled but critical risk operations exist",
@@ -46,7 +46,7 @@ func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *domain.Con
 	}
 
 	// Check for performance implications
-	if len(config.Profiles) > 20 {
+	if len(ConfigProfiles) > 20 {
 		result.Warnings = append(result.Warnings, ValidationWarning{
 			Field:      "profiles",
 			Message:    "Large number of profiles may impact performance",
@@ -56,15 +56,15 @@ func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *domain.Con
 }
 
 // applyStrictValidation applies strict validation rules
-func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, result *ValidationResult) {
+func (ecl *EnhancedConfigLoader) applyStrictValidation(config *config.Config, result *ValidationResult) {
 	// Strict validation rules that might fail
 
 	// Require explicit profiles (no auto-generation)
-	if len(config.Profiles) == 0 {
+	if len(ConfigProfiles) == 0 {
 		result.Errors = append(result.Errors, ValidationError{
 			Field:    "profiles",
 			Rule:     "strict",
-			Value:    config.Profiles,
+			Value:    ConfigProfiles,
 			Message:  "Strict mode requires at least one explicit profile",
 			Severity: SeverityError,
 		})
@@ -81,11 +81,11 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, re
 		}
 	}
 	for _, required := range requiredPaths {
-		if !ecl.isPathProtected(config.Protected, required) {
+		if !ecl.isPathProtected(ConfigProtected, required) {
 			result.Errors = append(result.Errors, ValidationError{
 				Field:    "protected",
 				Rule:     "strict",
-				Value:    config.Protected,
+				Value:    ConfigProtected,
 				Message:  fmt.Sprintf("Strict mode requires path: %s", required),
 				Severity: SeverityError,
 			})
@@ -95,14 +95,14 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, re
 }
 
 // hasCriticalRiskOperations checks if config contains critical risk operations
-func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *domain.Config) bool {
-	for _, profile := range config.Profiles {
+func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *config.Config) bool {
+	for _, profile := range ConfigProfiles {
 		// Guard against nil profiles (e.g., from "profile: null" in YAML)
 		if profile == nil {
 			continue
 		}
 		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskCritical {
+			if op.RiskLevel == shared.RiskCritical {
 				return true
 			}
 		}

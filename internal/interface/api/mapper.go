@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 

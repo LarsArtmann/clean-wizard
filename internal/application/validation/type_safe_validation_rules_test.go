@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // TestTypeSafeSchemaRules_DeepCopy verifies GetTypeSafeSchemaRules returns immutable copy

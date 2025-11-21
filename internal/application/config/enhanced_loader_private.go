@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // loadConfigWithRetry loads configuration with retry logic
-func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, options *ConfigLoadOptions) (*domain.Config, error) {
+func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, options *config.ConfigLoadOptions) (*config.Config, error) {
 	var lastErr error
 
 	for attempt := 0; attempt <= ecl.retryPolicy.MaxRetries; attempt++ {
@@ -44,7 +44,7 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, option
 }
 
 // saveConfigWithRetry saves configuration with retry logic
-func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) error {
+func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config *config.Config, options *config.ConfigSaveOptions) error {
 	var lastErr error
 
 	for attempt := 0; attempt <= ecl.retryPolicy.MaxRetries; attempt++ {
@@ -73,7 +73,7 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config
 }
 
 // createBackup creates a backup of the current configuration
-func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domain.Config) error {
+func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *config.Config) error {
 	// Read current config file and copy to backup location
 	originalConfigPath := filepath.Join(os.Getenv("HOME"), ".clean-wizard.yaml")
 	backupPath := fmt.Sprintf("%s.backup.%d", originalConfigPath, time.Now().Unix())

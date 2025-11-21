@@ -1,6 +1,6 @@
 package api
 
-import "github.com/LarsArtmann/clean-wizard/internal/domain"
+import "github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 
 // Type definitions with proper type safety - DOMAIN DRIVEN DESIGN
 // TODO: Generate from TypeSpec compiler in production

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/shared/utils/pkg/errors"
 )
 
 // LoadConfig loads configuration with comprehensive validation and caching
-func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *ConfigLoadOptions) (*domain.Config, error) {
+func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *config.ConfigLoadOptions) (*config.Config, error) {
 	if options == nil {
 		options = getDefaultLoadOptions()
 	}
@@ -57,7 +57,7 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 }
 
 // SaveConfig saves configuration with validation and cache update
-func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) (*domain.Config, error) {
+func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *config.Config, options *config.ConfigSaveOptions) (*config.Config, error) {
 	if options == nil {
 		options = getDefaultSaveOptions()
 	}
@@ -115,6 +115,6 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 }
 
 // ValidateConfig validates configuration at specified level
-func (ecl *EnhancedConfigLoader) ValidateConfig(ctx context.Context, config *domain.Config, level domain.ValidationLevelType) *ValidationResult {
+func (ecl *EnhancedConfigLoader) ValidateConfig(ctx context.Context, config *config.Config, level shared.ValidationLevelType) *ValidationResult {
 	return ecl.applyValidation(ctx, config, ValidationLevel(level))
 }

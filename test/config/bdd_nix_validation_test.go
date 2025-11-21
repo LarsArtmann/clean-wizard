@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // Builder helpers for BDD test scenarios
@@ -62,41 +62,41 @@ func thenValidationFailsWithError(expectedErrorText string) []BDDThen {
 }
 
 // BDD action helper for common "validate configuration" pattern
-func whenConfigValidated(cfg *domain.Config) (*ValidationResult, error) {
+func whenConfigValidated(cfg *shared.Config) (*ValidationResult, error) {
 	validator := NewConfigValidator()
 	return validator.ValidateConfig(cfg), nil
 }
 
-func newBaseNixConfig(t *testing.T, safeMode bool) *domain.Config {
+func newBaseNixConfig(t *testing.T, safeMode bool) *shared.Config {
 	t.Helper()
 
-	var safetyLevel domain.SafetyLevelType
+	var safetyLevel shared.SafetyLevelType
 	if safeMode {
-		safetyLevel = domain.SafetyLevelEnabled
+		safetyLevel = shared.SafetyLevelEnabled
 	} else {
-		safetyLevel = domain.SafetyLevelDisabled
+		safetyLevel = shared.SafetyLevelDisabled
 	}
 
-	return &domain.Config{
+	return &shared.Config{
 		Version:      "1.0.0",
 		SafetyLevel:  safetyLevel,
 		MaxDiskUsage: 50,
 		Protected:    []string{"/System", "/Applications"},
-		Profiles: map[string]*domain.Profile{
+		Profiles: map[string]*shared.Profile{
 			"nix-cleanup": {
 				Name:        "Nix Cleanup",
 				Description: "Clean Nix generations",
-				Status:      domain.StatusEnabled,
-				Operations: []domain.CleanupOperation{
+				Status:      shared.StatusEnabled,
+				Operations: []shared.CleanupOperation{
 					{
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Status:      domain.StatusEnabled,
-						Settings: &domain.OperationSettings{
-							NixGenerations: &domain.NixGenerationsSettings{
+						RiskLevel:   shared.RiskLow,
+						Status:      shared.StatusEnabled,
+						Settings: &shared.OperationSettings{
+							NixGenerations: &shared.NixGenerationsSettings{
 								Generations:  3,
-								Optimization: domain.OptimizationLevelConservative,
+								Optimization: shared.OptimizationLevelConservative,
 							},
 						},
 					},
@@ -108,7 +108,7 @@ func newBaseNixConfig(t *testing.T, safeMode bool) *domain.Config {
 
 // withGenerations sets/updates the nix-generations operation Generations value
 // Note: Uses shared helper from test_data.go to eliminate duplication
-func withGenerations(t *testing.T, cfg *domain.Config, generations int) *domain.Config {
+func withGenerations(t *testing.T, cfg *shared.Config, generations int) *shared.Config {
 	t.Helper()
 
 	if err := factories.SetNixGenerationsCount(cfg, generations); err != nil {
@@ -118,7 +118,7 @@ func withGenerations(t *testing.T, cfg *domain.Config, generations int) *domain.
 }
 
 // withRiskLevel adjusts the operation RiskLevel and Enabled flags
-func withRiskLevel(t *testing.T, cfg *domain.Config, level domain.RiskLevelType) *domain.Config {
+func withRiskLevel(t *testing.T, cfg *shared.Config, level shared.RiskLevelType) *shared.Config {
 	t.Helper()
 
 	// Find the nix-cleanup profile and its nix-generations operation
@@ -144,14 +144,14 @@ func withRiskLevel(t *testing.T, cfg *domain.Config, level domain.RiskLevelType)
 
 // withOptimize sets the Optimize flag for nix-generations
 // withOptimize sets Optimization level for nix-generations
-func withOptimize(t *testing.T, cfg *domain.Config, optimize bool) *domain.Config {
+func withOptimize(t *testing.T, cfg *shared.Config, optimize bool) *shared.Config {
 	t.Helper()
 
-	var optimizationLevel domain.OptimizationLevelType
+	var optimizationLevel shared.OptimizationLevelType
 	if optimize {
-		optimizationLevel = domain.OptimizationLevelConservative
+		optimizationLevel = shared.OptimizationLevelConservative
 	} else {
-		optimizationLevel = domain.OptimizationLevelNone
+		optimizationLevel = shared.OptimizationLevelNone
 	}
 
 	if err := factories.SetNixGenerationsOptimization(cfg, optimizationLevel); err != nil {
@@ -161,14 +161,14 @@ func withOptimize(t *testing.T, cfg *domain.Config, optimize bool) *domain.Confi
 }
 
 // withEnabled sets the Status for nix-generations operation
-func withEnabled(t *testing.T, cfg *domain.Config, enabled bool) *domain.Config {
+func withEnabled(t *testing.T, cfg *shared.Config, enabled bool) *shared.Config {
 	t.Helper()
 
-	var status domain.StatusType
+	var status shared.StatusType
 	if enabled {
-		status = domain.StatusEnabled
+		status = shared.StatusEnabled
 	} else {
-		status = domain.StatusDisabled
+		status = shared.StatusDisabled
 	}
 
 	// Find the nix-cleanup profile and its nix-generations operation
@@ -205,7 +205,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with valid Nix generations settings",
-						Setup: func(t *testing.T) (*domain.Config, error) {
+						Setup: func(t *testing.T) (*shared.Config, error) {
 							return newBaseNixConfig(t, true), nil
 						},
 					},
@@ -213,7 +213,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				When: []BDDWhen{
 					{
 						Description: "the configuration is validated",
-						Action: func(cfg *domain.Config) (*ValidationResult, error) {
+						Action: func(cfg *shared.Config) (*ValidationResult, error) {
 							validator := NewConfigValidator()
 							return validator.ValidateConfig(cfg), nil
 						},
@@ -246,7 +246,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with Nix generations below minimum",
-						Setup: func(t *testing.T) (*domain.Config, error) {
+						Setup: func(t *testing.T) (*shared.Config, error) {
 							return withGenerations(t, newBaseNixConfig(t, true), 0), nil
 						},
 					},
@@ -265,7 +265,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with Nix generations above maximum",
-						Setup: func(t *testing.T) (*domain.Config, error) {
+						Setup: func(t *testing.T) (*shared.Config, error) {
 							return withGenerations(t, newBaseNixConfig(t, true), 15), nil
 						},
 					},
@@ -284,15 +284,15 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with critical Nix operation in unsafe mode",
-						Setup: func(t *testing.T) (*domain.Config, error) {
-							return withRiskLevel(t, withGenerations(t, withOptimize(t, newBaseNixConfig(t, false), false), 1), domain.RiskCritical), nil
+						Setup: func(t *testing.T) (*shared.Config, error) {
+							return withRiskLevel(t, withGenerations(t, withOptimize(t, newBaseNixConfig(t, false), false), 1), shared.RiskCritical), nil
 						},
 					},
 				},
 				When: []BDDWhen{
 					{
 						Description: "the configuration is validated",
-						Action: func(cfg *domain.Config) (*ValidationResult, error) {
+						Action: func(cfg *shared.Config) (*ValidationResult, error) {
 							validator := NewConfigValidator()
 							return validator.ValidateConfig(cfg), nil
 						},

@@ -1,11 +1,11 @@
 package cleaner
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
-// Use domain.Cleaner interface directly
-type CleanerInterface = domain.Cleaner
+// Use shared.Cleaner interface directly
+type CleanerInterface = shared.Cleaner
 
 // Ensure all cleaners implement interface at compile time
 var (

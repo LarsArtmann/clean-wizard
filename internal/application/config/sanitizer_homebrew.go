@@ -3,7 +3,7 @@ package config
 import (
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // equalStringSlices helper to compare string slices
@@ -20,7 +20,7 @@ func equalStringSlices(a, b []string) bool {
 }
 
 // sanitizeHomebrewSettings sanitizes Homebrew settings
-func (cs *ConfigSanitizer) sanitizeHomebrewSettings(fieldPrefix string, settings *domain.HomebrewSettings, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeHomebrewSettings(fieldPrefix string, settings *shared.HomebrewSettings, result *SanitizationResult) {
 	if settings == nil {
 		return
 	}

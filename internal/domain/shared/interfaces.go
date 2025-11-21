@@ -1,8 +1,8 @@
-package domain
+package shared
 
 import (
 	"context"
-	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
+	
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
@@ -10,8 +10,8 @@ import (
 type Cleaner interface {
 	IsAvailable(ctx context.Context) bool
 	GetStoreSize(ctx context.Context) int64
-	ValidateSettings(settings *config.OperationSettings) error
-	Cleanup(ctx context.Context, settings *config.OperationSettings) result.Result[CleanResult]
+	ValidateSettings(settings *OperationSettings) error
+	Cleanup(ctx context.Context, settings *OperationSettings) result.Result[CleanResult]
 }
 
 // Cleaner interface for generation-based cleaners (Nix)
@@ -25,7 +25,7 @@ type GenerationCleaner interface {
 type PackageCleaner interface {
 	Cleaner
 	ListPackages(ctx context.Context) []string
-	CleanOldPackages(ctx context.Context, settings *config.OperationSettings) CleanResult
+	CleanOldPackages(ctx context.Context, settings *OperationSettings) CleanResult
 }
 
 // Scanner interface for all scanning operations

@@ -1,4 +1,4 @@
-package domain
+package shared
 
 import (
 	"encoding/json"

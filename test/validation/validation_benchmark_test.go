@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // CreateBenchmarkConfig alias for test compatibility
@@ -47,30 +47,30 @@ func BenchmarkValidation_ProfileNameValidation(b *testing.B) {
 
 // BenchmarkValidation_OperationSettingsValidation tests operation settings validation performance
 func BenchmarkValidation_OperationSettingsValidation(b *testing.B) {
-	settings := &domain.OperationSettings{
-		NixGenerations: &domain.NixGenerationsSettings{
+	settings := &shared.OperationSettings{
+		NixGenerations: &shared.NixGenerationsSettings{
 			Generations:  3,
-			Optimization: domain.OptimizationLevelConservative,
+			Optimization: shared.OptimizationLevelConservative,
 		},
-		TempFiles: &domain.TempFilesSettings{
+		TempFiles: &shared.TempFilesSettings{
 			OlderThan: "7d",
 			Excludes:  []string{"/tmp/keep", "/var/tmp/preserve"},
 		},
-		Homebrew: &domain.HomebrewSettings{
-			FileSelectionStrategy: domain.FileSelectionStrategyUnusedOnly,
+		Homebrew: &shared.HomebrewSettings{
+			FileSelectionStrategy: shared.FileSelectionStrategyUnusedOnly,
 			Prune:                 "30d",
 		},
-		SystemTemp: &domain.SystemTempSettings{
+		SystemTemp: &shared.SystemTempSettings{
 			Paths:     []string{"/tmp", "/var/tmp", "/tmp/.font-unix"},
 			OlderThan: "14d",
 		},
 	}
 
-	operationTypes := []domain.OperationType{
-		domain.OperationTypeNixGenerations,
-		domain.OperationTypeTempFiles,
-		domain.OperationTypeHomebrew,
-		domain.OperationTypeSystemTemp,
+	operationTypes := []shared.OperationType{
+		shared.OperationTypeNixGenerations,
+		shared.OperationTypeTempFiles,
+		shared.OperationTypeHomebrew,
+		shared.OperationTypeSystemTemp,
 	}
 
 	for b.Loop() {
@@ -88,7 +88,7 @@ func BenchmarkValidation_MaxDiskUsageValidation(b *testing.B) {
 	for b.Loop() {
 		for _, value := range testValues {
 			result := NewValidationResult() // Fresh result for each validation
-			cfg := &domain.Config{}         // Fresh config for each test
+			cfg := &shared.Config{}         // Fresh config for each test
 			cfg.MaxDiskUsage = value
 			validator.validateFieldConstraints(cfg, result)
 		}

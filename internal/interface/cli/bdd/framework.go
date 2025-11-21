@@ -10,7 +10,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/application/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/cucumber/godog"
 	"github.com/rs/zerolog/log"
 )

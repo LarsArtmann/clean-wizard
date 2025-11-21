@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 func TestConfigValidator_ValidateConfig(t *testing.T) {
@@ -33,15 +33,15 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			"/System",
 			"/Library",
 		},
-		RequireSafeMode: domain.EnforcementLevelStrict,
-		MaxRiskLevel:    domain.RiskHigh,
-		BackupRequired:  domain.RiskMedium,
+		RequireSafeMode: shared.EnforcementLevelStrict,
+		MaxRiskLevel:    shared.RiskHigh,
+		BackupRequired:  shared.RiskMedium,
 	}
 	validator := NewConfigValidatorWithRules(testRules)
 
 	tests := []struct {
 		name        string
-		config      *domain.Config
+		config      *shared.Config
 		expectValid bool
 		expectError string
 	}{
@@ -70,12 +70,12 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 		},
 		{
 			name: "no profiles",
-			config: &domain.Config{
+			config: &shared.Config{
 				Version:      "1.0.0",
-				SafetyLevel:  domain.SafetyLevelEnabled,
+				SafetyLevel:  shared.SafetyLevelEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles:     map[string]*domain.Profile{},
+				Profiles:     map[string]*shared.Profile{},
 			},
 			expectValid: false,
 			expectError: "profiles",

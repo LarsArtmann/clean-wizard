@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
@@ -64,13 +64,13 @@ func (nc *NpmCleaner) GetCacheSize(ctx context.Context) int64 {
 	return 0
 }
 
-// GetStoreSize implements domain.Cleaner interface
+// GetStoreSize implements shared.Cleaner interface
 func (nc *NpmCleaner) GetStoreSize(ctx context.Context) int64 {
 	return nc.GetCacheSize(ctx)
 }
 
 // ValidateSettings validates npm cleaner settings with type safety
-func (nc *NpmCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (nc *NpmCleaner) ValidateSettings(settings *shared.OperationSettings) error {
 	if settings == nil {
 		return nil // Settings are optional
 	}
@@ -80,11 +80,11 @@ func (nc *NpmCleaner) ValidateSettings(settings *domain.OperationSettings) error
 }
 
 // Cleanup performs npm cache cleanup
-func (nc *NpmCleaner) Cleanup(ctx context.Context, settings *domain.OperationSettings) result.Result[domain.CleanResult] {
+func (nc *NpmCleaner) Cleanup(ctx context.Context, settings *shared.OperationSettings) result.Result[shared.CleanResult] {
 	startTime := time.Now()
 
 	if !nc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("npm is not available"))
+		return result.Err[shared.CleanResult](fmt.Errorf("npm is not available"))
 	}
 
 	if nc.verbose {
@@ -94,20 +94,20 @@ func (nc *NpmCleaner) Cleanup(ctx context.Context, settings *domain.OperationSet
 	cleanupCmdResult := nc.runCleanupCommand(ctx)
 	
 	// Create final result
-	cleanResult := domain.CleanResult{
+	cleanResult := shared.CleanResult{
 		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
 		ItemsRemoved: cleanupCmdResult.Value().ItemsRemoved,
 		ItemsFailed:  cleanupCmdResult.Value().ItemsFailed,
 		CleanTime:    time.Since(startTime),
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative, // npm cache cleanup is conservative
+		Strategy:     shared.StrategyConservative, // npm cache cleanup is conservative
 	}
 
 	return result.Ok(cleanResult)
 }
 
 // runCleanupCommand executes npm cache cleanup
-func (nc *NpmCleaner) runCleanupCommand(ctx context.Context) result.Result[domain.CleanResult] {
+func (nc *NpmCleaner) runCleanupCommand(ctx context.Context) result.Result[shared.CleanResult] {
 	if nc.dryRun {
 		return nc.simulateCleanupCommand()
 	}
@@ -115,7 +115,7 @@ func (nc *NpmCleaner) runCleanupCommand(ctx context.Context) result.Result[domai
 	// Execute actual npm cache clean
 	cmdResult := runCommand(ctx, "npm", "cache", "clean", "--force")
 	if cmdResult.IsErr() {
-		return result.Err[domain.CleanResult](cmdResult.Error())
+		return result.Err[shared.CleanResult](cmdResult.Error())
 	}
 
 	output := cmdResult.Value()
@@ -137,20 +137,20 @@ func (nc *NpmCleaner) runCleanupCommand(ctx context.Context) result.Result[domai
 		}
 	}
 
-	cleanupCmdResult := domain.CleanResult{
+	cleanupCmdResult := shared.CleanResult{
 		FreedBytes:   bytesFreed,
 		ItemsRemoved: itemsRemoved,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     shared.StrategyConservative,
 	}
 
 	return result.Ok(cleanupCmdResult)
 }
 
 // simulateCleanupCommand simulates cleanup for dry-run mode
-func (nc *NpmCleaner) simulateCleanupCommand() result.Result[domain.CleanResult] {
+func (nc *NpmCleaner) simulateCleanupCommand() result.Result[shared.CleanResult] {
 	if nc.verbose {
 		fmt.Println("🔍 DRY RUN: npm cache clean --force")
 	}
@@ -159,13 +159,13 @@ func (nc *NpmCleaner) simulateCleanupCommand() result.Result[domain.CleanResult]
 	var itemsRemoved uint = 1 // Cache directory
 	var bytesFreed uint64 = 150 * 1024 * 1024 // 150MB estimate for npm cache
 
-	simulateResult := domain.CleanResult{
+	simulateResult := shared.CleanResult{
 		FreedBytes:   bytesFreed,
 		ItemsRemoved: itemsRemoved,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyDryRun,
+		Strategy:     shared.StrategyDryRun,
 	}
 
 	return result.Ok(simulateResult)

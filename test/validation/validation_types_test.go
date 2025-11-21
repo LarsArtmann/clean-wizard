@@ -2,13 +2,13 @@ package validation_test
 
 import (
 	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // TestValidationLevelTestCase defines validation level test cases
 type TestValidationLevelTestCase struct {
 	name         string
-	config       *domain.Config
+	config       *shared.Config
 	level        ValidationLevel
 	expectValid  bool
 	expectErrors int
@@ -16,7 +16,7 @@ type TestValidationLevelTestCase struct {
 
 // CreateTestConfigurations creates test configurations for validation testing
 // Note: Delegates to shared factory in test_data.go to eliminate duplication
-func CreateTestConfigurations() map[string]*domain.Config {
+func CreateTestConfigurations() map[string]*shared.Config {
 	return factories.CreateValidationTestConfigs()
 }
 

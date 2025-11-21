@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/internal/application/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/spf13/cobra"
 )
 

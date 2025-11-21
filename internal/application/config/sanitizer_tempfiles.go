@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // sanitizeTempFilesSettings sanitizes temporary files settings
-func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, settings *domain.TempFilesSettings, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, settings *shared.TempFilesSettings, result *SanitizationResult) {
 	if settings == nil {
 		return
 	}
@@ -26,7 +26,7 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, setting
 
 	// Always validate duration format if not empty (regardless of TrimWhitespace flag)
 	if settings.OlderThan != "" {
-		if parsedDuration, err := domain.ParseCustomDuration(settings.OlderThan); err != nil {
+		if parsedDuration, err := shared.ParseCustomDuration(settings.OlderThan); err != nil {
 			result.Warnings = append(result.Warnings, SanitizationWarning{
 				Field:     fieldPrefix + ".older_than",
 				Original:  originalOlderThan, // Use original pre-trim value
@@ -35,7 +35,7 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, setting
 			})
 		} else {
 			// Normalize the duration to canonical form
-			normalizedDuration := domain.FormatDuration(parsedDuration)
+			normalizedDuration := shared.FormatDuration(parsedDuration)
 			if strings.TrimSpace(originalOlderThan) != normalizedDuration {
 				settings.OlderThan = normalizedDuration
 				result.addChange(fieldPrefix+".older_than", originalOlderThan, normalizedDuration, "normalized duration")

@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // Precompiled semver regex for performance optimization

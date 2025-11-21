@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/application/config/factories"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 func TestIsValidSemver(t *testing.T) {
@@ -43,7 +43,7 @@ func TestIsValidSemver(t *testing.T) {
 
 // createTestConfig creates a test configuration with the specified version
 // Note: Delegates to shared factory in test_data.go to eliminate duplication
-func createTestConfig(version string) *domain.Config {
+func createTestConfig(version string) *shared.Config {
 	return factories.CreateSemverTestConfig(version)
 }
 

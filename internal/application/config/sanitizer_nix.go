@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // Constants for Nix generations validation
@@ -13,7 +13,7 @@ const (
 )
 
 // sanitizeNixGenerationsSettings sanitizes Nix generations settings
-func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(fieldPrefix string, settings *domain.NixGenerationsSettings, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeNixGenerationsSettings(fieldPrefix string, settings *shared.NixGenerationsSettings, result *SanitizationResult) {
 	if settings == nil {
 		return
 	}

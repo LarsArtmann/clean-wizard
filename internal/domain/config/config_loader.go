@@ -1,4 +1,8 @@
-package domain
+package config
+
+import (
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+)
 
 import (
 	"fmt"
@@ -18,7 +22,7 @@ type ViperConfig interface {
 // SafetyConfig represents single source of truth for safety configuration
 // This type eliminates split brains by having only ONE representation
 type SafetyConfig struct {
-	Level SafetyLevelType
+	Level shared.SafetyLevelType
 
 	// Whether this config was explicitly set by user
 	IsExplicit bool
@@ -40,7 +44,7 @@ func ParseSafetyConfig(v ViperConfig) SafetyConfig {
 
 		// Invalid value - return default with explicit flag
 		return SafetyConfig{
-			Level:      SafetyLevelEnabled,
+			Level:      shared.SafetyLevelEnabled,
 			IsExplicit: true,
 		}
 	}
@@ -51,26 +55,26 @@ func ParseSafetyConfig(v ViperConfig) SafetyConfig {
 
 		if safeMode {
 			return SafetyConfig{
-				Level:      SafetyLevelEnabled,
+				Level:      shared.SafetyLevelEnabled,
 				IsExplicit: true,
 			}
 		}
 		return SafetyConfig{
-			Level:      SafetyLevelDisabled,
+			Level:      shared.SafetyLevelDisabled,
 			IsExplicit: true,
 		}
 	}
 
 	// Default when neither is present
 	return SafetyConfig{
-		Level:      SafetyLevelEnabled,
+		Level:      shared.SafetyLevelEnabled,
 		IsExplicit: false,
 	}
 }
 
 // parseSafetyLevelValue attempts to parse safety level from interface value
 // Returns parsed level and success flag
-func parseSafetyLevelValue(value any) (SafetyLevelType, bool) {
+func parseSafetyLevelValue(value any) (shared.SafetyLevelType, bool) {
 	switch val := value.(type) {
 	case string:
 		return parseSafetyLevelString(strings.TrimSpace(val))
@@ -84,45 +88,45 @@ func parseSafetyLevelValue(value any) (SafetyLevelType, bool) {
 			return level, ok
 		}
 	}
-	return SafetyLevelEnabled, false
+	return shared.SafetyLevelEnabled, false
 }
 
-// parseSafetyLevelString converts string to SafetyLevelType
-func parseSafetyLevelString(s string) (SafetyLevelType, bool) {
+// parseSafetyLevelString converts string to shared.SafetyLevelType
+func parseSafetyLevelString(s string) (shared.SafetyLevelType, bool) {
 	switch strings.ToLower(s) {
 	case "disabled":
-		return SafetyLevelDisabled, true
+		return shared.SafetyLevelDisabled, true
 	case "enabled":
-		return SafetyLevelEnabled, true
+		return shared.SafetyLevelEnabled, true
 	case "strict":
-		return SafetyLevelStrict, true
+		return shared.SafetyLevelStrict, true
 	case "paranoid":
-		return SafetyLevelParanoid, true
+		return shared.SafetyLevelParanoid, true
 	}
-	return SafetyLevelEnabled, false
+	return shared.SafetyLevelEnabled, false
 }
 
-// parseSafetyLevelNumeric converts string number to SafetyLevelType
-func parseSafetyLevelNumeric(s string) (SafetyLevelType, bool) {
+// parseSafetyLevelNumeric converts string number to shared.SafetyLevelType
+func parseSafetyLevelNumeric(s string) (shared.SafetyLevelType, bool) {
 	if level, err := strconv.Atoi(s); err == nil {
-		switch SafetyLevelType(level) {
-		case SafetyLevelDisabled, SafetyLevelEnabled, SafetyLevelStrict, SafetyLevelParanoid:
-			return SafetyLevelType(level), true
+		switch shared.SafetyLevelType(level) {
+		case shared.SafetyLevelDisabled, shared.SafetyLevelEnabled, shared.SafetyLevelStrict, shared.SafetyLevelParanoid:
+			return shared.SafetyLevelType(level), true
 		}
 	}
-	return SafetyLevelEnabled, false
+	return shared.SafetyLevelEnabled, false
 }
 
 // Validate validates the safety configuration
 func (sc SafetyConfig) Validate() error {
 	// SafetyConfig uses strong typing which prevents invalid states at compile time
-	// The SafetyLevelType enum ensures only valid values can be assigned
+	// The shared.SafetyLevelType enum ensures only valid values can be assigned
 	// Currently, no runtime validation is needed for the existing fields
 	return nil
 }
 
 // ToSafetyLevel extracts the effective safety level
-func (sc SafetyConfig) ToSafetyLevel() SafetyLevelType {
+func (sc SafetyConfig) ToSafetyLevel() shared.SafetyLevelType {
 	return sc.Level
 }
 

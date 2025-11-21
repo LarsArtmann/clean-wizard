@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // validateCrossFieldConstraints validates cross-field relationships

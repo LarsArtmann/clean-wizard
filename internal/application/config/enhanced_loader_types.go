@@ -6,7 +6,7 @@ import (
 
 // ValidationLevel defines validation strictness (backward compatibility)
 //
-// IMPORTANT: These integer values MUST remain in sync with domain.ValidationLevelType
+// IMPORTANT: These integer values MUST remain in sync with shared.ValidationLevelType
 // See: internal/domain/type_safe_enums.go:116-123
 // When changing numeric values, update BOTH locations to prevent drift.
 // Consider aliasing the domain type directly to avoid duplication in the future.
@@ -39,8 +39,8 @@ func (vl ValidationLevel) String() string {
 type EnhancedConfigLoader struct {
 	middleware       *ValidationMiddleware
 	validator        *ConfigValidator
-	sanitizer        *ConfigSanitizer
-	cache            *ConfigCache
+	sanitizer        *config.ConfigSanitizer
+	cache            *config.ConfigCache
 	retryPolicy      *RetryPolicy
 	enableMonitoring bool
 }

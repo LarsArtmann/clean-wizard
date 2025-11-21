@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,7 +16,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 	tests := []struct {
 		name             string
 		setup            func(*viper.Viper)
-		expected         domain.SafetyLevelType
+		expected         shared.SafetyLevelType
 		expectedExplicit bool
 	}{
 		{
@@ -24,7 +24,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "enabled")
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -32,7 +32,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "disabled")
 			},
-			expected:         domain.SafetyLevelDisabled,
+			expected:         shared.SafetyLevelDisabled,
 			expectedExplicit: true,
 		},
 		{
@@ -40,7 +40,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "strict")
 			},
-			expected:         domain.SafetyLevelStrict,
+			expected:         shared.SafetyLevelStrict,
 			expectedExplicit: true,
 		},
 		{
@@ -48,7 +48,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "paranoid")
 			},
-			expected:         domain.SafetyLevelParanoid,
+			expected:         shared.SafetyLevelParanoid,
 			expectedExplicit: true,
 		},
 		{
@@ -56,7 +56,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "  enabled  ")
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -64,7 +64,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "ENABLED")
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -72,7 +72,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 0)
 			},
-			expected:         domain.SafetyLevelDisabled,
+			expected:         shared.SafetyLevelDisabled,
 			expectedExplicit: true,
 		},
 		{
@@ -80,7 +80,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 1)
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -88,7 +88,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 2)
 			},
-			expected:         domain.SafetyLevelStrict,
+			expected:         shared.SafetyLevelStrict,
 			expectedExplicit: true,
 		},
 		{
@@ -96,7 +96,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 3)
 			},
-			expected:         domain.SafetyLevelParanoid,
+			expected:         shared.SafetyLevelParanoid,
 			expectedExplicit: true,
 		},
 		{
@@ -104,7 +104,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 1.0)
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -112,7 +112,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 1.5)
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -120,7 +120,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safe_mode", true)
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -128,7 +128,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safe_mode", false)
 			},
-			expected:         domain.SafetyLevelDisabled,
+			expected:         shared.SafetyLevelDisabled,
 			expectedExplicit: true,
 		},
 		{
@@ -137,7 +137,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 				v.Set("safety_level", "strict")
 				v.Set("safe_mode", false)
 			},
-			expected:         domain.SafetyLevelStrict,
+			expected:         shared.SafetyLevelStrict,
 			expectedExplicit: true,
 		},
 		{
@@ -145,7 +145,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", "invalid")
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -153,7 +153,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				v.Set("safety_level", 999)
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: true,
 		},
 		{
@@ -161,7 +161,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 			setup: func(v *viper.Viper) {
 				// Don't set any safety-related keys
 			},
-			expected:         domain.SafetyLevelEnabled,
+			expected:         shared.SafetyLevelEnabled,
 			expectedExplicit: false, // Only case where IsExplicit is false
 		},
 	}
@@ -170,7 +170,7 @@ func TestParseSafetyLevelWithBackwardCompatibility(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			v := viper.New()
 			tt.setup(v)
-			result := domain.ParseSafetyConfig(v)
+			result := shared.ParseSafetyConfig(v)
 			assert.Equal(t, tt.expected, result.ToSafetyLevel())
 			assert.Equal(t, tt.expectedExplicit, result.IsExplicit, "IsExplicit should match expectation")
 		})
@@ -184,7 +184,7 @@ func TestLoadWithContext_SafetyLevelBackwardCompatibility(t *testing.T) {
 	tests := []struct {
 		name           string
 		configContent  string
-		expectedSafety domain.SafetyLevelType
+		expectedSafety shared.SafetyLevelType
 	}{
 		{
 			name: "new safety_level string format",
@@ -204,7 +204,7 @@ profiles:
         risk_level: "LOW"
         enabled: true
 `,
-			expectedSafety: domain.SafetyLevelStrict,
+			expectedSafety: shared.SafetyLevelStrict,
 		},
 		{
 			name: "new safety_level numeric format",
@@ -224,7 +224,7 @@ profiles:
         risk_level: "LOW"
         enabled: true
 `,
-			expectedSafety: domain.SafetyLevelStrict,
+			expectedSafety: shared.SafetyLevelStrict,
 		},
 		{
 			name: "legacy safe_mode format",
@@ -244,7 +244,7 @@ profiles:
         risk_level: "LOW"
         enabled: true
 `,
-			expectedSafety: domain.SafetyLevelDisabled,
+			expectedSafety: shared.SafetyLevelDisabled,
 		},
 		{
 			name: "safety_level takes precedence",
@@ -265,7 +265,7 @@ profiles:
         risk_level: "LOW"
         enabled: true
 `,
-			expectedSafety: domain.SafetyLevelParanoid,
+			expectedSafety: shared.SafetyLevelParanoid,
 		},
 		{
 			name: "default when no safety config",
@@ -284,7 +284,7 @@ profiles:
         risk_level: "LOW"
         enabled: true
 `,
-			expectedSafety: domain.SafetyLevelEnabled,
+			expectedSafety: shared.SafetyLevelEnabled,
 		},
 	}
 
@@ -341,5 +341,5 @@ profiles:
 	require.NotNil(t, config)
 
 	// Verify safety level
-	assert.Equal(t, domain.SafetyLevelParanoid, config.SafetyLevel)
+	assert.Equal(t, shared.SafetyLevelParanoid, config.SafetyLevel)
 }

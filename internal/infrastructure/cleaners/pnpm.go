@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
@@ -57,13 +57,13 @@ func (pc *PnpmCleaner) GetCacheSize(ctx context.Context) int64 {
 	return size
 }
 
-// GetStoreSize implements domain.Cleaner interface
+// GetStoreSize implements shared.Cleaner interface
 func (pc *PnpmCleaner) GetStoreSize(ctx context.Context) int64 {
 	return pc.GetCacheSize(ctx)
 }
 
 // ValidateSettings validates pnpm cleaner settings with type safety
-func (pc *PnpmCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (pc *PnpmCleaner) ValidateSettings(settings *shared.OperationSettings) error {
 	if settings == nil {
 		return nil // Settings are optional
 	}
@@ -73,11 +73,11 @@ func (pc *PnpmCleaner) ValidateSettings(settings *domain.OperationSettings) erro
 }
 
 // Cleanup performs pnpm store cleanup
-func (pc *PnpmCleaner) Cleanup(ctx context.Context, settings *domain.OperationSettings) result.Result[domain.CleanResult] {
+func (pc *PnpmCleaner) Cleanup(ctx context.Context, settings *shared.OperationSettings) result.Result[shared.CleanResult] {
 	startTime := time.Now()
 
 	if !pc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("pnpm is not available"))
+		return result.Err[shared.CleanResult](fmt.Errorf("pnpm is not available"))
 	}
 
 	if pc.verbose {
@@ -87,20 +87,20 @@ func (pc *PnpmCleaner) Cleanup(ctx context.Context, settings *domain.OperationSe
 	cleanupCmdResult := pc.runCleanupCommand(ctx)
 	
 	// Create final result
-	cleanResult := domain.CleanResult{
+	cleanResult := shared.CleanResult{
 		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
 		ItemsRemoved: cleanupCmdResult.Value().ItemsRemoved,
 		ItemsFailed:  cleanupCmdResult.Value().ItemsFailed,
 		CleanTime:    time.Since(startTime),
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative, // pnpm store cleanup is conservative
+		Strategy:     shared.StrategyConservative, // pnpm store cleanup is conservative
 	}
 
 	return result.Ok(cleanResult)
 }
 
 // runCleanupCommand executes pnpm store prune
-func (pc *PnpmCleaner) runCleanupCommand(ctx context.Context) result.Result[domain.CleanResult] {
+func (pc *PnpmCleaner) runCleanupCommand(ctx context.Context) result.Result[shared.CleanResult] {
 	if pc.dryRun {
 		return pc.simulateCleanupCommand()
 	}
@@ -108,7 +108,7 @@ func (pc *PnpmCleaner) runCleanupCommand(ctx context.Context) result.Result[doma
 	// Execute actual pnpm store prune
 	cmdResult := runCommand(ctx, "pnpm", "store", "prune")
 	if cmdResult.IsErr() {
-		return result.Err[domain.CleanResult](cmdResult.Error())
+		return result.Err[shared.CleanResult](cmdResult.Error())
 	}
 
 	output := cmdResult.Value()
@@ -138,20 +138,20 @@ func (pc *PnpmCleaner) runCleanupCommand(ctx context.Context) result.Result[doma
 		bytesFreed = 200 * 1024 * 1024 // 200MB estimate
 	}
 
-	cleanupCmdResult := domain.CleanResult{
+	cleanupCmdResult := shared.CleanResult{
 		FreedBytes:   bytesFreed,
 		ItemsRemoved: itemsRemoved,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     shared.StrategyConservative,
 	}
 
 	return result.Ok(cleanupCmdResult)
 }
 
 // simulateCleanupCommand simulates cleanup for dry-run mode
-func (pc *PnpmCleaner) simulateCleanupCommand() result.Result[domain.CleanResult] {
+func (pc *PnpmCleaner) simulateCleanupCommand() result.Result[shared.CleanResult] {
 	if pc.verbose {
 		fmt.Println("🔍 DRY RUN: pnpm store prune")
 	}
@@ -160,13 +160,13 @@ func (pc *PnpmCleaner) simulateCleanupCommand() result.Result[domain.CleanResult
 	var itemsRemoved uint = 1 // Store directory
 	var bytesFreed uint64 = 200 * 1024 * 1024 // 200MB estimate
 
-	simulateResult := domain.CleanResult{
+	simulateResult := shared.CleanResult{
 		FreedBytes:   bytesFreed,
 		ItemsRemoved: itemsRemoved,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyDryRun,
+		Strategy:     shared.StrategyDryRun,
 	}
 
 	return result.Ok(simulateResult)

@@ -6,14 +6,14 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // Test constants for invalid risk levels to improve readability and maintainability
 const (
-	testInvalidRiskUnknown  = domain.RiskLevelType(99)  // Unknown risk value outside valid range
-	testInvalidRiskNegative = domain.RiskLevelType(-1)  // Negative risk value
-	testInvalidRiskTooHigh  = domain.RiskLevelType(100) // Risk value above maximum
+	testInvalidRiskUnknown  = shared.RiskLevelType(99)  // Unknown risk value outside valid range
+	testInvalidRiskNegative = shared.RiskLevelType(-1)  // Negative risk value
+	testInvalidRiskTooHigh  = shared.RiskLevelType(100) // Risk value above maximum
 )
 
 // contains helper function
@@ -24,13 +24,13 @@ func contains(s, substr string) bool {
 func TestRiskLevel_String(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    domain.RiskLevel
+		level    shared.RiskLevel
 		expected string
 	}{
-		{"low risk", domain.RiskLow, "LOW"},
-		{"medium risk", domain.RiskMedium, "MEDIUM"},
-		{"high risk", domain.RiskHigh, "HIGH"},
-		{"critical risk", domain.RiskCritical, "CRITICAL"},
+		{"low risk", shared.RiskLow, "LOW"},
+		{"medium risk", shared.RiskMedium, "MEDIUM"},
+		{"high risk", shared.RiskHigh, "HIGH"},
+		{"critical risk", shared.RiskCritical, "CRITICAL"},
 		{"unknown risk", testInvalidRiskUnknown, "UNKNOWN"},
 	}
 
@@ -49,13 +49,13 @@ func TestRiskLevel_Icon(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		level    domain.RiskLevel
+		level    shared.RiskLevel
 		expected string
 	}{
-		{"low risk", domain.RiskLow, "🟢"},
-		{"medium risk", domain.RiskMedium, "🟡"},
-		{"high risk", domain.RiskHigh, "🟠"},
-		{"critical risk", domain.RiskCritical, "🔴"},
+		{"low risk", shared.RiskLow, "🟢"},
+		{"medium risk", shared.RiskMedium, "🟡"},
+		{"high risk", shared.RiskHigh, "🟠"},
+		{"critical risk", shared.RiskCritical, "🔴"},
 		{"unknown risk", testInvalidRiskUnknown, "⚪"},
 	}
 
@@ -72,13 +72,13 @@ func TestRiskLevel_Icon(t *testing.T) {
 func TestRiskLevel_IsValid(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    domain.RiskLevel
+		level    shared.RiskLevel
 		expected bool
 	}{
-		{"low risk", domain.RiskLow, true},
-		{"medium risk", domain.RiskMedium, true},
-		{"high risk", domain.RiskHigh, true},
-		{"critical risk", domain.RiskCritical, true},
+		{"low risk", shared.RiskLow, true},
+		{"medium risk", shared.RiskMedium, true},
+		{"high risk", shared.RiskHigh, true},
+		{"critical risk", shared.RiskCritical, true},
 		{"unknown risk", testInvalidRiskUnknown, false},
 		{"negative risk", testInvalidRiskNegative, false},
 		{"too high risk", testInvalidRiskTooHigh, false},
@@ -130,7 +130,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLow).
+					AddOperation(CleanTypeNixStore, shared.RiskLow).
 					Done()
 			},
 			expectError: false,
@@ -148,7 +148,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLow).
+					AddOperation(CleanTypeNixStore, shared.RiskLow).
 					Done()
 			},
 			expectError: false,
@@ -158,7 +158,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskCritical).
+					AddOperation(CleanTypeNixStore, shared.RiskCritical).
 					Done()
 			},
 			expectError: true,
@@ -205,7 +205,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLow)
+					AddOperation(CleanTypeNixStore, shared.RiskLow)
 			},
 			expectError: false,
 		},
@@ -223,7 +223,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskHigh)
+					AddOperation(CleanTypeNixStore, shared.RiskHigh)
 			},
 			expectError: false,
 		},

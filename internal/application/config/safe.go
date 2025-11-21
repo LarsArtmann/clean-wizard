@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // SafeConfig represents a validated cleaning configuration
@@ -12,7 +12,7 @@ type SafeConfig struct {
 	safeMode bool
 	dryRun   bool
 	backup   bool
-	maxRisk  domain.RiskLevel
+	maxRisk  shared.RiskLevel
 	profiles []SafeProfile
 	created  time.Time
 }
@@ -22,18 +22,18 @@ type SafeProfile struct {
 	name        string
 	description string
 	operations  []SafeOperation
-	maxRisk     domain.RiskLevel
+	maxRisk     shared.RiskLevel
 }
 
 // SafeOperation represents a validated cleaning operation
 type SafeOperation struct {
 	name    CleanType
-	risk    domain.RiskLevel
+	risk    shared.RiskLevel
 	enabled bool
 	backup  bool
 }
 
-// String returns string representation (removed - use domain.RiskLevel methods)
+// String returns string representation (removed - use shared.RiskLevel methods)
 
 // Icon returns emoji for risk level - moved to domain package
 
@@ -61,7 +61,7 @@ func (ct CleanType) IsValid() bool {
 func NewSafeConfigBuilder() *SafeConfigBuilder {
 	return &SafeConfigBuilder{
 		profiles: []SafeProfile{},
-		maxRisk:  domain.RiskLow,
+		maxRisk:  shared.RiskLow,
 	}
 }
 
@@ -70,7 +70,7 @@ type SafeConfigBuilder struct {
 	safeMode bool
 	dryRun   bool
 	backup   bool
-	maxRisk  domain.RiskLevel
+	maxRisk  shared.RiskLevel
 	profiles []SafeProfile
 	err      error
 }
@@ -104,7 +104,7 @@ func (scb *SafeConfigBuilder) AddProfile(name, description string) *SafeProfileB
 		description: description,
 		config:      scb,
 		operations:  []SafeOperation{},
-		maxRisk:     domain.RiskLow,
+		maxRisk:     shared.RiskLow,
 	}
 }
 
@@ -138,12 +138,12 @@ type SafeProfileBuilder struct {
 	description string
 	config      *SafeConfigBuilder
 	operations  []SafeOperation
-	maxRisk     domain.RiskLevel
+	maxRisk     shared.RiskLevel
 	err         error
 }
 
 // AddOperation adds a safe operation
-func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLevel) *SafeProfileBuilder {
+func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk shared.RiskLevel) *SafeProfileBuilder {
 	if spb.err != nil {
 		return spb
 	}
@@ -158,7 +158,7 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLe
 		return spb
 	}
 
-	if risk.IsHigherThan(domain.RiskHigh) && spb.err == nil {
+	if risk.IsHigherThan(shared.RiskHigh) && spb.err == nil {
 		spb.err = fmt.Errorf("cannot add critical risk operation to profile")
 		return spb
 	}
@@ -167,7 +167,7 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLe
 		name:    opType,
 		risk:    risk,
 		enabled: true,
-		backup:  risk.IsHigherOrEqualThan(domain.RiskMedium),
+		backup:  risk.IsHigherOrEqualThan(shared.RiskMedium),
 	}
 
 	spb.operations = append(spb.operations, op)
@@ -181,17 +181,17 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLe
 // Done finishes profile building
 func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 	if spb.err != nil {
-		spb.config.err = spb.err
+		spb.Configerr = spb.err
 		return spb.config
 	}
 
 	if len(spb.operations) == 0 {
-		spb.config.err = fmt.Errorf("profile must have at least one operation")
+		spb.Configerr = fmt.Errorf("profile must have at least one operation")
 		return spb.config
 	}
 
-	if spb.maxRisk.IsHigherThan(domain.RiskHigh) {
-		spb.config.err = fmt.Errorf("profile risk level cannot exceed HIGH")
+	if spb.maxRisk.IsHigherThan(shared.RiskHigh) {
+		spb.Configerr = fmt.Errorf("profile risk level cannot exceed HIGH")
 		return spb.config
 	}
 
@@ -202,9 +202,9 @@ func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 		maxRisk:     spb.maxRisk,
 	}
 
-	spb.config.profiles = append(spb.config.profiles, profile)
-	if spb.maxRisk > spb.config.maxRisk {
-		spb.config.maxRisk = spb.maxRisk
+	spb.Configprofiles = append(spb.Configprofiles, profile)
+	if spb.maxRisk > spb.ConfigmaxRisk {
+		spb.ConfigmaxRisk = spb.maxRisk
 	}
 
 	return spb.config

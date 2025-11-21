@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // sanitizeOperationSettings sanitizes operation settings with type safety
-func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName string, settings *domain.OperationSettings, result *SanitizationResult) {
+func (cs *config.ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName string, settings *shared.OperationSettings, result *SanitizationResult) {
 	// Guard against nil settings to prevent panic
 	if settings == nil {
 		result.Warnings = append(result.Warnings, SanitizationWarning{
@@ -20,12 +20,12 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName 
 		return
 	}
 
-	opType := domain.GetOperationType(operationName)
+	opType := shared.GetOperationType(operationName)
 
 	// Validate settings first
 	if err := settings.ValidateSettings(opType); err != nil {
 		// Convert validation errors to warnings since we're in sanitization
-		var vErr *domain.ValidationError
+		var vErr *shared.ValidationError
 		if errors.As(err, &vErr) {
 			result.Warnings = append(result.Warnings, SanitizationWarning{
 				Field:     fieldPrefix + "." + vErr.Field,
@@ -46,16 +46,16 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName 
 
 	// Type-aware sanitization based on operation type
 	switch opType {
-	case domain.OperationTypeNixGenerations:
+	case shared.OperationTypeNixGenerations:
 		cs.sanitizeNixGenerationsSettings(fieldPrefix, settings.NixGenerations, result)
 
-	case domain.OperationTypeTempFiles:
+	case shared.OperationTypeTempFiles:
 		cs.sanitizeTempFilesSettings(fieldPrefix, settings.TempFiles, result)
 
-	case domain.OperationTypeHomebrew:
+	case shared.OperationTypeHomebrew:
 		cs.sanitizeHomebrewSettings(fieldPrefix, settings.Homebrew, result)
 
-	case domain.OperationTypeSystemTemp:
+	case shared.OperationTypeSystemTemp:
 		cs.sanitizeSystemTempSettings(fieldPrefix, settings.SystemTemp, result)
 
 		// For custom operation types, no specific sanitization is applied

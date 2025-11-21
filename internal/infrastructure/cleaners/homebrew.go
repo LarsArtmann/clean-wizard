@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
@@ -61,13 +61,13 @@ func (hc *HomebrewCleaner) GetCacheSize(ctx context.Context) int64 {
 	return size
 }
 
-// GetStoreSize implements domain.Cleaner interface
+// GetStoreSize implements shared.Cleaner interface
 func (hc *HomebrewCleaner) GetStoreSize(ctx context.Context) int64 {
 	return hc.GetCacheSize(ctx)
 }
 
 // ValidateSettings validates Homebrew cleaner settings with type safety
-func (hc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (hc *HomebrewCleaner) ValidateSettings(settings *shared.OperationSettings) error {
 	if settings == nil {
 		return nil // Settings are optional
 	}
@@ -77,11 +77,11 @@ func (hc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings) 
 }
 
 // Cleanup performs Homebrew cleanup with comprehensive operations
-func (hc *HomebrewCleaner) Cleanup(ctx context.Context, settings *domain.OperationSettings) result.Result[domain.CleanResult] {
+func (hc *HomebrewCleaner) Cleanup(ctx context.Context, settings *shared.OperationSettings) result.Result[shared.CleanResult] {
 	startTime := time.Now()
 
 	if !hc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("homebrew is not available"))
+		return result.Err[shared.CleanResult](fmt.Errorf("homebrew is not available"))
 	}
 
 	var totalFreed uint64
@@ -132,20 +132,20 @@ func (hc *HomebrewCleaner) Cleanup(ctx context.Context, settings *domain.Operati
 	}
 
 	// Create final result
-	cleanResult := domain.CleanResult{
+	cleanResult := shared.CleanResult{
 		FreedBytes:   totalFreed,
 		ItemsRemoved: totalRemoved,
 		ItemsFailed:  totalFailed,
 		CleanTime:    time.Since(startTime),
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative, // Homebrew cleanup is conservative
+		Strategy:     shared.StrategyConservative, // Homebrew cleanup is conservative
 	}
 
 	return result.Ok(cleanResult)
 }
 
 // runCleanupCommand executes a Homebrew cleanup command
-func (hc *HomebrewCleaner) runCleanupCommand(ctx context.Context, args ...string) result.Result[domain.CleanResult] {
+func (hc *HomebrewCleaner) runCleanupCommand(ctx context.Context, args ...string) result.Result[shared.CleanResult] {
 	if hc.dryRun {
 		return hc.simulateCleanupCommand(args...)
 	}
@@ -153,7 +153,7 @@ func (hc *HomebrewCleaner) runCleanupCommand(ctx context.Context, args ...string
 	// Execute the actual command
 	cmdResult := runCommand(ctx, "brew", args...)
 	if cmdResult.IsErr() {
-		return result.Err[domain.CleanResult](cmdResult.Error())
+		return result.Err[shared.CleanResult](cmdResult.Error())
 	}
 
 	output := cmdResult.Value()
@@ -178,20 +178,20 @@ func (hc *HomebrewCleaner) runCleanupCommand(ctx context.Context, args ...string
 		}
 	}
 
-	cleanupResult := domain.CleanResult{
+	cleanupResult := shared.CleanResult{
 		FreedBytes:   bytesFreed,
 		ItemsRemoved: itemsRemoved,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     shared.StrategyConservative,
 	}
 
 	return result.Ok(cleanupResult)
 }
 
 // simulateCleanupCommand simulates cleanup for dry-run mode
-func (hc *HomebrewCleaner) simulateCleanupCommand(args ...string) result.Result[domain.CleanResult] {
+func (hc *HomebrewCleaner) simulateCleanupCommand(args ...string) result.Result[shared.CleanResult] {
 	if hc.verbose {
 		fmt.Printf("🔍 DRY RUN: brew %s\n", strings.Join(args, " "))
 	}
@@ -210,30 +210,30 @@ func (hc *HomebrewCleaner) simulateCleanupCommand(args ...string) result.Result[
 		bytesFreed = 200 * 1024 * 1024 // 200MB estimate
 	}
 
-	simulateResult := domain.CleanResult{
+	simulateResult := shared.CleanResult{
 		FreedBytes:   bytesFreed,
 		ItemsRemoved: itemsRemoved,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyDryRun,
+		Strategy:     shared.StrategyDryRun,
 	}
 
 	return result.Ok(simulateResult)
 }
 
 // cleanupCaskCache cleans up Homebrew Cask cache
-func (hc *HomebrewCleaner) cleanupCaskCache(ctx context.Context) result.Result[domain.CleanResult] {
+func (hc *HomebrewCleaner) cleanupCaskCache(ctx context.Context) result.Result[shared.CleanResult] {
 	// Check if Cask is available
 	caskResult := runCommand(ctx, "brew", "--help")
 	if caskResult.IsErr() {
-		return result.Ok(domain.CleanResult{
+		return result.Ok(shared.CleanResult{
 			FreedBytes:   0,
 			ItemsRemoved: 0,
 			ItemsFailed:  0,
 			CleanTime:    0,
 			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
+			Strategy:     shared.StrategyConservative,
 		})
 	}
 
