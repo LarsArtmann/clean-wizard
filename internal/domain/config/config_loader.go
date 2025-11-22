@@ -1,13 +1,11 @@
 package config
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
-)
-
-import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // ViperConfig interface for viper operations (enables testing and dependency inversion)

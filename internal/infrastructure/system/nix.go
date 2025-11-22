@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
-	"github.com/LarsArtmann/clean-wizard/test"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
+	mocks "github.com/LarsArtmann/clean-wizard/test"
 )
 
 // NixAdapter wraps Nix package manager operations

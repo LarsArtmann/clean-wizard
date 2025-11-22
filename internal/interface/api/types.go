@@ -1,13 +1,15 @@
 package api
 
-import "github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+import (
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+)
 
 // Type definitions with proper type safety - DOMAIN DRIVEN DESIGN
 // TODO: Generate from TypeSpec compiler in production
 
 type PublicConfig struct {
 	Version        string                    `json:"version"`
-	SafetyLevel    domain.SafetyLevelType    `json:"safetyLevel"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
+	SafetyLevel    shared.SafetyLevelType    `json:"safetyLevel"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
 	MaxDiskUsage   int32                     `json:"maxDiskUsage"`
 	ProtectedPaths []string                  `json:"protectedPaths"`
 	Profiles       map[string]*PublicProfile `json:"profiles"`
@@ -16,7 +18,7 @@ type PublicConfig struct {
 type PublicProfile struct {
 	Name        string            `json:"name"`
 	Description string            `json:"description"`
-	Status      domain.StatusType `json:"status"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
+	Status      shared.StatusType `json:"status"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
 	Operations  []PublicOperation `json:"operations"`
 }
 
@@ -24,12 +26,12 @@ type PublicOperation struct {
 	Name        string            `json:"name"`
 	Description string            `json:"description"`
 	RiskLevel   PublicRiskLevel   `json:"riskLevel"`
-	Status      domain.StatusType `json:"status"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
+	Status      shared.StatusType `json:"status"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
 	Settings    OperationSettings `json:"settings"`
 }
 
 type OperationSettings struct {
-	ExecutionMode       domain.ExecutionModeType `json:"executionMode"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
+	ExecutionMode       shared.ExecutionModeType `json:"executionMode"` // FIXED: bool → enum - invalid states UNREPRESENTABLE!
 	Verbose             bool                     `json:"verbose"`
 	TimeoutSeconds      int32                    `json:"timeoutSeconds"`
 	ConfirmBeforeDelete bool                     `json:"confirmBeforeDelete"`
@@ -73,7 +75,6 @@ const (
 	OperationTypeCacheFiles     OperationType = "cache-files"
 )
 
-// CleanRequest represents a cleaning request with type-safe operations
 // CleanRequest represents a cleaning request with type-safe operations
 type CleanRequest struct {
 	Config     PublicConfig    `json:"config"`

@@ -2,7 +2,7 @@ package shared
 
 import (
 	"context"
-	
+
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 

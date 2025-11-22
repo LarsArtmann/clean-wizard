@@ -85,7 +85,7 @@ func (pc *PnpmCleaner) Cleanup(ctx context.Context, settings *shared.OperationSe
 	}
 
 	cleanupCmdResult := pc.runCleanupCommand(ctx)
-	
+
 	// Create final result
 	cleanResult := shared.CleanResult{
 		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
@@ -112,13 +112,13 @@ func (pc *PnpmCleaner) runCleanupCommand(ctx context.Context) result.Result[shar
 	}
 
 	output := cmdResult.Value()
-	
+
 	// Parse pnpm store prune output to extract cleanup information
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	
+
 	var itemsRemoved uint
 	var bytesFreed uint64
-	
+
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if strings.Contains(line, "removed") || strings.Contains(line, "deleted") {
@@ -157,7 +157,7 @@ func (pc *PnpmCleaner) simulateCleanupCommand() result.Result[shared.CleanResult
 	}
 
 	// Simulate typical pnpm store cleanup results
-	var itemsRemoved uint = 1 // Store directory
+	var itemsRemoved uint = 1                 // Store directory
 	var bytesFreed uint64 = 200 * 1024 * 1024 // 200MB estimate
 
 	simulateResult := shared.CleanResult{

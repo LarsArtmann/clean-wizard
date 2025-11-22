@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	mocks "github.com/LarsArtmann/clean-wizard/test"
-	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
+	mocks "github.com/LarsArtmann/clean-wizard/test"
 )
 
 // NixCleaner handles Nix package manager cleanup with proper type safety
@@ -52,11 +52,11 @@ func (nc *NixCleaner) ValidateSettings(settings *shared.OperationSettings) error
 	if settings == nil || settings.NixGenerations == nil {
 		return fmt.Errorf("Nix generations settings required")
 	}
-	
+
 	if settings.NixGenerations.Generations <= 0 || settings.NixGenerations.Generations > 100 {
 		return fmt.Errorf("generations count must be between 1 and 100")
 	}
-	
+
 	return nil
 }
 
@@ -70,7 +70,7 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]share
 			// Return mock data when Nix not available for testing
 			return mocks.MockNixGenerationsResult()
 		}
-		
+
 		return nc.adapter.ListGenerations(ctx)
 	}
 }
@@ -80,7 +80,7 @@ func (nc *NixCleaner) Cleanup(ctx context.Context, settings *shared.OperationSet
 	if err := nc.ValidateSettings(settings); err != nil {
 		return result.Err[shared.CleanResult](err)
 	}
-	
+
 	select {
 	case <-ctx.Done():
 		return result.Err[shared.CleanResult](ctx.Err())
@@ -88,13 +88,13 @@ func (nc *NixCleaner) Cleanup(ctx context.Context, settings *shared.OperationSet
 		if !nc.IsAvailable(ctx) {
 			// Return success when Nix not available (graceful degradation)
 			return result.Ok(shared.CleanResult{
-				ItemsFailed:  0,
-				CleanTime:    0,
-				CleanedAt:    time.Now(),
-				Strategy:     shared.StrategyConservative,
+				ItemsFailed: 0,
+				CleanTime:   0,
+				CleanedAt:   time.Now(),
+				Strategy:    shared.StrategyConservative,
 			})
 		}
-		
+
 		// Perform garbage collection
 		cleanupResult := nc.adapter.CollectGarbage(ctx)
 		return cleanupResult
@@ -106,7 +106,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	if keepCount < 1 || keepCount > 100 {
 		return result.Err[shared.CleanResult](fmt.Errorf("keep count must be between 1 and 100"))
 	}
-	
+
 	select {
 	case <-ctx.Done():
 		return result.Err[shared.CleanResult](ctx.Err())
@@ -122,13 +122,13 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 				Strategy:     shared.StrategyConservative,
 			})
 		}
-		
+
 		// List all generations and remove old ones
 		genResult := nc.ListGenerations(ctx)
 		if genResult.IsErr() {
 			return result.Err[shared.CleanResult](genResult.Error())
 		}
-		
+
 		generations := genResult.Value()
 		if len(generations) <= keepCount {
 			// Nothing to remove
@@ -141,12 +141,12 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 				Strategy:     shared.StrategyConservative,
 			})
 		}
-		
+
 		// Remove old generations
 		var totalRemoved uint
 		var totalBytes uint64
 		start := time.Now()
-		
+
 		for i := keepCount; i < len(generations); i++ {
 			removeResult := nc.adapter.RemoveGeneration(ctx, int(generations[i].ID))
 			if removeResult.IsOk() {
@@ -154,10 +154,10 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 				totalBytes += removeResult.Value().FreedBytes
 			}
 		}
-		
+
 		return result.Ok(shared.CleanResult{
 			FreedBytes:   totalBytes,
-			ItemsRemoved: uint(totalRemoved), // Fixed type conversion
+			ItemsRemoved: uint(totalRemoved),                                     // Fixed type conversion
 			ItemsFailed:  uint(len(generations) - keepCount - int(totalRemoved)), // Fixed type conversion
 			CleanTime:    time.Since(start),
 			CleanedAt:    time.Now(),

@@ -15,14 +15,14 @@ import (
 // - Protected []string -> ProtectedPaths type
 // - All profile fields with proper value types
 type Config struct {
-	Version        string              `json:"version" yaml:"version"`
-	SafetyLevel    shared.SafetyLevelType     `json:"safety_level" yaml:"safety_level"`
-	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"` // TODO: Replace with MaxDiskUsage
-	Protected      []string            `json:"protected" yaml:"protected"`           // TODO: Replace with ProtectedPaths type
-	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`
-	CurrentProfile string              `json:"current_profile,omitempty" yaml:"current_profile,omitempty"` // TODO: Replace with ProfileName
-	LastClean      time.Time           `json:"last_clean" yaml:"last_clean"`
-	Updated        time.Time           `json:"updated" yaml:"updated"`
+	Version        string                 `json:"version" yaml:"version"`
+	SafetyLevel    shared.SafetyLevelType `json:"safety_level" yaml:"safety_level"`
+	MaxDiskUsage   int                    `json:"max_disk_usage" yaml:"max_disk_usage"` // TODO: Replace with MaxDiskUsage
+	Protected      []string               `json:"protected" yaml:"protected"`           // TODO: Replace with ProtectedPaths type
+	Profiles       map[string]*Profile    `json:"profiles" yaml:"profiles"`
+	CurrentProfile string                 `json:"current_profile,omitempty" yaml:"current_profile,omitempty"` // TODO: Replace with ProfileName
+	LastClean      time.Time              `json:"last_clean" yaml:"last_clean"`
+	Updated        time.Time              `json:"updated" yaml:"updated"`
 }
 
 // CreateDefaultConfig creates a working default configuration
@@ -55,7 +55,7 @@ func CreateDefaultConfig() (*Config, error) {
 		MaxDiskUsage: int(maxDiskUsage.Uint8()),
 		Protected: []string{
 			"/System",
-			"/Applications", 
+			"/Applications",
 			"/Library",
 			"/usr/local",
 			"/Users/*/Documents",
@@ -64,7 +64,7 @@ func CreateDefaultConfig() (*Config, error) {
 		CurrentProfile: currentProfile.String(),
 		LastClean:      time.Now(),
 		Updated:        time.Now(),
-		Profiles: make(map[string]*Profile),
+		Profiles:       make(map[string]*Profile),
 	}
 
 	// Create default profiles with working operations
@@ -80,7 +80,7 @@ func CreateDefaultConfig() (*Config, error) {
 				Status:      shared.StatusEnabled,
 			},
 			{
-				Name:        "temp-files", 
+				Name:        "temp-files",
 				Description: "Clean temporary files from user directories",
 				RiskLevel:   shared.RiskLevelLowType,
 				Status:      shared.StatusEnabled,
@@ -95,7 +95,7 @@ func CreateDefaultConfig() (*Config, error) {
 		Operations: []CleanupOperation{
 			{
 				Name:        "nix-generations",
-				Description: "Remove old Nix store generations", 
+				Description: "Remove old Nix store generations",
 				RiskLevel:   shared.RiskLevelLowType,
 				Status:      shared.StatusEnabled,
 			},
@@ -119,7 +119,7 @@ func CreateDefaultConfig() (*Config, error) {
 			},
 			{
 				Name:        "go-cache",
-				Description: "Go build and module cache cleanup", 
+				Description: "Go build and module cache cleanup",
 				RiskLevel:   shared.RiskLevelLowType,
 				Status:      shared.StatusEnabled,
 			},
@@ -213,7 +213,7 @@ type Profile struct {
 	Name        string             `json:"name" yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
 	Operations  []CleanupOperation `json:"operations" yaml:"operations"`
-	Status      shared.StatusType         `json:"status" yaml:"status"`
+	Status      shared.StatusType  `json:"status" yaml:"status"`
 }
 
 // IsValid validates profile
@@ -264,8 +264,8 @@ func (p *Profile) Validate(name string) error {
 
 // CleanupOperation represents single cleanup operation with type-safe settings
 type CleanupOperation struct {
-	Name        string             `json:"name" yaml:"name"`
-	Description string             `json:"description" yaml:"description"`
+	Name        string                    `json:"name" yaml:"name"`
+	Description string                    `json:"description" yaml:"description"`
 	RiskLevel   shared.RiskLevelType      `json:"risk_level" yaml:"risk_level"`
 	Status      shared.StatusType         `json:"status" yaml:"status"`
 	Settings    *shared.OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
@@ -297,13 +297,13 @@ func (op CleanupOperation) Validate() error {
 		return fmt.Errorf("Operation description cannot be empty")
 	}
 
-// 	// Validate settings if present
-// 	if op.Settings != nil {
-// 		opType := GetOperationType(op.Name)
-// 		if err := op.Settings.ValidateSettings(opType); err != nil {
-// 			return fmt.Errorf("Operation settings validation failed: %w", err)
-// 		}
-// 	}
+	// 	// Validate settings if present
+	// 	if op.Settings != nil {
+	// 		opType := GetOperationType(op.Name)
+	// 		if err := op.Settings.ValidateSettings(opType); err != nil {
+	// 			return fmt.Errorf("Operation settings validation failed: %w", err)
+	// 		}
+	// 	}
 
 	return nil
 }

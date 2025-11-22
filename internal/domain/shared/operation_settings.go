@@ -31,7 +31,7 @@ type NixGenerationsSettings struct {
 // TempFilesSettings provides configuration for temporary files cleanup
 type TempFilesSettings struct {
 	OlderThan string   `json:"older_than,omitempty"` // Duration string (e.g., "7d", "24h")
-	Excludes   []string `json:"excludes,omitempty"`   // Paths to exclude
+	Excludes  []string `json:"excludes,omitempty"`   // Paths to exclude
 }
 
 // HomebrewSettings provides configuration for Homebrew cleanup
@@ -42,6 +42,6 @@ type HomebrewSettings struct {
 // SystemTempSettings provides configuration for system temp cleanup
 type SystemTempSettings struct {
 	OlderThan string   `json:"older_than,omitempty"` // Duration string (e.g., "7d", "24h")
-	Excludes   []string `json:"excludes,omitempty"`   // Paths to exclude
-	Paths      []string `json:"paths,omitempty"`      // Additional paths to clean
+	Excludes  []string `json:"excludes,omitempty"`   // Paths to exclude
+	Paths     []string `json:"paths,omitempty"`      // Additional paths to clean
 }

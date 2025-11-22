@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 )
 
@@ -157,13 +157,13 @@ func (hc *HomebrewCleaner) runCleanupCommand(ctx context.Context, args ...string
 	}
 
 	output := cmdResult.Value()
-	
+
 	// Parse Homebrew output to extract cleanup information
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	
+
 	var itemsRemoved uint
 	var bytesFreed uint64
-	
+
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if strings.Contains(line, "removed") || strings.Contains(line, "deleted") {
@@ -203,10 +203,10 @@ func (hc *HomebrewCleaner) simulateCleanupCommand(args ...string) result.Result[
 	command := strings.Join(args, " ")
 	switch {
 	case strings.Contains(command, "autoremove"):
-		itemsRemoved = 2 // Typically removes 1-2 packages
+		itemsRemoved = 2               // Typically removes 1-2 packages
 		bytesFreed = 100 * 1024 * 1024 // 100MB estimate
 	case strings.Contains(command, "cleanup"):
-		itemsRemoved = 5 // Typically removes several cached files
+		itemsRemoved = 5               // Typically removes several cached files
 		bytesFreed = 200 * 1024 * 1024 // 200MB estimate
 	}
 

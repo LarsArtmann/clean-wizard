@@ -8,9 +8,10 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/application/config"
+	cleaners "github.com/LarsArtmann/clean-wizard/internal/infrastructure/cleaners"
+	appconfig "github.com/LarsArtmann/clean-wizard/internal/application/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+	domainconfig "github.com/LarsArtmann/clean-wizard/internal/domain/config"
 	"github.com/cucumber/godog"
 	"github.com/rs/zerolog/log"
 )
@@ -18,11 +19,12 @@ import (
 // BDDContext holds all state for BDD test scenarios
 type BDDContext struct {
 	ctx         context.Context
-	config      *domain.Config
-	nixAdapter  *adapters.NixAdapter
-	nixCleaner  *cleaner.NixCleaner
-	generations []domain.NixGeneration
-	cleanResult *domain.CleanResult
+	appConfig   *appconfig.ConfigLoader
+	domainConfig *domainconfig.Config
+	nixAdapter  *system.NixAdapter
+	nixCleaner  *cleaners.NixCleaner
+	generations []shared.NixGeneration
+	cleanResult *shared.CleanResult
 	error       error
 	tempDir     string
 	testMode    bool // true for test scenarios, false for integration
@@ -42,7 +44,7 @@ func (b *BDDContext) BeforeScenario(sc *godog.Scenario) {
 
 	// Reset context state
 	b.ctx = context.Background()
-	b.config = nil
+	b.domainConfig = nil
 	b.generations = nil
 	b.cleanResult = nil
 	b.error = nil
@@ -56,8 +58,11 @@ func (b *BDDContext) BeforeScenario(sc *godog.Scenario) {
 	b.tempDir = tempDir
 
 	// Set up test Nix adapter (dry-run mode for safety)
-	b.nixAdapter = adapters.NewNixAdapter(time.Second*30, 3) // 3 generations
-	b.nixCleaner = cleaner.NewNixCleaner(true, true)         // verbose=true, dry-run=true
+	b.nixAdapter = system.NewNixAdapter(time.Second*30, 3) // 3 generations
+	b.nixCleaner = cleaners.NewNixCleaner()               // Uses default configuration
+	
+	// Initialize application config loader
+	b.appConfig = appconfig.NewConfigLoader()
 }
 
 // AfterScenario cleans up after each scenario
@@ -74,47 +79,52 @@ func (b *BDDContext) AfterScenario(sc *godog.Scenario, err error) {
 
 // ========== CONFIGURATION STEPS ==========
 
-// theSystemHasConfiguration creates a system configuration
+// TheSystemHasConfiguration creates a system configuration
 func (b *BDDContext) TheSystemHasConfiguration() error {
-	b.config = config.GetDefaultConfig()
-	b.config.Profiles = make(map[string]*domain.Profile)
+	domainConfig, err := domainconfig.CreateDefaultConfig()
+	if err != nil {
+		return fmt.Errorf("failed to create default domain config: %w", err)
+	}
+	b.domainConfig = domainConfig
 	return nil
 }
 
-// withNixProfile adds a Nix profile to the configuration
+// WithNixProfile adds a Nix profile to the configuration
 func (b *BDDContext) WithNixProfile(profileName string) error {
-	if b.config == nil {
+	if b.domainConfig == nil {
 		return fmt.Errorf("configuration not initialized")
 	}
 
-	profile := &domain.Profile{
+	profile := &domainconfig.Profile{
 		Name:        profileName,
 		Description: fmt.Sprintf("BDD test profile for %s", profileName),
-		Status:      domain.StatusEnabled,
-		Operations: []domain.CleanupOperation{
+		Status:      shared.StatusEnabled,
+		Operations: []domainconfig.CleanupOperation{
 			{
 				Name:        "clean_nix_generations",
 				Description: "Clean old Nix generations",
-				RiskLevel:   domain.RiskMedium,
-				Status:      domain.StatusEnabled,
+				RiskLevel:   shared.RiskLevelMediumType,
+				Status:      shared.StatusEnabled,
 			},
 		},
 	}
 
-	b.config.Profiles[profileName] = profile
+	if b.domainConfig.Profiles == nil {
+		b.domainConfig.Profiles = make(map[string]*domainconfig.Profile)
+	}
+	b.domainConfig.Profiles[profileName] = profile
 	return nil
 }
 
-// withDryRunMode enables dry run mode
+// WithDryRunMode enables dry run mode
 func (b *BDDContext) WithDryRunMode() error {
 	b.testMode = true
-	if b.nixAdapter != nil {
-		b.nixAdapter.SetDryRun(true)
-	}
+	// Note: SetDryRun would need to be implemented in NixAdapter
+	log.Info().Msg("Dry run mode enabled")
 	return nil
 }
 
-// withVerboseMode enables verbose mode
+// WithVerboseMode enables verbose mode
 func (b *BDDContext) WithVerboseMode() error {
 	if b.nixCleaner != nil {
 		// Note: This would need to be added to NixCleaner interface
@@ -125,7 +135,7 @@ func (b *BDDContext) WithVerboseMode() error {
 
 // ========== NIX SYSTEM STEPS ==========
 
-// theNixSystemIsAvailable simulates Nix system availability
+// TheNixSystemIsAvailable simulates Nix system availability
 func (b *BDDContext) TheNixSystemIsAvailable() error {
 	if b.nixAdapter == nil {
 		return fmt.Errorf("Nix adapter not initialized")
@@ -135,22 +145,19 @@ func (b *BDDContext) TheNixSystemIsAvailable() error {
 	available := b.nixAdapter.IsAvailable(b.ctx)
 	if !available {
 		// For testing, we create a mock that's always available
-		b.nixAdapter = adapters.NewNixAdapter(time.Second*30, 3) // dry-run=false for real adapter
+		b.nixAdapter = system.NewNixAdapter(time.Second*30, 3)
 	}
 
 	return nil
 }
 
-// theNixSystemIsUnavailable simulates Nix system unavailability
+// TheNixSystemIsUnavailable simulates Nix system unavailability
 func (b *BDDContext) TheNixSystemIsUnavailable() error {
-	// Create adapter that always reports unavailable
-	b.nixAdapter = &adapters.NixAdapter{
-		// This would need to be implemented for testing
-	}
-	return nil
+	// This would need to be implemented as a mock adapter
+	return fmt.Errorf("unavailable Nix system simulation not implemented")
 }
 
-// iListAvailableNixGenerations lists Nix generations
+// IListAvailableNixGenerations lists Nix generations
 func (b *BDDContext) IListAvailableNixGenerations() error {
 	if b.nixAdapter == nil {
 		return fmt.Errorf("Nix adapter not initialized")
@@ -161,11 +168,17 @@ func (b *BDDContext) IListAvailableNixGenerations() error {
 		b.error = result.Error()
 		return b.error
 	}
-	b.generations, b.error = result.Unwrap()
+	
+	generations, err := result.Unwrap()
+	if err != nil {
+		b.error = err
+		return b.error
+	}
+	b.generations = generations
 	return nil
 }
 
-// theSystemShouldHaveGenerations validates generation count
+// TheSystemShouldHaveGenerations validates generation count
 func (b *BDDContext) TheSystemShouldHaveGenerations(expectedCount int) error {
 	if b.error != nil {
 		return b.error
@@ -182,7 +195,7 @@ func (b *BDDContext) TheSystemShouldHaveGenerations(expectedCount int) error {
 
 // ========== CLEANING OPERATION STEPS ==========
 
-// iCleanOldNixGenerationsWithKeepCount performs cleaning operation
+// ICleanOldNixGenerationsWithKeepCount performs cleaning operation
 func (b *BDDContext) ICleanOldNixGenerationsWithKeepCount(keepCount int) error {
 	if b.nixCleaner == nil {
 		return fmt.Errorf("Nix cleaner not initialized")
@@ -203,7 +216,7 @@ func (b *BDDContext) ICleanOldNixGenerationsWithKeepCount(keepCount int) error {
 	return nil
 }
 
-// theCleaningShouldBeSuccessful validates cleaning success
+// TheCleaningShouldBeSuccessful validates cleaning success
 func (b *BDDContext) TheCleaningShouldBeSuccessful() error {
 	if b.error != nil {
 		return fmt.Errorf("cleaning failed: %w", b.error)
@@ -223,7 +236,7 @@ func (b *BDDContext) TheCleaningShouldBeSuccessful() error {
 
 // ========== ASSERTION STEPS ==========
 
-// noErrorShouldHaveOccurred validates no errors occurred
+// NoErrorShouldHaveOccurred validates no errors occurred
 func (b *BDDContext) NoErrorShouldHaveOccurred() error {
 	if b.error != nil {
 		return fmt.Errorf("unexpected error: %w", b.error)
@@ -231,7 +244,7 @@ func (b *BDDContext) NoErrorShouldHaveOccurred() error {
 	return nil
 }
 
-// anErrorShouldHaveOccurredWithErrorType validates error occurred
+// AnErrorShouldHaveOccurredWithErrorType validates error occurred
 func (b *BDDContext) AnErrorShouldHaveOccurredWithErrorType(errorType string) error {
 	if b.error == nil {
 		return fmt.Errorf("expected error but none occurred")

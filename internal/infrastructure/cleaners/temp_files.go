@@ -81,7 +81,7 @@ func (tfc *TempFileCleaner) Cleanup(ctx context.Context, settings *shared.Operat
 	}
 
 	cleanupCmdResult := tfc.runCleanupCommand(ctx)
-	
+
 	// Create final result
 	cleanResult := shared.CleanResult{
 		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
@@ -146,7 +146,7 @@ func (tfc *TempFileCleaner) simulateCleanupCommand() result.Result[shared.CleanR
 	}
 
 	// Simulate typical temp file cleanup results
-	var itemsRemoved uint = 5 // Multiple temp files and directories
+	var itemsRemoved uint = 5                 // Multiple temp files and directories
 	var bytesFreed uint64 = 250 * 1024 * 1024 // 250MB estimate
 
 	simulateResult := shared.CleanResult{

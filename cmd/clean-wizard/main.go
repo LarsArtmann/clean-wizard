@@ -5,8 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands"
+	appconfig "github.com/LarsArtmann/clean-wizard/internal/application/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -38,8 +39,19 @@ func colorize(text, color string) string {
 }
 
 // parseValidationLevel converts string to ValidationLevel
-func parseValidationLevel(level string) config.ValidationLevel {
-	return commands.ParseValidationLevel(level)
+func parseValidationLevel(level string) shared.ValidationLevelType {
+	switch strings.ToLower(level) {
+	case "none":
+		return shared.ValidationLevelNoneType
+	case "basic":
+		return shared.ValidationLevelBasicType
+	case "comprehensive":
+		return shared.ValidationLevelComprehensiveType
+	case "strict":
+		return shared.ValidationLevelStrictType
+	default:
+		return shared.ValidationLevelBasicType
+	}
 }
 
 func init() {
@@ -61,31 +73,48 @@ func init() {
 }
 
 func main() {
-	rootCmd := commands.NewRootCmd()
+	if len(os.Args) < 2 {
+		fmt.Println(colorize("Clean Wizard - Safe System Cleaning Tool", "cyan"))
+		fmt.Println("\nUsage: clean-wizard [command] [options]")
+		fmt.Println("\nAvailable Commands:")
+		fmt.Println("  clean    - Clean system based on configuration")
+		fmt.Println("  scan     - Scan for cleanable files")
+		fmt.Println("  profile  - Manage configuration profiles")
+		fmt.Println("  generate - Generate default configuration")
+		fmt.Println("\nGlobal Options:")
+		fmt.Println("  -v, --verbose         Enable verbose output")
+		fmt.Println("      --dry-run        Show what would be deleted without actually deleting")
+		fmt.Println("      --force          Force cleanup without confirmation")
+		fmt.Println("      --profile <name> Configuration profile to use")
+		fmt.Println("      --validation-level <level> Validation level: none, basic, comprehensive, strict")
+		os.Exit(0)
+	}
 
-	// Add global flags
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
-	rootCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "Show what would be deleted without actually deleting")
-	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "Force cleanup without confirmation")
-	rootCmd.PersistentFlags().StringVar(&profileName, "profile", "daily", "Configuration profile to use")
-	rootCmd.PersistentFlags().StringVar(&validationLevel, "validation-level", "basic", "Validation level: none, basic, comprehensive, strict")
-
-	// Add subcommands
-	rootCmd.AddCommand(
-		commands.NewProfileCommand(),
-		commands.NewScanCommand(verbose, parseValidationLevel(validationLevel)),
-		commands.NewCleanCommand(),
-		commands.NewGenerateCommand(),
-	)
-
-	// Handle command execution with proper error handling
-	if err := rootCmd.Execute(); err != nil {
-		// Log fatal errors with context
-		if verbose {
-			log.Fatal().Err(err).Msg(colorize("Command execution failed", "red"))
-		} else {
-			fmt.Println(colorize(fmt.Sprintf("❌ Error: %s", err), "red"))
+	command := os.Args[1]
+	switch command {
+	case "clean":
+		fmt.Println(colorize("🧹 Clean command (not yet implemented)", "yellow"))
+	case "scan":
+		fmt.Println(colorize("🔍 Scan command (not yet implemented)", "yellow"))
+	case "profile":
+		fmt.Println(colorize("⚙️  Profile command (not yet implemented)", "yellow"))
+	case "generate":
+		fmt.Println(colorize("📄 Generating default configuration...", "cyan"))
+		defaultConfig, err := config.CreateDefaultConfig()
+		if err != nil {
+			fmt.Println(colorize(fmt.Sprintf("❌ Failed to create config: %s", err), "red"))
 			os.Exit(1)
 		}
+		
+		configPath := os.Getenv("HOME") + "/.clean-wizard.yaml"
+		if err := appconfig.SaveConfigToFile(defaultConfig, configPath); err != nil {
+			fmt.Println(colorize(fmt.Sprintf("❌ Failed to save config: %s", err), "red"))
+			os.Exit(1)
+		}
+		
+		fmt.Println(colorize(fmt.Sprintf("✅ Default configuration saved to: %s", configPath), "green"))
+	default:
+		fmt.Println(colorize(fmt.Sprintf("❌ Unknown command: %s", command), "red"))
+		os.Exit(1)
 	}
 }

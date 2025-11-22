@@ -44,7 +44,7 @@ func (nc *NpmCleaner) GetCacheSize(ctx context.Context) int64 {
 	// Parse npm cache verify output to extract size information
 	output := cacheResult.Value()
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	
+
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if strings.Contains(line, "Cache verified") && strings.Contains(line, "KB") {
@@ -92,7 +92,7 @@ func (nc *NpmCleaner) Cleanup(ctx context.Context, settings *shared.OperationSet
 	}
 
 	cleanupCmdResult := nc.runCleanupCommand(ctx)
-	
+
 	// Create final result
 	cleanResult := shared.CleanResult{
 		FreedBytes:   cleanupCmdResult.Value().FreedBytes,
@@ -119,10 +119,10 @@ func (nc *NpmCleaner) runCleanupCommand(ctx context.Context) result.Result[share
 	}
 
 	output := cmdResult.Value()
-	
+
 	// Parse npm cache clean output - npm typically doesn't give detailed stats
 	// So we estimate based on typical cache sizes
-	var itemsRemoved uint = 1 // Cache directory
+	var itemsRemoved uint = 1                 // Cache directory
 	var bytesFreed uint64 = 100 * 1024 * 1024 // 100MB estimate
 
 	// Try to extract any size information from output
@@ -156,7 +156,7 @@ func (nc *NpmCleaner) simulateCleanupCommand() result.Result[shared.CleanResult]
 	}
 
 	// Simulate typical npm cache cleanup results
-	var itemsRemoved uint = 1 // Cache directory
+	var itemsRemoved uint = 1                 // Cache directory
 	var bytesFreed uint64 = 150 * 1024 * 1024 // 150MB estimate for npm cache
 
 	simulateResult := shared.CleanResult{

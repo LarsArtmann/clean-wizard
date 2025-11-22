@@ -4,8 +4,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // === MAPPING LAYER TESTS ===
