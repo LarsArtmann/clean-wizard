@@ -105,13 +105,13 @@ func main() {
 			fmt.Println(colorize(fmt.Sprintf("❌ Failed to create config: %s", err), "red"))
 			os.Exit(1)
 		}
-		
+
 		configPath := os.Getenv("HOME") + "/.clean-wizard.yaml"
 		if err := appconfig.SaveConfigToFile(defaultConfig, configPath); err != nil {
 			fmt.Println(colorize(fmt.Sprintf("❌ Failed to save config: %s", err), "red"))
 			os.Exit(1)
 		}
-		
+
 		fmt.Println(colorize(fmt.Sprintf("✅ Default configuration saved to: %s", configPath), "green"))
 	default:
 		fmt.Println(colorize(fmt.Sprintf("❌ Unknown command: %s", command), "red"))

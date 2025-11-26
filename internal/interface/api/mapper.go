@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	domainconfig "github.com/LarsArtmann/clean-wizard/internal/domain/config"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // Mapper provides type-safe mapping between domain and API types
@@ -75,7 +75,7 @@ func (m *Mapper) DomainOperationToPublic(domain domainconfig.CleanupOperation) P
 		Description: domain.Description,
 		RiskLevel:   publicRisk,
 		Status:      domain.Status,
-		Settings:    OperationSettings{
+		Settings: OperationSettings{
 			ExecutionMode:       shared.ExecutionModeDryRun, // Default safe mode
 			Verbose:             false,
 			TimeoutSeconds:      300, // 5 minutes default

@@ -48,7 +48,7 @@ func LoadWithContext(ctx context.Context) (*config.Config, error) {
 		if err := readConfigFile(v); err != nil {
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
-		
+
 		// Check if config file was actually found
 		if v.ConfigFileUsed() == "" {
 			configExists = false
@@ -62,13 +62,13 @@ func LoadWithContext(ctx context.Context) (*config.Config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to create default config: %w", err)
 		}
-		
+
 		// Save default config for user
 		defaultConfigPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 		if err := SaveConfigToFile(defaultConfig, defaultConfigPath); err != nil {
 			log.Warn().Err(err).Msg("Failed to save default configuration")
 		}
-		
+
 		return defaultConfig, nil
 	}
 
@@ -139,7 +139,7 @@ func SaveConfigToFile(cfg *config.Config, configPath string) error {
 
 	// Use viper to write YAML
 	v := viper.New()
-	
+
 	// Map domain config to viper
 	if err := mapDomainConfigToViper(cfg, v); err != nil {
 		return fmt.Errorf("failed to map config for saving: %w", err)

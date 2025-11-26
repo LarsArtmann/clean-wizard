@@ -7,27 +7,27 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
-	cleaners "github.com/LarsArtmann/clean-wizard/internal/infrastructure/cleaners"
 	appconfig "github.com/LarsArtmann/clean-wizard/internal/application/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 	domainconfig "github.com/LarsArtmann/clean-wizard/internal/domain/config"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+	cleaners "github.com/LarsArtmann/clean-wizard/internal/infrastructure/cleaners"
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/cucumber/godog"
 	"github.com/rs/zerolog/log"
 )
 
 // BDDContext holds all state for BDD test scenarios
 type BDDContext struct {
-	ctx         context.Context
-	appConfig   *appconfig.ConfigLoader
+	ctx          context.Context
+	appConfig    *appconfig.ConfigLoader
 	domainConfig *domainconfig.Config
-	nixAdapter  *system.NixAdapter
-	nixCleaner  *cleaners.NixCleaner
-	generations []shared.NixGeneration
-	cleanResult *shared.CleanResult
-	error       error
-	tempDir     string
-	testMode    bool // true for test scenarios, false for integration
+	nixAdapter   *system.NixAdapter
+	nixCleaner   *cleaners.NixCleaner
+	generations  []shared.NixGeneration
+	cleanResult  *shared.CleanResult
+	error        error
+	tempDir      string
+	testMode     bool // true for test scenarios, false for integration
 }
 
 // NewBDDContext creates a fresh BDD context for scenarios
@@ -59,8 +59,8 @@ func (b *BDDContext) BeforeScenario(sc *godog.Scenario) {
 
 	// Set up test Nix adapter (dry-run mode for safety)
 	b.nixAdapter = system.NewNixAdapter(time.Second*30, 3) // 3 generations
-	b.nixCleaner = cleaners.NewNixCleaner()               // Uses default configuration
-	
+	b.nixCleaner = cleaners.NewNixCleaner()                // Uses default configuration
+
 	// Initialize application config loader
 	b.appConfig = appconfig.NewConfigLoader()
 }
@@ -168,7 +168,7 @@ func (b *BDDContext) IListAvailableNixGenerations() error {
 		b.error = result.Error()
 		return b.error
 	}
-	
+
 	generations, err := result.Unwrap()
 	if err != nil {
 		b.error = err
