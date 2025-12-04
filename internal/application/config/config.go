@@ -133,7 +133,7 @@ func SaveConfigToFile(cfg *config.Config, configPath string) error {
 
 	// Create directory if it doesn't exist
 	dir := filepath.Dir(configPath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
@@ -234,7 +234,7 @@ func mapViperToDomainConfig(v *viper.Viper) (*config.Config, error) {
 	// Map profiles
 	profiles := v.GetStringMap("profiles")
 	for name, profileData := range profiles {
-		profileMap, ok := profileData.(map[string]interface{})
+		profileMap, ok := profileData.(map[string]any)
 		if !ok {
 			continue
 		}
@@ -248,9 +248,9 @@ func mapViperToDomainConfig(v *viper.Viper) (*config.Config, error) {
 
 		// Map operations
 		if opsData, exists := profileMap["operations"]; exists {
-			if opsList, ok := opsData.([]interface{}); ok {
+			if opsList, ok := opsData.([]any); ok {
 				for _, opData := range opsList {
-					if opMap, ok := opData.(map[string]interface{}); ok {
+					if opMap, ok := opData.(map[string]any); ok {
 						op := config.CleanupOperation{
 							Name:        getString(opMap, "name"),
 							Description: getString(opMap, "description"),
@@ -322,7 +322,7 @@ func parseRiskLevel(risk string) shared.RiskLevelType {
 	}
 }
 
-func getString(m map[string]interface{}, key string) string {
+func getString(m map[string]any, key string) string {
 	if val, exists := m[key]; exists {
 		if str, ok := val.(string); ok {
 			return str

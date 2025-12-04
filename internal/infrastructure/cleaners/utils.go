@@ -19,7 +19,6 @@ func checkCommandExists(ctx context.Context, command string) bool {
 func runCommand(ctx context.Context, name string, args ...string) result.Result[string] {
 	cmd := exec.CommandContext(ctx, name, args...)
 	output, err := cmd.CombinedOutput()
-
 	if err != nil {
 		return result.Err[string](fmt.Errorf("command '%s %s' failed: %w\noutput: %s",
 			name, strings.Join(args, " "), err, string(output)))

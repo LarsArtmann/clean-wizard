@@ -43,9 +43,9 @@ func (nc *NpmCleaner) GetCacheSize(ctx context.Context) int64 {
 
 	// Parse npm cache verify output to extract size information
 	output := cacheResult.Value()
-	lines := strings.Split(strings.TrimSpace(output), "\n")
+	lines := strings.SplitSeq(strings.TrimSpace(output), "\n")
 
-	for _, line := range lines {
+	for line := range lines {
 		line = strings.TrimSpace(line)
 		if strings.Contains(line, "Cache verified") && strings.Contains(line, "KB") {
 			// Extract size from line like "Cache verified and compressed (1234 KB)"
