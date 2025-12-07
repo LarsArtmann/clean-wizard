@@ -3,11 +3,12 @@ package factories
 import (
 	"fmt"
 
+	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // SetNixGenerationsCount sets the Nix generations count in the config
-func SetNixGenerationsCount(cfg *shared.Config, generations int) error {
+func SetNixGenerationsCount(cfg *config.Config, generations int) error {
 	if cfg == nil {
 		return fmt.Errorf("config is nil")
 	}
@@ -42,7 +43,7 @@ func SetNixGenerationsCount(cfg *shared.Config, generations int) error {
 }
 
 // SetNixGenerationsOptimization sets the Nix generations optimization level in the config
-func SetNixGenerationsOptimization(cfg *shared.Config, optimizationLevel shared.OptimizationLevelType) error {
+func SetNixGenerationsOptimization(cfg *config.Config, optimizationLevel shared.OptimizationLevelType) error {
 	if cfg == nil {
 		return fmt.Errorf("config is nil")
 	}
@@ -62,7 +63,7 @@ func SetNixGenerationsOptimization(cfg *shared.Config, optimizationLevel shared.
 			if op.Settings.NixGenerations == nil {
 				op.Settings.NixGenerations = &shared.NixGenerationsSettings{}
 			}
-			op.Settings.NixGenerations.Optimization = optimizationLevel
+			op.Settings.NixGenerations.Generations = generations
 			profile.Operations[i] = op
 			operationFound = true
 			break

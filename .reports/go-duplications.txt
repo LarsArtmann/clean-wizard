@@ -1,8 +1,1012 @@
-2025/11/21 20:31:58 Building suffix tree
-2025/11/21 20:31:58 Searching for clones
+2025/12/07 01:28:36 Building suffix tree
+2025/12/07 01:28:37 Searching for clones
+found 2 clones:
+  internal/interface/cli/bdd/framework.go:167,170
+  internal/interface/cli/bdd/framework.go:205,208
 found 3 clones:
-  internal/infrastructure/cleaners/npm.go:83,107
-  internal/infrastructure/cleaners/pnpm.go:76,100
-  internal/infrastructure/cleaners/temp_files.go:72,96
+  internal/shared/result/type_test.go:116,116
+  internal/shared/result/type_test.go:120,120
+  internal/shared/result/type_test.go:124,124
+found 2 clones:
+  internal/shared/utils/format/format.go:30,32
+  internal/shared/utils/format/format.go:33,35
+found 2 clones:
+  test/config/bdd_nix_validation_test.go:114,116
+  test/config/bdd_nix_validation_test.go:157,159
+found 2 clones:
+  internal/infrastructure/cleaners/homebrew.go:167,179
+  internal/infrastructure/cleaners/pnpm.go:122,134
+found 2 clones:
+  internal/application/config/type_safe_validation_rules_test.go:93,98
+  internal/application/config/type_safe_validation_rules_test.go:99,104
+found 2 clones:
+  internal/application/config/config.go:27,27
+  internal/application/config/loader.go:23,23
+found 3 clones:
+  internal/infrastructure/cleaners/homebrew.go:96,101
+  internal/infrastructure/cleaners/homebrew.go:113,118
+  internal/infrastructure/cleaners/homebrew.go:127,132
+found 6 clones:
+  internal/interface/api/mapper_test.go:554,560
+  internal/interface/api/mapper_test.go:566,572
+  internal/interface/api/mapper_test.go:578,584
+  internal/interface/api/mapper_test.go:590,596
+  internal/interface/api/mapper_test.go:602,608
+  internal/interface/api/mapper_test.go:614,620
+found 2 clones:
+  internal/infrastructure/cleaners/temp_files.go:170,170
+  internal/infrastructure/cleaners/temp_files.go:260,260
+found 12 clones:
+  internal/infrastructure/system/errors.go:21,23
+  internal/infrastructure/system/errors.go:26,28
+  internal/infrastructure/system/errors.go:31,33
+  internal/infrastructure/system/errors.go:36,38
+  internal/infrastructure/system/errors.go:46,48
+  internal/infrastructure/system/errors.go:51,53
+  internal/infrastructure/system/errors.go:56,58
+  internal/infrastructure/system/errors.go:61,63
+  internal/shared/errors/errors.go:8,10
+  internal/shared/errors/errors.go:13,15
+  internal/shared/errors/errors.go:18,20
+  internal/shared/errors/errors.go:33,35
+found 2 clones:
+  internal/application/config/type_safe_validation_rules_test.go:66,74
+  internal/application/config/type_safe_validation_rules_test.go:235,243
+found 2 clones:
+  internal/infrastructure/system/http_client.go:102,104
+  internal/infrastructure/system/http_client.go:107,109
+found 3 clones:
+  test/validation/duration_parser_test.go:52,58
+  test/validation/duration_parser_test.go:66,72
+  test/validation/duration_parser_test.go:108,114
+found 5 clones:
+  test/domain/benchmarks_test.go:14,16
+  test/domain/benchmarks_test.go:22,24
+  test/domain/benchmarks_test.go:30,32
+  test/domain/benchmarks_test.go:41,43
+  test/domain/benchmarks_test.go:49,51
+found 2 clones:
+  cmd/clean-wizard/main.go:43,54
+  internal/application/config/config.go:311,322
+found 2 clones:
+  internal/infrastructure/cleaners/homebrew.go:172,188
+  internal/infrastructure/cleaners/npm.go:132,147
+found 2 clones:
+  cmd/clean-wizard/main.go:104,107
+  cmd/clean-wizard/main.go:110,113
+found 9 clones:
+  internal/application/config/safe_test.go:40,42
+  internal/application/config/safe_test.go:65,67
+  internal/application/config/safe_test.go:90,92
+  internal/application/config/safe_test.go:114,116
+  test/config/safe_test.go:39,41
+  test/config/safe_test.go:64,66
+  test/config/safe_test.go:89,91
+  test/config/safe_test.go:113,115
+  test/domain/cleanresult_test.go:119,121
+found 2 clones:
+  internal/interface/api/mapper_test.go:388,390
+  internal/interface/api/mapper_test.go:742,744
+found 2 clones:
+  internal/domain/config/config.go:161,163
+  internal/domain/shared/types.go:273,275
+found 7 clones:
+  internal/domain/shared/type_safe_enums.go:110,124
+  internal/domain/shared/type_safe_enums.go:228,242
+  internal/domain/shared/type_safe_enums.go:395,409
+  internal/domain/shared/type_safe_enums.go:474,483
+  internal/domain/shared/type_safe_enums.go:587,596
+  internal/domain/shared/type_safe_enums.go:772,781
+  internal/domain/shared/type_safe_enums.go:825,834
+found 2 clones:
+  internal/shared/utils/pkg/errors/errors.go:185,194
+  internal/shared/utils/pkg/errors/errors.go:197,206
+found 5 clones:
+  internal/infrastructure/cleaners/homebrew.go:226,226
+  internal/infrastructure/cleaners/npm.go:110,110
+  internal/infrastructure/cleaners/pnpm.go:103,103
+  internal/infrastructure/cleaners/temp_files.go:99,99
+  internal/infrastructure/system/nix.go:102,102
+found 3 clones:
+  internal/domain/shared/types.go:240,240
+  internal/domain/shared/types.go:277,277
+  internal/domain/shared/types.go:291,291
+found 2 clones:
+  internal/interface/api/mapper_test.go:600,611
+  internal/interface/api/mapper_test.go:612,623
+found 2 clones:
+  internal/shared/utils/pkg/errors/errors.go:136,159
+  internal/shared/utils/pkg/errors/errors.go:139,162
+found 2 clones:
+  internal/domain/shared/types.go:149,154
+  internal/domain/shared/types.go:205,210
+found 4 clones:
+  test/validation/duration_parser_test.go:249,258
+  test/validation/duration_parser_test.go:254,263
+  test/validation/duration_parser_test.go:283,292
+  test/validation/duration_parser_test.go:288,297
+found 2 clones:
+  internal/infrastructure/system/cache_manager.go:49,51
+  internal/infrastructure/system/rate_limiter.go:29,31
+found 2 clones:
+  test/config/bdd_nix_validation_test.go:131,137
+  test/config/bdd_nix_validation_test.go:181,187
+found 2 clones:
+  internal/shared/result/type_test.go:9,9
+  internal/shared/result/type_test.go:40,40
+found 2 clones:
+  internal/application/config/safe_test.go:237,249
+  test/config/safe_test.go:236,248
+found 14 clones:
+  test/config/safety_level_test.go:22,29
+  test/config/safety_level_test.go:30,37
+  test/config/safety_level_test.go:38,45
+  test/config/safety_level_test.go:46,53
+  test/config/safety_level_test.go:54,61
+  test/config/safety_level_test.go:62,69
+  test/config/safety_level_test.go:70,77
+  test/config/safety_level_test.go:78,85
+  test/config/safety_level_test.go:86,93
+  test/config/safety_level_test.go:94,101
+  test/config/safety_level_test.go:102,109
+  test/config/safety_level_test.go:110,117
+  test/config/safety_level_test.go:143,150
+  test/config/safety_level_test.go:151,158
+found 9 clones:
+  internal/application/config/type_safe_validation_rules_test.go:66,68
+  internal/application/config/type_safe_validation_rules_test.go:69,71
+  internal/application/config/type_safe_validation_rules_test.go:72,74
+  internal/application/config/type_safe_validation_rules_test.go:75,77
+  internal/application/config/type_safe_validation_rules_test.go:78,80
+  internal/application/config/type_safe_validation_rules_test.go:216,218
+  internal/application/config/type_safe_validation_rules_test.go:235,237
+  internal/application/config/type_safe_validation_rules_test.go:238,240
+  internal/application/config/type_safe_validation_rules_test.go:241,243
+found 3 clones:
+  test/nix.go:14,16
+  test/nix.go:15,17
+  test/nix.go:16,18
+found 5 clones:
+  test/validation/duration_parser_test.go:73,79
+  test/validation/duration_parser_test.go:80,86
+  test/validation/duration_parser_test.go:87,93
+  test/validation/duration_parser_test.go:94,100
+  test/validation/duration_parser_test.go:101,107
+found 3 clones:
+  test/validation/validation_sanitizer_test.go:13,18
+  test/validation/validation_sanitizer_test.go:23,28
+  test/validation/validation_sanitizer_test.go:37,42
+found 2 clones:
+  internal/application/config/type_safe_validation_rules.go:107,110
+  internal/application/config/type_safe_validation_rules.go:112,115
+found 2 clones:
+  test/validation/validation_benchmark_test.go:41,45
+  test/validation/validation_benchmark_test.go:76,80
+found 3 clones:
+  test/domain/cleanresult_test.go:20,27
+  test/domain/cleanresult_test.go:59,66
+  test/domain/cleanresult_test.go:73,80
+found 3 clones:
+  internal/infrastructure/cleaners/homebrew.go:31,34
+  internal/infrastructure/cleaners/npm.go:28,30
+  internal/infrastructure/cleaners/pnpm.go:28,30
+found 3 clones:
+  internal/infrastructure/cleaners/homebrew.go:172,177
+  internal/infrastructure/cleaners/npm.go:132,137
+  internal/infrastructure/cleaners/pnpm.go:127,132
+found 3 clones:
+  internal/interface/api/mapper_test.go:292,294
+  internal/interface/api/mapper_test.go:301,303
+  test/config/integration_test.go:65,67
+found 4 clones:
+  internal/domain/config/config.go:188,190
+  internal/domain/config/config.go:198,200
+  internal/domain/shared/types.go:223,225
+  test/config/bdd_nix_validation_test.go:24,26
+found 6 clones:
+  internal/domain/shared/type_safe_enums.go:286,313
+  internal/domain/shared/type_safe_enums.go:340,367
+  internal/domain/shared/type_safe_enums.go:422,445
+  internal/domain/shared/type_safe_enums.go:526,549
+  internal/domain/shared/type_safe_enums.go:639,662
+  internal/domain/shared/type_safe_enums.go:690,713
+found 5 clones:
+  test/validation/duration_parser_test.go:17,23
+  test/validation/duration_parser_test.go:24,30
+  test/validation/duration_parser_test.go:31,37
+  test/validation/duration_parser_test.go:45,51
+  test/validation/duration_parser_test.go:59,65
+found 8 clones:
+  internal/shared/errors/filesystem_integration_test.go:26,26
+  internal/shared/errors/filesystem_integration_test.go:32,32
+  internal/shared/errors/filesystem_integration_test.go:38,38
+  internal/shared/errors/filesystem_integration_test.go:64,64
+  internal/shared/errors/filesystem_integration_test.go:68,68
+  internal/shared/errors/filesystem_integration_test.go:72,72
+  internal/shared/errors/filesystem_integration_test.go:76,76
+  test/validation/validation_benchmark_test.go:59,62
+found 2 clones:
+  test/validation/duration_parser_test.go:45,58
+  test/validation/duration_parser_test.go:59,72
+found 2 clones:
+  internal/infrastructure/cleaners/nix.go:105,105
+  internal/infrastructure/system/nix.go:158,158
+found 2 clones:
+  internal/domain/shared/types.go:116,118
+  internal/domain/validation/duration_parser.go:78,80
+found 2 clones:
+  internal/shared/errors/adapters.go:131,143
+  internal/shared/errors/adapters.go:172,184
+found 3 clones:
+  internal/shared/errors/adapters.go:49,50
+  internal/shared/errors/adapters.go:52,53
+  internal/shared/errors/adapters.go:55,56
+found 2 clones:
+  internal/shared/errors/errors_test.go:119,129
+  internal/shared/errors/errors_test.go:131,141
+found 6 clones:
+  internal/shared/result/simple_fuzz_test.go:92,94
+  test/domain/enum_helper_test.go:26,28
+  test/domain/enum_helper_test.go:65,67
+  test/domain/enum_helper_test.go:88,90
+  test/domain/enum_helper_test.go:111,113
+  test/domain/enum_helper_test.go:134,136
+found 3 clones:
+  internal/shared/utils/pkg/errors/errors.go:241,246
+  internal/shared/utils/pkg/errors/errors.go:247,252
+  internal/shared/utils/pkg/errors/errors.go:253,258
+found 4 clones:
+  test/nix.go:14,15
+  test/nix.go:15,16
+  test/nix.go:16,17
+  test/nix.go:17,18
+found 5 clones:
+  internal/shared/utils/pkg/errors/errors.go:136,150
+  internal/shared/utils/pkg/errors/errors.go:139,153
+  internal/shared/utils/pkg/errors/errors.go:142,156
+  internal/shared/utils/pkg/errors/errors.go:145,159
+  internal/shared/utils/pkg/errors/errors.go:148,162
+found 3 clones:
+  internal/infrastructure/cleaners/homebrew.go:229,238
+  internal/infrastructure/cleaners/nix.go:114,124
+  internal/infrastructure/cleaners/nix.go:133,143
+found 2 clones:
+  test/config/safe_test.go:256,259
+  test/config/semver_validation_test.go:52,55
+found 2 clones:
+  test/validation/duration_parser_test.go:310,314
+  test/validation/duration_parser_test.go:315,319
+found 4 clones:
+  internal/infrastructure/system/environment.go:166,168
+  internal/infrastructure/system/environment.go:170,172
+  internal/infrastructure/system/environment.go:175,177
+  internal/infrastructure/system/environment.go:186,188
+found 4 clones:
+  internal/infrastructure/system/errors.go:21,33
+  internal/infrastructure/system/errors.go:26,38
+  internal/infrastructure/system/errors.go:46,58
+  internal/infrastructure/system/errors.go:51,63
+found 2 clones:
+  internal/shared/errors/types.go:157,166
+  internal/shared/errors/types.go:163,172
+found 4 clones:
+  internal/infrastructure/cleaners/homebrew.go:83,85
+  internal/infrastructure/cleaners/npm.go:86,88
+  internal/infrastructure/cleaners/pnpm.go:79,81
+  internal/infrastructure/cleaners/temp_files.go:75,77
+found 2 clones:
+  internal/application/config/config.go:288,297
+  internal/application/config/config.go:299,308
+found 3 clones:
+  internal/interface/api/mapper_test.go:181,183
+  internal/interface/api/mapper_test.go:225,227
+  internal/interface/api/mapper_test.go:722,724
+found 2 clones:
+  test/validation/validation_validator_test.go:53,58
+  test/validation/validation_validator_test.go:59,64
+found 3 clones:
+  internal/interface/api/mapper_test.go:690,692
+  internal/interface/api/mapper_test.go:693,695
+  internal/interface/api/mapper_test.go:702,704
+found 7 clones:
+  internal/infrastructure/system/errors.go:21,28
+  internal/infrastructure/system/errors.go:26,33
+  internal/infrastructure/system/errors.go:31,38
+  internal/infrastructure/system/errors.go:46,53
+  internal/infrastructure/system/errors.go:51,58
+  internal/infrastructure/system/errors.go:56,63
+  internal/shared/errors/errors.go:13,20
+found 3 clones:
+  internal/application/config/type_safe_validation_rules.go:64,68
+  internal/application/config/type_safe_validation_rules.go:69,73
+  internal/application/config/type_safe_validation_rules.go:74,78
+found 4 clones:
+  internal/application/config/safe_test.go:203,211
+  internal/application/config/safe_test.go:221,229
+  test/config/safe_test.go:202,210
+  test/config/safe_test.go:220,228
+found 3 clones:
+  internal/application/config/type_safe_validation_rules_test.go:20,25
+  internal/application/config/type_safe_validation_rules_test.go:26,31
+  internal/application/config/type_safe_validation_rules_test.go:32,37
+found 2 clones:
+  internal/shared/errors/centralized.go:204,213
+  internal/shared/errors/centralized.go:210,219
+found 5 clones:
+  internal/domain/shared/types.go:163,165
+  internal/domain/shared/types.go:198,200
+  internal/domain/shared/types.go:245,247
+  internal/domain/shared/types.go:248,250
+  internal/domain/shared/types.go:251,253
+found 2 clones:
+  internal/infrastructure/cleaners/nix.go:64,64
+  internal/infrastructure/system/nix.go:37,37
+found 2 clones:
+  internal/shared/errors/centralized.go:109,109
+  internal/shared/errors/types.go:186,186
+found 6 clones:
+  internal/application/config/safe_test.go:37,44
+  internal/application/config/safe_test.go:87,94
+  internal/application/config/safe_test.go:111,118
+  test/config/safe_test.go:36,43
+  test/config/safe_test.go:86,93
+  test/config/safe_test.go:110,117
+found 3 clones:
+  internal/domain/shared/types.go:195,197
+  internal/domain/shared/types.go:220,222
+  internal/domain/shared/types.go:297,299
+found 2 clones:
+  internal/shared/errors/centralized.go:46,50
+  internal/shared/errors/errors_test.go:233,237
+found 2 clones:
+  test/config/safety_level_test.go:118,125
+  test/config/safety_level_test.go:126,133
+found 2 clones:
+  internal/infrastructure/cleaners/temp_files.go:30,33
+  internal/shared/utils/middleware/validation_test.go:88,90
+found 5 clones:
+  internal/shared/utils/format/format_test.go:25,32
+  internal/shared/utils/format/format_test.go:50,57
+  internal/shared/utils/format/format_test.go:71,78
+  internal/shared/utils/format/format_test.go:128,135
+  test/config/semver_validation_test.go:34,41
+found 3 clones:
+  internal/interface/api/mapper_test.go:83,85
+  internal/interface/api/mapper_test.go:176,178
+  internal/interface/api/mapper_test.go:283,285
+found 2 clones:
+  internal/infrastructure/system/http_client.go:97,99
+  internal/infrastructure/system/http_client.go:112,114
+found 4 clones:
+  internal/domain/shared/types.go:54,61
+  internal/domain/shared/types.go:78,85
+  internal/domain/shared/types.go:99,106
+  internal/domain/shared/types.go:124,131
+found 7 clones:
+  internal/shared/utils/pkg/errors/errors.go:136,144
+  internal/shared/utils/pkg/errors/errors.go:139,147
+  internal/shared/utils/pkg/errors/errors.go:142,150
+  internal/shared/utils/pkg/errors/errors.go:145,153
+  internal/shared/utils/pkg/errors/errors.go:148,156
+  internal/shared/utils/pkg/errors/errors.go:151,159
+  internal/shared/utils/pkg/errors/errors.go:154,162
+found 3 clones:
+  internal/interface/api/mapper_test.go:68,70
+  internal/interface/api/mapper_test.go:166,168
+  internal/interface/api/mapper_test.go:221,223
+found 2 clones:
+  internal/shared/utils/middleware/validation.go:34,36
+  internal/shared/utils/middleware/validation.go:39,41
+found 2 clones:
+  internal/application/config/type_safe_validation_rules_test.go:83,86
+  internal/application/config/type_safe_validation_rules_test.go:87,90
+found 5 clones:
+  internal/infrastructure/system/nix.go:108,110
+  internal/infrastructure/system/nix.go:115,117
+  internal/infrastructure/system/nix.go:121,123
+  internal/infrastructure/system/nix.go:164,166
+  internal/infrastructure/system/nix.go:177,179
+found 2 clones:
+  internal/infrastructure/system/nix.go:130,137
+  internal/infrastructure/system/nix.go:186,193
+found 2 clones:
+  internal/infrastructure/system/environment.go:123,130
+  internal/infrastructure/system/environment.go:133,140
+found 2 clones:
+  internal/interface/api/mapper_test.go:162,168
+  internal/interface/api/mapper_test.go:217,223
+found 6 clones:
+  internal/shared/utils/pkg/errors/errors.go:237,240
+  internal/shared/utils/pkg/errors/errors.go:259,262
+  internal/shared/utils/pkg/errors/errors.go:263,266
+  internal/shared/utils/pkg/errors/errors.go:267,270
+  internal/shared/utils/pkg/errors/errors.go:271,274
+  internal/shared/utils/pkg/errors/errors.go:290,294
+found 2 clones:
+  internal/interface/api/mapper.go:31,33
+  internal/interface/api/mapper.go:52,54
+found 5 clones:
+  internal/domain/config/config.go:96,119
+  internal/domain/config/config.go:102,125
+  internal/domain/config/config.go:108,131
+  internal/domain/config/config.go:114,137
+  internal/domain/config/config.go:120,143
+found 2 clones:
+  internal/domain/shared/types.go:46,61
+  internal/domain/shared/types.go:91,106
+found 3 clones:
+  internal/application/config/type_safe_validation_rules_test.go:127,140
+  internal/application/config/type_safe_validation_rules_test.go:142,155
+  internal/application/config/type_safe_validation_rules_test.go:157,170
+found 3 clones:
+  test/config/bdd_nix_validation_test.go:111,111
+  test/config/bdd_nix_validation_test.go:147,147
+  test/config/bdd_nix_validation_test.go:164,164
+found 4 clones:
+  internal/application/config/safe_test.go:122,127
+  internal/application/config/safe_test.go:197,202
+  test/config/safe_test.go:121,126
+  test/config/safe_test.go:196,201
+found 2 clones:
+  internal/application/config/type_safe_validation_rules_test.go:173,177
+  internal/application/config/type_safe_validation_rules_test.go:178,182
+found 2 clones:
+  internal/shared/errors/adapters.go:153,156
+  test/validation/validation_benchmark_test.go:28,39
+found 5 clones:
+  internal/shared/errors/centralized.go:73,75
+  internal/shared/errors/centralized.go:78,80
+  internal/shared/errors/centralized.go:83,85
+  internal/shared/errors/centralized.go:88,90
+  internal/shared/errors/centralized.go:93,95
+found 2 clones:
+  internal/infrastructure/system/nix.go:17,21
+  internal/infrastructure/system/rate_limiter.go:39,43
+found 4 clones:
+  internal/shared/utils/pkg/errors/errors.go:407,408
+  internal/shared/utils/pkg/errors/errors.go:409,410
+  internal/shared/utils/pkg/errors/errors.go:411,412
+  internal/shared/utils/pkg/errors/errors.go:413,414
+found 4 clones:
+  internal/application/config/safe_test.go:128,137
+  internal/application/config/safe_test.go:146,155
+  test/config/safe_test.go:127,136
+  test/config/safe_test.go:145,154
+found 2 clones:
+  internal/interface/api/mapper_test.go:112,114
+  internal/interface/api/mapper_test.go:115,117
+found 2 clones:
+  internal/interface/cli/bdd/framework.go:221,223
+  internal/interface/cli/bdd/framework.go:241,243
+found 14 clones:
+  internal/domain/shared/type_safe_enums.go:115,117
+  internal/domain/shared/type_safe_enums.go:163,165
+  internal/domain/shared/type_safe_enums.go:233,235
+  internal/domain/shared/type_safe_enums.go:290,292
+  internal/domain/shared/type_safe_enums.go:344,346
+  internal/domain/shared/type_safe_enums.go:400,402
+  internal/domain/shared/type_safe_enums.go:426,428
+  internal/domain/shared/type_safe_enums.go:479,481
+  internal/domain/shared/type_safe_enums.go:530,532
+  internal/domain/shared/type_safe_enums.go:592,594
+  internal/domain/shared/type_safe_enums.go:643,645
+  internal/domain/shared/type_safe_enums.go:694,696
+  internal/domain/shared/type_safe_enums.go:777,779
+  internal/domain/shared/type_safe_enums.go:830,832
+found 2 clones:
+  internal/infrastructure/system/errors.go:16,18
+  internal/shared/errors/errors.go:38,40
+found 9 clones:
+  internal/shared/utils/pkg/errors/errors.go:136,138
+  internal/shared/utils/pkg/errors/errors.go:139,141
+  internal/shared/utils/pkg/errors/errors.go:142,144
+  internal/shared/utils/pkg/errors/errors.go:145,147
+  internal/shared/utils/pkg/errors/errors.go:148,150
+  internal/shared/utils/pkg/errors/errors.go:151,153
+  internal/shared/utils/pkg/errors/errors.go:154,156
+  internal/shared/utils/pkg/errors/errors.go:157,159
+  internal/shared/utils/pkg/errors/errors.go:160,162
+found 5 clones:
+  internal/infrastructure/cleaners/homebrew.go:80,80
+  internal/infrastructure/cleaners/nix.go:79,79
+  internal/infrastructure/cleaners/npm.go:83,83
+  internal/infrastructure/cleaners/pnpm.go:76,76
+  internal/infrastructure/cleaners/temp_files.go:72,72
+found 11 clones:
+  internal/application/config/safe_test.go:263,265
+  internal/application/config/safe_test.go:267,269
+  internal/infrastructure/cleaners/nix_test.go:88,90
+  internal/interface/api/mapper_test.go:78,80
+  internal/interface/api/mapper_test.go:88,90
+  test/config/integration_test.go:20,22
+  test/config/integration_test.go:45,47
+  test/config/integration_test.go:83,85
+  test/config/safe_test.go:262,264
+  test/config/safe_test.go:266,268
+  test/domain/domain_fuzz_test.go:59,61
+found 3 clones:
+  internal/domain/config/config.go:96,131
+  internal/domain/config/config.go:102,137
+  internal/domain/config/config.go:108,143
+found 2 clones:
+  internal/shared/errors/errors_test.go:40,45
+  internal/shared/errors/errors_test.go:47,52
+found 7 clones:
+  test/validation/duration_parser_test.go:249,253
+  test/validation/duration_parser_test.go:254,258
+  test/validation/duration_parser_test.go:259,263
+  test/validation/duration_parser_test.go:283,287
+  test/validation/duration_parser_test.go:288,292
+  test/validation/duration_parser_test.go:293,297
+  test/validation/duration_parser_test.go:322,326
+found 2 clones:
+  internal/interface/api/mapper_test.go:317,335
+  internal/interface/api/mapper_test.go:350,368
+found 4 clones:
+  internal/interface/api/mapper_test.go:57,59
+  internal/interface/api/mapper_test.go:93,95
+  internal/interface/api/mapper_test.go:162,164
+  internal/interface/api/mapper_test.go:217,219
+found 2 clones:
+  internal/shared/errors/filesystem_integration_test.go:18,23
+  test/validation/validation_validator_test.go:117,122
+found 3 clones:
+  internal/shared/utils/pkg/errors/errors.go:186,193
+  internal/shared/utils/pkg/errors/errors.go:198,205
+  internal/shared/utils/pkg/errors/errors.go:210,217
+found 2 clones:
+  internal/shared/errors/adapters.go:28,34
+  internal/shared/errors/adapters.go:118,125
+found 9 clones:
+  internal/application/config/type_safe_validation_rules_test.go:128,130
+  internal/application/config/type_safe_validation_rules_test.go:137,139
+  internal/application/config/type_safe_validation_rules_test.go:143,145
+  internal/application/config/type_safe_validation_rules_test.go:152,154
+  internal/application/config/type_safe_validation_rules_test.go:158,160
+  internal/application/config/type_safe_validation_rules_test.go:167,169
+  internal/application/config/type_safe_validation_rules_test.go:186,188
+  internal/application/config/type_safe_validation_rules_test.go:189,191
+  internal/application/config/type_safe_validation_rules_test.go:192,194
+found 6 clones:
+  internal/domain/shared/type_safe_enums.go:110,154
+  internal/domain/shared/type_safe_enums.go:228,272
+  internal/domain/shared/type_safe_enums.go:474,513
+  internal/domain/shared/type_safe_enums.go:587,626
+  internal/domain/shared/type_safe_enums.go:772,811
+  internal/domain/shared/type_safe_enums.go:825,864
+found 5 clones:
+  internal/application/config/config.go:222,222
+  test/config/bdd_nix_validation_test.go:208,208
+  test/config/bdd_nix_validation_test.go:249,249
+  test/config/bdd_nix_validation_test.go:268,268
+  test/config/bdd_nix_validation_test.go:287,287
+found 3 clones:
+  internal/shared/errors/filesystem_integration_test.go:24,29
+  internal/shared/errors/filesystem_integration_test.go:30,35
+  internal/shared/errors/filesystem_integration_test.go:36,41
+found 2 clones:
+  internal/interface/api/types.go:53,58
+  internal/interface/api/types.go:71,76
+found 3 clones:
+  internal/interface/api/mapper_test.go:213,215
+  test/config/integration_test.go:28,30
+  test/config/integration_test.go:35,37
+found 2 clones:
+  internal/infrastructure/system/nix.go:50,52
+  internal/infrastructure/system/nix.go:64,66
+found 2 clones:
+  internal/shared/errors/centralized.go:139,141
+  internal/shared/errors/centralized.go:144,146
+found 3 clones:
+  internal/infrastructure/system/adapters_test.go:45,45
+  internal/infrastructure/system/adapters_test.go:70,70
+  internal/infrastructure/system/adapters_test.go:89,89
+found 5 clones:
+  internal/domain/shared/types.go:59,61
+  internal/domain/shared/types.go:64,66
+  internal/domain/shared/types.go:83,85
+  internal/domain/shared/types.go:104,106
+  internal/domain/shared/types.go:129,131
+found 3 clones:
+  test/validation/validation_validator_test.go:15,15
+  test/validation/validation_validator_test.go:16,16
+  test/validation/validation_validator_test.go:21,21
+found 3 clones:
+  internal/application/config/config.go:48,50
+  internal/application/config/config.go:76,78
+  internal/application/config/config.go:115,117
+found 5 clones:
+  internal/shared/errors/errors_test.go:120,120
+  internal/shared/errors/errors_test.go:132,132
+  internal/shared/errors/errors_test.go:152,152
+  internal/shared/errors/filesystem_integration_test.go:101,101
+  internal/shared/errors/filesystem_integration_test.go:108,108
+found 2 clones:
+  internal/infrastructure/cleaners/nix.go:85,86
+  internal/infrastructure/cleaners/nix.go:111,112
+found 3 clones:
+  internal/infrastructure/cleaners/npm.go:20,25
+  internal/infrastructure/cleaners/pnpm.go:20,25
+  internal/infrastructure/cleaners/temp_files.go:22,27
+found 4 clones:
+  internal/domain/config/config.go:96,125
+  internal/domain/config/config.go:102,131
+  internal/domain/config/config.go:108,137
+  internal/domain/config/config.go:114,143
+found 2 clones:
+  internal/infrastructure/system/errors.go:21,38
+  internal/infrastructure/system/errors.go:46,63
+found 14 clones:
+  internal/domain/shared/type_safe_enums.go:142,154
+  internal/domain/shared/type_safe_enums.go:191,203
+  internal/domain/shared/type_safe_enums.go:260,272
+  internal/domain/shared/type_safe_enums.go:316,328
+  internal/domain/shared/type_safe_enums.go:370,382
+  internal/domain/shared/type_safe_enums.go:448,460
+  internal/domain/shared/type_safe_enums.go:501,513
+  internal/domain/shared/type_safe_enums.go:561,573
+  internal/domain/shared/type_safe_enums.go:614,626
+  internal/domain/shared/type_safe_enums.go:665,677
+  internal/domain/shared/type_safe_enums.go:716,728
+  internal/domain/shared/type_safe_enums.go:746,758
+  internal/domain/shared/type_safe_enums.go:799,811
+  internal/domain/shared/type_safe_enums.go:852,864
+found 2 clones:
+  internal/shared/errors/errors_test.go:167,179
+  internal/shared/errors/errors_test.go:181,193
+found 5 clones:
+  internal/shared/errors/types.go:157,160
+  internal/shared/errors/types.go:163,166
+  internal/shared/errors/types.go:169,172
+  internal/shared/utils/pkg/errors/errors.go:223,226
+  internal/shared/utils/pkg/errors/errors.go:307,310
+found 2 clones:
+  internal/shared/errors/centralized.go:129,131
+  internal/shared/errors/centralized.go:134,136
+found 3 clones:
+  internal/shared/utils/pkg/errors/errors.go:136,156
+  internal/shared/utils/pkg/errors/errors.go:139,159
+  internal/shared/utils/pkg/errors/errors.go:142,162
+found 3 clones:
+  internal/shared/result/simple_fuzz_test.go:19,21
+  internal/shared/result/simple_fuzz_test.go:23,25
+  internal/shared/result/simple_fuzz_test.go:27,29
+found 2 clones:
+  internal/shared/utils/pkg/errors/errors.go:259,270
+  internal/shared/utils/pkg/errors/errors.go:263,274
+found 2 clones:
+  internal/infrastructure/cleaners/homebrew.go:205,207
+  internal/infrastructure/cleaners/homebrew.go:208,210
+found 2 clones:
+  test/config/bdd_nix_validation_test.go:213,221
+  test/config/bdd_nix_validation_test.go:292,300
+found 2 clones:
+  internal/shared/result/simple_fuzz_test.go:19,25
+  internal/shared/result/simple_fuzz_test.go:23,29
+found 2 clones:
+  internal/shared/errors/types.go:135,142
+  internal/shared/errors/types.go:140,147
+found 2 clones:
+  internal/infrastructure/cleaners/npm.go:20,30
+  internal/infrastructure/cleaners/pnpm.go:20,30
+found 6 clones:
+  internal/shared/utils/pkg/errors/errors.go:136,147
+  internal/shared/utils/pkg/errors/errors.go:139,150
+  internal/shared/utils/pkg/errors/errors.go:142,153
+  internal/shared/utils/pkg/errors/errors.go:145,156
+  internal/shared/utils/pkg/errors/errors.go:148,159
+  internal/shared/utils/pkg/errors/errors.go:151,162
+found 2 clones:
+  internal/application/config/type_safe_validation_rules.go:64,73
+  internal/application/config/type_safe_validation_rules.go:69,78
+found 2 clones:
+  internal/infrastructure/cleaners/temp_files.go:40,44
+  internal/infrastructure/cleaners/temp_files.go:105,109
+found 3 clones:
+  internal/infrastructure/system/errors.go:41,43
+  internal/shared/errors/errors.go:23,25
+  internal/shared/errors/errors.go:28,30
+found 3 clones:
+  internal/application/config/type_safe_validation_rules_test.go:107,112
+  internal/application/config/type_safe_validation_rules_test.go:113,118
+  internal/application/config/type_safe_validation_rules_test.go:119,124
+found 2 clones:
+  internal/domain/config/config.go:96,137
+  internal/domain/config/config.go:102,143
+found 9 clones:
+  internal/shared/utils/pkg/errors/errors.go:363,365
+  internal/shared/utils/pkg/errors/errors.go:366,368
+  internal/shared/utils/pkg/errors/errors.go:369,371
+  internal/shared/utils/pkg/errors/errors.go:372,374
+  internal/shared/utils/pkg/errors/errors.go:375,377
+  internal/shared/utils/pkg/errors/errors.go:378,380
+  internal/shared/utils/pkg/errors/errors.go:381,383
+  internal/shared/utils/pkg/errors/errors.go:384,386
+  internal/shared/utils/pkg/errors/errors.go:387,389
+found 2 clones:
+  internal/interface/api/types.go:25,31
+  test/validation/duration_parser_test.go:10,16
+found 4 clones:
+  internal/shared/utils/pkg/errors/errors_test.go:14,16
+  internal/shared/utils/pkg/errors/errors_test.go:19,21
+  internal/shared/utils/pkg/errors/errors_test.go:43,45
+  internal/shared/utils/pkg/errors/errors_test.go:49,51
+found 3 clones:
+  internal/shared/errors/types.go:197,197
+  internal/shared/utils/pkg/errors/errors.go:197,197
+  internal/shared/utils/pkg/errors/handlers.go:75,75
+found 2 clones:
+  internal/application/config/safe_test.go:263,273
+  test/config/safe_test.go:262,272
+found 3 clones:
+  internal/infrastructure/system/environment.go:123,130
+  internal/infrastructure/system/environment.go:133,140
+  internal/infrastructure/system/environment.go:143,150
+found 6 clones:
+  internal/domain/config/config.go:96,113
+  internal/domain/config/config.go:102,119
+  internal/domain/config/config.go:108,125
+  internal/domain/config/config.go:114,131
+  internal/domain/config/config.go:120,137
+  internal/domain/config/config.go:126,143
+found 5 clones:
+  test/nix.go:14,14
+  test/nix.go:15,15
+  test/nix.go:16,16
+  test/nix.go:17,17
+  test/nix.go:18,18
+found 2 clones:
+  internal/shared/utils/format/format.go:40,45
+  internal/shared/utils/format/format.go:48,53
+found 4 clones:
+  internal/shared/errors/adapters.go:18,22
+  internal/shared/errors/adapters.go:159,163
+  internal/shared/errors/adapters.go:201,205
+  internal/shared/errors/adapters.go:243,247
+found 2 clones:
+  internal/shared/result/type.go:21,23
+  internal/shared/result/type.go:26,28
+found 2 clones:
+  test/validation/duration_parser_test.go:73,100
+  test/validation/duration_parser_test.go:80,107
+found 3 clones:
+  test/domain/enum_helper_test.go:161,166
+  test/domain/enum_helper_test.go:167,172
+  test/domain/enum_helper_test.go:173,178
+found 14 clones:
+  internal/domain/shared/type_safe_enums.go:127,139
+  internal/domain/shared/type_safe_enums.go:176,188
+  internal/domain/shared/type_safe_enums.go:245,257
+  internal/domain/shared/type_safe_enums.go:301,313
+  internal/domain/shared/type_safe_enums.go:355,367
+  internal/domain/shared/type_safe_enums.go:433,445
+  internal/domain/shared/type_safe_enums.go:486,498
+  internal/domain/shared/type_safe_enums.go:537,549
+  internal/domain/shared/type_safe_enums.go:599,611
+  internal/domain/shared/type_safe_enums.go:650,662
+  internal/domain/shared/type_safe_enums.go:701,713
+  internal/domain/shared/type_safe_enums.go:731,743
+  internal/domain/shared/type_safe_enums.go:784,796
+  internal/domain/shared/type_safe_enums.go:837,849
+found 2 clones:
+  internal/shared/errors/errors_test.go:89,94
+  internal/shared/errors/errors_test.go:277,282
+found 4 clones:
+  internal/infrastructure/cleaners/homebrew.go:155,157
+  internal/infrastructure/cleaners/nix.go:128,130
+  internal/infrastructure/cleaners/npm.go:117,119
+  internal/infrastructure/cleaners/pnpm.go:110,112
+found 2 clones:
+  internal/shared/errors/errors_test.go:387,390
+  internal/shared/errors/errors_test.go:404,407
+found 2 clones:
+  internal/interface/api/mapper.go:78,83
+  internal/interface/api/mapper_test.go:30,35
+found 28 clones:
+  internal/domain/shared/type_safe_enums.go:127,129
+  internal/domain/shared/type_safe_enums.go:132,134
+  internal/domain/shared/type_safe_enums.go:176,178
+  internal/domain/shared/type_safe_enums.go:181,183
+  internal/domain/shared/type_safe_enums.go:245,247
+  internal/domain/shared/type_safe_enums.go:250,252
+  internal/domain/shared/type_safe_enums.go:301,303
+  internal/domain/shared/type_safe_enums.go:306,308
+  internal/domain/shared/type_safe_enums.go:355,357
+  internal/domain/shared/type_safe_enums.go:360,362
+  internal/domain/shared/type_safe_enums.go:433,435
+  internal/domain/shared/type_safe_enums.go:438,440
+  internal/domain/shared/type_safe_enums.go:486,488
+  internal/domain/shared/type_safe_enums.go:491,493
+  internal/domain/shared/type_safe_enums.go:537,539
+  internal/domain/shared/type_safe_enums.go:542,544
+  internal/domain/shared/type_safe_enums.go:599,601
+  internal/domain/shared/type_safe_enums.go:604,606
+  internal/domain/shared/type_safe_enums.go:650,652
+  internal/domain/shared/type_safe_enums.go:655,657
+  internal/domain/shared/type_safe_enums.go:701,703
+  internal/domain/shared/type_safe_enums.go:706,708
+  internal/domain/shared/type_safe_enums.go:731,733
+  internal/domain/shared/type_safe_enums.go:736,738
+  internal/domain/shared/type_safe_enums.go:784,786
+  internal/domain/shared/type_safe_enums.go:789,791
+  internal/domain/shared/type_safe_enums.go:837,839
+  internal/domain/shared/type_safe_enums.go:842,844
+found 2 clones:
+  internal/shared/errors/errors_test.go:301,307
+  internal/shared/errors/errors_test.go:309,315
+found 2 clones:
+  test/nix.go:14,17
+  test/nix.go:15,18
+found 2 clones:
+  internal/application/config/safe_test.go:173,182
+  test/config/safe_test.go:172,181
+found 2 clones:
+  internal/infrastructure/system/http_client.go:126,133
+  internal/infrastructure/system/http_client.go:136,143
+found 2 clones:
+  internal/interface/api/mapper_test.go:288,294
+  internal/interface/api/mapper_test.go:297,303
+found 2 clones:
+  internal/infrastructure/cleaners/homebrew.go:96,106
+  internal/infrastructure/cleaners/homebrew.go:113,123
+found 2 clones:
+  internal/shared/errors/filesystem_integration_test.go:24,35
+  internal/shared/errors/filesystem_integration_test.go:30,41
+found 2 clones:
+  internal/interface/api/mapper_test.go:643,646
+  test/validation/duration_parser_test.go:122,125
+found 4 clones:
+  internal/shared/errors/centralized.go:192,195
+  internal/shared/errors/centralized.go:204,207
+  internal/shared/errors/centralized.go:210,213
+  internal/shared/errors/centralized.go:216,219
+found 2 clones:
+  test/validation/duration_parser_test.go:249,263
+  test/validation/duration_parser_test.go:283,297
+found 4 clones:
+  internal/application/config/safe_test.go:25,35
+  internal/application/config/safe_test.go:50,60
+  test/config/safe_test.go:24,34
+  test/config/safe_test.go:49,59
+found 2 clones:
+  internal/domain/shared/interfaces.go:21,21
+  internal/domain/shared/interfaces.go:33,33
+found 2 clones:
+  internal/shared/errors/adapters.go:64,67
+  internal/shared/errors/adapters.go:69,72
+found 2 clones:
+  test/config/semver_validation_test.go:80,84
+  test/config/semver_validation_test.go:86,90
+found 6 clones:
+  internal/application/config/type_safe_validation_rules_test.go:131,133
+  internal/application/config/type_safe_validation_rules_test.go:134,136
+  internal/application/config/type_safe_validation_rules_test.go:146,148
+  internal/application/config/type_safe_validation_rules_test.go:149,151
+  internal/application/config/type_safe_validation_rules_test.go:161,163
+  internal/application/config/type_safe_validation_rules_test.go:164,166
+found 2 clones:
+  internal/infrastructure/system/errors.go:26,43
+  internal/shared/errors/errors.go:8,25
+found 2 clones:
+  test/config/integration_test.go:107,107
+  test/config/integration_test.go:109,109
+found 2 clones:
+  test/domain/enum_helper_test.go:145,149
+  test/domain/enum_helper_test.go:150,154
+found 2 clones:
+  internal/domain/validation/duration_parser.go:22,29
+  internal/domain/validation/duration_parser.go:31,38
+found 4 clones:
+  internal/interface/api/mapper_test.go:46,49
+  internal/interface/api/mapper_test.go:151,154
+  internal/interface/api/mapper_test.go:202,205
+  internal/interface/api/mapper_test.go:267,270
+found 2 clones:
+  internal/shared/utils/format/format_test.go:61,69
+  internal/shared/utils/format/format_test.go:82,94
+found 4 clones:
+  internal/shared/utils/pkg/errors/errors.go:136,153
+  internal/shared/utils/pkg/errors/errors.go:139,156
+  internal/shared/utils/pkg/errors/errors.go:142,159
+  internal/shared/utils/pkg/errors/errors.go:145,162
+found 2 clones:
+  internal/shared/errors/centralized.go:124,126
+  internal/shared/errors/centralized.go:149,151
+found 3 clones:
+  internal/infrastructure/cleaners/npm.go:153,172
+  internal/infrastructure/cleaners/pnpm.go:154,173
+  internal/infrastructure/cleaners/temp_files.go:143,162
+found 2 clones:
+  internal/domain/shared/operation_settings.go:43,47
+  internal/interface/api/types.go:87,91
+found 4 clones:
+  test/domain/enum_helper_test.go:47,68
+  test/domain/enum_helper_test.go:70,91
+  test/domain/enum_helper_test.go:93,114
+  test/domain/enum_helper_test.go:116,137
+found 2 clones:
+  internal/domain/shared/type_safe_enums.go:206,208
+  internal/domain/shared/type_safe_enums.go:211,213
+found 2 clones:
+  internal/shared/errors/errors_test.go:292,299
+  internal/shared/errors/errors_test.go:327,334
+found 2 clones:
+  internal/infrastructure/system/errors.go:41,48
+  internal/shared/errors/errors.go:28,35
+found 3 clones:
+  test/domain/benchmarks_test.go:11,17
+  test/domain/benchmarks_test.go:27,33
+  test/domain/benchmarks_test.go:38,44
+found 2 clones:
+  test/domain/cleanresult_test.go:57,70
+  test/domain/cleanresult_test.go:71,84
+found 8 clones:
+  internal/shared/utils/pkg/errors/errors.go:136,141
+  internal/shared/utils/pkg/errors/errors.go:139,144
+  internal/shared/utils/pkg/errors/errors.go:142,147
+  internal/shared/utils/pkg/errors/errors.go:145,150
+  internal/shared/utils/pkg/errors/errors.go:148,153
+  internal/shared/utils/pkg/errors/errors.go:151,156
+  internal/shared/utils/pkg/errors/errors.go:154,159
+  internal/shared/utils/pkg/errors/errors.go:157,162
+found 2 clones:
+  internal/application/config/type_safe_validation_rules.go:129,132
+  internal/application/config/type_safe_validation_rules.go:133,136
+found 5 clones:
+  internal/domain/shared/type_safe_enums.go:286,328
+  internal/domain/shared/type_safe_enums.go:340,382
+  internal/domain/shared/type_safe_enums.go:422,460
+  internal/domain/shared/type_safe_enums.go:639,677
+  internal/domain/shared/type_safe_enums.go:690,728
+found 7 clones:
+  internal/infrastructure/cleaners/homebrew.go:181,188
+  internal/infrastructure/cleaners/homebrew.go:213,220
+  internal/infrastructure/cleaners/npm.go:140,147
+  internal/infrastructure/cleaners/npm.go:162,169
+  internal/infrastructure/cleaners/pnpm.go:141,148
+  internal/infrastructure/cleaners/pnpm.go:163,170
+  internal/infrastructure/cleaners/temp_files.go:152,159
+found 5 clones:
+  internal/shared/errors/types.go:135,137
+  internal/shared/errors/types.go:140,142
+  internal/shared/errors/types.go:145,147
+  internal/shared/utils/pkg/errors/errors.go:313,315
+  internal/shared/utils/pkg/errors/errors.go:318,320
+found 2 clones:
+  internal/application/config/config.go:67,67
+  internal/application/config/config.go:154,154
+found 3 clones:
+  internal/interface/api/mapper_test.go:440,442
+  internal/interface/api/mapper_test.go:483,485
+  internal/interface/api/mapper_test.go:535,537
+found 13 clones:
+  internal/domain/shared/type_safe_enums.go:127,154
+  internal/domain/shared/type_safe_enums.go:176,203
+  internal/domain/shared/type_safe_enums.go:245,272
+  internal/domain/shared/type_safe_enums.go:301,328
+  internal/domain/shared/type_safe_enums.go:355,382
+  internal/domain/shared/type_safe_enums.go:433,460
+  internal/domain/shared/type_safe_enums.go:486,513
+  internal/domain/shared/type_safe_enums.go:599,626
+  internal/domain/shared/type_safe_enums.go:650,677
+  internal/domain/shared/type_safe_enums.go:701,728
+  internal/domain/shared/type_safe_enums.go:731,758
+  internal/domain/shared/type_safe_enums.go:784,811
+  internal/domain/shared/type_safe_enums.go:837,864
+found 2 clones:
+  test/domain/benchmarks_test.go:11,25
+  test/domain/benchmarks_test.go:38,52
+found 8 clones:
+  internal/domain/config/config.go:76,87
+  internal/domain/config/config.go:96,107
+  internal/domain/config/config.go:102,113
+  internal/domain/config/config.go:108,119
+  internal/domain/config/config.go:114,125
+  internal/domain/config/config.go:120,131
+  internal/domain/config/config.go:126,137
+  internal/domain/config/config.go:132,143
+found 2 clones:
+  test/config/bdd_nix_validation_test.go:97,100
+  test/validation/validation_benchmark_test.go:51,54
 
-Found total 1 clone groups.
+Found total 218 clone groups.

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -91,6 +92,17 @@ func (m *mockCleaner) IsAvailable(ctx context.Context) bool {
 
 func (m *mockCleaner) GetStoreSize(ctx context.Context) int64 {
 	return 1000
+}
+
+func (m *mockCleaner) Cleanup(ctx context.Context, settings *shared.OperationSettings) result.Result[shared.CleanResult] {
+	return result.Ok(shared.CleanResult{
+		Success:      true,
+		FreedBytes:   1024,
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    "1s",
+		CleanedAt:    "2025-01-01T00:00:00Z",
+	})
 }
 
 func (m *mockCleaner) ValidateSettings(settings *shared.OperationSettings) error {

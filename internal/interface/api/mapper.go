@@ -156,7 +156,7 @@ func mapPublicOperationToDomain(public PublicOperation) domainconfig.CleanupOper
 		Settings: &shared.OperationSettings{
 			ExecutionMode:       public.Settings.ExecutionMode,
 			Verbose:             public.Settings.Verbose,
-			TimeoutSeconds:      int(public.Settings.TimeoutSeconds),
+			TimeoutSeconds:      public.Settings.TimeoutSeconds,
 			ConfirmBeforeDelete: public.Settings.ConfirmBeforeDelete,
 		},
 	}

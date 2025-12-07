@@ -100,10 +100,10 @@ func TestCleanType_IsValid(t *testing.T) {
 		cleanType CleanType
 		expected  bool
 	}{
-		{"nix store", CleanTypeNixStore, true},
-		{"homebrew", CleanTypeHomebrew, true},
-		{"package cache", CleanTypePackageCache, true},
-		{"temp files", CleanTypeTempFiles, true},
+		{"nix store", CleanType("nix-store"), true},
+		{"homebrew", CleanType("homebrew"), true},
+		{"package cache", CleanType("package-cache"), true},
+		{"temp files", CleanType("temp-files"), true},
 		{"invalid type", CleanType("invalid"), false},
 		{"empty type", CleanType(""), false},
 	}

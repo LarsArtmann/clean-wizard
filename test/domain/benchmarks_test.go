@@ -11,7 +11,7 @@ import (
 // BenchmarkEnumHelper_String benchmarks String() method across all enum types
 func BenchmarkEnumHelper_String(b *testing.B) {
 	b.Run("RiskLevel", func(b *testing.B) {
-		levels := []RiskLevelType{RiskLow, RiskMedium, RiskHigh, RiskCritical}
+		levels := []shared.RiskLevelType{shared.RiskLevelLowType, shared.RiskLevelMediumType, shared.RiskLevelHighType, shared.RiskLevelCriticalType}
 		b.ResetTimer()
 		for i := 0; b.Loop(); i++ {
 			_ = levels[i%len(levels)].String()
@@ -19,7 +19,11 @@ func BenchmarkEnumHelper_String(b *testing.B) {
 	})
 
 	b.Run("CleanStrategy", func(b *testing.B) {
-		strategies := []CleanStrategyType{StrategyAggressive, StrategyConservative, StrategyDryRun}
+		strategies := []shared.CleanStrategyType{
+			shared.CleanStrategyType(shared.StrategyAggressiveType),
+			shared.CleanStrategyType(shared.StrategyConservativeType),
+			shared.CleanStrategyType(shared.StrategyDryRunType),
+		}
 		b.ResetTimer()
 		for i := 0; b.Loop(); i++ {
 			_ = strategies[i%len(strategies)].String()

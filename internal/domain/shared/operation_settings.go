@@ -25,7 +25,8 @@ type OperationSettings struct {
 
 // NixGenerationsSettings provides configuration for Nix generations cleanup
 type NixGenerationsSettings struct {
-	Generations int `json:"generations,omitempty"`
+	Generations  int                   `json:"generations,omitempty"`
+	Optimization OptimizationLevelType `json:"optimization,omitempty"`
 }
 
 // TempFilesSettings provides configuration for temporary files cleanup

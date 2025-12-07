@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
-	"github.com/LarsArtmann/clean-wizard/internal/interface/api"
 )
 
 // === MAPPING LAYER TESTS ===

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 )
 
 func TestNixCleaner_ListGenerations(t *testing.T) {
@@ -15,7 +17,7 @@ func TestNixCleaner_ListGenerations(t *testing.T) {
 		{
 			name: "list generations successfully",
 			test: func(t *testing.T) {
-				cleaner := NewNixCleaner(false, false)
+				cleaner := NewNixCleaner()
 				ctx := context.Background()
 
 				result := cleaner.ListGenerations(ctx)
@@ -33,7 +35,7 @@ func TestNixCleaner_ListGenerations(t *testing.T) {
 		{
 			name: "list generations with context canceled",
 			test: func(t *testing.T) {
-				cleaner := NewNixCleaner(false, false)
+				cleaner := NewNixCleaner()
 				ctx, cancel := context.WithCancel(context.Background())
 				cancel() // Cancel immediately
 
@@ -51,7 +53,7 @@ func TestNixCleaner_ListGenerations(t *testing.T) {
 }
 
 func TestNixCleaner_CleanOldGenerations(t *testing.T) {
-	cleaner := NewNixCleaner(true, true) // dry run
+	cleaner := NewNixCleaner()
 	ctx := context.Background()
 
 	result := cleaner.CleanOldGenerations(ctx, 3)
@@ -68,7 +70,7 @@ func TestNixCleaner_CleanOldGenerations(t *testing.T) {
 }
 
 func TestNixCleaner_GetStoreSize(t *testing.T) {
-	cleaner := NewNixCleaner(false, false)
+	cleaner := NewNixCleaner()
 	ctx := context.Background()
 
 	size := cleaner.GetStoreSize(ctx)
@@ -76,7 +78,7 @@ func TestNixCleaner_GetStoreSize(t *testing.T) {
 }
 
 func TestNixCleaner_ParseGeneration(t *testing.T) {
-	adapter := adapters.NewNixAdapter(0, 0)
+	adapter := system.NewNixAdapter(0, 0)
 
 	// Test parsing valid generation line
 	gen, err := adapter.ParseGeneration("   1234  (2023-01-01)   /nix/var/nix/profiles/system-1234-link   current")

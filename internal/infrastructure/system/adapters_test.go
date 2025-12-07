@@ -5,12 +5,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/infrastructure/system"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewRateLimiter(t *testing.T) {
-	rl := adapters.NewRateLimiter(10, 5)
+	rl := system.NewRateLimiter(10, 5)
 	require.NotNil(t, rl)
 
 	stats := rl.Stats()
@@ -20,7 +21,7 @@ func TestNewRateLimiter(t *testing.T) {
 }
 
 func TestRateLimiter_Allow(t *testing.T) {
-	rl := adapters.NewRateLimiter(100, 10) // High limit for testing
+	rl := system.NewRateLimiter(100, 10) // High limit for testing
 	require.NotNil(t, rl)
 
 	// Should allow immediate request
@@ -31,7 +32,7 @@ func TestRateLimiter_Allow(t *testing.T) {
 }
 
 func TestRateLimiter_Wait(t *testing.T) {
-	rl := adapters.NewRateLimiter(100, 10) // High limit for testing
+	rl := system.NewRateLimiter(100, 10) // High limit for testing
 	require.NotNil(t, rl)
 
 	ctx := context.Background()
@@ -42,7 +43,7 @@ func TestRateLimiter_Wait(t *testing.T) {
 }
 
 func TestCacheManager(t *testing.T) {
-	cm := adapters.NewCacheManager(5*time.Minute, 10*time.Minute)
+	cm := system.NewCacheManager(5*time.Minute, 10*time.Minute)
 	require.NotNil(t, cm)
 
 	// Test Set and Get
@@ -67,7 +68,7 @@ func TestCacheManager(t *testing.T) {
 }
 
 func TestCacheManager_Expiration(t *testing.T) {
-	cm := adapters.NewCacheManager(100*time.Millisecond, 1*time.Minute)
+	cm := system.NewCacheManager(100*time.Millisecond, 1*time.Minute)
 	require.NotNil(t, cm)
 
 	cm.Set("expire_key", "expire_value", 50*time.Millisecond)
@@ -86,7 +87,7 @@ func TestCacheManager_Expiration(t *testing.T) {
 }
 
 func TestCacheManager_Clear(t *testing.T) {
-	cm := adapters.NewCacheManager(5*time.Minute, 10*time.Minute)
+	cm := system.NewCacheManager(5*time.Minute, 10*time.Minute)
 	require.NotNil(t, cm)
 
 	// Add multiple items
@@ -102,7 +103,7 @@ func TestCacheManager_Clear(t *testing.T) {
 }
 
 func TestHTTPClient(t *testing.T) {
-	client := adapters.NewHTTPClient()
+	client := system.NewHTTPClient()
 	require.NotNil(t, client)
 
 	// Test WithTimeout
@@ -123,7 +124,7 @@ func TestHTTPClient(t *testing.T) {
 }
 
 func TestEnvironmentConfig(t *testing.T) {
-	cfg, err := adapters.LoadEnvironmentConfig()
+	cfg, err := system.LoadEnvironmentConfig()
 	require.NoError(t, err)
 	require.NotNil(t, cfg)
 
@@ -139,7 +140,7 @@ func TestEnvironmentConfig(t *testing.T) {
 }
 
 func TestEnvironmentConfig_Validate(t *testing.T) {
-	cfg, err := adapters.LoadEnvironmentConfig()
+	cfg, err := system.LoadEnvironmentConfig()
 	require.NoError(t, err)
 
 	// Valid config should pass
@@ -149,70 +150,70 @@ func TestEnvironmentConfig_Validate(t *testing.T) {
 
 func TestEnvironmentConfig_Getters(t *testing.T) {
 	// Test GetEnvWithDefault
-	value := adapters.GetEnvWithDefault("NON_EXISTENT_ENV", "default")
+	value := system.GetEnvWithDefault("NON_EXISTENT_ENV", "default")
 	assert.Equal(t, "default", value)
 
 	// Test GetEnvBool
-	isTrue := adapters.GetEnvBool("DEBUG", false)
+	isTrue := system.GetEnvBool("DEBUG", false)
 	assert.False(t, isTrue) // Should be default since DEBUG is not set
 
 	// Test GetEnvInt
-	num := adapters.GetEnvInt("NON_EXISTENT_INT", 42)
+	num := system.GetEnvInt("NON_EXISTENT_INT", 42)
 	assert.Equal(t, 42, num)
 
 	// Test GetEnvDuration
-	dur := adapters.GetEnvDuration("NON_EXISTENT_DURATION", 30*time.Second)
+	dur := system.GetEnvDuration("NON_EXISTENT_DURATION", 30*time.Second)
 	assert.Equal(t, 30*time.Second, dur)
 }
 
 func TestErrorConstructors(t *testing.T) {
 	// Test ErrInvalidConfig
-	err := adapters.ErrInvalidConfig("test error")
+	err := system.ErrInvalidConfig("test error")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "configuration error: test error")
 
 	// Test ErrInvalidArgument
-	err = adapters.ErrInvalidArgument("arg", "test message")
+	err = system.ErrInvalidArgument("arg", "test message")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid argument 'arg': test message")
 
 	// Test ErrNotFound
-	err = adapters.ErrNotFound("resource")
+	err = system.ErrNotFound("resource")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "resource not found: resource")
 
 	// Test ErrTimeout
-	err = adapters.ErrTimeout("operation")
+	err = system.ErrTimeout("operation")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "operation timeout: operation")
 
 	// Test ErrRateLimit
-	err = adapters.ErrRateLimit(10.5)
+	err = system.ErrRateLimit(10.5)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "rate limit exceeded: 10.50 requests/second")
 
 	// Test ErrCacheMiss
-	err = adapters.ErrCacheMiss("key")
+	err = system.ErrCacheMiss("key")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "cache miss: key 'key' not found")
 
 	// Test ErrNotImplemented
-	err = adapters.ErrNotImplemented("feature")
+	err = system.ErrNotImplemented("feature")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "feature not implemented: feature")
 
 	// Test ErrUnauthorized
-	err = adapters.ErrUnauthorized("action")
+	err = system.ErrUnauthorized("action")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "unauthorized: action")
 
 	// Test ErrForbidden
-	err = adapters.ErrForbidden("action")
+	err = system.ErrForbidden("action")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "forbidden: action")
 
 	// Test ErrServiceUnavailable
-	err = adapters.ErrServiceUnavailable("service")
+	err = system.ErrServiceUnavailable("service")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "service unavailable: service")
 }
