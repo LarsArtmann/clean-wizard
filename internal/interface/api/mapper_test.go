@@ -4,6 +4,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+	"github.com/LarsArtmann/clean-wizard/internal/interface/api"
 )
 
 // === MAPPING LAYER TESTS ===
@@ -11,24 +14,24 @@ import (
 
 func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 	// Create public config
-	publicConfig := &PublicConfig{
+	publicConfig := &api.PublicConfig{
 		Version:        "1.0.0",
-		SafetyLevel:    domain.SafetyLevelEnabled, // FIXED: Use SafetyLevel, not SafeMode
+		SafetyLevel:    shared.SafetyLevelEnabled, // FIXED: Use SafetyLevel, not SafeMode
 		MaxDiskUsage:   80,
 		ProtectedPaths: []string{"/System", "/Library"},
-		Profiles: map[string]*PublicProfile{
+		Profiles: map[string]*api.PublicProfile{
 			"daily": {
 				Name:        "daily",
 				Description: "Daily cleanup",
-				Status:      domain.StatusEnabled, // FIXED: Use Status, not Enabled
-				Operations: []PublicOperation{
+				Status:      shared.StatusEnabled, // FIXED: Use Status, not Enabled
+				Operations: []api.PublicOperation{
 					{
 						Name:        "nix-generations",
 						Description: "Clean Nix generations",
-						RiskLevel:   PublicRiskLow,
-						Status:      domain.StatusEnabled, // FIXED: Use Status, not Enabled
-						Settings: OperationSettings{
-							ExecutionMode:       domain.ExecutionModeExecute, // FIXED: Use ExecutionMode, not DryRun
+						RiskLevel:   api.PublicRiskLow,
+						Status:      shared.StatusEnabled, // FIXED: Use Status, not Enabled
+						Settings: api.OperationSettings{
+							ExecutionMode:       shared.ExecutionModeExecute, // FIXED: Use ExecutionMode, not DryRun
 							Verbose:             true,
 							TimeoutSeconds:      300,
 							ConfirmBeforeDelete: false,
@@ -40,7 +43,7 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 	}
 
 	// Map to domain
-	domainConfigResult := MapConfigToDomain(publicConfig)
+	domainConfigResult := api.MapConfigToDomain(publicConfig)
 
 	// Validate successful mapping
 	if domainConfigResult.IsErr() {
@@ -418,7 +421,7 @@ func TestMapConfigToDomain_InvalidRiskLevel(t *testing.T) {
 	}
 
 	// Map to domain
-	domainConfigResult := MapConfigToDomain(publicConfig)
+	domainConfigResult := api.MapConfigToDomain(publicConfig)
 
 	// Validate error result
 	if !domainConfigResult.IsErr() {
@@ -462,7 +465,7 @@ func TestMapConfigToDomain_ProfileValidationFailure(t *testing.T) {
 	}
 
 	// Map to domain
-	domainConfigResult := MapConfigToDomain(publicConfig)
+	domainConfigResult := api.MapConfigToDomain(publicConfig)
 
 	// Validate error result
 	if !domainConfigResult.IsErr() {
@@ -514,7 +517,7 @@ func TestMapConfigToDomain_DomainValidationFailure(t *testing.T) {
 	}
 
 	// Map to domain
-	domainConfigResult := MapConfigToDomain(publicConfig)
+	domainConfigResult := api.MapConfigToDomain(publicConfig)
 
 	// Validate error result
 	if !domainConfigResult.IsErr() {

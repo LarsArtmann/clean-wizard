@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
 
 // BenchmarkEnumHelper_String benchmarks String() method across all enum types
