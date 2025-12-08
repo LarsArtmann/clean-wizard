@@ -135,6 +135,25 @@ func (p ProfileName) IsEqual(other ProfileName) bool {
 	return p.String() == other.String()
 }
 
+// CleanType represents cleaning operation type with type safety
+type CleanType string
+
+// IsValid checks if clean type is valid
+func (ct CleanType) IsValid() bool {
+	validTypes := []string{"nix-store", "homebrew", "package-cache", "temp-files"}
+	for _, valid := range validTypes {
+		if string(ct) == valid {
+			return true
+		}
+	}
+	return false
+}
+
+// String returns string representation
+func (ct CleanType) String() string {
+	return string(ct)
+}
+
 // CleanStrategy represents cleaning strategy with type safety
 type CleanStrategy = CleanStrategyType
 

@@ -31,7 +31,7 @@ func BenchmarkEnumHelper_String(b *testing.B) {
 	})
 
 	b.Run("ScanType", func(b *testing.B) {
-		types := []ScanTypeType{ScanTypeNixStoreType, ScanTypeHomebrewType, ScanTypeSystemType, ScanTypeTempType}
+		types := []shared.ScanTypeType{shared.ScanTypeNixStoreType, shared.ScanTypeHomebrewType, shared.ScanTypeSystemType, shared.ScanTypeTempType}
 		b.ResetTimer()
 		for i := 0; b.Loop(); i++ {
 			_ = types[i%len(types)].String()
@@ -50,7 +50,7 @@ func BenchmarkEnumHelper_IsValid(b *testing.B) {
 	})
 
 	b.Run("CleanStrategy", func(b *testing.B) {
-		strategies := []CleanStrategyType{StrategyAggressive, StrategyConservative, StrategyDryRun}
+		strategies := []shared.CleanStrategyType{shared.CleanStrategyType(shared.StrategyAggressiveType), shared.CleanStrategyType(shared.StrategyConservativeType), shared.CleanStrategyType(shared.StrategyDryRunType)}
 		b.ResetTimer()
 		for i := 0; b.Loop(); i++ {
 			_ = strategies[i%len(strategies)].IsValid()

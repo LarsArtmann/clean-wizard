@@ -6,8 +6,46 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
 )
+
+// SafeConfigBuilder provides type-safe configuration building
+type SafeConfigBuilder struct {
+	profileName string
+	profileDesc string
+	operations []config.CleanupOperation
+}
+
+// NewSafeConfigBuilder creates a new safe config builder
+func NewSafeConfigBuilder() *SafeConfigBuilder {
+	return &SafeConfigBuilder{
+		operations: make([]config.CleanupOperation, 0),
+	}
+}
+
+// AddProfile adds a profile to the builder
+func (scb *SafeConfigBuilder) AddProfile(name, desc string) *SafeConfigBuilder {
+	scb.profileName = name
+	scb.profileDesc = desc
+	return scb
+}
+
+// AddOperation adds an operation to the builder
+func (scb *SafeConfigBuilder) AddOperation(opType shared.CleanType, riskLevel shared.RiskLevelType) *SafeConfigBuilder {
+	operation := config.CleanupOperation{
+		Name:        strings.ToLower(string(opType)),
+		RiskLevel:   riskLevel,
+		Description: opType.String() + " cleanup",
+	}
+	scb.operations = append(scb.operations, operation)
+	return scb
+}
+
+// Done completes the builder and returns the config
+func (scb *SafeConfigBuilder) Done() *SafeConfigBuilder {
+	return scb
+}
 
 // Test constants for invalid risk levels to improve readability and maintainability
 const (
@@ -97,15 +135,15 @@ func TestRiskLevel_IsValid(t *testing.T) {
 func TestCleanType_IsValid(t *testing.T) {
 	tests := []struct {
 		name      string
-		cleanType CleanType
+		cleanType shared.CleanType
 		expected  bool
 	}{
-		{"nix store", CleanType("nix-store"), true},
-		{"homebrew", CleanType("homebrew"), true},
-		{"package cache", CleanType("package-cache"), true},
-		{"temp files", CleanType("temp-files"), true},
-		{"invalid type", CleanType("invalid"), false},
-		{"empty type", CleanType(""), false},
+		{"nix store", shared.CleanType("nix-store"), true},
+		{"homebrew", shared.CleanType("homebrew"), true},
+		{"package cache", shared.CleanType("package-cache"), true},
+		{"temp files", shared.CleanType("temp-files"), true},
+		{"invalid type", shared.CleanType("invalid"), false},
+		{"empty type", shared.CleanType(""), false},
 	}
 
 	for _, tt := range tests {
@@ -130,7 +168,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, shared.RiskLow).
+					AddOperation(shared.CleanType("nix-store"), shared.RiskLevelLowType).
 					Done()
 			},
 			expectError: false,
@@ -148,7 +186,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, shared.RiskLow).
+					AddOperation(shared.CleanType("nix-store"), shared.RiskLevelLowType).
 					Done()
 			},
 			expectError: false,
@@ -186,7 +224,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 				return
 			}
 
-			if !Configcreated.Before(time.Now().Add(time.Second)) {
+			if !config.Updated.Before(time.Now().Add(time.Second)) {
 				t.Error("config creation time seems incorrect")
 			}
 		})
@@ -202,10 +240,10 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 	}{
 		{
 			name: "build valid profile",
-			builderFunc: func() *SafeProfileBuilder {
+			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, shared.RiskLow)
+					AddOperation(shared.CleanType("nix-store"), shared.RiskLevelLowType)
 			},
 			expectError: false,
 		},
@@ -272,5 +310,27 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 				t.Error("expected at least one operation")
 			}
 		})
+	}
+}
+
+// Build creates a configuration from builder
+func (scb *SafeConfigBuilder) Build() *config.Config {
+	profile := &config.Profile{
+		Name:        scb.profileName,
+		Description: scb.profileDesc,
+		Status:      shared.StatusEnabled,
+		Operations:  scb.operations,
+	}
+	
+	return &config.Config{
+		Version:        "1.0.0",
+		SafetyLevel:    shared.SafetyLevelMediumType,
+		MaxDiskUsage:   50,
+		Profiles:       map[string]*config.Profile{
+			scb.profileName: profile,
+		},
+		CurrentProfile: scb.profileName,
+		LastClean:      time.Now(),
+		Updated:        time.Now(),
 	}
 }

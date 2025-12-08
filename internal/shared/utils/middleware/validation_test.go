@@ -96,12 +96,12 @@ func (m *mockCleaner) GetStoreSize(ctx context.Context) int64 {
 
 func (m *mockCleaner) Cleanup(ctx context.Context, settings *shared.OperationSettings) result.Result[shared.CleanResult] {
 	return result.Ok(shared.CleanResult{
-		Success:      true,
 		FreedBytes:   1024,
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
-		CleanTime:    "1s",
-		CleanedAt:    "2025-01-01T00:00:00Z",
+		CleanTime:    time.Second,
+		CleanedAt:    time.Now(),
+		Strategy:     shared.CleanStrategy(shared.StrategyConservative),
 	})
 }
 

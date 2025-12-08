@@ -63,7 +63,7 @@ func SetNixGenerationsOptimization(cfg *config.Config, optimizationLevel shared.
 			if op.Settings.NixGenerations == nil {
 				op.Settings.NixGenerations = &shared.NixGenerationsSettings{}
 			}
-			op.Settings.NixGenerations.Generations = generations
+			op.Settings.NixGenerations.Optimization = optimizationLevel
 			profile.Operations[i] = op
 			operationFound = true
 			break
