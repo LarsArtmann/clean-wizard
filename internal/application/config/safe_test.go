@@ -14,7 +14,7 @@ import (
 type SafeConfigBuilder struct {
 	profileName string
 	profileDesc string
-	operations []config.CleanupOperation
+	operations  []config.CleanupOperation
 }
 
 // NewSafeConfigBuilder creates a new safe config builder
@@ -321,12 +321,12 @@ func (scb *SafeConfigBuilder) Build() *config.Config {
 		Status:      shared.StatusEnabled,
 		Operations:  scb.operations,
 	}
-	
+
 	return &config.Config{
-		Version:        "1.0.0",
-		SafetyLevel:    shared.SafetyLevelMediumType,
-		MaxDiskUsage:   50,
-		Profiles:       map[string]*config.Profile{
+		Version:      "1.0.0",
+		SafetyLevel:  shared.SafetyLevelMediumType,
+		MaxDiskUsage: 50,
+		Profiles: map[string]*config.Profile{
 			scb.profileName: profile,
 		},
 		CurrentProfile: scb.profileName,

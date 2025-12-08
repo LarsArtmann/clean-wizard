@@ -1,5 +1,20 @@
 package shared
 
+//go:generate stringer -type=RiskLevelType
+//go:generate stringer -type=StatusType
+//go:generate stringer -type=OperationNameType
+//go:generate stringer -type=OptimizationLevelType
+//go:generate stringer -type=ExecutionModeType
+//go:generate stringer -type=StrategyType
+//go:generate stringer -type=ChangeOperationType
+//go:generate stringer -type=ScanTypeType
+//go:generate stringer -type=ValidationLevelType
+//go:generate stringer -type=EnforcementLevelType
+//go:generate stringer -type=SelectedStatusType
+//go:generate stringer -type=RecursionLevelType
+//go:generate stringer -type=FileSelectionStrategyType
+//go:generate stringer -type=SafetyLevelType
+
 import (
 	"encoding/json"
 	"fmt"
