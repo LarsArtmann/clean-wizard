@@ -11,11 +11,11 @@ import (
 func MockNixGenerations() []shared.NixGeneration {
 	now := time.Now()
 	return []shared.NixGeneration{
-		{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: now.Add(-24 * time.Hour), Status: shared.SelectedStatusSelected},
-		{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: now.Add(-48 * time.Hour), Status: shared.SelectedStatusNotSelected},
-		{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: now.Add(-72 * time.Hour), Status: shared.SelectedStatusNotSelected},
-		{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: now.Add(-96 * time.Hour), Status: shared.SelectedStatusNotSelected},
-		{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: now.Add(-120 * time.Hour), Status: shared.SelectedStatusNotSelected},
+		{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: now.Add(-24 * time.Hour), Status: shared.SelectedStatusSelectedType},
+		{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: now.Add(-48 * time.Hour), Status: shared.SelectedStatusNotSelectedType},
+		{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: now.Add(-72 * time.Hour), Status: shared.SelectedStatusNotSelectedType},
+		{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: now.Add(-96 * time.Hour), Status: shared.SelectedStatusNotSelectedType},
+		{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: now.Add(-120 * time.Hour), Status: shared.SelectedStatusNotSelectedType},
 	}
 }
 

@@ -226,7 +226,12 @@ func (n *NixAdapter) ParseGeneration(line string) (shared.NixGeneration, error) 
 		ID:     id,
 		Path:   fields[0],
 		Date:   date,
-		Status: shared.FromBool(strings.Contains(line, "current")),
+		Status: func() shared.SelectedStatusType {
+			if strings.Contains(line, "current") {
+				return shared.SelectedStatusSelectedType
+			}
+			return shared.SelectedStatusNotSelectedType
+		}(),
 	}, nil
 }
 
