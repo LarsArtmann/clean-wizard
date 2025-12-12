@@ -34,7 +34,18 @@ format:
 install-tools:
     @echo "🔧 Installing development tools..."
     go install golang.org/x/tools/cmd/goimports@latest
+    go install golang.org/x/tools/cmd/stringer@latest
     @echo "✅ Tools installed"
+
+# Generate code
+generate:
+    @echo "🔄 Generating code..."
+    go generate ./...
+    @echo "✅ Code generation complete"
+
+# Full setup including code generation
+setup: install-tools generate
+    @echo "✅ Full setup complete"
 
 # Run linter (basic go vet + custom checks)
 lint:
@@ -62,8 +73,17 @@ run: build
     ./{{BINARY_NAME}} --help
 
 # Continuous Integration pipeline
-ci: build test
+ci: setup build test
     @echo "✅ CI pipeline completed successfully"
+
+# Production readiness check
+prod-ready:
+    @echo "🚀 Running production readiness check..."
+    @if [ -f "scripts/production-readiness.sh" ]; then \
+		./scripts/production-readiness.sh; \
+	else \
+		echo "❌ Production readiness script not found"; \
+	fi
 
 # Default recipe
 default:
