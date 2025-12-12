@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/application/config"
 	domainConfig "github.com/LarsArtmann/clean-wizard/internal/domain/config"
@@ -307,6 +308,212 @@ func handleScanCommand() error {
 	return nil
 }
 
+// handleProfileCommand implements profile management command
+func handleProfileCommand() error {
+	if len(os.Args) < 3 {
+		fmt.Println(colorize("⚙️  Profile Management", "cyan"))
+		fmt.Println("\nUsage: clean-wizard profile [subcommand] [options]")
+		fmt.Println("\nSubcommands:")
+		fmt.Println("  list                    - List all profiles")
+		fmt.Println("  show <name>            - Show profile details")
+		fmt.Println("  create <name>           - Create new profile")
+		fmt.Println("  delete <name>           - Delete profile")
+		fmt.Println("  set-active <name>       - Set active profile")
+		return nil
+	}
+	
+	subcommand := os.Args[2]
+	switch subcommand {
+	case "list":
+		return handleProfileList()
+	case "show":
+		if len(os.Args) < 4 {
+			return fmt.Errorf("profile name required: clean-wizard profile show <name>")
+		}
+		return handleProfileShow(os.Args[3])
+	case "create":
+		if len(os.Args) < 4 {
+			return fmt.Errorf("profile name required: clean-wizard profile create <name>")
+		}
+		return handleProfileCreate(os.Args[3])
+	case "delete":
+		if len(os.Args) < 4 {
+			return fmt.Errorf("profile name required: clean-wizard profile delete <name>")
+		}
+		return handleProfileDelete(os.Args[3])
+	case "set-active":
+		if len(os.Args) < 4 {
+			return fmt.Errorf("profile name required: clean-wizard profile set-active <name>")
+		}
+		return handleProfileSetActive(os.Args[3])
+	default:
+		return fmt.Errorf("unknown subcommand: %s", subcommand)
+	}
+}
+
+// handleProfileList lists all available profiles
+func handleProfileList() error {
+	fmt.Println(colorize("📋 Available Profiles", "cyan"))
+	
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+	
+	if len(cfg.Profiles) == 0 {
+		fmt.Println(colorize("No profiles found. Run 'clean-wizard profile create <name>' to create one.", "yellow"))
+		return nil
+	}
+	
+	for name, profile := range cfg.Profiles {
+		status := "Inactive"
+		if cfg.CurrentProfile == name {
+			status = colorize("✅ Active", "green")
+		}
+		
+		fmt.Printf("📝 %s - %s (%s)\n", 
+			colorize(name, "blue"), 
+			profile.Description, 
+			status)
+		fmt.Printf("   Operations: %d\n", len(profile.Operations))
+		fmt.Printf("   Status: %s\n", profile.Status.String())
+		fmt.Println()
+	}
+	
+	return nil
+}
+
+// handleProfileShow shows profile details
+func handleProfileShow(name string) error {
+	fmt.Printf(colorize("📝 Profile Details: %s\n", "cyan"), name)
+	
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+	
+	profile, exists := cfg.Profiles[name]
+	if !exists {
+		return fmt.Errorf("profile not found: %s", name)
+	}
+	
+	fmt.Printf("Name: %s\n", profile.Name)
+	fmt.Printf("Description: %s\n", profile.Description)
+	fmt.Printf("Status: %s\n", profile.Status.String())
+	fmt.Printf("Operations: %d\n", len(profile.Operations))
+	fmt.Println("\nOperations:")
+	for i, op := range profile.Operations {
+		fmt.Printf("%d. %s - %s\n", i+1, op.Name, op.Description)
+		fmt.Printf("   Risk Level: %s\n", op.RiskLevel.String())
+		fmt.Printf("   Status: %s\n", op.Status.String())
+	}
+	
+	return nil
+}
+
+// handleProfileCreate creates a new profile
+func handleProfileCreate(name string) error {
+	fmt.Printf(colorize("📝 Creating Profile: %s\n", "cyan"), name)
+	
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+	
+	if _, exists := cfg.Profiles[name]; exists {
+		return fmt.Errorf("profile already exists: %s", name)
+	}
+	
+	// Create basic profile
+	profile := &domainConfig.Profile{
+		Name:        name,
+		Description: fmt.Sprintf("%s profile - auto-generated", name),
+		Status:      shared.StatusActiveType,
+		Operations: []domainConfig.CleanupOperation{
+			{
+				Name:        "temp-files",
+				Description: "Clean temporary files",
+				RiskLevel:   shared.RiskLevelLowType,
+				Status:      shared.StatusActiveType,
+			},
+		},
+	}
+	
+	cfg.Profiles[name] = profile
+	
+	// Save configuration
+	if err := saveConfig(cfg); err != nil {
+		return fmt.Errorf("failed to save configuration: %w", err)
+	}
+	
+	fmt.Println(colorize(fmt.Sprintf("✅ Profile '%s' created successfully", name), "green"))
+	fmt.Println(colorize("Run 'clean-wizard profile show <name>' to view details", "cyan"))
+	
+	return nil
+}
+
+// handleProfileDelete deletes a profile
+func handleProfileDelete(name string) error {
+	fmt.Printf(colorize("🗑️  Deleting Profile: %s\n", "cyan"), name)
+	
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+	
+	if _, exists := cfg.Profiles[name]; !exists {
+		return fmt.Errorf("profile not found: %s", name)
+	}
+	
+	// Don't allow deleting current active profile
+	if cfg.CurrentProfile == name {
+		return fmt.Errorf("cannot delete active profile. Switch to another profile first.")
+	}
+	
+	delete(cfg.Profiles, name)
+	
+	// Save configuration
+	if err := saveConfig(cfg); err != nil {
+		return fmt.Errorf("failed to save configuration: %w", err)
+	}
+	
+	fmt.Println(colorize(fmt.Sprintf("✅ Profile '%s' deleted successfully", name), "green"))
+	
+	return nil
+}
+
+// handleProfileSetActive sets active profile
+func handleProfileSetActive(name string) error {
+	fmt.Printf(colorize("⚙️  Setting Active Profile: %s\n", "cyan"), name)
+	
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+	
+	if _, exists := cfg.Profiles[name]; !exists {
+		return fmt.Errorf("profile not found: %s", name)
+	}
+	
+	cfg.CurrentProfile = name
+	cfg.Updated = time.Now()
+	
+	// Save configuration
+	if err := saveConfig(cfg); err != nil {
+		return fmt.Errorf("failed to save configuration: %w", err)
+	}
+	
+	fmt.Println(colorize(fmt.Sprintf("✅ Profile '%s' set as active", name), "green"))
+	
+	return nil
+}
+
+// saveConfig saves configuration to default location
+func saveConfig(cfg *domainConfig.Config) error {
+	configPath := os.Getenv("HOME") + "/.clean-wizard.yaml"
+	return config.SaveConfigToFile(cfg, configPath)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println(colorize("Clean Wizard - Safe System Cleaning Tool", "cyan"))
@@ -338,7 +545,10 @@ func main() {
 			os.Exit(1)
 		}
 	case "profile":
-		fmt.Println(colorize("⚙️  Profile command (not yet implemented)", "yellow"))
+		if err := handleProfileCommand(); err != nil {
+			fmt.Println(colorize(fmt.Sprintf("❌ Profile command failed: %s", err), "red"))
+			os.Exit(1)
+		}
 	case "generate":
 		fmt.Println(colorize("📄 Generating default configuration...", "cyan"))
 		defaultConfig, err := domainConfig.CreateDefaultConfig()
