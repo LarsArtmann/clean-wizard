@@ -2,6 +2,7 @@ package shared
 
 import (
 	"fmt"
+	"slices"
 	"time"
 )
 
@@ -141,12 +142,7 @@ type CleanType string
 // IsValid checks if clean type is valid
 func (ct CleanType) IsValid() bool {
 	validTypes := []string{"nix-store", "homebrew", "package-cache", "temp-files"}
-	for _, valid := range validTypes {
-		if string(ct) == valid {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(validTypes, string(ct))
 }
 
 // String returns string representation
