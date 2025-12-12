@@ -80,10 +80,10 @@ ci: setup build test
 prod-ready:
     @echo "🚀 Running production readiness check..."
     @if [ -f "scripts/production-readiness.sh" ]; then \
-		./scripts/production-readiness.sh; \
-	else \
-		echo "❌ Production readiness script not found"; \
-	fi
+        ./scripts/production-readiness.sh; \
+    else \
+        echo "❌ Production readiness script not found"; \
+    fi
 
 # Default recipe
 default:

@@ -51,7 +51,7 @@ func CreateDefaultConfig() (*Config, error) {
 
 	config := &Config{
 		Version:      "1.0.0",
-		SafetyLevel:  shared.SafetyLevelEnabled, // Safe by default
+		SafetyLevel:  shared.SafetyLevelSafeType, // Safe by default
 		MaxDiskUsage: int(maxDiskUsage.Uint8()),
 		Protected: []string{
 			"/System",
@@ -71,19 +71,19 @@ func CreateDefaultConfig() (*Config, error) {
 	config.Profiles["quick"] = &Profile{
 		Name:        quickProfile.String(),
 		Description: "Quick daily cleanup (safe operations only)",
-		Status:      shared.StatusEnabled,
+		Status:      shared.StatusActiveType,
 		Operations: []CleanupOperation{
 			{
 				Name:        "nix-generations",
 				Description: "Remove old Nix store generations",
 				RiskLevel:   shared.RiskLevelLowType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 			{
 				Name:        "temp-files",
 				Description: "Clean temporary files from user directories",
 				RiskLevel:   shared.RiskLevelLowType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 		},
 	}
@@ -91,55 +91,55 @@ func CreateDefaultConfig() (*Config, error) {
 	config.Profiles["comprehensive"] = &Profile{
 		Name:        comprehensiveProfile.String(),
 		Description: "Comprehensive system cleanup with development tools",
-		Status:      shared.StatusEnabled,
+		Status:      shared.StatusActiveType,
 		Operations: []CleanupOperation{
 			{
 				Name:        "nix-generations",
 				Description: "Remove old Nix store generations",
 				RiskLevel:   shared.RiskLevelLowType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 			{
 				Name:        "homebrew",
 				Description: "Homebrew cleanup, autoremove and cache cleaning",
 				RiskLevel:   shared.RiskLevelMediumType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 			{
 				Name:        "npm-cache",
 				Description: "Node.js npm cache cleanup",
 				RiskLevel:   shared.RiskLevelLowType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 			{
 				Name:        "pnpm-store",
 				Description: "pnpm store cleanup",
 				RiskLevel:   shared.RiskLevelLowType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 			{
 				Name:        "go-cache",
 				Description: "Go build and module cache cleanup",
 				RiskLevel:   shared.RiskLevelLowType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 			{
 				Name:        "cargo-cache",
 				Description: "Rust Cargo cache cleanup",
 				RiskLevel:   shared.RiskLevelLowType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 			{
 				Name:        "temp-files",
 				Description: "System and user temporary file cleanup",
 				RiskLevel:   shared.RiskLevelLowType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 			{
 				Name:        "docker",
 				Description: "Docker system cleanup (containers, images, volumes)",
 				RiskLevel:   shared.RiskLevelMediumType,
-				Status:      shared.StatusDisabled, // Disabled by default for safety
+				Status:      shared.StatusInactiveType, // Disabled by default for safety
 			},
 		},
 	}

@@ -162,7 +162,7 @@ func GetDefaultConfig() *config.Config {
 		log.Err(err).Msg("Failed to create default configuration, using minimal config")
 		return &config.Config{
 			Version:     "1.0.0",
-			SafetyLevel: shared.SafetyLevelEnabled,
+			SafetyLevel: shared.SafetyLevelSafeType,
 			Profiles:    make(map[string]*config.Profile),
 		}
 	}
@@ -288,22 +288,22 @@ func mapDomainConfigToViper(cfg *config.Config, v *viper.Viper) error {
 func parseSafetyLevel(level string) shared.SafetyLevelType {
 	switch level {
 	case "enabled":
-		return shared.SafetyLevelEnabled
+		return shared.SafetyLevelSafeType
 	case "disabled":
-		return shared.SafetyLevelDisabled
+		return shared.SafetyLevelUnsafeType
 	default:
-		return shared.SafetyLevelEnabled
+		return shared.SafetyLevelSafeType
 	}
 }
 
 func parseStatus(status string) shared.StatusType {
 	switch status {
 	case "enabled":
-		return shared.StatusEnabled
+		return shared.StatusActiveType
 	case "disabled":
-		return shared.StatusDisabled
+		return shared.StatusInactiveType
 	default:
-		return shared.StatusEnabled
+		return shared.StatusActiveType
 	}
 }
 

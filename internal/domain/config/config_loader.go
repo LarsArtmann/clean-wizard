@@ -42,7 +42,7 @@ func ParseSafetyConfig(v ViperConfig) SafetyConfig {
 
 		// Invalid value - return default with explicit flag
 		return SafetyConfig{
-			Level:      shared.SafetyLevelEnabled,
+			Level:      shared.SafetyLevelSafeType,
 			IsExplicit: true,
 		}
 	}
@@ -53,19 +53,19 @@ func ParseSafetyConfig(v ViperConfig) SafetyConfig {
 
 		if safeMode {
 			return SafetyConfig{
-				Level:      shared.SafetyLevelEnabled,
+				Level:      shared.SafetyLevelSafeType,
 				IsExplicit: true,
 			}
 		}
 		return SafetyConfig{
-			Level:      shared.SafetyLevelDisabled,
+			Level:      shared.SafetyLevelUnsafeType,
 			IsExplicit: true,
 		}
 	}
 
 	// Default when neither is present
 	return SafetyConfig{
-		Level:      shared.SafetyLevelEnabled,
+		Level:      shared.SafetyLevelSafeType,
 		IsExplicit: false,
 	}
 }
@@ -86,33 +86,33 @@ func parseSafetyLevelValue(value any) (shared.SafetyLevelType, bool) {
 			return level, ok
 		}
 	}
-	return shared.SafetyLevelEnabled, false
+	return shared.SafetyLevelSafeType, false
 }
 
 // parseSafetyLevelString converts string to shared.SafetyLevelType
 func parseSafetyLevelString(s string) (shared.SafetyLevelType, bool) {
 	switch strings.ToLower(s) {
 	case "disabled":
-		return shared.SafetyLevelDisabled, true
+		return shared.SafetyLevelUnsafeType, true
 	case "enabled":
-		return shared.SafetyLevelEnabled, true
+		return shared.SafetyLevelSafeType, true
 	case "strict":
-		return shared.SafetyLevelStrict, true
+		return shared.SafetyLevelStrictType, true
 	case "paranoid":
-		return shared.SafetyLevelParanoid, true
+		return shared.SafetyLevelParanoidType, true
 	}
-	return shared.SafetyLevelEnabled, false
+	return shared.SafetyLevelSafeType, false
 }
 
 // parseSafetyLevelNumeric converts string number to shared.SafetyLevelType
 func parseSafetyLevelNumeric(s string) (shared.SafetyLevelType, bool) {
 	if level, err := strconv.Atoi(s); err == nil {
 		switch shared.SafetyLevelType(level) {
-		case shared.SafetyLevelDisabled, shared.SafetyLevelEnabled, shared.SafetyLevelStrict, shared.SafetyLevelParanoid:
+		case shared.SafetyLevelUnsafeType, shared.SafetyLevelSafeType, shared.SafetyLevelStrictType, shared.SafetyLevelParanoidType:
 			return shared.SafetyLevelType(level), true
 		}
 	}
-	return shared.SafetyLevelEnabled, false
+	return shared.SafetyLevelSafeType, false
 }
 
 // Validate validates the safety configuration
