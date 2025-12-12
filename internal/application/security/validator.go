@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
-	"github.com/cyphar/filepath-securejoin"
+	securejoin "github.com/cyphar/filepath-securejoin"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -23,8 +23,8 @@ type ValidationError struct {
 
 // ValidationResult represents validation operation result
 type ValidationResult struct {
-	IsValid bool              `json:"is_valid"`
-	Errors  []ValidationError  `json:"errors"`
+	IsValid bool                       `json:"is_valid"`
+	Errors  []ValidationError          `json:"errors"`
 	Level   shared.ValidationLevelType `json:"level"`
 }
 
@@ -36,23 +36,23 @@ type SecurityValidator struct {
 
 // SecurityConfig defines security validation configuration
 type SecurityConfig struct {
-	MaxPathLength         int           `json:"max_path_length"`
-	AllowedFileExtensions []string       `json:"allowed_file_extensions"`
-	BlockedPatterns      []string       `json:"blocked_patterns"`
-	MaxUsernameLength    int            `json:"max_username_length"`
-	ValidationLevel      shared.ValidationLevelType `json:"validation_level"`
-	StrictPathChecking   bool           `json:"strict_path_checking"`
+	MaxPathLength         int                        `json:"max_path_length"`
+	AllowedFileExtensions []string                   `json:"allowed_file_extensions"`
+	BlockedPatterns       []string                   `json:"blocked_patterns"`
+	MaxUsernameLength     int                        `json:"max_username_length"`
+	ValidationLevel       shared.ValidationLevelType `json:"validation_level"`
+	StrictPathChecking    bool                       `json:"strict_path_checking"`
 }
 
 // NewSecurityValidator creates new security validator
 func NewSecurityValidator(config *SecurityConfig) *SecurityValidator {
 	v := validator.New()
-	
+
 	// Register custom validations
 	v.RegisterValidation("safe-path", validateSafePath)
 	v.RegisterValidation("clean-operation", validateCleanOperation)
 	v.RegisterValidation("profile-name", validateProfileName)
-	
+
 	return &SecurityValidator{
 		validator: v,
 		config:    config,
@@ -60,18 +60,18 @@ func NewSecurityValidator(config *SecurityConfig) *SecurityValidator {
 }
 
 // ValidateInput validates user input with comprehensive security checks
-func (sv *SecurityValidator) ValidateInput(field, value string, validationTag string) *ValidationResult {
+func (sv *SecurityValidator) ValidateInput(field, value, validationTag string) *ValidationResult {
 	result := &ValidationResult{
 		IsValid: true,
 		Errors:  []ValidationError{},
 		Level:   sv.config.ValidationLevel,
 	}
-	
+
 	// Skip validation if level is NONE
 	if sv.config.ValidationLevel == shared.ValidationLevelNoneType {
 		return result
 	}
-	
+
 	// Perform validation based on tag
 	err := sv.validator.Var(value, validationTag)
 	if err != nil {
@@ -83,10 +83,10 @@ func (sv *SecurityValidator) ValidateInput(field, value string, validationTag st
 			Code:    "VALIDATION_FAILED",
 		})
 	}
-	
+
 	// Additional security checks
 	sv.performSecurityChecks(field, value, result)
-	
+
 	return result
 }
 
@@ -97,12 +97,12 @@ func (sv *SecurityValidator) ValidateConfig(config interface{}) *ValidationResul
 		Errors:  []ValidationError{},
 		Level:   sv.config.ValidationLevel,
 	}
-	
+
 	// Skip validation if level is NONE
 	if sv.config.ValidationLevel == shared.ValidationLevelNoneType {
 		return result
 	}
-	
+
 	// Perform comprehensive validation
 	err := sv.validator.Struct(config)
 	if err != nil {
@@ -116,7 +116,7 @@ func (sv *SecurityValidator) ValidateConfig(config interface{}) *ValidationResul
 			})
 		}
 	}
-	
+
 	return result
 }
 
@@ -127,12 +127,12 @@ func (sv *SecurityValidator) ValidatePath(path string) *ValidationResult {
 		Errors:  []ValidationError{},
 		Level:   sv.config.ValidationLevel,
 	}
-	
+
 	// Skip validation if level is NONE
 	if sv.config.ValidationLevel == shared.ValidationLevelNoneType {
 		return result
 	}
-	
+
 	// Path length check
 	if len(path) > sv.config.MaxPathLength {
 		result.IsValid = false
@@ -143,7 +143,7 @@ func (sv *SecurityValidator) ValidatePath(path string) *ValidationResult {
 			Code:    "PATH_TOO_LONG",
 		})
 	}
-	
+
 	// Path traversal protection
 	if sv.config.StrictPathChecking {
 		cleanPath := filepath.Clean(path)
@@ -157,7 +157,7 @@ func (sv *SecurityValidator) ValidatePath(path string) *ValidationResult {
 			})
 		}
 	}
-	
+
 	// Secure path joining
 	if strings.Contains(path, "..") {
 		result.IsValid = false
@@ -168,7 +168,7 @@ func (sv *SecurityValidator) ValidatePath(path string) *ValidationResult {
 			Code:    "PARENT_TRAVERSAL",
 		})
 	}
-	
+
 	// Blocked patterns check
 	for _, pattern := range sv.config.BlockedPatterns {
 		if matched, _ := regexp.MatchString(pattern, path); matched {
@@ -182,7 +182,7 @@ func (sv *SecurityValidator) ValidatePath(path string) *ValidationResult {
 			break
 		}
 	}
-	
+
 	return result
 }
 
@@ -193,12 +193,12 @@ func (sv *SecurityValidator) ValidateOperation(operation string, settings map[st
 		Errors:  []ValidationError{},
 		Level:   sv.config.ValidationLevel,
 	}
-	
+
 	// Skip validation if level is NONE
 	if sv.config.ValidationLevel == shared.ValidationLevelNoneType {
 		return result
 	}
-	
+
 	// Validate operation name
 	if !sv.isValidOperation(operation) {
 		result.IsValid = false
@@ -209,7 +209,7 @@ func (sv *SecurityValidator) ValidateOperation(operation string, settings map[st
 			Code:    "INVALID_OPERATION",
 		})
 	}
-	
+
 	// Validate settings based on operation level
 	switch operation {
 	case "nix-generations":
@@ -234,7 +234,7 @@ func (sv *SecurityValidator) ValidateOperation(operation string, settings map[st
 			})
 		}
 	}
-	
+
 	return result
 }
 
@@ -242,13 +242,13 @@ func (sv *SecurityValidator) ValidateOperation(operation string, settings map[st
 func (sv *SecurityValidator) SanitizeInput(input string) string {
 	// Remove null bytes
 	sanitized := strings.ReplaceAll(input, "\x00", "")
-	
+
 	// Remove control characters except newlines and tabs
 	sanitized = regexp.MustCompile(`[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]`).ReplaceAllString(sanitized, "")
-	
+
 	// Normalize whitespace
 	sanitized = strings.Join(strings.Fields(sanitized), " ")
-	
+
 	return sanitized
 }
 
@@ -259,7 +259,7 @@ func (sv *SecurityValidator) SecureJoinPath(base, path string) (string, *Validat
 		Errors:  []ValidationError{},
 		Level:   sv.config.ValidationLevel,
 	}
-	
+
 	// Use secure join library
 	securePath, err := securejoin.SecureJoin(base, path)
 	if err != nil {
@@ -272,13 +272,13 @@ func (sv *SecurityValidator) SecureJoinPath(base, path string) (string, *Validat
 		})
 		return securePath, result
 	}
-	
+
 	// Validate the joined path
 	pathResult := sv.ValidatePath(securePath)
 	if !pathResult.IsValid {
 		return "", pathResult
 	}
-	
+
 	return securePath, result
 }
 
@@ -289,12 +289,12 @@ func (sv *SecurityValidator) ValidateEmail(email string) *ValidationResult {
 		Errors:  []ValidationError{},
 		Level:   sv.config.ValidationLevel,
 	}
-	
+
 	// Skip validation if level is NONE
 	if sv.config.ValidationLevel == shared.ValidationLevelNoneType {
 		return result
 	}
-	
+
 	// Basic email validation
 	if _, err := mail.ParseAddress(email); err != nil {
 		result.IsValid = false
@@ -305,7 +305,7 @@ func (sv *SecurityValidator) ValidateEmail(email string) *ValidationResult {
 			Code:    "INVALID_EMAIL",
 		})
 	}
-	
+
 	// Additional security checks
 	if len(email) > sv.config.MaxUsernameLength {
 		result.IsValid = false
@@ -316,7 +316,7 @@ func (sv *SecurityValidator) ValidateEmail(email string) *ValidationResult {
 			Code:    "EMAIL_TOO_LONG",
 		})
 	}
-	
+
 	return result
 }
 
@@ -327,17 +327,17 @@ func (sv *SecurityValidator) ValidateTimestamp(timestamp time.Time) *ValidationR
 		Errors:  []ValidationError{},
 		Level:   sv.config.ValidationLevel,
 	}
-	
+
 	// Skip validation if level is NONE
 	if sv.config.ValidationLevel == shared.ValidationLevelNoneType {
 		return result
 	}
-	
+
 	// Check reasonable time bounds
 	now := time.Now()
 	minTime := now.Add(-365 * 24 * time.Hour) // 1 year ago
 	maxTime := now.Add(365 * 24 * time.Hour)  // 1 year in future
-	
+
 	if timestamp.Before(minTime) || timestamp.After(maxTime) {
 		result.IsValid = false
 		result.Errors = append(result.Errors, ValidationError{
@@ -347,7 +347,7 @@ func (sv *SecurityValidator) ValidateTimestamp(timestamp time.Time) *ValidationR
 			Code:    "INVALID_TIMESTAMP",
 		})
 	}
-	
+
 	return result
 }
 
@@ -363,7 +363,7 @@ func (sv *SecurityValidator) performSecurityChecks(field, value string, result *
 			Code:    "XSS_PATTERN",
 		})
 	}
-	
+
 	// SQL injection protection
 	if sv.hasSQLInjectionPatterns(value) {
 		result.IsValid = false
@@ -386,14 +386,14 @@ func (sv *SecurityValidator) hasXSSPatterns(input string) bool {
 		"alert(",
 		"document.cookie",
 	}
-	
+
 	lowerInput := strings.ToLower(input)
 	for _, pattern := range xssPatterns {
 		if strings.Contains(lowerInput, pattern) {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -414,14 +414,14 @@ func (sv *SecurityValidator) hasSQLInjectionPatterns(input string) bool {
 		"delete",
 		"drop",
 	}
-	
+
 	lowerInput := strings.ToLower(input)
 	for _, pattern := range sqlPatterns {
 		if strings.Contains(lowerInput, pattern) {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -434,13 +434,13 @@ func (sv *SecurityValidator) isValidOperation(operation string) bool {
 		"pnpm-store",
 		"temp-files",
 	}
-	
+
 	for _, validOp := range validOperations {
 		if operation == validOp {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -506,30 +506,30 @@ func validateCleanOperation(fl validator.FieldLevel) bool {
 	operation := fl.Field().String()
 	validOps := []string{
 		"nix-generations",
-		"homebrew", 
+		"homebrew",
 		"npm-cache",
 		"pnpm-store",
 		"temp-files",
 	}
-	
+
 	for _, validOp := range validOps {
 		if operation == validOp {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
 // validateProfileName validates profile name
 func validateProfileName(fl validator.FieldLevel) bool {
 	name := fl.Field().String()
-	
+
 	// Check for valid characters
 	if matched, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+$`, name); !matched {
 		return false
 	}
-	
+
 	// Check length
 	return len(name) >= 1 && len(name) <= 50
 }
@@ -539,9 +539,9 @@ func GetDefaultSecurityConfig() *SecurityConfig {
 	return &SecurityConfig{
 		MaxPathLength:         4096,
 		AllowedFileExtensions: []string{"", ".log", ".tmp", ".cache"},
-		BlockedPatterns:      []string{`\.\.`, `\.\.\.`, `[<>]`},
-		MaxUsernameLength:    255,
-		ValidationLevel:      shared.ValidationLevelComprehensiveType,
-		StrictPathChecking:   true,
+		BlockedPatterns:       []string{`\.\.`, `\.\.\.`, `[<>]`},
+		MaxUsernameLength:     255,
+		ValidationLevel:       shared.ValidationLevelComprehensiveType,
+		StrictPathChecking:    true,
 	}
 }

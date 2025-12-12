@@ -223,9 +223,9 @@ func (n *NixAdapter) ParseGeneration(line string) (shared.NixGeneration, error) 
 	}
 
 	return shared.NixGeneration{
-		ID:     id,
-		Path:   fields[0],
-		Date:   date,
+		ID:   id,
+		Path: fields[0],
+		Date: date,
 		Status: func() shared.SelectedStatusType {
 			if strings.Contains(line, "current") {
 				return shared.SelectedStatusSelectedType

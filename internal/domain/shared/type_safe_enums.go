@@ -167,10 +167,10 @@ func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 // operationNameHelper provides shared functionality for OperationNameType
 var operationNameHelper = NewEnumHelper(map[OperationNameType]string{
 	OperationNameNixGenerations: "NIX_GENERATIONS",
-	OperationNameHomebrew:      "HOMEBREW",
+	OperationNameHomebrew:       "HOMEBREW",
 	OperationNamePackageCache:   "PACKAGE_CACHE",
 	OperationNameTempFiles:      "TEMP_FILES",
-	OperationNameSystemTemp:      "SYSTEM_TEMP",
+	OperationNameSystemTemp:     "SYSTEM_TEMP",
 }, func(on OperationNameType) bool {
 	return on >= OperationNameNixGenerations && on <= OperationNameSystemTemp
 }, func() []OperationNameType {
@@ -367,11 +367,11 @@ const (
 
 // scanTypeHelper provides shared functionality for ScanTypeType
 var scanTypeHelper = NewEnumHelper(map[ScanTypeType]string{
-	ScanTypeNixStoreType:      "NIX_STORE",
-	ScanTypeHomebrewType:       "HOMEBREW",
-	ScanTypePackageCacheType:   "PACKAGE_CACHE",
-	ScanTypeTempType:           "TEMP",
-	ScanTypeSystemType:         "SYSTEM",
+	ScanTypeNixStoreType:     "NIX_STORE",
+	ScanTypeHomebrewType:     "HOMEBREW",
+	ScanTypePackageCacheType: "PACKAGE_CACHE",
+	ScanTypeTempType:         "TEMP",
+	ScanTypeSystemType:       "SYSTEM",
 }, func(st ScanTypeType) bool {
 	return st >= ScanTypeNixStoreType && st <= ScanTypeSystemType
 }, func() []ScanTypeType {
@@ -422,10 +422,10 @@ const (
 // statusHelper provides shared functionality for StatusType
 var statusHelper = NewEnumHelper(map[StatusType]string{
 	StatusInactiveType:  "INACTIVE",
-	StatusActiveType:   "ACTIVE",
+	StatusActiveType:    "ACTIVE",
 	StatusCompletedType: "COMPLETED",
-	StatusFailedType:   "FAILED",
-	StatusPendingType:  "PENDING",
+	StatusFailedType:    "FAILED",
+	StatusPendingType:   "PENDING",
 }, func(s StatusType) bool {
 	return s >= StatusInactiveType && s <= StatusPendingType
 }, func() []StatusType {
@@ -475,9 +475,9 @@ const (
 // enforcementLevelHelper provides shared functionality for EnforcementLevelType
 var enforcementLevelHelper = NewEnumHelper(map[EnforcementLevelType]string{
 	EnforcementLevelNoneType:     "NONE",
-	EnforcementLevelWarningType:   "WARNING",
-	EnforcementLevelStrictType:     "STRICT",
-	EnforcementLevelCriticalType:  "CRITICAL",
+	EnforcementLevelWarningType:  "WARNING",
+	EnforcementLevelStrictType:   "STRICT",
+	EnforcementLevelCriticalType: "CRITICAL",
 }, func(el EnforcementLevelType) bool {
 	return el >= EnforcementLevelNoneType && el <= EnforcementLevelCriticalType
 }, func() []EnforcementLevelType {
@@ -526,7 +526,7 @@ const (
 // selectedStatusHelper provides shared functionality for SelectedStatusType
 var selectedStatusHelper = NewEnumHelper(map[SelectedStatusType]string{
 	SelectedStatusNotSelectedType: "NOT_SELECTED",
-	SelectedStatusSelectedType:   "SELECTED",
+	SelectedStatusSelectedType:    "SELECTED",
 	SelectedStatusPartialType:     "PARTIAL",
 	SelectedStatusExcludedType:    "EXCLUDED",
 }, func(ss SelectedStatusType) bool {
@@ -578,10 +578,10 @@ const (
 // recursionLevelHelper provides shared functionality for RecursionLevelType
 var recursionLevelHelper = NewEnumHelper(map[RecursionLevelType]string{
 	RecursionLevelNoneType:    "NONE",
-	RecursionLevelShallowType:  "SHALLOW",
-	RecursionLevelMediumType:   "MEDIUM",
-	RecursionLevelDeepType:     "DEEP",
-	RecursionLevelFullType:     "FULL",
+	RecursionLevelShallowType: "SHALLOW",
+	RecursionLevelMediumType:  "MEDIUM",
+	RecursionLevelDeepType:    "DEEP",
+	RecursionLevelFullType:    "FULL",
 }, func(rl RecursionLevelType) bool {
 	return rl >= RecursionLevelNoneType && rl <= RecursionLevelFullType
 }, func() []RecursionLevelType {
@@ -630,8 +630,8 @@ const (
 
 // optimizationLevelHelper provides shared functionality for OptimizationLevelType
 var optimizationLevelHelper = NewEnumHelper(map[OptimizationLevelType]string{
-	OptimizationLevelNoneType:      "NONE",
-	OptimizationLevelBasicType:     "BASIC",
+	OptimizationLevelNoneType:       "NONE",
+	OptimizationLevelBasicType:      "BASIC",
 	OptimizationLevelAggressiveType: "AGGRESSIVE",
 	OptimizationLevelMaximumType:    "MAXIMUM",
 }, func(ol OptimizationLevelType) bool {
@@ -737,8 +737,8 @@ const (
 var safetyLevelHelper = NewEnumHelper(map[SafetyLevelType]string{
 	SafetyLevelUnsafeType:   "UNSAFE",
 	SafetyLevelSafeType:     "SAFE",
-	SafetyLevelStrictType:    "STRICT",
-	SafetyLevelParanoidType:  "PARANOID",
+	SafetyLevelStrictType:   "STRICT",
+	SafetyLevelParanoidType: "PARANOID",
 }, func(sl SafetyLevelType) bool {
 	return sl >= SafetyLevelUnsafeType && sl <= SafetyLevelParanoidType
 }, func() []SafetyLevelType {
@@ -786,10 +786,10 @@ const (
 
 // executionModeHelper provides shared functionality for ExecutionModeType
 var executionModeHelper = NewEnumHelper(map[ExecutionModeType]string{
-	ExecutionModeSequentialType:   "SEQUENTIAL",
-	ExecutionModeParallelType:     "PARALLEL",
-	ExecutionModeBatchType:        "BATCH",
-	ExecutionModeInteractiveType:   "INTERACTIVE",
+	ExecutionModeSequentialType:  "SEQUENTIAL",
+	ExecutionModeParallelType:    "PARALLEL",
+	ExecutionModeBatchType:       "BATCH",
+	ExecutionModeInteractiveType: "INTERACTIVE",
 }, func(em ExecutionModeType) bool {
 	return em >= ExecutionModeSequentialType && em <= ExecutionModeInteractiveType
 }, func() []ExecutionModeType {

@@ -2,6 +2,7 @@ package testutils
 
 import (
 	"testing"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
@@ -10,7 +11,7 @@ import (
 
 // CleanerTestSuite provides comprehensive cleaner testing
 type CleanerTestSuite struct {
-	tc     *TestConfig
+	tc       *TestConfig
 	cleaners []shared.Cleaner
 }
 
@@ -18,7 +19,7 @@ type CleanerTestSuite struct {
 func NewCleanerTestSuite(t *testing.T) *CleanerTestSuite {
 	suite := &CleanerTestSuite{}
 	suite.tc = SetupTest(t)
-	
+
 	// Initialize all cleaners
 	suite.cleaners = []shared.Cleaner{
 		cleaner.NewNixCleaner(),
@@ -27,7 +28,7 @@ func NewCleanerTestSuite(t *testing.T) *CleanerTestSuite {
 		cleaner.NewPnpmCleaner(true, true),
 		cleaner.NewTempFileCleaner(true, true),
 	}
-	
+
 	return suite
 }
 
@@ -42,7 +43,7 @@ func (cts *CleanerTestSuite) TestCleanerAvailability(t *testing.T) {
 		for _, cleaner := range cts.cleaners {
 			available := cleaner.IsAvailable(cts.tc.Context)
 			t.Logf("Cleaner %s availability: %v", GetCleanerName(cleaner), available)
-			
+
 			// Some cleaners might not be available in test environment
 			// This is expected behavior
 		}
@@ -53,24 +54,24 @@ func (cts *CleanerTestSuite) TestCleanerAvailability(t *testing.T) {
 func (cts *CleanerTestSuite) TestCleanerDryRun(t *testing.T) {
 	t.Run("Cleaner Dry Run", func(t *testing.T) {
 		settings := &shared.OperationSettings{
-			ExecutionMode: shared.ExecutionModeSequentialType,
-			Verbose:      true,
-			TimeoutSeconds: 300,
+			ExecutionMode:       shared.ExecutionModeSequentialType,
+			Verbose:             true,
+			TimeoutSeconds:      300,
 			ConfirmBeforeDelete: true, // Always confirm in tests
 		}
-		
+
 		for _, cleaner := range cts.cleaners {
 			if !cleaner.IsAvailable(cts.tc.Context) {
 				t.Skipf("Cleaner %s not available", GetCleanerName(cleaner))
 				continue
 			}
-			
+
 			result := cleaner.Cleanup(cts.tc.Context, settings)
 			if result.IsOk() {
 				cleanResult := result.Value()
-				t.Logf("Cleaner %s dry-run result: %d items, %d bytes", 
-					GetCleanerName(cleaner), 
-					cleanResult.ItemsRemoved, 
+				t.Logf("Cleaner %s dry-run result: %d items, %d bytes",
+					GetCleanerName(cleaner),
+					cleanResult.ItemsRemoved,
 					cleanResult.FreedBytes)
 			} else {
 				t.Logf("Cleaner %s dry-run failed: %v", GetCleanerName(cleaner), result.Error())
@@ -87,10 +88,10 @@ func (cts *CleanerTestSuite) TestCleanerGetStoreSize(t *testing.T) {
 				t.Skipf("Cleaner %s not available", GetCleanerName(cleaner))
 				continue
 			}
-			
+
 			size := cleaner.GetStoreSize(cts.tc.Context)
 			t.Logf("Cleaner %s store size: %d bytes", GetCleanerName(cleaner), size)
-			
+
 			AssertNoError(t, nil, "Store size estimation should not error")
 		}
 	})
@@ -130,7 +131,7 @@ func (cts *ConfigTestSuite) TestProfileManagement(t *testing.T) {
 		profile, exists := cts.tc.Config.Profiles["test"]
 		AssertNoError(t, nil, "Profile should exist")
 		AssertEqual(t, true, exists, "Test profile should exist")
-		
+
 		if exists {
 			AssertEqual(t, "test", profile.Name, "Profile name should match")
 			AssertNotEmpty(t, profile.Description, "Profile description should not be empty")
@@ -157,20 +158,20 @@ func (cts *ConfigTestSuite) TestProfileValidation(t *testing.T) {
 				},
 			},
 		}
-		
+
 		// Test validation
 		AssertNoError(t, nil, "Profile should be valid")
-		
+
 		isValid := testProfile.IsValid("validation-test")
 		AssertEqual(t, true, isValid, "Test profile should be valid")
-		
+
 		// Test invalid profile (empty name)
 		invalidProfile := &config.Profile{
 			Name:        "",
 			Description: "Invalid test profile",
 			Status:      shared.StatusActiveType,
 		}
-		
+
 		isValid = invalidProfile.IsValid("")
 		AssertEqual(t, false, isValid, "Profile with empty name should be invalid")
 	})
@@ -202,19 +203,19 @@ func (cts *EnumTestSuite) TestRiskLevelType(t *testing.T) {
 			shared.RiskLevelHighType,
 			shared.RiskLevelCriticalType,
 		}
-		
+
 		stringMap := map[shared.RiskLevelType]string{
 			shared.RiskLevelLowType:      "LOW",
 			shared.RiskLevelMediumType:   "MEDIUM",
 			shared.RiskLevelHighType:     "HIGH",
 			shared.RiskLevelCriticalType: "CRITICAL",
 		}
-		
+
 		helper := NewEnumTestHelper(values, stringMap)
 		helper.TestEnumString(t, func(rl shared.RiskLevelType) string {
 			return rl.String()
 		})
-		
+
 		helper.TestEnumValidation(t, func(rl shared.RiskLevelType) bool {
 			return rl.IsValid()
 		})
@@ -231,20 +232,20 @@ func (cts *EnumTestSuite) TestStatusType(t *testing.T) {
 			shared.StatusFailedType,
 			shared.StatusPendingType,
 		}
-		
+
 		stringMap := map[shared.StatusType]string{
 			shared.StatusInactiveType:  "INACTIVE",
-			shared.StatusActiveType:   "ACTIVE",
+			shared.StatusActiveType:    "ACTIVE",
 			shared.StatusCompletedType: "COMPLETED",
-			shared.StatusFailedType:   "FAILED",
-			shared.StatusPendingType:  "PENDING",
+			shared.StatusFailedType:    "FAILED",
+			shared.StatusPendingType:   "PENDING",
 		}
-		
+
 		helper := NewEnumTestHelper(values, stringMap)
 		helper.TestEnumString(t, func(st shared.StatusType) string {
 			return st.String()
 		})
-		
+
 		helper.TestEnumValidation(t, func(st shared.StatusType) bool {
 			return st.IsValid()
 		})
@@ -260,19 +261,19 @@ func (cts *EnumTestSuite) TestExecutionModeType(t *testing.T) {
 			shared.ExecutionModeBatchType,
 			shared.ExecutionModeInteractiveType,
 		}
-		
+
 		stringMap := map[shared.ExecutionModeType]string{
-			shared.ExecutionModeSequentialType:   "SEQUENTIAL",
-			shared.ExecutionModeParallelType:     "PARALLEL",
-			shared.ExecutionModeBatchType:        "BATCH",
-			shared.ExecutionModeInteractiveType:   "INTERACTIVE",
+			shared.ExecutionModeSequentialType:  "SEQUENTIAL",
+			shared.ExecutionModeParallelType:    "PARALLEL",
+			shared.ExecutionModeBatchType:       "BATCH",
+			shared.ExecutionModeInteractiveType: "INTERACTIVE",
 		}
-		
+
 		helper := NewEnumTestHelper(values, stringMap)
 		helper.TestEnumString(t, func(em shared.ExecutionModeType) string {
 			return em.String()
 		})
-		
+
 		helper.TestEnumValidation(t, func(em shared.ExecutionModeType) bool {
 			return em.IsValid()
 		})
@@ -281,7 +282,7 @@ func (cts *EnumTestSuite) TestExecutionModeType(t *testing.T) {
 
 // PerformanceTestSuite provides performance testing utilities
 type PerformanceTestSuite struct {
-	tc      *TestConfig
+	tc       *TestConfig
 	profiler *TestProfiler
 }
 
@@ -302,16 +303,16 @@ func (pts *PerformanceTestSuite) Cleanup(t *testing.T) {
 func (pts *PerformanceTestSuite) TestCleanupPerformance(t *testing.T) {
 	t.Run("Cleanup Performance", func(t *testing.T) {
 		pts.profiler.StartProfiling()
-		
+
 		// Test configuration loading performance
 		_, err := config.Load()
 		AssertNoError(t, err, "Config loading should not error")
-		
+
 		duration := pts.profiler.EndProfiling()
-		
+
 		// Config loading should be fast (<100ms)
 		AssertDuration(t, duration, 100*time.Millisecond, "Config loading should be fast")
-		
+
 		t.Logf("Config loading took: %v", duration)
 	})
 }
@@ -327,13 +328,13 @@ func (pts *PerformanceTestSuite) TestMemoryUsage(t *testing.T) {
 			cleaner.NewPnpmCleaner(false, true),
 			cleaner.NewTempFileCleaner(false, true),
 		}
-		
+
 		// Test cleaner creation and basic operations
 		for _, cleaner := range cleaners {
 			_ = cleaner.IsAvailable(pts.tc.Context)
 			_ = cleaner.GetStoreSize(pts.tc.Context)
 		}
-		
+
 		// Memory usage should be reasonable
 		// Note: In a real scenario, you'd use runtime.MemStats to measure
 		t.Logf("Memory usage test completed with %d cleaners", len(cleaners))
@@ -362,32 +363,32 @@ func (its *IntegrationTestSuite) TestCleanCommandIntegration(t *testing.T) {
 	t.Run("Clean Command Integration", func(t *testing.T) {
 		// Test clean command with dry-run
 		settings := &shared.OperationSettings{
-			ExecutionMode: shared.ExecutionModeSequentialType,
-			Verbose:      true,
-			TimeoutSeconds: 300,
+			ExecutionMode:       shared.ExecutionModeSequentialType,
+			Verbose:             true,
+			TimeoutSeconds:      300,
 			ConfirmBeforeDelete: true,
 		}
-		
+
 		// Test with a subset of cleaners for integration
 		cleaners := []shared.Cleaner{
 			cleaner.NewHomebrewCleaner(true, true), // dry-run for testing
 		}
-		
+
 		for _, cleaner := range cleaners {
 			if !cleaner.IsAvailable(its.tc.Context) {
 				t.Skipf("Cleaner %s not available for integration test", GetCleanerName(cleaner))
 				continue
 			}
-			
+
 			result := cleaner.Cleanup(its.tc.Context, settings)
 			if result.IsOk() {
 				cleanResult := result.Value()
-				t.Logf("Integration test - cleaner %s: %d items, %d bytes", 
-					GetCleanerName(cleaner), 
-					cleanResult.ItemsRemoved, 
+				t.Logf("Integration test - cleaner %s: %d items, %d bytes",
+					GetCleanerName(cleaner),
+					cleanResult.ItemsRemoved,
 					cleanResult.FreedBytes)
 			} else {
-				t.Logf("Integration test - cleaner %s failed: %v", 
+				t.Logf("Integration test - cleaner %s failed: %v",
 					GetCleanerName(cleaner), result.Error())
 			}
 		}
@@ -401,21 +402,21 @@ func (its *IntegrationTestSuite) TestScanCommandIntegration(t *testing.T) {
 		cleaners := []shared.Cleaner{
 			cleaner.NewHomebrewCleaner(true, true),
 		}
-		
+
 		totalSize := int64(0)
 		for _, cleaner := range cleaners {
 			if !cleaner.IsAvailable(its.tc.Context) {
 				t.Skipf("Cleaner %s not available for integration test", GetCleanerName(cleaner))
 				continue
 			}
-			
+
 			size := cleaner.GetStoreSize(its.tc.Context)
 			totalSize += size
-			
-			t.Logf("Integration test - cleaner %s store size: %d bytes", 
+
+			t.Logf("Integration test - cleaner %s store size: %d bytes",
 				GetCleanerName(cleaner), size)
 		}
-		
+
 		t.Logf("Integration test - total store size: %d bytes", totalSize)
 	})
 }

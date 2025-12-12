@@ -14,23 +14,23 @@ import (
 
 // SecurityService provides comprehensive security service
 type SecurityService struct {
-	validator *SecurityValidator
+	validator  *SecurityValidator
 	middleware *SecurityMiddleware
-	config    *SecurityConfig
+	config     *SecurityConfig
 }
 
 // NewSecurityService creates new security service
 func NewSecurityService() *SecurityService {
 	// Get default security config
 	securityConfig := getDefaultSecurityConfig()
-	
+
 	// Override with environment variables if present
 	securityConfig = applyEnvironmentOverrides(securityConfig)
-	
+
 	// Create validator and middleware
 	validator := NewSecurityValidator(securityConfig)
 	middleware := NewSecurityMiddleware(securityConfig)
-	
+
 	return &SecurityService{
 		validator:  validator,
 		middleware: middleware,
@@ -45,14 +45,13 @@ func (ss *SecurityService) ValidateCommandInput(
 	args map[string]interface{},
 	user string,
 ) (*ValidationResult, map[string]interface{}) {
-	
 	// Create security context
 	secCtx := ss.middleware.CreateSecureContext(
-		user, 
-		command, 
+		user,
+		command,
 		ss.config.ValidationLevel,
 	)
-	
+
 	// Validate and sanitize input
 	return ss.middleware.ValidateAndSanitizeInput(secCtx, args)
 }
@@ -63,14 +62,13 @@ func (ss *SecurityService) ValidateConfiguration(
 	configuration interface{},
 	user string,
 ) *ValidationResult {
-	
 	// Create security context
 	secCtx := ss.middleware.CreateSecureContext(
 		user,
 		"validate_config",
 		ss.config.ValidationLevel,
 	)
-	
+
 	// Validate configuration
 	return ss.middleware.ValidateConfiguration(secCtx, configuration)
 }
@@ -82,17 +80,16 @@ func (ss *SecurityService) ValidateCleaningOperation(
 	settings map[string]interface{},
 	user string,
 ) (*ValidationResult, map[string]interface{}) {
-	
 	// Create security context
 	secCtx := ss.middleware.CreateSecureContext(
 		user,
 		operation,
 		ss.config.ValidationLevel,
 	)
-	
+
 	// Validate operation
 	validationResult := ss.middleware.ValidateOperation(secCtx, operation, settings)
-	
+
 	// Return validation result and sanitized settings
 	return validationResult, settings
 }
@@ -104,14 +101,13 @@ func (ss *SecurityService) ValidateAndSecurePath(
 	baseDir string,
 	user string,
 ) (string, *ValidationResult) {
-	
 	// Create security context
 	secCtx := ss.middleware.CreateSecureContext(
 		user,
 		"validate_path",
 		ss.config.ValidationLevel,
 	)
-	
+
 	// Validate and secure path
 	return ss.middleware.ValidatePathWithSecurity(secCtx, path, baseDir)
 }
@@ -122,7 +118,6 @@ func (ss *SecurityService) ValidateUserInput(
 	field, value, validationTag string,
 	user string,
 ) *ValidationResult {
-	
 	// Validate input
 	return ss.validator.ValidateInput(field, value, validationTag)
 }
@@ -136,14 +131,14 @@ func (ss *SecurityService) SanitizeInput(input string) string {
 func (ss *SecurityService) GetSecurityReport() *SecurityReport {
 	metrics := ss.middleware.GetSecurityMetrics()
 	auditLog := ss.middleware.GetAuditLog()
-	
+
 	return &SecurityReport{
-		GeneratedAt:    time.Now(),
+		GeneratedAt:     time.Now(),
 		ValidationLevel: ss.config.ValidationLevel,
-		Config:         ss.config,
-		Metrics:        metrics,
-		AuditLog:       auditLog,
-		Summary:        ss.generateSecuritySummary(metrics, auditLog),
+		Config:          ss.config,
+		Metrics:         metrics,
+		AuditLog:        auditLog,
+		Summary:         ss.generateSecuritySummary(metrics, auditLog),
 	}
 }
 
@@ -168,12 +163,12 @@ func (ss *SecurityService) UpdateSecurityConfig(newConfig *SecurityConfig) error
 	if err := ss.validateSecurityConfig(newConfig); err != nil {
 		return fmt.Errorf("invalid security config: %w", err)
 	}
-	
+
 	// Update configuration
 	ss.config = newConfig
 	ss.validator = NewSecurityValidator(newConfig)
 	ss.middleware = NewSecurityMiddleware(newConfig)
-	
+
 	return nil
 }
 
@@ -184,13 +179,13 @@ func (ss *SecurityService) SecureWorkingDirectory() error {
 	if err != nil {
 		return fmt.Errorf("failed to get working directory: %w", err)
 	}
-	
+
 	// Validate working directory
 	validationResult := ss.validator.ValidatePath(wd)
 	if !validationResult.IsValid {
 		return fmt.Errorf("working directory is not secure: %v", validationResult.Errors)
 	}
-	
+
 	// Check if working directory is in user home
 	userHome, err := os.UserHomeDir()
 	if err == nil {
@@ -198,7 +193,7 @@ func (ss *SecurityService) SecureWorkingDirectory() error {
 			return fmt.Errorf("working directory should be under user home directory")
 		}
 	}
-	
+
 	return nil
 }
 
@@ -208,7 +203,6 @@ func (ss *SecurityService) ValidateOperationPermissions(
 	operation string,
 	user string,
 ) *ValidationResult {
-	
 	// Check operation permissions
 	if !ss.hasOperationPermission(operation, user) {
 		return &ValidationResult{
@@ -224,7 +218,7 @@ func (ss *SecurityService) ValidateOperationPermissions(
 			Level: ss.config.ValidationLevel,
 		}
 	}
-	
+
 	return &ValidationResult{
 		IsValid: true,
 		Errors:  []ValidationError{},
@@ -239,13 +233,13 @@ func (ss *SecurityService) CreateSecureTempDir(baseDir, pattern string) (string,
 	if !validationResult.IsValid {
 		return "", fmt.Errorf("base directory is not secure: %v", validationResult.Errors)
 	}
-	
+
 	// Create secure temporary directory
 	tempDir, err := os.MkdirTemp(baseDir, pattern)
 	if err != nil {
 		return "", fmt.Errorf("failed to create temp directory: %w", err)
 	}
-	
+
 	// Validate created directory
 	validationResult = ss.validator.ValidatePath(tempDir)
 	if !validationResult.IsValid {
@@ -253,7 +247,7 @@ func (ss *SecurityService) CreateSecureTempDir(baseDir, pattern string) (string,
 		os.RemoveAll(tempDir)
 		return "", fmt.Errorf("created temp directory is not secure: %v", validationResult.Errors)
 	}
-	
+
 	return tempDir, nil
 }
 
@@ -261,7 +255,7 @@ func (ss *SecurityService) CreateSecureTempDir(baseDir, pattern string) (string,
 func (ss *SecurityService) SecureJoinPaths(base string, components ...string) (string, error) {
 	// Start with base path
 	securePath := base
-	
+
 	// Join each component using middleware
 	for _, component := range components {
 		secCtx := ss.middleware.CreateSecureContext(
@@ -269,27 +263,27 @@ func (ss *SecurityService) SecureJoinPaths(base string, components ...string) (s
 			"validate_path",
 			ss.config.ValidationLevel,
 		)
-		
+
 		var validationResult *ValidationResult
 		securePath, validationResult = ss.middleware.ValidatePathWithSecurity(secCtx, securePath, component)
 		if !validationResult.IsValid {
 			return "", fmt.Errorf("failed to join path components: %v", validationResult.Errors)
 		}
 	}
-	
+
 	// Validate final path
 	validationResult := ss.validator.ValidatePath(securePath)
 	if !validationResult.IsValid {
 		return "", fmt.Errorf("joined path is not secure: %v", validationResult.Errors)
 	}
-	
+
 	return securePath, nil
 }
 
 // GetSecurityStatistics returns security operation statistics
 func (ss *SecurityService) GetSecurityStatistics() map[string]interface{} {
 	metrics := ss.middleware.GetSecurityMetrics()
-	
+
 	statistics := map[string]interface{}{
 		"total_validations":    metrics.TotalValidations,
 		"total_failures":       metrics.TotalFailures,
@@ -301,40 +295,40 @@ func (ss *SecurityService) GetSecurityStatistics() map[string]interface{} {
 		"strict_path_checking": ss.config.StrictPathChecking,
 		"max_path_length":      ss.config.MaxPathLength,
 	}
-	
+
 	// Calculate success rate
 	if metrics.TotalValidations > 0 {
 		successRate := float64(metrics.TotalValidations-metrics.TotalFailures) / float64(metrics.TotalValidations) * 100
 		statistics["success_rate"] = successRate
 	}
-	
+
 	// Calculate block rate
 	if metrics.TotalValidations > 0 {
 		blockRate := float64(metrics.TotalBlocks) / float64(metrics.TotalValidations) * 100
 		statistics["block_rate"] = blockRate
 	}
-	
+
 	return statistics
 }
 
 // SecurityReport represents comprehensive security report
 type SecurityReport struct {
-	GeneratedAt    time.Time         `json:"generated_at"`
+	GeneratedAt     time.Time                  `json:"generated_at"`
 	ValidationLevel shared.ValidationLevelType `json:"validation_level"`
-	Config         *SecurityConfig   `json:"config"`
-	Metrics        SecurityMetrics   `json:"metrics"`
-	AuditLog       []AuditEntry     `json:"audit_log"`
-	Summary        SecuritySummary   `json:"summary"`
+	Config          *SecurityConfig            `json:"config"`
+	Metrics         SecurityMetrics            `json:"metrics"`
+	AuditLog        []AuditEntry               `json:"audit_log"`
+	Summary         SecuritySummary            `json:"summary"`
 }
 
 // SecuritySummary represents security summary
 type SecuritySummary struct {
-	OverallSecurity     string             `json:"overall_security"`
-	Recommendations    []string           `json:"recommendations"`
-	SecurityScore      float64            `json:"security_score"`
-	CriticalFindings   int                `json:"critical_findings"`
-	HighRiskFindings   int                `json:"high_risk_findings"`
-	MediumRiskFindings int                `json:"medium_risk_findings"`
+	OverallSecurity    string   `json:"overall_security"`
+	Recommendations    []string `json:"recommendations"`
+	SecurityScore      float64  `json:"security_score"`
+	CriticalFindings   int      `json:"critical_findings"`
+	HighRiskFindings   int      `json:"high_risk_findings"`
+	MediumRiskFindings int      `json:"medium_risk_findings"`
 }
 
 // Helper functions
@@ -342,20 +336,20 @@ type SecuritySummary struct {
 // getDefaultSecurityConfig returns default security configuration
 func getDefaultSecurityConfig() *SecurityConfig {
 	config := GetDefaultSecurityConfig()
-	
+
 	// Override with application-specific settings
 	config.AllowedFileExtensions = append(config.AllowedFileExtensions,
 		".bak", ".old", ".orig", ".tmp",
 	)
-	
+
 	config.BlockedPatterns = append(config.BlockedPatterns,
 		`\.\.passwd`, `\.\.shadow`, `\.\.key`,
 	)
-	
+
 	config.MaxPathLength = 8192 // 8KB max path length
 	config.ValidationLevel = shared.ValidationLevelComprehensiveType
 	config.StrictPathChecking = true
-	
+
 	return config
 }
 
@@ -367,7 +361,7 @@ func applyEnvironmentOverrides(config *SecurityConfig) *SecurityConfig {
 			config.ValidationLevel = parsedLevel
 		}
 	}
-	
+
 	// Override strict path checking
 	if strict := os.Getenv("CLEAN_WIZARD_STRICT_PATH"); strict != "" {
 		if strict == "true" || strict == "1" {
@@ -376,14 +370,14 @@ func applyEnvironmentOverrides(config *SecurityConfig) *SecurityConfig {
 			config.StrictPathChecking = false
 		}
 	}
-	
+
 	// Override max path length
 	if maxPath := os.Getenv("CLEAN_WIZARD_MAX_PATH"); maxPath != "" {
 		if parsed, err := strconv.Atoi(maxPath); err == nil && parsed > 0 {
 			config.MaxPathLength = parsed
 		}
 	}
-	
+
 	return config
 }
 
@@ -393,19 +387,19 @@ func (ss *SecurityService) validateSecurityConfig(config *SecurityConfig) error 
 	if !config.ValidationLevel.IsValid() {
 		return fmt.Errorf("invalid validation level: %v", config.ValidationLevel)
 	}
-	
+
 	// Validate max path length
 	if config.MaxPathLength <= 0 || config.MaxPathLength > 65536 {
 		return fmt.Errorf("max path length must be between 1 and 65536")
 	}
-	
+
 	// Validate blocked patterns
 	for _, pattern := range config.BlockedPatterns {
 		if _, err := regexp.Compile(pattern); err != nil {
 			return fmt.Errorf("invalid blocked pattern: %s", pattern)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -424,7 +418,7 @@ func (ss *SecurityService) generateSecuritySummary(metrics SecurityMetrics, audi
 		HighRiskFindings:   0,
 		MediumRiskFindings: 0,
 	}
-	
+
 	// Analyze audit log for findings
 	for _, entry := range auditLog {
 		for _, error := range entry.Validation.Errors {
@@ -442,10 +436,10 @@ func (ss *SecurityService) generateSecuritySummary(metrics SecurityMetrics, audi
 			}
 		}
 	}
-	
+
 	// Calculate security score
 	summary.SecurityScore = ss.calculateSecurityScore(metrics, summary)
-	
+
 	// Determine overall security
 	if summary.SecurityScore >= 90 {
 		summary.OverallSecurity = "EXCELLENT"
@@ -456,18 +450,18 @@ func (ss *SecurityService) generateSecuritySummary(metrics SecurityMetrics, audi
 	} else {
 		summary.OverallSecurity = "POOR"
 	}
-	
+
 	// Add general recommendations
 	if summary.CriticalFindings > 0 {
 		summary.Recommendations = append(summary.Recommendations,
 			"Enable strict validation mode for enhanced security")
 	}
-	
+
 	if summary.SecurityScore < 80 {
 		summary.Recommendations = append(summary.Recommendations,
 			"Review and update security configuration")
 	}
-	
+
 	return summary
 }
 
@@ -475,32 +469,32 @@ func (ss *SecurityService) generateSecuritySummary(metrics SecurityMetrics, audi
 func (ss *SecurityService) calculateSecurityScore(metrics SecurityMetrics, summary SecuritySummary) float64 {
 	// Base score from validation level
 	levelScores := map[shared.ValidationLevelType]float64{
-		shared.ValidationLevelNoneType:           0,
-		shared.ValidationLevelBasicType:          60,
+		shared.ValidationLevelNoneType:          0,
+		shared.ValidationLevelBasicType:         60,
 		shared.ValidationLevelComprehensiveType: 80,
-		shared.ValidationLevelStrictType:         95,
+		shared.ValidationLevelStrictType:        95,
 	}
-	
+
 	score := levelScores[ss.config.ValidationLevel]
-	
+
 	// Penalize for security issues
 	if summary.CriticalFindings > 0 {
 		score -= 20 * float64(summary.CriticalFindings)
 	}
-	
+
 	if summary.HighRiskFindings > 0 {
 		score -= 10 * float64(summary.HighRiskFindings)
 	}
-	
+
 	if summary.MediumRiskFindings > 0 {
 		score -= 5 * float64(summary.MediumRiskFindings)
 	}
-	
+
 	// Bonus for strict path checking
 	if ss.config.StrictPathChecking {
 		score += 5
 	}
-	
+
 	// Ensure score is within bounds
 	if score < 0 {
 		score = 0
@@ -508,6 +502,6 @@ func (ss *SecurityService) calculateSecurityScore(metrics SecurityMetrics, summa
 	if score > 100 {
 		score = 100
 	}
-	
+
 	return score
 }

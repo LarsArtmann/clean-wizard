@@ -16,10 +16,10 @@ import (
 
 // TestConfig provides standardized test configuration
 type TestConfig struct {
-	TempDir  string
-	Config   *config.Config
-	Context  context.Context
-	Cancel   context.CancelFunc
+	TempDir string
+	Config  *config.Config
+	Context context.Context
+	Cancel  context.CancelFunc
 }
 
 // SetupTest creates standardized test environment
@@ -103,7 +103,7 @@ func AssertNotEmpty(t *testing.T, value interface{}, contextMsg string) {
 // CreateTempFile creates a temporary file for testing
 func CreateTempFile(t *testing.T, dir, filename, content string) string {
 	path := filepath.Join(dir, filename)
-	err := os.WriteFile(path, []byte(content), 0644)
+	err := os.WriteFile(path, []byte(content), 0o644)
 	require.NoError(t, err)
 	return path
 }
@@ -111,16 +111,16 @@ func CreateTempFile(t *testing.T, dir, filename, content string) string {
 // CreateTempDir creates a temporary directory for testing
 func CreateTempDir(t *testing.T, parent, dirname string) string {
 	path := filepath.Join(parent, dirname)
-	err := os.MkdirAll(path, 0755)
+	err := os.MkdirAll(path, 0o755)
 	require.NoError(t, err)
 	return path
 }
 
 // MockCleaner implements shared.Cleaner for testing
 type MockCleaner struct {
-	Name      string
-	Available bool
-	StoreSize int64
+	Name        string
+	Available   bool
+	StoreSize   int64
 	CleanResult shared.CleanResult
 }
 
@@ -178,7 +178,7 @@ func (tp *TestProfiler) EndProfiling() time.Duration {
 }
 
 // AssertDuration asserts operation completes within expected duration
-func AssertDuration(t *testing.T, actual time.Duration, expectedMax time.Duration, contextMsg string) {
+func AssertDuration(t *testing.T, actual, expectedMax time.Duration, contextMsg string) {
 	if !assert.Less(t, actual, expectedMax, contextMsg) {
 		t.FailNow()
 	}
