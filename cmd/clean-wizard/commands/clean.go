@@ -128,10 +128,13 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 				for _, op := range usedProfile.Operations {
 					if op.Name == "nix-generations" && op.Enabled {
 						fmt.Printf("🔧 Configuring Nix generations cleanup\n")
+						fmt.Printf("🔍 Operation Settings: %+v\n", op.Settings)
 						if op.Settings != nil {
 							settings = op.Settings
+							fmt.Printf("✅ Using operation settings: %+v\n", settings)
 						} else {
 							settings = domain.DefaultSettings(domain.OperationTypeNixGenerations)
+							fmt.Printf("❌ Using default settings: %+v\n", settings)
 						}
 						break
 					}
@@ -140,6 +143,16 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 
 			// Extract dry-run from settings if configured in Nix generations
 			actualDryRun := cleanDryRun
+			fmt.Printf("🔍 Debug: settings = %+v\n", settings)
+			
+			if settings != nil {
+				fmt.Printf("🔍 Debug: settings.NixGenerations = %+v\n", settings.NixGenerations)
+				if settings.NixGenerations != nil {
+					fmt.Printf("🔍 Debug: NixGenerations.Optimize = %v\n", settings.NixGenerations.Optimize)
+					fmt.Printf("🔍 Debug: NixGenerations.DryRun = %v\n", settings.NixGenerations.DryRun)
+				}
+			}
+			
 			if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.Optimize {
 				// Using Optimize field as dry-run indicator for now
 				actualDryRun = true
@@ -148,7 +161,16 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 				fmt.Println("🔍 Running in DRY-RUN mode (from flag) - no files will be deleted")
 			}
 
-			fmt.Printf("⚙️  Settings: %+v\n", settings)
+			fmt.Printf("⚙️  Settings loaded: %+v\n", settings)
+			if settings != nil {
+				if settings.NixGenerations != nil {
+					fmt.Printf("🎛️  Nix Generations Settings: %+v\n", settings.NixGenerations)
+				} else {
+					fmt.Printf("❌ Nix Generations Settings: nil\n")
+				}
+			} else {
+				fmt.Printf("❌ Settings: nil\n")
+			}
 
 			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, actualDryRun)
 

@@ -25,3 +25,4 @@ profiles:
           nix_generations:
             generations: 3
             optimize: true
+            dry_run: true

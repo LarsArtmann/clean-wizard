@@ -9,6 +9,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -70,6 +71,9 @@ func init() {
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
+
+	// Enable debug logging for configuration loading
+	logrus.SetLevel(logrus.DebugLevel)
 }
 
 func main() {

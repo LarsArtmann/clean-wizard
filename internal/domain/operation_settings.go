@@ -4,40 +4,41 @@ package domain
 // This eliminates map[string]any violations while maintaining flexibility
 type OperationSettings struct {
 	// Nix Generations Settings
-	NixGenerations *NixGenerationsSettings `json:"nix_generations,omitempty"`
+	NixGenerations *NixGenerationsSettings `json:"nix_generations,omitempty" yaml:"nix_generations,omitempty"`
 
 	// Temp Files Settings
-	TempFiles *TempFilesSettings `json:"temp_files,omitempty"`
+	TempFiles *TempFilesSettings `json:"temp_files,omitempty" yaml:"temp_files,omitempty"`
 
 	// Homebrew Settings
-	Homebrew *HomebrewSettings `json:"homebrew,omitempty"`
+	Homebrew *HomebrewSettings `json:"homebrew,omitempty" yaml:"homebrew,omitempty"`
 
 	// System Temp Settings
-	SystemTemp *SystemTempSettings `json:"system_temp,omitempty"`
+	SystemTemp *SystemTempSettings `json:"system_temp,omitempty" yaml:"system_temp,omitempty"`
 }
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup
 type NixGenerationsSettings struct {
-	Generations int  `json:"generations"`
-	Optimize    bool `json:"optimize"`
+	Generations int  `json:"generations" yaml:"generations"`
+	Optimize    bool `json:"optimize" yaml:"optimize"`
+	DryRun     bool `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
 // TempFilesSettings provides type-safe settings for temporary files cleanup
 type TempFilesSettings struct {
-	OlderThan string   `json:"older_than"`
-	Excludes  []string `json:"excludes,omitempty"`
+	OlderThan string   `json:"older_than" yaml:"older_than"`
+	Excludes  []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
 }
 
 // HomebrewSettings provides type-safe settings for Homebrew cleanup
 type HomebrewSettings struct {
-	UnusedOnly bool   `json:"unused_only"`
-	Prune      string `json:"prune,omitempty"`
+	UnusedOnly bool   `json:"unused_only" yaml:"unused_only"`
+	Prune      string `json:"prune,omitempty" yaml:"prune,omitempty"`
 }
 
 // SystemTempSettings provides type-safe settings for system temp cleanup
 type SystemTempSettings struct {
-	Paths     []string `json:"paths"`
-	OlderThan string   `json:"older_than"`
+	Paths     []string `json:"paths" yaml:"paths"`
+	OlderThan string   `json:"older_than" yaml:"older_than"`
 }
 
 // OperationType represents different types of cleanup operations

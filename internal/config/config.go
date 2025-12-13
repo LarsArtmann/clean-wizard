@@ -72,9 +72,11 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
-	// Fix risk levels after unmarshaling (workaround for custom type unmarshaling)
+	// Fix risk levels and settings after unmarshaling (workaround for custom type unmarshaling)
 	for name, profile := range config.Profiles {
-		for i, op := range profile.Operations {
+		for i := range profile.Operations {
+			op := &profile.Operations[i] // Get pointer to actual operation
+			
 			// Convert string risk level to RiskLevel enum
 			var riskLevelStr string
 			v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr)
@@ -92,12 +94,70 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 				logrus.WithField("risk_level", riskLevelStr).Warn("Invalid risk level, defaulting to LOW")
 				op.RiskLevel = domain.RiskLow
 			}
+
+			// Explicitly unmarshal settings for each operation type
+			settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", name, i)
+			settingsMap := v.GetStringMap(settingsKey)
+			logrus.WithField("settingsKey", settingsKey).WithField("settingsMap", settingsMap).Debug("Checking settings")
+			
+			if len(settingsMap) > 0 {
+				// Check for nix_generations settings
+				if _, exists := settingsMap["nix_generations"]; exists {
+					nixGenSettings := &domain.NixGenerationsSettings{}
+					nixGenKey := settingsKey + ".nix_generations"
+					logrus.WithField("nixGenKey", nixGenKey).Debug("Unmarshaling Nix generations settings")
+					
+					if err := v.UnmarshalKey(nixGenKey, nixGenSettings); err == nil {
+						logrus.WithField("nixGenSettings", nixGenSettings).Debug("Assigning Nix generations settings")
+						
+						// Use direct field assignment to actual operation
+						op.Settings = &domain.OperationSettings{}
+						op.Settings.NixGenerations = nixGenSettings
+						logrus.WithField("opSettings", op.Settings.NixGenerations).Debug("Set operation settings")
+					} else {
+						logrus.WithError(err).Error("Failed to unmarshal nix_generations settings")
+					}
+				} else {
+					logrus.Debug("No nix_generations settings found")
+				}
+			} else {
+				logrus.Debug("No settings map found")
+			}
+		}
+	}
+
+	// IMMEDIATE DEBUG: Check settings RIGHT after assignment loop
+	logrus.Debug("=== CHECKING SETTINGS IMMEDIATELY AFTER ASSIGNMENT ===")
+	for name, profile := range config.Profiles {
+		for i, op := range profile.Operations {
+			if op.Name == "nix-generations" {
+				logrus.WithFields(logrus.Fields{
+					"profile": name,
+					"operation": i,
+					"hasSettings": op.Settings != nil,
+					"settings": op.Settings,
+				}).Debug("IMMEDIATE: Settings after assignment")
+			}
 		}
 	}
 
 	// Enable comprehensive validation - CRITICAL for production safety
 	if err := config.Validate(); err != nil {
 		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+	}
+
+	// DEBUG: Verify settings are preserved after validation
+	logrus.Debug("=== CHECKING SETTINGS AFTER VALIDATION ===")
+	for name, profile := range config.Profiles {
+		for i, op := range profile.Operations {
+			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
+				logrus.WithFields(logrus.Fields{
+					"profile": name,
+					"operation": i,
+					"settings": op.Settings.NixGenerations,
+				}).Debug("Settings preserved after validation")
+			}
+		}
 	}
 
 	// Apply comprehensive validation with strict enforcement
@@ -109,6 +169,20 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 				logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation error")
 			}
 			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
+		}
+	}
+
+	// FINAL DEBUG: Check settings before returning config
+	for name, profile := range config.Profiles {
+		for i, op := range profile.Operations {
+			if op.Name == "nix-generations" {
+				logrus.WithFields(logrus.Fields{
+					"profile": name,
+					"operation": i,
+					"hasSettings": op.Settings != nil,
+					"settings": op.Settings,
+				}).Debug("FINAL: Settings before returning config")
+			}
 		}
 	}
 
