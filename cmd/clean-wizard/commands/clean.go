@@ -138,7 +138,19 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 				}
 			}
 
-			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, cleanDryRun)
+			// Extract dry-run from settings if configured in Nix generations
+			actualDryRun := cleanDryRun
+			if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.Optimize {
+				// Using Optimize field as dry-run indicator for now
+				actualDryRun = true
+				fmt.Println("🔍 Running in DRY-RUN mode (from config) - no files will be deleted")
+			} else if cleanDryRun {
+				fmt.Println("🔍 Running in DRY-RUN mode (from flag) - no files will be deleted")
+			}
+
+			fmt.Printf("⚙️  Settings: %+v\n", settings)
+
+			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, actualDryRun)
 
 			validator := middleware.NewValidationMiddleware()
 			validatedSettings := validator.ValidateCleanerSettings(ctx, nixCleaner, settings)
@@ -148,20 +160,16 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 
 			startTime := time.Now()
 
-			if cleanDryRun {
-				fmt.Println("🔍 Running in DRY-RUN mode - no files will be deleted")
-			}
-
 			// Clean old generations (keep last 3)
 			result := nixCleaner.CleanOldGenerations(ctx, 3)
 
 			if result.IsErr() {
 				_, err := result.Unwrap()
-				return handleCleanError(err, cleanDryRun)
+				return handleCleanError(err, actualDryRun)
 			}
 
 			duration := time.Since(startTime)
-			displayCleanResults(result.Value(), cleanVerbose, duration, cleanDryRun)
+			displayCleanResults(result.Value(), cleanVerbose, duration, actualDryRun)
 			return nil
 		},
 	}
@@ -202,7 +210,7 @@ func displayCleanResults(result domain.CleanResult, verbose bool, duration time.
 	if result.IsValid() {
 		fmt.Printf("   • Status: %d items %s\n", result.ItemsRemoved, action)
 		if result.FreedBytes > 0 {
-			fmt.Printf("   • Space freed: %s\n", format.Bytes(result.FreedBytes))
+			fmt.Printf("   • Space freed: %s\n", format.Bytes(int64(result.FreedBytes)))
 		}
 
 		if verbose {

@@ -258,7 +258,7 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 		combinedStrategy = domain.StrategyConservative
 	}
 
-	return NewCleanResultWithFailures(combinedStrategy, totalItems, totalFailed, totalBytes, maxTime)
+	return NewCleanResultWithFailures(combinedStrategy, totalItems, totalFailed, int64(totalBytes), maxTime)
 }
 
 // ExtractBytesFromCleanResult extracts int64 from domain.CleanResult (for adapter compatibility)
@@ -268,7 +268,7 @@ func ExtractBytesFromCleanResult(cleanResult result.Result[domain.CleanResult]) 
 	}
 
 	cleanValue := cleanResult.Value()
-	return result.Ok(cleanValue.FreedBytes)
+	return result.Ok[int64](int64(cleanValue.FreedBytes))
 }
 
 // ToCleanResultFromError converts error to Result[domain.CleanResult]

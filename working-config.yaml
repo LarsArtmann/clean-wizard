@@ -22,4 +22,6 @@ profiles:
         risk_level: "LOW"
         enabled: true
         settings:
-          keep_count: 3
+          nix_generations:
+            generations: 3
+            optimize: true
