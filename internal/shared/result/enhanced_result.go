@@ -75,6 +75,22 @@ func (r Result[T]) ErrorOr(defaultError error) error {
 	return defaultError
 }
 
+// Unwrap returns the underlying error or panics if result is an error
+func (r Result[T]) Unwrap() T {
+	if r.err != nil {
+		panic("attempted to unwrap error result")
+	}
+	return r.value
+}
+
+// UnwrapOr returns to value if successful, or default if error
+func (r Result[T]) UnwrapOr(defaultValue T) T {
+	if r.err != nil {
+		return defaultValue
+	}
+	return r.value
+}
+
 // Match handles both success and error cases
 func (r Result[T]) Match(
 	onValue func(T) error,

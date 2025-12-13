@@ -1,10 +1,118 @@
 package errors
 
 import (
+	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"syscall"
 )
+
+// CleanWizardErrorCode represents error code enum for backward compatibility
+type CleanWizardErrorCode int
+
+const (
+	ErrCodeUnknown CleanWizardErrorCode = iota
+	ErrCodeFileNotFound
+	ErrCodePermissionError
+	ErrCodeDiskFull
+	ErrCodeFilesystem
+	ErrCodeInvalidConfig
+	ErrCodeValidationFailed
+	ErrCodeConnectionFailed
+	ErrCodeProcessFailed
+	ErrCodeCleanupFailed
+)
+
+// CleanWizardError represents a clean wizard error with context
+type CleanWizardError struct {
+	Code    CleanWizardErrorCode
+	Message string
+	Cause   error
+	Caller  string
+}
+
+// Error implements error interface
+func (e *CleanWizardError) Error() string {
+	if e.Caller != "" {
+		return fmt.Sprintf("[%s] %s (%s)", e.Code, e.Message, e.Caller)
+	}
+	return fmt.Sprintf("[%s] %s", e.Code, e.Message)
+}
+
+// Unwrap returns underlying cause
+func (e *CleanWizardError) Unwrap() error {
+	return e.Cause
+}
+
+// WithCause adds cause to error
+func (e *CleanWizardError) WithCause(cause error) *CleanWizardError {
+	e.Cause = cause
+	return e
+}
+
+// WithCaller adds caller information to error
+func (e *CleanWizardError) WithCaller() *CleanWizardError {
+	_, file, line, ok := runtime.Caller(1)
+	if ok {
+		e.Caller = fmt.Sprintf("%s:%d", file, line)
+	}
+	return e
+}
+
+// String returns string representation of error code
+func (ec CleanWizardErrorCode) String() string {
+	switch ec {
+	case ErrCodeUnknown:
+		return "UNKNOWN"
+	case ErrCodeFileNotFound:
+		return "FILE_NOT_FOUND"
+	case ErrCodePermissionError:
+		return "PERMISSION_ERROR"
+	case ErrCodeDiskFull:
+		return "DISK_FULL"
+	case ErrCodeFilesystem:
+		return "FILESYSTEM"
+	case ErrCodeInvalidConfig:
+		return "INVALID_CONFIG"
+	case ErrCodeValidationFailed:
+		return "VALIDATION_FAILED"
+	case ErrCodeConnectionFailed:
+		return "CONNECTION_FAILED"
+	case ErrCodeProcessFailed:
+		return "PROCESS_FAILED"
+	case ErrCodeCleanupFailed:
+		return "CLEANUP_FAILED"
+	default:
+		return fmt.Sprintf("UNKNOWN_%d", int(ec))
+	}
+}
+
+// NewError creates new CleanWizardError
+func NewError(code CleanWizardErrorCode, message string) *CleanWizardError {
+	return &CleanWizardError{
+		Code:    code,
+		Message: message,
+	}
+}
+
+// WrapError wraps existing error with CleanWizardError
+func WrapError(err error, code CleanWizardErrorCode, message string) *CleanWizardError {
+	return &CleanWizardError{
+		Code:    code,
+		Message: message,
+		Cause:   err,
+	}
+}
+
+// WrapErrorf wraps existing error with formatted message
+func WrapErrorf(err error, code CleanWizardErrorCode, format string, args ...interface{}) *CleanWizardError {
+	return &CleanWizardError{
+		Code:    code,
+		Message: fmt.Sprintf(format, args...),
+		Cause:   err,
+	}
+}
 
 // isErrorType checks if error matches any of the provided indicator strings
 // Generic helper to eliminate duplication between error type detection functions

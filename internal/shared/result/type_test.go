@@ -125,7 +125,7 @@ func TestResult_Value(t *testing.T) {
 }
 
 func TestResult_Error(t *testing.T) {
-	runMethodTestWithErrorHandling(t, "Error", func(r Result[int]) error { return r.Error() }, error(nil), errors.New("test error"), true, false, func(actual, expected error) bool {
+	runMethodTestWithErrorHandling(t, "Error", func(r Result[int]) error { return r.Error() }, error(nil), errors.New("test error"), false, false, func(actual, expected error) bool {
 		if actual == nil && expected == nil {
 			return true
 		}

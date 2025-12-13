@@ -26,5 +26,5 @@ func MockNixGenerationsResult() result.Result[[]shared.NixGeneration] {
 
 // MockNixGenerationsResultWithMessage returns mock Nix generations with a custom message
 func MockNixGenerationsResultWithMessage(message string) result.Result[[]shared.NixGeneration] {
-	return result.MockSuccess(MockNixGenerations(), message)
+	return result.Ok(MockNixGenerations())
 }

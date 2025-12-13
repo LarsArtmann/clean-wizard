@@ -782,6 +782,7 @@ const (
 	ExecutionModeParallelType
 	ExecutionModeBatchType
 	ExecutionModeInteractiveType
+	ExecutionModeDryRunType
 )
 
 // executionModeHelper provides shared functionality for ExecutionModeType
@@ -790,14 +791,16 @@ var executionModeHelper = NewEnumHelper(map[ExecutionModeType]string{
 	ExecutionModeParallelType:    "PARALLEL",
 	ExecutionModeBatchType:       "BATCH",
 	ExecutionModeInteractiveType: "INTERACTIVE",
+	ExecutionModeDryRunType:     "DRY_RUN",
 }, func(em ExecutionModeType) bool {
-	return em >= ExecutionModeSequentialType && em <= ExecutionModeInteractiveType
+	return em >= ExecutionModeSequentialType && em <= ExecutionModeDryRunType
 }, func() []ExecutionModeType {
 	return []ExecutionModeType{
 		ExecutionModeSequentialType,
 		ExecutionModeParallelType,
 		ExecutionModeBatchType,
 		ExecutionModeInteractiveType,
+		ExecutionModeDryRunType,
 	}
 }, true)
 

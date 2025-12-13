@@ -98,13 +98,13 @@ func (b *BDDContext) WithNixProfile(profileName string) error {
 	profile := &domainconfig.Profile{
 		Name:        profileName,
 		Description: fmt.Sprintf("BDD test profile for %s", profileName),
-		Status:      shared.StatusEnabled,
+		Status:      shared.StatusActiveType,
 		Operations: []domainconfig.CleanupOperation{
 			{
 				Name:        "clean_nix_generations",
 				Description: "Clean old Nix generations",
 				RiskLevel:   shared.RiskLevelMediumType,
-				Status:      shared.StatusEnabled,
+				Status:      shared.StatusActiveType,
 			},
 		},
 	}
@@ -169,11 +169,12 @@ func (b *BDDContext) IListAvailableNixGenerations() error {
 		return b.error
 	}
 
-	generations, err := result.Unwrap()
-	if err != nil {
-		b.error = err
+	if result.IsErr() {
+		b.error = result.Error()
 		return b.error
 	}
+	
+	generations := result.Unwrap()
 	b.generations = generations
 	return nil
 }
@@ -207,11 +208,7 @@ func (b *BDDContext) ICleanOldNixGenerationsWithKeepCount(keepCount int) error {
 		return b.error
 	}
 
-	cleanRes, err := result.Unwrap()
-	if err != nil {
-		b.error = err
-		return b.error
-	}
+	cleanRes := result.Unwrap()
 	b.cleanResult = &cleanRes
 	return nil
 }

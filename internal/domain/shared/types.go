@@ -28,6 +28,9 @@ var (
 	OperationAdded    = ChangeOperationType(ChangeOperationAddedType)
 	OperationRemoved  = ChangeOperationType(ChangeOperationRemovedType)
 	OperationModified = ChangeOperationType(ChangeOperationModifiedType)
+
+	// Execution mode constants for backward compatibility
+	ExecutionModeDryRun = ExecutionModeType(ExecutionModeDryRunType)
 )
 
 // TODO: CRITICAL TYPE SAFETY IMPROVEMENTS NEEDED:
