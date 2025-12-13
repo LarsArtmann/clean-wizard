@@ -2,7 +2,6 @@ package errors
 
 import (
 	"fmt"
-
 	"runtime"
 	"strings"
 	"time"
@@ -101,16 +100,16 @@ func (e ErrorLevel) String() string {
 
 // ErrorDetails represents strongly-typed error context information
 type ErrorDetails struct {
-	Field       string `json:"field,omitempty"`
-	Value       string `json:"value,omitempty"`
-	Expected    string `json:"expected,omitempty"`
-	Actual      string `json:"actual,omitempty"`
-	Operation   string `json:"operation,omitempty"`
-	FilePath    string `json:"file_path,omitempty"`
-	LineNumber  int    `json:"line_number,omitempty"`
-	RetryCount  int    `json:"retry_count,omitempty"`
-	Duration    string `json:"duration,omitempty"`
-	Metadata    map[string]string `json:"metadata,omitempty"`
+	Field      string            `json:"field,omitempty"`
+	Value      string            `json:"value,omitempty"`
+	Expected   string            `json:"expected,omitempty"`
+	Actual     string            `json:"actual,omitempty"`
+	Operation  string            `json:"operation,omitempty"`
+	FilePath   string            `json:"file_path,omitempty"`
+	LineNumber int               `json:"line_number,omitempty"`
+	RetryCount int               `json:"retry_count,omitempty"`
+	Duration   string            `json:"duration,omitempty"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
 // CleanWizardError represents structured error with context

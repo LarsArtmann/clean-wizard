@@ -37,9 +37,9 @@ func (rl *RateLimiter) Reservation() *rate.Reservation {
 
 // RateLimitStats provides rate limiting statistics
 type RateLimitStats struct {
-	Limit   rate.Limit `json:"limit"`
-	Burst   int        `json:"burst"`
-	Tokens  float64    `json:"tokens"`
+	Limit  rate.Limit `json:"limit"`
+	Burst  int        `json:"burst"`
+	Tokens float64    `json:"tokens"`
 }
 
 // Stats returns current rate limiter statistics

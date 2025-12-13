@@ -29,11 +29,11 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 
 	// Create domain config
 	config := &domain.Config{
-		Version:     publicConfig.Version,
-		SafeMode:    publicConfig.SafeMode,
+		Version:      publicConfig.Version,
+		SafeMode:     publicConfig.SafeMode,
 		MaxDiskUsage: int(publicConfig.MaxDiskUsage),
-		Protected:   publicConfig.ProtectedPaths,
-		Profiles:    profiles,
+		Protected:    publicConfig.ProtectedPaths,
+		Profiles:     profiles,
 	}
 
 	// Validate domain config
@@ -58,11 +58,11 @@ func MapConfigToPublic(domainConfig *domain.Config) result.Result[*PublicConfig]
 	}
 
 	publicConfig := &PublicConfig{
-		Version:      domainConfig.Version,
-		SafeMode:     domainConfig.SafeMode,
-		MaxDiskUsage:  int32(domainConfig.MaxDiskUsage),
+		Version:        domainConfig.Version,
+		SafeMode:       domainConfig.SafeMode,
+		MaxDiskUsage:   int32(domainConfig.MaxDiskUsage),
 		ProtectedPaths: domainConfig.Protected,
-		Profiles:      publicProfiles,
+		Profiles:       publicProfiles,
 	}
 
 	return result.Ok(publicConfig)
@@ -155,9 +155,9 @@ func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOpera
 func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationSettings {
 	// Default values for simplified public API
 	publicSettings := OperationSettings{
-		DryRun:             true, // Safe default
-		Verbose:            false,
-		TimeoutSeconds:     300, // 5 minutes
+		DryRun:              true, // Safe default
+		Verbose:             false,
+		TimeoutSeconds:      300, // 5 minutes
 		ConfirmBeforeDelete: false,
 	}
 
@@ -210,13 +210,13 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 	strategy := MapStrategyToPublic(domainResult.Strategy)
 
 	publicResult := &PublicCleanResult{
-		Success:     domainResult.IsValid(),
-		FreedBytes:  domainResult.FreedBytes,
+		Success:      domainResult.IsValid(),
+		FreedBytes:   domainResult.FreedBytes,
 		ItemsRemoved: uint32(domainResult.ItemsRemoved),
 		ItemsFailed:  uint32(domainResult.ItemsFailed),
-		CleanTime:   domainResult.CleanTime.String(),
-		CleanedAt:   domainResult.CleanedAt.Format(time.RFC3339),
-		Strategy:    strategy,
+		CleanTime:    domainResult.CleanTime.String(),
+		CleanedAt:    domainResult.CleanedAt.Format(time.RFC3339),
+		Strategy:     strategy,
 	}
 
 	// Add validation errors if any

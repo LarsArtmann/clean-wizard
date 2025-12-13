@@ -52,7 +52,7 @@ type ValidationLogger interface {
 type ValidationMiddlewareOptions struct {
 	RequireSafeModeConfirmation bool   `json:"require_safe_mode_confirmation"`
 	EnableDetailedLogging       bool   `json:"enable_detailed_logging"`
-	Environment                string `json:"environment"` // "development", "production", etc.
+	Environment                 string `json:"environment"` // "development", "production", etc.
 }
 
 // DefaultValidationLogger provides default logging implementation
@@ -150,7 +150,7 @@ func NewValidationMiddlewareWithOptions(options ...func(*ValidationMiddlewareOpt
 	opts := &ValidationMiddlewareOptions{
 		RequireSafeModeConfirmation: false,
 		EnableDetailedLogging:       true,
-		Environment:                "development",
+		Environment:                 "development",
 	}
 
 	for _, opt := range options {
@@ -177,7 +177,7 @@ func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddl
 		options: &ValidationMiddlewareOptions{
 			RequireSafeModeConfirmation: false,
 			EnableDetailedLogging:       false,
-			Environment:                "development",
+			Environment:                 "development",
 		},
 	}
 }

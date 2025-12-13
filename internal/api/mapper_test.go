@@ -13,9 +13,9 @@ import (
 func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 	// Create public config
 	publicConfig := &PublicConfig{
-		Version:     "1.0.0",
-		SafeMode:    true,
-		MaxDiskUsage: 80,
+		Version:        "1.0.0",
+		SafeMode:       true,
+		MaxDiskUsage:   80,
 		ProtectedPaths: []string{"/System", "/Library"},
 		Profiles: map[string]*PublicProfile{
 			"daily": {
@@ -29,9 +29,9 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 						RiskLevel:   PublicRiskLow,
 						Enabled:     true,
 						Settings: OperationSettings{
-							DryRun:             false,
-							Verbose:            true,
-							TimeoutSeconds:     300,
+							DryRun:              false,
+							Verbose:             true,
+							TimeoutSeconds:      300,
 							ConfirmBeforeDelete: false,
 						},
 					},
@@ -107,7 +107,7 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 						Description: "Test operation",
 						RiskLevel:   domain.RiskMediumType,
 						Enabled:     true,
-						Settings: domain.DefaultSettings(domain.OperationTypeNixGenerations),
+						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 				},
 			},
@@ -191,8 +191,8 @@ func TestMapCleanResultToPublic_ValidResult(t *testing.T) {
 func TestMapRiskLevel_Conversions(t *testing.T) {
 	// Test all risk level conversions
 	testCases := []struct {
-		public  PublicRiskLevel
-		domain  domain.RiskLevelType
+		public PublicRiskLevel
+		domain domain.RiskLevelType
 	}{
 		{PublicRiskLow, domain.RiskLowType},
 		{PublicRiskMedium, domain.RiskMediumType},
