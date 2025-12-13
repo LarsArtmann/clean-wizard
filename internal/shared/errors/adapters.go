@@ -1,0 +1,358 @@
+package errors
+
+import (
+	"fmt"
+	"os"
+	"runtime"
+	"strings"
+	"syscall"
+)
+
+// CleanWizardErrorCode represents error code enum for backward compatibility
+type CleanWizardErrorCode int
+
+const (
+	ErrCodeUnknown CleanWizardErrorCode = iota
+	ErrCodeFileNotFound
+	ErrCodePermissionError
+	ErrCodeDiskFull
+	ErrCodeFilesystem
+	ErrCodeInvalidConfig
+	ErrCodeValidationFailed
+	ErrCodeConnectionFailed
+	ErrCodeProcessFailed
+	ErrCodeCleanupFailed
+)
+
+// CleanWizardError represents a clean wizard error with context
+type CleanWizardError struct {
+	Code    CleanWizardErrorCode
+	Message string
+	Cause   error
+	Caller  string
+}
+
+// Error implements error interface
+func (e *CleanWizardError) Error() string {
+	if e.Caller != "" {
+		return fmt.Sprintf("[%s] %s (%s)", e.Code, e.Message, e.Caller)
+	}
+	return fmt.Sprintf("[%s] %s", e.Code, e.Message)
+}
+
+// Unwrap returns underlying cause
+func (e *CleanWizardError) Unwrap() error {
+	return e.Cause
+}
+
+// WithCause adds cause to error
+func (e *CleanWizardError) WithCause(cause error) *CleanWizardError {
+	e.Cause = cause
+	return e
+}
+
+// WithCaller adds caller information to error
+func (e *CleanWizardError) WithCaller() *CleanWizardError {
+	_, file, line, ok := runtime.Caller(1)
+	if ok {
+		e.Caller = fmt.Sprintf("%s:%d", file, line)
+	}
+	return e
+}
+
+// String returns string representation of error code
+func (ec CleanWizardErrorCode) String() string {
+	switch ec {
+	case ErrCodeUnknown:
+		return "UNKNOWN"
+	case ErrCodeFileNotFound:
+		return "FILE_NOT_FOUND"
+	case ErrCodePermissionError:
+		return "PERMISSION_ERROR"
+	case ErrCodeDiskFull:
+		return "DISK_FULL"
+	case ErrCodeFilesystem:
+		return "FILESYSTEM"
+	case ErrCodeInvalidConfig:
+		return "INVALID_CONFIG"
+	case ErrCodeValidationFailed:
+		return "VALIDATION_FAILED"
+	case ErrCodeConnectionFailed:
+		return "CONNECTION_FAILED"
+	case ErrCodeProcessFailed:
+		return "PROCESS_FAILED"
+	case ErrCodeCleanupFailed:
+		return "CLEANUP_FAILED"
+	default:
+		return fmt.Sprintf("UNKNOWN_%d", int(ec))
+	}
+}
+
+// NewError creates new CleanWizardError
+func NewError(code CleanWizardErrorCode, message string) *CleanWizardError {
+	return &CleanWizardError{
+		Code:    code,
+		Message: message,
+	}
+}
+
+// WrapError wraps existing error with CleanWizardError
+func WrapError(err error, code CleanWizardErrorCode, message string) *CleanWizardError {
+	return &CleanWizardError{
+		Code:    code,
+		Message: message,
+		Cause:   err,
+	}
+}
+
+// WrapErrorf wraps existing error with formatted message
+func WrapErrorf(err error, code CleanWizardErrorCode, format string, args ...interface{}) *CleanWizardError {
+	return &CleanWizardError{
+		Code:    code,
+		Message: fmt.Sprintf(format, args...),
+		Cause:   err,
+	}
+}
+
+// isErrorType checks if error matches any of the provided indicator strings
+// Generic helper to eliminate duplication between error type detection functions
+func isErrorType(err error, indicators []string) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range indicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// isConfigurationError checks if error is configuration-related
+func isConfigurationError(err error) bool {
+	configIndicators := []string{
+		"config", "configuration", "yaml", "json", "toml",
+		"parse", "invalid", "missing", "required",
+	}
+	return isErrorType(err, configIndicators)
+}
+
+// FileSystemErrorAdapter wraps file system errors with proper type safety
+type FileSystemErrorAdapter struct{}
+
+// Adapt converts OS-level errors to structured errors
+func (fsa *FileSystemErrorAdapter) Adapt(err error) *CleanWizardError {
+	if err == nil {
+		return nil
+	}
+
+	// Handle specific OS errors
+	if pathErr, ok := err.(*os.PathError); ok {
+		switch pathErr.Err {
+		case syscall.ENOENT, os.ErrNotExist:
+			return NewError(ErrCodeFileNotFound,
+				"File not found: "+pathErr.Path).WithCause(err).WithCaller()
+		case syscall.EACCES, syscall.EPERM, os.ErrPermission:
+			return NewError(ErrCodePermissionError,
+				"Permission denied: "+pathErr.Path).WithCause(err).WithCaller()
+		case syscall.ENOSPC:
+			return NewError(ErrCodeDiskFull,
+				"Disk full: "+pathErr.Path).WithCause(err).WithCaller()
+		default:
+			return NewError(ErrCodeFilesystem,
+				"File system error: "+pathErr.Err.Error()+" ("+pathErr.Path+")").WithCause(err).WithCaller()
+		}
+	}
+
+	// Handle other OS errors
+	if os.IsNotExist(err) {
+		return NewError(ErrCodeFileNotFound,
+			"File or directory not found").WithCause(err).WithCaller()
+	}
+
+	if os.IsPermission(err) {
+		return NewError(ErrCodePermissionError,
+			"Permission denied").WithCause(err).WithCaller()
+	}
+
+	// Not a file system error, return nil to let other adapters handle it
+	return nil
+}
+
+// ConfigErrorAdapter wraps configuration errors with proper type safety
+type ConfigErrorAdapter struct{}
+
+// Adapt converts configuration errors to structured errors
+func (cea *ConfigErrorAdapter) Adapt(err error, context string) *CleanWizardError {
+	if err == nil {
+		return nil
+	}
+
+	// Only handle actual configuration-related errors, not generic errors
+	// This allows the default handler to catch non-config errors
+	if isConfigurationError(err) {
+		return WrapError(err, ErrCodeInvalidConfig,
+			"Configuration error: "+context).WithCaller()
+	}
+
+	// Not a configuration error
+	return nil
+}
+
+// ValidationErrorAdapter wraps validation errors with proper type safety
+type ValidationErrorAdapter struct{}
+
+// Adapt converts validation errors to structured errors
+func (vea *ValidationErrorAdapter) Adapt(err error, field string) *CleanWizardError {
+	if err == nil {
+		return nil
+	}
+
+	// Only handle actual validation errors
+	if isValidationError(err) {
+		return WrapErrorf(err, ErrCodeValidationFailed,
+			"Validation failed for field '%s': %v", field, err).WithCaller()
+	}
+
+	// Not a validation error
+	return nil
+}
+
+// isValidationError checks if error is validation-related
+func isValidationError(err error) bool {
+	validationIndicators := []string{
+		"validation failed", "validation error", "invalid format",
+		"invalid range", "required field", "constraint violation",
+		"unacceptable value", "validation rule", "invalid value",
+	}
+	return isErrorType(err, validationIndicators)
+}
+
+// NetworkErrorAdapter wraps network errors with proper type safety
+type NetworkErrorAdapter struct{}
+
+// Adapt converts network errors to structured errors
+func (nea *NetworkErrorAdapter) Adapt(err error, operation string) *CleanWizardError {
+	if err == nil {
+		return nil
+	}
+
+	// Only handle actual network errors
+	if !isNetworkError(err) {
+		return nil
+	}
+
+	return WrapError(err, ErrCodeConnectionFailed,
+		"Network operation failed: "+operation).WithCaller()
+}
+
+// isNetworkError checks if error is network-related
+func isNetworkError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	// Common indicators of network errors
+	networkIndicators := []string{
+		"connection", "timeout", "network", "dns", "host", "dial",
+		"refused", "unreachable", "network unreachable", "connection refused",
+	}
+
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range networkIndicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// SystemErrorAdapter wraps system-level errors with proper type safety
+type SystemErrorAdapter struct{}
+
+// Adapt converts system errors to structured errors
+func (sea *SystemErrorAdapter) Adapt(err error, component string) *CleanWizardError {
+	if err == nil {
+		return nil
+	}
+
+	// Only handle actual system errors
+	if !isSystemError(err) {
+		return nil
+	}
+
+	return WrapError(err, ErrCodeProcessFailed,
+		"System component failed: "+component).WithCaller()
+}
+
+// isSystemError checks if error is system-related
+func isSystemError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	// Common indicators of system errors
+	systemIndicators := []string{
+		"permission denied", "access denied", "operation not permitted",
+		"no such file", "file not found", "device", "resource", "memory",
+		"disk", "space", "quota", "limit", "system", "kernel",
+	}
+
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range systemIndicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// ExternalToolErrorAdapter wraps external tool errors with proper type safety
+type ExternalToolErrorAdapter struct{}
+
+// Adapt converts external tool errors to structured errors
+func (eta *ExternalToolErrorAdapter) Adapt(err error, tool string) *CleanWizardError {
+	if err == nil {
+		return nil
+	}
+
+	// Only handle actual external tool errors
+	if !isExternalToolError(err) {
+		return nil
+	}
+
+	return WrapError(err, ErrCodeCleanupFailed,
+		"External tool '"+tool+"' failed").WithCaller()
+}
+
+// isExternalToolError checks if error is external tool-related
+func isExternalToolError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	// Common indicators of external tool errors
+	externalToolIndicators := []string{
+		"nix", "brew", "docker", "kubectl", "git", "curl", "wget",
+		"command not found", "executable", "binary", "tool", "utility",
+		"external command", "subprocess", "child process", "fork",
+	}
+
+	lowerErrStr := strings.ToLower(errStr)
+	for _, indicator := range externalToolIndicators {
+		if strings.Contains(lowerErrStr, indicator) {
+			return true
+		}
+	}
+
+	return false
+}

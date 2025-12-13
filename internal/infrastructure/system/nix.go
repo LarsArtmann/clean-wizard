@@ -1,0 +1,250 @@
+package system
+
+import (
+	"context"
+	"fmt"
+	"os/exec"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/shared"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/result"
+	mocks "github.com/LarsArtmann/clean-wizard/test"
+)
+
+// NixAdapter wraps Nix package manager operations
+type NixAdapter struct {
+	timeout time.Duration
+	retries int
+	dryRun  bool
+}
+
+// NewNixAdapter creates Nix adapter with configuration
+func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter {
+	return &NixAdapter{
+		timeout: timeout,
+		retries: retries,
+	}
+}
+
+// SetDryRun configures dry-run mode for the adapter
+func (n *NixAdapter) SetDryRun(dryRun bool) {
+	n.dryRun = dryRun
+}
+
+// ListGenerations lists Nix generations with dry-run isolation
+func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]shared.NixGeneration] {
+	if !n.IsAvailable(ctx) {
+		return result.Err[[]shared.NixGeneration](fmt.Errorf("nix not available"))
+	}
+
+	// If dry-run, return mock data without system calls
+	if n.dryRun {
+		return mocks.MockNixGenerationsResult()
+	}
+
+	// Real system call for production mode
+	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
+	output, err := cmd.Output()
+	if err != nil {
+		return result.Err[[]shared.NixGeneration](fmt.Errorf("failed to list generations: %w", err))
+	}
+
+	var generations []shared.NixGeneration
+	lines := strings.SplitSeq(string(output), "\n")
+
+	for line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		gen, err := n.ParseGeneration(line)
+		if err != nil {
+			return result.Err[[]shared.NixGeneration](fmt.Errorf("failed to parse generation: %w", err))
+		}
+
+		generations = append(generations, gen)
+	}
+
+	return result.Ok(generations)
+}
+
+// GetStoreSize returns Nix store size with dry-run isolation
+func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
+	// If dry-run, return estimated size without system calls
+	if n.dryRun {
+		return result.Ok(int64(50 * 1024 * 1024 * 1024)) // 50GB estimate
+	}
+
+	// Real system call for production mode
+	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
+	output, err := cmd.Output()
+	if err != nil {
+		return result.Err[int64](fmt.Errorf("failed to get store size: %w", err))
+	}
+
+	fields := strings.Fields(string(output))
+	if len(fields) < 1 {
+		return result.Err[int64](fmt.Errorf("invalid du output: %s", string(output)))
+	}
+
+	size, err := strconv.ParseInt(fields[0], 10, 64)
+	if err != nil {
+		return result.Err[int64](fmt.Errorf("failed to parse size: %w", err))
+	}
+
+	return result.Ok(size)
+}
+
+// CollectGarbage removes old Nix generations using centralized conversion
+func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[shared.CleanResult] {
+	// Capture start time before garbage-collection work begins
+	startTime := time.Now()
+
+	// Get store size before garbage collection
+	beforeSize, err := n.getActualStoreSize(ctx)
+	if err != nil {
+		return result.Err[shared.CleanResult](fmt.Errorf("failed to get pre-gc store size: %w", err))
+	}
+
+	// Run actual nix-collect-garbage command
+	cmd := exec.CommandContext(ctx, "nix-collect-garbage", "-d")
+	err = cmd.Run()
+	if err != nil {
+		return result.Err[shared.CleanResult](fmt.Errorf("failed to collect garbage: %w", err))
+	}
+
+	// Get store size after garbage collection
+	afterSize, err := n.getActualStoreSize(ctx)
+	if err != nil {
+		return result.Err[shared.CleanResult](fmt.Errorf("failed to get post-gc store size: %w", err))
+	}
+
+	bytesFreed := max(beforeSize-afterSize,
+		// Shouldn't happen but guard against it
+		0)
+
+	// Create clean result directly with proper timing
+	cleanResult := shared.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    time.Since(startTime),
+		CleanedAt:    time.Now(),
+		Strategy:     shared.StrategyAggressive,
+	}
+	return result.Ok(cleanResult)
+}
+
+// getActualStoreSize helper function to get real store size
+func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
+	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, err
+	}
+
+	fields := strings.Fields(string(output))
+	if len(fields) < 1 {
+		return 0, fmt.Errorf("invalid du output: %s", string(output))
+	}
+
+	return strconv.ParseInt(fields[0], 10, 64)
+}
+
+// RemoveGeneration removes specific Nix generation using centralized conversion
+func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[shared.CleanResult] {
+	// Capture start time before removal work begins
+	startTime := time.Now()
+
+	// Get store size before removal
+	beforeSize, err := n.getActualStoreSize(ctx)
+	if err != nil {
+		return result.Err[shared.CleanResult](fmt.Errorf("failed to get pre-remove store size: %w", err))
+	}
+
+	// Remove the specific generation
+	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", fmt.Sprintf("%d", genID))
+	err = cmd.Run()
+	if err != nil {
+		return result.Err[shared.CleanResult](fmt.Errorf("failed to remove generation %d: %w", genID, err))
+	}
+
+	// Get store size after removal
+	afterSize, err := n.getActualStoreSize(ctx)
+	if err != nil {
+		return result.Err[shared.CleanResult](fmt.Errorf("failed to get post-remove store size: %w", err))
+	}
+
+	bytesFreed := max(beforeSize-afterSize,
+		// Guard against negative values
+		0)
+
+	// Create clean result directly with proper timing
+	cleanResult := shared.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    time.Since(startTime),
+		CleanedAt:    time.Now(),
+		Strategy:     shared.StrategyConservative,
+	}
+	return result.Ok(cleanResult)
+}
+
+// ParseGeneration parses generation line from nix-env output
+func (n *NixAdapter) ParseGeneration(line string) (shared.NixGeneration, error) {
+	fields := strings.Fields(line)
+	if len(fields) < 1 {
+		return shared.NixGeneration{}, fmt.Errorf("invalid generation line: %s", line)
+	}
+
+	pathParts := strings.Split(fields[0], "-")
+	if len(pathParts) < 2 {
+		return shared.NixGeneration{}, fmt.Errorf("invalid generation path: %s", fields[0])
+	}
+
+	id, err := strconv.Atoi(pathParts[len(pathParts)-1])
+	if err != nil {
+		return shared.NixGeneration{}, fmt.Errorf("invalid generation ID: %s", pathParts[len(pathParts)-1])
+	}
+
+	// Simple date parsing
+	date := time.Now()
+	if len(fields) > 1 && strings.Contains(fields[1], "-") {
+		parts := strings.Split(fields[1], "-")
+		if len(parts) == 3 {
+			if parsed, err := time.Parse("2006-01-02", strings.Join(parts, "-")); err == nil {
+				date = parsed
+			}
+		}
+	}
+
+	return shared.NixGeneration{
+		ID:   id,
+		Path: fields[0],
+		Date: date,
+		Status: func() shared.SelectedStatusType {
+			if strings.Contains(line, "current") {
+				return shared.SelectedStatusSelectedType
+			}
+			return shared.SelectedStatusNotSelectedType
+		}(),
+	}, nil
+}
+
+// IsAvailable checks if Nix is available and accessible
+func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
+	// First check if nix command exists
+	versionCmd := exec.CommandContext(ctx, "nix", "--version")
+	if err := versionCmd.Run(); err != nil {
+		return false
+	}
+
+	// Then check if we can access profiles (the actual operation we need)
+	listCmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
+	err := listCmd.Run()
+	return err == nil
+}
