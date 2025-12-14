@@ -141,35 +141,14 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 				}
 			}
 
-			// Extract dry-run from settings if configured in Nix generations
-			actualDryRun := cleanDryRun
-			fmt.Printf("🔍 Debug: settings = %+v\n", settings)
-
-			if settings != nil {
-				fmt.Printf("🔍 Debug: settings.NixGenerations = %+v\n", settings.NixGenerations)
-				if settings.NixGenerations != nil {
-					fmt.Printf("🔍 Debug: NixGenerations.Optimize = %v\n", settings.NixGenerations.Optimize)
-					fmt.Printf("🔍 Debug: NixGenerations.DryRun = %v\n", settings.NixGenerations.DryRun)
-				}
-			}
-
-			if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.Optimize {
-				// Using Optimize field as dry-run indicator for now
+			// Determine dry-run mode: CLI flag takes precedence over config
+			actualDryRun := false
+			if cleanDryRun {
+				actualDryRun = true
+				fmt.Println("🔍 Running in DRY-RUN mode (from flag) - no files will be deleted")
+			} else if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.DryRun {
 				actualDryRun = true
 				fmt.Println("🔍 Running in DRY-RUN mode (from config) - no files will be deleted")
-			} else if cleanDryRun {
-				fmt.Println("🔍 Running in DRY-RUN mode (from flag) - no files will be deleted")
-			}
-
-			fmt.Printf("⚙️  Settings loaded: %+v\n", settings)
-			if settings != nil {
-				if settings.NixGenerations != nil {
-					fmt.Printf("🎛️  Nix Generations Settings: %+v\n", settings.NixGenerations)
-				} else {
-					fmt.Printf("❌ Nix Generations Settings: nil\n")
-				}
-			} else {
-				fmt.Printf("❌ Settings: nil\n")
 			}
 
 			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, actualDryRun)

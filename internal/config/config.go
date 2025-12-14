@@ -51,7 +51,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		if err := v.ReadInConfig(); err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 				// Config file not found, return default config
-				return getDefaultConfig(), nil
+				return GetDefaultConfig(), nil
 			}
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
@@ -246,8 +246,8 @@ func GetCurrentTime() time.Time {
 	return time.Now()
 }
 
-// getDefaultConfig returns the default configuration
-func getDefaultConfig() *domain.Config {
+// GetDefaultConfig returns the default configuration
+func GetDefaultConfig() *domain.Config {
 	now := GetCurrentTime()
 
 	return &domain.Config{

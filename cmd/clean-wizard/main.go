@@ -88,10 +88,12 @@ func main() {
 
 	// Add subcommands
 	rootCmd.AddCommand(
+		commands.NewInitCommand(),
 		commands.NewProfileCommand(),
 		commands.NewScanCommand(verbose, parseValidationLevel(validationLevel)),
 		commands.NewCleanCommand(parseValidationLevel(validationLevel)),
 		commands.NewGenerateCommand(),
+		commands.NewConfigCommand(),
 	)
 
 	// Handle command execution with proper error handling
