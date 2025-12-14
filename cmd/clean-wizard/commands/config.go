@@ -83,11 +83,11 @@ func runConfigShow(cmd *cobra.Command, args []string) error {
 	fmt.Printf("🔤 Version: %s\n", cfg.Version)
 	fmt.Printf("🛡️  Safe Mode: %v\n", cfg.SafeMode)
 	fmt.Printf("💾 Max Disk Usage: %d%%\n", cfg.MaxDiskUsage)
-	
+
 	if cfg.CurrentProfile != "" {
 		fmt.Printf("🏷️  Current Profile: %s\n", cfg.CurrentProfile)
 	}
-	
+
 	fmt.Printf("🚫 Protected Paths: %d\n", len(cfg.Protected))
 	if len(cfg.Protected) > 0 {
 		fmt.Println("   Protected paths:")
@@ -95,7 +95,7 @@ func runConfigShow(cmd *cobra.Command, args []string) error {
 			fmt.Printf("   • %s\n", path)
 		}
 	}
-	
+
 	fmt.Printf("📋 Profiles: %d\n", len(cfg.Profiles))
 	if len(cfg.Profiles) > 0 {
 		for name, profile := range cfg.Profiles {
@@ -106,14 +106,14 @@ func runConfigShow(cmd *cobra.Command, args []string) error {
 			fmt.Printf("   %s %s - %s (%d operations)\n", status, name, profile.Description, len(profile.Operations))
 		}
 	}
-	
+
 	return nil
 }
 
 // runConfigEdit opens config in default editor
 func runConfigEdit(cmd *cobra.Command, args []string) error {
 	configPath := getConfigPath()
-	
+
 	// Check if editor is available
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
@@ -128,73 +128,73 @@ func runConfigEdit(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("no editor found. Please set EDITOR environment variable")
 		}
 	}
-	
+
 	fmt.Printf("📝 Opening %s with %s...\n", configPath, editor)
-	
+
 	editCmd := exec.Command(editor, configPath)
 	editCmd.Stdin = os.Stdin
 	editCmd.Stdout = os.Stdout
 	editCmd.Stderr = os.Stderr
-	
+
 	return editCmd.Run()
 }
 
 // runConfigValidate validates configuration file
 func runConfigValidate(cmd *cobra.Command, args []string) error {
 	fmt.Println("🔍 Validating configuration...")
-	
+
 	cfg, err := config.Load()
 	if err != nil {
 		fmt.Printf("❌ Configuration validation failed: %v\n", err)
 		return err
 	}
-	
+
 	if err := cfg.Validate(); err != nil {
 		fmt.Printf("❌ Configuration validation failed: %v\n", err)
 		return err
 	}
-	
+
 	fmt.Printf("✅ Configuration is valid!\n")
 	fmt.Printf("📋 Configuration has:\n")
 	fmt.Printf("   • %d profiles\n", len(cfg.Profiles))
 	fmt.Printf("   • %d protected paths\n", len(cfg.Protected))
 	fmt.Printf("   • Safe mode: %v\n", cfg.SafeMode)
 	fmt.Printf("   • Max disk usage: %d%%\n", cfg.MaxDiskUsage)
-	
+
 	return nil
 }
 
 // runConfigReset resets configuration to defaults
 func runConfigReset(cmd *cobra.Command, args []string) error {
 	configPath := getConfigPath()
-	
+
 	// Backup existing config if it exists
 	if _, err := os.Stat(configPath); err == nil {
 		backupPath := configPath + ".backup"
 		fmt.Printf("💾 Creating backup at %s...\n", backupPath)
-		
+
 		err := copyFile(configPath, backupPath)
 		if err != nil {
 			return fmt.Errorf("failed to create backup: %w", err)
 		}
-		
+
 		fmt.Printf("✅ Backup created successfully\n")
 	}
-	
+
 	fmt.Println("🔄 Resetting configuration to defaults...")
-	
+
 	// Get default config
 	defaultCfg := config.GetDefaultConfig()
-	
+
 	// Save default config
 	if err := config.Save(defaultCfg); err != nil {
 		return fmt.Errorf("failed to save default configuration: %w", err)
 	}
-	
+
 	fmt.Printf("✅ Configuration reset to defaults\n")
 	fmt.Printf("📝 Edit with: clean-wizard config edit\n")
 	fmt.Printf("💡 Restore backup with: cp %s.backup %s\n", configPath, configPath)
-	
+
 	return nil
 }
 
@@ -212,6 +212,6 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	
-	return os.WriteFile(dst, data, 0644)
+
+	return os.WriteFile(dst, data, 0o644)
 }

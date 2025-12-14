@@ -23,7 +23,7 @@ func NewInitCommand() *cobra.Command {
 		Long:  `Interactive setup wizard that creates a comprehensive cleaning configuration tailored to your needs.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			configPath := filepath.Join(os.Getenv("HOME"), ".clean-wizard.yaml")
-			
+
 			// Check if config already exists
 			if _, err := os.Stat(configPath); err == nil && !force {
 				fmt.Printf("⚠️  Configuration file already exists at %s\n", configPath)
@@ -78,7 +78,7 @@ func runInteractiveSetup(config *domain.Config) error {
 
 	// Dry run by default
 	dryRun := askYesNo(reader, "Enable dry run by default?", true)
-	
+
 	// Automatic backups
 	_ = askYesNo(reader, "Enable automatic backups?", true) // TODO: Implement backup functionality
 
@@ -97,14 +97,14 @@ func askYesNo(reader *bufio.Reader, question string, defaultValue bool) bool {
 	if defaultValue {
 		defaultStr = "y"
 	}
-	
+
 	for {
 		fmt.Printf("? %s › %s ", question, defaultStr)
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			return defaultValue
 		}
-		
+
 		input = strings.TrimSpace(strings.ToLower(input))
 		if input == "" {
 			return defaultValue
@@ -126,24 +126,24 @@ func askNumber(reader *bufio.Reader, question string, min, max, defaultValue int
 		if err != nil {
 			return defaultValue
 		}
-		
+
 		input = strings.TrimSpace(input)
 		if input == "" {
 			return defaultValue
 		}
-		
+
 		var value int
 		_, err = fmt.Sscanf(input, "%d", &value)
 		if err != nil {
 			fmt.Printf("Please enter a number between %d and %d\n", min, max)
 			continue
 		}
-		
+
 		if value < min || value > max {
 			fmt.Printf("Please enter a number between %d and %d\n", min, max)
 			continue
 		}
-		
+
 		return value
 	}
 }
@@ -240,8 +240,8 @@ func configureProfiles(config *domain.Config, dryRun, safeMode bool) {
 
 func createDefaultConfig() *domain.Config {
 	return &domain.Config{
-		Version:    "1.0.0",
-		SafeMode:   true,
+		Version:      "1.0.0",
+		SafeMode:     true,
 		MaxDiskUsage: 90,
 		Protected: []string{
 			"/",
@@ -266,7 +266,7 @@ func writeConfiguration(config *domain.Config, configPath string) error {
 		return fmt.Errorf("failed to marshal configuration: %w", err)
 	}
 
-	err = os.WriteFile(configPath, data, 0644)
+	err = os.WriteFile(configPath, data, 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to write configuration file: %w", err)
 	}
