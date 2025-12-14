@@ -20,7 +20,7 @@ type OperationSettings struct {
 type NixGenerationsSettings struct {
 	Generations int  `json:"generations" yaml:"generations"`
 	Optimize    bool `json:"optimize" yaml:"optimize"`
-	DryRun     bool `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
+	DryRun      bool `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
 // TempFilesSettings provides type-safe settings for temporary files cleanup

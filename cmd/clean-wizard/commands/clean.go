@@ -144,7 +144,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			// Extract dry-run from settings if configured in Nix generations
 			actualDryRun := cleanDryRun
 			fmt.Printf("🔍 Debug: settings = %+v\n", settings)
-			
+
 			if settings != nil {
 				fmt.Printf("🔍 Debug: settings.NixGenerations = %+v\n", settings.NixGenerations)
 				if settings.NixGenerations != nil {
@@ -152,7 +152,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					fmt.Printf("🔍 Debug: NixGenerations.DryRun = %v\n", settings.NixGenerations.DryRun)
 				}
 			}
-			
+
 			if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.Optimize {
 				// Using Optimize field as dry-run indicator for now
 				actualDryRun = true

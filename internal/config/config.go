@@ -76,7 +76,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	for name, profile := range config.Profiles {
 		for i := range profile.Operations {
 			op := &profile.Operations[i] // Get pointer to actual operation
-			
+
 			// Convert string risk level to RiskLevel enum
 			var riskLevelStr string
 			v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr)
@@ -99,17 +99,17 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", name, i)
 			settingsMap := v.GetStringMap(settingsKey)
 			logrus.WithField("settingsKey", settingsKey).WithField("settingsMap", settingsMap).Debug("Checking settings")
-			
+
 			if len(settingsMap) > 0 {
 				// Check for nix_generations settings
 				if _, exists := settingsMap["nix_generations"]; exists {
 					nixGenSettings := &domain.NixGenerationsSettings{}
 					nixGenKey := settingsKey + ".nix_generations"
 					logrus.WithField("nixGenKey", nixGenKey).Debug("Unmarshaling Nix generations settings")
-					
+
 					if err := v.UnmarshalKey(nixGenKey, nixGenSettings); err == nil {
 						logrus.WithField("nixGenSettings", nixGenSettings).Debug("Assigning Nix generations settings")
-						
+
 						// Use direct field assignment to actual operation
 						op.Settings = &domain.OperationSettings{}
 						op.Settings.NixGenerations = nixGenSettings
@@ -132,10 +132,10 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		for i, op := range profile.Operations {
 			if op.Name == "nix-generations" {
 				logrus.WithFields(logrus.Fields{
-					"profile": name,
-					"operation": i,
+					"profile":     name,
+					"operation":   i,
 					"hasSettings": op.Settings != nil,
-					"settings": op.Settings,
+					"settings":    op.Settings,
 				}).Debug("IMMEDIATE: Settings after assignment")
 			}
 		}
@@ -152,9 +152,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		for i, op := range profile.Operations {
 			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
 				logrus.WithFields(logrus.Fields{
-					"profile": name,
+					"profile":   name,
 					"operation": i,
-					"settings": op.Settings.NixGenerations,
+					"settings":  op.Settings.NixGenerations,
 				}).Debug("Settings preserved after validation")
 			}
 		}
@@ -177,10 +177,10 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		for i, op := range profile.Operations {
 			if op.Name == "nix-generations" {
 				logrus.WithFields(logrus.Fields{
-					"profile": name,
-					"operation": i,
+					"profile":     name,
+					"operation":   i,
 					"hasSettings": op.Settings != nil,
-					"settings": op.Settings,
+					"settings":    op.Settings,
 				}).Debug("FINAL: Settings before returning config")
 			}
 		}
