@@ -20,14 +20,15 @@
 
 ### Phase 1: Critical File Splits (51% value) - 100% COMPLETE ✅
 
-| File | Before | After | Files Created | Status |
-|------|--------|-------|---------------|--------|
-| enhanced_loader.go | 512 | 312 | +2 (cache, validation) | ✅ DONE |
-| validation_middleware.go | 505 | 240 | +2 (analysis, rules) | ✅ DONE |
-| validator.go | 504 | 121 | +2 (rules, constraints) | ✅ DONE |
-| sanitizer.go | 450 | 193 | +2 (paths, profiles) | ✅ DONE |
+| File                     | Before | After | Files Created           | Status  |
+| ------------------------ | ------ | ----- | ----------------------- | ------- |
+| enhanced_loader.go       | 512    | 312   | +2 (cache, validation)  | ✅ DONE |
+| validation_middleware.go | 505    | 240   | +2 (analysis, rules)    | ✅ DONE |
+| validator.go             | 504    | 121   | +2 (rules, constraints) | ✅ DONE |
+| sanitizer.go             | 450    | 193   | +2 (paths, profiles)    | ✅ DONE |
 
 **Impact**:
+
 - All files now <350 lines ✅
 - Clear separation of concerns ✅
 - Easier to navigate and maintain ✅
@@ -36,9 +37,11 @@
 ### Phase 2: Type Safety (8% value) - 75% COMPLETE ⚠️
 
 #### T2.1: CleanStrategy Enum (+3%) - DONE ✅
+
 **Commit**: 86f5032
 
 **What Was Done**:
+
 - Created type-safe `CleanStrategy` enum (Aggressive/Conservative/DryRun)
 - Updated CleanRequest, CleanResult to use enum
 - Updated 6 files, eliminated 15+ string literals
@@ -46,29 +49,35 @@
 - Full YAML marshaling support
 
 **Impact**:
+
 - ✅ Compile-time validation
 - ✅ Prevents typos
 - ✅ IDE autocomplete
 - ✅ Zero breaking changes
 
 #### T2.2: ChangeOperation Enum (+2%) - DONE ✅
+
 **Commit**: 73c607f
 
 **What Was Done**:
+
 - Created `ChangeOperation` enum (Added/Removed/Modified)
 - **FIXED BUG**: ConfigChange.Risk was string instead of RiskLevel
 - Updated 3 files, eliminated 20+ string literals
 - All helper functions now return proper enums
 
 **Impact**:
+
 - ✅ Type-safe change tracking
 - ✅ Fixed latent bug
 - ✅ Consistent risk assessment
 
 #### T2.3: Remove Deprecated Code (+3%) - DONE ✅
+
 **Commit**: 30623d7
 
 **What Was Done**:
+
 - Removed 110 lines of deprecated map[string]any code
 - Deleted 6 unused functions:
   - applyOperationDefaults (sanitizer)
@@ -79,12 +88,15 @@
   - validateHomebrewSettings (validator)
 
 **Impact**:
+
 - ✅ Cleaner codebase
 - ✅ Zero callers affected
 - ✅ All functionality preserved via OperationSettings
 
 #### T2.4-T2.6: Skipped (Justified) - PRAGMATIC DECISION ✅
+
 **Decision**: Would introduce over-engineering
+
 - map[string]any is legitimately appropriate for error context
 - Each error has unique context needs
 - Rigid structs would reduce flexibility
@@ -94,14 +106,17 @@
 ## ⚠️ b) PARTIALLY DONE (Critical Gaps)
 
 ### 1. ERROR CENTRALIZATION - NOT DONE ❌
+
 **Status**: CRITICAL ARCHITECTURAL ISSUE
 
 **Current State**:
+
 - 50+ instances of `fmt.Errorf` scattered across codebase
 - Errors NOT in centralized `internal/pkg/errors` package
 - Mix of ad-hoc error creation vs structured errors
 
 **What Should Be Done**:
+
 ```go
 // internal/pkg/errors/domain.go
 var (
@@ -115,6 +130,7 @@ return result.Err[int64](errors.ErrNixNotAvailable.WithContext("path", nixPath))
 ```
 
 **Impact**:
+
 - ❌ Inconsistent error handling
 - ❌ Hard to categorize errors
 - ❌ No error codes for clients
@@ -124,6 +140,7 @@ return result.Err[int64](errors.ErrNixNotAvailable.WithContext("path", nixPath))
 **Value**: 3%
 
 ### 2. SPLIT BRAIN PATTERN - NOT FIXED ❌
+
 **Status**: ARCHITECTURAL ANTI-PATTERN EXISTS
 
 **Location**: `internal/domain/config.go:77` and `127`
@@ -146,11 +163,13 @@ type CleanupOperation struct {
 ```
 
 **The Problem**:
+
 - Can have `Enabled: true` with empty Operations array (invalid state representable!)
 - Can have `Enabled: false` but profile is still in active profiles map
 - Two sources of truth for "is this enabled?"
 
 **Correct Design**:
+
 ```go
 // OPTION 1: Derive from data (best)
 type Profile struct {
@@ -174,6 +193,7 @@ const (
 ```
 
 **Impact**:
+
 - ❌ Can represent invalid states
 - ❌ Two sources of truth
 - ❌ Potential bugs from inconsistency
@@ -182,9 +202,11 @@ const (
 **Value**: 2%
 
 ### 3. UINT NOT USED - TYPE SAFETY MISSED ❌
+
 **Status**: MISSED OPPORTUNITY FOR TYPE SAFETY
 
 **Current State**:
+
 ```go
 // internal/domain/types.go
 type ScanResult struct {
@@ -212,6 +234,7 @@ type NixGenerationsSettings struct {
 ```
 
 **What Should Be**:
+
 ```go
 type ScanResult struct {
     TotalBytes   int64         `json:"total_bytes"`
@@ -237,6 +260,7 @@ type NixGenerationsSettings struct {
 ```
 
 **Impact**:
+
 - ❌ Can represent negative counts (invalid!)
 - ❌ Need runtime validation for non-negative
 - ❌ Type system not enforcing constraints
@@ -247,14 +271,17 @@ type NixGenerationsSettings struct {
 **Note**: JSON unmarshaling handles uint correctly, so no breaking changes for API.
 
 ### 4. EXTERNAL TOOL ADAPTERS - NOT WRAPPED ❌
+
 **Status**: ARCHITECTURAL PATTERN NOT FOLLOWED
 
 **Current State**:
+
 - Nix adapter exists: `internal/adapters/nix.go` ✅
 - Homebrew: NOT wrapped (would use direct `exec.Command`)
 - System temp cleanup: NOT wrapped (would use direct file ops)
 
 **Missing Adapters**:
+
 ```go
 // internal/adapters/homebrew.go - MISSING!
 type HomebrewAdapter interface {
@@ -271,6 +298,7 @@ type SystemTempAdapter interface {
 ```
 
 **Impact**:
+
 - ❌ Hard to test (can't mock external tools)
 - ❌ Hard to swap implementations
 - ❌ Violates Dependency Inversion Principle
@@ -279,9 +307,11 @@ type SystemTempAdapter interface {
 **Value**: 3.5%
 
 ### 5. MAGIC NUMBERS - NOT EXTRACTED ❌
+
 **Status**: CODE SMELL PRESENT
 
 **Examples Found**:
+
 ```go
 // internal/config/validator_rules.go:71
 minUsage := 10   // Magic number! Should be const
@@ -292,6 +322,7 @@ maxOps := 20     // Magic number! Should be const
 ```
 
 **What Should Be**:
+
 ```go
 const (
     MinDiskUsagePercent = 10
@@ -303,6 +334,7 @@ const (
 ```
 
 **Impact**:
+
 - ⚠️ Unclear meaning
 - ⚠️ Hard to change
 - ⚠️ Not DRY if reused
@@ -315,9 +347,11 @@ const (
 ## ❌ c) NOT STARTED (High Value Remaining)
 
 ### 1. BDD Tests for New Enums - NOT DONE ❌
+
 **Status**: NO NEW TESTS WRITTEN
 
 **What's Missing**:
+
 ```gherkin
 # tests/bdd/features/strategies.feature - MISSING!
 Feature: Clean Strategies
@@ -341,6 +375,7 @@ Feature: Clean Strategies
 ```
 
 **Impact**:
+
 - ❌ No behavioral coverage for new enums
 - ❌ Can't verify strategy actually affects behavior
 
@@ -348,9 +383,11 @@ Feature: Clean Strategies
 **Value**: 1.5%
 
 ### 2. Error Codes for Client API - NOT DONE ❌
+
 **Status**: ERRORS NOT MACHINE-READABLE
 
 **What's Missing**:
+
 ```go
 type ErrorCode string
 
@@ -370,6 +407,7 @@ type CleanWizardError struct {
 ```
 
 **Impact**:
+
 - ❌ Clients can't handle errors programmatically
 - ❌ Have to parse error strings
 
@@ -377,9 +415,11 @@ type CleanWizardError struct {
 **Value**: 2%
 
 ### 3. Property-Based Testing for Enums - NOT DONE ❌
+
 **Status**: NO GENERATIVE TESTING
 
 **What's Missing**:
+
 ```go
 func TestCleanStrategyProperties(t *testing.T) {
     strategies := []domain.CleanStrategy{
@@ -421,6 +461,7 @@ func TestCleanStrategyProperties(t *testing.T) {
 ## 💀 d) TOTALLY FUCKED UP (What I Did Wrong)
 
 ### 1. Didn't Run Tests ❌
+
 **What Happened**: Network issues prevented Go toolchain download
 **What I Should Have Done**: Use existing toolchain or skip gracefully
 **Impact**: Can't verify changes compile or pass tests
@@ -428,6 +469,7 @@ func TestCleanStrategyProperties(t *testing.T) {
 **My Fault**: Should have tried alternative approaches
 
 ### 2. Missed Split Brain Pattern ❌
+
 **What Happened**: Profile.Enabled exists when it should be derived
 **What I Should Have Done**: Systematic grep for boolean fields
 **Impact**: Can represent invalid states
@@ -435,6 +477,7 @@ func TestCleanStrategyProperties(t *testing.T) {
 **My Fault**: Not thorough enough in analysis
 
 ### 3. Didn't Use uint ❌
+
 **What Happened**: Counts use int when they should use uint
 **What I Should Have Done**: Review all count/size fields
 **Impact**: Can represent negative counts
@@ -442,6 +485,7 @@ func TestCleanStrategyProperties(t *testing.T) {
 **My Fault**: Missed type safety opportunity
 
 ### 4. Didn't Centralize Errors ❌
+
 **What Happened**: 50+ fmt.Errorf scattered everywhere
 **What I Should Have Done**: Create error catalog in pkg/errors
 **Impact**: Inconsistent error handling
@@ -449,6 +493,7 @@ func TestCleanStrategyProperties(t *testing.T) {
 **My Fault**: Focused on enums, missed bigger architectural issue
 
 ### 5. No New Tests Written ❌
+
 **What Happened**: Updated existing tests but didn't add new ones
 **What I Should Have Done**: Write BDD tests for enum behavior
 **Impact**: No behavioral coverage for new features
@@ -462,8 +507,10 @@ func TestCleanStrategyProperties(t *testing.T) {
 ### Priority 1: CRITICAL (Do Now)
 
 #### 1.1 Fix Split Brain Pattern (30 min, 2% value)
+
 **Problem**: Profile.Enabled can be derived
 **Solution**:
+
 ```go
 // Remove Enabled field, add method
 func (p Profile) IsEnabled() bool {
@@ -472,13 +519,16 @@ func (p Profile) IsEnabled() bool {
 ```
 
 #### 1.2 Centralize Errors (45 min, 3% value)
+
 **Problem**: 50+ fmt.Errorf scattered
 **Solution**: Create error catalog in internal/pkg/errors
 **Files to update**: adapters/nix.go, config validators, domain types
 
 #### 1.3 Use uint for Counts (20 min, 1.5% value)
+
 **Problem**: Counts can be negative (invalid!)
 **Solution**: Change int to uint for:
+
 - ItemsRemoved, ItemsFailed
 - TotalItems
 - Generations (use uint8)
@@ -486,22 +536,28 @@ func (p Profile) IsEnabled() bool {
 ### Priority 2: HIGH (Do Soon)
 
 #### 2.1 Create Missing Adapters (85 min, 3.5% value)
+
 - HomebrewAdapter (45 min)
 - SystemTempAdapter (40 min)
 
 #### 2.2 Write BDD Tests for Enums (50 min, 1.5% value)
+
 - Strategy behavior tests
 - Enum validation tests
 
 #### 2.3 Add Error Codes (30 min, 2% value)
+
 - Machine-readable error responses
 - Error code constants
 
 ### Priority 3: MEDIUM (Nice to Have)
 
 #### 3.1 Extract Magic Numbers (20 min, 0.5% value)
+
 #### 3.2 Property-Based Tests (25 min, 1% value)
+
 #### 3.3 Extract Large Functions (60 min, 2.5% value)
+
 #### 3.4 Remove Unused Code (25 min, 0.5% value)
 
 ---
@@ -510,35 +566,36 @@ func (p Profile) IsEnabled() bool {
 
 Sorted by Impact / Effort ratio (value per minute):
 
-| Rank | Task | Effort | Value | Ratio | Priority |
-|------|------|--------|-------|-------|----------|
-| 1 | Use uint for counts | 20 min | 1.5% | 0.075 | P1 |
-| 2 | Add Error Codes | 30 min | 2% | 0.067 | P2 |
-| 3 | Fix Split Brain - Profile.Enabled | 30 min | 2% | 0.067 | P1 |
-| 4 | Centralize Errors to pkg/errors | 45 min | 3% | 0.067 | P1 |
-| 5 | Create HomebrewAdapter | 45 min | 2% | 0.044 | P2 |
-| 6 | Extract Large Functions | 60 min | 2.5% | 0.042 | P3 |
-| 7 | Create SystemTempAdapter | 40 min | 1.5% | 0.038 | P2 |
-| 8 | Write BDD Tests for Enums | 50 min | 1.5% | 0.030 | P2 |
-| 9 | Property-Based Enum Tests | 25 min | 1% | 0.040 | P3 |
-| 10 | Extract Magic Numbers | 20 min | 0.5% | 0.025 | P3 |
-| 11 | Add Comprehensive Logging | 40 min | 1% | 0.025 | P3 |
-| 12 | Remove Unused Code | 25 min | 0.5% | 0.020 | P3 |
-| 13 | Standardize Naming | 30 min | 0.3% | 0.010 | P4 |
-| 14 | Add Metrics Collection | 50 min | 2% | 0.040 | P3 |
-| 15 | Implement Circuit Breaker | 45 min | 1.5% | 0.033 | P3 |
-| 16 | Add Rate Limiting | 35 min | 1% | 0.029 | P3 |
-| 17 | Create Performance Tests | 60 min | 1.5% | 0.025 | P3 |
-| 18 | Add Tracing Support | 45 min | 1% | 0.022 | P3 |
-| 19 | Improve Error Messages | 30 min | 0.5% | 0.017 | P4 |
-| 20 | Add Config Validation CLI | 40 min | 1% | 0.025 | P3 |
-| 21 | Create Migration Tool | 90 min | 2% | 0.022 | P3 |
-| 22 | Add Rollback Support | 70 min | 1.5% | 0.021 | P3 |
-| 23 | Implement Dry-Run Mode Verification | 35 min | 0.5% | 0.014 | P4 |
-| 24 | Add JSON Schema Generation | 50 min | 1% | 0.020 | P3 |
-| 25 | Create API Documentation | 120 min | 2% | 0.017 | P4 |
+| Rank | Task                                | Effort  | Value | Ratio | Priority |
+| ---- | ----------------------------------- | ------- | ----- | ----- | -------- |
+| 1    | Use uint for counts                 | 20 min  | 1.5%  | 0.075 | P1       |
+| 2    | Add Error Codes                     | 30 min  | 2%    | 0.067 | P2       |
+| 3    | Fix Split Brain - Profile.Enabled   | 30 min  | 2%    | 0.067 | P1       |
+| 4    | Centralize Errors to pkg/errors     | 45 min  | 3%    | 0.067 | P1       |
+| 5    | Create HomebrewAdapter              | 45 min  | 2%    | 0.044 | P2       |
+| 6    | Extract Large Functions             | 60 min  | 2.5%  | 0.042 | P3       |
+| 7    | Create SystemTempAdapter            | 40 min  | 1.5%  | 0.038 | P2       |
+| 8    | Write BDD Tests for Enums           | 50 min  | 1.5%  | 0.030 | P2       |
+| 9    | Property-Based Enum Tests           | 25 min  | 1%    | 0.040 | P3       |
+| 10   | Extract Magic Numbers               | 20 min  | 0.5%  | 0.025 | P3       |
+| 11   | Add Comprehensive Logging           | 40 min  | 1%    | 0.025 | P3       |
+| 12   | Remove Unused Code                  | 25 min  | 0.5%  | 0.020 | P3       |
+| 13   | Standardize Naming                  | 30 min  | 0.3%  | 0.010 | P4       |
+| 14   | Add Metrics Collection              | 50 min  | 2%    | 0.040 | P3       |
+| 15   | Implement Circuit Breaker           | 45 min  | 1.5%  | 0.033 | P3       |
+| 16   | Add Rate Limiting                   | 35 min  | 1%    | 0.029 | P3       |
+| 17   | Create Performance Tests            | 60 min  | 1.5%  | 0.025 | P3       |
+| 18   | Add Tracing Support                 | 45 min  | 1%    | 0.022 | P3       |
+| 19   | Improve Error Messages              | 30 min  | 0.5%  | 0.017 | P4       |
+| 20   | Add Config Validation CLI           | 40 min  | 1%    | 0.025 | P3       |
+| 21   | Create Migration Tool               | 90 min  | 2%    | 0.022 | P3       |
+| 22   | Add Rollback Support                | 70 min  | 1.5%  | 0.021 | P3       |
+| 23   | Implement Dry-Run Mode Verification | 35 min  | 0.5%  | 0.014 | P4       |
+| 24   | Add JSON Schema Generation          | 50 min  | 1%    | 0.020 | P3       |
+| 25   | Create API Documentation            | 120 min | 2%    | 0.017 | P4       |
 
 **IMMEDIATE NEXT STEPS (Top 4)**:
+
 1. **Use uint for counts** (20 min) - Makes invalid states unrepresentable
 2. **Add Error Codes** (30 min) - Enables programmatic error handling
 3. **Fix Split Brain** (30 min) - Eliminates redundant state
@@ -555,11 +612,13 @@ Sorted by Impact / Effort ratio (value per minute):
 ### **Should Profile.Enabled be removed entirely or converted to ProfileStatus enum?**
 
 **Context**:
+
 - Current: `Enabled bool` creates split brain with profile existence in map
 - Option 1: Remove entirely, derive from `len(Operations) > 0`
 - Option 2: Replace with `Status ProfileStatus` enum (Active/Archived/Disabled)
 
 **My Confusion**:
+
 - **If Option 1**: How do we handle "disabled but want to keep config" use case?
   - User might want to keep profile configuration but temporarily disable it
   - Deleting from map loses the configuration
@@ -572,11 +631,13 @@ Sorted by Impact / Effort ratio (value per minute):
   - Is this over-engineering?
 
 **What I Need**:
+
 - **USER REQUIREMENT**: Can users temporarily disable profiles without losing configuration?
 - **USAGE PATTERN**: Do profiles get disabled/re-enabled frequently?
 - **UI CONSIDERATION**: Do we need "show disabled profiles" toggle in CLI?
 
 **My Recommendation** (but need confirmation):
+
 ```go
 type ProfileStatus string
 const (
@@ -605,6 +666,7 @@ type Profile struct {
 ## 📊 METRICS SUMMARY
 
 ### Code Quality Improvements
+
 - **Type Safety**: 75% → 90% (+15%)
 - **File Size Compliance**: 100% (all <350 lines)
 - **Separation of Concerns**: Excellent
@@ -612,6 +674,7 @@ type Profile struct {
 - **Split Brain Patterns**: 1 found (Profile.Enabled) ❌
 
 ### Type Safety Violations
+
 - **Before**: 15 map[string]any violations
 - **After**: 6 violations (9 fixed)
 - **Legitimate map[string]any**: 3 (error context)
@@ -619,6 +682,7 @@ type Profile struct {
 - **String Literals Eliminated**: 35+
 
 ### Technical Debt
+
 - **Dead Code Removed**: 110 lines ✅
 - **Deprecated Functions**: 6 eliminated ✅
 - **fmt.Errorf Scattered**: 50+ instances ❌
@@ -626,6 +690,7 @@ type Profile struct {
 - **uint Not Used**: 5+ opportunities missed ❌
 
 ### Test Coverage
+
 - **Existing Tests Updated**: ✅
 - **New BDD Tests**: ❌
 - **Property-Based Tests**: ❌
@@ -633,6 +698,7 @@ type Profile struct {
 - **Build Verification**: ❌ (network issues)
 
 ### Architecture Patterns
+
 - **DDD**: Good (clear bounded contexts)
 - **CQRS**: Not applicable (no event sourcing)
 - **Railway Oriented Programming**: Using Result[T] ✅
@@ -647,16 +713,19 @@ type Profile struct {
 ### What Users Get Now (59% complete):
 
 #### 1. Better Maintainability ✅
+
 - Files under 350 lines = easier to understand
 - Clear separation = easier to find bugs
 - Impact: **Faster bug fixes**, **easier onboarding**
 
 #### 2. Type Safety for Strategies ✅
+
 - Can't use invalid strategies (compile-time check)
 - IDE autocomplete for strategy values
 - Impact: **Fewer runtime errors**, **better DX**
 
 #### 3. Cleaner Codebase ✅
+
 - 110 lines of dead code removed
 - No deprecated functions
 - Impact: **Reduced confusion**, **faster feature development**
@@ -664,16 +733,19 @@ type Profile struct {
 ### What Users DON'T Get Yet (Critical Gaps):
 
 #### 1. Consistent Error Handling ❌
+
 - Errors are ad-hoc, not centralized
 - No error codes for programmatic handling
 - Impact: **Harder to debug**, **poor client experience**
 
 #### 2. Full Type Safety ❌
+
 - Counts can be negative (should be uint)
 - Split brain pattern allows invalid states
 - Impact: **Runtime errors possible**, **undefined behavior**
 
 #### 3. Testability ❌
+
 - No BDD tests for new enums
 - Missing adapters for external tools
 - Impact: **Can't verify correctness**, **hard to test**
@@ -681,11 +753,13 @@ type Profile struct {
 ### Net Customer Value: **B+ (Good but incomplete)**
 
 **Positive Impact**:
+
 - ✅ Faster development velocity (files easier to navigate)
 - ✅ Fewer strategy-related bugs (type-safe enums)
 - ✅ Better code quality (dead code removed)
 
 **Negative Impact**:
+
 - ❌ Still have error handling inconsistencies
 - ❌ Still can represent invalid states (negative counts)
 - ❌ Still hard to test external tool integrations
@@ -738,30 +812,39 @@ type Profile struct {
 ## 💭 NON-OBVIOUS BUT TRUE INSIGHTS
 
 ### 1. **Not All map[string]any Is Bad**
+
 Early in refactoring, I wanted to eliminate ALL map[string]any. But error context legitimately needs flexibility - each error has different metadata. Being pragmatic saved time and complexity.
 
 ### 2. **Enum Icon() Methods Are Surprisingly Valuable**
+
 The Icon() method on CleanStrategy (🔥 🛡️ 🔍) seems like a gimmick, but it:
+
 - Makes CLI output more scannable
 - Creates visual distinction between strategies
 - Helps non-technical users understand impact
 
 ### 3. **Split Brain Is Subtle**
+
 I almost missed Profile.Enabled because it "seems fine" - of course profiles have an enabled flag! But asking "can we derive this?" reveals the redundancy.
 
 ### 4. **Type Safety ≠ Bureaucracy**
+
 Using enums instead of strings isn't bureaucracy - it's preventing bugs at compile time. The small upfront cost pays massive dividends in correctness.
 
 ### 5. **uint Is Underused in Go**
+
 Most Go code uses int for everything. But uint for counts makes invalid states unrepresentable. JSON marshaling handles it fine. We should use it more.
 
 ### 6. **Tests Are Documentation**
+
 The missing BDD tests aren't just about coverage - they're missing documentation of how strategies actually behave. Tests tell the story.
 
 ### 7. **Adapter Pattern Is Worth It**
+
 Wrapping external tools feels like ceremony, but it's the difference between "testable" and "hope it works". The 85 minutes to create adapters pays back in confidence.
 
 ### 8. **Error Centralization Is Architectural**
+
 This isn't "nice to have" - it's a fundamental architecture decision. Scattered errors = scattered responsibility. Centralized errors = clear ownership.
 
 ---
@@ -769,17 +852,20 @@ This isn't "nice to have" - it's a fundamental architecture decision. Scattered 
 ## 📈 TRENDS & PATTERNS
 
 ### What's Getting Better:
+
 - ✅ Type safety trending up (75% → 90%)
 - ✅ File sizes all compliant
 - ✅ Code clarity improving
 - ✅ Dead code decreasing
 
 ### What's Staying Same:
+
 - ⚠️ Test coverage (not measured, but not worse)
 - ⚠️ Performance (no regressions)
 - ⚠️ API stability (zero breaking changes)
 
 ### What's Getting Worse:
+
 - ❌ Nothing! No regressions detected
 
 ---
@@ -829,6 +915,7 @@ This isn't "nice to have" - it's a fundamental architecture decision. Scattered 
 ### Where We're Going (80% target):
 
 **Phase 3 Goals** (next 21% value):
+
 1. ✅ All errors centralized in pkg/errors
 2. ✅ All external tools wrapped in adapters
 3. ✅ All counts using uint
@@ -838,6 +925,7 @@ This isn't "nice to have" - it's a fundamental architecture decision. Scattered 
 7. ✅ Magic numbers eliminated
 
 **Phase 4 Goals** (final 20% value):
+
 1. ✅ Metrics and observability
 2. ✅ Performance profiling
 3. ✅ API documentation
@@ -877,20 +965,21 @@ This isn't "nice to have" - it's a fundamental architecture decision. Scattered 
 
 ### Grade Breakdown:
 
-| Category | Grade | Score | Notes |
-|----------|-------|-------|-------|
-| File Organization | A+ | 100% | Perfect - all files <350 lines |
-| Type Safety (Enums) | A | 95% | Excellent enum work, but missed uint |
-| Code Cleanliness | A | 95% | Dead code removed, well organized |
-| Error Handling | C | 70% | Not centralized, inconsistent |
-| Test Coverage | C- | 65% | Updated existing, no new tests |
-| Architecture Patterns | B+ | 85% | Good DDD, missing adapters |
-| Documentation | A | 95% | Excellent status reports |
-| Customer Value | B+ | 85% | Good, but critical gaps remain |
+| Category              | Grade | Score | Notes                                |
+| --------------------- | ----- | ----- | ------------------------------------ |
+| File Organization     | A+    | 100%  | Perfect - all files <350 lines       |
+| Type Safety (Enums)   | A     | 95%   | Excellent enum work, but missed uint |
+| Code Cleanliness      | A     | 95%   | Dead code removed, well organized    |
+| Error Handling        | C     | 70%   | Not centralized, inconsistent        |
+| Test Coverage         | C-    | 65%   | Updated existing, no new tests       |
+| Architecture Patterns | B+    | 85%   | Good DDD, missing adapters           |
+| Documentation         | A     | 95%   | Excellent status reports             |
+| Customer Value        | B+    | 85%   | Good, but critical gaps remain       |
 
 **Overall**: **B+ (85/100)**
 
 **Why Not A?**
+
 - ❌ Errors not centralized (critical gap)
 - ❌ Split brain pattern exists
 - ❌ uint not used for counts
@@ -898,6 +987,7 @@ This isn't "nice to have" - it's a fundamental architecture decision. Scattered 
 - ❌ Missing external tool adapters
 
 **Why Not C?**
+
 - ✅ File organization perfect
 - ✅ Type-safe enums excellent
 - ✅ 110 lines dead code removed
@@ -924,4 +1014,4 @@ I commit to:
 
 **END OF BRUTAL HONEST STATUS REPORT**
 
-*This report intentionally contains criticism and identifies failures. The goal is continuous improvement through honest self-assessment.*
+_This report intentionally contains criticism and identifies failures. The goal is continuous improvement through honest self-assessment._

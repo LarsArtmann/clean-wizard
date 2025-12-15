@@ -16,16 +16,16 @@ func GetEnvDuration(key string, defaultValue time.Duration) time.Duration
 func GetEnvInt(key string, defaultValue int) int
 func GetEnvWithDefault(key, defaultValue string) string
 type CacheManager struct{ ... }
-    func NewCacheManager(defaultExpiration, cleanupInterval time.Duration) *CacheManager
+func NewCacheManager(defaultExpiration, cleanupInterval time.Duration) *CacheManager
 type CacheStats struct{ ... }
 type EnvironmentConfig struct{ ... }
-    func LoadEnvironmentConfig() (*EnvironmentConfig, error)
-    func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error)
+func LoadEnvironmentConfig() (*EnvironmentConfig, error)
+func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error)
 type HTTPClient struct{ ... }
-    func NewHTTPClient() *HTTPClient
+func NewHTTPClient() *HTTPClient
 type HTTPResponse struct{ ... }
 type NixAdapter struct{ ... }
-    func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter
+func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter
 type RateLimitStats struct{ ... }
 type RateLimiter struct{ ... }
-    func NewRateLimiter(rps float64, burst int) *RateLimiter
+func NewRateLimiter(rps float64, burst int) *RateLimiter

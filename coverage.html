@@ -1,198 +1,311 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>commands: Go Coverage Report</title>
-		<style>
-			body {
-				background: black;
-				color: rgb(80, 80, 80);
-			}
-			body, pre, #legend span {
-				font-family: Menlo, monospace;
-				font-weight: bold;
-			}
-			#topbar {
-				background: black;
-				position: fixed;
-				top: 0; left: 0; right: 0;
-				height: 42px;
-				border-bottom: 1px solid rgb(80, 80, 80);
-			}
-			#content {
-				margin-top: 50px;
-			}
-			#nav, #legend {
-				float: left;
-				margin-left: 10px;
-			}
-			#legend {
-				margin-top: 12px;
-			}
-			#nav {
-				margin-top: 10px;
-			}
-			#legend span {
-				margin: 0 5px;
-			}
-			.cov0 { color: rgb(192, 0, 0) }
-.cov1 { color: rgb(128, 128, 128) }
-.cov2 { color: rgb(116, 140, 131) }
-.cov3 { color: rgb(104, 152, 134) }
-.cov4 { color: rgb(92, 164, 137) }
-.cov5 { color: rgb(80, 176, 140) }
-.cov6 { color: rgb(68, 188, 143) }
-.cov7 { color: rgb(56, 200, 146) }
-.cov8 { color: rgb(44, 212, 149) }
-.cov9 { color: rgb(32, 224, 152) }
-.cov10 { color: rgb(20, 236, 155) }
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>commands: Go Coverage Report</title>
+    <style>
+      			body {
+      				background: black;
+      				color: rgb(80, 80, 80);
+      			}
+      			body, pre, #legend span {
+      				font-family: Menlo, monospace;
+      				font-weight: bold;
+      			}
+      			#topbar {
+      				background: black;
+      				position: fixed;
+      				top: 0; left: 0; right: 0;
+      				height: 42px;
+      				border-bottom: 1px solid rgb(80, 80, 80);
+      			}
+      			#content {
+      				margin-top: 50px;
+      			}
+      			#nav, #legend {
+      				float: left;
+      				margin-left: 10px;
+      			}
+      			#legend {
+      				margin-top: 12px;
+      			}
+      			#nav {
+      				margin-top: 10px;
+      			}
+      			#legend span {
+      				margin: 0 5px;
+      			}
+      			.cov0 { color: rgb(192, 0, 0) }
+      .cov1 { color: rgb(128, 128, 128) }
+      .cov2 { color: rgb(116, 140, 131) }
+      .cov3 { color: rgb(104, 152, 134) }
+      .cov4 { color: rgb(92, 164, 137) }
+      .cov5 { color: rgb(80, 176, 140) }
+      .cov6 { color: rgb(68, 188, 143) }
+      .cov7 { color: rgb(56, 200, 146) }
+      .cov8 { color: rgb(44, 212, 149) }
+      .cov9 { color: rgb(32, 224, 152) }
+      .cov10 { color: rgb(20, 236, 155) }
+    </style>
+  </head>
+  <body>
+    <div id="topbar">
+      <div id="nav">
+        <select id="files">
+          <option value="file0">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/clean.go (0.0%)
+          </option>
 
-		</style>
-	</head>
-	<body>
-		<div id="topbar">
-			<div id="nav">
-				<select id="files">
-				
-				<option value="file0">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/clean.go (0.0%)</option>
-				
-				<option value="file1">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/config.go (0.0%)</option>
-				
-				<option value="file2">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/generate.go (0.0%)</option>
-				
-				<option value="file3">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/init.go (0.0%)</option>
-				
-				<option value="file4">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/profile.go (0.0%)</option>
-				
-				<option value="file5">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/root.go (0.0%)</option>
-				
-				<option value="file6">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/scan.go (0.0%)</option>
-				
-				<option value="file7">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/util.go (0.0%)</option>
-				
-				<option value="file8">github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/main.go (0.0%)</option>
-				
-				<option value="file9">github.com/LarsArtmann/clean-wizard/internal/adapters/cache_manager.go (37.5%)</option>
-				
-				<option value="file10">github.com/LarsArtmann/clean-wizard/internal/adapters/environment.go (45.9%)</option>
-				
-				<option value="file11">github.com/LarsArtmann/clean-wizard/internal/adapters/errors.go (90.9%)</option>
-				
-				<option value="file12">github.com/LarsArtmann/clean-wizard/internal/adapters/http_client.go (39.4%)</option>
-				
-				<option value="file13">github.com/LarsArtmann/clean-wizard/internal/adapters/nix.go (0.0%)</option>
-				
-				<option value="file14">github.com/LarsArtmann/clean-wizard/internal/adapters/rate_limiter.go (80.0%)</option>
-				
-				<option value="file15">github.com/LarsArtmann/clean-wizard/internal/api/mapper.go (75.7%)</option>
-				
-				<option value="file16">github.com/LarsArtmann/clean-wizard/internal/cleaner/nix.go (32.1%)</option>
-				
-				<option value="file17">github.com/LarsArtmann/clean-wizard/internal/config/bdd_framework.go (61.5%)</option>
-				
-				<option value="file18">github.com/LarsArtmann/clean-wizard/internal/config/config.go (0.0%)</option>
-				
-				<option value="file19">github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader.go (0.0%)</option>
-				
-				<option value="file20">github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_api.go (0.0%)</option>
-				
-				<option value="file21">github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_cache.go (0.0%)</option>
-				
-				<option value="file22">github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_defaults.go (0.0%)</option>
-				
-				<option value="file23">github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_private.go (0.0%)</option>
-				
-				<option value="file24">github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_types.go (10.5%)</option>
-				
-				<option value="file25">github.com/LarsArtmann/clean-wizard/internal/config/safe.go (70.0%)</option>
-				
-				<option value="file26">github.com/LarsArtmann/clean-wizard/internal/config/sanitizer.go (78.7%)</option>
-				
-				<option value="file27">github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_homebrew.go (87.5%)</option>
-				
-				<option value="file28">github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_nix.go (50.0%)</option>
-				
-				<option value="file29">github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_operation_settings.go (58.3%)</option>
-				
-				<option value="file30">github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_paths.go (76.5%)</option>
-				
-				<option value="file31">github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_profile_main.go (76.0%)</option>
-				
-				<option value="file32">github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_systemtemp.go (82.8%)</option>
-				
-				<option value="file33">github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_tempfiles.go (88.5%)</option>
-				
-				<option value="file34">github.com/LarsArtmann/clean-wizard/internal/config/type_safe_validation_rules.go (0.0%)</option>
-				
-				<option value="file35">github.com/LarsArtmann/clean-wizard/internal/config/validation_middleware.go (0.0%)</option>
-				
-				<option value="file36">github.com/LarsArtmann/clean-wizard/internal/config/validation_middleware_analysis.go (0.0%)</option>
-				
-				<option value="file37">github.com/LarsArtmann/clean-wizard/internal/config/validation_middleware_rules.go (0.0%)</option>
-				
-				<option value="file38">github.com/LarsArtmann/clean-wizard/internal/config/validator.go (78.9%)</option>
-				
-				<option value="file39">github.com/LarsArtmann/clean-wizard/internal/config/validator_business.go (71.2%)</option>
-				
-				<option value="file40">github.com/LarsArtmann/clean-wizard/internal/config/validator_crossfield.go (86.4%)</option>
-				
-				<option value="file41">github.com/LarsArtmann/clean-wizard/internal/config/validator_field.go (94.1%)</option>
-				
-				<option value="file42">github.com/LarsArtmann/clean-wizard/internal/config/validator_profile.go (0.0%)</option>
-				
-				<option value="file43">github.com/LarsArtmann/clean-wizard/internal/config/validator_rules.go (54.5%)</option>
-				
-				<option value="file44">github.com/LarsArtmann/clean-wizard/internal/config/validator_structure.go (100.0%)</option>
-				
-				<option value="file45">github.com/LarsArtmann/clean-wizard/internal/conversions/conversions.go (88.7%)</option>
-				
-				<option value="file46">github.com/LarsArtmann/clean-wizard/internal/domain/config.go (0.0%)</option>
-				
-				<option value="file47">github.com/LarsArtmann/clean-wizard/internal/domain/duration_parser.go (95.7%)</option>
-				
-				<option value="file48">github.com/LarsArtmann/clean-wizard/internal/domain/operation_settings.go (0.0%)</option>
-				
-				<option value="file49">github.com/LarsArtmann/clean-wizard/internal/domain/type_safe_enums.go (12.9%)</option>
-				
-				<option value="file50">github.com/LarsArtmann/clean-wizard/internal/domain/types.go (30.6%)</option>
-				
-				<option value="file51">github.com/LarsArtmann/clean-wizard/internal/errors/errors.go (0.0%)</option>
-				
-				<option value="file52">github.com/LarsArtmann/clean-wizard/internal/format/bytes_function.go (0.0%)</option>
-				
-				<option value="file53">github.com/LarsArtmann/clean-wizard/internal/format/format.go (100.0%)</option>
-				
-				<option value="file54">github.com/LarsArtmann/clean-wizard/internal/middleware/validation.go (100.0%)</option>
-				
-				<option value="file55">github.com/LarsArtmann/clean-wizard/internal/pkg/errors/errors.go (0.0%)</option>
-				
-				<option value="file56">github.com/LarsArtmann/clean-wizard/internal/pkg/errors/handlers.go (0.0%)</option>
-				
-				<option value="file57">github.com/LarsArtmann/clean-wizard/internal/result/type.go (70.8%)</option>
-				
-				</select>
-			</div>
-			<div id="legend">
-				<span>not tracked</span>
-			
-				<span class="cov0">no coverage</span>
-				<span class="cov1">low coverage</span>
-				<span class="cov2">*</span>
-				<span class="cov3">*</span>
-				<span class="cov4">*</span>
-				<span class="cov5">*</span>
-				<span class="cov6">*</span>
-				<span class="cov7">*</span>
-				<span class="cov8">*</span>
-				<span class="cov9">*</span>
-				<span class="cov10">high coverage</span>
-			
-			</div>
-		</div>
-		<div id="content">
-		
-		<pre class="file" id="file0" style="display: none">package commands
+          <option value="file1">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/config.go (0.0%)
+          </option>
+
+          <option value="file2">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/generate.go (0.0%)
+          </option>
+
+          <option value="file3">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/init.go (0.0%)
+          </option>
+
+          <option value="file4">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/profile.go (0.0%)
+          </option>
+
+          <option value="file5">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/root.go (0.0%)
+          </option>
+
+          <option value="file6">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/scan.go (0.0%)
+          </option>
+
+          <option value="file7">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands/util.go (0.0%)
+          </option>
+
+          <option value="file8">
+            github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/main.go (0.0%)
+          </option>
+
+          <option value="file9">
+            github.com/LarsArtmann/clean-wizard/internal/adapters/cache_manager.go (37.5%)
+          </option>
+
+          <option value="file10">
+            github.com/LarsArtmann/clean-wizard/internal/adapters/environment.go (45.9%)
+          </option>
+
+          <option value="file11">
+            github.com/LarsArtmann/clean-wizard/internal/adapters/errors.go (90.9%)
+          </option>
+
+          <option value="file12">
+            github.com/LarsArtmann/clean-wizard/internal/adapters/http_client.go (39.4%)
+          </option>
+
+          <option value="file13">
+            github.com/LarsArtmann/clean-wizard/internal/adapters/nix.go (0.0%)
+          </option>
+
+          <option value="file14">
+            github.com/LarsArtmann/clean-wizard/internal/adapters/rate_limiter.go (80.0%)
+          </option>
+
+          <option value="file15">
+            github.com/LarsArtmann/clean-wizard/internal/api/mapper.go (75.7%)
+          </option>
+
+          <option value="file16">
+            github.com/LarsArtmann/clean-wizard/internal/cleaner/nix.go (32.1%)
+          </option>
+
+          <option value="file17">
+            github.com/LarsArtmann/clean-wizard/internal/config/bdd_framework.go (61.5%)
+          </option>
+
+          <option value="file18">
+            github.com/LarsArtmann/clean-wizard/internal/config/config.go (0.0%)
+          </option>
+
+          <option value="file19">
+            github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader.go (0.0%)
+          </option>
+
+          <option value="file20">
+            github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_api.go (0.0%)
+          </option>
+
+          <option value="file21">
+            github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_cache.go (0.0%)
+          </option>
+
+          <option value="file22">
+            github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_defaults.go (0.0%)
+          </option>
+
+          <option value="file23">
+            github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_private.go (0.0%)
+          </option>
+
+          <option value="file24">
+            github.com/LarsArtmann/clean-wizard/internal/config/enhanced_loader_types.go (10.5%)
+          </option>
+
+          <option value="file25">
+            github.com/LarsArtmann/clean-wizard/internal/config/safe.go (70.0%)
+          </option>
+
+          <option value="file26">
+            github.com/LarsArtmann/clean-wizard/internal/config/sanitizer.go (78.7%)
+          </option>
+
+          <option value="file27">
+            github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_homebrew.go (87.5%)
+          </option>
+
+          <option value="file28">
+            github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_nix.go (50.0%)
+          </option>
+
+          <option value="file29">
+            github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_operation_settings.go
+            (58.3%)
+          </option>
+
+          <option value="file30">
+            github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_paths.go (76.5%)
+          </option>
+
+          <option value="file31">
+            github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_profile_main.go (76.0%)
+          </option>
+
+          <option value="file32">
+            github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_systemtemp.go (82.8%)
+          </option>
+
+          <option value="file33">
+            github.com/LarsArtmann/clean-wizard/internal/config/sanitizer_tempfiles.go (88.5%)
+          </option>
+
+          <option value="file34">
+            github.com/LarsArtmann/clean-wizard/internal/config/type_safe_validation_rules.go (0.0%)
+          </option>
+
+          <option value="file35">
+            github.com/LarsArtmann/clean-wizard/internal/config/validation_middleware.go (0.0%)
+          </option>
+
+          <option value="file36">
+            github.com/LarsArtmann/clean-wizard/internal/config/validation_middleware_analysis.go
+            (0.0%)
+          </option>
+
+          <option value="file37">
+            github.com/LarsArtmann/clean-wizard/internal/config/validation_middleware_rules.go
+            (0.0%)
+          </option>
+
+          <option value="file38">
+            github.com/LarsArtmann/clean-wizard/internal/config/validator.go (78.9%)
+          </option>
+
+          <option value="file39">
+            github.com/LarsArtmann/clean-wizard/internal/config/validator_business.go (71.2%)
+          </option>
+
+          <option value="file40">
+            github.com/LarsArtmann/clean-wizard/internal/config/validator_crossfield.go (86.4%)
+          </option>
+
+          <option value="file41">
+            github.com/LarsArtmann/clean-wizard/internal/config/validator_field.go (94.1%)
+          </option>
+
+          <option value="file42">
+            github.com/LarsArtmann/clean-wizard/internal/config/validator_profile.go (0.0%)
+          </option>
+
+          <option value="file43">
+            github.com/LarsArtmann/clean-wizard/internal/config/validator_rules.go (54.5%)
+          </option>
+
+          <option value="file44">
+            github.com/LarsArtmann/clean-wizard/internal/config/validator_structure.go (100.0%)
+          </option>
+
+          <option value="file45">
+            github.com/LarsArtmann/clean-wizard/internal/conversions/conversions.go (88.7%)
+          </option>
+
+          <option value="file46">
+            github.com/LarsArtmann/clean-wizard/internal/domain/config.go (0.0%)
+          </option>
+
+          <option value="file47">
+            github.com/LarsArtmann/clean-wizard/internal/domain/duration_parser.go (95.7%)
+          </option>
+
+          <option value="file48">
+            github.com/LarsArtmann/clean-wizard/internal/domain/operation_settings.go (0.0%)
+          </option>
+
+          <option value="file49">
+            github.com/LarsArtmann/clean-wizard/internal/domain/type_safe_enums.go (12.9%)
+          </option>
+
+          <option value="file50">
+            github.com/LarsArtmann/clean-wizard/internal/domain/types.go (30.6%)
+          </option>
+
+          <option value="file51">
+            github.com/LarsArtmann/clean-wizard/internal/errors/errors.go (0.0%)
+          </option>
+
+          <option value="file52">
+            github.com/LarsArtmann/clean-wizard/internal/format/bytes_function.go (0.0%)
+          </option>
+
+          <option value="file53">
+            github.com/LarsArtmann/clean-wizard/internal/format/format.go (100.0%)
+          </option>
+
+          <option value="file54">
+            github.com/LarsArtmann/clean-wizard/internal/middleware/validation.go (100.0%)
+          </option>
+
+          <option value="file55">
+            github.com/LarsArtmann/clean-wizard/internal/pkg/errors/errors.go (0.0%)
+          </option>
+
+          <option value="file56">
+            github.com/LarsArtmann/clean-wizard/internal/pkg/errors/handlers.go (0.0%)
+          </option>
+
+          <option value="file57">
+            github.com/LarsArtmann/clean-wizard/internal/result/type.go (70.8%)
+          </option>
+        </select>
+      </div>
+      <div id="legend">
+        <span>not tracked</span>
+
+        <span class="cov0">no coverage</span>
+        <span class="cov1">low coverage</span>
+        <span class="cov2">*</span>
+        <span class="cov3">*</span>
+        <span class="cov4">*</span>
+        <span class="cov5">*</span>
+        <span class="cov6">*</span>
+        <span class="cov7">*</span>
+        <span class="cov8">*</span>
+        <span class="cov9">*</span>
+        <span class="cov10">high coverage</span>
+      </div>
+    </div>
+    <div id="content">
+      <pre class="file" id="file0" style="display: none">package commands
 
 import (
         "context"
@@ -446,8 +559,8 @@ func displayCleanResults(result domain.CleanResult, verbose bool, duration time.
         }</span>
 }
 </pre>
-		
-		<pre class="file" id="file1" style="display: none">package commands
+
+      <pre class="file" id="file1" style="display: none">package commands
 
 import (
         "fmt"
@@ -476,8 +589,8 @@ func NewConfigCommand() *cobra.Command <span class="cov0" title="0">{
         <span class="cov0" title="0">return configCmd</span>
 }
 </pre>
-		
-		<pre class="file" id="file2" style="display: none">package commands
+
+      <pre class="file" id="file2" style="display: none">package commands
 
 import (
         "fmt"
@@ -744,8 +857,8 @@ settings:
 `
 }</span>
 </pre>
-		
-		<pre class="file" id="file3" style="display: none">package commands
+
+      <pre class="file" id="file3" style="display: none">package commands
 
 import (
         "fmt"
@@ -766,8 +879,8 @@ func NewInitCommand() *cobra.Command <span class="cov0" title="0">{
         }
 }
 </pre>
-		
-		<pre class="file" id="file4" style="display: none">package commands
+
+      <pre class="file" id="file4" style="display: none">package commands
 
 import (
         "fmt"
@@ -1060,8 +1173,8 @@ func getRiskColor(level domain.RiskLevel) string <span class="cov0" title="0">{
         }
 }
 </pre>
-		
-		<pre class="file" id="file5" style="display: none">package commands
+
+      <pre class="file" id="file5" style="display: none">package commands
 
 import "github.com/spf13/cobra"
 
@@ -1074,8 +1187,8 @@ func NewRootCmd() *cobra.Command <span class="cov0" title="0">{
         }
 }</span>
 </pre>
-		
-		<pre class="file" id="file6" style="display: none">package commands
+
+      <pre class="file" id="file6" style="display: none">package commands
 
 import (
         "context"
@@ -1298,8 +1411,8 @@ func displayScanResults(result domain.ScanResult, generations []domain.NixGenera
         <span class="cov0" title="0">fmt.Printf("\n✅ Scan completed!\n")</span>
 }
 </pre>
-		
-		<pre class="file" id="file7" style="display: none">package commands
+
+      <pre class="file" id="file7" style="display: none">package commands
 
 import (
         "strings"
@@ -1323,8 +1436,8 @@ func ParseValidationLevel(level string) config.ValidationLevel <span class="cov0
         }
 }
 </pre>
-		
-		<pre class="file" id="file8" style="display: none">package main
+
+      <pre class="file" id="file8" style="display: none">package main
 
 import (
         "fmt"
@@ -1432,8 +1545,8 @@ func main() <span class="cov0" title="0">{
         }
 }
 </pre>
-		
-		<pre class="file" id="file9" style="display: none">package adapters
+
+      <pre class="file" id="file9" style="display: none">package adapters
 
 import (
         "time"
@@ -1527,8 +1640,8 @@ func (cm *CacheManager) FlushExpired() <span class="cov0" title="0">{
         }
 }
 </pre>
-		
-		<pre class="file" id="file10" style="display: none">package adapters
+
+      <pre class="file" id="file10" style="display: none">package adapters
 
 import (
         "os"
@@ -1745,8 +1858,8 @@ func (cfg *EnvironmentConfig) ToMap() map[string]any <span class="cov0" title="0
         }
 }</span>
 </pre>
-		
-		<pre class="file" id="file11" style="display: none">package adapters
+
+      <pre class="file" id="file11" style="display: none">package adapters
 
 import (
         "fmt"
@@ -1807,8 +1920,8 @@ func ErrServiceUnavailable(service string) error <span class="cov8" title="1">{
         return fmt.Errorf("service unavailable: %s", service)
 }</span>
 </pre>
-		
-		<pre class="file" id="file12" style="display: none">package adapters
+
+      <pre class="file" id="file12" style="display: none">package adapters
 
 import (
         "context"
@@ -1952,8 +2065,8 @@ func (hr *HTTPResponse) IsServerError() bool <span class="cov0" title="0">{
         return hr.StatusCode &gt;= 500
 }</span>
 </pre>
-		
-		<pre class="file" id="file13" style="display: none">package adapters
+
+      <pre class="file" id="file13" style="display: none">package adapters
 
 import (
         "context"
@@ -2185,8 +2298,8 @@ func (n *NixAdapter) IsAvailable(ctx context.Context) bool <span class="cov0" ti
         return err == nil</span>
 }
 </pre>
-		
-		<pre class="file" id="file14" style="display: none">package adapters
+
+      <pre class="file" id="file14" style="display: none">package adapters
 
 import (
         "context"
@@ -2239,8 +2352,8 @@ func (rl *RateLimiter) Stats() RateLimitStats <span class="cov1" title="1">{
         }
 }</span>
 </pre>
-		
-		<pre class="file" id="file15" style="display: none">package api
+
+      <pre class="file" id="file15" style="display: none">package api
 
 import (
         "fmt"
@@ -2484,8 +2597,8 @@ func MapStrategyToPublic(domainStrategy domain.CleanStrategyType) PublicStrategy
         }
 }
 </pre>
-		
-		<pre class="file" id="file16" style="display: none">package cleaner
+
+      <pre class="file" id="file16" style="display: none">package cleaner
 
 import (
         "context"
@@ -2640,8 +2753,8 @@ func countOldGenerations(generations []domain.NixGeneration, keepCount int) int 
         <span class="cov1" title="1">return len(generations) - keepCount</span>
 }
 </pre>
-		
-		<pre class="file" id="file17" style="display: none">package config
+
+      <pre class="file" id="file17" style="display: none">package config
 
 import (
         "testing"
@@ -2793,8 +2906,8 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) <span class="cov6" tit
         <span class="cov6" title="4">b.t.Logf("✓ Scenario passed: %s", scenario.Name)</span>
 }
 </pre>
-		
-		<pre class="file" id="file18" style="display: none">package config
+
+      <pre class="file" id="file18" style="display: none">package config
 
 import (
         "context"
@@ -3132,8 +3245,8 @@ func getDefaultConfig() *domain.Config <span class="cov0" title="0">{
         }
 }</span>
 </pre>
-		
-		<pre class="file" id="file19" style="display: none">package config
+
+      <pre class="file" id="file19" style="display: none">package config
 
 import (
         "context"
@@ -3319,8 +3432,8 @@ func (ecl *EnhancedConfigLoader) formatValidationErrors(errors []ValidationError
         <span class="cov0" title="0">return fmt.Sprintf("%d validation errors: %s", len(errors), fmt.Sprintf("%v", messages))</span>
 }
 </pre>
-		
-		<pre class="file" id="file20" style="display: none">package config
+
+      <pre class="file" id="file20" style="display: none">package config
 
 import (
         "context"
@@ -3441,8 +3554,8 @@ func (ecl *EnhancedConfigLoader) ValidateConfig(ctx context.Context, config *dom
         return ecl.applyValidation(ctx, config, ValidationLevel(level))
 }</span>
 </pre>
-		
-		<pre class="file" id="file21" style="display: none">package config
+
+      <pre class="file" id="file21" style="display: none">package config
 
 import (
         "sync"
@@ -3501,8 +3614,8 @@ func (cc *ConfigCache) Set(config *domain.Config) <span class="cov0" title="0">{
         cc.loadedAt = time.Now()
 }</span>
 </pre>
-		
-		<pre class="file" id="file22" style="display: none">package config
+
+      <pre class="file" id="file22" style="display: none">package config
 
 import (
         "time"
@@ -3540,8 +3653,8 @@ func getDefaultRetryPolicy() *RetryPolicy <span class="cov0" title="0">{
         }
 }</span>
 </pre>
-		
-		<pre class="file" id="file23" style="display: none">package config
+
+      <pre class="file" id="file23" style="display: none">package config
 
 import (
         "context"
@@ -3661,8 +3774,8 @@ func (ecl *EnhancedConfigLoader) calculateDelay(attempt int) time.Duration <span
         <span class="cov0" title="0">return time.Duration(delay)</span>
 }
 </pre>
-		
-		<pre class="file" id="file24" style="display: none">package config
+
+      <pre class="file" id="file24" style="display: none">package config
 
 import (
         "time"
@@ -3775,8 +3888,8 @@ func WithRetryPolicy(policy *RetryPolicy) func(*EnhancedConfigLoader) <span clas
         }
 }
 </pre>
-		
-		<pre class="file" id="file25" style="display: none">package config
+
+      <pre class="file" id="file25" style="display: none">package config
 
 import (
         "fmt"
@@ -3988,8 +4101,8 @@ func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder <span class="cov7" titl
         <span class="cov6" title="4">return spb.config</span>
 }
 </pre>
-		
-		<pre class="file" id="file26" style="display: none">package config
+
+      <pre class="file" id="file26" style="display: none">package config
 
 import (
         "fmt"
@@ -4217,8 +4330,8 @@ func getDefaultSanitizationRules() *SanitizationRules <span class="cov9" title="
         }
 }</span>
 </pre>
-		
-		<pre class="file" id="file27" style="display: none">package config
+
+      <pre class="file" id="file27" style="display: none">package config
 
 import (
         "strings"
@@ -4244,8 +4357,8 @@ func (cs *ConfigSanitizer) sanitizeHomebrewSettings(fieldPrefix string, settings
         <span class="cov8" title="1">result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".homebrew")</span>
 }
 </pre>
-		
-		<pre class="file" id="file28" style="display: none">package config
+
+      <pre class="file" id="file28" style="display: none">package config
 
 import (
         "github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -4270,8 +4383,8 @@ func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(fieldPrefix string, se
         <span class="cov10" title="2">result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".nix_generations")</span>
 }
 </pre>
-		
-		<pre class="file" id="file29" style="display: none">package config
+
+      <pre class="file" id="file29" style="display: none">package config
 
 import (
         "fmt"
@@ -4329,8 +4442,8 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName 
         }
 }
 </pre>
-		
-		<pre class="file" id="file30" style="display: none">package config
+
+      <pre class="file" id="file30" style="display: none">package config
 
 import (
         "fmt"
@@ -4432,8 +4545,8 @@ func (cs *ConfigSanitizer) sortStrings(slice []string) <span class="cov6" title=
         sort.Strings(slice)
 }</span>
 </pre>
-		
-		<pre class="file" id="file31" style="display: none">package config
+
+      <pre class="file" id="file31" style="display: none">package config
 
 import (
         "fmt"
@@ -4545,8 +4658,8 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
         }
 }
 </pre>
-		
-		<pre class="file" id="file32" style="display: none">package config
+
+      <pre class="file" id="file32" style="display: none">package config
 
 import (
         "fmt"
@@ -4627,8 +4740,8 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settin
         <span class="cov1" title="1">result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".system_temp")</span>
 }
 </pre>
-		
-		<pre class="file" id="file33" style="display: none">package config
+
+      <pre class="file" id="file33" style="display: none">package config
 
 import (
         "fmt"
@@ -4698,8 +4811,8 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, setting
         <span class="cov1" title="1">result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".temp_files")</span>
 }
 </pre>
-		
-		<pre class="file" id="file34" style="display: none">package config
+
+      <pre class="file" id="file34" style="display: none">package config
 
 import (
         "github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -4883,8 +4996,8 @@ func (tsvr *TypeSafeValidationRules) copyStringRule(rule *StringValidationRule) 
         }
 }</span>
 </pre>
-		
-		<pre class="file" id="file35" style="display: none">package config
+
+      <pre class="file" id="file35" style="display: none">package config
 
 import (
         "context"
@@ -5202,8 +5315,8 @@ func (vm *ValidationMiddleware) formatValidationErrors(errors []ValidationError)
         <span class="cov0" title="0">return message</span>
 }
 </pre>
-		
-		<pre class="file" id="file36" style="display: none">package config
+
+      <pre class="file" id="file36" style="display: none">package config
 
 import (
         "fmt"
@@ -5411,8 +5524,8 @@ func (vm *ValidationMiddleware) makeStringSet(slice []string) map[string]bool <s
         <span class="cov0" title="0">return result</span>
 }
 </pre>
-		
-		<pre class="file" id="file37" style="display: none">package config
+
+      <pre class="file" id="file37" style="display: none">package config
 
 import (
         "fmt"
@@ -5462,8 +5575,8 @@ func (vm *ValidationMiddleware) validateOperationSettings(operationName string, 
         return op.Settings.ValidateSettings(opType)</span>
 }
 </pre>
-		
-		<pre class="file" id="file38" style="display: none">package config
+
+      <pre class="file" id="file38" style="display: none">package config
 
 import (
         "fmt"
@@ -5602,8 +5715,8 @@ func (cv *ConfigValidator) ValidateField(field string, value any) error <span cl
         }
 }
 </pre>
-		
-		<pre class="file" id="file39" style="display: none">package config
+
+      <pre class="file" id="file39" style="display: none">package config
 
 import (
         "fmt"
@@ -5788,8 +5901,8 @@ func (cv *ConfigValidator) isPathProtected(protected []string, targetPath string
         <span class="cov0" title="0">return false</span>
 }
 </pre>
-		
-		<pre class="file" id="file40" style="display: none">package config
+
+      <pre class="file" id="file40" style="display: none">package config
 
 import (
         "fmt"
@@ -5897,8 +6010,8 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
         }
 }
 </pre>
-		
-		<pre class="file" id="file41" style="display: none">package config
+
+      <pre class="file" id="file41" style="display: none">package config
 
 import (
         "fmt"
@@ -5978,8 +6091,8 @@ func (cv *ConfigValidator) findDuplicatePaths(paths []string) []string <span cla
         <span class="cov6" title="11">return duplicates</span>
 }
 </pre>
-		
-		<pre class="file" id="file42" style="display: none">package config
+
+      <pre class="file" id="file42" style="display: none">package config
 
 import (
         "fmt"
@@ -6047,8 +6160,8 @@ func (cv *ConfigValidator) validateProfileName(name string) error <span class="c
         <span class="cov0" title="0">return nil</span>
 }
 </pre>
-		
-		<pre class="file" id="file43" style="display: none">package config
+
+      <pre class="file" id="file43" style="display: none">package config
 
 import (
         "regexp"
@@ -6180,8 +6293,8 @@ func getDefaultValidationRules() *ConfigValidationRules <span class="cov10" titl
         }
 }</span>
 </pre>
-		
-		<pre class="file" id="file44" style="display: none">package config
+
+      <pre class="file" id="file44" style="display: none">package config
 
 import (
         "github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -6226,8 +6339,8 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
         }</span>
 }
 </pre>
-		
-		<pre class="file" id="file45" style="display: none">package conversions
+
+      <pre class="file" id="file45" style="display: none">package conversions
 
 import (
         "fmt"
@@ -6528,8 +6641,8 @@ func ValidateAndConvertScanResult(scanResult domain.ScanResult) result.Result[do
         <span class="cov0" title="0">return result.Ok(scanResult)</span>
 }
 </pre>
-		
-		<pre class="file" id="file46" style="display: none">package domain
+
+      <pre class="file" id="file46" style="display: none">package domain
 
 import (
         "fmt"
@@ -6693,8 +6806,8 @@ func (op CleanupOperation) Validate() error <span class="cov0" title="0">{
         <span class="cov0" title="0">return nil</span>
 }
 </pre>
-		
-		<pre class="file" id="file47" style="display: none">package domain
+
+      <pre class="file" id="file47" style="display: none">package domain
 
 import (
         "fmt"
@@ -6765,8 +6878,8 @@ func ValidateCustomDuration(durationStr string) error <span class="cov5" title="
         return err</span>
 }
 </pre>
-		
-		<pre class="file" id="file48" style="display: none">package domain
+
+      <pre class="file" id="file48" style="display: none">package domain
 
 // OperationSettings provides type-safe configuration for different operation types
 // This eliminates map[string]any violations while maintaining flexibility
@@ -6930,8 +7043,8 @@ func (e *ValidationError) Error() string <span class="cov0" title="0">{
         return e.Message
 }</span>
 </pre>
-		
-		<pre class="file" id="file49" style="display: none">package domain
+
+      <pre class="file" id="file49" style="display: none">package domain
 
 import (
         "encoding/json"
@@ -7264,8 +7377,8 @@ func (cs CleanStrategyType) Icon() string <span class="cov0" title="0">{
 
 // Convenience constants for backward compatibility are now in types.go
 </pre>
-		
-		<pre class="file" id="file50" style="display: none">package domain
+
+      <pre class="file" id="file50" style="display: none">package domain
 
 import (
         "fmt"
@@ -7481,8 +7594,8 @@ func (cr CleanResult) Validate() error <span class="cov10" title="7">{
         <span class="cov6" title="3">return nil</span>
 }
 </pre>
-		
-		<pre class="file" id="file51" style="display: none">package errors
+
+      <pre class="file" id="file51" style="display: none">package errors
 
 import (
         "fmt"
@@ -7523,16 +7636,16 @@ func InputValidationError(field, value string) error <span class="cov0" title="0
         return fmt.Errorf("invalid input for field '%s': %s", field, value)
 }</span>
 </pre>
-		
-		<pre class="file" id="file52" style="display: none">package format
+
+      <pre class="file" id="file52" style="display: none">package format
 
 // Bytes formats bytes for display (alias for Size for consistency)
 func Bytes(bytes int64) string <span class="cov0" title="0">{
         return Size(bytes)
 }</span>
 </pre>
-		
-		<pre class="file" id="file53" style="display: none">package format
+
+      <pre class="file" id="file53" style="display: none">package format
 
 import (
         "fmt"
@@ -7602,8 +7715,8 @@ func Number(n int64) string <span class="cov6" title="8">{
         <span class="cov6" title="8">return string(result)</span>
 }
 </pre>
-		
-		<pre class="file" id="file54" style="display: none">package middleware
+
+      <pre class="file" id="file54" style="display: none">package middleware
 
 import (
         "context"
@@ -7645,8 +7758,8 @@ func (vm *ValidationMiddleware) ValidateCleanerSettings(ctx context.Context, cle
         <span class="cov1" title="1">return result.Ok(settings)</span>
 }
 </pre>
-		
-		<pre class="file" id="file55" style="display: none">package errors
+
+      <pre class="file" id="file55" style="display: none">package errors
 
 import (
         "fmt"
@@ -8034,8 +8147,8 @@ func (e *CleanWizardError) Log() <span class="cov0" title="0">{
         }
 }
 </pre>
-		
-		<pre class="file" id="file56" style="display: none">package errors
+
+      <pre class="file" id="file56" style="display: none">package errors
 
 import (
         "fmt"
@@ -8131,8 +8244,8 @@ func IsNixAvailable() bool <span class="cov0" title="0">{
         return err == nil
 }</span>
 </pre>
-		
-		<pre class="file" id="file57" style="display: none">package result
+
+      <pre class="file" id="file57" style="display: none">package result
 
 // Result is a type-safe way to return values or errors
 type Result[T any] struct {
@@ -8217,34 +8330,33 @@ func MockSuccess[T any](value T, message string) Result[T] <span class="cov0" ti
         return Ok(value)
 }</span>
 </pre>
-		
-		</div>
-	</body>
-	<script>
-	(function() {
-		var files = document.getElementById('files');
-		var visible;
-		files.addEventListener('change', onChange, false);
-		function select(part) {
-			if (visible)
-				visible.style.display = 'none';
-			visible = document.getElementById(part);
-			if (!visible)
-				return;
-			files.value = part;
-			visible.style.display = 'block';
-			location.hash = part;
-		}
-		function onChange() {
-			select(files.value);
-			window.scrollTo(0, 0);
-		}
-		if (location.hash != "") {
-			select(location.hash.substr(1));
-		}
-		if (!visible) {
-			select("file0");
-		}
-	})();
-	</script>
+    </div>
+  </body>
+  <script>
+    (function() {
+    	var files = document.getElementById('files');
+    	var visible;
+    	files.addEventListener('change', onChange, false);
+    	function select(part) {
+    		if (visible)
+    			visible.style.display = 'none';
+    		visible = document.getElementById(part);
+    		if (!visible)
+    			return;
+    		files.value = part;
+    		visible.style.display = 'block';
+    		location.hash = part;
+    	}
+    	function onChange() {
+    		select(files.value);
+    		window.scrollTo(0, 0);
+    	}
+    	if (location.hash != "") {
+    		select(location.hash.substr(1));
+    	}
+    	if (!visible) {
+    		select("file0");
+    	}
+    })();
+  </script>
 </html>

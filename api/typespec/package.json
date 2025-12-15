@@ -11,9 +11,9 @@
   },
   "devDependencies": {
     "@typespec/compiler": "latest",
-    "@typespec/http": "latest", 
-    "@typespec/rest": "latest",
+    "@typespec/http": "latest",
     "@typespec/openapi3": "latest",
+    "@typespec/rest": "latest",
     "@typespec/versioning": "latest"
   },
   "engines": {

@@ -1,7 +1,7 @@
 version: "1.0.0"
 safe_mode: true
 max_disk_usage: 50
-protected: 
+protected:
   - "/System"
   - "/Library"
 profiles:

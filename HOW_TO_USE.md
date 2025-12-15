@@ -32,6 +32,7 @@ clean-wizard init
 ```
 
 This creates an interactive setup wizard that guides you through:
+
 - Safety preferences
 - Disk usage limits
 - Protected paths configuration
@@ -241,28 +242,31 @@ clean-wizard config edit
 ### Common Issues
 
 1. **Permission Denied**
+
    ```bash
    # Check if you have sufficient permissions
    clean-wizard scan --verbose
-   
+
    # Some operations may require sudo
    sudo clean-wizard clean --profile aggressive
    ```
 
 2. **Configuration Not Found**
+
    ```bash
    # Initialize configuration
    clean-wizard init
-   
+
    # Check default location
    ls -la ~/.clean-wizard.yaml
    ```
 
 3. **Dry Run Shows Nothing**
+
    ```bash
    # Try more comprehensive scan
    clean-wizard scan --validation-level comprehensive
-   
+
    # Check if you're already clean
    clean-wizard clean --dry-run --verbose
    ```

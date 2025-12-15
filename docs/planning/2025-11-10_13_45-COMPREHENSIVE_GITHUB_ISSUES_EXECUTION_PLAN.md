@@ -4,7 +4,7 @@
 
 **Date**: November 10, 2025  
 **Priority**: HIGH - Critical user experience improvements  
-**Scope**: 4 open GitHub issues covering BDD infrastructure, profile management, interactive configuration, and migration system  
+**Scope**: 4 open GitHub issues covering BDD infrastructure, profile management, interactive configuration, and migration system
 
 This plan addresses the complete resolution of all open GitHub Issues in strategic order, ensuring maximum user value and architectural integrity.
 
@@ -13,15 +13,17 @@ This plan addresses the complete resolution of all open GitHub Issues in strateg
 ## 📋 ISSUE ANALYSIS & STRATEGIC ORDERING
 
 ### **Current Open Issues**
+
 1. **Issue #20** 🎨 FEATURE: Profile management commands (HIGH)
-2. **Issue #19** 🔧 MAINTENANCE: Configuration migration system (MEDIUM)  
+2. **Issue #19** 🔧 MAINTENANCE: Configuration migration system (MEDIUM)
 3. **Issue #18** 🎨 ENHANCEMENT: Interactive configuration generation (MEDIUM)
 4. **Issue #17** 🔧 TECHNICAL: Clean up BDD test infrastructure (LOW)
 
 ### **Strategic Execution Order**
+
 ```
 1. Issue #17 → Critical Infrastructure Foundation
-2. Issue #20 → Core User Experience  
+2. Issue #20 → Core User Experience
 3. Issue #18 → Advanced User Experience
 4. Issue #19 → System Maintenance & Future-Proofing
 ```
@@ -33,11 +35,13 @@ This plan addresses the complete resolution of all open GitHub Issues in strateg
 ## 🚀 PHASE 1: CRITICAL INFRASTRUCTURE (Issue #17)
 
 ### **Problem Statement**
+
 Minor technical cleanup needed for BDD testing framework to ensure clean CI/CD execution.
 
 ### **Technical Issues Identified**
+
 - ❌ Import Cleanup: Remove unused imports in scan.go
-- ❌ Field Name Optimization: Fix ScanResult field usage  
+- ❌ Field Name Optimization: Fix ScanResult field usage
 - ❌ Build Warnings: Resolve minor build-time warnings
 - ❌ BDD Test Mismatches: Test expectations don't match actual output
 - ❌ CI/CD Integration: Ensure clean automated test runs
@@ -45,6 +49,7 @@ Minor technical cleanup needed for BDD testing framework to ensure clean CI/CD e
 ### **Implementation Tasks**
 
 #### **Task 1.1: Fix Scan Logic in scan.go**
+
 ```bash
 # BEFORE (lines 142-143):
 fmt.Printf("   • Current generation: %d\n", result.TotalItems-4) // TODO: Fix this logic
@@ -63,12 +68,14 @@ fmt.Printf("   • Cleanable generations: %d\n", cleanableCount)
 ```
 
 #### **Task 1.2: Remove Unused Imports**
+
 ```bash
 # Remove unused "strings" import from clean.go (now in util.go)
 # Ensure all imports are properly utilized
 ```
 
 #### **Task 1.3: Fix BDD Test Expectations**
+
 ```bash
 # Update nix_test.go expectations:
 # FROM: "✅ Cleanup completed!"
@@ -76,14 +83,16 @@ fmt.Printf("   • Cleanable generations: %d\n", cleanableCount)
 ```
 
 #### **Task 1.4: Add Completion Messages**
+
 ```bash
 # Add "✅ Scan completed!" message to scan.go displayScanResults()
 # Ensures BDD tests have proper completion detection
 ```
 
 ### **Acceptance Criteria**
+
 - [x] BDD tests run without build warnings
-- [x] CI/CD execution is clean  
+- [x] CI/CD execution is clean
 - [x] All imports are properly utilized
 - [x] Field names match domain types
 - [x] Scan logic correctly calculates current/cleanable generations
@@ -94,11 +103,13 @@ fmt.Printf("   • Cleanable generations: %d\n", cleanableCount)
 ## 🎯 PHASE 2: CORE USER EXPERIENCE (Issue #20)
 
 ### **Problem Statement**
+
 Users need CLI commands for profile management to work with multiple cleanup profiles effectively.
 
 ### **Current State Analysis**
+
 - ✅ Profile-based configuration working
-- ✅ Multiple profiles can be defined in config files  
+- ✅ Multiple profiles can be defined in config files
 - ✅ Daily profile is used by default
 - ❌ No CLI commands for profile operations
 - ❌ No way to list available profiles
@@ -107,31 +118,40 @@ Users need CLI commands for profile management to work with multiple cleanup pro
 ### **Feature Requirements**
 
 #### **Requirement 2.1: Profile Listing Command**
+
 ```bash
 clean-wizard profile list
 ```
+
 **Expected Output:**
+
 ```
 📋 Available Profiles:
    ✅ daily    - Daily cleanup operations (5 operations)
-   ✅ weekly   - Weekly deep cleanup (12 operations)  
+   ✅ weekly   - Weekly deep cleanup (12 operations)
    ❌ monthly  - Monthly maintenance (disabled)
 ```
 
 #### **Requirement 2.2: Profile Selection Command**
+
 ```bash
 clean-wizard profile select weekly
 ```
+
 **Expected Features:**
+
 - Profile validation and existence checking
 - Current selection display
 - Graceful error handling for missing profiles
 
 #### **Requirement 2.3: Profile Information Command**
+
 ```bash
 clean-wizard profile info daily
 ```
+
 **Expected Output:**
+
 ```
 📋 Profile: daily
 Description: Daily cleanup operations
@@ -145,6 +165,7 @@ Operations (5):
 ```
 
 #### **Requirement 2.4: Enhanced --profile Flag Support**
+
 ```bash
 clean-wizard scan --profile weekly
 clean-wizard clean --profile daily --dry-run
@@ -153,16 +174,18 @@ clean-wizard clean --profile daily --dry-run
 ### **Implementation Architecture**
 
 #### **New Command Structure**
+
 ```
 cmd/clean-wizard/commands/
 ├── profile.go          # NEW: Profile management commands
 ├── profile_list.go     # NEW: Profile listing
-├── profile_select.go    # NEW: Profile selection  
+├── profile_select.go    # NEW: Profile selection
 ├── profile_info.go      # NEW: Profile information
 └── util.go            # EXISTING: Shared utilities
 ```
 
 #### **Core Data Flow**
+
 ```mermaid
 graph TD
     A[CLI Command] --> B[Profile Manager]
@@ -170,14 +193,15 @@ graph TD
     C --> D[Profile Validator]
     D --> E[Profile Operations]
     E --> F[Display Formatter]
-    
+
     G[Scan Command] --> H[Profile Context]
     H --> I[Operation Executor]
-    
+
     J[Clean Command] --> H
 ```
 
 #### **Profile Manager Interface**
+
 ```go
 type ProfileManager interface {
     ListProfiles(ctx context.Context) ([]*ProfileInfo, error)
@@ -203,6 +227,7 @@ type ProfileDetail struct {
 ### **Implementation Tasks**
 
 #### **Task 2.1: Create Profile Command Structure**
+
 ```bash
 # Create profile command group
 # Implement subcommands: list, select, info
@@ -210,6 +235,7 @@ type ProfileDetail struct {
 ```
 
 #### **Task 2.2: Implement Profile Listing**
+
 ```bash
 # Load all profiles from configuration
 # Calculate operation counts and risk levels
@@ -217,6 +243,7 @@ type ProfileDetail struct {
 ```
 
 #### **Task 2.3: Implement Profile Selection**
+
 ```bash
 # Validate profile existence
 # Update configuration or runtime state
@@ -224,6 +251,7 @@ type ProfileDetail struct {
 ```
 
 #### **Task 2.4: Implement Profile Information**
+
 ```bash
 # Load detailed profile information
 # Display operation details with risk levels
@@ -231,6 +259,7 @@ type ProfileDetail struct {
 ```
 
 #### **Task 2.5: Enhance Main Commands**
+
 ```bash
 # Add --profile flag to scan and clean commands
 # Load profile-specific configurations
@@ -238,6 +267,7 @@ type ProfileDetail struct {
 ```
 
 #### **Task 2.6: Update Configuration System**
+
 ```bash
 # Add current profile tracking
 # Support for profile selection persistence
@@ -245,8 +275,9 @@ type ProfileDetail struct {
 ```
 
 ### **Acceptance Criteria**
+
 - [ ] `clean-wizard profile list` shows all available profiles with status
-- [ ] `clean-wizard profile select <name>` changes active profile with validation  
+- [ ] `clean-wizard profile select <name>` changes active profile with validation
 - [ ] `clean-wizard profile info <name>` displays detailed profile information
 - [ ] `--profile` flag works with scan and clean commands
 - [ ] Error handling works for missing/invalid profiles
@@ -258,9 +289,11 @@ type ProfileDetail struct {
 ## 🎨 PHASE 3: ADVANCED USER EXPERIENCE (Issue #18)
 
 ### **Problem Statement**
+
 Users need interactive configuration generation for better user experience and customization.
 
 ### **Current State Analysis**
+
 - ✅ Template generation working with 4 template types
 - ✅ Configuration files can be generated instantly
 - ✅ CLI integration working
@@ -270,40 +303,46 @@ Users need interactive configuration generation for better user experience and c
 ### **Feature Requirements**
 
 #### **Requirement 3.1: Interactive Prompts System**
+
 ```bash
 clean-wizard generate --interactive
 ```
 
 **Prompt Sequence:**
+
 1. **Safe Mode Confirmation**
+
    ```
    🛡️  Enable Safe Mode? (default: yes)
-   > [Y/n] 
+   > [Y/n]
    ```
 
 2. **Protected Paths Customization**
+
    ```
    📁 Protected System Paths (comma-separated, press Enter for defaults):
    > /System,/Library,/Applications,/usr,/etc,/var
-   
+
    🏠 Add custom protected paths? (optional)
    > /Users/larsartmann/Documents,/Users/larsartmann/Projects
    ```
 
 3. **Disk Usage Threshold**
+
    ```
    💾 Maximum disk usage percentage (1-100, default: 50):
    > 75
    ```
 
 4. **Profile Configuration**
+
    ```
    📋 Configure cleanup profiles:
-   
+
    Daily profile? (recommended) [Y/n]
-   Weekly profile? [y/N]  
+   Weekly profile? [y/N]
    Monthly profile? [y/N]
-   
+
    Daily profile operations:
    ✅ nix-generations (LOW risk)
    ✅ temp-files (MEDIUM risk)
@@ -311,6 +350,7 @@ clean-wizard generate --interactive
    ```
 
 #### **Requirement 3.2: Real-time Validation**
+
 ```bash
 # Input validation during generation:
 - Path existence checking
@@ -320,6 +360,7 @@ clean-wizard generate --interactive
 ```
 
 #### **Requirement 3.3: Configuration Preview & Confirmation**
+
 ```bash
 📋 Configuration Preview:
 
@@ -328,7 +369,7 @@ safe_mode: true
 max_disk_usage: 75
 protected:
   - "/System"
-  - "/Library" 
+  - "/Library"
   - "/Applications"
   - "/Users/larsartmann/Documents"
 profiles:
@@ -345,6 +386,7 @@ profiles:
 ### **Implementation Architecture**
 
 #### **Interactive System Components**
+
 ```go
 type InteractiveGenerator interface {
     RunInteractiveSetup(ctx context.Context) (*domain.Config, error)
@@ -365,6 +407,7 @@ type PromptValidator interface {
 ```
 
 #### **User Experience Flow**
+
 ```mermaid
 graph TD
     A[Start Interactive Mode] --> B[Safe Mode Prompt]
@@ -387,6 +430,7 @@ graph TD
 ### **Implementation Tasks**
 
 #### **Task 3.1: Create Interactive Prompt System**
+
 ```bash
 # Implement terminal UI for prompts
 # Add input validation and error handling
@@ -394,14 +438,16 @@ graph TD
 ```
 
 #### **Task 3.2: Implement Real-time Validation**
+
 ```bash
 # Path existence checking
-# Disk usage range validation  
+# Disk usage range validation
 # Profile conflict detection
 # Operation compatibility checking
 ```
 
 #### **Task 3.3: Create Configuration Preview**
+
 ```bash
 # YAML formatting for preview
 # Highlight important settings
@@ -409,6 +455,7 @@ graph TD
 ```
 
 #### **Task 3.4: Add Help and Guidance**
+
 ```bash
 # Context-sensitive help for each prompt
 # Risk level explanations
@@ -416,6 +463,7 @@ graph TD
 ```
 
 #### **Task 3.5: Integration with Existing CLI**
+
 ```bash
 # Add --interactive flag to generate command
 # Maintain backward compatibility with template generation
@@ -423,6 +471,7 @@ graph TD
 ```
 
 ### **Acceptance Criteria**
+
 - [ ] Interactive prompts work for all configuration fields
 - [ ] Real-time validation during input
 - [ ] Users can customize protected paths and profiles
@@ -437,11 +486,13 @@ graph TD
 ## 🔧 PHASE 4: SYSTEM MAINTENANCE (Issue #19)
 
 ### **Problem Statement**
+
 Need configuration migration system to handle format changes gracefully and provide backwards compatibility.
 
 ### **Current State Analysis**
+
 - ✅ Configuration loading working with YAML
-- ✅ Validation system implemented  
+- ✅ Validation system implemented
 - ✅ Template generation working
 - ❌ No migration system for format changes
 - ❌ No backwards compatibility handling
@@ -450,6 +501,7 @@ Need configuration migration system to handle format changes gracefully and prov
 ### **Feature Requirements**
 
 #### **Requirement 4.1: Configuration Versioning**
+
 ```yaml
 version: "1.2.0"  # NEW: Configuration format version
 safe_mode: true
@@ -458,6 +510,7 @@ max_disk_usage: 50
 ```
 
 #### **Requirement 4.2: Migration Engine**
+
 ```go
 type MigrationEngine interface {
     DetectVersion(config *domain.Config) (string, error)
@@ -475,6 +528,7 @@ type Migration interface {
 ```
 
 #### **Requirement 4.3: User Experience**
+
 ```bash
 # Migration notification:
 📦 Configuration format update available: v1.0.0 → v1.2.0
@@ -487,6 +541,7 @@ type Migration interface {
 ### **Migration Examples**
 
 #### **Migration 1.0.0 → 1.1.0: Protected Path Format Changes**
+
 ```yaml
 # BEFORE (v1.0.0):
 protected:
@@ -505,6 +560,7 @@ protected:
 ```
 
 #### **Migration 1.1.0 → 1.2.0: Profile Structure Updates**
+
 ```yaml
 # BEFORE (v1.1.0):
 profiles:
@@ -532,6 +588,7 @@ profiles:
 ```
 
 #### **Migration 1.2.0 → 1.3.0: Validation System Changes**
+
 ```yaml
 # NEW: validation_levels section
 validation:
@@ -545,6 +602,7 @@ validation:
 ### **Implementation Architecture**
 
 #### **Migration System Components**
+
 ```mermaid
 graph TD
     A[Load Configuration] --> B[Detect Version]
@@ -562,6 +620,7 @@ graph TD
 ```
 
 #### **Migration Registry**
+
 ```go
 type MigrationRegistry struct {
     migrations map[string][]Migration  // from_version -> []migrations
@@ -581,6 +640,7 @@ func (r *MigrationRegistry) GetMigrationPath(from, to string) ([]Migration, erro
 ### **Implementation Tasks**
 
 #### **Task 4.1: Add Version Tracking**
+
 ```bash
 # Add version field to Config struct
 # Update YAML serialization
@@ -588,6 +648,7 @@ func (r *MigrationRegistry) GetMigrationPath(from, to string) ([]Migration, erro
 ```
 
 #### **Task 4.2: Implement Migration Engine**
+
 ```bash
 # Create migration interface and registry
 # Implement migration graph resolution
@@ -595,6 +656,7 @@ func (r *MigrationRegistry) GetMigrationPath(from, to string) ([]Migration, erro
 ```
 
 #### **Task 4.3: Create Specific Migrations**
+
 ```bash
 # Migration v1.0.0 → v1.1.0: Protected paths restructure
 # Migration v1.1.0 → v1.2.0: Profile field standardization
@@ -602,6 +664,7 @@ func (r *MigrationRegistry) GetMigrationPath(from, to string) ([]Migration, erro
 ```
 
 #### **Task 4.4: Backup and Restore System**
+
 ```bash
 # Automatic backup creation before migration
 # Timestamp-based backup filenames
@@ -609,6 +672,7 @@ func (r *MigrationRegistry) GetMigrationPath(from, to string) ([]Migration, erro
 ```
 
 #### **Task 4.5: User Notification System**
+
 ```bash
 # Migration availability detection
 # Clear description of changes
@@ -617,6 +681,7 @@ func (r *MigrationRegistry) GetMigrationPath(from, to string) ([]Migration, erro
 ```
 
 #### **Task 4.6: Migration Validation**
+
 ```bash
 # Pre-migration validation checks
 # Post-migration configuration validation
@@ -624,6 +689,7 @@ func (r *MigrationRegistry) GetMigrationPath(from, to string) ([]Migration, erro
 ```
 
 ### **Acceptance Criteria**
+
 - [ ] Configuration version detection works automatically
 - [ ] Migration between versions is seamless
 - [ ] Backups are created before migration
@@ -640,33 +706,33 @@ func (r *MigrationRegistry) GetMigrationPath(from, to string) ([]Migration, erro
 ```mermaid
 graph TD
     A[Start: All Issues Open] --> B[Phase 1: Issue #17 BDD Infrastructure]
-    
+
     B --> B1[Fix scan.go logic]
     B1 --> B2[Remove unused imports]
     B2 --> B3[Fix BDD test expectations]
     B3 --> B4[Add completion messages]
     B4 --> B5[✅ BDD tests pass cleanly]
-    
+
     B5 --> C[Phase 2: Issue #20 Profile Management]
-    
+
     C --> C1[Create profile command structure]
     C1 --> C2[Implement profile listing]
     C2 --> C3[Implement profile selection]
     C3 --> C4[Implement profile info]
     C4 --> C5[Add --profile flag support]
     C5 --> C6[✅ Profile management complete]
-    
+
     C6 --> D[Phase 3: Issue #18 Interactive Config]
-    
+
     D --> D1[Create interactive prompt system]
     D1 --> D2[Implement real-time validation]
     D2 --> D3[Create configuration preview]
     D3 --> D4[Add help and guidance]
     D4 --> D5[Integrate with existing CLI]
     D5 --> D6[✅ Interactive generation complete]
-    
+
     D6 --> E[Phase 4: Issue #19 Migration System]
-    
+
     E --> E1[Add configuration versioning]
     E1 --> E2[Implement migration engine]
     E2 --> E3[Create specific migrations]
@@ -674,20 +740,20 @@ graph TD
     E4 --> E5[Create user notifications]
     E5 --> E6[Add migration validation]
     E6 --> E7[✅ Migration system complete]
-    
+
     E7 --> F[Final Integration & Testing]
-    
+
     F --> F1[Integration testing all phases]
     F1 --> F2[Documentation updates]
     F2 --> F3[Performance validation]
     F3 --> F4[✅ All issues resolved]
-    
+
     F4 --> G[Success: Production Ready]
-    
+
     style A fill:#ff9999
     style G fill:#99ff99
     style B fill:#ffdd99
-    style C fill:#ffdd99  
+    style C fill:#ffdd99
     style D fill:#ffdd99
     style E fill:#ffdd99
     style F fill:#ddff99
@@ -698,6 +764,7 @@ graph TD
 ## 🎯 SUCCESS METRICS
 
 ### **Technical Metrics**
+
 - [ ] 100% BDD test pass rate (currently failing on minor issues)
 - [ ] Zero build warnings or errors
 - [ ] <100ms command execution time for profile operations
@@ -705,12 +772,14 @@ graph TD
 - [ ] Zero data loss during migrations
 
 ### **User Experience Metrics**
+
 - [ ] Profile management reduces configuration editing by 80%
 - [ ] Interactive setup reduces onboarding time from 10min → 2min
 - [ ] Migration system prevents 100% of configuration corruption
 - [ ] CLI help coverage for all new commands
 
 ### **Code Quality Metrics**
+
 - [ ] Test coverage ≥ 90% for all new features
 - [ ] Zero TODO items left in code
 - [ ] All new code follows established patterns
@@ -721,16 +790,19 @@ graph TD
 ## 🚦 RISK MITIGATION
 
 ### **Technical Risks**
+
 - **Risk**: Breaking existing configurations
 - **Mitigation**: Comprehensive migration system with automatic backups
 - **Recovery**: Rollback capability and validation
 
-### **User Experience Risks**  
+### **User Experience Risks**
+
 - **Risk**: Complex interactive prompts
 - **Mitigation**: Smart defaults, clear help text, progressive disclosure
 - **Recovery**: Template generation fallback option
 
 ### **Development Risks**
+
 - **Risk**: Scope creep or delays
 - **Mitigation**: Clear phase boundaries, incremental delivery
 - **Recovery**: MVP delivery with enhancements in subsequent releases
@@ -740,20 +812,24 @@ graph TD
 ## 📅 IMPLEMENTATION TIMELINE
 
 ### **Phase 1 (Issue #17)**: 2-4 hours
+
 - Day 1: Complete BDD infrastructure fixes ✅
 - Testing and validation
 
-### **Phase 2 (Issue #20)**: 8-12 hours  
+### **Phase 2 (Issue #20)**: 8-12 hours
+
 - Day 1-2: Profile command structure and listing
 - Day 2-3: Profile selection and info commands
 - Day 3: Integration and testing
 
 ### **Phase 3 (Issue #18)**: 12-16 hours
+
 - Day 4-5: Interactive prompt system
-- Day 6: Real-time validation and preview  
+- Day 6: Real-time validation and preview
 - Day 7: Integration and polish
 
 ### **Phase 4 (Issue #19)**: 10-14 hours
+
 - Day 8-9: Migration engine and versioning
 - Day 10: Specific migrations and backup system
 - Day 11: Testing and documentation
@@ -765,14 +841,16 @@ graph TD
 ## 🏁 EXECUTION PREREQUISITES
 
 ### **Before Starting**
+
 - [x] Git repository is clean
 - [x] All existing tests pass
 - [x] Development environment ready
 - [x] Dependencies up to date
 
 ### **During Execution**
+
 - Commit after each major milestone
-- Run full test suite before phase transitions  
+- Run full test suite before phase transitions
 - Update documentation as features are implemented
 - Maintain backward compatibility at all times
 
@@ -781,24 +859,27 @@ graph TD
 ## 📝 NOTES & DECISIONS
 
 ### **Architecture Decisions**
+
 1. **Profile Management**: CLI-first approach with optional file-based configuration
 2. **Interactive System**: Progressive disclosure with smart defaults
 3. **Migration Engine**: Graph-based path resolution for complex version jumps
 4. **Error Handling**: User-friendly messages with technical details in verbose mode
 
 ### **Design Principles Applied**
+
 - **User Experience**: Reduce cognitive load, provide clear guidance
-- **Safety First**: Automatic backups, validation, rollback capability  
+- **Safety First**: Automatic backups, validation, rollback capability
 - **Performance**: Minimal overhead for common operations
 - **Extensibility**: Easy addition of new profile types and migrations
 
 ### **Technical Trade-offs**
+
 - **Complexity vs. Flexibility**: Migration system adds complexity but enables long-term maintainability
 - **Interactivity vs. Scriptability**: Interactive mode helps beginners, templates preserve automation
 - **Safety vs. Convenience**: Automatic migrations safe but may require user confirmation
 
 ---
 
-*Last Updated: November 10, 2025*  
-*Execution Priority: CRITICAL - All issues must be resolved for production readiness*  
-*Architecture Standard: EXCELLENCE - Zero compromise on code quality and user experience*
+_Last Updated: November 10, 2025_  
+_Execution Priority: CRITICAL - All issues must be resolved for production readiness_  
+_Architecture Standard: EXCELLENCE - Zero compromise on code quality and user experience_

@@ -7,16 +7,19 @@
 ## RATIONALE
 
 ### 1. EXTERNAL CONTRACT STABILITY
+
 - Public APIs need stable contracts across languages
 - TypeSpec provides automatic schema validation and documentation
 - Future Rust/Python/etc. clients need consistent interfaces
 
-### 2. INTERNAL FLEXIBILITY  
+### 2. INTERNAL FLEXIBILITY
+
 - Domain models benefit from Go's strong typing and performance
 - Complex business logic easier in native Go
 - No generation overhead for internal operations
 
 ### 3. PRAGMATIC COMPROMISE
+
 - Avoids full generation complexity
 - Maintains Go ecosystem benefits
 - Enables cross-language capabilities where needed
@@ -24,6 +27,7 @@
 ## IMPLEMENTATION STRATEGY
 
 ### PHASE 1: Define Public API Contracts
+
 ```typescript
 // config.typespec - Public API
 model Config {
@@ -41,6 +45,7 @@ model CleanResult {
 ```
 
 ### PHASE 2: Generate API Layer
+
 ```go
 // Generated Go API for external clients
 type ConfigAPIClient struct {
@@ -50,12 +55,13 @@ type ConfigAPIClient struct {
 ```
 
 ### PHASE 3: Internal Go Domain Models
+
 ```go
 // Rich domain models with business logic
 type Config struct {
   version  string
   safeMode bool
-  
+
   // Business methods
   func (c *Config) Validate() Result[ValidationContext]
   func (c *Config) Sanitize() SanitizationResult
@@ -63,6 +69,7 @@ type Config struct {
 ```
 
 ### PHASE 4: Mapping Layer
+
 ```go
 // Convert between API types and domain models
 func APIConfigToDomain(apiConfig apitypes.Config) domain.Config

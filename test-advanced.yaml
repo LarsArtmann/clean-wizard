@@ -39,7 +39,7 @@ profiles:
         settings:
           keep_count: 3
           keep_current: true
-  
+
   weekly:
     name: "weekly"
     description: "Weekly cleanup for deeper maintenance"
@@ -52,7 +52,7 @@ profiles:
         settings:
           keep_recent: true
           max_age_days: 30
-  
+
   monthly:
     name: "monthly"
     description: "Monthly cleanup for deep maintenance"
@@ -65,7 +65,7 @@ profiles:
         settings:
           max_age_days: 7
           exclude_patterns: ["*.log", "*.tmp"]
-      
+
       - name: "logs"
         description: "Clean old log files"
         risk_level: "MEDIUM"

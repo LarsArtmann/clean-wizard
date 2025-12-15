@@ -17,14 +17,14 @@ clean-wizard
 
 These flags are available on all commands:
 
-| Flag | Short | Type | Default | Description |
-|------|-------|------|---------|-------------|
-| `--verbose` | `-v` | bool | `false` | Enable verbose output |
-| `--dry-run` | | bool | `false` | Show what would be deleted without actually deleting |
-| `--force` | `-f` | bool | `false` | Force cleanup without confirmation |
-| `--profile` | `-p` | string | `"daily"` | Configuration profile to use |
-| `--validation-level` | | string | `"basic"` | Validation level: none, basic, comprehensive, strict |
-| `--config` | `-c` | string | | Configuration file path |
+| Flag                 | Short | Type   | Default   | Description                                          |
+| -------------------- | ----- | ------ | --------- | ---------------------------------------------------- |
+| `--verbose`          | `-v`  | bool   | `false`   | Enable verbose output                                |
+| `--dry-run`          |       | bool   | `false`   | Show what would be deleted without actually deleting |
+| `--force`            | `-f`  | bool   | `false`   | Force cleanup without confirmation                   |
+| `--profile`          | `-p`  | string | `"daily"` | Configuration profile to use                         |
+| `--validation-level` |       | string | `"basic"` | Validation level: none, basic, comprehensive, strict |
+| `--config`           | `-c`  | string |           | Configuration file path                              |
 
 ### Validation Levels
 
@@ -40,19 +40,21 @@ These flags are available on all commands:
 Perform system cleanup based on configuration or profile.
 
 #### Usage
+
 ```bash
 clean-wizard clean [flags]
 ```
 
 #### Flags Specific to `clean`
 
-| Flag | Type | Default | Description |
-|------|------|---------|-------------|
-| `--dry-run` | bool | `false` | Show what would be cleaned without doing it |
-| `--config` | string | | Configuration file path |
-| `--profile` | string | `"daily"` | Cleaning profile to use |
+| Flag        | Type   | Default   | Description                                 |
+| ----------- | ------ | --------- | ------------------------------------------- |
+| `--dry-run` | bool   | `false`   | Show what would be cleaned without doing it |
+| `--config`  | string |           | Configuration file path                     |
+| `--profile` | string | `"daily"` | Cleaning profile to use                     |
 
 #### Examples
+
 ```bash
 # Basic cleanup with default profile
 clean-wizard clean
@@ -74,6 +76,7 @@ clean-wizard clean --validation-level strict
 ```
 
 #### Output Format
+
 ```
 🧹 Starting system cleanup...
 📄 Loading configuration from /Users/user/.clean-wizard.yaml...
@@ -101,18 +104,20 @@ clean-wizard clean --validation-level strict
 Scan your system for cleanable items and show size estimates.
 
 #### Usage
+
 ```bash
 clean-wizard scan [flags]
 ```
 
 #### Flags Specific to `scan`
 
-| Flag | Short | Type | Default | Description |
-|------|-------|------|---------|-------------|
-| `--verbose` | `-v` | bool | `false` | Show detailed scan information |
-| `--profile` | `-p` | string | | Filter results by profile |
+| Flag        | Short | Type   | Default | Description                    |
+| ----------- | ----- | ------ | ------- | ------------------------------ |
+| `--verbose` | `-v`  | bool   | `false` | Show detailed scan information |
+| `--profile` | `-p`  | string |         | Filter results by profile      |
 
 #### Examples
+
 ```bash
 # Basic scan
 clean-wizard scan
@@ -128,6 +133,7 @@ clean-wizard scan --profile daily
 ```
 
 #### Output Format
+
 ```
 🔍 Scanning system...
 ✅ Scan completed!
@@ -144,18 +150,20 @@ clean-wizard scan --profile daily
 Interactive setup wizard that creates a comprehensive cleaning configuration.
 
 #### Usage
+
 ```bash
 clean-wizard init [flags]
 ```
 
 #### Flags Specific to `init`
 
-| Flag | Short | Type | Default | Description |
-|------|-------|------|---------|-------------|
-| `--force` | `-f` | bool | `false` | Overwrite existing configuration |
-| `--minimal` | | bool | `false` | Create minimal configuration |
+| Flag        | Short | Type | Default | Description                      |
+| ----------- | ----- | ---- | ------- | -------------------------------- |
+| `--force`   | `-f`  | bool | `false` | Overwrite existing configuration |
+| `--minimal` |       | bool | `false` | Create minimal configuration     |
 
 #### Examples
+
 ```bash
 # Interactive setup
 clean-wizard init
@@ -168,6 +176,7 @@ clean-wizard init --minimal
 ```
 
 #### Output Format
+
 ```
 🧹 Clean Wizard Setup
 ======================
@@ -188,6 +197,7 @@ Let's create the perfect cleaning configuration for your system!
 Manage cleaning profiles.
 
 #### Usage
+
 ```bash
 clean-wizard profile [subcommand] [flags]
 ```
@@ -195,6 +205,7 @@ clean-wizard profile [subcommand] [flags]
 #### Subcommands
 
 ##### `profile list`
+
 List all available profiles.
 
 ```bash
@@ -202,6 +213,7 @@ clean-wizard profile list
 ```
 
 ##### `profile show [profile]`
+
 Show details of a specific profile.
 
 ```bash
@@ -210,6 +222,7 @@ clean-wizard profile show comprehensive
 ```
 
 ##### `profile create`
+
 Create a new profile interactively.
 
 ```bash
@@ -217,6 +230,7 @@ clean-wizard profile create
 ```
 
 ##### `profile delete [profile]`
+
 Delete a profile.
 
 ```bash
@@ -224,6 +238,7 @@ clean-wizard profile delete custom-profile
 ```
 
 #### Examples
+
 ```bash
 # List all profiles
 clean-wizard profile list
@@ -245,6 +260,7 @@ clean-wizard profile delete old-profile
 Manage configuration files.
 
 #### Usage
+
 ```bash
 clean-wizard config [subcommand] [flags]
 ```
@@ -252,6 +268,7 @@ clean-wizard config [subcommand] [flags]
 #### Subcommands
 
 ##### `config show`
+
 Display current configuration.
 
 ```bash
@@ -259,6 +276,7 @@ clean-wizard config show
 ```
 
 ##### `config edit`
+
 Edit configuration in default editor.
 
 ```bash
@@ -266,6 +284,7 @@ clean-wizard config edit
 ```
 
 ##### `config validate`
+
 Validate configuration file.
 
 ```bash
@@ -274,6 +293,7 @@ clean-wizard config validate --config /path/to/config.yaml
 ```
 
 ##### `config reset`
+
 Reset configuration to defaults.
 
 ```bash
@@ -281,6 +301,7 @@ clean-wizard config reset
 ```
 
 #### Examples
+
 ```bash
 # Show current configuration
 clean-wizard config show
@@ -302,14 +323,14 @@ clean-wizard config reset
 
 ## 📊 Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | General error |
-| 2 | Configuration error |
-| 3 | Validation error |
-| 4 | Permission error |
-| 5 | Network/IO error |
+| Code | Meaning             |
+| ---- | ------------------- |
+| 0    | Success             |
+| 1    | General error       |
+| 2    | Configuration error |
+| 3    | Validation error    |
+| 4    | Permission error    |
+| 5    | Network/IO error    |
 
 ## 🔧 Configuration File
 
@@ -381,46 +402,47 @@ profiles:
 
 ### Configuration Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `version` | string | Yes | Configuration version |
-| `safe_mode` | bool | No | Enable safety features (default: true) |
-| `max_disk_usage` | int | No | Maximum disk usage percentage (default: 90) |
-| `protected` | []string | Yes | Paths that should never be cleaned |
-| `profiles` | object | Yes | Cleaning profiles configuration |
+| Field            | Type     | Required | Description                                 |
+| ---------------- | -------- | -------- | ------------------------------------------- |
+| `version`        | string   | Yes      | Configuration version                       |
+| `safe_mode`      | bool     | No       | Enable safety features (default: true)      |
+| `max_disk_usage` | int      | No       | Maximum disk usage percentage (default: 90) |
+| `protected`      | []string | Yes      | Paths that should never be cleaned          |
+| `profiles`       | object   | Yes      | Cleaning profiles configuration             |
 
 ### Profile Configuration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Profile identifier |
-| `description` | string | Yes | Profile description |
-| `enabled` | bool | Yes | Whether profile is active |
-| `operations` | []object | Yes | List of cleaning operations |
+| Field         | Type     | Required | Description                 |
+| ------------- | -------- | -------- | --------------------------- |
+| `name`        | string   | Yes      | Profile identifier          |
+| `description` | string   | Yes      | Profile description         |
+| `enabled`     | bool     | Yes      | Whether profile is active   |
+| `operations`  | []object | Yes      | List of cleaning operations |
 
 ### Operation Configuration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Operation identifier |
-| `description` | string | Yes | Operation description |
-| `risk_level` | string | Yes | Risk level: low, medium, high, critical |
-| `enabled` | bool | Yes | Whether operation is active |
-| `settings` | object | No | Operation-specific settings |
+| Field         | Type   | Required | Description                             |
+| ------------- | ------ | -------- | --------------------------------------- |
+| `name`        | string | Yes      | Operation identifier                    |
+| `description` | string | Yes      | Operation description                   |
+| `risk_level`  | string | Yes      | Risk level: low, medium, high, critical |
+| `enabled`     | bool   | Yes      | Whether operation is active             |
+| `settings`    | object | No       | Operation-specific settings             |
 
 ## 🎨 Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CLEAN_WIZARD_CONFIG` | `~/.clean-wizard.yaml` | Path to configuration file |
-| `CLEAN_WIZARD_PROFILE` | `daily` | Default profile to use |
-| `CLEAN_WIZARD_VALIDATION_LEVEL` | `basic` | Default validation level |
-| `NO_COLOR` | | Disable colored output |
-| `CLEAN_WIZARD_DRY_RUN` | `false` | Default dry-run setting |
+| Variable                        | Default                | Description                |
+| ------------------------------- | ---------------------- | -------------------------- |
+| `CLEAN_WIZARD_CONFIG`           | `~/.clean-wizard.yaml` | Path to configuration file |
+| `CLEAN_WIZARD_PROFILE`          | `daily`                | Default profile to use     |
+| `CLEAN_WIZARD_VALIDATION_LEVEL` | `basic`                | Default validation level   |
+| `NO_COLOR`                      |                        | Disable colored output     |
+| `CLEAN_WIZARD_DRY_RUN`          | `false`                | Default dry-run setting    |
 
 ## 📝 Examples and Workflows
 
 ### Development Environment Setup
+
 ```bash
 # Initialize with development-friendly settings
 clean-wizard init --minimal
@@ -452,6 +474,7 @@ clean-wizard config validate
 ```
 
 ### Automated Cleanup Script
+
 ```bash
 #!/bin/bash
 # automated-cleanup.sh
@@ -486,6 +509,7 @@ log "Cleanup completed for $DATE"
 ```
 
 ### CI/CD Integration
+
 ```yaml
 # .github/workflows/cleanup.yml
 name: System Cleanup
@@ -500,24 +524,24 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Setup Go
       uses: actions/setup-go@v3
       with:
         go-version: '1.25'
-    
+
     - name: Install Clean Wizard
       run: |
         go install github.com/LarsArtmann/clean-wizard@latest
-        
+
     - name: Initialize Configuration
       run: |
         clean-wizard init --minimal
-        
+
     - name: Scan System
       run: |
         clean-wizard scan --validation-level comprehensive
-        
+
     - name: Perform Cleanup
       run: |
         clean-wizard clean --profile comprehensive --validation-level strict

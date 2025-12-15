@@ -1,12 +1,14 @@
 ## 🎯 CLEAN WIZARD PROFESSIONAL EXCELLENCE
 
 ### 📋 OBJECTIVES (Choose One)
+
 - [ ] **TYPE SAFETY** - Make impossible states unrepresentable
 - [ ] **PERFORMANCE** - Optimize critical path without sacrificing safety
 - [ ] **DOMAIN LOGIC** - Encapsulate business rules within aggregates
 - [ ] **API CONTRACTS** - Maintain external API stability
 
 ### 🛡️ TYPE SAFETY VALIDATIONS (for ALL PRs)
+
 - [ ] **No `map[string]any` violations** - Use typed containers
 - [ ] **No `interface{}` abuse** - Prefer `any` with concrete types
 - [ ] **No `reflect` packages** - Use generics instead
@@ -16,6 +18,7 @@
 - [ ] **No package cycles** - Verify dependency graph is acyclic
 
 ### 🧪 COMPREHENSIVE TESTING REQUIREMENTS
+
 - [ ] **Unit Tests** - Minimum 80% coverage for new code
 - [ ] **Integration Tests** - Test component interactions
 - [ ] **Property-Based Tests** - For complex business logic
@@ -23,6 +26,7 @@
 - [ ] **Performance Regression Tests** - If affecting critical path
 
 ### 📏 CODE QUALITY STANDARDS
+
 - [ ] **Single Responsibility** - Each function has one clear purpose
 - [ ] **Explicit Error Handling** - No silent failures or panics
 - [ ] **Type-Safe Constants** - Use enums over magic strings/numbers
@@ -30,6 +34,7 @@
 - [ ] **Naming Clarity** - Function names reveal intent and return type
 
 ### 🔒 SECURITY VALIDATIONS
+
 - [ ] **Input Validation** - All external inputs sanitized
 - [ ] **Dependency Security** - No known vulnerable packages
 - [ ] **Secret Management** - No hardcoded credentials
@@ -37,6 +42,7 @@
 - [ ] **Command Injection** - Validate all external commands
 
 ### 📊 PERFORMANCE VALIDATIONS
+
 - [ ] **No Regressions** - Performance benchmarks pass
 - [ ] **Memory Efficiency** - No memory leaks or excessive allocation
 - [ ] **Concurrency Safety** - Thread-safe when applicable
@@ -44,6 +50,7 @@
 - [ ] **I/O Optimization** - Batch operations where possible
 
 ### 🔄 MIGRATION IMPACT ASSESSMENT
+
 - [ ] **Breaking Changes** - Document all breaking changes
 - [ ] **Backward Compatibility** - Maintain existing API contracts
 - [ ] **Migration Path** - Provide upgrade instructions
@@ -54,18 +61,23 @@
 ## 📝 PULL REQUEST DETAILS
 
 ### 🔍 PROBLEM SUMMARY
+
 <!-- What specific problem does this PR solve? -->
 
 ### 💡 PROPOSED SOLUTION
+
 <!-- How does this PR solve the problem? -->
 
 ### 🧬 APPROACH JUSTIFICATION
+
 <!-- Why this approach over alternatives? -->
 
 ### 🧪 TESTING APPROACH
+
 <!-- How was this solution validated? -->
 
 ### 📊 IMPACT ASSESSMENT
+
 <!-- What are the performance, security, and usability impacts? -->
 
 ---
@@ -82,24 +94,30 @@
 ### 🎯 TYPE SIGNATURE CONTRACT
 
 **Input Types:**
+
 <!-- Define expected input type signatures -->
 
 **Output Types:**
+
 <!-- Define expected output type signatures -->
 
 **Error Conditions:**
+
 <!-- Define all possible error states -->
 
 **Performance Expectations:**
+
 <!-- Define expected performance characteristics -->
 
 ---
 
 ### 📎 LINKED ISSUES
+
 Closes #<issue_number>
 Relates to #<related_issue_number>
 
 ### 🏷️ TYPE LABELS
+
 - [ ] `type-safety`
 - [ ] `performance`
 - [ ] `domain-logic`

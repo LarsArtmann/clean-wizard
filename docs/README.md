@@ -2,15 +2,15 @@
 
 ## 📚 Package Documentation
 
-| Package | Description | Documentation |
-|----------|-------------|----------------|
-| [domain](./domain.md) | Core domain types and business logic | [GoDoc](./domain.md) |
-| [adapters](./adapters.md) | Modern library integrations and infrastructure | [GoDoc](./adapters.md) |
-| [config](./config.md) | Configuration management and validation | [GoDoc](./config.md) |
-| [cleaner](./cleaner.md) | Cleaning operations and adapters | [GoDoc](./cleaner.md) |
-| [conversions](./conversions.md) | Type conversions and builders | [GoDoc](./conversions.md) |
-| [middleware](./middleware.md) | Validation and request middleware | [GoDoc](./middleware.md) |
-| [result](./result.md) | Result type with railway programming | [GoDoc](./result.md) |
+| Package                         | Description                                    | Documentation             |
+| ------------------------------- | ---------------------------------------------- | ------------------------- |
+| [domain](./domain.md)           | Core domain types and business logic           | [GoDoc](./domain.md)      |
+| [adapters](./adapters.md)       | Modern library integrations and infrastructure | [GoDoc](./adapters.md)    |
+| [config](./config.md)           | Configuration management and validation        | [GoDoc](./config.md)      |
+| [cleaner](./cleaner.md)         | Cleaning operations and adapters               | [GoDoc](./cleaner.md)     |
+| [conversions](./conversions.md) | Type conversions and builders                  | [GoDoc](./conversions.md) |
+| [middleware](./middleware.md)   | Validation and request middleware              | [GoDoc](./middleware.md)  |
+| [result](./result.md)           | Result type with railway programming           | [GoDoc](./result.md)      |
 
 ## 🚀 Quick Start Guide
 
@@ -75,7 +75,7 @@ import "github.com/LarsArtmann/clean-wizard/internal/result"
 func handleCleaningResult(res result.Result[domain.CleanResult]) {
     if res.IsOk() {
         cleanResult := res.Value()
-        fmt.Printf("Cleaned %d items, freed %d bytes\n", 
+        fmt.Printf("Cleaned %d items, freed %d bytes\n",
             cleanResult.ItemsRemoved, cleanResult.FreedBytes)
     } else {
         fmt.Printf("Cleaning failed: %v\n", res.Error())

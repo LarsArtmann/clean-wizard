@@ -8,82 +8,82 @@ on:
 jobs:
   type-safety-check:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: Setup Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
-        
-    - name: Install golangci-lint
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: latest
-        
-    - name: Type Safety Linting
-      run: |
-        echo "🔍 TYPE SAFETY VALIDATION"
-        echo "Checking for type safety violations..."
-        
-        # 1. Check for map[string]any violations
-        if grep -r "map\[string\]any" internal/ --include="*.go" --exclude-dir=vendor; then
-          echo "❌ VIOLATION: map[string]any found"
-          exit 1
-        fi
-        echo "✅ No map[string]any violations"
-        
-        # 2. Check for interface{} abuse
-        if grep -r "interface{}" internal/ --include="*.go" --exclude-dir=vendor; then
-          echo "❌ VIOLATION: interface{} found"
-          exit 1
-        fi
-        echo "✅ No interface{} violations"
-        
-        # 3. Check for unsafe package usage
-        if grep -r "unsafe\." internal/ --include="*.go" --exclude-dir=vendor; then
-          echo "❌ VIOLATION: unsafe package usage"
-          exit 1
-        fi
-        echo "✅ No unsafe package violations"
-        
-        # 4. Check for reflect package usage (requires explicit justification)
-        if grep -r "reflect\." internal/ --include="*.go" --exclude-dir=vendor; then
-          echo "❌ VIOLATION: reflect package usage"
-          echo "If reflection is necessary, add // REFLECT-JUSTIFIED: <reason> comment"
-          exit 1
-        fi
-        echo "✅ No reflect package violations"
-        
-        # 5. Check for generic usage opportunities
-        echo "🔍 Checking for generic opportunities..."
-        
-        # 6. Run golangci-lint with strict rules
-        echo "🔍 Running type safety focused linting..."
-        golangci-lint run --timeout=5m \
-          --disable-all \
-          --enable=govet,goimports,gofmt,errcheck,staticcheck,unused \
-          --config=.github/type-safety.yml || true
-          
-    - name: Dependency Cycle Check
-      run: |
-        echo "🔍 CHECKING DEPENDENCY CYCLES"
-        go install github.com/fzipp/gocycmd/cmd/gocycmd@latest
-        if ! gocycmd ./...; then
-          echo "❌ VIOLATION: Dependency cycle detected"
-          exit 1
-        fi
-        echo "✅ No dependency cycles"
-        
-    - name: Type Safety Summary
-      run: |
-        echo "✅ TYPE SAFETY VALIDATION PASSED"
-        echo "📊 Summary:"
-        echo "- No map[string]any violations"
-        echo "- No interface{} violations"
-        echo "- No unsafe package violations"
-        echo "- No reflect package violations"
-        echo "- No dependency cycles"
-        echo "- Code follows Type Safety First principles"
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+      - name: Type Safety Linting
+        run: |
+          echo "🔍 TYPE SAFETY VALIDATION"
+          echo "Checking for type safety violations..."
+
+          # 1. Check for map[string]any violations
+          if grep -r "map\[string\]any" internal/ --include="*.go" --exclude-dir=vendor; then
+            echo "❌ VIOLATION: map[string]any found"
+            exit 1
+          fi
+          echo "✅ No map[string]any violations"
+
+          # 2. Check for interface{} abuse
+          if grep -r "interface{}" internal/ --include="*.go" --exclude-dir=vendor; then
+            echo "❌ VIOLATION: interface{} found"
+            exit 1
+          fi
+          echo "✅ No interface{} violations"
+
+          # 3. Check for unsafe package usage
+          if grep -r "unsafe\." internal/ --include="*.go" --exclude-dir=vendor; then
+            echo "❌ VIOLATION: unsafe package usage"
+            exit 1
+          fi
+          echo "✅ No unsafe package violations"
+
+          # 4. Check for reflect package usage (requires explicit justification)
+          if grep -r "reflect\." internal/ --include="*.go" --exclude-dir=vendor; then
+            echo "❌ VIOLATION: reflect package usage"
+            echo "If reflection is necessary, add // REFLECT-JUSTIFIED: <reason> comment"
+            exit 1
+          fi
+          echo "✅ No reflect package violations"
+
+          # 5. Check for generic usage opportunities
+          echo "🔍 Checking for generic opportunities..."
+
+          # 6. Run golangci-lint with strict rules
+          echo "🔍 Running type safety focused linting..."
+          golangci-lint run --timeout=5m \
+            --disable-all \
+            --enable=govet,goimports,gofmt,errcheck,staticcheck,unused \
+            --config=.github/type-safety.yml || true
+
+      - name: Dependency Cycle Check
+        run: |
+          echo "🔍 CHECKING DEPENDENCY CYCLES"
+          go install github.com/fzipp/gocycmd/cmd/gocycmd@latest
+          if ! gocycmd ./...; then
+            echo "❌ VIOLATION: Dependency cycle detected"
+            exit 1
+          fi
+          echo "✅ No dependency cycles"
+
+      - name: Type Safety Summary
+        run: |
+          echo "✅ TYPE SAFETY VALIDATION PASSED"
+          echo "📊 Summary:"
+          echo "- No map[string]any violations"
+          echo "- No interface{} violations"
+          echo "- No unsafe package violations"
+          echo "- No reflect package violations"
+          echo "- No dependency cycles"
+          echo "- Code follows Type Safety First principles"

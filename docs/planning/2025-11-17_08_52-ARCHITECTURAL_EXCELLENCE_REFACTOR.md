@@ -10,6 +10,7 @@
 ## 📊 EXECUTIVE SUMMARY
 
 ### Current State Assessment
+
 - **Build Status:** ✅ Functional (network issues prevent testing)
 - **Type Safety:** B+ (75%) - 15 map[string]any violations, 69 naked `any` usages
 - **File Organization:** C (65%) - 4 files critically oversized (>350 lines)
@@ -17,6 +18,7 @@
 - **Overall Grade:** B+ (83/100)
 
 ### Target State
+
 - **Build Status:** ✅ Functional with comprehensive tests passing
 - **Type Safety:** A+ (95%) - <3 map[string]any violations (only where truly needed)
 - **File Organization:** A+ (95%) - All files <350 lines
@@ -25,12 +27,12 @@
 
 ### Impact Analysis (Pareto Principle Applied)
 
-| **Effort** | **Value Delivered** | **Tasks** | **Focus** |
-|------------|---------------------|-----------|-----------|
-| **1%** | **51%** | 4 tasks | Critical file splits |
-| **4%** | **64%** | 8 tasks | Type safety violations |
-| **20%** | **80%** | 15 tasks | Architectural excellence |
-| **Remaining 80%** | **20%** | Future | Polish & perfection |
+| **Effort**        | **Value Delivered** | **Tasks** | **Focus**                |
+| ----------------- | ------------------- | --------- | ------------------------ |
+| **1%**            | **51%**             | 4 tasks   | Critical file splits     |
+| **4%**            | **64%**             | 8 tasks   | Type safety violations   |
+| **20%**           | **80%**             | 15 tasks  | Architectural excellence |
+| **Remaining 80%** | **20%**             | Future    | Polish & perfection      |
 
 ---
 
@@ -41,6 +43,7 @@
 **CRITICAL FILE SPLITS - Maximum Impact, Minimum Effort**
 
 These 4 files are the primary source of maintainability pain. Splitting them unlocks:
+
 - ✅ Better testability (each file focused)
 - ✅ Reduced cognitive load (smaller units)
 - ✅ Parallel development (multiple devs can work)
@@ -75,6 +78,7 @@ These 4 files are the primary source of maintainability pain. Splitting them unl
 **TYPE SAFETY VIOLATIONS - Foundation for Excellence**
 
 Eliminating type safety violations prevents entire classes of bugs and enables:
+
 - ✅ Compile-time error detection
 - ✅ Better IDE autocomplete
 - ✅ Self-documenting code
@@ -213,12 +217,12 @@ These changes transform good code into excellent code:
 
 ### PHASE 1: THE 1% (CRITICAL FILE SPLITS) - 165 minutes
 
-| ID | Task | Duration | Value | Priority | Dependencies |
-|----|------|----------|-------|----------|--------------|
-| **T1.1** | Split enhanced_loader.go into 3 files | 45 min | 15% | CRITICAL | None |
-| **T1.2** | Split validation_middleware.go into 3 files | 45 min | 15% | CRITICAL | None |
-| **T1.3** | Split validator.go into 3 files | 40 min | 12% | CRITICAL | None |
-| **T1.4** | Split sanitizer.go into 3 files | 35 min | 9% | CRITICAL | None |
+| ID       | Task                                        | Duration | Value | Priority | Dependencies |
+| -------- | ------------------------------------------- | -------- | ----- | -------- | ------------ |
+| **T1.1** | Split enhanced_loader.go into 3 files       | 45 min   | 15%   | CRITICAL | None         |
+| **T1.2** | Split validation_middleware.go into 3 files | 45 min   | 15%   | CRITICAL | None         |
+| **T1.3** | Split validator.go into 3 files             | 40 min   | 12%   | CRITICAL | None         |
+| **T1.4** | Split sanitizer.go into 3 files             | 35 min   | 9%    | CRITICAL | None         |
 
 **PHASE 1 TOTAL: 165 min (2h 45m) = 51% VALUE**
 
@@ -226,16 +230,16 @@ These changes transform good code into excellent code:
 
 ### PHASE 2: THE 4% (TYPE SAFETY) - 180 minutes
 
-| ID | Task | Duration | Value | Priority | Dependencies |
-|----|------|----------|-------|----------|--------------|
-| **T2.1** | Create CleanStrategy enum in domain/types.go | 20 min | 3% | HIGH | None |
-| **T2.2** | Create ChangeOperation enum in config/types.go | 15 min | 2% | HIGH | None |
-| **T2.3** | Replace map[string]any defaults in config.go | 30 min | 3% | HIGH | None |
-| **T2.4** | Create ValidationContext struct | 25 min | 2% | HIGH | None |
-| **T2.5** | Create ChangeRecord struct | 20 min | 1.5% | HIGH | T2.2 |
-| **T2.6** | Create ErrorDetails struct | 15 min | 1% | HIGH | None |
-| **T2.7** | Make ConfigChange generic | 25 min | 1% | HIGH | T2.2 |
-| **T2.8** | Replace naked `any` in validator | 30 min | 0.5% | HIGH | T2.4 |
+| ID       | Task                                           | Duration | Value | Priority | Dependencies |
+| -------- | ---------------------------------------------- | -------- | ----- | -------- | ------------ |
+| **T2.1** | Create CleanStrategy enum in domain/types.go   | 20 min   | 3%    | HIGH     | None         |
+| **T2.2** | Create ChangeOperation enum in config/types.go | 15 min   | 2%    | HIGH     | None         |
+| **T2.3** | Replace map[string]any defaults in config.go   | 30 min   | 3%    | HIGH     | None         |
+| **T2.4** | Create ValidationContext struct                | 25 min   | 2%    | HIGH     | None         |
+| **T2.5** | Create ChangeRecord struct                     | 20 min   | 1.5%  | HIGH     | T2.2         |
+| **T2.6** | Create ErrorDetails struct                     | 15 min   | 1%    | HIGH     | None         |
+| **T2.7** | Make ConfigChange generic                      | 25 min   | 1%    | HIGH     | T2.2         |
+| **T2.8** | Replace naked `any` in validator               | 30 min   | 0.5%  | HIGH     | T2.4         |
 
 **PHASE 2 TOTAL: 180 min (3h) = 64% CUMULATIVE VALUE**
 
@@ -243,23 +247,23 @@ These changes transform good code into excellent code:
 
 ### PHASE 3: THE 20% (ARCHITECTURAL EXCELLENCE) - 625 minutes
 
-| ID | Task | Duration | Value | Priority | Dependencies |
-|----|------|----------|-------|----------|--------------|
-| **T3.1** | Centralize fmt.Errorf to pkg/errors | 45 min | 3% | HIGH | None |
-| **T3.2** | Extract LoadConfig large function | 30 min | 1.5% | MEDIUM | T1.1 |
-| **T3.3** | Extract analyzeConfigChanges large function | 30 min | 1% | MEDIUM | T1.2 |
-| **T3.4** | Remove Profile.Enabled split brain | 30 min | 2% | HIGH | None |
-| **T3.5** | Create OperationMode enum | 25 min | 1.5% | MEDIUM | None |
-| **T3.6** | Create HomebrewAdapter | 45 min | 2% | MEDIUM | None |
-| **T3.7** | Create SystemTempAdapter | 40 min | 1.5% | MEDIUM | None |
-| **T3.8** | Remove IsValid() duplicates | 30 min | 1% | MEDIUM | None |
-| **T3.9** | Extract CleaningService from commands | 60 min | 2% | MEDIUM | None |
-| **T3.10** | Add command layer unit tests | 50 min | 1.5% | MEDIUM | T3.9 |
-| **T3.11** | Add adapter unit tests | 40 min | 1% | MEDIUM | T3.6, T3.7 |
-| **T3.12** | Resolve TODO comments (create issues) | 35 min | 0.5% | LOW | None |
-| **T3.13** | Extract magic numbers to constants | 20 min | 0.5% | LOW | None |
-| **T3.14** | Remove unused code | 25 min | 0.5% | LOW | None |
-| **T3.15** | Standardize naming conventions | 30 min | 0.3% | LOW | None |
+| ID        | Task                                        | Duration | Value | Priority | Dependencies |
+| --------- | ------------------------------------------- | -------- | ----- | -------- | ------------ |
+| **T3.1**  | Centralize fmt.Errorf to pkg/errors         | 45 min   | 3%    | HIGH     | None         |
+| **T3.2**  | Extract LoadConfig large function           | 30 min   | 1.5%  | MEDIUM   | T1.1         |
+| **T3.3**  | Extract analyzeConfigChanges large function | 30 min   | 1%    | MEDIUM   | T1.2         |
+| **T3.4**  | Remove Profile.Enabled split brain          | 30 min   | 2%    | HIGH     | None         |
+| **T3.5**  | Create OperationMode enum                   | 25 min   | 1.5%  | MEDIUM   | None         |
+| **T3.6**  | Create HomebrewAdapter                      | 45 min   | 2%    | MEDIUM   | None         |
+| **T3.7**  | Create SystemTempAdapter                    | 40 min   | 1.5%  | MEDIUM   | None         |
+| **T3.8**  | Remove IsValid() duplicates                 | 30 min   | 1%    | MEDIUM   | None         |
+| **T3.9**  | Extract CleaningService from commands       | 60 min   | 2%    | MEDIUM   | None         |
+| **T3.10** | Add command layer unit tests                | 50 min   | 1.5%  | MEDIUM   | T3.9         |
+| **T3.11** | Add adapter unit tests                      | 40 min   | 1%    | MEDIUM   | T3.6, T3.7   |
+| **T3.12** | Resolve TODO comments (create issues)       | 35 min   | 0.5%  | LOW      | None         |
+| **T3.13** | Extract magic numbers to constants          | 20 min   | 0.5%  | LOW      | None         |
+| **T3.14** | Remove unused code                          | 25 min   | 0.5%  | LOW      | None         |
+| **T3.15** | Standardize naming conventions              | 30 min   | 0.3%  | LOW      | None         |
 
 **PHASE 3 TOTAL: 625 min (10h 25m) = 80% CUMULATIVE VALUE**
 
@@ -271,43 +275,43 @@ These changes transform good code into excellent code:
 
 #### **T1.1: Split enhanced_loader.go (45 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M1.1.1 | Read and analyze enhanced_loader.go structure | 5 min | Understand dependencies |
-| M1.1.2 | Create enhanced_loader_validation.go with validation methods | 15 min | Move validation logic |
-| M1.1.3 | Create enhanced_loader_cache.go with caching methods | 15 min | Move cache logic |
-| M1.1.4 | Update imports and verify compilation | 5 min | Fix import paths |
-| M1.1.5 | Run tests to verify no breakage | 5 min | Ensure functionality |
+| Micro  | Task                                                         | Duration | Details                 |
+| ------ | ------------------------------------------------------------ | -------- | ----------------------- |
+| M1.1.1 | Read and analyze enhanced_loader.go structure                | 5 min    | Understand dependencies |
+| M1.1.2 | Create enhanced_loader_validation.go with validation methods | 15 min   | Move validation logic   |
+| M1.1.3 | Create enhanced_loader_cache.go with caching methods         | 15 min   | Move cache logic        |
+| M1.1.4 | Update imports and verify compilation                        | 5 min    | Fix import paths        |
+| M1.1.5 | Run tests to verify no breakage                              | 5 min    | Ensure functionality    |
 
 #### **T1.2: Split validation_middleware.go (45 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M1.2.1 | Read and analyze validation_middleware.go structure | 5 min | Understand organization |
-| M1.2.2 | Create validation_middleware_analysis.go | 15 min | Move change analysis |
-| M1.2.3 | Create validation_middleware_rules.go | 15 min | Move business rules |
-| M1.2.4 | Update imports and verify compilation | 5 min | Fix imports |
-| M1.2.5 | Run validation tests | 5 min | Verify functionality |
+| Micro  | Task                                                | Duration | Details                 |
+| ------ | --------------------------------------------------- | -------- | ----------------------- |
+| M1.2.1 | Read and analyze validation_middleware.go structure | 5 min    | Understand organization |
+| M1.2.2 | Create validation_middleware_analysis.go            | 15 min   | Move change analysis    |
+| M1.2.3 | Create validation_middleware_rules.go               | 15 min   | Move business rules     |
+| M1.2.4 | Update imports and verify compilation               | 5 min    | Fix imports             |
+| M1.2.5 | Run validation tests                                | 5 min    | Verify functionality    |
 
 #### **T1.3: Split validator.go (40 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M1.3.1 | Analyze validator.go structure | 5 min | Understand validation layers |
-| M1.3.2 | Create validator_rules.go with validation rules | 15 min | Move rule definitions |
-| M1.3.3 | Create validator_constraints.go with constraints | 12 min | Move constraint checking |
-| M1.3.4 | Update imports and compile | 5 min | Fix paths |
-| M1.3.5 | Run validator tests | 3 min | Verify |
+| Micro  | Task                                             | Duration | Details                      |
+| ------ | ------------------------------------------------ | -------- | ---------------------------- |
+| M1.3.1 | Analyze validator.go structure                   | 5 min    | Understand validation layers |
+| M1.3.2 | Create validator_rules.go with validation rules  | 15 min   | Move rule definitions        |
+| M1.3.3 | Create validator_constraints.go with constraints | 12 min   | Move constraint checking     |
+| M1.3.4 | Update imports and compile                       | 5 min    | Fix paths                    |
+| M1.3.5 | Run validator tests                              | 3 min    | Verify                       |
 
 #### **T1.4: Split sanitizer.go (35 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M1.4.1 | Analyze sanitizer.go structure | 5 min | Understand sanitization |
-| M1.4.2 | Create sanitizer_paths.go | 12 min | Path sanitization |
-| M1.4.3 | Create sanitizer_profiles.go | 10 min | Profile sanitization |
-| M1.4.4 | Update imports | 5 min | Fix imports |
-| M1.4.5 | Run sanitizer tests | 3 min | Verify |
+| Micro  | Task                           | Duration | Details                 |
+| ------ | ------------------------------ | -------- | ----------------------- |
+| M1.4.1 | Analyze sanitizer.go structure | 5 min    | Understand sanitization |
+| M1.4.2 | Create sanitizer_paths.go      | 12 min   | Path sanitization       |
+| M1.4.3 | Create sanitizer_profiles.go   | 10 min   | Profile sanitization    |
+| M1.4.4 | Update imports                 | 5 min    | Fix imports             |
+| M1.4.5 | Run sanitizer tests            | 3 min    | Verify                  |
 
 ---
 
@@ -315,76 +319,76 @@ These changes transform good code into excellent code:
 
 #### **T2.1: Create CleanStrategy enum (20 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M2.1.1 | Define CleanStrategy type in domain/types.go | 5 min | Create enum type |
-| M2.1.2 | Add constants (Aggressive, Conservative, DryRun) | 3 min | Define values |
-| M2.1.3 | Add IsValid() method | 3 min | Validation |
-| M2.1.4 | Update CleanResult to use CleanStrategy | 5 min | Replace string |
-| M2.1.5 | Update all usages and test | 4 min | Fix references |
+| Micro  | Task                                             | Duration | Details          |
+| ------ | ------------------------------------------------ | -------- | ---------------- |
+| M2.1.1 | Define CleanStrategy type in domain/types.go     | 5 min    | Create enum type |
+| M2.1.2 | Add constants (Aggressive, Conservative, DryRun) | 3 min    | Define values    |
+| M2.1.3 | Add IsValid() method                             | 3 min    | Validation       |
+| M2.1.4 | Update CleanResult to use CleanStrategy          | 5 min    | Replace string   |
+| M2.1.5 | Update all usages and test                       | 4 min    | Fix references   |
 
 #### **T2.2: Create ChangeOperation enum (15 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M2.2.1 | Define ChangeOperation type | 4 min | Create enum |
-| M2.2.2 | Add constants (Added, Removed, Modified) | 3 min | Define values |
-| M2.2.3 | Add IsValid() method | 3 min | Validation |
-| M2.2.4 | Update ConfigChange to use enum | 5 min | Replace string |
+| Micro  | Task                                     | Duration | Details        |
+| ------ | ---------------------------------------- | -------- | -------------- |
+| M2.2.1 | Define ChangeOperation type              | 4 min    | Create enum    |
+| M2.2.2 | Add constants (Added, Removed, Modified) | 3 min    | Define values  |
+| M2.2.3 | Add IsValid() method                     | 3 min    | Validation     |
+| M2.2.4 | Update ConfigChange to use enum          | 5 min    | Replace string |
 
 #### **T2.3: Replace map[string]any in config.go (30 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M2.3.1 | Create ProfileDefaults struct | 8 min | Type-safe structure |
-| M2.3.2 | Create OperationDefaults struct | 7 min | Operation defaults |
-| M2.3.3 | Replace SetDefault calls with structs | 10 min | Update config loading |
-| M2.3.4 | Test configuration loading | 5 min | Verify functionality |
+| Micro  | Task                                  | Duration | Details               |
+| ------ | ------------------------------------- | -------- | --------------------- |
+| M2.3.1 | Create ProfileDefaults struct         | 8 min    | Type-safe structure   |
+| M2.3.2 | Create OperationDefaults struct       | 7 min    | Operation defaults    |
+| M2.3.3 | Replace SetDefault calls with structs | 10 min   | Update config loading |
+| M2.3.4 | Test configuration loading            | 5 min    | Verify functionality  |
 
 #### **T2.4: Create ValidationContext struct (25 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M2.4.1 | Define ValidationContext struct in validator.go | 8 min | Create type |
-| M2.4.2 | Add fields (Level, ProfileName, OperationType) | 5 min | Add fields |
-| M2.4.3 | Replace map[string]any context usage | 10 min | Update code |
-| M2.4.4 | Test validation with new context | 2 min | Verify |
+| Micro  | Task                                            | Duration | Details     |
+| ------ | ----------------------------------------------- | -------- | ----------- |
+| M2.4.1 | Define ValidationContext struct in validator.go | 8 min    | Create type |
+| M2.4.2 | Add fields (Level, ProfileName, OperationType)  | 5 min    | Add fields  |
+| M2.4.3 | Replace map[string]any context usage            | 10 min   | Update code |
+| M2.4.4 | Test validation with new context                | 2 min    | Verify      |
 
 #### **T2.5: Create ChangeRecord struct (20 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M2.5.1 | Define ChangeRecord struct in sanitizer.go | 7 min | Create type |
-| M2.5.2 | Add fields (Operation, Field, Before, After) | 5 min | Add fields |
-| M2.5.3 | Replace map[string]any changes | 6 min | Update code |
-| M2.5.4 | Test sanitization tracking | 2 min | Verify |
+| Micro  | Task                                         | Duration | Details     |
+| ------ | -------------------------------------------- | -------- | ----------- |
+| M2.5.1 | Define ChangeRecord struct in sanitizer.go   | 7 min    | Create type |
+| M2.5.2 | Add fields (Operation, Field, Before, After) | 5 min    | Add fields  |
+| M2.5.3 | Replace map[string]any changes               | 6 min    | Update code |
+| M2.5.4 | Test sanitization tracking                   | 2 min    | Verify      |
 
 #### **T2.6: Create ErrorDetails struct (15 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M2.6.1 | Define ErrorDetails in pkg/errors/errors.go | 5 min | Create struct |
-| M2.6.2 | Add typed fields (Code, Path, Field, Value) | 4 min | Add fields |
-| M2.6.3 | Replace map[string]any Details | 4 min | Update usage |
-| M2.6.4 | Test error creation | 2 min | Verify |
+| Micro  | Task                                        | Duration | Details       |
+| ------ | ------------------------------------------- | -------- | ------------- |
+| M2.6.1 | Define ErrorDetails in pkg/errors/errors.go | 5 min    | Create struct |
+| M2.6.2 | Add typed fields (Code, Path, Field, Value) | 4 min    | Add fields    |
+| M2.6.3 | Replace map[string]any Details              | 4 min    | Update usage  |
+| M2.6.4 | Test error creation                         | 2 min    | Verify        |
 
 #### **T2.7: Make ConfigChange generic (25 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M2.7.1 | Define ConfigChange[T any] struct | 6 min | Generic type |
-| M2.7.2 | Update field types (OldValue T, NewValue T) | 4 min | Type parameters |
-| M2.7.3 | Update analyzeConfigChanges to use generic | 10 min | Update usage |
-| M2.7.4 | Test change tracking | 5 min | Verify |
+| Micro  | Task                                        | Duration | Details         |
+| ------ | ------------------------------------------- | -------- | --------------- |
+| M2.7.1 | Define ConfigChange[T any] struct           | 6 min    | Generic type    |
+| M2.7.2 | Update field types (OldValue T, NewValue T) | 4 min    | Type parameters |
+| M2.7.3 | Update analyzeConfigChanges to use generic  | 10 min   | Update usage    |
+| M2.7.4 | Test change tracking                        | 5 min    | Verify          |
 
 #### **T2.8: Replace naked `any` in validator (30 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M2.8.1 | Update ValidateField signature with type param | 8 min | Generic function |
-| M2.8.2 | Update ValidationRule to use constraints.Ordered | 7 min | Better constraints |
-| M2.8.3 | Update all ValidateField calls | 12 min | Fix call sites |
-| M2.8.4 | Test validation with types | 3 min | Verify |
+| Micro  | Task                                             | Duration | Details            |
+| ------ | ------------------------------------------------ | -------- | ------------------ |
+| M2.8.1 | Update ValidateField signature with type param   | 8 min    | Generic function   |
+| M2.8.2 | Update ValidationRule to use constraints.Ordered | 7 min    | Better constraints |
+| M2.8.3 | Update all ValidateField calls                   | 12 min   | Fix call sites     |
+| M2.8.4 | Test validation with types                       | 3 min    | Verify             |
 
 ---
 
@@ -392,152 +396,152 @@ These changes transform good code into excellent code:
 
 #### **T3.1: Centralize fmt.Errorf (45 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.1.1 | Search all fmt.Errorf in domain/config.go | 5 min | Find occurrences |
-| M3.1.2 | Replace with pkgerrors.NewValidationError | 12 min | Update domain |
-| M3.1.3 | Search all fmt.Errorf in domain/operation_settings.go | 5 min | Find occurrences |
-| M3.1.4 | Replace with pkgerrors functions | 10 min | Update settings |
-| M3.1.5 | Search remaining fmt.Errorf in other files | 5 min | Find stragglers |
-| M3.1.6 | Replace and test all error handling | 8 min | Complete migration |
+| Micro  | Task                                                  | Duration | Details            |
+| ------ | ----------------------------------------------------- | -------- | ------------------ |
+| M3.1.1 | Search all fmt.Errorf in domain/config.go             | 5 min    | Find occurrences   |
+| M3.1.2 | Replace with pkgerrors.NewValidationError             | 12 min   | Update domain      |
+| M3.1.3 | Search all fmt.Errorf in domain/operation_settings.go | 5 min    | Find occurrences   |
+| M3.1.4 | Replace with pkgerrors functions                      | 10 min   | Update settings    |
+| M3.1.5 | Search remaining fmt.Errorf in other files            | 5 min    | Find stragglers    |
+| M3.1.6 | Replace and test all error handling                   | 8 min    | Complete migration |
 
 #### **T3.2: Extract LoadConfig function (30 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.2.1 | Analyze LoadConfig function complexity | 5 min | Understand flow |
-| M3.2.2 | Extract validateAndApplyOptions method | 10 min | New method |
-| M3.2.3 | Extract loadConfigWithValidation method | 10 min | New method |
-| M3.2.4 | Update LoadConfig to call extracted methods | 3 min | Refactor |
-| M3.2.5 | Test configuration loading | 2 min | Verify |
+| Micro  | Task                                        | Duration | Details         |
+| ------ | ------------------------------------------- | -------- | --------------- |
+| M3.2.1 | Analyze LoadConfig function complexity      | 5 min    | Understand flow |
+| M3.2.2 | Extract validateAndApplyOptions method      | 10 min   | New method      |
+| M3.2.3 | Extract loadConfigWithValidation method     | 10 min   | New method      |
+| M3.2.4 | Update LoadConfig to call extracted methods | 3 min    | Refactor        |
+| M3.2.5 | Test configuration loading                  | 2 min    | Verify          |
 
 #### **T3.3: Extract analyzeConfigChanges (30 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.3.1 | Create ConfigChangeAnalyzer struct | 8 min | New analyzer |
-| M3.3.2 | Move analyzeConfigChanges logic | 12 min | Migrate code |
-| M3.3.3 | Update ValidationMiddleware to use analyzer | 7 min | Integration |
-| M3.3.4 | Test change analysis | 3 min | Verify |
+| Micro  | Task                                        | Duration | Details      |
+| ------ | ------------------------------------------- | -------- | ------------ |
+| M3.3.1 | Create ConfigChangeAnalyzer struct          | 8 min    | New analyzer |
+| M3.3.2 | Move analyzeConfigChanges logic             | 12 min   | Migrate code |
+| M3.3.3 | Update ValidationMiddleware to use analyzer | 7 min    | Integration  |
+| M3.3.4 | Test change analysis                        | 3 min    | Verify       |
 
 #### **T3.4: Remove Profile.Enabled split brain (30 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.4.1 | Add Profile.IsEnabled() method | 5 min | Derived method |
-| M3.4.2 | Add Profile.EnabledOperations() method | 8 min | Filter operations |
-| M3.4.3 | Remove Enabled field from Profile struct | 5 min | Delete field |
-| M3.4.4 | Update all Profile.Enabled usages | 10 min | Use IsEnabled() |
-| M3.4.5 | Test profile activation | 2 min | Verify |
+| Micro  | Task                                     | Duration | Details           |
+| ------ | ---------------------------------------- | -------- | ----------------- |
+| M3.4.1 | Add Profile.IsEnabled() method           | 5 min    | Derived method    |
+| M3.4.2 | Add Profile.EnabledOperations() method   | 8 min    | Filter operations |
+| M3.4.3 | Remove Enabled field from Profile struct | 5 min    | Delete field      |
+| M3.4.4 | Update all Profile.Enabled usages        | 10 min   | Use IsEnabled()   |
+| M3.4.5 | Test profile activation                  | 2 min    | Verify            |
 
 #### **T3.5: Create OperationMode enum (25 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.5.1 | Define OperationMode type in domain/config.go | 5 min | Create enum |
-| M3.5.2 | Add constants (Safe, Normal, Aggressive) | 3 min | Define values |
-| M3.5.3 | Replace SafeMode bool with Mode OperationMode | 8 min | Update struct |
-| M3.5.4 | Update all SafeMode usages | 7 min | Migrate code |
-| M3.5.5 | Test operation modes | 2 min | Verify |
+| Micro  | Task                                          | Duration | Details       |
+| ------ | --------------------------------------------- | -------- | ------------- |
+| M3.5.1 | Define OperationMode type in domain/config.go | 5 min    | Create enum   |
+| M3.5.2 | Add constants (Safe, Normal, Aggressive)      | 3 min    | Define values |
+| M3.5.3 | Replace SafeMode bool with Mode OperationMode | 8 min    | Update struct |
+| M3.5.4 | Update all SafeMode usages                    | 7 min    | Migrate code  |
+| M3.5.5 | Test operation modes                          | 2 min    | Verify        |
 
 #### **T3.6: Create HomebrewAdapter (45 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.6.1 | Create internal/adapters/homebrew.go | 5 min | New file |
-| M3.6.2 | Define HomebrewAdapter struct (timeout, retries, dryRun) | 5 min | Struct |
-| M3.6.3 | Implement Cleanup method | 15 min | Core logic |
-| M3.6.4 | Implement Autoremove method | 10 min | Additional method |
-| M3.6.5 | Add tests for HomebrewAdapter | 8 min | Unit tests |
-| M3.6.6 | Integrate into cleaner | 2 min | Wire up |
+| Micro  | Task                                                     | Duration | Details           |
+| ------ | -------------------------------------------------------- | -------- | ----------------- |
+| M3.6.1 | Create internal/adapters/homebrew.go                     | 5 min    | New file          |
+| M3.6.2 | Define HomebrewAdapter struct (timeout, retries, dryRun) | 5 min    | Struct            |
+| M3.6.3 | Implement Cleanup method                                 | 15 min   | Core logic        |
+| M3.6.4 | Implement Autoremove method                              | 10 min   | Additional method |
+| M3.6.5 | Add tests for HomebrewAdapter                            | 8 min    | Unit tests        |
+| M3.6.6 | Integrate into cleaner                                   | 2 min    | Wire up           |
 
 #### **T3.7: Create SystemTempAdapter (40 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.7.1 | Create internal/adapters/systemtemp.go | 5 min | New file |
-| M3.7.2 | Define SystemTempAdapter struct | 5 min | Struct |
-| M3.7.3 | Implement CleanTemp method | 15 min | Core logic |
-| M3.7.4 | Implement SafetyChecks (protected paths) | 10 min | Safety |
-| M3.7.5 | Add tests and integration | 5 min | Tests |
+| Micro  | Task                                     | Duration | Details    |
+| ------ | ---------------------------------------- | -------- | ---------- |
+| M3.7.1 | Create internal/adapters/systemtemp.go   | 5 min    | New file   |
+| M3.7.2 | Define SystemTempAdapter struct          | 5 min    | Struct     |
+| M3.7.3 | Implement CleanTemp method               | 15 min   | Core logic |
+| M3.7.4 | Implement SafetyChecks (protected paths) | 10 min   | Safety     |
+| M3.7.5 | Add tests and integration                | 5 min    | Tests      |
 
 #### **T3.8: Remove IsValid() duplicates (30 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.8.1 | Search all IsValid() methods | 5 min | Find duplicates |
-| M3.8.2 | Remove IsValid() from Config | 8 min | Use Validate() |
-| M3.8.3 | Remove IsValid() from OperationSettings | 8 min | Use Validate() |
-| M3.8.4 | Update all IsValid() call sites | 7 min | Use Validate() |
-| M3.8.5 | Test validation logic | 2 min | Verify |
+| Micro  | Task                                    | Duration | Details         |
+| ------ | --------------------------------------- | -------- | --------------- |
+| M3.8.1 | Search all IsValid() methods            | 5 min    | Find duplicates |
+| M3.8.2 | Remove IsValid() from Config            | 8 min    | Use Validate()  |
+| M3.8.3 | Remove IsValid() from OperationSettings | 8 min    | Use Validate()  |
+| M3.8.4 | Update all IsValid() call sites         | 7 min    | Use Validate()  |
+| M3.8.5 | Test validation logic                   | 2 min    | Verify          |
 
 #### **T3.9: Extract CleaningService (60 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.9.1 | Create internal/service/cleaning.go | 5 min | New file |
-| M3.9.2 | Define CleaningService struct | 5 min | Service struct |
-| M3.9.3 | Extract ExecuteCleanup business logic | 25 min | Move from cmd |
-| M3.9.4 | Extract ValidateCleanupRequest logic | 15 min | Validation |
-| M3.9.5 | Update commands to use service | 8 min | Integration |
-| M3.9.6 | Test service layer | 2 min | Verify |
+| Micro  | Task                                  | Duration | Details        |
+| ------ | ------------------------------------- | -------- | -------------- |
+| M3.9.1 | Create internal/service/cleaning.go   | 5 min    | New file       |
+| M3.9.2 | Define CleaningService struct         | 5 min    | Service struct |
+| M3.9.3 | Extract ExecuteCleanup business logic | 25 min   | Move from cmd  |
+| M3.9.4 | Extract ValidateCleanupRequest logic  | 15 min   | Validation     |
+| M3.9.5 | Update commands to use service        | 8 min    | Integration    |
+| M3.9.6 | Test service layer                    | 2 min    | Verify         |
 
 #### **T3.10: Add command unit tests (50 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.10.1 | Create cmd/clean-wizard/commands/clean_test.go | 5 min | New file |
-| M3.10.2 | Write tests for clean command | 15 min | Test logic |
-| M3.10.3 | Create cmd/clean-wizard/commands/scan_test.go | 5 min | New file |
-| M3.10.4 | Write tests for scan command | 15 min | Test logic |
-| M3.10.5 | Create cmd/clean-wizard/commands/profile_test.go | 5 min | New file |
-| M3.10.6 | Write tests for profile command | 5 min | Test logic |
+| Micro   | Task                                             | Duration | Details    |
+| ------- | ------------------------------------------------ | -------- | ---------- |
+| M3.10.1 | Create cmd/clean-wizard/commands/clean_test.go   | 5 min    | New file   |
+| M3.10.2 | Write tests for clean command                    | 15 min   | Test logic |
+| M3.10.3 | Create cmd/clean-wizard/commands/scan_test.go    | 5 min    | New file   |
+| M3.10.4 | Write tests for scan command                     | 15 min   | Test logic |
+| M3.10.5 | Create cmd/clean-wizard/commands/profile_test.go | 5 min    | New file   |
+| M3.10.6 | Write tests for profile command                  | 5 min    | Test logic |
 
 #### **T3.11: Add adapter unit tests (40 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.11.1 | Create internal/adapters/nix_test.go | 5 min | New file |
-| M3.11.2 | Write NixAdapter unit tests | 12 min | Test logic |
-| M3.11.3 | Write HomebrewAdapter unit tests | 12 min | Test logic |
-| M3.11.4 | Write SystemTempAdapter unit tests | 11 min | Test logic |
+| Micro   | Task                                 | Duration | Details    |
+| ------- | ------------------------------------ | -------- | ---------- |
+| M3.11.1 | Create internal/adapters/nix_test.go | 5 min    | New file   |
+| M3.11.2 | Write NixAdapter unit tests          | 12 min   | Test logic |
+| M3.11.3 | Write HomebrewAdapter unit tests     | 12 min   | Test logic |
+| M3.11.4 | Write SystemTempAdapter unit tests   | 11 min   | Test logic |
 
 #### **T3.12: Resolve TODO comments (35 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.12.1 | Search all TODO comments | 5 min | Find all |
-| M3.12.2 | Create GitHub issues for each TODO | 15 min | Document |
-| M3.12.3 | Remove TODO from sanitizer.go | 5 min | Clean up |
-| M3.12.4 | Remove TODO from scan.go | 5 min | Clean up |
-| M3.12.5 | Remove TODO from validation_middleware.go | 5 min | Clean up |
+| Micro   | Task                                      | Duration | Details  |
+| ------- | ----------------------------------------- | -------- | -------- |
+| M3.12.1 | Search all TODO comments                  | 5 min    | Find all |
+| M3.12.2 | Create GitHub issues for each TODO        | 15 min   | Document |
+| M3.12.3 | Remove TODO from sanitizer.go             | 5 min    | Clean up |
+| M3.12.4 | Remove TODO from scan.go                  | 5 min    | Clean up |
+| M3.12.5 | Remove TODO from validation_middleware.go | 5 min    | Clean up |
 
 #### **T3.13: Extract magic numbers (20 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.13.1 | Find magic numbers in validator.go | 5 min | Search |
-| M3.13.2 | Create validation constants | 5 min | Define consts |
-| M3.13.3 | Replace magic numbers with constants | 8 min | Update code |
-| M3.13.4 | Test validation with constants | 2 min | Verify |
+| Micro   | Task                                 | Duration | Details       |
+| ------- | ------------------------------------ | -------- | ------------- |
+| M3.13.1 | Find magic numbers in validator.go   | 5 min    | Search        |
+| M3.13.2 | Create validation constants          | 5 min    | Define consts |
+| M3.13.3 | Replace magic numbers with constants | 8 min    | Update code   |
+| M3.13.4 | Test validation with constants       | 2 min    | Verify        |
 
 #### **T3.14: Remove unused code (25 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.14.1 | Remove MockSuccess from result/type.go | 5 min | Delete |
-| M3.14.2 | Remove old validation methods in sanitizer | 10 min | Clean up |
-| M3.14.3 | Remove arraysEqual (use slices.Equal) | 5 min | Use stdlib |
-| M3.14.4 | Test after removal | 5 min | Verify |
+| Micro   | Task                                       | Duration | Details    |
+| ------- | ------------------------------------------ | -------- | ---------- |
+| M3.14.1 | Remove MockSuccess from result/type.go     | 5 min    | Delete     |
+| M3.14.2 | Remove old validation methods in sanitizer | 10 min   | Clean up   |
+| M3.14.3 | Remove arraysEqual (use slices.Equal)      | 5 min    | Use stdlib |
+| M3.14.4 | Test after removal                         | 5 min    | Verify     |
 
 #### **T3.15: Standardize naming (30 min)**
 
-| Micro | Task | Duration | Details |
-|-------|------|----------|---------|
-| M3.15.1 | Rename ConfigValidator to ValidatorConfig | 8 min | Consistency |
-| M3.15.2 | Rename ConfigSanitizer to SanitizerConfig | 8 min | Consistency |
-| M3.15.3 | Update all references | 12 min | Fix usage |
-| M3.15.4 | Test compilation | 2 min | Verify |
+| Micro   | Task                                      | Duration | Details     |
+| ------- | ----------------------------------------- | -------- | ----------- |
+| M3.15.1 | Rename ConfigValidator to ValidatorConfig | 8 min    | Consistency |
+| M3.15.2 | Rename ConfigSanitizer to SanitizerConfig | 8 min    | Consistency |
+| M3.15.3 | Update all references                     | 12 min   | Fix usage   |
+| M3.15.4 | Test compilation                          | 2 min    | Verify      |
 
 ---
 
@@ -545,45 +549,45 @@ These changes transform good code into excellent code:
 
 ### Phase 1: 1% Effort = 51% Value (4 tasks, 165 min)
 
-| ID | Task | Duration | Value | Micro-Tasks |
-|----|------|----------|-------|-------------|
-| T1.1 | Split enhanced_loader.go | 45 min | 15% | 5 tasks |
-| T1.2 | Split validation_middleware.go | 45 min | 15% | 5 tasks |
-| T1.3 | Split validator.go | 40 min | 12% | 5 tasks |
-| T1.4 | Split sanitizer.go | 35 min | 9% | 5 tasks |
+| ID   | Task                           | Duration | Value | Micro-Tasks |
+| ---- | ------------------------------ | -------- | ----- | ----------- |
+| T1.1 | Split enhanced_loader.go       | 45 min   | 15%   | 5 tasks     |
+| T1.2 | Split validation_middleware.go | 45 min   | 15%   | 5 tasks     |
+| T1.3 | Split validator.go             | 40 min   | 12%   | 5 tasks     |
+| T1.4 | Split sanitizer.go             | 35 min   | 9%    | 5 tasks     |
 
 ### Phase 2: 4% Effort = 64% Value (8 tasks, 180 min)
 
-| ID | Task | Duration | Value | Micro-Tasks |
-|----|------|----------|-------|-------------|
-| T2.1 | Create CleanStrategy enum | 20 min | 3% | 5 tasks |
-| T2.2 | Create ChangeOperation enum | 15 min | 2% | 4 tasks |
-| T2.3 | Replace map[string]any defaults | 30 min | 3% | 4 tasks |
-| T2.4 | Create ValidationContext struct | 25 min | 2% | 4 tasks |
-| T2.5 | Create ChangeRecord struct | 20 min | 1.5% | 4 tasks |
-| T2.6 | Create ErrorDetails struct | 15 min | 1% | 4 tasks |
-| T2.7 | Make ConfigChange generic | 25 min | 1% | 4 tasks |
-| T2.8 | Replace naked any in validator | 30 min | 0.5% | 4 tasks |
+| ID   | Task                            | Duration | Value | Micro-Tasks |
+| ---- | ------------------------------- | -------- | ----- | ----------- |
+| T2.1 | Create CleanStrategy enum       | 20 min   | 3%    | 5 tasks     |
+| T2.2 | Create ChangeOperation enum     | 15 min   | 2%    | 4 tasks     |
+| T2.3 | Replace map[string]any defaults | 30 min   | 3%    | 4 tasks     |
+| T2.4 | Create ValidationContext struct | 25 min   | 2%    | 4 tasks     |
+| T2.5 | Create ChangeRecord struct      | 20 min   | 1.5%  | 4 tasks     |
+| T2.6 | Create ErrorDetails struct      | 15 min   | 1%    | 4 tasks     |
+| T2.7 | Make ConfigChange generic       | 25 min   | 1%    | 4 tasks     |
+| T2.8 | Replace naked any in validator  | 30 min   | 0.5%  | 4 tasks     |
 
 ### Phase 3: 20% Effort = 80% Value (15 tasks, 625 min)
 
-| ID | Task | Duration | Value | Micro-Tasks |
-|----|------|----------|-------|-------------|
-| T3.1 | Centralize fmt.Errorf | 45 min | 3% | 6 tasks |
-| T3.2 | Extract LoadConfig function | 30 min | 1.5% | 5 tasks |
-| T3.3 | Extract analyzeConfigChanges | 30 min | 1% | 4 tasks |
-| T3.4 | Remove Profile.Enabled split brain | 30 min | 2% | 5 tasks |
-| T3.5 | Create OperationMode enum | 25 min | 1.5% | 5 tasks |
-| T3.6 | Create HomebrewAdapter | 45 min | 2% | 6 tasks |
-| T3.7 | Create SystemTempAdapter | 40 min | 1.5% | 5 tasks |
-| T3.8 | Remove IsValid() duplicates | 30 min | 1% | 5 tasks |
-| T3.9 | Extract CleaningService | 60 min | 2% | 6 tasks |
-| T3.10 | Add command unit tests | 50 min | 1.5% | 6 tasks |
-| T3.11 | Add adapter unit tests | 40 min | 1% | 4 tasks |
-| T3.12 | Resolve TODO comments | 35 min | 0.5% | 5 tasks |
-| T3.13 | Extract magic numbers | 20 min | 0.5% | 4 tasks |
-| T3.14 | Remove unused code | 25 min | 0.5% | 4 tasks |
-| T3.15 | Standardize naming | 30 min | 0.3% | 4 tasks |
+| ID    | Task                               | Duration | Value | Micro-Tasks |
+| ----- | ---------------------------------- | -------- | ----- | ----------- |
+| T3.1  | Centralize fmt.Errorf              | 45 min   | 3%    | 6 tasks     |
+| T3.2  | Extract LoadConfig function        | 30 min   | 1.5%  | 5 tasks     |
+| T3.3  | Extract analyzeConfigChanges       | 30 min   | 1%    | 4 tasks     |
+| T3.4  | Remove Profile.Enabled split brain | 30 min   | 2%    | 5 tasks     |
+| T3.5  | Create OperationMode enum          | 25 min   | 1.5%  | 5 tasks     |
+| T3.6  | Create HomebrewAdapter             | 45 min   | 2%    | 6 tasks     |
+| T3.7  | Create SystemTempAdapter           | 40 min   | 1.5%  | 5 tasks     |
+| T3.8  | Remove IsValid() duplicates        | 30 min   | 1%    | 5 tasks     |
+| T3.9  | Extract CleaningService            | 60 min   | 2%    | 6 tasks     |
+| T3.10 | Add command unit tests             | 50 min   | 1.5%  | 6 tasks     |
+| T3.11 | Add adapter unit tests             | 40 min   | 1%    | 4 tasks     |
+| T3.12 | Resolve TODO comments              | 35 min   | 0.5%  | 5 tasks     |
+| T3.13 | Extract magic numbers              | 20 min   | 0.5%  | 4 tasks     |
+| T3.14 | Remove unused code                 | 25 min   | 0.5%  | 4 tasks     |
+| T3.15 | Standardize naming                 | 30 min   | 0.3%  | 4 tasks     |
 
 **GRAND TOTAL: 27 tasks, 970 minutes (16.2 hours), 80% value delivered**
 
@@ -603,6 +607,7 @@ PHASE 1 (Do FIRST) → PHASE 2 (Do SECOND) → PHASE 3 (Do THIRD)
 ### Parallel Execution Opportunities
 
 Tasks that can run in parallel:
+
 - **Phase 1:** All 4 file splits are independent
 - **Phase 2:** T2.1, T2.2, T2.3, T2.6 are independent
 - **Phase 3:** T3.6, T3.7 can run in parallel
@@ -610,6 +615,7 @@ Tasks that can run in parallel:
 ### Quality Gates
 
 After each phase:
+
 1. ✅ All files compile without errors
 2. ✅ All existing tests pass
 3. ✅ New tests added for new code
@@ -777,6 +783,7 @@ graph TB
 ## 🎯 SUCCESS CRITERIA
 
 ### Phase 1 Success (51% value)
+
 - ✅ All 4 files split successfully
 - ✅ No file >350 lines in config package
 - ✅ All tests pass
@@ -784,6 +791,7 @@ graph TB
 - ✅ No regressions in functionality
 
 ### Phase 2 Success (64% cumulative)
+
 - ✅ <5 map[string]any violations remaining
 - ✅ CleanStrategy enum in use
 - ✅ ChangeOperation enum in use
@@ -791,6 +799,7 @@ graph TB
 - ✅ All tests pass
 
 ### Phase 3 Success (80% cumulative)
+
 - ✅ All fmt.Errorf centralized
 - ✅ No functions >50 lines
 - ✅ No split brain patterns
@@ -801,6 +810,7 @@ graph TB
 - ✅ Consistent naming
 
 ### Overall Success
+
 - ✅ Grade improvement: B+ (83%) → A+ (96%)
 - ✅ Type safety: 75% → 95%
 - ✅ File organization: 65% → 95%
@@ -814,6 +824,7 @@ graph TB
 ## 🚨 RISK MITIGATION
 
 ### High-Risk Activities
+
 1. **File Splits** - Risk: Breaking imports
    - Mitigation: Compile after each split
    - Rollback: Git stash available
@@ -827,6 +838,7 @@ graph TB
    - Rollback: Feature branches
 
 ### Contingency Plan
+
 - Each task is atomic and independently committable
 - Can stop at any phase and still have value
 - Minimum viable: Complete Phase 1 (51% value)
@@ -838,11 +850,13 @@ graph TB
 ## 📊 RESOURCE ALLOCATION
 
 ### Time Investment
+
 - **Phase 1:** 2h 45m (1% effort) = 51% value ⭐ **HIGHEST ROI**
 - **Phase 2:** 3h (additional) = +13% value ⭐ **HIGH ROI**
 - **Phase 3:** 10h 25m (additional) = +16% value ⭐ **GOOD ROI**
 
 ### Priority If Time-Constrained
+
 1. **MUST DO:** Phase 1 (file splits) - 51% value for 2h 45m
 2. **SHOULD DO:** Phase 2 (type safety) - +13% value for 3h
 3. **NICE TO HAVE:** Phase 3 (excellence) - +16% value for 10h 25m
@@ -852,6 +866,7 @@ graph TB
 ## 🎯 FINAL NOTES
 
 ### Architectural Philosophy
+
 - **Type Safety First** - Prevent bugs at compile time
 - **Small Files** - Easy to understand and test
 - **Single Responsibility** - Each file does one thing well
@@ -860,6 +875,7 @@ graph TB
 - **No Magic** - Explicit is better than implicit
 
 ### Code Review Checklist
+
 - [ ] All files <350 lines
 - [ ] No map[string]any in critical paths
 - [ ] All errors use pkg/errors
@@ -870,6 +886,7 @@ graph TB
 - [ ] Comprehensive documentation
 
 ### Post-Completion
+
 - Create detailed commit messages
 - Push to feature branch
 - Create pull request with summary

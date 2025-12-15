@@ -1,9 +1,9 @@
 > 🚨 **PROJECT ORIGIN**
-> 
-> This project originated from: [Setup-Mac](https://github.com/LarsArtmann/Setup-Mac)
-> 
-> **GitHub Issue:** [Setup-Mac #111](https://github.com/LarsArtmann/Setup-Mac/issues/111)
 >
+> This project originated from: [Setup-Mac](https://github.com/LarsArtmann/Setup-Mac)
+>
+> **GitHub Issue:** [Setup-Mac #111](https://github.com/LarsArtmann/Setup-Mac/issues/111)
+
 # Clean Wizard
 
 [![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)](https://golang.org)
@@ -84,6 +84,7 @@ $ clean-wizard scan
 Interactive setup wizard that creates a comprehensive cleaning configuration.
 
 **Options:**
+
 - `--force, -f` - Overwrite existing configuration
 - `--minimal` - Create minimal configuration
 
@@ -92,6 +93,7 @@ Interactive setup wizard that creates a comprehensive cleaning configuration.
 Scans your system for cleanable items and shows size estimates.
 
 **Options:**
+
 - `--verbose, -v` - Show detailed scan information
 - `--profile, -p` - Filter results by profile
 
@@ -100,6 +102,7 @@ Scans your system for cleanable items and shows size estimates.
 Performs system cleanup based on configuration or profile.
 
 **Options:**
+
 - `--profile, -p` - Cleaning profile to use (daily, comprehensive, aggressive)
 - `--dry-run` - Show what would be cleaned without doing it
 - `--force, -f` - Skip confirmation prompts
@@ -110,6 +113,7 @@ Performs system cleanup based on configuration or profile.
 Manage configuration files.
 
 **Subcommands:**
+
 - `show` - Display current configuration
 - `edit` - Edit configuration in default editor
 - `validate` - Validate configuration file
@@ -120,6 +124,7 @@ Manage configuration files.
 Manage cleaning profiles.
 
 **Subcommands:**
+
 - `list` - List available profiles
 - `show [profile]` - Show profile details
 - `create` - Create new profile
@@ -128,17 +133,21 @@ Manage cleaning profiles.
 ## 🎯 Cleaning Profiles
 
 ### Daily Profile
+
 Quick daily cleanup for routine maintenance.
 
 **Operations:**
+
 - Clean old Nix generations
 - Homebrew autoremove and recent prune
 - Go package caches
 
 ### Comprehensive Profile
+
 Complete system cleanup for weekly maintenance.
 
 **Operations:**
+
 - Nix store optimization
 - Full Homebrew cleanup
 - All package caches (npm, pnpm, cargo, etc.)
@@ -146,9 +155,11 @@ Complete system cleanup for weekly maintenance.
 - Docker system prune
 
 ### Aggressive Profile
+
 Nuclear option - everything that can be cleaned.
 
 **Operations:**
+
 - Remove all Nix generations
 - Clean all language versions (Node, Python, Ruby)
 - Remove all cache directories
@@ -159,7 +170,9 @@ Nuclear option - everything that can be cleaned.
 ## 🔒 Safety Features
 
 ### Protected Paths
+
 The following paths are never cleaned by default:
+
 - `/nix/store` - Nix store
 - `/Users` - User directories
 - `/System` - System files
@@ -167,16 +180,19 @@ The following paths are never cleaned by default:
 - `/Library` - Library files
 
 ### Safe Mode
+
 - Prevents dangerous operations
 - Shows warnings before risky actions
 - Can be disabled with `--force` flag
 
 ### Dry Run Mode
+
 - Shows what would be cleaned
 - No actual changes made
 - Perfect for testing configurations
 
 ### Backup Creation
+
 - Creates backups before aggressive operations
 - Configurable backup location
 - Can be disabled if not needed
@@ -194,6 +210,7 @@ Clean Wizard is built with inspiration from GoReleaser-Wizard and uses:
 ## 📦 What It Cleans
 
 ### Package Managers
+
 - **Nix** - Store optimization, generation cleanup
 - **Homebrew** - Autoremove, cache cleanup
 - **npm/pnpm** - Package cache cleanup
@@ -201,12 +218,14 @@ Clean Wizard is built with inspiration from GoReleaser-Wizard and uses:
 - **Cargo** - Rust package cache cleanup
 
 ### System Files
+
 - **Temporary files** - System temp directories
 - **Spotlight metadata** - Search index cleanup
 - **System logs** - Log file cleanup
 - **Docker** - System prune, volume cleanup
 
 ### Development Tools
+
 - **iOS Simulators** - Derived data, simulator cleanup
 - **Language versions** - Node, Python, Ruby versions
 - **Build caches** - Gradle, Maven, etc.
@@ -228,21 +247,25 @@ go build -o clean-wizard ./cmd/clean-wizard/
 ## 📚 Examples
 
 ### Basic Daily Cleanup
+
 ```bash
 clean-wizard clean --profile daily
 ```
 
 ### Comprehensive Cleanup with Dry Run
+
 ```bash
 clean-wizard clean --profile comprehensive --dry-run
 ```
 
 ### Aggressive Cleanup (Force)
+
 ```bash
 clean-wizard clean --profile aggressive --force
 ```
 
 ### Create Custom Profile
+
 ```bash
 clean-wizard profile create
 ```
