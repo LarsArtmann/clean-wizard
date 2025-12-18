@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Duplicates</title>
+<style>
+	pre {
+		background-color: #FFD;
+		border: 1px solid #E2E2E2;
+		padding: 1ex;
+	}
+</style>
+</head>
+<body>
+<h1>#1 found 4 clones</h1>
+<h2>internal/conversions/conversions.go:287</h2>
+<pre>                                                                                                     {
+	if err := cleanResult.Validate(); err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf(&#34;invalid CleanResult: %w&#34;, err))
+	}
+	return result.Ok(cleanResult)
+}</pre>
+<h2>internal/conversions/conversions.go:295</h2>
+<pre>                                                                                                 {
+	if err := scanResult.Validate(); err != nil {
+		return result.Err[domain.ScanResult](fmt.Errorf(&#34;invalid ScanResult: %w&#34;, err))
+	}
+	return result.Ok(scanResult)
+}</pre>
+<h2>internal/middleware/validation.go:20</h2>
+<pre>                                                                                                                                   {
+	if err := req.Validate(); err != nil {
+		return result.Err[domain.ScanRequest](fmt.Errorf(&#34;invalid scan request: %w&#34;, err))
+	}
+	return result.Ok(req)
+}</pre>
+<h2>internal/middleware/validation.go:28</h2>
+<pre>                                                                                                                                      {
+	if err := req.Validate(); err != nil {
+		return result.Err[domain.CleanRequest](fmt.Errorf(&#34;invalid clean request: %w&#34;, err))
+	}
+	return result.Ok(req)
+}</pre>
+<h1>#2 found 2 clones</h1>
+<h2>internal/config/sanitizer_profile_main.go:14</h2>
+<pre>if cs.rules.TrimWhitespace {
+	original := profile.Name
+	profile.Name = strings.TrimSpace(profile.Name)
+	if original != profile.Name {
+		result.addChange(fmt.Sprintf(&#34;profiles.%s.name&#34;, name), original, profile.Name, &#34;trimmed whitespace&#34;)
+	}
+}</pre>
+<h2>internal/config/sanitizer_profile_main.go:23</h2>
+<pre>if cs.rules.TrimWhitespace {
+	original := profile.Description
+	profile.Description = strings.TrimSpace(profile.Description)
+	if original != profile.Description {
+		result.addChange(fmt.Sprintf(&#34;profiles.%s.description&#34;, name), original, profile.Description, &#34;trimmed whitespace&#34;)
+	}
+}</pre>
+<h1>#3 found 2 clones</h1>
+<h2>internal/config/enhanced_loader.go:154</h2>
+<pre>func (ecl *EnhancedConfigLoader) getSchemaMinimum() *float64 {
+	if ecl.validator.rules.MaxDiskUsage != nil &amp;&amp; ecl.validator.rules.MaxDiskUsage.Min != nil {
+		v := float64(*ecl.validator.rules.MaxDiskUsage.Min)
+		return &amp;v
+	}
+	v := 10.0 // fallback to current literal
+	return &amp;v
+}</pre>
+<h2>internal/config/enhanced_loader.go:164</h2>
+<pre>func (ecl *EnhancedConfigLoader) getSchemaMaximum() *float64 {
+	if ecl.validator.rules.MaxDiskUsage != nil &amp;&amp; ecl.validator.rules.MaxDiskUsage.Max != nil {
+		v := float64(*ecl.validator.rules.MaxDiskUsage.Max)
+		return &amp;v
+	}
+	v := 95.0 // fallback to current literal
+	return &amp;v
+}</pre>
+<h1>#4 found 2 clones</h1>
+<h2>tests/bdd/configuration_workflow_bdd_test.go:142</h2>
+<pre>func (c *ConfigurationWorkflowContext) haveValidConfigFile(filename string) error {
+	configContent := `version: &#34;1.0.0&#34;
+safe_mode: true
+max_disk_usage: 50
+protected:
+  - &#34;/System&#34;
+  - &#34;/Library&#34;
+  - &#34;/Applications&#34;
+  - &#34;/usr&#34;
+  - &#34;/etc&#34;
+  - &#34;/var&#34;
+  - &#34;/bin&#34;
+  - &#34;/sbin&#34;
+profiles:
+  daily:
+    name: &#34;daily&#34;
+    description: &#34;Daily cleanup&#34;
+    enabled: true
+    operations:
+      - name: &#34;nix-generations&#34;
+        description: &#34;Clean Nix generations&#34;
+        risk_level: &#34;LOW&#34;
+        enabled: true`
+
+	configPath := filepath.Join(c.tempDir, filename)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
+}</pre>
+<h2>tests/bdd/configuration_workflow_bdd_test.go:170</h2>
+<pre>func (c *ConfigurationWorkflowContext) haveInvalidConfigFile(filename string) error {
+	configContent := `version: &#34;1.0.0&#34;
+safe_mode: true
+invalid_field: true
+profiles: []`
+
+	configPath := filepath.Join(c.tempDir, filename)
+	return ioutil.WriteFile(configPath, []byte(configContent), 0o644)
+}</pre>
+<h1>#5 found 3 clones</h1>
+<h2>internal/pkg/errors/errors.go:232</h2>
+<pre>case &#34;value&#34;:
+	if v, ok := value.(string); ok {
+		e.Details.Value = v
+	} else {
+		e.Details.Value = fmt.Sprintf(&#34;%v&#34;, value)
+	}</pre>
+<h2>internal/pkg/errors/errors.go:238</h2>
+<pre>case &#34;expected&#34;:
+	if v, ok := value.(string); ok {
+		e.Details.Expected = v
+	} else {
+		e.Details.Expected = fmt.Sprintf(&#34;%v&#34;, value)
+	}</pre>
+<h2>internal/pkg/errors/errors.go:244</h2>
+<pre>case &#34;actual&#34;:
+	if v, ok := value.(string); ok {
+		e.Details.Actual = v
+	} else {
+		e.Details.Actual = fmt.Sprintf(&#34;%v&#34;, value)
+	}</pre>
+<h1>#6 found 4 clones</h1>
+<h2>tests/bdd/configuration_workflow_bdd_test.go:315</h2>
+<pre>func (c *ConfigurationWorkflowContext) shouldSeeScanResults() error {
+	if !strings.Contains(c.commandOutput, &#34;Total generations:&#34;) {
+		return fmt.Errorf(&#34;expected scan results with generations, but got:\n%s&#34;, c.commandOutput)
+	}
+	return nil
+}</pre>
+<h2>tests/bdd/configuration_workflow_bdd_test.go:329</h2>
+<pre>func (c *ConfigurationWorkflowContext) shouldSeeDailyProfile() error {
+	if !strings.Contains(c.commandOutput, &#34;Using daily profile configuration&#34;) {
+		return fmt.Errorf(&#34;expected to see daily profile usage, but got:\n%s&#34;, c.commandOutput)
+	}
+	return nil
+}</pre>
+<h2>tests/bdd/configuration_workflow_bdd_test.go:336</h2>
+<pre>func (c *ConfigurationWorkflowContext) shouldSeeDryRunMode() error {
+	if !strings.Contains(c.commandOutput, &#34;DRY-RUN mode&#34;) {
+		return fmt.Errorf(&#34;expected to see dry-run mode, but got:\n%s&#34;, c.commandOutput)
+	}
+	return nil
+}</pre>
+<h2>tests/bdd/configuration_workflow_bdd_test.go:379</h2>
+<pre>func (c *ConfigurationWorkflowContext) shouldSeeScanResultsReflectingDailyProfile() error {
+	if !strings.Contains(c.commandOutput, &#34;Using daily profile configuration&#34;) {
+		return fmt.Errorf(&#34;expected scan results to reflect daily profile, but got:\n%s&#34;, c.commandOutput)
+	}
+	return nil
+}</pre>
+<h1>#7 found 2 clones</h1>
+<h2>internal/config/validation_middleware_analysis.go:15</h2>
+<pre>if current.SafeMode != proposed.SafeMode {
+	changes = append(changes, ConfigChange{
+		Field:     &#34;safe_mode&#34;,
+		OldValue:  current.SafeMode,
+		NewValue:  proposed.SafeMode,
+		Operation: vm.getChangeOperation(current.SafeMode, proposed.SafeMode),
+		Risk:      vm.assessChangeRisk(&#34;safe_mode&#34;, current.SafeMode, proposed.SafeMode),
+	})
+}</pre>
+<h2>internal/config/validation_middleware_analysis.go:25</h2>
+<pre>if current.MaxDiskUsage != proposed.MaxDiskUsage {
+	changes = append(changes, ConfigChange{
+		Field:     &#34;max_disk_usage&#34;,
+		OldValue:  current.MaxDiskUsage,
+		NewValue:  proposed.MaxDiskUsage,
+		Operation: vm.getChangeOperation(current.MaxDiskUsage, proposed.MaxDiskUsage),
+		Risk:      vm.assessChangeRisk(&#34;max_disk_usage&#34;, current.MaxDiskUsage, proposed.MaxDiskUsage),
+	})
+}</pre>
+<h1>#8 found 2 clones</h1>
+<h2>internal/config/bdd_nix_validation_test.go:152</h2>
+<pre>{
+	Name:        &#34;Invalid Nix generations below minimum&#34;,
+	Description: &#34;Should reject Nix generations below minimum threshold&#34;,
+	Given: []BDDGiven{
+		{
+			Description: &#34;a configuration with Nix generations below minimum&#34;,
+			Setup: func() (*domain.Config, error) {
+				return withGenerations(newBaseNixConfig(true), 0), nil
+			},
+		},
+	},
+	When: []BDDWhen{
+		{
+			Description: &#34;the configuration is validated&#34;,
+			Action: func(cfg *domain.Config) (*ValidationResult, error) {
+				validator := NewConfigValidator()
+				return validator.ValidateConfig(cfg), nil
+			},
+		},
+	},
+	Then: []BDDThen{
+		{
+			Description: &#34;validation should fail&#34;,
+			Validate: func(result *ValidationResult) error {
+				if result.IsValid {
+					return fmt.Errorf(&#34;expected invalid configuration&#34;)
+				}
+				return nil
+			},
+		},
+		{
+			Description: &#34;validation errors should be present&#34;,
+			Validate: func(result *ValidationResult) error {
+				if len(result.Errors) == 0 {
+					return fmt.Errorf(&#34;expected validation errors&#34;)
+				}
+				return nil
+			},
+		},
+		{
+			Description: &#34;error should mention generations constraint&#34;,
+			Validate: func(result *ValidationResult) error {
+				found := false
+				for _, err := range result.Errors {
+					if strings.Contains(err.Message, &#34;generations&#34;) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					return fmt.Errorf(&#34;expected error mentioning generations constraint&#34;)
+				}
+				return nil
+			},
+		},
+	},
+}</pre>
+<h2>internal/config/bdd_nix_validation_test.go:209</h2>
+<pre>{
+	Name:        &#34;Invalid Nix generations above maximum&#34;,
+	Description: &#34;Should reject Nix generations above maximum threshold&#34;,
+	Given: []BDDGiven{
+		{
+			Description: &#34;a configuration with Nix generations above maximum&#34;,
+			Setup: func() (*domain.Config, error) {
+				return withGenerations(newBaseNixConfig(true), 15), nil
+			},
+		},
+	},
+	When: []BDDWhen{
+		{
+			Description: &#34;the configuration is validated&#34;,
+			Action: func(cfg *domain.Config) (*ValidationResult, error) {
+				validator := NewConfigValidator()
+				return validator.ValidateConfig(cfg), nil
+			},
+		},
+	},
+	Then: []BDDThen{
+		{
+			Description: &#34;validation should fail&#34;,
+			Validate: func(result *ValidationResult) error {
+				if result.IsValid {
+					return fmt.Errorf(&#34;expected invalid configuration&#34;)
+				}
+				return nil
+			},
+		},
+		{
+			Description: &#34;validation errors should be present&#34;,
+			Validate: func(result *ValidationResult) error {
+				if len(result.Errors) == 0 {
+					return fmt.Errorf(&#34;expected validation errors&#34;)
+				}
+				return nil
+			},
+		},
+		{
+			Description: &#34;error should mention generations constraint&#34;,
+			Validate: func(result *ValidationResult) error {
+				found := false
+				for _, err := range result.Errors {
+					if strings.Contains(err.Message, &#34;generations&#34;) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					return fmt.Errorf(&#34;expected error mentioning generations constraint&#34;)
+				}
+				return nil
+			},
+		},
+	},
+}</pre>
+<h1>#9 found 2 clones</h1>
+<h2>cmd/clean-wizard/commands/clean.go:84</h2>
+<pre>       {
+	// Load default configuration to get profile information
+	var err error
+	loadedCfg, err = config.LoadWithContext(ctx)
+	if err != nil {
+		fmt.Printf(&#34;⚠️  Could not load default configuration: %v\n&#34;, err)
+		// Continue without profile support
+	} else {
+		fmt.Printf(&#34;📋 Using configuration from ~/.clean-wizard.yaml\n&#34;)
+	}
+}</pre>
+<h2>cmd/clean-wizard/commands/scan.go:67</h2>
+<pre>       {
+	// Load default configuration to get profile information
+	var err error
+	loadedCfg, err = config.LoadWithContext(ctx)
+	if err != nil {
+		fmt.Printf(&#34;⚠️  Could not load default configuration: %v\n&#34;, err)
+		// Continue without profile support
+	} else {
+		fmt.Printf(&#34;📋 Using configuration from ~/.clean-wizard.yaml\n&#34;)
+	}
+}</pre>
+<h1>#10 found 2 clones</h1>
+<h2>cmd/clean-wizard/commands/init.go:162</h2>
+<pre>comprehensiveSettings := &amp;domain.OperationSettings{
+	NixGenerations: &amp;domain.NixGenerationsSettings{
+		Generations: 1,
+		Optimize:    true,
+		DryRun:      dryRun,
+	},
+	Homebrew: &amp;domain.HomebrewSettings{
+		UnusedOnly: true,
+		Prune:      &#34;recent&#34;,
+	},
+}</pre>
+<h2>cmd/clean-wizard/commands/init.go:175</h2>
+<pre>aggressiveSettings := &amp;domain.OperationSettings{
+	NixGenerations: &amp;domain.NixGenerationsSettings{
+		Generations: 0, // Remove all but current
+		Optimize:    true,
+		DryRun:      dryRun,
+	},
+	Homebrew: &amp;domain.HomebrewSettings{
+		UnusedOnly: false,
+		Prune:      &#34;all&#34;,
+	},
+}</pre>
+</body>
+</html>
