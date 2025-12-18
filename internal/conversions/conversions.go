@@ -1,11 +1,11 @@
 package conversions
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/validation"
 )
 
 // DOMAIN BUILDERS - Single source of truth for domain object construction
@@ -285,16 +285,10 @@ func ToScanResultFromError(err error) result.Result[domain.ScanResult] {
 
 // ValidateAndConvertCleanResult ensures CleanResult is valid before returning
 func ValidateAndConvertCleanResult(cleanResult domain.CleanResult) result.Result[domain.CleanResult] {
-	if err := cleanResult.Validate(); err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("invalid CleanResult: %w", err))
-	}
-	return result.Ok(cleanResult)
+	return validation.ValidateAndWrap(cleanResult, "CleanResult")
 }
 
 // ValidateAndConvertScanResult ensures ScanResult is valid before returning
 func ValidateAndConvertScanResult(scanResult domain.ScanResult) result.Result[domain.ScanResult] {
-	if err := scanResult.Validate(); err != nil {
-		return result.Err[domain.ScanResult](fmt.Errorf("invalid ScanResult: %w", err))
-	}
-	return result.Ok(scanResult)
+	return validation.ValidateAndWrap(scanResult, "ScanResult")
 }

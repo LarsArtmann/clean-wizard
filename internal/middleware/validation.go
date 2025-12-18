@@ -6,6 +6,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/validation"
 )
 
 // ValidationMiddleware provides validation for all operations
@@ -18,18 +19,12 @@ func NewValidationMiddleware() *ValidationMiddleware {
 
 // ValidateScanRequest validates scan request before processing
 func (vm *ValidationMiddleware) ValidateScanRequest(ctx context.Context, req domain.ScanRequest) result.Result[domain.ScanRequest] {
-	if err := req.Validate(); err != nil {
-		return result.Err[domain.ScanRequest](fmt.Errorf("invalid scan request: %w", err))
-	}
-	return result.Ok(req)
+	return validation.ValidateAndWrap(req, "scan request")
 }
 
 // ValidateCleanRequest validates clean request before processing
 func (vm *ValidationMiddleware) ValidateCleanRequest(ctx context.Context, req domain.CleanRequest) result.Result[domain.CleanRequest] {
-	if err := req.Validate(); err != nil {
-		return result.Err[domain.CleanRequest](fmt.Errorf("invalid clean request: %w", err))
-	}
-	return result.Ok(req)
+	return validation.ValidateAndWrap(req, "clean request")
 }
 
 // ValidateCleanerSettings validates cleaner settings with type safety
