@@ -11,6 +11,8 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/middleware"
+	sharedConfig "github.com/LarsArtmann/clean-wizard/internal/shared/utils/config"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -79,17 +81,20 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					}
 				}
 
-				fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n",
-					loadedCfg.SafeMode, len(loadedCfg.Profiles))
+				sharedConfig.PrintConfigSuccess(loadedCfg)
 			} else {
 				// Load default configuration to get profile information
+				logger := logrus.New()
+				logger.SetOutput(os.Stderr)
+				logger.SetFormatter(&logrus.TextFormatter{ForceColors: true})
+				
 				var err error
-				loadedCfg, err = config.LoadWithContext(ctx)
+				loadedCfg, err = sharedConfig.LoadConfigOrContinue(ctx, logger)
 				if err != nil {
-					fmt.Printf("⚠️  Could not load default configuration: %v\n", err)
+					// This shouldn't happen with LoadConfigOrContinue
+					fmt.Printf("⚠️  Unexpected error loading configuration: %v\n", err)
+				} else if loadedCfg == nil {
 					// Continue without profile support
-				} else {
-					fmt.Printf("📋 Using configuration from ~/.clean-wizard.yaml\n")
 				}
 			}
 
