@@ -80,7 +80,7 @@ func CleaningError(message string) error {
 // ValidationError creates validation error
 func ValidationError(field, value, expected string) error {
 	return NewErrorWithDetails(ErrInvalidInput, "Validation failed", &ErrorDetails{
-		Field:    field,
+		Field:     field,
 		Value:     value,
 		Expected:  expected,
 		Operation: "validation",

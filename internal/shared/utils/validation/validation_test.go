@@ -54,7 +54,7 @@ func TestValidateAndWrap(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ValidateAndWrap(tt.item, tt.itemType)
-			
+
 			if tt.wantErr {
 				assert.True(t, result.IsErr(), "Expected error but got success")
 				err := result.Error()

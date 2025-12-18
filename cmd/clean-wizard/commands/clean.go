@@ -87,7 +87,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 				logger := logrus.New()
 				logger.SetOutput(os.Stderr)
 				logger.SetFormatter(&logrus.TextFormatter{ForceColors: true})
-				
+
 				var err error
 				loadedCfg, err = sharedConfig.LoadConfigOrContinue(ctx, logger)
 				if err != nil {

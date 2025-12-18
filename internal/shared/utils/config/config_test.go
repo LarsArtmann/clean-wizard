@@ -14,9 +14,9 @@ func TestPrintConfigSuccess(t *testing.T) {
 	cfg := &domain.Config{
 		SafeMode: true,
 		Profiles: map[string]*domain.Profile{
-			"daily":   {Name: "daily", Enabled: true},
-			"weekly":  {Name: "weekly", Enabled: true},
-			"custom":  {Name: "custom", Enabled: false},
+			"daily":  {Name: "daily", Enabled: true},
+			"weekly": {Name: "weekly", Enabled: true},
+			"custom": {Name: "custom", Enabled: false},
 		},
 	}
 

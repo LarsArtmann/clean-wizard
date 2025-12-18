@@ -64,7 +64,7 @@ func (e *CleanWizardError) Error() string {
 	if e.Details.Duration != "" {
 		details = append(details, fmt.Sprintf("duration=%s", e.Details.Duration))
 	}
-	
+
 	// Add metadata
 	for key, value := range e.Details.Metadata {
 		details = append(details, fmt.Sprintf("%s=%s", key, value))
