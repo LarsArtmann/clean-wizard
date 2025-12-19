@@ -281,7 +281,7 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, pr
 		Name:        operationName,
 		Description: "Validation operation",
 		RiskLevel:   domain.RiskLow, // Default to low for validation
-		Enabled:     true,
+		Enabled:     domain.ProfileStatusEnabled,
 		Settings:    settings,
 	}
 

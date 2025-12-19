@@ -69,7 +69,7 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 // validateCrossFieldConstraints validates relationships between fields
 func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, result *ValidationResult) {
 	// Safe mode vs risk level consistency
-	if !cfg.SafeMode {
+	if !cfg.SafeMode.IsEnabled() {
 		maxRisk := cv.findMaxRiskLevel(cfg)
 		if maxRisk == domain.RiskCritical {
 			result.Warnings = append(result.Warnings, ValidationWarning{

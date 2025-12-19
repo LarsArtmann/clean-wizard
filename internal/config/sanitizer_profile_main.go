@@ -2,31 +2,31 @@ package config
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	stringsutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/strings"
 )
+
+// SanitizationResultAdapter adapts local SanitizationResult to strings utility interface
+type SanitizationResultAdapter struct {
+	result *SanitizationResult
+}
+
+func (a *SanitizationResultAdapter) AddChange(path string, original, newValue any, reason string) {
+	a.result.addChange(path, original, newValue, reason)
+}
 
 // sanitizeProfiles sanitizes profiles and their operations
 func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *SanitizationResult) {
 	for name, profile := range cfg.Profiles {
-		// Sanitize profile name
-		if cs.rules.TrimWhitespace {
-			original := profile.Name
-			profile.Name = strings.TrimSpace(profile.Name)
-			if original != profile.Name {
-				result.addChange(fmt.Sprintf("profiles.%s.name", name), original, profile.Name, "trimmed whitespace")
-			}
-		}
-
-		// Sanitize profile description
-		if cs.rules.TrimWhitespace {
-			original := profile.Description
-			profile.Description = strings.TrimSpace(profile.Description)
-			if original != profile.Description {
-				result.addChange(fmt.Sprintf("profiles.%s.description", name), original, profile.Description, "trimmed whitespace")
-			}
-		}
+		// Sanitize profile name and description using utility
+		adapter := &SanitizationResultAdapter{result: result}
+		profileFields := stringsutil.NewTrimmableFieldsBuilder().
+			AddField("name", fmt.Sprintf("profiles.%s.name", name), &profile.Name).
+			AddField("description", fmt.Sprintf("profiles.%s.description", name), &profile.Description).
+			Build()
+		
+		stringsutil.TrimMultipleFields(cs.rules.TrimWhitespace, profileFields, adapter)
 
 		// Sanitize operations
 		cs.sanitizeOperations(name, profile.Operations, result)
@@ -39,23 +39,14 @@ func (cs *ConfigSanitizer) sanitizeOperations(profileName string, operations []d
 		op := &operations[i] // Get pointer to mutate slice element in place
 		fieldPrefix := fmt.Sprintf("profiles.%s.operations[%d]", profileName, i)
 
-		// Sanitize operation name
-		if cs.rules.TrimWhitespace {
-			original := op.Name
-			op.Name = strings.TrimSpace(op.Name)
-			if original != op.Name {
-				result.addChange(fieldPrefix+".name", original, op.Name, "trimmed whitespace")
-			}
-		}
-
-		// Sanitize operation description
-		if cs.rules.TrimWhitespace {
-			original := op.Description
-			op.Description = strings.TrimSpace(op.Description)
-			if original != op.Description {
-				result.addChange(fieldPrefix+".description", original, op.Description, "trimmed whitespace")
-			}
-		}
+		// Sanitize operation name and description using utility
+		adapter := &SanitizationResultAdapter{result: result}
+		opFields := stringsutil.NewTrimmableFieldsBuilder().
+			AddField("name", fieldPrefix+".name", &op.Name).
+			AddField("description", fieldPrefix+".description", &op.Description).
+			Build()
+		
+		stringsutil.TrimMultipleFields(cs.rules.TrimWhitespace, opFields, adapter)
 
 		// Sanitize settings
 		if op.Settings != nil {

@@ -11,6 +11,32 @@ import (
 // === MAPPING LAYER: API ↔ DOMAIN TYPES ===
 // Converts between public API types and internal domain models
 
+// boolToSafeMode converts boolean to SafeMode enum
+func boolToSafeMode(b bool) domain.SafeMode {
+	if b {
+		return domain.SafeModeEnabled
+	}
+	return domain.SafeModeDisabled
+}
+
+// boolToProfileStatus converts boolean to ProfileStatus enum
+func boolToProfileStatus(b bool) domain.ProfileStatus {
+	if b {
+		return domain.ProfileStatusEnabled
+	}
+	return domain.ProfileStatusDisabled
+}
+
+// safeModeToBool converts SafeMode enum to boolean
+func safeModeToBool(sm domain.SafeMode) bool {
+	return sm == domain.SafeModeEnabled || sm == domain.SafeModeStrict
+}
+
+// profileStatusToBool converts ProfileStatus enum to boolean
+func profileStatusToBool(ps domain.ProfileStatus) bool {
+	return ps == domain.ProfileStatusEnabled
+}
+
 // MapConfigToDomain converts public API config to internal domain model
 func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config] {
 	if publicConfig == nil {
@@ -30,7 +56,7 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 	// Create domain config
 	config := &domain.Config{
 		Version:      publicConfig.Version,
-		SafeMode:     publicConfig.SafeMode,
+		SafeMode:     boolToSafeMode(publicConfig.SafeMode),
 		MaxDiskUsage: int(publicConfig.MaxDiskUsage),
 		Protected:    publicConfig.ProtectedPaths,
 		Profiles:     profiles,
@@ -59,7 +85,7 @@ func MapConfigToPublic(domainConfig *domain.Config) result.Result[*PublicConfig]
 
 	publicConfig := &PublicConfig{
 		Version:        domainConfig.Version,
-		SafeMode:       domainConfig.SafeMode,
+		SafeMode:       safeModeToBool(domainConfig.SafeMode),
 		MaxDiskUsage:   int32(domainConfig.MaxDiskUsage),
 		ProtectedPaths: domainConfig.Protected,
 		Profiles:       publicProfiles,
@@ -87,7 +113,7 @@ func MapProfileToDomain(publicProfile *PublicProfile) (*domain.Profile, error) {
 	return &domain.Profile{
 		Name:        publicProfile.Name,
 		Description: publicProfile.Description,
-		Enabled:     publicProfile.Enabled,
+		Enabled:     boolToProfileStatus(publicProfile.Enabled),
 		Operations:  operations,
 	}, nil
 }
@@ -107,7 +133,7 @@ func MapProfileToPublic(domainProfile *domain.Profile) *PublicProfile {
 	return &PublicProfile{
 		Name:        domainProfile.Name,
 		Description: domainProfile.Description,
-		Enabled:     domainProfile.Enabled,
+		Enabled:     profileStatusToBool(domainProfile.Enabled),
 		Operations:  publicOperations,
 	}
 }
@@ -128,7 +154,7 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 		Name:        publicOperation.Name,
 		Description: publicOperation.Description,
 		RiskLevel:   riskLevel,
-		Enabled:     publicOperation.Enabled,
+		Enabled:     boolToProfileStatus(publicOperation.Enabled),
 		Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations), // Simplified for PoC
 	}, nil
 }
@@ -146,7 +172,7 @@ func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOpera
 		Name:        domainOperation.Name,
 		Description: domainOperation.Description,
 		RiskLevel:   MapRiskLevelToPublic(domainOperation.RiskLevel),
-		Enabled:     domainOperation.Enabled,
+		Enabled:     profileStatusToBool(domainOperation.Enabled),
 		Settings:    publicSettings,
 	}
 }
@@ -164,7 +190,7 @@ func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationS
 	// Extract relevant values from domain-specific settings
 	if settings.NixGenerations != nil {
 		publicSettings.DryRun = false // Nix operations default to false
-		if settings.NixGenerations.Optimize {
+		if settings.NixGenerations.Optimize.IsEnabled() {
 			publicSettings.Verbose = true
 		}
 	}

@@ -37,7 +37,7 @@ func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *domain.Con
 	// Additional comprehensive validation rules
 
 	// Check for configuration consistency
-	if config.SafeMode && ecl.hasCriticalRiskOperations(config) {
+	if config.SafeMode.IsEnabled() && ecl.hasCriticalRiskOperations(config) {
 		result.Warnings = append(result.Warnings, ValidationWarning{
 			Field:      "safe_mode",
 			Message:    "Safe mode is enabled but critical risk operations exist",

@@ -11,6 +11,14 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// boolToGenerationStatus converts boolean to GenerationStatus enum
+func boolToGenerationStatus(b bool) domain.GenerationStatus {
+	if b {
+		return domain.GenerationStatusCurrent
+	}
+	return domain.GenerationStatusHistorical
+}
+
 // NixCleaner handles Nix package manager cleanup with proper type safety
 type NixCleaner struct {
 	adapter *adapters.NixAdapter
@@ -70,11 +78,11 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	if !nc.adapter.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: true},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: false},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: false},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Current: false},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Current: false},
+			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusCurrent},
+			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: domain.GenerationStatusHistorical},
+			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: domain.GenerationStatusHistorical},
+			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Current: domain.GenerationStatusHistorical},
+			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Current: domain.GenerationStatusHistorical},
 		}, "Nix not available - using mock data")
 	}
 
@@ -110,7 +118,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 
 		for i := len(generations) - toRemove; i < len(generations); i++ {
 			// Skip current generation
-			if generations[i].Current {
+			if generations[i].Current.IsCurrent() {
 				continue
 			}
 

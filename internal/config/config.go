@@ -19,6 +19,14 @@ const (
 	configType = "yaml"
 )
 
+// boolToSafeMode converts boolean to SafeMode enum
+func boolToSafeMode(b bool) domain.SafeMode {
+	if b {
+		return domain.SafeModeEnabled
+	}
+	return domain.SafeModeDisabled
+}
+
 // Load loads the configuration from file or creates default
 func Load() (*domain.Config, error) {
 	return LoadWithContext(context.Background())
@@ -62,7 +70,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Manually unmarshal fields to avoid YAML tag issues
 	config.Version = v.GetString("version")
-	config.SafeMode = v.GetBool("safe_mode")
+	config.SafeMode = boolToSafeMode(v.GetBool("safe_mode"))
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
 	config.Protected = v.GetStringSlice("protected")
 
@@ -252,7 +260,7 @@ func GetDefaultConfig() *domain.Config {
 
 	return &domain.Config{
 		Version:      "1.0.0",
-		SafeMode:     true, // Default to safe mode
+		SafeMode:     domain.SafeModeEnabled, // Default to safe mode
 		MaxDiskUsage: 50,
 		Protected: []string{
 			"/System",
@@ -268,18 +276,18 @@ func GetDefaultConfig() *domain.Config {
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 					},
 				},
-				Enabled: true,
+				Enabled: domain.ProfileStatusEnabled,
 			},
 			"aggressive": {
 				Name:        "aggressive",
@@ -289,18 +297,18 @@ func GetDefaultConfig() *domain.Config {
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
 						RiskLevel:   domain.RiskHigh,
-						Enabled:     true,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean old Homebrew packages",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 					},
 				},
-				Enabled: true,
+				Enabled: domain.ProfileStatusEnabled,
 			},
 			"comprehensive": {
 				Name:        "comprehensive",
@@ -310,25 +318,25 @@ func GetDefaultConfig() *domain.Config {
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
 						RiskLevel:   domain.RiskCritical,
-						Enabled:     true,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean old Homebrew packages",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 					},
 					{
 						Name:        "system-temp",
 						Description: "Clean system temporary files",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeSystemTemp),
 					},
 				},
-				Enabled: true,
+				Enabled: domain.ProfileStatusEnabled,
 			},
 		},
 		LastClean: now,

@@ -13,61 +13,30 @@ func (e *CleanWizardError) WithOperation(operation string) *CleanWizardError {
 
 // WithDetail adds single detail to error
 func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
-	if e.Details == nil {
-		e.Details = &ErrorDetails{
-			Metadata: make(map[string]string),
-		}
-	}
+	ensureDetails(&e.Details)
 
 	switch key {
 	case "field":
-		if v, ok := value.(string); ok {
-			e.Details.Field = v
-		}
+		setStringFieldStrict(&e.Details.Field, value)
 	case "value":
-		if v, ok := value.(string); ok {
-			e.Details.Value = v
-		} else {
-			e.Details.Value = fmt.Sprintf("%v", value)
-		}
+		setStringField(&e.Details.Value, value)
 	case "expected":
-		if v, ok := value.(string); ok {
-			e.Details.Expected = v
-		} else {
-			e.Details.Expected = fmt.Sprintf("%v", value)
-		}
+		setStringField(&e.Details.Expected, value)
 	case "actual":
-		if v, ok := value.(string); ok {
-			e.Details.Actual = v
-		} else {
-			e.Details.Actual = fmt.Sprintf("%v", value)
-		}
+		setStringField(&e.Details.Actual, value)
 	case "operation":
-		if v, ok := value.(string); ok {
-			e.Details.Operation = v
-		}
+		setStringFieldStrict(&e.Details.Operation, value)
 	case "file_path":
-		if v, ok := value.(string); ok {
-			e.Details.FilePath = v
-		}
+		setStringFieldStrict(&e.Details.FilePath, value)
 	case "line_number":
-		if v, ok := value.(int); ok {
-			e.Details.LineNumber = v
-		}
+		setIntField(&e.Details.LineNumber, value)
 	case "retry_count":
-		if v, ok := value.(int); ok {
-			e.Details.RetryCount = v
-		}
+		setIntField(&e.Details.RetryCount, value)
 	case "duration":
-		if v, ok := value.(string); ok {
-			e.Details.Duration = v
-		}
+		setStringFieldStrict(&e.Details.Duration, value)
 	default:
 		// Add to metadata for custom keys
-		if e.Details.Metadata == nil {
-			e.Details.Metadata = make(map[string]string)
-		}
-		e.Details.Metadata[key] = fmt.Sprintf("%v", value)
+		e.Details.Metadata = addToMetadata(e.Details.Metadata, key, value)
 	}
 	return e
 }

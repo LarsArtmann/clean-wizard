@@ -34,7 +34,7 @@ type SanitizationRules struct {
 	AddDefaults      bool `json:"add_defaults"`
 
 	// Safety defaults
-	DefaultSafeMode       bool          `json:"default_safe_mode"`
+	DefaultSafeMode       domain.SafeMode `json:"default_safe_mode"`
 	DefaultMaxDiskUsage   int           `json:"default_max_disk_usage"`
 	DefaultBackup         time.Duration `json:"default_backup"`
 	DefaultProtectedPaths []string      `json:"default_protected_paths"`
@@ -178,9 +178,9 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 	}
 
 	// Ensure safe mode defaults
-	if cs.rules.DefaultSafeMode && !cfg.SafeMode {
+	if cs.rules.DefaultSafeMode.IsEnabled() && !cfg.SafeMode.IsEnabled() {
 		original := cfg.SafeMode
-		cfg.SafeMode = true
+		cfg.SafeMode = domain.SafeModeEnabled
 		result.addChange("safe_mode", original, cfg.SafeMode, "enabled safe mode for security")
 	}
 }
@@ -219,7 +219,7 @@ func getDefaultSanitizationRules() *SanitizationRules {
 		SortArrays:            true,
 		RemoveDuplicates:      true,
 		AddDefaults:           true,
-		DefaultSafeMode:       true,
+		DefaultSafeMode:       domain.SafeModeEnabled,
 		DefaultMaxDiskUsage:   50,
 		DefaultBackup:         24 * time.Hour,
 		DefaultProtectedPaths: []string{"/System", "/Applications", "/Library"},

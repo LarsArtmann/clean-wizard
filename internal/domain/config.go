@@ -8,7 +8,7 @@ import (
 // Config represents application configuration with type safety
 type Config struct {
 	Version        string              `json:"version" yaml:"version"`
-	SafeMode       bool                `json:"safe_mode" yaml:"safe_mode"`
+	SafeMode       SafeMode            `json:"safe_mode" yaml:"safe_mode"`
 	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"`
 	Protected      []string            `json:"protected" yaml:"protected"`
 	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`
@@ -74,7 +74,7 @@ type Profile struct {
 	Name        string             `json:"name" yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
 	Operations  []CleanupOperation `json:"operations" yaml:"operations"`
-	Enabled     bool               `json:"enabled" yaml:"enabled"`
+	Enabled     ProfileStatus       `json:"enabled" yaml:"enabled"`
 }
 
 // IsValid validates profile
@@ -124,7 +124,7 @@ type CleanupOperation struct {
 	Name        string             `json:"name" yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
 	RiskLevel   RiskLevel          `json:"risk_level" yaml:"risk_level"`
-	Enabled     bool               `json:"enabled" yaml:"enabled"`
+	Enabled     ProfileStatus       `json:"enabled" yaml:"enabled"`
 	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }
 
