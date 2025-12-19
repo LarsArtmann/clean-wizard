@@ -19,18 +19,18 @@ func FindProfileOperation(cfg *domain.Config, profileName, operationName string)
 	if cfg == nil {
 		return nil, -1
 	}
-	
+
 	profile, exists := cfg.Profiles[profileName]
 	if !exists {
 		return nil, -1
 	}
-	
+
 	for i, op := range profile.Operations {
 		if op.Name == operationName {
 			return profile, i
 		}
 	}
-	
+
 	return profile, -1
 }
 
@@ -41,7 +41,7 @@ func ModifyProfileOperation(cfg *domain.Config, profileName, operationName strin
 	if profile == nil || opIndex == -1 {
 		return false
 	}
-	
+
 	return modifier(profile, &profile.Operations[opIndex])
 }
 

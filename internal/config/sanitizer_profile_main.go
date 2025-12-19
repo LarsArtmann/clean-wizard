@@ -25,7 +25,7 @@ func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *Sanitiza
 			AddField("name", fmt.Sprintf("profiles.%s.name", name), &profile.Name).
 			AddField("description", fmt.Sprintf("profiles.%s.description", name), &profile.Description).
 			Build()
-		
+
 		stringsutil.TrimMultipleFields(cs.rules.TrimWhitespace, profileFields, adapter)
 
 		// Sanitize operations
@@ -45,7 +45,7 @@ func (cs *ConfigSanitizer) sanitizeOperations(profileName string, operations []d
 			AddField("name", fieldPrefix+".name", &op.Name).
 			AddField("description", fieldPrefix+".description", &op.Description).
 			Build()
-		
+
 		stringsutil.TrimMultipleFields(cs.rules.TrimWhitespace, opFields, adapter)
 
 		// Sanitize settings

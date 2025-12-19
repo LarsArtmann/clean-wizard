@@ -18,9 +18,9 @@ type OperationSettings struct {
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup
 type NixGenerationsSettings struct {
-	Generations   int               `json:"generations" yaml:"generations"`
-	Optimize      OptimizationMode  `json:"optimize" yaml:"optimize"`
-	DryRun        ExecutionMode     `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
+	Generations int              `json:"generations" yaml:"generations"`
+	Optimize    OptimizationMode `json:"optimize" yaml:"optimize"`
+	DryRun      ExecutionMode    `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
 // TempFilesSettings provides type-safe settings for temporary files cleanup
@@ -73,9 +73,9 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 	case OperationTypeNixGenerations:
 		return &OperationSettings{
 			NixGenerations: &NixGenerationsSettings{
-				Generations:   1,
-				Optimize:      OptimizationModeDisabled,
-				DryRun:        ExecutionModeNormal,
+				Generations: 1,
+				Optimize:    OptimizationModeDisabled,
+				DryRun:      ExecutionModeNormal,
 			},
 		}
 	case OperationTypeTempFiles:

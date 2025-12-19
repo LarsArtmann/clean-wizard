@@ -82,7 +82,7 @@ func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	} else {
 		optimizationMode = domain.OptimizationModeDisabled
 	}
-	
+
 	// Find the nix-cleanup profile and its nix-generations operation
 	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
 		for i, op := range profile.Operations {

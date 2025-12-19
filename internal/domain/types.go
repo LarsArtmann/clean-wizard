@@ -43,7 +43,7 @@ var (
 type NixGeneration struct {
 	ID      int              `json:"id"`
 	Path    string           `json:"path"`
-	Date    time.Time         `json:"date"`
+	Date    time.Time        `json:"date"`
 	Current GenerationStatus `json:"current"`
 }
 
@@ -99,9 +99,9 @@ func (st ScanType) IsValid() bool {
 
 // ScanRequest represents scanning command
 type ScanRequest struct {
-	Type      ScanType  `json:"type"`
-	Recursive ScanMode   `json:"recursive"`
-	Limit     int       `json:"limit"`
+	Type      ScanType `json:"type"`
+	Recursive ScanMode `json:"recursive"`
+	Limit     int      `json:"limit"`
 }
 
 // Validate returns errors for invalid scan request

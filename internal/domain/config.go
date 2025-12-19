@@ -74,7 +74,7 @@ type Profile struct {
 	Name        string             `json:"name" yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
 	Operations  []CleanupOperation `json:"operations" yaml:"operations"`
-	Enabled     ProfileStatus       `json:"enabled" yaml:"enabled"`
+	Enabled     ProfileStatus      `json:"enabled" yaml:"enabled"`
 }
 
 // IsValid validates profile
@@ -124,7 +124,7 @@ type CleanupOperation struct {
 	Name        string             `json:"name" yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
 	RiskLevel   RiskLevel          `json:"risk_level" yaml:"risk_level"`
-	Enabled     ProfileStatus       `json:"enabled" yaml:"enabled"`
+	Enabled     ProfileStatus      `json:"enabled" yaml:"enabled"`
 	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }
 

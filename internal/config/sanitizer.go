@@ -35,9 +35,9 @@ type SanitizationRules struct {
 
 	// Safety defaults
 	DefaultSafeMode       domain.SafeMode `json:"default_safe_mode"`
-	DefaultMaxDiskUsage   int           `json:"default_max_disk_usage"`
-	DefaultBackup         time.Duration `json:"default_backup"`
-	DefaultProtectedPaths []string      `json:"default_protected_paths"`
+	DefaultMaxDiskUsage   int             `json:"default_max_disk_usage"`
+	DefaultBackup         time.Duration   `json:"default_backup"`
+	DefaultProtectedPaths []string        `json:"default_protected_paths"`
 }
 
 // SanitizationChange represents a specific field change with context

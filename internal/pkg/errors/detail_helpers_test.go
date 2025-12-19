@@ -43,7 +43,7 @@ func TestSetStringField(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var target string
 			wasExact := setStringField(&target, tt.inputValue)
-			
+
 			assert.Equal(t, tt.expectValue, target)
 			assert.Equal(t, tt.expectExact, wasExact)
 		})
@@ -52,10 +52,10 @@ func TestSetStringField(t *testing.T) {
 
 func TestSetStringFieldStrict(t *testing.T) {
 	tests := []struct {
-		name           string
-		inputValue     any
-		expectValue    string
-		expectSet      bool
+		name            string
+		inputValue      any
+		expectValue     string
+		expectSet       bool
 		expectUnchanged bool
 	}{
 		{
@@ -65,17 +65,17 @@ func TestSetStringFieldStrict(t *testing.T) {
 			expectSet:   true,
 		},
 		{
-			name:           "rejects non-string value",
-			inputValue:     42,
-			expectValue:    "",
-			expectSet:      false,
+			name:            "rejects non-string value",
+			inputValue:      42,
+			expectValue:     "",
+			expectSet:       false,
 			expectUnchanged: true,
 		},
 		{
-			name:           "rejects nil value",
-			inputValue:     nil,
-			expectValue:    "",
-			expectSet:      false,
+			name:            "rejects nil value",
+			inputValue:      nil,
+			expectValue:     "",
+			expectSet:       false,
 			expectUnchanged: true,
 		},
 	}
@@ -84,7 +84,7 @@ func TestSetStringFieldStrict(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var target string
 			wasSet := setStringFieldStrict(&target, tt.inputValue)
-			
+
 			if tt.expectUnchanged {
 				assert.Equal(t, "", target)
 			} else {
@@ -97,10 +97,10 @@ func TestSetStringFieldStrict(t *testing.T) {
 
 func TestSetIntField(t *testing.T) {
 	tests := []struct {
-		name           string
-		inputValue     any
-		expectValue    int
-		expectSet      bool
+		name            string
+		inputValue      any
+		expectValue     int
+		expectSet       bool
 		expectUnchanged bool
 	}{
 		{
@@ -110,24 +110,24 @@ func TestSetIntField(t *testing.T) {
 			expectSet:   true,
 		},
 		{
-			name:           "rejects string value",
-			inputValue:     "42",
-			expectValue:    0,
-			expectSet:      false,
+			name:            "rejects string value",
+			inputValue:      "42",
+			expectValue:     0,
+			expectSet:       false,
 			expectUnchanged: true,
 		},
 		{
-			name:           "rejects float value",
-			inputValue:     42.5,
-			expectValue:    0,
-			expectSet:      false,
+			name:            "rejects float value",
+			inputValue:      42.5,
+			expectValue:     0,
+			expectSet:       false,
 			expectUnchanged: true,
 		},
 		{
-			name:           "rejects nil value",
-			inputValue:     nil,
-			expectValue:    0,
-			expectSet:      false,
+			name:            "rejects nil value",
+			inputValue:      nil,
+			expectValue:     0,
+			expectSet:       false,
 			expectUnchanged: true,
 		},
 	}
@@ -136,7 +136,7 @@ func TestSetIntField(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var target int
 			wasSet := setIntField(&target, tt.inputValue)
-			
+
 			if tt.expectUnchanged {
 				assert.Equal(t, 0, target)
 			} else {
@@ -181,10 +181,10 @@ func TestAddToMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := addToMetadata(tt.metadata, tt.key, tt.inputValue)
-			
+
 			assert.NotNil(t, result)
 			assert.Equal(t, tt.expectVal, result[tt.key])
-			
+
 			// If original was nil, result should be a new map
 			if tt.metadata == nil {
 				assert.NotNil(t, result)
@@ -196,14 +196,14 @@ func TestAddToMetadata(t *testing.T) {
 
 func TestEnsureDetails(t *testing.T) {
 	tests := []struct {
-		name           string
-		inputDetails    **ErrorDetails
-		expectField     string
+		name         string
+		inputDetails **ErrorDetails
+		expectField  string
 	}{
 		{
-			name:       "initializes nil details",
+			name:         "initializes nil details",
 			inputDetails: func() **ErrorDetails { var d *ErrorDetails; return &d }(),
-			expectField: "",
+			expectField:  "",
 		},
 		{
 			name: "keeps existing details",
@@ -218,7 +218,7 @@ func TestEnsureDetails(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ensureDetails(tt.inputDetails)
-			
+
 			assert.NotNil(t, *tt.inputDetails)
 			assert.NotNil(t, (*tt.inputDetails).Metadata)
 			assert.Equal(t, tt.expectField, (*tt.inputDetails).Field)
