@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -309,9 +310,10 @@ func (vm *ValidationMiddleware) formatValidationErrors(errors []ValidationError)
 		return ""
 	}
 
-	message := fmt.Sprintf("Validation failed (%d errors):", len(errors))
+	var message strings.Builder
+	message.WriteString(fmt.Sprintf("Validation failed (%d errors):", len(errors)))
 	for i, err := range errors {
-		message += fmt.Sprintf("\n%d. %s: %s", i+1, err.Field, err.Message)
+		message.WriteString(fmt.Sprintf("\n%d. %s: %s", i+1, err.Field, err.Message))
 	}
-	return message
+	return message.String()
 }
