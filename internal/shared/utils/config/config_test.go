@@ -12,11 +12,11 @@ import (
 
 func TestPrintConfigSuccess(t *testing.T) {
 	cfg := &domain.Config{
-		SafeMode: true,
+		SafeMode: domain.SafeModeEnabled,
 		Profiles: map[string]*domain.Profile{
-			"daily":  {Name: "daily", Enabled: true},
-			"weekly": {Name: "weekly", Enabled: true},
-			"custom": {Name: "custom", Enabled: false},
+			"daily":  {Name: "daily", Enabled: domain.ProfileStatusEnabled},
+			"weekly": {Name: "weekly", Enabled: domain.ProfileStatusEnabled},
+			"custom": {Name: "custom", Enabled: domain.ProfileStatusDisabled},
 		},
 	}
 

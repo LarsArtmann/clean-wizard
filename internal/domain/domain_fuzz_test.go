@@ -40,11 +40,17 @@ func FuzzNixGenerationCreation(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, data string) {
 		// Should not panic on any string input
+		// Randomly assign current status
+		currentStatus := GenerationStatusHistorical
+		if len(data)%2 == 0 {
+			currentStatus = GenerationStatusCurrent
+		}
+
 		gen := NixGeneration{
 			ID:      len(data), // Convert string length to ID
 			Path:    "/nix/store/" + data,
-			Date:    time.Time{},      // Zero value for fuzzing
-			Current: len(data)%2 == 0, // Random current status
+			Date:    time.Time{}, // Zero value for fuzzing
+			Current: currentStatus, // Random current status
 		}
 
 		// Should not panic on creation

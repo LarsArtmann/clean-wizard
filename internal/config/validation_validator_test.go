@@ -48,7 +48,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			name: "valid config",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode:     true,
+				SafeMode: domain.SafeModeEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles: map[string]*domain.Profile{
@@ -60,10 +60,10 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
+								Enabled: domain.ProfileStatusEnabled,
 							},
 						},
-						Enabled: true,
+						Enabled: domain.ProfileStatusEnabled,
 					},
 				},
 			},
@@ -73,7 +73,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			name: "invalid max disk usage",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode:     true,
+				SafeMode: domain.SafeModeEnabled,
 				MaxDiskUsage: 150, // Invalid: > 95
 				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles: map[string]*domain.Profile{
@@ -85,10 +85,10 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
+								Enabled: domain.ProfileStatusEnabled,
 							},
 						},
-						Enabled: true,
+						Enabled: domain.ProfileStatusEnabled,
 					},
 				},
 			},
@@ -98,7 +98,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 		{
 			name: "missing version",
 			config: &domain.Config{
-				SafeMode:     true,
+				SafeMode: domain.SafeModeEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles: map[string]*domain.Profile{
@@ -110,10 +110,10 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
+								Enabled: domain.ProfileStatusEnabled,
 							},
 						},
-						Enabled: true,
+						Enabled: domain.ProfileStatusEnabled,
 					},
 				},
 			},
@@ -124,7 +124,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			name: "empty protected paths",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode:     true,
+				SafeMode: domain.SafeModeEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{},
 				Profiles: map[string]*domain.Profile{
@@ -136,10 +136,10 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled:     true,
+								Enabled: domain.ProfileStatusEnabled,
 							},
 						},
-						Enabled: true,
+						Enabled: domain.ProfileStatusEnabled,
 					},
 				},
 			},
@@ -150,7 +150,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			name: "no profiles",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode:     true,
+				SafeMode: domain.SafeModeEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
 				Profiles:     map[string]*domain.Profile{},

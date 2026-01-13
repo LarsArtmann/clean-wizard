@@ -11,7 +11,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 	// Create complex configuration for realistic testing
 	cfg := &domain.Config{
 		Version:      "1.0.0",
-		SafeMode:     true,
+		SafeMode: domain.SafeModeEnabled,
 		MaxDiskUsage: 75,
 		Protected:    []string{"/System", "/Applications", "/Library", "/usr", "/etc", "/var"},
 		Profiles: map[string]*domain.Profile{
@@ -23,11 +23,11 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "nix-generations",
 						Description: "Clean Nix generations",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Enabled: domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
 								Generations: 3,
-								Optimize:    true,
+								Optimize: domain.OptimizationModeEnabled,
 							},
 						},
 					},
@@ -35,7 +35,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "temp-files",
 						Description: "Clean temporary files",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Enabled: domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							TempFiles: &domain.TempFilesSettings{
 								OlderThan: "7d",
@@ -47,10 +47,10 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "homebrew-cleanup",
 						Description: "Clean Homebrew",
 						RiskLevel:   domain.RiskLow,
-						Enabled:     true,
+						Enabled: domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							Homebrew: &domain.HomebrewSettings{
-								UnusedOnly: true,
+								UnusedOnly: domain.HomebrewModeUnusedOnly,
 								Prune:      "30d",
 							},
 						},
@@ -59,7 +59,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "system-temp",
 						Description: "Clean system temp",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Enabled: domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							SystemTemp: &domain.SystemTempSettings{
 								Paths:     []string{"/tmp", "/var/tmp", "/tmp/.font-unix"},
@@ -68,7 +68,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						},
 					},
 				},
-				Enabled: true,
+				Enabled: domain.ProfileStatusEnabled,
 			},
 			"weekly": {
 				Name:        "Weekly Cleanup",
@@ -78,16 +78,16 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "nix-generations",
 						Description: "Deep Nix cleanup",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Enabled: domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
 								Generations: 5,
-								Optimize:    true,
+								Optimize: domain.OptimizationModeEnabled,
 							},
 						},
 					},
 				},
-				Enabled: true,
+				Enabled: domain.ProfileStatusEnabled,
 			},
 		},
 	}
@@ -127,14 +127,14 @@ func BenchmarkValidation_OperationSettingsValidation(b *testing.B) {
 	settings := &domain.OperationSettings{
 		NixGenerations: &domain.NixGenerationsSettings{
 			Generations: 3,
-			Optimize:    true,
+			Optimize: domain.OptimizationModeEnabled,
 		},
 		TempFiles: &domain.TempFilesSettings{
 			OlderThan: "7d",
 			Excludes:  []string{"/tmp/keep", "/var/tmp/preserve"},
 		},
 		Homebrew: &domain.HomebrewSettings{
-			UnusedOnly: true,
+			UnusedOnly: domain.HomebrewModeUnusedOnly,
 			Prune:      "30d",
 		},
 		SystemTemp: &domain.SystemTempSettings{

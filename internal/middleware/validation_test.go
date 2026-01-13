@@ -17,7 +17,7 @@ func TestValidationMiddleware(t *testing.T) {
 	t.Run("ValidScanRequest", func(t *testing.T) {
 		req := domain.ScanRequest{
 			Type:      domain.ScanTypeNixStore,
-			Recursive: true,
+			Recursive: domain.ScanModeRecursive,
 			Limit:     100,
 		}
 
@@ -28,7 +28,7 @@ func TestValidationMiddleware(t *testing.T) {
 	t.Run("InvalidScanRequest", func(t *testing.T) {
 		req := domain.ScanRequest{
 			Type:      "invalid",
-			Recursive: true,
+			Recursive: domain.ScanModeRecursive,
 			Limit:     -1,
 		}
 

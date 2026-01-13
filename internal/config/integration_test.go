@@ -24,11 +24,11 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Name:        "nix-generations",
 							Description: " Clean Nix generations ",
 							RiskLevel:   domain.RiskLow,
-							Enabled:     true,
+							Enabled:     domain.ProfileStatusEnabled,
 							Settings: &domain.OperationSettings{
 								NixGenerations: &domain.NixGenerationsSettings{
 									Generations: 3,
-									Optimize:    true,
+									Optimize:    domain.OptimizationModeEnabled,
 								},
 							},
 						},
@@ -36,7 +36,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Name:        "temp-files",
 							Description: "Clean temporary files",
 							RiskLevel:   domain.RiskMedium,
-							Enabled:     true,
+							Enabled: domain.ProfileStatusEnabled,
 							Settings: &domain.OperationSettings{
 								TempFiles: &domain.TempFilesSettings{
 									OlderThan: " 7d  ",                                                 // Needs whitespace sanitization
@@ -48,10 +48,10 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Name:        "homebrew-cleanup",
 							Description: "Clean Homebrew",
 							RiskLevel:   domain.RiskLow,
-							Enabled:     true,
+							Enabled: domain.ProfileStatusEnabled,
 							Settings: &domain.OperationSettings{
 								Homebrew: &domain.HomebrewSettings{
-									UnusedOnly: true,
+									UnusedOnly: domain.HomebrewModeUnusedOnly,
 									Prune:      " 30d  ", // Needs whitespace sanitization
 								},
 							},
@@ -60,7 +60,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Name:        "system-temp",
 							Description: "Clean system temp",
 							RiskLevel:   domain.RiskMedium,
-							Enabled:     true,
+							Enabled: domain.ProfileStatusEnabled,
 							Settings: &domain.OperationSettings{
 								SystemTemp: &domain.SystemTempSettings{
 									Paths:     []string{"/tmp", "/var/tmp", " /tmp/extra ", "/tmp"}, // Needs sanitization
@@ -69,7 +69,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							},
 						},
 					},
-					Enabled: true,
+					Enabled: domain.ProfileStatusEnabled,
 				},
 				"weekly": {
 					Name:        "Weekly Deep Cleanup",
@@ -79,16 +79,16 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Name:        "nix-generations",
 							Description: "Deep Nix cleanup",
 							RiskLevel:   domain.RiskMedium,
-							Enabled:     true,
+							Enabled:     domain.ProfileStatusEnabled,
 							Settings: &domain.OperationSettings{
 								NixGenerations: &domain.NixGenerationsSettings{
 									Generations: 5,
-									Optimize:    true,
+									Optimize:    domain.OptimizationModeEnabled,
 								},
 							},
 						},
 					},
-					Enabled: true,
+					Enabled: domain.ProfileStatusEnabled,
 				},
 			},
 		}

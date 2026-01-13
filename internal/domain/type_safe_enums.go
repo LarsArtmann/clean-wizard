@@ -3,6 +3,7 @@ package domain
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/yaml.v3"
 	"strings"
 )
 
@@ -330,3 +331,39 @@ func (cs CleanStrategyType) Icon() string {
 }
 
 // Convenience constants for backward compatibility are now in types.go
+
+// UnmarshalYAML implements yaml.Unmarshaler for RiskLevelType
+func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
+	var s string
+	if err := value.Decode(&s); err != nil {
+		// If string unmarshaling fails, try integer
+		var i int
+		if err := value.Decode(&i); err == nil {
+			*rl = RiskLevelType(i)
+			return nil
+		}
+		return err
+	}
+
+	switch strings.ToUpper(s) {
+	case "LOW":
+		*rl = RiskLevelLowType
+	case "MEDIUM":
+		*rl = RiskLevelMediumType
+	case "HIGH":
+		*rl = RiskLevelHighType
+	case "CRITICAL":
+		*rl = RiskLevelCriticalType
+	default:
+		return fmt.Errorf("invalid risk level: %s (must be LOW, MEDIUM, HIGH, or CRITICAL)", s)
+	}
+	return nil
+}
+
+// MarshalYAML implements yaml.Marshaler for RiskLevelType
+func (rl RiskLevelType) MarshalYAML() (interface{}, error) {
+	if !rl.IsValid() {
+		return nil, fmt.Errorf("invalid risk level: %d", rl)
+	}
+	return rl.String(), nil
+}

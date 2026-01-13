@@ -106,22 +106,17 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			// Explicitly unmarshal settings for each operation type
 			settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", name, i)
 			settingsMap := v.GetStringMap(settingsKey)
-			logrus.WithField("settingsKey", settingsKey).WithField("settingsMap", settingsMap).Debug("Checking settings")
 
 			if len(settingsMap) > 0 {
 				// Check for nix_generations settings
 				if _, exists := settingsMap["nix_generations"]; exists {
 					nixGenSettings := &domain.NixGenerationsSettings{}
 					nixGenKey := settingsKey + ".nix_generations"
-					logrus.WithField("nixGenKey", nixGenKey).Debug("Unmarshaling Nix generations settings")
 
 					if err := v.UnmarshalKey(nixGenKey, nixGenSettings); err == nil {
-						logrus.WithField("nixGenSettings", nixGenSettings).Debug("Assigning Nix generations settings")
-
 						// Use direct field assignment to actual operation
 						op.Settings = &domain.OperationSettings{}
 						op.Settings.NixGenerations = nixGenSettings
-						logrus.WithField("opSettings", op.Settings.NixGenerations).Debug("Set operation settings")
 					} else {
 						logrus.WithError(err).Error("Failed to unmarshal nix_generations settings")
 					}
@@ -134,39 +129,14 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		}
 	}
 
-	// IMMEDIATE DEBUG: Check settings RIGHT after assignment loop
-	logrus.Debug("=== CHECKING SETTINGS IMMEDIATELY AFTER ASSIGNMENT ===")
-	for name, profile := range config.Profiles {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" {
-				logrus.WithFields(logrus.Fields{
-					"profile":     name,
-					"operation":   i,
-					"hasSettings": op.Settings != nil,
-					"settings":    op.Settings,
-				}).Debug("IMMEDIATE: Settings after assignment")
-			}
-		}
-	}
+	// Removed debug logging for production
 
 	// Enable comprehensive validation - CRITICAL for production safety
 	if err := config.Validate(); err != nil {
 		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
-	// DEBUG: Verify settings are preserved after validation
-	logrus.Debug("=== CHECKING SETTINGS AFTER VALIDATION ===")
-	for name, profile := range config.Profiles {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
-				logrus.WithFields(logrus.Fields{
-					"profile":   name,
-					"operation": i,
-					"settings":  op.Settings.NixGenerations,
-				}).Debug("Settings preserved after validation")
-			}
-		}
-	}
+	// Removed debug logging for production
 
 	// Apply comprehensive validation with strict enforcement
 	if validator := NewConfigValidator(); validator != nil {
@@ -180,19 +150,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		}
 	}
 
-	// FINAL DEBUG: Check settings before returning config
-	for name, profile := range config.Profiles {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" {
-				logrus.WithFields(logrus.Fields{
-					"profile":     name,
-					"operation":   i,
-					"hasSettings": op.Settings != nil,
-					"settings":    op.Settings,
-				}).Debug("FINAL: Settings before returning config")
-			}
-		}
-	}
+	// Removed debug logging for production
 
 	return &config, nil
 }
@@ -210,7 +168,7 @@ func Save(config *domain.Config) error {
 
 	// Set configuration values
 	v.Set("version", config.Version)
-	v.Set("safe_mode", config.SafeMode)
+	v.Set("safe_mode", config.SafeMode.String())
 	v.Set("max_disk_usage_percent", config.MaxDiskUsage)
 	v.Set("protected", config.Protected)
 	v.Set("last_clean", config.LastClean)
@@ -220,14 +178,14 @@ func Save(config *domain.Config) error {
 	for name, profile := range config.Profiles {
 		v.Set("profiles."+name+".name", profile.Name)
 		v.Set("profiles."+name+".description", profile.Description)
-		v.Set("profiles."+name+".enabled", profile.Enabled)
+		v.Set("profiles."+name+".enabled", profile.Enabled.String())
 
 		for i, op := range profile.Operations {
 			opKey := fmt.Sprintf("profiles.%s.operations.%d", name, i)
 			v.Set(opKey+".name", op.Name)
 			v.Set(opKey+".description", op.Description)
-			v.Set(opKey+".risk_level", op.RiskLevel)
-			v.Set(opKey+".enabled", op.Enabled)
+			v.Set(opKey+".risk_level", op.RiskLevel.String())
+			v.Set(opKey+".enabled", op.Enabled.String())
 			if op.Settings != nil {
 				v.Set(opKey+".settings", op.Settings)
 			}
