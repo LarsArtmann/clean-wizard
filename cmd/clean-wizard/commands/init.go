@@ -74,10 +74,14 @@ func runInteractiveSetup(config *domain.Config) error {
 
 	// Safe mode
 	safeMode := askYesNo(reader, "Enable safe mode?", true)
-	config.SafeMode = safeMode
+	if safeMode {
+		config.SafeMode = domain.SafeModeEnabled
+	} else {
+		config.SafeMode = domain.SafeModeDisabled
+	}
 
 	// Dry run by default
-	dryRun := askYesNo(reader, "Enable dry run by default?", true)
+	_ = askYesNo(reader, "Enable dry run by default?", true)
 
 	// Automatic backups
 	_ = askYesNo(reader, "Enable automatic backups?", true) // TODO: Implement backup functionality
@@ -87,7 +91,7 @@ func runInteractiveSetup(config *domain.Config) error {
 	config.MaxDiskUsage = maxDiskUsage
 
 	// Configure profiles based on safety preferences
-	configureProfiles(config, dryRun, safeMode)
+	configureProfiles(config, config.SafeMode)
 
 	return nil
 }
@@ -148,13 +152,13 @@ func askNumber(reader *bufio.Reader, question string, min, max, defaultValue int
 	}
 }
 
-func configureProfiles(config *domain.Config, dryRun, safeMode bool) {
+func configureProfiles(config *domain.Config, safeMode domain.SafeMode) {
 	// Daily profile
 	dailySettings := &domain.OperationSettings{
 		NixGenerations: &domain.NixGenerationsSettings{
 			Generations: 3,
-			Optimize:    true,
-			DryRun:      dryRun,
+			Optimize:    domain.OptimizationModeEnabled,
+			DryRun:      domain.ExecutionModeNormal,
 		},
 	}
 
@@ -162,11 +166,11 @@ func configureProfiles(config *domain.Config, dryRun, safeMode bool) {
 	comprehensiveSettings := &domain.OperationSettings{
 		NixGenerations: &domain.NixGenerationsSettings{
 			Generations: 1,
-			Optimize:    true,
-			DryRun:      dryRun,
+			Optimize:    domain.OptimizationModeEnabled,
+			DryRun:      domain.ExecutionModeNormal,
 		},
 		Homebrew: &domain.HomebrewSettings{
-			UnusedOnly: true,
+			UnusedOnly: domain.HomebrewModeUnusedOnly,
 			Prune:      "recent",
 		},
 	}
@@ -175,11 +179,11 @@ func configureProfiles(config *domain.Config, dryRun, safeMode bool) {
 	aggressiveSettings := &domain.OperationSettings{
 		NixGenerations: &domain.NixGenerationsSettings{
 			Generations: 0, // Remove all but current
-			Optimize:    true,
-			DryRun:      dryRun,
+			Optimize:    domain.OptimizationModeEnabled,
+			DryRun:      domain.ExecutionModeNormal,
 		},
 		Homebrew: &domain.HomebrewSettings{
-			UnusedOnly: false,
+			UnusedOnly: domain.HomebrewModeAll,
 			Prune:      "all",
 		},
 	}
@@ -189,13 +193,13 @@ func configureProfiles(config *domain.Config, dryRun, safeMode bool) {
 		"daily": {
 			Name:        "daily",
 			Description: "Quick daily cleanup for routine maintenance",
-			Enabled:     true,
+			Enabled:     domain.ProfileStatusEnabled,
 			Operations: []domain.CleanupOperation{
 				{
 					Name:        "nix-generations",
 					Description: "Clean old Nix generations",
 					RiskLevel:   domain.RiskLow,
-					Enabled:     true,
+					Enabled:     domain.ProfileStatusEnabled,
 					Settings:    dailySettings,
 				},
 			},
@@ -203,13 +207,13 @@ func configureProfiles(config *domain.Config, dryRun, safeMode bool) {
 		"comprehensive": {
 			Name:        "comprehensive",
 			Description: "Complete system cleanup for weekly maintenance",
-			Enabled:     true,
+			Enabled:     domain.ProfileStatusEnabled,
 			Operations: []domain.CleanupOperation{
 				{
 					Name:        "nix-generations",
 					Description: "Comprehensive Nix cleanup",
 					RiskLevel:   domain.RiskLow,
-					Enabled:     true,
+					Enabled:     domain.ProfileStatusEnabled,
 					Settings:    comprehensiveSettings,
 				},
 			},
@@ -217,17 +221,17 @@ func configureProfiles(config *domain.Config, dryRun, safeMode bool) {
 	}
 
 	// Only add aggressive profile if not in safe mode
-	if !safeMode {
+	if !safeMode.IsEnabled() {
 		config.Profiles["aggressive"] = &domain.Profile{
 			Name:        "aggressive",
 			Description: "Nuclear option - everything that can be cleaned",
-			Enabled:     true,
+			Enabled:     domain.ProfileStatusEnabled,
 			Operations: []domain.CleanupOperation{
 				{
 					Name:        "nix-generations",
 					Description: "Aggressive Nix cleanup",
 					RiskLevel:   domain.RiskHigh,
-					Enabled:     true,
+					Enabled:     domain.ProfileStatusEnabled,
 					Settings:    aggressiveSettings,
 				},
 			},
@@ -241,7 +245,7 @@ func configureProfiles(config *domain.Config, dryRun, safeMode bool) {
 func createDefaultConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
-		SafeMode:     true,
+		SafeMode:     domain.SafeModeEnabled,
 		MaxDiskUsage: 90,
 		Protected: []string{
 			"/",

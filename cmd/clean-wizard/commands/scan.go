@@ -38,7 +38,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 			// Determine scan parameters from configuration
 			scanType := domain.ScanTypeNixStore
-			recursive := true
+			scanMode := domain.ScanModeRecursive
 			limit := 100
 			var loadedCfg *domain.Config
 
@@ -102,7 +102,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 				if validationLevel >= config.ValidationLevelStrict {
 					// Strict validation
-					if !loadedCfg.SafeMode {
+					if !loadedCfg.SafeMode.IsEnabled() {
 						return fmt.Errorf("strict validation failed: safe_mode must be enabled")
 					}
 				}
@@ -118,7 +118,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 					return fmt.Errorf("profile '%s' not found in configuration", profileName)
 				}
 
-				if !profile.Enabled {
+				if !profile.Enabled.IsEnabled() {
 					return fmt.Errorf("profile '%s' is disabled", profileName)
 				}
 
@@ -126,28 +126,28 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
 				// Use current profile from config
 				profile := loadedCfg.Profiles[loadedCfg.CurrentProfile]
-				if profile != nil && profile.Enabled {
+				if profile != nil && profile.Enabled.IsEnabled() {
 					fmt.Printf("🏷️  Using current profile: %s (%s)\n", loadedCfg.CurrentProfile, profile.Description)
 				}
 			} else if loadedCfg != nil {
-				// Default to daily profile if available
-				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled {
-					fmt.Printf("📋 Using daily profile configuration\n")
-					// Extract scan parameters from profile
-					for _, op := range dailyProfile.Operations {
-						if op.Name == "nix-generations" && op.Enabled {
-							// Nix generations scanning
-							limit = 50 // Default for generations
-							break
-						}
+			// Default to daily profile if available
+			if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled.IsEnabled() {
+				fmt.Printf("📋 Using daily profile configuration\n")
+				// Extract scan parameters from profile
+				for _, op := range dailyProfile.Operations {
+					if op.Name == "nix-generations" && op.Enabled.IsEnabled() {
+						// Nix generations scanning
+						limit = 50 // Default for generations
+						break
 					}
 				}
+			}
 			}
 
 			// Create scan request with applied configuration
 			scanReq := domain.ScanRequest{
 				Type:      scanType,
-				Recursive: recursive,
+				Recursive: scanMode,
 				Limit:     limit,
 			}
 
@@ -203,7 +203,7 @@ func displayScanResults(result domain.ScanResult, generations []domain.NixGenera
 	// Count current generations
 	currentCount := 0
 	for _, gen := range generations {
-		if gen.Current {
+		if gen.Current.IsCurrent() {
 			currentCount++
 		}
 	}

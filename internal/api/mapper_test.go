@@ -58,7 +58,7 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 		t.Errorf("Expected version %s, got %s", publicConfig.Version, domainConfig.Version)
 	}
 
-	if domainConfig.SafeMode != publicConfig.SafeMode {
+	if domainConfig.SafeMode.IsEnabled() != publicConfig.SafeMode {
 		t.Errorf("Expected safeMode %v, got %v", publicConfig.SafeMode, domainConfig.SafeMode)
 	}
 
@@ -95,18 +95,18 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 	// Create domain config
 	domainConfig := &domain.Config{
 		Version:  "1.0.0",
-		SafeMode: true,
+		SafeMode: domain.SafeModeEnabled,
 		Profiles: map[string]*domain.Profile{
 			"test": {
 				Name:        "test",
 				Description: "Test profile",
-				Enabled:     true,
+				Enabled:     domain.ProfileStatusEnabled,
 				Operations: []domain.CleanupOperation{
 					{
 						Name:        "test-op",
 						Description: "Test operation",
 						RiskLevel:   domain.RiskMedium,
-						Enabled:     true,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
 				},

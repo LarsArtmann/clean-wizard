@@ -100,7 +100,7 @@ func runConfigShow(cmd *cobra.Command, args []string) error {
 	if len(cfg.Profiles) > 0 {
 		for name, profile := range cfg.Profiles {
 			status := "✅"
-			if !profile.Enabled {
+			if !profile.Enabled.IsEnabled() {
 				status = "❌"
 			}
 			fmt.Printf("   %s %s - %s (%d operations)\n", status, name, profile.Description, len(profile.Operations))

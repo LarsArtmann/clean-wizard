@@ -12,7 +12,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 		// Create complex configuration that exercises all validation paths
 		cfg := &domain.Config{
 			Version:      " 1.0.0  ", // Needs whitespace sanitization
-			SafeMode:     true,
+			SafeMode:     domain.SafeModeEnabled,
 			MaxDiskUsage: 85,
 			Protected:    []string{"/System", "/Library", "/Applications", "/System"}, // Duplicate /System
 			Profiles: map[string]*domain.Profile{

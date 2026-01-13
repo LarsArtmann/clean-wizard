@@ -75,7 +75,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 
 					if validationLevel >= config.ValidationLevelStrict {
 						// Strict validation
-						if !loadedCfg.SafeMode {
+						if !loadedCfg.SafeMode.IsEnabled() {
 							return fmt.Errorf("strict validation failed: safe_mode must be enabled")
 						}
 					}
@@ -106,7 +106,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					return fmt.Errorf("profile '%s' not found in configuration", profileName)
 				}
 
-				if !profile.Enabled {
+				if !profile.Enabled.IsEnabled() {
 					return fmt.Errorf("profile '%s' is disabled", profileName)
 				}
 
@@ -115,13 +115,13 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
 				// Use current profile from config
 				profile := loadedCfg.Profiles[loadedCfg.CurrentProfile]
-				if profile != nil && profile.Enabled {
+				if profile != nil && profile.Enabled.IsEnabled() {
 					fmt.Printf("🏷️  Using current profile: %s (%s)\n", loadedCfg.CurrentProfile, profile.Description)
 					usedProfile = profile
 				}
 			} else if loadedCfg != nil {
 				// Default to daily profile if available
-				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled {
+				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled.IsEnabled() {
 					fmt.Printf("📋 Using daily profile configuration\n")
 					usedProfile = dailyProfile
 				}
@@ -131,7 +131,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			var settings *domain.OperationSettings
 			if usedProfile != nil {
 				for _, op := range usedProfile.Operations {
-					if op.Name == "nix-generations" && op.Enabled {
+					if op.Name == "nix-generations" && op.Enabled.IsEnabled() {
 						fmt.Printf("🔧 Configuring Nix generations cleanup\n")
 						fmt.Printf("🔍 Operation Settings: %+v\n", op.Settings)
 						if op.Settings != nil {
@@ -151,7 +151,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			if cleanDryRun {
 				actualDryRun = true
 				fmt.Println("🔍 Running in DRY-RUN mode (from flag) - no files will be deleted")
-			} else if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.DryRun {
+			} else if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.DryRun.IsDryRun() {
 				actualDryRun = true
 				fmt.Println("🔍 Running in DRY-RUN mode (from config) - no files will be deleted")
 			}
