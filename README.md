@@ -64,17 +64,24 @@ Let's create the perfect cleaning configuration for your system!
 ? Enable automatic backups? › Yes
 ? Maximum disk usage percentage? › 90
 
-✅ Configuration created successfully!
+✅ Configuration created successfully at ~/.clean-wizard.yaml
 ```
 
 ```bash
 $ clean-wizard scan
-🔍 Scanning system...
+🔍 Analyzing system state...
+✅ Configuration applied: safe_mode=ENABLED, profiles=2
+🏷️  Using profile: daily (Quick daily cleanup for routine maintenance)
+
+📊 Scan Results:
+   • Total generations: 5
+   • Current generation: 1
+   • Cleanable generations: 4
+   • Store size: 250.0 MB
+
+💡 You can clean up 4 old generations to free space
+
 ✅ Scan completed!
-📦 Nix Store: 2.3 GB cleanable
-🍺 Homebrew: 150 MB cleanable
-📁 Package Caches: 500 MB cleanable
-💡 Total: ~3 GB can be recovered
 ```
 
 ## 🛠️ Commands
