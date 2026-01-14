@@ -164,7 +164,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 	// Get store size before removal
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get pre-remove store size: %w", err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get pre-remove store size for generation %d: %w", genID, err))
 	}
 
 	// Remove the specific generation
@@ -177,7 +177,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 	// Get store size after removal
 	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-remove store size: %w", err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-remove store size for generation %d: %w", genID, err))
 	}
 
 	bytesFreed := max(beforeSize-afterSize,

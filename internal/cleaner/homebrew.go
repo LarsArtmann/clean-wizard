@@ -27,6 +27,11 @@ func NewHomebrewCleaner(verbose, dryRun bool, unusedOnly domain.HomebrewMode) *H
 	}
 }
 
+// Type returns operation type for Homebrew cleaner.
+func (hbc *HomebrewCleaner) Type() domain.OperationType {
+	return domain.OperationTypeHomebrew
+}
+
 // IsAvailable checks if Homebrew cleaner is available.
 func (hbc *HomebrewCleaner) IsAvailable(ctx context.Context) bool {
 	// Check if brew command exists

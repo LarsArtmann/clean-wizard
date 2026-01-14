@@ -4,6 +4,7 @@ import "context"
 
 // Cleaner interface for all cleaning operations with type-safe settings.
 type Cleaner interface {
+	Type() OperationType
 	IsAvailable(ctx context.Context) bool
 	GetStoreSize(ctx context.Context) int64
 	ValidateSettings(settings *OperationSettings) error

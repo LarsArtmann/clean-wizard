@@ -37,6 +37,11 @@ func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
 	return nc
 }
 
+// Type returns the operation type for Nix cleaner.
+func (nc *NixCleaner) Type() domain.OperationType {
+	return domain.OperationTypeNixGenerations
+}
+
 // IsAvailable checks if Nix cleaner is available.
 func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
 	return nc.adapter.IsAvailable(ctx)

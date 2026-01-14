@@ -83,6 +83,10 @@ func TestValidationMiddleware(t *testing.T) {
 // mockCleaner implements domain.Cleaner for testing.
 type mockCleaner struct{}
 
+func (m *mockCleaner) Type() domain.OperationType {
+	return domain.OperationTypeNixGenerations
+}
+
 func (m *mockCleaner) IsAvailable(ctx context.Context) bool {
 	return true
 }

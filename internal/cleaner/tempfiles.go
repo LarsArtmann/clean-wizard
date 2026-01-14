@@ -51,6 +51,11 @@ func NewTempFilesCleaner(verbose, dryRun bool, olderThan string, excludes, baseP
 	}, nil
 }
 
+// Type returns operation type for temp files cleaner.
+func (tfc *TempFilesCleaner) Type() domain.OperationType {
+	return domain.OperationTypeTempFiles
+}
+
 // IsAvailable checks if temp files cleaner is available.
 func (tfc *TempFilesCleaner) IsAvailable(ctx context.Context) bool {
 	// Temp files cleaner is always available

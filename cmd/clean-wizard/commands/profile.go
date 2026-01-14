@@ -442,8 +442,8 @@ func runProfileEdit(cmd *cobra.Command, args []string, description string, enabl
 		for name := range cfg.Profiles {
 			names = append(names, name)
 		}
-		return fmt.Errorf("profile '%s' not found. Available profiles: %s",
-			profileName, strings.Join(names, ", "))
+		return fmt.Errorf("profile '%s' not found. Available profiles: %s (attempted: description=%q, enabled=%v, enabledProvided=%v)",
+			profileName, strings.Join(names, ", "), description, enabled, enabledProvided)
 	}
 
 	// Track if any changes were made
@@ -468,13 +468,13 @@ func runProfileEdit(cmd *cobra.Command, args []string, description string, enabl
 	}
 
 	if !changed {
-		return fmt.Errorf("no changes specified. Use --description or --enabled flags")
+		return fmt.Errorf("no changes specified for profile '%s'. Use --description or --enabled flags (provided: description=%q, enabled=%v, enabledProvided=%v)", profileName, description, enabled, enabledProvided)
 	}
 
 	// Save configuration
 	cfg.Updated = config.GetCurrentTime()
 	if err := config.Save(cfg); err != nil {
-		return fmt.Errorf("failed to save configuration: %w", err)
+		return fmt.Errorf("failed to save configuration for profile '%s': %w", profileName, err)
 	}
 
 	fmt.Printf("✅ Profile '%s' updated successfully\n", profileName)
