@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -13,7 +14,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// boolToGenerationStatus converts boolean to GenerationStatus enum
+// boolToGenerationStatus converts boolean to GenerationStatus enum.
 func boolToGenerationStatus(b bool) domain.GenerationStatus {
 	if b {
 		return domain.GenerationStatusCurrent
@@ -21,14 +22,14 @@ func boolToGenerationStatus(b bool) domain.GenerationStatus {
 	return domain.GenerationStatusHistorical
 }
 
-// NixAdapter wraps Nix package manager operations
+// NixAdapter wraps Nix package manager operations.
 type NixAdapter struct {
 	timeout time.Duration
 	retries int
 	dryRun  bool
 }
 
-// NewNixAdapter creates Nix adapter with configuration
+// NewNixAdapter creates Nix adapter with configuration.
 func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter {
 	return &NixAdapter{
 		timeout: timeout,
@@ -36,15 +37,15 @@ func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter {
 	}
 }
 
-// SetDryRun configures dry-run mode for the adapter
+// SetDryRun configures dry-run mode for the adapter.
 func (n *NixAdapter) SetDryRun(dryRun bool) {
 	n.dryRun = dryRun
 }
 
-// ListGenerations lists Nix generations with dry-run isolation
+// ListGenerations lists Nix generations with dry-run isolation.
 func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
 	if !n.IsAvailable(ctx) {
-		return result.Err[[]domain.NixGeneration](fmt.Errorf("nix not available"))
+		return result.Err[[]domain.NixGeneration](errors.New("nix not available"))
 	}
 
 	// If dry-run, return mock data without system calls
@@ -85,7 +86,7 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 	return result.Ok(generations)
 }
 
-// GetStoreSize returns Nix store size with dry-run isolation
+// GetStoreSize returns Nix store size with dry-run isolation.
 func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	// If dry-run, return estimated size without system calls
 	if n.dryRun {
@@ -112,7 +113,7 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	return result.Ok(size)
 }
 
-// CollectGarbage removes old Nix generations using centralized conversion
+// CollectGarbage removes old Nix generations using centralized conversion.
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
 	// Get store size before garbage collection
 	beforeSize, err := n.getActualStoreSize(ctx)
@@ -142,7 +143,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	return result.Ok(cleanResult)
 }
 
-// getActualStoreSize helper function to get real store size
+// getActualStoreSize helper function to get real store size.
 func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
 	output, err := cmd.Output()
@@ -158,7 +159,7 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 	return strconv.ParseInt(fields[0], 10, 64)
 }
 
-// RemoveGeneration removes specific Nix generation using centralized conversion
+// RemoveGeneration removes specific Nix generation using centralized conversion.
 func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[domain.CleanResult] {
 	// Get store size before removal
 	beforeSize, err := n.getActualStoreSize(ctx)
@@ -167,7 +168,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 	}
 
 	// Remove the specific generation
-	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", fmt.Sprintf("%d", genID))
+	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", strconv.Itoa(genID))
 	err = cmd.Run()
 	if err != nil {
 		return conversions.ToCleanResultFromError(fmt.Errorf("failed to remove generation %d: %w", genID, err))
@@ -188,7 +189,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 	return result.Ok(cleanResult)
 }
 
-// ParseGeneration parses generation line from nix-env output
+// ParseGeneration parses generation line from nix-env output.
 func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) {
 	fields := strings.Fields(line)
 	if len(fields) < 1 {
@@ -224,7 +225,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 	}, nil
 }
 
-// IsAvailable checks if Nix is available and accessible
+// IsAvailable checks if Nix is available and accessible.
 func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
 	// First check if nix command exists
 	versionCmd := exec.CommandContext(ctx, "nix", "--version")

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// TestParseCustomDuration provides comprehensive testing for custom duration parsing
+// TestParseCustomDuration provides comprehensive testing for custom duration parsing.
 func TestParseCustomDuration(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -141,7 +141,7 @@ func TestParseCustomDuration(t *testing.T) {
 	}
 }
 
-// TestValidateCustomDuration tests the validation function
+// TestValidateCustomDuration tests the validation function.
 func TestValidateCustomDuration(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -193,7 +193,7 @@ func TestValidateCustomDuration(t *testing.T) {
 	}
 }
 
-// BenchmarkParseCustomDuration benchmarks custom duration parser performance
+// BenchmarkParseCustomDuration benchmarks custom duration parser performance.
 func BenchmarkParseCustomDuration(b *testing.B) {
 	testInputs := []string{"1d", "7d", "24h", "30m", "1h30m", "15s"}
 
@@ -204,7 +204,7 @@ func BenchmarkParseCustomDuration(b *testing.B) {
 	}
 }
 
-// BenchmarkParseGoDuration benchmarks Go's native time.ParseDuration
+// BenchmarkParseGoDuration benchmarks Go's native time.ParseDuration.
 func BenchmarkParseGoDuration(b *testing.B) {
 	testInputs := []string{"24h", "30m", "1h30m", "15s"}
 

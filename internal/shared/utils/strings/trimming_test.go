@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// MockSanitizationResult implements the SanitizationResult interface for testing
+// MockSanitizationResult implements the SanitizationResult interface for testing.
 type MockSanitizationResult struct {
 	Changes []struct {
 		Path     string

@@ -7,6 +7,12 @@ build:
     go build -o {{BINARY_NAME}} ./cmd/clean-wizard
     @echo "✅ Build complete: ./{{BINARY_NAME}}"
 
+# Install binary locally
+install-local:
+    @echo "📦 Installing {{BINARY_NAME}} locally..."
+    go install ./cmd/clean-wizard
+    @echo "✅ Installation complete"
+
 # Clean build artifacts
 clean:
     @echo "🧹 Cleaning build artifacts..."

@@ -21,7 +21,7 @@ var (
 	validationLevel string
 )
 
-// colorize adds color to output based on type
+// colorize adds color to output based on type.
 func colorize(text, color string) string {
 	colors := map[string]string{
 		"red":    "\033[31m",
@@ -39,7 +39,7 @@ func colorize(text, color string) string {
 	return text
 }
 
-// parseValidationLevel converts string to ValidationLevel
+// parseValidationLevel converts string to ValidationLevel.
 func parseValidationLevel(level string) config.ValidationLevel {
 	switch strings.ToLower(level) {
 	case "none":
@@ -90,8 +90,8 @@ func main() {
 	rootCmd.AddCommand(
 		commands.NewInitCommand(),
 		commands.NewProfileCommand(),
-		commands.NewScanCommand(verbose, parseValidationLevel(validationLevel)),
-		commands.NewCleanCommand(parseValidationLevel(validationLevel)),
+		commands.NewScanCommand(),
+		commands.NewCleanCommand(),
 		commands.NewGenerateCommand(),
 		commands.NewConfigCommand(),
 	)

@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-// TestNixCleaningBDD tests Nix cleaning operations
+// TestNixCleaningBDD tests Nix cleaning operations.
 func TestNixCleaningBDD(t *testing.T) {
 	t.Run("Scenario: List available Nix generations", func(t *testing.T) {
 		// Given I have Nix installed
@@ -52,7 +52,7 @@ func TestNixCleaningBDD(t *testing.T) {
 	})
 }
 
-// contains helper function
+// contains helper function.
 func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }

@@ -1,7 +1,7 @@
 package domain
 
 // OperationSettings provides type-safe configuration for different operation types
-// This eliminates map[string]any violations while maintaining flexibility
+// This eliminates map[string]any violations while maintaining flexibility.
 type OperationSettings struct {
 	// Nix Generations Settings
 	NixGenerations *NixGenerationsSettings `json:"nix_generations,omitempty" yaml:"nix_generations,omitempty"`
@@ -16,32 +16,32 @@ type OperationSettings struct {
 	SystemTemp *SystemTempSettings `json:"system_temp,omitempty" yaml:"system_temp,omitempty"`
 }
 
-// NixGenerationsSettings provides type-safe settings for Nix generations cleanup
+// NixGenerationsSettings provides type-safe settings for Nix generations cleanup.
 type NixGenerationsSettings struct {
-	Generations int              `json:"generations" yaml:"generations"`
-	Optimize    OptimizationMode `json:"optimize" yaml:"optimize"`
+	Generations int              `json:"generations"       yaml:"generations"`
+	Optimize    OptimizationMode `json:"optimize"          yaml:"optimize"`
 	DryRun      ExecutionMode    `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
-// TempFilesSettings provides type-safe settings for temporary files cleanup
+// TempFilesSettings provides type-safe settings for temporary files cleanup.
 type TempFilesSettings struct {
-	OlderThan string   `json:"older_than" yaml:"older_than"`
+	OlderThan string   `json:"older_than"         yaml:"older_than"`
 	Excludes  []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
 }
 
-// HomebrewSettings provides type-safe settings for Homebrew cleanup
+// HomebrewSettings provides type-safe settings for Homebrew cleanup.
 type HomebrewSettings struct {
-	UnusedOnly HomebrewMode `json:"unused_only" yaml:"unused_only"`
+	UnusedOnly HomebrewMode `json:"unused_only"     yaml:"unused_only"`
 	Prune      string       `json:"prune,omitempty" yaml:"prune,omitempty"`
 }
 
-// SystemTempSettings provides type-safe settings for system temp cleanup
+// SystemTempSettings provides type-safe settings for system temp cleanup.
 type SystemTempSettings struct {
-	Paths     []string `json:"paths" yaml:"paths"`
+	Paths     []string `json:"paths"      yaml:"paths"`
 	OlderThan string   `json:"older_than" yaml:"older_than"`
 }
 
-// OperationType represents different types of cleanup operations
+// OperationType represents different types of cleanup operations.
 type OperationType string
 
 const (
@@ -51,7 +51,7 @@ const (
 	OperationTypeSystemTemp     OperationType = "system-temp"
 )
 
-// GetOperationType returns the operation type from operation name
+// GetOperationType returns the operation type from operation name.
 func GetOperationType(name string) OperationType {
 	switch name {
 	case "nix-generations":
@@ -67,7 +67,7 @@ func GetOperationType(name string) OperationType {
 	}
 }
 
-// DefaultSettings returns default settings for the given operation type
+// DefaultSettings returns default settings for the given operation type.
 func DefaultSettings(opType OperationType) *OperationSettings {
 	switch opType {
 	case OperationTypeNixGenerations:
@@ -103,17 +103,17 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 	}
 }
 
-// ValidateSettings validates settings for the given operation type
+// ValidateSettings validates settings for the given operation type.
 func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 	switch opType {
 	case OperationTypeNixGenerations:
 		if os.NixGenerations == nil {
 			return nil // Optional settings
 		}
-		if os.NixGenerations.Generations < 1 || os.NixGenerations.Generations > 10 {
+		if os.NixGenerations.Generations < 0 || os.NixGenerations.Generations > 10 {
 			return &ValidationError{
 				Field:   "nix_generations.generations",
-				Message: "generations must be between 1 and 10",
+				Message: "generations must be between 0 and 10 (0 = keep only current)",
 				Value:   os.NixGenerations.Generations,
 			}
 		}
@@ -152,7 +152,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 	return nil
 }
 
-// ValidationError represents a settings validation error
+// ValidationError represents a settings validation error.
 type ValidationError struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`

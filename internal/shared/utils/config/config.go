@@ -10,7 +10,7 @@ import (
 )
 
 // LoadConfigWithFallback loads configuration with proper error handling and user feedback
-// This eliminates duplicate config loading patterns across commands
+// This eliminates duplicate config loading patterns across commands.
 func LoadConfigWithFallback(ctx context.Context, logger *logrus.Logger) (*domain.Config, error) {
 	loadedCfg, err := config.LoadWithContext(ctx)
 	if err != nil {
@@ -22,7 +22,7 @@ func LoadConfigWithFallback(ctx context.Context, logger *logrus.Logger) (*domain
 }
 
 // LoadConfigOrContinue loads configuration but allows caller to continue on error
-// Returns (config, error) where error can be ignored for graceful degradation
+// Returns (config, error) where error can be ignored for graceful degradation.
 func LoadConfigOrContinue(ctx context.Context, logger *logrus.Logger) (*domain.Config, error) {
 	loadedCfg, err := config.LoadWithContext(ctx)
 	if err != nil {
@@ -33,7 +33,7 @@ func LoadConfigOrContinue(ctx context.Context, logger *logrus.Logger) (*domain.C
 	return loadedCfg, nil
 }
 
-// PrintConfigSuccess prints configuration success message
+// PrintConfigSuccess prints configuration success message.
 func PrintConfigSuccess(cfg *domain.Config) {
 	fmt.Printf("✅ Configuration applied: safe_mode=%v, profiles=%d\n",
 		cfg.SafeMode, len(cfg.Profiles))

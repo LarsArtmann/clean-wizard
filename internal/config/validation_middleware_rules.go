@@ -1,12 +1,13 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// validateChangeBusinessRules validates changes against business rules
+// validateChangeBusinessRules validates changes against business rules.
 func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChange) error {
 	for _, change := range changes {
 		// Rule: Cannot remove critical protected paths
@@ -23,13 +24,13 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 		if change.Field == "safe_mode" && change.OldValue == true && change.NewValue == false {
 			// Check if safe mode confirmation is required
 			if vm.options != nil && vm.options.RequireSafeModeConfirmation {
-				return fmt.Errorf("disabling safe mode requires explicit confirmation (use --confirm-safe-mode-disable)")
+				return errors.New("disabling safe mode requires explicit confirmation (use --confirm-safe-mode-disable)")
 			}
 
 			// Log warning in production environments
 			if vm.options != nil && vm.options.Environment == "production" {
 				vm.logger.LogError("safe_mode", "config_change",
-					fmt.Errorf("safe mode disabled in production environment"))
+					errors.New("safe mode disabled in production environment"))
 			}
 		}
 	}
@@ -37,7 +38,7 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 	return nil
 }
 
-// validateOperationSettings validates operation-specific settings with type safety
+// validateOperationSettings validates operation-specific settings with type safety.
 func (vm *ValidationMiddleware) validateOperationSettings(operationName string, op domain.CleanupOperation) error {
 	// Use the already-validated settings from the operation
 	if op.Settings == nil {

@@ -2,18 +2,19 @@ package config
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// ConfigSanitizer provides configuration sanitization and normalization
+// ConfigSanitizer provides configuration sanitization and normalization.
 type ConfigSanitizer struct {
 	rules *SanitizationRules
 }
 
-// SanitizationRules defines how to sanitize different configuration aspects
+// SanitizationRules defines how to sanitize different configuration aspects.
 type SanitizationRules struct {
 	// Path sanitization
 	NormalizePaths bool `json:"normalize_paths"`
@@ -40,7 +41,7 @@ type SanitizationRules struct {
 	DefaultProtectedPaths []string        `json:"default_protected_paths"`
 }
 
-// SanitizationChange represents a specific field change with context
+// SanitizationChange represents a specific field change with context.
 type SanitizationChange struct {
 	Original  any       `json:"original"`
 	Sanitized any       `json:"sanitized"`
@@ -48,7 +49,7 @@ type SanitizationChange struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
-// SanitizationResult contains sanitization outcomes
+// SanitizationResult contains sanitization outcomes.
 type SanitizationResult struct {
 	SanitizedFields []string                       `json:"sanitized_fields"`
 	Warnings        []SanitizationWarning          `json:"warnings"`
@@ -56,7 +57,7 @@ type SanitizationResult struct {
 	Timestamp       time.Time                      `json:"timestamp"`
 }
 
-// SanitizationWarning represents a sanitization warning
+// SanitizationWarning represents a sanitization warning.
 type SanitizationWarning struct {
 	Field     string `json:"field"`
 	Original  any    `json:"original"`
@@ -64,21 +65,21 @@ type SanitizationWarning struct {
 	Reason    string `json:"reason"`
 }
 
-// NewConfigSanitizer creates a configuration sanitizer with default rules
+// NewConfigSanitizer creates a configuration sanitizer with default rules.
 func NewConfigSanitizer() *ConfigSanitizer {
 	return &ConfigSanitizer{
 		rules: getDefaultSanitizationRules(),
 	}
 }
 
-// NewConfigSanitizerWithRules creates a sanitizer with custom rules
+// NewConfigSanitizerWithRules creates a sanitizer with custom rules.
 func NewConfigSanitizerWithRules(rules *SanitizationRules) *ConfigSanitizer {
 	return &ConfigSanitizer{
 		rules: rules,
 	}
 }
 
-// SanitizeConfig performs comprehensive configuration sanitization
+// SanitizeConfig performs comprehensive configuration sanitization.
 func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *ValidationResult) {
 	start := time.Now()
 	defer func() {
@@ -115,8 +116,8 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 			FieldsModified: result.SanitizedFields,
 			RulesApplied:   []string{"basic_sanitization", "default_values"},
 			Metadata: map[string]string{
-				"sanitized_count": fmt.Sprintf("%d", len(result.SanitizedFields)),
-				"warnings_count":  fmt.Sprintf("%d", len(result.Warnings)),
+				"sanitized_count": strconv.Itoa(len(result.SanitizedFields)),
+				"warnings_count":  strconv.Itoa(len(result.Warnings)),
 			},
 		}
 
@@ -138,7 +139,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 	}
 }
 
-// sanitizeBasicFields sanitizes basic configuration fields
+// sanitizeBasicFields sanitizes basic configuration fields.
 func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *SanitizationResult) {
 	// Sanitize version
 	if cs.rules.TrimWhitespace {
@@ -206,7 +207,7 @@ func (r *SanitizationResult) addWarning(field string, original, sanitized any, r
 	})
 }
 
-// getDefaultSanitizationRules returns default sanitization configuration
+// getDefaultSanitizationRules returns default sanitization configuration.
 func getDefaultSanitizationRules() *SanitizationRules {
 	return &SanitizationRules{
 		NormalizePaths:        true,

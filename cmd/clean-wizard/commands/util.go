@@ -6,7 +6,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 )
 
-// ParseValidationLevel converts string to ValidationLevel
+// ParseValidationLevel converts string to ValidationLevel.
 func ParseValidationLevel(level string) config.ValidationLevel {
 	switch strings.ToLower(level) {
 	case "none":

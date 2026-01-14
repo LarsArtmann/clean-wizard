@@ -12,7 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// NewInitCommand creates init command
+// NewInitCommand creates init command.
 func NewInitCommand() *cobra.Command {
 	var force bool
 	var minimal bool

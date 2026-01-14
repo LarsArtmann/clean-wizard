@@ -4,7 +4,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// sanitizeNixGenerationsSettings sanitizes Nix generations settings
+// sanitizeNixGenerationsSettings sanitizes Nix generations settings.
 func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(fieldPrefix string, settings *domain.NixGenerationsSettings, result *SanitizationResult) {
 	if settings == nil {
 		return

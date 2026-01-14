@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewGenerateCommand creates configuration generation command
+// NewGenerateCommand creates configuration generation command.
 func NewGenerateCommand() *cobra.Command {
 	var outputFile string
 	var template string
@@ -38,7 +38,7 @@ Available templates:
 	return generateCmd
 }
 
-// generateConfigTemplate generates the specified configuration template
+// generateConfigTemplate generates the specified configuration template.
 func generateConfigTemplate(template, outputFile string) error {
 	var content string
 
@@ -68,7 +68,7 @@ func generateConfigTemplate(template, outputFile string) error {
 	return nil
 }
 
-// getSimpleTemplate returns basic configuration template
+// getSimpleTemplate returns basic configuration template.
 func getSimpleTemplate() string {
 	return `# Clean-wizard basic configuration
 # Generated with: clean-wizard generate simple
@@ -104,7 +104,7 @@ profiles:
 `
 }
 
-// getWorkingTemplate returns complete configuration template
+// getWorkingTemplate returns complete configuration template.
 func getWorkingTemplate() string {
 	return `# Clean-wizard working configuration
 # Generated with: clean-wizard generate working
@@ -153,7 +153,7 @@ profiles:
 `
 }
 
-// getMinimalTemplate returns bare minimum configuration
+// getMinimalTemplate returns bare minimum configuration.
 func getMinimalTemplate() string {
 	return `# Clean-wizard minimal configuration
 # Generated with: clean-wizard generate minimal
@@ -177,7 +177,7 @@ profiles:
 `
 }
 
-// getAdvancedTemplate returns production-ready configuration
+// getAdvancedTemplate returns production-ready configuration.
 func getAdvancedTemplate() string {
 	return `# Clean-wizard advanced production configuration
 # Generated with: clean-wizard generate advanced

@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// validateFieldConstraints validates individual fields against rules
+// validateFieldConstraints validates individual fields against rules.
 func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *ValidationResult) {
 	// MaxDiskUsage validation
 	if err := cv.validateMaxDiskUsage(cfg.MaxDiskUsage); err != nil {
@@ -66,7 +67,7 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	}
 }
 
-// validateCrossFieldConstraints validates relationships between fields
+// validateCrossFieldConstraints validates relationships between fields.
 func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, result *ValidationResult) {
 	// Safe mode vs risk level consistency
 	if !cfg.SafeMode.IsEnabled() {
@@ -96,8 +97,8 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 					Suggestion: "Consider splitting operations into multiple profiles",
 					Context: &ValidationContext{
 						Metadata: map[string]string{
-							"operation_count": fmt.Sprintf("%d", len(profile.Operations)),
-							"max_operations":  fmt.Sprintf("%d", *cv.rules.MaxOperations.Max),
+							"operation_count": strconv.Itoa(len(profile.Operations)),
+							"max_operations":  strconv.Itoa(*cv.rules.MaxOperations.Max),
 						},
 					},
 				})

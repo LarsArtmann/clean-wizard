@@ -19,7 +19,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			name: "whitespace cleanup",
 			config: &domain.Config{
 				Version:      "  1.0.0  ",
-				SafeMode: domain.SafeModeEnabled,
+				SafeMode:     domain.SafeModeEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library"},
 				Profiles: map[string]*domain.Profile{
@@ -31,7 +31,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled: domain.ProfileStatusEnabled,
+								Enabled:     domain.ProfileStatusEnabled,
 							},
 						},
 						Enabled: domain.ProfileStatusEnabled,
@@ -45,7 +45,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			name: "max disk usage clamping",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode: domain.SafeModeEnabled,
+				SafeMode:     domain.SafeModeEnabled,
 				MaxDiskUsage: 150, // Will be clamped to 95
 				Protected:    []string{"/System", "/Library"},
 				Profiles: map[string]*domain.Profile{
@@ -57,7 +57,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled: domain.ProfileStatusEnabled,
+								Enabled:     domain.ProfileStatusEnabled,
 							},
 						},
 						Enabled: domain.ProfileStatusEnabled,
@@ -71,7 +71,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			name: "duplicate paths",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode: domain.SafeModeEnabled,
+				SafeMode:     domain.SafeModeEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library", "/System"}, // Duplicate /System
 				Profiles: map[string]*domain.Profile{
@@ -83,7 +83,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled: domain.ProfileStatusEnabled,
+								Enabled:     domain.ProfileStatusEnabled,
 							},
 						},
 						Enabled: domain.ProfileStatusEnabled,

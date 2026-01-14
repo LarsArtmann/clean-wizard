@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// TestCleanResultValidation tests the enhanced CleanResult validation
+// TestCleanResultValidation tests the enhanced CleanResult validation.
 func TestCleanResultValidation(t *testing.T) {
 	tests := []struct {
 		name        string

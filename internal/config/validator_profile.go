@@ -1,12 +1,13 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// validateProfiles validates all profiles in configuration
+// validateProfiles validates all profiles in configuration.
 func (cv *ConfigValidator) validateProfiles(cfg *domain.Config) error {
 	for name, profile := range cfg.Profiles {
 		// Validate profile name
@@ -28,11 +29,11 @@ func (cv *ConfigValidator) validateProfiles(cfg *domain.Config) error {
 	return nil
 }
 
-// validateProfileName validates profile name format
+// validateProfileName validates profile name format.
 func (cv *ConfigValidator) validateProfileName(name string) error {
 	// Explicitly reject empty names
 	if name == "" {
-		return fmt.Errorf("profile name cannot be empty")
+		return errors.New("profile name cannot be empty")
 	}
 
 	// Use configured regex pattern if available
@@ -53,7 +54,7 @@ func (cv *ConfigValidator) validateProfileName(name string) error {
 			}
 		}
 		// Pattern field exists but is empty - use default validation
-		return fmt.Errorf("profile name pattern is configured but empty")
+		return errors.New("profile name pattern is configured but empty")
 	}
 
 	// No pattern rule configured - use reasonable default validation

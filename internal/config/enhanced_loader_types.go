@@ -19,7 +19,7 @@ const (
 	ValidationLevelStrict        ValidationLevel = 3
 )
 
-// String returns string representation
+// String returns string representation.
 func (vl ValidationLevel) String() string {
 	switch vl {
 	case ValidationLevelNone:
@@ -35,7 +35,7 @@ func (vl ValidationLevel) String() string {
 	}
 }
 
-// EnhancedConfigLoader provides comprehensive configuration loading with validation
+// EnhancedConfigLoader provides comprehensive configuration loading with validation.
 type EnhancedConfigLoader struct {
 	middleware       *ValidationMiddleware
 	validator        *ConfigValidator
@@ -45,7 +45,7 @@ type EnhancedConfigLoader struct {
 	enableMonitoring bool
 }
 
-// ConfigLoadOptions provides options for configuration loading
+// ConfigLoadOptions provides options for configuration loading.
 type ConfigLoadOptions struct {
 	ForceRefresh       bool            `json:"force_refresh"`
 	EnableCache        bool            `json:"enable_cache"`
@@ -54,7 +54,7 @@ type ConfigLoadOptions struct {
 	Timeout            time.Duration   `json:"timeout"`
 }
 
-// ConfigSaveOptions provides options for configuration saving
+// ConfigSaveOptions provides options for configuration saving.
 type ConfigSaveOptions struct {
 	EnableSanitization bool            `json:"enable_sanitization"`
 	BackupEnabled      bool            `json:"backup_enabled"`
@@ -63,7 +63,7 @@ type ConfigSaveOptions struct {
 	ForceSave          bool            `json:"force_save"` // Override validation failures
 }
 
-// RetryPolicy defines retry behavior for configuration operations
+// RetryPolicy defines retry behavior for configuration operations.
 type RetryPolicy struct {
 	MaxRetries    int           `json:"max_retries"`
 	InitialDelay  time.Duration `json:"initial_delay"`
@@ -71,7 +71,7 @@ type RetryPolicy struct {
 	BackoffFactor float64       `json:"backoff_factor"`
 }
 
-// NewEnhancedConfigLoader creates a new enhanced config loader
+// NewEnhancedConfigLoader creates a new enhanced config loader.
 func NewEnhancedConfigLoader(options ...func(*EnhancedConfigLoader)) *EnhancedConfigLoader {
 	validator := NewConfigValidator()
 	sanitizer := NewConfigSanitizer()
@@ -93,14 +93,14 @@ func NewEnhancedConfigLoader(options ...func(*EnhancedConfigLoader)) *EnhancedCo
 	return ecl
 }
 
-// WithMonitoring enables monitoring output
+// WithMonitoring enables monitoring output.
 func WithMonitoring(enabled bool) func(*EnhancedConfigLoader) {
 	return func(ecl *EnhancedConfigLoader) {
 		ecl.enableMonitoring = enabled
 	}
 }
 
-// WithRetryPolicy sets custom retry policy
+// WithRetryPolicy sets custom retry policy.
 func WithRetryPolicy(policy *RetryPolicy) func(*EnhancedConfigLoader) {
 	return func(ecl *EnhancedConfigLoader) {
 		// Guard against nil policy to preserve defaults

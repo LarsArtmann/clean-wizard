@@ -9,7 +9,7 @@ import (
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 )
 
-// LoadConfig loads configuration with comprehensive validation and caching
+// LoadConfig loads configuration with comprehensive validation and caching.
 func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *ConfigLoadOptions) (*domain.Config, error) {
 	if options == nil {
 		options = getDefaultLoadOptions()
@@ -56,7 +56,7 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 	return config, nil
 }
 
-// SaveConfig saves configuration with validation and cache update
+// SaveConfig saves configuration with validation and cache update.
 func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) (*domain.Config, error) {
 	if options == nil {
 		options = getDefaultSaveOptions()
@@ -114,7 +114,7 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 	return config, nil
 }
 
-// ValidateConfig validates configuration at specified level
+// ValidateConfig validates configuration at specified level.
 func (ecl *EnhancedConfigLoader) ValidateConfig(ctx context.Context, config *domain.Config, level domain.ValidationLevelType) *ValidationResult {
 	return ecl.applyValidation(ctx, config, ValidationLevel(level))
 }

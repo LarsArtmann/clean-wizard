@@ -7,7 +7,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// ConfigValidationRules defines all validation constraints
+// ConfigValidationRules defines all validation constraints.
 type ConfigValidationRules struct {
 	// Numeric Constraints
 	MaxDiskUsage      *ValidationRule[int] `json:"max_disk_usage"`
@@ -33,7 +33,7 @@ type ConfigValidationRules struct {
 	BackupRequired domain.RiskLevel `json:"backup_required"`
 }
 
-// ValidationRule represents a validation constraint for a specific type
+// ValidationRule represents a validation constraint for a specific type.
 type ValidationRule[T comparable] struct {
 	Required bool   `json:"required"`
 	Min      *T     `json:"min,omitempty"`
@@ -47,7 +47,7 @@ type ValidationRule[T comparable] struct {
 	regexOnce     sync.Once
 }
 
-// ValidationSeverity represents error severity levels
+// ValidationSeverity represents error severity levels.
 type ValidationSeverity string
 
 const (
@@ -56,7 +56,7 @@ const (
 	SeverityInfo    ValidationSeverity = "info"
 )
 
-// GetCompiledRegex returns the compiled regex pattern, creating it once if needed
+// GetCompiledRegex returns the compiled regex pattern, creating it once if needed.
 func (vr *ValidationRule[T]) GetCompiledRegex() *regexp.Regexp {
 	vr.regexOnce.Do(func() {
 		if vr.Pattern != "" {
@@ -70,7 +70,7 @@ func (vr *ValidationRule[T]) GetCompiledRegex() *regexp.Regexp {
 	return vr.compiledRegex
 }
 
-// getDefaultValidationRules returns default validation constraints
+// getDefaultValidationRules returns default validation constraints.
 func getDefaultValidationRules() *ConfigValidationRules {
 	// Magic numbers extracted to constants for maintainability
 	minUsage := 10

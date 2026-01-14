@@ -1,11 +1,12 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 )
 
-// validateMaxDiskUsage validates max disk usage percentage
+// validateMaxDiskUsage validates max disk usage percentage.
 func (cv *ConfigValidator) validateMaxDiskUsage(value any) error {
 	usage, ok := value.(int)
 	if !ok {
@@ -23,7 +24,7 @@ func (cv *ConfigValidator) validateMaxDiskUsage(value any) error {
 	return nil
 }
 
-// getMaxDiskUsageBounds safely returns min and max bounds for max disk usage
+// getMaxDiskUsageBounds safely returns min and max bounds for max disk usage.
 func (cv *ConfigValidator) getMaxDiskUsageBounds() (min, max int) {
 	min, max = 0, 100 // Safe defaults
 
@@ -38,7 +39,7 @@ func (cv *ConfigValidator) getMaxDiskUsageBounds() (min, max int) {
 	return min, max
 }
 
-// validateProtectedPaths validates protected paths array
+// validateProtectedPaths validates protected paths array.
 func (cv *ConfigValidator) validateProtectedPaths(value any) error {
 	paths, ok := value.([]string)
 	if !ok {
@@ -47,7 +48,7 @@ func (cv *ConfigValidator) validateProtectedPaths(value any) error {
 
 	// Explicitly reject empty arrays as required field
 	if len(paths) == 0 {
-		return fmt.Errorf("protected paths cannot be empty")
+		return errors.New("protected paths cannot be empty")
 	}
 
 	for i, path := range paths {
@@ -62,7 +63,7 @@ func (cv *ConfigValidator) validateProtectedPaths(value any) error {
 	return nil
 }
 
-// findDuplicatePaths finds duplicate paths in the given slice
+// findDuplicatePaths finds duplicate paths in the given slice.
 func (cv *ConfigValidator) findDuplicatePaths(paths []string) []string {
 	seen := make(map[string]bool)
 	duplicates := []string{}

@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewProfileCommand creates the profile command
+// NewProfileCommand creates the profile command.
 func NewProfileCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "profile",
@@ -23,12 +23,15 @@ func NewProfileCommand() *cobra.Command {
 		NewProfileListCommand(),
 		NewProfileSelectCommand(),
 		NewProfileInfoCommand(),
+		NewProfileCreateCommand(),
+		NewProfileDeleteCommand(),
+		NewProfileEditCommand(),
 	)
 
 	return cmd
 }
 
-// NewProfileListCommand creates the profile list command
+// NewProfileListCommand creates the profile list command.
 func NewProfileListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
@@ -39,7 +42,7 @@ func NewProfileListCommand() *cobra.Command {
 	}
 }
 
-// NewProfileSelectCommand creates the profile select command
+// NewProfileSelectCommand creates the profile select command.
 func NewProfileSelectCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "select [profile-name]",
@@ -50,7 +53,7 @@ func NewProfileSelectCommand() *cobra.Command {
 	}
 }
 
-// NewProfileInfoCommand creates the profile info command
+// NewProfileInfoCommand creates the profile info command.
 func NewProfileInfoCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "info [profile-name]",
@@ -61,7 +64,63 @@ func NewProfileInfoCommand() *cobra.Command {
 	}
 }
 
-// runProfileList lists all available profiles
+// NewProfileCreateCommand creates the profile create command.
+func NewProfileCreateCommand() *cobra.Command {
+	var description string
+	var enabled bool
+
+	cmd := &cobra.Command{
+		Use:   "create [profile-name]",
+		Short: "Create a new configuration profile",
+		Long:  `Create a new cleanup configuration profile with default settings.`,
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runProfileCreate(cmd, args, description, enabled)
+		},
+	}
+
+	cmd.Flags().StringVarP(&description, "description", "d", "", "Profile description")
+	cmd.Flags().BoolVarP(&enabled, "enabled", "e", true, "Enable profile immediately")
+
+	return cmd
+}
+
+// NewProfileDeleteCommand creates the profile delete command.
+func NewProfileDeleteCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "delete [profile-name]",
+		Short: "Delete a configuration profile",
+		Long:  `Delete a configuration profile. Cannot delete the currently selected profile.`,
+		Args:  cobra.ExactArgs(1),
+		RunE:  runProfileDelete,
+	}
+
+	return cmd
+}
+
+// NewProfileEditCommand creates the profile edit command.
+func NewProfileEditCommand() *cobra.Command {
+	var description string
+	var enabled bool
+
+	cmd := &cobra.Command{
+		Use:   "edit [profile-name]",
+		Short: "Edit a configuration profile",
+		Long:  `Edit a configuration profile's settings. Use flags to specify what to change.`,
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			enabledProvided := cmd.Flags().Changed("enabled")
+			return runProfileEdit(cmd, args, description, enabled, enabledProvided)
+		},
+	}
+
+	cmd.Flags().StringVarP(&description, "description", "d", "", "New profile description")
+	cmd.Flags().BoolVarP(&enabled, "enabled", "e", false, "Enable or disable profile")
+
+	return cmd
+}
+
+// runProfileList lists all available profiles.
 func runProfileList(cmd *cobra.Command, args []string) error {
 	cfg, err := config.Load()
 	if err != nil {
@@ -124,7 +183,7 @@ func runProfileList(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// runProfileSelect selects a profile as default
+// runProfileSelect selects a profile as default.
 func runProfileSelect(cmd *cobra.Command, args []string) error {
 	profileName := args[0]
 
@@ -166,7 +225,7 @@ func runProfileSelect(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// runProfileInfo shows detailed information about a profile
+// runProfileInfo shows detailed information about a profile.
 func runProfileInfo(cmd *cobra.Command, args []string) error {
 	cfg, err := config.Load()
 	if err != nil {
@@ -275,7 +334,163 @@ func runProfileInfo(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// getRiskColor returns color code for risk level
+// runProfileCreate creates a new profile.
+func runProfileCreate(cmd *cobra.Command, args []string, description string, enabled bool) error {
+	profileName := args[0]
+
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+
+	// Check if profile already exists
+	if _, exists := cfg.Profiles[profileName]; exists {
+		return fmt.Errorf("profile '%s' already exists", profileName)
+	}
+
+	// Create new profile with default Nix operation
+	newProfile := &domain.Profile{
+		Name:        profileName,
+		Description: description,
+		Enabled:     boolToProfileStatus(enabled),
+		Operations: []domain.CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Clean up old Nix generations",
+				Enabled:     domain.ProfileStatusEnabled,
+				RiskLevel:   domain.RiskLow,
+				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+			},
+		},
+	}
+
+	// Set default description if not provided
+	if newProfile.Description == "" {
+		newProfile.Description = fmt.Sprintf("Custom profile: %s", profileName)
+	}
+
+	// Add profile to config
+	cfg.Profiles[profileName] = newProfile
+	cfg.Updated = config.GetCurrentTime()
+
+	// Save configuration
+	if err := config.Save(cfg); err != nil {
+		return fmt.Errorf("failed to save configuration: %w", err)
+	}
+
+	fmt.Printf("✅ Profile '%s' created successfully\n", profileName)
+	if !enabled {
+		fmt.Printf("⚠️  Profile is disabled. Enable it with: clean-wizard profile edit %s --enabled\n", profileName)
+	}
+	fmt.Printf("📝 Use 'clean-wizard profile select %s' to use this profile\n", profileName)
+
+	return nil
+}
+
+// runProfileDelete deletes a profile.
+func runProfileDelete(cmd *cobra.Command, args []string) error {
+	profileName := args[0]
+
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+
+	// Check if profile exists
+	_, exists := cfg.Profiles[profileName]
+	if !exists {
+		var names []string
+		for name := range cfg.Profiles {
+			names = append(names, name)
+		}
+		return fmt.Errorf("profile '%s' not found. Available profiles: %s",
+			profileName, strings.Join(names, ", "))
+	}
+
+	// Check if it's the current profile
+	if cfg.CurrentProfile == profileName {
+		return fmt.Errorf("cannot delete currently selected profile '%s'. Select another profile first.", profileName)
+	}
+
+	// Delete profile
+	delete(cfg.Profiles, profileName)
+	cfg.Updated = config.GetCurrentTime()
+
+	// Save configuration
+	if err := config.Save(cfg); err != nil {
+		return fmt.Errorf("failed to save configuration: %w", err)
+	}
+
+	fmt.Printf("✅ Profile '%s' deleted successfully\n", profileName)
+
+	return nil
+}
+
+// runProfileEdit edits a profile.
+func runProfileEdit(cmd *cobra.Command, args []string, description string, enabled bool, enabledProvided bool) error {
+	profileName := args[0]
+
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+
+	// Check if profile exists
+	profile, exists := cfg.Profiles[profileName]
+	if !exists {
+		var names []string
+		for name := range cfg.Profiles {
+			names = append(names, name)
+		}
+		return fmt.Errorf("profile '%s' not found. Available profiles: %s",
+			profileName, strings.Join(names, ", "))
+	}
+
+	// Track if any changes were made
+	changed := false
+
+	// Update description if provided
+	if description != "" {
+		profile.Description = description
+		changed = true
+		fmt.Printf("📝 Description updated\n")
+	}
+
+	// Update enabled status if provided
+	if enabledProvided {
+		profile.Enabled = boolToProfileStatus(enabled)
+		changed = true
+		status := "enabled"
+		if !enabled {
+			status = "disabled"
+		}
+		fmt.Printf("📝 Profile %s\n", status)
+	}
+
+	if !changed {
+		return fmt.Errorf("no changes specified. Use --description or --enabled flags")
+	}
+
+	// Save configuration
+	cfg.Updated = config.GetCurrentTime()
+	if err := config.Save(cfg); err != nil {
+		return fmt.Errorf("failed to save configuration: %w", err)
+	}
+
+	fmt.Printf("✅ Profile '%s' updated successfully\n", profileName)
+
+	return nil
+}
+
+// boolToProfileStatus converts boolean to ProfileStatus.
+func boolToProfileStatus(b bool) domain.ProfileStatus {
+	if b {
+		return domain.ProfileStatusEnabled
+	}
+	return domain.ProfileStatusDisabled
+}
+
+// getRiskColor returns color code for risk level.
 func getRiskColor(level domain.RiskLevel) string {
 	switch level {
 	case domain.RiskLow:

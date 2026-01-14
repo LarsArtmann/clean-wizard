@@ -6,12 +6,12 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// BenchmarkValidation_ConfigValidation tests full configuration validation performance
+// BenchmarkValidation_ConfigValidation tests full configuration validation performance.
 func BenchmarkValidation_ConfigValidation(b *testing.B) {
 	// Create complex configuration for realistic testing
 	cfg := &domain.Config{
 		Version:      "1.0.0",
-		SafeMode: domain.SafeModeEnabled,
+		SafeMode:     domain.SafeModeEnabled,
 		MaxDiskUsage: 75,
 		Protected:    []string{"/System", "/Applications", "/Library", "/usr", "/etc", "/var"},
 		Profiles: map[string]*domain.Profile{
@@ -23,11 +23,11 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "nix-generations",
 						Description: "Clean Nix generations",
 						RiskLevel:   domain.RiskLow,
-						Enabled: domain.ProfileStatusEnabled,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
 								Generations: 3,
-								Optimize: domain.OptimizationModeEnabled,
+								Optimize:    domain.OptimizationModeEnabled,
 							},
 						},
 					},
@@ -35,7 +35,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "temp-files",
 						Description: "Clean temporary files",
 						RiskLevel:   domain.RiskMedium,
-						Enabled: domain.ProfileStatusEnabled,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							TempFiles: &domain.TempFilesSettings{
 								OlderThan: "7d",
@@ -47,7 +47,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "homebrew-cleanup",
 						Description: "Clean Homebrew",
 						RiskLevel:   domain.RiskLow,
-						Enabled: domain.ProfileStatusEnabled,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							Homebrew: &domain.HomebrewSettings{
 								UnusedOnly: domain.HomebrewModeUnusedOnly,
@@ -59,7 +59,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "system-temp",
 						Description: "Clean system temp",
 						RiskLevel:   domain.RiskMedium,
-						Enabled: domain.ProfileStatusEnabled,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							SystemTemp: &domain.SystemTempSettings{
 								Paths:     []string{"/tmp", "/var/tmp", "/tmp/.font-unix"},
@@ -78,11 +78,11 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 						Name:        "nix-generations",
 						Description: "Deep Nix cleanup",
 						RiskLevel:   domain.RiskMedium,
-						Enabled: domain.ProfileStatusEnabled,
+						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
 								Generations: 5,
-								Optimize: domain.OptimizationModeEnabled,
+								Optimize:    domain.OptimizationModeEnabled,
 							},
 						},
 					},
@@ -99,7 +99,7 @@ func BenchmarkValidation_ConfigValidation(b *testing.B) {
 	}
 }
 
-// BenchmarkValidation_ProfileNameValidation tests profile name validation performance
+// BenchmarkValidation_ProfileNameValidation tests profile name validation performance.
 func BenchmarkValidation_ProfileNameValidation(b *testing.B) {
 	validator := NewConfigValidator()
 	profileNames := []string{
@@ -122,12 +122,12 @@ func BenchmarkValidation_ProfileNameValidation(b *testing.B) {
 	}
 }
 
-// BenchmarkValidation_OperationSettingsValidation tests operation settings validation performance
+// BenchmarkValidation_OperationSettingsValidation tests operation settings validation performance.
 func BenchmarkValidation_OperationSettingsValidation(b *testing.B) {
 	settings := &domain.OperationSettings{
 		NixGenerations: &domain.NixGenerationsSettings{
 			Generations: 3,
-			Optimize: domain.OptimizationModeEnabled,
+			Optimize:    domain.OptimizationModeEnabled,
 		},
 		TempFiles: &domain.TempFilesSettings{
 			OlderThan: "7d",
@@ -157,7 +157,7 @@ func BenchmarkValidation_OperationSettingsValidation(b *testing.B) {
 	}
 }
 
-// BenchmarkValidation_MaxDiskUsageValidation tests max disk usage validation performance
+// BenchmarkValidation_MaxDiskUsageValidation tests max disk usage validation performance.
 func BenchmarkValidation_MaxDiskUsageValidation(b *testing.B) {
 	validator := NewConfigValidator()
 	testValues := []int{10, 25, 50, 75, 95}
@@ -169,7 +169,7 @@ func BenchmarkValidation_MaxDiskUsageValidation(b *testing.B) {
 	}
 }
 
-// BenchmarkValidation_RegexCompilation tests regex pattern compilation performance
+// BenchmarkValidation_RegexCompilation tests regex pattern compilation performance.
 func BenchmarkValidation_RegexCompilation(b *testing.B) {
 	pattern := "^[a-zA-Z0-9_-]+$"
 	testNames := []string{

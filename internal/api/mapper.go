@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 // === MAPPING LAYER: API ↔ DOMAIN TYPES ===
 // Converts between public API types and internal domain models
 
-// boolToSafeMode converts boolean to SafeMode enum
+// boolToSafeMode converts boolean to SafeMode enum.
 func boolToSafeMode(b bool) domain.SafeMode {
 	if b {
 		return domain.SafeModeEnabled
@@ -19,7 +20,7 @@ func boolToSafeMode(b bool) domain.SafeMode {
 	return domain.SafeModeDisabled
 }
 
-// boolToProfileStatus converts boolean to ProfileStatus enum
+// boolToProfileStatus converts boolean to ProfileStatus enum.
 func boolToProfileStatus(b bool) domain.ProfileStatus {
 	if b {
 		return domain.ProfileStatusEnabled
@@ -27,20 +28,20 @@ func boolToProfileStatus(b bool) domain.ProfileStatus {
 	return domain.ProfileStatusDisabled
 }
 
-// safeModeToBool converts SafeMode enum to boolean
+// safeModeToBool converts SafeMode enum to boolean.
 func safeModeToBool(sm domain.SafeMode) bool {
 	return sm == domain.SafeModeEnabled || sm == domain.SafeModeStrict
 }
 
-// profileStatusToBool converts ProfileStatus enum to boolean
+// profileStatusToBool converts ProfileStatus enum to boolean.
 func profileStatusToBool(ps domain.ProfileStatus) bool {
 	return ps == domain.ProfileStatusEnabled
 }
 
-// MapConfigToDomain converts public API config to internal domain model
+// MapConfigToDomain converts public API config to internal domain model.
 func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config] {
 	if publicConfig == nil {
-		return result.Err[*domain.Config](fmt.Errorf("public config cannot be nil"))
+		return result.Err[*domain.Config](errors.New("public config cannot be nil"))
 	}
 
 	// Map profiles
@@ -70,10 +71,10 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 	return result.Ok(config)
 }
 
-// MapConfigToPublic converts internal domain config to public API type
+// MapConfigToPublic converts internal domain config to public API type.
 func MapConfigToPublic(domainConfig *domain.Config) result.Result[*PublicConfig] {
 	if domainConfig == nil {
-		return result.Err[*PublicConfig](fmt.Errorf("domain config cannot be nil"))
+		return result.Err[*PublicConfig](errors.New("domain config cannot be nil"))
 	}
 
 	// Map profiles
@@ -94,10 +95,10 @@ func MapConfigToPublic(domainConfig *domain.Config) result.Result[*PublicConfig]
 	return result.Ok(publicConfig)
 }
 
-// MapProfileToDomain converts public API profile to domain model
+// MapProfileToDomain converts public API profile to domain model.
 func MapProfileToDomain(publicProfile *PublicProfile) (*domain.Profile, error) {
 	if publicProfile == nil {
-		return nil, fmt.Errorf("public profile cannot be nil")
+		return nil, errors.New("public profile cannot be nil")
 	}
 
 	// Map operations
@@ -118,7 +119,7 @@ func MapProfileToDomain(publicProfile *PublicProfile) (*domain.Profile, error) {
 	}, nil
 }
 
-// MapProfileToPublic converts domain profile to public API type
+// MapProfileToPublic converts domain profile to public API type.
 func MapProfileToPublic(domainProfile *domain.Profile) *PublicProfile {
 	if domainProfile == nil {
 		return nil
@@ -138,10 +139,10 @@ func MapProfileToPublic(domainProfile *domain.Profile) *PublicProfile {
 	}
 }
 
-// MapOperationToDomain converts public API operation to domain model
+// MapOperationToDomain converts public API operation to domain model.
 func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOperation, error) {
 	if publicOperation == nil {
-		return nil, fmt.Errorf("public operation cannot be nil")
+		return nil, errors.New("public operation cannot be nil")
 	}
 
 	// Map risk level
@@ -159,7 +160,7 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 	}, nil
 }
 
-// MapOperationToPublic converts domain operation to public API type
+// MapOperationToPublic converts domain operation to public API type.
 func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOperation {
 	if domainOperation == nil {
 		return nil
@@ -177,7 +178,7 @@ func MapOperationToPublic(domainOperation *domain.CleanupOperation) *PublicOpera
 	}
 }
 
-// MapOperationSettingsToPublic converts complex domain settings to simplified public API settings
+// MapOperationSettingsToPublic converts complex domain settings to simplified public API settings.
 func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationSettings {
 	// Default values for simplified public API
 	publicSettings := OperationSettings{
@@ -198,7 +199,7 @@ func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationS
 	return publicSettings
 }
 
-// MapRiskLevelToDomain converts public risk level string to domain enum
+// MapRiskLevelToDomain converts public risk level string to domain enum.
 func MapRiskLevelToDomain(publicRisk PublicRiskLevel) (domain.RiskLevelType, error) {
 	switch publicRisk {
 	case PublicRiskLow:
@@ -214,7 +215,7 @@ func MapRiskLevelToDomain(publicRisk PublicRiskLevel) (domain.RiskLevelType, err
 	}
 }
 
-// MapRiskLevelToPublic converts domain risk level enum to public string
+// MapRiskLevelToPublic converts domain risk level enum to public string.
 func MapRiskLevelToPublic(domainRisk domain.RiskLevelType) PublicRiskLevel {
 	switch domainRisk {
 	case domain.RiskLow:
@@ -230,7 +231,7 @@ func MapRiskLevelToPublic(domainRisk domain.RiskLevelType) PublicRiskLevel {
 	}
 }
 
-// MapCleanResultToPublic converts domain clean result to public API type
+// MapCleanResultToPublic converts domain clean result to public API type.
 func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*PublicCleanResult] {
 	// Map strategy
 	strategy := MapStrategyToPublic(domainResult.Strategy)
@@ -254,7 +255,7 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 	return result.Ok(publicResult)
 }
 
-// MapStrategyToPublic converts domain strategy enum to public string
+// MapStrategyToPublic converts domain strategy enum to public string.
 func MapStrategyToPublic(domainStrategy domain.CleanStrategyType) PublicStrategy {
 	switch domainStrategy {
 	case domain.StrategyAggressive:

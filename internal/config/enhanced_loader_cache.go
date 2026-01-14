@@ -7,7 +7,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// ConfigCache provides configuration caching with TTL
+// ConfigCache provides configuration caching with TTL.
 type ConfigCache struct {
 	mu        sync.RWMutex
 	config    *domain.Config
@@ -16,7 +16,7 @@ type ConfigCache struct {
 	validator *ConfigValidator
 }
 
-// NewConfigCache creates a new configuration cache with specified TTL
+// NewConfigCache creates a new configuration cache with specified TTL.
 func NewConfigCache(ttl time.Duration) *ConfigCache {
 	return &ConfigCache{
 		ttl:       ttl,
@@ -24,7 +24,7 @@ func NewConfigCache(ttl time.Duration) *ConfigCache {
 	}
 }
 
-// Get retrieves cached configuration if valid and not expired
+// Get retrieves cached configuration if valid and not expired.
 func (cc *ConfigCache) Get() *domain.Config {
 	cc.mu.RLock()
 	if cc.config == nil || time.Since(cc.loadedAt) > cc.ttl {
@@ -48,7 +48,7 @@ func (cc *ConfigCache) Get() *domain.Config {
 	return config
 }
 
-// Set stores configuration in cache with current timestamp
+// Set stores configuration in cache with current timestamp.
 func (cc *ConfigCache) Set(config *domain.Config) {
 	cc.mu.Lock()
 	defer cc.mu.Unlock()

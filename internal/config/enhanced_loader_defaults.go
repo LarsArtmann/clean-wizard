@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// getDefaultLoadOptions returns default load options
+// getDefaultLoadOptions returns default load options.
 func getDefaultLoadOptions() *ConfigLoadOptions {
 	return &ConfigLoadOptions{
 		ForceRefresh:       false,
@@ -15,7 +15,7 @@ func getDefaultLoadOptions() *ConfigLoadOptions {
 	}
 }
 
-// getDefaultSaveOptions returns default save options
+// getDefaultSaveOptions returns default save options.
 func getDefaultSaveOptions() *ConfigSaveOptions {
 	return &ConfigSaveOptions{
 		EnableSanitization: true,
@@ -26,7 +26,7 @@ func getDefaultSaveOptions() *ConfigSaveOptions {
 	}
 }
 
-// getDefaultRetryPolicy returns default retry policy
+// getDefaultRetryPolicy returns default retry policy.
 func getDefaultRetryPolicy() *RetryPolicy {
 	return &RetryPolicy{
 		MaxRetries:    3,

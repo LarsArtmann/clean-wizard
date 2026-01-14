@@ -1,18 +1,19 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
 
-// Backward compatibility aliases - delegate to type-safe enums
+// Backward compatibility aliases - delegate to type-safe enums.
 type (
 	RiskLevel       = RiskLevelType
 	ValidationLevel = ValidationLevelType
 	ChangeOperation = ChangeOperationType
 )
 
-// Backward compatibility constants - point to type-safe enums
+// Backward compatibility constants - point to type-safe enums.
 var (
 	RiskLow      = RiskLevelType(RiskLevelLowType)
 	RiskMedium   = RiskLevelType(RiskLevelMediumType)
@@ -29,17 +30,17 @@ var (
 	OperationModified = ChangeOperationType(ChangeOperationModifiedType)
 )
 
-// CleanStrategy represents cleaning strategy with type safety
+// CleanStrategy represents cleaning strategy with type safety.
 type CleanStrategy = CleanStrategyType
 
-// Backward compatibility constants - delegate to type-safe enums
+// Backward compatibility constants - delegate to type-safe enums.
 var (
 	StrategyAggressive   = CleanStrategyType(StrategyAggressiveType)
 	StrategyConservative = CleanStrategyType(StrategyConservativeType)
 	StrategyDryRun       = CleanStrategyType(StrategyDryRunType)
 )
 
-// NixGeneration represents Nix store generation
+// NixGeneration represents Nix store generation.
 type NixGeneration struct {
 	ID      int              `json:"id"`
 	Path    string           `json:"path"`
@@ -47,27 +48,27 @@ type NixGeneration struct {
 	Current GenerationStatus `json:"current"`
 }
 
-// IsValid validates generation
+// IsValid validates generation.
 func (g NixGeneration) IsValid() bool {
 	return g.ID > 0 && g.Path != "" && !g.Date.IsZero()
 }
 
-// Validate returns errors for invalid generation
+// Validate returns errors for invalid generation.
 func (g NixGeneration) Validate() error {
 	if g.ID <= 0 {
 		return fmt.Errorf("Generation ID must be positive, got: %d", g.ID)
 	}
 	if g.Path == "" {
-		return fmt.Errorf("Generation path cannot be empty")
+		return errors.New("Generation path cannot be empty")
 	}
 	if g.Date.IsZero() {
-		return fmt.Errorf("Generation date cannot be zero")
+		return errors.New("Generation date cannot be zero")
 	}
 	return nil
 }
 
 // EstimateSize estimates the size of this generation in bytes
-// This is a rough estimate used when actual size calculation is not available
+// This is a rough estimate used when actual size calculation is not available.
 func (g NixGeneration) EstimateSize() int64 {
 	// Rough estimate: 50MB per generation as baseline with adjustments
 	// Older generations tend to be larger, newer ones smaller
@@ -77,7 +78,7 @@ func (g NixGeneration) EstimateSize() int64 {
 	return baseSize + (ageFactor * 10 * 1024 * 1024) // Add 10MB per month
 }
 
-// ScanType represents different scanning domains
+// ScanType represents different scanning domains.
 type ScanType string
 
 const (
@@ -87,7 +88,7 @@ const (
 	ScanTypeTemp     ScanType = "temp_files"
 )
 
-// IsValid validates ScanType
+// IsValid validates ScanType.
 func (st ScanType) IsValid() bool {
 	switch st {
 	case ScanTypeNixStore, ScanTypeHomebrew, ScanTypeSystem, ScanTypeTemp:
@@ -97,14 +98,14 @@ func (st ScanType) IsValid() bool {
 	}
 }
 
-// ScanRequest represents scanning command
+// ScanRequest represents scanning command.
 type ScanRequest struct {
 	Type      ScanType `json:"type"`
 	Recursive ScanMode `json:"recursive"`
 	Limit     int      `json:"limit"`
 }
 
-// Validate returns errors for invalid scan request
+// Validate returns errors for invalid scan request.
 func (sr ScanRequest) Validate() error {
 	if !sr.Type.IsValid() {
 		return fmt.Errorf("Invalid scan type: %s", sr.Type)
@@ -115,7 +116,7 @@ func (sr ScanRequest) Validate() error {
 	return nil
 }
 
-// ScanItem represents item found during scanning
+// ScanItem represents item found during scanning.
 type ScanItem struct {
 	Path     string    `json:"path"`
 	Size     int64     `json:"size"`
@@ -123,24 +124,24 @@ type ScanItem struct {
 	ScanType ScanType  `json:"scan_type"`
 }
 
-// CleanRequest represents cleaning command
+// CleanRequest represents cleaning command.
 type CleanRequest struct {
 	Items    []ScanItem    `json:"items"`
 	Strategy CleanStrategy `json:"strategy"`
 }
 
-// Validate returns errors for invalid clean request
+// Validate returns errors for invalid clean request.
 func (cr CleanRequest) Validate() error {
 	if !cr.Strategy.IsValid() {
 		return fmt.Errorf("Invalid strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", cr.Strategy)
 	}
 	if len(cr.Items) == 0 {
-		return fmt.Errorf("Items cannot be empty")
+		return errors.New("Items cannot be empty")
 	}
 	return nil
 }
 
-// ScanResult represents successful scan outcome
+// ScanResult represents successful scan outcome.
 type ScanResult struct {
 	TotalBytes   int64         `json:"total_bytes"`
 	TotalItems   int           `json:"total_items"`
@@ -149,12 +150,12 @@ type ScanResult struct {
 	ScannedAt    time.Time     `json:"scanned_at"`
 }
 
-// IsValid checks if scan result is valid
+// IsValid checks if scan result is valid.
 func (sr ScanResult) IsValid() bool {
 	return sr.TotalBytes >= 0 && sr.TotalItems >= 0 && sr.ScanTime >= 0 && !sr.ScannedAt.IsZero()
 }
 
-// Validate returns errors for invalid scan result
+// Validate returns errors for invalid scan result.
 func (sr ScanResult) Validate() error {
 	if sr.TotalBytes < 0 {
 		return fmt.Errorf("TotalBytes cannot be negative, got: %d", sr.TotalBytes)
@@ -166,12 +167,12 @@ func (sr ScanResult) Validate() error {
 		return fmt.Errorf("ScanTime cannot be negative, got: %d", sr.ScanTime)
 	}
 	if sr.ScannedAt.IsZero() {
-		return fmt.Errorf("ScannedAt cannot be zero")
+		return errors.New("ScannedAt cannot be zero")
 	}
 	return nil
 }
 
-// CleanResult represents successful clean outcome
+// CleanResult represents successful clean outcome.
 type CleanResult struct {
 	FreedBytes   uint64        `json:"freed_bytes"`
 	ItemsRemoved uint          `json:"items_removed"`
@@ -181,7 +182,7 @@ type CleanResult struct {
 	Strategy     CleanStrategy `json:"strategy"`
 }
 
-// IsValid checks if clean result is valid
+// IsValid checks if clean result is valid.
 func (cr CleanResult) IsValid() bool {
 	// Cannot remove items without freeing bytes
 	if cr.ItemsRemoved > 0 && cr.FreedBytes == 0 {
@@ -192,21 +193,21 @@ func (cr CleanResult) IsValid() bool {
 		return false
 	}
 	// Other validations
-	return cr.CleanedAt.IsZero() == false && cr.Strategy.IsValid()
+	return !cr.CleanedAt.IsZero() && cr.Strategy.IsValid()
 }
 
-// Validate returns errors for invalid clean result
+// Validate returns errors for invalid clean result.
 func (cr CleanResult) Validate() error {
 	// Cannot remove items without freeing bytes
 	if cr.ItemsRemoved > 0 && cr.FreedBytes == 0 {
-		return fmt.Errorf("cannot have zero FreedBytes when ItemsRemoved is > 0")
+		return errors.New("cannot have zero FreedBytes when ItemsRemoved is > 0")
 	}
 	// Cannot fail items without any activity (removed or freed)
 	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.FreedBytes == 0 {
-		return fmt.Errorf("cannot have failed items when no items were processed")
+		return errors.New("cannot have failed items when no items were processed")
 	}
 	if cr.CleanedAt.IsZero() {
-		return fmt.Errorf("CleanedAt cannot be zero")
+		return errors.New("CleanedAt cannot be zero")
 	}
 	if !cr.Strategy.IsValid() {
 		return fmt.Errorf("Invalid strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", cr.Strategy)

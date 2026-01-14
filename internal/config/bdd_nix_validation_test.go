@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -10,7 +11,7 @@ import (
 
 // Builder helpers for BDD test scenarios
 
-// newBaseNixConfig creates a common config skeleton for Nix tests
+// newBaseNixConfig creates a common config skeleton for Nix tests.
 func newBaseNixConfig(safeMode bool) *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
@@ -41,7 +42,7 @@ func newBaseNixConfig(safeMode bool) *domain.Config {
 	}
 }
 
-// withGenerations sets/updates the nix-generations operation Generations value
+// withGenerations sets/updates the nix-generations operation Generations value.
 func withGenerations(cfg *domain.Config, generations int) *domain.Config {
 	// Find the nix-cleanup profile and its nix-generations operation
 	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
@@ -55,7 +56,7 @@ func withGenerations(cfg *domain.Config, generations int) *domain.Config {
 	return cfg
 }
 
-// withRiskLevel adjusts the operation RiskLevel and Enabled flags
+// withRiskLevel adjusts the operation RiskLevel and Enabled flags.
 func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Config {
 	// Find the nix-cleanup profile and its nix-generations operation
 	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
@@ -73,7 +74,7 @@ func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Confi
 	return cfg
 }
 
-// withOptimize sets the Optimize flag for nix-generations
+// withOptimize sets the Optimize flag for nix-generations.
 func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	// Convert boolean to enum
 	var optimizationMode domain.OptimizationMode
@@ -95,7 +96,7 @@ func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	return cfg
 }
 
-// withEnabled sets the Enabled flag for nix-generations operation
+// withEnabled sets the Enabled flag for nix-generations operation.
 func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
 	WithOperationSettings(cfg, "nix-cleanup", "nix-generations", func(settings *domain.OperationSettings) bool {
 		if settings.NixGenerations == nil {
@@ -115,7 +116,7 @@ func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
 	return cfg
 }
 
-// TestBDD_NixGenerationsValidation provides comprehensive BDD tests for Nix generations
+// TestBDD_NixGenerationsValidation provides comprehensive BDD tests for Nix generations.
 func TestBDD_NixGenerationsValidation(t *testing.T) {
 	feature := BDDFeature{
 		Name:        "Nix Generations Configuration Validation",
@@ -188,7 +189,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "validation should fail",
 						Validate: func(result *ValidationResult) error {
 							if result.IsValid {
-								return fmt.Errorf("expected invalid configuration")
+								return errors.New("expected invalid configuration")
 							}
 							return nil
 						},
@@ -197,7 +198,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "validation errors should be present",
 						Validate: func(result *ValidationResult) error {
 							if len(result.Errors) == 0 {
-								return fmt.Errorf("expected validation errors")
+								return errors.New("expected validation errors")
 							}
 							return nil
 						},
@@ -213,7 +214,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 								}
 							}
 							if !found {
-								return fmt.Errorf("expected error mentioning generations constraint")
+								return errors.New("expected error mentioning generations constraint")
 							}
 							return nil
 						},
@@ -245,7 +246,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "validation should fail",
 						Validate: func(result *ValidationResult) error {
 							if result.IsValid {
-								return fmt.Errorf("expected invalid configuration")
+								return errors.New("expected invalid configuration")
 							}
 							return nil
 						},
@@ -254,7 +255,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "validation errors should be present",
 						Validate: func(result *ValidationResult) error {
 							if len(result.Errors) == 0 {
-								return fmt.Errorf("expected validation errors")
+								return errors.New("expected validation errors")
 							}
 							return nil
 						},
@@ -270,7 +271,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 								}
 							}
 							if !found {
-								return fmt.Errorf("expected error mentioning generations constraint")
+								return errors.New("expected error mentioning generations constraint")
 							}
 							return nil
 						},
@@ -302,7 +303,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "validation should fail with security error",
 						Validate: func(result *ValidationResult) error {
 							if result.IsValid {
-								return fmt.Errorf("expected invalid configuration")
+								return errors.New("expected invalid configuration")
 							}
 							return nil
 						},
@@ -318,7 +319,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 								}
 							}
 							if !found {
-								return fmt.Errorf("expected security validation error for critical operation in unsafe mode")
+								return errors.New("expected security validation error for critical operation in unsafe mode")
 							}
 							return nil
 						},

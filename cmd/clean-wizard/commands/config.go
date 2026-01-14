@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewConfigCommand creates config command
+// NewConfigCommand creates config command.
 func NewConfigCommand() *cobra.Command {
 	configCmd := &cobra.Command{
 		Use:   "config",
@@ -28,7 +29,7 @@ func NewConfigCommand() *cobra.Command {
 	return configCmd
 }
 
-// NewConfigShowCommand creates config show command
+// NewConfigShowCommand creates config show command.
 func NewConfigShowCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "show",
@@ -39,7 +40,7 @@ func NewConfigShowCommand() *cobra.Command {
 	}
 }
 
-// NewConfigEditCommand creates config edit command
+// NewConfigEditCommand creates config edit command.
 func NewConfigEditCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "edit",
@@ -50,7 +51,7 @@ func NewConfigEditCommand() *cobra.Command {
 	}
 }
 
-// NewConfigValidateCommand creates config validate command
+// NewConfigValidateCommand creates config validate command.
 func NewConfigValidateCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "validate",
@@ -61,7 +62,7 @@ func NewConfigValidateCommand() *cobra.Command {
 	}
 }
 
-// NewConfigResetCommand creates config reset command
+// NewConfigResetCommand creates config reset command.
 func NewConfigResetCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "reset",
@@ -72,7 +73,7 @@ func NewConfigResetCommand() *cobra.Command {
 	}
 }
 
-// runConfigShow displays current configuration
+// runConfigShow displays current configuration.
 func runConfigShow(cmd *cobra.Command, args []string) error {
 	cfg, err := config.Load()
 	if err != nil {
@@ -110,7 +111,7 @@ func runConfigShow(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// runConfigEdit opens config in default editor
+// runConfigEdit opens config in default editor.
 func runConfigEdit(cmd *cobra.Command, args []string) error {
 	configPath := getConfigPath()
 
@@ -125,7 +126,7 @@ func runConfigEdit(cmd *cobra.Command, args []string) error {
 		} else if _, err := exec.LookPath("nano"); err == nil {
 			editor = "nano"
 		} else {
-			return fmt.Errorf("no editor found. Please set EDITOR environment variable")
+			return errors.New("no editor found. Please set EDITOR environment variable")
 		}
 	}
 
@@ -139,7 +140,7 @@ func runConfigEdit(cmd *cobra.Command, args []string) error {
 	return editCmd.Run()
 }
 
-// runConfigValidate validates configuration file
+// runConfigValidate validates configuration file.
 func runConfigValidate(cmd *cobra.Command, args []string) error {
 	fmt.Println("🔍 Validating configuration...")
 
@@ -164,7 +165,7 @@ func runConfigValidate(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// runConfigReset resets configuration to defaults
+// runConfigReset resets configuration to defaults.
 func runConfigReset(cmd *cobra.Command, args []string) error {
 	configPath := getConfigPath()
 
@@ -198,7 +199,7 @@ func runConfigReset(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// getConfigPath returns the path to configuration file
+// getConfigPath returns the path to configuration file.
 func getConfigPath() string {
 	if configPath := os.Getenv("CONFIG_PATH"); configPath != "" {
 		return configPath
@@ -206,7 +207,7 @@ func getConfigPath() string {
 	return os.ExpandEnv("$HOME/.clean-wizard.yaml")
 }
 
-// copyFile copies a file from src to dst
+// copyFile copies a file from src to dst.
 func copyFile(src, dst string) error {
 	data, err := os.ReadFile(src)
 	if err != nil {

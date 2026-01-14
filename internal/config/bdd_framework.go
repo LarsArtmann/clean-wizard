@@ -6,7 +6,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// BDDFeature represents a BDD feature for behavior-driven development
+// BDDFeature represents a BDD feature for behavior-driven development.
 type BDDFeature struct {
 	Name        string
 	Description string
@@ -14,7 +14,7 @@ type BDDFeature struct {
 	Scenarios   []BDDScenario
 }
 
-// BDDScenario represents a single BDD test scenario
+// BDDScenario represents a single BDD test scenario.
 type BDDScenario struct {
 	Name        string
 	Description string
@@ -23,32 +23,32 @@ type BDDScenario struct {
 	Then        []BDDThen
 }
 
-// BDDGiven represents the initial state in BDD
+// BDDGiven represents the initial state in BDD.
 type BDDGiven struct {
 	Description string
 	Setup       func() (*domain.Config, error)
 }
 
-// BDDWhen represents the action in BDD
+// BDDWhen represents the action in BDD.
 type BDDWhen struct {
 	Description string
 	Action      func(*domain.Config) (*ValidationResult, error)
 }
 
-// BDDThen represents the expected outcome in BDD
+// BDDThen represents the expected outcome in BDD.
 type BDDThen struct {
 	Description string
 	Validate    func(*ValidationResult) error
 }
 
-// BDDTestRunner provides comprehensive BDD test execution
+// BDDTestRunner provides comprehensive BDD test execution.
 type BDDTestRunner struct {
 	t         *testing.T
 	feature   BDDFeature
 	validator *ConfigValidator
 }
 
-// NewBDDTestRunner creates a new BDD test runner
+// NewBDDTestRunner creates a new BDD test runner.
 func NewBDDTestRunner(t *testing.T, feature BDDFeature) *BDDTestRunner {
 	return &BDDTestRunner{
 		t:         t,
@@ -57,7 +57,7 @@ func NewBDDTestRunner(t *testing.T, feature BDDFeature) *BDDTestRunner {
 	}
 }
 
-// RunFeature executes all scenarios in a BDD feature
+// RunFeature executes all scenarios in a BDD feature.
 func (b *BDDTestRunner) RunFeature() {
 	b.t.Logf("Feature: %s", b.feature.Name)
 	b.t.Logf("Description: %s", b.feature.Description)
@@ -70,7 +70,7 @@ func (b *BDDTestRunner) RunFeature() {
 	}
 }
 
-// runScenario executes a single BDD scenario
+// runScenario executes a single BDD scenario.
 func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 	b.t.Logf("Scenario: %s", scenario.Name)
 	b.t.Logf("Description: %s", scenario.Description)

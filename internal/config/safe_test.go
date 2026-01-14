@@ -8,14 +8,14 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// Test constants for invalid risk levels to improve readability and maintainability
+// Test constants for invalid risk levels to improve readability and maintainability.
 const (
 	testInvalidRiskUnknown  = domain.RiskLevelType(99)  // Unknown risk value outside valid range
 	testInvalidRiskNegative = domain.RiskLevelType(-1)  // Negative risk value
 	testInvalidRiskTooHigh  = domain.RiskLevelType(100) // Risk value above maximum
 )
 
-// contains helper function
+// contains helper function.
 func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }

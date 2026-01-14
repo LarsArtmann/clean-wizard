@@ -1,36 +1,38 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 )
 
-// HandleCommandError standardizes command execution errors
+// HandleCommandError standardizes command execution errors.
 func HandleCommandError(cmd *exec.Cmd, err error) *CleanWizardError {
 	if err == nil {
 		return nil
 	}
 
 	// Create base error
-	baseErr := NewError(ErrNixCommandFailed, fmt.Sprintf("Command failed: %s", err.Error()))
+	baseErr := NewError(ErrNixCommandFailed, "Command failed: "+err.Error())
 
 	// Add command context
 	baseErr = baseErr.
-		WithOperation(fmt.Sprintf("exec: %s", cmd.String())).
+		WithOperation("exec: "+cmd.String()).
 		WithDetail("command", cmd.Args).
 		WithDetail("path", cmd.Path)
 
 	// Add specific error details based on error type
-	if exitErr, ok := err.(*exec.ExitError); ok {
+	exitErr := &exec.ExitError{}
+	if errors.As(err, &exitErr) {
 		baseErr = baseErr.
 			WithDetail("exit_code", exitErr.ExitCode).
-			WithDetail("signal", exitErr.ProcessState.String())
+			WithDetail("signal", exitErr.String())
 	}
 
 	return baseErr
 }
 
-// HandleNixNotAvailable standardizes Nix availability errors
+// HandleNixNotAvailable standardizes Nix availability errors.
 func HandleNixNotAvailable(operation string) *CleanWizardError {
 	return NewErrorWithLevel(ErrNixNotAvailable, LevelWarn,
 		"Nix package manager is not available on this system").
@@ -39,22 +41,22 @@ func HandleNixNotAvailable(operation string) *CleanWizardError {
 		WithDetail("documentation", "https://nixos.org/download.html")
 }
 
-// HandleConfigError standardizes configuration errors
+// HandleConfigError standardizes configuration errors.
 func HandleConfigError(operation string, err error) *CleanWizardError {
-	baseErr := NewError(ErrConfigLoad, fmt.Sprintf("Configuration error: %s", err.Error()))
+	baseErr := NewError(ErrConfigLoad, "Configuration error: "+err.Error())
 	baseErr.Operation = operation
 	return baseErr
 }
 
-// HandleValidationError standardizes validation errors
+// HandleValidationError standardizes validation errors.
 func HandleValidationError(operation string, err error) *CleanWizardError {
-	baseErr := NewError(ErrConfigValidation, fmt.Sprintf("Validation error: %s", err.Error()))
+	baseErr := NewError(ErrConfigValidation, "Validation error: "+err.Error())
 	baseErr.Operation = operation
 	baseErr.WithDetail("validation_type", "comprehensive")
 	return baseErr
 }
 
-// HandleValidationErrorWithDetails standardizes validation errors with detailed context
+// HandleValidationErrorWithDetails standardizes validation errors with detailed context.
 func HandleValidationErrorWithDetails(operation, field string, value any, reason string) *CleanWizardError {
 	return NewErrorWithDetails(ErrConfigValidation,
 		fmt.Sprintf("Validation failed for %s: %s", field, reason),
@@ -68,7 +70,7 @@ func HandleValidationErrorWithDetails(operation, field string, value any, reason
 		})
 }
 
-// WrapError wraps existing error with CleanWizardError context
+// WrapError wraps existing error with CleanWizardError context.
 func WrapError(err error, code ErrorCode, operation string) *CleanWizardError {
 	if err == nil {
 		return nil
@@ -79,7 +81,8 @@ func WrapError(err error, code ErrorCode, operation string) *CleanWizardError {
 	cleanErr.WithDetail("wrapped_error", err.Error())
 
 	// If it's already a CleanWizardError, preserve details
-	if wizardErr, ok := err.(*CleanWizardError); ok {
+	wizardErr := &CleanWizardError{}
+	if errors.As(err, &wizardErr) {
 		cleanErr.Details = wizardErr.Details
 		cleanErr.Stack = wizardErr.Stack
 		cleanErr.Timestamp = wizardErr.Timestamp
@@ -88,7 +91,7 @@ func WrapError(err error, code ErrorCode, operation string) *CleanWizardError {
 	return cleanErr
 }
 
-// IsNixAvailable checks if Nix is available on the system
+// IsNixAvailable checks if Nix is available on the system.
 func IsNixAvailable() bool {
 	_, err := exec.LookPath("nix")
 	return err == nil

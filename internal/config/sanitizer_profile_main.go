@@ -7,7 +7,7 @@ import (
 	stringsutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/strings"
 )
 
-// SanitizationResultAdapter adapts local SanitizationResult to strings utility interface
+// SanitizationResultAdapter adapts local SanitizationResult to strings utility interface.
 type SanitizationResultAdapter struct {
 	result *SanitizationResult
 }
@@ -16,7 +16,7 @@ func (a *SanitizationResultAdapter) AddChange(path string, original, newValue an
 	a.result.addChange(path, original, newValue, reason)
 }
 
-// sanitizeProfiles sanitizes profiles and their operations
+// sanitizeProfiles sanitizes profiles and their operations.
 func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *SanitizationResult) {
 	for name, profile := range cfg.Profiles {
 		// Sanitize profile name and description using utility
@@ -33,7 +33,7 @@ func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *Sanitiza
 	}
 }
 
-// sanitizeOperations sanitizes cleanup operations
+// sanitizeOperations sanitizes cleanup operations.
 func (cs *ConfigSanitizer) sanitizeOperations(profileName string, operations []domain.CleanupOperation, result *SanitizationResult) {
 	for i := range operations {
 		op := &operations[i] // Get pointer to mutate slice element in place
@@ -55,7 +55,7 @@ func (cs *ConfigSanitizer) sanitizeOperations(profileName string, operations []d
 	}
 }
 
-// applyDefaults applies default values to missing fields
+// applyDefaults applies default values to missing fields.
 func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *SanitizationResult) {
 	// Set default version if empty
 	if cfg.Version == "" {

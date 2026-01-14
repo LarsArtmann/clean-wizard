@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// FuzzBasicConfig tests basic configuration fuzzing
+// FuzzBasicConfig tests basic configuration fuzzing.
 func FuzzBasicConfig(f *testing.F) {
 	f.Add("version: \"1.0.0\"\nsafe_mode: true\n")
 
@@ -33,7 +33,7 @@ func FuzzBasicConfig(f *testing.F) {
 	})
 }
 
-// FuzzValidationLevelBasic tests validation level fuzzing
+// FuzzValidationLevelBasic tests validation level fuzzing.
 func FuzzValidationLevelBasic(f *testing.F) {
 	f.Add(int32(ValidationLevelBasic))
 
@@ -60,7 +60,7 @@ func FuzzValidationLevelBasic(f *testing.F) {
 	})
 }
 
-// FuzzStringOperations tests string operations with fuzzed data
+// FuzzStringOperations tests string operations with fuzzed data.
 func FuzzStringOperations(f *testing.F) {
 	f.Add("test string")
 
@@ -96,7 +96,7 @@ func FuzzStringOperations(f *testing.F) {
 	})
 }
 
-// FuzzSliceOperations tests slice operations with fuzzed data
+// FuzzSliceOperations tests slice operations with fuzzed data.
 func FuzzSliceOperations(f *testing.F) {
 	f.Add("/System")
 
@@ -139,12 +139,4 @@ func FuzzSliceOperations(f *testing.F) {
 			_ = r // Should not panic on any unicode
 		}
 	})
-}
-
-// Helper function
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

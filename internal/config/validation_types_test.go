@@ -6,7 +6,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// TestSanitizationTestCase defines a single sanitization test case
+// TestSanitizationTestCase defines a single sanitization test case.
 type TestSanitizationTestCase struct {
 	name             string
 	config           *domain.Config
@@ -14,7 +14,7 @@ type TestSanitizationTestCase struct {
 	expectedWarnings int
 }
 
-// TestValidationLevelTestCase defines validation level test cases
+// TestValidationLevelTestCase defines validation level test cases.
 type TestValidationLevelTestCase struct {
 	name         string
 	config       *domain.Config
@@ -23,12 +23,12 @@ type TestValidationLevelTestCase struct {
 	expectErrors int
 }
 
-// CreateTestConfigurations creates test configurations for validation testing
+// CreateTestConfigurations creates test configurations for validation testing.
 func CreateTestConfigurations() map[string]*domain.Config {
 	return map[string]*domain.Config{
 		"valid": {
 			Version:      "1.0.0",
-			SafeMode: domain.SafeModeEnabled,
+			SafeMode:     domain.SafeModeEnabled,
 			MaxDiskUsage: 50,
 			Protected:    []string{"/System", "/Library", "/Applications"},
 			Profiles: map[string]*domain.Profile{
@@ -40,7 +40,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 							Name:        "nix-generations",
 							Description: "Clean Nix generations",
 							RiskLevel:   domain.RiskLow,
-							Enabled: domain.ProfileStatusEnabled,
+							Enabled:     domain.ProfileStatusEnabled,
 						},
 					},
 					Enabled: domain.ProfileStatusEnabled,
@@ -51,7 +51,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 		},
 		"invalid_high_disk": {
 			Version:      "1.0.0",
-			SafeMode: domain.SafeModeEnabled,
+			SafeMode:     domain.SafeModeEnabled,
 			MaxDiskUsage: 150, // Invalid: too high
 			Protected:    []string{"/System"},
 			Profiles: map[string]*domain.Profile{
@@ -63,7 +63,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 							Name:        "nix-generations",
 							Description: "Clean Nix generations",
 							RiskLevel:   domain.RiskLow,
-							Enabled: domain.ProfileStatusEnabled,
+							Enabled:     domain.ProfileStatusEnabled,
 						},
 					},
 					Enabled: domain.ProfileStatusEnabled,
@@ -75,14 +75,14 @@ func CreateTestConfigurations() map[string]*domain.Config {
 	}
 }
 
-// GetSanitizationTestCases returns all sanitization test cases
+// GetSanitizationTestCases returns all sanitization test cases.
 func GetSanitizationTestCases() []TestSanitizationTestCase {
 	return []TestSanitizationTestCase{
 		{
 			name: "whitespace cleanup",
 			config: &domain.Config{
 				Version:      "  1.0.0  ",
-				SafeMode: domain.SafeModeEnabled,
+				SafeMode:     domain.SafeModeEnabled,
 				MaxDiskUsage: 50,
 				Protected:    []string{"/System", "/Library"},
 				Profiles: map[string]*domain.Profile{
@@ -94,7 +94,7 @@ func GetSanitizationTestCases() []TestSanitizationTestCase {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled: domain.ProfileStatusEnabled,
+								Enabled:     domain.ProfileStatusEnabled,
 							},
 						},
 						Enabled: domain.ProfileStatusEnabled,
@@ -108,7 +108,7 @@ func GetSanitizationTestCases() []TestSanitizationTestCase {
 			name: "max disk usage clamping",
 			config: &domain.Config{
 				Version:      "1.0.0",
-				SafeMode: domain.SafeModeEnabled,
+				SafeMode:     domain.SafeModeEnabled,
 				MaxDiskUsage: 150, // Will be clamped to 95
 				Protected:    []string{"/System", "/Library"},
 				Profiles: map[string]*domain.Profile{
@@ -120,7 +120,7 @@ func GetSanitizationTestCases() []TestSanitizationTestCase {
 								Name:        "nix-generations",
 								Description: "Clean Nix generations",
 								RiskLevel:   domain.RiskLow,
-								Enabled: domain.ProfileStatusEnabled,
+								Enabled:     domain.ProfileStatusEnabled,
 							},
 						},
 						Enabled: domain.ProfileStatusEnabled,

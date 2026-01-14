@@ -1,13 +1,14 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// SafeConfig represents a validated cleaning configuration
+// SafeConfig represents a validated cleaning configuration.
 type SafeConfig struct {
 	safeMode bool
 	dryRun   bool
@@ -17,7 +18,7 @@ type SafeConfig struct {
 	created  time.Time
 }
 
-// SafeProfile represents a validated cleaning profile
+// SafeProfile represents a validated cleaning profile.
 type SafeProfile struct {
 	name        string
 	description string
@@ -25,7 +26,7 @@ type SafeProfile struct {
 	maxRisk     domain.RiskLevel
 }
 
-// SafeOperation represents a validated cleaning operation
+// SafeOperation represents a validated cleaning operation.
 type SafeOperation struct {
 	name    CleanType
 	risk    domain.RiskLevel
@@ -37,7 +38,7 @@ type SafeOperation struct {
 
 // Icon returns emoji for risk level - moved to domain package
 
-// CleanType represents type-safe cleaning types
+// CleanType represents type-safe cleaning types.
 type CleanType string
 
 const (
@@ -47,7 +48,7 @@ const (
 	CleanTypeTempFiles    CleanType = "temp_files"
 )
 
-// IsValid checks if clean type is valid
+// IsValid checks if clean type is valid.
 func (ct CleanType) IsValid() bool {
 	switch ct {
 	case CleanTypeNixStore, CleanTypeHomebrew, CleanTypePackageCache, CleanTypeTempFiles:
@@ -57,7 +58,7 @@ func (ct CleanType) IsValid() bool {
 	}
 }
 
-// NewSafeConfigBuilder creates a type-safe configuration builder
+// NewSafeConfigBuilder creates a type-safe configuration builder.
 func NewSafeConfigBuilder() *SafeConfigBuilder {
 	return &SafeConfigBuilder{
 		profiles: []SafeProfile{},
@@ -65,7 +66,7 @@ func NewSafeConfigBuilder() *SafeConfigBuilder {
 	}
 }
 
-// SafeConfigBuilder builds type-safe configurations
+// SafeConfigBuilder builds type-safe configurations.
 type SafeConfigBuilder struct {
 	safeMode bool
 	dryRun   bool
@@ -75,25 +76,25 @@ type SafeConfigBuilder struct {
 	err      error
 }
 
-// SafeMode enables safe mode
+// SafeMode enables safe mode.
 func (scb *SafeConfigBuilder) SafeMode() *SafeConfigBuilder {
 	scb.safeMode = true
 	return scb
 }
 
-// DryRun enables dry-run mode
+// DryRun enables dry-run mode.
 func (scb *SafeConfigBuilder) DryRun() *SafeConfigBuilder {
 	scb.dryRun = true
 	return scb
 }
 
-// Backup enables backup mode
+// Backup enables backup mode.
 func (scb *SafeConfigBuilder) Backup() *SafeConfigBuilder {
 	scb.backup = true
 	return scb
 }
 
-// AddProfile adds a safe profile
+// AddProfile adds a safe profile.
 func (scb *SafeConfigBuilder) AddProfile(name, description string) *SafeProfileBuilder {
 	if scb.err != nil {
 		return &SafeProfileBuilder{err: scb.err}
@@ -108,14 +109,14 @@ func (scb *SafeConfigBuilder) AddProfile(name, description string) *SafeProfileB
 	}
 }
 
-// Build creates safe configuration
+// Build creates safe configuration.
 func (scb *SafeConfigBuilder) Build() (SafeConfig, error) {
 	if scb.err != nil {
 		return SafeConfig{}, scb.err
 	}
 
 	if len(scb.profiles) == 0 {
-		return SafeConfig{}, fmt.Errorf("config must have at least one profile")
+		return SafeConfig{}, errors.New("config must have at least one profile")
 	}
 
 	if !scb.maxRisk.IsValid() {
@@ -132,7 +133,7 @@ func (scb *SafeConfigBuilder) Build() (SafeConfig, error) {
 	}, nil
 }
 
-// SafeProfileBuilder builds type-safe profiles
+// SafeProfileBuilder builds type-safe profiles.
 type SafeProfileBuilder struct {
 	name        string
 	description string
@@ -142,7 +143,7 @@ type SafeProfileBuilder struct {
 	err         error
 }
 
-// AddOperation adds a safe operation
+// AddOperation adds a safe operation.
 func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLevel) *SafeProfileBuilder {
 	if spb.err != nil {
 		return spb
@@ -159,7 +160,7 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLe
 	}
 
 	if risk.IsHigherThan(domain.RiskHigh) && spb.err == nil {
-		spb.err = fmt.Errorf("cannot add critical risk operation to profile")
+		spb.err = errors.New("cannot add critical risk operation to profile")
 		return spb
 	}
 
@@ -178,7 +179,7 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLe
 	return spb
 }
 
-// Done finishes profile building
+// Done finishes profile building.
 func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 	if spb.err != nil {
 		spb.config.err = spb.err
@@ -186,12 +187,12 @@ func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 	}
 
 	if len(spb.operations) == 0 {
-		spb.config.err = fmt.Errorf("profile must have at least one operation")
+		spb.config.err = errors.New("profile must have at least one operation")
 		return spb.config
 	}
 
 	if spb.maxRisk.IsHigherThan(domain.RiskHigh) {
-		spb.config.err = fmt.Errorf("profile risk level cannot exceed HIGH")
+		spb.config.err = errors.New("profile risk level cannot exceed HIGH")
 		return spb.config
 	}
 

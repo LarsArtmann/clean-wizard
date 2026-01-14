@@ -8,7 +8,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// sanitizeTempFilesSettings sanitizes temporary files settings
+// sanitizeTempFilesSettings sanitizes temporary files settings.
 func (cs *ConfigSanitizer) sanitizeTempFilesSettings(fieldPrefix string, settings *domain.TempFilesSettings, result *SanitizationResult) {
 	if settings == nil {
 		return

@@ -2,6 +2,8 @@ package commands
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -19,10 +21,11 @@ import (
 var (
 	cleanDryRun  bool
 	cleanVerbose bool
+	cleanJSON    bool
 )
 
-// NewCleanCommand creates clean command with proper domain types
-func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
+// NewCleanCommand creates clean command with proper domain types.
+func NewCleanCommand() *cobra.Command {
 	var configFile string
 	var profileName string
 
@@ -31,7 +34,12 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 		Short: "Perform system cleanup",
 		Long:  `Safely clean old files, package caches, and temporary data from your system.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("🧹 Starting system cleanup...")
+			// Parse JSON flag early
+			cleanJSON, _ = cmd.Flags().GetBool("json")
+
+			if !cleanJSON {
+				fmt.Println("🧹 Starting system cleanup...")
+			}
 			ctx := context.Background()
 
 			// Parse validation level from flag
@@ -44,7 +52,9 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			// Load and validate configuration if provided
 			var loadedCfg *domain.Config
 			if configFile != "" {
-				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
+				if !cleanJSON {
+					fmt.Printf("📄 Loading configuration from %s...\n", configFile)
+				}
 
 				// Set config file path using environment variable
 				os.Setenv("CONFIG_PATH", configFile)
@@ -57,12 +67,14 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 
 				// Apply validation based on level
 				if validationLevel > config.ValidationLevelNone {
-					fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
+					if !cleanJSON {
+						fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
+					}
 
 					if validationLevel >= config.ValidationLevelBasic {
 						// Basic validation
 						if len(loadedCfg.Protected) == 0 {
-							return fmt.Errorf("basic validation failed: protected paths cannot be empty")
+							return errors.New("basic validation failed: protected paths cannot be empty")
 						}
 					}
 
@@ -76,12 +88,14 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 					if validationLevel >= config.ValidationLevelStrict {
 						// Strict validation
 						if !loadedCfg.SafeMode.IsEnabled() {
-							return fmt.Errorf("strict validation failed: safe_mode must be enabled")
+							return errors.New("strict validation failed: safe_mode must be enabled")
 						}
 					}
 				}
 
-				sharedConfig.PrintConfigSuccess(loadedCfg)
+				if !cleanJSON {
+					sharedConfig.PrintConfigSuccess(loadedCfg)
+				}
 			} else {
 				// Load default configuration to get profile information
 				logger := logrus.New()
@@ -175,7 +189,7 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 			}
 
 			duration := time.Since(startTime)
-			displayCleanResults(result.Value(), cleanVerbose, duration, actualDryRun)
+			displayCleanResults(result.Value(), cleanVerbose, duration, actualDryRun, cleanJSON)
 			return nil
 		},
 	}
@@ -184,11 +198,12 @@ func NewCleanCommand(validationLevel config.ValidationLevel) *cobra.Command {
 	cleanCmd.Flags().BoolVar(&cleanDryRun, "dry-run", false, "Show what would be cleaned without doing it")
 	cleanCmd.Flags().BoolVar(&cleanVerbose, "verbose", false, "Show detailed output")
 	cleanCmd.Flags().StringVarP(&configFile, "config", "c", "", "Configuration file path")
+	cleanCmd.Flags().BoolVar(&cleanJSON, "json", false, "Output results in JSON format")
 
 	return cleanCmd
 }
 
-// handleCleanError provides user-friendly error messages
+// handleCleanError provides user-friendly error messages.
 func handleCleanError(err error, isDryRun bool) error {
 	if isDryRun {
 		fmt.Printf("🔍 Dry run encountered issues: %s\n", err)
@@ -198,8 +213,25 @@ func handleCleanError(err error, isDryRun bool) error {
 	return fmt.Errorf("cleanup failed: %w", err)
 }
 
-// displayCleanResults shows cleanup results to user
-func displayCleanResults(result domain.CleanResult, verbose bool, duration time.Duration, isDryRun bool) {
+// displayCleanResults shows cleanup results to user.
+func displayCleanResults(result domain.CleanResult, verbose bool, duration time.Duration, isDryRun, isJSON bool) {
+	if isJSON {
+		jsonOutput := map[string]any{
+			"status":            "success",
+			"items_removed":     result.ItemsRemoved,
+			"items_failed":      result.ItemsFailed,
+			"freed_bytes":       result.FreedBytes,
+			"freed_bytes_human": format.Bytes(int64(result.FreedBytes)),
+			"duration_ms":       duration.Milliseconds(),
+			"strategy":          result.Strategy,
+			"dry_run":           isDryRun,
+			"cleaned_at":        result.CleanedAt,
+		}
+		jsonData, _ := json.MarshalIndent(jsonOutput, "", "  ")
+		fmt.Println(string(jsonData))
+		return
+	}
+
 	status := "SUCCESS"
 	if !result.IsValid() {
 		status = "FAILED"

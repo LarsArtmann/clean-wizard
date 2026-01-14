@@ -2,10 +2,11 @@ package format
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
-// Size formats bytes for human reading
+// Size formats bytes for human reading.
 func Size(bytes int64) string {
 	const unit = 1024
 	if bytes < unit {
@@ -19,7 +20,7 @@ func Size(bytes int64) string {
 	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }
 
-// Duration formats duration for human reading
+// Duration formats duration for human reading.
 func Duration(d time.Duration) string {
 	if d < time.Millisecond {
 		return fmt.Sprintf("%.0f ns", float64(d.Nanoseconds()))
@@ -36,7 +37,7 @@ func Duration(d time.Duration) string {
 	return fmt.Sprintf("%.1f h", d.Hours())
 }
 
-// Date formats date for human reading
+// Date formats date for human reading.
 func Date(t time.Time) string {
 	if t.IsZero() {
 		return "never"
@@ -44,7 +45,7 @@ func Date(t time.Time) string {
 	return t.Format("2006-01-02")
 }
 
-// DateTime formats date and time for human reading
+// DateTime formats date and time for human reading.
 func DateTime(t time.Time) string {
 	if t.IsZero() {
 		return "never"
@@ -52,9 +53,9 @@ func DateTime(t time.Time) string {
 	return t.Format("2006-01-02 15:04:05")
 }
 
-// Number formats number with thousand separators
+// Number formats number with thousand separators.
 func Number(n int64) string {
-	s := fmt.Sprintf("%d", n)
+	s := strconv.FormatInt(n, 10)
 
 	// Add commas for thousands
 	var result []rune

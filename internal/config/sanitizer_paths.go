@@ -10,7 +10,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// sanitizeProtectedPaths sanitizes protected paths array
+// sanitizeProtectedPaths sanitizes protected paths array.
 func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *domain.Config, result *SanitizationResult) {
 	sanitizedPaths := make([]string, 0, len(cfg.Protected))
 
@@ -43,7 +43,7 @@ func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *domain.Config, result *Sa
 				Field:     fmt.Sprintf("protected[%d]", i),
 				Original:  original,
 				Sanitized: path,
-				Reason:    fmt.Sprintf("protected path must be absolute: %s", original),
+				Reason:    "protected path must be absolute: " + original,
 			})
 			continue // Skip processing invalid path
 		}

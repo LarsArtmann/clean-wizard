@@ -86,7 +86,7 @@ func TestSetStringFieldStrict(t *testing.T) {
 			wasSet := setStringFieldStrict(&target, tt.inputValue)
 
 			if tt.expectUnchanged {
-				assert.Equal(t, "", target)
+				assert.Empty(t, target)
 			} else {
 				assert.Equal(t, tt.expectValue, target)
 			}

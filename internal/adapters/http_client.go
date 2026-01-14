@@ -7,12 +7,12 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-// HTTPClient provides a modern HTTP client with built-in features
+// HTTPClient provides a modern HTTP client with built-in features.
 type HTTPClient struct {
 	client *resty.Client
 }
 
-// NewHTTPClient creates a new HTTP client with sensible defaults
+// NewHTTPClient creates a new HTTP client with sensible defaults.
 func NewHTTPClient() *HTTPClient {
 	client := resty.New()
 
@@ -29,13 +29,13 @@ func NewHTTPClient() *HTTPClient {
 	}
 }
 
-// WithTimeout sets the request timeout
+// WithTimeout sets the request timeout.
 func (hc *HTTPClient) WithTimeout(timeout time.Duration) *HTTPClient {
 	hc.client.SetTimeout(timeout)
 	return hc
 }
 
-// WithRetry configures retry behavior
+// WithRetry configures retry behavior.
 func (hc *HTTPClient) WithRetry(count int, waitTime, maxWaitTime time.Duration) *HTTPClient {
 	hc.client.SetRetryCount(count).
 		SetRetryWaitTime(waitTime).
@@ -43,7 +43,7 @@ func (hc *HTTPClient) WithRetry(count int, waitTime, maxWaitTime time.Duration) 
 	return hc
 }
 
-// WithAuth sets authentication header
+// WithAuth sets authentication header.
 func (hc *HTTPClient) WithAuth(authType, token string) *HTTPClient {
 	hc.client.SetAuthToken(token)
 	if authType == "Bearer" {
@@ -52,13 +52,13 @@ func (hc *HTTPClient) WithAuth(authType, token string) *HTTPClient {
 	return hc
 }
 
-// WithHeader adds a default header
+// WithHeader adds a default header.
 func (hc *HTTPClient) WithHeader(key, value string) *HTTPClient {
 	hc.client.SetHeader(key, value)
 	return hc
 }
 
-// Get performs HTTP GET request
+// Get performs HTTP GET request.
 func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error) {
 	resp, err := hc.client.R().SetContext(ctx).Get(url)
 	if err != nil {
@@ -72,7 +72,7 @@ func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error
 	}, nil
 }
 
-// Post performs HTTP POST request
+// Post performs HTTP POST request.
 func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResponse, error) {
 	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Post(url)
 	if err != nil {
@@ -86,7 +86,7 @@ func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResp
 	}, nil
 }
 
-// Put performs HTTP PUT request
+// Put performs HTTP PUT request.
 func (hc *HTTPClient) Put(ctx context.Context, url string, body any) (*HTTPResponse, error) {
 	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Put(url)
 	if err != nil {
@@ -100,7 +100,7 @@ func (hc *HTTPClient) Put(ctx context.Context, url string, body any) (*HTTPRespo
 	}, nil
 }
 
-// Delete performs HTTP DELETE request
+// Delete performs HTTP DELETE request.
 func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, error) {
 	resp, err := hc.client.R().SetContext(ctx).Delete(url)
 	if err != nil {
@@ -114,7 +114,7 @@ func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, er
 	}, nil
 }
 
-// HTTPResponse wraps resty response
+// HTTPResponse wraps resty response.
 type HTTPResponse struct {
 	StatusCode int                 `json:"status_code"`
 	Body       string              `json:"body"`
@@ -122,22 +122,22 @@ type HTTPResponse struct {
 	Request    *resty.Request      `json:"request"`
 }
 
-// IsSuccess returns true if status code indicates success (2xx)
+// IsSuccess returns true if status code indicates success (2xx).
 func (hr *HTTPResponse) IsSuccess() bool {
 	return hr.StatusCode >= 200 && hr.StatusCode < 300
 }
 
-// IsError returns true if status code indicates error (4xx, 5xx)
+// IsError returns true if status code indicates error (4xx, 5xx).
 func (hr *HTTPResponse) IsError() bool {
 	return hr.StatusCode >= 400
 }
 
-// IsClientError returns true if status code indicates client error (4xx)
+// IsClientError returns true if status code indicates client error (4xx).
 func (hr *HTTPResponse) IsClientError() bool {
 	return hr.StatusCode >= 400 && hr.StatusCode < 500
 }
 
-// IsServerError returns true if status code indicates server error (5xx)
+// IsServerError returns true if status code indicates server error (5xx).
 func (hr *HTTPResponse) IsServerError() bool {
 	return hr.StatusCode >= 500
 }

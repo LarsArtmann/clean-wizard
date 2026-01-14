@@ -10,7 +10,7 @@ import (
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 )
 
-// ChangeOperation represents type of configuration change with type safety
+// ChangeOperation represents type of configuration change with type safety.
 type ChangeOperation string
 
 const (
@@ -19,7 +19,7 @@ const (
 	OperationModified ChangeOperation = "modified"
 )
 
-// IsValid checks if change operation is valid
+// IsValid checks if change operation is valid.
 func (co ChangeOperation) IsValid() bool {
 	switch co {
 	case OperationAdded, OperationRemoved, OperationModified:
@@ -29,12 +29,12 @@ func (co ChangeOperation) IsValid() bool {
 	}
 }
 
-// String returns string representation
+// String returns string representation.
 func (co ChangeOperation) String() string {
 	return string(co)
 }
 
-// ValidationMiddleware provides comprehensive validation for configuration operations
+// ValidationMiddleware provides comprehensive validation for configuration operations.
 type ValidationMiddleware struct {
 	validator *ConfigValidator
 	sanitizer *ConfigSanitizer
@@ -42,26 +42,26 @@ type ValidationMiddleware struct {
 	options   *ValidationMiddlewareOptions
 }
 
-// ValidationLogger interface for validation logging
+// ValidationLogger interface for validation logging.
 type ValidationLogger interface {
 	LogValidation(result *ValidationResult)
 	LogSanitization(result *SanitizationResult)
 	LogError(field, operation string, err error)
 }
 
-// ValidationMiddlewareOptions provides configuration for validation middleware
+// ValidationMiddlewareOptions provides configuration for validation middleware.
 type ValidationMiddlewareOptions struct {
 	RequireSafeModeConfirmation bool   `json:"require_safe_mode_confirmation"`
 	EnableDetailedLogging       bool   `json:"enable_detailed_logging"`
 	Environment                 string `json:"environment"` // "development", "production", etc.
 }
 
-// DefaultValidationLogger provides default logging implementation
+// DefaultValidationLogger provides default logging implementation.
 type DefaultValidationLogger struct {
 	enableDetailedLogging bool
 }
 
-// ConfigChangeResult represents configuration change validation result
+// ConfigChangeResult represents configuration change validation result.
 type ConfigChangeResult struct {
 	IsValid   bool                `json:"is_valid"`
 	Changes   []ConfigChange      `json:"changes"`
@@ -70,7 +70,7 @@ type ConfigChangeResult struct {
 	Timestamp time.Time           `json:"timestamp"`
 }
 
-// ConfigChange represents a single configuration change
+// ConfigChange represents a single configuration change.
 type ConfigChange struct {
 	Field     string           `json:"field"`
 	OldValue  any              `json:"old_value"`
@@ -79,7 +79,7 @@ type ConfigChange struct {
 	Risk      domain.RiskLevel `json:"risk"`
 }
 
-// ProfileOperationResult represents profile operation validation result
+// ProfileOperationResult represents profile operation validation result.
 type ProfileOperationResult struct {
 	IsValid   bool                     `json:"is_valid"`
 	Operation *domain.CleanupOperation `json:"operation,omitempty"`
@@ -87,35 +87,35 @@ type ProfileOperationResult struct {
 	Timestamp time.Time                `json:"timestamp"`
 }
 
-// NewDefaultValidationLogger creates a default validation logger
+// NewDefaultValidationLogger creates a default validation logger.
 func NewDefaultValidationLogger(enableDetailed bool) *DefaultValidationLogger {
 	return &DefaultValidationLogger{
 		enableDetailedLogging: enableDetailed,
 	}
 }
 
-// WithRequireSafeModeConfirmation enables safe mode confirmation requirement
+// WithRequireSafeModeConfirmation enables safe mode confirmation requirement.
 func WithRequireSafeModeConfirmation(require bool) func(*ValidationMiddlewareOptions) {
 	return func(opts *ValidationMiddlewareOptions) {
 		opts.RequireSafeModeConfirmation = require
 	}
 }
 
-// WithEnvironment sets the environment for validation middleware
+// WithEnvironment sets the environment for validation middleware.
 func WithEnvironment(env string) func(*ValidationMiddlewareOptions) {
 	return func(opts *ValidationMiddlewareOptions) {
 		opts.Environment = env
 	}
 }
 
-// WithDetailedLogging enables detailed logging in validation middleware
+// WithDetailedLogging enables detailed logging in validation middleware.
 func WithDetailedLogging(enable bool) func(*ValidationMiddlewareOptions) {
 	return func(opts *ValidationMiddlewareOptions) {
 		opts.EnableDetailedLogging = enable
 	}
 }
 
-// LogValidation logs validation results
+// LogValidation logs validation results.
 func (l *DefaultValidationLogger) LogValidation(result *ValidationResult) {
 	if l.enableDetailedLogging {
 		if result.IsValid {
@@ -129,24 +129,24 @@ func (l *DefaultValidationLogger) LogValidation(result *ValidationResult) {
 	}
 }
 
-// LogSanitization logs sanitization results
+// LogSanitization logs sanitization results.
 func (l *DefaultValidationLogger) LogSanitization(result *SanitizationResult) {
 	if l.enableDetailedLogging && len(result.SanitizedFields) > 0 {
 		fmt.Printf("🔧 Configuration sanitized %d fields\n", len(result.SanitizedFields))
 	}
 }
 
-// LogError logs validation errors
+// LogError logs validation errors.
 func (l *DefaultValidationLogger) LogError(field, operation string, err error) {
 	fmt.Printf("⚠️  Validation error in %s.%s: %v\n", operation, field, err)
 }
 
-// NewValidationMiddleware creates comprehensive validation middleware
+// NewValidationMiddleware creates comprehensive validation middleware.
 func NewValidationMiddleware() *ValidationMiddleware {
 	return NewValidationMiddlewareWithOptions()
 }
 
-// NewValidationMiddlewareWithOptions creates middleware with custom options
+// NewValidationMiddlewareWithOptions creates middleware with custom options.
 func NewValidationMiddlewareWithOptions(options ...func(*ValidationMiddlewareOptions)) *ValidationMiddleware {
 	opts := &ValidationMiddlewareOptions{
 		RequireSafeModeConfirmation: false,
@@ -169,7 +169,7 @@ func NewValidationMiddlewareWithOptions(options ...func(*ValidationMiddlewareOpt
 	}
 }
 
-// NewValidationMiddlewareWithLogger creates middleware with custom logger
+// NewValidationMiddlewareWithLogger creates middleware with custom logger.
 func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddleware {
 	return &ValidationMiddleware{
 		validator: NewConfigValidator(),
@@ -183,7 +183,7 @@ func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddl
 	}
 }
 
-// ValidateAndLoadConfig loads and validates configuration with comprehensive checks
+// ValidateAndLoadConfig loads and validates configuration with comprehensive checks.
 func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.Config, error) {
 	// Load configuration using existing loader
 	cfg, err := LoadWithContext(ctx)
@@ -204,7 +204,7 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 	return cfg, nil
 }
 
-// ValidateAndSaveConfig validates and saves configuration
+// ValidateAndSaveConfig validates and saves configuration.
 func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *domain.Config) (*domain.Config, error) {
 	// Perform comprehensive validation first
 	validationResult := vm.validator.ValidateConfig(cfg)
@@ -224,7 +224,7 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 	return cfg, nil
 }
 
-// ValidateConfigChange validates a specific configuration change
+// ValidateConfigChange validates a specific configuration change.
 func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, current, proposed *domain.Config) *ConfigChangeResult {
 	changeResult := &ConfigChangeResult{
 		IsValid:   true,
@@ -263,7 +263,7 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 	return changeResult
 }
 
-// ValidateProfileOperation validates a specific profile operation with type safety
+// ValidateProfileOperation validates a specific profile operation with type safety.
 func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, profileName, operationName string, settings *domain.OperationSettings) *ProfileOperationResult {
 	result := &ProfileOperationResult{
 		IsValid:   true,
@@ -304,7 +304,7 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, pr
 	return result
 }
 
-// formatValidationErrors formats validation errors into a readable string
+// formatValidationErrors formats validation errors into a readable string.
 func (vm *ValidationMiddleware) formatValidationErrors(errors []ValidationError) string {
 	if len(errors) == 0 {
 		return ""

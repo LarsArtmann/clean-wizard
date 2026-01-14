@@ -11,7 +11,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// boolToGenerationStatus converts boolean to GenerationStatus enum
+// boolToGenerationStatus converts boolean to GenerationStatus enum.
 func boolToGenerationStatus(b bool) domain.GenerationStatus {
 	if b {
 		return domain.GenerationStatusCurrent
@@ -19,14 +19,14 @@ func boolToGenerationStatus(b bool) domain.GenerationStatus {
 	return domain.GenerationStatusHistorical
 }
 
-// NixCleaner handles Nix package manager cleanup with proper type safety
+// NixCleaner handles Nix package manager cleanup with proper type safety.
 type NixCleaner struct {
 	adapter *adapters.NixAdapter
 	verbose bool
 	dryRun  bool
 }
 
-// NewNixCleaner creates Nix cleaner with proper configuration
+// NewNixCleaner creates Nix cleaner with proper configuration.
 func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
 	nc := &NixCleaner{
 		adapter: adapters.NewNixAdapter(0, 0),
@@ -37,12 +37,12 @@ func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
 	return nc
 }
 
-// IsAvailable checks if Nix cleaner is available
+// IsAvailable checks if Nix cleaner is available.
 func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
 	return nc.adapter.IsAvailable(ctx)
 }
 
-// GetStoreSize gets Nix store size with type safety
+// GetStoreSize gets Nix store size with type safety.
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	if !nc.adapter.IsAvailable(ctx) {
 		return int64(300 * 1024 * 1024 * 1024) // Mock store size
@@ -55,7 +55,7 @@ func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	return storeSizeResult.Value()
 }
 
-// ValidateSettings validates Nix cleaner settings with type safety
+// ValidateSettings validates Nix cleaner settings with type safety.
 func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error {
 	if settings == nil || settings.NixGenerations == nil {
 		return nil // Settings are optional
@@ -72,7 +72,7 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 	return nil
 }
 
-// ListGenerations lists Nix generations with proper type safety
+// ListGenerations lists Nix generations with proper type safety.
 func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
 	// Check availability first
 	if !nc.adapter.IsAvailable(ctx) {
@@ -90,7 +90,7 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	return nc.adapter.ListGenerations(ctx)
 }
 
-// CleanOldGenerations removes old Nix generations using centralized conversions
+// CleanOldGenerations removes old Nix generations using centralized conversions.
 func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) result.Result[domain.CleanResult] {
 	// Get generations first
 	genResult := nc.ListGenerations(ctx)
@@ -153,7 +153,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	return result.Ok(cleanResult)
 }
 
-// countOldGenerations counts generations to remove (keeping current + N others)
+// countOldGenerations counts generations to remove (keeping current + N others).
 func countOldGenerations(generations []domain.NixGeneration, keepCount int) int {
 	if len(generations) <= keepCount {
 		return 0

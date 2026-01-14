@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// ErrorDetails represents strongly-typed error context information
+// ErrorDetails represents strongly-typed error context information.
 type ErrorDetails struct {
 	Field      string            `json:"field,omitempty"`
 	Value      string            `json:"value,omitempty"`
@@ -19,7 +19,7 @@ type ErrorDetails struct {
 	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
-// CleanWizardError represents structured error with context
+// CleanWizardError represents structured error with context.
 type CleanWizardError struct {
 	Code      ErrorCode
 	Level     ErrorLevel
@@ -30,7 +30,7 @@ type CleanWizardError struct {
 	Stack     string
 }
 
-// Error implements error interface
+// Error implements error interface.
 func (e *CleanWizardError) Error() string {
 	if e.Details == nil {
 		return fmt.Sprintf("[%s] %s: %s", e.Level.String(), e.Code.String(), e.Message)
@@ -38,22 +38,22 @@ func (e *CleanWizardError) Error() string {
 
 	var details []string
 	if e.Details.Field != "" {
-		details = append(details, fmt.Sprintf("field=%s", e.Details.Field))
+		details = append(details, "field="+e.Details.Field)
 	}
 	if e.Details.Value != "" {
-		details = append(details, fmt.Sprintf("value=%s", e.Details.Value))
+		details = append(details, "value="+e.Details.Value)
 	}
 	if e.Details.Expected != "" {
-		details = append(details, fmt.Sprintf("expected=%s", e.Details.Expected))
+		details = append(details, "expected="+e.Details.Expected)
 	}
 	if e.Details.Actual != "" {
-		details = append(details, fmt.Sprintf("actual=%s", e.Details.Actual))
+		details = append(details, "actual="+e.Details.Actual)
 	}
 	if e.Details.Operation != "" {
-		details = append(details, fmt.Sprintf("operation=%s", e.Details.Operation))
+		details = append(details, "operation="+e.Details.Operation)
 	}
 	if e.Details.FilePath != "" {
-		details = append(details, fmt.Sprintf("file=%s", e.Details.FilePath))
+		details = append(details, "file="+e.Details.FilePath)
 	}
 	if e.Details.LineNumber > 0 {
 		details = append(details, fmt.Sprintf("line=%d", e.Details.LineNumber))
@@ -62,7 +62,7 @@ func (e *CleanWizardError) Error() string {
 		details = append(details, fmt.Sprintf("retry=%d", e.Details.RetryCount))
 	}
 	if e.Details.Duration != "" {
-		details = append(details, fmt.Sprintf("duration=%s", e.Details.Duration))
+		details = append(details, "duration="+e.Details.Duration)
 	}
 
 	// Add metadata
@@ -78,7 +78,7 @@ func (e *CleanWizardError) Error() string {
 	return fmt.Sprintf("[%s] %s: %s%s", e.Level.String(), e.Code.String(), e.Message, detailStr)
 }
 
-// Unwrap returns the underlying error for compatibility with Go 1.13+ error wrapping
+// Unwrap returns the underlying error for compatibility with Go 1.13+ error wrapping.
 func (e *CleanWizardError) Unwrap() error {
 	if e.Details != nil && e.Details.Value != "" {
 		return fmt.Errorf("wrapped error: %s", e.Details.Value)

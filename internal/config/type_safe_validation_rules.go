@@ -4,7 +4,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// TypeSafeValidationRules defines validation constraints with compile-time type safety
+// TypeSafeValidationRules defines validation constraints with compile-time type safety.
 type TypeSafeValidationRules struct {
 	// Numeric Constraints - using proper typed bounds
 	MaxDiskUsage      *NumericValidationRule `json:"max_disk_usage"`
@@ -30,7 +30,7 @@ type TypeSafeValidationRules struct {
 	BackupRequired domain.RiskLevelType `json:"backup_required"`
 }
 
-// NumericValidationRule provides type-safe numeric validation
+// NumericValidationRule provides type-safe numeric validation.
 type NumericValidationRule struct {
 	Required bool   `json:"required"`
 	Min      *int   `json:"min,omitempty"`
@@ -38,14 +38,14 @@ type NumericValidationRule struct {
 	Message  string `json:"message,omitempty"`
 }
 
-// StringValidationRule provides type-safe string validation
+// StringValidationRule provides type-safe string validation.
 type StringValidationRule struct {
 	Required bool   `json:"required"`
 	Pattern  string `json:"pattern,omitempty"`
 	Message  string `json:"message,omitempty"`
 }
 
-// NewTypeSafeValidationRules creates type-safe validation rules with defaults
+// NewTypeSafeValidationRules creates type-safe validation rules with defaults.
 func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 	// Extract constants to variables for reference
 	minUsage := 10
@@ -110,7 +110,7 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 	}
 }
 
-// GetTypeSafeSchemaRules returns type-safe schema rules for external consumption
+// GetTypeSafeSchemaRules returns type-safe schema rules for external consumption.
 func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidationRules {
 	// Deep copy to prevent external modifications
 	copied := &TypeSafeValidationRules{
@@ -157,7 +157,7 @@ func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidatio
 	return copied
 }
 
-// Helper methods for deep copying
+// Helper methods for deep copying.
 func (tsvr *TypeSafeValidationRules) copyNumericRule(rule *NumericValidationRule) *NumericValidationRule {
 	copied := &NumericValidationRule{
 		Required: rule.Required,

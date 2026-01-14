@@ -7,7 +7,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// validateBusinessLogic validates business logic constraints
+// validateBusinessLogic validates business logic constraints.
 func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *ValidationResult) {
 	for name, profile := range cfg.Profiles {
 		// Validate profile business logic
@@ -67,7 +67,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 	}
 }
 
-// validateSecurityConstraints validates security-related constraints
+// validateSecurityConstraints validates security-related constraints.
 func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, result *ValidationResult) {
 	// Validate no protected paths contain dangerous patterns
 	for _, path := range cfg.Protected {
@@ -114,7 +114,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 	}
 }
 
-// validateProtectedPathsConflict checks if operations might affect protected paths
+// validateProtectedPathsConflict checks if operations might affect protected paths.
 func (cv *ConfigValidator) validateProtectedPathsConflict(protected []string, op domain.CleanupOperation) error {
 	switch op.Name {
 	case "temp-files":
@@ -129,7 +129,7 @@ func (cv *ConfigValidator) validateProtectedPathsConflict(protected []string, op
 	}
 }
 
-// checkTempFilesConflict checks for temp files conflicts
+// checkTempFilesConflict checks for temp files conflicts.
 func (cv *ConfigValidator) checkTempFilesConflict(protected []string, op domain.CleanupOperation) error {
 	if op.Settings != nil && op.Settings.TempFiles != nil {
 		for _, exclude := range op.Settings.TempFiles.Excludes {
@@ -143,7 +143,7 @@ func (cv *ConfigValidator) checkTempFilesConflict(protected []string, op domain.
 	return nil
 }
 
-// checkNixConflict checks for Nix conflicts
+// checkNixConflict checks for Nix conflicts.
 func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.CleanupOperation) error {
 	// Nix operations typically affect /nix/store, check if protected paths overlap
 	nixStorePath := "/nix/store"
@@ -155,7 +155,7 @@ func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.Cleanu
 	return nil
 }
 
-// findMaxRiskLevel finds the maximum risk level in configuration
+// findMaxRiskLevel finds the maximum risk level in configuration.
 func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel {
 	maxRisk := domain.RiskLow
 	for _, profile := range cfg.Profiles {
@@ -173,7 +173,7 @@ func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel
 	return maxRisk
 }
 
-// isPathProtected checks if a path is protected
+// isPathProtected checks if a path is protected.
 func (cv *ConfigValidator) isPathProtected(protected []string, targetPath string) bool {
 	for _, path := range protected {
 		if strings.HasPrefix(path, targetPath) || strings.HasPrefix(targetPath, path) {

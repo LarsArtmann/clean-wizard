@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestValidator implements Validator interface for testing
+// TestValidator implements Validator interface for testing.
 type TestValidator struct {
 	Name  string
 	Valid bool

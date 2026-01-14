@@ -6,7 +6,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// TestIntegration_ValidationSanitizationPipeline tests complete validation and sanitization workflow
+// TestIntegration_ValidationSanitizationPipeline tests complete validation and sanitization workflow.
 func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 	t.Run("Complete pipeline with complex configuration", func(t *testing.T) {
 		// Create complex configuration that exercises all validation paths
@@ -36,7 +36,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Name:        "temp-files",
 							Description: "Clean temporary files",
 							RiskLevel:   domain.RiskMedium,
-							Enabled: domain.ProfileStatusEnabled,
+							Enabled:     domain.ProfileStatusEnabled,
 							Settings: &domain.OperationSettings{
 								TempFiles: &domain.TempFilesSettings{
 									OlderThan: " 7d  ",                                                 // Needs whitespace sanitization
@@ -48,7 +48,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Name:        "homebrew-cleanup",
 							Description: "Clean Homebrew",
 							RiskLevel:   domain.RiskLow,
-							Enabled: domain.ProfileStatusEnabled,
+							Enabled:     domain.ProfileStatusEnabled,
 							Settings: &domain.OperationSettings{
 								Homebrew: &domain.HomebrewSettings{
 									UnusedOnly: domain.HomebrewModeUnusedOnly,
@@ -60,7 +60,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 							Name:        "system-temp",
 							Description: "Clean system temp",
 							RiskLevel:   domain.RiskMedium,
-							Enabled: domain.ProfileStatusEnabled,
+							Enabled:     domain.ProfileStatusEnabled,
 							Settings: &domain.OperationSettings{
 								SystemTemp: &domain.SystemTempSettings{
 									Paths:     []string{"/tmp", "/var/tmp", " /tmp/extra ", "/tmp"}, // Needs sanitization

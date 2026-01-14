@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// FuzzRiskLevelCreation tests risk level creation with fuzzed inputs
+// FuzzRiskLevelCreation tests risk level creation with fuzzed inputs.
 func FuzzRiskLevelCreation(f *testing.F) {
 	f.Add(RiskLow.String())
 	f.Add(RiskMedium.String())
@@ -34,7 +34,7 @@ func FuzzRiskLevelCreation(f *testing.F) {
 	})
 }
 
-// FuzzNixGenerationCreation tests Nix generation creation with fuzzed inputs
+// FuzzNixGenerationCreation tests Nix generation creation with fuzzed inputs.
 func FuzzNixGenerationCreation(f *testing.F) {
 	f.Add("2024-01-01")
 
@@ -49,7 +49,7 @@ func FuzzNixGenerationCreation(f *testing.F) {
 		gen := NixGeneration{
 			ID:      len(data), // Convert string length to ID
 			Path:    "/nix/store/" + data,
-			Date:    time.Time{}, // Zero value for fuzzing
+			Date:    time.Time{},   // Zero value for fuzzing
 			Current: currentStatus, // Random current status
 		}
 

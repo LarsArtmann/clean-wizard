@@ -1,13 +1,12 @@
 package config
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// analyzeConfigChanges analyzes differences between current and proposed configuration
+// analyzeConfigChanges analyzes differences between current and proposed configuration.
 func (vm *ValidationMiddleware) analyzeConfigChanges(current, proposed *domain.Config) []ConfigChange {
 	changes := []ConfigChange{}
 
@@ -43,7 +42,7 @@ func (vm *ValidationMiddleware) analyzeConfigChanges(current, proposed *domain.C
 	return changes
 }
 
-// analyzePathChanges analyzes path array changes
+// analyzePathChanges analyzes path array changes.
 func (vm *ValidationMiddleware) analyzePathChanges(field string, current, proposed []string) []ConfigChange {
 	changes := []ConfigChange{}
 
@@ -79,7 +78,7 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 	return changes
 }
 
-// analyzeProfileChanges analyzes profile map changes
+// analyzeProfileChanges analyzes profile map changes.
 func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[string]*domain.Profile) []ConfigChange {
 	changes := []ConfigChange{}
 
@@ -91,7 +90,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 				continue
 			}
 			changes = append(changes, ConfigChange{
-				Field:     fmt.Sprintf("profiles.%s", name),
+				Field:     "profiles." + name,
 				OldValue:  nil,
 				NewValue:  profile.Name,
 				Operation: OperationAdded,
@@ -104,7 +103,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 	for name, profile := range current {
 		if proposed[name] == nil {
 			changes = append(changes, ConfigChange{
-				Field:     fmt.Sprintf("profiles.%s", name),
+				Field:     "profiles." + name,
 				OldValue:  profile.Name,
 				NewValue:  nil,
 				Operation: OperationRemoved,
@@ -125,7 +124,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 				currentProfile.Description != proposedProfile.Description ||
 				!reflect.DeepEqual(currentProfile.Operations, proposedProfile.Operations) {
 				changes = append(changes, ConfigChange{
-					Field:     fmt.Sprintf("profiles.%s", name),
+					Field:     "profiles." + name,
 					OldValue:  currentProfile.Name,
 					NewValue:  proposedProfile.Name,
 					Operation: OperationModified,

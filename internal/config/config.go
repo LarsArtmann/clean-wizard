@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -19,7 +20,7 @@ const (
 	configType = "yaml"
 )
 
-// boolToSafeMode converts boolean to SafeMode enum
+// boolToSafeMode converts boolean to SafeMode enum.
 func boolToSafeMode(b bool) domain.SafeMode {
 	if b {
 		return domain.SafeModeEnabled
@@ -27,12 +28,12 @@ func boolToSafeMode(b bool) domain.SafeMode {
 	return domain.SafeModeDisabled
 }
 
-// Load loads the configuration from file or creates default
+// Load loads the configuration from file or creates default.
 func Load() (*domain.Config, error) {
 	return LoadWithContext(context.Background())
 }
 
-// LoadWithContext loads configuration with context support
+// LoadWithContext loads configuration with context support.
 func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	v := viper.New()
 	v.SetConfigName(configName)
@@ -57,7 +58,8 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		return nil, ctx.Err()
 	default:
 		if err := v.ReadInConfig(); err != nil {
-			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			var configFileNotFoundError viper.ConfigFileNotFoundError
+			if errors.As(err, &configFileNotFoundError) {
 				// Config file not found, return default config
 				return GetDefaultConfig(), nil
 			}
@@ -155,7 +157,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	return &config, nil
 }
 
-// Save saves the configuration to file
+// Save saves the configuration to file.
 func Save(config *domain.Config) error {
 	v := viper.New()
 
@@ -207,12 +209,12 @@ func Save(config *domain.Config) error {
 	return nil
 }
 
-// GetCurrentTime returns current time (helper for testing)
+// GetCurrentTime returns current time (helper for testing).
 func GetCurrentTime() time.Time {
 	return time.Now()
 }
 
-// GetDefaultConfig returns the default configuration
+// GetDefaultConfig returns the default configuration.
 func GetDefaultConfig() *domain.Config {
 	now := GetCurrentTime()
 

@@ -1,23 +1,24 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
 
-// Config represents application configuration with type safety
+// Config represents application configuration with type safety.
 type Config struct {
-	Version        string              `json:"version" yaml:"version"`
-	SafeMode       SafeMode            `json:"safe_mode" yaml:"safe_mode"`
-	MaxDiskUsage   int                 `json:"max_disk_usage" yaml:"max_disk_usage"`
-	Protected      []string            `json:"protected" yaml:"protected"`
-	Profiles       map[string]*Profile `json:"profiles" yaml:"profiles"`
+	Version        string              `json:"version"                   yaml:"version"`
+	SafeMode       SafeMode            `json:"safe_mode"                 yaml:"safe_mode"`
+	MaxDiskUsage   int                 `json:"max_disk_usage"            yaml:"max_disk_usage"`
+	Protected      []string            `json:"protected"                 yaml:"protected"`
+	Profiles       map[string]*Profile `json:"profiles"                  yaml:"profiles"`
 	CurrentProfile string              `json:"current_profile,omitempty" yaml:"current_profile,omitempty"`
-	LastClean      time.Time           `json:"last_clean" yaml:"last_clean"`
-	Updated        time.Time           `json:"updated" yaml:"updated"`
+	LastClean      time.Time           `json:"last_clean"                yaml:"last_clean"`
+	Updated        time.Time           `json:"updated"                   yaml:"updated"`
 }
 
-// IsValid validates configuration
+// IsValid validates configuration.
 func (c *Config) IsValid() bool {
 	if c.MaxDiskUsage < 0 || c.MaxDiskUsage > 100 {
 		return false
@@ -40,14 +41,14 @@ func (c *Config) IsValid() bool {
 	return true
 }
 
-// Validate returns errors for invalid configuration
+// Validate returns errors for invalid configuration.
 func (c *Config) Validate() error {
 	if c.MaxDiskUsage < 0 || c.MaxDiskUsage > 100 {
 		return fmt.Errorf("MaxDiskUsage must be between 0 and 100, got: %d", c.MaxDiskUsage)
 	}
 
 	if len(c.Protected) == 0 {
-		return fmt.Errorf("Protected paths cannot be empty")
+		return errors.New("Protected paths cannot be empty")
 	}
 
 	for i, path := range c.Protected {
@@ -57,7 +58,7 @@ func (c *Config) Validate() error {
 	}
 
 	if len(c.Profiles) == 0 {
-		return fmt.Errorf("Configuration must have at least one profile")
+		return errors.New("Configuration must have at least one profile")
 	}
 
 	for name, profile := range c.Profiles {
@@ -69,15 +70,15 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// Profile represents cleanup profile
+// Profile represents cleanup profile.
 type Profile struct {
-	Name        string             `json:"name" yaml:"name"`
+	Name        string             `json:"name"        yaml:"name"`
 	Description string             `json:"description" yaml:"description"`
-	Operations  []CleanupOperation `json:"operations" yaml:"operations"`
-	Enabled     ProfileStatus      `json:"enabled" yaml:"enabled"`
+	Operations  []CleanupOperation `json:"operations"  yaml:"operations"`
+	Enabled     ProfileStatus      `json:"enabled"     yaml:"enabled"`
 }
 
-// IsValid validates profile
+// IsValid validates profile.
 func (p *Profile) IsValid(name string) bool {
 	if p.Name == "" {
 		return false
@@ -98,7 +99,7 @@ func (p *Profile) IsValid(name string) bool {
 	return true
 }
 
-// Validate returns errors for invalid profile
+// Validate returns errors for invalid profile.
 func (p *Profile) Validate(name string) error {
 	if p.Name == "" {
 		return fmt.Errorf("Profile %s: name cannot be empty", name)
@@ -119,16 +120,16 @@ func (p *Profile) Validate(name string) error {
 	return nil
 }
 
-// CleanupOperation represents single cleanup operation with type-safe settings
+// CleanupOperation represents single cleanup operation with type-safe settings.
 type CleanupOperation struct {
-	Name        string             `json:"name" yaml:"name"`
-	Description string             `json:"description" yaml:"description"`
-	RiskLevel   RiskLevel          `json:"risk_level" yaml:"risk_level"`
-	Enabled     ProfileStatus      `json:"enabled" yaml:"enabled"`
+	Name        string             `json:"name"               yaml:"name"`
+	Description string             `json:"description"        yaml:"description"`
+	RiskLevel   RiskLevel          `json:"risk_level"         yaml:"risk_level"`
+	Enabled     ProfileStatus      `json:"enabled"            yaml:"enabled"`
 	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }
 
-// IsValid validates cleanup operation
+// IsValid validates cleanup operation.
 func (op CleanupOperation) IsValid() bool {
 	if op.Name == "" {
 		return false
@@ -142,13 +143,13 @@ func (op CleanupOperation) IsValid() bool {
 	return true
 }
 
-// Validate returns errors for invalid cleanup operation
+// Validate returns errors for invalid cleanup operation.
 func (op CleanupOperation) Validate() error {
 	if op.Name == "" {
-		return fmt.Errorf("Operation name cannot be empty")
+		return errors.New("Operation name cannot be empty")
 	}
 	if op.Description == "" {
-		return fmt.Errorf("Operation description cannot be empty")
+		return errors.New("Operation description cannot be empty")
 	}
 
 	// Validate settings if present

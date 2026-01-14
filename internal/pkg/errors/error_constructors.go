@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// NewError creates new CleanWizardError
+// NewError creates new CleanWizardError.
 func NewError(code ErrorCode, message string) *CleanWizardError {
 	return &CleanWizardError{
 		Code:      code,
@@ -16,7 +16,7 @@ func NewError(code ErrorCode, message string) *CleanWizardError {
 	}
 }
 
-// NewErrorWithLevel creates new CleanWizardError with custom level
+// NewErrorWithLevel creates new CleanWizardError with custom level.
 func NewErrorWithLevel(code ErrorCode, level ErrorLevel, message string) *CleanWizardError {
 	return &CleanWizardError{
 		Code:      code,
@@ -28,7 +28,7 @@ func NewErrorWithLevel(code ErrorCode, level ErrorLevel, message string) *CleanW
 	}
 }
 
-// NewErrorWithDetails creates new CleanWizardError with context details
+// NewErrorWithDetails creates new CleanWizardError with context details.
 func NewErrorWithDetails(code ErrorCode, message string, details *ErrorDetails) *CleanWizardError {
 	err := &CleanWizardError{
 		Code:      code,
@@ -42,42 +42,42 @@ func NewErrorWithDetails(code ErrorCode, message string, details *ErrorDetails) 
 	return err
 }
 
-// ConfigValidateError creates config validation error
+// ConfigValidateError creates config validation error.
 func ConfigValidateError(message string) error {
 	return NewErrorWithDetails(ErrConfigValidation, message, &ErrorDetails{
 		Operation: "config_validation",
 	})
 }
 
-// ConfigLoadError creates config loading error
+// ConfigLoadError creates config loading error.
 func ConfigLoadError(message string) error {
 	return NewErrorWithDetails(ErrConfigLoad, message, &ErrorDetails{
 		Operation: "config_load",
 	})
 }
 
-// ConfigSaveError creates config saving error
+// ConfigSaveError creates config saving error.
 func ConfigSaveError(message string) error {
 	return NewErrorWithDetails(ErrConfigSave, message, &ErrorDetails{
 		Operation: "config_save",
 	})
 }
 
-// NixCommandError creates nix command error
+// NixCommandError creates nix command error.
 func NixCommandError(message string) error {
 	return NewErrorWithDetails(ErrNixCommandFailed, message, &ErrorDetails{
 		Operation: "nix_command",
 	})
 }
 
-// CleaningError creates cleaning operation error
+// CleaningError creates cleaning operation error.
 func CleaningError(message string) error {
 	return NewErrorWithDetails(ErrCleaningFailed, message, &ErrorDetails{
 		Operation: "cleaning",
 	})
 }
 
-// ValidationError creates validation error
+// ValidationError creates validation error.
 func ValidationError(field, value, expected string) error {
 	return NewErrorWithDetails(ErrInvalidInput, "Validation failed", &ErrorDetails{
 		Field:     field,

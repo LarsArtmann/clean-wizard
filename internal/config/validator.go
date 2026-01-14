@@ -7,13 +7,13 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// ConfigValidator provides comprehensive type-safe configuration validation
+// ConfigValidator provides comprehensive type-safe configuration validation.
 type ConfigValidator struct {
 	rules     *ConfigValidationRules
 	sanitizer *ConfigSanitizer
 }
 
-// ValidationResult contains validation results with detailed error information
+// ValidationResult contains validation results with detailed error information.
 type ValidationResult struct {
 	IsValid   bool                     `json:"is_valid"`
 	Errors    []ValidationError        `json:"errors,omitempty"`
@@ -24,7 +24,7 @@ type ValidationResult struct {
 }
 
 // ValidationSanitizedData provides type-safe configuration data
-// FIXED: Removed map[string]any to improve type safety
+// FIXED: Removed map[string]any to improve type safety.
 type ValidationSanitizedData struct {
 	FieldsModified []string          `json:"fields_modified,omitempty"`
 	RulesApplied   []string          `json:"rules_applied,omitempty"`
@@ -35,7 +35,7 @@ type ValidationSanitizedData struct {
 	AppliedProfiles []string `json:"applied_profiles,omitempty"`
 }
 
-// ValidationContext provides strongly-typed validation context information
+// ValidationContext provides strongly-typed validation context information.
 type ValidationContext struct {
 	ConfigPath      string            `json:"config_path,omitempty"`
 	ValidationLevel string            `json:"validation_level,omitempty"`
@@ -49,7 +49,7 @@ type ValidationContext struct {
 	Metadata        map[string]string `json:"metadata,omitempty"`
 }
 
-// ValidationError represents a specific validation error
+// ValidationError represents a specific validation error.
 type ValidationError struct {
 	Field      string             `json:"field"`
 	Rule       string             `json:"rule"`
@@ -60,7 +60,7 @@ type ValidationError struct {
 	Context    *ValidationContext `json:"context,omitempty"`
 }
 
-// ValidationWarning represents a non-critical validation issue
+// ValidationWarning represents a non-critical validation issue.
 type ValidationWarning struct {
 	Field      string             `json:"field"`
 	Message    string             `json:"message"`
@@ -68,7 +68,7 @@ type ValidationWarning struct {
 	Context    *ValidationContext `json:"context,omitempty"`
 }
 
-// NewConfigValidator creates a comprehensive configuration validator
+// NewConfigValidator creates a comprehensive configuration validator.
 func NewConfigValidator() *ConfigValidator {
 	return &ConfigValidator{
 		rules:     getDefaultValidationRules(),
@@ -76,7 +76,7 @@ func NewConfigValidator() *ConfigValidator {
 	}
 }
 
-// NewConfigValidatorWithRules creates a validator with custom rules
+// NewConfigValidatorWithRules creates a validator with custom rules.
 func NewConfigValidatorWithRules(rules *ConfigValidationRules) *ConfigValidator {
 	return &ConfigValidator{
 		rules:     rules,
@@ -84,7 +84,7 @@ func NewConfigValidatorWithRules(rules *ConfigValidationRules) *ConfigValidator 
 	}
 }
 
-// ValidateConfig performs comprehensive configuration validation
+// ValidateConfig performs comprehensive configuration validation.
 func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult {
 	start := time.Now()
 	result := &ValidationResult{
@@ -120,7 +120,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 	return result
 }
 
-// ValidateField validates a specific configuration field
+// ValidateField validates a specific configuration field.
 func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	switch field {
 	case "max_disk_usage":

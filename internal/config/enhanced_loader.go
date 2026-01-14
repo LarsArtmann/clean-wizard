@@ -9,7 +9,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// applyValidation applies validation at the specified level
+// applyValidation applies validation at the specified level.
 func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *domain.Config, level ValidationLevel) *ValidationResult {
 	switch level {
 	case ValidationLevelNone:
@@ -32,7 +32,7 @@ func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *do
 	}
 }
 
-// applyComprehensiveValidation applies comprehensive validation rules
+// applyComprehensiveValidation applies comprehensive validation rules.
 func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *domain.Config, result *ValidationResult) {
 	// Additional comprehensive validation rules
 
@@ -55,7 +55,7 @@ func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *domain.Con
 	}
 }
 
-// applyStrictValidation applies strict validation rules
+// applyStrictValidation applies strict validation rules.
 func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, result *ValidationResult) {
 	// Strict validation rules that might fail
 
@@ -86,7 +86,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, re
 				Field:    "protected",
 				Rule:     "strict",
 				Value:    config.Protected,
-				Message:  fmt.Sprintf("Strict mode requires path: %s", required),
+				Message:  "Strict mode requires path: " + required,
 				Severity: SeverityError,
 			})
 			result.IsValid = false
@@ -94,7 +94,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, re
 	}
 }
 
-// hasCriticalRiskOperations checks if config contains critical risk operations
+// hasCriticalRiskOperations checks if config contains critical risk operations.
 func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *domain.Config) bool {
 	for _, profile := range config.Profiles {
 		// Guard against nil profiles (e.g., from "profile: null" in YAML)
@@ -110,12 +110,12 @@ func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *domain.Config
 	return false
 }
 
-// isPathProtected checks if a path is in the protected list
+// isPathProtected checks if a path is in the protected list.
 func (ecl *EnhancedConfigLoader) isPathProtected(protected []string, target string) bool {
 	return slices.Contains(protected, target)
 }
 
-// mapValidatorRulesToSchemaRules converts validator rules to stable schema rules
+// mapValidatorRulesToSchemaRules converts validator rules to stable schema rules.
 func (ecl *EnhancedConfigLoader) mapValidatorRulesToSchemaRules() *ConfigValidationRules {
 	rules := ecl.validator.rules
 
@@ -150,7 +150,7 @@ func (ecl *EnhancedConfigLoader) mapValidatorRulesToSchemaRules() *ConfigValidat
 	return schemaRules
 }
 
-// getSchemaMinimum returns the minimum value for max_disk_usage from rules
+// getSchemaMinimum returns the minimum value for max_disk_usage from rules.
 func (ecl *EnhancedConfigLoader) getSchemaMinimum() *float64 {
 	if ecl.validator.rules.MaxDiskUsage != nil && ecl.validator.rules.MaxDiskUsage.Min != nil {
 		v := float64(*ecl.validator.rules.MaxDiskUsage.Min)
@@ -160,7 +160,7 @@ func (ecl *EnhancedConfigLoader) getSchemaMinimum() *float64 {
 	return &v
 }
 
-// getSchemaMaximum returns the maximum value for max_disk_usage from rules
+// getSchemaMaximum returns the maximum value for max_disk_usage from rules.
 func (ecl *EnhancedConfigLoader) getSchemaMaximum() *float64 {
 	if ecl.validator.rules.MaxDiskUsage != nil && ecl.validator.rules.MaxDiskUsage.Max != nil {
 		v := float64(*ecl.validator.rules.MaxDiskUsage.Max)
@@ -170,7 +170,7 @@ func (ecl *EnhancedConfigLoader) getSchemaMaximum() *float64 {
 	return &v
 }
 
-// formatValidationErrors formats validation errors for display
+// formatValidationErrors formats validation errors for display.
 func (ecl *EnhancedConfigLoader) formatValidationErrors(errors []ValidationError) string {
 	if len(errors) == 0 {
 		return "no errors"

@@ -1,33 +1,33 @@
 package errors
 
-// ErrorCode represents standardized error codes
+// ErrorCode represents standardized error codes.
 type ErrorCode int
 
 const (
-	// General errors
+	// General errors.
 	ErrUnknown ErrorCode = iota
 	ErrInvalidInput
 	ErrNotFound
 	ErrPermissionDenied
 	ErrTimeout
 
-	// Configuration errors
+	// Configuration errors.
 	ErrConfigLoad
 	ErrConfigSave
 	ErrConfigValidation
 
-	// Nix-specific errors
+	// Nix-specific errors.
 	ErrNixNotAvailable
 	ErrNixCommandFailed
 	ErrNixStoreCorrupted
 
-	// Cleaning errors
+	// Cleaning errors.
 	ErrCleaningFailed
 	ErrCleaningTimeout
 	ErrCleanupRollback
 )
 
-// String returns string representation of error code
+// String returns string representation of error code.
 func (e ErrorCode) String() string {
 	switch e {
 	case ErrUnknown:

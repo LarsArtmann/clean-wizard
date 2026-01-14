@@ -3,18 +3,19 @@ package domain
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
-// TypeSafeEnum provides compile-time guaranteed enums with JSON serialization
+// TypeSafeEnum provides compile-time guaranteed enums with JSON serialization.
 type TypeSafeEnum[T any] interface {
 	String() string
 	IsValid() bool
 	Values() []T
 }
 
-// RiskLevelType represents the risk level enum with compile-time safety
+// RiskLevelType represents the risk level enum with compile-time safety.
 type RiskLevelType int
 
 const (
@@ -24,7 +25,7 @@ const (
 	RiskLevelCriticalType
 )
 
-// String returns the string representation
+// String returns the string representation.
 func (rl RiskLevelType) String() string {
 	switch rl {
 	case RiskLevelLowType:
@@ -40,12 +41,12 @@ func (rl RiskLevelType) String() string {
 	}
 }
 
-// IsValid checks if risk level is valid
+// IsValid checks if risk level is valid.
 func (rl RiskLevelType) IsValid() bool {
 	return rl >= RiskLevelLowType && rl <= RiskLevelCriticalType
 }
 
-// Values returns all possible values
+// Values returns all possible values.
 func (rl RiskLevelType) Values() []RiskLevelType {
 	return []RiskLevelType{
 		RiskLevelLowType,
@@ -55,7 +56,7 @@ func (rl RiskLevelType) Values() []RiskLevelType {
 	}
 }
 
-// MarshalJSON implements json.Marshaler
+// MarshalJSON implements json.Marshaler.
 func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
 	if !rl.IsValid() {
 		return nil, fmt.Errorf("invalid risk level: %d", rl)
@@ -63,7 +64,7 @@ func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(rl.String())
 }
 
-// UnmarshalJSON implements json.Unmarshaler
+// UnmarshalJSON implements json.Unmarshaler.
 func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -85,7 +86,7 @@ func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Icon returns emoji for risk level
+// Icon returns emoji for risk level.
 func (rl RiskLevelType) Icon() string {
 	switch rl {
 	case RiskLevelLowType:
@@ -101,19 +102,19 @@ func (rl RiskLevelType) Icon() string {
 	}
 }
 
-// IsHigherThan returns true if this risk level is higher than comparison
+// IsHigherThan returns true if this risk level is higher than comparison.
 func (rl RiskLevelType) IsHigherThan(other RiskLevelType) bool {
 	return rl > other
 }
 
-// IsHigherOrEqualThan returns true if this risk level is higher or equal than comparison
+// IsHigherOrEqualThan returns true if this risk level is higher or equal than comparison.
 func (rl RiskLevelType) IsHigherOrEqualThan(other RiskLevelType) bool {
 	return rl >= other
 }
 
 // Convenience constants for backward compatibility are now in types.go
 
-// ValidationLevelType represents validation levels with compile-time safety
+// ValidationLevelType represents validation levels with compile-time safety.
 type ValidationLevelType int
 
 const (
@@ -123,7 +124,7 @@ const (
 	ValidationLevelStrictType
 )
 
-// String returns the string representation
+// String returns the string representation.
 func (vl ValidationLevelType) String() string {
 	switch vl {
 	case ValidationLevelNoneType:
@@ -139,12 +140,12 @@ func (vl ValidationLevelType) String() string {
 	}
 }
 
-// IsValid checks if validation level is valid
+// IsValid checks if validation level is valid.
 func (vl ValidationLevelType) IsValid() bool {
 	return vl >= ValidationLevelNoneType && vl <= ValidationLevelStrictType
 }
 
-// Values returns all possible values
+// Values returns all possible values.
 func (vl ValidationLevelType) Values() []ValidationLevelType {
 	return []ValidationLevelType{
 		ValidationLevelNoneType,
@@ -154,7 +155,7 @@ func (vl ValidationLevelType) Values() []ValidationLevelType {
 	}
 }
 
-// MarshalJSON implements json.Marshaler
+// MarshalJSON implements json.Marshaler.
 func (vl ValidationLevelType) MarshalJSON() ([]byte, error) {
 	if !vl.IsValid() {
 		return nil, fmt.Errorf("invalid validation level: %d", vl)
@@ -162,7 +163,7 @@ func (vl ValidationLevelType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(vl.String())
 }
 
-// UnmarshalJSON implements json.Unmarshaler
+// UnmarshalJSON implements json.Unmarshaler.
 func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -186,7 +187,7 @@ func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
 
 // Convenience constants for backward compatibility are now in types.go
 
-// ChangeOperationType represents change operations with compile-time safety
+// ChangeOperationType represents change operations with compile-time safety.
 type ChangeOperationType int
 
 const (
@@ -195,7 +196,7 @@ const (
 	ChangeOperationModifiedType
 )
 
-// String returns the string representation
+// String returns the string representation.
 func (co ChangeOperationType) String() string {
 	switch co {
 	case ChangeOperationAddedType:
@@ -209,12 +210,12 @@ func (co ChangeOperationType) String() string {
 	}
 }
 
-// IsValid checks if change operation is valid
+// IsValid checks if change operation is valid.
 func (co ChangeOperationType) IsValid() bool {
 	return co >= ChangeOperationAddedType && co <= ChangeOperationModifiedType
 }
 
-// Values returns all possible values
+// Values returns all possible values.
 func (co ChangeOperationType) Values() []ChangeOperationType {
 	return []ChangeOperationType{
 		ChangeOperationAddedType,
@@ -223,7 +224,7 @@ func (co ChangeOperationType) Values() []ChangeOperationType {
 	}
 }
 
-// MarshalJSON implements json.Marshaler
+// MarshalJSON implements json.Marshaler.
 func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
 	if !co.IsValid() {
 		return nil, fmt.Errorf("invalid change operation: %d", co)
@@ -231,7 +232,7 @@ func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(co.String())
 }
 
-// UnmarshalJSON implements json.Unmarshaler
+// UnmarshalJSON implements json.Unmarshaler.
 func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -251,7 +252,7 @@ func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CleanStrategyType represents cleaning strategies with compile-time safety
+// CleanStrategyType represents cleaning strategies with compile-time safety.
 type CleanStrategyType int
 
 const (
@@ -260,7 +261,7 @@ const (
 	StrategyDryRunType
 )
 
-// String returns string representation
+// String returns string representation.
 func (cs CleanStrategyType) String() string {
 	switch cs {
 	case StrategyAggressiveType:
@@ -274,12 +275,12 @@ func (cs CleanStrategyType) String() string {
 	}
 }
 
-// IsValid checks if clean strategy is valid
+// IsValid checks if clean strategy is valid.
 func (cs CleanStrategyType) IsValid() bool {
 	return cs >= StrategyAggressiveType && cs <= StrategyDryRunType
 }
 
-// Values returns all possible values
+// Values returns all possible values.
 func (cs CleanStrategyType) Values() []CleanStrategyType {
 	return []CleanStrategyType{
 		StrategyAggressiveType,
@@ -288,7 +289,7 @@ func (cs CleanStrategyType) Values() []CleanStrategyType {
 	}
 }
 
-// MarshalJSON implements json.Marshaler
+// MarshalJSON implements json.Marshaler.
 func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
 	if !cs.IsValid() {
 		return nil, fmt.Errorf("invalid clean strategy: %d", cs)
@@ -296,7 +297,7 @@ func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(cs.String())
 }
 
-// UnmarshalJSON implements json.Unmarshaler
+// UnmarshalJSON implements json.Unmarshaler.
 func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -316,7 +317,7 @@ func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Icon returns emoji for clean strategy
+// Icon returns emoji for clean strategy.
 func (cs CleanStrategyType) Icon() string {
 	switch cs {
 	case StrategyAggressiveType:
@@ -332,7 +333,7 @@ func (cs CleanStrategyType) Icon() string {
 
 // Convenience constants for backward compatibility are now in types.go
 
-// UnmarshalYAML implements yaml.Unmarshaler for RiskLevelType
+// UnmarshalYAML implements yaml.Unmarshaler for RiskLevelType.
 func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
 	var s string
 	if err := value.Decode(&s); err != nil {
@@ -360,8 +361,8 @@ func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-// MarshalYAML implements yaml.Marshaler for RiskLevelType
-func (rl RiskLevelType) MarshalYAML() (interface{}, error) {
+// MarshalYAML implements yaml.Marshaler for RiskLevelType.
+func (rl RiskLevelType) MarshalYAML() (any, error) {
 	if !rl.IsValid() {
 		return nil, fmt.Errorf("invalid risk level: %d", rl)
 	}

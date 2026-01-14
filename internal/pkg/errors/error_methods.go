@@ -1,17 +1,16 @@
 package errors
 
 import (
-	"fmt"
 	"runtime/debug"
 )
 
-// WithOperation adds operation context to error
+// WithOperation adds operation context to error.
 func (e *CleanWizardError) WithOperation(operation string) *CleanWizardError {
 	e.Operation = operation
 	return e
 }
 
-// WithDetail adds single detail to error
+// WithDetail adds single detail to error.
 func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 	ensureDetails(&e.Details)
 
@@ -41,29 +40,29 @@ func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 	return e
 }
 
-// WithLevel sets error level
+// WithLevel sets error level.
 func (e *CleanWizardError) WithLevel(level ErrorLevel) *CleanWizardError {
 	e.Level = level
 	return e
 }
 
-// IsLevel checks if error matches specific level
+// IsLevel checks if error matches specific level.
 func (e *CleanWizardError) IsLevel(level ErrorLevel) bool {
 	return e.Level == level
 }
 
-// IsErrorCode checks if error matches specific error code
+// IsErrorCode checks if error matches specific error code.
 func (e *CleanWizardError) IsErrorCode(code ErrorCode) bool {
 	return e.Code == code
 }
 
-// captureStack captures the current call stack
+// captureStack captures the current call stack.
 func captureStack() string {
 	// Use debug.Stack() for simpler stack capture
 	return string(debug.Stack())
 }
 
-// IsRetryable checks if error is retryable
+// IsRetryable checks if error is retryable.
 func (e *CleanWizardError) IsRetryable() bool {
 	switch e.Code {
 	case ErrTimeout, ErrNixCommandFailed, ErrCleaningFailed:
@@ -75,7 +74,7 @@ func (e *CleanWizardError) IsRetryable() bool {
 	}
 }
 
-// IsUserFriendly checks if error is safe to show to users
+// IsUserFriendly checks if error is safe to show to users.
 func (e *CleanWizardError) IsUserFriendly() bool {
 	switch e.Code {
 	case ErrPermissionDenied, ErrTimeout, ErrConfigValidation:
@@ -87,7 +86,7 @@ func (e *CleanWizardError) IsUserFriendly() bool {
 	}
 }
 
-// Log logs the error with appropriate level
+// Log logs the error with appropriate level.
 func (e *CleanWizardError) Log() {
 	level := e.Level.LogLevel()
 	switch level {
@@ -108,34 +107,34 @@ func (e *CleanWizardError) Log() {
 	}
 }
 
-// Helper logging methods
+// Helper logging methods.
 func (e *CleanWizardError) debugLog() {
 	// Implementation depends on logging library choice
 	// For now, using simple approach
-	_ = fmt.Sprintf("[DEBUG] %s", e.Error())
+	_ = "[DEBUG] " + e.Error()
 }
 
 func (e *CleanWizardError) infoLog() {
 	// Implementation depends on logging library choice
-	_ = fmt.Sprintf("[INFO] %s", e.Error())
+	_ = "[INFO] " + e.Error()
 }
 
 func (e *CleanWizardError) warnLog() {
 	// Implementation depends on logging library choice
-	_ = fmt.Sprintf("[WARN] %s", e.Error())
+	_ = "[WARN] " + e.Error()
 }
 
 func (e *CleanWizardError) errorLog() {
 	// Implementation depends on logging library choice
-	_ = fmt.Sprintf("[ERROR] %s", e.Error())
+	_ = "[ERROR] " + e.Error()
 }
 
 func (e *CleanWizardError) fatalLog() {
 	// Implementation depends on logging library choice
-	_ = fmt.Sprintf("[FATAL] %s", e.Error())
+	_ = "[FATAL] " + e.Error()
 }
 
 func (e *CleanWizardError) panicLog() {
 	// Implementation depends on logging library choice
-	_ = fmt.Sprintf("[PANIC] %s", e.Error())
+	_ = "[PANIC] " + e.Error()
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// validateBasicStructure validates basic configuration structure
+// validateBasicStructure validates basic configuration structure.
 func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *ValidationResult) {
 	// Version validation
 	if cfg.Version == "" {

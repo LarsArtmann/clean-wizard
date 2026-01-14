@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// FuzzResultCreationBasic tests result type creation with fuzzed inputs
+// FuzzResultCreationBasic tests result type creation with fuzzed inputs.
 func FuzzResultCreationBasic(f *testing.F) {
 	f.Add("test data")
 
@@ -36,7 +36,7 @@ func FuzzResultCreationBasic(f *testing.F) {
 	})
 }
 
-// FuzzResultStringOperations tests result string operations
+// FuzzResultStringOperations tests result string operations.
 func FuzzResultStringOperations(f *testing.F) {
 	f.Add("string test")
 
@@ -71,7 +71,7 @@ func FuzzResultStringOperations(f *testing.F) {
 	})
 }
 
-// FuzzResultErrorHandling tests error handling with fuzzed inputs
+// FuzzResultErrorHandling tests error handling with fuzzed inputs.
 func FuzzResultErrorHandling(f *testing.F) {
 	f.Add("error test")
 

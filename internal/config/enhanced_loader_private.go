@@ -10,7 +10,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// loadConfigWithRetry loads configuration with retry logic
+// loadConfigWithRetry loads configuration with retry logic.
 func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, options *ConfigLoadOptions) (*domain.Config, error) {
 	var lastErr error
 
@@ -43,7 +43,7 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, option
 	return nil, fmt.Errorf("failed to load config after %d attempts: %w", ecl.retryPolicy.MaxRetries+1, lastErr)
 }
 
-// saveConfigWithRetry saves configuration with retry logic
+// saveConfigWithRetry saves configuration with retry logic.
 func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) error {
 	var lastErr error
 
@@ -72,7 +72,7 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config
 	return fmt.Errorf("failed to save config after %d attempts: %w", ecl.retryPolicy.MaxRetries+1, lastErr)
 }
 
-// createBackup creates a backup of the current configuration
+// createBackup creates a backup of the current configuration.
 func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domain.Config) error {
 	// Read current config file and copy to backup location
 	originalConfigPath := filepath.Join(os.Getenv("HOME"), ".clean-wizard.yaml")
@@ -96,7 +96,7 @@ func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domai
 	return nil
 }
 
-// shouldRetry determines if an error should trigger a retry
+// shouldRetry determines if an error should trigger a retry.
 func (ecl *EnhancedConfigLoader) shouldRetry(err error) bool {
 	// Don't retry on certain errors
 	if err.Error() == "validation failed" {
@@ -105,7 +105,7 @@ func (ecl *EnhancedConfigLoader) shouldRetry(err error) bool {
 	return true
 }
 
-// calculateDelay calculates exponential backoff delay
+// calculateDelay calculates exponential backoff delay.
 func (ecl *EnhancedConfigLoader) calculateDelay(attempt int) time.Duration {
 	delay := float64(ecl.retryPolicy.InitialDelay) *
 		float64(ecl.retryPolicy.BackoffFactor) *

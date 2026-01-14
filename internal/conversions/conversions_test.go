@@ -1,7 +1,7 @@
 package conversions
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -130,7 +130,7 @@ func TestToCleanResult(t *testing.T) {
 }
 
 func TestToCleanResultWithError(t *testing.T) {
-	expectedErr := fmt.Errorf("test error")
+	expectedErr := errors.New("test error")
 	bytesResult := result.Err[int64](expectedErr)
 
 	cleanResult := ToCleanResult(bytesResult)
@@ -311,7 +311,7 @@ func TestExtractBytesFromCleanResult(t *testing.T) {
 }
 
 func TestExtractBytesFromCleanResultWithError(t *testing.T) {
-	expectedErr := fmt.Errorf("test error")
+	expectedErr := errors.New("test error")
 	cleanResult := result.Err[domain.CleanResult](expectedErr)
 
 	extracted := ExtractBytesFromCleanResult(cleanResult)
@@ -326,7 +326,7 @@ func TestExtractBytesFromCleanResultWithError(t *testing.T) {
 }
 
 func TestToCleanResultFromError(t *testing.T) {
-	expectedErr := fmt.Errorf("test error")
+	expectedErr := errors.New("test error")
 
 	cleanResult := ToCleanResultFromError(expectedErr)
 

@@ -2,6 +2,8 @@ package commands
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -16,22 +18,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewScanCommand creates scan command with proper domain types
-func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra.Command {
+// NewScanCommand creates scan command with proper domain types.
+func NewScanCommand() *cobra.Command {
 	var configFile string
 	var profileName string
+	var jsonOutput bool
 
 	cmd := &cobra.Command{
 		Use:   "scan",
 		Short: "Scan system for cleanable items",
 		Long:  `Analyze your system to identify old files, package caches, and temporary data that can be safely cleaned.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("🔍 Analyzing system state...")
+			jsonOutput, _ = cmd.Flags().GetBool("json")
+			if !jsonOutput {
+				fmt.Println("🔍 Analyzing system state...")
+			}
 			ctx := context.Background()
+
+			// Get verbose from parent command's persistent flags
+			verbose, _ := cmd.Parent().PersistentFlags().GetBool("verbose")
 
 			// Parse validation level from flag
 			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
-			validationLevel = ParseValidationLevel(validationLevelStr)
+			validationLevel := ParseValidationLevel(validationLevelStr)
 
 			// Parse profile name from flag
 			profileName, _ = cmd.Flags().GetString("profile")
@@ -44,7 +53,9 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 			// Load and validate configuration if provided
 			if configFile != "" {
-				fmt.Printf("📄 Loading configuration from %s...\n", configFile)
+				if !jsonOutput {
+					fmt.Printf("📄 Loading configuration from %s...\n", configFile)
+				}
 
 				// Set config file path using environment variable
 				os.Setenv("CONFIG_PATH", configFile)
@@ -57,12 +68,14 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 
 				// Apply validation based on level
 				if validationLevel > config.ValidationLevelNone {
-					fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
+					if !jsonOutput {
+						fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
+					}
 
 					if validationLevel >= config.ValidationLevelBasic {
 						// Basic validation
 						if len(loadedCfg.Protected) == 0 {
-							return fmt.Errorf("basic validation failed: protected paths cannot be empty")
+							return errors.New("basic validation failed: protected paths cannot be empty")
 						}
 					}
 				}
@@ -89,7 +102,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 				if validationLevel >= config.ValidationLevelBasic {
 					// Basic validation
 					if len(loadedCfg.Protected) == 0 {
-						return fmt.Errorf("basic validation failed: protected paths cannot be empty")
+						return errors.New("basic validation failed: protected paths cannot be empty")
 					}
 				}
 
@@ -103,7 +116,7 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 				if validationLevel >= config.ValidationLevelStrict {
 					// Strict validation
 					if !loadedCfg.SafeMode.IsEnabled() {
-						return fmt.Errorf("strict validation failed: safe_mode must be enabled")
+						return errors.New("strict validation failed: safe_mode must be enabled")
 					}
 				}
 
@@ -130,18 +143,18 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 					fmt.Printf("🏷️  Using current profile: %s (%s)\n", loadedCfg.CurrentProfile, profile.Description)
 				}
 			} else if loadedCfg != nil {
-			// Default to daily profile if available
-			if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled.IsEnabled() {
-				fmt.Printf("📋 Using daily profile configuration\n")
-				// Extract scan parameters from profile
-				for _, op := range dailyProfile.Operations {
-					if op.Name == "nix-generations" && op.Enabled.IsEnabled() {
-						// Nix generations scanning
-						limit = 50 // Default for generations
-						break
+				// Default to daily profile if available
+				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled.IsEnabled() {
+					fmt.Printf("📋 Using daily profile configuration\n")
+					// Extract scan parameters from profile
+					for _, op := range dailyProfile.Operations {
+						if op.Name == "nix-generations" && op.Enabled.IsEnabled() {
+							// Nix generations scanning
+							limit = 50 // Default for generations
+							break
+						}
 					}
 				}
-			}
 			}
 
 			// Create scan request with applied configuration
@@ -184,19 +197,48 @@ func NewScanCommand(verbose bool, validationLevel config.ValidationLevel) *cobra
 			}
 
 			// Display results
-			displayScanResults(scanResult, generations, verbose)
+			displayScanResults(scanResult, generations, verbose, jsonOutput)
 			return nil
 		},
 	}
 
 	// Scan command flags
 	cmd.Flags().StringVarP(&configFile, "config", "c", "", "Configuration file path")
+	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Output results in JSON format")
 
 	return cmd
 }
 
-// displayScanResults shows scan results to user
-func displayScanResults(result domain.ScanResult, generations []domain.NixGeneration, verbose bool) {
+// displayScanResults shows scan results to user.
+func displayScanResults(result domain.ScanResult, generations []domain.NixGeneration, verbose, jsonOutput bool) {
+	if jsonOutput {
+		// Create JSON output for generations
+		generationsJSON := make([]map[string]any, 0, len(generations))
+		for _, gen := range generations {
+			generationsJSON = append(generationsJSON, map[string]any{
+				"id":                  gen.ID,
+				"path":                gen.Path,
+				"date":                gen.Date,
+				"current":             gen.Current.IsCurrent(),
+				"size_estimate_bytes": gen.EstimateSize(),
+			})
+		}
+
+		jsonOutput := map[string]any{
+			"status":            "success",
+			"total_items":       result.TotalItems,
+			"total_bytes":       result.TotalBytes,
+			"total_bytes_human": format.Bytes(result.TotalBytes),
+			"scan_time_ms":      result.ScanTime.Milliseconds(),
+			"scanned_at":        result.ScannedAt,
+			"scanned_paths":     result.ScannedPaths,
+			"generations":       generationsJSON,
+		}
+		jsonData, _ := json.MarshalIndent(jsonOutput, "", "  ")
+		fmt.Println(string(jsonData))
+		return
+	}
+
 	fmt.Printf("\n📊 Scan Results:\n")
 	fmt.Printf("   • Total generations: %d\n", result.TotalItems)
 

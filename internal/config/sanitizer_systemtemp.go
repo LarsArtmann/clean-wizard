@@ -8,7 +8,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// sanitizeSystemTempSettings sanitizes system temp settings
+// sanitizeSystemTempSettings sanitizes system temp settings.
 func (cs *ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settings *domain.SystemTempSettings, result *SanitizationResult) {
 	if settings == nil {
 		return
@@ -34,7 +34,7 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settin
 					Field:     fmt.Sprintf("%s.paths[%d]", fieldPrefix, i),
 					Original:  original,
 					Sanitized: path,
-					Reason:    fmt.Sprintf("system temp path must be absolute: %s", original),
+					Reason:    "system temp path must be absolute: " + original,
 				})
 				continue // Skip processing invalid path
 			}

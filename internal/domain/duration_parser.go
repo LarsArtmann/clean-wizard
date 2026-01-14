@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -9,13 +10,13 @@ import (
 )
 
 // ParseCustomDuration parses human-readable duration formats like "7d", "24h", "30m"
-// and converts them to Go time.Duration
+// and converts them to Go time.Duration.
 func ParseCustomDuration(durationStr string) (time.Duration, error) {
 	// Trim whitespace first
 	durationStr = strings.TrimSpace(durationStr)
 
 	if durationStr == "" {
-		return 0, fmt.Errorf("empty duration string")
+		return 0, errors.New("empty duration string")
 	}
 
 	// Check if it's already a valid Go duration
@@ -32,7 +33,7 @@ func ParseCustomDuration(durationStr string) (time.Duration, error) {
 	return parseComplexDuration(durationStr)
 }
 
-// parseDaysDuration parses duration with "d" suffix
+// parseDaysDuration parses duration with "d" suffix.
 func parseDaysDuration(durationStr string) (time.Duration, error) {
 	re := regexp.MustCompile(`^(\d+(?:\.\d+)?)d$`)
 	matches := re.FindStringSubmatch(durationStr)
@@ -42,7 +43,7 @@ func parseDaysDuration(durationStr string) (time.Duration, error) {
 
 	days, err := strconv.ParseFloat(matches[1], 64)
 	if err != nil {
-		return 0, fmt.Errorf("invalid days value: %v", err)
+		return 0, fmt.Errorf("invalid days value: %w", err)
 	}
 
 	// Convert days to hours (24 hours per day)
@@ -52,17 +53,17 @@ func parseDaysDuration(durationStr string) (time.Duration, error) {
 	return time.ParseDuration(goDurationStr)
 }
 
-// parseComplexDuration parses combined durations like "7d12h"
+// parseComplexDuration parses combined durations like "7d12h".
 func parseComplexDuration(durationStr string) (time.Duration, error) {
 	// This could be extended to support complex formats
 	// For now, focus on the most common case: days only
 	return 0, fmt.Errorf("unsupported duration format: %s (supported formats: '7d', '24h', '30m', '1h30m')", durationStr)
 }
 
-// ValidateCustomDuration checks if a duration string is valid for this system
+// ValidateCustomDuration checks if a duration string is valid for this system.
 func ValidateCustomDuration(durationStr string) error {
 	if durationStr == "" {
-		return fmt.Errorf("duration cannot be empty")
+		return errors.New("duration cannot be empty")
 	}
 
 	_, err := ParseCustomDuration(durationStr)

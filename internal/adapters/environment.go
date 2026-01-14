@@ -8,59 +8,59 @@ import (
 	"github.com/caarlos0/env/v6"
 )
 
-// EnvironmentConfig holds environment-based configuration
+// EnvironmentConfig holds environment-based configuration.
 type EnvironmentConfig struct {
 	// Application settings
-	Debug       bool   `env:"DEBUG" envDefault:"false"`
-	Environment string `env:"ENV" envDefault:"development"`
+	Debug       bool   `env:"DEBUG"     envDefault:"false"`
+	Environment string `env:"ENV"       envDefault:"development"`
 	LogLevel    string `env:"LOG_LEVEL" envDefault:"info"`
-	Version     string `env:"VERSION" envDefault:"dev"`
+	Version     string `env:"VERSION"   envDefault:"dev"`
 
 	// Performance settings
 	MaxConcurrency int           `env:"MAX_CONCURRENCY" envDefault:"4"`
-	Timeout        time.Duration `env:"TIMEOUT" envDefault:"30s"`
-	RateLimitRPS   float64       `env:"RATE_LIMIT_RPS" envDefault:"10"`
+	Timeout        time.Duration `env:"TIMEOUT"         envDefault:"30s"`
+	RateLimitRPS   float64       `env:"RATE_LIMIT_RPS"  envDefault:"10"`
 
 	// Cache settings
-	CacheEnabled         bool          `env:"CACHE_ENABLED" envDefault:"true"`
-	CacheTTL             time.Duration `env:"CACHE_TTL" envDefault:"5m"`
+	CacheEnabled         bool          `env:"CACHE_ENABLED"          envDefault:"true"`
+	CacheTTL             time.Duration `env:"CACHE_TTL"              envDefault:"5m"`
 	CacheCleanupInterval time.Duration `env:"CACHE_CLEANUP_INTERVAL" envDefault:"10m"`
 
 	// HTTP client settings
-	HTTPTimeout       time.Duration `env:"HTTP_TIMEOUT" envDefault:"30s"`
-	HTTPRetryCount    int           `env:"HTTP_RETRY_COUNT" envDefault:"3"`
+	HTTPTimeout       time.Duration `env:"HTTP_TIMEOUT"         envDefault:"30s"`
+	HTTPRetryCount    int           `env:"HTTP_RETRY_COUNT"     envDefault:"3"`
 	HTTPRetryWaitTime time.Duration `env:"HTTP_RETRY_WAIT_TIME" envDefault:"1s"`
-	HTTPRetryMaxWait  time.Duration `env:"HTTP_RETRY_MAX_WAIT" envDefault:"10s"`
+	HTTPRetryMaxWait  time.Duration `env:"HTTP_RETRY_MAX_WAIT"  envDefault:"10s"`
 
 	// Nix settings
-	NixPath               string `env:"NIX_PATH" envDefault:"/nix/var/nix"`
-	MaxNixGenerations     int    `env:"MAX_NIX_GENERATIONS" envDefault:"10"`
+	NixPath               string `env:"NIX_PATH"                envDefault:"/nix/var/nix"`
+	MaxNixGenerations     int    `env:"MAX_NIX_GENERATIONS"     envDefault:"10"`
 	DefaultNixGenerations int    `env:"DEFAULT_NIX_GENERATIONS" envDefault:"3"`
-	NixStoreSizeGB        int    `env:"NIX_STORE_SIZE_GB" envDefault:"300"`
+	NixStoreSizeGB        int    `env:"NIX_STORE_SIZE_GB"       envDefault:"300"`
 
 	// Disk settings
 	MaxDiskUsagePercent int `env:"MAX_DISK_USAGE_PERCENT" envDefault:"50"`
 	MinDiskUsagePercent int `env:"MIN_DISK_USAGE_PERCENT" envDefault:"10"`
-	RoundingIncrement   int `env:"ROUNDING_INCREMENT" envDefault:"10"`
+	RoundingIncrement   int `env:"ROUNDING_INCREMENT"     envDefault:"10"`
 
 	// Security settings
-	SafeMode            bool `env:"SAFE_MODE" envDefault:"true"`
+	SafeMode            bool `env:"SAFE_MODE"            envDefault:"true"`
 	RequireConfirmation bool `env:"REQUIRE_CONFIRMATION" envDefault:"true"`
 
 	// Filesystem settings
-	TempDir        string `env:"TEMP_DIR" envDefault:"/tmp"`
-	ConfigFile     string `env:"CONFIG_FILE" envDefault:"clean-wizard.yaml"`
+	TempDir        string `env:"TEMP_DIR"        envDefault:"/tmp"`
+	ConfigFile     string `env:"CONFIG_FILE"     envDefault:"clean-wizard.yaml"`
 	StateDirectory string `env:"STATE_DIRECTORY" envDefault:"~/.clean-wizard"`
 
 	// Monitoring settings
-	MetricsEnabled  bool   `env:"METRICS_ENABLED" envDefault:"false"`
-	MetricsPort     int    `env:"METRICS_PORT" envDefault:"8080"`
-	MetricsPath     string `env:"METRICS_PATH" envDefault:"/metrics"`
-	TracingEnabled  bool   `env:"TRACING_ENABLED" envDefault:"false"`
+	MetricsEnabled  bool   `env:"METRICS_ENABLED"  envDefault:"false"`
+	MetricsPort     int    `env:"METRICS_PORT"     envDefault:"8080"`
+	MetricsPath     string `env:"METRICS_PATH"     envDefault:"/metrics"`
+	TracingEnabled  bool   `env:"TRACING_ENABLED"  envDefault:"false"`
 	TracingEndpoint string `env:"TRACING_ENDPOINT" envDefault:""`
 }
 
-// LoadEnvironmentConfig loads configuration from environment variables
+// LoadEnvironmentConfig loads configuration from environment variables.
 func LoadEnvironmentConfig() (*EnvironmentConfig, error) {
 	cfg := &EnvironmentConfig{}
 
@@ -71,7 +71,7 @@ func LoadEnvironmentConfig() (*EnvironmentConfig, error) {
 	return cfg, nil
 }
 
-// LoadEnvironmentConfigWithPrefix loads configuration with custom prefix
+// LoadEnvironmentConfigWithPrefix loads configuration with custom prefix.
 func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error) {
 	cfg := &EnvironmentConfig{}
 
@@ -84,7 +84,7 @@ func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error) 
 	return cfg, nil
 }
 
-// GetEnvWithDefault returns environment variable with default value
+// GetEnvWithDefault returns environment variable with default value.
 func GetEnvWithDefault(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
@@ -92,7 +92,7 @@ func GetEnvWithDefault(key, defaultValue string) string {
 	return defaultValue
 }
 
-// GetEnvBool returns boolean environment variable with default
+// GetEnvBool returns boolean environment variable with default.
 func GetEnvBool(key string, defaultValue bool) bool {
 	if value, exists := os.LookupEnv(key); exists {
 		if parsed, err := strconv.ParseBool(value); err == nil {
@@ -102,7 +102,7 @@ func GetEnvBool(key string, defaultValue bool) bool {
 	return defaultValue
 }
 
-// GetEnvInt returns integer environment variable with default
+// GetEnvInt returns integer environment variable with default.
 func GetEnvInt(key string, defaultValue int) int {
 	if value, exists := os.LookupEnv(key); exists {
 		if parsed, err := strconv.Atoi(value); err == nil {
@@ -112,7 +112,7 @@ func GetEnvInt(key string, defaultValue int) int {
 	return defaultValue
 }
 
-// GetEnvDuration returns duration environment variable with default
+// GetEnvDuration returns duration environment variable with default.
 func GetEnvDuration(key string, defaultValue time.Duration) time.Duration {
 	if value, exists := os.LookupEnv(key); exists {
 		if parsed, err := time.ParseDuration(value); err == nil {
@@ -122,7 +122,7 @@ func GetEnvDuration(key string, defaultValue time.Duration) time.Duration {
 	return defaultValue
 }
 
-// ValidateEnvironmentConfig validates the loaded configuration
+// ValidateEnvironmentConfig validates the loaded configuration.
 func (cfg *EnvironmentConfig) ValidateEnvironmentConfig() error {
 	if cfg.MaxConcurrency <= 0 {
 		return ErrInvalidConfig("max_concurrency must be positive")
@@ -147,7 +147,7 @@ func (cfg *EnvironmentConfig) ValidateEnvironmentConfig() error {
 	return nil
 }
 
-// EnvironmentConfigView provides strongly-typed config representation for logging/debugging
+// EnvironmentConfigView provides strongly-typed config representation for logging/debugging.
 type EnvironmentConfigView struct {
 	Debug               bool          `json:"debug"`
 	Environment         string        `json:"environment"`
@@ -168,7 +168,7 @@ type EnvironmentConfigView struct {
 	StateDirectory      string        `json:"state_directory"`
 }
 
-// ToView converts config to strongly-typed view for logging/debugging
+// ToView converts config to strongly-typed view for logging/debugging.
 func (cfg *EnvironmentConfig) ToView() EnvironmentConfigView {
 	return EnvironmentConfigView{
 		Debug:               cfg.Debug,
@@ -191,7 +191,7 @@ func (cfg *EnvironmentConfig) ToView() EnvironmentConfigView {
 	}
 }
 
-// ToMap converts config to map for legacy compatibility (deprecated)
+// ToMap converts config to map for legacy compatibility (deprecated).
 func (cfg *EnvironmentConfig) ToMap() map[string]any {
 	view := cfg.ToView()
 	return map[string]any{

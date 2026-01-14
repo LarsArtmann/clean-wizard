@@ -206,7 +206,7 @@ func ToCleanResultFromItems(itemsRemoved int, bytesResult result.Result[int64], 
 	return result.Ok(cleanResult)
 }
 
-// ToTimedCleanResult creates a timed CleanResult from bytes and duration
+// ToTimedCleanResult creates a timed CleanResult from bytes and duration.
 func ToTimedCleanResult(bytesResult result.Result[int64], strategy domain.CleanStrategy, cleanTime time.Duration) result.Result[domain.CleanResult] {
 	if bytesResult.IsErr() {
 		return result.Err[domain.CleanResult](bytesResult.Error())
@@ -217,14 +217,14 @@ func ToTimedCleanResult(bytesResult result.Result[int64], strategy domain.CleanS
 	return result.Ok(cleanResult)
 }
 
-// ToScanResult converts primitive scanning results to domain.ScanResult
+// ToScanResult converts primitive scanning results to domain.ScanResult.
 func ToScanResult(totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration) domain.ScanResult {
 	return NewScanResult(totalBytes, totalItems, scannedPaths, scanDuration)
 }
 
 // UTILITY FUNCTIONS - Helper transformations
 
-// CombineCleanResults combines multiple CleanResults into one
+// CombineCleanResults combines multiple CleanResults into one.
 func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	if len(results) == 0 {
 		return NewCleanResult(domain.StrategyConservative, 0, 0)
@@ -261,7 +261,7 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	return NewCleanResultWithFailures(combinedStrategy, totalItems, totalFailed, int64(totalBytes), maxTime)
 }
 
-// ExtractBytesFromCleanResult extracts int64 from domain.CleanResult (for adapter compatibility)
+// ExtractBytesFromCleanResult extracts int64 from domain.CleanResult (for adapter compatibility).
 func ExtractBytesFromCleanResult(cleanResult result.Result[domain.CleanResult]) result.Result[int64] {
 	if cleanResult.IsErr() {
 		return result.Err[int64](cleanResult.Error())
@@ -271,24 +271,24 @@ func ExtractBytesFromCleanResult(cleanResult result.Result[domain.CleanResult]) 
 	return result.Ok[int64](int64(cleanValue.FreedBytes))
 }
 
-// ToCleanResultFromError converts error to Result[domain.CleanResult]
+// ToCleanResultFromError converts error to Result[domain.CleanResult].
 func ToCleanResultFromError(err error) result.Result[domain.CleanResult] {
 	return result.Err[domain.CleanResult](err)
 }
 
-// ToScanResultFromError converts error to Result[domain.ScanResult]
+// ToScanResultFromError converts error to Result[domain.ScanResult].
 func ToScanResultFromError(err error) result.Result[domain.ScanResult] {
 	return result.Err[domain.ScanResult](err)
 }
 
 // VALIDATION HELPERS
 
-// ValidateAndConvertCleanResult ensures CleanResult is valid before returning
+// ValidateAndConvertCleanResult ensures CleanResult is valid before returning.
 func ValidateAndConvertCleanResult(cleanResult domain.CleanResult) result.Result[domain.CleanResult] {
 	return validation.ValidateAndWrap(cleanResult, "CleanResult")
 }
 
-// ValidateAndConvertScanResult ensures ScanResult is valid before returning
+// ValidateAndConvertScanResult ensures ScanResult is valid before returning.
 func ValidateAndConvertScanResult(scanResult domain.ScanResult) result.Result[domain.ScanResult] {
 	return validation.ValidateAndWrap(scanResult, "ScanResult")
 }
