@@ -171,7 +171,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 					{
 						Description: "a configuration with Nix generations below minimum",
 						Setup: func() (*domain.Config, error) {
-							return withGenerations(newBaseNixConfig(true), 0), nil
+							return withGenerations(newBaseNixConfig(true), -1), nil
 						},
 					},
 				},
