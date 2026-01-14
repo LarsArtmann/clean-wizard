@@ -6,6 +6,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
+
 // ExecutionMode represents execution behavior as a type-safe enum.
 type ExecutionMode int
 
@@ -57,7 +58,7 @@ func (em ExecutionMode) IsForce() bool {
 }
 
 // MarshalYAML implements yaml.Marshaler interface for ExecutionMode.
-func (em ExecutionMode) MarshalYAML() (interface{}, error) {
+func (em ExecutionMode) MarshalYAML() (any, error) {
 	return int(em), nil
 }
 
@@ -150,7 +151,7 @@ func (sm SafeMode) IsStrict() bool {
 }
 
 // MarshalYAML implements yaml.Marshaler interface for SafeMode.
-func (sm SafeMode) MarshalYAML() (interface{}, error) {
+func (sm SafeMode) MarshalYAML() (any, error) {
 	return int(sm), nil
 }
 
@@ -233,7 +234,7 @@ func (ps ProfileStatus) IsEnabled() bool {
 }
 
 // MarshalYAML implements yaml.Marshaler interface for ProfileStatus.
-func (ps ProfileStatus) MarshalYAML() (interface{}, error) {
+func (ps ProfileStatus) MarshalYAML() (any, error) {
 	return int(ps), nil
 }
 
@@ -312,7 +313,7 @@ func (om OptimizationMode) IsEnabled() bool {
 }
 
 // MarshalYAML implements yaml.Marshaler interface for OptimizationMode.
-func (om OptimizationMode) MarshalYAML() (interface{}, error) {
+func (om OptimizationMode) MarshalYAML() (any, error) {
 	return int(om), nil
 }
 
@@ -391,7 +392,7 @@ func (hm HomebrewMode) IsUnusedOnly() bool {
 }
 
 // MarshalYAML implements yaml.Marshaler interface for HomebrewMode.
-func (hm HomebrewMode) MarshalYAML() (interface{}, error) {
+func (hm HomebrewMode) MarshalYAML() (any, error) {
 	return int(hm), nil
 }
 

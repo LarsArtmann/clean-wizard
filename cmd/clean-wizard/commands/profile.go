@@ -427,7 +427,7 @@ func runProfileDelete(cmd *cobra.Command, args []string) error {
 }
 
 // runProfileEdit edits a profile.
-func runProfileEdit(cmd *cobra.Command, args []string, description string, enabled bool, enabledProvided bool) error {
+func runProfileEdit(cmd *cobra.Command, args []string, description string, enabled, enabledProvided bool) error {
 	profileName := args[0]
 
 	cfg, err := config.Load()
