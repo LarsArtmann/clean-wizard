@@ -60,7 +60,8 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 	}
 
 	// Real system call for production mode
-	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
+	// Use nix-env without --profile to let it use the default user profile
+	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations")
 	output, err := cmd.Output()
 	if err != nil {
 		return result.Err[[]domain.NixGeneration](fmt.Errorf("failed to list generations: %w", err))
@@ -190,51 +191,49 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 }
 
 // ParseGeneration parses generation line from nix-env output.
+// Expected format when using --list-generations (without --profile):
+//   "32   2026-01-12 08:03:14"
+//   "33   2026-01-15 21:14:05   (current)"
 func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) {
 	fields := strings.Fields(line)
-	if len(fields) < 1 {
+	if len(fields) < 3 {
 		return domain.NixGeneration{}, fmt.Errorf("invalid generation line: %s", line)
 	}
 
-	pathParts := strings.Split(fields[0], "-")
-	if len(pathParts) < 2 {
-		return domain.NixGeneration{}, fmt.Errorf("invalid generation path: %s", fields[0])
-	}
-
-	id, err := strconv.Atoi(pathParts[len(pathParts)-1])
+	// Parse generation ID from first field
+	id, err := strconv.Atoi(fields[0])
 	if err != nil {
-		return domain.NixGeneration{}, fmt.Errorf("invalid generation ID: %s", pathParts[len(pathParts)-1])
+		return domain.NixGeneration{}, fmt.Errorf("invalid generation ID: %s", fields[0])
 	}
 
-	// Simple date parsing
-	date := time.Now()
-	if len(fields) > 1 && strings.Contains(fields[1], "-") {
-		parts := strings.Split(fields[1], "-")
-		if len(parts) == 3 {
-			if parsed, err := time.Parse("2006-01-02", strings.Join(parts, "-")); err == nil {
-				date = parsed
-			}
-		}
+	// Parse date and time from second and third fields
+	dateTimeStr := fmt.Sprintf("%s %s", fields[1], fields[2])
+	date, err := time.Parse("2006-01-02 15:04:05", dateTimeStr)
+	if err != nil {
+		return domain.NixGeneration{}, fmt.Errorf("invalid date/time: %s %s", fields[1], fields[2])
 	}
+
+	// Build a reasonable path based on the generation ID
+	path := fmt.Sprintf("/nix/var/nix/profiles/per-user/profile-%d-link", id)
+
+	// Check if this is the current generation
+	isCurrent := strings.Contains(line, "current")
 
 	return domain.NixGeneration{
 		ID:      id,
-		Path:    fields[0],
+		Path:    path,
 		Date:    date,
-		Current: boolToGenerationStatus(strings.Contains(line, "current")),
+		Current: boolToGenerationStatus(isCurrent),
 	}, nil
 }
 
 // IsAvailable checks if Nix is available and accessible.
 func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
-	// First check if nix command exists
+	// Check if nix command exists
 	versionCmd := exec.CommandContext(ctx, "nix", "--version")
 	if err := versionCmd.Run(); err != nil {
 		return false
 	}
 
-	// Then check if we can access profiles (the actual operation we need)
-	listCmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
-	err := listCmd.Run()
-	return err == nil
+	return true
 }
