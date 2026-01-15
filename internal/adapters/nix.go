@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -213,8 +214,15 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 		return domain.NixGeneration{}, fmt.Errorf("invalid date/time: %s %s", fields[1], fields[2])
 	}
 
-	// Build a reasonable path based on the generation ID
-	path := fmt.Sprintf("/nix/var/nix/profiles/per-user/profile-%d-link", id)
+	// Build the profile path using the standard Nix profile directory
+	// On macOS with Nix installed via single-user or multi-user:
+	// User profiles are typically in ~/.local/state/nix/profiles/ (Darwin)
+	// or ~/.nix-profile/ (Linux fallback)
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return domain.NixGeneration{}, fmt.Errorf("failed to get home directory: %w", err)
+	}
+	path := fmt.Sprintf("%s/.local/state/nix/profiles/profile-%d-link", homeDir, id)
 
 	// Check if this is the current generation
 	isCurrent := strings.Contains(line, "current")

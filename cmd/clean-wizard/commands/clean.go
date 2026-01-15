@@ -15,24 +15,33 @@ import (
 
 // NewCleanCommand creates a simplified clean command with TUI.
 func NewCleanCommand() *cobra.Command {
+	var dryRun bool
+
 	cmd := &cobra.Command{
 		Use:   "clean",
 		Short: "Clean old Nix generations",
 		Long:  `Interactively select and clean old Nix generations.`,
-		RunE:  runCleanCommand,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runCleanCommand(cmd, args, dryRun)
+		},
 	}
+
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Simulate deletion without actually removing generations")
 
 	return cmd
 }
 
 // runCleanCommand executes the clean command with TUI.
-func runCleanCommand(cmd *cobra.Command, args []string) error {
+func runCleanCommand(cmd *cobra.Command, args []string, dryRun bool) error {
 	ctx := context.Background()
 
 	fmt.Println("🔍 Scanning for Nix generations...")
 
 	// List all generations using adapter
 	nixAdapter := adapters.NewNixAdapter(0, 0)
+	if dryRun {
+		nixAdapter.SetDryRun(true)
+	}
 	result := nixAdapter.ListGenerations(ctx)
 
 	if result.IsErr() {
