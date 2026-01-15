@@ -88,6 +88,18 @@ Interactively scan and clean old Nix generations.
 
 **No configuration needed. No profiles. No setup.** Just run it.
 
+**Flags:**
+- `--dry-run` - Simulate deletion without actually removing generations
+
+**Examples:**
+```bash
+# Normal mode - actually delete selected generations
+clean-wizard clean
+
+# Dry-run mode - test without making changes
+clean-wizard clean --dry-run
+```
+
 ## 🔒 Safety Features
 
 ### Protected Generations
