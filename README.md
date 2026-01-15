@@ -1,5 +1,5 @@
 > 🚨 **PROJECT ORIGIN**
->
+
 > This project originated from: [Setup-Mac](https://github.com/LarsArtmann/Setup-Mac)
 >
 > **GitHub Issue:** [Setup-Mac #111](https://github.com/LarsArtmann/Setup-Mac/issues/111)
@@ -8,21 +8,18 @@
 
 [![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Inspired by](https://img.shields.io/badge/inspired%20by-GoReleaser%20Wizard-purple.svg)](https://github.com/LarsArtmann/GoReleaser-Wizard)
 
-**The interactive system cleaning wizard that replaces all your cleanup commands with a unified, intelligent solution.**
+**A simple TUI tool to clean old Nix generations.**
 
-Stop running multiple `just clean*` commands. Stop guessing what to clean. Get a comprehensive cleaning solution with one command.
+Just run `clean-wizard clean` to scan and interactively select which generations to delete.
 
 ## ✨ Features
 
-- 🎯 **Interactive wizard** - Guides you through every cleaning option
-- 🧠 **Smart scanning** - Automatically detects cleanable items and sizes
-- 🚀 **Multiple profiles** - Daily, comprehensive, and aggressive cleaning modes
-- 🔒 **Safety built-in** - Protected paths, dry runs, and backup creation
-- 📊 **Real-time feedback** - Progress visualization and size estimates
-- 🎨 **Beautiful TUI** - Powered by Charm Bracelet for a modern terminal experience
-- ⚡ **Fast & efficient** - Optimized cleaning operations for macOS/Linux
+- 🎯 **Interactive TUI** - Select which generations to delete with a beautiful interface
+- 🧠 **Smart scanning** - Automatically detects and lists all Nix generations
+- 📊 **Size estimates** - Shows estimated space each generation occupies
+- 🎨 **Beautiful UI** - Powered by Charm Bracelet's Huh library
+- ⚡ **Fast & efficient** - Clean exactly what you want, nothing more
 
 ## 🎬 Quick Start
 
@@ -41,201 +38,74 @@ go build -o clean-wizard ./cmd/clean-wizard/
 ### Basic Usage
 
 ```bash
-# Initialize configuration
-clean-wizard init
-
-# Scan for cleanable items
-clean-wizard scan
-
-# Perform cleanup
 clean-wizard clean
 ```
+
+That's it. The tool will:
+1. Scan for all Nix generations
+2. Show you which ones can be cleaned (old generations)
+3. Let you interactively select which ones to delete
+4. Confirm before making changes
+5. Clean them and show results
 
 ## 📸 Demo
 
 ```bash
-$ clean-wizard init
-🧹 Clean Wizard Setup
-======================
-Let's create the perfect cleaning configuration for your system!
+$ clean-wizard clean
+🔍 Scanning for Nix generations...
+✓ Current generation: 300 (from 1 day ago)
+✓ Found 4 old generations
 
-? Enable safe mode? › Yes
-? Enable dry run by default? › Yes
-? Enable automatic backups? › Yes
-? Maximum disk usage percentage? › 90
+# TUI interface appears - select which generations to clean
 
-✅ Configuration created successfully at ~/.clean-wizard.yaml
-```
+# After selection:
 
-```bash
-$ clean-wizard scan
-🔍 Analyzing system state...
-✅ Configuration applied: safe_mode=ENABLED, profiles=2
-🏷️  Using profile: daily (Quick daily cleanup for routine maintenance)
+🗑️  Cleaning 2 generation(s)...
 
-📊 Scan Results:
-   • Total generations: 5
-   • Current generation: 1
-   • Cleanable generations: 4
-   • Store size: 250.0 MB
+Will delete:
+  • Generation 299 (from 2 days ago) ~ 50 MB
+  • Generation 298 (from 3 days ago) ~ 50 MB
 
-💡 You can clean up 4 old generations to free space
+Total space to free: 100 MB
 
-✅ Scan completed!
+# Confirm dialog appears
+
+🧹 Cleaning...
+  ✓ Removed generation 299
+  ✓ Removed generation 298
+  🔄 Running garbage collection...
+
+✅ Cleanup completed in 2.3s
+   • Removed 2 generation(s)
+   • Freed approximately 100 MB
 ```
 
 ## 🛠️ Commands
 
-### `clean-wizard init`
-
-Interactive setup wizard that creates a comprehensive cleaning configuration.
-
-**Options:**
-
-- `--force, -f` - Overwrite existing configuration
-- `--minimal` - Create minimal configuration
-
-### `clean-wizard scan`
-
-Scans your system for cleanable items and shows size estimates.
-
-**Options:**
-
-- `--verbose, -v` - Show detailed scan information
-- `--profile, -p` - Filter results by profile
-
 ### `clean-wizard clean`
 
-Performs system cleanup based on configuration or profile.
+Interactively scan and clean old Nix generations.
 
-**Options:**
-
-- `--profile, -p` - Cleaning profile to use (daily, comprehensive, aggressive)
-- `--dry-run` - Show what would be cleaned without doing it
-- `--force, -f` - Skip confirmation prompts
-- `--verbose, -v` - Show detailed output
-
-### `clean-wizard config`
-
-Manage configuration files.
-
-**Subcommands:**
-
-- `show` - Display current configuration
-- `edit` - Edit configuration in default editor
-- `validate` - Validate configuration file
-- `reset` - Reset to defaults
-
-### `clean-wizard profile`
-
-Manage cleaning profiles.
-
-**Subcommands:**
-
-- `list` - List available profiles
-- `show [profile]` - Show profile details
-- `create` - Create new profile
-- `delete [profile]` - Delete profile
-
-## 🎯 Cleaning Profiles
-
-### Daily Profile
-
-Quick daily cleanup for routine maintenance.
-
-**Operations:**
-
-- Clean old Nix generations
-- Homebrew autoremove and recent prune
-- Go package caches
-
-### Comprehensive Profile
-
-Complete system cleanup for weekly maintenance.
-
-**Operations:**
-
-- Nix store optimization
-- Full Homebrew cleanup
-- All package caches (npm, pnpm, cargo, etc.)
-- System temporary files
-- Docker system prune
-
-### Aggressive Profile
-
-Nuclear option - everything that can be cleaned.
-
-**Operations:**
-
-- Remove all Nix generations
-- Clean all language versions (Node, Python, Ruby)
-- Remove all cache directories
-- System logs and temp files
-- Docker volumes and images
-- iOS simulator data
+**No configuration needed. No profiles. No setup.** Just run it.
 
 ## 🔒 Safety Features
 
-### Protected Paths
+### Protected Generations
 
-The following paths are never cleaned by default:
+- The current (active) generation is never shown for deletion
+- Confirmation dialog before any deletions
+- Clear display of what will be deleted
 
-- `/nix/store` - Nix store
-- `/Users` - User directories
-- `/System` - System files
-- `/Applications` - Applications
-- `/Library` - Library files
+### What It Cleans
 
-### Safe Mode
-
-- Prevents dangerous operations
-- Shows warnings before risky actions
-- Can be disabled with `--force` flag
-
-### Dry Run Mode
-
-- Shows what would be cleaned
-- No actual changes made
-- Perfect for testing configurations
-
-### Backup Creation
-
-- Creates backups before aggressive operations
-- Configurable backup location
-- Can be disabled if not needed
+- **Nix generations** - Old, historical Nix generations (current one is always protected)
 
 ## 🏗️ Architecture
 
-Clean Wizard is built with inspiration from GoReleaser-Wizard and uses:
-
+Clean Wizard is built with:
 - **Cobra** - CLI framework
-- **Viper** - Configuration management
-- **Charm Bracelet** - Beautiful TUI components
-- **Huh** - Interactive forms and selections
-- **Bubbletea** - Terminal user interface
-
-## 📦 What It Cleans
-
-### Package Managers
-
-- **Nix** - Store optimization, generation cleanup
-- **Homebrew** - Autoremove, cache cleanup
-- **npm/pnpm** - Package cache cleanup
-- **Go** - Module cache cleanup
-- **Cargo** - Rust package cache cleanup
-
-### System Files
-
-- **Temporary files** - System temp directories
-- **Spotlight metadata** - Search index cleanup
-- **System logs** - Log file cleanup
-- **Docker** - System prune, volume cleanup
-
-### Development Tools
-
-- **iOS Simulators** - Derived data, simulator cleanup
-- **Language versions** - Node, Python, Ruby versions
-- **Build caches** - Gradle, Maven, etc.
+- **Huh** (by Charm Bracelet) - Beautiful TUI forms and selections
+- **BubbleTea** (by Charm Bracelet) - Terminal user interface framework
 
 ## 🧪 Testing
 
@@ -246,93 +116,16 @@ go test ./...
 # Build and test CLI
 go build -o clean-wizard ./cmd/clean-wizard/
 ./clean-wizard --help
-./clean-wizard init
-./clean-wizard scan
-./clean-wizard clean --dry-run
+./clean-wizard clean --help
 ```
-
-## 📚 Examples
-
-### Basic Daily Cleanup
-
-```bash
-clean-wizard clean --profile daily
-```
-
-### Comprehensive Cleanup with Dry Run
-
-```bash
-clean-wizard clean --profile comprehensive --dry-run
-```
-
-### Aggressive Cleanup (Force)
-
-```bash
-clean-wizard clean --profile aggressive --force
-```
-
-### Create Custom Profile
-
-```bash
-clean-wizard profile create
-```
-
-## 🔧 Configuration
-
-The configuration file is located at `~/.clean-wizard.yaml`:
-
-```yaml
-defaults:
-  safe_mode: true
-  dry_run: true
-  confirm_before_cleanup: true
-  backup_enabled: true
-  max_disk_usage_percent: 90
-
-safety:
-  protected_paths:
-    - /nix/store
-    - /Users
-    - /System
-    - /Applications
-    - /Library
-
-profiles:
-  daily:
-    description: "Quick daily cleanup"
-    operations:
-      - nix: { generations: 1, optimize: false }
-      - homebrew: { autoremove: true, prune: "recent" }
-      - caches: { go: true, npm: false }
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [GoReleaser-Wizard](https://github.com/LarsArtmann/GoReleaser-Wizard) - Inspiration for the wizard interface
-- [Charm Bracelet](https://charm.sh) - Beautiful terminal UI components
-- [Cobra](https://github.com/spf13/cobra) - CLI framework
-- [Viper](https://github.com/spf13/viper) - Configuration management
 
 ## 🔗 Links
 
 - [GitHub Repository](https://github.com/LarsArtmann/clean-wizard)
 - [Report Issues](https://github.com/LarsArtmann/clean-wizard/issues)
-- [GoReleaser-Wizard](https://github.com/LarsArtmann/GoReleaser-Wizard)
+- [Huh Library](https://github.com/charmbracelet/huh)
+- [Charm Bracelet](https://charm.sh)
 
 ---
 
-**Made with ❤️ to simplify system cleanup**
+**Made with ❤️ to simplify Nix cleanup**

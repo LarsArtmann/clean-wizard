@@ -2,268 +2,203 @@ package commands
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"os"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/config"
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
-	"github.com/LarsArtmann/clean-wizard/internal/middleware"
-	sharedConfig "github.com/LarsArtmann/clean-wizard/internal/shared/utils/config"
-	"github.com/sirupsen/logrus"
+	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 )
 
-var (
-	cleanDryRun  bool
-	cleanVerbose bool
-	cleanJSON    bool
-)
-
-// NewCleanCommand creates clean command with proper domain types.
+// NewCleanCommand creates a simplified clean command with TUI.
 func NewCleanCommand() *cobra.Command {
-	var configFile string
-	var profileName string
-
-	cleanCmd := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "clean",
-		Short: "Perform system cleanup",
-		Long:  `Safely clean old files, package caches, and temporary data from your system.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// Parse JSON flag early
-			cleanJSON, _ = cmd.Flags().GetBool("json")
-
-			if !cleanJSON {
-				fmt.Println("🧹 Starting system cleanup...")
-			}
-			ctx := context.Background()
-
-			// Parse validation level from flag
-			validationLevelStr, _ := cmd.Flags().GetString("validation-level")
-			validationLevel := ParseValidationLevel(validationLevelStr)
-
-			// Parse profile name from flag
-			profileName, _ = cmd.Flags().GetString("profile")
-
-			// Load and validate configuration if provided
-			var loadedCfg *domain.Config
-			if configFile != "" {
-				if !cleanJSON {
-					fmt.Printf("📄 Loading configuration from %s...\n", configFile)
-				}
-
-				// Set config file path using environment variable
-				os.Setenv("CONFIG_PATH", configFile)
-
-				var err error
-				loadedCfg, err = config.LoadWithContext(ctx)
-				if err != nil {
-					return fmt.Errorf("failed to load configuration: %w", err)
-				}
-
-				// Apply validation based on level
-				if validationLevel > config.ValidationLevelNone {
-					if !cleanJSON {
-						fmt.Printf("🔍 Applying validation level: %s\n", validationLevel.String())
-					}
-
-					if validationLevel >= config.ValidationLevelBasic {
-						// Basic validation
-						if len(loadedCfg.Protected) == 0 {
-							return errors.New("basic validation failed: protected paths cannot be empty")
-						}
-					}
-
-					if validationLevel >= config.ValidationLevelComprehensive {
-						// Comprehensive validation
-						if err := loadedCfg.Validate(); err != nil {
-							return fmt.Errorf("comprehensive validation failed: %w", err)
-						}
-					}
-
-					if validationLevel >= config.ValidationLevelStrict {
-						// Strict validation
-						if !loadedCfg.SafeMode.IsEnabled() {
-							return errors.New("strict validation failed: safe_mode must be enabled")
-						}
-					}
-				}
-
-				if !cleanJSON {
-					sharedConfig.PrintConfigSuccess(loadedCfg)
-				}
-			} else {
-				// Load default configuration to get profile information
-				logger := logrus.New()
-				logger.SetOutput(os.Stderr)
-				logger.SetFormatter(&logrus.TextFormatter{ForceColors: true})
-
-				var err error
-				loadedCfg, err = sharedConfig.LoadConfigOrContinue(ctx, logger)
-				if err != nil {
-					// This shouldn't happen with LoadConfigOrContinue
-					fmt.Printf("⚠️  Unexpected error loading configuration: %v\n", err)
-				} else if loadedCfg == nil {
-					// Continue without profile support
-				}
-			}
-
-			// Apply profile if specified
-			var usedProfile *domain.Profile
-			if loadedCfg != nil && profileName != "" {
-				profile, exists := loadedCfg.Profiles[profileName]
-				if !exists {
-					return fmt.Errorf("profile '%s' not found in configuration", profileName)
-				}
-
-				if !profile.Enabled.IsEnabled() {
-					return fmt.Errorf("profile '%s' is disabled", profileName)
-				}
-
-				fmt.Printf("🏷️  Using profile: %s (%s)\n", profileName, profile.Description)
-				usedProfile = profile
-			} else if loadedCfg != nil && loadedCfg.CurrentProfile != "" {
-				// Use current profile from config
-				profile := loadedCfg.Profiles[loadedCfg.CurrentProfile]
-				if profile != nil && profile.Enabled.IsEnabled() {
-					fmt.Printf("🏷️  Using current profile: %s (%s)\n", loadedCfg.CurrentProfile, profile.Description)
-					usedProfile = profile
-				}
-			} else if loadedCfg != nil {
-				// Default to daily profile if available
-				if dailyProfile, exists := loadedCfg.Profiles["daily"]; exists && dailyProfile.Enabled.IsEnabled() {
-					fmt.Printf("📋 Using daily profile configuration\n")
-					usedProfile = dailyProfile
-				}
-			}
-
-			// Extract settings from profile if available
-			var settings *domain.OperationSettings
-			if usedProfile != nil {
-				for _, op := range usedProfile.Operations {
-					if op.Name == "nix-generations" && op.Enabled.IsEnabled() {
-						fmt.Printf("🔧 Configuring Nix generations cleanup\n")
-						fmt.Printf("🔍 Operation Settings: %+v\n", op.Settings)
-						if op.Settings != nil {
-							settings = op.Settings
-							fmt.Printf("✅ Using operation settings: %+v\n", settings)
-						} else {
-							settings = domain.DefaultSettings(domain.OperationTypeNixGenerations)
-							fmt.Printf("❌ Using default settings: %+v\n", settings)
-						}
-						break
-					}
-				}
-			}
-
-			// Determine dry-run mode: CLI flag takes precedence over config
-			actualDryRun := false
-			if cleanDryRun {
-				actualDryRun = true
-				fmt.Println("🔍 Running in DRY-RUN mode (from flag) - no files will be deleted")
-			} else if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.DryRun.IsDryRun() {
-				actualDryRun = true
-				fmt.Println("🔍 Running in DRY-RUN mode (from config) - no files will be deleted")
-			}
-
-			nixCleaner := cleaner.NewNixCleaner(cleanVerbose, actualDryRun)
-
-			validator := middleware.NewValidationMiddleware()
-			validatedSettings := validator.ValidateCleanerSettings(ctx, nixCleaner, settings)
-			if validatedSettings.IsErr() {
-				return fmt.Errorf("cleaner validation failed: %w", validatedSettings.Error())
-			}
-
-			startTime := time.Now()
-
-			// Clean old generations (keep last 3)
-			result := nixCleaner.CleanOldGenerations(ctx, 3)
-
-			if result.IsErr() {
-				_, err := result.Unwrap()
-				return handleCleanError(err, actualDryRun)
-			}
-
-			duration := time.Since(startTime)
-			displayCleanResults(result.Value(), cleanVerbose, duration, actualDryRun, cleanJSON)
-			return nil
-		},
+		Short: "Clean old Nix generations",
+		Long:  `Interactively select and clean old Nix generations.`,
+		RunE:  runCleanCommand,
 	}
 
-	// Clean command flags
-	cleanCmd.Flags().BoolVar(&cleanDryRun, "dry-run", false, "Show what would be cleaned without doing it")
-	cleanCmd.Flags().BoolVar(&cleanVerbose, "verbose", false, "Show detailed output")
-	cleanCmd.Flags().StringVarP(&configFile, "config", "c", "", "Configuration file path")
-	cleanCmd.Flags().BoolVar(&cleanJSON, "json", false, "Output results in JSON format")
-
-	return cleanCmd
+	return cmd
 }
 
-// handleCleanError provides user-friendly error messages.
-func handleCleanError(err error, isDryRun bool) error {
-	if isDryRun {
-		fmt.Printf("🔍 Dry run encountered issues: %s\n", err)
+// runCleanCommand executes the clean command with TUI.
+func runCleanCommand(cmd *cobra.Command, args []string) error {
+	ctx := context.Background()
+
+	fmt.Println("🔍 Scanning for Nix generations...")
+
+	// List all generations using adapter
+	nixAdapter := adapters.NewNixAdapter(0, 0)
+	result := nixAdapter.ListGenerations(ctx)
+
+	if result.IsErr() {
+		return fmt.Errorf("failed to list generations: %w", result.Error())
+	}
+
+	generations := result.Value()
+
+	if len(generations) == 0 {
+		fmt.Println("✅ No generations found to clean.")
 		return nil
 	}
 
-	return fmt.Errorf("cleanup failed: %w", err)
+	// Separate current and historical generations
+	var currentGen domain.NixGeneration
+	var historicalGens []domain.NixGeneration
+	for _, gen := range generations {
+		if gen.Current.IsCurrent() {
+			currentGen = gen
+		} else {
+			historicalGens = append(historicalGens, gen)
+		}
+	}
+
+	if len(historicalGens) == 0 {
+		fmt.Println("✅ No old generations to clean.")
+		return nil
+	}
+
+	// Show current generation info
+	fmt.Printf("✓ Current generation: %d (from %s)\n", currentGen.ID, formatRelativeTime(currentGen.Date))
+	fmt.Printf("✓ Found %d old generations\n\n", len(historicalGens))
+
+	// Create variable to store selected IDs
+	var selectedIDs []int
+
+	// Build Huh form with multi-select
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewMultiSelect[int]().
+				Title("Select generations to clean").
+				Description("Choose which old generations to delete (Space to select, Enter to confirm)").
+				Options(
+					func() []huh.Option[int] {
+						opts := make([]huh.Option[int], len(historicalGens))
+						for i, gen := range historicalGens {
+							sizeEstimate := format.Bytes(gen.EstimateSize())
+							desc := fmt.Sprintf("%s ago • ~%s", formatRelativeTime(gen.Date), sizeEstimate)
+							opts[i] = huh.NewOption(desc, gen.ID)
+						}
+						return opts
+					}()...,
+				).
+				Value(&selectedIDs),
+		),
+	)
+
+	// Run the TUI form
+	if err := form.Run(); err != nil {
+		return fmt.Errorf("form error: %w", err)
+	}
+
+	// If user cancelled or selected nothing
+	if len(selectedIDs) == 0 {
+		fmt.Println("❌ No generations selected. Nothing to clean.")
+		return nil
+	}
+
+	fmt.Printf("\n🗑️  Cleaning %d generation(s)...\n", len(selectedIDs))
+
+	// Filter selected generations
+	var toClean []domain.NixGeneration
+	for _, gen := range historicalGens {
+		for _, id := range selectedIDs {
+			if gen.ID == id {
+				toClean = append(toClean, gen)
+				break
+			}
+		}
+	}
+
+	// Show what will be deleted
+	fmt.Println("\nWill delete:")
+	totalBytes := int64(0)
+	for _, gen := range toClean {
+		size := gen.EstimateSize()
+		totalBytes += size
+		fmt.Printf("  • Generation %d (from %s) ~ %s\n", gen.ID, formatRelativeTime(gen.Date), format.Bytes(size))
+	}
+
+	fmt.Printf("\nTotal space to free: %s\n", format.Bytes(totalBytes))
+
+	// Confirm deletion
+	var confirm bool
+	confirmForm := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title("Proceed with deletion?").
+				Affirmative("Yes, delete them").
+				Negative("No, cancel").
+				Value(&confirm),
+		),
+	)
+
+	if err := confirmForm.Run(); err != nil {
+		return fmt.Errorf("confirmation error: %w", err)
+	}
+
+	if !confirm {
+		fmt.Println("❌ Cancelled. No changes made.")
+		return nil
+	}
+
+	// Perform the cleanup
+	fmt.Println("\n🧹 Cleaning...")
+
+	startTime := time.Now()
+
+	// Remove selected generations
+	itemsRemoved := 0
+	for _, gen := range toClean {
+		result := nixAdapter.RemoveGeneration(ctx, gen.ID)
+		if result.IsErr() {
+			fmt.Printf("  ⚠️  Failed to remove generation %d: %v\n", gen.ID, result.Error())
+		} else {
+			fmt.Printf("  ✓ Removed generation %d\n", gen.ID)
+			itemsRemoved++
+		}
+	}
+
+	// Run garbage collection
+	fmt.Println("  🔄 Running garbage collection...")
+	nixAdapter.CollectGarbage(ctx)
+
+	duration := time.Since(startTime)
+
+	fmt.Printf("\n✅ Cleanup completed in %s\n", duration.String())
+	fmt.Printf("   • Removed %d generation(s)\n", itemsRemoved)
+	fmt.Printf("   • Freed approximately %s\n", format.Bytes(totalBytes))
+
+	return nil
 }
 
-// displayCleanResults shows cleanup results to user.
-func displayCleanResults(result domain.CleanResult, verbose bool, duration time.Duration, isDryRun, isJSON bool) {
-	if isJSON {
-		jsonOutput := map[string]any{
-			"status":            "success",
-			"items_removed":     result.ItemsRemoved,
-			"items_failed":      result.ItemsFailed,
-			"freed_bytes":       result.FreedBytes,
-			"freed_bytes_human": format.Bytes(int64(result.FreedBytes)),
-			"duration_ms":       duration.Milliseconds(),
-			"strategy":          result.Strategy,
-			"dry_run":           isDryRun,
-			"cleaned_at":        result.CleanedAt,
-		}
-		jsonData, _ := json.MarshalIndent(jsonOutput, "", "  ")
-		fmt.Println(string(jsonData))
-		return
+// formatRelativeTime formats a time as a relative string (e.g., "2 days ago").
+func formatRelativeTime(t time.Time) string {
+	dur := time.Since(t)
+	hours := int(dur.Hours())
+	days := hours / 24
+
+	switch {
+	case days > 30:
+		months := days / 30
+		return fmt.Sprintf("%d month%s ago", months, pluralize(months))
+	case days > 0:
+		return fmt.Sprintf("%d day%s ago", days, pluralize(days))
+	case hours > 0:
+		return fmt.Sprintf("%d hour%s ago", hours, pluralize(hours))
+	default:
+		minutes := int(dur.Minutes())
+		return fmt.Sprintf("%d minute%s ago", minutes, pluralize(minutes))
 	}
+}
 
-	status := "SUCCESS"
-	if !result.IsValid() {
-		status = "FAILED"
+// pluralize returns "s" if n != 1, otherwise "".
+func pluralize(n int) string {
+	if n != 1 {
+		return "s"
 	}
-
-	action := "cleaned"
-	if isDryRun {
-		action = "would be cleaned"
-	}
-
-	fmt.Printf("\n🎯 Cleanup Results (%s):\n", status)
-	fmt.Printf("   • Duration: %s\n", duration.String())
-
-	if result.IsValid() {
-		fmt.Printf("   • Status: %d items %s\n", result.ItemsRemoved, action)
-		if result.FreedBytes > 0 {
-			fmt.Printf("   • Space freed: %s\n", format.Bytes(int64(result.FreedBytes)))
-		}
-
-		if verbose {
-			fmt.Printf("\n📋 Details:\n")
-			fmt.Printf("   - Strategy: %s\n", result.Strategy)
-			fmt.Printf("   - Items failed: %d\n", result.ItemsFailed)
-		}
-	}
-
-	if isDryRun {
-		fmt.Printf("\n💡 This was a dry run - no files were actually deleted\n")
-		fmt.Printf("   🏃 Run 'clean-wizard clean' without --dry-run to perform cleanup\n")
-	}
-
-	if result.IsValid() {
-		fmt.Printf("\n✅ Cleanup completed successfully\n")
-	}
+	return ""
 }
