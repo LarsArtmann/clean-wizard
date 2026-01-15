@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
@@ -105,11 +106,8 @@ func runCleanCommand(cmd *cobra.Command, args []string) error {
 	// Filter selected generations
 	var toClean []domain.NixGeneration
 	for _, gen := range historicalGens {
-		for _, id := range selectedIDs {
-			if gen.ID == id {
-				toClean = append(toClean, gen)
-				break
-			}
+		if slices.Contains(selectedIDs, gen.ID) {
+			toClean = append(toClean, gen)
 		}
 	}
 
