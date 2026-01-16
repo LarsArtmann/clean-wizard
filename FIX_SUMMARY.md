@@ -175,3 +175,125 @@ All issues have been resolved:
 7. ✅ End-to-end functionality verified
 
 The tool is now ready for production use!
+
+---
+
+## CRITICAL DRY-RUN BUG FIX (Commit fa080fc)
+
+### Problem Discovered
+
+During thorough testing, a **CRITICAL BUG** was discovered in the dry-run implementation:
+
+**The `--dry-run` flag was completely broken and DANGEROUS:**
+
+1. **ListGenerations()**: Returned fake mock data instead of real user generations
+   - Mock data had wrong paths: `/nix/var/nix/profiles/default-300-link`
+   - Users couldn't see their actual generations to select from
+   - Defeated the entire purpose of dry-run mode
+
+2. **RemoveGeneration()**: Still ACTUALLY DELETED generations even with --dry-run
+   - No dry-run check existed in the function
+   - `nix-env --delete-generations` was executed unconditionally
+   - Users could accidentally delete data thinking it was a simulation
+
+3. **CollectGarbage()**: Still ACTUALLY RAN `nix-collect-garbage -d` even with --dry-run
+   - No dry-run check existed
+   - Garbage collection ran unconditionally
+   - Could cause irreversible data loss
+
+### Impact
+
+- **Data Loss Risk**: Users could accidentally delete their Nix generations
+- **Misleading Behavior**: Dry-run mode didn't actually simulate anything
+- **False Sense of Security**: Users thought they were safe when they weren't
+
+### Solutions Implemented
+
+1. **Fixed ListGenerations()**
+   - Removed mock data generation in dry-run mode
+   - Now lists REAL user generations even in dry-run mode
+   - Users can see their actual generations before simulating deletion
+
+2. **Fixed RemoveGeneration()**
+   - Added dry-run check at function start
+   - Returns success without calling `nix-env --delete-generations`
+   - No actual deletion occurs in dry-run mode
+   - Returns estimated 50MB freed per generation
+
+3. **Fixed CollectGarbage()**
+   - Added dry-run check at function start
+   - Returns success without calling `nix-collect-garbage -d`
+   - No actual garbage collection occurs in dry-run mode
+   - Returns estimated 100MB freed
+
+4. **Added UI Indicators**
+   - Warning at start: "⚠️ DRY RUN MODE: No actual changes will be made"
+   - Changes "Will delete" to "Would delete (DRY RUN)"
+   - Changes "Removed generation" to "Would remove generation (DRY RUN)"
+   - Changes "Running garbage collection" to "Would run garbage collection (DRY RUN)"
+   - Adds "(DRY RUN: No actual changes were made)" at completion
+
+### Testing Performed
+
+All tests pass:
+
+**Dry-Run Mode Tests:**
+- ✅ DRY RUN warning displayed at start
+- ✅ Shows REAL current generation (33)
+- ✅ Shows REAL old generations count (1)
+- ✅ Generation 32 still exists (dry-run didn't delete it)
+- ✅ Generation 33 still current (dry-run didn't affect it)
+- ✅ Normal mode scans without DRY RUN warning
+- ✅ Normal mode doesn't show DRY RUN warning
+- ✅ --dry-run flag documented in help
+
+**Edge Case Tests:**
+- ✅ ListGenerations works (found 2 generations)
+- ✅ Dry-run deletion works
+- ✅ Garbage collection dry-run works
+- ✅ Current generation (33) profile link exists
+- ✅ Old generation (32) profile link exists
+- ✅ Store size query works (7.0G)
+- ✅ TUI scanning phase works
+- ✅ Current generation displayed
+- ✅ Normal mode works correctly
+- ✅ Error handling works for invalid input
+
+### Safety Verification
+
+**Before Fix (DANGEROUS):**
+```bash
+$ clean-wizard clean --dry-run
+# Shows FAKE generations (300, 299, 298, 297, 296)
+# User selects generation 300
+# Actually DELETES real generation 32!
+# Runs nix-collect-garbage for real!
+# DATA LOSS!
+```
+
+**After Fix (SAFE):**
+```bash
+$ clean-wizard clean --dry-run
+⚠️ DRY RUN MODE: No actual changes will be made
+
+✓ Current generation: 33 (from 12 hours ago)
+✓ Found 1 old generations
+
+# TUI shows REAL generation 32
+# User selects generation 32
+# Simulates deletion WITHOUT actually deleting
+# No garbage collection runs
+# DATA SAFE!
+```
+
+### Summary
+
+This critical fix ensures:
+- ✅ Dry-run mode shows REAL user data
+- ✅ Dry-run mode makes NO system changes
+- ✅ Clear visual indicators throughout UI
+- ✅ Prevents accidental data loss
+- ✅ Users can safely test before actual cleanup
+
+**This is the most important fix in this project** as it prevented potential catastrophic data loss.
+
