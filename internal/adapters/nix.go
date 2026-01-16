@@ -199,8 +199,9 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 
 // ParseGeneration parses generation line from nix-env output.
 // Expected format when using --list-generations (without --profile):
-//   "32   2026-01-12 08:03:14"
-//   "33   2026-01-15 21:14:05   (current)"
+//
+//	"32   2026-01-12 08:03:14"
+//	"33   2026-01-15 21:14:05   (current)"
 func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) {
 	fields := strings.Fields(line)
 	if len(fields) < 3 {
