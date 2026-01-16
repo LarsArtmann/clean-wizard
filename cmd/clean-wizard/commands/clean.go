@@ -36,6 +36,10 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun bool) error {
 	ctx := context.Background()
 
 	fmt.Println("🔍 Scanning for Nix generations...")
+	if dryRun {
+		fmt.Println("⚠️  DRY RUN MODE: No actual changes will be made")
+		fmt.Println()
+	}
 
 	// List all generations using adapter
 	nixAdapter := adapters.NewNixAdapter(0, 0)
@@ -111,6 +115,9 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun bool) error {
 	}
 
 	fmt.Printf("\n🗑️  Cleaning %d generation(s)...\n", len(selectedIDs))
+	if dryRun {
+		fmt.Println("   (DRY RUN: Simulated only)")
+	}
 
 	// Filter selected generations
 	var toClean []domain.NixGeneration
@@ -121,7 +128,11 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun bool) error {
 	}
 
 	// Show what will be deleted
-	fmt.Println("\nWill delete:")
+	action := "Will delete"
+	if dryRun {
+		action = "Would delete (DRY RUN)"
+	}
+	fmt.Printf("\n%s:\n", action)
 	totalBytes := int64(0)
 	for _, gen := range toClean {
 		size := gen.EstimateSize()
@@ -154,6 +165,9 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun bool) error {
 
 	// Perform the cleanup
 	fmt.Println("\n🧹 Cleaning...")
+	if dryRun {
+		fmt.Println("   (DRY RUN: Simulated only)")
+	}
 
 	startTime := time.Now()
 
@@ -164,18 +178,29 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun bool) error {
 		if result.IsErr() {
 			fmt.Printf("  ⚠️  Failed to remove generation %d: %v\n", gen.ID, result.Error())
 		} else {
-			fmt.Printf("  ✓ Removed generation %d\n", gen.ID)
+			if dryRun {
+				fmt.Printf("  ✓ Would remove generation %d (DRY RUN)\n", gen.ID)
+			} else {
+				fmt.Printf("  ✓ Removed generation %d\n", gen.ID)
+			}
 			itemsRemoved++
 		}
 	}
 
 	// Run garbage collection
-	fmt.Println("  🔄 Running garbage collection...")
-	nixAdapter.CollectGarbage(ctx)
+	if dryRun {
+		fmt.Println("  🔄 Would run garbage collection (DRY RUN)")
+	} else {
+		fmt.Println("  🔄 Running garbage collection...")
+		nixAdapter.CollectGarbage(ctx)
+	}
 
 	duration := time.Since(startTime)
 
 	fmt.Printf("\n✅ Cleanup completed in %s\n", duration.String())
+	if dryRun {
+		fmt.Println("   (DRY RUN: No actual changes were made)")
+	}
 	fmt.Printf("   • Removed %d generation(s)\n", itemsRemoved)
 	fmt.Printf("   • Freed approximately %s\n", format.Bytes(totalBytes))
 

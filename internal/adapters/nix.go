@@ -43,24 +43,13 @@ func (n *NixAdapter) SetDryRun(dryRun bool) {
 	n.dryRun = dryRun
 }
 
-// ListGenerations lists Nix generations with dry-run isolation.
+// ListGenerations lists Nix generations.
+// In dry-run mode, still lists real generations but won't actually delete them.
 func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
 	if !n.IsAvailable(ctx) {
 		return result.Err[[]domain.NixGeneration](errors.New("nix not available"))
 	}
 
-	// If dry-run, return mock data without system calls
-	if n.dryRun {
-		return result.Ok([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusCurrent},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: domain.GenerationStatusHistorical},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: domain.GenerationStatusHistorical},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Current: domain.GenerationStatusHistorical},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Current: domain.GenerationStatusHistorical},
-		})
-	}
-
-	// Real system call for production mode
 	// Use nix-env without --profile to let it use the default user profile
 	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations")
 	output, err := cmd.Output()
@@ -115,8 +104,16 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	return result.Ok(size)
 }
 
-// CollectGarbage removes old Nix generations using centralized conversion.
+// CollectGarbage removes old Nix generations.
+// In dry-run mode, returns a success result without actually running garbage collection.
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
+	// In dry-run mode, return success without actually running GC
+	if n.dryRun {
+		estimatedFreed := int64(100 * 1024 * 1024) // 100MB estimate from GC
+		cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyAggressive, 1, estimatedFreed, 0)
+		return result.Ok(cleanResult)
+	}
+
 	// Get store size before garbage collection
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
@@ -161,8 +158,17 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 	return strconv.ParseInt(fields[0], 10, 64)
 }
 
-// RemoveGeneration removes specific Nix generation using centralized conversion.
+// RemoveGeneration removes specific Nix generation.
+// In dry-run mode, returns a success result without actually deleting.
 func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[domain.CleanResult] {
+	// In dry-run mode, return success without actually removing
+	if n.dryRun {
+		// Return a success result with estimated bytes freed
+		estimatedFreed := int64(50 * 1024 * 1024) // 50MB estimate per generation
+		cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyConservative, 1, estimatedFreed, 0)
+		return result.Ok(cleanResult)
+	}
+
 	// Get store size before removal
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
