@@ -3,234 +3,338 @@ package commands
 import (
 	"context"
 	"fmt"
-	"slices"
+	"path/filepath"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 )
 
-// NewCleanCommand creates a simplified clean command with TUI.
+// CleanerType represents available cleaner types for TUI selection.
+type CleanerType string
+
+const (
+	CleanerTypeNix       CleanerType = "nix"
+	CleanerTypeHomebrew  CleanerType = "homebrew"
+	CleanerTypeTempFiles CleanerType = "tempfiles"
+)
+
+// AvailableCleaners returns all available cleaner types.
+func AvailableCleaners() []CleanerType {
+	return []CleanerType{
+		CleanerTypeNix,
+		CleanerTypeHomebrew,
+		CleanerTypeTempFiles,
+	}
+}
+
+// CleanerConfig holds configuration for each cleaner type.
+type CleanerConfig struct {
+	Type       CleanerType
+	Name       string
+	Description string
+	Icon       string
+	Available  bool
+}
+
+// GetCleanerConfigs returns all cleaner configurations with availability status.
+func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
+	configs := []CleanerConfig{
+		{
+			Type:       CleanerTypeNix,
+			Name:       "Nix Generations",
+			Description: "Clean old Nix store generations and optimize store",
+			Icon:       "❄️",
+			Available:  true, // Nix cleaner always available (uses mock data if not)
+		},
+		{
+			Type:       CleanerTypeHomebrew,
+			Name:       "Homebrew",
+			Description: "Clean Homebrew cache and unused packages",
+			Icon:       "🍺",
+			Available:  cleaner.NewHomebrewCleaner(false, false, domain.HomebrewModeAll).IsAvailable(ctx),
+		},
+		{
+			Type:       CleanerTypeTempFiles,
+			Name:       "Temporary Files",
+			Description: "Clean system temporary files older than 7 days",
+			Icon:       "🗂️",
+			Available:  true, // Temp files cleaner always available
+		},
+	}
+	return configs
+}
+
+// NewCleanCommand creates a multi-cleaner command with TUI.
 func NewCleanCommand() *cobra.Command {
 	var dryRun bool
+	var mode string
 
 	cmd := &cobra.Command{
 		Use:   "clean",
-		Short: "Clean old Nix generations",
-		Long:  `Interactively select and clean old Nix generations.`,
+		Short: "Clean system caches and package managers",
+		Long:  `Interactively select and clean system caches, package managers, and temporary data.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCleanCommand(cmd, args, dryRun)
+			return runCleanCommand(cmd, args, dryRun, mode)
 		},
 	}
 
-	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Simulate deletion without actually removing generations")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Simulate deletion without actually removing anything")
+	cmd.Flags().StringVar(&mode, "mode", "", "Preset mode: quick, standard, or aggressive")
 
 	return cmd
 }
 
-// runCleanCommand executes the clean command with TUI.
-func runCleanCommand(cmd *cobra.Command, args []string, dryRun bool) error {
+// runCleanCommand executes the clean command with multi-cleaner TUI.
+func runCleanCommand(cmd *cobra.Command, args []string, dryRun bool, mode string) error {
 	ctx := context.Background()
 
-	fmt.Println("🔍 Scanning for Nix generations...")
+	fmt.Println("🔍 Detecting available cleaners...")
 	if dryRun {
 		fmt.Println("⚠️  DRY RUN MODE: No actual changes will be made")
 		fmt.Println()
 	}
 
-	// List all generations using adapter
-	nixAdapter := adapters.NewNixAdapter(0, 0)
-	if dryRun {
-		nixAdapter.SetDryRun(true)
-	}
-	result := nixAdapter.ListGenerations(ctx)
+	// Get cleaner configurations with availability status
+	cleanerConfigs := GetCleanerConfigs(ctx)
 
-	if result.IsErr() {
-		return fmt.Errorf("failed to list generations: %w", result.Error())
-	}
-
-	generations := result.Value()
-
-	if len(generations) == 0 {
-		fmt.Println("✅ No generations found to clean.")
-		return nil
-	}
-
-	// Separate current and historical generations
-	var currentGen domain.NixGeneration
-	var historicalGens []domain.NixGeneration
-	for _, gen := range generations {
-		if gen.Current.IsCurrent() {
-			currentGen = gen
-		} else {
-			historicalGens = append(historicalGens, gen)
+	// Filter to available cleaners only
+	availableConfigs := make([]CleanerConfig, 0, len(cleanerConfigs))
+	for _, cfg := range cleanerConfigs {
+		if cfg.Available {
+			availableConfigs = append(availableConfigs, cfg)
 		}
 	}
 
-	if len(historicalGens) == 0 {
-		fmt.Println("✅ No old generations to clean.")
-		return nil
+	if len(availableConfigs) == 0 {
+		return fmt.Errorf("no cleaners available on this system")
 	}
 
-	// Show current generation info
-	fmt.Printf("✓ Current generation: %d (from %s)\n", currentGen.ID, formatRelativeTime(currentGen.Date))
-	fmt.Printf("✓ Found %d old generations\n\n", len(historicalGens))
+	fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableConfigs))
 
-	// Create variable to store selected IDs
-	var selectedIDs []int
+	// If mode is specified, use preset selection
+	var selectedCleaners []CleanerType
+	if mode != "" {
+		selectedCleaners = getPresetSelection(mode, availableConfigs)
+		fmt.Printf("🎯 Using preset mode: %s\n", mode)
+		fmt.Println()
+		for _, ct := range selectedCleaners {
+			fmt.Printf("  ✓ %s\n", getCleanerName(ct))
+		}
+		fmt.Println()
+	} else {
+		// Interactive cleaner selection
+		var selectedTypes []CleanerType
+		form := huh.NewForm(
+			huh.NewGroup(
+				huh.NewMultiSelect[CleanerType]().
+					Title("Select cleaners to run").
+					Description("Choose which cleaners to execute (Space to select, Enter to confirm)").
+					Options(
+						func() []huh.Option[CleanerType] {
+							opts := make([]huh.Option[CleanerType], len(availableConfigs))
+							for i, cfg := range availableConfigs {
+								desc := fmt.Sprintf("%s %s", cfg.Description, cfg.Icon)
+								opts[i] = huh.NewOption(desc, cfg.Type)
+							}
+							return opts
+						}()...,
+					).
+					Value(&selectedTypes),
+			),
+		)
 
-	// Build Huh form with multi-select
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewMultiSelect[int]().
-				Title("Select generations to clean").
-				Description("Choose which old generations to delete (Space to select, Enter to confirm)").
-				Options(
-					func() []huh.Option[int] {
-						opts := make([]huh.Option[int], len(historicalGens))
-						for i, gen := range historicalGens {
-							sizeEstimate := format.Bytes(gen.EstimateSize())
-							desc := fmt.Sprintf("%s ago • ~%s", formatRelativeTime(gen.Date), sizeEstimate)
-							opts[i] = huh.NewOption(desc, gen.ID)
-						}
-						return opts
-					}()...,
-				).
-				Value(&selectedIDs),
-		),
-	)
+		if err := form.Run(); err != nil {
+			return fmt.Errorf("form error: %w", err)
+		}
 
-	// Run the TUI form
-	if err := form.Run(); err != nil {
-		return fmt.Errorf("form error: %w", err)
+		if len(selectedTypes) == 0 {
+			fmt.Println("❌ No cleaners selected. Nothing to clean.")
+			return nil
+		}
+
+		selectedCleaners = selectedTypes
 	}
 
-	// If user cancelled or selected nothing
-	if len(selectedIDs) == 0 {
-		fmt.Println("❌ No generations selected. Nothing to clean.")
-		return nil
-	}
+	// Confirm before running
+	if !dryRun {
+		var confirm bool
+		confirmForm := huh.NewForm(
+			huh.NewGroup(
+				huh.NewConfirm().
+					Title("Run selected cleaners?").
+					Affirmative("Yes, run them").
+					Negative("No, cancel").
+					Value(&confirm),
+			),
+		)
 
-	fmt.Printf("\n🗑️  Cleaning %d generation(s)...\n", len(selectedIDs))
-	if dryRun {
-		fmt.Println("   (DRY RUN: Simulated only)")
-	}
+		if err := confirmForm.Run(); err != nil {
+			return fmt.Errorf("confirmation error: %w", err)
+		}
 
-	// Filter selected generations
-	var toClean []domain.NixGeneration
-	for _, gen := range historicalGens {
-		if slices.Contains(selectedIDs, gen.ID) {
-			toClean = append(toClean, gen)
+		if !confirm {
+			fmt.Println("❌ Cancelled. No changes made.")
+			return nil
 		}
 	}
 
-	// Show what will be deleted
-	action := "Will delete"
-	if dryRun {
-		action = "Would delete (DRY RUN)"
-	}
-	fmt.Printf("\n%s:\n", action)
-	totalBytes := int64(0)
-	for _, gen := range toClean {
-		size := gen.EstimateSize()
-		totalBytes += size
-		fmt.Printf("  • Generation %d (from %s) ~ %s\n", gen.ID, formatRelativeTime(gen.Date), format.Bytes(size))
-	}
-
-	fmt.Printf("\nTotal space to free: %s\n", format.Bytes(totalBytes))
-
-	// Confirm deletion
-	var confirm bool
-	confirmForm := huh.NewForm(
-		huh.NewGroup(
-			huh.NewConfirm().
-				Title("Proceed with deletion?").
-				Affirmative("Yes, delete them").
-				Negative("No, cancel").
-				Value(&confirm),
-		),
-	)
-
-	if err := confirmForm.Run(); err != nil {
-		return fmt.Errorf("confirmation error: %w", err)
-	}
-
-	if !confirm {
-		fmt.Println("❌ Cancelled. No changes made.")
-		return nil
-	}
-
-	// Perform the cleanup
-	fmt.Println("\n🧹 Cleaning...")
+	// Run selected cleaners
+	fmt.Println("\n🧹 Starting cleanup...")
 	if dryRun {
 		fmt.Println("   (DRY RUN: Simulated only)")
 	}
+	fmt.Println()
 
 	startTime := time.Now()
 
-	// Remove selected generations
-	itemsRemoved := 0
-	for _, gen := range toClean {
-		result := nixAdapter.RemoveGeneration(ctx, gen.ID)
-		if result.IsErr() {
-			fmt.Printf("  ⚠️  Failed to remove generation %d: %v\n", gen.ID, result.Error())
-		} else {
-			if dryRun {
-				fmt.Printf("  ✓ Would remove generation %d (DRY RUN)\n", gen.ID)
-			} else {
-				fmt.Printf("  ✓ Removed generation %d\n", gen.ID)
-			}
-			itemsRemoved++
-		}
-	}
+	// Aggregate results from all cleaners
+	var totalBytesFreed uint64
+	var totalItemsRemoved uint
+	var totalItemsFailed uint
 
-	// Run garbage collection
-	if dryRun {
-		fmt.Println("  🔄 Would run garbage collection (DRY RUN)")
-	} else {
-		fmt.Println("  🔄 Running garbage collection...")
-		nixAdapter.CollectGarbage(ctx)
+	for _, cleanerType := range selectedCleaners {
+		result, err := runCleaner(ctx, cleanerType, dryRun)
+		if err != nil {
+			fmt.Printf("  ⚠️  Cleaner %s failed: %v\n", getCleanerName(cleanerType), err)
+			continue
+		}
+
+		totalBytesFreed += result.FreedBytes
+		totalItemsRemoved += result.ItemsRemoved
+		totalItemsFailed += result.ItemsFailed
 	}
 
 	duration := time.Since(startTime)
 
+	// Show final results
 	fmt.Printf("\n✅ Cleanup completed in %s\n", duration.String())
 	if dryRun {
 		fmt.Println("   (DRY RUN: No actual changes were made)")
 	}
-	fmt.Printf("   • Removed %d generation(s)\n", itemsRemoved)
-	fmt.Printf("   • Freed approximately %s\n", format.Bytes(totalBytes))
+	fmt.Printf("   • Cleaned %d item(s)\n", totalItemsRemoved)
+	fmt.Printf("   • Freed %s\n", format.Bytes(int64(totalBytesFreed)))
+	if totalItemsFailed > 0 {
+		fmt.Printf("   • %d item(s) failed to clean\n", totalItemsFailed)
+	}
 
 	return nil
 }
 
-// formatRelativeTime formats a time as a relative string (e.g., "2 days ago").
-func formatRelativeTime(t time.Time) string {
-	dur := time.Since(t)
-	hours := int(dur.Hours())
-	days := hours / 24
+// runCleaner runs a specific cleaner and returns the result.
+func runCleaner(ctx context.Context, cleanerType CleanerType, dryRun bool) (domain.CleanResult, error) {
+	fmt.Printf("🔧 Running %s cleaner...\n", getCleanerName(cleanerType))
 
-	switch {
-	case days > 30:
-		months := days / 30
-		return fmt.Sprintf("%d month%s ago", months, pluralize(months))
-	case days > 0:
-		return fmt.Sprintf("%d day%s ago", days, pluralize(days))
-	case hours > 0:
-		return fmt.Sprintf("%d hour%s ago", hours, pluralize(hours))
+	switch cleanerType {
+	case CleanerTypeNix:
+		return runNixCleaner(ctx, dryRun)
+	case CleanerTypeHomebrew:
+		return runHomebrewCleaner(ctx, dryRun)
+	case CleanerTypeTempFiles:
+		return runTempFilesCleaner(ctx, dryRun)
 	default:
-		minutes := int(dur.Minutes())
-		return fmt.Sprintf("%d minute%s ago", minutes, pluralize(minutes))
+		return domain.CleanResult{}, fmt.Errorf("unknown cleaner type: %s", cleanerType)
 	}
 }
 
-// pluralize returns "s" if n != 1, otherwise "".
-func pluralize(n int) string {
-	if n != 1 {
-		return "s"
+// runNixCleaner executes the Nix cleaner.
+func runNixCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	// Import adapter for Nix operations
+	nixAdapter := cleaner.NewNixCleaner(false, dryRun)
+
+	if !nixAdapter.IsAvailable(ctx) {
+		fmt.Println("  ℹ️  Nix not available - using mock data")
 	}
-	return ""
+
+	// Clean old generations (keep last 5)
+	keepCount := 5
+	result := nixAdapter.CleanOldGenerations(ctx, keepCount)
+
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Nix cleaner completed\n")
+	return cleanResult, nil
+}
+
+// runHomebrewCleaner executes the Homebrew cleaner.
+func runHomebrewCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	homebrewCleaner := cleaner.NewHomebrewCleaner(false, dryRun, domain.HomebrewModeAll)
+
+	result := homebrewCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Homebrew cleaner completed\n")
+	return cleanResult, nil
+}
+
+// runTempFilesCleaner executes the TempFiles cleaner.
+func runTempFilesCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	// Default temp paths and excludes
+	defaultTempPaths := []string{filepath.Join("/", "tmp")}
+	defaultExcludes := []string{}
+
+	tempFilesCleaner, err := cleaner.NewTempFilesCleaner(false, dryRun, "7d", defaultExcludes, defaultTempPaths)
+	if err != nil {
+		return domain.CleanResult{}, err
+	}
+
+	result := tempFilesCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Temp files cleaner completed\n")
+	return cleanResult, nil
+}
+
+// getPresetSelection returns cleaner selection based on preset mode.
+func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
+	switch mode {
+	case "quick":
+		// Quick mode: Homebrew + TempFiles (fast, no Nix store changes)
+		return []CleanerType{
+			CleanerTypeHomebrew,
+			CleanerTypeTempFiles,
+		}
+	case "aggressive":
+		// Aggressive mode: All cleaners
+		var allTypes []CleanerType
+		for _, cfg := range configs {
+			allTypes = append(allTypes, cfg.Type)
+		}
+		return allTypes
+	case "standard":
+		fallthrough
+	default:
+		// Standard mode: All available cleaners
+		var allTypes []CleanerType
+		for _, cfg := range configs {
+			allTypes = append(allTypes, cfg.Type)
+		}
+		return allTypes
+	}
+}
+
+// getCleanerName returns the display name for a cleaner type.
+func getCleanerName(cleanerType CleanerType) string {
+	switch cleanerType {
+	case CleanerTypeNix:
+		return "Nix"
+	case CleanerTypeHomebrew:
+		return "Homebrew"
+	case CleanerTypeTempFiles:
+		return "Temp Files"
+	default:
+		return string(cleanerType)
+	}
 }
