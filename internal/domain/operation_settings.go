@@ -12,6 +12,15 @@ type OperationSettings struct {
 	// Homebrew Settings
 	Homebrew *HomebrewSettings `json:"homebrew,omitempty" yaml:"homebrew,omitempty"`
 
+	// Node Packages Settings
+	NodePackages *NodePackagesSettings `json:"node_packages,omitempty" yaml:"node_packages,omitempty"`
+
+	// Go Packages Settings
+	GoPackages *GoPackagesSettings `json:"go_packages,omitempty" yaml:"go_packages,omitempty"`
+
+	// Cargo Packages Settings
+	CargoPackages *CargoPackagesSettings `json:"cargo_packages,omitempty" yaml:"cargo_packages,omitempty"`
+
 	// System Temp Settings
 	SystemTemp *SystemTempSettings `json:"system_temp,omitempty" yaml:"system_temp,omitempty"`
 }
@@ -35,6 +44,24 @@ type HomebrewSettings struct {
 	Prune      string       `json:"prune,omitempty" yaml:"prune,omitempty"`
 }
 
+// NodePackagesSettings provides type-safe settings for Node.js package manager cleanup.
+type NodePackagesSettings struct {
+	PackageManagers []string `json:"package_managers" yaml:"package_managers"`
+}
+
+// GoPackagesSettings provides type-safe settings for Go language cleanup.
+type GoPackagesSettings struct {
+	CleanCache      bool `json:"clean_cache,omitempty" yaml:"clean_cache,omitempty"`
+	CleanTestCache  bool `json:"clean_test_cache,omitempty" yaml:"clean_test_cache,omitempty"`
+	CleanModCache   bool `json:"clean_mod_cache,omitempty" yaml:"clean_mod_cache,omitempty"`
+	CleanBuildCache bool `json:"clean_build_cache,omitempty" yaml:"clean_build_cache,omitempty"`
+}
+
+// CargoPackagesSettings provides type-safe settings for Cargo package manager cleanup.
+type CargoPackagesSettings struct {
+	Autoclean bool `json:"autoclean,omitempty" yaml:"autoclean,omitempty"`
+}
+
 // SystemTempSettings provides type-safe settings for system temp cleanup.
 type SystemTempSettings struct {
 	Paths     []string `json:"paths"      yaml:"paths"`
@@ -48,6 +75,9 @@ const (
 	OperationTypeNixGenerations OperationType = "nix-generations"
 	OperationTypeTempFiles      OperationType = "temp-files"
 	OperationTypeHomebrew       OperationType = "homebrew-cleanup"
+	OperationTypeNodePackages   OperationType = "node-packages"
+	OperationTypeGoPackages     OperationType = "go-packages"
+	OperationTypeCargoPackages  OperationType = "cargo-packages"
 	OperationTypeSystemTemp     OperationType = "system-temp"
 )
 
@@ -60,6 +90,12 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeTempFiles
 	case "homebrew-cleanup":
 		return OperationTypeHomebrew
+	case "node-packages":
+		return OperationTypeNodePackages
+	case "go-packages":
+		return OperationTypeGoPackages
+	case "cargo-packages":
+		return OperationTypeCargoPackages
 	case "system-temp":
 		return OperationTypeSystemTemp
 	default:
@@ -89,6 +125,27 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 		return &OperationSettings{
 			Homebrew: &HomebrewSettings{
 				UnusedOnly: HomebrewModeUnusedOnly,
+			},
+		}
+	case OperationTypeNodePackages:
+		return &OperationSettings{
+			NodePackages: &NodePackagesSettings{
+				PackageManagers: []string{"npm", "pnpm", "yarn", "bun"},
+			},
+		}
+	case OperationTypeGoPackages:
+		return &OperationSettings{
+			GoPackages: &GoPackagesSettings{
+				CleanCache:      true,
+				CleanTestCache:  true,
+				CleanModCache:   true,
+				CleanBuildCache: true,
+			},
+		}
+	case OperationTypeCargoPackages:
+		return &OperationSettings{
+			CargoPackages: &CargoPackagesSettings{
+				Autoclean: true,
 			},
 		}
 	case OperationTypeSystemTemp:

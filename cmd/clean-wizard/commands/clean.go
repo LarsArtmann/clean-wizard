@@ -17,9 +17,12 @@ import (
 type CleanerType string
 
 const (
-	CleanerTypeNix       CleanerType = "nix"
-	CleanerTypeHomebrew  CleanerType = "homebrew"
-	CleanerTypeTempFiles CleanerType = "tempfiles"
+	CleanerTypeNix        CleanerType = "nix"
+	CleanerTypeHomebrew   CleanerType = "homebrew"
+	CleanerTypeTempFiles  CleanerType = "tempfiles"
+	CleanerTypeNodePackages CleanerType = "nodepackages"
+	CleanerTypeGoPackages CleanerType = "gopackages"
+	CleanerTypeCargoPackages CleanerType = "cargopackages"
 )
 
 // AvailableCleaners returns all available cleaner types.
@@ -28,6 +31,9 @@ func AvailableCleaners() []CleanerType {
 		CleanerTypeNix,
 		CleanerTypeHomebrew,
 		CleanerTypeTempFiles,
+		CleanerTypeNodePackages,
+		CleanerTypeGoPackages,
+		CleanerTypeCargoPackages,
 	}
 }
 
@@ -63,6 +69,27 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 			Description: "Clean system temporary files older than 7 days",
 			Icon:       "🗂️",
 			Available:  true, // Temp files cleaner always available
+		},
+		{
+			Type:       CleanerTypeNodePackages,
+			Name:       "Node.js Packages",
+			Description: "Clean npm, pnpm, yarn, bun caches",
+			Icon:       "📦",
+			Available:  cleaner.NewNodePackageManagerCleaner(false, false, cleaner.AvailableNodePackageManagers()).IsAvailable(ctx),
+		},
+		{
+			Type:       CleanerTypeGoPackages,
+			Name:       "Go Packages",
+			Description: "Clean Go module, test, and build caches",
+			Icon:       "🐹",
+			Available:  cleaner.NewGoCleaner(false, false, true, true, true, true).IsAvailable(ctx),
+		},
+		{
+			Type:       CleanerTypeCargoPackages,
+			Name:       "Cargo Packages",
+			Description: "Clean Rust/Cargo registry and source caches",
+			Icon:       "🦀",
+			Available:  cleaner.NewCargoCleaner(false, false).IsAvailable(ctx),
 		},
 	}
 	return configs
@@ -235,6 +262,12 @@ func runCleaner(ctx context.Context, cleanerType CleanerType, dryRun bool) (doma
 		return runHomebrewCleaner(ctx, dryRun)
 	case CleanerTypeTempFiles:
 		return runTempFilesCleaner(ctx, dryRun)
+	case CleanerTypeNodePackages:
+		return runNodePackageManagerCleaner(ctx, dryRun)
+	case CleanerTypeGoPackages:
+		return runGoCleaner(ctx, dryRun)
+	case CleanerTypeCargoPackages:
+		return runCargoCleaner(ctx, dryRun)
 	default:
 		return domain.CleanResult{}, fmt.Errorf("unknown cleaner type: %s", cleanerType)
 	}
@@ -297,13 +330,57 @@ func runTempFilesCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, 
 	return cleanResult, nil
 }
 
+// runNodePackageManagerCleaner executes the Node package manager cleaner.
+func runNodePackageManagerCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	nodeCleaner := cleaner.NewNodePackageManagerCleaner(false, dryRun, cleaner.AvailableNodePackageManagers())
+
+	result := nodeCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Node package manager cleaner completed\n")
+	return cleanResult, nil
+}
+
+// runGoCleaner executes the Go cleaner.
+func runGoCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	goCleaner := cleaner.NewGoCleaner(false, dryRun, true, true, true, true)
+
+	result := goCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Go cleaner completed\n")
+	return cleanResult, nil
+}
+
+// runCargoCleaner executes the Cargo cleaner.
+func runCargoCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	cargoCleaner := cleaner.NewCargoCleaner(false, dryRun)
+
+	result := cargoCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Cargo cleaner completed\n")
+	return cleanResult, nil
+}
+
 // getPresetSelection returns cleaner selection based on preset mode.
 func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 	switch mode {
 	case "quick":
-		// Quick mode: Homebrew + TempFiles (fast, no Nix store changes)
+		// Quick mode: Homebrew + Node + Go + TempFiles (fast, no Nix store changes)
 		return []CleanerType{
 			CleanerTypeHomebrew,
+			CleanerTypeNodePackages,
+			CleanerTypeGoPackages,
 			CleanerTypeTempFiles,
 		}
 	case "aggressive":
@@ -334,6 +411,12 @@ func getCleanerName(cleanerType CleanerType) string {
 		return "Homebrew"
 	case CleanerTypeTempFiles:
 		return "Temp Files"
+	case CleanerTypeNodePackages:
+		return "Node.js Packages"
+	case CleanerTypeGoPackages:
+		return "Go Packages"
+	case CleanerTypeCargoPackages:
+		return "Cargo Packages"
 	default:
 		return string(cleanerType)
 	}

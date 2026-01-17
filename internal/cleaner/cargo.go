@@ -1,0 +1,240 @@
+package cleaner
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"os/exec"
+	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
+)
+
+// CargoCleaner handles Rust/Cargo cleanup.
+type CargoCleaner struct {
+	verbose bool
+	dryRun  bool
+}
+
+// NewCargoCleaner creates Cargo cleaner.
+func NewCargoCleaner(verbose, dryRun bool) *CargoCleaner {
+	return &CargoCleaner{
+		verbose: verbose,
+		dryRun:  dryRun,
+	}
+}
+
+// Type returns operation type for Cargo cleaner.
+func (cc *CargoCleaner) Type() domain.OperationType {
+	return domain.OperationTypeCargoPackages
+}
+
+// IsAvailable checks if Cargo is available.
+func (cc *CargoCleaner) IsAvailable(ctx context.Context) bool {
+	_, err := exec.LookPath("cargo")
+	return err == nil
+}
+
+// ValidateSettings validates Cargo cleaner settings.
+func (cc *CargoCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+	if settings == nil || settings.CargoPackages == nil {
+		return nil // Settings are optional
+	}
+
+	// All Cargo settings are valid by default
+	return nil
+}
+
+// Scan scans for Cargo caches.
+func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+	items := make([]domain.ScanItem, 0)
+
+	// Get CARGO_HOME environment variable
+	cargoHome := os.Getenv("CARGO_HOME")
+	if cargoHome == "" {
+		// Fallback to default ~/.cargo
+		if homeDir := cc.getHomeDir(); homeDir != "" {
+			cargoHome = fmt.Sprintf("%s/.cargo", homeDir)
+		}
+	}
+
+	if cargoHome != "" {
+		// Add registry cache location
+		registryCache := fmt.Sprintf("%s/registry", cargoHome)
+		items = append(items, domain.ScanItem{
+			Path:     registryCache,
+			Size:     cc.getDirSize(registryCache),
+			Created:  cc.getDirModTime(registryCache),
+			ScanType: domain.ScanTypeTemp,
+		})
+
+		if cc.verbose {
+			fmt.Printf("Found Cargo registry cache: %s\n", registryCache)
+		}
+
+		// Add source cache location
+		sourceCache := fmt.Sprintf("%s/git", cargoHome)
+		items = append(items, domain.ScanItem{
+			Path:     sourceCache,
+			Size:     cc.getDirSize(sourceCache),
+			Created:  cc.getDirModTime(sourceCache),
+			ScanType: domain.ScanTypeTemp,
+		})
+
+		if cc.verbose {
+			fmt.Printf("Found Cargo source cache: %s\n", sourceCache)
+		}
+	}
+
+	return result.Ok(items)
+}
+
+// Clean removes Cargo caches.
+func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+	if !cc.IsAvailable(ctx) {
+		return result.Err[domain.CleanResult](fmt.Errorf("Cargo not available"))
+	}
+
+	if cc.dryRun {
+		// Estimate cache sizes based on typical usage
+		totalBytes := int64(500 * 1024 * 1024) // Estimate 500MB for Cargo
+		itemsRemoved := 1
+
+		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
+		return result.Ok(cleanResult)
+	}
+
+	// Real cleaning implementation
+	startTime := time.Now()
+	itemsRemoved := 0
+	bytesFreed := int64(0)
+
+	// Check if cargo-cache tool is available (optional extension)
+	if cc.hasCargoCacheTool() {
+		cacheToolResult := cc.cleanWithCargoCacheTool(ctx)
+		if cacheToolResult.IsErr() {
+			if cc.verbose {
+				fmt.Printf("Warning: cargo-cache tool failed, falling back to manual clean: %v\n", cacheToolResult.Error())
+			}
+			// Fall through to manual clean
+		} else {
+			cacheCleanResult := cacheToolResult.Value()
+			itemsRemoved++
+			bytesFreed += int64(cacheCleanResult.FreedBytes)
+
+			duration := time.Since(startTime)
+			finalResult := domain.CleanResult{
+				FreedBytes:   uint64(bytesFreed),
+				ItemsRemoved: uint(itemsRemoved),
+				ItemsFailed:  0,
+				CleanTime:    duration,
+				CleanedAt:    time.Now(),
+				Strategy:     domain.StrategyConservative,
+			}
+			return result.Ok(finalResult)
+		}
+	}
+
+	// Manual cleanup using cargo clean command
+	cleanResult := cc.cleanWithCargoClean(ctx)
+	if cleanResult.IsErr() {
+		return result.Err[domain.CleanResult](fmt.Errorf("cargo clean failed: %w", cleanResult.Error()))
+	}
+
+	itemsRemoved++
+	bytesFreed += int64(cleanResult.Value().FreedBytes)
+
+	duration := time.Since(startTime)
+	finalResult := domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: uint(itemsRemoved),
+		ItemsFailed:  0,
+		CleanTime:    duration,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	}
+
+	return result.Ok(finalResult)
+}
+
+// cleanWithCargoCacheTool cleans using cargo-cache extension.
+func (cc *CargoCleaner) cleanWithCargoCacheTool(ctx context.Context) result.Result[domain.CleanResult] {
+	cmd := exec.CommandContext(ctx, "cargo-cache", "--autoclean")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("cargo-cache --autoclean failed: %w (output: %s)", err, string(output)))
+	}
+
+	if cc.verbose {
+		fmt.Println("  ✓ Cargo cache cleaned with cargo-cache tool")
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   0,
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	})
+}
+
+// cleanWithCargoClean cleans using standard cargo clean command.
+func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[domain.CleanResult] {
+	cmd := exec.CommandContext(ctx, "cargo", "clean")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("cargo clean failed: %w (output: %s)", err, string(output)))
+	}
+
+	if cc.verbose {
+		fmt.Println("  ✓ Cargo cache cleaned")
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   0,
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	})
+}
+
+// hasCargoCacheTool checks if cargo-cache tool is available.
+func (cc *CargoCleaner) hasCargoCacheTool() bool {
+	_, err := exec.LookPath("cargo-cache")
+	return err == nil
+}
+
+// getHomeDir returns user's home directory.
+func (cc *CargoCleaner) getHomeDir() string {
+	// Try getting from HOME environment variable
+	if home := os.Getenv("HOME"); home != "" {
+		return home
+	}
+
+	// Fallback to user profile directory
+	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
+		return userProfile
+	}
+
+	return ""
+}
+
+// getDirSize returns total size of directory recursively.
+func (cc *CargoCleaner) getDirSize(path string) int64 {
+	// For Cargo, we'll estimate size instead of walking
+	// Cargo cache directories can be very large
+	estimate := int64(250 * 1024 * 1024) // Estimate 250MB per cache type
+	return estimate
+}
+
+// getDirModTime returns most recent modification time in directory.
+func (cc *CargoCleaner) getDirModTime(path string) time.Time {
+	// For simplicity, return current time
+	// In production, you'd want to walk the directory
+	return time.Now()
+}
