@@ -21,6 +21,18 @@ type OperationSettings struct {
 	// Cargo Packages Settings
 	CargoPackages *CargoPackagesSettings `json:"cargo_packages,omitempty" yaml:"cargo_packages,omitempty"`
 
+	// Build Cache Settings
+	BuildCache *BuildCacheSettings `json:"build_cache,omitempty" yaml:"build_cache,omitempty"`
+
+	// Docker Settings
+	Docker *DockerSettings `json:"docker,omitempty" yaml:"docker,omitempty"`
+
+	// System Cache Settings
+	SystemCache *SystemCacheSettings `json:"system_cache,omitempty" yaml:"system_cache,omitempty"`
+
+	// Language Version Manager Settings
+	LangVersionManager *LangVersionManagerSettings `json:"lang_version_manager,omitempty" yaml:"lang_version_manager,omitempty"`
+
 	// System Temp Settings
 	SystemTemp *SystemTempSettings `json:"system_temp,omitempty" yaml:"system_temp,omitempty"`
 }
@@ -62,6 +74,28 @@ type CargoPackagesSettings struct {
 	Autoclean bool `json:"autoclean,omitempty" yaml:"autoclean,omitempty"`
 }
 
+// BuildCacheSettings provides type-safe settings for build cache cleanup.
+type BuildCacheSettings struct {
+	ToolTypes []string `json:"tool_types,omitempty" yaml:"tool_types,omitempty"`
+	OlderThan string   `json:"older_than,omitempty" yaml:"older_than,omitempty"`
+}
+
+// DockerSettings provides type-safe settings for Docker cleanup.
+type DockerSettings struct {
+	PruneMode string `json:"prune_mode,omitempty" yaml:"prune_mode,omitempty"`
+}
+
+// SystemCacheSettings provides type-safe settings for macOS system cache cleanup.
+type SystemCacheSettings struct {
+	CacheTypes []string `json:"cache_types,omitempty" yaml:"cache_types,omitempty"`
+	OlderThan  string   `json:"older_than,omitempty"  yaml:"older_than,omitempty"`
+}
+
+// LangVersionManagerSettings provides type-safe settings for language version manager cleanup.
+type LangVersionManagerSettings struct {
+	ManagerTypes []string `json:"manager_types,omitempty" yaml:"manager_types,omitempty"`
+}
+
 // SystemTempSettings provides type-safe settings for system temp cleanup.
 type SystemTempSettings struct {
 	Paths     []string `json:"paths"      yaml:"paths"`
@@ -72,13 +106,17 @@ type SystemTempSettings struct {
 type OperationType string
 
 const (
-	OperationTypeNixGenerations OperationType = "nix-generations"
-	OperationTypeTempFiles      OperationType = "temp-files"
-	OperationTypeHomebrew       OperationType = "homebrew-cleanup"
-	OperationTypeNodePackages   OperationType = "node-packages"
-	OperationTypeGoPackages     OperationType = "go-packages"
-	OperationTypeCargoPackages  OperationType = "cargo-packages"
-	OperationTypeSystemTemp     OperationType = "system-temp"
+	OperationTypeNixGenerations    OperationType = "nix-generations"
+	OperationTypeTempFiles         OperationType = "temp-files"
+	OperationTypeHomebrew          OperationType = "homebrew-cleanup"
+	OperationTypeNodePackages      OperationType = "node-packages"
+	OperationTypeGoPackages        OperationType = "go-packages"
+	OperationTypeCargoPackages     OperationType = "cargo-packages"
+	OperationTypeBuildCache        OperationType = "build-cache"
+	OperationTypeDocker            OperationType = "docker"
+	OperationTypeSystemCache       OperationType = "system-cache"
+	OperationTypeLangVersionManager OperationType = "lang-version-manager"
+	OperationTypeSystemTemp        OperationType = "system-temp"
 )
 
 // GetOperationType returns the operation type from operation name.
@@ -96,6 +134,14 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeGoPackages
 	case "cargo-packages":
 		return OperationTypeCargoPackages
+	case "build-cache":
+		return OperationTypeBuildCache
+	case "docker":
+		return OperationTypeDocker
+	case "system-cache":
+		return OperationTypeSystemCache
+	case "lang-version-manager":
+		return OperationTypeLangVersionManager
 	case "system-temp":
 		return OperationTypeSystemTemp
 	default:
@@ -146,6 +192,32 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 		return &OperationSettings{
 			CargoPackages: &CargoPackagesSettings{
 				Autoclean: true,
+			},
+		}
+	case OperationTypeBuildCache:
+		return &OperationSettings{
+			BuildCache: &BuildCacheSettings{
+				ToolTypes: []string{"gradle", "maven", "sbt"},
+				OlderThan: "30d",
+			},
+		}
+	case OperationTypeDocker:
+		return &OperationSettings{
+			Docker: &DockerSettings{
+				PruneMode: "standard",
+			},
+		}
+	case OperationTypeSystemCache:
+		return &OperationSettings{
+			SystemCache: &SystemCacheSettings{
+				CacheTypes: []string{"spotlight", "xcode", "cocoapods", "homebrew"},
+				OlderThan:  "30d",
+			},
+		}
+	case OperationTypeLangVersionManager:
+		return &OperationSettings{
+			LangVersionManager: &LangVersionManagerSettings{
+				ManagerTypes: []string{"nvm", "pyenv", "rbenv"},
 			},
 		}
 	case OperationTypeSystemTemp:

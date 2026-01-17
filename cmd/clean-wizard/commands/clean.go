@@ -17,12 +17,16 @@ import (
 type CleanerType string
 
 const (
-	CleanerTypeNix        CleanerType = "nix"
-	CleanerTypeHomebrew   CleanerType = "homebrew"
-	CleanerTypeTempFiles  CleanerType = "tempfiles"
-	CleanerTypeNodePackages CleanerType = "nodepackages"
-	CleanerTypeGoPackages CleanerType = "gopackages"
-	CleanerTypeCargoPackages CleanerType = "cargopackages"
+	CleanerTypeNix               CleanerType = "nix"
+	CleanerTypeHomebrew          CleanerType = "homebrew"
+	CleanerTypeTempFiles         CleanerType = "tempfiles"
+	CleanerTypeNodePackages     CleanerType = "nodepackages"
+	CleanerTypeGoPackages       CleanerType = "gopackages"
+	CleanerTypeCargoPackages    CleanerType = "cargopackages"
+	CleanerTypeBuildCache       CleanerType = "buildcache"
+	CleanerTypeDocker           CleanerType = "docker"
+	CleanerTypeSystemCache      CleanerType = "systemcache"
+	CleanerTypeLangVersionMgr   CleanerType = "langversionmanager"
 )
 
 // AvailableCleaners returns all available cleaner types.
@@ -34,6 +38,10 @@ func AvailableCleaners() []CleanerType {
 		CleanerTypeNodePackages,
 		CleanerTypeGoPackages,
 		CleanerTypeCargoPackages,
+		CleanerTypeBuildCache,
+		CleanerTypeDocker,
+		CleanerTypeSystemCache,
+		CleanerTypeLangVersionMgr,
 	}
 }
 
@@ -90,6 +98,34 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 			Description: "Clean Rust/Cargo registry and source caches",
 			Icon:       "🦀",
 			Available:  cleaner.NewCargoCleaner(false, false).IsAvailable(ctx),
+		},
+		{
+			Type:       CleanerTypeBuildCache,
+			Name:       "Build Cache",
+			Description: "Clean Gradle, Maven, and SBT caches",
+			Icon:       "🔨",
+			Available:  true, // Build cache cleaner always available
+		},
+		{
+			Type:       CleanerTypeDocker,
+			Name:       "Docker",
+			Description: "Clean Docker images, containers, and volumes",
+			Icon:       "🐳",
+			Available:  cleaner.NewDockerCleaner(false, false, cleaner.DockerPruneStandard).IsAvailable(ctx),
+		},
+		{
+			Type:       CleanerTypeSystemCache,
+			Name:       "System Cache",
+			Description: "Clean macOS Spotlight, Xcode, CocoaPods caches",
+			Icon:       "⚙️",
+			Available:  true, // System cache cleaner always available (macOS detection at runtime)
+		},
+		{
+			Type:       CleanerTypeLangVersionMgr,
+			Name:       "Language Version Managers",
+			Description: "Clean NVM, Pyenv, and Rbenv versions (WARNING: Destructive)",
+			Icon:       "🗑️",
+			Available:  true, // Lang version manager cleaner always available
 		},
 	}
 	return configs
@@ -268,6 +304,14 @@ func runCleaner(ctx context.Context, cleanerType CleanerType, dryRun bool) (doma
 		return runGoCleaner(ctx, dryRun)
 	case CleanerTypeCargoPackages:
 		return runCargoCleaner(ctx, dryRun)
+	case CleanerTypeBuildCache:
+		return runBuildCacheCleaner(ctx, dryRun)
+	case CleanerTypeDocker:
+		return runDockerCleaner(ctx, dryRun)
+	case CleanerTypeSystemCache:
+		return runSystemCacheCleaner(ctx, dryRun)
+	case CleanerTypeLangVersionMgr:
+		return runLangVersionManagerCleaner(ctx, dryRun)
 	default:
 		return domain.CleanResult{}, fmt.Errorf("unknown cleaner type: %s", cleanerType)
 	}
@@ -372,19 +416,82 @@ func runCargoCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, erro
 	return cleanResult, nil
 }
 
+// runBuildCacheCleaner executes the Build Cache cleaner.
+func runBuildCacheCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	buildCacheCleaner, err := cleaner.NewBuildCacheCleaner(false, dryRun, "30d", []string{}, []string{})
+	if err != nil {
+		return domain.CleanResult{}, err
+	}
+
+	result := buildCacheCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Build Cache cleaner completed\n")
+	return cleanResult, nil
+}
+
+// runDockerCleaner executes the Docker cleaner.
+func runDockerCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	dockerCleaner := cleaner.NewDockerCleaner(false, dryRun, cleaner.DockerPruneStandard)
+
+	result := dockerCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Docker cleaner completed\n")
+	return cleanResult, nil
+}
+
+// runSystemCacheCleaner executes the System Cache cleaner.
+func runSystemCacheCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	systemCacheCleaner, err := cleaner.NewSystemCacheCleaner(false, dryRun, "30d")
+	if err != nil {
+		return domain.CleanResult{}, err
+	}
+
+	result := systemCacheCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ System Cache cleaner completed\n")
+	return cleanResult, nil
+}
+
+// runLangVersionManagerCleaner executes the Language Version Manager cleaner.
+func runLangVersionManagerCleaner(ctx context.Context, dryRun bool) (domain.CleanResult, error) {
+	langVersionManagerCleaner := cleaner.NewLanguageVersionManagerCleaner(false, dryRun, cleaner.AvailableLangVersionManagers())
+
+	result := langVersionManagerCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	cleanResult := result.Value()
+	fmt.Printf("  ✓ Language Version Manager cleaner completed\n")
+	return cleanResult, nil
+}
+
 // getPresetSelection returns cleaner selection based on preset mode.
 func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 	switch mode {
 	case "quick":
-		// Quick mode: Homebrew + Node + Go + TempFiles (fast, no Nix store changes)
+		// Quick mode: Homebrew + Node + Go + TempFiles + BuildCache (fast, no Nix/Docker/System changes)
 		return []CleanerType{
 			CleanerTypeHomebrew,
 			CleanerTypeNodePackages,
 			CleanerTypeGoPackages,
 			CleanerTypeTempFiles,
+			CleanerTypeBuildCache,
 		}
 	case "aggressive":
-		// Aggressive mode: All cleaners
+		// Aggressive mode: All cleaners including Docker and System Cache
 		var allTypes []CleanerType
 		for _, cfg := range configs {
 			allTypes = append(allTypes, cfg.Type)
@@ -417,6 +524,14 @@ func getCleanerName(cleanerType CleanerType) string {
 		return "Go Packages"
 	case CleanerTypeCargoPackages:
 		return "Cargo Packages"
+	case CleanerTypeBuildCache:
+		return "Build Cache"
+	case CleanerTypeDocker:
+		return "Docker"
+	case CleanerTypeSystemCache:
+		return "System Cache"
+	case CleanerTypeLangVersionMgr:
+		return "Language Version Managers"
 	default:
 		return string(cleanerType)
 	}
