@@ -208,7 +208,7 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType Sy
 // Clean removes system caches.
 func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !scc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("system cache cleaner not available (macOS only)"))
+		return result.Err[domain.CleanResult](fmt.Errorf("not available on this platform (requires macOS)"))
 	}
 
 	if scc.dryRun {

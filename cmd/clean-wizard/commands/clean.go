@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -74,7 +75,7 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 		{
 			Type:       CleanerTypeTempFiles,
 			Name:       "Temporary Files",
-			Description: "Clean system temporary files older than 7 days",
+			Description: "Clean /tmp files (not dirs) older than 7 days",
 			Icon:       "🗂️",
 			Available:  true, // Temp files cleaner always available
 		},
@@ -118,7 +119,7 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 			Name:       "System Cache",
 			Description: "Clean macOS Spotlight, Xcode, CocoaPods caches",
 			Icon:       "⚙️",
-			Available:  true, // System cache cleaner always available (macOS detection at runtime)
+			Available:  isSystemCacheAvailable(ctx),
 		},
 		{
 			Type:       CleanerTypeLangVersionMgr,
@@ -260,11 +261,29 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 	var totalBytesFreed uint64
 	var totalItemsRemoved uint
 	var totalItemsFailed uint
+	var skippedCleaners []string
+	var failedCleaners []struct {
+		name  string
+		error string
+	}
 
 	for _, cleanerType := range selectedCleaners {
 		result, err := runCleaner(ctx, cleanerType, dryRun, verbose)
 		if err != nil {
-			fmt.Printf("  ⚠️  Cleaner %s failed: %v\n", getCleanerName(cleanerType), err)
+			name := getCleanerName(cleanerType)
+			errMsg := err.Error()
+
+			// Check if this is a "not available" error vs actual failure
+			if isNotAvailableError(errMsg) {
+				skippedCleaners = append(skippedCleaners, name)
+				fmt.Printf("  ℹ️  Skipped %s: %s\n", name, errMsg)
+			} else {
+				failedCleaners = append(failedCleaners, struct {
+					name  string
+					error string
+				}{name: name, error: errMsg})
+				fmt.Printf("  ❌ Cleaner %s failed: %s\n", name, errMsg)
+			}
 			continue
 		}
 
@@ -282,8 +301,16 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 	}
 	fmt.Printf("   • Cleaned %d item(s)\n", totalItemsRemoved)
 	fmt.Printf("   • Freed %s\n", format.Bytes(int64(totalBytesFreed)))
+
+	// Show errors and warnings
 	if totalItemsFailed > 0 {
 		fmt.Printf("   • %d item(s) failed to clean\n", totalItemsFailed)
+	}
+	if len(skippedCleaners) > 0 {
+		fmt.Printf("   • %d cleaner(s) skipped (not available)\n", len(skippedCleaners))
+	}
+	if len(failedCleaners) > 0 {
+		fmt.Printf("   • %d cleaner(s) failed\n", len(failedCleaners))
 	}
 
 	return nil
@@ -291,44 +318,91 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 
 // runCleaner runs a specific cleaner and returns the result.
 func runCleaner(ctx context.Context, cleanerType CleanerType, dryRun, verbose bool) (domain.CleanResult, error) {
-	fmt.Printf("🔧 Running %s cleaner...\n", getCleanerName(cleanerType))
+	name := getCleanerName(cleanerType)
+	fmt.Printf("🔧 Running %s cleaner...\n", name)
+
+	var result domain.CleanResult
+	var err error
 
 	switch cleanerType {
 	case CleanerTypeNix:
-		return runNixCleaner(ctx, dryRun, verbose)
+		result, err = runNixCleaner(ctx, dryRun, verbose)
 	case CleanerTypeHomebrew:
-		return runHomebrewCleaner(ctx, dryRun, verbose)
+		result, err = runHomebrewCleaner(ctx, dryRun, verbose)
 	case CleanerTypeTempFiles:
-		return runTempFilesCleaner(ctx, dryRun, verbose)
+		result, err = runTempFilesCleaner(ctx, dryRun, verbose)
 	case CleanerTypeNodePackages:
-		return runNodePackageManagerCleaner(ctx, dryRun, verbose)
+		result, err = runNodePackageManagerCleaner(ctx, dryRun, verbose)
 	case CleanerTypeGoPackages:
-		return runGoCleaner(ctx, dryRun, verbose)
+		result, err = runGoCleaner(ctx, dryRun, verbose)
 	case CleanerTypeCargoPackages:
-		return runCargoCleaner(ctx, dryRun, verbose)
+		result, err = runCargoCleaner(ctx, dryRun, verbose)
 	case CleanerTypeBuildCache:
-		return runBuildCacheCleaner(ctx, dryRun, verbose)
+		result, err = runBuildCacheCleaner(ctx, dryRun, verbose)
 	case CleanerTypeDocker:
-		return runDockerCleaner(ctx, dryRun, verbose)
+		result, err = runDockerCleaner(ctx, dryRun, verbose)
 	case CleanerTypeSystemCache:
-		return runSystemCacheCleaner(ctx, dryRun, verbose)
+		result, err = runSystemCacheCleaner(ctx, dryRun, verbose)
 	case CleanerTypeLangVersionMgr:
-		return runLangVersionManagerCleaner(ctx, dryRun, verbose)
+		result, err = runLangVersionManagerCleaner(ctx, dryRun, verbose)
 	default:
 		return domain.CleanResult{}, fmt.Errorf("unknown cleaner type: %s", cleanerType)
 	}
+
+	if err != nil {
+		return domain.CleanResult{}, err
+	}
+
+	// Display cleaner result details
+	printCleanerResult(name, result, dryRun)
+	return result, nil
+}
+
+// printCleanerResult displays detailed results for a cleaner.
+func printCleanerResult(name string, result domain.CleanResult, dryRun bool) {
+	details := ""
+	if result.ItemsRemoved > 0 {
+		if dryRun {
+			details = fmt.Sprintf("would clean %d item(s)", result.ItemsRemoved)
+		} else {
+			details = fmt.Sprintf("cleaned %d item(s), freed %s", result.ItemsRemoved, format.Bytes(int64(result.FreedBytes)))
+		}
+	} else if result.FreedBytes > 0 {
+		details = fmt.Sprintf("freed %s", format.Bytes(int64(result.FreedBytes)))
+	} else {
+		details = "no items to clean"
+	}
+
+	fmt.Printf("  ✓ %s cleaner: %s\n", name, details)
+}
+
+// isNotAvailableError checks if an error indicates a cleaner is not available.
+func isNotAvailableError(errMsg string) bool {
+	lowerMsg := strings.ToLower(errMsg)
+	unavailableKeywords := []string{
+		"not available",
+		"not found",
+		"not installed",
+		"command not found",
+		"no such file or directory",
+	}
+
+	for _, keyword := range unavailableKeywords {
+		if strings.Contains(lowerMsg, keyword) {
+			return true
+		}
+	}
+	return false
 }
 
 // runNixCleaner executes the Nix cleaner.
 func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	// Import adapter for Nix operations
 	nixAdapter := cleaner.NewNixCleaner(verbose, dryRun)
 
 	if !nixAdapter.IsAvailable(ctx) {
-		fmt.Println("  ℹ️  Nix not available - using mock data")
+		return domain.CleanResult{}, fmt.Errorf("nix not available on this system")
 	}
 
-	// Clean old generations (keep last 5)
 	keepCount := 5
 	result := nixAdapter.CleanOldGenerations(ctx, keepCount)
 
@@ -336,9 +410,7 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Nix cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runHomebrewCleaner executes the Homebrew cleaner.
@@ -350,14 +422,11 @@ func runHomebrewCleaner(ctx context.Context, dryRun, verbose bool) (domain.Clean
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Homebrew cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runTempFilesCleaner executes the TempFiles cleaner.
 func runTempFilesCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	// Default temp paths and excludes
 	defaultTempPaths := []string{filepath.Join("/", "tmp")}
 	defaultExcludes := []string{}
 
@@ -371,9 +440,7 @@ func runTempFilesCleaner(ctx context.Context, dryRun, verbose bool) (domain.Clea
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Temp files cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runNodePackageManagerCleaner executes the Node package manager cleaner.
@@ -385,9 +452,7 @@ func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Node package manager cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runGoCleaner executes the Go cleaner.
@@ -399,9 +464,7 @@ func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Go cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runCargoCleaner executes the Cargo cleaner.
@@ -413,9 +476,7 @@ func runCargoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanRes
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Cargo cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runBuildCacheCleaner executes the Build Cache cleaner.
@@ -430,9 +491,7 @@ func runBuildCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cle
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Build Cache cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runDockerCleaner executes the Docker cleaner.
@@ -444,9 +503,7 @@ func runDockerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanRe
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Docker cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runSystemCacheCleaner executes the System Cache cleaner.
@@ -461,9 +518,7 @@ func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cl
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ System Cache cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // runLangVersionManagerCleaner executes the Language Version Manager cleaner.
@@ -475,9 +530,7 @@ func runLangVersionManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 		return domain.CleanResult{}, result.Error()
 	}
 
-	cleanResult := result.Value()
-	fmt.Printf("  ✓ Language Version Manager cleaner completed\n")
-	return cleanResult, nil
+	return result.Value(), nil
 }
 
 // getPresetSelection returns cleaner selection based on preset mode.
@@ -537,4 +590,13 @@ func getCleanerName(cleanerType CleanerType) string {
 	default:
 		return string(cleanerType)
 	}
+}
+
+// isSystemCacheAvailable checks if System Cache cleaner is available.
+func isSystemCacheAvailable(ctx context.Context) bool {
+	cleaner, err := cleaner.NewSystemCacheCleaner(false, false, "30d")
+	if err != nil {
+		return false
+	}
+	return cleaner.IsAvailable(ctx)
 }
