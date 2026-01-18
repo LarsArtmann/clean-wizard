@@ -15,11 +15,11 @@ import (
 
 // BuildCacheCleaner handles build tool cache cleanup.
 type BuildCacheCleaner struct {
-	verbose      bool
-	dryRun       bool
-	olderThan    time.Duration
-	toolTypes    []BuildToolType
-	basePaths    []string
+	verbose   bool
+	dryRun    bool
+	olderThan time.Duration
+	toolTypes []BuildToolType
+	basePaths []string
 }
 
 // BuildToolType represents different build tool types.
@@ -412,7 +412,6 @@ func (bcc *BuildCacheCleaner) getDirSize(path string) int64 {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return 0
 	}
@@ -433,7 +432,6 @@ func (bcc *BuildCacheCleaner) getDirModTime(path string) time.Time {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return time.Time{}
 	}

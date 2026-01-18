@@ -75,18 +75,18 @@ func TestNodePackageManagerCleaner_Type(t *testing.T) {
 
 func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 	tests := []struct {
-		name            string
-		packageManagers []NodePackageManagerType
+		name              string
+		packageManagers   []NodePackageManagerType
 		shouldBeAvailable bool
 	}{
 		{
-			name:            "all package managers",
-			packageManagers: AvailableNodePackageManagers(),
+			name:              "all package managers",
+			packageManagers:   AvailableNodePackageManagers(),
 			shouldBeAvailable: true, // At least npm should be available
 		},
 		{
-			name:            "empty package managers",
-			packageManagers: []NodePackageManagerType{},
+			name:              "empty package managers",
+			packageManagers:   []NodePackageManagerType{},
 			shouldBeAvailable: false,
 		},
 	}

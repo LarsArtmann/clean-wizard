@@ -16,8 +16,8 @@ import (
 
 // GoCleaner handles Go language cleanup.
 type GoCleaner struct {
-	verbose bool
-	dryRun  bool
+	verbose         bool
+	dryRun          bool
 	cleanCache      bool
 	cleanTestCache  bool
 	cleanModCache   bool
@@ -27,9 +27,9 @@ type GoCleaner struct {
 // NewGoCleaner creates Go cleaner.
 func NewGoCleaner(verbose, dryRun, cleanCache, cleanTestCache, cleanModCache, cleanBuildCache bool) *GoCleaner {
 	return &GoCleaner{
-		verbose:        verbose,
-		dryRun:         dryRun,
-		cleanCache:     cleanCache,
+		verbose:         verbose,
+		dryRun:          dryRun,
+		cleanCache:      cleanCache,
 		cleanTestCache:  cleanTestCache,
 		cleanModCache:   cleanModCache,
 		cleanBuildCache: cleanBuildCache,
@@ -373,7 +373,6 @@ func (gc *GoCleaner) getDirSize(path string) int64 {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return 0
 	}
@@ -394,7 +393,6 @@ func (gc *GoCleaner) getDirModTime(path string) time.Time {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return time.Time{}
 	}

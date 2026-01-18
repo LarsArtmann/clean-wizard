@@ -365,14 +365,14 @@ func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {
 
 func TestBuildCacheCleaner_ParseDuration(t *testing.T) {
 	tests := []struct {
-		duration   string
-		wantValid  bool
+		duration  string
+		wantValid bool
 	}{
 		{"1h", true},
 		{"24h", true},
 		{"7d", true},
 		{"30d", true},
-		{"1w", false},  // Not supported
+		{"1w", false}, // Not supported
 		{"invalid", false},
 	}
 

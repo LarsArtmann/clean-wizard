@@ -14,17 +14,17 @@ import (
 
 // DockerCleaner handles Docker cleanup.
 type DockerCleaner struct {
-	verbose      bool
-	dryRun       bool
-	pruneMode    DockerPruneMode
+	verbose   bool
+	dryRun    bool
+	pruneMode DockerPruneMode
 }
 
 // DockerPruneMode represents Docker prune mode.
 type DockerPruneMode string
 
 const (
-	DockerPruneLight      DockerPruneMode = "light"       // docker system prune -f
-	DockerPruneStandard   DockerPruneMode = "standard"    // docker system prune -af
+	DockerPruneLight      DockerPruneMode = "light"      // docker system prune -f
+	DockerPruneStandard   DockerPruneMode = "standard"   // docker system prune -af
 	DockerPruneAggressive DockerPruneMode = "aggressive" // docker system prune -af --volumes
 )
 

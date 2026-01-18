@@ -18,16 +18,16 @@ import (
 type CleanerType string
 
 const (
-	CleanerTypeNix               CleanerType = "nix"
-	CleanerTypeHomebrew          CleanerType = "homebrew"
-	CleanerTypeTempFiles         CleanerType = "tempfiles"
-	CleanerTypeNodePackages     CleanerType = "nodepackages"
-	CleanerTypeGoPackages       CleanerType = "gopackages"
-	CleanerTypeCargoPackages    CleanerType = "cargopackages"
-	CleanerTypeBuildCache       CleanerType = "buildcache"
-	CleanerTypeDocker           CleanerType = "docker"
-	CleanerTypeSystemCache      CleanerType = "systemcache"
-	CleanerTypeLangVersionMgr   CleanerType = "langversionmanager"
+	CleanerTypeNix            CleanerType = "nix"
+	CleanerTypeHomebrew       CleanerType = "homebrew"
+	CleanerTypeTempFiles      CleanerType = "tempfiles"
+	CleanerTypeNodePackages   CleanerType = "nodepackages"
+	CleanerTypeGoPackages     CleanerType = "gopackages"
+	CleanerTypeCargoPackages  CleanerType = "cargopackages"
+	CleanerTypeBuildCache     CleanerType = "buildcache"
+	CleanerTypeDocker         CleanerType = "docker"
+	CleanerTypeSystemCache    CleanerType = "systemcache"
+	CleanerTypeLangVersionMgr CleanerType = "langversionmanager"
 )
 
 // AvailableCleaners returns all available cleaner types.
@@ -48,85 +48,85 @@ func AvailableCleaners() []CleanerType {
 
 // CleanerConfig holds configuration for each cleaner type.
 type CleanerConfig struct {
-	Type       CleanerType
-	Name       string
+	Type        CleanerType
+	Name        string
 	Description string
-	Icon       string
-	Available  bool
+	Icon        string
+	Available   bool
 }
 
 // GetCleanerConfigs returns all cleaner configurations with availability status.
 func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 	configs := []CleanerConfig{
 		{
-			Type:       CleanerTypeNix,
-			Name:       "Nix Generations",
+			Type:        CleanerTypeNix,
+			Name:        "Nix Generations",
 			Description: "Clean old Nix store generations and optimize store",
-			Icon:       "❄️",
-			Available:  true, // Nix cleaner always available (uses mock data if not)
+			Icon:        "❄️",
+			Available:   true, // Nix cleaner always available (uses mock data if not)
 		},
 		{
-			Type:       CleanerTypeHomebrew,
-			Name:       "Homebrew",
+			Type:        CleanerTypeHomebrew,
+			Name:        "Homebrew",
 			Description: "Clean Homebrew cache and unused packages",
-			Icon:       "🍺",
-			Available:  cleaner.NewHomebrewCleaner(false, false, domain.HomebrewModeAll).IsAvailable(ctx),
+			Icon:        "🍺",
+			Available:   cleaner.NewHomebrewCleaner(false, false, domain.HomebrewModeAll).IsAvailable(ctx),
 		},
 		{
-			Type:       CleanerTypeTempFiles,
-			Name:       "Temporary Files",
+			Type:        CleanerTypeTempFiles,
+			Name:        "Temporary Files",
 			Description: "Clean /tmp files (not dirs) older than 7 days",
-			Icon:       "🗂️",
-			Available:  true, // Temp files cleaner always available
+			Icon:        "🗂️",
+			Available:   true, // Temp files cleaner always available
 		},
 		{
-			Type:       CleanerTypeNodePackages,
-			Name:       "Node.js Packages",
+			Type:        CleanerTypeNodePackages,
+			Name:        "Node.js Packages",
 			Description: "Clean npm, pnpm, yarn, bun caches",
-			Icon:       "📦",
-			Available:  cleaner.NewNodePackageManagerCleaner(false, false, cleaner.AvailableNodePackageManagers()).IsAvailable(ctx),
+			Icon:        "📦",
+			Available:   cleaner.NewNodePackageManagerCleaner(false, false, cleaner.AvailableNodePackageManagers()).IsAvailable(ctx),
 		},
 		{
-			Type:       CleanerTypeGoPackages,
-			Name:       "Go Packages",
+			Type:        CleanerTypeGoPackages,
+			Name:        "Go Packages",
 			Description: "Clean Go module, test, and build caches",
-			Icon:       "🐹",
-			Available:  cleaner.NewGoCleaner(false, false, true, true, true, true).IsAvailable(ctx),
+			Icon:        "🐹",
+			Available:   cleaner.NewGoCleaner(false, false, true, true, true, true).IsAvailable(ctx),
 		},
 		{
-			Type:       CleanerTypeCargoPackages,
-			Name:       "Cargo Packages",
+			Type:        CleanerTypeCargoPackages,
+			Name:        "Cargo Packages",
 			Description: "Clean Rust/Cargo registry and source caches",
-			Icon:       "🦀",
-			Available:  cleaner.NewCargoCleaner(false, false).IsAvailable(ctx),
+			Icon:        "🦀",
+			Available:   cleaner.NewCargoCleaner(false, false).IsAvailable(ctx),
 		},
 		{
-			Type:       CleanerTypeBuildCache,
-			Name:       "Build Cache",
+			Type:        CleanerTypeBuildCache,
+			Name:        "Build Cache",
 			Description: "Clean Gradle, Maven, and SBT caches",
-			Icon:       "🔨",
-			Available:  true, // Build cache cleaner always available
+			Icon:        "🔨",
+			Available:   true, // Build cache cleaner always available
 		},
 		{
-			Type:       CleanerTypeDocker,
-			Name:       "Docker",
+			Type:        CleanerTypeDocker,
+			Name:        "Docker",
 			Description: "Clean Docker images, containers, and volumes",
-			Icon:       "🐳",
-			Available:  cleaner.NewDockerCleaner(false, false, cleaner.DockerPruneStandard).IsAvailable(ctx),
+			Icon:        "🐳",
+			Available:   cleaner.NewDockerCleaner(false, false, cleaner.DockerPruneStandard).IsAvailable(ctx),
 		},
 		{
-			Type:       CleanerTypeSystemCache,
-			Name:       "System Cache",
+			Type:        CleanerTypeSystemCache,
+			Name:        "System Cache",
 			Description: "Clean macOS Spotlight, Xcode, CocoaPods caches",
-			Icon:       "⚙️",
-			Available:  isSystemCacheAvailable(ctx),
+			Icon:        "⚙️",
+			Available:   isSystemCacheAvailable(ctx),
 		},
 		{
-			Type:       CleanerTypeLangVersionMgr,
-			Name:       "Language Version Managers",
+			Type:        CleanerTypeLangVersionMgr,
+			Name:        "Language Version Managers",
 			Description: "Clean NVM, Pyenv, and Rbenv versions (WARNING: Destructive)",
-			Icon:       "🗑️",
-			Available:  true, // Lang version manager cleaner always available
+			Icon:        "🗑️",
+			Available:   true, // Lang version manager cleaner always available
 		},
 	}
 	return configs

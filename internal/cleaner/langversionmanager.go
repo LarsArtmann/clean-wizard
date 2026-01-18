@@ -15,9 +15,9 @@ import (
 
 // LanguageVersionManagerCleaner handles language version manager cleanup.
 type LanguageVersionManagerCleaner struct {
-	verbose            bool
-	dryRun             bool
-	managerTypes       []LangVersionManagerType
+	verbose      bool
+	dryRun       bool
+	managerTypes []LangVersionManagerType
 }
 
 // LangVersionManagerType represents different language version manager types.
@@ -308,7 +308,6 @@ func (lvmc *LanguageVersionManagerCleaner) getDirSize(path string) int64 {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return 0
 	}
@@ -329,7 +328,6 @@ func (lvmc *LanguageVersionManagerCleaner) getDirModTime(path string) time.Time 
 		}
 		return nil
 	})
-
 	if err != nil {
 		return time.Time{}
 	}

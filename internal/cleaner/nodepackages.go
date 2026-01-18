@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 	"time"
 
@@ -17,10 +18,10 @@ import (
 type NodePackageManagerType string
 
 const (
-	NodePackageManagerNPM    NodePackageManagerType = "npm"
-	NodePackageManagerPNPM   NodePackageManagerType = "pnpm"
-	NodePackageManagerYarn   NodePackageManagerType = "yarn"
-	NodePackageManagerBun    NodePackageManagerType = "bun"
+	NodePackageManagerNPM  NodePackageManagerType = "npm"
+	NodePackageManagerPNPM NodePackageManagerType = "pnpm"
+	NodePackageManagerYarn NodePackageManagerType = "yarn"
+	NodePackageManagerBun  NodePackageManagerType = "bun"
 )
 
 // AvailableNodePackageManagers returns all available Node.js package managers.
@@ -35,17 +36,17 @@ func AvailableNodePackageManagers() []NodePackageManagerType {
 
 // NodePackageManagerCleaner handles Node.js package manager cleanup.
 type NodePackageManagerCleaner struct {
-	verbose          bool
-	dryRun           bool
-	packageManagers   []NodePackageManagerType
+	verbose         bool
+	dryRun          bool
+	packageManagers []NodePackageManagerType
 }
 
 // NewNodePackageManagerCleaner creates Node.js package manager cleaner.
 func NewNodePackageManagerCleaner(verbose, dryRun bool, packageManagers []NodePackageManagerType) *NodePackageManagerCleaner {
 	return &NodePackageManagerCleaner{
-		verbose:          verbose,
-		dryRun:           dryRun,
-		packageManagers:   packageManagers,
+		verbose:         verbose,
+		dryRun:          dryRun,
+		packageManagers: packageManagers,
 	}
 }
 
@@ -56,12 +57,7 @@ func (npmc *NodePackageManagerCleaner) Type() domain.OperationType {
 
 // IsAvailable checks if any Node.js package manager is available.
 func (npmc *NodePackageManagerCleaner) IsAvailable(ctx context.Context) bool {
-	for _, pm := range npmc.packageManagers {
-		if npmc.isPackageManagerAvailable(pm) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(npmc.packageManagers, npmc.isPackageManagerAvailable)
 }
 
 // isPackageManagerAvailable checks if a specific package manager is available.
@@ -92,10 +88,10 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 
 	// Validate package managers are valid
 	validPackageManagers := map[NodePackageManagerType]bool{
-		NodePackageManagerNPM:   true,
-		NodePackageManagerPNPM:  true,
-		NodePackageManagerYarn:  true,
-		NodePackageManagerBun:   true,
+		NodePackageManagerNPM:  true,
+		NodePackageManagerPNPM: true,
+		NodePackageManagerYarn: true,
+		NodePackageManagerBun:  true,
 	}
 
 	for _, pm := range settings.NodePackages.PackageManagers {

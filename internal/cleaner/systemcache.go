@@ -17,7 +17,7 @@ import (
 type SystemCacheCleaner struct {
 	verbose    bool
 	dryRun     bool
-	cacheTypes  []SystemCacheType
+	cacheTypes []SystemCacheType
 	olderThan  time.Duration
 }
 
@@ -25,10 +25,10 @@ type SystemCacheCleaner struct {
 type SystemCacheType string
 
 const (
-	SystemCacheSpotlight   SystemCacheType = "spotlight"
-	SystemCacheXcode       SystemCacheType = "xcode"
-	SystemCacheCocoaPods  SystemCacheType = "cocoapods"
-	SystemCacheHomebrew   SystemCacheType = "homebrew"
+	SystemCacheSpotlight SystemCacheType = "spotlight"
+	SystemCacheXcode     SystemCacheType = "xcode"
+	SystemCacheCocoaPods SystemCacheType = "cocoapods"
+	SystemCacheHomebrew  SystemCacheType = "homebrew"
 )
 
 // AvailableSystemCacheTypes returns all available system cache types.
@@ -53,10 +53,10 @@ func NewSystemCacheCleaner(verbose, dryRun bool, olderThan string) (*SystemCache
 	cacheTypes := AvailableSystemCacheTypes()
 
 	return &SystemCacheCleaner{
-		verbose:   verbose,
-		dryRun:    dryRun,
+		verbose:    verbose,
+		dryRun:     dryRun,
 		cacheTypes: cacheTypes,
-		olderThan: duration,
+		olderThan:  duration,
 	}, nil
 }
 
@@ -79,10 +79,10 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 
 	// Validate cache types
 	validCacheTypes := map[SystemCacheType]bool{
-		SystemCacheSpotlight:  true,
-		SystemCacheXcode:      true,
+		SystemCacheSpotlight: true,
+		SystemCacheXcode:     true,
 		SystemCacheCocoaPods: true,
-		SystemCacheHomebrew:   true,
+		SystemCacheHomebrew:  true,
 	}
 
 	for _, cacheType := range settings.SystemCache.CacheTypes {
@@ -448,7 +448,6 @@ func (scc *SystemCacheCleaner) getDirSize(path string) int64 {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return 0
 	}
@@ -469,7 +468,6 @@ func (scc *SystemCacheCleaner) getDirModTime(path string) time.Time {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return time.Time{}
 	}
