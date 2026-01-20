@@ -37,7 +37,7 @@ All completed tasks eliminated type safety violations and improved code quality 
 **Benefits**:
 
 - ✅ Compile-time validation of strategy values
-- ✅ Prevents typos (e.g., "agressive" vs "aggressive")
+- ✅ Prevents typos (e.g., "aggressive" vs "aggressive")
 - ✅ IDE autocomplete support
 - ✅ YAML configuration maintained
 
