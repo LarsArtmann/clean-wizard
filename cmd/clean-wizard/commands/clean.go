@@ -193,6 +193,10 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 		fmt.Println()
 	} else {
 		// Interactive cleaner selection
+		fmt.Println("⌨️  Keyboard Shortcuts:")
+		fmt.Println("   ↑↓ : Navigate  |  Space : Select  |  Enter : Confirm  |  Esc : Cancel")
+		fmt.Println()
+		// Interactive cleaner selection
 		var selectedTypes []CleanerType
 		form := huh.NewForm(
 			huh.NewGroup(
