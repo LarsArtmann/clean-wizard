@@ -222,6 +222,34 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 
 // cleanGoCache cleans GOCACHE.
 func (gc *GoCleaner) cleanGoCache(ctx context.Context) result.Result[domain.CleanResult] {
+	// Get cache path first to calculate size
+	cachePath, err := gc.getGoEnv(ctx, "GOCACHE")
+	if err != nil || cachePath == "" {
+		// If we can't get the path, still try to clean
+		cmd := exec.CommandContext(ctx, "go", "clean", "-cache")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf("go clean -cache failed: %w (output: %s)", err, string(output)))
+		}
+		if gc.verbose {
+			fmt.Println("  ✓ Go cache cleaned")
+		}
+		return result.Ok(domain.CleanResult{
+			FreedBytes:   0,
+			ItemsRemoved: 1,
+			ItemsFailed:  0,
+			CleanTime:    0,
+			CleanedAt:    time.Now(),
+			Strategy:     domain.StrategyConservative,
+		})
+	}
+
+	// Calculate size before cleaning
+	bytesFreed := int64(0)
+	if !gc.dryRun {
+		bytesFreed = gc.getDirSize(cachePath)
+	}
+
 	cmd := exec.CommandContext(ctx, "go", "clean", "-cache")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -233,7 +261,7 @@ func (gc *GoCleaner) cleanGoCache(ctx context.Context) result.Result[domain.Clea
 	}
 
 	return result.Ok(domain.CleanResult{
-		FreedBytes:   0,
+		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
 		CleanTime:    0,
@@ -244,6 +272,33 @@ func (gc *GoCleaner) cleanGoCache(ctx context.Context) result.Result[domain.Clea
 
 // cleanGoTestCache cleans GOTESTCACHE.
 func (gc *GoCleaner) cleanGoTestCache(ctx context.Context) result.Result[domain.CleanResult] {
+	// Get cache path first to calculate size
+	cachePath, err := gc.getGoEnv(ctx, "GOCACHE")
+	if err != nil || cachePath == "" {
+		// If we can't get the path, still try to clean
+		cmd := exec.CommandContext(ctx, "go", "clean", "-testcache")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache failed: %w (output: %s)", err, string(output)))
+		}
+		if gc.verbose {
+			fmt.Println("  ✓ Go test cache cleaned")
+		}
+		return result.Ok(domain.CleanResult{
+			FreedBytes:   0,
+			ItemsRemoved: 1,
+			ItemsFailed:  0,
+			CleanTime:    0,
+			CleanedAt:    time.Now(),
+			Strategy:     domain.StrategyConservative,
+		})
+	}
+
+	// Calculate size before cleaning (test cache is part of GOCACHE)
+	// Note: test cache doesn't have a separate path, it's managed internally by Go
+	// We'll estimate it as 0 since we can't accurately measure test cache size separately
+	bytesFreed := int64(0)
+
 	cmd := exec.CommandContext(ctx, "go", "clean", "-testcache")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -255,7 +310,7 @@ func (gc *GoCleaner) cleanGoTestCache(ctx context.Context) result.Result[domain.
 	}
 
 	return result.Ok(domain.CleanResult{
-		FreedBytes:   0,
+		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
 		CleanTime:    0,
@@ -266,6 +321,34 @@ func (gc *GoCleaner) cleanGoTestCache(ctx context.Context) result.Result[domain.
 
 // cleanGoModCache cleans GOMODCACHE.
 func (gc *GoCleaner) cleanGoModCache(ctx context.Context) result.Result[domain.CleanResult] {
+	// Get cache path first to calculate size
+	cachePath, err := gc.getGoEnv(ctx, "GOMODCACHE")
+	if err != nil || cachePath == "" {
+		// If we can't get the path, still try to clean
+		cmd := exec.CommandContext(ctx, "go", "clean", "-modcache")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf("go clean -modcache failed: %w (output: %s)", err, string(output)))
+		}
+		if gc.verbose {
+			fmt.Println("  ✓ Go module cache cleaned")
+		}
+		return result.Ok(domain.CleanResult{
+			FreedBytes:   0,
+			ItemsRemoved: 1,
+			ItemsFailed:  0,
+			CleanTime:    0,
+			CleanedAt:    time.Now(),
+			Strategy:     domain.StrategyConservative,
+		})
+	}
+
+	// Calculate size before cleaning
+	bytesFreed := int64(0)
+	if !gc.dryRun {
+		bytesFreed = gc.getDirSize(cachePath)
+	}
+
 	cmd := exec.CommandContext(ctx, "go", "clean", "-modcache")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -277,7 +360,7 @@ func (gc *GoCleaner) cleanGoModCache(ctx context.Context) result.Result[domain.C
 	}
 
 	return result.Ok(domain.CleanResult{
-		FreedBytes:   0,
+		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
 		CleanTime:    0,
@@ -300,7 +383,13 @@ func (gc *GoCleaner) cleanGoBuildCache(ctx context.Context) result.Result[domain
 	}
 
 	itemsRemoved := 0
+	bytesFreed := int64(0)
 	for _, match := range matches {
+		// Calculate size before removal
+		if !gc.dryRun {
+			bytesFreed += gc.getDirSize(match)
+		}
+
 		if gc.dryRun {
 			itemsRemoved++
 			continue
@@ -325,7 +414,7 @@ func (gc *GoCleaner) cleanGoBuildCache(ctx context.Context) result.Result[domain
 	}
 
 	return result.Ok(domain.CleanResult{
-		FreedBytes:   0,
+		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  0,
 		CleanTime:    0,

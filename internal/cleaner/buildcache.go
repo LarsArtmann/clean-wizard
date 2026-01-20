@@ -256,7 +256,13 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		}
 
 		itemsRemoved := 0
+		bytesFreed := int64(0)
 		for _, match := range matches {
+			// Calculate size before removal
+			if !bcc.dryRun {
+				bytesFreed += bcc.getDirSize(match)
+			}
+
 			if bcc.dryRun {
 				itemsRemoved++
 				continue
@@ -281,7 +287,7 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		}
 
 		return result.Ok(domain.CleanResult{
-			FreedBytes:   0,
+			FreedBytes:   uint64(bytesFreed),
 			ItemsRemoved: uint(itemsRemoved),
 			ItemsFailed:  0,
 			CleanTime:    0,
@@ -299,7 +305,15 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		}
 
 		itemsRemoved := 0
+		bytesFreed := int64(0)
 		for _, match := range matches {
+			// Calculate size before removal
+			if !bcc.dryRun {
+				if info, err := os.Stat(match); err == nil {
+					bytesFreed += info.Size()
+				}
+			}
+
 			if bcc.dryRun {
 				itemsRemoved++
 				continue
@@ -324,7 +338,7 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		}
 
 		return result.Ok(domain.CleanResult{
-			FreedBytes:   0,
+			FreedBytes:   uint64(bytesFreed),
 			ItemsRemoved: uint(itemsRemoved),
 			ItemsFailed:  0,
 			CleanTime:    0,
@@ -341,7 +355,13 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		}
 
 		itemsRemoved := 0
+		bytesFreed := int64(0)
 		for _, match := range matches {
+			// Calculate size before removal
+			if !bcc.dryRun {
+				bytesFreed += bcc.getDirSize(match)
+			}
+
 			if bcc.dryRun {
 				itemsRemoved++
 				continue
@@ -366,7 +386,7 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		}
 
 		return result.Ok(domain.CleanResult{
-			FreedBytes:   0,
+			FreedBytes:   uint64(bytesFreed),
 			ItemsRemoved: uint(itemsRemoved),
 			ItemsFailed:  0,
 			CleanTime:    0,
