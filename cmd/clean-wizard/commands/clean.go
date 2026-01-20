@@ -306,6 +306,13 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 	fmt.Printf("   • Cleaned %d item(s)\n", totalItemsRemoved)
 	fmt.Printf("   • Freed %s\n", format.Bytes(int64(totalBytesFreed)))
 
+	// Add encouraging message based on space freed
+	if totalBytesFreed > 1_000_000_000 { // > 1 GB
+		fmt.Println("\n🎉 Great job! You freed over 1 GB of space!")
+	} else if totalBytesFreed > 100_000_000 { // > 100 MB
+		fmt.Println("\n✅ Nice! You freed some space.")
+	}
+
 	if dryRun {
 		fmt.Println("\n💡 Tip: Remove --dry-run flag to actually clean:")
 		fmt.Println("   clean-wizard clean --mode standard")
