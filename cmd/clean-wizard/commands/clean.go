@@ -302,6 +302,11 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 	fmt.Printf("   • Cleaned %d item(s)\n", totalItemsRemoved)
 	fmt.Printf("   • Freed %s\n", format.Bytes(int64(totalBytesFreed)))
 
+	if dryRun {
+		fmt.Println("\n💡 Tip: Remove --dry-run flag to actually clean:")
+		fmt.Println("   clean-wizard clean --mode standard")
+	}
+
 	// Show errors and warnings
 	if totalItemsFailed > 0 {
 		fmt.Printf("   • %d item(s) failed to clean\n", totalItemsFailed)
