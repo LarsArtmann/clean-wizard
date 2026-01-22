@@ -15,7 +15,7 @@ func main() {
 	fmt.Println("=== Go Cache Cleaner Test ===\n")
 
 	// Test 1: Check Go is available
-	goCleaner := cleaner.NewGoCleaner(true, false, true, true, true, true)
+	goCleaner := cleaner.NewGoCleaner(true, false, true, true, true, true, true)
 	if !goCleaner.IsAvailable(ctx) {
 		fmt.Println("❌ Go is not available")
 		os.Exit(1)

@@ -16,6 +16,7 @@ func TestNewGoCleaner(t *testing.T) {
 		cleanTestCache  bool
 		cleanModCache   bool
 		cleanBuildCache bool
+		cleanLintCache  bool
 	}{
 		{
 			name:            "all caches enabled",
@@ -25,6 +26,7 @@ func TestNewGoCleaner(t *testing.T) {
 			cleanTestCache:  true,
 			cleanModCache:   true,
 			cleanBuildCache: true,
+			cleanLintCache:  true,
 		},
 		{
 			name:            "only cache enabled",
@@ -34,6 +36,7 @@ func TestNewGoCleaner(t *testing.T) {
 			cleanTestCache:  false,
 			cleanModCache:   false,
 			cleanBuildCache: false,
+			cleanLintCache:  false,
 		},
 		{
 			name:            "dry-run with all caches",
@@ -43,12 +46,13 @@ func TestNewGoCleaner(t *testing.T) {
 			cleanTestCache:  true,
 			cleanModCache:   true,
 			cleanBuildCache: true,
+			cleanLintCache:  true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleaner(tt.verbose, tt.dryRun, tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache)
+			cleaner := NewGoCleaner(tt.verbose, tt.dryRun, tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, tt.cleanLintCache)
 
 			if cleaner == nil {
 				t.Fatal("NewGoCleaner() returned nil cleaner")
@@ -82,7 +86,7 @@ func TestNewGoCleaner(t *testing.T) {
 }
 
 func TestGoCleaner_Type(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true)
+	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
 
 	if cleaner.Type() != domain.OperationTypeGoPackages {
 		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeGoPackages)
@@ -90,7 +94,7 @@ func TestGoCleaner_Type(t *testing.T) {
 }
 
 func TestGoCleaner_IsAvailable(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true)
+	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
 	available := cleaner.IsAvailable(context.Background())
 
 	// Result depends on Go installation
@@ -156,7 +160,7 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleaner(false, false, true, true, true, true)
+			cleaner := NewGoCleaner(false, false, true, true, true, true, false)
 
 			err := cleaner.ValidateSettings(tt.settings)
 			if (err != nil) != tt.wantErr {
@@ -211,7 +215,7 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleaner(false, true, tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache)
+			cleaner := NewGoCleaner(false, true, tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, false)
 
 			result := cleaner.Clean(context.Background())
 			if result.IsErr() {
@@ -239,7 +243,7 @@ func TestGoCleaner_Clean_NoAvailable(t *testing.T) {
 	// This test would fail if Go is installed
 	// We just verify the error handling logic
 
-	cleaner := NewGoCleaner(false, false, true, true, true, true)
+	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
 
 	// Can't easily test "Go not available" case without mocking
 	// So we just verify IsAvailable is called
@@ -247,7 +251,7 @@ func TestGoCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestGoCleaner_GetHomeDir(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true)
+	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
 
 	// Set HOME explicitly
 	t.Setenv("HOME", "/test/home")
@@ -274,7 +278,7 @@ func TestGoCleaner_GetHomeDir(t *testing.T) {
 }
 
 func TestGoCleaner_GetDirSize(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true)
+	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
 
 	// Test with non-existent path
 	size := cleaner.getDirSize("/non/existent/path/12345")
@@ -293,7 +297,7 @@ func TestGoCleaner_GetDirSize(t *testing.T) {
 }
 
 func TestGoCleaner_GetDirModTime(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true)
+	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
 
 	// Test with non-existent path
 	modTime := cleaner.getDirModTime("/non/existent/path/12345")
@@ -310,7 +314,7 @@ func TestGoCleaner_GetDirModTime(t *testing.T) {
 }
 
 func TestGoCleaner_DryRunStrategy(t *testing.T) {
-	cleaner := NewGoCleaner(false, true, true, true, true, true)
+	cleaner := NewGoCleaner(false, true, true, true, true, true, true)
 
 	result := cleaner.Clean(context.Background())
 	if result.IsErr() {
@@ -327,5 +331,22 @@ func TestGoCleaner_DryRunStrategy(t *testing.T) {
 	// Verify no files were actually removed (dry-run)
 	if cleanResult.ItemsRemoved == 0 {
 		t.Error("Dry-run should report items that would be removed")
+	}
+}
+
+func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {
+	cleaner := NewGoCleaner(true, false, false, false, false, false, true)
+
+	result := cleaner.cleanGolangciLintCache(context.Background())
+	if result.IsErr() {
+		// golangci-lint might not be installed, which is acceptable
+		t.Logf("cleanGolangciLintCache() returned error (golangci-lint may not be installed): %v", result.Error())
+		return
+	}
+
+	cleanResult := result.Value()
+
+	if cleanResult.ItemsRemoved != 1 {
+		t.Errorf("cleanGolangciLintCache() removed %d items, want 1", cleanResult.ItemsRemoved)
 	}
 }

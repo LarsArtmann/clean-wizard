@@ -16,23 +16,25 @@ import (
 
 // GoCleaner handles Go language cleanup.
 type GoCleaner struct {
-	verbose         bool
-	dryRun          bool
-	cleanCache      bool
-	cleanTestCache  bool
-	cleanModCache   bool
-	cleanBuildCache bool
+	verbose          bool
+	dryRun           bool
+	cleanCache       bool
+	cleanTestCache   bool
+	cleanModCache    bool
+	cleanBuildCache  bool
+	cleanLintCache   bool
 }
 
 // NewGoCleaner creates Go cleaner.
-func NewGoCleaner(verbose, dryRun, cleanCache, cleanTestCache, cleanModCache, cleanBuildCache bool) *GoCleaner {
+func NewGoCleaner(verbose, dryRun, cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache bool) *GoCleaner {
 	return &GoCleaner{
-		verbose:         verbose,
-		dryRun:          dryRun,
-		cleanCache:      cleanCache,
-		cleanTestCache:  cleanTestCache,
-		cleanModCache:   cleanModCache,
-		cleanBuildCache: cleanBuildCache,
+		verbose:          verbose,
+		dryRun:           dryRun,
+		cleanCache:       cleanCache,
+		cleanTestCache:   cleanTestCache,
+		cleanModCache:    cleanModCache,
+		cleanBuildCache:  cleanBuildCache,
+		cleanLintCache:   cleanLintCache,
 	}
 }
 
@@ -140,6 +142,9 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 		if gc.cleanBuildCache {
 			itemsRemoved++
 		}
+		if gc.cleanLintCache {
+			itemsRemoved++
+		}
 
 		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
 		return result.Ok(cleanResult)
@@ -200,6 +205,20 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 			itemsFailed++
 			if gc.verbose {
 				fmt.Printf("Warning: failed to clean Go build cache: %v\n", result.Error())
+			}
+		} else {
+			itemsRemoved++
+			bytesFreed += int64(result.Value().FreedBytes)
+		}
+	}
+
+	// Clean golangci-lint cache
+	if gc.cleanLintCache {
+		result := gc.cleanGolangciLintCache(ctx)
+		if result.IsErr() {
+			itemsFailed++
+			if gc.verbose {
+				fmt.Printf("Warning: failed to clean golangci-lint cache: %v\n", result.Error())
 			}
 		} else {
 			itemsRemoved++
@@ -416,6 +435,43 @@ func (gc *GoCleaner) cleanGoBuildCache(ctx context.Context) result.Result[domain
 	return result.Ok(domain.CleanResult{
 		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: uint(itemsRemoved),
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	})
+}
+
+// cleanGolangciLintCache cleans golangci-lint cache.
+func (gc *GoCleaner) cleanGolangciLintCache(ctx context.Context) result.Result[domain.CleanResult] {
+	_, err := exec.LookPath("golangci-lint")
+	if err != nil {
+		if gc.verbose {
+			fmt.Println("  ⚠️  golangci-lint not found, skipping cache cleanup")
+		}
+		return result.Ok(domain.CleanResult{
+			FreedBytes:   0,
+			ItemsRemoved: 0,
+			ItemsFailed:  0,
+			CleanTime:    0,
+			CleanedAt:    time.Now(),
+			Strategy:     domain.StrategyConservative,
+		})
+	}
+
+	cmd := exec.CommandContext(ctx, "golangci-lint", "cache", "clean")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("golangci-lint cache clean failed: %w (output: %s)", err, string(output)))
+	}
+
+	if gc.verbose {
+		fmt.Println("  ✓ golangci-lint cache cleaned")
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   0,
+		ItemsRemoved: 1,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
