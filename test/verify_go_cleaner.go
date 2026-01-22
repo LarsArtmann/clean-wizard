@@ -15,7 +15,7 @@ func main() {
 	fmt.Println("=== Go Cache Cleaner Verification ===\n")
 
 	// Test 1: Check Go is available
-	goCleaner := cleaner.NewGoCleaner(true, false, true, true, true, true, true)
+	goCleaner := cleaner.NewGoCleaner(true, false, true, true, false, true, false)
 	if !goCleaner.IsAvailable(ctx) {
 		fmt.Println("❌ Go is not available")
 		os.Exit(1)
@@ -44,7 +44,7 @@ func main() {
 
 	// Test 3: Dry-run clean
 	fmt.Println("🧹 Testing dry-run clean...")
-	dryRunCleaner := cleaner.NewGoCleaner(true, true, true, true, true, true)
+	dryRunCleaner := cleaner.NewGoCleaner(true, true, true, true, false, true, false)
 	cleanResult := dryRunCleaner.Clean(ctx)
 	if cleanResult.IsErr() {
 		fmt.Printf("❌ Clean failed: %v\n", cleanResult.Error())

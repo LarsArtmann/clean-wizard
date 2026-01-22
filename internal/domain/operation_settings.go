@@ -185,9 +185,9 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 			GoPackages: &GoPackagesSettings{
 				CleanCache:       true,
 				CleanTestCache:   true,
-				CleanModCache:    true,
+				CleanModCache:    false,
 				CleanBuildCache:  true,
-				CleanLintCache:   true,
+				CleanLintCache:   false,
 			},
 		}
 	case OperationTypeCargoPackages:
