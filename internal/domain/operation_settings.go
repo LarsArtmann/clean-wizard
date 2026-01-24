@@ -35,6 +35,9 @@ type OperationSettings struct {
 
 	// System Temp Settings
 	SystemTemp *SystemTempSettings `json:"system_temp,omitempty" yaml:"system_temp,omitempty"`
+
+	// Projects Management Automation Settings
+	ProjectsManagementAutomation *ProjectsManagementAutomationSettings `json:"projects_management_automation,omitempty" yaml:"projects_management_automation,omitempty"`
 }
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup.
@@ -103,21 +106,27 @@ type SystemTempSettings struct {
 	OlderThan string   `json:"older_than" yaml:"older_than"`
 }
 
+// ProjectsManagementAutomationSettings provides type-safe settings for projects management automation cleanup.
+type ProjectsManagementAutomationSettings struct {
+	ClearCache bool `json:"clear_cache" yaml:"clear_cache"`
+}
+
 // OperationType represents different types of cleanup operations.
 type OperationType string
 
 const (
-	OperationTypeNixGenerations     OperationType = "nix-generations"
-	OperationTypeTempFiles          OperationType = "temp-files"
-	OperationTypeHomebrew           OperationType = "homebrew-cleanup"
-	OperationTypeNodePackages       OperationType = "node-packages"
-	OperationTypeGoPackages         OperationType = "go-packages"
-	OperationTypeCargoPackages      OperationType = "cargo-packages"
-	OperationTypeBuildCache         OperationType = "build-cache"
-	OperationTypeDocker             OperationType = "docker"
-	OperationTypeSystemCache        OperationType = "system-cache"
-	OperationTypeLangVersionManager OperationType = "lang-version-manager"
-	OperationTypeSystemTemp         OperationType = "system-temp"
+	OperationTypeNixGenerations              OperationType = "nix-generations"
+	OperationTypeTempFiles                   OperationType = "temp-files"
+	OperationTypeHomebrew                    OperationType = "homebrew-cleanup"
+	OperationTypeNodePackages                OperationType = "node-packages"
+	OperationTypeGoPackages                  OperationType = "go-packages"
+	OperationTypeCargoPackages               OperationType = "cargo-packages"
+	OperationTypeBuildCache                  OperationType = "build-cache"
+	OperationTypeDocker                      OperationType = "docker"
+	OperationTypeSystemCache                 OperationType = "system-cache"
+	OperationTypeLangVersionManager          OperationType = "lang-version-manager"
+	OperationTypeSystemTemp                  OperationType = "system-temp"
+	OperationTypeProjectsManagementAutomation OperationType = "projects-management-automation"
 )
 
 // GetOperationType returns the operation type from operation name.
@@ -145,6 +154,8 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeLangVersionManager
 	case "system-temp":
 		return OperationTypeSystemTemp
+	case "projects-management-automation":
+		return OperationTypeProjectsManagementAutomation
 	default:
 		return OperationType(name) // Fallback for custom types
 	}
@@ -227,6 +238,12 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 			SystemTemp: &SystemTempSettings{
 				Paths:     []string{"/tmp", "/var/tmp"},
 				OlderThan: "30d",
+			},
+		}
+	case OperationTypeProjectsManagementAutomation:
+		return &OperationSettings{
+			ProjectsManagementAutomation: &ProjectsManagementAutomationSettings{
+				ClearCache: true,
 			},
 		}
 	default:

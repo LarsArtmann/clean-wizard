@@ -18,16 +18,17 @@ import (
 type CleanerType string
 
 const (
-	CleanerTypeNix            CleanerType = "nix"
-	CleanerTypeHomebrew       CleanerType = "homebrew"
-	CleanerTypeTempFiles      CleanerType = "tempfiles"
-	CleanerTypeNodePackages   CleanerType = "nodepackages"
-	CleanerTypeGoPackages     CleanerType = "gopackages"
-	CleanerTypeCargoPackages  CleanerType = "cargopackages"
-	CleanerTypeBuildCache     CleanerType = "buildcache"
-	CleanerTypeDocker         CleanerType = "docker"
-	CleanerTypeSystemCache    CleanerType = "systemcache"
-	CleanerTypeLangVersionMgr CleanerType = "langversionmanager"
+	CleanerTypeNix                          CleanerType = "nix"
+	CleanerTypeHomebrew                     CleanerType = "homebrew"
+	CleanerTypeTempFiles                    CleanerType = "tempfiles"
+	CleanerTypeNodePackages                 CleanerType = "nodepackages"
+	CleanerTypeGoPackages                   CleanerType = "gopackages"
+	CleanerTypeCargoPackages                CleanerType = "cargopackages"
+	CleanerTypeBuildCache                   CleanerType = "buildcache"
+	CleanerTypeDocker                      CleanerType = "docker"
+	CleanerTypeSystemCache                 CleanerType = "systemcache"
+	CleanerTypeLangVersionMgr              CleanerType = "langversionmanager"
+	CleanerTypeProjectsManagementAutomation CleanerType = "projectsmanagementautomation"
 )
 
 // AvailableCleaners returns all available cleaner types.
@@ -43,6 +44,7 @@ func AvailableCleaners() []CleanerType {
 		CleanerTypeDocker,
 		CleanerTypeSystemCache,
 		CleanerTypeLangVersionMgr,
+		CleanerTypeProjectsManagementAutomation,
 	}
 }
 
@@ -127,6 +129,13 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 			Description: "Clean NVM, Pyenv, and Rbenv versions (WARNING: Destructive)",
 			Icon:        "🗑️",
 			Available:   true, // Lang version manager cleaner always available
+		},
+		{
+			Type:        CleanerTypeProjectsManagementAutomation,
+			Name:        "Projects Management Automation",
+			Description: "Clear projects-management-automation cache",
+			Icon:        "⚙️",
+			Available:   cleaner.NewProjectsManagementAutomationCleaner(false, false).IsAvailable(ctx),
 		},
 	}
 	return configs
@@ -361,6 +370,8 @@ func runCleaner(ctx context.Context, cleanerType CleanerType, dryRun, verbose bo
 		result, err = runSystemCacheCleaner(ctx, dryRun, verbose)
 	case CleanerTypeLangVersionMgr:
 		result, err = runLangVersionManagerCleaner(ctx, dryRun, verbose)
+	case CleanerTypeProjectsManagementAutomation:
+		result, err = runProjectsManagementAutomationCleaner(ctx, dryRun, verbose)
 	default:
 		return domain.CleanResult{}, fmt.Errorf("unknown cleaner type: %s", cleanerType)
 	}
@@ -549,6 +560,18 @@ func runLangVersionManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 	return result.Value(), nil
 }
 
+// runProjectsManagementAutomationCleaner executes Projects Management Automation cleaner.
+func runProjectsManagementAutomationCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
+	projectsManagementAutomationCleaner := cleaner.NewProjectsManagementAutomationCleaner(verbose, dryRun)
+
+	result := projectsManagementAutomationCleaner.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	return result.Value(), nil
+}
+
 // getPresetSelection returns cleaner selection based on preset mode.
 func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 	switch mode {
@@ -603,6 +626,8 @@ func getCleanerName(cleanerType CleanerType) string {
 		return "System Cache"
 	case CleanerTypeLangVersionMgr:
 		return "Language Version Managers"
+	case CleanerTypeProjectsManagementAutomation:
+		return "Projects Management Automation"
 	default:
 		return string(cleanerType)
 	}
