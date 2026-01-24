@@ -2335,6 +2335,7 @@ type SizeEstimate struct {
    - How to combine: "250 MB (some unknown)"? (messy)
 
 3. **Aggregation problems** - How to sum totals?
+
    ```go
    total := SizeEstimate{}
    for _, result := range results {
