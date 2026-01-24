@@ -1,4 +1,5 @@
 # 🚨 ARCHITECTURAL REVIEW & STATUS REPORT
+
 ## Golangci-Lint Cache Cleaning Implementation
 
 **Date**: 2026-01-20
@@ -11,7 +12,9 @@
 ## 📊 EXECUTIVE SUMMARY
 
 ### ✅ What Was Done
+
 Successfully implemented golangci-lint cache cleaning functionality with:
+
 - Domain type extension with `CleanLintCache` field
 - Cleaner integration with `cleanGolangciLintCache()` method
 - Conservative defaults (lint cache disabled by default)
@@ -19,12 +22,15 @@ Successfully implemented golangci-lint cache cleaning functionality with:
 - Updated all 12 call sites with new parameter
 
 ### 🚨 Critical Architectural Issues Identified
+
 **3 SEVERE** violations requiring immediate attention:
+
 1. **Type Safety Violation** - 5 booleans instead of type-safe enum
 2. **Data Integrity Lie** - Returns `FreedBytes: 0` when bytes were freed
 3. **File Size Violation** - 490+ lines (limit: 350 lines)
 
 ### 🟡 Medium Priority Issues
+
 - No scan support for lint cache
 - No BDD tests
 - Duplicated error handling (4x)
@@ -35,12 +41,15 @@ Successfully implemented golangci-lint cache cleaning functionality with:
 ## ✅ FULLY DONE (Production Ready)
 
 ### 1. Core Implementation - 100% COMPLETE
+
 **File**: `internal/domain/operation_settings.go`
+
 - Added `CleanLintCache bool` field to `GoPackagesSettings` (line 67)
 - Updated `DefaultSettings()` with conservative defaults (line 190)
   - `CleanLintCache: false` (disabled by default)
 
 **File**: `internal/cleaner/golang.go`
+
 - Added `cleanLintCache` field to `GoCleaner` struct (line 25)
 - Updated constructor signature to accept 7th parameter (line 28)
 - Implemented `cleanGolangciLintCache()` method (lines 396-423)
@@ -53,6 +62,7 @@ Successfully implemented golangci-lint cache cleaning functionality with:
 - Added dry-run support (line 145)
 
 ### 2. Integration - 100% COMPLETE
+
 - **12 Call Sites Updated** (all passing 7 parameters):
   1. `cmd/clean-wizard/commands/clean.go:94` (availability check)
   2. `cmd/clean-wizard/commands/clean.go:476` (runGoCleaner)
@@ -60,7 +70,7 @@ Successfully implemented golangci-lint cache cleaning functionality with:
   4. `test/verify_go_cleaner.go:47` (dry-run)
   5. `test_go_cleaner_main.go:18` (main test)
   6. `test_go_cleaner_main.go:47` (dry-run)
-  7-12. `internal/cleaner/golang_test.go` (6 test functions)
+     7-12. `internal/cleaner/golang_test.go` (6 test functions)
 
 - **Parameter Pattern Applied**:
   ```go
@@ -73,7 +83,9 @@ Successfully implemented golangci-lint cache cleaning functionality with:
   ```
 
 ### 3. Testing - 100% COMPLETE
+
 **File**: `internal/cleaner/golang_test.go`
+
 - Updated `TestNewGoCleaner` with `cleanLintCache` field (line 19)
 - Added test cases for all cache combinations
 - Added `TestGoCleaner_CleanGolangciLintCache()` (lines 337-353)
@@ -82,7 +94,9 @@ Successfully implemented golangci-lint cache cleaning functionality with:
   - Proper error handling
 
 ### 4. Documentation - 0% COMPLETE (DEFERRED)
+
 **Files Needing Updates**:
+
 - `USAGE.md` - No documentation of `clean_lint_cache` option
 - `HOW_TO_USE.md` - No usage examples
 - `test-config.yaml` - No example setting
@@ -94,7 +108,9 @@ Successfully implemented golangci-lint cache cleaning functionality with:
 ## 🟡 PARTIALLY DONE (Needs Refactoring)
 
 ### 1. Type Safety - 40% COMPLETE (CRITICAL ISSUE)
+
 **Current State**: Uses 5 boolean parameters
+
 ```go
 type GoCleaner struct {
     verbose         bool
@@ -108,12 +124,14 @@ type GoCleaner struct {
 ```
 
 **Problem**:
+
 - Can enable/disable independently (good)
 - But can have ALL false = invalid state (bad)
 - Type system doesn't enforce at least one must be true
 - No validation on construction
 
 **Should Be**:
+
 ```go
 type GoCacheType uint16
 
@@ -163,6 +181,7 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 ```
 
 **Benefits**:
+
 - ✅ Impossible to have all caches disabled (compile-time)
 - ✅ Can enable multiple caches (bit flags)
 - ✅ Type-safe API
@@ -170,6 +189,7 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 - ✅ Better ergonomics: `NewGoCleaner(v, dr, GoCacheGOCACHE|GoCacheLintCache)`
 
 **Migration Path**:
+
 1. Create `GoCacheType` enum in new file
 2. Add conversion methods to `GoPackagesSettings`
 3. Update `GoCleaner` to use `GoCacheType`
@@ -184,7 +204,9 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 ---
 
 ### 2. Data Integrity - 30% COMPLETE (CRITICAL ISSUE)
+
 **Current State**: Lies about bytes freed
+
 ```go
 func (gc *GoCleaner) cleanGolangciLintCache(ctx context.Context) result.Result[domain.CleanResult] {
     // ... executes golangci-lint cache clean ...
@@ -197,6 +219,7 @@ func (gc *GoCleaner) cleanGolangciLintCache(ctx context.Context) result.Result[d
 ```
 
 **Problem**:
+
 - Domain layer returns `FreedBytes: 0`
 - But cache WAS cleaned (ItemsRemoved: 1)
 - Callers can't trust `FreedBytes` field
@@ -204,6 +227,7 @@ func (gc *GoCleaner) cleanGolangciLintCache(ctx context.Context) result.Result[d
 - Breaks domain model integrity
 
 **Should Be**:
+
 ```go
 // NEW: Honest size reporting type
 type SizeEstimate struct {
@@ -238,6 +262,7 @@ type CleanResult struct {
 ```
 
 **Usage**:
+
 ```go
 func (gc *GoCleaner) cleanGolangciLintCache(ctx context.Context) result.Result[domain.CleanResult] {
     // ... executes golangci-lint cache clean ...
@@ -261,6 +286,7 @@ func (gc *GoCleaner) cleanGoCache(ctx context.Context) result.Result[domain.Clea
 ```
 
 **Output Formatting**:
+
 ```go
 // BEFORE: Confusing
 "✅ Go cache cleaned: 0 bytes freed"  // User: "Did it actually work?"
@@ -270,6 +296,7 @@ func (gc *GoCleaner) cleanGoCache(ctx context.Context) result.Result[domain.Clea
 ```
 
 **Migration Path**:
+
 1. Create `SizeEstimate` type in `internal/domain/types.go`
 2. Add `SizeEstimate SizeEstimate` field to `CleanResult`
 3. Update all cleaners to populate `SizeEstimate`
@@ -283,10 +310,12 @@ func (gc *GoCleaner) cleanGoCache(ctx context.Context) result.Result[domain.Clea
 ---
 
 ### 3. File Size Limits - 20% COMPLETE (CRITICAL ISSUE)
+
 **Current State**: Single file at 490+ lines
 **Standard**: Maximum 350 lines per file
 
 **File**: `internal/cleaner/golang.go`
+
 ```
 Total Lines: 490+
 Limit:      350 lines
@@ -294,6 +323,7 @@ Exceeded:   140 lines (40% over limit)
 ```
 
 **Structure**:
+
 - Lines 1-25: Struct definition (25 lines)
 - Lines 27-37: Constructor (10 lines)
 - Lines 39-42: Type() method (3 lines)
@@ -309,6 +339,7 @@ Exceeded:   140 lines (40% over limit)
 - Lines 437-490: Helper methods (53 lines)
 
 **Problem**:
+
 - Single file doing too many things
 - Hard to understand (cognitive load)
 - Hard to test (everything in one place)
@@ -318,6 +349,7 @@ Exceeded:   140 lines (40% over limit)
 **Should Be** (Split into 4 files):
 
 #### File 1: `internal/cleaner/golang_cleaner.go` (< 200 lines)
+
 ```go
 // Core cleaner interface and orchestration
 package cleaner
@@ -405,6 +437,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 ```
 
 #### File 2: `internal/cleaner/golang_cache_cleaner.go` (< 150 lines)
+
 ```go
 // Go-specific cache cleaning operations
 package cleaner
@@ -488,6 +521,7 @@ func (gcc *GoCacheCleaner) cleanBuildCache(ctx context.Context) result.Result[do
 ```
 
 #### File 3: `internal/cleaner/golang_lint_adapter.go` (< 100 lines)
+
 ```go
 // External tool adapter for golangci-lint
 package cleaner
@@ -555,6 +589,7 @@ func (gla *GolangciLintAdapter) Clean(ctx context.Context) result.Result[domain.
 ```
 
 #### File 4: `internal/cleaner/golang_scanner.go` (< 100 lines)
+
 ```go
 // Scan logic for Go caches
 package cleaner
@@ -667,6 +702,7 @@ func (gs *GoScanner) detectLintCacheDir() string {
 ```
 
 #### File 5: `internal/cleaner/golang_helpers.go` (< 100 lines)
+
 ```go
 // Shared helper methods
 package cleaner
@@ -724,6 +760,7 @@ func (gc *GoCleaner) getDirModTime(path string) time.Time {
 ```
 
 **Migration Path**:
+
 1. Create `internal/cleaner/golang_helpers.go` - move helper methods
 2. Create `internal/cleaner/golang_lint_adapter.go` - move lint logic
 3. Create `internal/cleaner/golang_scanner.go` - move scan logic
@@ -740,7 +777,9 @@ func (gc *GoCleaner) getDirModTime(path string) time.Time {
 ---
 
 ### 4. Error Handling - 50% COMPLETE (DRY VIOLATION)
+
 **Current State**: Same pattern repeated 4 times
+
 ```go
 // Pattern 1: Clean Go cache
 if gc.cleanCache {
@@ -792,6 +831,7 @@ if gc.cleanBuildCache {
 ```
 
 **Problem**:
+
 - Same code repeated 4 times (25 lines × 4 = 100 lines of duplication)
 - Violates DRY (Don't Repeat Yourself) principle
 - Hard to maintain (change needs to be made in 4 places)
@@ -799,6 +839,7 @@ if gc.cleanBuildCache {
 - Makes file larger (contributes to 490-line bloat)
 
 **Should Be**:
+
 ```go
 // CleanStats tracks cleaning metrics.
 type CleanStats struct {
@@ -881,6 +922,7 @@ func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) 
 ```
 
 **Before vs After**:
+
 ```go
 // BEFORE: 100 lines of duplication (25 lines × 4)
 if gc.cleanCache {
@@ -933,6 +975,7 @@ for _, cacheType := range gc.config.Caches.EnabledTypes() {
 ```
 
 **Migration Path**:
+
 1. Create `CleanStats` struct
 2. Create `processCacheResult()` method
 3. Create `logWarning()` method
@@ -948,18 +991,22 @@ for _, cacheType := range gc.config.Caches.EnabledTypes() {
 ---
 
 ### 5. Naming - 60% COMPLETE (COUPLING ISSUE)
+
 **Current State**: Method names include tool name
+
 ```go
 func (gc *GoCleaner) cleanGolangciLintCache(ctx context.Context) result.Result[domain.CleanResult]
 ```
 
 **Problem**:
+
 - Includes specific tool name ("golangci-lint")
 - What if we want to add support for `revive cache`, `staticcheck cache`?
 - Can't reuse method name
 - Couples implementation to specific tool
 
 **Should Be**:
+
 ```go
 // Option 1: Abstract the tool
 func (gc *GoCleaner) cleanLintCache(ctx context.Context) result.Result[domain.CleanResult] {
@@ -989,6 +1036,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 ```
 
 **Migration Path**:
+
 1. Rename `cleanGolangciLintCache()` → `cleanLintCache()`
 2. Create `LintCleaner` interface
 3. Create `GolangciLintCleaner` adapter
@@ -1004,10 +1052,12 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 ## ❌ NOT STARTED (Deferred)
 
 ### 1. Scan Support for Lint Cache - 0% COMPLETE
+
 **What**: Detect and report golangci-lint cache in scan results
 **Why**: Users can't make informed decisions without knowing cache size
 **Current**: `Scan()` method only looks for Go caches, not lint cache
 **Should**:
+
 - Detect XDG_CACHE_HOME environment variable
 - Detect ~/.cache/golangci-lint directory
 - Calculate directory size
@@ -1018,10 +1068,12 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 **Impact**: HIGH (improves UX significantly)
 
 ### 2. BDD Tests - 0% COMPLETE
+
 **What**: Behavior-driven development tests using Gherkin
 **Why**: Documents behavior, tests user scenarios, ensures feature works as expected
 **Current**: Only unit tests (no behavior tests)
 **Should**:
+
 ```gherkin
 Feature: Lint Cache Cleaning
 
@@ -1068,10 +1120,12 @@ Feature: Lint Cache Cleaning
 **Impact**: HIGH (documents behavior, prevents regressions)
 
 ### 3. Documentation - 0% COMPLETE
+
 **What**: Update all documentation files
 **Why**: Users need to know about new feature
 **Current**: No documentation of `clean_lint_cache` option
 **Should**:
+
 - Update `USAGE.md` with new cache flag
 - Update example YAML configs
 - Update `HOW_TO_USE.md` with usage examples
@@ -1081,10 +1135,12 @@ Feature: Lint Cache Cleaning
 **Impact**: MEDIUM (helps users discover feature)
 
 ### 4. Installation Hints - 0% COMPLETE
+
 **What**: Provide helpful error messages when golangci-lint is missing
 **Why**: Improves UX, helps users fix the issue
 **Current**: "golangci-lint not found, skipping cache cleanup"
 **Should**:
+
 ```go
 if !gla.IsAvailable(ctx) {
     if gla.config.Verbose {
@@ -1100,10 +1156,12 @@ if !gla.IsAvailable(ctx) {
 **Impact**: MEDIUM (improves UX significantly)
 
 ### 5. External Tool Adapter Pattern - 0% COMPLETE
+
 **What**: Use Adapter pattern for external tools
 **Why**: Decouples from specific tools, enables testing, improves extensibility
 **Current**: Direct method calls, tight coupling
 **Should**:
+
 ```go
 type ExternalToolCleaner interface {
     Name() string
@@ -1129,10 +1187,12 @@ type GolangciLintCleaner struct { /* ... */ }
 **Impact**: MEDIUM (better architecture, extensibility)
 
 ### 6. Generics Usage - 0% COMPLETE
+
 **What**: Use generics for code reuse
 **Why**: Reduces boilerplate, improves type safety
 **Current**: All cleaners have similar but duplicated code
 **Should**:
+
 ```go
 type CacheCleaner[T any] interface {
     Clean(ctx context.Context, config T) result.Result[domain.CleanResult]
@@ -1151,10 +1211,12 @@ func RunCleaner[T any](
 **Impact**: LOW (nice to have, limited benefit)
 
 ### 7. Concurrent Cleaning - 0% COMPLETE
+
 **What**: Run multiple cache cleaners in parallel
 **Why**: Improves performance for many cache types
 **Current**: Sequential cleaning (slow)
 **Should**:
+
 ```go
 func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
     // ... setup ...
@@ -1197,6 +1259,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 ## 🚀 WHAT WE SHOULD IMPROVE
 
 ### Critical (Do Immediately)
+
 1. **Extract result processing** - Remove 90 lines of duplication (2 hours)
 2. **Fix naming** - Remove tool coupling (30 min)
 3. **Create type-safe flags** - Replace 5 bools with enum (4 hours)
@@ -1204,6 +1267,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 5. **Split golang.go** - Meet 350-line limit (3 hours)
 
 ### High Priority (Do Soon)
+
 6. **Add lint cache scanning** - Users need to see cache size (2 hours)
 7. **Add BDD tests** - Document behavior (3 hours)
 8. **Add installation hints** - Improve UX (30 min)
@@ -1211,6 +1275,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 10. **Update documentation** - USAGE.md, examples (1 hour)
 
 ### Medium Priority (Nice to Have)
+
 11. **Extract lint adapter** - External tool pattern (3 hours)
 12. **Add error handling utils** - Centralize patterns (1 hour)
 13. **Add cache age detection** - Show cache age (1 hour)
@@ -1218,6 +1283,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 15. **Add verification step** - Check tool functionality (1 hour)
 
 ### Low Priority (Future)
+
 16. **Use generics** - Code reuse (4 hours)
 17. **Add concurrent cleaning** - Performance (4 hours)
 18. **Add cleanup history** - Track last clean (2 hours)
@@ -1229,6 +1295,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 ## 📋 TOP #25 THINGS TO GET DONE NEXT
 
 ### CRITICAL (Do Today - Must Fix)
+
 1. **Extract result processing method** - Remove 4× duplication in Clean() (2 hours)
    - Create `CleanStats` struct
    - Create `processCacheResult()` method
@@ -1265,6 +1332,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
    - **Impact**: Meets project standards, improves maintainability
 
 ### HIGH PRIORITY (Do This Week)
+
 6. **Add lint cache scanning** - Users need to see cache size (2 hours)
    - Detect XDG_CACHE_HOME
    - Detect ~/.cache/golangci-lint
@@ -1297,6 +1365,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
     - **Impact**: Helps users discover feature
 
 ### MEDIUM PRIORITY (Do This Month)
+
 11. **Extract lint adapter** - External tool pattern (3 hours)
     - Create `LintCleaner` interface
     - Create `GolangciLintCleaner` adapter
@@ -1324,6 +1393,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
     - **Impact**: Improves reliability
 
 ### LOW PRIORITY (Future Enhancements)
+
 16. **Use generics** - Code reuse (4 hours)
     - Create generic `CacheCleaner` interface
     - Extract common patterns
@@ -1383,22 +1453,26 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 ### Data Flow - How Could It Be Better?
 
 **Current Flow**:
+
 ```
 Config (5 bools) → GoCleaner → Clean() → Check 5 bools → Execute Methods → CleanResult
 ```
 
 **Issues**:
+
 - Too many conditionals in `Clean()` (check 5 bools)
 - No composition (all logic in one place)
 - Hard to extend (add new cache = add new bool + new conditional)
 - Hard to test (can't mock cache types individually)
 
 **Should Be**:
+
 ```
 Config (GoCacheType) → GoCleaner → Cleaners (map) → Iterate → Execute → CleanResult
 ```
 
 **Benefits**:
+
 - Single iteration loop (no conditionals)
 - Composable architecture (add new cache = add to map)
 - Easy to extend (add new cleaner, done)
@@ -1407,6 +1481,7 @@ Config (GoCacheType) → GoCleaner → Cleaners (map) → Iterate → Execute �
 ### State Representation - Can We Make Impossible States Unrepresentable?
 
 **Current**:
+
 ```go
 type GoCleaner struct {
     cleanCache      bool  // ❌ Can be false
@@ -1421,6 +1496,7 @@ type GoCleaner struct {
 ```
 
 **Should Be**:
+
 ```go
 type GoCacheType uint16
 
@@ -1442,6 +1518,7 @@ const (
 ### Composition - Are We Building a Proper Architecture?
 
 **Current**: Single monolithic class
+
 ```go
 type GoCleaner struct {
     // 5 bools
@@ -1454,6 +1531,7 @@ type GoCleaner struct {
 ```
 
 **Should Be**: Composed architecture
+
 ```go
 // Core orchestrator
 type GoCleaner struct {
@@ -1470,6 +1548,7 @@ type LintCleaner interface { /* ... */ }       // Abstraction
 ```
 
 **Benefits**:
+
 - Each component has single responsibility
 - Easy to test in isolation
 - Easy to extend (add new cleaner)
@@ -1478,6 +1557,7 @@ type LintCleaner interface { /* ... */ }       // Abstraction
 ### Generics - Are We Using Them Properly?
 
 **Current**: No generics usage
+
 ```go
 func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
     // ... repeated code for each cache type ...
@@ -1485,6 +1565,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 ```
 
 **Should Be**: Use generics for common patterns
+
 ```go
 // Generic cache cleaner interface
 type CacheCleaner[T any] interface {
@@ -1512,6 +1593,7 @@ ProcessCacheResult(lintCleaner.Clean(ctx, lintConfig), &stats)
 ```
 
 **Benefits**:
+
 - Code reuse (single implementation)
 - Type safety (compile-time checking)
 - Easy to extend (add new config type)
@@ -1519,16 +1601,19 @@ ProcessCacheResult(lintCleaner.Clean(ctx, lintConfig), &stats)
 ### Booleans → Enums - Should We?
 
 **Current**: 5 booleans (BAD)
+
 - Can enable nonsensical combinations
 - Type system doesn't help
 - No validation
 
 **Should Be**: Bit flag enum (GOOD)
+
 - Type-safe combinations
 - Type system validates
 - Easy to extend
 
 **Migration Path**:
+
 ```go
 // Step 1: Create enum
 type GoCacheType uint16
@@ -1565,6 +1650,7 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 ### uint vs int - Do We Use uints Properly?
 
 **Current**: Inconsistent types
+
 ```go
 // domain.CleanResult uses uint
 type CleanResult struct {
@@ -1587,6 +1673,7 @@ result := domain.CleanResult{
 ```
 
 **Should Be**: Consistent uint types
+
 ```go
 // Use uint throughout
 itemsRemoved := uint(0)
@@ -1601,6 +1688,7 @@ result := domain.CleanResult{
 ```
 
 **Benefits**:
+
 - Consistent types
 - No type conversions
 - Type-safe (can't have negative counts)
@@ -1622,6 +1710,7 @@ result := domain.CleanResult{
    - **Impact**: 490+ lines (40% over limit)
 
 **What we should have done** (better order):
+
 1. ✅ Create `GoCacheType` enum
 2. ✅ Create `SizeEstimate` type
 3. ✅ Split `golang.go` into smaller files
@@ -1631,6 +1720,7 @@ result := domain.CleanResult{
 ### Did We Forget Anything?
 
 **We forgot**:
+
 1. **Scan support** - Lint cache not detected in `Scan()`
    - **Impact**: Users can't see lint cache size
    - **Should**: Detect XDG_CACHE_HOME or ~/.cache/golangci-lint
@@ -1650,27 +1740,25 @@ result := domain.CleanResult{
 ### What Should We Implement?
 
 **Immediate (Critical)**:
+
 1. Type-safe cache flags (enum)
 2. Honest size reporting (SizeEstimate)
 3. File splitting (meet 350-line limit)
 4. Result processing extraction (remove duplication)
 5. Scan support (lint cache detection)
 
-**Soon (High Priority)**:
-6. BDD tests
-7. Installation hints
-8. Documentation updates
-9. uint/int consistency
-10. Lint adapter pattern
+**Soon (High Priority)**: 6. BDD tests 7. Installation hints 8. Documentation updates 9. uint/int consistency 10. Lint adapter pattern
 
 ### What Should We Consolidate?
 
 **Consolidate duplicate patterns**:
+
 1. Error handling (4× duplication)
 2. Cache result processing (4× duplication)
 3. Dry-run logic (2× duplication)
 
 **Consolidate similar operations**:
+
 1. All cache cleaners have similar structure
    - Check availability
    - Get cache path
@@ -1681,6 +1769,7 @@ result := domain.CleanResult{
 ### What Should We Refactor?
 
 **Refactor large files**:
+
 1. `golang.go` (490+ lines) → Split into 5 files
    - `golang_cleaner.go` (< 200 lines)
    - `golang_cache_cleaner.go` (< 150 lines)
@@ -1689,10 +1778,12 @@ result := domain.CleanResult{
    - `golang_helpers.go` (< 100 lines)
 
 **Refactor types**:
+
 1. 5 bools → 1 enum (GoCacheType)
 2. Add SizeEstimate type
 
 **Refactor patterns**:
+
 1. Extract result processing
 2. Extract error handling
 3. Extract cache cleaners
@@ -1700,16 +1791,19 @@ result := domain.CleanResult{
 ### What Could Be Removed?
 
 **Remove duplication**:
+
 1. 90 lines of result processing (4× 25 lines)
 2. 40 lines of error handling patterns
 3. 20 lines of dry-run logic
 
 **Remove dead code**:
+
 - None detected
 
 ### Are We 222% Sure Everything Works Together?
 
 **Risks identified**:
+
 1. **Type consistency** - Some tests use `false` for cleanLintCache, some don't specify
    - **Check**: `golang_test.go` line 218 has `false` parameter
    - **Risk**: Inconsistent test behavior
@@ -1725,6 +1819,7 @@ result := domain.CleanResult{
    - **Risk**: Dry-run might not count lint cache correctly
 
 **What to verify**:
+
 - [ ] All tests pass
 - [ ] Build succeeds
 - [ ] Dry-run includes lint cache
@@ -1736,17 +1831,20 @@ result := domain.CleanResult{
 **NO - Does not make sense for this project**
 
 **Reasoning**:
+
 1. Go cache cleaning is CORE functionality, not a plugin
 2. golangci-lint is a common tool, not obscure
 3. Plugin architecture would add complexity without benefit
 4. Configuration file already supports enabling/disabling
 
 **What COULD be a plugin**:
+
 - Custom cache cleaners (user-defined)
 - External tool cleaners (future)
 - But not for built-in Go + lint cache cleaning
 
 **Better approach**:
+
 - Use Adapter pattern for external tools
 - Keep built-in Go cache in core
 - Plugin architecture for future extensibility (not now)
@@ -1756,38 +1854,25 @@ result := domain.CleanResult{
 **Order of operations** (critical vs. easy):
 
 **PHASE 1: Fix Type Safety (CRITICAL)**
+
 1. Extract result processing (2 hours, removes 90 lines)
 2. Fix naming (30 min, removes coupling)
 3. Create GoCacheType enum (4 hours, massive type safety)
 
-**PHASE 2: Fix Data Integrity (CRITICAL)**
-4. Create SizeEstimate type (2 hours, fixes lie)
-5. Update lint cleaner to use SizeEstimate (1 hour)
-6. Update all cleaners to use SizeEstimate (2 hours)
+**PHASE 2: Fix Data Integrity (CRITICAL)** 4. Create SizeEstimate type (2 hours, fixes lie) 5. Update lint cleaner to use SizeEstimate (1 hour) 6. Update all cleaners to use SizeEstimate (2 hours)
 
-**PHASE 3: Fix File Size (HIGH)**
-7. Split golang.go into 5 files (3 hours, meets standards)
-8. Verify each file < 350 lines
-9. Run all tests
+**PHASE 3: Fix File Size (HIGH)** 7. Split golang.go into 5 files (3 hours, meets standards) 8. Verify each file < 350 lines 9. Run all tests
 
-**PHASE 4: Add Missing Features (HIGH)**
-10. Add scan support for lint cache (2 hours, improves UX)
-11. Add installation hints (30 min, improves UX)
-12. Add BDD tests (3 hours, documents behavior)
+**PHASE 4: Add Missing Features (HIGH)** 10. Add scan support for lint cache (2 hours, improves UX) 11. Add installation hints (30 min, improves UX) 12. Add BDD tests (3 hours, documents behavior)
 
-**PHASE 5: Documentation (MEDIUM)**
-13. Update USAGE.md (30 min)
-14. Update example configs (30 min)
-15. Update README (30 min)
+**PHASE 5: Documentation (MEDIUM)** 13. Update USAGE.md (30 min) 14. Update example configs (30 min) 15. Update README (30 min)
 
-**PHASE 6: Advanced Refactoring (LOW - FUTURE)**
-16. Extract lint adapter (3 hours)
-17. Use generics (4 hours)
-18. Add concurrent cleaning (4 hours)
+**PHASE 6: Advanced Refactoring (LOW - FUTURE)** 16. Extract lint adapter (3 hours) 17. Use generics (4 hours) 18. Add concurrent cleaning (4 hours)
 
 ### Package Structure - How Should We Organize?
 
 **Current**:
+
 ```
 internal/cleaner/
 ├── golang.go (490+ lines) ❌
@@ -1799,6 +1884,7 @@ internal/cleaner/
 ```
 
 **Should Be**:
+
 ```
 internal/cleaner/
 ├── golang/
@@ -1820,6 +1906,7 @@ internal/cleaner/
 ```
 
 **Benefits**:
+
 - Each cleaner in own directory
 - Small files (< 350 lines)
 - Easy to navigate
@@ -1828,6 +1915,7 @@ internal/cleaner/
 ### How Do We Make Sure Everything Works Together?
 
 **Integration strategy**:
+
 1. **Unit tests** - Test each component in isolation
 2. **Integration tests** - Test components together
 3. **BDD tests** - Test user scenarios
@@ -1835,6 +1923,7 @@ internal/cleaner/
 5. **CI/CD** - Automated testing on every commit
 
 **Verification checklist**:
+
 - [ ] All unit tests pass
 - [ ] All integration tests pass
 - [ ] All BDD tests pass
@@ -1849,16 +1938,19 @@ internal/cleaner/
 ### TypeSpec vs Handwritten Code
 
 **What should be in TypeSpec**:
+
 - **Domain types** - `GoCacheType`, `CleanResult`, `SizeEstimate`
 - **Operation types** - Enums, interfaces
 - **Configuration types** - YAML schemas, validation
 
 **What should be handwritten in Go**:
+
 - **Implementation** - Actual cleaning logic
 - **External tool adapters** - OS-specific code
 - **Helper methods** - File operations, etc.
 
 **Why**:
+
 - TypeSpec generates type-safe code
 - Go code implements business logic
 - Best of both worlds
@@ -1866,6 +1958,7 @@ internal/cleaner/
 ### Centralized Errors - Are They Organized?
 
 **Current**: Errors scattered throughout code
+
 ```go
 return result.Err[domain.CleanResult](fmt.Errorf("Go not available"))
 return result.Err[domain.CleanResult](fmt.Errorf("failed to clean: %w", err))
@@ -1873,6 +1966,7 @@ return result.Err[domain.CleanResult](fmt.Errorf("failed to clean: %w", err))
 ```
 
 **Should Be**: Centralized error package
+
 ```go
 // internal/errors/cache_errors.go
 package errors
@@ -1917,6 +2011,7 @@ return result.Err[domain.CleanResult](ErrGoNotAvailable)
 ```
 
 **Benefits**:
+
 - Centralized error definitions
 - Type-safe errors
 - Easy to test
@@ -1925,12 +2020,14 @@ return result.Err[domain.CleanResult](ErrGoNotAvailable)
 ### External Tools - Are They Wrapped in Adapters?
 
 **Current**: Direct calls to external tools
+
 ```go
 cmd := exec.CommandContext(ctx, "golangci-lint", "cache", "clean")
 output, err := cmd.CombinedOutput()
 ```
 
 **Should Be**: Adapter pattern
+
 ```go
 type ExternalToolAdapter interface {
     Name() string
@@ -1956,6 +2053,7 @@ output, err := adapter.Execute(ctx)
 ```
 
 **Benefits**:
+
 - Easy to test (can mock adapter)
 - Easy to extend (add new tool)
 - Decouples from specific tools
@@ -1964,10 +2062,12 @@ output, err := adapter.Execute(ctx)
 ### File Size Limits - Are We Under 350 Lines?
 
 **Current Status**:
+
 - `golang.go`: 490+ lines ❌ (40% over limit)
 - Other files: Mostly OK ✅
 
 **After Refactoring**:
+
 - `golang_cleaner.go`: < 200 lines ✅
 - `golang_cache_cleaner.go`: < 150 lines ✅
 - `golang_lint_adapter.go`: < 100 lines ✅
@@ -1977,11 +2077,13 @@ output, err := adapter.Execute(ctx)
 ### Naming - Did We Put In Extra Hours?
 
 **Current Naming** (some issues):
+
 - `cleanGolangciLintCache()` ❌ (includes tool name)
 - `cleanCache` ❌ (generic, not descriptive)
 - `cleanTestCache` ❌ (generic)
 
 **Should Be** (better naming):
+
 - `cleanLintCache()` ✅ (abstract, extensible)
 - `cleanGoCache()` ✅ (specific to Go)
 - `cleanGoTestCache()` ✅ (specific to Go test)
@@ -1989,6 +2091,7 @@ output, err := adapter.Execute(ctx)
 - `cleanGoBuildCache()` ✅ (specific to Go builds)
 
 **Principles**:
+
 - Be specific (what are you cleaning?)
 - Be abstract (what category is it?)
 - Avoid tool names (coupling)
@@ -1997,6 +2100,7 @@ output, err := adapter.Execute(ctx)
 ### Domain-Driven Design - Exceptionally Great Types?
 
 **Current Types** (need improvement):
+
 ```go
 // BAD: Boolean flags
 type GoPackagesSettings struct {
@@ -2013,6 +2117,7 @@ type CleanResult struct {
 ```
 
 **Should Be** (DDD + great types):
+
 ```go
 // GOOD: Type-safe flags
 type GoCacheType uint16
@@ -2086,6 +2191,7 @@ type CacheCleanFailedEvent struct {
 ```
 
 **Benefits**:
+
 - Type-safe (can't have invalid states)
 - Self-documenting (types explain themselves)
 - Rich domain model (events, not just data)
@@ -2098,12 +2204,14 @@ type CacheCleanFailedEvent struct {
 ### What Did We Deliver?
 
 **Core Value**:
+
 - Users can now clean golangci-lint cache automatically
 - Saves disk space (golangci-lint cache can be 100MB+)
 - Saves time (manual cache cleanup takes minutes)
 - Improves reliability (prevents cache corruption)
 
 **Quality Value**:
+
 - Graceful degradation (works even without golangci-lint)
 - Verbose output (shows what's happening)
 - Error handling (doesn't crash on errors)
@@ -2112,6 +2220,7 @@ type CacheCleanFailedEvent struct {
 ### How Could We Deliver More Value?
 
 **Immediate Improvements**:
+
 1. **Scan support** - Users see cache size before cleaning
    - **Value**: Informed decision-making
    - **Impact**: Users trust the tool more
@@ -2124,10 +2233,10 @@ type CacheCleanFailedEvent struct {
    - **Value**: Transparency, trust
    - **Impact**: Users don't think feature is broken
 
-**Long-term Improvements**:
-4. **Type-safe flags** - Users can't configure invalid states
-   - **Value**: Better configuration experience
-   - **Impact**: Fewer support requests
+**Long-term Improvements**: 4. **Type-safe flags** - Users can't configure invalid states
+
+- **Value**: Better configuration experience
+- **Impact**: Fewer support requests
 
 5. **BDD tests** - Feature is stable and reliable
    - **Value**: Quality assurance
@@ -2146,6 +2255,7 @@ type CacheCleanFailedEvent struct {
 ### The Dilemma:
 
 **Domain Model (Should Be)**:
+
 ```go
 type CleanResult struct {
     FreedBytes uint64  // MUST be accurate
@@ -2153,6 +2263,7 @@ type CleanResult struct {
 ```
 
 **External Tool Reality**:
+
 ```bash
 $ golangci-lint cache clean
 # Returns: NO OUTPUT
@@ -2162,33 +2273,41 @@ $ golangci-lint cache clean
 ### Current Solutions (All Have Problems):
 
 **A. Return 0 (Current) - LIE**
+
 ```go
 FreedBytes: 0  // ❌ Bytes WERE freed, but we say 0
 ```
+
 - **Pros**: Type-safe, consistent
 - **Cons**: Users think feature is broken
 - **Cons**: Violates domain model honesty
 
 **B. Estimate size before clean - FRAGILE**
+
 ```go
 bytesFreed := getDirSize(cacheDir)  // ❌ What if dir changes during clean?
 ```
+
 - **Pros**: Accurate size
 - **Cons**: Race condition (dir changes)
 - **Cons**: Fragile (cache location varies)
 
 **C. Return unknown type - BREAKS API**
+
 ```go
 type Size uint64 | Unknown
 ```
+
 - **Pros**: Honest
 - **Cons**: Requires breaking API change
 - **Cons**: Complex for users to handle
 
 **D. Use string type - DUCK TYPING**
+
 ```go
 FreedBytes: "250 MB"  // ❌ Not numeric, can't sort
 ```
+
 - **Pros**: Honest, readable
 - **Cons**: Can't calculate totals
 - **Cons**: Can't sort/sort by size
@@ -2196,6 +2315,7 @@ FreedBytes: "250 MB"  // ❌ Not numeric, can't sort
 ### My Attempted Solution (Still Has Problems):
 
 **The SizeEstimate Type**:
+
 ```go
 type SizeEstimate struct {
     Known  uint64
@@ -2204,6 +2324,7 @@ type SizeEstimate struct {
 ```
 
 **Problems**:
+
 1. **Dual state** - Either `Known` or `Unknown` is set, but both fields exist
    - Why not use `Option[uint64]` or `Result<uint64, error>`?
    - Why not use interface type?
@@ -2225,6 +2346,7 @@ type SizeEstimate struct {
    }
    // What if 3 unknown, 2 known? Still unknown!
    ```
+
    - **Issue**: One unknown poisons the whole total
    - **Issue**: Can't show "250 MB + unknown" cleanly
 
@@ -2235,6 +2357,7 @@ type SizeEstimate struct {
 **Is there a well-established pattern I'm missing?**
 
 Options I've researched but haven't tried:
+
 - **Option types** (Rust-style): `Size(uint64) | Unknown`
 - **Result types**: `Result<uint64, error>` with custom error for unknown
 - **Partial monad**: `Partial<uint64>` with validation
@@ -2247,12 +2370,14 @@ Options I've researched but haven't tried:
 - Should we accept that `FreedBytes` is an estimate, not exact?
 
 **Help me understand**:
+
 1. What pattern does clean-wizard ALREADY use for similar issues?
 2. Is there a Go idiomatic way to handle optional/maybe types?
 3. Should I accept that `FreedBytes` is always an estimate (rename to `EstimatedFreedBytes`)?
 4. Should we model this as a quality of measurement (precision level) instead of known/unknown?
 
 This feels like a fundamental design choice about:
+
 - **Honesty vs Usability** - Tell truth (unknown) vs show value (estimate)
 - **Type safety vs Flexibility** - Compile-time safety vs runtime adaptation
 - **Domain purity vs Pragmatism** - Perfect domain model vs real-world messiness

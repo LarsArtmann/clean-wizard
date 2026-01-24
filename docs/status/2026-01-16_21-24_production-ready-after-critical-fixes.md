@@ -12,6 +12,7 @@
 Clean-Wizard is now **fully functional and production-ready** after fixing 4 critical bugs that prevented the tool from working at all. The tool successfully scans, displays, and allows interactive deletion of old Nix generations with a beautiful TUI interface.
 
 **Key Achievements:**
+
 - ✅ Fixed all critical Nix integration bugs
 - ✅ Implemented safe and functional dry-run mode
 - ✅ Comprehensive testing suite passing
@@ -25,6 +26,7 @@ Clean-Wizard is now **fully functional and production-ready** after fixing 4 cri
 **Initial State: BROKEN**
 
 User ran `clean-wizard clean` and encountered:
+
 ```
 🔍 Scanning for Nix generations...
 Error: failed to list generations: nix not available
@@ -33,6 +35,7 @@ Error: failed to list generations: nix not available
 Despite Nix being installed and working (`nix --version` returned `2.31.2+1`), the tool failed completely.
 
 **Root Issues Identified:**
+
 1. Wrong hardcoded profile path requiring root permissions
 2. Over-aggressive availability check failing even when Nix worked
 3. Incorrect output format parsing
@@ -45,6 +48,7 @@ Despite Nix being installed and working (`nix --version` returned `2.31.2+1`), t
 ### Bug #1: Nix Availability Check Failure (Commit c84bb04)
 
 **Root Cause:**
+
 ```go
 // IsAvailable() tried to verify profile access
 listCmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
@@ -53,6 +57,7 @@ return err == nil  // Failed with "Permission denied"
 ```
 
 **Fix:**
+
 ```go
 // Only check if nix command exists, don't verify profile access
 versionCmd := exec.CommandContext(ctx, "nix", "--version")
@@ -69,17 +74,20 @@ return true
 ### Bug #2: Incorrect Profile Path (Commit c84bb04)
 
 **Root Cause:**
+
 ```go
 // Hardcoded root profile path
 cmd := exec.CommandContext(ctx, "nix-env", "--list-generations", "--profile", "/nix/var/nix/profiles/default")
 ```
 
 This path:
+
 - Requires root permissions
 - Is incorrect for user profiles on macOS
 - User profiles are at `~/.local/state/nix/profiles/`
 
 **Fix:**
+
 ```go
 // Remove --profile flag, use default user profile
 cmd := exec.CommandContext(ctx, "nix-env", "--list-generations")
@@ -92,6 +100,7 @@ cmd := exec.CommandContext(ctx, "nix-env", "--list-generations")
 ### Bug #3: Wrong Output Format Parsing (Commit c84bb04)
 
 **Root Cause:**
+
 ```go
 // Expected full path format like:
 // "/nix/var/nix/profiles/default-32-link 2026-01-12 08:03:14 (current)"
@@ -101,12 +110,14 @@ id, err := strconv.Atoi(pathParts[len(pathParts)-1])
 ```
 
 But actual output without `--profile` is:
+
 ```
-  32   2026-01-12 08:03:14   
+  32   2026-01-12 08:03:14
   33   2026-01-15 21:14:05   (current)
 ```
 
 **Fix:**
+
 ```go
 // Parse actual format: "ID   YYYY-MM-DD HH:MM:SS"
 id, err := strconv.Atoi(fields[0])
@@ -125,18 +136,21 @@ path := fmt.Sprintf("%s/.local/state/nix/profiles/profile-%d-link", homeDir, id)
 ### Bug #4: Profile Link Path Construction (Commit 16ff632)
 
 **Root Cause:**
+
 ```go
 // Used hardcoded root path pattern
 path := fmt.Sprintf("/nix/var/nix/profiles/per-user/profile-%d-link", id)
 ```
 
 Actual paths on macOS:
+
 ```
 /Users/larsartmann/.local/state/nix/profiles/profile-33-link
 /Users/larsartmann/.local/state/nix/profiles/profile-32-link
 ```
 
 **Fix:**
+
 ```go
 // Dynamically construct path using user's home directory
 homeDir, err := os.UserHomeDir()
@@ -159,6 +173,7 @@ During thorough testing, a **CRITICAL BUG** was discovered:
 **The `--dry-run` flag was completely broken and DANGEROUS:**
 
 1. **ListGenerations()**: Returned fake mock data instead of real user generations
+
    ```go
    // WRONG: Mock data generation
    if n.dryRun {
@@ -170,6 +185,7 @@ During thorough testing, a **CRITICAL BUG** was discovered:
    ```
 
 2. **RemoveGeneration()**: Still ACTUALLY DELETED generations even with --dry-run
+
    ```go
    // WRONG: No dry-run check
    func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) {
@@ -196,6 +212,7 @@ During thorough testing, a **CRITICAL BUG** was discovered:
 ### Solutions Implemented
 
 1. **Fixed ListGenerations()**
+
    ```go
    // CORRECT: Always list real generations
    func (n *NixAdapter) ListGenerations(ctx context.Context) {
@@ -207,6 +224,7 @@ During thorough testing, a **CRITICAL BUG** was discovered:
    ```
 
 2. **Fixed RemoveGeneration()**
+
    ```go
    // CORRECT: Check dry-run before deleting
    func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) {
@@ -223,6 +241,7 @@ During thorough testing, a **CRITICAL BUG** was discovered:
    ```
 
 3. **Fixed CollectGarbage()**
+
    ```go
    // CORRECT: Check dry-run before GC
    func (n *NixAdapter) CollectGarbage(ctx context.Context) {
@@ -249,6 +268,7 @@ During thorough testing, a **CRITICAL BUG** was discovered:
 ### Safety Verification
 
 **Before Fix (DANGEROUS):**
+
 ```bash
 $ clean-wizard clean --dry-run
 # Shows FAKE generations (300, 299, 298, 297, 296)
@@ -259,6 +279,7 @@ $ clean-wizard clean --dry-run
 ```
 
 **After Fix (SAFE):**
+
 ```bash
 $ clean-wizard clean --dry-run
 ⚠️  DRY RUN MODE: No actual changes will be made
@@ -333,39 +354,39 @@ $ clean-wizard clean --dry-run
 
 ### Functional Status
 
-| Component | Status | Notes |
-|-----------|---------|-------|
-| Nix integration | ✅ Working | Correctly detects and lists generations |
-| Profile path construction | ✅ Working | Uses user's home directory |
-| Output format parsing | ✅ Working | Parses nix-env output correctly |
-| TUI interface | ✅ Working | Beautiful Huh-powered interface |
-| Dry-run mode | ✅ Working | Safe, no system changes |
-| Normal mode | ✅ Working | Correctly deletes generations |
-| Garbage collection | ✅ Working | Runs nix-collect-garbage -d |
-| Error handling | ✅ Working | Clear user feedback |
-| Validation | ✅ Working | All generations pass validation |
-| Documentation | ✅ Complete | README and FIX_SUMMARY |
+| Component                 | Status      | Notes                                   |
+| ------------------------- | ----------- | --------------------------------------- |
+| Nix integration           | ✅ Working  | Correctly detects and lists generations |
+| Profile path construction | ✅ Working  | Uses user's home directory              |
+| Output format parsing     | ✅ Working  | Parses nix-env output correctly         |
+| TUI interface             | ✅ Working  | Beautiful Huh-powered interface         |
+| Dry-run mode              | ✅ Working  | Safe, no system changes                 |
+| Normal mode               | ✅ Working  | Correctly deletes generations           |
+| Garbage collection        | ✅ Working  | Runs nix-collect-garbage -d             |
+| Error handling            | ✅ Working  | Clear user feedback                     |
+| Validation                | ✅ Working  | All generations pass validation         |
+| Documentation             | ✅ Complete | README and FIX_SUMMARY                  |
 
 ### Code Quality
 
-| Metric | Status |
-|---------|---------|
-| Build | ✅ Compiles without errors |
-| Tests | ✅ 22/22 tests passing |
-| Linting | ✅ No warnings |
-| Git status | ✅ Clean, all commits pushed |
-| Code review | ✅ Self-reviewed |
+| Metric      | Status                       |
+| ----------- | ---------------------------- |
+| Build       | ✅ Compiles without errors   |
+| Tests       | ✅ 22/22 tests passing       |
+| Linting     | ✅ No warnings               |
+| Git status  | ✅ Clean, all commits pushed |
+| Code review | ✅ Self-reviewed             |
 
 ### Performance
 
-| Operation | Time | Notes |
-|-----------|-------|-------|
-| List generations | ~100ms | Very fast |
-| Parse generations | <10ms | Instant |
-| Show TUI | Instant | Beautiful UI |
-| Remove generation | ~500ms | Per generation |
-| Garbage collection | ~5-10s | Depends on store size |
-| Total cleanup | ~6-12s | For 1-5 generations |
+| Operation          | Time    | Notes                 |
+| ------------------ | ------- | --------------------- |
+| List generations   | ~100ms  | Very fast             |
+| Parse generations  | <10ms   | Instant               |
+| Show TUI           | Instant | Beautiful UI          |
+| Remove generation  | ~500ms  | Per generation        |
+| Garbage collection | ~5-10s  | Depends on store size |
+| Total cleanup      | ~6-12s  | For 1-5 generations   |
 
 ---
 
@@ -386,12 +407,12 @@ c84bb04 - fix: resolve nix availability check and profile access issues
 
 ### Files Changed
 
-| File | Changes | Status |
-|------|----------|--------|
-| `internal/adapters/nix.go` | +29/-24 lines | ✅ Pushed |
+| File                                 | Changes       | Status    |
+| ------------------------------------ | ------------- | --------- |
+| `internal/adapters/nix.go`           | +29/-24 lines | ✅ Pushed |
 | `cmd/clean-wizard/commands/clean.go` | +50/-19 lines | ✅ Pushed |
-| `README.md` | +5/-4 lines | ✅ Pushed |
-| `FIX_SUMMARY.md` | +122 lines | ✅ Pushed |
+| `README.md`                          | +5/-4 lines   | ✅ Pushed |
+| `FIX_SUMMARY.md`                     | +122 lines    | ✅ Pushed |
 
 ### Branch Status
 
@@ -433,16 +454,16 @@ Flags:
 
 ### Production Readiness
 
-| Aspect | Status | Evidence |
-|---------|---------|----------|
-| Critical bugs fixed | ✅ Yes | 4 bugs resolved |
-| Testing complete | ✅ Yes | 22/22 tests passing |
-| Documentation complete | ✅ Yes | README + FIX_SUMMARY |
-| Error handling | ✅ Yes | All paths covered |
-| User feedback | ✅ Yes | Clear messages throughout |
-| Safety features | ✅ Yes | Dry-run + confirmations |
-| Git hygiene | ✅ Yes | Clean state |
-| **Production Ready** | **✅ YES** | **All checks passed** |
+| Aspect                 | Status     | Evidence                  |
+| ---------------------- | ---------- | ------------------------- |
+| Critical bugs fixed    | ✅ Yes     | 4 bugs resolved           |
+| Testing complete       | ✅ Yes     | 22/22 tests passing       |
+| Documentation complete | ✅ Yes     | README + FIX_SUMMARY      |
+| Error handling         | ✅ Yes     | All paths covered         |
+| User feedback          | ✅ Yes     | Clear messages throughout |
+| Safety features        | ✅ Yes     | Dry-run + confirmations   |
+| Git hygiene            | ✅ Yes     | Clean state               |
+| **Production Ready**   | **✅ YES** | **All checks passed**     |
 
 ---
 
@@ -637,6 +658,7 @@ Flags:
 
 **Context:**
 Current implementation uses hardcoded estimates (50MB/generation, 100MB/GC). This is:
+
 - **Inaccurate** - Might be 10MB or 500MB in reality
 - **Misleading** - Users don't know real impact
 - **Frustrating** - Can't make informed decisions
@@ -644,21 +666,25 @@ Current implementation uses hardcoded estimates (50MB/generation, 100MB/GC). Thi
 **Options:**
 
 **Option A: Profile link size (simpler, faster)**
+
 ```bash
 du -sh ~/.local/state/nix/profiles/profile-32-link
 # Result: 4.0K (just symlink)
 ```
+
 - ✅ Very fast (microseconds)
 - ✅ Simple implementation
 - ❌ Doesn't show real impact (symlink only)
 - ❌ Might undercount if profile has unique store paths
 
 **Option B: Store path traversal (accurate, slow)**
+
 ```bash
 # Get all store paths referenced by profile
 nix-store --query --requisites ~/.local/state/nix/profiles/profile-32-link
 # Then du -sh each path and sum
 ```
+
 - ✅ Accurate real disk usage
 - ✅ Shows true impact of deletion
 - ❌ Very slow (seconds per generation)
@@ -666,11 +692,13 @@ nix-store --query --requisites ~/.local/state/nix/profiles/profile-32-link
 - ❌ Might time out on large profiles
 
 **Option C: Nix store analysis (best, most complex)**
+
 ```bash
 # Use Nix GC roots to find referenced paths
 nix-store --gc --print-roots
 # Calculate shared vs unique store usage
 ```
+
 - ✅ Most accurate (accounts for shared paths)
 - ✅ Shows true impact (shared paths only freed when all refs deleted)
 - ❌ Extremely complex
@@ -678,6 +706,7 @@ nix-store --gc --print-roots
 - ❌ Requires understanding Nix's internal GC logic
 
 **Questions:**
+
 1. What does "space freed" mean in Nix context?
 2. How does Nix actually calculate space?
 3. What do users expect - profile size or store path size?
@@ -692,6 +721,7 @@ Research Nix's internal mechanisms before implementing. Start with Option B (sto
 ## 📈 Success Metrics
 
 ### Pre-Fix State
+
 - **Tool functionality:** ❌ Broken (0%)
 - **Tests passing:** 0/22 (0%)
 - **Critical bugs:** 4 (blocking)
@@ -699,6 +729,7 @@ Research Nix's internal mechanisms before implementing. Start with Option B (sto
 - **Production ready:** ❌ No
 
 ### Post-Fix State
+
 - **Tool functionality:** ✅ Complete (100%)
 - **Tests passing:** 22/22 (100%)
 - **Critical bugs:** 0 (all resolved)
@@ -706,6 +737,7 @@ Research Nix's internal mechanisms before implementing. Start with Option B (sto
 - **Production ready:** ✅ Yes
 
 ### Improvement Summary
+
 - **Functionality:** +100% (from broken to working)
 - **Test coverage:** +100% (from 0 to 22 tests)
 - **Bug fixes:** -100% (from 4 to 0 critical bugs)
@@ -781,11 +813,13 @@ This project benefited from:
 ## 📞 Support
 
 ### Issues
+
 - **GitHub Issues:** https://github.com/LarsArtmann/clean-wizard/issues
 - **Documentation:** See README.md and FIX_SUMMARY.md
 - **Status Reports:** docs/status/ directory
 
 ### Usage
+
 ```bash
 # Clean with interactive TUI
 clean-wizard clean
@@ -805,6 +839,7 @@ clean-wizard --help
 Clean-Wizard is now **production-ready** and fully functional. All critical bugs have been fixed, comprehensive testing confirms reliability, and documentation is complete.
 
 The tool successfully:
+
 - ✅ Scans Nix generations correctly
 - ✅ Shows real user data (not mock)
 - ✅ Provides interactive TUI for selection
@@ -816,6 +851,7 @@ The tool successfully:
 **Status:** ✅ READY FOR PRODUCTION USE
 
 **Next Steps:**
+
 1. Implement version flag (Priority: 1)
 2. Add auto-confirmation (Priority: 2)
 3. Implement accurate size calculation (Priority: 3)

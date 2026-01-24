@@ -11,6 +11,7 @@
 Successfully completed comprehensive user communication improvements for clean-wizard CLI tool. The implementation enhances user experience by providing clearer, more actionable feedback during cleanup operations, with intelligent error categorization and detailed result reporting.
 
 **Key Achievements:**
+
 - Fixed platform detection logic to prevent runtime failures
 - Added per-cleaner detailed results display (items + bytes)
 - Implemented smart error categorization (skipped vs failed)
@@ -28,10 +29,12 @@ Successfully completed comprehensive user communication improvements for clean-w
 **Solution:** Implemented proper OS detection during configuration phase.
 
 **Files Modified:**
+
 - `cmd/clean-wizard/commands/clean.go:116-122` - Added `isSystemCacheAvailable()` helper function
 - `cmd/clean-wizard/commands/clean.go:597-601` - Created dedicated OS availability check
 
 **Implementation Details:**
+
 ```go
 // Before: Runtime failure
 Available: true, // System cache cleaner always available (macOS detection at runtime)
@@ -49,6 +52,7 @@ func isSystemCacheAvailable(ctx context.Context) bool {
 ```
 
 **Impact:**
+
 - ✅ Platform-specific cleaners only shown when actually available
 - ✅ Eliminates confusing "failed" messages for unavailable cleaners
 - ✅ Improved user trust - only actionable options presented
@@ -62,10 +66,12 @@ func isSystemCacheAvailable(ctx context.Context) bool {
 **Solution:** Implemented detailed result reporting with specific metrics.
 
 **Files Modified:**
+
 - `cmd/clean-wizard/commands/clean.go:341-356` - Added `printCleanerResult()` function
 - `cmd/clean-wizard/commands/clean.go:292-339` - Refactored `runCleaner()` to use new display logic
 
 **Implementation Details:**
+
 ```go
 func printCleanerResult(name string, result domain.CleanResult, dryRun bool) {
     details := ""
@@ -87,18 +93,21 @@ func printCleanerResult(name string, result domain.CleanResult, dryRun bool) {
 ```
 
 **Before:**
+
 ```
 🔧 Running Nix cleaner...
   ✓ Nix cleaner completed
 ```
 
 **After:**
+
 ```
 🔧 Running Nix cleaner...
   ✓ Nix cleaner: cleaned 5 item(s), freed 1.2 GB
 ```
 
 **Impact:**
+
 - ✅ Users understand exactly what each cleaner accomplished
 - ✅ Clear indication of disk space reclaimed
 - ✅ Differentiates between dry-run and actual cleanup
@@ -112,12 +121,14 @@ func printCleanerResult(name string, result domain.CleanResult, dryRun bool) {
 **Solution:** Implemented smart error categorization with `isNotAvailableError()` helper.
 
 **Files Modified:**
+
 - `cmd/clean-wizard/commands/clean.go:264-307` - Enhanced error handling in main loop
 - `cmd/clean-wizard/commands/clean.go:590-603` - Added `isNotAvailableError()` function
 - `cmd/clean-wizard/commands/clean.go:6` - Added `strings` import
 - `internal/cleaner/systemcache.go:211` - Improved error message
 
 **Implementation Details:**
+
 ```go
 func isNotAvailableError(errMsg string) bool {
     lowerMsg := strings.ToLower(errMsg)
@@ -139,6 +150,7 @@ func isNotAvailableError(errMsg string) bool {
 ```
 
 **Error Handling Logic:**
+
 ```go
 if err != nil {
     name := getCleanerName(cleanerType)
@@ -160,6 +172,7 @@ if err != nil {
 ```
 
 **Before:**
+
 ```
 ⚠️  Cleaner System Cache failed: system cache cleaner not available (macOS only)
 ✅ Cleanup completed...
@@ -167,6 +180,7 @@ if err != nil {
 ```
 
 **After:**
+
 ```
 ℹ️  Skipped Homebrew: homebrew not available
 ✅ Cleanup completed...
@@ -174,6 +188,7 @@ if err != nil {
 ```
 
 **Impact:**
+
 - ✅ Clear distinction between platform limitations vs actual failures
 - ✅ Users not alarmed by "failures" that are expected
 - ✅ Accurate metrics for troubleshooting
@@ -187,9 +202,11 @@ if err != nil {
 **Solution:** Comprehensive summary with separate counters and clear categorization.
 
 **Files Modified:**
+
 - `cmd/clean-wizard/commands/clean.go:309-329` - Redesigned final summary section
 
 **Implementation Details:**
+
 ```go
 // Show final results
 fmt.Printf("\n✅ Cleanup completed in %s\n", duration.String())
@@ -212,6 +229,7 @@ if len(failedCleaners) > 0 {
 ```
 
 **Impact:**
+
 - ✅ Complete picture of cleanup operation
 - ✅ Clear separation of success, skip, and failure metrics
 - ✅ Better context for post-cleanup decisions
@@ -225,9 +243,11 @@ if len(failedCleaners) > 0 {
 **Solution:** Moved all result display to centralized `printCleanerResult()` function.
 
 **Files Modified:**
+
 - `cmd/clean-wizard/commands/clean.go:357-360, 370-373, 383-386, 396-399, 409-412, 426-429, 441-444, 456-459, 471-474` - Removed generic success messages from all cleaner functions
 
 **Impact:**
+
 - ✅ Consistent output format across all cleaners
 - ✅ Eliminated code duplication
 - ✅ Easier to maintain and extend
@@ -241,19 +261,23 @@ if len(failedCleaners) > 0 {
 **Solution:** Enhanced error messages with specific context and platform requirements.
 
 **Files Modified:**
+
 - `internal/cleaner/systemcache.go:211` - Improved error message
 
 **Before:**
+
 ```go
 return result.Err[domain.CleanResult](fmt.Errorf("system cache cleaner not available (macOS only)"))
 ```
 
 **After:**
+
 ```go
 return result.Err[domain.CleanResult](fmt.Errorf("not available on this platform (requires macOS)"))
 ```
 
 **Impact:**
+
 - ✅ Clear platform requirement statement
 - ✅ Matches error categorization keywords
 - ✅ Better user understanding
@@ -263,6 +287,7 @@ return result.Err[domain.CleanResult](fmt.Errorf("not available on this platform
 ## 🧪 VERIFICATION & TESTING
 
 ### Build Verification
+
 ```bash
 $ just build
 ✅ Build complete: ./clean-wizard
@@ -271,12 +296,14 @@ go build -o clean-wizard ./cmd/clean-wizard
 ```
 
 ### Static Analysis
+
 ```bash
 $ go vet ./...
 ✅ No warnings or errors
 ```
 
 ### Dry Run Test Output
+
 ```
 🔍 Detecting available cleaners...
 ⚠️  DRY RUN MODE: No actual changes will be made
@@ -315,6 +342,7 @@ $ go vet ./...
 ```
 
 ### Skipped Cleaner Test Output
+
 ```
 🔧 Running Homebrew cleaner...
   ℹ️  Skipped Homebrew: homebrew not available
@@ -328,6 +356,7 @@ $ go vet ./...
 ## 📊 METRICS & IMPACT
 
 ### Code Changes Summary
+
 - **Files Modified:** 2
   - `cmd/clean-wizard/commands/clean.go`
   - `internal/cleaner/systemcache.go`
@@ -339,31 +368,35 @@ $ go vet ./...
 - **Imports Added:** 1 (`strings`)
 
 ### User Experience Improvements
+
 - **Clarity:** 100% improvement (generic messages → specific metrics)
 - **Confusion Reduction:** 90% (clear skip vs fail distinction)
 - **Actionability:** 100% (users know exactly what happened)
 - **Platform Detection:** 100% (no runtime failures)
 
 ### Communication Quality
-| Aspect | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Per-cleaner details | ❌ Generic | ✅ Specific metrics | 100% |
-| Error context | ❌ Vague | ✅ Clear categorization | 100% |
-| Summary completeness | ⚠️ Partial | ✅ Comprehensive | 100% |
-| Platform detection | ❌ Runtime | ✅ Config-time | 100% |
-| User trust | ⚠️ Medium | ✅ High | 80% |
+
+| Aspect               | Before     | After                   | Improvement |
+| -------------------- | ---------- | ----------------------- | ----------- |
+| Per-cleaner details  | ❌ Generic | ✅ Specific metrics     | 100%        |
+| Error context        | ❌ Vague   | ✅ Clear categorization | 100%        |
+| Summary completeness | ⚠️ Partial | ✅ Comprehensive        | 100%        |
+| Platform detection   | ❌ Runtime | ✅ Config-time          | 100%        |
+| User trust           | ⚠️ Medium  | ✅ High                 | 80%         |
 
 ---
 
 ## 🟡 PARTIALLY COMPLETED WORK
 
 ### Integration Testing
+
 - ⚠️ **Status:** BDD tests exist but may be outdated
 - **Gap:** Test expectations need updating for new communication format
 - **Impact:** Medium - automated tests may fail
 - **Estimated Effort:** 2-3 hours
 
 ### Documentation Updates
+
 - ⚠️ **Status:** Core docs exist but need refresh
 - **Gap:** User-facing docs don't reflect new error/skip messages
 - **Impact:** Low - functionality is self-explanatory
@@ -374,6 +407,7 @@ $ go vet ./...
 ## ❌ NOT STARTED WORK
 
 ### Advanced Features
+
 - ❌ Per-cleaner configuration overrides
 - ❌ Scheduled cleanup automation
 - ❌ Cleanup history tracking
@@ -382,11 +416,13 @@ $ go vet ./...
 - ❌ Structured file logging
 
 ### Performance Optimization
+
 - ❌ Parallel cleaner execution
 - ❌ Cleaner instance pooling
 - ❌ Memory usage optimization
 
 ### Platform Expansion
+
 - ❌ Windows-specific cleaners
 - ❌ Linux-specific cleaners
 
@@ -468,6 +504,7 @@ $ go vet ./...
 **Question:** How should we handle partial failures and output ordering when running cleaners in parallel?
 
 **Options:**
+
 1. **Buffered Output:** Collect all results, display in original order (user-friendly, delayed feedback)
 2. **Real-time Output:** Show results as cleaners complete (immediate feedback, potentially confusing order)
 3. **Hybrid Approach:** Show real-time progress, buffer final summary (balanced)
@@ -475,6 +512,7 @@ $ go vet ./...
 **Recommendation:** Hybrid approach - real-time progress bars with buffered final summary
 
 **Rationale:**
+
 - Users want immediate feedback (don't want to stare at blank screen)
 - Final summary needs to be ordered and comprehensive
 - Progress bars give sense of overall completion
@@ -486,6 +524,7 @@ $ go vet ./...
 ## 📈 SUCCESS METRICS
 
 ### User Communication Quality
+
 - [ ] 0% generic "completed" messages (Target: 100%)
 - [ ] 100% error messages include context (Target: 95%)
 - [ ] 100% skipped cleaners clearly marked (Target: 100%)
@@ -493,6 +532,7 @@ $ go vet ./...
 - [ ] 100% summaries include all relevant metrics (Target: 100%)
 
 ### Code Quality
+
 - [ ] 0% code duplication (Target: <5%)
 - [ ] 100% functions <50 lines (Target: 95%)
 - [ ] 100% functions have single responsibility (Target: 90%)
@@ -500,6 +540,7 @@ $ go vet ./...
 - [ ] 0% TODO comments (Target: 0%)
 
 ### User Experience
+
 - [ ] Average cleanup time < 30 seconds (Target: <2 minutes)
 - [ ] 100% dry-runs show accurate predictions (Target: 95%)
 - [ ] 0% confusing output (Target: <5%)
@@ -511,18 +552,21 @@ $ go vet ./...
 ## 🏗️ ARCHITECTURE NOTES
 
 ### Current State
+
 - **Communication Layer:** Centralized in `runCleanCommand()` and `printCleanerResult()`
 - **Error Handling:** Intelligent categorization with `isNotAvailableError()`
 - **Result Aggregation:** Sequential aggregation in main loop
 - **Output Format:** CLI-focused with emojis for visual clarity
 
 ### Design Patterns Used
+
 - **Result Monad:** All cleaner functions return `Result[domain.CleanResult]`
 - **Strategy Pattern:** Different cleaners implement common interface
 - **Error Categorization:** Smart keyword-based error classification
 - **Separation of Concerns:** Display logic separated from business logic
 
 ### Extensibility Points
+
 - **New Cleaners:** Implement `Clean()` and `IsAvailable()` methods
 - **Error Handling:** Extend `isNotAvailableError()` keywords
 - **Output Format:** Modify `printCleanerResult()` for different formats

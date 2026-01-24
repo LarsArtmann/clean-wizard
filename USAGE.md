@@ -516,35 +516,35 @@ name: System Cleanup
 
 on:
   schedule:
-    - cron: '0 2 * * 0'  # Weekly on Sunday at 2 AM
+    - cron: "0 2 * * 0" # Weekly on Sunday at 2 AM
   workflow_dispatch:
 
 jobs:
   cleanup:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Setup Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.25'
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.25"
 
-    - name: Install Clean Wizard
-      run: |
-        go install github.com/LarsArtmann/clean-wizard@latest
+      - name: Install Clean Wizard
+        run: |
+          go install github.com/LarsArtmann/clean-wizard@latest
 
-    - name: Initialize Configuration
-      run: |
-        clean-wizard init --minimal
+      - name: Initialize Configuration
+        run: |
+          clean-wizard init --minimal
 
-    - name: Scan System
-      run: |
-        clean-wizard scan --validation-level comprehensive
+      - name: Scan System
+        run: |
+          clean-wizard scan --validation-level comprehensive
 
-    - name: Perform Cleanup
-      run: |
-        clean-wizard clean --profile comprehensive --validation-level strict
+      - name: Perform Cleanup
+        run: |
+          clean-wizard clean --profile comprehensive --validation-level strict
 ```
 
 ## 🔍 Debug Mode

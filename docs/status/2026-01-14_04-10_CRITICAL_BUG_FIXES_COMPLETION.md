@@ -1,4 +1,5 @@
 # Status Report: 2026-01-14 04:10
+
 ## Clean Wizard Project - Critical Bug Fixes & Stability Improvements
 
 ---
@@ -18,16 +19,19 @@
 ## 🚨 CRITICAL ISSUES FIXED
 
 ### Issue 1: YAML Enum Parsing Failure ✅
+
 **Severity**: 🔴 CRITICAL - Application unusable
 **Error**: `cannot parse value as 'domain.ProfileStatus': strconv.ParseInt: invalid syntax`
 
 **Root Cause**:
+
 - YAML unmarshaling for enums (`ProfileStatus`, `SafeMode`, `OptimizationMode`, `HomebrewMode`, `ExecutionMode`) only accepted string values
 - Configuration file contained integer values (`enabled: 1`, `safe_mode: 0`)
 - UnmarshalYAML methods didn't handle integer fallback
 
 **Solution**:
 Updated all enum types in `internal/domain/execution_enums.go` to accept both string AND integer representations:
+
 ```go
 func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
     // Try as string first
@@ -63,6 +67,7 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ```
 
 **Files Modified**:
+
 - `internal/domain/execution_enums.go` (lines 155-230)
   - ProfileStatus.UnmarshalYAML - Enhanced with integer support
   - SafeMode.UnmarshalYAML - Added marshal/unmarshal methods with integer support
@@ -71,6 +76,7 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
   - ExecutionMode.UnmarshalYAML - Added marshal/unmarshal methods with integer support
 
 **Verification**:
+
 ```bash
 $ clean-wizard profile list
 ✅ Success - All profiles load correctly
@@ -79,8 +85,10 @@ $ clean-wizard profile list
 ---
 
 ### Issue 2: Nil Pointer Dereference Panic ✅
+
 **Severity**: 🔴 CRITICAL - Application crash on startup
 **Error**:
+
 ```
 panic: runtime error: invalid memory address or nil pointer dereference
 [signal SIGSEGV: segmentation violation code=0x2 addr=0x0 pc=0x100f11764]
@@ -93,6 +101,7 @@ github.com/spf13/pflag.(*FlagSet).BoolVarP(...)
 ```
 
 **Root Cause**:
+
 - Command constructors (`NewScanCommand`, `NewCleanCommand`) required parameters (`verbose bool`, `validationLevel config.ValidationLevel`)
 - These parameters were passed from global variables in `main.go` at initialization time
 - Global variables were uninitialized when commands were created, causing nil pointers in cobra/pflag setup
@@ -100,12 +109,14 @@ github.com/spf13/pflag.(*FlagSet).BoolVarP(...)
 
 **Solution**:
 Simplified command constructors by removing parameter dependencies:
+
 1. Changed `NewScanCommand(verbose bool, validationLevel config.ValidationLevel)` → `NewScanCommand()`
 2. Changed `NewCleanCommand(validationLevel config.ValidationLevel)` → `NewCleanCommand()`
 3. Parse flags at runtime within command execution instead of at initialization
 4. Get verbose flag from parent command's persistent flags at runtime
 
 **Files Modified**:
+
 - `cmd/clean-wizard/main.go`
   - Line 93: Simplified `commands.NewScanCommand()` call
   - Line 94: Simplified `commands.NewCleanCommand()` call
@@ -120,6 +131,7 @@ Simplified command constructors by removing parameter dependencies:
   - Lines 45-47: Added runtime flag parsing
 
 **Verification**:
+
 ```bash
 $ clean-wizard
 ✅ Success - No panic, help displays correctly
@@ -131,16 +143,19 @@ $ clean-wizard scan
 ---
 
 ### Issue 3: Nix Generations Validation Too Strict ✅
+
 **Severity**: 🟡 HIGH - Configuration file rejected
 **Error**: `Profile aggressive: operation 0 invalid: Operation settings validation failed: generations must be between 1 and 10`
 
 **Root Cause**:
+
 - Aggressive profile configured with `generations: 0` to remove all but current generation
 - Validation logic required `generations >= 1 && generations <= 10`
 - This prevented valid "keep only current" configuration
 
 **Solution**:
 Updated validation in `internal/domain/operation_settings.go`:
+
 ```go
 // Before:
 if os.NixGenerations.Generations < 1 || os.NixGenerations.Generations > 10 {
@@ -162,6 +177,7 @@ if os.NixGenerations.Generations < 0 || os.NixGenerations.Generations > 10 {
 ```
 
 **Files Modified**:
+
 - `internal/domain/operation_settings.go`
   - Line 113: Changed validation from `< 1` to `< 0`
   - Line 116: Updated error message to clarify `0 = keep only current`
@@ -170,6 +186,7 @@ if os.NixGenerations.Generations < 0 || os.NixGenerations.Generations > 10 {
   - Line 174: Changed test case from `generations: 0` to `generations: -1` for invalid case
 
 **Verification**:
+
 ```bash
 $ clean-wizard profile info aggressive
 ✅ Success - Aggressive profile loads with generations: 0
@@ -180,11 +197,13 @@ $ clean-wizard profile info aggressive
 ## 🧪 TEST RESULTS
 
 ### Full Test Suite Execution
+
 **Command**: `just test` (go test -v ./...)
 
 **Results**: ✅ **ALL PASSING**
 
 #### Test Suite Summary
+
 ```
 ✅ internal/adapters (10 tests)
    - Rate limiter, cache manager, HTTP client, environment config, error constructors
@@ -237,22 +256,22 @@ $ clean-wizard profile info aggressive
 
 ### CLI Commands - All Working ✅
 
-| Command | Status | Output |
-|----------|--------|--------|
-| `clean-wizard` | ✅ | Displays help without panic |
-| `clean-wizard scan` | ✅ | Scans system, displays results |
-| `clean-wizard clean --dry-run` | ✅ | Shows cleanup plan, no changes |
-| `clean-wizard profile list` | ✅ | Lists all 3 profiles |
-| `clean-wizard profile info <name>` | ✅ | Shows profile details |
-| `clean-wizard init` | ✅ | Interactive setup wizard |
+| Command                            | Status | Output                         |
+| ---------------------------------- | ------ | ------------------------------ |
+| `clean-wizard`                     | ✅     | Displays help without panic    |
+| `clean-wizard scan`                | ✅     | Scans system, displays results |
+| `clean-wizard clean --dry-run`     | ✅     | Shows cleanup plan, no changes |
+| `clean-wizard profile list`        | ✅     | Lists all 3 profiles           |
+| `clean-wizard profile info <name>` | ✅     | Shows profile details          |
+| `clean-wizard init`                | ✅     | Interactive setup wizard       |
 
 ### Configuration Loading - All Working ✅
 
-| Profile | Status | Risk | Generations |
-|---------|--------|------|-------------|
-| `daily` | ✅ Enabled | Low | 3 |
-| `comprehensive` | ✅ Enabled | Low | 1 |
-| `aggressive` | ✅ Enabled | High | 0 |
+| Profile         | Status     | Risk | Generations |
+| --------------- | ---------- | ---- | ----------- |
+| `daily`         | ✅ Enabled | Low  | 3           |
+| `comprehensive` | ✅ Enabled | Low  | 1           |
+| `aggressive`    | ✅ Enabled | High | 0           |
 
 **Configuration File**: `~/.clean-wizard.yaml`
 **Safe Mode**: Disabled (0)
@@ -283,6 +302,7 @@ $ clean-wizard --version
 **Test Updates**: 1 test case
 
 **Change Distribution**:
+
 - Type-safe enum improvements: 80 lines (53%)
 - Command constructor simplification: 40 lines (27%)
 - Validation logic adjustment: 20 lines (13%)
@@ -291,16 +311,19 @@ $ clean-wizard --version
 ### Architecture Improvements
 
 **1. Robust Type System**
+
 - Enums now handle multiple YAML formats (string, int)
 - Backward compatible with existing configs
 - Future-proof for mixed-format configurations
 
 **2. Runtime Flag Parsing**
+
 - Commands no longer depend on initialization order
 - Flexible flag access from parent/child commands
 - Simpler constructor signatures
 
 **3. Flexible Validation**
+
 - Business rules now match user expectations
 - Clear error messages with guidance
 - Supports edge cases (generations: 0)
@@ -382,11 +405,13 @@ $ clean-wizard --version
 ## 📋 NEXT STEPS - TOP 25
 
 ### Immediate (Today) 🔥
+
 1. Remove debug printf from clean.go line 118
 2. Investigate safe mode vs aggressive profile logic
 3. Document YAML enum formats in README
 
 ### Short Term (This Week) 📅
+
 4. Add CLI command test suite (scan, clean, profile commands)
 5. Improve validation error messages with suggestions
 6. Add configuration backup before changes
@@ -394,6 +419,7 @@ $ clean-wizard --version
 8. Add --help examples for all commands
 
 ### Medium Term (This Month) 🗓️
+
 9. Add configuration migration tool
 10. Add interactive profile creation wizard
 11. Add cleanup history tracking
@@ -403,6 +429,7 @@ $ clean-wizard --version
 15. Add profile inheritance/composition
 
 ### Long Term (This Quarter) 📈
+
 16. Add scheduled cleanup support (cron/integration)
 17. Add performance metrics tracking
 18. Add health check command
@@ -423,23 +450,25 @@ $ clean-wizard --version
 **🤯 Why is the `aggressive` profile present and enabled when `safe_mode: 0` (disabled)?**
 
 **Context**:
+
 ```yaml
 # ~/.clean-wizard.yaml
-safe_mode: 0  # Disabled
+safe_mode: 0 # Disabled
 profiles:
-    aggressive:  # This profile exists
-        enabled: 1
-        name: aggressive
-        description: Nuclear option - everything that can be cleaned
-        operations:
-            - name: nix-generations
-              risk_level: HIGH
-              settings:
-                nix_generations:
-                    generations: 0  # Remove all but current
+  aggressive: # This profile exists
+    enabled: 1
+    name: aggressive
+    description: Nuclear option - everything that can be cleaned
+    operations:
+      - name: nix-generations
+        risk_level: HIGH
+        settings:
+          nix_generations:
+            generations: 0 # Remove all but current
 ```
 
 **Code Analysis** (`cmd/clean-wizard/commands/init.go:224-239`):
+
 ```go
 // Only add aggressive profile if not in safe mode
 if !safeMode.IsEnabled() {
@@ -461,6 +490,7 @@ if !safeMode.IsEnabled() {
 ```
 
 **SafeMode Definition** (`internal/domain/execution_enums.go:99-102`):
+
 ```go
 func (sm SafeMode) IsEnabled() bool {
     return sm == SafeModeEnabled || sm == SafeModeStrict
@@ -468,12 +498,14 @@ func (sm SafeMode) IsEnabled() bool {
 ```
 
 **Logic Analysis**:
+
 - `safe_mode: 0` → `SafeModeDisabled`
 - `SafeModeDisabled.IsEnabled()` → `false`
 - `!safeMode.IsEnabled()` → `true`
 - Condition: `if !safeMode.IsEnabled()` → `if true` → **ADD AGGRESSIVE PROFILE**
 
 **Contradiction**:
+
 - Comment says: "Only add aggressive profile if not in safe mode"
 - "Not in safe mode" means "safe mode is OFF/DISABLED"
 - When safe mode is disabled, aggressive profile IS added
@@ -481,30 +513,36 @@ func (sm SafeMode) IsEnabled() bool {
 
 **Expected Behavior (Unknown)**:
 A) Should aggressive profile be ADDED when safe mode is DISABLED (current behavior)?
-   - If yes: High risk operations allowed when safety is OFF
-   - This seems intentional - disable safety to enable dangerous operations
+
+- If yes: High risk operations allowed when safety is OFF
+- This seems intentional - disable safety to enable dangerous operations
 
 B) Should aggressive profile be REMOVED when safe mode is DISABLED?
-   - If yes: Need to change condition to `if safeMode.IsEnabled()`
-   - But this contradicts the comment
+
+- If yes: Need to change condition to `if safeMode.IsEnabled()`
+- But this contradicts the comment
 
 C) Should aggressive profile exist only when safe mode is ENABLED (STRICT)?
-   - If yes: Need to check for `SafeModeStrict`
-   - Would prevent aggressive profile in normal safe mode
+
+- If yes: Need to check for `SafeModeStrict`
+- Would prevent aggressive profile in normal safe mode
 
 **Business Rule Question**:
 Is the purpose of safe mode to:
+
 1. **Prevent** aggressive operations when safe mode is OFF? (change condition)
 2. **Require** safe mode to be OFF for aggressive operations? (current behavior)
 3. **Require** safe mode to be ON (STRICT) for aggressive operations? (change to check Strict)
 
 **Security Implications**:
+
 - Current: Users can enable aggressive (HIGH RISK) operations by setting `safe_mode: 0`
 - Alternative: Users must explicitly enable aggressive profile after disabling safe mode
 - Recommended: Add warning when aggressive profile is used with safe_mode disabled
 
 **Recommendation**:
 Clarify business rules and add validation:
+
 1. Document safe mode behavior explicitly
 2. Add warning when aggressive profile selected with safe_mode disabled
 3. Consider adding separate `allow_aggressive_operations` flag
@@ -517,24 +555,28 @@ Clarify business rules and add validation:
 ## 📈 PROJECT HEALTH
 
 ### Code Quality
+
 - **Type Safety**: ✅ Excellent (strong enums, domain types)
 - **Test Coverage**: ✅ Good (27 test suites, BDD tests)
 - **Error Handling**: ✅ Good (Result type, comprehensive errors)
 - **Documentation**: ⚠️ Needs improvement (no CLI command docs)
 
 ### Architecture
+
 - **Separation of Concerns**: ✅ Excellent (domain, adapters, config layers)
 - **Dependency Management**: ✅ Clean (minimal external deps)
 - **Extensibility**: ✅ Good (plugin-style operations)
 - **Maintainability**: ✅ Good (clear package structure)
 
 ### Stability
+
 - **Current Status**: ✅ Stable
 - **Regression Risk**: ⚠️ Medium (CLI commands not tested)
 - **Production Ready**: ✅ Yes
 - **Known Issues**: 0 (all fixed)
 
 ### User Experience
+
 - **CLI**: ✅ Good (helpful commands, clear output)
 - **Configuration**: ⚠️ Fair (YAML format, needs documentation)
 - **Error Messages**: ⚠️ Fair (could be more actionable)
@@ -549,6 +591,7 @@ Clarify business rules and add validation:
 All critical issues have been resolved. The application is stable, tested, and fully functional.
 
 **Key Achievements**:
+
 1. Fixed YAML parsing for all enum types (5 enums updated)
 2. Resolved nil pointer panic in command initialization
 3. Adjusted validation to support edge cases
@@ -556,6 +599,7 @@ All critical issues have been resolved. The application is stable, tested, and f
 5. All CLI commands verified working
 
 **Next Focus Areas**:
+
 1. Remove debug output (5 min)
 2. Clarify safe mode logic (30 min)
 3. Add CLI tests (4-6 hours)

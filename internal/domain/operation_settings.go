@@ -63,11 +63,11 @@ type NodePackagesSettings struct {
 
 // GoPackagesSettings provides type-safe settings for Go language cleanup.
 type GoPackagesSettings struct {
-	CleanCache       bool `json:"clean_cache,omitempty" yaml:"clean_cache,omitempty"`
-	CleanTestCache   bool `json:"clean_test_cache,omitempty" yaml:"clean_test_cache,omitempty"`
-	CleanModCache    bool `json:"clean_mod_cache,omitempty" yaml:"clean_mod_cache,omitempty"`
-	CleanBuildCache  bool `json:"clean_build_cache,omitempty" yaml:"clean_build_cache,omitempty"`
-	CleanLintCache   bool `json:"clean_lint_cache,omitempty" yaml:"clean_lint_cache,omitempty"`
+	CleanCache      bool `json:"clean_cache,omitempty" yaml:"clean_cache,omitempty"`
+	CleanTestCache  bool `json:"clean_test_cache,omitempty" yaml:"clean_test_cache,omitempty"`
+	CleanModCache   bool `json:"clean_mod_cache,omitempty" yaml:"clean_mod_cache,omitempty"`
+	CleanBuildCache bool `json:"clean_build_cache,omitempty" yaml:"clean_build_cache,omitempty"`
+	CleanLintCache  bool `json:"clean_lint_cache,omitempty" yaml:"clean_lint_cache,omitempty"`
 }
 
 // CargoPackagesSettings provides type-safe settings for Cargo package manager cleanup.
@@ -183,11 +183,11 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 	case OperationTypeGoPackages:
 		return &OperationSettings{
 			GoPackages: &GoPackagesSettings{
-				CleanCache:       true,
-				CleanTestCache:   true,
-				CleanModCache:    false,
-				CleanBuildCache:  true,
-				CleanLintCache:   false,
+				CleanCache:      true,
+				CleanTestCache:  true,
+				CleanModCache:   false,
+				CleanBuildCache: true,
+				CleanLintCache:  false,
 			},
 		}
 	case OperationTypeCargoPackages:

@@ -42,6 +42,7 @@ clean-wizard clean
 ```
 
 That's it. The tool will:
+
 1. Scan for all Nix generations
 2. Show you which ones can be cleaned (old generations)
 3. Let you interactively select which ones to delete
@@ -89,9 +90,11 @@ Interactively scan and clean old Nix generations.
 **No configuration needed. No profiles. No setup.** Just run it.
 
 **Flags:**
+
 - `--dry-run` - Simulate deletion without actually removing generations
 
 **Examples:**
+
 ```bash
 # Normal mode - actually delete selected generations
 clean-wizard clean
@@ -115,6 +118,7 @@ clean-wizard clean --dry-run
 ## 🏗️ Architecture
 
 Clean Wizard is built with:
+
 - **Cobra** - CLI framework
 - **Huh** (by Charm Bracelet) - Beautiful TUI forms and selections
 - **BubbleTea** (by Charm Bracelet) - Terminal user interface framework

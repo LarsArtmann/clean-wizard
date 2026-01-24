@@ -16,25 +16,25 @@ import (
 
 // GoCleaner handles Go language cleanup.
 type GoCleaner struct {
-	verbose          bool
-	dryRun           bool
-	cleanCache       bool
-	cleanTestCache   bool
-	cleanModCache    bool
-	cleanBuildCache  bool
-	cleanLintCache   bool
+	verbose         bool
+	dryRun          bool
+	cleanCache      bool
+	cleanTestCache  bool
+	cleanModCache   bool
+	cleanBuildCache bool
+	cleanLintCache  bool
 }
 
 // NewGoCleaner creates Go cleaner.
 func NewGoCleaner(verbose, dryRun, cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache bool) *GoCleaner {
 	return &GoCleaner{
-		verbose:          verbose,
-		dryRun:           dryRun,
-		cleanCache:       cleanCache,
-		cleanTestCache:   cleanTestCache,
-		cleanModCache:    cleanModCache,
-		cleanBuildCache:  cleanBuildCache,
-		cleanLintCache:   cleanLintCache,
+		verbose:         verbose,
+		dryRun:          dryRun,
+		cleanCache:      cleanCache,
+		cleanTestCache:  cleanTestCache,
+		cleanModCache:   cleanModCache,
+		cleanBuildCache: cleanBuildCache,
+		cleanLintCache:  cleanLintCache,
 	}
 }
 

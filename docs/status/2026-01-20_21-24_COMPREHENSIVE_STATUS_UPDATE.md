@@ -15,6 +15,7 @@
 clean-wizard is a production-ready multi-cleaner CLI tool for system cache and package manager cleanup with comprehensive TUI support. The project has achieved **80% completion** of core features with strong architectural foundations and extensive test coverage (35 test files across 110 Go files).
 
 ### Current State
+
 - **Status:** ✅ STABLE - All cleaners working, reporting accurate, validation passing
 - **Build:** ✅ PASSING - No compilation errors
 - **Tests:** ✅ PASSING - All 35 test files passing (71.725s runtime)
@@ -22,12 +23,14 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - **Type Safety:** ✅ 100% - Strict type checking with Result[T] pattern
 
 ### Recent Milestone
+
 - **Fixed:** Critical byte tracking bug (FreedBytes = 0) in Go and BuildCache cleaners
 - **Issue:** User reported "WHAT?" to incorrect 0 B reporting when actual space was freed
 - **Resolution:** Implemented accurate byte tracking with size measurement before deletion
 - **Impact:** Domain validation now compliant, accurate space reporting restored
 
 ### Project Health
+
 - **Code Quality:** ⭐⭐⭐⭐⭐ Excellent - Clean architecture, strong typing
 - **Test Coverage:** ⭐⭐⭐⭐ High - 35 test files, BDD integration, comprehensive unit tests
 - **Documentation:** ⭐⭐⭐⭐⭐ Complete - README, guides, status reports, API docs
@@ -35,6 +38,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - **Maintainability:** ⭐⭐⭐⭐⭐ Excellent - Modular design, clear separation of concerns
 
 ### Overall Assessment
+
 - **Completion:** 80% of core features implemented
 - **Production Ready:** ✅ YES - All critical issues resolved
 - **Recommended Action:** Focus on performance optimization (parallel execution) and user experience improvements (configuration profiles)
@@ -48,6 +52,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 1. Core Architecture (100% COMPLETE)
 
 **Domain-Driven Design Implementation:**
+
 - ✅ Domain layer with rich business logic
 - ✅ Application layer with use case orchestration
 - ✅ Infrastructure layer with external system adapters
@@ -56,6 +61,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Dependency injection via constructor parameters
 
 **Type-Safe Result[T] Pattern:**
+
 - ✅ Generic Result[T] type for type-safe error handling
 - ✅ Ok() and Err() constructors for creating results
 - ✅ IsOk() and IsErr() methods for result checking
@@ -64,6 +70,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Comprehensive error types with error levels
 
 **Immutable Data Structures:**
+
 - ✅ Domain models with immutable fields (private, getters only)
 - ✅ Value objects for type safety (OperationType, Strategy, etc.)
 - ✅ Enum-like types for fixed values (DockerPruneMode, ScanType, etc.)
@@ -71,6 +78,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Immutable configuration objects
 
 **Validation Layer:**
+
 - ✅ Domain model validation with IsValid() methods
 - ✅ Business rule enforcement in domain layer
 - ✅ Configuration validation with comprehensive checks
@@ -78,6 +86,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Early validation to fail fast with clear errors
 
 **Configuration System:**
+
 - ✅ YAML-based configuration files
 - ✅ Environment variable overrides
 - ✅ Command-line flag configuration
@@ -86,6 +95,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Default values for all settings
 
 **Middleware Pattern:**
+
 - ✅ Logging middleware for request/response tracking
 - ✅ Error handling middleware for consistent error responses
 - ✅ Validation middleware for input validation
@@ -93,6 +103,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Composable middleware chain
 
 **Adapter Pattern:**
+
 - ✅ System-specific adapters (Nix, macOS, Linux)
 - ✅ Package manager adapters (npm, yarn, pnpm, bun, cargo)
 - ✅ Container runtime adapters (Docker, OrbStack)
@@ -100,6 +111,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Clean interfaces for adapter implementation
 
 **Multi-Cleaner Orchestration:**
+
 - ✅ Cleaner discovery and registration
 - ✅ Cleaner filtering by type and availability
 - ✅ Parallel execution support (sequential in current implementation)
@@ -109,6 +121,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 2. CLI Infrastructure (100% COMPLETE)
 
 **Cobra-Based CLI:**
+
 - ✅ Root command with help and version subcommands
 - ✅ Clean command with mode and cleaner selection options
 - ✅ Scan command with verbose output option
@@ -117,6 +130,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Flag validation and error handling
 
 **Interactive TUI (Huh Library):**
+
 - ✅ Cleaner selection form with multi-select
 - ✅ Mode selection form (quick, standard, aggressive)
 - ✅ Confirmation dialog before cleanup
@@ -125,6 +139,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Responsive layout for terminal sizes
 
 **Preset Modes:**
+
 - ✅ Quick mode: Minimal cleanup, fastest execution
 - ✅ Standard mode: Balanced cleanup, recommended for most users
 - ✅ Aggressive mode: Maximum cleanup, longer execution
@@ -132,6 +147,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Mode descriptions in TUI for user guidance
 
 **Dry-Run Mode:**
+
 - ✅ Safe simulation without actual changes
 - ✅ Size estimation based on typical usage
 - ✅ Item count estimation
@@ -139,6 +155,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ "No actual changes will be made" warning
 
 **Verbose Mode:**
+
 - ✅ Detailed per-cleaner operation logging
 - ✅ Individual item removal messages
 - ✅ Success/failure indicators for each item
@@ -146,6 +163,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Debug-level information for troubleshooting
 
 **Progress Reporting:**
+
 - ✅ Real-time feedback during operations
 - ✅ Cleaner-by-cleaner progress updates
 - ✅ Summary statistics after completion
@@ -153,6 +171,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Human-readable byte formatting (e.g., "1.4 GB")
 
 **Color-Coded Output:**
+
 - ✅ Success messages in green
 - ✅ Warning messages in yellow
 - ✅ Error messages in red
@@ -161,6 +180,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Consistent color scheme across all output
 
 **Error Recovery:**
+
 - ✅ Graceful handling of cleaner unavailability
 - ✅ Continuation despite individual cleaner failures
 - ✅ Error aggregation and summary reporting
@@ -170,6 +190,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 3. Cleaner Implementations (100% COMPLETE)
 
 **Nix Cleaner (100%):**
+
 - ✅ Nix availability detection via `nix-store` command
 - ✅ Profile path construction with fallback logic
 - ✅ Old generation identification via `nix-env` command
@@ -182,6 +203,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Test coverage: 6 test cases
 
 **TempFiles Cleaner (100%):**
+
 - ✅ /tmp directory scanning
 - ✅ Age-based filtering (older than threshold)
 - ✅ Pattern matching for specific file types
@@ -194,6 +216,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Test coverage: 8 test cases
 
 **Node.js Packages Cleaner (100%):**
+
 - ✅ npm cache detection and cleanup
 - ✅ pnpm cache detection and cleanup
 - ✅ yarn cache detection and cleanup
@@ -207,10 +230,11 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Test coverage: 10 test cases
 
 **Go Packages Cleaner (100%):**
+
 - ✅ GOCACHE cleanup via `go clean -cache`
 - ✅ GOTESTCACHE cleanup via `go clean -testcache`
 - ✅ GOMODCACHE cleanup via `go clean -modcache`
-- ✅ Build cache cleanup (go-build* folders)
+- ✅ Build cache cleanup (go-build\* folders)
 - ✅ Go availability detection via `go` command
 - ✅ Cache path detection via `go env` (GOCACHE, GOMODCACHE)
 - ✅ Size calculation before deletion
@@ -221,6 +245,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Test coverage: 9 test cases
 
 **Cargo Packages Cleaner (100%):**
+
 - ✅ Cargo availability detection via `cargo` command
 - ✅ Cargo cache detection (registry, source, git db)
 - ✅ Autoclean mode support (--autoclean flag)
@@ -231,9 +256,10 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Test coverage: 8 test cases
 
 **BuildCache Cleaner (100%):**
-- ✅ Gradle cache cleanup (~/.gradle/caches/*)
-- ✅ Maven partial files cleanup (repository/**/*.part)
-- ✅ SBT cache cleanup (~/.ivy2/cache/*)
+
+- ✅ Gradle cache cleanup (~/.gradle/caches/\*)
+- ✅ Maven partial files cleanup (repository/\*_/_.part)
+- ✅ SBT cache cleanup (~/.ivy2/cache/\*)
 - ✅ Build tool availability detection
 - ✅ Cache path detection (Gradle, Maven, SBT)
 - ✅ Size calculation before deletion
@@ -244,6 +270,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Test coverage: 12 test cases
 
 **Docker Cleaner (100%):**
+
 - ✅ Docker availability detection via `docker` command
 - ✅ Image pruning (dangling images)
 - ✅ Container cleanup (stopped containers)
@@ -256,6 +283,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Test coverage: 10 test cases
 
 **SystemCache Cleaner (100%):**
+
 - ✅ macOS Spotlight index cleanup
 - ✅ Xcode DerivedData cleanup
 - ✅ CocoaPods cache cleanup
@@ -268,6 +296,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Test coverage: 8 test cases
 
 **Language Version Manager Cleaner (100% - SAFE MODE ONLY):**
+
 - ✅ NVM availability detection
 - ✅ Pyenv availability detection
 - ✅ Rbenv availability detection
@@ -285,6 +314,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 **Test Files: 35 Total**
 
 **Unit Tests:**
+
 - ✅ 30+ unit test files covering all major components
 - ✅ Test coverage for all cleaners (10 cleaners)
 - ✅ Domain model validation tests
@@ -293,6 +323,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Error handling tests
 
 **BDD Testing:**
+
 - ✅ Cucumber/Godog integration
 - ✅ Feature files with Gherkin syntax
 - ✅ Scenario definitions for user workflows
@@ -300,31 +331,36 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Behavior-driven test organization
 
 **Integration Tests:**
+
 - ✅ Real cleaner execution tests
 - ✅ External system integration tests (Nix, Docker, etc.)
 - ✅ End-to-end workflow tests
 - ✅ Environment-specific tests (macOS, Linux)
 
 **Fuzz Testing:**
+
 - ✅ Fuzz tests for string parsing functions
 - ✅ Fuzz tests for configuration validation
 - ✅ Fuzz tests for path handling
 - ✅ CI integration for continuous fuzzing
 
 **Benchmark Tests:**
+
 - ✅ Performance benchmarks for cleaner execution
 - ✅ Memory usage benchmarks
 - ✅ I/O operation benchmarks
 - ✅ CI integration for performance regression detection
 
 **Test Coverage:**
+
 - ✅ High coverage on domain layer (95%+)
 - ✅ Medium coverage on cleaner layer (70-80%)
 - ✅ Critical path coverage (100% for user-facing features)
 - ✅ Coverage reporting via go test -cover
 
 **Test Organization:**
-- ✅ Test files named with _test.go suffix
+
+- ✅ Test files named with \_test.go suffix
 - ✅ Test functions named with Test prefix
 - ✅ Subtests for test case organization (TestFunction/TestCaseName)
 - ✅ Table-driven tests for multiple test cases
@@ -333,6 +369,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 5. Documentation (100% COMPLETE)
 
 **README.md (100%):**
+
 - ✅ Project description and overview
 - ✅ Installation instructions (Homebrew, build from source)
 - ✅ Usage examples (quick start, advanced usage)
@@ -344,6 +381,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ License information
 
 **HOW_TO_USE.md (100%):**
+
 - ✅ Step-by-step usage guide
 - ✅ Common use cases with examples
 - ✅ Mode selection guide (quick, standard, aggressive)
@@ -353,6 +391,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Tips and best practices
 
 **USAGE.md (100%):**
+
 - ✅ Complete command reference
 - ✅ All flags and options documented
 - ✅ Subcommand descriptions
@@ -361,6 +400,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Configuration file schema
 
 **IMPLEMENTATION_STATUS.md (100%):**
+
 - ✅ Feature completion tracking
 - ✅ Cleaner implementation status
 - ✅ Platform support matrix
@@ -368,6 +408,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Future roadmap
 
 **REFACTORING_PLAN.md (100%):**
+
 - ✅ Current architecture overview
 - ✅ Identified code smells and technical debt
 - ✅ Refactoring recommendations
@@ -375,6 +416,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Risk assessment for changes
 
 **Architecture Documentation (100%):**
+
 - ✅ Domain layer documentation (docs/architecture/domain.md)
 - ✅ Application layer documentation (docs/architecture/application.md)
 - ✅ Infrastructure layer documentation (docs/architecture/infrastructure.md)
@@ -383,6 +425,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Component interaction diagrams
 
 **Status Reports (100%):**
+
 - ✅ Monthly status reports in docs/status/ directory
 - ✅ Critical bug fix reports
 - ✅ Feature completion reports
@@ -390,6 +433,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Historical tracking of progress
 
 **API Documentation (100%):**
+
 - ✅ Typespec specification for API contracts
 - ✅ Data type definitions
 - ✅ Interface definitions
@@ -399,6 +443,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 6. Recent Critical Fixes (100% COMPLETE)
 
 **Byte Tracking Bug Fix (2026-01-20):**
+
 - ✅ **Issue:** FreedBytes hardcoded to 0 in Go and BuildCache cleaners
 - ✅ **Root Cause:** Cleaners removing items without measuring size first
 - ✅ **Impact:** Domain validation failure, user confusion ("WHAT?" reaction)
@@ -407,7 +452,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
   - cleanGoCache(): Query GOCACHE path, measure size, then clean
   - cleanGoModCache(): Query GOMODCACHE path, measure size, then clean
   - cleanGoTestCache(): Query GOCACHE path, measure size (0 for test cache), then clean
-  - cleanGoBuildCache(): Measure go-build* folders before removal
+  - cleanGoBuildCache(): Measure go-build\* folders before removal
 - ✅ **BuildCache Cleaner Changes:**
   - Gradle cache: Measure directories before removal
   - Maven partial files: Measure files before removal
@@ -416,6 +461,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ **Result:** Accurate byte tracking (e.g., "Freed 1.4 GB" instead of "Freed 0 B")
 
 **Domain Validation Compliance (2026-01-20):**
+
 - ✅ **Issue:** CleanResult.IsValid() failing for some cleaners
 - ✅ **Root Cause:** FreedBytes = 0 when ItemsRemoved > 0 (business rule violation)
 - ✅ **Solution:** Ensure all cleaners report accurate FreedBytes > 0 when items removed
@@ -427,6 +473,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ **Result:** All CleanResult.IsValid() checks passing
 
 **Size Measurement Implementation (2026-01-20):**
+
 - ✅ **Implementation:** getDirSize() function with recursive directory traversal
 - ✅ **Timing:** Size measured BEFORE deletion (critical for accurate reporting)
 - ✅ **Dry-Run:** Size calculations skip during dry-run (uses estimates)
@@ -435,12 +482,14 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ **Result:** Accurate byte tracking for all cache and file removal operations
 
 **Graceful Degradation (2026-01-20):**
+
 - ✅ **Implementation:** Fallback logic for path query failures
 - ✅ **Go Cleaner:** If getGoEnv() fails, still execute go clean command
 - ✅ **Result:** Cleaning continues even if size measurement fails
 - ✅ **User Experience:** Cleaners don't fail completely on partial errors
 
 **Dry-Run Compatibility (2026-01-20):**
+
 - ✅ **Implementation:** Conditional size calculation (!dryRun)
 - ✅ **Behavior:** Dry-run mode skips size measurement, uses estimates
 - ✅ **Result:** Dry-run stays fast, real-run has accurate byte tracking
@@ -452,6 +501,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 1. SystemCache Cleaner (85% COMPLETE)
 
 **Completed:**
+
 - ✅ macOS Spotlight index cleanup
 - ✅ Xcode DerivedData cleanup
 - ✅ CocoaPods cache cleanup
@@ -459,20 +509,24 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ macOS-specific cache paths and detection
 
 **Not Started:**
+
 - ❌ Linux system cache support (apt, dnf, pacman caches)
 - ❌ Windows system cache support (AppData, ProgramData, TEMP)
 - ❌ Platform-specific cache path detection for Linux
 - ❌ Platform-specific cache path detection for Windows
 
 **Partially Implemented:**
+
 - ⚠️ Size calculation - Some caches estimate size instead of measuring (Spotlight index)
 
 **What's Missing (15%):**
+
 - Platform parity (Linux, Windows support)
 - Accurate size measurement for all cache types
 - Platform-specific cache detection logic
 
 **Estimated Effort to Complete:**
+
 - Linux support: 6 hours implementation, 3 hours testing
 - Windows support: 12 hours implementation, 6 hours testing
 - Total: ~27 hours effort
@@ -480,6 +534,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 2. Language Version Manager Cleaner (70% COMPLETE)
 
 **Completed:**
+
 - ✅ NVM availability detection
 - ✅ Pyenv availability detection
 - ✅ Rbenv availability detection
@@ -489,6 +544,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Verbose logging for safety
 
 **Not Started:**
+
 - ❌ Destructive cleanup implementation (actual version removal)
 - ❌ Version selection UI (multi-select form for choosing which versions to keep)
 - ❌ Rollback support (ability to undo deletions)
@@ -496,15 +552,18 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Version metadata tracking (installation date, last used, etc.)
 
 **Partially Implemented:**
+
 - ⚠️ Cleanup returns 0 items, 0 bytes (intentional conservative behavior)
 
 **What's Missing (30%):**
+
 - Actual destructive cleanup (currently disabled for safety)
 - Version selection interface
 - Rollback/undo functionality
 - Post-cleanup tool validation
 
 **Estimated Effort to Complete:**
+
 - Version selection UI: 8 hours implementation, 2 hours testing
 - Destructive cleanup: 12 hours implementation, 8 hours testing
 - Rollback support: 16 hours implementation, 8 hours testing
@@ -514,29 +573,34 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 3. BuildCache Cleaner (90% COMPLETE)
 
 **Completed:**
-- ✅ Gradle cache cleanup (~/.gradle/caches/*)
-- ✅ Maven partial files cleanup (repository/**/*.part)
-- ✅ SBT cache cleanup (~/.ivy2/cache/*)
+
+- ✅ Gradle cache cleanup (~/.gradle/caches/\*)
+- ✅ Maven partial files cleanup (repository/\*_/_.part)
+- ✅ SBT cache cleanup (~/.ivy2/cache/\*)
 - ✅ Size calculation before deletion (RECENTLY FIXED)
 - ✅ Dry-run mode with safe simulation
 - ✅ Verbose mode with detailed logging
 
 **Not Started:**
+
 - ❌ Age-based filtering (only clean caches older than threshold)
 - ❌ Gradle wrapper cleanup (gradle-wrapper jars)
 - ❌ Maven repository full cleanup (currently conservative, only .part files)
 - ❌ Build tool detection (check if tools actually installed before running)
 
 **Partially Implemented:**
+
 - ⚠️ All caches cleaned regardless of age (no time-based filtering)
 
 **What's Missing (10%):**
+
 - Age-based filtering for selective cleanup
 - Gradle wrapper jar cleanup
 - More aggressive Maven cleanup (full repository cleanup)
 - Build tool detection to skip unavailable tools
 
 **Estimated Effort to Complete:**
+
 - Age-based filtering: 8 hours implementation, 4 hours testing
 - Gradle wrapper cleanup: 4 hours implementation, 2 hours testing
 - Maven repository cleanup: 6 hours implementation, 4 hours testing
@@ -546,29 +610,34 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 4. Go Cleaner (95% COMPLETE)
 
 **Completed:**
+
 - ✅ GOCACHE cleanup via `go clean -cache`
 - ✅ GOTESTCACHE cleanup via `go clean -testcache`
 - ✅ GOMODCACHE cleanup via `go clean -modcache`
-- ✅ Build cache cleanup (go-build* folders)
+- ✅ Build cache cleanup (go-build\* folders)
 - ✅ Size calculation before deletion (RECENTLY FIXED)
 - ✅ Dry-run mode with safe simulation
 - ✅ Verbose mode with detailed logging
 - ✅ Graceful degradation when Go not installed
 
 **Not Started:**
+
 - ❌ GOPATH cleanup (legacy Go workspace cleanup)
 - ❌ Go version detection (check Go version for compatibility)
 - ❌ Go-specific cache filtering (based on Go version)
 
 **Partially Implemented:**
+
 - ⚠️ Test cache size reports 0 bytes (unavoidable limitation - test cache is internal to Go)
 
 **What's Missing (5%):**
+
 - GOPATH cleanup (minor use case)
 - Go version detection for compatibility
 - Go-specific cache filtering logic
 
 **Estimated Effort to Complete:**
+
 - GOPATH cleanup: 4 hours implementation, 2 hours testing
 - Go version detection: 2 hours implementation, 2 hours testing
 - Go-specific filtering: 6 hours implementation, 4 hours testing
@@ -577,6 +646,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 5. Docker Cleaner (90% COMPLETE)
 
 **Completed:**
+
 - ✅ Docker availability detection via `docker` command
 - ✅ Image pruning (dangling images)
 - ✅ Container cleanup (stopped containers)
@@ -588,22 +658,26 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Graceful handling when Docker not running
 
 **Not Started:**
+
 - ❌ Podman support (container runtime alternative)
 - ❌ Docker Compose cleanup (projects, services, networks)
 - ❌ Build cache cleanup (Docker buildx cache)
 - ❌ Docker system cleanup (more aggressive than volume prune)
 
 **Partially Implemented:**
+
 - ⚠️ Error messages explicitly mention OrbStack path (cosmetic issue)
 - ⚠️ Docker daemon detection fails gracefully but unclear user feedback
 
 **What's Missing (10%):**
+
 - Podman support (alternative container runtime)
 - Docker Compose resource cleanup
 - More aggressive Docker system cleanup options
 - Clearer error messages when Docker daemon not running
 
 **Estimated Effort to Complete:**
+
 - Podman support: 12 hours implementation, 6 hours testing
 - Docker Compose cleanup: 8 hours implementation, 4 hours testing
 - Build cache cleanup: 4 hours implementation, 2 hours testing
@@ -613,6 +687,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 6. Error Handling (85% COMPLETE)
 
 **Completed:**
+
 - ✅ Result[T] pattern for type-safe error handling
 - ✅ Error constructors with structured error information
 - ✅ Error levels (INFO, WARNING, ERROR, CRITICAL)
@@ -621,20 +696,24 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ✅ Error aggregation (summary of all errors after completion)
 
 **Not Started:**
+
 - ❌ User-friendly messages for all error types (some too technical)
 - ❌ Recovery suggestions for all recoverable errors
 - ❌ Error aggregation with grouping (similar errors grouped together)
 
 **Partially Implemented:**
+
 - ⚠️ Some error messages too technical for average users
 - ⚠️ Not all recoverable errors provide recovery suggestions
 
 **What's Missing (15%):**
+
 - Simplified, user-friendly error messages
 - Recovery suggestions for all error scenarios
 - Error grouping in summaries
 
 **Estimated Effort to Complete:**
+
 - User-friendly error messages: 8 hours implementation, 2 hours testing
 - Recovery suggestions: 6 hours implementation, 4 hours testing
 - Error grouping: 4 hours implementation, 2 hours testing
@@ -647,6 +726,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 1. Configuration Management (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Persistent user preferences (beyond YAML config file)
 - ❌ Profile management (save/load cleaner selections)
 - ❌ Global configuration (system-wide settings, not just user-level)
@@ -656,18 +736,21 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Configuration versioning (track changes to config over time)
 
 **Current State:**
+
 - YAML configuration files only
 - No profile saving/loading
 - No interactive config editing
 - Single config file per user
 
 **What's Missing (100%):**
+
 - Profile management system
 - Configuration persistence for user preferences
 - Interactive configuration editing UI
 - Configuration migration and versioning
 
 **Estimated Effort to Complete:**
+
 - Profile management: 16 hours implementation, 8 hours testing
 - Interactive config UI: 12 hours implementation, 6 hours testing
 - Configuration migration: 8 hours implementation, 4 hours testing
@@ -676,6 +759,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 2. Plugin System (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ External cleaner plugins (no plugin architecture)
 - ❌ Community cleaners (no way to add custom cleaners)
 - ❌ Plugin discovery (no plugin loading mechanism)
@@ -686,11 +770,13 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Plugin versioning (no plugin update/check mechanism)
 
 **Current State:**
+
 - All cleaners built-in (hardcoded)
 - No plugin infrastructure
 - No extensibility beyond source code modification
 
 **What's Missing (100%):**
+
 - Plugin system architecture
 - Plugin API definition
 - Plugin loader and discovery
@@ -698,6 +784,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Plugin security and validation
 
 **Estimated Effort to Complete:**
+
 - Plugin API design: 8 hours design, 4 hours documentation
 - Plugin loader: 12 hours implementation, 8 hours testing
 - Plugin discovery: 8 hours implementation, 4 hours testing
@@ -707,6 +794,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 3. Analytics & Telemetry (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Usage tracking (no analytics collection)
 - ❌ Performance monitoring (no remote telemetry)
 - ❌ Error reporting (no crash reporting system)
@@ -717,12 +805,14 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Retention tracking (no user engagement metrics)
 
 **Current State:**
+
 - No analytics collection
 - No remote telemetry
 - No error reporting
 - No update checking
 
 **What's Missing (100%):**
+
 - Analytics collection system
 - Remote telemetry infrastructure
 - Error reporting mechanism
@@ -730,6 +820,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Privacy controls for data collection
 
 **Estimated Effort to Complete:**
+
 - Analytics collection: 12 hours implementation, 6 hours testing
 - Remote telemetry: 16 hours implementation, 8 hours testing
 - Error reporting: 8 hours implementation, 4 hours testing
@@ -740,6 +831,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 4. Advanced Features (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Scheduling support (no cron integration or automatic cleanup)
 - ❌ Notification system (no alerts when cleanup completes)
 - ❌ Space analysis (no predictive cleanup suggestions)
@@ -750,12 +842,14 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Cache aging analysis (no tracking of cache freshness)
 
 **Current State:**
+
 - No scheduling
 - No notifications
 - No smart features
 - No analytics or historical tracking
 
 **What's Missing (100%):**
+
 - Scheduling system (cron/launchd integration)
 - Notification system (desktop alerts)
 - Space analysis and predictive features
@@ -763,6 +857,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Historical tracking and trend analysis
 
 **Estimated Effort to Complete:**
+
 - Scheduling support: 16 hours implementation, 8 hours testing
 - Notification system: 8 hours implementation, 4 hours testing
 - Space analysis: 20 hours implementation, 12 hours testing
@@ -773,6 +868,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 5. UI/UX Enhancements (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Web UI (no browser-based interface)
 - ❌ Mobile support (no mobile app or responsive design)
 - ❌ Dark/light themes (no theme switching)
@@ -783,6 +879,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Internationalized UI (English only)
 
 **Current State:**
+
 - CLI/TUI only
 - No web interface
 - Single theme (default)
@@ -790,6 +887,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - No visual progress bars
 
 **What's Missing (100%):**
+
 - Web UI implementation
 - Theme system and customization
 - Visual progress indicators
@@ -797,6 +895,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Internationalization and localization
 
 **Estimated Effort to Complete:**
+
 - Web UI: 80 hours implementation, 24 hours testing
 - Theme system: 12 hours implementation, 6 hours testing
 - Progress bars: 6 hours implementation, 2 hours testing
@@ -807,6 +906,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 6. Platform Support (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Linux packages (no .deb, .rpm packages)
 - ❌ Windows installer (no .msi or .exe installer)
 - ❌ Snap package (no snap build and distribution)
@@ -817,16 +917,19 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ AppImage (no Linux self-contained package)
 
 **Current State:**
+
 - Source code distribution only
 - Build from source instructions
 - Local Homebrew formula for macOS
 
 **What's Missing (100%):**
+
 - Multi-platform package builds
 - Package distribution channels
 - Package manager submissions (Homebrew, Snap, Flatpak, etc.)
 
 **Estimated Effort to Complete:**
+
 - Linux packages (.deb, .rpm): 16 hours implementation, 8 hours testing
 - Windows installer (.msi): 12 hours implementation, 6 hours testing
 - Snap package: 8 hours implementation, 4 hours testing
@@ -839,6 +942,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 7. Documentation (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Video tutorials (no screencast or video guides)
 - ❌ API reference (no generated API documentation)
 - ❌ Contributing guide (minimal contribution guidelines)
@@ -849,6 +953,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Migration guides (no upgrade guides between versions)
 
 **Current State:**
+
 - README.md (basic overview)
 - HOW_TO_USE.md (usage guide)
 - USAGE.md (command reference)
@@ -856,6 +961,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Architecture documentation (text-only)
 
 **What's Missing (100%):**
+
 - Video tutorials and screencasts
 - Generated API documentation (godoc, pkgsite)
 - Comprehensive contributing guide
@@ -864,6 +970,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Developer onboarding materials
 
 **Estimated Effort to Complete:**
+
 - Video tutorials: 8 hours recording, 4 hours editing
 - API reference: 12 hours implementation (godoc), 4 hours documentation
 - Contributing guide: 8 hours writing, 2 hours review
@@ -874,6 +981,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 8. Performance Optimizations (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Parallel cleanup (cleaners run sequentially, not in parallel)
 - ❌ Cache size caching (no caching between scan and clean)
 - ❌ Incremental scanning (full scan every time)
@@ -884,12 +992,14 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Database optimization (no database usage, all in-memory)
 
 **Current State:**
+
 - Sequential cleaner execution (one at a time)
 - No caching of scan results
 - Full directory traversal on every scan
 - In-memory data structures only
 
 **What's Missing (100%):**
+
 - Parallel cleaner execution (goroutine pool, worker pattern)
 - Scan result caching (between scan and clean)
 - Incremental scanning (track changes between scans)
@@ -897,6 +1007,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Background daemon mode for automated cleanup
 
 **Estimated Effort to Complete:**
+
 - Parallel cleanup: 8 hours implementation, 4 hours testing
 - Scan result caching: 12 hours implementation, 8 hours testing
 - Incremental scanning: 24 hours implementation, 12 hours testing
@@ -907,6 +1018,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 9. Security Enhancements (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Audit logging (no security event logging)
 - ❌ Privilege escalation (no sudo integration for system caches)
 - ❌ Sandboxing (no isolation for cleaner execution)
@@ -917,6 +1029,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Access control (no permission checking beyond OS permissions)
 
 **Current State:**
+
 - No security audit logging
 - No privilege escalation (requires user to run with sudo manually)
 - No sandboxing (cleaners run with user permissions)
@@ -924,6 +1037,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - No dependency vulnerability scanning
 
 **What's Missing (100%):**
+
 - Security audit logging
 - Privilege escalation with sudo integration
 - Sandboxing for cleaner isolation
@@ -932,6 +1046,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Enhanced input validation and sanitization
 
 **Estimated Effort to Complete:**
+
 - Audit logging: 8 hours implementation, 4 hours testing
 - Privilege escalation: 12 hours implementation, 8 hours testing
 - Sandboxing: 24 hours implementation, 12 hours testing
@@ -943,6 +1058,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 #### 10. Internationalization (0% COMPLETE)
 
 **Not Started:**
+
 - ❌ Multi-language support (English only)
 - ❌ Localization (no locale support)
 - ❌ Date/time formatting (no locale-aware formatting)
@@ -953,12 +1069,14 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - ❌ Translation workflow (no translation management system)
 
 **Current State:**
+
 - English only
 - No localization framework
 - No translation files
 - Limited Unicode testing
 
 **What's Missing (100%):**
+
 - Internationalization (i18n) framework
 - Translation files for major languages
 - Locale-aware formatting (dates, numbers, etc.)
@@ -966,6 +1084,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 - Translation workflow and management
 
 **Estimated Effort to Complete:**
+
 - i18n framework: 20 hours implementation, 8 hours testing
 - Translations (10 languages): 80 hours translation, 20 hours review
 - Locale-aware formatting: 12 hours implementation, 4 hours testing
@@ -978,11 +1097,12 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 
 #### NONE - CURRENT STATE IS STABLE ✅
 
-**Status:** ✅ **NO CRITICAL ISSUES**  
+**Status:** ✅ **NO CRITICAL ISSUES**
 
 The project is in excellent shape with no major problems. All recent issues have been resolved:
 
 **Fixed Issues:**
+
 - ✅ **Byte tracking bug** (FIXED 2026-01-20) - FreedBytes now correctly calculated
 - ✅ **Domain validation** (FIXED 2026-01-20) - All CleanResult.IsValid() checks passing
 - ✅ **Docker daemon detection** (FIXED 2026-01-16) - Graceful handling when Docker not running
@@ -991,6 +1111,7 @@ The project is in excellent shape with no major problems. All recent issues have
 - ✅ **Multi-cleaner orchestration** (FIXED 2026-01-14) - All cleaners working together
 
 **Minor Issues (Not Blocking):**
+
 1. **Test cache size reporting** - Go test cache reports 0 bytes
    - **Why Unavoidable:** Test cache is internal to Go, no separate path to measure
    - **Impact:** Minor - test cache typically small compared to other caches
@@ -1043,7 +1164,8 @@ The project is in **excellent shape** with no critical issues blocking productio
 **Problem:**  
 Cleaners run sequentially, wasting time on independent operations. When multiple cleaners are selected, each cleaner waits for the previous one to complete before starting.
 
-**Impact:**  
+**Impact:**
+
 - Cleanup takes 15-20s instead of potential 3-5s
 - User experience suffers with long wait times
 - System resources underutilized (CPU idle during I/O waits)
@@ -1052,6 +1174,7 @@ Cleaners run sequentially, wasting time on independent operations. When multiple
 Implement goroutine pool with worker pattern to run cleaners concurrently.
 
 **Implementation Details:**
+
 ```go
 // Create worker pool with limited concurrency
 workers := 5 // Limit to 5 concurrent cleaners
@@ -1073,16 +1196,19 @@ for i := 0; i < len(cleaners); i++ {
 ```
 
 **Benefits:**
+
 - 75% time reduction (from 20s to 5s typical)
 - Better CPU utilization
 - Improved user experience
 
 **Risks:**
+
 - Concurrency issues (race conditions on shared state)
 - Resource contention (too many concurrent I/O operations)
 - Error handling complexity (multiple concurrent errors)
 
 **Mitigation:**
+
 - Use mutex for shared state
 - Limit concurrency to 3-5 workers
 - Aggregate errors from all workers
@@ -1095,7 +1221,8 @@ for i := 0; i < len(cleaners); i++ {
 **Problem:**  
 Users must select cleaners every time they run clean-wizard. This is inconvenient for repeated use, especially when users have consistent preferences (e.g., always run standard mode with Go, Node.js, Docker cleaners).
 
-**Impact:**  
+**Impact:**
+
 - Inconvenience for repeated use
 - User must remember preferred cleaner combinations
 - No way to share cleaner configurations between users
@@ -1104,6 +1231,7 @@ Users must select cleaners every time they run clean-wizard. This is inconvenien
 Save/load profiles from ~/.clean-wizard/profiles.yaml
 
 **Implementation Details:**
+
 ```yaml
 # ~/.clean-wizard/profiles.yaml
 profiles:
@@ -1131,6 +1259,7 @@ profiles:
 ```
 
 **New CLI Flags:**
+
 ```bash
 # Save current selection as profile
 clean-wizard clean --save-profile development
@@ -1146,16 +1275,19 @@ clean-wizard profile delete development
 ```
 
 **Benefits:**
+
 - One-command cleanup with preferred settings
 - Shareable profiles between users
 - Consistent cleanup behavior
 
 **Risks:**
+
 - Profile file corruption (invalid YAML)
 - Profile versioning (schema changes between versions)
 - Security (profiles in home directory)
 
 **Mitigation:**
+
 - Validate profile YAML on load
 - Include profile version in file
 - Restrict profile file permissions
@@ -1168,7 +1300,8 @@ clean-wizard profile delete development
 **Problem:**  
 Scan calculates sizes, Clean calculates again (duplicate work). When user runs scan to preview, then runs clean, both phases traverse directories to calculate sizes.
 
-**Impact:**  
+**Impact:**
+
 - Slower execution (2x directory traversal)
 - Inconsistent reporting (sizes may differ between scan and clean)
 - Unnecessary I/O operations
@@ -1179,6 +1312,7 @@ Pass scan results to Clean() via context or cache in cleaner state.
 **Implementation Options:**
 
 **Option A: Pass Scan Results to Clean**
+
 ```go
 func (c *Cleaner) Clean(ctx context.Context, scanItems []ScanItem) Result[CleanResult] {
     bytesFreed := int64(0)
@@ -1191,6 +1325,7 @@ func (c *Cleaner) Clean(ctx context.Context, scanItems []ScanItem) Result[CleanR
 ```
 
 **Option B: Cache in Cleaner State**
+
 ```go
 type Cleaner struct {
     cachedSizes map[string]int64 // Cache between scan and clean
@@ -1217,16 +1352,19 @@ func (c *Cleaner) Clean(ctx context.Context) Result[CleanResult] {
 ```
 
 **Benefits:**
+
 - 50% time reduction on scan+clean workflow
 - Consistent size reporting (scan matches clean)
 - Eliminates duplicate I/O operations
 
 **Risks:**
+
 - Cache invalidation (files change between scan and clean)
 - Thread safety (concurrent access to cached data)
 - State mutation (violates functional programming principles)
 
 **Mitigation:**
+
 - Add cache expiration (invalidate after 5 minutes)
 - Use mutex for thread-safe access
 - Document cache behavior in comments
@@ -1239,7 +1377,8 @@ func (c *Cleaner) Clean(ctx context.Context) Result[CleanResult] {
 **Problem:**  
 Users hit errors without clear resolution path. When clean-wizard fails or behaves unexpectedly, users don't know how to diagnose or fix the issue.
 
-**Impact:**  
+**Impact:**
+
 - Support burden (users file issues or ask for help)
 - User frustration (stuck on errors without resolution)
 - Lost productivity (users can't complete cleanup)
@@ -1248,50 +1387,60 @@ Users hit errors without clear resolution path. When clean-wizard fails or behav
 Create FAQ with common issues and solutions.
 
 **Table of Contents:**
+
 ```markdown
 # Troubleshooting Guide
 
 ## Docker Issues
+
 - "docker command not found"
 - "Docker daemon not running"
 - "Permission denied while accessing Docker socket"
 
 ## Nix Issues
+
 - "nix-store: command not found"
 - "Nix profile path not found"
 - "Permission denied while accessing Nix profile"
 
 ## Permission Issues
+
 - "Permission denied while removing files"
 - "Run with sudo" warnings
 - "Read-only filesystem" errors
 
 ## Cache Issues
+
 - "Cache directory not found"
 - "Cache size calculation failed"
 - "Cache cleanup failed"
 
 ## Performance Issues
+
 - "Cleanup taking too long"
 - "High memory usage"
 - "System slowdown during cleanup"
 
 ## CLI Issues
+
 - "Unknown command or flag"
 - "Configuration file not found"
 - "Invalid configuration"
 ```
 
 **Benefits:**
+
 - Self-service support (users can fix issues themselves)
 - Reduced support burden
 - Better user experience
 
 **Risks:**
+
 - Documentation maintenance overhead (keep FAQ up-to-date)
 - Incorrect solutions (guidance that doesn't work)
 
 **Mitigation:**
+
 - Link FAQ to GitHub issues (update FAQ based on real issues)
 - Add "Did this help?" feedback mechanism
 - Review FAQ quarterly for accuracy
@@ -1304,7 +1453,8 @@ Create FAQ with common issues and solutions.
 **Problem:**  
 SystemCacheCleaner only works on macOS. Linux users miss out on system cache cleanup (apt, dnf, pacman caches, etc.).
 
-**Impact:**  
+**Impact:**
+
 - Platform inequality (macOS has more features than Linux)
 - Linux users can't clean system caches
 - Inconsistent user experience across platforms
@@ -1313,6 +1463,7 @@ SystemCacheCleaner only works on macOS. Linux users miss out on system cache cle
 Add Linux-specific cache paths and cleanup logic.
 
 **Linux Cache Locations:**
+
 ```go
 // APT (Debian, Ubuntu)
 aptCache := "/var/cache/apt/archives/"
@@ -1334,6 +1485,7 @@ flatpakCache := "/var/lib/flatpak/runtime/"
 ```
 
 **Implementation Details:**
+
 ```go
 func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context) Result[CleanResult] {
     switch runtime.GOOS {
@@ -1350,16 +1502,19 @@ func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context) Result[Clea
 ```
 
 **Benefits:**
+
 - Platform parity (Linux users get same features as macOS)
 - More comprehensive cleanup for Linux users
 - Larger user base (Linux users can use all features)
 
 **Risks:**
+
 - Permission issues (system caches often require root)
 - Cache directory variation (different distributions use different paths)
 - Package detection (need to detect which package manager is installed)
 
 **Mitigation:**
+
 - Check package manager installation before attempting cleanup
 - Require sudo for system cache cleanup (or fail gracefully)
 - Document sudo requirements in troubleshooting guide
@@ -1374,7 +1529,8 @@ func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context) Result[Clea
 **Problem:**  
 Users must manually run cleanup. Caches accumulate unnecessarily between manual runs.
 
-**Impact:**  
+**Impact:**
+
 - User inconvenience (must remember to run cleanup)
 - Suboptimal cleanup (caches grow larger between runs)
 - Lost disk space (space not reclaimed regularly)
@@ -1383,6 +1539,7 @@ Users must manually run cleanup. Caches accumulate unnecessarily between manual 
 Integrate with cron/launchd for scheduled cleanup.
 
 **Implementation Details:**
+
 ```go
 // Schedule cleanup command
 clean-wizard schedule create --name "daily" --cron "0 2 * * *" --profile default
@@ -1399,21 +1556,25 @@ clean-wizard schedule disable daily
 ```
 
 **Platform-Specific Integration:**
+
 - **macOS:** Create launchd plist files in ~/Library/LaunchAgents/
 - **Linux:** Create cron jobs via crontab
 - **Windows:** Create Task Scheduler tasks
 
 **Benefits:**
+
 - Set and forget (cleanup runs automatically)
 - Regular maintenance (no manual intervention needed)
 - Optimal disk space (reclaimed consistently)
 
 **Risks:**
+
 - System load (cleanup running during peak usage times)
 - Permission issues (scheduled jobs may not have proper permissions)
 - Missed schedules (system offline, power loss, etc.)
 
 **Mitigation:**
+
 - Default schedules to off-peak hours (2 AM, 3 AM, etc.)
 - Document permission requirements for scheduled jobs
 - Add "run on resume" option for missed schedules
@@ -1426,7 +1587,8 @@ clean-wizard schedule disable daily
 **Problem:**  
 No way to add custom cleaners. Limited extensibility, community contributions blocked.
 
-**Impact:**  
+**Impact:**
+
 - Limited customization (users can't add cleaners for their specific needs)
 - Blocked community contributions (must fork project to add cleaners)
 - Maintenance burden (all cleaners must be maintained in core project)
@@ -1435,6 +1597,7 @@ No way to add custom cleaners. Limited extensibility, community contributions bl
 Define plugin interface, create plugin loader.
 
 **Plugin API Design:**
+
 ```go
 // Plugin interface that all plugins must implement
 type Plugin interface {
@@ -1443,7 +1606,7 @@ type Plugin interface {
     Version() string
     Description() string
     Author() string
-    
+
     // Cleaner interface
     Type() domain.OperationType
     IsAvailable(ctx context.Context) bool
@@ -1461,21 +1624,25 @@ type PluginLoader interface {
 ```
 
 **Plugin Distribution:**
+
 - Local plugins: ~/.clean-wizard/plugins/
 - Remote plugins: Download from plugin marketplace
 - Plugin manifest: plugin.yaml with metadata and dependencies
 
 **Benefits:**
+
 - Extensibility (users can add custom cleaners)
 - Community contributions (plugins without core project changes)
 - Specialized cleanup (domain-specific plugins, e.g., "android-dev-cleaner")
 
 **Risks:**
+
 - Security (untrusted plugins could be malicious)
 - Stability (poorly written plugins could crash application)
 - Dependency management (plugins may have conflicting dependencies)
 
 **Mitigation:**
+
 - Plugin sandboxing (restrict plugin capabilities)
 - Plugin signing and verification (ensure authenticity)
 - Plugin reviews and ratings (community vetting)
@@ -1488,7 +1655,8 @@ type PluginLoader interface {
 **Problem:**  
 Some edge cases not tested in real environments. Unit tests use mocks, which may not accurately reflect real-world behavior.
 
-**Impact:**  
+**Impact:**
+
 - Potential regressions in production (bugs not caught by unit tests)
 - Unexpected behavior in real environments (differences between mocks and reality)
 - Reduced confidence in deployment (not sure if changes work in real world)
@@ -1497,15 +1665,16 @@ Some edge cases not tested in real environments. Unit tests use mocks, which may
 Add integration tests for all cleaners with real cache data.
 
 **Test Infrastructure:**
+
 ```go
 // Integration test setup
 func setupRealCache(t *testing.T) (string, func()) {
     // Create temporary directory with real cache structure
     cacheDir := t.TempDir()
-    
+
     // Create cache files and directories
     createRealCacheFiles(cacheDir)
-    
+
     // Return cleanup function
     return cacheDir, func() {
         os.RemoveAll(cacheDir)
@@ -1517,14 +1686,14 @@ func TestGoCleaner_Integration(t *testing.T) {
     if !goAvailable() {
         t.Skip("Go not available")
     }
-    
+
     ctx := context.Background()
     gc := NewGoCleaner(false, false, true, false, false, false)
-    
+
     // Scan real cache
     result := gc.Scan(ctx)
     require.True(t, result.IsOk())
-    
+
     // Clean real cache
     cleanResult := gc.Clean(ctx)
     require.True(t, cleanResult.IsOk())
@@ -1533,21 +1702,25 @@ func TestGoCleaner_Integration(t *testing.T) {
 ```
 
 **Test Environments:**
+
 - Local development (run on developer's machine)
 - CI/CD (run in GitHub Actions with real tools installed)
 - Docker (run in containers with isolated environments)
 
 **Benefits:**
+
 - Quality assurance (catches real-world bugs)
 - Increased confidence (tested against real caches)
 - Regression prevention (changes tested against real data)
 
 **Risks:**
+
 - Test flakiness (real caches may be inconsistent)
 - Test environment setup (need to install real tools in CI)
 - Test execution time (integration tests slower than unit tests)
 
 **Mitigation:**
+
 - Test isolation (use temporary directories, don't affect real system)
 - CI tool installation (pre-install Go, Docker, Nix, etc. in GitHub Actions)
 - Separate test suites (unit tests fast, integration tests thorough)
@@ -1560,7 +1733,8 @@ func TestGoCleaner_Integration(t *testing.T) {
 **Problem:**  
 No visual feedback for slow operations (Nix, large caches). Users think tool is frozen when it's actually working.
 
-**Impact:**  
+**Impact:**
+
 - User confusion (is it working or stuck?)
 - Premature termination (users kill process thinking it's hung)
 - Poor user experience (no sense of progress or time remaining)
@@ -1569,6 +1743,7 @@ No visual feedback for slow operations (Nix, large caches). Users think tool is 
 Implement progress bars using bubbletea.
 
 **Implementation Details:**
+
 ```go
 // Progress bar model
 type ProgressModel struct {
@@ -1584,7 +1759,7 @@ func (m ProgressModel) View() string {
     barWidth := 40
     filled := int(percent / 100 * float64(barWidth))
     bar := strings.Repeat("█", filled) + strings.Repeat("░", barWidth-filled)
-    
+
     return fmt.Sprintf(
         "%s\n%s  %d/%d (%.1f%%)\n%s",
         m.cleanerName,
@@ -1598,6 +1773,7 @@ func (m ProgressModel) View() string {
 ```
 
 **Progress Display:**
+
 ```
 🔧 Cleaning Nix...
 ████████████████████████░░░░░░░░░  24/50 (48.0%)
@@ -1605,16 +1781,19 @@ Removing /nix/store/abc123...
 ```
 
 **Benefits:**
+
 - Visual feedback (users see progress)
 - Time estimation (users know when cleanup will finish)
 - Improved user experience (less confusion, fewer premature terminations)
 
 **Risks:**
+
 - Performance overhead (updating progress bars takes time)
 - Inaccurate estimates (hard to predict remaining time)
 - Cluttered output (too many progress bars for multiple cleaners)
 
 **Mitigation:**
+
 - Limit progress update frequency (update every 100ms, not every item)
 - Show single global progress bar instead of per-cleaner bars
 - Option to disable progress bars (--no-progress flag)
@@ -1627,7 +1806,8 @@ Removing /nix/store/abc123...
 **Problem:**  
 Errors don't provide actionable next steps. Users stuck on errors without resolution.
 
-**Impact:**  
+**Impact:**
+
 - User frustration (error message doesn't explain how to fix)
 - Support burden (users file issues or ask for help)
 - Lost productivity (users can't resolve errors themselves)
@@ -1636,6 +1816,7 @@ Errors don't provide actionable next steps. Users stuck on errors without resolu
 Add error recovery suggestions to error types.
 
 **Implementation Details:**
+
 ```go
 // Error with recovery suggestions
 type Error struct {
@@ -1661,6 +1842,7 @@ return Error{
 ```
 
 **Error Output:**
+
 ```
 ❌ Error: Docker daemon not running
 
@@ -1673,16 +1855,19 @@ For more help, visit: https://github.com/LarsArtmann/clean-wizard/wiki/Troublesh
 ```
 
 **Benefits:**
+
 - Self-service support (users can fix errors themselves)
 - Reduced support burden (fewer GitHub issues)
 - Better user experience (clear path to resolution)
 
 **Risks:**
+
 - Incorrect suggestions (guidance that doesn't work)
 - Suggestion maintenance overhead (keep suggestions up-to-date)
 - Suggestion overload (too many suggestions, hard to read)
 
 **Mitigation:**
+
 - Test suggestions in real environments
 - Link suggestions to documentation (keep docs up-to-date)
 - Limit to 3-5 top suggestions per error
@@ -1697,7 +1882,8 @@ For more help, visit: https://github.com/LarsArtmann/clean-wizard/wiki/Troublesh
 **Problem:**  
 No Windows system cache cleanup. Windows users miss out on comprehensive system cleanup.
 
-**Impact:**  
+**Impact:**
+
 - Platform inequality (Windows has fewer features than macOS/Linux)
 - Windows users can't clean Windows-specific caches
 - Reduced user base (Windows users may not adopt tool)
@@ -1706,6 +1892,7 @@ No Windows system cache cleanup. Windows users miss out on comprehensive system 
 Add Windows-specific cache paths and cleanup logic.
 
 **Windows Cache Locations:**
+
 ```go
 // Windows Temp Files
 windowsTemp := os.Getenv("TEMP")
@@ -1724,6 +1911,7 @@ installerCache := `C:\Windows\Installer$PatchCache$`
 ```
 
 **Implementation Details:**
+
 ```go
 func (scc *SystemCacheCleaner) cleanWindowsCache(ctx context.Context) Result[CleanResult] {
     // Clean Windows-specific caches
@@ -1734,16 +1922,19 @@ func (scc *SystemCacheCleaner) cleanWindowsCache(ctx context.Context) Result[Cle
 ```
 
 **Benefits:**
+
 - Platform parity (Windows users get same features)
 - Larger user base (Windows users can use all features)
 - Comprehensive cleanup (Windows caches included)
 
 **Risks:**
+
 - Path separators (Windows uses backslash, macOS/Linux uses forward slash)
 - Permission issues (Windows caches often require admin)
 - Case sensitivity (Windows is case-insensitive, macOS/Linux is case-sensitive)
 
 **Mitigation:**
+
 - Use filepath package (cross-platform path handling)
 - Document admin requirements for Windows caches
 - Test on Windows (ensure case-insensitivity handled correctly)
@@ -1756,7 +1947,8 @@ func (scc *SystemCacheCleaner) cleanWindowsCache(ctx context.Context) Result[Cle
 **Problem:**  
 No browser-based interface. CLI/TUI may be unfamiliar to some users.
 
-**Impact:**  
+**Impact:**
+
 - Limited user base (users who prefer web UI may not use tool)
 - Steeper learning curve (TUI navigation not intuitive for all users)
 - Reduced accessibility (web UI can be more accessible than TUI)
@@ -1765,12 +1957,14 @@ No browser-based interface. CLI/TUI may be unfamiliar to some users.
 Create browser-based interface using standard web stack.
 
 **Tech Stack:**
+
 - Frontend: React or Vue.js
 - Backend: Go (Gin or Echo framework)
 - API: RESTful API for cleaner operations
 - UI: Modern web interface with component library
 
 **Features:**
+
 - Cleaner selection with checkboxes
 - Mode selection with radio buttons
 - Real-time progress updates via WebSocket
@@ -1779,16 +1973,19 @@ Create browser-based interface using standard web stack.
 - Profile save/load via web interface
 
 **Benefits:**
+
 - Alternative UI (users who prefer web over CLI)
 - Better accessibility (screen readers, keyboard navigation)
 - Richer interface (charts, visual feedback, animations)
 
 **Risks:**
+
 - Increased complexity (maintain both CLI/TUI and web UI)
 - Security (web UI exposed to network attacks)
 - Resource usage (web UI requires browser, more memory)
 
 **Mitigation:**
+
 - Shared business logic (CLI/TUI and web UI use same Go backend)
 - Security best practices (HTTPS, input validation, rate limiting)
 - Optional web UI (web UI not required for CLI use)
@@ -1801,7 +1998,8 @@ Create browser-based interface using standard web stack.
 **Problem:**  
 No screencast or video guides. Some users prefer visual learning over reading documentation.
 
-**Impact:**  
+**Impact:**
+
 - Steeper learning curve (text-only docs may not be sufficient)
 - Limited user adoption (visual learners may not adopt tool)
 - Support burden (users ask questions that video could answer)
@@ -1810,6 +2008,7 @@ No screencast or video guides. Some users prefer visual learning over reading do
 Create screencasts demonstrating key features.
 
 **Video Topics:**
+
 1. Installation (Homebrew, build from source)
 2. Quick start (first-time usage)
 3. Cleaner selection (interactive TUI)
@@ -1818,22 +2017,26 @@ Create screencasts demonstrating key features.
 6. Advanced usage (configuration, profiles)
 
 **Production Tools:**
+
 - Screen recording: OBS Studio, QuickTime
 - Audio recording: microphone, system audio
 - Video editing: Final Cut Pro, DaVinci Resolve
 - Hosting: YouTube, Vimeo, GitHub releases
 
 **Benefits:**
+
 - Better learning (visual learners prefer video)
 - Reduced support burden (video answers common questions)
 - Wider adoption (video more engaging than text)
 
 **Risks:**
+
 - Video maintenance overhead (update videos when features change)
 - Production quality (poor audio/video reflects poorly on project)
 - Hosting costs (video file storage and bandwidth)
 
 **Mitigation:**
+
 - Timestamp chapters (users can jump to relevant sections)
 - Transcript for accessibility (text summary of video content)
 - Link to documentation (video supplements, doesn't replace docs)
@@ -1843,13 +2046,13 @@ Create screencasts demonstrating key features.
 
 [TRUNCATED - CONTINUED IN PART 2]
 
-
 ##### 14. Architecture - Analytics/Telemetry
 
 **Problem:**  
 No anonymous usage tracking for product decisions. Development team lacks data on user behavior, feature usage, and performance metrics.
 
-**Impact:**  
+**Impact:**
+
 - Data-driven decisions: Can't make informed choices about which features to prioritize
 - Performance issues: Can't identify slow operations in real-world usage
 - User behavior: Don't know which cleaners are most popular
@@ -1859,6 +2062,7 @@ No anonymous usage tracking for product decisions. Development team lacks data o
 Add anonymous usage tracking for product decisions.
 
 **Implementation Details:**
+
 ```go
 // Analytics collector
 type AnalyticsCollector struct {
@@ -1910,6 +2114,7 @@ func (ac *AnalyticsCollector) TrackError(errorType string, errorMessage string, 
 ```
 
 **Privacy Controls:**
+
 ```bash
 # Opt-out of analytics
 clean-wizard config set analytics.enabled false
@@ -1922,18 +2127,21 @@ clean-wizard analytics clear
 ```
 
 **Benefits:**
+
 - Data-driven decisions (prioritize features users actually use)
 - Performance monitoring (identify slow operations in real world)
 - Bug detection (proactive error tracking)
 - User insights (understand user behavior and preferences)
 
 **Risks:**
+
 - Privacy concerns (users may object to data collection)
 - GDPR compliance (must provide opt-out, data deletion)
 - Data volume (analytics events may overwhelm storage)
 - Data interpretation (misreading data leads to wrong decisions)
 
 **Mitigation:**
+
 - Anonymous tracking (no personal identifiable information)
 - Opt-out by default (user must explicitly opt-in)
 - Privacy policy (clear explanation of data collection)
@@ -1947,7 +2155,8 @@ clean-wizard analytics clear
 **Problem:**  
 No streaming for large directory traversals. When scanning massive caches (multi-gigabyte directories), entire directory tree loaded into memory at once.
 
-**Impact:**  
+**Impact:**
+
 - High memory usage (can exceed available RAM on large caches)
 - Slow performance (loading entire tree into memory is slow)
 - System instability (memory pressure causes system slowdown)
@@ -1957,6 +2166,7 @@ No streaming for large directory traversals. When scanning massive caches (multi
 Implement streaming for large directory traversals.
 
 **Implementation Details:**
+
 ```go
 // Streaming directory traversal
 func streamDirTraverse(path string, callback func(filePath string) error) error {
@@ -1964,7 +2174,7 @@ func streamDirTraverse(path string, callback func(filePath string) error) error 
         if err != nil {
             return err
         }
-        
+
         // Process file immediately, don't store in memory
         return callback(filePath)
     })
@@ -1984,17 +2194,20 @@ func getDirSizeStreaming(path string) int64 {
 ```
 
 **Benefits:**
+
 - Lower memory usage (stream processing instead of loading all into memory)
 - Faster performance (no overhead of loading entire tree)
 - Better scalability (can handle very large caches)
 - Improved stability (less memory pressure)
 
 **Risks:**
+
 - Complexity (streaming code is more complex than loading all at once)
 - Error handling (errors during streaming may corrupt partial results)
 - Progress tracking (harder to track progress when streaming)
 
 **Mitigation:**
+
 - Simplified streaming API (abstract away complexity)
 - Error recovery (continue streaming after errors)
 - Chunked processing (track progress in chunks)
@@ -2007,7 +2220,8 @@ func getDirSizeStreaming(path string) int64 {
 **Problem:**  
 No code signing for binary. Users may be hesitant to download and execute unsigned binary from the internet.
 
-**Impact:**  
+**Impact:**
+
 - Trust issues (users don't trust unsigned binaries)
 - Security warnings (OS may show "unidentified developer" warnings)
 - Reduced adoption (security-conscious users won't download unsigned binary)
@@ -2017,6 +2231,7 @@ No code signing for binary. Users may be hesitant to download and execute unsign
 Sign binary with developer certificate.
 
 **Implementation Details:**
+
 ```bash
 # macOS code signing
 codesign -s "Developer ID Application: Your Name" bin/clean-wizard
@@ -2030,6 +2245,7 @@ signtool verify /pa bin/clean-wizard.exe
 ```
 
 **CI/CD Integration:**
+
 ```yaml
 # GitHub Actions for code signing
 - name: Code Sign Binary
@@ -2040,18 +2256,21 @@ signtool verify /pa bin/clean-wizard.exe
 ```
 
 **Benefits:**
+
 - Trust and security (users can verify binary authenticity)
 - No security warnings (OS recognizes signed binary)
 - Wider distribution (some platforms require signed binaries)
 - Professionalism (code signing shows commitment to security)
 
 **Risks:**
+
 - Certificate cost (developer certificates cost money)
 - Certificate management (must store certificates securely in CI/CD)
 - Certificate expiration (must renew certificates periodically)
 - Cross-platform signing (different signing processes for macOS, Windows)
 
 **Mitigation:**
+
 - Free developer certificates (Apple provides free developer certificates)
 - Secure secret management (store certificates in CI/CD secrets)
 - Certificate expiration alerts (set up alerts for certificate renewal)
@@ -2065,7 +2284,8 @@ signtool verify /pa bin/clean-wizard.exe
 **Problem:**  
 No AI/ML for optimal cleanup decisions. Users must manually decide which cleaners to run and which mode to use, without guidance on what will be most effective.
 
-**Impact:**  
+**Impact:**
+
 - Suboptimal cleanup (users may not run most effective cleaners)
 - User confusion (don't know which mode to use for their situation)
 - Wasted time (running unnecessary cleaners or wrong mode)
@@ -2075,6 +2295,7 @@ No AI/ML for optimal cleanup decisions. Users must manually decide which cleaner
 Analyze usage patterns to suggest optimal cleanup strategy.
 
 **Implementation Details:**
+
 ```go
 // Smart recommender
 type SmartRecommender struct {
@@ -2086,10 +2307,10 @@ type SmartRecommender struct {
 func (sr *SmartRecommender) AnalyzePatterns() *CleanupRecommendation {
     // Get historical cleanup data
     history := sr.historyManager.GetHistory()
-    
+
     // Identify patterns
     patterns := sr.mlModel.IdentifyPatterns(history)
-    
+
     // Generate recommendation
     recommendation := &CleanupRecommendation{
         SuggestedCleaners: patterns.MostEffectiveCleaners,
@@ -2097,7 +2318,7 @@ func (sr *SmartRecommender) AnalyzePatterns() *CleanupRecommendation {
         EstimatedFreedBytes: patterns.EstimatedSpace,
         Confidence: patterns.Confidence,
     }
-    
+
     return recommendation
 }
 
@@ -2110,6 +2331,7 @@ type MLModel interface {
 ```
 
 **Recommendation Display:**
+
 ```
 💡 Smart Recommendation
 
@@ -2131,18 +2353,21 @@ Would you like to apply this recommendation? [Y/n]
 ```
 
 **Benefits:**
+
 - Optimized cleanup (users run most effective cleaners for their situation)
 - Reduced decision fatigue (AI suggests optimal strategy)
 - Better results (more space freed than manual selection)
 - Personalized (recommendations based on individual usage patterns)
 
 **Risks:**
+
 - ML model accuracy (recommendations may be wrong)
 - Privacy concerns (need historical data to train model)
 - Model maintenance (model must be retrained periodically)
 - Over-reliance on AI (users may trust AI blindly)
 
 **Mitigation:**
+
 - Confidence levels (show users how confident AI is)
 - Opt-out option (users can disable AI recommendations)
 - Privacy-first (local ML processing, no data sent to cloud)
@@ -2156,7 +2381,8 @@ Would you like to apply this recommendation? [Y/n]
 **Problem:**  
 No .deb, .rpm, snap, flatpak packages. Users can't install clean-wizard from their preferred package manager.
 
-**Impact:**  
+**Impact:**
+
 - Limited distribution (users must build from source or use Homebrew)
 - Lower adoption (users prefer package manager over building from source)
 - Platform inequality (some platforms have packages, others don't)
@@ -2168,6 +2394,7 @@ Create .deb, .rpm, snap, flatpak packages.
 **Package Types:**
 
 **DEB Package (Debian, Ubuntu):**
+
 ```bash
 # Build DEB package
 dpkg-deb --build package/ clean-wizard_1.26.0_amd64.deb
@@ -2180,6 +2407,7 @@ dput ppa:your-ppa/clean-wizard clean-wizard_1.26.0_source.changes
 ```
 
 **RPM Package (Fedora, RHEL, CentOS):**
+
 ```bash
 # Build RPM package
 rpmbuild -bb clean-wizard.spec
@@ -2192,10 +2420,11 @@ cp clean-wizard-1.26.0-1.x86_64.rpm /var/www/html/packages/
 ```
 
 **Snap Package (Ubuntu, other Linux distros):**
+
 ```yaml
 # snap/snapcraft.yaml
 name: clean-wizard
-version: '1.26.0'
+version: "1.26.0"
 summary: Multi-cleaner CLI tool for system cache cleanup
 description: |
   clean-wizard is a production-ready multi-cleaner CLI tool
@@ -2228,6 +2457,7 @@ snapcraft push clean-wizard_1.26.0_amd64.snap
 ```
 
 **Flatpak Package (Universal Linux):**
+
 ```xml
 <!-- flatpak/com.larsartmann.clean-wizard.json -->
 {
@@ -2275,18 +2505,21 @@ flatpak build-bundle repo clean-wizard.flatpak com.larsartmann.clean-wizard
 ```
 
 **Benefits:**
+
 - Wider distribution (users can install from package manager)
 - Easier installation (no need to build from source)
 - Platform parity (all major Linux distros have packages)
 - Dependency management (package manager handles dependencies)
 
 **Risks:**
+
 - Maintenance overhead (must update packages for each release)
 - Package format differences (different build processes for each format)
 - Submission process (each package store has different submission process)
 - Package review (some stores require review before publishing)
 
 **Mitigation:**
+
 - Automated builds (CI/CD automatically builds all packages)
 - Package templates (reusable package configurations)
 - Submission scripts (automate submission to package stores)
@@ -2300,7 +2533,8 @@ flatpak build-bundle repo clean-wizard.flatpak com.larsartmann.clean-wizard
 **Problem:**  
 No desktop notifications when cleanup completes. Users must monitor terminal to see when cleanup finishes, can't multitask effectively.
 
-**Impact:**  
+**Impact:**
+
 - Poor user experience (users must watch terminal)
 - Lost productivity (can't do other work while cleanup runs)
 - Missed results (users may not see completion message if terminal closed)
@@ -2310,6 +2544,7 @@ No desktop notifications when cleanup completes. Users must monitor terminal to 
 Send desktop notifications when cleanup completes.
 
 **Implementation Details:**
+
 ```go
 // Notification sender
 type NotificationSender interface {
@@ -2343,12 +2578,13 @@ func (wns *WindowsNotificationSender) Send(title, message string) error {
 ```
 
 **Notification Display:**
+
 ```
 🔔 Desktop Notification
 
 Title: clean-wizard cleanup complete
 
-Body: 
+Body:
 ✅ Cleaned 16 items
 ✅ Freed 1.4 GB
 ✅ Completed in 5.2s
@@ -2357,18 +2593,21 @@ Body:
 ```
 
 **Benefits:**
+
 - User convenience (can multitask while cleanup runs)
 - Better feedback (notification even if terminal closed)
 - Improved experience (no need to monitor terminal)
 - Completion alerts (users know when cleanup finishes)
 
 **Risks:**
+
 - Platform differences (different notification APIs for each OS)
 - Permission issues (may require user permission to send notifications)
 - Notification fatigue (too many notifications annoy users)
 - Dependency issues (notification libraries may not be installed)
 
 **Mitigation:**
+
 - Platform abstraction (unified notification interface with platform-specific implementations)
 - Fallback mechanism (gracefully degrade if notifications fail)
 - User controls (option to disable notifications)
@@ -2382,7 +2621,8 @@ Body:
 **Problem:**  
 English only. Non-English users can't use clean-wizard in their native language, creating barriers to adoption.
 
-**Impact:**  
+**Impact:**
+
 - Language barrier (non-English users struggle to use tool)
 - Limited adoption (only English-speaking users can use tool)
 - Poor accessibility (language barrier creates accessibility issue)
@@ -2392,6 +2632,7 @@ English only. Non-English users can't use clean-wizard in their native language,
 Add i18n framework with translations for major languages.
 
 **Implementation Details:**
+
 ```go
 // I18n manager
 type I18nManager struct {
@@ -2407,7 +2648,7 @@ func (im *I18nManager) LoadTranslations(locale string) error {
     if err != nil {
         return err
     }
-    
+
     // Parse translations
     return json.Unmarshal(data, &im.translations[locale])
 }
@@ -2419,13 +2660,14 @@ func (im *I18nManager) Translate(key string, args ...interface{}) string {
             return fmt.Sprintf(translation, args...)
         }
     }
-    
+
     // Fallback to English
     return im.translate("en", key, args...)
 }
 ```
 
 **Translation Files:**
+
 ```json
 // locales/en.json (English)
 {
@@ -2483,6 +2725,7 @@ func (im *I18nManager) Translate(key string, args ...interface{}) string {
 ```
 
 **Locale Detection:**
+
 ```go
 // Detect system locale
 func detectLocale() string {
@@ -2492,13 +2735,13 @@ func detectLocale() string {
         locale = strings.Split(locale, "_")[0] // "en_US" -> "en"
         return locale
     }
-    
+
     if lang := os.Getenv("LC_ALL"); lang != "" {
         locale := strings.Split(lang, ".")[0]
         locale = strings.Split(locale, "_")[0]
         return locale
     }
-    
+
     // Default to English
     return "en"
 }
@@ -2511,6 +2754,7 @@ func (im *I18nManager) SetLocale(locale string) {
 ```
 
 **CLI Flags:**
+
 ```bash
 # Set locale explicitly
 clean-wizard clean --locale de
@@ -2523,18 +2767,21 @@ clean-wizard locale current
 ```
 
 **Benefits:**
+
 - Global reach (non-English users can use tool)
 - Better accessibility (language barrier removed)
 - Wider adoption (can reach international audience)
 - Cultural adaptation (translations can adapt to cultural context)
 
 **Risks:**
+
 - Translation maintenance (keep translations in sync with code)
 - Translation quality (poor translations reflect poorly on project)
 - Localization complexity (date/time formats, number formats vary by locale)
 - Right-to-left language support (Hebrew, Arabic require special handling)
 
 **Mitigation:**
+
 - Crowdsourced translations (community contributes translations)
 - Translation management system (tools to track translation status)
 - Locale-aware formatting (use Go's localization packages)
@@ -2548,7 +2795,8 @@ clean-wizard locale current
 **Problem:**  
 No daemon mode for automated cleanup. Users must manually run cleanup, can't set up background service.
 
-**Impact:**  
+**Impact:**
+
 - Manual intervention (users must run cleanup themselves)
 - Inconsistent cleanup (users forget to run cleanup)
 - Scheduling complexity (users must use cron/launchd manually)
@@ -2558,6 +2806,7 @@ No daemon mode for automated cleanup. Users must manually run cleanup, can't set
 Run cleanup as background service with web API.
 
 **Implementation Details:**
+
 ```go
 // Daemon service
 type DaemonService struct {
@@ -2580,19 +2829,19 @@ func (ds *DaemonService) Start() error {
         Addr: fmt.Sprintf(":%d", ds.config.Port),
         Handler: ds.createRouter(),
     }
-    
+
     return ds.server.ListenAndServe()
 }
 
 // Web API routes
 func (ds *DaemonService) createRouter() *http.ServeMux {
     router := http.NewServeMux{}
-    
+
     router.HandleFunc("/api/status", ds.handleStatus)
     router.HandleFunc("/api/clean", ds.handleClean)
     router.HandleFunc("/api/config", ds.handleConfig)
     router.HandleFunc("/api/history", ds.handleHistory)
-    
+
     return router
 }
 
@@ -2601,16 +2850,17 @@ func (ds *DaemonService) handleClean(w http.ResponseWriter, r *http.Request) {
     // Parse request
     var req CleanRequest
     json.NewDecoder(r.Body).Decode(&req)
-    
+
     // Execute cleanup
     result := ds.executeCleanup(req.Cleaners, req.Mode)
-    
+
     // Return result
     json.NewEncoder(w).Encode(result)
 }
 ```
 
 **Web API Endpoints:**
+
 ```bash
 # Get daemon status
 GET /api/status
@@ -2664,6 +2914,7 @@ Response:
 ```
 
 **Daemon Management:**
+
 ```bash
 # Start daemon
 clean-wizard daemon start
@@ -2682,18 +2933,21 @@ clean-wizard daemon logs
 ```
 
 **Benefits:**
+
 - Automation (cleanup runs automatically without user intervention)
 - Remote control (trigger cleanup via web API)
 - Scheduling (daemon handles cron/launchd internally)
 - Monitoring (check daemon status via web API)
 
 **Risks:**
+
 - Security (web API exposed to network attacks)
 - Resource usage (daemon runs continuously in background)
 - Complexity (must handle daemon lifecycle, crash recovery, etc.)
 - Permission issues (daemon may need elevated permissions for some operations)
 
 **Mitigation:**
+
 - Security best practices (HTTPS, authentication, rate limiting)
 - Resource limits (limit CPU/memory usage of daemon)
 - Graceful shutdown (handle signals, cleanup before exit)
@@ -2707,7 +2961,8 @@ clean-wizard daemon logs
 **Problem:**  
 No dark/light theme switching. Users can't customize appearance to match their preferences or system theme.
 
-**Impact:**  
+**Impact:**
+
 - Limited customization (users stuck with default theme)
 - Poor UX in certain lighting (light theme hard on eyes in dark room)
 - Inconsistent with system theme (doesn't match OS theme)
@@ -2717,6 +2972,7 @@ No dark/light theme switching. Users can't customize appearance to match their p
 Add dark/light theme switching.
 
 **Implementation Details:**
+
 ```go
 // Theme manager
 type ThemeManager struct {
@@ -2754,7 +3010,7 @@ func (tm *ThemeManager) defineThemes() {
                 Foreground(lipgloss.Color("#CC0000")),
         },
     }
-    
+
     tm.themes["dark"] = Theme{
         Name: "dark",
         Colors: map[string]lipgloss.Color{
@@ -2798,7 +3054,7 @@ func (tm *ThemeManager) DetectSystemTheme() string {
         }
         return "light"
     }
-    
+
     // Linux
     if runtime.GOOS == "linux" {
         // Check GNOME theme
@@ -2808,7 +3064,7 @@ func (tm *ThemeManager) DetectSystemTheme() string {
         }
         return "dark" // Default to dark on Linux
     }
-    
+
     // Windows
     if runtime.GOOS == "windows" {
         cmd := exec.Command("reg", "query", "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "/v", "AppsUseLightTheme")
@@ -2818,13 +3074,14 @@ func (tm *ThemeManager) DetectSystemTheme() string {
         }
         return "light"
     }
-    
+
     // Default
     return "light"
 }
 ```
 
 **CLI Flags:**
+
 ```bash
 # Set theme explicitly
 clean-wizard --theme dark
@@ -2840,18 +3097,21 @@ clean-wizard theme current
 ```
 
 **Benefits:**
+
 - User customization (users can choose preferred theme)
 - Better UX (theme matches user preferences and lighting)
 - System integration (auto-detect and match system theme)
 - Visual accessibility (users can choose high-contrast theme)
 
 **Risks:**
+
 - Theme maintenance (keep themes in sync with UI changes)
 - System theme detection complexity (different APIs for each OS)
 - Theme quality (poorly designed themes reflect poorly on project)
 - Performance overhead (theme switching may add minimal overhead)
 
 **Mitigation:**
+
 - Theme templates (reuse styling across themes)
 - Fallback detection (gracefully degrade if system theme detection fails)
 - Theme guidelines (design system for consistent theme design)
@@ -2865,7 +3125,8 @@ clean-wizard theme current
 **Problem:**  
 Add fuzz tests for all public APIs. Current fuzz tests are limited, may miss edge cases in complex functions.
 
-**Impact:**  
+**Impact:**
+
 - Undiscovered bugs (edge cases not tested may cause crashes)
 - Security vulnerabilities (fuzz testing can discover security issues)
 - Quality assurance (fuzz testing finds bugs that unit tests miss)
@@ -2875,6 +3136,7 @@ Add fuzz tests for all public APIs. Current fuzz tests are limited, may miss edg
 Add fuzz tests for all public APIs.
 
 **Implementation Details:**
+
 ```go
 // Fuzz test for directory traversal
 func FuzzGetDirSize(f *testing.F) {
@@ -2882,12 +3144,12 @@ func FuzzGetDirSize(f *testing.F) {
     f.Add("/tmp/test")
     f.Add("/home/user/.cache")
     f.Add("/var/cache")
-    
+
     // Fuzz test function
     f.Fuzz(func(t *testing.T, path string) {
         // Call function under test
         size := getDirSize(path)
-        
+
         // Assert invariants
         assert.GreaterOrEqual(t, size, int64(0))
     })
@@ -2899,12 +3161,12 @@ func FuzzParsePath(f *testing.F) {
     f.Add("/home/user/.cache/npm")
     f.Add("C:\Users\user\AppData\Local\npm")
     f.Add("~/.cache/cargo")
-    
+
     // Fuzz test function
     f.Fuzz(func(t *testing.T, path string) {
         // Call function under test
         parsedPath, err := parsePath(path)
-        
+
         // Assert invariants
         if err == nil {
             assert.NotEmpty(t, parsedPath)
@@ -2918,12 +3180,12 @@ func FuzzParseConfig(f *testing.F) {
     f.Add(`mode: standard`)
     f.Add(`cleaners: [go, node, docker]`)
     f.Add(`dry_run: true`)
-    
+
     // Fuzz test function
     f.Fuzz(func(t *testing.T, configYAML string) {
         // Call function under test
         config, err := parseConfig(configYAML)
-        
+
         // Assert invariants
         if err == nil {
             assert.NotNil(t, config)
@@ -2934,6 +3196,7 @@ func FuzzParseConfig(f *testing.F) {
 ```
 
 **Fuzz Test Targets:**
+
 - Directory traversal functions (getDirSize, getDirModTime, etc.)
 - Path parsing functions (parsePath, normalizePath, etc.)
 - Configuration parsing functions (parseConfig, parseSettings, etc.)
@@ -2941,6 +3204,7 @@ func FuzzParseConfig(f *testing.F) {
 - Error handling functions (constructError, withContext, etc.)
 
 **CI/CD Integration:**
+
 ```yaml
 # GitHub Actions for fuzz testing
 - name: Run Fuzz Tests
@@ -2958,18 +3222,21 @@ func FuzzParseConfig(f *testing.F) {
 ```
 
 **Benefits:**
+
 - Security (fuzz testing discovers security vulnerabilities)
 - Quality assurance (finds edge cases that unit tests miss)
 - Proactive bug discovery (finds bugs before users encounter them)
 - Coverage expansion (fuzz testing covers more input space than unit tests)
 
 **Risks:**
+
 - CI time (fuzz tests take longer than unit tests)
 - False positives (fuzz tests may find non-issues)
 - Corpus management (must maintain seed corpus for effective fuzzing)
 - Fuzzing expertise (need knowledge of fuzzing best practices)
 
 **Mitigation:**
+
 - Limit fuzz time (run fuzz tests for 60s each in CI)
 - Crasher analysis (manually review fuzz crashers to filter false positives)
 - Corpus automation (auto-update corpus from crashers)
@@ -2983,7 +3250,8 @@ func FuzzParseConfig(f *testing.F) {
 **Problem:**  
 Create visual diagrams of system architecture. Current documentation is text-only, making it hard to understand relationships between components.
 
-**Impact:**  
+**Impact:**
+
 - Steeper learning curve (harder to understand architecture without visual aids)
 - Onboarding difficulty (new contributors struggle to understand system)
 - Communication gaps (harder to explain architecture without diagrams)
@@ -2995,39 +3263,46 @@ Create visual diagrams of system architecture.
 **Diagram Types:**
 
 **High-Level Architecture Diagram:**
+
 - Layers: Domain, Application, Infrastructure, Presentation
 - Component relationships: How components interact
 - Data flow: How data moves through system
 - External dependencies: Nix, Docker, Go, etc.
 
 **Component Diagram:**
+
 - Individual components: Nix cleaner, Docker cleaner, etc.
 - Interfaces: Clean(), Scan(), ValidateSettings(), etc.
 - Dependencies: Which components depend on which
 - Modularity: How components can be swapped/replaced
 
 **Data Flow Diagram:**
+
 - User input flow: CLI → Cleaners → Result
 - Error flow: Error → Error Handler → User
 - Scan → Clean flow: Scan() → Clean() → Result
 
 **Sequence Diagram:**
+
 - User interaction: User → CLI → Cleaner → External System → Result
 - Error handling: Error → Error Handler → User Feedback
 - Parallel execution: Multiple cleaners running concurrently
 
 **Deployment Diagram:**
+
 - Binary distribution: Build → Package → Install
 - Configuration: Config File → Load → Validate
 - Execution: Binary → Load Config → Run Cleaners → Report Results
 
 **Diagram Tools:**
+
 - Draw.io (free, open-source diagram tool)
 - Mermaid (text-to-diagram, integrates with Markdown)
 - PlantUML (text-to-diagram, industry standard)
 - Excalidraw (open-source, hand-drawn style)
 
 **Example Mermaid Diagram:**
+
 ```mermaid
 graph TD
     A[User] -->|CLI| B[Presentation Layer]
@@ -3051,18 +3326,21 @@ graph TD
 ```
 
 **Benefits:**
+
 - Better understanding (visual diagrams clarify architecture)
 - Faster onboarding (new contributors understand system quickly)
 - Improved communication (easier to explain architecture with diagrams)
 - Design clarity (diagrams reveal design issues)
 
 **Risks:**
+
 - Maintenance overhead (diagrams must be updated when architecture changes)
 - Diagram accuracy (diagrams may become outdated if not maintained)
 - Diagram quality (poorly designed diagrams confuse rather than clarify)
 - Tool selection (choosing right diagram tool for the job)
 
 **Mitigation:**
+
 - Diagram as code (use Mermaid/PlantUML in Markdown files)
 - Automated diagram generation (generate diagrams from code annotations)
 - Diagram review (review diagrams in code reviews)
@@ -3076,7 +3354,8 @@ graph TD
 **Problem:**  
 No tracking of space freed over time with visualization. Users can't see trends in cache size or effectiveness of cleanup operations.
 
-**Impact:**  
+**Impact:**
+
 - No visibility (users don't know if cleanup is effective over time)
 - No trend analysis (can't see if caches grow faster after cleanup)
 - No optimization (can't identify which cleaners are most effective over time)
@@ -3086,6 +3365,7 @@ No tracking of space freed over time with visualization. Users can't see trends 
 Track space freed over time with visualization.
 
 **Implementation Details:**
+
 ```go
 // History manager
 type HistoryManager struct {
@@ -3108,13 +3388,13 @@ type CleanupRecord struct {
 func (hm *HistoryManager) RecordCleanup(record CleanupRecord) error {
     // Append to history
     hm.history = append(hm.history, record)
-    
+
     // Save to file
     data, err := json.MarshalIndent(hm.history, "", "  ")
     if err != nil {
         return err
     }
-    
+
     return os.WriteFile(hm.historyFile, data, 0644)
 }
 
@@ -3129,23 +3409,23 @@ func (hm *HistoryManager) GetTrends() *TrendData {
     bytesFreedPerCleaner := make(map[string]uint64)
     bytesFreedPerMode := make(map[string]uint64)
     bytesFreedOverTime := []TimeDataPoint{}
-    
+
     for _, record := range hm.history {
         // Track per-cleaner
         for _, cleaner := range record.Cleaners {
             bytesFreedPerCleaner[cleaner] += record.BytesFreed / uint64(len(record.Cleaners))
         }
-        
+
         // Track per-mode
         bytesFreedPerMode[record.Mode] += record.BytesFreed
-        
+
         // Track over time
         bytesFreedOverTime = append(bytesFreedOverTime, TimeDataPoint{
             Timestamp: record.Timestamp,
             BytesFreed: record.BytesFreed,
         })
     }
-    
+
     return &TrendData{
         PerCleaner: bytesFreedPerCleaner,
         PerMode: bytesFreedPerMode,
@@ -3155,6 +3435,7 @@ func (hm *HistoryManager) GetTrends() *TrendData {
 ```
 
 **Visualization Display:**
+
 ```
 📊 Cache Size History
 
@@ -3194,6 +3475,7 @@ Trends:
 ```
 
 **CLI Commands:**
+
 ```bash
 # Show history
 clean-wizard history
@@ -3209,18 +3491,21 @@ clean-wizard history --clear
 ```
 
 **Benefits:**
+
 - Visibility (users can see cleanup effectiveness over time)
 - Trend analysis (identify patterns in cache size and cleanup)
 - Optimization (identify most effective cleaners and modes)
 - Insights (understand cache behavior and growth patterns)
 
 **Risks:**
+
 - Privacy concerns (history file may contain sensitive information)
 - Storage overhead (history file grows over time)
 - Visualization complexity (creating effective charts and graphs)
 - Trend analysis accuracy (may draw incorrect conclusions from limited data)
 
 **Mitigation:**
+
 - Privacy controls (option to disable history, clear history)
 - Data retention limits (only keep last N months of history)
 - Simple visualizations (start with basic charts, add advanced later)
@@ -3236,28 +3521,33 @@ clean-wizard history --clear
 ### Code Metrics
 
 **Total Go Files:** 110
+
 - Source files: 75
 - Test files: 35
 - Configuration files: 5
 - Documentation files: 15
 
 **Lines of Code:** ~8,500 (estimated)
+
 - Source code: ~6,000 lines
 - Test code: ~1,500 lines
 - Documentation: ~1,000 lines
 
 **Functions:** ~450 (estimated)
+
 - Public functions: ~120
 - Private functions: ~330
 - Test functions: ~200
 
 **Types:** ~180 (estimated)
+
 - Domain types: ~60
 - Error types: ~40
 - Configuration types: ~30
 - Utility types: ~50
 
 **Interfaces:** ~45 (estimated)
+
 - Cleaner interfaces: ~10
 - Service interfaces: ~15
 - Utility interfaces: ~20
@@ -3265,17 +3555,20 @@ clean-wizard history --clear
 ### Test Metrics
 
 **Test Files:** 35 (31.8% of total files)
+
 - Unit test files: ~25
 - Integration test files: ~7
 - Fuzz test files: ~3
 - Benchmark test files: ~2
 
 **Test Functions:** ~200 (estimated)
+
 - Passing tests: ~195 (97.5%)
 - Skipped tests: ~4 (2.0%)
 - Failing tests: ~1 (0.5%)
 
 **Test Coverage:**
+
 - Domain layer: ~95% (high coverage)
 - Application layer: ~85% (high coverage)
 - Infrastructure layer: ~70% (medium coverage)
@@ -3283,6 +3576,7 @@ clean-wizard history --clear
 - Overall: ~82% (good coverage)
 
 **Test Runtime:** ~70s (full test suite)
+
 - Unit tests: ~30s
 - Integration tests: ~35s
 - Fuzz tests: ~5s
@@ -3290,16 +3584,19 @@ clean-wizard history --clear
 ### Cleaner Metrics
 
 **Total Cleaners:** 10
+
 - Fully implemented: 10 (100%)
 - Tested cleaners: 10 (100%)
 - Platform-specific: 3 (Nix, SystemCache, TempFiles)
 
 **Cleaner Availability:**
+
 - Always available: 4 (TempFiles, Go, Node.js, Cargo)
 - Platform-specific: 3 (Nix, SystemCache, Docker)
 - Tool-dependent: 3 (BuildCache, LanguageVersionManager, Docker)
 
 **Cleaner Effectiveness (Estimated):**
+
 - Most space freed: Docker (typically ~1-2 GB per cleanup)
 - Least space freed: TempFiles (typically ~100-500 MB per cleanup)
 - Average cleanup: ~1-2 GB per cleanup
@@ -3307,19 +3604,23 @@ clean-wizard history --clear
 ### Performance Metrics
 
 **Build Time:** ~15-20s (full build with dependencies)
+
 - Clean build: ~20s
 - Incremental build: ~5s
 
 **Binary Size:** ~12-15 MB (compiled binary)
+
 - Stripped binary: ~8 MB
 - UPX compressed: ~4 MB
 
 **Memory Usage:** ~50-100 MB (typical operation)
+
 - Idle: ~20 MB
 - Single cleaner: ~50 MB
 - Multiple cleaners: ~100 MB
 
 **Execution Time:**
+
 - Single cleaner: ~2-5s
 - Multiple cleaners: ~15-20s (sequential)
 - Multiple cleaners: ~5s (parallel, estimated)
@@ -3327,23 +3628,27 @@ clean-wizard history --clear
 ### Quality Metrics
 
 **Build Status:** ✅ PASSING
+
 - Go build: ✅ PASSING
 - Go test: ✅ PASSING
 - Linting: ✅ PASSING (golangci-lint)
 - Formatting: ✅ PASSING (gofmt)
 
 **Test Status:** ✅ PASSING (71.725s, all tests green)
+
 - Unit tests: ✅ PASSING
 - Integration tests: ✅ PASSING
 - Fuzz tests: ✅ PASSING
 - Benchmark tests: ✅ PASSING
 
 **Domain Validation:** ✅ PASSING (all CleanResults valid)
+
 - CleanResult validation: ✅ PASSING
 - ScanItem validation: ✅ PASSING
 - Configuration validation: ✅ PASSING
 
 **Type Safety:** ✅ 100% (strict TypeScript equivalent in Go)
+
 - Result[T] pattern: ✅ IMPLEMENTED
 - Error handling: ✅ TYPE-SAFE
 - Configuration: ✅ VALIDATED
@@ -3351,26 +3656,31 @@ clean-wizard history --clear
 ### Recent Activity
 
 **Last Commit:** 8a65bbb - "fix(cleaner): implement accurate byte tracking for Go and BuildCache cleaners"
+
 - Date: 2026-01-20
 - Files changed: 4 files, +122 lines, -13 lines
 - Issue resolved: FreedBytes = 0 bug fixed
 
 **Commits This Month:** 5
+
 - Week 1 (Jan 1-7): 2 commits
 - Week 2 (Jan 8-14): 2 commits
 - Week 3 (Jan 15-20): 1 commit
 
 **Active Developers:** 1 (Lars Artmann)
+
 - Commits: 5 this month
 - Lines added: ~500
 - Lines deleted: ~200
 
 **Open Issues:** Unknown (check GitHub)
+
 - Need to check GitHub Issues for current count
 - Need to categorize issues (bug, feature, documentation)
 - Need to prioritize issues for next sprint
 
 **Closed Issues:** Unknown (check GitHub)
+
 - Need to check GitHub Issues for closed issue count
 - Need to analyze issue resolution time
 - Need to identify common issue patterns
@@ -3378,16 +3688,19 @@ clean-wizard history --clear
 ### Platform Support
 
 **Supported Platforms:** 2
+
 - macOS: ✅ FULLY SUPPORTED (primary development platform)
 - Linux: ⚠️ PARTIALLY SUPPORTED (most cleaners work, some missing)
 - Windows: ❌ NOT SUPPORTED (cleaners may work, not tested)
 
 **Platform-Specific Features:**
+
 - macOS: SystemCache cleaner, Homebrew cache, Xcode cache
 - Linux: (limited support) - SystemCache cleaner needs Linux support
 - Windows: (no support) - SystemCache cleaner needs Windows support
 
 **Package Distribution:**
+
 - macOS: Homebrew (local formula, not submitted)
 - Linux: No packages (.deb, .rpm, snap, flatpak)
 - Windows: No installer (.msi, .exe)
@@ -3399,6 +3712,7 @@ clean-wizard history --clear
 ### Completed Goals ✅
 
 **Q1 2025 Goals (Completed ✅):**
+
 - ✅ Multi-cleaner architecture with 10 cleaners
 - ✅ Interactive TUI for cleaner selection
 - ✅ Accurate byte tracking and reporting
@@ -3407,6 +3721,7 @@ clean-wizard history --clear
 - ✅ Production-ready status
 
 **Q2 2025 Goals (Completed ✅):**
+
 - ✅ SystemCache cleaner implementation
 - ✅ LanguageVersionManager cleaner (safe mode)
 - ✅ Docker cleaner with pruning modes
@@ -3414,6 +3729,7 @@ clean-wizard history --clear
 - ✅ Comprehensive documentation
 
 **Q3 2025 Goals (Completed ✅):**
+
 - ✅ Domain validation layer
 - ✅ Result[T] pattern implementation
 - ✅ Clean architecture separation
@@ -3421,6 +3737,7 @@ clean-wizard history --clear
 - ✅ Error handling with recovery
 
 **Q4 2025 Goals (Completed ✅):**
+
 - ✅ Critical bug fixes (dry-run safety, byte tracking, etc.)
 - ✅ Domain validation compliance
 - ✅ Production-ready status
@@ -3429,6 +3746,7 @@ clean-wizard history --clear
 ### In-Progress Goals 🔄
 
 **Q1 2026 Goals (In-Progress 🔄):**
+
 - 🔄 Performance optimization (parallel execution planned)
 - 🔄 User experience improvements (profiles planned)
 - 🔄 Platform support expansion (Linux planned)
@@ -3439,6 +3757,7 @@ clean-wizard history --clear
 ### Upcoming Goals 📅
 
 **Q2 2026 Goals (Planned 📅):**
+
 - 📅 Plugin system foundation
 - 📅 Scheduling support
 - 📅 Windows support
@@ -3448,6 +3767,7 @@ clean-wizard history --clear
 **Target Completion:** Q2 2026 (June 2026)
 
 **Q3 2026 Goals (Planned 📅):**
+
 - 📅 Web UI prototype
 - 📅 Analytics/telemetry (opt-in)
 - 📅 Smart cleanup suggestions (AI/ML)
@@ -3456,6 +3776,7 @@ clean-wizard history --clear
 **Target Completion:** Q3 2026 (September 2026)
 
 **Q4 2026 Goals (Planned 📅):**
+
 - 📅 Web UI production release
 - 📅 Plugin marketplace
 - 📅 Internationalization (5 major languages)
@@ -3466,6 +3787,7 @@ clean-wizard history --clear
 ### Long-Term Vision 🚀
 
 **2027 Goals:**
+
 - 🚀 Community-driven plugin ecosystem
 - 🚀 AI/ML smart cleanup recommendations
 - 🚀 Cross-platform parity (macOS, Linux, Windows)
@@ -3473,6 +3795,7 @@ clean-wizard history --clear
 - 🚀 Mobile app (iOS, Android)
 
 **2028 Goals:**
+
 - 🚀 Cloud-based cleanup (remote cache management)
 - 🚀 Team collaboration (shared cleanup configurations)
 - 🚀 API platform (third-party integrations)
@@ -3485,6 +3808,7 @@ clean-wizard history --clear
 ### Core Contributors
 
 **Lars Artmann** (@LarsArtmann)
+
 - Role: Lead Developer, Architecture, Implementation
 - Contributions: All core features, all cleaners, all infrastructure
 - Commits: ~100+ (estimated)
@@ -3493,79 +3817,97 @@ clean-wizard history --clear
 ### Dependencies & Libraries
 
 **CLI Framework:**
+
 - **Cobra** (github.com/spf13/cobra) - CLI command framework
 - **Viper** (github.com/spf13/viper) - Configuration management
 - **Pflag** (github.com/spf13/pflag) - Command-line flag parsing
 
 **Interactive UI:**
+
 - **Huh** (github.com/charmbracelet/huh) - Interactive TUI library
 - **Bubbletea** (github.com/charmbracelet/bubbletea) - TUI framework
 - **Lipgloss** (github.com/charmbracelet/lipgloss) - Styling library
 
 **Logging:**
+
 - **Logrus** (github.com/sirupsen/logrus) - Structured logging
 - **Termenv** (github.com/muesli/termenv) - Terminal environment
 
 **Testing:**
+
 - **Testify** (github.com/stretchr/testify) - Testing framework
 - **Godog** (github.com/cucumber/godog) - BDD testing framework
 - **Gomock** (github.com/golang/mock) - Mocking framework
 
 **HTTP:**
+
 - **Resty** (github.com/go-resty/resty/v2) - HTTP client
 
 **YAML:**
+
 - **Viper** (github.com/spf13/viper) - YAML parsing and validation
 
 **Utilities:**
+
 - **Humanize** (github.com/dustin/go-humanize) - Human-readable formatting
 - **Copyfile** (github.com/otiai10/copy) - File copying
 
 ### Tools & Infrastructure
 
 **Programming Language:**
+
 - **Go** (golang.org) - Programming language (v1.25.6)
 
 **Version Control:**
+
 - **Git** (git-scm.com) - Version control
 - **GitHub** (github.com) - Version control, CI/CD
 
 **Dependency Management:**
+
 - **Go Modules** (golang.org) - Dependency management
 - **go.sum** - Dependency checksums
 
 **Build Automation:**
+
 - **Make** (gnu.org/software/make) - Build automation (if used)
 - **Just** (just.systems) - Command runner (if used)
 
 **CI/CD:**
+
 - **GitHub Actions** (github.com/features/actions) - CI/CD pipeline
 - **GoReleaser** (goreleaser.com) - Release automation (if used)
 
 ### Testing Infrastructure
 
 **Unit Testing:**
+
 - **Go Test** (golang.org/pkg/testing) - Built-in testing
 - **Testify** (github.com/stretchr/testify) - Assertion library
 
 **Integration Testing:**
+
 - **Godog** (github.com/cucumber/godog) - BDD testing
 - **Testcontainers** (github.com/testcontainers/testcontainers-go) - Container testing (if used)
 
 **Fuzz Testing:**
+
 - **Go Fuzz** (golang.org/doc/fuzz) - Built-in fuzz testing
 
 **Benchmark Testing:**
+
 - **Go Benchmark** (golang.org/pkg/testing) - Built-in benchmarking
 
 ### Design & Documentation
 
 **Architecture:**
+
 - **Clean Architecture** (blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - **Domain-Driven Design** (domainlanguage.com/ddd)
 - **SOLID Principles** (en.wikipedia.org/wiki/SOLID)
 
 **Documentation:**
+
 - **Markdown** (daringfireball.net/projects/markdown) - Documentation format
 - **Mermaid** (mermaid-js.github.io) - Diagram generation
 - **Just** (just.systems) - Command documentation
@@ -3577,6 +3919,7 @@ clean-wizard history --clear
 ### Getting Help
 
 **Documentation:**
+
 - README.md: Project overview, installation, usage
 - HOW_TO_USE.md: Step-by-step usage guide
 - USAGE.md: Complete command reference
@@ -3584,12 +3927,14 @@ clean-wizard history --clear
 - docs/status/: Status reports and project history
 
 **GitHub:**
+
 - Issues: Report bugs at github.com/LarsArtmann/clean-wizard/issues
 - Discussions: Ask questions at github.com/LarsArtmann/clean-wizard/discussions
 - Wiki: Additional documentation at github.com/LarsArtmann/clean-wizard/wiki
 - Releases: Release notes at github.com/LarsArtmann/clean-wizard/releases
 
 **Email:**
+
 - Contact: Contact via GitHub profile (larsartmann on GitHub)
 - Response time: Typically 24-48 hours
 - Support language: English preferred
@@ -3597,6 +3942,7 @@ clean-wizard history --clear
 ### Contributing
 
 **Pull Requests:**
+
 - Welcome and encouraged
 - Must pass all tests
 - Must follow code style (gofmt, golangci-lint)
@@ -3604,21 +3950,25 @@ clean-wizard history --clear
 - Must update documentation
 
 **Code of Conduct:**
+
 - TBD (add to repository)
 - Expected: Be respectful, constructive, and inclusive
 
 **Contributing Guide:**
+
 - TBD (add to repository)
 - Expected: Development workflow, coding standards, PR process
 
 ### Community
 
 **Users:**
+
 - Count: Unknown (check GitHub analytics)
 - Distribution: Worldwide (GitHub analytics)
 - Platforms: Primarily macOS, some Linux
 
 **Contributors:**
+
 - Count: 1 (Lars Artmann)
 - Welcome: New contributors encouraged
 - Recognition: Contributors listed in README
@@ -3626,6 +3976,7 @@ clean-wizard history --clear
 ### License
 
 **License:** TBD (add LICENSE file)
+
 - Expected: MIT License (permissive)
 - Copyright: Lars Artmann
 - Year: 2025-2026
@@ -3641,6 +3992,7 @@ clean-wizard history --clear
 **Commit:** 8a65bbb - "fix(cleaner): implement accurate byte tracking for Go and BuildCache cleaners"
 
 **Changes:**
+
 - Fixed FreedBytes calculation (was hardcoded to 0)
 - Domain validation now passing for all cleaners
 - Size measurement added before deletion
@@ -3648,15 +4000,18 @@ clean-wizard history --clear
 - Dry-run compatibility (size calculations skip during dry-run)
 
 **Affected Cleaners:**
+
 - Go Cleaner (GOCACHE, GOTESTCACHE, GOMODCACHE, build cache)
 - BuildCache Cleaner (Gradle, Maven, SBT)
 
 **Testing:**
+
 - All tests passing (71.725s runtime)
 - Domain validation compliant
 - No regressions introduced
 
 **Impact:**
+
 - Before: "Freed 0 B" (incorrect, violated validation)
 - After: "Freed 1.4 GB" (correct, passes validation)
 
@@ -3665,6 +4020,7 @@ clean-wizard history --clear
 **Commit:** ee16673 - "docs(status): add user communication improvements status"
 
 **Changes:**
+
 - Added comprehensive progress reporting
 - Improved error messages with suggestions
 - Added detailed cleaner descriptions
@@ -3672,12 +4028,14 @@ clean-wizard history --clear
 - Added user-friendly error explanations
 
 **Affected Components:**
+
 - CLI output formatting
 - Error handling and display
 - Progress reporting
 - User communication
 
 **Impact:**
+
 - Better user experience (clearer messages, better feedback)
 - Improved error handling (users know how to fix errors)
 - Enhanced progress visibility (users see what's happening)
@@ -3687,6 +4045,7 @@ clean-wizard history --clear
 **Commit:** 4e421a9 - "feat(cleaner): implement multi-cleaner functionality with system cache cleaning"
 
 **Changes:**
+
 - Completed SystemCache cleaner implementation
 - Added LanguageVersionManager cleaner (safe mode)
 - Completed Docker cleaner with pruning modes
@@ -3694,16 +4053,19 @@ clean-wizard history --clear
 - Updated documentation with new features
 
 **Affected Cleaners:**
+
 - SystemCache Cleaner (macOS Spotlight, Xcode, CocoaPods, Homebrew)
 - LanguageVersionManager Cleaner (NVM, Pyenv, Rbenv - safe mode only)
 - Docker Cleaner (images, containers, volumes - light, standard, aggressive modes)
 
 **Testing:**
+
 - All 10 cleaners tested
 - Integration tests added
 - Regression tests added
 
 **Impact:**
+
 - Production-ready status achieved
 - All 10 cleaners working and validated
 - Comprehensive feature set complete
@@ -3713,18 +4075,21 @@ clean-wizard history --clear
 **Commit:** c9b171e - "test(cleaner): add comprehensive tests"
 
 **Changes:**
+
 - Resolved domain validation failures
 - Fixed dry-run mode safety issues
 - Corrected profile path construction
 - Added regression tests for critical bugs
 
 **Affected Components:**
+
 - Domain validation layer
 - Nix cleaner (profile path construction)
 - All cleaners (dry-run safety)
 - Test suite (regression tests)
 
 **Impact:**
+
 - Critical bugs resolved
 - Domain validation compliant
 - Safe dry-run mode
@@ -3733,16 +4098,19 @@ clean-wizard history --clear
 ### Historical Changes (2025)
 
 **December 2025:**
+
 - Added Node.js, Go, and Cargo package manager cleaners (Phase 2)
 - Implemented multi-cleaner TUI support
 - Created comprehensive expansion plan
 
 **November 2025:**
+
 - Added Build, Docker, System, and Language Version Manager cleaners (Phase 3)
 - Implemented core cleaning functionality
 - Achieved 80% completion of core features
 
 **October 2025:**
+
 - Added Nix and TempFiles cleaners (Phase 1)
 - Implemented core infrastructure
 - Established clean architecture
@@ -3928,6 +4296,7 @@ clean-wizard is in **excellent shape** with a solid foundation, comprehensive fe
 ### Next Focus
 
 **Immediate (This Week):**
+
 1. Configuration profile support (save/load cleaner selections)
 2. Parallel cleaner execution (75% time reduction)
 3. Troubleshooting guide (reduce support load)
@@ -3935,6 +4304,7 @@ clean-wizard is in **excellent shape** with a solid foundation, comprehensive fe
 5. Linux system cache support (platform parity)
 
 **Short-Term (This Month):**
+
 - Performance profiling (identify bottlenecks)
 - Plugin system architecture (extensibility foundation)
 - User feedback gathering (prioritize improvements)
@@ -3942,6 +4312,7 @@ clean-wizard is in **excellent shape** with a solid foundation, comprehensive fe
 - Documentation updates (reflect new features)
 
 **Medium-Term (Next Quarter):**
+
 - Linux system cache support (platform parity)
 - Scheduling support (set and forget)
 - Progress bars (user experience)
@@ -3952,24 +4323,30 @@ clean-wizard is in **excellent shape** with a solid foundation, comprehensive fe
 
 clean-wizard is a **world-class CLI tool** with excellent architecture, comprehensive features, and high-quality code. The project is ready for widespread use and adoption.
 
-**Technical Excellence:** ⭐⭐⭐⭐⭐  
+**Technical Excellence:** ⭐⭐⭐⭐⭐
+
 - Clean architecture, type-safe design, comprehensive testing
 
-**User Experience:** ⭐⭐⭐⭐  
+**User Experience:** ⭐⭐⭐⭐
+
 - Interactive TUI, preset modes, clear feedback, accurate reporting
 
-**Code Quality:** ⭐⭐⭐⭐⭐  
+**Code Quality:** ⭐⭐⭐⭐⭐
+
 - No critical issues, passing tests, high coverage, clean code
 
-**Documentation:** ⭐⭐⭐⭐⭐  
+**Documentation:** ⭐⭐⭐⭐⭐
+
 - Comprehensive, well-written, up-to-date, helpful
 
-**Production Readiness:** ⭐⭐⭐⭐⭐  
+**Production Readiness:** ⭐⭐⭐⭐⭐
+
 - Stable, tested, validated, ready for production use
 
 ### Recommendation
 
 **Proceed with confidence.** clean-wizard is in excellent condition and ready for:
+
 - Widespread deployment and use
 - Community contributions and plugin development
 - Feature expansion and platform support

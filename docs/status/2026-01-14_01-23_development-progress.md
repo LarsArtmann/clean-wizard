@@ -17,15 +17,18 @@ Successfully implemented core cleaning operations, JSON output for scripting, te
 ## ✅ Completed Features
 
 ### 1. JSON Output for Scripting Support
+
 **Status**: ✅ Completed
 **Location**: `cmd/clean-wizard/commands/clean.go`, `cmd/clean-wizard/commands/scan.go`
 
 **Implementation**:
+
 - Added `--json` flag to `scan` and `clean` commands
 - Structured JSON output with all relevant metrics
 - Includes human-readable byte formatting alongside raw values
 
 **Output Format**:
+
 ```json
 {
   "status": "success",
@@ -41,6 +44,7 @@ Successfully implemented core cleaning operations, JSON output for scripting, te
 ```
 
 **Usage**:
+
 ```bash
 clean-wizard scan --json
 clean-wizard clean --dry-run --json
@@ -49,10 +53,12 @@ clean-wizard clean --dry-run --json
 ---
 
 ### 2. Temp Files Cleanup with Age Detection
+
 **Status**: ✅ Completed
 **Location**: `internal/cleaner/tempfiles.go`, `internal/cleaner/tempfiles_test.go`
 
 **Implementation**:
+
 - Age-based file filtering using custom duration parser
 - Supports human-readable durations: "7d", "24h", "30m"
 - Exclusion list for protected paths
@@ -60,6 +66,7 @@ clean-wizard clean --dry-run --json
 - Comprehensive test coverage
 
 **Features**:
+
 - Scan operation identifies cleanable files
 - Cleanup operation removes old files
 - Configurable age threshold
@@ -67,6 +74,7 @@ clean-wizard clean --dry-run --json
 - Verbose logging option
 
 **Usage**:
+
 ```go
 cleaner, err := NewTempFilesCleaner(verbose, dryRun, "7d", []string{"/tmp/keep"}, []string{"/tmp"})
 ```
@@ -76,21 +84,25 @@ cleaner, err := NewTempFilesCleaner(verbose, dryRun, "7d", []string{"/tmp/keep"}
 ---
 
 ### 3. Homebrew Cleanup Integration
+
 **Status**: ✅ Completed
 **Location**: `internal/cleaner/homebrew.go`
 
 **Implementation**:
+
 - Outdated package scanning via `brew outdated`
 - Cleanup via `brew cleanup` and `brew prune`
 - Configurable unused-only mode
 - Safe mode validation
 
 **Known Limitations**:
+
 - **No native dry-run support**: Homebrew doesn't provide dry-run functionality
 - **Dry-run message**: Displays informative message when `--dry-run` is used
 - **Size estimation**: Cannot predict exact space to be freed
 
 **Dry-Run Message**:
+
 ```
 ⚠️  Dry-run mode is not yet supported for Homebrew cleanup.
    Homebrew does not provide a native dry-run feature.
@@ -100,51 +112,60 @@ cleaner, err := NewTempFilesCleaner(verbose, dryRun, "7d", []string{"/tmp/keep"}
 ---
 
 ### 4. Profile CRUD Operations
+
 **Status**: ✅ Completed
 **Location**: `cmd/clean-wizard/commands/profile.go`
 
 **Implemented Commands**:
 
 #### `profile create [name]`
+
 - Creates new profile with default Nix operation
 - Optional `--description` flag
 - Optional `--enabled` flag (default: true)
 - Validates profile name uniqueness
 
 **Usage**:
+
 ```bash
 clean-wizard profile create test-profile --description "Test profile" --enabled=false
 ```
 
 #### `profile delete [name]`
+
 - Deletes specified profile
 - Prevents deletion of currently selected profile
 - Shows available profiles on error
 
 **Usage**:
+
 ```bash
 clean-wizard profile delete test-profile
 ```
 
 #### `profile edit [name]`
+
 - Updates profile description
 - Toggles enabled status with `--enabled` and `--toggle-enabled` flags
 - Validates profile existence
 - Shows confirmation on success
 
 **Usage**:
+
 ```bash
 clean-wizard profile edit test-profile --description "Updated description"
 clean-wizard profile edit test-profile --enabled --toggle-enabled
 ```
 
 #### `profile list` (Enhanced)
+
 - Lists all available profiles
 - Shows status (enabled/disabled)
 - Displays operation count
 - Risk level summary
 
 #### `profile info [name]` (Already Existed)
+
 - Detailed profile information
 - Operation details with settings
 - Risk level visualization
@@ -153,16 +174,19 @@ clean-wizard profile edit test-profile --enabled --toggle-enabled
 ---
 
 ### 5. ProfileStatus Enum Serialization
+
 **Status**: ✅ Completed
 **Location**: `internal/domain/execution_enums.go`
 
 **Implementation**:
+
 - Added `MarshalYAML()` interface implementation
 - Added `UnmarshalYAML()` interface implementation
 - Type-safe enum with compile-time guarantees
 - String representation: "ENABLED"/"DISABLED"
 
 **Code Structure**:
+
 ```go
 // MarshalYAML implements yaml.Marshaler interface for ProfileStatus.
 func (ps ProfileStatus) MarshalYAML() (interface{}, error) {
@@ -193,11 +217,13 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ## 📋 Remaining Tasks
 
 ### 1. Progress Indicators using Bubbletea
+
 **Status**: ⏳ Pending
 **Priority**: Medium
 **Description**: Add visual progress indicators for long-running operations
 
 **Requirements**:
+
 - Interactive progress bars for cleanup operations
 - Real-time status updates
 - Cancellation support
@@ -208,11 +234,13 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ---
 
 ### 2. Docker Cleanup with Daemon Detection
+
 **Status**: ⏳ Pending
 **Priority**: Medium
 **Description**: Implement Docker container and image cleanup
 
 **Requirements**:
+
 - Detect Docker daemon availability
 - Clean up unused containers
 - Remove dangling images
@@ -222,11 +250,13 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ---
 
 ### 3. Parallel Cleanup Operations
+
 **Status**: ⏳ Pending
 **Priority**: High
 **Description**: Execute multiple cleanup operations concurrently
 
 **Requirements**:
+
 - Goroutine-based parallel execution
 - Error aggregation and handling
 - Result combination
@@ -236,11 +266,13 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ---
 
 ### 4. Linux Compatibility and Testing
+
 **Status**: ⏳ Pending
 **Priority**: High
 **Description**: Ensure tool works on Linux distributions
 
 **Requirements**:
+
 - Test on Ubuntu/Debian
 - Test on Fedora/RHEL
 - Path handling differences
@@ -250,11 +282,13 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ---
 
 ### 5. CI/CD Pipeline with GitHub Actions
+
 **Status**: ⏳ Pending
 **Priority**: Medium
 **Description**: Automated testing and deployment pipeline
 
 **Requirements**:
+
 - Automated builds on push
 - Test execution matrix (macOS, Linux)
 - Code coverage reporting
@@ -264,11 +298,13 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ---
 
 ### 6. CONTRIBUTING.md Guide
+
 **Status**: ⏳ Pending
 **Priority**: Low
 **Description**: Guide for contributors
 
 **Requirements**:
+
 - Setup instructions
 - Code style guidelines
 - Testing procedures
@@ -278,11 +314,13 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ---
 
 ### 7. API Documentation with godoc
+
 **Status**: ⏳ Pending
 **Priority**: Low
 **Description**: Generate and host API documentation
 
 **Requirements**:
+
 - Package-level documentation
 - Function documentation
 - Example code
@@ -292,11 +330,13 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ---
 
 ### 8. ARCHITECTURE.md Documentation
+
 **Status**: ⏳ Pending
 **Priority**: Low
 **Description**: Detailed architecture documentation
 
 **Requirements**:
+
 - System design overview
 - Component interactions
 - Data flow diagrams
@@ -308,15 +348,18 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 ## 🔧 Technical Implementation Details
 
 ### Custom Duration Parser
+
 **Location**: `internal/domain/duration_parser.go`
 
 Supports human-readable duration formats beyond Go's standard:
+
 - `"7d"` → 7 days
 - `"24h"` → 24 hours
 - `"30m"` → 30 minutes
 - Standard formats: `"24h30m"`, `"1h30m"`
 
 **Implementation**:
+
 ```go
 func ParseCustomDuration(durationStr string) (time.Duration, error) {
     // Custom regex parsing for "7d", "24h" formats
@@ -325,22 +368,27 @@ func ParseCustomDuration(durationStr string) (time.Duration, error) {
 ```
 
 ### Domain-Driven Design
+
 The project follows strong domain-driven design principles:
 
 **Domain Types** (`internal/domain/`):
+
 - Type-safe enums (ProfileStatus, RiskLevel, etc.)
 - Custom validation
 - YAML/JSON serialization
 - Business logic encapsulation
 
 **Result Type** (`internal/result/`):
+
 - Monadic result pattern
 - Type-safe error handling
 - Value/error combination
 - Functional chaining support
 
 ### Configuration System
+
 **Features**:
+
 - YAML-based configuration
 - Profile-based cleanup strategies
 - Safe mode enforcement
@@ -354,6 +402,7 @@ The project follows strong domain-driven design principles:
 ## ⚠️ Known Issues and Limitations
 
 ### ProfileStatus Enum Unmarshaling
+
 **Issue**: Custom `UnmarshalYAML()` not called during config loading
 
 **Root Cause**: Config loader uses manual unmarshal (`v.UnmarshalKey`) that bypasses YAML library's custom interface detection
@@ -393,16 +442,19 @@ clean-wizard/
 ## 📊 Code Quality Metrics
 
 ### Test Coverage
+
 - **Temp Files Cleaner**: 6 test cases
 - **Profile CRUD**: Integrated testing via CLI
 - **Domain Types**: Comprehensive unit tests
 
 ### Build Status
+
 - **Compilation**: ✅ Successful
 - **Tests**: ✅ Passing
 - **Import Errors**: ✅ Resolved
 
 ### Code Style
+
 - **Go Vet**: ✅ Clean
 - **Imports**: ✅ Organized
 - **Documentation**: ✅ Comprehensive
@@ -412,16 +464,19 @@ clean-wizard/
 ## 🚀 Next Steps
 
 ### Immediate Priorities
+
 1. **Parallel Cleanup Operations**: High priority for performance
 2. **Linux Compatibility**: High priority for broader support
 3. **Progress Indicators**: Medium priority for UX
 
 ### Short-term Goals
+
 1. Docker cleanup integration
 2. CI/CD pipeline setup
 3. Enhanced testing
 
 ### Long-term Vision
+
 1. GUI interface option
 2. Plugin system for custom cleaners
 3. Machine learning for cleanup recommendations
@@ -432,20 +487,26 @@ clean-wizard/
 ## 📝 Development Notes
 
 ### Import Resolution
+
 Resolved multiple import errors across the codebase:
+
 - Fixed missing `errors` package imports
 - Corrected `strconv` package imports
 - Updated domain type references
 
 ### Type Safety
+
 All new features implemented with strict type safety:
+
 - Domain types for all operations
 - Custom enum types with validation
 - Result monad for error handling
 - Interface-based architecture
 
 ### Configuration Management
+
 Profile CRUD operations integrate seamlessly with existing config system:
+
 - Uses `config.Load()` and `config.Save()`
 - Maintains config file integrity
 - Proper error handling and validation
@@ -456,6 +517,7 @@ Profile CRUD operations integrate seamlessly with existing config system:
 ## 🎯 Success Metrics
 
 ### Completed Metrics
+
 - ✅ 5 features fully implemented
 - ✅ 2 new cleaner types added
 - ✅ 3 new CLI commands added
@@ -463,12 +525,14 @@ Profile CRUD operations integrate seamlessly with existing config system:
 - ✅ Type-safe enum serialization improved
 
 ### Code Quality
+
 - ✅ Zero compilation errors
 - ✅ Comprehensive test coverage
 - ✅ Proper error handling
 - ✅ Documentation updates
 
 ### User Experience
+
 - ✅ CLI commands work as expected
 - ✅ Helpful error messages
 - ✅ Progress feedback (basic)

@@ -10,25 +10,27 @@
 
 ### Top Duplication Patterns by Impact:
 
-| Pattern | Files Affected | Impact | Work Required | Priority |
-|---------|---------------|---------|---------------|----------|
-| **Validation Wrapping** | 4 files | HIGH | LOW | 🥇 #1 |
-| **Config Loading** | 2 files | HIGH | LOW | 🥈 #2 |
-| **String Trimming** | 2 files | MEDIUM | LOW | 🥉 #3 |
-| **Error Detail Setting** | 3 files | MEDIUM | MEDIUM | #4 |
-| **Test Helper Functions** | 8+ files | MEDIUM | MEDIUM | #5 |
-| **Schema Min/Max Logic** | 2 files | LOW | LOW | #6 |
-| **BDD Test Structure** | 10+ files | LOW | HIGH | #7 |
+| Pattern                   | Files Affected | Impact | Work Required | Priority |
+| ------------------------- | -------------- | ------ | ------------- | -------- |
+| **Validation Wrapping**   | 4 files        | HIGH   | LOW           | 🥇 #1    |
+| **Config Loading**        | 2 files        | HIGH   | LOW           | 🥈 #2    |
+| **String Trimming**       | 2 files        | MEDIUM | LOW           | 🥉 #3    |
+| **Error Detail Setting**  | 3 files        | MEDIUM | MEDIUM        | #4       |
+| **Test Helper Functions** | 8+ files       | MEDIUM | MEDIUM        | #5       |
+| **Schema Min/Max Logic**  | 2 files        | LOW    | LOW           | #6       |
+| **BDD Test Structure**    | 10+ files      | LOW    | HIGH          | #7       |
 
 ## 🔍 Self-Reflection & Learnings
 
 ### What I Could Have Done Better:
+
 1. **Better Initial Analysis** - Should have examined existing Result type and error infrastructure first
 2. **Type System Discovery** - Should have identified the Validate() interface pattern earlier
 3. **Library Awareness** - Should have leveraged existing libraries (logrus, testify) more effectively
 4. **Generic Patterns** - Should have considered Go generics for type-safe utilities earlier
 
 ### Existing Infrastructure We Should Leverage:
+
 - ✅ **Result[T]** type - Well-designed, supports chaining
 - ✅ **Validate() interface** - Multiple types already implement
 - ✅ **pkg/errors** - Structured error handling
@@ -40,6 +42,7 @@
 ### Phase 1: High-Impact, Low-Effort (Quick Wins)
 
 #### 1.1 Create Generic Validation Interface ⚡
+
 **Files**: `internal/shared/utils/validation/`
 **Impact**: Eliminates 4 validation duplicates
 **Work**: 2 hours
@@ -60,6 +63,7 @@ func ValidateAndWrap[T Validator](item T, itemType string) result.Result[T] {
 ```
 
 #### 1.2 Create Config Loading Utility ⚡
+
 **Files**: `internal/shared/utils/config/`
 **Impact**: Eliminates 2 config loading duplicates  
 **Work**: 1 hour
@@ -77,6 +81,7 @@ func LoadConfigWithFallback(ctx context.Context, logger *logrus.Logger) (*domain
 ```
 
 #### 1.3 Create String Trimming Utility ⚡
+
 **Files**: `internal/shared/utils/strings/`
 **Impact**: Eliminates 2 string trimming duplicates
 **Work**: 30 minutes
@@ -102,16 +107,19 @@ func TrimWhitespaceField(field TrimmableField, changes *SanitizationResult) bool
 ### Phase 2: Medium-Impact Improvements
 
 #### 2.1 Create Error Details Utility
+
 **Files**: `internal/pkg/errors/`
 **Impact**: Eliminates 3 error detail setting duplicates
 **Work**: 2 hours
 
 #### 2.2 Refactor Test Helper Functions
+
 **Files**: `tests/bdd/helpers/`
 **Impact**: Eliminates 8+ test helper duplicates
 **Work**: 3 hours
 
 #### 2.3 Create Schema Min/Max Utility
+
 **Files**: `internal/shared/utils/schema/`
 **Impact**: Eliminates 2 schema logic duplicates
 **Work**: 1 hour
@@ -119,6 +127,7 @@ func TrimWhitespaceField(field TrimmableField, changes *SanitizationResult) bool
 ### Phase 3: Architecture Improvements
 
 #### 3.1 Improve Type Models
+
 **Files**: `internal/domain/interfaces.go`
 **Impact**: Better compile-time guarantees
 **Work**: 4 hours
@@ -130,7 +139,7 @@ type (
         *domain.Config
         Validate() error
     }
-    
+
     ValidCleanRequest interface {
         domain.CleanRequest
         Validate() error
@@ -140,6 +149,7 @@ type (
 ```
 
 #### 3.2 Enhance Result Type for Validation Chaining
+
 **Files**: `internal/result/validation.go`
 **Impact**: Better validation composition
 **Work**: 2 hours
@@ -147,28 +157,33 @@ type (
 ## 🎯 Prioritized Execution Order
 
 ### Week 1: Quick Wins (High Impact, Low Effort)
+
 1. ✅ Generic validation interface (2h) - **IMPACT: 4 duplicates eliminated**
 2. ✅ Config loading utility (1h) - **IMPACT: 2 duplicates eliminated**
 3. ✅ String trimming utility (0.5h) - **IMPACT: 2 duplicates eliminated**
 
 ### Week 2: Medium Impact Improvements
+
 4. Error details utility (2h) - **IMPACT: 3 duplicates eliminated**
 5. Test helper refactoring (3h) - **IMPACT: 8+ duplicates eliminated**
 6. Schema min/max utility (1h) - **IMPACT: 2 duplicates eliminated**
 
 ### Week 3: Architecture Enhancement
+
 7. Type model improvements (4h) - **IMPACT: Better architecture**
 8. Result type enhancement (2h) - **IMPACT: Better validation patterns**
 
 ## 📈 Expected Metrics
 
 ### Before Refactoring:
+
 - **Total Duplicates**: 62
 - **Lines of Duplicate Code**: ~500+
 - **Maintenance Overhead**: High
 - **Type Safety**: Medium
 
 ### After Refactoring:
+
 - **Total Duplicates**: ~15 (75% reduction)
 - **Lines of Duplicate Code**: ~100 (80% reduction)
 - **Maintenance Overhead**: Low
@@ -176,13 +191,13 @@ type (
 
 ## 🔧 Established Libraries to Leverage
 
-| Library | Current Usage | Proposed Usage |
-|---------|---------------|----------------|
-| **logrus** | ✅ Used | ✅ Expand for config loading |
-| **testify** | ✅ Used | ✅ More test utilities |
-| **viper** | ✅ Used | ✅ Config patterns |
-| **cobra** | ✅ Used | ✅ Command patterns |
-| **go.mod** | ✅ Used | ✅ Consider adding generic utility libraries |
+| Library     | Current Usage | Proposed Usage                               |
+| ----------- | ------------- | -------------------------------------------- |
+| **logrus**  | ✅ Used       | ✅ Expand for config loading                 |
+| **testify** | ✅ Used       | ✅ More test utilities                       |
+| **viper**   | ✅ Used       | ✅ Config patterns                           |
+| **cobra**   | ✅ Used       | ✅ Command patterns                          |
+| **go.mod**  | ✅ Used       | ✅ Consider adding generic utility libraries |
 
 ## 🚦 Success Criteria
 
@@ -195,6 +210,7 @@ type (
 ## 📋 Implementation Checklist
 
 ### For Each Refactor:
+
 - [ ] Create utility function
 - [ ] Replace duplicate code
 - [ ] Run `go test ./...`
@@ -203,6 +219,7 @@ type (
 - [ ] Update documentation
 
 ### Final Verification:
+
 - [ ] All tests pass
 - [ ] Build succeeds
 - [ ] `art-dupl` shows significant improvement

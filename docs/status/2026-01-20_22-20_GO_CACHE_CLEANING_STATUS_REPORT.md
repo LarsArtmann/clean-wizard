@@ -12,6 +12,7 @@
 The Go cache cleaning implementation supports **3 of 4** official `go clean` commands with solid test coverage and proper integration into the CLI. However, **critical configuration issues** and a **duplicate detection bug** prevent production deployment. The implementation works for basic use cases but ignores configuration files entirely due to hardcoded values.
 
 ### Key Metrics
+
 - **Supported Go Commands:** 3 of 4 (75%)
   - ✅ `go clean -cache`
   - ✅ `go clean -testcache`
@@ -30,6 +31,7 @@ The Go cache cleaning implementation supports **3 of 4** official `go clean` com
 ### ✅ Fully Implemented Commands
 
 #### 1. `go clean -cache` (GOCACHE)
+
 - **Purpose:** Remove entire Go build cache
 - **Implementation:** `cleanGoCache()` method at `internal/cleaner/golang.go:224`
 - **Features:**
@@ -40,6 +42,7 @@ The Go cache cleaning implementation supports **3 of 4** official `go clean` com
 - **Code Location:** `internal/cleaner/golang.go:224-271`
 
 #### 2. `go clean -testcache` (GOTESTCACHE)
+
 - **Purpose:** Expire all test results in Go build cache
 - **Implementation:** `cleanGoTestCache()` method at `internal/cleaner/golang.go:274`
 - **Features:**
@@ -49,6 +52,7 @@ The Go cache cleaning implementation supports **3 of 4** official `go clean` com
 - **Code Location:** `internal/cleaner/golang.go:274-320`
 
 #### 3. `go clean -modcache` (GOMODCACHE)
+
 - **Purpose:** Remove entire module download cache
 - **Implementation:** `cleanGoModCache()` method at `internal/cleaner/golang.go:323`
 - **Features:**
@@ -58,7 +62,8 @@ The Go cache cleaning implementation supports **3 of 4** official `go clean` com
   - Returns accurate byte tracking
 - **Code Location:** `internal/cleaner/golang.go:323-370`
 
-#### 4. Build Cache Folders (go-build*)
+#### 4. Build Cache Folders (go-build\*)
+
 - **Purpose:** Remove temporary build cache folders
 - **Implementation:** `cleanGoBuildCache()` method at `internal/cleaner/golang.go:373`
 - **Features:**
@@ -71,6 +76,7 @@ The Go cache cleaning implementation supports **3 of 4** official `go clean` com
 ### ❌ Missing Implementation
 
 #### `go clean -fuzzcache` (GOFUZZCACHE)
+
 - **Purpose:** Remove files stored in Go build cache for fuzz testing
 - **Go Version:** Available since Go 1.18
 - **Status:** **NOT IMPLEMENTED**
@@ -88,6 +94,7 @@ The Go cache cleaning implementation supports **3 of 4** official `go clean` com
 ### Core Components
 
 #### 1. GoCleaner Struct
+
 ```go
 type GoCleaner struct {
     verbose         bool
@@ -99,9 +106,11 @@ type GoCleaner struct {
     // Missing: cleanFuzzCache bool
 }
 ```
+
 **Location:** `internal/cleaner/golang.go:18-25`
 
 #### 2. GoPackagesSettings Domain Model
+
 ```go
 type GoPackagesSettings struct {
     CleanCache      bool `json:"clean_cache,omitempty"`
@@ -111,13 +120,16 @@ type GoPackagesSettings struct {
     // Missing: CleanFuzzCache bool
 }
 ```
+
 **Location:** `internal/domain/operation_settings.go:64-70`
 
 #### 3. Constructor
+
 ```go
 func NewGoCleaner(verbose, dryRun, cleanCache, cleanTestCache,
                  cleanModCache, cleanBuildCache bool) *GoCleaner
 ```
+
 **Location:** `internal/cleaner/golang.go:28-37`
 
 ---
@@ -125,6 +137,7 @@ func NewGoCleaner(verbose, dryRun, cleanCache, cleanTestCache,
 ## 🧪 Test Coverage
 
 ### Test File: `internal/cleaner/golang_test.go`
+
 **Lines of Code:** 330 lines
 **Test Cases:** 10+
 **Pass Rate:** 100%
@@ -177,6 +190,7 @@ func NewGoCleaner(verbose, dryRun, cleanCache, cleanTestCache,
     - Tests that dry-run reports items but doesn't clean
 
 ### Test Execution Results
+
 ```bash
 $ go test -v ./internal/cleaner -run TestGoCleaner
 === RUN   TestGoCleaner_Type
@@ -206,12 +220,15 @@ ok  	github.com/LarsArtmann/clean-wizard/internal/cleaner	0.318s
 ### Integration Points
 
 #### 1. Cleaner Type Enumeration
+
 ```go
 const CleanerTypeGoPackages CleanerType = "gopackages"
 ```
+
 **Location:** `cmd/clean-wizard/commands/clean.go:25`
 
 #### 2. Cleaner Configuration
+
 ```go
 {
     Type:        CleanerTypeGoPackages,
@@ -221,9 +238,11 @@ const CleanerTypeGoPackages CleanerType = "gopackages"
     Available:   cleaner.NewGoCleaner(false, false, true, true, true, true).IsAvailable(ctx),
 }
 ```
+
 **Location:** `cmd/clean-wizard/commands/clean.go:90-95`
 
 #### 3. Runner Implementation
+
 ```go
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
     goCleaner := cleaner.NewGoCleaner(verbose, dryRun, true, true, true, true)
@@ -232,9 +251,11 @@ func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult
     // ...
 }
 ```
+
 **Location:** `cmd/clean-wizard/commands/clean.go:458-468`
 
 #### 4. Preset Mode Inclusion
+
 ```go
 case "quick":
     return []CleanerType{
@@ -245,6 +266,7 @@ case "quick":
         CleanerTypeBuildCache,
     }
 ```
+
 **Location:** `cmd/clean-wizard/commands/clean.go:540-547`
 
 ---
@@ -283,6 +305,7 @@ matches, err := filepath.Glob(filepath.Join(tempDir, buildCachePattern))  // Als
 `go env GOCACHE` and the glob pattern both target the same directory, so it appears twice in results.
 
 **Fix Required:**
+
 1. Use a map to deduplicate scan results
 2. OR remove the glob pattern and rely only on `go env`
 3. OR verify semantic difference between these two approaches
@@ -308,6 +331,7 @@ func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult
 ```
 
 **Why This Matters:**
+
 1. **Type-safe domain model exists** but is unused
 2. **Users have zero control** over which caches to clean
 3. **Violates DRY principle** and configuration architecture
@@ -315,6 +339,7 @@ func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult
 5. **Breaks consistency** with other cleaners that use config
 
 **Example Config (Would Be Ignored):**
+
 ```yaml
 profiles:
   go-cache-cleanup:
@@ -322,19 +347,21 @@ profiles:
       - name: "go-packages"
         settings:
           go_packages:
-            clean_cache: true      # ✅ Would be ignored
+            clean_cache: true # ✅ Would be ignored
             clean_test_cache: false # ✅ Would be ignored (still cleans!)
-            clean_mod_cache: true   # ✅ Would be ignored
+            clean_mod_cache: true # ✅ Would be ignored
             clean_build_cache: false # ✅ Would be ignored (still cleans!)
 ```
 
 **Fix Required:**
+
 1. Read `GoPackagesSettings` from loaded config
 2. Pass actual settings to `NewGoCleaner()` instead of hardcoded `true`
 3. Add CLI flags for individual cache type selection
 4. Add TUI sub-menu for cache type selection
 
 **Required Changes:**
+
 ```go
 // BEFORE (broken):
 goCleaner := cleaner.NewGoCleaner(verbose, dryRun, true, true, true, true)
@@ -360,7 +387,7 @@ goCleaner := cleaner.NewGoCleaner(
 1. **Scan Detection**
    - Finds GOCACHE via `go env`
    - Finds GOMODCACHE via `go env`
-   - Finds go-build* folders via glob
+   - Finds go-build\* folders via glob
    - Calculates sizes accurately
    - Cross-platform home directory detection
 
@@ -482,6 +509,7 @@ goCleaner := cleaner.NewGoCleaner(
 ## 📝 Configuration System Status
 
 ### Domain Model: ✅ Well Designed
+
 - **File:** `internal/domain/operation_settings.go:64-70`
 - **Type Safety:** Full struct with boolean flags
 - **JSON/YAML Tags:** Properly configured
@@ -489,12 +517,14 @@ goCleaner := cleaner.NewGoCleaner(
 - **Validation:** Accepts all combinations
 
 ### CLI Integration: ❌ Completely Broken
+
 - **File:** `cmd/clean-wizard/commands/clean.go:460`
 - **Problem:** Hardcoded `true` values
 - **Config Read:** Never happens
 - **Settings Use:** Non-existent
 
 ### Example Configs: ❌ Missing
+
 - **Status:** No example YAML files
 - **Documentation:** No Go cleaner config shown
 - **User Guidance:** No examples provided
@@ -506,6 +536,7 @@ goCleaner := cleaner.NewGoCleaner(
 ### Test Execution: `test/verify_go_cleaner.go`
 
 **Output:**
+
 ```
 === Go Cache Cleaner Verification ===
 
@@ -538,6 +569,7 @@ Found Go build cache: /Users/larsartmann/Library/Caches/go-build
 ```
 
 **Key Findings:**
+
 - Go is available and functional
 - Scan detects 3 locations (with duplicate)
 - Dry-run works correctly
@@ -548,38 +580,42 @@ Found Go build cache: /Users/larsartmann/Library/Caches/go-build
 
 ## 📈 Metrics Summary
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Supported Go Commands | 3 of 4 | 🟡 75% |
-| Test Coverage | 10+ cases | ✅ 100% pass |
-| Configuration Support | Model exists, ignored | 🔴 Broken |
-| CLI Integration | Basic, hardcoded | 🟡 Partial |
-| Duplicate Detection | 1 duplicate found | 🔴 Bug |
-| Fuzzcache Support | Not implemented | ❌ Missing |
-| Example Configs | None | ❌ Missing |
-| Production Ready | No | 🔴 Issues |
+| Metric                | Value                 | Status       |
+| --------------------- | --------------------- | ------------ |
+| Supported Go Commands | 3 of 4                | 🟡 75%       |
+| Test Coverage         | 10+ cases             | ✅ 100% pass |
+| Configuration Support | Model exists, ignored | 🔴 Broken    |
+| CLI Integration       | Basic, hardcoded      | 🟡 Partial   |
+| Duplicate Detection   | 1 duplicate found     | 🔴 Bug       |
+| Fuzzcache Support     | Not implemented       | ❌ Missing   |
+| Example Configs       | None                  | ❌ Missing   |
+| Production Ready      | No                    | 🔴 Issues    |
 
 ---
 
 ## 🎯 Next Steps
 
 ### Immediate Actions (Today)
+
 1. Fix duplicate cache detection in `Scan()` method
 2. Make configuration file settings actually work
 3. Create example Go cleaner config file
 
 ### Short Term (This Week)
+
 4. Add fuzzcache implementation
 5. Add CLI flags for individual cache types
 6. Improve scan result formatting
 
 ### Medium Term (This Month)
+
 7. Add TUI sub-selection for cache types
 8. Add integration tests
 9. Add cache size warnings
 10. Document Go cleaner in README
 
 ### Long Term (Future)
+
 11. Add Go cache statistics tracking
 12. Implement cache age recommendations
 13. Add Go cache cleanup scheduling
@@ -590,42 +626,51 @@ Found Go build cache: /Users/larsartmann/Library/Caches/go-build
 
 ## 🔬 Open Questions
 
-### Q1: GOCACHE vs go-build* Semantics
+### Q1: GOCACHE vs go-build\* Semantics
+
 **Question:** Are `go env GOCACHE` and `~/Library/Caches/go-build*` referring to the same cache or different caches?
 
 **Context:**
+
 - `go env GOCACHE` returns: `/Users/larsartmann/Library/Caches/go-build`
 - Glob pattern finds: `/Users/larsartmann/Library/Caches/go-build`
 - Both appear in scan results as duplicates
 
 **Need clarification on:**
+
 1. Are these semantically different caches?
 2. If same, which detection method should we use?
 3. If different, what's the difference?
 
 ### Q2: Fuzzcache Priority
+
 **Question:** Should fuzzcache support be considered critical or optional?
 
 **Context:**
+
 - Available since Go 1.18 (standard feature)
 - Only useful for fuzzing workflows
 - Most users don't do fuzzing
 - Missing from implementation
 
 **Need decision on:**
+
 1. Should this block production release?
 2. Or is it acceptable to defer?
 
 ### Q3: Configuration Philosophy
+
 **Question:** Should individual cache selection be CLI flags or config-only?
 
 **Context:**
+
 - Other cleaners don't have granular CLI flags
 - Config file provides better persistence
 - CLI flags are more discoverable
 - Both could be supported
 
 **Need decision on:**
+
 1. Add CLI flags for individual cache types?
 2. Config-only approach?
 3. Or both (config + CLI overrides)?
@@ -635,12 +680,14 @@ Found Go build cache: /Users/larsartmann/Library/Caches/go-build
 ## 📚 Documentation Status
 
 ### Existing Docs
+
 - ✅ Status report mentions 4 cache types
 - ✅ Planning docs specify implementation details
 - ✅ Test completion report documents features
 - ✅ Cleaner.md exists but is minimal
 
 ### Missing Docs
+
 - ❌ No Go cleaner usage examples
 - ❌ No config file examples
 - ❌ No cache type explanations
@@ -655,6 +702,7 @@ The Go cache cleaning implementation is **functional for basic use cases** but h
 **Overall Status:** 🟡 Functional but Requires Critical Fixes
 
 **Key Takeaways:**
+
 1. ✅ Core cleaning logic is solid and well-tested
 2. 🔴 Configuration system is completely broken
 3. 🔴 Duplicate cache detection confuses users

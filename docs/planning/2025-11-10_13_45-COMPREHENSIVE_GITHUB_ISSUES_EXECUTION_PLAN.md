@@ -503,7 +503,7 @@ Need configuration migration system to handle format changes gracefully and prov
 #### **Requirement 4.1: Configuration Versioning**
 
 ```yaml
-version: "1.2.0"  # NEW: Configuration format version
+version: "1.2.0" # NEW: Configuration format version
 safe_mode: true
 max_disk_usage: 50
 # ... rest of configuration
@@ -592,7 +592,7 @@ profiles:
 ```yaml
 # NEW: validation_levels section
 validation:
-  level: "comprehensive"  # none, basic, comprehensive, strict
+  level: "comprehensive" # none, basic, comprehensive, strict
   custom_rules:
     - name: "protect_recent_files"
       enabled: true
