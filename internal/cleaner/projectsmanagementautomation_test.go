@@ -257,19 +257,19 @@ func TestProjectsManagementAutomationCleaner_DryRunStrategy(t *testing.T) {
 
 func TestProjectsManagementAutomationCleaner_ClearCacheSettings(t *testing.T) {
 	tests := []struct {
-		name      string
+		name       string
 		clearCache bool
-		wantErr   bool
+		wantErr    bool
 	}{
 		{
-			name:      "clear_cache enabled",
+			name:       "clear_cache enabled",
 			clearCache: true,
-			wantErr:   false,
+			wantErr:    false,
 		},
 		{
-			name:      "clear_cache disabled",
+			name:       "clear_cache disabled",
 			clearCache: false,
-			wantErr:   false,
+			wantErr:    false,
 		},
 	}
 

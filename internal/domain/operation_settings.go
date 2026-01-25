@@ -115,17 +115,17 @@ type ProjectsManagementAutomationSettings struct {
 type OperationType string
 
 const (
-	OperationTypeNixGenerations              OperationType = "nix-generations"
-	OperationTypeTempFiles                   OperationType = "temp-files"
-	OperationTypeHomebrew                    OperationType = "homebrew-cleanup"
-	OperationTypeNodePackages                OperationType = "node-packages"
-	OperationTypeGoPackages                  OperationType = "go-packages"
-	OperationTypeCargoPackages               OperationType = "cargo-packages"
-	OperationTypeBuildCache                  OperationType = "build-cache"
-	OperationTypeDocker                      OperationType = "docker"
-	OperationTypeSystemCache                 OperationType = "system-cache"
-	OperationTypeLangVersionManager          OperationType = "lang-version-manager"
-	OperationTypeSystemTemp                  OperationType = "system-temp"
+	OperationTypeNixGenerations               OperationType = "nix-generations"
+	OperationTypeTempFiles                    OperationType = "temp-files"
+	OperationTypeHomebrew                     OperationType = "homebrew-cleanup"
+	OperationTypeNodePackages                 OperationType = "node-packages"
+	OperationTypeGoPackages                   OperationType = "go-packages"
+	OperationTypeCargoPackages                OperationType = "cargo-packages"
+	OperationTypeBuildCache                   OperationType = "build-cache"
+	OperationTypeDocker                       OperationType = "docker"
+	OperationTypeSystemCache                  OperationType = "system-cache"
+	OperationTypeLangVersionManager           OperationType = "lang-version-manager"
+	OperationTypeSystemTemp                   OperationType = "system-temp"
 	OperationTypeProjectsManagementAutomation OperationType = "projects-management-automation"
 )
 

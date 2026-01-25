@@ -25,9 +25,9 @@ const (
 	CleanerTypeGoPackages                   CleanerType = "gopackages"
 	CleanerTypeCargoPackages                CleanerType = "cargopackages"
 	CleanerTypeBuildCache                   CleanerType = "buildcache"
-	CleanerTypeDocker                      CleanerType = "docker"
-	CleanerTypeSystemCache                 CleanerType = "systemcache"
-	CleanerTypeLangVersionMgr              CleanerType = "langversionmanager"
+	CleanerTypeDocker                       CleanerType = "docker"
+	CleanerTypeSystemCache                  CleanerType = "systemcache"
+	CleanerTypeLangVersionMgr               CleanerType = "langversionmanager"
 	CleanerTypeProjectsManagementAutomation CleanerType = "projectsmanagementautomation"
 )
 
