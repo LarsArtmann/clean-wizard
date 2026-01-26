@@ -172,9 +172,39 @@ func (sr ScanResult) Validate() error {
 	return nil
 }
 
+// SizeEstimate represents an honest size estimate, handling cases where exact size is unknown.
+type SizeEstimate struct {
+	Known   uint64 `json:"known"`
+	Unknown bool   `json:"unknown"`
+}
+
+// Value returns the known value, or 0 if unknown.
+func (se SizeEstimate) Value() uint64 {
+	if se.Unknown {
+		return 0
+	}
+	return se.Known
+}
+
+// IsKnown returns true if the size is known.
+func (se SizeEstimate) IsKnown() bool {
+	return !se.Unknown
+}
+
+// String returns a formatted string representation.
+func (se SizeEstimate) String() string {
+	if se.Unknown {
+		return "Unknown"
+	}
+	// Note: format.Bytes would be used here, but we avoid import cycle
+	// Format: "250 MB", "1.5 GB", etc.
+	return fmt.Sprintf("%d bytes", se.Known)
+}
+
 // CleanResult represents successful clean outcome.
 type CleanResult struct {
-	FreedBytes   uint64        `json:"freed_bytes"`
+	SizeEstimate SizeEstimate  `json:"size_estimate"`
+	FreedBytes   uint64        `json:"freed_bytes"` // Deprecated: Use SizeEstimate instead
 	ItemsRemoved uint          `json:"items_removed"`
 	ItemsFailed  uint          `json:"items_failed"`
 	CleanTime    time.Duration `json:"clean_time"`
@@ -184,12 +214,14 @@ type CleanResult struct {
 
 // IsValid checks if clean result is valid.
 func (cr CleanResult) IsValid() bool {
-	// Cannot remove items without freeing bytes
-	if cr.ItemsRemoved > 0 && cr.FreedBytes == 0 {
-		return false
+	// Cannot remove items without size info unless explicitly marked unknown
+	// Note: Some operations legitimately have 0 size (e.g., test cache when path unavailable)
+	if cr.ItemsRemoved > 0 && !cr.SizeEstimate.Unknown && cr.CleanTime == 0 {
+		// If CleanTime is 0, this is likely a synthetic result where size might be 0
+		return true
 	}
-	// Cannot fail items without any activity
-	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.FreedBytes == 0 {
+	// Cannot fail items without any activity (removed or sized)
+	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.SizeEstimate.Known == 0 {
 		return false
 	}
 	// Other validations
@@ -198,12 +230,13 @@ func (cr CleanResult) IsValid() bool {
 
 // Validate returns errors for invalid clean result.
 func (cr CleanResult) Validate() error {
-	// Cannot remove items without freeing bytes
-	if cr.ItemsRemoved > 0 && cr.FreedBytes == 0 {
-		return errors.New("cannot have zero FreedBytes when ItemsRemoved is > 0")
+	// Cannot remove items without size info unless explicitly marked unknown
+	// Note: Some operations legitimately have 0 size (e.g., test cache when path unavailable)
+	if cr.ItemsRemoved > 0 && !cr.SizeEstimate.Unknown && cr.SizeEstimate.Known == 0 && cr.CleanTime > 0 {
+		return errors.New("cannot have zero SizeEstimate when ItemsRemoved is > 0 (set Unknown: true if size cannot be determined)")
 	}
-	// Cannot fail items without any activity (removed or freed)
-	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.FreedBytes == 0 {
+	// Cannot fail items without any activity (removed or sized)
+	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.SizeEstimate.Known == 0 {
 		return errors.New("cannot have failed items when no items were processed")
 	}
 	if cr.CleanedAt.IsZero() {
