@@ -38,6 +38,12 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 		return nil, fmt.Errorf("at least one cache type must be specified")
 	}
 
+	return NewGoCleanerWithSettings(verbose, dryRun, caches), (error)(nil)
+}
+
+// NewGoCleanerWithSettings creates Go cleaner with type-safe cache configuration (panics on invalid caches).
+// This is a convenience function for tests and backward compatibility.
+func NewGoCleanerWithSettings(verbose, dryRun bool, caches GoCacheType) *GoCleaner {
 	config := GoCacheConfig{
 		Verbose: verbose,
 		DryRun:  dryRun,
@@ -63,7 +69,7 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 		config:   config,
 		scanner:  scanner,
 		cleaners: cleaners,
-	}, nil
+	}
 }
 
 // Type returns operation type.

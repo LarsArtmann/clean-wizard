@@ -7,6 +7,27 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// cacheTypeFromBools converts old boolean parameters to GoCacheType enum.
+func cacheTypeFromBools(cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache bool) GoCacheType {
+	var caches GoCacheType
+	if cleanCache {
+		caches |= GoCacheGOCACHE
+	}
+	if cleanTestCache {
+		caches |= GoCacheTestCache
+	}
+	if cleanModCache {
+		caches |= GoCacheModCache
+	}
+	if cleanBuildCache {
+		caches |= GoCacheBuildCache
+	}
+	if cleanLintCache {
+		caches |= GoCacheLintCache
+	}
+	return caches
+}
+
 func TestNewGoCleaner(t *testing.T) {
 	tests := []struct {
 		name            string
@@ -52,41 +73,41 @@ func TestNewGoCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleaner(tt.verbose, tt.dryRun, tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, tt.cleanLintCache)
+			cleaner := NewGoCleanerWithSettings(tt.verbose, tt.dryRun, cacheTypeFromBools(tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, tt.cleanLintCache))
 
 			if cleaner == nil {
 				t.Fatal("NewGoCleaner() returned nil cleaner")
 			}
 
-			if cleaner.verbose != tt.verbose {
-				t.Errorf("verbose = %v, want %v", cleaner.verbose, tt.verbose)
+			if cleaner.config.Verbose != tt.verbose {
+				t.Errorf("verbose = %v, want %v", cleaner.config.Verbose, tt.verbose)
 			}
 
-			if cleaner.dryRun != tt.dryRun {
-				t.Errorf("dryRun = %v, want %v", cleaner.dryRun, tt.dryRun)
+			if cleaner.config.DryRun != tt.dryRun {
+				t.Errorf("dryRun = %v, want %v", cleaner.config.DryRun, tt.dryRun)
 			}
 
-			if cleaner.cleanCache != tt.cleanCache {
-				t.Errorf("cleanCache = %v, want %v", cleaner.cleanCache, tt.cleanCache)
+			if cleaner.config.Caches.Has(GoCacheGOCACHE) != tt.cleanCache {
+				t.Errorf("cleanCache = %v, want %v", cleaner.config.Caches.Has(GoCacheGOCACHE), tt.cleanCache)
 			}
 
-			if cleaner.cleanTestCache != tt.cleanTestCache {
-				t.Errorf("cleanTestCache = %v, want %v", cleaner.cleanTestCache, tt.cleanTestCache)
+			if cleaner.config.Caches.Has(GoCacheTestCache) != tt.cleanTestCache {
+				t.Errorf("cleanTestCache = %v, want %v", cleaner.config.Caches.Has(GoCacheTestCache), tt.cleanTestCache)
 			}
 
-			if cleaner.cleanModCache != tt.cleanModCache {
-				t.Errorf("cleanModCache = %v, want %v", cleaner.cleanModCache, tt.cleanModCache)
+			if cleaner.config.Caches.Has(GoCacheModCache) != tt.cleanModCache {
+				t.Errorf("cleanModCache = %v, want %v", cleaner.config.Caches.Has(GoCacheModCache), tt.cleanModCache)
 			}
 
-			if cleaner.cleanBuildCache != tt.cleanBuildCache {
-				t.Errorf("cleanBuildCache = %v, want %v", cleaner.cleanBuildCache, tt.cleanBuildCache)
+			if cleaner.config.Caches.Has(GoCacheBuildCache) != tt.cleanBuildCache {
+				t.Errorf("cleanBuildCache = %v, want %v", cleaner.config.Caches.Has(GoCacheBuildCache), tt.cleanBuildCache)
 			}
 		})
 	}
 }
 
 func TestGoCleaner_Type(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
+	cleaner := NewGoCleanerWithSettings(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
 
 	if cleaner.Type() != domain.OperationTypeGoPackages {
 		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeGoPackages)
@@ -94,7 +115,7 @@ func TestGoCleaner_Type(t *testing.T) {
 }
 
 func TestGoCleaner_IsAvailable(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
+	cleaner := NewGoCleanerWithSettings(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
 	available := cleaner.IsAvailable(context.Background())
 
 	// Result depends on Go installation
@@ -160,7 +181,7 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleaner(false, false, true, true, true, true, false)
+			cleaner := NewGoCleanerWithSettings(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
 
 			err := cleaner.ValidateSettings(tt.settings)
 			if (err != nil) != tt.wantErr {
@@ -215,7 +236,7 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleaner(false, true, tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, false)
+			cleaner := NewGoCleanerWithSettings(false, true, cacheTypeFromBools(tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, false))
 
 			result := cleaner.Clean(context.Background())
 			if result.IsErr() {
@@ -243,78 +264,15 @@ func TestGoCleaner_Clean_NoAvailable(t *testing.T) {
 	// This test would fail if Go is installed
 	// We just verify the error handling logic
 
-	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
+	cleaner := NewGoCleanerWithSettings(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
 
 	// Can't easily test "Go not available" case without mocking
 	// So we just verify IsAvailable is called
 	_ = cleaner.IsAvailable(context.Background())
 }
 
-func TestGoCleaner_GetHomeDir(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
-
-	// Set HOME explicitly
-	t.Setenv("HOME", "/test/home")
-	home := cleaner.getHomeDir()
-	if home != "/test/home" {
-		t.Errorf("getHomeDir() = %v, want /test/home", home)
-	}
-
-	// Test fallback on Windows (USERPROFILE)
-	t.Setenv("HOME", "")
-	t.Setenv("USERPROFILE", "C:\\Users\\test")
-	home = cleaner.getHomeDir()
-	if home != "C:\\Users\\test" {
-		t.Errorf("getHomeDir() = %v, want C:\\Users\\test", home)
-	}
-
-	// Test fallback to empty string
-	t.Setenv("HOME", "")
-	t.Setenv("USERPROFILE", "")
-	home = cleaner.getHomeDir()
-	if home != "" {
-		t.Errorf("getHomeDir() = %v, want empty string", home)
-	}
-}
-
-func TestGoCleaner_GetDirSize(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
-
-	// Test with non-existent path
-	size := cleaner.getDirSize("/non/existent/path/12345")
-	// Should return 0 for non-existent path
-	if size != 0 {
-		t.Errorf("getDirSize() for non-existent path = %d, want 0", size)
-	}
-
-	// Test with temp directory
-	tmpDir := t.TempDir()
-	size = cleaner.getDirSize(tmpDir)
-	// Should be 0 for empty directory
-	if size != 0 {
-		t.Errorf("getDirSize() for empty dir = %d, want 0", size)
-	}
-}
-
-func TestGoCleaner_GetDirModTime(t *testing.T) {
-	cleaner := NewGoCleaner(false, false, true, true, true, true, false)
-
-	// Test with non-existent path
-	modTime := cleaner.getDirModTime("/non/existent/path/12345")
-	if !modTime.IsZero() {
-		t.Errorf("getDirModTime() for non-existent path = %v, want zero time", modTime)
-	}
-
-	// Test with temp directory
-	tmpDir := t.TempDir()
-	modTime = cleaner.getDirModTime(tmpDir)
-	if modTime.IsZero() {
-		t.Error("getDirModTime() for temp dir returned zero time")
-	}
-}
-
 func TestGoCleaner_DryRunStrategy(t *testing.T) {
-	cleaner := NewGoCleaner(false, true, true, true, true, true, true)
+	cleaner := NewGoCleanerWithSettings(false, true, cacheTypeFromBools(true, true, true, true, true))
 
 	result := cleaner.Clean(context.Background())
 	if result.IsErr() {
@@ -335,18 +293,18 @@ func TestGoCleaner_DryRunStrategy(t *testing.T) {
 }
 
 func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {
-	cleaner := NewGoCleaner(true, false, false, false, false, false, true)
+	lintCleaner := NewGolangciLintCleaner(true)
 
-	result := cleaner.cleanGolangciLintCache(context.Background())
+	result := lintCleaner.Clean(context.Background())
 	if result.IsErr() {
 		// golangci-lint might not be installed, which is acceptable
-		t.Logf("cleanGolangciLintCache() returned error (golangci-lint may not be installed): %v", result.Error())
+		t.Logf("lintCleaner.Clean() returned error (golangci-lint may not be installed): %v", result.Error())
 		return
 	}
 
 	cleanResult := result.Value()
 
 	if cleanResult.ItemsRemoved != 1 {
-		t.Errorf("cleanGolangciLintCache() removed %d items, want 1", cleanResult.ItemsRemoved)
+		t.Errorf("lintCleaner.Clean() removed %d items, want 1", cleanResult.ItemsRemoved)
 	}
 }

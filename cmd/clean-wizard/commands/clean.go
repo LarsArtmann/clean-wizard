@@ -93,7 +93,7 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 			Name:        "Go Packages",
 			Description: "Clean Go module, test, and build caches",
 			Icon:        "🐹",
-			Available:   cleaner.NewGoCleaner(false, false, true, true, false, true, false).IsAvailable(ctx),
+			Available:   isGoCleanerAvailable(ctx),
 		},
 		{
 			Type:        CleanerTypeCargoPackages,
@@ -484,7 +484,10 @@ func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 
 // runGoCleaner executes the Go cleaner.
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	goCleaner := cleaner.NewGoCleaner(verbose, dryRun, true, true, false, true, false)
+	goCleaner, err := cleaner.NewGoCleaner(verbose, dryRun, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheBuildCache)
+	if err != nil {
+		return domain.CleanResult{}, fmt.Errorf("failed to create Go cleaner: %w", err)
+	}
 
 	result := goCleaner.Clean(ctx)
 	if result.IsErr() {
