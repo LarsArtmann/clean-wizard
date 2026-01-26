@@ -12,6 +12,10 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// goCommandTimeout is the timeout for Go cache cleaning operations.
+// This is longer than lint timeout because Go caches can be large.
+const goCommandTimeout = 60 * time.Second
+
 // GoCacheCleaner handles built-in Go cache cleaning operations.
 type GoCacheCleaner struct {
 	cacheType GoCacheType
@@ -52,9 +56,17 @@ func (gcc *GoCacheCleaner) cleanGoCache(ctx context.Context) result.Result[domai
 	cachePath, err := gcc.helper.getGoEnv(ctx, "GOCACHE")
 	if err != nil || cachePath == "" {
 		// If we can't get the path, still try to clean
-		cmd := exec.CommandContext(ctx, "go", "clean", "-cache")
+		// Create a timeout context to prevent hanging
+		timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
+		defer cancel()
+		
+		cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-cache")
 		output, err := cmd.CombinedOutput()
 		if err != nil {
+			// Check if it's a timeout error
+			if timeoutCtx.Err() == context.DeadlineExceeded {
+				return result.Err[domain.CleanResult](fmt.Errorf("go clean -cache timed out after %v (command may be hanging)", goCommandTimeout))
+			}
 			return result.Err[domain.CleanResult](fmt.Errorf("go clean -cache failed: %w (output: %s)", err, string(output)))
 		}
 		if gcc.verbose {
@@ -80,9 +92,17 @@ func (gcc *GoCacheCleaner) cleanGoCache(ctx context.Context) result.Result[domai
 		sizeEstimate = domain.SizeEstimate{Known: 0}
 	}
 
-	cmd := exec.CommandContext(ctx, "go", "clean", "-cache")
+	// Create a timeout context to prevent hanging
+	timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
+	defer cancel()
+	
+	cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-cache")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		// Check if it's a timeout error
+		if timeoutCtx.Err() == context.DeadlineExceeded {
+			return result.Err[domain.CleanResult](fmt.Errorf("go clean -cache timed out after %v (command may be hanging)", goCommandTimeout))
+		}
 		return result.Err[domain.CleanResult](fmt.Errorf("go clean -cache failed: %w (output: %s)", err, string(output)))
 	}
 
@@ -107,9 +127,17 @@ func (gcc *GoCacheCleaner) cleanGoTestCache(ctx context.Context) result.Result[d
 	cachePath, err := gcc.helper.getGoEnv(ctx, "GOCACHE")
 	if err != nil || cachePath == "" {
 		// If we can't get the path, still try to clean
-		cmd := exec.CommandContext(ctx, "go", "clean", "-testcache")
+		// Create a timeout context to prevent hanging
+		timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
+		defer cancel()
+		
+		cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-testcache")
 		output, err := cmd.CombinedOutput()
 		if err != nil {
+			// Check if it's a timeout error
+			if timeoutCtx.Err() == context.DeadlineExceeded {
+				return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache timed out after %v (command may be hanging)", goCommandTimeout))
+			}
 			return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache failed: %w (output: %s)", err, string(output)))
 		}
 		if gcc.verbose {
@@ -128,9 +156,17 @@ func (gcc *GoCacheCleaner) cleanGoTestCache(ctx context.Context) result.Result[d
 
 	// Note: test cache doesn't have a separate path, it's managed internally by Go
 	// We'll estimate it as 0 since we can't accurately measure test cache size separately
-	cmd := exec.CommandContext(ctx, "go", "clean", "-testcache")
+	// Create a timeout context to prevent hanging
+	timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
+	defer cancel()
+	
+	cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-testcache")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		// Check if it's a timeout error
+		if timeoutCtx.Err() == context.DeadlineExceeded {
+			return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache timed out after %v (command may be hanging)", goCommandTimeout))
+		}
 		return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache failed: %w (output: %s)", err, string(output)))
 	}
 
@@ -155,9 +191,17 @@ func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[do
 	cachePath, err := gcc.helper.getGoEnv(ctx, "GOMODCACHE")
 	if err != nil || cachePath == "" {
 		// If we can't get the path, still try to clean
-		cmd := exec.CommandContext(ctx, "go", "clean", "-modcache")
+		// Create a timeout context to prevent hanging
+		timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
+		defer cancel()
+		
+		cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-modcache")
 		output, err := cmd.CombinedOutput()
 		if err != nil {
+			// Check if it's a timeout error
+			if timeoutCtx.Err() == context.DeadlineExceeded {
+				return result.Err[domain.CleanResult](fmt.Errorf("go clean -modcache timed out after %v (command may be hanging)", goCommandTimeout))
+			}
 			return result.Err[domain.CleanResult](fmt.Errorf("go clean -modcache failed: %w (output: %s)", err, string(output)))
 		}
 		if gcc.verbose {
@@ -183,9 +227,17 @@ func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[do
 		sizeEstimate = domain.SizeEstimate{Known: 0}
 	}
 
-	cmd := exec.CommandContext(ctx, "go", "clean", "-modcache")
+	// Create a timeout context to prevent hanging
+	timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
+	defer cancel()
+	
+	cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-modcache")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		// Check if it's a timeout error
+		if timeoutCtx.Err() == context.DeadlineExceeded {
+			return result.Err[domain.CleanResult](fmt.Errorf("go clean -modcache timed out after %v (command may be hanging)", goCommandTimeout))
+		}
 		return result.Err[domain.CleanResult](fmt.Errorf("go clean -modcache failed: %w (output: %s)", err, string(output)))
 	}
 

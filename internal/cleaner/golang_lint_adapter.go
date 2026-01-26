@@ -10,6 +10,9 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// lintCommandTimeout is the timeout for lint cache cleaning operations.
+const lintCommandTimeout = 30 * time.Second
+
 // LintCleaner defines an interface for lint cache cleaning operations.
 type LintCleaner interface {
 	IsAvailable(ctx context.Context) bool
@@ -57,9 +60,17 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 		})
 	}
 
-	cmd := exec.CommandContext(ctx, "golangci-lint", "cache", "clean")
+	// Create a timeout context to prevent hanging
+	timeoutCtx, cancel := context.WithTimeout(ctx, lintCommandTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(timeoutCtx, "golangci-lint", "cache", "clean")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		// Check if it's a timeout error
+		if timeoutCtx.Err() == context.DeadlineExceeded {
+			return result.Err[domain.CleanResult](fmt.Errorf("golangci-lint cache clean timed out after %v (command may be hanging)", lintCommandTimeout))
+		}
 		return result.Err[domain.CleanResult](fmt.Errorf("golangci-lint cache clean failed: %w (output: %s)", err, string(output)))
 	}
 
