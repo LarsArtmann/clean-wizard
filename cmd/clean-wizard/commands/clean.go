@@ -145,6 +145,7 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 func NewCleanCommand() *cobra.Command {
 	var dryRun bool
 	var verbose bool
+	var jsonOutput bool
 	var mode string
 
 	cmd := &cobra.Command{
@@ -152,19 +153,20 @@ func NewCleanCommand() *cobra.Command {
 		Short: "Clean system caches and package managers",
 		Long:  `Interactively select and clean system caches, package managers, and temporary data.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCleanCommand(cmd, args, dryRun, verbose, mode)
+			return runCleanCommand(cmd, args, dryRun, verbose, jsonOutput, mode)
 		},
 	}
 
 	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Simulate deletion without actually removing anything")
 	cmd.Flags().BoolVar(&verbose, "verbose", false, "Enable verbose output for cleaner operations")
+	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Output results in JSON format (non-interactive)")
 	cmd.Flags().StringVar(&mode, "mode", "", "Preset mode: quick, standard, or aggressive")
 
 	return cmd
 }
 
 // runCleanCommand executes the clean command with multi-cleaner TUI.
-func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mode string) error {
+func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose, jsonOutput bool, mode string) error {
 	ctx := context.Background()
 
 	fmt.Println("🔍 Detecting available cleaners...")
@@ -194,14 +196,21 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 	var selectedCleaners []CleanerType
 	if mode != "" {
 		selectedCleaners = getPresetSelection(mode, availableConfigs)
-		fmt.Printf("🎯 Using preset mode: %s\n", mode)
-		fmt.Println()
-		for _, ct := range selectedCleaners {
-			fmt.Printf("  ✓ %s\n", getCleanerName(ct))
+		if !jsonOutput {
+			fmt.Printf("🎯 Using preset mode: %s\n", mode)
+			fmt.Println()
+			for _, ct := range selectedCleaners {
+				fmt.Printf("  ✓ %s\n", getCleanerName(ct))
+			}
+			fmt.Println()
 		}
-		fmt.Println()
+	} else if jsonOutput {
+		// In JSON mode without --mode, use all available cleaners
+		for _, cfg := range availableConfigs {
+			selectedCleaners = append(selectedCleaners, cfg.Type)
+		}
 	} else {
-		// Interactive cleaner selection
+		// Interactive cleaner selection (TUI mode only)
 		fmt.Println("⌨️  Keyboard Shortcuts:")
 		fmt.Println("   ↑↓ : Navigate  |  Space : Select  |  Enter : Confirm  |  Esc : Cancel")
 		fmt.Println()
@@ -275,27 +284,37 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 	var totalItemsRemoved uint
 	var totalItemsFailed uint
 	var skippedCleaners []string
+	var skippedErrors = make(map[string]error)
 	var failedCleaners []struct {
 		name  string
 		error string
 	}
+	var failedErrors = make(map[string]error)
+	cleanerResults := make(map[string]domain.CleanResult)
 
 	for _, cleanerType := range selectedCleaners {
 		result, err := runCleaner(ctx, cleanerType, dryRun, verbose)
+		name := getCleanerName(cleanerType)
+		
 		if err != nil {
-			name := getCleanerName(cleanerType)
 			errMsg := err.Error()
 
 			// Check if this is a "not available" error vs actual failure
 			if isNotAvailableError(errMsg) {
 				skippedCleaners = append(skippedCleaners, name)
-				fmt.Printf("  ℹ️  Skipped %s: %s\n", name, errMsg)
+				skippedErrors[name] = err
+				if !jsonOutput {
+					fmt.Printf("  ℹ️  Skipped %s: %s\n", name, errMsg)
+				}
 			} else {
 				failedCleaners = append(failedCleaners, struct {
 					name  string
 					error string
 				}{name: name, error: errMsg})
-				fmt.Printf("  ❌ Cleaner %s failed: %s\n", name, errMsg)
+				failedErrors[name] = err
+				if !jsonOutput {
+					fmt.Printf("  ❌ Cleaner %s failed: %s\n", name, errMsg)
+				}
 			}
 			continue
 		}
@@ -303,11 +322,22 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose bool, mo
 		totalBytesFreed += result.FreedBytes
 		totalItemsRemoved += result.ItemsRemoved
 		totalItemsFailed += result.ItemsFailed
+		cleanerResults[name] = result
 	}
 
 	duration := time.Since(startTime)
 
-	// Show final results
+	// Output JSON if requested
+	if jsonOutput {
+		jsonBytes, err := format.CleanResultsToJSON(cleanerResults, duration, dryRun, skippedErrors, failedErrors)
+		if err != nil {
+			return fmt.Errorf("failed to generate JSON output: %w", err)
+		}
+		fmt.Println(string(jsonBytes))
+		return nil
+	}
+
+	// Show final results (TUI mode)
 	fmt.Printf("\n✅ Cleanup completed in %s\n", duration.String())
 	if dryRun {
 		fmt.Println("   (DRY RUN: No actual changes were made)")
