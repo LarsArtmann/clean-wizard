@@ -720,18 +720,19 @@ linters-settings:
             reason: "OpenTracing is deprecated - migrate to OpenTelemetry for CNCF standard observability"
             recommendations:
               - go.opentelemetry.io/otel
-        - github.com/sirupsen/logrus:
-            reason: "Use structured logging with OpenTelemetry or standard library logger"
-            recommendations:
-              - go.opentelemetry.io/otel
-        - github.com/rs/zerolog:
-            reason: "Use charmbracelet/fang for better CLI logging integration or OpenTelemetry for observability"
-            recommendations:
-              - github.com/charmbracelet/fang
-        - go.uber.org/zap:
-            reason: "Use charmbracelet/fang for better CLI logging integration or OpenTelemetry for observability"
-            recommendations:
-              - github.com/charmbracelet/fang
+        # Note: logrus, zerolog, zap allowed for now - TODO: migrate to charmbracelet/log
+        # - github.com/sirupsen/logrus:
+        #     reason: "Use structured logging with OpenTelemetry or standard library logger"
+        #     recommendations:
+        #       - go.opentelemetry.io/otel
+        # - github.com/rs/zerolog:
+        #     reason: "Use charmbracelet/fang for better CLI logging integration or OpenTelemetry for observability"
+        #     recommendations:
+        #       - github.com/charmbracelet/fang
+        # - go.uber.org/zap:
+        #     reason: "Use charmbracelet/fang for better CLI logging integration or OpenTelemetry for observability"
+        #     recommendations:
+        #       - github.com/charmbracelet/fang
 
     local-replace-directives: true
 

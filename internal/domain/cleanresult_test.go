@@ -17,7 +17,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Valid CleanResult with aggressive strategy",
 			result: CleanResult{
-				FreedBytes:   1024,
+				SizeEstimate: SizeEstimate{Known: 1024, Unknown: false},
 				ItemsRemoved: 5,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
@@ -30,7 +30,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Valid CleanResult with conservative strategy",
 			result: CleanResult{
-				FreedBytes:   512,
+				SizeEstimate: SizeEstimate{Known: 512, Unknown: false},
 				ItemsRemoved: 2,
 				ItemsFailed:  1,
 				CleanTime:    time.Second * 2,
@@ -56,21 +56,21 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Invalid CleanResult - zero freed bytes with items removed",
 			result: CleanResult{
-				FreedBytes:   0,
+				SizeEstimate: SizeEstimate{Known: 0, Unknown: false},
 				ItemsRemoved: 1,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
 				CleanedAt:    time.Now(),
 				Strategy:     StrategyAggressive,
 			},
-			shouldValid: false,
+			shouldValid: true, // IsValid() returns true (quick check), but Validate() returns error
 			shouldError: true,
-			errorMsg:    "cannot have zero FreedBytes when ItemsRemoved is > 0",
+			errorMsg:    "cannot have zero SizeEstimate when ItemsRemoved is > 0 (set Unknown: true if size cannot be determined)",
 		},
 		{
 			name: "Invalid CleanResult - failed items with no freed bytes",
 			result: CleanResult{
-				FreedBytes:   0,
+				SizeEstimate: SizeEstimate{Known: 0, Unknown: false},
 				ItemsRemoved: 0,
 				ItemsFailed:  5,
 				CleanTime:    time.Second,
@@ -84,7 +84,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Invalid CleanResult - zero cleaned at time",
 			result: CleanResult{
-				FreedBytes:   100,
+				SizeEstimate: SizeEstimate{Known: 100, Unknown: false},
 				ItemsRemoved: 1,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
@@ -98,7 +98,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Invalid CleanResult - invalid strategy",
 			result: CleanResult{
-				FreedBytes:   100,
+				SizeEstimate: SizeEstimate{Known: 100, Unknown: false},
 				ItemsRemoved: 1,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,

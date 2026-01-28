@@ -60,3 +60,12 @@ ci: build test
 # Default recipe
 default:
     @just --list
+
+# Fix module issues
+fix-modules:
+    @echo "🔧 Fixing module cache..."
+    go clean -modcache
+    go mod tidy
+    go mod download
+    go mod verify
+    @echo "✅ Modules fixed"

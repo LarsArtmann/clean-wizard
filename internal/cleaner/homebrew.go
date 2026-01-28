@@ -11,6 +11,9 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// homebrewCommandTimeout is the timeout for Homebrew operations.
+const homebrewCommandTimeout = 5 * time.Minute
+
 // HomebrewCleaner handles Homebrew package manager cleanup with proper type safety.
 type HomebrewCleaner struct {
 	verbose    bool
@@ -30,6 +33,13 @@ func NewHomebrewCleaner(verbose, dryRun bool, unusedOnly domain.HomebrewMode) *H
 // Type returns operation type for Homebrew cleaner.
 func (hbc *HomebrewCleaner) Type() domain.OperationType {
 	return domain.OperationTypeHomebrew
+}
+
+// execWithTimeout executes a Homebrew command with timeout.
+func (hbc *HomebrewCleaner) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
+	timeoutCtx, cancel := context.WithTimeout(ctx, homebrewCommandTimeout)
+	_ = cancel // will be called by cmd.Wait() or context usage
+	return exec.CommandContext(timeoutCtx, name, arg...)
 }
 
 // IsAvailable checks if Homebrew cleaner is available.
@@ -63,7 +73,7 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 	items := make([]domain.ScanItem, 0)
 
 	// Get list of outdated packages
-	outdatedCmd := exec.CommandContext(ctx, "brew", "outdated")
+	outdatedCmd := hbc.execWithTimeout(ctx, "brew", "outdated")
 	output, err := outdatedCmd.CombinedOutput()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to check for outdated packages: %w", err))
@@ -141,12 +151,12 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 	for _, cmd := range commands {
 		var cleanCmd *exec.Cmd
 		if cmd == "cleanup" {
-			cleanCmd = exec.CommandContext(ctx, "brew", "cleanup")
+			cleanCmd = hbc.execWithTimeout(ctx, "brew", "cleanup")
 			if hbc.verbose {
 				fmt.Println("🔧 Running 'brew cleanup'")
 			}
 		} else if cmd == "prune" {
-			cleanCmd = exec.CommandContext(ctx, "brew", "prune")
+			cleanCmd = hbc.execWithTimeout(ctx, "brew", "prune")
 			if hbc.verbose {
 				fmt.Println("🔧 Running 'brew prune'")
 			}

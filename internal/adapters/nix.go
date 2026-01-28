@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -51,7 +50,7 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 	}
 
 	// Use nix-env without --profile to let it use the default user profile
-	cmd := exec.CommandContext(ctx, "nix-env", "--list-generations")
+	cmd := n.execWithTimeout(ctx, "nix-env", "--list-generations")
 	output, err := cmd.Output()
 	if err != nil {
 		return result.Err[[]domain.NixGeneration](fmt.Errorf("failed to list generations: %w", err))
@@ -85,7 +84,7 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	}
 
 	// Real system call for production mode
-	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
+	cmd := n.execWithTimeout(ctx, "du", "-sb", "/nix/store")
 	output, err := cmd.Output()
 	if err != nil {
 		return result.Err[int64](fmt.Errorf("failed to get store size: %w", err))
@@ -121,7 +120,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	}
 
 	// Run actual nix-collect-garbage command
-	cmd := exec.CommandContext(ctx, "nix-collect-garbage", "-d")
+	cmd := n.execWithTimeout(ctx, "nix-collect-garbage", "-d")
 	err = cmd.Run()
 	if err != nil {
 		return conversions.ToCleanResultFromError(fmt.Errorf("failed to collect garbage: %w", err))
@@ -144,7 +143,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 
 // getActualStoreSize helper function to get real store size.
 func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
-	cmd := exec.CommandContext(ctx, "du", "-sb", "/nix/store")
+	cmd := n.execWithTimeout(ctx, "du", "-sb", "/nix/store")
 	output, err := cmd.Output()
 	if err != nil {
 		return 0, err
@@ -176,7 +175,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 	}
 
 	// Remove the specific generation
-	cmd := exec.CommandContext(ctx, "nix-env", "--delete-generations", strconv.Itoa(genID))
+	cmd := n.execWithTimeout(ctx, "nix-env", "--delete-generations", strconv.Itoa(genID))
 	err = cmd.Run()
 	if err != nil {
 		return conversions.ToCleanResultFromError(fmt.Errorf("failed to remove generation %d: %w", genID, err))
@@ -245,7 +244,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 // IsAvailable checks if Nix is available and accessible.
 func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
 	// Check if nix command exists
-	versionCmd := exec.CommandContext(ctx, "nix", "--version")
+	versionCmd := n.execWithTimeout(ctx, "nix", "--version")
 	if err := versionCmd.Run(); err != nil {
 		return false
 	}

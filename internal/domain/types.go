@@ -6,14 +6,19 @@ import (
 	"time"
 )
 
-// Backward compatibility aliases - delegate to type-safe enums.
-type (
-	RiskLevel       = RiskLevelType
-	ValidationLevel = ValidationLevelType
-	ChangeOperation = ChangeOperationType
-)
+// Deprecated: Use RiskLevelType directly. Will be removed in v2.0.
+type RiskLevel = RiskLevelType
 
-// Backward compatibility constants - point to type-safe enums.
+// Deprecated: Use ValidationLevelType directly. Will be removed in v2.0.
+type ValidationLevel = ValidationLevelType
+
+// Deprecated: Use ChangeOperationType directly. Will be removed in v2.0.
+type ChangeOperation = ChangeOperationType
+
+// Deprecated: Use CleanStrategyType directly. Will be removed in v2.0.
+type CleanStrategy = CleanStrategyType
+
+// Deprecated: Use type-safe constants directly. Will be removed in v2.0.
 var (
 	RiskLow      = RiskLevelType(RiskLevelLowType)
 	RiskMedium   = RiskLevelType(RiskLevelMediumType)
@@ -28,13 +33,7 @@ var (
 	OperationAdded    = ChangeOperationType(ChangeOperationAddedType)
 	OperationRemoved  = ChangeOperationType(ChangeOperationRemovedType)
 	OperationModified = ChangeOperationType(ChangeOperationModifiedType)
-)
 
-// CleanStrategy represents cleaning strategy with type safety.
-type CleanStrategy = CleanStrategyType
-
-// Backward compatibility constants - delegate to type-safe enums.
-var (
 	StrategyAggressive   = CleanStrategyType(StrategyAggressiveType)
 	StrategyConservative = CleanStrategyType(StrategyConservativeType)
 	StrategyDryRun       = CleanStrategyType(StrategyDryRunType)

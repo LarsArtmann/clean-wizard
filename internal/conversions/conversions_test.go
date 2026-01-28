@@ -351,10 +351,11 @@ func TestValidateAndConvertCleanResult(t *testing.T) {
 
 func TestValidateAndConvertCleanResultInvalid(t *testing.T) {
 	invalidResult := domain.CleanResult{
-		FreedBytes:   0, // Invalid zero bytes with ItemsRemoved > 0
+		SizeEstimate: domain.SizeEstimate{Known: 0, Unknown: false}, // Invalid zero bytes with ItemsRemoved > 0
 		ItemsRemoved: 1,
 		CleanedAt:    time.Now(),
 		Strategy:     domain.StrategyDryRun,
+		CleanTime:    time.Second, // Non-zero clean time triggers validation
 	}
 
 	result := ValidateAndConvertCleanResult(invalidResult)
