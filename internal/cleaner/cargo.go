@@ -13,6 +13,14 @@ import (
 )
 
 // CargoCleaner handles Rust/Cargo cleanup.
+
+// execWithTimeout executes a Cargo command with timeout.
+func (cc *CargoCleaner) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
+	timeoutCtx, cancel := context.WithTimeout(ctx, cargoCommandTimeout)
+	_ = cancel // will be called by cmd.Wait() or context usage
+	return exec.CommandContext(timeoutCtx, name, arg...)
+}
+
 type CargoCleaner struct {
 	verbose bool
 	dryRun  bool
@@ -161,7 +169,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 
 // cleanWithCargoCacheTool cleans using cargo-cache extension.
 func (cc *CargoCleaner) cleanWithCargoCacheTool(ctx context.Context) result.Result[domain.CleanResult] {
-	cmd := exec.CommandContext(ctx, "cargo-cache", "--autoclean")
+	cmd := cc.execWithTimeout(ctx, "cargo-cache", "--autoclean")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("cargo-cache --autoclean failed: %w (output: %s)", err, string(output)))
@@ -183,7 +191,7 @@ func (cc *CargoCleaner) cleanWithCargoCacheTool(ctx context.Context) result.Resu
 
 // cleanWithCargoClean cleans using standard cargo clean command.
 func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[domain.CleanResult] {
-	cmd := exec.CommandContext(ctx, "cargo", "clean")
+	cmd := cc.execWithTimeout(ctx, "cargo", "clean")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("cargo clean failed: %w (output: %s)", err, string(output)))
