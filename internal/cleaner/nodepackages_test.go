@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 func TestNewNodePackageManagerCleaner(t *testing.T) {
@@ -104,72 +105,71 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
-	tests := []struct {
-		name     string
-		settings *domain.OperationSettings
-		wantErr  bool
-	}{
+	factory := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return NewNodePackageManagerCleaner(verbose, dryRun, AvailableNodePackageManagers())
+	}
+	testCases := []ValidateSettingsTestCase{
 		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  false,
+			Name:     "nil settings",
+			Settings: nil,
+			WantErr:  false,
 		},
 		{
-			name:     "nil node packages settings",
-			settings: &domain.OperationSettings{},
-			wantErr:  false,
+			Name:     "nil node packages settings",
+			Settings: &domain.OperationSettings{},
+			WantErr:  false,
 		},
 		{
-			name: "valid settings with all PMs",
-			settings: &domain.OperationSettings{
+			Name: "valid settings with all PMs",
+			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
 					PackageManagers: []string{"npm", "pnpm", "yarn", "bun"},
 				},
 			},
-			wantErr: false,
+			WantErr: false,
 		},
 		{
-			name: "valid settings with single PM",
-			settings: &domain.OperationSettings{
+			Name: "valid settings with single PM",
+			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
 					PackageManagers: []string{"npm"},
 				},
 			},
-			wantErr: false,
+			WantErr: false,
 		},
 		{
-			name: "valid settings with no PMs",
-			settings: &domain.OperationSettings{
+			Name: "valid settings with no PMs",
+			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
 					PackageManagers: []string{},
 				},
 			},
-			wantErr: false,
+			WantErr: false,
 		},
 		{
-			name: "invalid package manager",
-			settings: &domain.OperationSettings{
+			Name: "invalid package manager",
+			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
 					PackageManagers: []string{"invalid-pm"},
 				},
 			},
-			wantErr: true,
+			WantErr: true,
 		},
 		{
-			name: "mixed valid and invalid PMs",
-			settings: &domain.OperationSettings{
+			Name: "mixed valid and invalid PMs",
+			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
 					PackageManagers: []string{"npm", "invalid-pm"},
 				},
 			},
-			wantErr: true,
+			WantErr: true,
 		},
 	}
-
-	factory := func() settingsCleaner {
-		return NewNodePackageManagerCleaner(false, false, AvailableNodePackageManagers())
-	}
-	testValidateSettings(t, factory, tests)
+	TestValidateSettings(t, factory, testCases)
 }
 
 func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {

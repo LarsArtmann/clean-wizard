@@ -90,93 +90,72 @@ func TestLanguageVersionManagerCleaner_IsAvailable(t *testing.T) {
 	}
 }
 
-type settingsCleaner interface {
-	ValidateSettings(*domain.OperationSettings) error
-}
-
-func testValidateSettings(t *testing.T, factory func() settingsCleaner, tests []struct {
-	name     string
-	settings *domain.OperationSettings
-	wantErr  bool
-}) {
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cleaner := factory()
-			err := cleaner.ValidateSettings(tt.settings)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateSettings() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestLanguageVersionManagerCleaner_ValidateSettings(t *testing.T) {
-	tests := []struct {
-		name     string
-		settings *domain.OperationSettings
-		wantErr  bool
-	}{
+	factory := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return NewLanguageVersionManagerCleaner(verbose, dryRun, AvailableLangVersionManagers())
+	}
+	testCases := []ValidateSettingsTestCase{
 		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  false,
+			Name:     "nil settings",
+			Settings: nil,
+			WantErr:  false,
 		},
 		{
-			name:     "nil lang version manager settings",
-			settings: &domain.OperationSettings{},
-			wantErr:  false,
+			Name:     "nil lang version manager settings",
+			Settings: &domain.OperationSettings{},
+			WantErr:  false,
 		},
 		{
-			name: "valid settings with all managers",
-			settings: &domain.OperationSettings{
+			Name: "valid settings with all managers",
+			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
 					ManagerTypes: []string{"nvm", "pyenv", "rbenv"},
 				},
 			},
-			wantErr: false,
+			WantErr: false,
 		},
 		{
-			name: "valid settings with single manager",
-			settings: &domain.OperationSettings{
+			Name: "valid settings with single manager",
+			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
 					ManagerTypes: []string{"nvm"},
 				},
 			},
-			wantErr: false,
+			WantErr: false,
 		},
 		{
-			name: "valid settings with no managers",
-			settings: &domain.OperationSettings{
+			Name: "valid settings with no managers",
+			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
 					ManagerTypes: []string{},
 				},
 			},
-			wantErr: false,
+			WantErr: false,
 		},
 		{
-			name: "invalid manager type",
-			settings: &domain.OperationSettings{
+			Name: "invalid manager type",
+			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
 					ManagerTypes: []string{"invalid-manager"},
 				},
 			},
-			wantErr: true,
+			WantErr: true,
 		},
 		{
-			name: "mixed valid and invalid managers",
-			settings: &domain.OperationSettings{
+			Name: "mixed valid and invalid managers",
+			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
 					ManagerTypes: []string{"nvm", "invalid-manager"},
 				},
 			},
-			wantErr: true,
+			WantErr: true,
 		},
 	}
-
-	factory := func() settingsCleaner {
-		return NewLanguageVersionManagerCleaner(false, false, AvailableLangVersionManagers())
-	}
-	testValidateSettings(t, factory, tests)
+	TestValidateSettings(t, factory, testCases)
 }
 
 func TestLanguageVersionManagerCleaner_Clean_DryRun(t *testing.T) {
