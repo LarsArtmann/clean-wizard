@@ -237,3 +237,45 @@ func TestCleanTiming(
 
 	NewCleanResultAnalyzer(t, cleanResult.Value(), elapsed).VerifyTiming()
 }
+
+// BooleanSettingsCleanerTestConfig holds configuration for testing cleaners with a boolean settings field.
+// Use this with TestBooleanSettingsCleanerValidateSettings and TestBooleanSettingsCleanerCleanDryRun.
+type BooleanSettingsCleanerTestConfig struct {
+	TestName          string
+	ToolName          string
+	SettingsFieldName string
+	CreateSettings    func(bool) *domain.OperationSettings
+	ExpectedItems     uint
+}
+
+// TestBooleanSettingsCleanerValidateSettings runs a standard ValidateSettings test for cleaners with a single boolean settings field.
+// This eliminates duplicate test code across multiple cleaner test files.
+//
+// Parameters:
+//   - t: The testing.T object
+//   - config: Configuration for the tests including constructor and settings creation
+//   - newCleaner: Constructor function for the cleaner
+func TestBooleanSettingsCleanerValidateSettings[T any](t *testing.T, config BooleanSettingsCleanerTestConfig, newCleaner func(verbose, dryRun bool) T) {
+	testCases := CreateBooleanSettingsTestCases(config.SettingsFieldName, config.CreateSettings)
+
+	wrappedConstructor := func(verbose, dryRun bool) CleanerConstructorWithSettings {
+		return newCleaner(verbose, dryRun)
+	}
+
+	TestValidateSettings(t, wrappedConstructor, testCases)
+}
+
+// TestBooleanSettingsCleanerCleanDryRun runs a standard Clean_DryRun test for cleaners with expected items removed.
+// This eliminates duplicate test code across multiple cleaner test files.
+//
+// Parameters:
+//   - t: The testing.T object
+//   - config: Configuration for the tests including tool name and expected items
+//   - newCleaner: Constructor function for the cleaner
+func TestBooleanSettingsCleanerCleanDryRun[T any](t *testing.T, config BooleanSettingsCleanerTestConfig, newCleaner func(verbose, dryRun bool) T) {
+	simpleConstructor := func(verbose, dryRun bool) SimpleCleanerConstructor {
+		return newCleaner(verbose, dryRun)
+	}
+
+	TestCleanDryRun(t, simpleConstructor, config.ToolName, config.ExpectedItems)
+}
