@@ -240,22 +240,14 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 
 func TestDockerPruneMode_String(t *testing.T) {
 	tests := []struct {
-		mode DockerPruneMode
-		want string
+		Item DockerPruneMode
+		Want string
 	}{
 		{DockerPruneLight, "light"},
 		{DockerPruneStandard, "standard"},
 		{DockerPruneAggressive, "aggressive"},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.want, func(t *testing.T) {
-			got := string(tt.mode)
-			if got != tt.want {
-				t.Errorf("string(%v) = %v, want %v", tt.mode, got, tt.want)
-			}
-		})
-	}
+	stringTypesTestHelper(t, tests, func(t DockerPruneMode) string { return string(t) }, "string")
 }
 
 func TestDockerCleaner_Clean_Verbose(t *testing.T) {
