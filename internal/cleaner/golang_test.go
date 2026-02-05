@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 // cacheTypeFromBools converts old boolean parameters to GoCacheType enum.
