@@ -114,66 +114,7 @@ func (gcc *GoCacheCleaner) cleanGoCache(ctx context.Context) result.Result[domai
 
 // cleanGoTestCache cleans GOTESTCACHE.
 func (gcc *GoCacheCleaner) cleanGoTestCache(ctx context.Context) result.Result[domain.CleanResult] {
-	// Get cache path first to calculate size
-	cachePath, err := gcc.helper.getGoEnv(ctx, "GOCACHE")
-	if err != nil || cachePath == "" {
-		// If we can't get the path, still try to clean
-		// Create a timeout context to prevent hanging
-		timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
-		defer cancel()
-		
-		cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-testcache")
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			// Check if it's a timeout error
-			if timeoutCtx.Err() == context.DeadlineExceeded {
-				return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache timed out after %v (command may be hanging)", goCommandTimeout))
-			}
-			return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache failed: %w (output: %s)", err, string(output)))
-		}
-		if gcc.verbose {
-			fmt.Println("  ✓ Go test cache cleaned")
-		}
-		return result.Ok(domain.CleanResult{
-			SizeEstimate: domain.SizeEstimate{Known: 0},
-			FreedBytes:   0, // Deprecated field
-			ItemsRemoved: 1,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
-		})
-	}
-
-	// Note: test cache doesn't have a separate path, it's managed internally by Go
-	// We'll estimate it as 0 since we can't accurately measure test cache size separately
-	// Create a timeout context to prevent hanging
-	timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
-	defer cancel()
-	
-	cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-testcache")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		// Check if it's a timeout error
-		if timeoutCtx.Err() == context.DeadlineExceeded {
-			return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache timed out after %v (command may be hanging)", goCommandTimeout))
-		}
-		return result.Err[domain.CleanResult](fmt.Errorf("go clean -testcache failed: %w (output: %s)", err, string(output)))
-	}
-
-	if gcc.verbose {
-		fmt.Println("  ✓ Go test cache cleaned")
-	}
-
-	return result.Ok(domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{Known: 0},
-		FreedBytes:   0, // Deprecated field
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
-	})
+	return gcc.executeGoCleanCommand(ctx, "testcache", "  ✓ Go test cache cleaned", 0)
 }
 
 // cleanGoModCache cleans GOMODCACHE.
