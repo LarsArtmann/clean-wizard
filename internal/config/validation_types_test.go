@@ -75,58 +75,43 @@ func CreateTestConfigurations() map[string]*domain.Config {
 	}
 }
 
+// createTestConfig creates a test configuration with customizable fields.
+func createTestConfig(version string, maxDiskUsage int, profileName string, protected []string) *domain.Config {
+	return &domain.Config{
+		Version:      version,
+		SafeMode:     domain.SafeModeEnabled,
+		MaxDiskUsage: maxDiskUsage,
+		Protected:    protected,
+		Profiles: map[string]*domain.Profile{
+			"daily": {
+				Name:        profileName,
+				Description: "Daily cleanup",
+				Operations: []domain.CleanupOperation{
+					{
+						Name:        "nix-generations",
+						Description: "Clean Nix generations",
+						RiskLevel:   domain.RiskLow,
+						Enabled:     domain.ProfileStatusEnabled,
+					},
+				},
+				Enabled: domain.ProfileStatusEnabled,
+			},
+		},
+	}
+}
+
 // GetSanitizationTestCases returns all sanitization test cases.
 func GetSanitizationTestCases() []TestSanitizationTestCase {
 	return []TestSanitizationTestCase{
 		{
-			name: "whitespace cleanup",
-			config: &domain.Config{
-				Version:      "  1.0.0  ",
-				SafeMode:     domain.SafeModeEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "  daily  ",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     domain.ProfileStatusEnabled,
-							},
-						},
-						Enabled: domain.ProfileStatusEnabled,
-					},
-				},
-			},
+			name:             "whitespace cleanup",
+			config:           createTestConfig("  1.0.0  ", 50, "  daily  ", []string{"/System", "/Library"}),
 			expectedChanges:  []string{"version", "profiles.daily.name"},
 			expectedWarnings: 0,
 		},
 		{
-			name: "max disk usage clamping",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     domain.SafeModeEnabled,
-				MaxDiskUsage: 150, // Will be clamped to 95
-				Protected:    []string{"/System", "/Library"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     domain.ProfileStatusEnabled,
-							},
-						},
-						Enabled: domain.ProfileStatusEnabled,
-					},
-				},
-			},
+			name:             "max disk usage clamping",
+			config:           createTestConfig("1.0.0", 150, "daily", []string{"/System", "/Library"}),
 			expectedChanges:  []string{"max_disk_usage"},
 			expectedWarnings: 1,
 		},
