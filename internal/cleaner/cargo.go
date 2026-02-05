@@ -171,36 +171,40 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 
 // cleanWithCargoCacheTool cleans using cargo-cache extension.
 func (cc *CargoCleaner) cleanWithCargoCacheTool(ctx context.Context) result.Result[domain.CleanResult] {
-	cmd := cc.execWithTimeout(ctx, "cargo-cache", "--autoclean")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("cargo-cache --autoclean failed: %w (output: %s)", err, string(output)))
-	}
-
-	if cc.verbose {
-		fmt.Println("  ✓ Cargo cache cleaned with cargo-cache tool")
-	}
-
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   0,
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
-	})
+	return cc.executeCargoCleanCommand(
+		ctx,
+		"cargo-cache", []string{"--autoclean"},
+		"cargo-cache --autoclean failed: %w (output: %s)",
+		"  ✓ Cargo cache cleaned with cargo-cache tool",
+	)
 }
 
 // cleanWithCargoClean cleans using standard cargo clean command.
 func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[domain.CleanResult] {
-	cmd := cc.execWithTimeout(ctx, "cargo", "clean")
+	return cc.executeCargoCleanCommand(
+		ctx,
+		"cargo", []string{"clean"},
+		"cargo clean failed: %w (output: %s)",
+		"  ✓ Cargo cache cleaned",
+	)
+}
+
+// executeCargoCleanCommand is a helper that executes a cargo command and returns a clean result.
+func (cc *CargoCleaner) executeCargoCleanCommand(
+	ctx context.Context,
+	cmdName string,
+	args []string,
+	errorFormat string,
+	successMessage string,
+) result.Result[domain.CleanResult] {
+	cmd := cc.execWithTimeout(ctx, cmdName, args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("cargo clean failed: %w (output: %s)", err, string(output)))
+		return result.Err[domain.CleanResult](fmt.Errorf(errorFormat, err, string(output)))
 	}
 
 	if cc.verbose {
-		fmt.Println("  ✓ Cargo cache cleaned")
+		fmt.Println(successMessage)
 	}
 
 	return result.Ok(domain.CleanResult{
