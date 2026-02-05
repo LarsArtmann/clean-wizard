@@ -3,9 +3,9 @@ package cleaner
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
@@ -83,11 +83,27 @@ func TestProjectsManagementAutomationCleaner_ValidateSettings(t *testing.T) {
 		}
 	})
 
-	TestValidateSettings(t, NewProjectsManagementAutomationCleaner, testCases)
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
+	}
+
+	TestValidateSettings(t, constructor, testCases)
 }
 
 func TestProjectsManagementAutomationCleaner_Clean_DryRun(t *testing.T) {
-	TestCleanDryRun(t, NewProjectsManagementAutomationCleaner, "projects-management-automation", 1)
+	constructor := ToSimpleCleanerConstructor(func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
+	})
+
+	TestCleanDryRun(t, constructor, "projects-management-automation", 1)
 }
 
 func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
@@ -167,7 +183,15 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_DryRunStrategy(t *testing.T) {
-	TestDryRunStrategy(t, NewProjectsManagementAutomationCleaner, "projects-management-automation")
+	constructor := ToSimpleCleanerConstructor(func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
+	})
+
+	TestDryRunStrategy(t, constructor, "projects-management-automation")
 }
 
 func TestProjectsManagementAutomationCleaner_ClearCacheSettings(t *testing.T) {
@@ -207,41 +231,12 @@ func TestProjectsManagementAutomationCleaner_ClearCacheSettings(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_Clean_Timing(t *testing.T) {
-	cleaner := NewProjectsManagementAutomationCleaner(false, true)
-
-	// Skip test if projects-management-automation is not available
-	if !cleaner.IsAvailable(context.Background()) {
-		t.Skipf("Skipping test: projects-management-automation not available")
-		return
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	} {
+		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
 	}
 
-	startTime := time.Now()
-	result := cleaner.Clean(context.Background())
-	elapsed := time.Since(startTime)
-
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
-	}
-
-	cleanResult := result.Value()
-
-	// CleanTime should be recorded and reasonable
-	if cleanResult.CleanTime == 0 {
-		t.Error("Clean() returned CleanTime = 0")
-	}
-
-	// CleanedAt should be set
-	if cleanResult.CleanedAt.IsZero() {
-		t.Error("Clean() returned CleanedAt = zero time")
-	}
-
-	// Verify timing is reasonable (clean operation should complete quickly)
-	if cleanResult.CleanTime > 30*time.Second {
-		t.Errorf("Clean() took %v, which seems too long", cleanResult.CleanTime)
-	}
-
-	// Actual execution time should be close to CleanTime
-	if elapsed < cleanResult.CleanTime/2 || elapsed > cleanResult.CleanTime*2 {
-		t.Logf("Note: Clean() recorded time %v but actual elapsed was %v", cleanResult.CleanTime, elapsed)
-	}
+	TestCleanTiming(t, constructor, "projects-management-automation")
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 func TestNewCargoCleaner(t *testing.T) {
@@ -83,7 +84,6 @@ func TestCargoCleaner_ValidateSettings(t *testing.T) {
 		}
 	})
 
-	// Wrap NewCargoCleaner to match CleanerConstructor interface
 	constructor := func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
@@ -96,14 +96,13 @@ func TestCargoCleaner_ValidateSettings(t *testing.T) {
 }
 
 func TestCargoCleaner_Clean_DryRun(t *testing.T) {
-	// Wrap NewCargoCleaner to match CleanerConstructor interface
-	constructor := func(verbose, dryRun bool) interface {
+	constructor := ToSimpleCleanerConstructor(func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
 		ValidateSettings(*domain.OperationSettings) error
 	} {
 		return NewCargoCleaner(verbose, dryRun)
-	}
+	})
 
 	TestCleanDryRun(t, constructor, "Cargo", 1)
 }
@@ -201,16 +200,26 @@ func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_DryRunStrategy(t *testing.T) {
-	// Wrap NewCargoCleaner to match CleanerConstructor interface
-	constructor := func(verbose, dryRun bool) interface {
+	constructor := ToSimpleCleanerConstructor(func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
 		ValidateSettings(*domain.OperationSettings) error
 	} {
 		return NewCargoCleaner(verbose, dryRun)
-	}
+	})
 
 	TestDryRunStrategy(t, constructor, "Cargo")
+}
+
+func TestCargoCleaner_Clean_Timing(t *testing.T) {
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	} {
+		return NewCargoCleaner(verbose, dryRun)
+	}
+
+	TestCleanTiming(t, constructor, "Cargo")
 }
 
 func TestCargoCleaner_Scan(t *testing.T) {

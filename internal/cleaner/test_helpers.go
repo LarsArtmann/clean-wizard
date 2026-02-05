@@ -3,6 +3,7 @@ package cleaner
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -15,15 +16,31 @@ type ValidateSettingsTestCase struct {
 	WantErr  bool
 }
 
-// CleanerConstructor is a function type for creating cleaners in tests
-type CleanerConstructor func(verbose, dryRun bool) interface {
+// CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings
+type CleanerConstructorWithSettings func(verbose, dryRun bool) interface {
 	IsAvailable(ctx context.Context) bool
 	Clean(ctx context.Context) result.Result[domain.CleanResult]
 	ValidateSettings(*domain.OperationSettings) error
 }
 
+// SimpleCleanerConstructor is a function type for creating cleaners in tests that only need Clean and IsAvailable
+type SimpleCleanerConstructor func(verbose, dryRun bool) interface {
+	IsAvailable(ctx context.Context) bool
+	Clean(ctx context.Context) result.Result[domain.CleanResult]
+}
+
+// ToSimpleCleanerConstructor converts a constructor with additional methods to one that only exposes Clean and IsAvailable
+func ToSimpleCleanerConstructor(fullConstructor CleanerConstructorWithSettings) SimpleCleanerConstructor {
+	return func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	} {
+		return fullConstructor(verbose, dryRun)
+	}
+}
+
 // TestValidateSettings runs a standard validation settings test suite
-func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructor, testCases []ValidateSettingsTestCase) {
+func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructorWithSettings, testCases []ValidateSettingsTestCase) {
 	for _, tt := range testCases {
 		t.Run(tt.Name, func(t *testing.T) {
 			cleaner := newCleanerFunc(false, false)
@@ -37,7 +54,7 @@ func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructor, testC
 }
 
 // TestCleanDryRun runs a standard clean dry-run test suite
-func TestCleanDryRun(t *testing.T, newCleanerFunc CleanerConstructor, toolName string, expectedItemsRemoved uint) {
+func TestCleanDryRun(t *testing.T, newCleanerFunc SimpleCleanerConstructor, toolName string, expectedItemsRemoved uint) {
 	cleaner := newCleanerFunc(false, true)
 
 	if !cleaner.IsAvailable(context.Background()) {
@@ -66,7 +83,7 @@ func TestCleanDryRun(t *testing.T, newCleanerFunc CleanerConstructor, toolName s
 }
 
 // TestDryRunStrategy runs a standard dry-run strategy test suite
-func TestDryRunStrategy(t *testing.T, newCleanerFunc CleanerConstructor, toolName string) {
+func TestDryRunStrategy(t *testing.T, newCleanerFunc SimpleCleanerConstructor, toolName string) {
 	cleaner := newCleanerFunc(false, true)
 
 	if !cleaner.IsAvailable(context.Background()) {
@@ -125,4 +142,67 @@ func CreateBooleanSettingsTestCases(nilName string, settingsFunc func(bool) *dom
 			WantErr:  false,
 		},
 	}
+}
+
+// CleanResultAnalyzer provides methods for analyzing CleanResult in tests
+type CleanResultAnalyzer struct {
+	t          *testing.T
+	cleanResult domain.CleanResult
+	elapsed    time.Duration
+}
+
+// NewCleanResultAnalyzer creates a new analyzer for the given CleanResult
+func NewCleanResultAnalyzer(t *testing.T, cleanResult domain.CleanResult, elapsed time.Duration) *CleanResultAnalyzer {
+	return &CleanResultAnalyzer{
+		t:          t,
+		cleanResult: cleanResult,
+		elapsed:    elapsed,
+	}
+}
+
+// VerifyTiming verifies that clean operation timing is correctly recorded
+func (a *CleanResultAnalyzer) VerifyTiming() {
+	// CleanTime should be recorded
+	if a.cleanResult.CleanTime == 0 {
+		a.t.Error("Clean() returned CleanTime = 0")
+	}
+
+	// CleanedAt should be set
+	if a.cleanResult.CleanedAt.IsZero() {
+		a.t.Error("Clean() returned CleanedAt = zero time")
+	}
+
+	// Verify timing is reasonable (clean operation should complete quickly)
+	if a.cleanResult.CleanTime > 30*time.Second {
+		a.t.Errorf("Clean() took %v, which seems too long", a.cleanResult.CleanTime)
+	}
+
+	// Actual execution time should be close to CleanTime
+	if a.elapsed < a.cleanResult.CleanTime/2 || a.elapsed > a.cleanResult.CleanTime*2 {
+		a.t.Logf("Note: Clean() recorded time %v but actual elapsed was %v", a.cleanResult.CleanTime, a.elapsed)
+	}
+}
+
+// TestCleanTiming runs a standard clean timing test suite
+func TestCleanTiming(
+	t *testing.T,
+	newCleanerFunc SimpleCleanerConstructor,
+	toolName string,
+) {
+	cleaner := newCleanerFunc(false, true)
+
+	if !cleaner.IsAvailable(context.Background()) {
+		t.Skipf("Skipping test: %s not available", toolName)
+		return
+	}
+
+	startTime := time.Now()
+	cleanResult := cleaner.Clean(context.Background())
+	elapsed := time.Since(startTime)
+
+	if cleanResult.IsErr() {
+		t.Fatalf("Clean() error = %v", cleanResult.Error())
+	}
+
+	NewCleanResultAnalyzer(t, cleanResult.Value(), elapsed).VerifyTiming()
 }
