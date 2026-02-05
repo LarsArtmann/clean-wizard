@@ -6,27 +6,35 @@ import (
 )
 
 func TestResult_Ok(t *testing.T) {
-	testCases := []struct {
+	testPredicateCases(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, []struct {
 		name     string
 		result   Result[int]
 		expected bool
 	}{
-		{"ok result", Ok(42), true},
-		{"error result", Err[int](errors.New("test error")), false},
-	}
-	testPredicateCases(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, testCases)
+		{"ok result", testOkResult(), true},
+		{"error result", testErrResult(), false},
+	})
 }
 
 func TestResult_IsErr(t *testing.T) {
-	testCases := []struct {
+	testPredicateCases(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, []struct {
 		name     string
 		result   Result[int]
 		expected bool
 	}{
-		{"ok result", Ok(42), false},
-		{"error result", Err[int](errors.New("test error")), true},
-	}
-	testPredicateCases(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, testCases)
+		{"ok result", testOkResult(), false},
+		{"error result", testErrResult(), true},
+	})
+}
+
+// testOkResult returns a successful result for testing.
+func testOkResult() Result[int] {
+	return Ok(42)
+}
+
+// testErrResult returns an error result for testing.
+func testErrResult() Result[int] {
+	return Err[int](errors.New("test error"))
 }
 
 func testPredicateCases(t *testing.T, methodName string, predicate func(Result[int]) bool, cases []struct {
@@ -50,17 +58,8 @@ func TestResult_Value(t *testing.T) {
 		expected  int
 		wantPanic bool
 	}{
-		{
-			name:      "ok result",
-			result:    Ok(42),
-			expected:  42,
-			wantPanic: false,
-		},
-		{
-			name:      "error result",
-			result:    Err[int](errors.New("test error")),
-			wantPanic: true,
-		},
+		{name: "ok result", result: testOkResult(), expected: 42, wantPanic: false},
+		{name: "error result", result: testErrResult(), wantPanic: true},
 	}
 
 	for _, tt := range tests {
@@ -92,17 +91,8 @@ func TestResult_Error(t *testing.T) {
 		expected  string
 		wantPanic bool
 	}{
-		{
-			name:      "ok result",
-			result:    Ok(42),
-			wantPanic: true,
-		},
-		{
-			name:      "error result",
-			result:    Err[int](errors.New("test error")),
-			expected:  "test error",
-			wantPanic: false,
-		},
+		{name: "ok result", result: testOkResult(), wantPanic: true},
+		{name: "error result", result: testErrResult(), expected: "test error", wantPanic: false},
 	}
 
 	for _, tt := range tests {
@@ -134,18 +124,8 @@ func TestResult_UnwrapOr(t *testing.T) {
 		default_ int
 		expected int
 	}{
-		{
-			name:     "ok result",
-			result:   Ok(42),
-			default_: 0,
-			expected: 42,
-		},
-		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			default_: 99,
-			expected: 99,
-		},
+		{name: "ok result", result: testOkResult(), default_: 0, expected: 42},
+		{name: "error result", result: testErrResult(), default_: 99, expected: 99},
 	}
 
 	for _, tt := range tests {
@@ -165,18 +145,8 @@ func TestResult_Map(t *testing.T) {
 		fn       func(int) string
 		expected Result[string]
 	}{
-		{
-			name:     "ok result",
-			result:   Ok(42),
-			fn:       func(i int) string { return "42" },
-			expected: Ok("42"),
-		},
-		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			fn:       func(i int) string { return "42" },
-			expected: Err[string](errors.New("test error")),
-		},
+		{name: "ok result", result: testOkResult(), fn: func(i int) string { return "42" }, expected: Ok("42")},
+		{name: "error result", result: testErrResult(), fn: func(i int) string { return "42" }, expected: Err[string](errors.New("test error"))},
 	}
 
 	for _, tt := range tests {
