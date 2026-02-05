@@ -102,6 +102,23 @@ func ScanDirectory(path string, scanType domain.ScanType, verbose bool) ScanDire
 	return result
 }
 
+// appendScanItem appends a scan item for a directory to the items slice with verbose output.
+func appendScanItem(items []domain.ScanItem, path, displayName string, scanType domain.ScanType, verbose bool) []domain.ScanItem {
+	item := domain.ScanItem{
+		Path:     path,
+		Size:     GetDirSize(path),
+		Created:  GetDirModTime(path),
+		ScanType: scanType,
+	}
+	items = append(items, item)
+
+	if verbose {
+		fmt.Printf("Found %s: %s\n", displayName, filepath.Base(path))
+	}
+
+	return items
+}
+
 // ScanVersionDirectory scans a version directory for a language version manager.
 // It returns scan items for each version subdirectory found.
 func ScanVersionDirectory(ctx context.Context, versionsDir, managerName string, verbose bool) result.Result[[]domain.ScanItem] {
@@ -118,16 +135,7 @@ func ScanVersionDirectory(ctx context.Context, versionsDir, managerName string, 
 	}
 
 	for _, match := range matches {
-		items = append(items, domain.ScanItem{
-			Path:     match,
-			Size:     GetDirSize(match),
-			Created:  GetDirModTime(match),
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if verbose {
-			fmt.Printf("Found %s version: %s\n", managerName, filepath.Base(match))
-		}
+		items = appendScanItem(items, match, managerName, domain.ScanTypeTemp, verbose)
 	}
 
 	return result.Ok(items)
@@ -166,29 +174,11 @@ func ScanPath(homeDir string, scanType domain.ScanType, displayName string, verb
 			}
 
 			for _, match := range matches {
-				result.Items = append(result.Items, domain.ScanItem{
-					Path:     match,
-					Size:     GetDirSize(match),
-					Created:  GetDirModTime(match),
-					ScanType: scanType,
-				})
-
-				if verbose {
-					fmt.Printf("Found %s: %s\n", displayName, filepath.Base(match))
-				}
+				result.Items = appendScanItem(result.Items, match, displayName, scanType, verbose)
 			}
 		} else {
 			// Scan the directory itself
-			result.Items = append(result.Items, domain.ScanItem{
-				Path:     fullPath,
-				Size:     GetDirSize(fullPath),
-				Created:  GetDirModTime(fullPath),
-				ScanType: scanType,
-			})
-
-			if verbose {
-				fmt.Printf("Found %s: %s\n", displayName, filepath.Base(fullPath))
-			}
+			result.Items = appendScanItem(result.Items, fullPath, displayName, scanType, verbose)
 		}
 	}
 
