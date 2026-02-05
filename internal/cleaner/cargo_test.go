@@ -75,11 +75,7 @@ func TestCargoCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_ValidateSettings(t *testing.T) {
-	tests := []struct {
-		name     string
-		settings *domain.OperationSettings
-		wantErr  bool
-	}{
+	testCases := []ValidateSettingsTestCase{
 		{
 			name:     "nil settings",
 			settings: nil,
@@ -110,46 +106,11 @@ func TestCargoCleaner_ValidateSettings(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewCargoCleaner(false, false)
-
-			err := cleaner.ValidateSettings(tt.settings)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateSettings() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	TestValidateSettings(t, NewCargoCleaner, testCases)
 }
 
 func TestCargoCleaner_Clean_DryRun(t *testing.T) {
-	cleaner := NewCargoCleaner(false, true)
-
-	// Skip test if Cargo is not available
-	if !cleaner.IsAvailable(context.Background()) {
-		t.Skipf("Skipping test: Cargo not available")
-		return
-	}
-
-	result := cleaner.Clean(context.Background())
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
-	}
-
-	cleanResult := result.Value()
-
-	// Dry-run should report 1 item removed
-	if cleanResult.ItemsRemoved != 1 {
-		t.Errorf("Clean() removed %d items, want 1", cleanResult.ItemsRemoved)
-	}
-
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
-	}
-
-	if cleanResult.FreedBytes == 0 {
-		t.Errorf("Clean() freed %d bytes, want > 0", cleanResult.FreedBytes)
-	}
+	TestCleanDryRun(t, NewCargoCleaner, "Cargo", 1)
 }
 
 func TestCargoCleaner_GetHomeDir(t *testing.T) {
@@ -229,30 +190,7 @@ func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_DryRunStrategy(t *testing.T) {
-	cleaner := NewCargoCleaner(false, true)
-
-	// Skip test if Cargo is not available
-	if !cleaner.IsAvailable(context.Background()) {
-		t.Skipf("Skipping test: Cargo not available")
-		return
-	}
-
-	result := cleaner.Clean(context.Background())
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
-	}
-
-	cleanResult := result.Value()
-
-	// Verify dry-run strategy is set
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
-	}
-
-	// Verify no failures occurred
-	if cleanResult.ItemsFailed != 0 {
-		t.Errorf("Clean() failed %d items, want 0", cleanResult.ItemsFailed)
-	}
+	TestDryRunStrategy(t, NewCargoCleaner, "Cargo")
 }
 
 func TestCargoCleaner_Scan(t *testing.T) {

@@ -75,11 +75,7 @@ func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_ValidateSettings(t *testing.T) {
-	tests := []struct {
-		name     string
-		settings *domain.OperationSettings
-		wantErr  bool
-	}{
+	testCases := []ValidateSettingsTestCase{
 		{
 			name:     "nil settings",
 			settings: nil,
@@ -110,46 +106,11 @@ func TestProjectsManagementAutomationCleaner_ValidateSettings(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewProjectsManagementAutomationCleaner(false, false)
-
-			err := cleaner.ValidateSettings(tt.settings)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateSettings() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	TestValidateSettings(t, NewProjectsManagementAutomationCleaner, testCases)
 }
 
 func TestProjectsManagementAutomationCleaner_Clean_DryRun(t *testing.T) {
-	cleaner := NewProjectsManagementAutomationCleaner(false, true)
-
-	// Skip test if projects-management-automation is not available
-	if !cleaner.IsAvailable(context.Background()) {
-		t.Skipf("Skipping test: projects-management-automation not available")
-		return
-	}
-
-	result := cleaner.Clean(context.Background())
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
-	}
-
-	cleanResult := result.Value()
-
-	// Dry-run should report 1 item removed
-	if cleanResult.ItemsRemoved != 1 {
-		t.Errorf("Clean() removed %d items, want 1", cleanResult.ItemsRemoved)
-	}
-
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
-	}
-
-	if cleanResult.FreedBytes == 0 {
-		t.Errorf("Clean() freed %d bytes, want > 0", cleanResult.FreedBytes)
-	}
+	TestCleanDryRun(t, NewProjectsManagementAutomationCleaner, "projects-management-automation", 1)
 }
 
 func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
@@ -229,30 +190,7 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_DryRunStrategy(t *testing.T) {
-	cleaner := NewProjectsManagementAutomationCleaner(false, true)
-
-	// Skip test if projects-management-automation is not available
-	if !cleaner.IsAvailable(context.Background()) {
-		t.Skipf("Skipping test: projects-management-automation not available")
-		return
-	}
-
-	result := cleaner.Clean(context.Background())
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
-	}
-
-	cleanResult := result.Value()
-
-	// Verify dry-run strategy is set
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
-	}
-
-	// Verify no failures occurred
-	if cleanResult.ItemsFailed != 0 {
-		t.Errorf("Clean() failed %d items, want 0", cleanResult.ItemsFailed)
-	}
+	TestDryRunStrategy(t, NewProjectsManagementAutomationCleaner, "projects-management-automation")
 }
 
 func TestProjectsManagementAutomationCleaner_ClearCacheSettings(t *testing.T) {
