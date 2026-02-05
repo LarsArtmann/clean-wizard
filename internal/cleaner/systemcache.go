@@ -260,148 +260,63 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	return result.Ok(cleanResult)
 }
 
+// removeCachePath removes a cache directory and returns the appropriate result.
+func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) result.Result[domain.CleanResult] {
+	if scc.dryRun {
+		if scc.verbose {
+			fmt.Printf("  [DRY RUN] Would remove: %s\n", path)
+		}
+		return result.Ok(domain.CleanResult{
+			FreedBytes:   0,
+			ItemsRemoved: 1,
+			ItemsFailed:  0,
+			CleanTime:    0,
+			CleanedAt:    time.Now(),
+			Strategy:     domain.StrategyConservative,
+		})
+	}
+
+	err := os.RemoveAll(path)
+	if err != nil && !os.IsNotExist(err) {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to remove %s: %w", path, err))
+	}
+
+	if scc.verbose {
+		fmt.Println("  ✓ " + successMessage)
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   0,
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	})
+}
+
 // cleanSystemCache cleans cache for a specific system cache type.
 func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context, cacheType SystemCacheType, homeDir string) result.Result[domain.CleanResult] {
 	switch cacheType {
 	case SystemCacheSpotlight:
 		// Remove SpotlightKnowledgeEvents
-		spotlightPath := filepath.Join(homeDir, "Library", "Metadata", "CoreSpotlight", "SpotlightKnowledgeEvents")
-		if scc.dryRun {
-			if scc.verbose {
-				fmt.Printf("  [DRY RUN] Would remove: %s\n", spotlightPath)
-			}
-			return result.Ok(domain.CleanResult{
-				FreedBytes:   0,
-				ItemsRemoved: 1,
-				ItemsFailed:  0,
-				CleanTime:    0,
-				CleanedAt:    time.Now(),
-				Strategy:     domain.StrategyConservative,
-			})
-		}
-
-		err := os.RemoveAll(spotlightPath)
-		if err != nil && !os.IsNotExist(err) {
-			return result.Err[domain.CleanResult](fmt.Errorf("failed to remove Spotlight metadata: %w", err))
-		}
-
-		if scc.verbose {
-			fmt.Println("  ✓ Spotlight metadata cleaned")
-		}
-
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   0,
-			ItemsRemoved: 1,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
-		})
+		path := filepath.Join(homeDir, "Library", "Metadata", "CoreSpotlight", "SpotlightKnowledgeEvents")
+		return scc.removeCachePath(path, "Spotlight metadata cleaned")
 
 	case SystemCacheXcode:
 		// Remove Xcode DerivedData
-		xcodeDerivedData := filepath.Join(homeDir, "Library", "Developer", "Xcode", "DerivedData")
-		if scc.dryRun {
-			if scc.verbose {
-				fmt.Printf("  [DRY RUN] Would remove: %s\n", xcodeDerivedData)
-			}
-			return result.Ok(domain.CleanResult{
-				FreedBytes:   0,
-				ItemsRemoved: 1,
-				ItemsFailed:  0,
-				CleanTime:    0,
-				CleanedAt:    time.Now(),
-				Strategy:     domain.StrategyConservative,
-			})
-		}
-
-		err := os.RemoveAll(xcodeDerivedData)
-		if err != nil && !os.IsNotExist(err) {
-			return result.Err[domain.CleanResult](fmt.Errorf("failed to remove Xcode DerivedData: %w", err))
-		}
-
-		if scc.verbose {
-			fmt.Println("  ✓ Xcode DerivedData cleaned")
-		}
-
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   0,
-			ItemsRemoved: 1,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
-		})
+		path := filepath.Join(homeDir, "Library", "Developer", "Xcode", "DerivedData")
+		return scc.removeCachePath(path, "Xcode DerivedData cleaned")
 
 	case SystemCacheCocoaPods:
 		// Remove CocoaPods cache
-		cocoaPodsCache := filepath.Join(homeDir, "Library", "Caches", "CocoaPods")
-		if scc.dryRun {
-			if scc.verbose {
-				fmt.Printf("  [DRY RUN] Would remove: %s\n", cocoaPodsCache)
-			}
-			return result.Ok(domain.CleanResult{
-				FreedBytes:   0,
-				ItemsRemoved: 1,
-				ItemsFailed:  0,
-				CleanTime:    0,
-				CleanedAt:    time.Now(),
-				Strategy:     domain.StrategyConservative,
-			})
-		}
-
-		err := os.RemoveAll(cocoaPodsCache)
-		if err != nil && !os.IsNotExist(err) {
-			return result.Err[domain.CleanResult](fmt.Errorf("failed to remove CocoaPods cache: %w", err))
-		}
-
-		if scc.verbose {
-			fmt.Println("  ✓ CocoaPods cache cleaned")
-		}
-
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   0,
-			ItemsRemoved: 1,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
-		})
+		path := filepath.Join(homeDir, "Library", "Caches", "CocoaPods")
+		return scc.removeCachePath(path, "CocoaPods cache cleaned")
 
 	case SystemCacheHomebrew:
 		// Remove Homebrew cache
-		homebrewCache := filepath.Join(homeDir, "Library", "Caches", "Homebrew")
-		if scc.dryRun {
-			if scc.verbose {
-				fmt.Printf("  [DRY RUN] Would remove: %s\n", homebrewCache)
-			}
-			return result.Ok(domain.CleanResult{
-				FreedBytes:   0,
-				ItemsRemoved: 1,
-				ItemsFailed:  0,
-				CleanTime:    0,
-				CleanedAt:    time.Now(),
-				Strategy:     domain.StrategyConservative,
-			})
-		}
-
-		err := os.RemoveAll(homebrewCache)
-		if err != nil && !os.IsNotExist(err) {
-			return result.Err[domain.CleanResult](fmt.Errorf("failed to remove Homebrew cache: %w", err))
-		}
-
-		if scc.verbose {
-			fmt.Println("  ✓ Homebrew cache cleaned")
-		}
-
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   0,
-			ItemsRemoved: 1,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
-		})
+		path := filepath.Join(homeDir, "Library", "Caches", "Homebrew")
+		return scc.removeCachePath(path, "Homebrew cache cleaned")
 	}
 
 	return result.Err[domain.CleanResult](fmt.Errorf("unknown system cache type: %s", cacheType))
