@@ -283,45 +283,30 @@ func TestSystemCacheCleaner_DryRunStrategy(t *testing.T) {
 }
 
 func TestAvailableSystemCacheTypes(t *testing.T) {
-	types := AvailableSystemCacheTypes()
-
-	if len(types) != 4 {
-		t.Errorf("AvailableSystemCacheTypes() returned %d types, want 4", len(types))
-	}
-
 	expectedTypes := []SystemCacheType{
 		SystemCacheSpotlight,
 		SystemCacheXcode,
 		SystemCacheCocoaPods,
 		SystemCacheHomebrew,
 	}
-
-	for i, cacheType := range types {
-		if cacheType != expectedTypes[i] {
-			t.Errorf("AvailableSystemCacheTypes()[%d] = %v, want %v", i, cacheType, expectedTypes[i])
-		}
-	}
+	TestAvailableTypesGeneric(t, "AvailableSystemCacheTypes", AvailableSystemCacheTypes, expectedTypes)
 }
 
 func TestSystemCacheType_String(t *testing.T) {
-	tests := []struct {
-		cacheType SystemCacheType
-		want      string
-	}{
-		{SystemCacheSpotlight, "spotlight"},
-		{SystemCacheXcode, "xcode"},
-		{SystemCacheCocoaPods, "cocoapods"},
-		{SystemCacheHomebrew, "homebrew"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.want, func(t *testing.T) {
-			got := string(tt.cacheType)
-			if got != tt.want {
-				t.Errorf("string(%v) = %v, want %v", tt.cacheType, got, tt.want)
-			}
-		})
-	}
+	TestTypeStringGeneric(t, "SystemCacheType", func() []struct {
+		Value SystemCacheType
+		Want  string
+	} {
+		return []struct {
+			Value SystemCacheType
+			Want  string
+		}{
+			{SystemCacheSpotlight, "spotlight"},
+			{SystemCacheXcode, "xcode"},
+			{SystemCacheCocoaPods, "cocoapods"},
+			{SystemCacheHomebrew, "homebrew"},
+		}
+	})
 }
 
 func TestSystemCacheCleaner_ParseDuration(t *testing.T) {

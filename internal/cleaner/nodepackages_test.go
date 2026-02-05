@@ -241,45 +241,30 @@ func TestNodePackageManagerCleaner_Clean_NoAvailableManagers(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_AvailableNodePackageManagers(t *testing.T) {
-	pms := AvailableNodePackageManagers()
-
-	if len(pms) != 4 {
-		t.Errorf("AvailableNodePackageManagers() returned %d PMs, want 4", len(pms))
-	}
-
 	expectedPMs := []NodePackageManagerType{
 		NodePackageManagerNPM,
 		NodePackageManagerPNPM,
 		NodePackageManagerYarn,
 		NodePackageManagerBun,
 	}
-
-	for i, pm := range pms {
-		if pm != expectedPMs[i] {
-			t.Errorf("AvailableNodePackageManagers()[%d] = %v, want %v", i, pm, expectedPMs[i])
-		}
-	}
+	TestAvailableTypesGeneric(t, "AvailableNodePackageManagers", AvailableNodePackageManagers, expectedPMs)
 }
 
 func TestNodePackageManagerType_String(t *testing.T) {
-	tests := []struct {
-		pm   NodePackageManagerType
-		want string
-	}{
-		{NodePackageManagerNPM, "npm"},
-		{NodePackageManagerPNPM, "pnpm"},
-		{NodePackageManagerYarn, "yarn"},
-		{NodePackageManagerBun, "bun"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.want, func(t *testing.T) {
-			got := string(tt.pm)
-			if got != tt.want {
-				t.Errorf("string(%v) = %v, want %v", tt.pm, got, tt.want)
-			}
-		})
-	}
+	TestTypeStringGeneric(t, "NodePackageManagerType", func() []struct {
+		Value NodePackageManagerType
+		Want  string
+	} {
+		return []struct {
+			Value NodePackageManagerType
+			Want  string
+		}{
+			{NodePackageManagerNPM, "npm"},
+			{NodePackageManagerPNPM, "pnpm"},
+			{NodePackageManagerYarn, "yarn"},
+			{NodePackageManagerBun, "bun"},
+		}
+	})
 }
 
 func TestGetHomeDir(t *testing.T) {
