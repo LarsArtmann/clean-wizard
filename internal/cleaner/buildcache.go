@@ -132,16 +132,20 @@ func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[domain.Cl
 
 type CacheCleanerFunc func(ctx context.Context, toolType BuildToolType, homeDir string) result.Result[domain.CleanResult]
 
-// cleanCacheDir removes all items in a cache directory matching a pattern.
-func (bcc *BuildCacheCleaner) cleanCacheDir(
+type RemoveFunc func(path string) error
+
+// genericClean handles common cleanup logic for both cache directories and partial files.
+func (bcc *BuildCacheCleaner) genericClean(
 	ctx context.Context,
-	cacheName string,
-	cacheDir string,
+	toolName string,
+	baseDir string,
 	pattern string,
+	verboseMsg string,
+	removeFn RemoveFunc,
 ) result.Result[domain.CleanResult] {
-	matches, err := filepath.Glob(filepath.Join(cacheDir, pattern))
+	matches, err := filepath.Glob(filepath.Join(baseDir, pattern))
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to find %s caches: %w", cacheName, err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to find %s: %w", toolName, err))
 	}
 
 	itemsRemoved := 0
@@ -156,7 +160,7 @@ func (bcc *BuildCacheCleaner) cleanCacheDir(
 			continue
 		}
 
-		err := os.RemoveAll(match)
+		err := removeFn(match)
 		if err != nil {
 			if bcc.verbose {
 				fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
@@ -166,12 +170,12 @@ func (bcc *BuildCacheCleaner) cleanCacheDir(
 
 		itemsRemoved++
 		if bcc.verbose {
-			fmt.Printf("  ✓ Removed %s cache: %s\n", cacheName, filepath.Base(match))
+			fmt.Printf("  ✓ Removed %s: %s\n", verboseMsg, filepath.Base(match))
 		}
 	}
 
 	if bcc.verbose && itemsRemoved > 0 {
-		fmt.Printf("  ✓ %s caches cleaned\n", cacheName)
+		fmt.Printf("  ✓ %s cleaned\n", toolName)
 	}
 
 	return result.Ok(domain.CleanResult{
@@ -184,6 +188,16 @@ func (bcc *BuildCacheCleaner) cleanCacheDir(
 	})
 }
 
+// cleanCacheDir removes all items in a cache directory matching a pattern.
+func (bcc *BuildCacheCleaner) cleanCacheDir(
+	ctx context.Context,
+	cacheName string,
+	cacheDir string,
+	pattern string,
+) result.Result[domain.CleanResult] {
+	return bcc.genericClean(ctx, cacheName, cacheDir, pattern, cacheName+" cache", os.RemoveAll)
+}
+
 // cleanPartialFiles removes partial files matching a pattern.
 func (bcc *BuildCacheCleaner) cleanPartialFiles(
 	ctx context.Context,
@@ -191,51 +205,7 @@ func (bcc *BuildCacheCleaner) cleanPartialFiles(
 	baseDir string,
 	pattern string,
 ) result.Result[domain.CleanResult] {
-	matches, err := filepath.Glob(filepath.Join(baseDir, pattern))
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to find %s partial files: %w", toolName, err))
-	}
-
-	itemsRemoved := 0
-	bytesFreed := int64(0)
-	for _, match := range matches {
-		if !bcc.dryRun {
-			if info, err := os.Stat(match); err == nil {
-				bytesFreed += info.Size()
-			}
-		}
-
-		if bcc.dryRun {
-			itemsRemoved++
-			continue
-		}
-
-		err := os.Remove(match)
-		if err != nil {
-			if bcc.verbose {
-				fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
-			}
-			continue
-		}
-
-		itemsRemoved++
-		if bcc.verbose {
-			fmt.Printf("  ✓ Removed %s partial file: %s\n", toolName, filepath.Base(match))
-		}
-	}
-
-	if bcc.verbose && itemsRemoved > 0 {
-		fmt.Printf("  ✓ %s partial files cleaned\n", toolName)
-	}
-
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
-	})
+	return bcc.genericClean(ctx, toolName, baseDir, pattern, toolName+" partial file", os.Remove)
 }
 
 // cleanBuildTool cleans cache for a specific build tool.
