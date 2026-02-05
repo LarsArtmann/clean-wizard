@@ -85,22 +85,14 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 		return nil // Settings are optional
 	}
 
-	// Validate package managers are valid
-	validPackageManagers := map[NodePackageManagerType]bool{
-		NodePackageManagerNPM:  true,
-		NodePackageManagerPNPM: true,
-		NodePackageManagerYarn: true,
-		NodePackageManagerBun:  true,
-	}
+	validPackageManagersMap := toStringMap(AvailableNodePackageManagers())
 
-	for _, pm := range settings.NodePackages.PackageManagers {
-		pmStr := NodePackageManagerType(pm)
-		if !validPackageManagers[pmStr] {
-			return fmt.Errorf("invalid package manager: %s (must be npm, pnpm, yarn, or bun)", pm)
-		}
-	}
-
-	return nil
+	return validateSettings(
+		settings.NodePackages.PackageManagers,
+		validPackageManagersMap,
+		"package manager",
+		"npm, pnpm, yarn, or bun",
+	)
 }
 
 // Scan scans for Node.js package manager caches.

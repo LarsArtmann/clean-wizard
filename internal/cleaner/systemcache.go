@@ -76,22 +76,14 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 		return nil // Settings are optional
 	}
 
-	// Validate cache types
-	validCacheTypes := map[SystemCacheType]bool{
-		SystemCacheSpotlight: true,
-		SystemCacheXcode:     true,
-		SystemCacheCocoaPods: true,
-		SystemCacheHomebrew:  true,
-	}
+	validCacheTypesMap := toStringMap(AvailableSystemCacheTypes())
 
-	for _, cacheType := range settings.SystemCache.CacheTypes {
-		cacheStr := SystemCacheType(cacheType)
-		if !validCacheTypes[cacheStr] {
-			return fmt.Errorf("invalid cache type: %s (must be spotlight, xcode, cocoapods, or homebrew)", cacheType)
-		}
-	}
-
-	return nil
+	return validateSettings(
+		settings.SystemCache.CacheTypes,
+		validCacheTypesMap,
+		"cache type",
+		"spotlight, xcode, cocoapods, or homebrew",
+	)
 }
 
 // Scan scans for system caches.
