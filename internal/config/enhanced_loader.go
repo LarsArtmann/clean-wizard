@@ -150,23 +150,24 @@ func (ecl *EnhancedConfigLoader) mapValidatorRulesToSchemaRules() *ConfigValidat
 	return schemaRules
 }
 
+// getSchemaConstraintValue extracts a float64 value from an optional int pointer constraint,
+// returning the value or a fallback.
+func (ecl *EnhancedConfigLoader) getSchemaConstraintValue(constraint *int, fallback float64) float64 {
+	if constraint != nil {
+		return float64(*constraint)
+	}
+	return fallback
+}
+
 // getSchemaMinimum returns the minimum value for max_disk_usage from rules.
 func (ecl *EnhancedConfigLoader) getSchemaMinimum() *float64 {
-	if ecl.validator.rules.MaxDiskUsage != nil && ecl.validator.rules.MaxDiskUsage.Min != nil {
-		v := float64(*ecl.validator.rules.MaxDiskUsage.Min)
-		return &v
-	}
-	v := 10.0 // fallback to current literal
+	v := ecl.getSchemaConstraintValue(ecl.validator.rules.MaxDiskUsage.Min, 10.0)
 	return &v
 }
 
 // getSchemaMaximum returns the maximum value for max_disk_usage from rules.
 func (ecl *EnhancedConfigLoader) getSchemaMaximum() *float64 {
-	if ecl.validator.rules.MaxDiskUsage != nil && ecl.validator.rules.MaxDiskUsage.Max != nil {
-		v := float64(*ecl.validator.rules.MaxDiskUsage.Max)
-		return &v
-	}
-	v := 95.0 // fallback to current literal
+	v := ecl.getSchemaConstraintValue(ecl.validator.rules.MaxDiskUsage.Max, 95.0)
 	return &v
 }
 
