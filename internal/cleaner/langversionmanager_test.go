@@ -90,6 +90,26 @@ func TestLanguageVersionManagerCleaner_IsAvailable(t *testing.T) {
 	}
 }
 
+type settingsCleaner interface {
+	ValidateSettings(*domain.OperationSettings) error
+}
+
+func testValidateSettings(t *testing.T, factory func() settingsCleaner, tests []struct {
+	name     string
+	settings *domain.OperationSettings
+	wantErr  bool
+}) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cleaner := factory()
+			err := cleaner.ValidateSettings(tt.settings)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateSettings() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestLanguageVersionManagerCleaner_ValidateSettings(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -153,16 +173,10 @@ func TestLanguageVersionManagerCleaner_ValidateSettings(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewLanguageVersionManagerCleaner(false, false, AvailableLangVersionManagers())
-
-			err := cleaner.ValidateSettings(tt.settings)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateSettings() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
+	factory := func() settingsCleaner {
+		return NewLanguageVersionManagerCleaner(false, false, AvailableLangVersionManagers())
 	}
+	testValidateSettings(t, factory, tests)
 }
 
 func TestLanguageVersionManagerCleaner_Clean_DryRun(t *testing.T) {
