@@ -45,116 +45,31 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 		expectError string
 	}{
 		{
-			name: "valid config",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     domain.SafeModeEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     domain.ProfileStatusEnabled,
-							},
-						},
-						Enabled: domain.ProfileStatusEnabled,
-					},
-				},
-			},
+			name:        "valid config",
+			config:      CreateTestConfig(),
 			expectValid: true,
 		},
 		{
-			name: "invalid max disk usage",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     domain.SafeModeEnabled,
-				MaxDiskUsage: 150, // Invalid: > 95
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     domain.ProfileStatusEnabled,
-							},
-						},
-						Enabled: domain.ProfileStatusEnabled,
-					},
-				},
-			},
+			name:        "invalid max disk usage",
+			config:      CreateTestConfig(WithMaxDiskUsage(150)),
 			expectValid: false,
 			expectError: "max_disk_usage",
 		},
 		{
-			name: "missing version",
-			config: &domain.Config{
-				SafeMode:     domain.SafeModeEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     domain.ProfileStatusEnabled,
-							},
-						},
-						Enabled: domain.ProfileStatusEnabled,
-					},
-				},
-			},
+			name:        "missing version",
+			config:      CreateTestConfig(WithVersion("")),
 			expectValid: false,
 			expectError: "version",
 		},
 		{
-			name: "empty protected paths",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     domain.SafeModeEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     domain.ProfileStatusEnabled,
-							},
-						},
-						Enabled: domain.ProfileStatusEnabled,
-					},
-				},
-			},
+			name:        "empty protected paths",
+			config:      CreateTestConfig(WithProtectedPaths([]string{})),
 			expectValid: false,
 			expectError: "protected",
 		},
 		{
-			name: "no profiles",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     domain.SafeModeEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/usr", "/etc", "/var", "/bin", "/sbin"},
-				Profiles:     map[string]*domain.Profile{},
-			},
+			name:        "no profiles",
+			config:      CreateTestConfig(WithEmptyProfiles()),
 			expectValid: false,
 			expectError: "profiles",
 		},

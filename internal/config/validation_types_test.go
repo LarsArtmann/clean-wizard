@@ -121,19 +121,7 @@ func CreateTestConfig(opts ...ConfigOption) *domain.Config {
 		MaxDiskUsage: 50,
 		Protected:    []string{"/System", "/Library"},
 		Profiles: map[string]*domain.Profile{
-			"daily": {
-				Name:        "daily",
-				Description: "Daily cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     domain.ProfileStatusEnabled,
-					},
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
+			"daily": CreateDailyProfile(),
 		},
 	}
 
@@ -171,7 +159,14 @@ func WithProtectedPaths(paths []string) ConfigOption {
 // WithProfileName sets the profile name.
 func WithProfileName(name string) ConfigOption {
 	return func(c *domain.Config) {
-		c.Profiles["daily"].Name = name
+		c.Profiles["daily"] = CreateDailyProfile(WithDailyProfileName(name))
+	}
+}
+
+// WithEmptyProfiles sets the Profiles map to empty.
+func WithEmptyProfiles() ConfigOption {
+	return func(c *domain.Config) {
+		c.Profiles = map[string]*domain.Profile{}
 	}
 }
 
@@ -196,5 +191,38 @@ func GetSanitizationTestCases() []TestSanitizationTestCase {
 			expectedChanges:  []string{"profiles.daily.operations[0].settings"},
 			expectedWarnings: 0,
 		},
+	}
+}
+
+// CreateDailyProfile creates a test daily profile with customizable options.
+func CreateDailyProfile(opts ...DailyProfileOption) *domain.Profile {
+	profile := &domain.Profile{
+		Name:        "daily",
+		Description: "Daily cleanup",
+		Operations: []domain.CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Clean Nix generations",
+				RiskLevel:   domain.RiskLow,
+				Enabled:     domain.ProfileStatusEnabled,
+			},
+		},
+		Enabled: domain.ProfileStatusEnabled,
+	}
+
+	for _, opt := range opts {
+		opt(profile)
+	}
+
+	return profile
+}
+
+// DailyProfileOption is a function that modifies a test profile.
+type DailyProfileOption func(*domain.Profile)
+
+// WithDailyProfileName sets the profile name.
+func WithDailyProfileName(name string) DailyProfileOption {
+	return func(p *domain.Profile) {
+		p.Name = name
 	}
 }
