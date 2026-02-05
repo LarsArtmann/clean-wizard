@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 func TestNewNodePackageManagerCleaner(t *testing.T) {
@@ -105,13 +104,7 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
-	factory := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-		ValidateSettings(*domain.OperationSettings) error
-	} {
-		return NewNodePackageManagerCleaner(verbose, dryRun, AvailableNodePackageManagers())
-	}
+	factory := NewCleanerConstructorWithSettings(NewNodePackageManagerCleaner, AvailableNodePackageManagers)
 	testCases := []ValidateSettingsTestCase{
 		{
 			Name:     "nil settings",

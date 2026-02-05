@@ -319,3 +319,33 @@ func TestStandardCleaner(t *testing.T, constructor CleanerConstructorWithSetting
 		TestCleanTimingWithConstructor(t, ToSimpleCleanerConstructor(constructor), toolName)
 	})
 }
+
+// NewCleanerConstructorWithSettings creates a CleanerConstructorWithSettings from a constructor function
+// that takes additional manager types parameter.
+// This eliminates duplicate factory functions in test files.
+//
+// Type Parameters:
+//   - T: The cleaner type that must implement the cleaner interface
+//   - M: The manager type
+//
+// Parameters:
+//   - constructor: Function that creates a cleaner with given verbose, dryRun, and managers
+//   - availableManagers: Function that returns the available managers
+//
+// Returns a CleanerConstructorWithSettings that matches the TestValidateSettings signature
+func NewCleanerConstructorWithSettings[T interface {
+	IsAvailable(ctx context.Context) bool
+	Clean(ctx context.Context) result.Result[domain.CleanResult]
+	ValidateSettings(*domain.OperationSettings) error
+}, M any](
+	constructor func(verbose, dryRun bool, managers []M) T,
+	availableManagers func() []M,
+) CleanerConstructorWithSettings {
+	return func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return constructor(verbose, dryRun, availableManagers())
+	}
+}
