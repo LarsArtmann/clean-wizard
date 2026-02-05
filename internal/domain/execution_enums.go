@@ -39,6 +39,34 @@ func unmarshalBinaryEnum[T ~int](
 	return fmt.Errorf("cannot parse %s: expected string or int", name)
 }
 
+// binaryEnumStringMap creates a string mapping function for binary enums.
+func binaryEnumStringMap[T ~int](disabled, enabled T) func(string) (T, bool) {
+	return func(s string) (T, bool) {
+		switch s {
+		case "DISABLED", "0", "FALSE":
+			return disabled, true
+		case "ENABLED", "1", "TRUE":
+			return enabled, true
+		default:
+			return 0, false
+		}
+	}
+}
+
+// binaryEnumIntMap creates an integer mapping function for binary enums.
+func binaryEnumIntMap[T ~int](disabled, enabled T) func(int) (T, bool) {
+	return func(i int) (T, bool) {
+		switch i {
+		case 0:
+			return disabled, true
+		case 1:
+			return enabled, true
+		default:
+			return 0, false
+		}
+	}
+}
+
 // ExecutionMode represents execution behavior as a type-safe enum.
 type ExecutionMode int
 
@@ -273,27 +301,12 @@ func (ps ProfileStatus) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for ProfileStatus.
 // Accepts both string and integer representations.
 func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
-	stringMap := func(s string) (ProfileStatus, bool) {
-		switch s {
-		case "DISABLED", "0", "FALSE":
-			return ProfileStatusDisabled, true
-		case "ENABLED", "1", "TRUE":
-			return ProfileStatusEnabled, true
-		default:
-			return 0, false
-		}
-	}
-	intMap := func(i int) (ProfileStatus, bool) {
-		switch i {
-		case 0:
-			return ProfileStatusDisabled, true
-		case 1:
-			return ProfileStatusEnabled, true
-		default:
-			return 0, false
-		}
-	}
-	return unmarshalBinaryEnum(value, ps, stringMap, intMap, "profile status")
+	return unmarshalBinaryEnum(
+		value, ps,
+		binaryEnumStringMap(ProfileStatusDisabled, ProfileStatusEnabled),
+		binaryEnumIntMap(ProfileStatusDisabled, ProfileStatusEnabled),
+		"profile status",
+	)
 }
 
 // OptimizationMode represents optimization preference as type-safe enum.
@@ -344,27 +357,12 @@ func (om OptimizationMode) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for OptimizationMode.
 // Accepts both string and integer representations.
 func (om *OptimizationMode) UnmarshalYAML(value *yaml.Node) error {
-	stringMap := func(s string) (OptimizationMode, bool) {
-		switch s {
-		case "DISABLED", "0", "FALSE":
-			return OptimizationModeDisabled, true
-		case "ENABLED", "1", "TRUE":
-			return OptimizationModeEnabled, true
-		default:
-			return 0, false
-		}
-	}
-	intMap := func(i int) (OptimizationMode, bool) {
-		switch i {
-		case 0:
-			return OptimizationModeDisabled, true
-		case 1:
-			return OptimizationModeEnabled, true
-		default:
-			return 0, false
-		}
-	}
-	return unmarshalBinaryEnum(value, om, stringMap, intMap, "optimization mode")
+	return unmarshalBinaryEnum(
+		value, om,
+		binaryEnumStringMap(OptimizationModeDisabled, OptimizationModeEnabled),
+		binaryEnumIntMap(OptimizationModeDisabled, OptimizationModeEnabled),
+		"optimization mode",
+	)
 }
 
 // HomebrewMode represents homebrew operation mode as type-safe enum.
