@@ -300,11 +300,24 @@ func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
 }
 
 func TestAvailableBuildTools(t *testing.T) {
-	testBuildToolAvailable(t)
+	expectedTools := []BuildToolType{
+		BuildToolGradle,
+		BuildToolMaven,
+		BuildToolSBT,
+	}
+	availableItemsTestHelper(t, expectedTools, AvailableBuildTools, "AvailableBuildTools")
 }
 
 func TestBuildToolType_String(t *testing.T) {
-	testBuildToolString(t)
+	tests := []struct {
+		Item BuildToolType
+		Want string
+	}{
+		{BuildToolGradle, "gradle"},
+		{BuildToolMaven, "maven"},
+		{BuildToolSBT, "sbt"},
+	}
+	stringTypesTestHelper(t, tests, func(t BuildToolType) string { return string(t) }, "string")
 }
 
 func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {

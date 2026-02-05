@@ -244,11 +244,24 @@ func TestLanguageVersionManagerCleaner_DryRunStrategy(t *testing.T) {
 }
 
 func TestAvailableLangVersionManagers(t *testing.T) {
-	testLangVersionManagerAvailable(t)
+	expectedManagers := []LangVersionManagerType{
+		LangVersionManagerNVM,
+		LangVersionManagerPYENV,
+		LangVersionManagerRBENV,
+	}
+	availableItemsTestHelper(t, expectedManagers, AvailableLangVersionManagers, "AvailableLangVersionManagers")
 }
 
 func TestLangVersionManagerType_String(t *testing.T) {
-	testLangVersionManagerString(t)
+	tests := []struct {
+		Item LangVersionManagerType
+		Want string
+	}{
+		{LangVersionManagerNVM, "nvm"},
+		{LangVersionManagerPYENV, "pyenv"},
+		{LangVersionManagerRBENV, "rbenv"},
+	}
+	stringTypesTestHelper(t, tests, func(t LangVersionManagerType) string { return string(t) }, "string")
 }
 
 func TestLanguageVersionManagerCleaner_Verbose(t *testing.T) {
