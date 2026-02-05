@@ -8,93 +8,10 @@ import (
 
 // BenchmarkValidation_ConfigValidation tests full configuration validation performance.
 func BenchmarkValidation_ConfigValidation(b *testing.B) {
-	// Create complex configuration for realistic testing
-	cfg := &domain.Config{
-		Version:      "1.0.0",
-		SafeMode:     domain.SafeModeEnabled,
-		MaxDiskUsage: 75,
-		Protected:    []string{"/System", "/Applications", "/Library", "/usr", "/etc", "/var"},
-		Profiles: map[string]*domain.Profile{
-			"daily": {
-				Name:        "Daily Cleanup",
-				Description: "Daily system cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							NixGenerations: &domain.NixGenerationsSettings{
-								Generations: 3,
-								Optimize:    domain.OptimizationModeEnabled,
-							},
-						},
-					},
-					{
-						Name:        "temp-files",
-						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							TempFiles: &domain.TempFilesSettings{
-								OlderThan: "7d",
-								Excludes:  []string{"/tmp/keep", "/var/tmp/preserve"},
-							},
-						},
-					},
-					{
-						Name:        "homebrew-cleanup",
-						Description: "Clean Homebrew",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							Homebrew: &domain.HomebrewSettings{
-								UnusedOnly: domain.HomebrewModeUnusedOnly,
-								Prune:      "30d",
-							},
-						},
-					},
-					{
-						Name:        "system-temp",
-						Description: "Clean system temp",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							SystemTemp: &domain.SystemTempSettings{
-								Paths:     []string{"/tmp", "/var/tmp", "/tmp/.font-unix"},
-								OlderThan: "14d",
-							},
-						},
-					},
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
-			"weekly": {
-				Name:        "Weekly Cleanup",
-				Description: "Weekly deep cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Deep Nix cleanup",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							NixGenerations: &domain.NixGenerationsSettings{
-								Generations: 5,
-								Optimize:    domain.OptimizationModeEnabled,
-							},
-						},
-					},
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
-		},
-	}
-
 	validator := NewConfigValidator()
 
 	for b.Loop() {
+		cfg := CreateBenchmarkConfig()
 		validator.ValidateConfig(cfg)
 	}
 }
