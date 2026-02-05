@@ -472,14 +472,9 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 
 // runHomebrewCleaner executes the Homebrew cleaner.
 func runHomebrewCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	homebrewCleaner := cleaner.NewHomebrewCleaner(verbose, dryRun, domain.HomebrewModeAll)
-
-	result := homebrewCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewHomebrewCleaner(v, d, domain.HomebrewModeAll)
+	})
 }
 
 // runTempFilesCleaner executes the TempFiles cleaner.
@@ -487,17 +482,13 @@ func runTempFilesCleaner(ctx context.Context, dryRun, verbose bool) (domain.Clea
 	defaultTempPaths := []string{filepath.Join("/", "tmp")}
 	defaultExcludes := []string{}
 
-	tempFilesCleaner, err := cleaner.NewTempFilesCleaner(verbose, dryRun, "7d", defaultExcludes, defaultTempPaths)
-	if err != nil {
-		return domain.CleanResult{}, err
-	}
-
-	result := tempFilesCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		tempFilesCleaner, err := cleaner.NewTempFilesCleaner(v, d, "7d", defaultExcludes, defaultTempPaths)
+		if err != nil {
+			panic(err) // This should never happen with valid parameters
+		}
+		return tempFilesCleaner
+	})
 }
 
 // runGenericCleaner executes a cleaner using a factory function.
@@ -536,14 +527,9 @@ func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult
 
 // runCargoCleaner executes the Cargo cleaner.
 func runCargoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	cargoCleaner := cleaner.NewCargoCleaner(verbose, dryRun)
-
-	result := cargoCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewCargoCleaner(v, d)
+	})
 }
 
 // runBuildCacheCleaner executes the Build Cache cleaner.
@@ -563,29 +549,20 @@ func runBuildCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cle
 
 // runDockerCleaner executes the Docker cleaner.
 func runDockerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	dockerCleaner := cleaner.NewDockerCleaner(verbose, dryRun, cleaner.DockerPruneStandard)
-
-	result := dockerCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewDockerCleaner(v, d, cleaner.DockerPruneStandard)
+	})
 }
 
 // runSystemCacheCleaner executes the System Cache cleaner.
 func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	systemCacheCleaner, err := cleaner.NewSystemCacheCleaner(verbose, dryRun, "30d")
-	if err != nil {
-		return domain.CleanResult{}, err
-	}
-
-	result := systemCacheCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		systemCacheCleaner, err := cleaner.NewSystemCacheCleaner(v, d, "30d")
+		if err != nil {
+			panic(err) // This should never happen with valid parameters
+		}
+		return systemCacheCleaner
+	})
 }
 
 // runLangVersionManagerCleaner executes the Language Version Manager cleaner.
@@ -597,14 +574,9 @@ func runLangVersionManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 
 // runProjectsManagementAutomationCleaner executes Projects Management Automation cleaner.
 func runProjectsManagementAutomationCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	projectsManagementAutomationCleaner := cleaner.NewProjectsManagementAutomationCleaner(verbose, dryRun)
-
-	result := projectsManagementAutomationCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewProjectsManagementAutomationCleaner(v, d)
+	})
 }
 
 // getPresetSelection returns cleaner selection based on preset mode.
