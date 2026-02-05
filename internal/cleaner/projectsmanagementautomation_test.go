@@ -79,13 +79,19 @@ func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_ValidateSettings(t *testing.T) {
-	testCases := CreateBooleanSettingsTestCases("projects management automation", func(enabled bool) *domain.OperationSettings {
-		return &domain.OperationSettings{
-			ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
-				ClearCache: enabled,
-			},
-		}
-	})
+	config := BooleanSettingsCleanerTestConfig{
+		TestName:          "ProjectsManagementAutomation",
+		ToolName:          "projects-management-automation",
+		SettingsFieldName: "projects management automation",
+		CreateSettings: func(enabled bool) *domain.OperationSettings {
+			return &domain.OperationSettings{
+				ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
+					ClearCache: enabled,
+				},
+			}
+		},
+		ExpectedItems: 1,
+	}
 
 	constructor := func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
@@ -95,19 +101,33 @@ func TestProjectsManagementAutomationCleaner_ValidateSettings(t *testing.T) {
 		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
 	}
 
-	TestValidateSettings(t, constructor, testCases)
+	TestBooleanSettingsCleanerValidateSettings(t, config, constructor)
 }
 
 func TestProjectsManagementAutomationCleaner_Clean_DryRun(t *testing.T) {
-	constructor := ToSimpleCleanerConstructor(func(verbose, dryRun bool) interface {
+	config := BooleanSettingsCleanerTestConfig{
+		TestName:          "ProjectsManagementAutomation",
+		ToolName:          "projects-management-automation",
+		SettingsFieldName: "projects management automation",
+		CreateSettings: func(enabled bool) *domain.OperationSettings {
+			return &domain.OperationSettings{
+				ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
+					ClearCache: enabled,
+				},
+			}
+		},
+		ExpectedItems: 1,
+	}
+
+	constructor := func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
 		ValidateSettings(*domain.OperationSettings) error
 	} {
 		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
-	})
+	}
 
-	TestCleanDryRun(t, constructor, "projects-management-automation", 1)
+	TestBooleanSettingsCleanerCleanDryRun(t, config, constructor)
 }
 
 func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {

@@ -80,13 +80,19 @@ func TestCargoCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_ValidateSettings(t *testing.T) {
-	testCases := CreateBooleanSettingsTestCases("cargo packages", func(enabled bool) *domain.OperationSettings {
-		return &domain.OperationSettings{
-			CargoPackages: &domain.CargoPackagesSettings{
-				Autoclean: enabled,
-			},
-		}
-	})
+	config := BooleanSettingsCleanerTestConfig{
+		TestName:          "Cargo",
+		ToolName:          "Cargo",
+		SettingsFieldName: "cargo packages",
+		CreateSettings: func(enabled bool) *domain.OperationSettings {
+			return &domain.OperationSettings{
+				CargoPackages: &domain.CargoPackagesSettings{
+					Autoclean: enabled,
+				},
+			}
+		},
+		ExpectedItems: 1,
+	}
 
 	constructor := func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
@@ -96,19 +102,33 @@ func TestCargoCleaner_ValidateSettings(t *testing.T) {
 		return NewCargoCleaner(verbose, dryRun)
 	}
 
-	TestValidateSettings(t, constructor, testCases)
+	TestBooleanSettingsCleanerValidateSettings(t, config, constructor)
 }
 
 func TestCargoCleaner_Clean_DryRun(t *testing.T) {
-	constructor := ToSimpleCleanerConstructor(func(verbose, dryRun bool) interface {
+	config := BooleanSettingsCleanerTestConfig{
+		TestName:          "Cargo",
+		ToolName:          "Cargo",
+		SettingsFieldName: "cargo packages",
+		CreateSettings: func(enabled bool) *domain.OperationSettings {
+			return &domain.OperationSettings{
+				CargoPackages: &domain.CargoPackagesSettings{
+					Autoclean: enabled,
+				},
+			}
+		},
+		ExpectedItems: 1,
+	}
+
+	constructor := func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
 		ValidateSettings(*domain.OperationSettings) error
 	} {
 		return NewCargoCleaner(verbose, dryRun)
-	})
+	}
 
-	TestCleanDryRun(t, constructor, "Cargo", 1)
+	TestBooleanSettingsCleanerCleanDryRun(t, config, constructor)
 }
 
 func TestCargoCleaner_GetHomeDir(t *testing.T) {

@@ -254,15 +254,10 @@ type BooleanSettingsCleanerTestConfig struct {
 // Parameters:
 //   - t: The testing.T object
 //   - config: Configuration for the tests including constructor and settings creation
-//   - newCleaner: Constructor function for the cleaner
-func TestBooleanSettingsCleanerValidateSettings[T any](t *testing.T, config BooleanSettingsCleanerTestConfig, newCleaner func(verbose, dryRun bool) T) {
+//   - constructor: Constructor function that returns an interface with IsAvailable, Clean, and ValidateSettings methods
+func TestBooleanSettingsCleanerValidateSettings(t *testing.T, config BooleanSettingsCleanerTestConfig, constructor CleanerConstructorWithSettings) {
 	testCases := CreateBooleanSettingsTestCases(config.SettingsFieldName, config.CreateSettings)
-
-	wrappedConstructor := func(verbose, dryRun bool) CleanerConstructorWithSettings {
-		return newCleaner(verbose, dryRun)
-	}
-
-	TestValidateSettings(t, wrappedConstructor, testCases)
+	TestValidateSettings(t, constructor, testCases)
 }
 
 // TestBooleanSettingsCleanerCleanDryRun runs a standard Clean_DryRun test for cleaners with expected items removed.
@@ -271,11 +266,8 @@ func TestBooleanSettingsCleanerValidateSettings[T any](t *testing.T, config Bool
 // Parameters:
 //   - t: The testing.T object
 //   - config: Configuration for the tests including tool name and expected items
-//   - newCleaner: Constructor function for the cleaner
-func TestBooleanSettingsCleanerCleanDryRun[T any](t *testing.T, config BooleanSettingsCleanerTestConfig, newCleaner func(verbose, dryRun bool) T) {
-	simpleConstructor := func(verbose, dryRun bool) SimpleCleanerConstructor {
-		return newCleaner(verbose, dryRun)
-	}
-
+//   - constructor: Constructor function that returns an interface with IsAvailable, Clean, and ValidateSettings methods
+func TestBooleanSettingsCleanerCleanDryRun(t *testing.T, config BooleanSettingsCleanerTestConfig, constructor CleanerConstructorWithSettings) {
+	simpleConstructor := ToSimpleCleanerConstructor(constructor)
 	TestCleanDryRun(t, simpleConstructor, config.ToolName, config.ExpectedItems)
 }
