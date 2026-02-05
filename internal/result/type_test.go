@@ -6,54 +6,38 @@ import (
 )
 
 func TestResult_Ok(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		name     string
 		result   Result[int]
 		expected bool
 	}{
-		{
-			name:     "ok result",
-			result:   Ok(42),
-			expected: true,
-		},
-		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			expected: false,
-		},
+		{"ok result", Ok(42), true},
+		{"error result", Err[int](errors.New("test error")), false},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.result.IsOk() != tt.expected {
-				t.Errorf("IsOk() = %v, want %v", tt.result.IsOk(), tt.expected)
-			}
-		})
-	}
+	testPredicateCases(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, testCases)
 }
 
 func TestResult_IsErr(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		name     string
 		result   Result[int]
 		expected bool
 	}{
-		{
-			name:     "ok result",
-			result:   Ok(42),
-			expected: false,
-		},
-		{
-			name:     "error result",
-			result:   Err[int](errors.New("test error")),
-			expected: true,
-		},
+		{"ok result", Ok(42), false},
+		{"error result", Err[int](errors.New("test error")), true},
 	}
+	testPredicateCases(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, testCases)
+}
 
-	for _, tt := range tests {
+func testPredicateCases(t *testing.T, methodName string, predicate func(Result[int]) bool, cases []struct {
+	name     string
+	result   Result[int]
+	expected bool
+}) {
+	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.result.IsErr() != tt.expected {
-				t.Errorf("IsErr() = %v, want %v", tt.result.IsErr(), tt.expected)
+			if predicate(tt.result) != tt.expected {
+				t.Errorf("%s() = %v, want %v", methodName, predicate(tt.result), tt.expected)
 			}
 		})
 	}
