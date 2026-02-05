@@ -177,7 +177,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, p
 
 	case NodePackageManagerYarn:
 		// Yarn cache location is typically ~/.yarn/cache
-		homeDir, err := getHomeDir()
+		homeDir, err := GetHomeDir()
 		if err != nil {
 			return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 		}
@@ -196,7 +196,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, p
 
 	case NodePackageManagerBun:
 		// Bun cache location is typically ~/.bun/install/cache
-		homeDir, err := getHomeDir()
+		homeDir, err := GetHomeDir()
 		if err != nil {
 			return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 		}

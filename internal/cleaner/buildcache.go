@@ -85,7 +85,7 @@ func (bcc *BuildCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.S
 	items := make([]domain.ScanItem, 0)
 
 	// Get home directory
-	homeDir, err := getHomeDir()
+	homeDir, err := GetHomeDir()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 	}
@@ -122,8 +122,8 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 		for _, match := range matches {
 			items = append(items, domain.ScanItem{
 				Path:     match,
-				Size:     getDirSize(match),
-				Created:  getDirModTime(match),
+				Size:     GetDirSize(match),
+				Created:  GetDirModTime(match),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -138,8 +138,8 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 		if info, err := os.Stat(mavenCache); err == nil && info.IsDir() {
 			items = append(items, domain.ScanItem{
 				Path:     mavenCache,
-				Size:     getDirSize(mavenCache),
-				Created:  getDirModTime(mavenCache),
+				Size:     GetDirSize(mavenCache),
+				Created:  GetDirModTime(mavenCache),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -154,8 +154,8 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 		if info, err := os.Stat(sbtCache); err == nil && info.IsDir() {
 			items = append(items, domain.ScanItem{
 				Path:     sbtCache,
-				Size:     getDirSize(sbtCache),
-				Created:  getDirModTime(sbtCache),
+				Size:     GetDirSize(sbtCache),
+				Created:  GetDirModTime(sbtCache),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -195,7 +195,7 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		bytesFreed := int64(0)
 		for _, match := range matches {
 			if !bcc.dryRun {
-				bytesFreed += getDirSize(match)
+				bytesFreed += GetDirSize(match)
 			}
 
 			if bcc.dryRun {
@@ -289,7 +289,7 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		bytesFreed := int64(0)
 		for _, match := range matches {
 			if !bcc.dryRun {
-				bytesFreed += getDirSize(match)
+				bytesFreed += GetDirSize(match)
 			}
 
 			if bcc.dryRun {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -49,55 +48,19 @@ func (h *golangHelpers) getGoEnv(ctx context.Context, key string) (string, error
 
 // getHomeDir returns user's home directory.
 func (h *golangHelpers) getHomeDir() string {
-	// Try getting from HOME environment variable
-	if home := os.Getenv("HOME"); home != "" {
-		return home
+	home, err := GetHomeDir()
+	if err != nil {
+		return ""
 	}
-
-	// Fallback to user profile directory
-	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
-		return userProfile
-	}
-
-	return ""
+	return home
 }
 
 // getDirSize returns total size of directory recursively.
 func (h *golangHelpers) getDirSize(path string) int64 {
-	var size int64
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-	if err != nil {
-		return 0
-	}
-
-	return size
+	return GetDirSize(path)
 }
 
 // getDirModTime returns the most recent modification time in directory.
 func (h *golangHelpers) getDirModTime(path string) time.Time {
-	var modTime time.Time
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if info.ModTime().After(modTime) {
-			modTime = info.ModTime()
-		}
-		return nil
-	})
-	if err != nil {
-		return time.Time{}
-	}
-
-	return modTime
+	return GetDirModTime(path)
 }

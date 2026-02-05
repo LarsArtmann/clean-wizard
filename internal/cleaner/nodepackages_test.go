@@ -283,35 +283,35 @@ func TestNodePackageManagerType_String(t *testing.T) {
 }
 
 func TestGetHomeDir(t *testing.T) {
-	// This test verifies getHomeDir doesn't crash
+	// This test verifies GetHomeDir doesn't crash
 	// Actual behavior depends on environment variables
 
 	// Set HOME explicitly
 	t.Setenv("HOME", "/test/home")
-	home, err := getHomeDir()
+	home, err := GetHomeDir()
 	if err != nil {
-		t.Errorf("getHomeDir() error = %v", err)
+		t.Errorf("GetHomeDir() error = %v", err)
 	}
 	if home != "/test/home" {
-		t.Errorf("getHomeDir() = %v, want /test/home", home)
+		t.Errorf("GetHomeDir() = %v, want /test/home", home)
 	}
 
 	// Test fallback on Windows (USERPROFILE)
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "C:\\Users\\test")
-	home, err = getHomeDir()
+	home, err = GetHomeDir()
 	if err != nil {
-		t.Errorf("getHomeDir() error = %v", err)
+		t.Errorf("GetHomeDir() error = %v", err)
 	}
 	if home != "C:\\Users\\test" {
-		t.Errorf("getHomeDir() = %v, want C:\\Users\\test", home)
+		t.Errorf("GetHomeDir() = %v, want C:\\Users\\test", home)
 	}
 
 	// Test error case
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "")
-	_, err = getHomeDir()
+	_, err = GetHomeDir()
 	if err == nil {
-		t.Error("getHomeDir() should return error when no home directory can be determined")
+		t.Error("GetHomeDir() should return error when no home directory can be determined")
 	}
 }
