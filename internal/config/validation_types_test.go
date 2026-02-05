@@ -192,6 +192,29 @@ func CreateDailyProfile(opts ...DailyProfileOption) *domain.Profile {
 	return profile
 }
 
+// CreateWeeklyProfile creates a weekly profile for deep cleanup operations.
+func CreateWeeklyProfile() *domain.Profile {
+	return &domain.Profile{
+		Name:        "Weekly Deep Cleanup",
+		Description: "Weekly deep cleanup operations",
+		Operations: []domain.CleanupOperation{
+			{
+				Name:        "nix-generations",
+				Description: "Deep Nix cleanup",
+				RiskLevel:   domain.RiskMedium,
+				Enabled:     domain.ProfileStatusEnabled,
+				Settings: &domain.OperationSettings{
+					NixGenerations: &domain.NixGenerationsSettings{
+						Generations: 5,
+						Optimize:    domain.OptimizationModeEnabled,
+					},
+				},
+			},
+		},
+		Enabled: domain.ProfileStatusEnabled,
+	}
+}
+
 // DailyProfileOption is a function that modifies a test profile.
 type DailyProfileOption func(*domain.Profile)
 
@@ -266,25 +289,7 @@ func CreateBenchmarkConfig() *domain.Config {
 				},
 				Enabled: domain.ProfileStatusEnabled,
 			},
-			"weekly": {
-				Name:        "Weekly Cleanup",
-				Description: "Weekly deep cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Deep Nix cleanup",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							NixGenerations: &domain.NixGenerationsSettings{
-								Generations: 5,
-								Optimize:    domain.OptimizationModeEnabled,
-							},
-						},
-					},
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
+			"weekly": CreateWeeklyProfile(),
 		},
 	}
 }
@@ -353,25 +358,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 				},
 				Enabled: domain.ProfileStatusEnabled,
 			},
-			"weekly": {
-				Name:        "Weekly Deep Cleanup",
-				Description: "Weekly deep cleanup operations",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Deep Nix cleanup",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							NixGenerations: &domain.NixGenerationsSettings{
-								Generations: 5,
-								Optimize:    domain.OptimizationModeEnabled,
-							},
-						},
-					},
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
+			"weekly": CreateWeeklyProfile(),
 		},
 	}
 }
