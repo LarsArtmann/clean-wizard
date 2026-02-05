@@ -500,16 +500,23 @@ func runTempFilesCleaner(ctx context.Context, dryRun, verbose bool) (domain.Clea
 	return result.Value(), nil
 }
 
-// runNodePackageManagerCleaner executes the Node package manager cleaner.
-func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	nodeCleaner := cleaner.NewNodePackageManagerCleaner(verbose, dryRun, cleaner.AvailableNodePackageManagers())
+// runGenericCleaner executes a cleaner using a factory function.
+func runGenericCleaner(ctx context.Context, verbose, dryRun bool, factory func(bool, bool) cleaner.Cleaner) (domain.CleanResult, error) {
+	cleanerInstance := factory(verbose, dryRun)
 
-	result := nodeCleaner.Clean(ctx)
+	result := cleanerInstance.Clean(ctx)
 	if result.IsErr() {
 		return domain.CleanResult{}, result.Error()
 	}
 
 	return result.Value(), nil
+}
+
+// runNodePackageManagerCleaner executes the Node package manager cleaner.
+func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewNodePackageManagerCleaner(v, d, cleaner.AvailableNodePackageManagers())
+	})
 }
 
 // runGoCleaner executes the Go cleaner.
@@ -583,14 +590,9 @@ func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cl
 
 // runLangVersionManagerCleaner executes the Language Version Manager cleaner.
 func runLangVersionManagerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	langVersionManagerCleaner := cleaner.NewLanguageVersionManagerCleaner(verbose, dryRun, cleaner.AvailableLangVersionManagers())
-
-	result := langVersionManagerCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewLanguageVersionManagerCleaner(v, d, cleaner.AvailableLangVersionManagers())
+	})
 }
 
 // runProjectsManagementAutomationCleaner executes Projects Management Automation cleaner.
