@@ -32,6 +32,19 @@ var riskLevelTestCases = []struct {
 	{"unknown risk", testInvalidRiskUnknown},
 }
 
+// testRiskLevelMethod is a helper function that tests RiskLevel methods with expected values.
+func testRiskLevelMethod(t *testing.T, methodName string, method func(domain.RiskLevel) string, expected map[domain.RiskLevel]string) {
+	for _, tc := range riskLevelTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := method(tc.level)
+			expect := expected[tc.level]
+			if result != expect {
+				t.Errorf("%s() = %v, want %v", methodName, result, expect)
+			}
+		})
+	}
+}
+
 func TestRiskLevel_String(t *testing.T) {
 	expected := map[domain.RiskLevel]string{
 		domain.RiskLow:         "LOW",
@@ -41,15 +54,7 @@ func TestRiskLevel_String(t *testing.T) {
 		testInvalidRiskUnknown: "UNKNOWN",
 	}
 
-	for _, tc := range riskLevelTestCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result := tc.level.String()
-			expect := expected[tc.level]
-			if result != expect {
-				t.Errorf("String() = %v, want %v", result, expect)
-			}
-		})
-	}
+	testRiskLevelMethod(t, "String", func(level domain.RiskLevel) string { return level.String() }, expected)
 }
 
 func TestRiskLevel_Icon(t *testing.T) {
@@ -61,15 +66,7 @@ func TestRiskLevel_Icon(t *testing.T) {
 		testInvalidRiskUnknown: "⚪",
 	}
 
-	for _, tc := range riskLevelTestCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result := tc.level.Icon()
-			expect := expected[tc.level]
-			if result != expect {
-				t.Errorf("Icon() = %v, want %v", result, expect)
-			}
-		})
-	}
+	testRiskLevelMethod(t, "Icon", func(level domain.RiskLevel) string { return level.Icon() }, expected)
 }
 
 func TestRiskLevel_IsValid(t *testing.T) {
