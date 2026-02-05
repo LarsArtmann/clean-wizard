@@ -168,42 +168,44 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, p
 		}
 
 	case NodePackageManagerYarn:
-		// Yarn cache location is typically ~/.yarn/cache
-		homeDir, err := GetHomeDir()
-		if err != nil {
-			return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
-		}
-
-		cachePath := fmt.Sprintf("%s/.yarn/cache", homeDir)
-		items = append(items, domain.ScanItem{
-			Path:     cachePath,
-			Size:     0, // Size unknown without checking
-			Created:  time.Time{},
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if npmc.verbose {
-			fmt.Printf("Found yarn cache: %s\n", cachePath)
+		cacheResult := npmc.scanHomeDirCache(ctx, ".yarn/cache", "yarn")
+		if cacheResult.IsOk() {
+			items = append(items, cacheResult.Value()...)
+		} else {
+			return cacheResult
 		}
 
 	case NodePackageManagerBun:
-		// Bun cache location is typically ~/.bun/install/cache
-		homeDir, err := GetHomeDir()
-		if err != nil {
-			return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
+		cacheResult := npmc.scanHomeDirCache(ctx, ".bun/install/cache", "bun")
+		if cacheResult.IsOk() {
+			items = append(items, cacheResult.Value()...)
+		} else {
+			return cacheResult
 		}
+	}
 
-		cachePath := fmt.Sprintf("%s/.bun/install/cache", homeDir)
-		items = append(items, domain.ScanItem{
+	return result.Ok(items)
+}
+
+// scanHomeDirCache scans a cache directory located under the home directory.
+func (npmc *NodePackageManagerCleaner) scanHomeDirCache(ctx context.Context, cacheSuffix, pmName string) result.Result[[]domain.ScanItem] {
+	homeDir, err := GetHomeDir()
+	if err != nil {
+		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
+	}
+
+	cachePath := fmt.Sprintf("%s/%s", homeDir, cacheSuffix)
+	items := []domain.ScanItem{
+		{
 			Path:     cachePath,
 			Size:     0, // Size unknown without checking
 			Created:  time.Time{},
 			ScanType: domain.ScanTypeTemp,
-		})
+		},
+	}
 
-		if npmc.verbose {
-			fmt.Printf("Found bun cache: %s\n", cachePath)
-		}
+	if npmc.verbose {
+		fmt.Printf("Found %s cache: %s\n", pmName, cachePath)
 	}
 
 	return result.Ok(items)
