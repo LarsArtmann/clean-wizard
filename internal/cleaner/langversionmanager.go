@@ -3,7 +3,6 @@ package cleaner
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -78,32 +77,11 @@ func (lvmc *LanguageVersionManagerCleaner) Scan(ctx context.Context) result.Resu
 
 // scanVersionDir scans a versions directory and returns scan items.
 func (lvmc *LanguageVersionManagerCleaner) scanVersionDir(versionsDir, managerName string) ([]domain.ScanItem, error) {
-	items := make([]domain.ScanItem, 0)
-
-	info, err := os.Stat(versionsDir)
-	if err != nil || !info.IsDir() {
-		return items, nil
+	result := ScanVersionDirectory(context.Background(), versionsDir, managerName, lvmc.verbose)
+	if result.IsErr() {
+		return nil, result.Error()
 	}
-
-	matches, err := filepath.Glob(filepath.Join(versionsDir, "*"))
-	if err != nil {
-		return nil, fmt.Errorf("failed to find %s versions: %w", managerName, err)
-	}
-
-	for _, match := range matches {
-		items = append(items, domain.ScanItem{
-			Path:     match,
-			Size:     GetDirSize(match),
-			Created:  GetDirModTime(match),
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if lvmc.verbose {
-			fmt.Printf("Found %s version: %s\n", managerName, filepath.Base(match))
-		}
-	}
-
-	return items, nil
+	return result.Value(), nil
 }
 
 // scanLangVersionManager scans installations for a specific language version manager.

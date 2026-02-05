@@ -1,11 +1,15 @@
 package cleaner
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 // GetHomeDir returns user's home directory.
@@ -64,4 +68,68 @@ func GetDirModTime(path string) time.Time {
 	}
 
 	return modTime
+}
+
+// ScanDirectoryResult represents the result of scanning a directory.
+type ScanDirectoryResult struct {
+	Items []domain.ScanItem
+	Found bool
+}
+
+// ScanDirectory scans a directory and returns scan items if it exists and is a directory.
+// This helper consolidates the common pattern of checking if a path exists and is a directory,
+// then creating scan items for it.
+func ScanDirectory(path string, scanType domain.ScanType, verbose bool) ScanDirectoryResult {
+	result := ScanDirectoryResult{
+		Items: make([]domain.ScanItem, 0),
+		Found: false,
+	}
+
+	info, err := os.Stat(path)
+	if err == nil && info.IsDir() {
+		result.Found = true
+		result.Items = append(result.Items, domain.ScanItem{
+			Path:     path,
+			Size:     GetDirSize(path),
+			Created:  GetDirModTime(path),
+			ScanType: scanType,
+		})
+
+		if verbose {
+			fmt.Printf("Found: %s\n", filepath.Base(path))
+		}
+	}
+
+	return result
+}
+
+// ScanVersionDirectory scans a version directory for a language version manager.
+// It returns scan items for each version subdirectory found.
+func ScanVersionDirectory(ctx context.Context, versionsDir, managerName string, verbose bool) result.Result[[]domain.ScanItem] {
+	items := make([]domain.ScanItem, 0)
+
+	info, err := os.Stat(versionsDir)
+	if err != nil || !info.IsDir() {
+		return result.Ok(items)
+	}
+
+	matches, err := filepath.Glob(filepath.Join(versionsDir, "*"))
+	if err != nil {
+		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to find %s versions: %w", managerName, err))
+	}
+
+	for _, match := range matches {
+		items = append(items, domain.ScanItem{
+			Path:     match,
+			Size:     GetDirSize(match),
+			Created:  GetDirModTime(match),
+			ScanType: domain.ScanTypeTemp,
+		})
+
+		if verbose {
+			fmt.Printf("Found %s version: %s\n", managerName, filepath.Base(match))
+		}
+	}
+
+	return result.Ok(items)
 }

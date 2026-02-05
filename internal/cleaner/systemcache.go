@@ -273,22 +273,8 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 
 // scanCachePath scans a cache directory and returns scan items.
 func (scc *SystemCacheCleaner) scanCachePath(ctx context.Context, path string, scanType domain.ScanType) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
-
-	if info, err := os.Stat(path); err == nil && info.IsDir() {
-		items = append(items, domain.ScanItem{
-			Path:     path,
-			Size:     GetDirSize(path),
-			Created:  GetDirModTime(path),
-			ScanType: scanType,
-		})
-
-		if scc.verbose {
-			fmt.Printf("Found cache: %s\n", filepath.Base(path))
-		}
-	}
-
-	return result.Ok(items)
+	scanResult := ScanDirectory(path, scanType, scc.verbose)
+	return result.Ok(scanResult.Items)
 }
 
 // cleanSystemCache cleans cache for a specific system cache type.
