@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -72,9 +73,24 @@ func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error
 	}, nil
 }
 
-// Post performs HTTP POST request.
-func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Post(url)
+func (hc *HTTPClient) doRequest(ctx context.Context, url string, body any, method string) (*HTTPResponse, error) {
+	req := hc.client.R().SetContext(ctx)
+	if body != nil {
+		req.SetBody(body)
+	}
+
+	var resp *resty.Response
+	var err error
+
+	switch method {
+	case "POST":
+		resp, err = req.Post(url)
+	case "PUT":
+		resp, err = req.Put(url)
+	default:
+		return nil, fmt.Errorf("unsupported HTTP method: %s", method)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -86,18 +102,14 @@ func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResp
 	}, nil
 }
 
+// Post performs HTTP POST request.
+func (hc *HTTPClient) Post(ctx context.Context, url string, body any) (*HTTPResponse, error) {
+	return hc.doRequest(ctx, url, body, "POST")
+}
+
 // Put performs HTTP PUT request.
 func (hc *HTTPClient) Put(ctx context.Context, url string, body any) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetBody(body).SetContext(ctx).Put(url)
-	if err != nil {
-		return nil, err
-	}
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		Body:       string(resp.Body()),
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
+	return hc.doRequest(ctx, url, body, "PUT")
 }
 
 // Delete performs HTTP DELETE request.
