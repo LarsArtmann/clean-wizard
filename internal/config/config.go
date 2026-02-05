@@ -225,6 +225,16 @@ func newCleanupOperation(name, description string, riskLevel domain.RiskLevel, o
 	}
 }
 
+// newProfile creates a cleanup profile with the specified name, description, and operations.
+func newProfile(name, description string, operations []domain.CleanupOperation) *domain.Profile {
+	return &domain.Profile{
+		Name:        name,
+		Description: description,
+		Operations:  operations,
+		Enabled:     domain.ProfileStatusEnabled,
+	}
+}
+
 // GetDefaultConfig returns the default configuration.
 func GetDefaultConfig() *domain.Config {
 	now := GetCurrentTime()
@@ -239,34 +249,19 @@ func GetDefaultConfig() *domain.Config {
 			"/Library",
 		},
 		Profiles: map[string]*domain.Profile{
-			"daily": {
-				Name:        "daily",
-				Description: "Quick daily cleanup",
-				Operations: []domain.CleanupOperation{
-					newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLow, domain.OperationTypeNixGenerations),
-					newCleanupOperation("temp-files", "Clean temporary files", domain.RiskLow, domain.OperationTypeTempFiles),
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
-			"aggressive": {
-				Name:        "aggressive",
-				Description: "Deep aggressive cleanup",
-				Operations: []domain.CleanupOperation{
-					newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskHigh, domain.OperationTypeNixGenerations),
-					newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
-			"comprehensive": {
-				Name:        "comprehensive",
-				Description: "Complete system cleanup",
-				Operations: []domain.CleanupOperation{
-					newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskCritical, domain.OperationTypeNixGenerations),
-					newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
-					newCleanupOperation("system-temp", "Clean system temporary files", domain.RiskMedium, domain.OperationTypeSystemTemp),
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
+			"daily": newProfile("daily", "Quick daily cleanup", []domain.CleanupOperation{
+				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLow, domain.OperationTypeNixGenerations),
+				newCleanupOperation("temp-files", "Clean temporary files", domain.RiskLow, domain.OperationTypeTempFiles),
+			}),
+			"aggressive": newProfile("aggressive", "Deep aggressive cleanup", []domain.CleanupOperation{
+				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskHigh, domain.OperationTypeNixGenerations),
+				newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
+			}),
+			"comprehensive": newProfile("comprehensive", "Complete system cleanup", []domain.CleanupOperation{
+				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskCritical, domain.OperationTypeNixGenerations),
+				newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
+				newCleanupOperation("system-temp", "Clean system temporary files", domain.RiskMedium, domain.OperationTypeSystemTemp),
+			}),
 		},
 		LastClean: now,
 		Updated:   now,
