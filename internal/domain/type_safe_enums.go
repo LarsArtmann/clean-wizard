@@ -8,6 +8,28 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// UnmarshalJSONEnum is a generic helper for unmarshaling JSON string values to enum types.
+func UnmarshalJSONEnum[T any](
+	data []byte,
+	target *T,
+	valueMap map[string]T,
+	errorMsg string,
+) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	upperKey := strings.ToUpper(s)
+	for key, value := range valueMap {
+		if strings.ToUpper(key) == upperKey {
+			*target = value
+			return nil
+		}
+	}
+	return fmt.Errorf("%s: %s", errorMsg, s)
+}
+
 // TypeSafeEnum provides compile-time guaranteed enums with JSON serialization.
 type TypeSafeEnum[T any] interface {
 	String() string
@@ -66,24 +88,12 @@ func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToUpper(s) {
-	case "LOW":
-		*rl = RiskLevelLowType
-	case "MEDIUM":
-		*rl = RiskLevelMediumType
-	case "HIGH":
-		*rl = RiskLevelHighType
-	case "CRITICAL":
-		*rl = RiskLevelCriticalType
-	default:
-		return fmt.Errorf("invalid risk level: %s", s)
-	}
-	return nil
+	return UnmarshalJSONEnum(data, rl, map[string]RiskLevelType{
+		"LOW":      RiskLevelLowType,
+		"MEDIUM":    RiskLevelMediumType,
+		"HIGH":      RiskLevelHighType,
+		"CRITICAL":  RiskLevelCriticalType,
+	}, "invalid risk level")
 }
 
 // Icon returns emoji for risk level.
@@ -165,24 +175,12 @@ func (vl ValidationLevelType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToUpper(s) {
-	case "NONE":
-		*vl = ValidationLevelNoneType
-	case "BASIC":
-		*vl = ValidationLevelBasicType
-	case "COMPREHENSIVE":
-		*vl = ValidationLevelComprehensiveType
-	case "STRICT":
-		*vl = ValidationLevelStrictType
-	default:
-		return fmt.Errorf("invalid validation level: %s", s)
-	}
-	return nil
+	return UnmarshalJSONEnum(data, vl, map[string]ValidationLevelType{
+		"NONE":          ValidationLevelNoneType,
+		"BASIC":         ValidationLevelBasicType,
+		"COMPREHENSIVE": ValidationLevelComprehensiveType,
+		"STRICT":        ValidationLevelStrictType,
+	}, "invalid validation level")
 }
 
 // Convenience constants for backward compatibility are now in types.go
@@ -234,22 +232,11 @@ func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToUpper(s) {
-	case "ADDED":
-		*co = ChangeOperationAddedType
-	case "REMOVED":
-		*co = ChangeOperationRemovedType
-	case "MODIFIED":
-		*co = ChangeOperationModifiedType
-	default:
-		return fmt.Errorf("invalid change operation: %s", s)
-	}
-	return nil
+	return UnmarshalJSONEnum(data, co, map[string]ChangeOperationType{
+		"ADDED":     ChangeOperationAddedType,
+		"REMOVED":   ChangeOperationRemovedType,
+		"MODIFIED":  ChangeOperationModifiedType,
+	}, "invalid change operation")
 }
 
 // CleanStrategyType represents cleaning strategies with compile-time safety.
@@ -299,22 +286,12 @@ func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	switch strings.ToLower(s) {
-	case "aggressive":
-		*cs = StrategyAggressiveType
-	case "conservative":
-		*cs = StrategyConservativeType
-	case "dry-run", "dryrun":
-		*cs = StrategyDryRunType
-	default:
-		return fmt.Errorf("invalid clean strategy: %s", s)
-	}
-	return nil
+	return UnmarshalJSONEnum(data, cs, map[string]CleanStrategyType{
+		"aggressive": StrategyAggressiveType,
+		"conservative": StrategyConservativeType,
+		"dry-run": StrategyDryRunType,
+		"dryrun": StrategyDryRunType,
+	}, "invalid clean strategy")
 }
 
 // Icon returns emoji for clean strategy.
