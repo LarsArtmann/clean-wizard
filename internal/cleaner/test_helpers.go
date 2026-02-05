@@ -16,6 +16,37 @@ type ValidateSettingsTestCase struct {
 	WantErr  bool
 }
 
+// IsAvailableConstructor is a function type for creating cleaners in tests that need IsAvailable
+type IsAvailableConstructor func() interface {
+	IsAvailable(ctx context.Context) bool
+}
+
+// IsAvailableTestCase represents a test case for IsAvailable tests
+type IsAvailableTestCase struct {
+	Name        string
+	Constructor IsAvailableConstructor
+}
+
+// TestIsAvailableGeneric runs a standard IsAvailable test suite for cleaners that should
+// always return a boolean value (true or false).
+// This eliminates duplicate test code across multiple cleaner test files.
+//
+// Parameters:
+//   - t: The testing.T object
+//   - testCases: Slice of IsAvailableTestCase containing test cases to run
+func TestIsAvailableGeneric(t *testing.T, testCases []IsAvailableTestCase) {
+	for _, tt := range testCases {
+		t.Run(tt.Name, func(t *testing.T) {
+			cleaner := tt.Constructor()
+			available := cleaner.IsAvailable(context.Background())
+
+			if available != true && available != false {
+				t.Errorf("IsAvailable() returned invalid value")
+			}
+		})
+	}
+}
+
 // CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings
 type CleanerConstructorWithSettings func(verbose, dryRun bool) interface {
 	IsAvailable(ctx context.Context) bool
@@ -205,4 +236,24 @@ func TestCleanTiming(
 	}
 
 	NewCleanResultAnalyzer(t, cleanResult.Value(), elapsed).VerifyTiming()
+}
+
+// TestIsAvailableGeneric runs a standard IsAvailable test suite for cleaners that should
+// always return a boolean value (true or false).
+// This eliminates duplicate test code across multiple cleaner test files.
+//
+// Parameters:
+//   - t: The testing.T object
+//   - testCases: Slice of IsAvailableTestCase containing test cases to run
+func TestIsAvailableGeneric(t *testing.T, testCases []IsAvailableTestCase) {
+	for _, tt := range testCases {
+		t.Run(tt.Name, func(t *testing.T) {
+			cleaner := tt.Constructor()
+			available := cleaner.IsAvailable(context.Background())
+
+			if available != true && available != false {
+				t.Errorf("IsAvailable() returned invalid value")
+			}
+		})
+	}
 }

@@ -64,14 +64,18 @@ func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
-	cleaner := NewProjectsManagementAutomationCleaner(false, false)
-	available := cleaner.IsAvailable(context.Background())
-
-	// Result depends on projects-management-automation installation
-	// We just verify it doesn't crash and returns a boolean
-	if available != true && available != false {
-		t.Errorf("IsAvailable() returned invalid value")
+	testCases := []IsAvailableTestCase{
+		{
+			Name: "default configuration",
+			Constructor: func() interface {
+				IsAvailable(ctx context.Context) bool
+			} {
+				return NewProjectsManagementAutomationCleaner(false, false)
+			},
+		},
 	}
+
+	TestIsAvailableGeneric(t, testCases)
 }
 
 func TestProjectsManagementAutomationCleaner_ValidateSettings(t *testing.T) {
