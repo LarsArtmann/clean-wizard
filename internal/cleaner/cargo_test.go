@@ -224,15 +224,15 @@ func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_DryRunStrategy(t *testing.T) {
-	constructor := ToSimpleCleanerConstructor(func(verbose, dryRun bool) interface {
+	constructor := func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
 		ValidateSettings(*domain.OperationSettings) error
 	} {
 		return NewCargoCleaner(verbose, dryRun)
-	})
+	}
 
-	TestDryRunStrategy(t, constructor, "Cargo")
+	TestDryRunStrategyWithConstructor(t, constructor, "Cargo")
 }
 
 func TestCargoCleaner_Clean_Timing(t *testing.T) {
@@ -243,7 +243,7 @@ func TestCargoCleaner_Clean_Timing(t *testing.T) {
 		return NewCargoCleaner(verbose, dryRun)
 	}
 
-	TestCleanTiming(t, constructor, "Cargo")
+	TestCleanTimingWithConstructor(t, constructor, "Cargo")
 }
 
 func TestCargoCleaner_Scan(t *testing.T) {

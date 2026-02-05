@@ -207,15 +207,15 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_DryRunStrategy(t *testing.T) {
-	constructor := ToSimpleCleanerConstructor(func(verbose, dryRun bool) interface {
+	constructor := func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
 		ValidateSettings(*domain.OperationSettings) error
 	} {
 		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
-	})
+	}
 
-	TestDryRunStrategy(t, constructor, "projects-management-automation")
+	TestDryRunStrategyWithConstructor(t, constructor, "projects-management-automation")
 }
 
 
@@ -228,5 +228,5 @@ func TestProjectsManagementAutomationCleaner_Clean_Timing(t *testing.T) {
 		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
 	}
 
-	TestCleanTiming(t, constructor, "projects-management-automation")
+	TestCleanTimingWithConstructor(t, constructor, "projects-management-automation")
 }

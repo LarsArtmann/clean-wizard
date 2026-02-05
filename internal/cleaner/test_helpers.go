@@ -271,3 +271,27 @@ func TestBooleanSettingsCleanerCleanDryRun(t *testing.T, config BooleanSettingsC
 	simpleConstructor := ToSimpleCleanerConstructor(constructor)
 	TestCleanDryRun(t, simpleConstructor, config.ToolName, config.ExpectedItems)
 }
+
+// TestDryRunStrategyWithConstructor is a helper that creates a DryRunStrategy test
+// by wrapping the cleaner constructor with ToSimpleCleanerConstructor and calling TestDryRunStrategy.
+// This eliminates duplicate constructor code across multiple cleaner test files.
+//
+// Parameters:
+//   - t: The testing.T object
+//   - constructor: Constructor function that returns an interface with IsAvailable, Clean, and ValidateSettings methods
+//   - toolName: Name of the tool being tested (for logging/skips)
+func TestDryRunStrategyWithConstructor(t *testing.T, constructor CleanerConstructorWithSettings, toolName string) {
+	TestDryRunStrategy(t, ToSimpleCleanerConstructor(constructor), toolName)
+}
+
+// TestCleanTimingWithConstructor is a helper that creates a Clean_Timing test
+// by calling TestCleanTiming with the given constructor.
+// This eliminates duplicate constructor code across multiple cleaner test files.
+//
+// Parameters:
+//   - t: The testing.T object
+//   - constructor: Constructor function that returns an interface with IsAvailable and Clean methods
+//   - toolName: Name of the tool being tested (for logging/skips)
+func TestCleanTimingWithConstructor(t *testing.T, constructor SimpleCleanerConstructor, toolName string) {
+	TestCleanTiming(t, constructor, toolName)
+}
