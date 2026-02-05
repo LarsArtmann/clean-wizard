@@ -295,3 +295,27 @@ func TestDryRunStrategyWithConstructor(t *testing.T, constructor CleanerConstruc
 func TestCleanTimingWithConstructor(t *testing.T, constructor SimpleCleanerConstructor, toolName string) {
 	TestCleanTiming(t, constructor, toolName)
 }
+
+// TestStandardCleaner is a helper that runs DryRunStrategy and Clean_Timing tests
+// for cleaners that support the full CleanerConstructorWithSettings interface.
+// This eliminates duplicate constructor code across multiple cleaner test files.
+//
+// Usage:
+//   func Test<X>Cleaner_StandardTests(t *testing.T) {
+//       TestStandardCleaner(t, func(verbose, dryRun bool) interface {
+//           IsAvailable(ctx context.Context) bool
+//           Clean(ctx context.Context) result.Result[domain.CleanResult]
+//           ValidateSettings(*domain.OperationSettings) error
+//       } {
+//           return NewXCleaner(verbose, dryRun)
+//       }, "ToolName")
+//   }
+func TestStandardCleaner(t *testing.T, constructor CleanerConstructorWithSettings, toolName string) {
+	t.Run("DryRunStrategy", func(t *testing.T) {
+		TestDryRunStrategyWithConstructor(t, constructor, toolName)
+	})
+
+	t.Run("Clean_Timing", func(t *testing.T) {
+		TestCleanTimingWithConstructor(t, ToSimpleCleanerConstructor(constructor), toolName)
+	})
+}

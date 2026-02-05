@@ -206,7 +206,7 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 	_ = cleaner.IsAvailable(context.Background())
 }
 
-func TestProjectsManagementAutomationCleaner_DryRunStrategy(t *testing.T) {
+func TestProjectsManagementAutomationCleaner_StandardTests(t *testing.T) {
 	constructor := func(verbose, dryRun bool) interface {
 		IsAvailable(ctx context.Context) bool
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
@@ -215,18 +215,5 @@ func TestProjectsManagementAutomationCleaner_DryRunStrategy(t *testing.T) {
 		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
 	}
 
-	TestDryRunStrategyWithConstructor(t, constructor, "projects-management-automation")
-}
-
-
-
-func TestProjectsManagementAutomationCleaner_Clean_Timing(t *testing.T) {
-	constructor := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-	} {
-		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
-	}
-
-	TestCleanTimingWithConstructor(t, constructor, "projects-management-automation")
+	TestStandardCleaner(t, constructor, "projects-management-automation")
 }
