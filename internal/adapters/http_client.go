@@ -61,16 +61,7 @@ func (hc *HTTPClient) WithHeader(key, value string) *HTTPClient {
 
 // Get performs HTTP GET request.
 func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetContext(ctx).Get(url)
-	if err != nil {
-		return nil, err
-	}
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		Body:       string(resp.Body()),
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
+	return hc.doRequest(ctx, url, nil, "GET")
 }
 
 func (hc *HTTPClient) doRequest(ctx context.Context, url string, body any, method string) (*HTTPResponse, error) {
@@ -83,10 +74,14 @@ func (hc *HTTPClient) doRequest(ctx context.Context, url string, body any, metho
 	var err error
 
 	switch method {
+	case "GET":
+		resp, err = req.Get(url)
 	case "POST":
 		resp, err = req.Post(url)
 	case "PUT":
 		resp, err = req.Put(url)
+	case "DELETE":
+		resp, err = req.Delete(url)
 	default:
 		return nil, fmt.Errorf("unsupported HTTP method: %s", method)
 	}
@@ -114,16 +109,7 @@ func (hc *HTTPClient) Put(ctx context.Context, url string, body any) (*HTTPRespo
 
 // Delete performs HTTP DELETE request.
 func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, error) {
-	resp, err := hc.client.R().SetContext(ctx).Delete(url)
-	if err != nil {
-		return nil, err
-	}
-	return &HTTPResponse{
-		StatusCode: resp.StatusCode(),
-		Body:       string(resp.Body()),
-		Headers:    resp.Header(),
-		Request:    resp.Request,
-	}, nil
+	return hc.doRequest(ctx, url, nil, "DELETE")
 }
 
 // HTTPResponse wraps resty response.
