@@ -71,7 +71,7 @@ func (lvmc *LanguageVersionManagerCleaner) Scan(ctx context.Context) result.Resu
 	items := make([]domain.ScanItem, 0)
 
 	// Get home directory
-	homeDir, err := getHomeDir()
+	homeDir, err := GetHomeDir()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 	}
@@ -109,8 +109,8 @@ func (lvmc *LanguageVersionManagerCleaner) scanVersionDir(versionsDir, managerNa
 	for _, match := range matches {
 		items = append(items, domain.ScanItem{
 			Path:     match,
-			Size:     getDirSize(match),
-			Created:  getDirModTime(match),
+			Size:     GetDirSize(match),
+			Created:  GetDirModTime(match),
 			ScanType: domain.ScanTypeTemp,
 		})
 

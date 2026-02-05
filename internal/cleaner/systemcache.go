@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 	"time"
 
@@ -104,7 +103,7 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.
 	}
 
 	// Get home directory
-	homeDir, err := scc.getHomeDir()
+	homeDir, err := GetHomeDir()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 	}
@@ -142,8 +141,8 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType Sy
 			for _, match := range matches {
 				items = append(items, domain.ScanItem{
 					Path:     match,
-					Size:     scc.getDirSize(match),
-					Created:  scc.getDirModTime(match),
+					Size:     GetDirSize(match),
+					Created:  GetDirModTime(match),
 					ScanType: domain.ScanTypeTemp,
 				})
 
@@ -159,8 +158,8 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType Sy
 		if info, err := os.Stat(xcodeDerivedData); err == nil && info.IsDir() {
 			items = append(items, domain.ScanItem{
 				Path:     xcodeDerivedData,
-				Size:     scc.getDirSize(xcodeDerivedData),
-				Created:  scc.getDirModTime(xcodeDerivedData),
+				Size:     GetDirSize(xcodeDerivedData),
+				Created:  GetDirModTime(xcodeDerivedData),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -175,8 +174,8 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType Sy
 		if info, err := os.Stat(cocoaPodsCache); err == nil && info.IsDir() {
 			items = append(items, domain.ScanItem{
 				Path:     cocoaPodsCache,
-				Size:     scc.getDirSize(cocoaPodsCache),
-				Created:  scc.getDirModTime(cocoaPodsCache),
+				Size:     GetDirSize(cocoaPodsCache),
+				Created:  GetDirModTime(cocoaPodsCache),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -191,8 +190,8 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType Sy
 		if info, err := os.Stat(homebrewCache); err == nil && info.IsDir() {
 			items = append(items, domain.ScanItem{
 				Path:     homebrewCache,
-				Size:     scc.getDirSize(homebrewCache),
-				Created:  scc.getDirModTime(homebrewCache),
+				Size:     GetDirSize(homebrewCache),
+				Created:  GetDirModTime(homebrewCache),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -227,7 +226,7 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	bytesFreed := int64(0)
 
 	// Get home directory
-	homeDir, err := scc.getHomeDir()
+	homeDir, err := GetHomeDir()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("failed to get home directory: %w", err))
 	}
@@ -412,65 +411,4 @@ func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context, cacheType S
 func (scc *SystemCacheCleaner) isMacOS() bool {
 	// Simple check for macOS
 	return os.Getenv("GOOS") == "darwin" || os.Getenv("OSTYPE") == "darwin"
-}
-
-// getHomeDir returns user's home directory.
-func (scc *SystemCacheCleaner) getHomeDir() (string, error) {
-	// Try using os/user package
-	currentUser, err := user.Current()
-	if err == nil {
-		return currentUser.HomeDir, nil
-	}
-
-	// Fallback to HOME environment variable
-	if home := os.Getenv("HOME"); home != "" {
-		return home, nil
-	}
-
-	// Fallback to user profile directory
-	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
-		return userProfile, nil
-	}
-
-	return "", fmt.Errorf("unable to determine home directory")
-}
-
-// getDirSize returns total size of directory recursively.
-func (scc *SystemCacheCleaner) getDirSize(path string) int64 {
-	var size int64
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-	if err != nil {
-		return 0
-	}
-
-	return size
-}
-
-// getDirModTime returns most recent modification time in directory.
-func (scc *SystemCacheCleaner) getDirModTime(path string) time.Time {
-	var modTime time.Time
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if info.ModTime().After(modTime) {
-			modTime = info.ModTime()
-		}
-		return nil
-	})
-	if err != nil {
-		return time.Time{}
-	}
-
-	return modTime
 }

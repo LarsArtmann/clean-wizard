@@ -83,65 +83,99 @@ func TestCargoCleaner_ValidateSettings(t *testing.T) {
 		}
 	})
 
-	TestValidateSettings(t, NewCargoCleaner, testCases)
+	// Wrap NewCargoCleaner to match CleanerConstructor interface
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return NewCargoCleaner(verbose, dryRun)
+	}
+
+	TestValidateSettings(t, constructor, testCases)
 }
 
 func TestCargoCleaner_Clean_DryRun(t *testing.T) {
-	TestCleanDryRun(t, NewCargoCleaner, "Cargo", 1)
+	// Wrap NewCargoCleaner to match CleanerConstructor interface
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return NewCargoCleaner(verbose, dryRun)
+	}
+
+	TestCleanDryRun(t, constructor, "Cargo", 1)
 }
 
 func TestCargoCleaner_GetHomeDir(t *testing.T) {
-	cleaner := NewCargoCleaner(false, false)
-
 	// Set HOME explicitly
 	t.Setenv("HOME", "/test/home")
-	home := cleaner.getHomeDir()
+	home, err := GetHomeDir()
+	if err != nil {
+		t.Errorf("GetHomeDir() error = %v", err)
+	}
 	if home != "/test/home" {
-		t.Errorf("getHomeDir() = %v, want /test/home", home)
+		t.Errorf("GetHomeDir() = %v, want /test/home", home)
 	}
 
 	// Test fallback on Windows (USERPROFILE)
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "C:\\Users\\test")
-	home = cleaner.getHomeDir()
+	home, err = GetHomeDir()
+	if err != nil {
+		t.Errorf("GetHomeDir() error = %v", err)
+	}
 	if home != "C:\\Users\\test" {
-		t.Errorf("getHomeDir() = %v, want C:\\Users\\test", home)
+		t.Errorf("GetHomeDir() = %v, want C:\\Users\\test", home)
 	}
 
-	// Test fallback to empty string
+	// Test fallback to empty string when no home can be determined
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "")
-	home = cleaner.getHomeDir()
+	home, err = GetHomeDir()
+	if err == nil {
+		t.Errorf("GetHomeDir() error = %v, want error for missing home", err)
+	}
 	if home != "" {
-		t.Errorf("getHomeDir() = %v, want empty string", home)
+		t.Errorf("GetHomeDir() = %v, want empty string", home)
 	}
 }
 
 func TestCargoCleaner_GetDirSize(t *testing.T) {
-	cleaner := NewCargoCleaner(false, false)
+	// Test with non-existent path
+	size := GetDirSize("/non/existent/path/12345")
+	// Should return 0 for non-existent path
+	if size != 0 {
+		t.Errorf("GetDirSize() for non-existent path = %d, want 0", size)
+	}
 
-	// Cargo uses estimated size, not actual directory size
-	// Estimate should be 250MB
-	size := cleaner.getDirSize("/any/path")
-	expectedSize := int64(250 * 1024 * 1024) // 250MB
-
-	if size != expectedSize {
-		t.Errorf("getDirSize() = %d, want %d (250MB)", size, expectedSize)
+	// Test with temp directory
+	tmpDir := t.TempDir()
+	size = GetDirSize(tmpDir)
+	// Should return 0 for empty directory
+	if size != 0 {
+		t.Errorf("GetDirSize() for empty dir = %d, want 0", size)
 	}
 }
 
 func TestCargoCleaner_GetDirModTime(t *testing.T) {
-	cleaner := NewCargoCleaner(false, false)
+	// Test with non-existent path
+	modTime := GetDirModTime("/non/existent/path/12345")
+	if !modTime.IsZero() {
+		t.Errorf("GetDirModTime() for non-existent path = %v, want zero time", modTime)
+	}
 
-	// Cargo returns current time as estimate
-	modTime := cleaner.getDirModTime("/any/path")
+	// Test with temp directory
+	tmpDir := t.TempDir()
+	modTime = GetDirModTime(tmpDir)
 	if modTime.IsZero() {
-		t.Error("getDirModTime() returned zero time")
+		t.Error("GetDirModTime() for temp dir returned zero time")
 	}
 
 	// Should be close to now (within 1 second tolerance)
 	if modTime.After(time.Now().Add(time.Second)) {
-		t.Error("getDirModTime() returned time in the future")
+		t.Error("GetDirModTime() returned time in the future")
 	}
 }
 
@@ -167,7 +201,16 @@ func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_DryRunStrategy(t *testing.T) {
-	TestDryRunStrategy(t, NewCargoCleaner, "Cargo")
+	// Wrap NewCargoCleaner to match CleanerConstructor interface
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return NewCargoCleaner(verbose, dryRun)
+	}
+
+	TestDryRunStrategy(t, constructor, "Cargo")
 }
 
 func TestCargoCleaner_Scan(t *testing.T) {

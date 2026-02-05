@@ -37,7 +37,7 @@ func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructor, testC
 }
 
 // TestCleanDryRun runs a standard clean dry-run test suite
-func TestCleanDryRun(t *testing.T, newCleanerFunc CleanerConstructor, toolName string, expectedItemsRemoved int) {
+func TestCleanDryRun(t *testing.T, newCleanerFunc CleanerConstructor, toolName string, expectedItemsRemoved uint) {
 	cleaner := newCleanerFunc(false, true)
 
 	if !cleaner.IsAvailable(context.Background()) {

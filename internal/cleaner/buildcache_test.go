@@ -244,16 +244,16 @@ func TestBuildCacheCleaner_GetHomeDir(t *testing.T) {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
 	}
 
-	// Test getHomeDir doesn't crash
-	home, err := cleaner.getHomeDir()
+	// Test GetHomeDir doesn't crash
+	home, err := GetHomeDir()
 
 	// May return empty string if home cannot be determined
 	if home == "" && err == nil {
-		t.Error("getHomeDir() returned empty string and no error")
+		t.Error("GetHomeDir() returned empty string and no error")
 	}
 
 	if home != "" {
-		t.Logf("getHomeDir() = %s", home)
+		t.Logf("GetHomeDir() = %s", home)
 	}
 }
 
@@ -264,18 +264,18 @@ func TestBuildCacheCleaner_GetDirSize(t *testing.T) {
 	}
 
 	// Test with non-existent path
-	size := cleaner.getDirSize("/non/existent/path/12345")
+	size := GetDirSize("/non/existent/path/12345")
 	// Should return 0 for non-existent path
 	if size != 0 {
-		t.Errorf("getDirSize() for non-existent path = %d, want 0", size)
+		t.Errorf("GetDirSize() for non-existent path = %d, want 0", size)
 	}
 
 	// Test with temp directory
 	tmpDir := t.TempDir()
-	size = cleaner.getDirSize(tmpDir)
+	size = GetDirSize(tmpDir)
 	// Should be 0 for empty directory
 	if size != 0 {
-		t.Errorf("getDirSize() for empty dir = %d, want 0", size)
+		t.Errorf("GetDirSize() for empty dir = %d, want 0", size)
 	}
 }
 
@@ -286,16 +286,16 @@ func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
 	}
 
 	// Test with non-existent path
-	modTime := cleaner.getDirModTime("/non/existent/path/12345")
+	modTime := GetDirModTime("/non/existent/path/12345")
 	if !modTime.IsZero() {
-		t.Errorf("getDirModTime() for non-existent path = %v, want zero time", modTime)
+		t.Errorf("GetDirModTime() for non-existent path = %v, want zero time", modTime)
 	}
 
 	// Test with temp directory
 	tmpDir := t.TempDir()
-	modTime = cleaner.getDirModTime(tmpDir)
+	modTime = GetDirModTime(tmpDir)
 	if modTime.IsZero() {
-		t.Error("getDirModTime() for temp dir returned zero time")
+		t.Error("GetDirModTime() for temp dir returned zero time")
 	}
 }
 

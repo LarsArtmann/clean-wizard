@@ -14,6 +14,8 @@ import (
 
 // CargoCleaner handles Rust/Cargo cleanup.
 
+const cargoCommandTimeout = 5 * time.Minute
+
 // execWithTimeout executes a Cargo command with timeout.
 func (cc *CargoCleaner) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	timeoutCtx, cancel := context.WithTimeout(ctx, cargoCommandTimeout)
@@ -63,7 +65,7 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 	cargoHome := os.Getenv("CARGO_HOME")
 	if cargoHome == "" {
 		// Fallback to default ~/.cargo
-		if homeDir := cc.getHomeDir(); homeDir != "" {
+		if homeDir, err := GetHomeDir(); err == nil && homeDir != "" {
 			cargoHome = fmt.Sprintf("%s/.cargo", homeDir)
 		}
 	}
@@ -73,8 +75,8 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 		registryCache := fmt.Sprintf("%s/registry", cargoHome)
 		items = append(items, domain.ScanItem{
 			Path:     registryCache,
-			Size:     cc.getDirSize(registryCache),
-			Created:  cc.getDirModTime(registryCache),
+			Size:     GetDirSize(registryCache),
+			Created:  GetDirModTime(registryCache),
 			ScanType: domain.ScanTypeTemp,
 		})
 
@@ -86,8 +88,8 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 		sourceCache := fmt.Sprintf("%s/git", cargoHome)
 		items = append(items, domain.ScanItem{
 			Path:     sourceCache,
-			Size:     cc.getDirSize(sourceCache),
-			Created:  cc.getDirModTime(sourceCache),
+			Size:     GetDirSize(sourceCache),
+			Created:  GetDirModTime(sourceCache),
 			ScanType: domain.ScanTypeTemp,
 		})
 
@@ -215,34 +217,4 @@ func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[d
 func (cc *CargoCleaner) hasCargoCacheTool() bool {
 	_, err := exec.LookPath("cargo-cache")
 	return err == nil
-}
-
-// getHomeDir returns user's home directory.
-func (cc *CargoCleaner) getHomeDir() string {
-	// Try getting from HOME environment variable
-	if home := os.Getenv("HOME"); home != "" {
-		return home
-	}
-
-	// Fallback to user profile directory
-	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
-		return userProfile
-	}
-
-	return ""
-}
-
-// getDirSize returns total size of directory recursively.
-func (cc *CargoCleaner) getDirSize(path string) int64 {
-	// For Cargo, we'll estimate size instead of walking
-	// Cargo cache directories can be very large
-	estimate := int64(250 * 1024 * 1024) // Estimate 250MB per cache type
-	return estimate
-}
-
-// getDirModTime returns most recent modification time in directory.
-func (cc *CargoCleaner) getDirModTime(path string) time.Time {
-	// For simplicity, return current time
-	// In production, you'd want to walk the directory
-	return time.Now()
 }

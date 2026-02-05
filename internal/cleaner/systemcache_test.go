@@ -239,16 +239,16 @@ func TestSystemCacheCleaner_GetHomeDir(t *testing.T) {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
 	}
 
-	// Test getHomeDir doesn't crash
-	home, err := cleaner.getHomeDir()
+	// Test GetHomeDir doesn't crash
+	home, err := GetHomeDir()
 
 	// May return empty string if home cannot be determined
 	if home == "" && err == nil {
-		t.Error("getHomeDir() returned empty string and no error")
+		t.Error("GetHomeDir() returned empty string and no error")
 	}
 
 	if home != "" {
-		t.Logf("getHomeDir() = %s", home)
+		t.Logf("GetHomeDir() = %s", home)
 	}
 }
 
