@@ -52,8 +52,18 @@ func (gs *GoScanner) Scan(ctx context.Context, caches GoCacheType) result.Result
 
 // scanGoCache scans GOCACHE.
 func (gs *GoScanner) scanGoCache(ctx context.Context) []domain.ScanItem {
+	return gs.scanGoEnvCache(ctx, "GOCACHE", "Go cache")
+}
+
+// scanGoModCache scans GOMODCACHE.
+func (gs *GoScanner) scanGoModCache(ctx context.Context) []domain.ScanItem {
+	return gs.scanGoEnvCache(ctx, "GOMODCACHE", "Go module cache")
+}
+
+// scanGoEnvCache scans a Go environment variable cache path.
+func (gs *GoScanner) scanGoEnvCache(ctx context.Context, envVar, cacheName string) []domain.ScanItem {
 	items := make([]domain.ScanItem, 0)
-	cachePath, err := gs.helper.getGoEnv(ctx, "GOCACHE")
+	cachePath, err := gs.helper.getGoEnv(ctx, envVar)
 	if err == nil && cachePath != "" {
 		items = append(items, domain.ScanItem{
 			Path:     cachePath,
@@ -63,26 +73,7 @@ func (gs *GoScanner) scanGoCache(ctx context.Context) []domain.ScanItem {
 		})
 
 		if gs.verbose {
-			fmt.Printf("Found Go cache: %s\n", cachePath)
-		}
-	}
-	return items
-}
-
-// scanGoModCache scans GOMODCACHE.
-func (gs *GoScanner) scanGoModCache(ctx context.Context) []domain.ScanItem {
-	items := make([]domain.ScanItem, 0)
-	modCachePath, err := gs.helper.getGoEnv(ctx, "GOMODCACHE")
-	if err == nil && modCachePath != "" {
-		items = append(items, domain.ScanItem{
-			Path:     modCachePath,
-			Size:     gs.helper.getDirSize(modCachePath),
-			Created:  gs.helper.getDirModTime(modCachePath),
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if gs.verbose {
-			fmt.Printf("Found Go module cache: %s\n", modCachePath)
+			fmt.Printf("Found %s: %s\n", cacheName, cachePath)
 		}
 	}
 	return items
