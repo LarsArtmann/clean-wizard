@@ -75,31 +75,6 @@ func CreateTestConfigurations() map[string]*domain.Config {
 	}
 }
 
-// createTestConfig creates a test configuration with customizable fields.
-func createTestConfig(version string, maxDiskUsage int, profileName string, protected []string) *domain.Config {
-	return &domain.Config{
-		Version:      version,
-		SafeMode:     domain.SafeModeEnabled,
-		MaxDiskUsage: maxDiskUsage,
-		Protected:    protected,
-		Profiles: map[string]*domain.Profile{
-			"daily": {
-				Name:        profileName,
-				Description: "Daily cleanup",
-				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     domain.ProfileStatusEnabled,
-					},
-				},
-				Enabled: domain.ProfileStatusEnabled,
-			},
-		},
-	}
-}
-
 // CreateTestConfig creates a test configuration with optional overrides.
 // Default values:
 //   - Version: "1.0.0"
