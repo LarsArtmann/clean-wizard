@@ -98,23 +98,8 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 	case BuildToolGradle:
 		// Gradle cache location: ~/.gradle/caches/*
 		gradleCache := filepath.Join(homeDir, ".gradle", "caches")
-		matches, err := filepath.Glob(filepath.Join(gradleCache, "*"))
-		if err != nil {
-			return result.Err[[]domain.ScanItem](fmt.Errorf("failed to find Gradle caches: %w", err))
-		}
-
-		for _, match := range matches {
-			items = append(items, domain.ScanItem{
-				Path:     match,
-				Size:     GetDirSize(match),
-				Created:  GetDirModTime(match),
-				ScanType: domain.ScanTypeTemp,
-			})
-
-			if bcc.verbose {
-				fmt.Printf("Found Gradle cache: %s\n", match)
-			}
-		}
+		scanResult := ScanPath("", domain.ScanTypeTemp, "Gradle cache", bcc.verbose, "*", gradleCache)
+		items = append(items, scanResult.Items...)
 
 	case BuildToolMaven:
 		// Maven cache location: ~/.m2/repository
