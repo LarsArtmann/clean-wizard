@@ -45,26 +45,41 @@ func testRiskLevelMethod(t *testing.T, methodName string, method func(domain.Ris
 	}
 }
 
-func TestRiskLevel_String(t *testing.T) {
-	expected := map[domain.RiskLevel]string{
-		domain.RiskLow:         "LOW",
-		domain.RiskMedium:      "MEDIUM",
-		domain.RiskHigh:        "HIGH",
-		domain.RiskCritical:    "CRITICAL",
-		testInvalidRiskUnknown: "UNKNOWN",
+// riskLevelExpected holds key-value pairs for RiskLevel method testing.
+type riskLevelExpected struct {
+	level domain.RiskLevelType
+	value string
+}
+
+// createRiskLevelExpectedMap creates a map of expected values for RiskLevel method testing.
+func createRiskLevelExpectedMap(pairs ...riskLevelExpected) map[domain.RiskLevel]string {
+	m := make(map[domain.RiskLevel]string)
+	for _, p := range pairs {
+		m[domain.RiskLevel(p.level)] = p.value
 	}
+	return m
+}
+
+func TestRiskLevel_String(t *testing.T) {
+	expected := createRiskLevelExpectedMap(
+		riskLevelExpected{level: domain.RiskLow, value: "LOW"},
+		riskLevelExpected{level: domain.RiskMedium, value: "MEDIUM"},
+		riskLevelExpected{level: domain.RiskHigh, value: "HIGH"},
+		riskLevelExpected{level: domain.RiskCritical, value: "CRITICAL"},
+		riskLevelExpected{level: testInvalidRiskUnknown, value: "UNKNOWN"},
+	)
 
 	testRiskLevelMethod(t, "String", func(level domain.RiskLevel) string { return level.String() }, expected)
 }
 
 func TestRiskLevel_Icon(t *testing.T) {
-	expected := map[domain.RiskLevel]string{
-		domain.RiskLow:         "🟢",
-		domain.RiskMedium:      "🟡",
-		domain.RiskHigh:        "🟠",
-		domain.RiskCritical:    "🔴",
-		testInvalidRiskUnknown: "⚪",
-	}
+	expected := createRiskLevelExpectedMap(
+		riskLevelExpected{level: domain.RiskLow, value: "🟢"},
+		riskLevelExpected{level: domain.RiskMedium, value: "🟡"},
+		riskLevelExpected{level: domain.RiskHigh, value: "🟠"},
+		riskLevelExpected{level: domain.RiskCritical, value: "🔴"},
+		riskLevelExpected{level: testInvalidRiskUnknown, value: "⚪"},
+	)
 
 	testRiskLevelMethod(t, "Icon", func(level domain.RiskLevel) string { return level.Icon() }, expected)
 }
