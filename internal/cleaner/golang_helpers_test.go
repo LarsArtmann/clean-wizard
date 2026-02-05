@@ -33,13 +33,12 @@ func TestGolangHelpers_getHomeDir(t *testing.T) {
 }
 
 func TestGolangHelpers_getDirSize(t *testing.T) {
-	helper := &golangHelpers{}
 	testDir := t.TempDir()
 
 	// Should return 0 for empty directory
-	size := helper.getDirSize(testDir)
+	size := GetDirSize(testDir)
 	if size != 0 {
-		t.Errorf("getDirSize() on empty dir = %v, want 0", size)
+		t.Errorf("GetDirSize() on empty dir = %v, want 0", size)
 	}
 
 	// Create test files
@@ -51,15 +50,14 @@ func TestGolangHelpers_getDirSize(t *testing.T) {
 	os.Mkdir(subDir, 0755)
 	os.WriteFile(subDir+"/file3.txt", []byte("abcde"), 0644)
 
-	size = helper.getDirSize(testDir)
+	size = GetDirSize(testDir)
 	expectedSize := int64(5 + 5 + 5) // 5+5+5 = 15 bytes
 	if size != expectedSize {
-		t.Errorf("getDirSize() = %v, want %v", size, expectedSize)
+		t.Errorf("GetDirSize() = %v, want %v", size, expectedSize)
 	}
 }
 
 func TestGolangHelpers_getDirModTime(t *testing.T) {
-	helper := &golangHelpers{}
 	testDir := t.TempDir()
 
 	// Create a test file
@@ -67,8 +65,8 @@ func TestGolangHelpers_getDirModTime(t *testing.T) {
 	os.WriteFile(testFile, []byte("test"), 0644)
 
 	// Should return non-zero time
-	modTime := helper.getDirModTime(testDir)
+	modTime := GetDirModTime(testDir)
 	if modTime.IsZero() {
-		t.Error("getDirModTime() returned zero time")
+		t.Error("GetDirModTime() returned zero time")
 	}
 }

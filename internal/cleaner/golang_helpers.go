@@ -54,13 +54,3 @@ func (h *golangHelpers) getHomeDir() string {
 	}
 	return home
 }
-
-// getDirSize returns total size of directory recursively.
-func (h *golangHelpers) getDirSize(path string) int64 {
-	return GetDirSize(path)
-}
-
-// getDirModTime returns the most recent modification time in directory.
-func (h *golangHelpers) getDirModTime(path string) time.Time {
-	return GetDirModTime(path)
-}

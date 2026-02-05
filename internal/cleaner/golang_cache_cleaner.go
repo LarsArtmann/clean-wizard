@@ -101,7 +101,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 
 	var sizeEstimate uint64
 	if !gcc.dryRun {
-		sizeEstimate = uint64(gcc.helper.getDirSize(cachePath))
+		sizeEstimate = uint64(GetDirSize(cachePath))
 	}
 
 	return gcc.executeGoCleanCommand(ctx, cleanFlag, successMessage, sizeEstimate)
@@ -149,7 +149,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 	for _, match := range matches {
 		// Calculate size before removal
 		if !gcc.dryRun {
-			bytesFreed := gcc.helper.getDirSize(match)
+			bytesFreed := GetDirSize(match)
 			totalSizeEstimate = domain.SizeEstimate{Known: totalSizeEstimate.Known + uint64(bytesFreed)}
 		}
 

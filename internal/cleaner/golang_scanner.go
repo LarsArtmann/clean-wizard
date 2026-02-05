@@ -64,8 +64,8 @@ func (gs *GoScanner) scanGoModCache(ctx context.Context) []domain.ScanItem {
 func (gs *GoScanner) addScanItem(items []domain.ScanItem, path string, cacheName string) []domain.ScanItem {
 	items = append(items, domain.ScanItem{
 		Path:     path,
-		Size:     gs.helper.getDirSize(path),
-		Created:  gs.helper.getDirModTime(path),
+		Size:     GetDirSize(path),
+		Created:  GetDirModTime(path),
 		ScanType: domain.ScanTypeTemp,
 	})
 
