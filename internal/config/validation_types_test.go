@@ -115,5 +115,31 @@ func GetSanitizationTestCases() []TestSanitizationTestCase {
 			expectedChanges:  []string{"max_disk_usage"},
 			expectedWarnings: 1,
 		},
+		{
+			name: "duplicate paths",
+			config: &domain.Config{
+				Version:      "1.0.0",
+				SafeMode:     domain.SafeModeEnabled,
+				MaxDiskUsage: 50,
+				Protected:    []string{"/System", "/Library", "/System"},
+				Profiles: map[string]*domain.Profile{
+					"daily": {
+						Name:        "daily",
+						Description: "Daily cleanup",
+						Operations: []domain.CleanupOperation{
+							{
+								Name:        "nix-generations",
+								Description: "Clean Nix generations",
+								RiskLevel:   domain.RiskLow,
+								Enabled:     domain.ProfileStatusEnabled,
+							},
+						},
+						Enabled: domain.ProfileStatusEnabled,
+					},
+				},
+			},
+			expectedChanges:  []string{"profiles.daily.operations[0].settings"},
+			expectedWarnings: 0,
+		},
 	}
 }
