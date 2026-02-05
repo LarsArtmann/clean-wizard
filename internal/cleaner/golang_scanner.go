@@ -60,21 +60,27 @@ func (gs *GoScanner) scanGoModCache(ctx context.Context) []domain.ScanItem {
 	return gs.scanGoEnvCache(ctx, "GOMODCACHE", "Go module cache")
 }
 
+// addScanItem creates a scan item for a cache directory and appends it to items.
+func (gs *GoScanner) addScanItem(items []domain.ScanItem, path string, cacheName string) []domain.ScanItem {
+	items = append(items, domain.ScanItem{
+		Path:     path,
+		Size:     gs.helper.getDirSize(path),
+		Created:  gs.helper.getDirModTime(path),
+		ScanType: domain.ScanTypeTemp,
+	})
+
+	if gs.verbose {
+		fmt.Printf("Found %s: %s\n", cacheName, path)
+	}
+	return items
+}
+
 // scanGoEnvCache scans a Go environment variable cache path.
 func (gs *GoScanner) scanGoEnvCache(ctx context.Context, envVar, cacheName string) []domain.ScanItem {
 	items := make([]domain.ScanItem, 0)
 	cachePath, err := gs.helper.getGoEnv(ctx, envVar)
 	if err == nil && cachePath != "" {
-		items = append(items, domain.ScanItem{
-			Path:     cachePath,
-			Size:     gs.helper.getDirSize(cachePath),
-			Created:  gs.helper.getDirModTime(cachePath),
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if gs.verbose {
-			fmt.Printf("Found %s: %s\n", cacheName, cachePath)
-		}
+		items = gs.addScanItem(items, cachePath, cacheName)
 	}
 	return items
 }
@@ -91,16 +97,7 @@ func (gs *GoScanner) scanGoBuildCache() []domain.ScanItem {
 	matches, err := filepath.Glob(filepath.Join(tempDir, buildCachePattern))
 	if err == nil {
 		for _, match := range matches {
-			items = append(items, domain.ScanItem{
-				Path:     match,
-				Size:     gs.helper.getDirSize(match),
-				Created:  gs.helper.getDirModTime(match),
-				ScanType: domain.ScanTypeTemp,
-			})
-
-			if gs.verbose {
-				fmt.Printf("Found Go build cache: %s\n", match)
-			}
+			items = gs.addScanItem(items, match, "Go build cache")
 		}
 	}
 	return items
@@ -111,16 +108,7 @@ func (gs *GoScanner) scanLintCache() []domain.ScanItem {
 	items := make([]domain.ScanItem, 0)
 	cacheDir := gs.detectLintCacheDir()
 	if cacheDir != "" {
-		items = append(items, domain.ScanItem{
-			Path:     cacheDir,
-			Size:     gs.helper.getDirSize(cacheDir),
-			Created:  gs.helper.getDirModTime(cacheDir),
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if gs.verbose {
-			fmt.Printf("Found golangci-lint cache: %s\n", cacheDir)
-		}
+		items = gs.addScanItem(items, cacheDir, "golangci-lint cache")
 	}
 	return items
 }
