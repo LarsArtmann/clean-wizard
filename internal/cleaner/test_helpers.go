@@ -237,23 +237,3 @@ func TestCleanTiming(
 
 	NewCleanResultAnalyzer(t, cleanResult.Value(), elapsed).VerifyTiming()
 }
-
-// TestIsAvailableGeneric runs a standard IsAvailable test suite for cleaners that should
-// always return a boolean value (true or false).
-// This eliminates duplicate test code across multiple cleaner test files.
-//
-// Parameters:
-//   - t: The testing.T object
-//   - testCases: Slice of IsAvailableTestCase containing test cases to run
-func TestIsAvailableGeneric(t *testing.T, testCases []IsAvailableTestCase) {
-	for _, tt := range testCases {
-		t.Run(tt.Name, func(t *testing.T) {
-			cleaner := tt.Constructor()
-			available := cleaner.IsAvailable(context.Background())
-
-			if available != true && available != false {
-				t.Errorf("IsAvailable() returned invalid value")
-			}
-		})
-	}
-}
