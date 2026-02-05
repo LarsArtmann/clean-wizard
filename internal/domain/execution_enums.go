@@ -7,6 +7,38 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// unmarshalBinaryEnum is a generic helper for unmarshaling binary enums (0/1 values).
+// Takes mapping functions for string and integer decoding.
+func unmarshalBinaryEnum[T ~int](
+	value *yaml.Node,
+	result *T,
+	stringMap func(string) (T, bool),
+	intMap func(int) (T, bool),
+	name string,
+) error {
+	// Try as string first
+	var s string
+	if err := value.Decode(&s); err == nil {
+		if v, ok := stringMap(strings.ToUpper(s)); ok {
+			*result = v
+			return nil
+		}
+		return fmt.Errorf("invalid %s: %s", name, s)
+	}
+
+	// Try as integer
+	var i int
+	if err := value.Decode(&i); err == nil {
+		if v, ok := intMap(i); ok {
+			*result = v
+			return nil
+		}
+		return fmt.Errorf("invalid %s value: %d", name, i)
+	}
+
+	return fmt.Errorf("cannot parse %s: expected string or int", name)
+}
+
 // ExecutionMode represents execution behavior as a type-safe enum.
 type ExecutionMode int
 
@@ -241,35 +273,27 @@ func (ps ProfileStatus) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for ProfileStatus.
 // Accepts both string and integer representations.
 func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
-	// Try as string first
-	var s string
-	if err := value.Decode(&s); err == nil {
-		switch strings.ToUpper(s) {
+	stringMap := func(s string) (ProfileStatus, bool) {
+		switch s {
 		case "DISABLED", "0", "FALSE":
-			*ps = ProfileStatusDisabled
+			return ProfileStatusDisabled, true
 		case "ENABLED", "1", "TRUE":
-			*ps = ProfileStatusEnabled
+			return ProfileStatusEnabled, true
 		default:
-			return fmt.Errorf("invalid profile status: %s", s)
+			return 0, false
 		}
-		return nil
 	}
-
-	// Try as integer
-	var i int
-	if err := value.Decode(&i); err == nil {
+	intMap := func(i int) (ProfileStatus, bool) {
 		switch i {
 		case 0:
-			*ps = ProfileStatusDisabled
+			return ProfileStatusDisabled, true
 		case 1:
-			*ps = ProfileStatusEnabled
+			return ProfileStatusEnabled, true
 		default:
-			return fmt.Errorf("invalid profile status value: %d (must be 0 or 1)", i)
+			return 0, false
 		}
-		return nil
 	}
-
-	return fmt.Errorf("cannot parse profile status: expected string or int")
+	return unmarshalBinaryEnum(value, ps, stringMap, intMap, "profile status")
 }
 
 // OptimizationMode represents optimization preference as type-safe enum.
@@ -320,35 +344,27 @@ func (om OptimizationMode) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for OptimizationMode.
 // Accepts both string and integer representations.
 func (om *OptimizationMode) UnmarshalYAML(value *yaml.Node) error {
-	// Try as string first
-	var s string
-	if err := value.Decode(&s); err == nil {
-		switch strings.ToUpper(s) {
+	stringMap := func(s string) (OptimizationMode, bool) {
+		switch s {
 		case "DISABLED", "0", "FALSE":
-			*om = OptimizationModeDisabled
+			return OptimizationModeDisabled, true
 		case "ENABLED", "1", "TRUE":
-			*om = OptimizationModeEnabled
+			return OptimizationModeEnabled, true
 		default:
-			return fmt.Errorf("invalid optimization mode: %s", s)
+			return 0, false
 		}
-		return nil
 	}
-
-	// Try as integer
-	var i int
-	if err := value.Decode(&i); err == nil {
+	intMap := func(i int) (OptimizationMode, bool) {
 		switch i {
 		case 0:
-			*om = OptimizationModeDisabled
+			return OptimizationModeDisabled, true
 		case 1:
-			*om = OptimizationModeEnabled
+			return OptimizationModeEnabled, true
 		default:
-			return fmt.Errorf("invalid optimization mode value: %d (must be 0 or 1)", i)
+			return 0, false
 		}
-		return nil
 	}
-
-	return fmt.Errorf("cannot parse optimization mode: expected string or int")
+	return unmarshalBinaryEnum(value, om, stringMap, intMap, "optimization mode")
 }
 
 // HomebrewMode represents homebrew operation mode as type-safe enum.
