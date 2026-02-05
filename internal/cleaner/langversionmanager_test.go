@@ -244,43 +244,11 @@ func TestLanguageVersionManagerCleaner_DryRunStrategy(t *testing.T) {
 }
 
 func TestAvailableLangVersionManagers(t *testing.T) {
-	managers := AvailableLangVersionManagers()
-
-	if len(managers) != 3 {
-		t.Errorf("AvailableLangVersionManagers() returned %d managers, want 3", len(managers))
-	}
-
-	expectedManagers := []LangVersionManagerType{
-		LangVersionManagerNVM,
-		LangVersionManagerPYENV,
-		LangVersionManagerRBENV,
-	}
-
-	for i, manager := range managers {
-		if manager != expectedManagers[i] {
-			t.Errorf("AvailableLangVersionManagers()[%d] = %v, want %v", i, manager, expectedManagers[i])
-		}
-	}
+	testLangVersionManagerAvailable(t)
 }
 
 func TestLangVersionManagerType_String(t *testing.T) {
-	tests := []struct {
-		managerType LangVersionManagerType
-		want        string
-	}{
-		{LangVersionManagerNVM, "nvm"},
-		{LangVersionManagerPYENV, "pyenv"},
-		{LangVersionManagerRBENV, "rbenv"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.want, func(t *testing.T) {
-			got := string(tt.managerType)
-			if got != tt.want {
-				t.Errorf("string(%v) = %v, want %v", tt.managerType, got, tt.want)
-			}
-		})
-	}
+	testLangVersionManagerString(t)
 }
 
 func TestLanguageVersionManagerCleaner_Verbose(t *testing.T) {

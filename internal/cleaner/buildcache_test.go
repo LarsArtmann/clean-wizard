@@ -300,43 +300,11 @@ func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
 }
 
 func TestAvailableBuildTools(t *testing.T) {
-	tools := AvailableBuildTools()
-
-	if len(tools) != 3 {
-		t.Errorf("AvailableBuildTools() returned %d tools, want 3", len(tools))
-	}
-
-	expectedTools := []BuildToolType{
-		BuildToolGradle,
-		BuildToolMaven,
-		BuildToolSBT,
-	}
-
-	for i, tool := range tools {
-		if tool != expectedTools[i] {
-			t.Errorf("AvailableBuildTools()[%d] = %v, want %v", i, tool, expectedTools[i])
-		}
-	}
+	testBuildToolAvailable(t)
 }
 
 func TestBuildToolType_String(t *testing.T) {
-	tests := []struct {
-		tool BuildToolType
-		want string
-	}{
-		{BuildToolGradle, "gradle"},
-		{BuildToolMaven, "maven"},
-		{BuildToolSBT, "sbt"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.want, func(t *testing.T) {
-			got := string(tt.tool)
-			if got != tt.want {
-				t.Errorf("string(%v) = %v, want %v", tt.tool, got, tt.want)
-			}
-		})
-	}
+	testBuildToolString(t)
 }
 
 func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {
