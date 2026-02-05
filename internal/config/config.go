@@ -214,6 +214,17 @@ func GetCurrentTime() time.Time {
 	return time.Now()
 }
 
+// newCleanupOperation creates a cleanup operation with the specified parameters.
+func newCleanupOperation(name, description string, riskLevel domain.RiskLevel, opType domain.OperationType) domain.CleanupOperation {
+	return domain.CleanupOperation{
+		Name:        name,
+		Description: description,
+		RiskLevel:   riskLevel,
+		Enabled:     domain.ProfileStatusEnabled,
+		Settings:    domain.DefaultSettings(opType),
+	}
+}
+
 // GetDefaultConfig returns the default configuration.
 func GetDefaultConfig() *domain.Config {
 	now := GetCurrentTime()
@@ -232,20 +243,8 @@ func GetDefaultConfig() *domain.Config {
 				Name:        "daily",
 				Description: "Quick daily cleanup",
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "temp-files",
-						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskLow,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
-					},
+					newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLow, domain.OperationTypeNixGenerations),
+					newCleanupOperation("temp-files", "Clean temporary files", domain.RiskLow, domain.OperationTypeTempFiles),
 				},
 				Enabled: domain.ProfileStatusEnabled,
 			},
@@ -253,20 +252,8 @@ func GetDefaultConfig() *domain.Config {
 				Name:        "aggressive",
 				Description: "Deep aggressive cleanup",
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskHigh,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "homebrew-cleanup",
-						Description: "Clean old Homebrew packages",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
-					},
+					newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskHigh, domain.OperationTypeNixGenerations),
+					newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
 				},
 				Enabled: domain.ProfileStatusEnabled,
 			},
@@ -274,27 +261,9 @@ func GetDefaultConfig() *domain.Config {
 				Name:        "comprehensive",
 				Description: "Complete system cleanup",
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskCritical,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
-					},
-					{
-						Name:        "homebrew-cleanup",
-						Description: "Clean old Homebrew packages",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
-					},
-					{
-						Name:        "system-temp",
-						Description: "Clean system temporary files",
-						RiskLevel:   domain.RiskMedium,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings:    domain.DefaultSettings(domain.OperationTypeSystemTemp),
-					},
+					newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskCritical, domain.OperationTypeNixGenerations),
+					newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
+					newCleanupOperation("system-temp", "Clean system temporary files", domain.RiskMedium, domain.OperationTypeSystemTemp),
 				},
 				Enabled: domain.ProfileStatusEnabled,
 			},
