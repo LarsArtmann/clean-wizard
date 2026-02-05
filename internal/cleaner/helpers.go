@@ -128,3 +128,36 @@ func ValidateBuildCacheSettings(settings *domain.OperationSettings) error {
 	}
 	return ValidateToolTypes(settings.BuildCache.ToolTypes, availableTypes, "tool")
 }
+
+// ScanItemFunc is a function that scans for items of type T and returns scan results.
+type ScanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[[]domain.ScanItem]
+
+// scanWithIterator is a shared helper function that performs the common scan pattern.
+// It iterates over types, calls the scanFunc for each, and aggregates results.
+func scanWithIterator[T any](
+	ctx context.Context,
+	types []T,
+	scanFunc ScanItemFunc[T],
+	verbose bool,
+) result.Result[[]domain.ScanItem] {
+	items := make([]domain.ScanItem, 0)
+
+	homeDir, err := GetHomeDir()
+	if err != nil {
+		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
+	}
+
+	for _, item := range types {
+		result := scanFunc(ctx, item, homeDir)
+		if result.IsErr() {
+			if verbose {
+				fmt.Printf("Warning: failed to scan %v: %v\n", item, result.Error())
+			}
+			continue
+		}
+
+		items = append(items, result.Value()...)
+	}
+
+	return result.Ok(items)
+}

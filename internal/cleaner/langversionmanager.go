@@ -68,28 +68,12 @@ func (lvmc *LanguageVersionManagerCleaner) ValidateSettings(settings *domain.Ope
 
 // Scan scans for language version manager installations.
 func (lvmc *LanguageVersionManagerCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
-
-	// Get home directory
-	homeDir, err := GetHomeDir()
-	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
-	}
-
-	// Scan for each manager type
-	for _, managerType := range lvmc.managerTypes {
-		result := lvmc.scanLangVersionManager(ctx, managerType, homeDir)
-		if result.IsErr() {
-			if lvmc.verbose {
-				fmt.Printf("Warning: failed to scan %s: %v\n", managerType, result.Error())
-			}
-			continue
-		}
-
-		items = append(items, result.Value()...)
-	}
-
-	return result.Ok(items)
+	return scanWithIterator[LangVersionManagerType](
+		ctx,
+		lvmc.managerTypes,
+		lvmc.scanLangVersionManager,
+		lvmc.verbose,
+	)
 }
 
 // scanVersionDir scans a versions directory and returns scan items.

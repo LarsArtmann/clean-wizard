@@ -82,28 +82,12 @@ func (bcc *BuildCacheCleaner) ValidateSettings(settings *domain.OperationSetting
 
 // Scan scans for build tool caches.
 func (bcc *BuildCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
-
-	// Get home directory
-	homeDir, err := GetHomeDir()
-	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
-	}
-
-	// Scan for each build tool type
-	for _, toolType := range bcc.toolTypes {
-		result := bcc.scanBuildTool(ctx, toolType, homeDir)
-		if result.IsErr() {
-			if bcc.verbose {
-				fmt.Printf("Warning: failed to scan %s: %v\n", toolType, result.Error())
-			}
-			continue
-		}
-
-		items = append(items, result.Value()...)
-	}
-
-	return result.Ok(items)
+	return scanWithIterator[BuildToolType](
+		ctx,
+		bcc.toolTypes,
+		bcc.scanBuildTool,
+		bcc.verbose,
+	)
 }
 
 // scanBuildTool scans cache for a specific build tool.
