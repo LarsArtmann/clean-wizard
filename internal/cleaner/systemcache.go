@@ -124,42 +124,40 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.
 	return result.Ok(items)
 }
 
+// addScanItems appends scan items from a cache path to the items slice.
+func (scc *SystemCacheCleaner) addScanItems(ctx context.Context, homeDir string, scanType domain.ScanType, pathComponents ...string) result.Result[[]domain.ScanItem] {
+	path := filepath.Join(append([]string{homeDir}, pathComponents...)...)
+	return scc.scanCachePath(ctx, path, scanType)
+}
+
 // scanSystemCache scans cache for a specific system cache type.
 func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType SystemCacheType, homeDir string) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	switch cacheType {
 	case SystemCacheSpotlight:
-		// Spotlight metadata: ~/Library/Metadata/CoreSpotlight
-		path := filepath.Join(homeDir, "Library", "Metadata", "CoreSpotlight")
-		scanResult := scc.scanCachePath(ctx, path, domain.ScanTypeTemp)
+		scanResult := scc.addScanItems(ctx, homeDir, domain.ScanTypeTemp, "Library", "Metadata", "CoreSpotlight")
 		if scanResult.IsErr() {
 			return result.Err[[]domain.ScanItem](scanResult.Error())
 		}
 		items = append(items, scanResult.Value()...)
 
 	case SystemCacheXcode:
-		// Xcode Derived Data: ~/Library/Developer/Xcode/DerivedData
-		path := filepath.Join(homeDir, "Library", "Developer", "Xcode", "DerivedData")
-		scanResult := scc.scanCachePath(ctx, path, domain.ScanTypeTemp)
+		scanResult := scc.addScanItems(ctx, homeDir, domain.ScanTypeTemp, "Library", "Developer", "Xcode", "DerivedData")
 		if scanResult.IsErr() {
 			return result.Err[[]domain.ScanItem](scanResult.Error())
 		}
 		items = append(items, scanResult.Value()...)
 
 	case SystemCacheCocoaPods:
-		// CocoaPods cache: ~/Library/Caches/CocoaPods
-		path := filepath.Join(homeDir, "Library", "Caches", "CocoaPods")
-		scanResult := scc.scanCachePath(ctx, path, domain.ScanTypeTemp)
+		scanResult := scc.addScanItems(ctx, homeDir, domain.ScanTypeTemp, "Library", "Caches", "CocoaPods")
 		if scanResult.IsErr() {
 			return result.Err[[]domain.ScanItem](scanResult.Error())
 		}
 		items = append(items, scanResult.Value()...)
 
 	case SystemCacheHomebrew:
-		// Homebrew cache: ~/Library/Caches/Homebrew
-		path := filepath.Join(homeDir, "Library", "Caches", "Homebrew")
-		scanResult := scc.scanCachePath(ctx, path, domain.ScanTypeTemp)
+		scanResult := scc.addScanItems(ctx, homeDir, domain.ScanTypeTemp, "Library", "Caches", "Homebrew")
 		if scanResult.IsErr() {
 			return result.Err[[]domain.ScanItem](scanResult.Error())
 		}
