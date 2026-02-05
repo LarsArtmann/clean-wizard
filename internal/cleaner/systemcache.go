@@ -170,8 +170,7 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType Sy
 		return result.Err[[]domain.ScanItem](fmt.Errorf("unknown system cache type: %s", cacheType))
 	}
 
-	path := filepath.Join(append([]string{homeDir}, config.pathComponents...)...)
-	scanResult := scc.scanCachePath(ctx, path, config.scanType)
+	scanResult := scc.scanCachePathWithConfig(ctx, homeDir, config)
 	if scanResult.IsErr() {
 		return result.Err[[]domain.ScanItem](scanResult.Error())
 	}
@@ -274,6 +273,12 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 // scanCachePath scans a cache directory and returns scan items.
 func (scc *SystemCacheCleaner) scanCachePath(ctx context.Context, path string, scanType domain.ScanType) result.Result[[]domain.ScanItem] {
 	scanResult := ScanDirectory(path, scanType, scc.verbose)
+	return result.Ok(scanResult.Items)
+}
+
+// scanCachePathWithConfig scans a cache directory using configuration and returns scan items.
+func (scc *SystemCacheCleaner) scanCachePathWithConfig(ctx context.Context, homeDir string, config cacheTypeConfig) result.Result[[]domain.ScanItem] {
+	scanResult := ScanPath(homeDir, config.scanType, config.displayName, scc.verbose, "", config.pathComponents...)
 	return result.Ok(scanResult.Items)
 }
 

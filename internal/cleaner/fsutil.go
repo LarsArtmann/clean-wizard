@@ -133,3 +133,65 @@ func ScanVersionDirectory(ctx context.Context, versionsDir, managerName string, 
 
 	return result.Ok(items)
 }
+
+// ScanPath scans a directory path constructed from components and returns scan items.
+// This is a generic helper that consolidates the common pattern of:
+// 1. Constructing a path from components (homeDir + pathComponents)
+// 2. Checking if the path exists and is a directory
+// 3. Creating a scan item for the directory
+// If homeDir is empty and pathComponents contains a complete path, it uses that directly.
+// If pattern is provided, it walks the directory to find matching entries instead of scanning the directory itself.
+func ScanPath(homeDir string, scanType domain.ScanType, displayName string, verbose bool, pattern string, pathComponents ...string) ScanDirectoryResult {
+	result := ScanDirectoryResult{
+		Items: make([]domain.ScanItem, 0),
+		Found: false,
+	}
+
+	var fullPath string
+	if homeDir == "" {
+		fullPath = filepath.Join(pathComponents...)
+	} else {
+		fullPath = filepath.Join(append([]string{homeDir}, pathComponents...)...)
+	}
+
+	info, err := os.Stat(fullPath)
+	if err == nil && info.IsDir() {
+		result.Found = true
+
+		if pattern != "" {
+			// Walk the directory to find matching entries
+			walkPattern := filepath.Join(fullPath, pattern)
+			matches, err := filepath.Glob(walkPattern)
+			if err != nil {
+				return result
+			}
+
+			for _, match := range matches {
+				result.Items = append(result.Items, domain.ScanItem{
+					Path:     match,
+					Size:     GetDirSize(match),
+					Created:  GetDirModTime(match),
+					ScanType: scanType,
+				})
+
+				if verbose {
+					fmt.Printf("Found %s: %s\n", displayName, filepath.Base(match))
+				}
+			}
+		} else {
+			// Scan the directory itself
+			result.Items = append(result.Items, domain.ScanItem{
+				Path:     fullPath,
+				Size:     GetDirSize(fullPath),
+				Created:  GetDirModTime(fullPath),
+				ScanType: scanType,
+			})
+
+			if verbose {
+				fmt.Printf("Found %s: %s\n", displayName, filepath.Base(fullPath))
+			}
+		}
+	}
+
+	return result
+}
