@@ -77,11 +77,11 @@ func (lvmc *LanguageVersionManagerCleaner) Scan(ctx context.Context) result.Resu
 
 // scanVersionDir scans a versions directory and returns scan items.
 func (lvmc *LanguageVersionManagerCleaner) scanVersionDir(versionsDir, managerName string) ([]domain.ScanItem, error) {
-	scanResult := ScanPath("", domain.ScanTypeTemp, managerName, lvmc.verbose, "*", versionsDir)
-	if scanResult.Found {
-		return scanResult.Items, nil
+	scanResult := ScanVersionDirectory(context.Background(), versionsDir, managerName, lvmc.verbose)
+	if scanResult.IsErr() {
+		return nil, scanResult.Error()
 	}
-	return make([]domain.ScanItem, 0), nil
+	return scanResult.Value(), nil
 }
 
 // scanLangVersionManager scans installations for a specific language version manager.
