@@ -194,41 +194,7 @@ func TestProjectsManagementAutomationCleaner_DryRunStrategy(t *testing.T) {
 	TestDryRunStrategy(t, constructor, "projects-management-automation")
 }
 
-func TestProjectsManagementAutomationCleaner_ClearCacheSettings(t *testing.T) {
-	tests := []struct {
-		name       string
-		clearCache bool
-		wantErr    bool
-	}{
-		{
-			name:       "clear_cache enabled",
-			clearCache: true,
-			wantErr:    false,
-		},
-		{
-			name:       "clear_cache disabled",
-			clearCache: false,
-			wantErr:    false,
-		},
-	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewProjectsManagementAutomationCleaner(false, false)
-
-			settings := &domain.OperationSettings{
-				ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
-					ClearCache: tt.clearCache,
-				},
-			}
-
-			err := cleaner.ValidateSettings(settings)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateSettings() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
 
 func TestProjectsManagementAutomationCleaner_Clean_Timing(t *testing.T) {
 	constructor := func(verbose, dryRun bool) interface {

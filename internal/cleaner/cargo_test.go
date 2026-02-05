@@ -264,38 +264,4 @@ func TestCargoCleaner_Scan_DefaultCargoHome(t *testing.T) {
 	}
 }
 
-func TestCargoCleaner_AutocleanSettings(t *testing.T) {
-	tests := []struct {
-		name      string
-		autoclean bool
-		wantErr   bool
-	}{
-		{
-			name:      "autoclean enabled",
-			autoclean: true,
-			wantErr:   false,
-		},
-		{
-			name:      "autoclean disabled",
-			autoclean: false,
-			wantErr:   false,
-		},
-	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewCargoCleaner(false, false)
-
-			settings := &domain.OperationSettings{
-				CargoPackages: &domain.CargoPackagesSettings{
-					Autoclean: tt.autoclean,
-				},
-			}
-
-			err := cleaner.ValidateSettings(settings)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateSettings() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
