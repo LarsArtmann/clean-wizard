@@ -165,148 +165,128 @@ func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[domain.Cl
 	)
 }
 
+type CacheCleanerFunc func(ctx context.Context, toolType BuildToolType, homeDir string) result.Result[domain.CleanResult]
+
+// cleanCacheDir removes all items in a cache directory matching a pattern.
+func (bcc *BuildCacheCleaner) cleanCacheDir(
+	ctx context.Context,
+	cacheName string,
+	cacheDir string,
+	pattern string,
+) result.Result[domain.CleanResult] {
+	matches, err := filepath.Glob(filepath.Join(cacheDir, pattern))
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to find %s caches: %w", cacheName, err))
+	}
+
+	itemsRemoved := 0
+	bytesFreed := int64(0)
+	for _, match := range matches {
+		if !bcc.dryRun {
+			bytesFreed += GetDirSize(match)
+		}
+
+		if bcc.dryRun {
+			itemsRemoved++
+			continue
+		}
+
+		err := os.RemoveAll(match)
+		if err != nil {
+			if bcc.verbose {
+				fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
+			}
+			continue
+		}
+
+		itemsRemoved++
+		if bcc.verbose {
+			fmt.Printf("  ✓ Removed %s cache: %s\n", cacheName, filepath.Base(match))
+		}
+	}
+
+	if bcc.verbose && itemsRemoved > 0 {
+		fmt.Printf("  ✓ %s caches cleaned\n", cacheName)
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: uint(itemsRemoved),
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	})
+}
+
+// cleanPartialFiles removes partial files matching a pattern.
+func (bcc *BuildCacheCleaner) cleanPartialFiles(
+	ctx context.Context,
+	toolName string,
+	baseDir string,
+	pattern string,
+) result.Result[domain.CleanResult] {
+	matches, err := filepath.Glob(filepath.Join(baseDir, pattern))
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to find %s partial files: %w", toolName, err))
+	}
+
+	itemsRemoved := 0
+	bytesFreed := int64(0)
+	for _, match := range matches {
+		if !bcc.dryRun {
+			if info, err := os.Stat(match); err == nil {
+				bytesFreed += info.Size()
+			}
+		}
+
+		if bcc.dryRun {
+			itemsRemoved++
+			continue
+		}
+
+		err := os.Remove(match)
+		if err != nil {
+			if bcc.verbose {
+				fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
+			}
+			continue
+		}
+
+		itemsRemoved++
+		if bcc.verbose {
+			fmt.Printf("  ✓ Removed %s partial file: %s\n", toolName, filepath.Base(match))
+		}
+	}
+
+	if bcc.verbose && itemsRemoved > 0 {
+		fmt.Printf("  ✓ %s partial files cleaned\n", toolName)
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: uint(itemsRemoved),
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	})
+}
+
 // cleanBuildTool cleans cache for a specific build tool.
 func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType BuildToolType, homeDir string) result.Result[domain.CleanResult] {
 	switch toolType {
 	case BuildToolGradle:
 		gradleCache := filepath.Join(homeDir, ".gradle", "caches")
-		matches, err := filepath.Glob(filepath.Join(gradleCache, "*"))
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("failed to find Gradle caches: %w", err))
-		}
-
-		itemsRemoved := 0
-		bytesFreed := int64(0)
-		for _, match := range matches {
-			if !bcc.dryRun {
-				bytesFreed += GetDirSize(match)
-			}
-
-			if bcc.dryRun {
-				itemsRemoved++
-				continue
-			}
-
-			err := os.RemoveAll(match)
-			if err != nil {
-				if bcc.verbose {
-					fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
-				}
-				continue
-			}
-
-			itemsRemoved++
-			if bcc.verbose {
-				fmt.Printf("  ✓ Removed Gradle cache: %s\n", filepath.Base(match))
-			}
-		}
-
-		if bcc.verbose && itemsRemoved > 0 {
-			fmt.Println("  ✓ Gradle caches cleaned")
-		}
-
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   uint64(bytesFreed),
-			ItemsRemoved: uint(itemsRemoved),
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
-		})
+		return bcc.cleanCacheDir(ctx, "Gradle", gradleCache, "*")
 
 	case BuildToolMaven:
 		mavenRepository := filepath.Join(homeDir, ".m2", "repository")
-		matches, err := filepath.Glob(filepath.Join(mavenRepository, "**", "*.part"))
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("failed to find Maven partial files: %w", err))
-		}
-
-		itemsRemoved := 0
-		bytesFreed := int64(0)
-		for _, match := range matches {
-			if !bcc.dryRun {
-				if info, err := os.Stat(match); err == nil {
-					bytesFreed += info.Size()
-				}
-			}
-
-			if bcc.dryRun {
-				itemsRemoved++
-				continue
-			}
-
-			err := os.Remove(match)
-			if err != nil {
-				if bcc.verbose {
-					fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
-				}
-				continue
-			}
-
-			itemsRemoved++
-			if bcc.verbose {
-				fmt.Printf("  ✓ Removed Maven partial file: %s\n", filepath.Base(match))
-			}
-		}
-
-		if bcc.verbose && itemsRemoved > 0 {
-			fmt.Println("  ✓ Maven partial files cleaned")
-		}
-
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   uint64(bytesFreed),
-			ItemsRemoved: uint(itemsRemoved),
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
-		})
+		return bcc.cleanPartialFiles(ctx, "Maven", mavenRepository, "**/*.part")
 
 	case BuildToolSBT:
 		sbtCache := filepath.Join(homeDir, ".ivy2", "cache")
-		matches, err := filepath.Glob(filepath.Join(sbtCache, "*"))
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("failed to find SBT caches: %w", err))
-		}
-
-		itemsRemoved := 0
-		bytesFreed := int64(0)
-		for _, match := range matches {
-			if !bcc.dryRun {
-				bytesFreed += GetDirSize(match)
-			}
-
-			if bcc.dryRun {
-				itemsRemoved++
-				continue
-			}
-
-			err := os.RemoveAll(match)
-			if err != nil {
-				if bcc.verbose {
-					fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
-				}
-				continue
-			}
-
-			itemsRemoved++
-			if bcc.verbose {
-				fmt.Printf("  ✓ Removed SBT cache: %s\n", filepath.Base(match))
-			}
-		}
-
-		if bcc.verbose && itemsRemoved > 0 {
-			fmt.Println("  ✓ SBT caches cleaned")
-		}
-
-		return result.Ok(domain.CleanResult{
-			FreedBytes:   uint64(bytesFreed),
-			ItemsRemoved: uint(itemsRemoved),
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
-		})
+		return bcc.cleanCacheDir(ctx, "SBT", sbtCache, "*")
 	}
 
 	return result.Err[domain.CleanResult](fmt.Errorf("unknown build tool type: %s", toolType))
