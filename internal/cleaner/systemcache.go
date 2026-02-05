@@ -130,75 +130,40 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType Sy
 
 	switch cacheType {
 	case SystemCacheSpotlight:
-		// Spotlight metadata: ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents
-		spotlightPath := filepath.Join(homeDir, "Library", "Metadata", "CoreSpotlight")
-		if info, err := os.Stat(spotlightPath); err == nil && info.IsDir() {
-			matches, err := filepath.Glob(filepath.Join(spotlightPath, "*"))
-			if err != nil {
-				return result.Err[[]domain.ScanItem](fmt.Errorf("failed to find Spotlight metadata: %w", err))
-			}
-
-			for _, match := range matches {
-				items = append(items, domain.ScanItem{
-					Path:     match,
-					Size:     GetDirSize(match),
-					Created:  GetDirModTime(match),
-					ScanType: domain.ScanTypeTemp,
-				})
-
-				if scc.verbose {
-					fmt.Printf("Found Spotlight metadata: %s\n", filepath.Base(match))
-				}
-			}
+		// Spotlight metadata: ~/Library/Metadata/CoreSpotlight
+		path := filepath.Join(homeDir, "Library", "Metadata", "CoreSpotlight")
+		scanResult := scc.scanCachePath(ctx, path, domain.ScanTypeTemp)
+		if scanResult.IsErr() {
+			return result.Err[[]domain.ScanItem](scanResult.Error())
 		}
+		items = append(items, scanResult.Value()...)
 
 	case SystemCacheXcode:
 		// Xcode Derived Data: ~/Library/Developer/Xcode/DerivedData
-		xcodeDerivedData := filepath.Join(homeDir, "Library", "Developer", "Xcode", "DerivedData")
-		if info, err := os.Stat(xcodeDerivedData); err == nil && info.IsDir() {
-			items = append(items, domain.ScanItem{
-				Path:     xcodeDerivedData,
-				Size:     GetDirSize(xcodeDerivedData),
-				Created:  GetDirModTime(xcodeDerivedData),
-				ScanType: domain.ScanTypeTemp,
-			})
-
-			if scc.verbose {
-				fmt.Printf("Found Xcode DerivedData: %s\n", xcodeDerivedData)
-			}
+		path := filepath.Join(homeDir, "Library", "Developer", "Xcode", "DerivedData")
+		scanResult := scc.scanCachePath(ctx, path, domain.ScanTypeTemp)
+		if scanResult.IsErr() {
+			return result.Err[[]domain.ScanItem](scanResult.Error())
 		}
+		items = append(items, scanResult.Value()...)
 
 	case SystemCacheCocoaPods:
 		// CocoaPods cache: ~/Library/Caches/CocoaPods
-		cocoaPodsCache := filepath.Join(homeDir, "Library", "Caches", "CocoaPods")
-		if info, err := os.Stat(cocoaPodsCache); err == nil && info.IsDir() {
-			items = append(items, domain.ScanItem{
-				Path:     cocoaPodsCache,
-				Size:     GetDirSize(cocoaPodsCache),
-				Created:  GetDirModTime(cocoaPodsCache),
-				ScanType: domain.ScanTypeTemp,
-			})
-
-			if scc.verbose {
-				fmt.Printf("Found CocoaPods cache: %s\n", cocoaPodsCache)
-			}
+		path := filepath.Join(homeDir, "Library", "Caches", "CocoaPods")
+		scanResult := scc.scanCachePath(ctx, path, domain.ScanTypeTemp)
+		if scanResult.IsErr() {
+			return result.Err[[]domain.ScanItem](scanResult.Error())
 		}
+		items = append(items, scanResult.Value()...)
 
 	case SystemCacheHomebrew:
 		// Homebrew cache: ~/Library/Caches/Homebrew
-		homebrewCache := filepath.Join(homeDir, "Library", "Caches", "Homebrew")
-		if info, err := os.Stat(homebrewCache); err == nil && info.IsDir() {
-			items = append(items, domain.ScanItem{
-				Path:     homebrewCache,
-				Size:     GetDirSize(homebrewCache),
-				Created:  GetDirModTime(homebrewCache),
-				ScanType: domain.ScanTypeTemp,
-			})
-
-			if scc.verbose {
-				fmt.Printf("Found Homebrew cache: %s\n", homebrewCache)
-			}
+		path := filepath.Join(homeDir, "Library", "Caches", "Homebrew")
+		scanResult := scc.scanCachePath(ctx, path, domain.ScanTypeTemp)
+		if scanResult.IsErr() {
+			return result.Err[[]domain.ScanItem](scanResult.Error())
 		}
+		items = append(items, scanResult.Value()...)
 	}
 
 	return result.Ok(items)
@@ -293,6 +258,26 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 		CleanedAt:    time.Now(),
 		Strategy:     domain.StrategyConservative,
 	})
+}
+
+// scanCachePath scans a cache directory and returns scan items.
+func (scc *SystemCacheCleaner) scanCachePath(ctx context.Context, path string, scanType domain.ScanType) result.Result[[]domain.ScanItem] {
+	items := make([]domain.ScanItem, 0)
+
+	if info, err := os.Stat(path); err == nil && info.IsDir() {
+		items = append(items, domain.ScanItem{
+			Path:     path,
+			Size:     GetDirSize(path),
+			Created:  GetDirModTime(path),
+			ScanType: scanType,
+		})
+
+		if scc.verbose {
+			fmt.Printf("Found cache: %s\n", filepath.Base(path))
+		}
+	}
+
+	return result.Ok(items)
 }
 
 // cleanSystemCache cleans cache for a specific system cache type.
