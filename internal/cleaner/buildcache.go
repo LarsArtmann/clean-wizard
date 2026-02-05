@@ -119,34 +119,14 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 	case BuildToolMaven:
 		// Maven cache location: ~/.m2/repository
 		mavenCache := filepath.Join(homeDir, ".m2", "repository")
-		if info, err := os.Stat(mavenCache); err == nil && info.IsDir() {
-			items = append(items, domain.ScanItem{
-				Path:     mavenCache,
-				Size:     GetDirSize(mavenCache),
-				Created:  GetDirModTime(mavenCache),
-				ScanType: domain.ScanTypeTemp,
-			})
-
-			if bcc.verbose {
-				fmt.Printf("Found Maven repository: %s\n", mavenCache)
-			}
-		}
+		scanResult := ScanDirectory(mavenCache, domain.ScanTypeTemp, bcc.verbose)
+		items = append(items, scanResult.Items...)
 
 	case BuildToolSBT:
 		// SBT cache location: ~/.ivy2/cache
 		sbtCache := filepath.Join(homeDir, ".ivy2", "cache")
-		if info, err := os.Stat(sbtCache); err == nil && info.IsDir() {
-			items = append(items, domain.ScanItem{
-				Path:     sbtCache,
-				Size:     GetDirSize(sbtCache),
-				Created:  GetDirModTime(sbtCache),
-				ScanType: domain.ScanTypeTemp,
-			})
-
-			if bcc.verbose {
-				fmt.Printf("Found SBT cache: %s\n", sbtCache)
-			}
-		}
+		scanResult := ScanDirectory(sbtCache, domain.ScanTypeTemp, bcc.verbose)
+		items = append(items, scanResult.Items...)
 	}
 
 	return result.Ok(items)
