@@ -75,36 +75,13 @@ func TestCargoCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_ValidateSettings(t *testing.T) {
-	testCases := []ValidateSettingsTestCase{
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  false,
-		},
-		{
-			name:     "nil cargo packages settings",
-			settings: &domain.OperationSettings{},
-			wantErr:  false,
-		},
-		{
-			name: "valid settings with autoclean",
-			settings: &domain.OperationSettings{
-				CargoPackages: &domain.CargoPackagesSettings{
-					Autoclean: true,
-				},
+	testCases := CreateBooleanSettingsTestCases("cargo packages", func(enabled bool) *domain.OperationSettings {
+		return &domain.OperationSettings{
+			CargoPackages: &domain.CargoPackagesSettings{
+				Autoclean: enabled,
 			},
-			wantErr: false,
-		},
-		{
-			name: "valid settings without autoclean",
-			settings: &domain.OperationSettings{
-				CargoPackages: &domain.CargoPackagesSettings{
-					Autoclean: false,
-				},
-			},
-			wantErr: false,
-		},
-	}
+		}
+	})
 
 	TestValidateSettings(t, NewCargoCleaner, testCases)
 }

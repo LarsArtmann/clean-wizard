@@ -75,36 +75,13 @@ func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_ValidateSettings(t *testing.T) {
-	testCases := []ValidateSettingsTestCase{
-		{
-			name:     "nil settings",
-			settings: nil,
-			wantErr:  false,
-		},
-		{
-			name:     "nil projects management automation settings",
-			settings: &domain.OperationSettings{},
-			wantErr:  false,
-		},
-		{
-			name: "valid settings with clear_cache enabled",
-			settings: &domain.OperationSettings{
-				ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
-					ClearCache: true,
-				},
+	testCases := CreateBooleanSettingsTestCases("projects management automation", func(enabled bool) *domain.OperationSettings {
+		return &domain.OperationSettings{
+			ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
+				ClearCache: enabled,
 			},
-			wantErr: false,
-		},
-		{
-			name: "valid settings with clear_cache disabled",
-			settings: &domain.OperationSettings{
-				ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
-					ClearCache: false,
-				},
-			},
-			wantErr: false,
-		},
-	}
+		}
+	})
 
 	TestValidateSettings(t, NewProjectsManagementAutomationCleaner, testCases)
 }

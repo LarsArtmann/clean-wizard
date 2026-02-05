@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 // ValidateSettingsTestCase represents a test case for ValidateSettings
@@ -15,9 +16,9 @@ type ValidateSettingsTestCase struct {
 }
 
 // CleanerConstructor is a function type for creating cleaners in tests
-type CleanerConstructor func(verbose, dryRun bool) interface{
+type CleanerConstructor func(verbose, dryRun bool) interface {
 	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) *domain.Result
+	Clean(ctx context.Context) result.Result[domain.CleanResult]
 	ValidateSettings(*domain.OperationSettings) error
 }
 
@@ -86,5 +87,42 @@ func TestDryRunStrategy(t *testing.T, newCleanerFunc CleanerConstructor, toolNam
 
 	if cleanResult.ItemsFailed != 0 {
 		t.Errorf("Clean() failed %d items, want 0", cleanResult.ItemsFailed)
+	}
+}
+
+// CreateBooleanSettingsTestCases creates standard test cases for cleaners with a single boolean settings field.
+// This eliminates duplicate test case code across multiple cleaner test files.
+//
+// Parameters:
+//   - nilName: Name describing the settings field (e.g., "cargo packages" for Cargo)
+//   - settingsFunc: Function that creates an OperationSettings with the specific field configured
+//
+// Returns test cases for:
+//   - nil settings (valid)
+//   - empty OperationSettings (valid)
+//   - settings with field enabled (valid)
+//   - settings with field disabled (valid)
+func CreateBooleanSettingsTestCases(nilName string, settingsFunc func(bool) *domain.OperationSettings) []ValidateSettingsTestCase {
+	return []ValidateSettingsTestCase{
+		{
+			Name:     "nil settings",
+			Settings: nil,
+			WantErr:  false,
+		},
+		{
+			Name:     "nil " + nilName + " settings",
+			Settings: &domain.OperationSettings{},
+			WantErr:  false,
+		},
+		{
+			Name:     "valid settings with feature enabled",
+			Settings: settingsFunc(true),
+			WantErr:  false,
+		},
+		{
+			Name:     "valid settings with feature disabled",
+			Settings: settingsFunc(false),
+			WantErr:  false,
+		},
 	}
 }
