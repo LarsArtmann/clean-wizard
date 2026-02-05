@@ -239,15 +239,19 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 }
 
 func TestDockerPruneMode_String(t *testing.T) {
-	tests := []struct {
-		Item DockerPruneMode
-		Want string
-	}{
-		{DockerPruneLight, "light"},
-		{DockerPruneStandard, "standard"},
-		{DockerPruneAggressive, "aggressive"},
-	}
-	stringTypesTestHelper(t, tests, func(t DockerPruneMode) string { return string(t) }, "string")
+	TestTypeStringGeneric(t, "DockerPruneMode", func() []struct {
+		Value DockerPruneMode
+		Want  string
+	} {
+		return []struct {
+			Value DockerPruneMode
+			Want  string
+		}{
+			{DockerPruneLight, "light"},
+			{DockerPruneStandard, "standard"},
+			{DockerPruneAggressive, "aggressive"},
+		}
+	})
 }
 
 func TestDockerCleaner_Clean_Verbose(t *testing.T) {

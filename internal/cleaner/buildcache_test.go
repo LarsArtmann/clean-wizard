@@ -310,15 +310,19 @@ func TestAvailableBuildTools(t *testing.T) {
 }
 
 func TestBuildToolType_String(t *testing.T) {
-	tests := []struct {
-		Item BuildToolType
-		Want string
-	}{
-		{BuildToolGradle, "gradle"},
-		{BuildToolMaven, "maven"},
-		{BuildToolSBT, "sbt"},
-	}
-	stringTypesTestHelper(t, tests, func(t BuildToolType) string { return string(t) }, "string")
+	TestTypeStringGeneric(t, "BuildToolType", func() []struct {
+		Value BuildToolType
+		Want  string
+	} {
+		return []struct {
+			Value BuildToolType
+			Want  string
+		}{
+			{BuildToolGradle, "gradle"},
+			{BuildToolMaven, "maven"},
+			{BuildToolSBT, "sbt"},
+		}
+	})
 }
 
 func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {

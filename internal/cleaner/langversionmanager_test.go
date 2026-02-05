@@ -246,15 +246,19 @@ func TestAvailableLangVersionManagers(t *testing.T) {
 }
 
 func TestLangVersionManagerType_String(t *testing.T) {
-	tests := []struct {
-		Item LangVersionManagerType
-		Want string
-	}{
-		{LangVersionManagerNVM, "nvm"},
-		{LangVersionManagerPYENV, "pyenv"},
-		{LangVersionManagerRBENV, "rbenv"},
-	}
-	stringTypesTestHelper(t, tests, func(t LangVersionManagerType) string { return string(t) }, "string")
+	TestTypeStringGeneric(t, "LangVersionManagerType", func() []struct {
+		Value LangVersionManagerType
+		Want  string
+	} {
+		return []struct {
+			Value LangVersionManagerType
+			Want  string
+		}{
+			{LangVersionManagerNVM, "nvm"},
+			{LangVersionManagerPYENV, "pyenv"},
+			{LangVersionManagerRBENV, "rbenv"},
+		}
+	})
 }
 
 func TestLanguageVersionManagerCleaner_Verbose(t *testing.T) {
