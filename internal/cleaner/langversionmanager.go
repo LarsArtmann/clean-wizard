@@ -63,25 +63,7 @@ func (lvmc *LanguageVersionManagerCleaner) IsAvailable(ctx context.Context) bool
 
 // ValidateSettings validates language version manager cleaner settings.
 func (lvmc *LanguageVersionManagerCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.LangVersionManager == nil {
-		return nil // Settings are optional
-	}
-
-	// Validate manager types
-	validManagerTypes := map[LangVersionManagerType]bool{
-		LangVersionManagerNVM:   true,
-		LangVersionManagerPYENV: true,
-		LangVersionManagerRBENV: true,
-	}
-
-	for _, manager := range settings.LangVersionManager.ManagerTypes {
-		managerStr := LangVersionManagerType(manager)
-		if !validManagerTypes[managerStr] {
-			return fmt.Errorf("invalid manager type: %s (must be nvm, pyenv, or rbenv)", manager)
-		}
-	}
-
-	return nil
+	return ValidateLangVersionManagerSettings(settings)
 }
 
 // Scan scans for language version manager installations.

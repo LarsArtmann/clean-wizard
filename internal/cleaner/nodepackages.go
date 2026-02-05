@@ -3,7 +3,6 @@ package cleaner
 import (
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"slices"
 	"strings"
@@ -331,19 +330,4 @@ func (npmc *NodePackageManagerCleaner) cleanPackageManager(ctx context.Context, 
 	}
 
 	return result.Ok(cleanResult)
-}
-
-// getHomeDir returns the user's home directory.
-func getHomeDir() (string, error) {
-	// Try getting from HOME environment variable
-	if home := os.Getenv("HOME"); home != "" {
-		return home, nil
-	}
-
-	// Fallback to user profile directory
-	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
-		return userProfile, nil
-	}
-
-	return "", fmt.Errorf("unable to determine home directory")
 }

@@ -77,25 +77,7 @@ func (bcc *BuildCacheCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates build cache cleaner settings.
 func (bcc *BuildCacheCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.BuildCache == nil {
-		return nil // Settings are optional
-	}
-
-	// Validate tool types
-	validToolTypes := map[BuildToolType]bool{
-		BuildToolGradle: true,
-		BuildToolMaven:  true,
-		BuildToolSBT:    true,
-	}
-
-	for _, tool := range settings.BuildCache.ToolTypes {
-		toolStr := BuildToolType(tool)
-		if !validToolTypes[toolStr] {
-			return fmt.Errorf("invalid tool type: %s (must be gradle, maven, or sbt)", tool)
-		}
-	}
-
-	return nil
+	return ValidateBuildCacheSettings(settings)
 }
 
 // Scan scans for build tool caches.

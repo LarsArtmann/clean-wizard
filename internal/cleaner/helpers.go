@@ -135,3 +135,54 @@ func getDirModTime(path string) time.Time {
 
 	return modTime
 }
+
+// ValidateToolTypes validates configured tool types against a set of available types.
+// This eliminates duplicate validation code across different cleaner implementations.
+func ValidateToolTypes(
+	configuredTypes []string,
+	availableTypes []string,
+	typeName string,
+) error {
+	// Build map of valid types for O(1) lookup
+	validTypes := make(map[string]bool, len(availableTypes))
+	for _, t := range availableTypes {
+		validTypes[t] = true
+	}
+
+	// Validate each configured type
+	for _, t := range configuredTypes {
+		if !validTypes[t] {
+			return fmt.Errorf("invalid %s type: %s", typeName, t)
+		}
+	}
+
+	return nil
+}
+
+// ValidateLangVersionManagerSettings validates language version manager settings.
+func ValidateLangVersionManagerSettings(settings *domain.OperationSettings) error {
+	if settings == nil || settings.LangVersionManager == nil {
+		return nil
+	}
+
+	availableTypes := []string{
+		string(LangVersionManagerNVM),
+		string(LangVersionManagerPYENV),
+		string(LangVersionManagerRBENV),
+	}
+	return ValidateToolTypes(settings.LangVersionManager.ManagerTypes, availableTypes, "manager")
+}
+
+// ValidateBuildCacheSettings validates build cache settings.
+func ValidateBuildCacheSettings(settings *domain.OperationSettings) error {
+	if settings == nil || settings.BuildCache == nil {
+		return nil
+	}
+
+	availableTypes := []string{
+		string(BuildToolGradle),
+		string(BuildToolMaven),
+		string(BuildToolSBT),
+	}
+	return ValidateToolTypes(settings.BuildCache.ToolTypes, availableTypes, "tool")
+}
