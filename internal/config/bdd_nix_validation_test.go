@@ -131,6 +131,30 @@ func newInvalidValidationThen(errorSubstring string) []BDDThen {
 	}
 }
 
+// newValidValidationThen creates validation checks for valid configurations.
+func newValidValidationThen() []BDDThen {
+	return []BDDThen{
+		{
+			Description: "validation should succeed",
+			Validate: func(result *ValidationResult) error {
+				if !result.IsValid {
+					return fmt.Errorf("expected valid configuration, got errors: %v", result.Errors)
+				}
+				return nil
+			},
+		},
+		{
+			Description: "no validation errors should be present",
+			Validate: func(result *ValidationResult) error {
+				if len(result.Errors) > 0 {
+					return fmt.Errorf("expected no errors, got: %v", result.Errors)
+				}
+				return nil
+			},
+		},
+	}
+}
+
 // newSecurityErrorValidationThen creates validation checks for security errors.
 func newSecurityErrorValidationThen() []BDDThen {
 	return []BDDThen{
@@ -204,26 +228,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						},
 					},
 				},
-				Then: []BDDThen{
-					{
-						Description: "validation should succeed",
-						Validate: func(result *ValidationResult) error {
-							if !result.IsValid {
-								return fmt.Errorf("expected valid configuration, got errors: %v", result.Errors)
-							}
-							return nil
-						},
-					},
-					{
-						Description: "no validation errors should be present",
-						Validate: func(result *ValidationResult) error {
-							if len(result.Errors) > 0 {
-								return fmt.Errorf("expected no errors, got: %v", result.Errors)
-							}
-							return nil
-						},
-					},
-				},
+				Then: newValidValidationThen(),
 			},
 			{
 				Name:        "Invalid Nix generations below minimum",
