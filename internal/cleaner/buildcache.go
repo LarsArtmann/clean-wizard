@@ -167,6 +167,9 @@ func (bcc *BuildCacheCleaner) genericClean(
 
 		if bcc.dryRun {
 			itemsRemoved++
+			if bcc.verbose {
+				fmt.Printf("  ✓ Would remove %s: %s\n", verboseMsg, filepath.Base(match))
+			}
 			continue
 		}
 
