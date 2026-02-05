@@ -96,6 +96,67 @@ func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	return cfg
 }
 
+// newInvalidValidationThen creates validation checks for invalid configurations.
+func newInvalidValidationThen(errorSubstring string) []BDDThen {
+	return []BDDThen{
+		{
+			Description: "validation should fail",
+			Validate: func(result *ValidationResult) error {
+				if result.IsValid {
+					return errors.New("expected invalid configuration")
+				}
+				return nil
+			},
+		},
+		{
+			Description: "validation errors should be present",
+			Validate: func(result *ValidationResult) error {
+				if len(result.Errors) == 0 {
+					return errors.New("expected validation errors")
+				}
+				return nil
+			},
+		},
+		{
+			Description: "error should mention " + errorSubstring + " constraint",
+			Validate: func(result *ValidationResult) error {
+				for _, err := range result.Errors {
+					if strings.Contains(err.Message, errorSubstring) {
+						return nil
+					}
+				}
+				return fmt.Errorf("expected error mentioning %s constraint", errorSubstring)
+			},
+		},
+	}
+}
+
+// newSecurityErrorValidationThen creates validation checks for security errors.
+func newSecurityErrorValidationThen() []BDDThen {
+	return []BDDThen{
+		{
+			Description: "validation should fail with security error",
+			Validate: func(result *ValidationResult) error {
+				if result.IsValid {
+					return errors.New("expected invalid configuration")
+				}
+				return nil
+			},
+		},
+		{
+			Description: "security validation error should be present",
+			Validate: func(result *ValidationResult) error {
+				for _, err := range result.Errors {
+					if err.Rule == "security" && strings.Contains(err.Message, "Critical risk operation") {
+						return nil
+					}
+				}
+				return errors.New("expected security validation error for critical operation in unsafe mode")
+			},
+		},
+	}
+}
+
 // withEnabled sets the Enabled flag for nix-generations operation.
 func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
 	WithOperationSettings(cfg, "nix-cleanup", "nix-generations", func(settings *domain.OperationSettings) bool {
@@ -184,42 +245,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						},
 					},
 				},
-				Then: []BDDThen{
-					{
-						Description: "validation should fail",
-						Validate: func(result *ValidationResult) error {
-							if result.IsValid {
-								return errors.New("expected invalid configuration")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "validation errors should be present",
-						Validate: func(result *ValidationResult) error {
-							if len(result.Errors) == 0 {
-								return errors.New("expected validation errors")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "error should mention generations constraint",
-						Validate: func(result *ValidationResult) error {
-							found := false
-							for _, err := range result.Errors {
-								if strings.Contains(err.Message, "generations") {
-									found = true
-									break
-								}
-							}
-							if !found {
-								return errors.New("expected error mentioning generations constraint")
-							}
-							return nil
-						},
-					},
-				},
+				Then: newInvalidValidationThen("generations"),
 			},
 			{
 				Name:        "Invalid Nix generations above maximum",
@@ -241,42 +267,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						},
 					},
 				},
-				Then: []BDDThen{
-					{
-						Description: "validation should fail",
-						Validate: func(result *ValidationResult) error {
-							if result.IsValid {
-								return errors.New("expected invalid configuration")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "validation errors should be present",
-						Validate: func(result *ValidationResult) error {
-							if len(result.Errors) == 0 {
-								return errors.New("expected validation errors")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "error should mention generations constraint",
-						Validate: func(result *ValidationResult) error {
-							found := false
-							for _, err := range result.Errors {
-								if strings.Contains(err.Message, "generations") {
-									found = true
-									break
-								}
-							}
-							if !found {
-								return errors.New("expected error mentioning generations constraint")
-							}
-							return nil
-						},
-					},
-				},
+				Then: newInvalidValidationThen("generations"),
 			},
 			{
 				Name:        "Critical Nix operation in unsafe mode",
@@ -298,33 +289,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						},
 					},
 				},
-				Then: []BDDThen{
-					{
-						Description: "validation should fail with security error",
-						Validate: func(result *ValidationResult) error {
-							if result.IsValid {
-								return errors.New("expected invalid configuration")
-							}
-							return nil
-						},
-					},
-					{
-						Description: "security validation error should be present",
-						Validate: func(result *ValidationResult) error {
-							found := false
-							for _, err := range result.Errors {
-								if err.Rule == "security" && strings.Contains(err.Message, "Critical risk operation") {
-									found = true
-									break
-								}
-							}
-							if !found {
-								return errors.New("expected security validation error for critical operation in unsafe mode")
-							}
-							return nil
-						},
-					},
-				},
+				Then: newSecurityErrorValidationThen(),
 			},
 		},
 	}
