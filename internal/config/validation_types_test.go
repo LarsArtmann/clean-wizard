@@ -100,44 +100,99 @@ func createTestConfig(version string, maxDiskUsage int, profileName string, prot
 	}
 }
 
+// CreateTestConfig creates a test configuration with optional overrides.
+// Default values:
+//   - Version: "1.0.0"
+//   - MaxDiskUsage: 50
+//   - ProfileName: "daily"
+//   - Protected: []string{"/System", "/Library"}
+//
+// Example usage:
+//   // Default config
+//   CreateTestConfig()
+//   // Custom max disk usage
+//   CreateTestConfig(WithMaxDiskUsage(75))
+//   // Custom protected paths
+//   CreateTestConfig(WithProtectedPaths([]string{"/System"}))
+func CreateTestConfig(opts ...ConfigOption) *domain.Config {
+	cfg := &domain.Config{
+		Version:      "1.0.0",
+		SafeMode:     domain.SafeModeEnabled,
+		MaxDiskUsage: 50,
+		Protected:    []string{"/System", "/Library"},
+		Profiles: map[string]*domain.Profile{
+			"daily": {
+				Name:        "daily",
+				Description: "Daily cleanup",
+				Operations: []domain.CleanupOperation{
+					{
+						Name:        "nix-generations",
+						Description: "Clean Nix generations",
+						RiskLevel:   domain.RiskLow,
+						Enabled:     domain.ProfileStatusEnabled,
+					},
+				},
+				Enabled: domain.ProfileStatusEnabled,
+			},
+		},
+	}
+
+	for _, opt := range opts {
+		opt(cfg)
+	}
+
+	return cfg
+}
+
+// ConfigOption is a function that modifies a test configuration.
+type ConfigOption func(*domain.Config)
+
+// WithVersion sets the version of the configuration.
+func WithVersion(version string) ConfigOption {
+	return func(c *domain.Config) {
+		c.Version = version
+	}
+}
+
+// WithMaxDiskUsage sets the max disk usage percentage.
+func WithMaxDiskUsage(percent int) ConfigOption {
+	return func(c *domain.Config) {
+		c.MaxDiskUsage = percent
+	}
+}
+
+// WithProtectedPaths sets the protected paths.
+func WithProtectedPaths(paths []string) ConfigOption {
+	return func(c *domain.Config) {
+		c.Protected = paths
+	}
+}
+
+// WithProfileName sets the profile name.
+func WithProfileName(name string) ConfigOption {
+	return func(c *domain.Config) {
+		c.Profiles["daily"].Name = name
+	}
+}
+
 // GetSanitizationTestCases returns all sanitization test cases.
 func GetSanitizationTestCases() []TestSanitizationTestCase {
 	return []TestSanitizationTestCase{
 		{
 			name:             "whitespace cleanup",
-			config:           createTestConfig("  1.0.0  ", 50, "  daily  ", []string{"/System", "/Library"}),
+			config:           CreateTestConfig(WithVersion("  1.0.0  "), WithProfileName("  daily  ")),
 			expectedChanges:  []string{"version", "profiles.daily.name"},
 			expectedWarnings: 0,
 		},
 		{
 			name:             "max disk usage clamping",
-			config:           createTestConfig("1.0.0", 150, "daily", []string{"/System", "/Library"}),
+			config:           CreateTestConfig(WithMaxDiskUsage(150)),
 			expectedChanges:  []string{"max_disk_usage"},
 			expectedWarnings: 1,
 		},
 		{
-			name: "duplicate paths",
-			config: &domain.Config{
-				Version:      "1.0.0",
-				SafeMode:     domain.SafeModeEnabled,
-				MaxDiskUsage: 50,
-				Protected:    []string{"/System", "/Library", "/System"},
-				Profiles: map[string]*domain.Profile{
-					"daily": {
-						Name:        "daily",
-						Description: "Daily cleanup",
-						Operations: []domain.CleanupOperation{
-							{
-								Name:        "nix-generations",
-								Description: "Clean Nix generations",
-								RiskLevel:   domain.RiskLow,
-								Enabled:     domain.ProfileStatusEnabled,
-							},
-						},
-						Enabled: domain.ProfileStatusEnabled,
-					},
-				},
-			},
+			name:             "duplicate paths",
+			config:           CreateTestConfig(WithProtectedPaths([]string{"/System", "/Library", "/System"})),
 			expectedChanges:  []string{"profiles.daily.operations[0].settings"},
 			expectedWarnings: 0,
 		},
