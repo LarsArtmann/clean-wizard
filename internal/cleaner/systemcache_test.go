@@ -258,28 +258,14 @@ func TestSystemCacheCleaner_DryRunStrategy(t *testing.T) {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
 	}
 
-	// Skip test if not on macOS
-	if !cleaner.IsAvailable(context.Background()) {
-		t.Skipf("Skipping test: SystemCacheCleaner only available on macOS")
-		return
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	} {
+		return cleaner
 	}
 
-	result := cleaner.Clean(context.Background())
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
-	}
-
-	cleanResult := result.Value()
-
-	// Verify dry-run strategy is set
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
-	}
-
-	// Verify no failures occurred
-	if cleanResult.ItemsFailed != 0 {
-		t.Errorf("Clean() failed %d items, want 0", cleanResult.ItemsFailed)
-	}
+	TestDryRunStrategy(t, constructor, "system-cache")
 }
 
 func TestAvailableSystemCacheTypes(t *testing.T) {

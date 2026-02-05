@@ -225,22 +225,14 @@ func TestLanguageVersionManagerCleaner_GetHomeDir(t *testing.T) {
 func TestLanguageVersionManagerCleaner_DryRunStrategy(t *testing.T) {
 	cleaner := NewLanguageVersionManagerCleaner(false, true, AvailableLangVersionManagers())
 
-	result := cleaner.Clean(context.Background())
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	} {
+		return cleaner
 	}
 
-	cleanResult := result.Value()
-
-	// Verify dry-run strategy is set
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
-	}
-
-	// Verify no failures occurred
-	if cleanResult.ItemsFailed != 0 {
-		t.Errorf("Clean() failed %d items, want 0", cleanResult.ItemsFailed)
-	}
+	TestDryRunStrategy(t, constructor, "language-version-manager")
 }
 
 func TestAvailableLangVersionManagers(t *testing.T) {

@@ -274,22 +274,14 @@ func TestGoCleaner_Clean_NoAvailable(t *testing.T) {
 func TestGoCleaner_DryRunStrategy(t *testing.T) {
 	cleaner := NewGoCleanerWithSettings(false, true, cacheTypeFromBools(true, true, true, true, true))
 
-	result := cleaner.Clean(context.Background())
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
+	constructor := func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	} {
+		return cleaner
 	}
 
-	cleanResult := result.Value()
-
-	// Verify dry-run strategy is set
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
-	}
-
-	// Verify no files were actually removed (dry-run)
-	if cleanResult.ItemsRemoved == 0 {
-		t.Error("Dry-run should report items that would be removed")
-	}
+	TestDryRunStrategy(t, constructor, "go")
 }
 
 func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {
