@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -109,6 +110,36 @@ func (lvmc *LanguageVersionManagerCleaner) Scan(ctx context.Context) result.Resu
 	return result.Ok(items)
 }
 
+// scanVersionDir scans a versions directory and returns scan items.
+func (lvmc *LanguageVersionManagerCleaner) scanVersionDir(versionsDir, managerName string) ([]domain.ScanItem, error) {
+	items := make([]domain.ScanItem, 0)
+
+	info, err := os.Stat(versionsDir)
+	if err != nil || !info.IsDir() {
+		return items, nil
+	}
+
+	matches, err := filepath.Glob(filepath.Join(versionsDir, "*"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to find %s versions: %w", managerName, err)
+	}
+
+	for _, match := range matches {
+		items = append(items, domain.ScanItem{
+			Path:     match,
+			Size:     getDirSize(match),
+			Created:  getDirModTime(match),
+			ScanType: domain.ScanTypeTemp,
+		})
+
+		if lvmc.verbose {
+			fmt.Printf("Found %s version: %s\n", managerName, filepath.Base(match))
+		}
+	}
+
+	return items, nil
+}
+
 // scanLangVersionManager scans installations for a specific language version manager.
 func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Context, managerType LangVersionManagerType, homeDir string) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
@@ -116,69 +147,27 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 	switch managerType {
 	case LangVersionManagerNVM:
 		nvmVersions := filepath.Join(homeDir, ".nvm", "versions", "node")
-		if info, err := os.Stat(nvmVersions); err == nil && info.IsDir() {
-			matches, err := filepath.Glob(filepath.Join(nvmVersions, "*"))
-			if err != nil {
-				return result.Err[[]domain.ScanItem](fmt.Errorf("failed to find NVM versions: %w", err))
-			}
-
-			for _, match := range matches {
-				items = append(items, domain.ScanItem{
-					Path:     match,
-					Size:     getDirSize(match),
-					Created:  getDirModTime(match),
-					ScanType: domain.ScanTypeTemp,
-				})
-
-				if lvmc.verbose {
-					fmt.Printf("Found NVM version: %s\n", filepath.Base(match))
-				}
-			}
+		scannedItems, err := lvmc.scanVersionDir(nvmVersions, "NVM")
+		if err != nil {
+			return result.Err[[]domain.ScanItem](err)
 		}
+		items = append(items, scannedItems...)
 
 	case LangVersionManagerPYENV:
 		pyenvVersions := filepath.Join(homeDir, ".pyenv", "versions")
-		if info, err := os.Stat(pyenvVersions); err == nil && info.IsDir() {
-			matches, err := filepath.Glob(filepath.Join(pyenvVersions, "*"))
-			if err != nil {
-				return result.Err[[]domain.ScanItem](fmt.Errorf("failed to find Pyenv versions: %w", err))
-			}
-
-			for _, match := range matches {
-				items = append(items, domain.ScanItem{
-					Path:     match,
-					Size:     getDirSize(match),
-					Created:  getDirModTime(match),
-					ScanType: domain.ScanTypeTemp,
-				})
-
-				if lvmc.verbose {
-					fmt.Printf("Found Pyenv version: %s\n", filepath.Base(match))
-				}
-			}
+		scannedItems, err := lvmc.scanVersionDir(pyenvVersions, "Pyenv")
+		if err != nil {
+			return result.Err[[]domain.ScanItem](err)
 		}
+		items = append(items, scannedItems...)
 
 	case LangVersionManagerRBENV:
 		rbenvVersions := filepath.Join(homeDir, ".rbenv", "versions")
-		if info, err := os.Stat(rbenvVersions); err == nil && info.IsDir() {
-			matches, err := filepath.Glob(filepath.Join(rbenvVersions, "*"))
-			if err != nil {
-				return result.Err[[]domain.ScanItem](fmt.Errorf("failed to find Rbenv versions: %w", err))
-			}
-
-			for _, match := range matches {
-				items = append(items, domain.ScanItem{
-					Path:     match,
-					Size:     getDirSize(match),
-					Created:  getDirModTime(match),
-					ScanType: domain.ScanTypeTemp,
-				})
-
-				if lvmc.verbose {
-					fmt.Printf("Found Rbenv version: %s\n", filepath.Base(match))
-				}
-			}
+		scannedItems, err := lvmc.scanVersionDir(rbenvVersions, "Rbenv")
+		if err != nil {
+			return result.Err[[]domain.ScanItem](err)
 		}
+		items = append(items, scannedItems...)
 	}
 
 	return result.Ok(items)
