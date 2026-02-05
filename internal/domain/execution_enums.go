@@ -125,39 +125,11 @@ func (em ExecutionMode) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for ExecutionMode.
 // Accepts both string and integer representations.
 func (em *ExecutionMode) UnmarshalYAML(value *yaml.Node) error {
-	// Try as string first
-	var s string
-	if err := value.Decode(&s); err == nil {
-		switch strings.ToUpper(s) {
-		case "DRY_RUN":
-			*em = ExecutionModeDryRun
-		case "NORMAL":
-			*em = ExecutionModeNormal
-		case "FORCE":
-			*em = ExecutionModeForce
-		default:
-			return fmt.Errorf("invalid execution mode: %s", s)
-		}
-		return nil
-	}
-
-	// Try as integer
-	var i int
-	if err := value.Decode(&i); err == nil {
-		switch i {
-		case 0:
-			*em = ExecutionModeDryRun
-		case 1:
-			*em = ExecutionModeNormal
-		case 2:
-			*em = ExecutionModeForce
-		default:
-			return fmt.Errorf("invalid execution mode value: %d (must be 0, 1, or 2)", i)
-		}
-		return nil
-	}
-
-	return fmt.Errorf("cannot parse execution mode: expected string or int")
+	return UnmarshalYAMLEnum(value, em, map[string]ExecutionMode{
+		"DRY_RUN": ExecutionModeDryRun,
+		"NORMAL":  ExecutionModeNormal,
+		"FORCE":   ExecutionModeForce,
+	}, "invalid execution mode")
 }
 
 // SafeMode represents safety level as a type-safe enum.
@@ -218,39 +190,11 @@ func (sm SafeMode) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for SafeMode.
 // Accepts both string and integer representations.
 func (sm *SafeMode) UnmarshalYAML(value *yaml.Node) error {
-	// Try as string first
-	var s string
-	if err := value.Decode(&s); err == nil {
-		switch strings.ToUpper(s) {
-		case "DISABLED", "0", "FALSE":
-			*sm = SafeModeDisabled
-		case "ENABLED", "1", "TRUE":
-			*sm = SafeModeEnabled
-		case "STRICT", "2":
-			*sm = SafeModeStrict
-		default:
-			return fmt.Errorf("invalid safe mode: %s", s)
-		}
-		return nil
-	}
-
-	// Try as integer
-	var i int
-	if err := value.Decode(&i); err == nil {
-		switch i {
-		case 0:
-			*sm = SafeModeDisabled
-		case 1:
-			*sm = SafeModeEnabled
-		case 2:
-			*sm = SafeModeStrict
-		default:
-			return fmt.Errorf("invalid safe mode value: %d (must be 0, 1, or 2)", i)
-		}
-		return nil
-	}
-
-	return fmt.Errorf("cannot parse safe mode: expected string or int")
+	return UnmarshalYAMLEnum(value, sm, map[string]SafeMode{
+		"DISABLED": SafeModeDisabled,
+		"ENABLED":  SafeModeEnabled,
+		"STRICT":   SafeModeStrict,
+	}, "invalid safe mode")
 }
 
 // ProfileStatus represents profile enabled state as type-safe enum.
@@ -413,35 +357,10 @@ func (hm HomebrewMode) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for HomebrewMode.
 // Accepts both string and integer representations.
 func (hm *HomebrewMode) UnmarshalYAML(value *yaml.Node) error {
-	// Try as string first
-	var s string
-	if err := value.Decode(&s); err == nil {
-		switch strings.ToUpper(s) {
-		case "ALL":
-			*hm = HomebrewModeAll
-		case "UNUSED_ONLY":
-			*hm = HomebrewModeUnusedOnly
-		default:
-			return fmt.Errorf("invalid homebrew mode: %s", s)
-		}
-		return nil
-	}
-
-	// Try as integer
-	var i int
-	if err := value.Decode(&i); err == nil {
-		switch i {
-		case 0:
-			*hm = HomebrewModeAll
-		case 1:
-			*hm = HomebrewModeUnusedOnly
-		default:
-			return fmt.Errorf("invalid homebrew mode value: %d (must be 0 or 1)", i)
-		}
-		return nil
-	}
-
-	return fmt.Errorf("cannot parse homebrew mode: expected string or int")
+	return UnmarshalYAMLEnum(value, hm, map[string]HomebrewMode{
+		"ALL":          HomebrewModeAll,
+		"UNUSED_ONLY":  HomebrewModeUnusedOnly,
+	}, "invalid homebrew mode")
 }
 
 // GenerationStatus represents generation status as type-safe enum.

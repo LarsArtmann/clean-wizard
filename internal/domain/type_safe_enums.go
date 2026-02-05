@@ -8,6 +8,75 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// UnmarshalYAMLEnum is a generic helper for unmarshaling YAML node values to enum types.
+// Accepts both string (case-insensitive) and integer representations.
+func UnmarshalYAMLEnum[T ~int](
+	value *yaml.Node,
+	target *T,
+	valueMap map[string]T,
+	errorMsg string,
+) error {
+	// Try as string first
+	var s string
+	if err := value.Decode(&s); err == nil {
+		upperKey := strings.ToUpper(s)
+		for key, enumVal := range valueMap {
+			if strings.ToUpper(key) == upperKey {
+				*target = enumVal
+				return nil
+			}
+		}
+		return fmt.Errorf("%s: %s", errorMsg, s)
+	}
+
+	// Try as integer
+	var i int
+	if err := value.Decode(&i); err == nil {
+		for _, enumVal := range valueMap {
+			if int(enumVal) == i {
+				*target = enumVal
+				return nil
+			}
+		}
+		return fmt.Errorf("%s value: %d", errorMsg, i)
+	}
+
+	return fmt.Errorf("cannot parse %s: expected string or int", errorMsg)
+}
+
+// UnmarshalYAMLEnumWithDefault is like UnmarshalYAMLEnum but returns a default value for invalid inputs.
+func UnmarshalYAMLEnumWithDefault[T ~int](
+	value *yaml.Node,
+	target *T,
+	valueMap map[string]T,
+	defaultVal T,
+	errorMsg string,
+) T {
+	var s string
+	if err := value.Decode(&s); err == nil {
+		upperKey := strings.ToUpper(s)
+		for key, enumVal := range valueMap {
+			if strings.ToUpper(key) == upperKey {
+				return enumVal
+			}
+		}
+		return defaultVal
+	}
+
+	// Try as integer
+	var i int
+	if err := value.Decode(&i); err == nil {
+		for _, enumVal := range valueMap {
+			if int(enumVal) == i {
+				return enumVal
+			}
+		}
+		return defaultVal
+	}
+
+	return defaultVal
+}
+
 // UnmarshalJSONEnum is a generic helper for unmarshaling JSON string values to enum types.
 func UnmarshalJSONEnum[T any](
 	data []byte,
