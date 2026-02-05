@@ -20,47 +20,53 @@ func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }
 
+// riskLevelTestCases provides reusable test cases for RiskLevel method testing.
+var riskLevelTestCases = []struct {
+	name  string
+	level domain.RiskLevel
+}{
+	{"low risk", domain.RiskLow},
+	{"medium risk", domain.RiskMedium},
+	{"high risk", domain.RiskHigh},
+	{"critical risk", domain.RiskCritical},
+	{"unknown risk", testInvalidRiskUnknown},
+}
+
 func TestRiskLevel_String(t *testing.T) {
-	tests := []struct {
-		name     string
-		level    domain.RiskLevel
-		expected string
-	}{
-		{"low risk", domain.RiskLow, "LOW"},
-		{"medium risk", domain.RiskMedium, "MEDIUM"},
-		{"high risk", domain.RiskHigh, "HIGH"},
-		{"critical risk", domain.RiskCritical, "CRITICAL"},
-		{"unknown risk", testInvalidRiskUnknown, "UNKNOWN"},
+	expected := map[domain.RiskLevel]string{
+		domain.RiskLow:         "LOW",
+		domain.RiskMedium:      "MEDIUM",
+		domain.RiskHigh:        "HIGH",
+		domain.RiskCritical:    "CRITICAL",
+		testInvalidRiskUnknown: "UNKNOWN",
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.level.String()
-			if result != tt.expected {
-				t.Errorf("String() = %v, want %v", result, tt.expected)
+	for _, tc := range riskLevelTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := tc.level.String()
+			expect := expected[tc.level]
+			if result != expect {
+				t.Errorf("String() = %v, want %v", result, expect)
 			}
 		})
 	}
 }
 
 func TestRiskLevel_Icon(t *testing.T) {
-	tests := []struct {
-		name     string
-		level    domain.RiskLevel
-		expected string
-	}{
-		{"low risk", domain.RiskLow, "🟢"},
-		{"medium risk", domain.RiskMedium, "🟡"},
-		{"high risk", domain.RiskHigh, "🟠"},
-		{"critical risk", domain.RiskCritical, "🔴"},
-		{"unknown risk", testInvalidRiskUnknown, "⚪"},
+	expected := map[domain.RiskLevel]string{
+		domain.RiskLow:         "🟢",
+		domain.RiskMedium:      "🟡",
+		domain.RiskHigh:        "🟠",
+		domain.RiskCritical:    "🔴",
+		testInvalidRiskUnknown: "⚪",
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.level.Icon()
-			if result != tt.expected {
-				t.Errorf("Icon() = %v, want %v", result, tt.expected)
+	for _, tc := range riskLevelTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := tc.level.Icon()
+			expect := expected[tc.level]
+			if result != expect {
+				t.Errorf("Icon() = %v, want %v", result, expect)
 			}
 		})
 	}
