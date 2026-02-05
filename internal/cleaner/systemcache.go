@@ -130,39 +130,52 @@ func (scc *SystemCacheCleaner) addScanItems(ctx context.Context, homeDir string,
 	return scc.scanCachePath(ctx, path, scanType)
 }
 
+// cacheTypeConfig holds configuration for each system cache type.
+type cacheTypeConfig struct {
+	pathComponents []string
+	displayName    string
+	scanType        domain.ScanType
+}
+
+// systemCacheConfigs maps cache types to their configuration.
+var systemCacheConfigs = map[SystemCacheType]cacheTypeConfig{
+	SystemCacheSpotlight: {
+		pathComponents: []string{"Library", "Metadata", "CoreSpotlight", "SpotlightKnowledgeEvents"},
+		displayName:    "Spotlight metadata",
+		scanType:        domain.ScanTypeTemp,
+	},
+	SystemCacheXcode: {
+		pathComponents: []string{"Library", "Developer", "Xcode", "DerivedData"},
+		displayName:    "Xcode DerivedData",
+		scanType:        domain.ScanTypeTemp,
+	},
+	SystemCacheCocoaPods: {
+		pathComponents: []string{"Library", "Caches", "CocoaPods"},
+		displayName:    "CocoaPods cache",
+		scanType:        domain.ScanTypeTemp,
+	},
+	SystemCacheHomebrew: {
+		pathComponents: []string{"Library", "Caches", "Homebrew"},
+		displayName:    "Homebrew cache",
+		scanType:        domain.ScanTypeTemp,
+	},
+}
+
 // scanSystemCache scans cache for a specific system cache type.
 func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType SystemCacheType, homeDir string) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
-	switch cacheType {
-	case SystemCacheSpotlight:
-		scanResult := scc.addScanItems(ctx, homeDir, domain.ScanTypeTemp, "Library", "Metadata", "CoreSpotlight")
-		if scanResult.IsErr() {
-			return result.Err[[]domain.ScanItem](scanResult.Error())
-		}
-		items = append(items, scanResult.Value()...)
-
-	case SystemCacheXcode:
-		scanResult := scc.addScanItems(ctx, homeDir, domain.ScanTypeTemp, "Library", "Developer", "Xcode", "DerivedData")
-		if scanResult.IsErr() {
-			return result.Err[[]domain.ScanItem](scanResult.Error())
-		}
-		items = append(items, scanResult.Value()...)
-
-	case SystemCacheCocoaPods:
-		scanResult := scc.addScanItems(ctx, homeDir, domain.ScanTypeTemp, "Library", "Caches", "CocoaPods")
-		if scanResult.IsErr() {
-			return result.Err[[]domain.ScanItem](scanResult.Error())
-		}
-		items = append(items, scanResult.Value()...)
-
-	case SystemCacheHomebrew:
-		scanResult := scc.addScanItems(ctx, homeDir, domain.ScanTypeTemp, "Library", "Caches", "Homebrew")
-		if scanResult.IsErr() {
-			return result.Err[[]domain.ScanItem](scanResult.Error())
-		}
-		items = append(items, scanResult.Value()...)
+	config, exists := systemCacheConfigs[cacheType]
+	if !exists {
+		return result.Err[[]domain.ScanItem](fmt.Errorf("unknown system cache type: %s", cacheType))
 	}
+
+	path := filepath.Join(append([]string{homeDir}, config.pathComponents...)...)
+	scanResult := scc.scanCachePath(ctx, path, config.scanType)
+	if scanResult.IsErr() {
+		return result.Err[[]domain.ScanItem](scanResult.Error())
+	}
+	items = append(items, scanResult.Value()...)
 
 	return result.Ok(items)
 }
@@ -280,29 +293,13 @@ func (scc *SystemCacheCleaner) scanCachePath(ctx context.Context, path string, s
 
 // cleanSystemCache cleans cache for a specific system cache type.
 func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context, cacheType SystemCacheType, homeDir string) result.Result[domain.CleanResult] {
-	switch cacheType {
-	case SystemCacheSpotlight:
-		// Remove SpotlightKnowledgeEvents
-		path := filepath.Join(homeDir, "Library", "Metadata", "CoreSpotlight", "SpotlightKnowledgeEvents")
-		return scc.removeCachePath(path, "Spotlight metadata cleaned")
-
-	case SystemCacheXcode:
-		// Remove Xcode DerivedData
-		path := filepath.Join(homeDir, "Library", "Developer", "Xcode", "DerivedData")
-		return scc.removeCachePath(path, "Xcode DerivedData cleaned")
-
-	case SystemCacheCocoaPods:
-		// Remove CocoaPods cache
-		path := filepath.Join(homeDir, "Library", "Caches", "CocoaPods")
-		return scc.removeCachePath(path, "CocoaPods cache cleaned")
-
-	case SystemCacheHomebrew:
-		// Remove Homebrew cache
-		path := filepath.Join(homeDir, "Library", "Caches", "Homebrew")
-		return scc.removeCachePath(path, "Homebrew cache cleaned")
+	config, exists := systemCacheConfigs[cacheType]
+	if !exists {
+		return result.Err[domain.CleanResult](fmt.Errorf("unknown system cache type: %s", cacheType))
 	}
 
-	return result.Err[domain.CleanResult](fmt.Errorf("unknown system cache type: %s", cacheType))
+	path := filepath.Join(append([]string{homeDir}, config.pathComponents...)...)
+	return scc.removeCachePath(path, config.displayName+" cleaned")
 }
 
 // isMacOS checks if the system is macOS.
