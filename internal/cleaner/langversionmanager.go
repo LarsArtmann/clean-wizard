@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -188,54 +186,15 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 
 // Clean removes language version manager installations.
 func (lvmc *LanguageVersionManagerCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
-	if !lvmc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("language version manager cleaner not available"))
-	}
-
-	if lvmc.dryRun {
-		totalBytes := int64(300 * 1024 * 1024)
-		itemsRemoved := len(lvmc.managerTypes)
-
-		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
-		return result.Ok(cleanResult)
-	}
-
-	startTime := time.Now()
-	itemsRemoved := 0
-	itemsFailed := 0
-	bytesFreed := int64(0)
-
-	homeDir, err := getHomeDir()
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get home directory: %w", err))
-	}
-
-	for _, managerType := range lvmc.managerTypes {
-		result := lvmc.cleanLangVersionManager(ctx, managerType, homeDir)
-		if result.IsErr() {
-			itemsFailed++
-			if lvmc.verbose {
-				fmt.Printf("Warning: failed to clean %s: %v\n", managerType, result.Error())
-			}
-			continue
-		}
-
-		cleanResult := result.Value()
-		itemsRemoved++
-		bytesFreed += int64(cleanResult.FreedBytes)
-	}
-
-	duration := time.Since(startTime)
-	cleanResult := domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
-	}
-
-	return result.Ok(cleanResult)
+	return cleanWithIterator[LangVersionManagerType](
+		ctx,
+		"language version manager cleaner",
+		lvmc.IsAvailable,
+		lvmc.managerTypes,
+		lvmc.cleanLangVersionManager,
+		lvmc.verbose,
+		lvmc.dryRun,
+	)
 }
 
 // cleanLangVersionManager cleans installations for a specific language version manager.

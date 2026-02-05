@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -189,54 +188,15 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 
 // Clean removes build tool caches.
 func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
-	if !bcc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("build cache cleaner not available"))
-	}
-
-	if bcc.dryRun {
-		totalBytes := int64(300 * 1024 * 1024)
-		itemsRemoved := len(bcc.toolTypes)
-
-		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
-		return result.Ok(cleanResult)
-	}
-
-	startTime := time.Now()
-	itemsRemoved := 0
-	itemsFailed := 0
-	bytesFreed := int64(0)
-
-	homeDir, err := getHomeDir()
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get home directory: %w", err))
-	}
-
-	for _, toolType := range bcc.toolTypes {
-		result := bcc.cleanBuildTool(ctx, toolType, homeDir)
-		if result.IsErr() {
-			itemsFailed++
-			if bcc.verbose {
-				fmt.Printf("Warning: failed to clean %s: %v\n", toolType, result.Error())
-			}
-			continue
-		}
-
-		cleanResult := result.Value()
-		itemsRemoved++
-		bytesFreed += int64(cleanResult.FreedBytes)
-	}
-
-	duration := time.Since(startTime)
-	cleanResult := domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
-	}
-
-	return result.Ok(cleanResult)
+	return cleanWithIterator[BuildToolType](
+		ctx,
+		"build cache cleaner",
+		bcc.IsAvailable,
+		bcc.toolTypes,
+		bcc.cleanBuildTool,
+		bcc.verbose,
+		bcc.dryRun,
+	)
 }
 
 // cleanBuildTool cleans cache for a specific build tool.
