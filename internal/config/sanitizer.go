@@ -226,3 +226,21 @@ func getDefaultSanitizationRules() *SanitizationRules {
 		DefaultProtectedPaths: []string{"/System", "/Applications", "/Library"},
 	}
 }
+
+// sanitizeOlderThan sanitizes the OlderThan field with whitespace trimming and duration validation.
+func (cs *ConfigSanitizer) sanitizeOlderThan(fieldPrefix string, olderThan *string, result *SanitizationResult) {
+	if !cs.rules.TrimWhitespace || *olderThan == "" {
+		return
+	}
+
+	original := *olderThan
+	*olderThan = strings.TrimSpace(*olderThan)
+	if original != *olderThan {
+		result.addChange(fieldPrefix+".older_than", original, *olderThan, "trimmed whitespace")
+	}
+
+	// Validate duration format using custom parser
+	if _, err := domain.ParseCustomDuration(*olderThan); err != nil {
+		result.addWarning(fieldPrefix+".older_than", *olderThan, *olderThan, fmt.Sprintf("invalid duration format: %v", err))
+	}
+}

@@ -58,23 +58,7 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settin
 	}
 
 	// Sanitize older_than duration
-	if cs.rules.TrimWhitespace && settings.OlderThan != "" {
-		original := settings.OlderThan
-		settings.OlderThan = strings.TrimSpace(settings.OlderThan)
-		if original != settings.OlderThan {
-			result.addChange(fieldPrefix+".older_than", original, settings.OlderThan, "trimmed whitespace")
-		}
-
-		// Validate duration format using custom parser
-		if _, err := domain.ParseCustomDuration(settings.OlderThan); err != nil {
-			result.Warnings = append(result.Warnings, SanitizationWarning{
-				Field:     fieldPrefix + ".older_than",
-				Original:  settings.OlderThan,
-				Sanitized: settings.OlderThan,
-				Reason:    fmt.Sprintf("invalid duration format: %v", err),
-			})
-		}
-	}
+	cs.sanitizeOlderThan(fieldPrefix, &settings.OlderThan, result)
 
 	result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".system_temp")
 }
