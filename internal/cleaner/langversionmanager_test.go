@@ -207,7 +207,7 @@ func TestLanguageVersionManagerCleaner_Scan(t *testing.T) {
 }
 
 func TestLanguageVersionManagerCleaner_GetHomeDir(t *testing.T) {
-	cleaner := NewLanguageVersionManagerCleaner(false, false, AvailableLangVersionManagers())
+	_ = NewLanguageVersionManagerCleaner(false, false, AvailableLangVersionManagers())
 
 	// Test GetHomeDir doesn't crash
 	home, err := GetHomeDir()

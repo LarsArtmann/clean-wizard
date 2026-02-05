@@ -30,33 +30,15 @@ func GetHomeDir() (string, error) {
 	return "", fmt.Errorf("unable to determine home directory")
 }
 
-// GetDirSize returns total size of directory recursively.
-func GetDirSize(path string) int64 {
-	var size int64
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
+// walkDirectory walks the directory tree starting at path, collecting size and modTime.
+// This consolidates the common directory walking pattern to avoid duplication.
+func walkDirectory(path string) (size int64, modTime time.Time, ok bool) {
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, walkErr error) error {
+		if walkErr != nil {
 			return nil
 		}
 		if !info.IsDir() {
 			size += info.Size()
-		}
-		return nil
-	})
-	if err != nil {
-		return 0
-	}
-
-	return size
-}
-
-// GetDirModTime returns most recent modification time in directory.
-func GetDirModTime(path string) time.Time {
-	var modTime time.Time
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
 		}
 		if info.ModTime().After(modTime) {
 			modTime = info.ModTime()
@@ -64,9 +46,26 @@ func GetDirModTime(path string) time.Time {
 		return nil
 	})
 	if err != nil {
+		return 0, time.Time{}, false
+	}
+	return size, modTime, true
+}
+
+// GetDirSize returns total size of directory recursively.
+func GetDirSize(path string) int64 {
+	size, _, ok := walkDirectory(path)
+	if !ok {
+		return 0
+	}
+	return size
+}
+
+// GetDirModTime returns the most recent modification time in directory.
+func GetDirModTime(path string) time.Time {
+	_, modTime, ok := walkDirectory(path)
+	if !ok {
 		return time.Time{}
 	}
-
 	return modTime
 }
 

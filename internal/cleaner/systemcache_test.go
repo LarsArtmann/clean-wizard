@@ -234,7 +234,7 @@ func TestSystemCacheCleaner_Scan(t *testing.T) {
 }
 
 func TestSystemCacheCleaner_GetHomeDir(t *testing.T) {
-	cleaner, err := NewSystemCacheCleaner(false, false, "30d")
+	_, err := NewSystemCacheCleaner(false, false, "30d")
 	if err != nil {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
 	}

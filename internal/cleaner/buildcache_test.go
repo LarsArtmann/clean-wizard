@@ -239,7 +239,7 @@ func TestBuildCacheCleaner_Scan(t *testing.T) {
 }
 
 func TestBuildCacheCleaner_GetHomeDir(t *testing.T) {
-	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
 	}
@@ -258,7 +258,7 @@ func TestBuildCacheCleaner_GetHomeDir(t *testing.T) {
 }
 
 func TestBuildCacheCleaner_GetDirSize(t *testing.T) {
-	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
 	}
@@ -280,7 +280,7 @@ func TestBuildCacheCleaner_GetDirSize(t *testing.T) {
 }
 
 func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
-	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
 	}
