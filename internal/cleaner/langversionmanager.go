@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 	"time"
 
@@ -91,7 +90,7 @@ func (lvmc *LanguageVersionManagerCleaner) Scan(ctx context.Context) result.Resu
 	items := make([]domain.ScanItem, 0)
 
 	// Get home directory
-	homeDir, err := lvmc.getHomeDir()
+	homeDir, err := getHomeDir()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 	}
@@ -118,7 +117,6 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 
 	switch managerType {
 	case LangVersionManagerNVM:
-		// NVM versions: ~/.nvm/versions/node/*
 		nvmVersions := filepath.Join(homeDir, ".nvm", "versions", "node")
 		if info, err := os.Stat(nvmVersions); err == nil && info.IsDir() {
 			matches, err := filepath.Glob(filepath.Join(nvmVersions, "*"))
@@ -127,12 +125,10 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 			}
 
 			for _, match := range matches {
-				// Keep only old versions (not currently active)
-				// This is a conservative scan - actual removal requires version selection
 				items = append(items, domain.ScanItem{
 					Path:     match,
-					Size:     lvmc.getDirSize(match),
-					Created:  lvmc.getDirModTime(match),
+					Size:     getDirSize(match),
+					Created:  getDirModTime(match),
 					ScanType: domain.ScanTypeTemp,
 				})
 
@@ -143,7 +139,6 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 		}
 
 	case LangVersionManagerPYENV:
-		// Pyenv versions: ~/.pyenv/versions/*
 		pyenvVersions := filepath.Join(homeDir, ".pyenv", "versions")
 		if info, err := os.Stat(pyenvVersions); err == nil && info.IsDir() {
 			matches, err := filepath.Glob(filepath.Join(pyenvVersions, "*"))
@@ -154,8 +149,8 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 			for _, match := range matches {
 				items = append(items, domain.ScanItem{
 					Path:     match,
-					Size:     lvmc.getDirSize(match),
-					Created:  lvmc.getDirModTime(match),
+					Size:     getDirSize(match),
+					Created:  getDirModTime(match),
 					ScanType: domain.ScanTypeTemp,
 				})
 
@@ -166,7 +161,6 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 		}
 
 	case LangVersionManagerRBENV:
-		// Rbenv versions: ~/.rbenv/versions/*
 		rbenvVersions := filepath.Join(homeDir, ".rbenv", "versions")
 		if info, err := os.Stat(rbenvVersions); err == nil && info.IsDir() {
 			matches, err := filepath.Glob(filepath.Join(rbenvVersions, "*"))
@@ -177,8 +171,8 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 			for _, match := range matches {
 				items = append(items, domain.ScanItem{
 					Path:     match,
-					Size:     lvmc.getDirSize(match),
-					Created:  lvmc.getDirModTime(match),
+					Size:     getDirSize(match),
+					Created:  getDirModTime(match),
 					ScanType: domain.ScanTypeTemp,
 				})
 
@@ -199,30 +193,23 @@ func (lvmc *LanguageVersionManagerCleaner) Clean(ctx context.Context) result.Res
 	}
 
 	if lvmc.dryRun {
-		// Estimate cache sizes based on typical usage
-		// Each language version is typically 100-500MB
-		totalBytes := int64(300 * 1024 * 1024) // Estimate 300MB per manager
+		totalBytes := int64(300 * 1024 * 1024)
 		itemsRemoved := len(lvmc.managerTypes)
 
 		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
 		return result.Ok(cleanResult)
 	}
 
-	// Real cleaning implementation
-	// WARNING: This removes ALL versions except current
-	// Users should be warned about reinstalling tools
 	startTime := time.Now()
 	itemsRemoved := 0
 	itemsFailed := 0
 	bytesFreed := int64(0)
 
-	// Get home directory
-	homeDir, err := lvmc.getHomeDir()
+	homeDir, err := getHomeDir()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("failed to get home directory: %w", err))
 	}
 
-	// Clean for each manager type
 	for _, managerType := range lvmc.managerTypes {
 		result := lvmc.cleanLangVersionManager(ctx, managerType, homeDir)
 		if result.IsErr() {
@@ -274,63 +261,4 @@ func (lvmc *LanguageVersionManagerCleaner) cleanLangVersionManager(ctx context.C
 	})
 }
 
-// getHomeDir returns user's home directory.
-func (lvmc *LanguageVersionManagerCleaner) getHomeDir() (string, error) {
-	// Try using os/user package
-	currentUser, err := user.Current()
-	if err == nil {
-		return currentUser.HomeDir, nil
-	}
 
-	// Fallback to HOME environment variable
-	if home := os.Getenv("HOME"); home != "" {
-		return home, nil
-	}
-
-	// Fallback to user profile directory
-	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
-		return userProfile, nil
-	}
-
-	return "", fmt.Errorf("unable to determine home directory")
-}
-
-// getDirSize returns total size of directory recursively.
-func (lvmc *LanguageVersionManagerCleaner) getDirSize(path string) int64 {
-	var size int64
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-	if err != nil {
-		return 0
-	}
-
-	return size
-}
-
-// getDirModTime returns most recent modification time in directory.
-func (lvmc *LanguageVersionManagerCleaner) getDirModTime(path string) time.Time {
-	var modTime time.Time
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if info.ModTime().After(modTime) {
-			modTime = info.ModTime()
-		}
-		return nil
-	})
-	if err != nil {
-		return time.Time{}
-	}
-
-	return modTime
-}

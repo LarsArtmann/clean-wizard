@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 	"time"
 
@@ -105,7 +104,7 @@ func (bcc *BuildCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.S
 	items := make([]domain.ScanItem, 0)
 
 	// Get home directory
-	homeDir, err := bcc.getHomeDir()
+	homeDir, err := getHomeDir()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 	}
@@ -142,8 +141,8 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 		for _, match := range matches {
 			items = append(items, domain.ScanItem{
 				Path:     match,
-				Size:     bcc.getDirSize(match),
-				Created:  bcc.getDirModTime(match),
+				Size:     getDirSize(match),
+				Created:  getDirModTime(match),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -158,8 +157,8 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 		if info, err := os.Stat(mavenCache); err == nil && info.IsDir() {
 			items = append(items, domain.ScanItem{
 				Path:     mavenCache,
-				Size:     bcc.getDirSize(mavenCache),
-				Created:  bcc.getDirModTime(mavenCache),
+				Size:     getDirSize(mavenCache),
+				Created:  getDirModTime(mavenCache),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -174,8 +173,8 @@ func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildT
 		if info, err := os.Stat(sbtCache); err == nil && info.IsDir() {
 			items = append(items, domain.ScanItem{
 				Path:     sbtCache,
-				Size:     bcc.getDirSize(sbtCache),
-				Created:  bcc.getDirModTime(sbtCache),
+				Size:     getDirSize(sbtCache),
+				Created:  getDirModTime(sbtCache),
 				ScanType: domain.ScanTypeTemp,
 			})
 
@@ -195,27 +194,23 @@ func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[domain.Cl
 	}
 
 	if bcc.dryRun {
-		// Estimate cache sizes based on typical usage
-		totalBytes := int64(300 * 1024 * 1024) // Estimate 300MB per tool
+		totalBytes := int64(300 * 1024 * 1024)
 		itemsRemoved := len(bcc.toolTypes)
 
 		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
 		return result.Ok(cleanResult)
 	}
 
-	// Real cleaning implementation
 	startTime := time.Now()
 	itemsRemoved := 0
 	itemsFailed := 0
 	bytesFreed := int64(0)
 
-	// Get home directory
-	homeDir, err := bcc.getHomeDir()
+	homeDir, err := getHomeDir()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("failed to get home directory: %w", err))
 	}
 
-	// Clean for each build tool type
 	for _, toolType := range bcc.toolTypes {
 		result := bcc.cleanBuildTool(ctx, toolType, homeDir)
 		if result.IsErr() {
@@ -248,7 +243,6 @@ func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[domain.Cl
 func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType BuildToolType, homeDir string) result.Result[domain.CleanResult] {
 	switch toolType {
 	case BuildToolGradle:
-		// Remove ~/.gradle/caches/*
 		gradleCache := filepath.Join(homeDir, ".gradle", "caches")
 		matches, err := filepath.Glob(filepath.Join(gradleCache, "*"))
 		if err != nil {
@@ -258,9 +252,8 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		itemsRemoved := 0
 		bytesFreed := int64(0)
 		for _, match := range matches {
-			// Calculate size before removal
 			if !bcc.dryRun {
-				bytesFreed += bcc.getDirSize(match)
+				bytesFreed += getDirSize(match)
 			}
 
 			if bcc.dryRun {
@@ -296,8 +289,6 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		})
 
 	case BuildToolMaven:
-		// Remove partial files from ~/.m2/repository
-		// (This is conservative - we don't remove the entire repository)
 		mavenRepository := filepath.Join(homeDir, ".m2", "repository")
 		matches, err := filepath.Glob(filepath.Join(mavenRepository, "**", "*.part"))
 		if err != nil {
@@ -307,7 +298,6 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		itemsRemoved := 0
 		bytesFreed := int64(0)
 		for _, match := range matches {
-			// Calculate size before removal
 			if !bcc.dryRun {
 				if info, err := os.Stat(match); err == nil {
 					bytesFreed += info.Size()
@@ -347,7 +337,6 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		})
 
 	case BuildToolSBT:
-		// Remove ~/.ivy2/cache/*
 		sbtCache := filepath.Join(homeDir, ".ivy2", "cache")
 		matches, err := filepath.Glob(filepath.Join(sbtCache, "*"))
 		if err != nil {
@@ -357,9 +346,8 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 		itemsRemoved := 0
 		bytesFreed := int64(0)
 		for _, match := range matches {
-			// Calculate size before removal
 			if !bcc.dryRun {
-				bytesFreed += bcc.getDirSize(match)
+				bytesFreed += getDirSize(match)
 			}
 
 			if bcc.dryRun {
@@ -398,63 +386,4 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType Build
 	return result.Err[domain.CleanResult](fmt.Errorf("unknown build tool type: %s", toolType))
 }
 
-// getHomeDir returns user's home directory.
-func (bcc *BuildCacheCleaner) getHomeDir() (string, error) {
-	// Try using os/user package
-	currentUser, err := user.Current()
-	if err == nil {
-		return currentUser.HomeDir, nil
-	}
 
-	// Fallback to HOME environment variable
-	if home := os.Getenv("HOME"); home != "" {
-		return home, nil
-	}
-
-	// Fallback to user profile directory
-	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
-		return userProfile, nil
-	}
-
-	return "", fmt.Errorf("unable to determine home directory")
-}
-
-// getDirSize returns total size of directory recursively.
-func (bcc *BuildCacheCleaner) getDirSize(path string) int64 {
-	var size int64
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-	if err != nil {
-		return 0
-	}
-
-	return size
-}
-
-// getDirModTime returns most recent modification time in directory.
-func (bcc *BuildCacheCleaner) getDirModTime(path string) time.Time {
-	var modTime time.Time
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if info.ModTime().After(modTime) {
-			modTime = info.ModTime()
-		}
-		return nil
-	})
-	if err != nil {
-		return time.Time{}
-	}
-
-	return modTime
-}
