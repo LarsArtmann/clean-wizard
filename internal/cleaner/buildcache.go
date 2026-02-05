@@ -90,26 +90,36 @@ func (bcc *BuildCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.S
 	)
 }
 
+// getCachePath returns the cache directory path for a build tool type.
+func getCachePath(toolType BuildToolType, homeDir string) string {
+	switch toolType {
+	case BuildToolGradle:
+		return filepath.Join(homeDir, ".gradle", "caches")
+	case BuildToolMaven:
+		return filepath.Join(homeDir, ".m2", "repository")
+	case BuildToolSBT:
+		return filepath.Join(homeDir, ".ivy2", "cache")
+	}
+	return ""
+}
+
 // scanBuildTool scans cache for a specific build tool.
 func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType BuildToolType, homeDir string) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	switch toolType {
 	case BuildToolGradle:
-		// Gradle cache location: ~/.gradle/caches/*
-		gradleCache := filepath.Join(homeDir, ".gradle", "caches")
+		gradleCache := getCachePath(toolType, homeDir)
 		scanResult := ScanPath("", domain.ScanTypeTemp, "Gradle cache", bcc.verbose, "*", gradleCache)
 		items = append(items, scanResult.Items...)
 
 	case BuildToolMaven:
-		// Maven cache location: ~/.m2/repository
-		mavenCache := filepath.Join(homeDir, ".m2", "repository")
+		mavenCache := getCachePath(toolType, homeDir)
 		scanResult := ScanDirectory(mavenCache, domain.ScanTypeTemp, bcc.verbose)
 		items = append(items, scanResult.Items...)
 
 	case BuildToolSBT:
-		// SBT cache location: ~/.ivy2/cache
-		sbtCache := filepath.Join(homeDir, ".ivy2", "cache")
+		sbtCache := getCachePath(toolType, homeDir)
 		scanResult := ScanDirectory(sbtCache, domain.ScanTypeTemp, bcc.verbose)
 		items = append(items, scanResult.Items...)
 	}
@@ -212,15 +222,15 @@ func (bcc *BuildCacheCleaner) cleanPartialFiles(
 func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType BuildToolType, homeDir string) result.Result[domain.CleanResult] {
 	switch toolType {
 	case BuildToolGradle:
-		gradleCache := filepath.Join(homeDir, ".gradle", "caches")
+		gradleCache := getCachePath(toolType, homeDir)
 		return bcc.cleanCacheDir(ctx, "Gradle", gradleCache, "*")
 
 	case BuildToolMaven:
-		mavenRepository := filepath.Join(homeDir, ".m2", "repository")
+		mavenRepository := getCachePath(toolType, homeDir)
 		return bcc.cleanPartialFiles(ctx, "Maven", mavenRepository, "**/*.part")
 
 	case BuildToolSBT:
-		sbtCache := filepath.Join(homeDir, ".ivy2", "cache")
+		sbtCache := getCachePath(toolType, homeDir)
 		return bcc.cleanCacheDir(ctx, "SBT", sbtCache, "*")
 	}
 
