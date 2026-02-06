@@ -253,11 +253,11 @@ func (ctx *BDDTestContext) shouldSeeWhatWouldBeCleaned() error {
 }
 
 func (ctx *BDDTestContext) shouldSeeEstimatedSpace() error {
-	if ctx.cleanResult.IsErr() {
-		return ctx.cleanResult.Error()
+	result, err := ctx.validateResult(ctx.cleanResult)
+	if err != nil {
+		return err
 	}
 
-	result := ctx.cleanResult.Value()
 	if result.FreedBytes <= 0 {
 		return fmt.Errorf("expected positive estimated space but got: %d", result.FreedBytes)
 	}
@@ -266,16 +266,23 @@ func (ctx *BDDTestContext) shouldSeeEstimatedSpace() error {
 }
 
 func (ctx *BDDTestContext) shouldSeeGenerationsCount() error {
-	if ctx.cleanResult.IsErr() {
-		return ctx.cleanResult.Error()
+	result, err := ctx.validateResult(ctx.cleanResult)
+	if err != nil {
+		return err
 	}
 
-	result := ctx.cleanResult.Value()
 	if result.ItemsRemoved < 0 {
 		return fmt.Errorf("expected non-negative item count but got: %d", result.ItemsRemoved)
 	}
 
 	return nil
+}
+
+func (ctx *BDDTestContext) validateResult(r result.Result[domain.CleanResult]) (*domain.CleanResult, error) {
+	if r.IsErr() {
+		return nil, r.Error()
+	}
+	return r.Value(), nil
 }
 
 func (ctx *BDDTestContext) shouldNotPerformCleaning() error {
