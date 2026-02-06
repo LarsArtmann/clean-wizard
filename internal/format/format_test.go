@@ -72,6 +72,16 @@ func runTimeFormattingTests(t *testing.T, tests []struct {
 	}
 }
 
+var commonTimeTestCases = []struct {
+		name     string
+		t        time.Time
+		expected string
+	}{
+		{"valid datetime", time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC), "2023-12-25 15:30:45"},
+		{"zero time", time.Time{}, "never"},
+		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
+	}
+
 func TestDate(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -87,21 +97,7 @@ func TestDate(t *testing.T) {
 }
 
 func TestDateTime(t *testing.T) {
-	tests := []struct {
-		name     string
-		t        time.Time
-		expected string
-	}{
-		{
-			"valid datetime",
-			time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC),
-			"2023-12-25 15:30:45",
-		},
-		{"zero time", time.Time{}, "never"},
-		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
-	}
-
-	for _, tt := range tests {
+	for _, tt := range commonTimeTestCases {
 		t.Run(tt.name, func(t *testing.T) {
 			result := DateTime(tt.t)
 			if tt.expected == "never" && result != "never" {
