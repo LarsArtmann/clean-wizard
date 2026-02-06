@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 func TestNewLanguageVersionManagerCleaner(t *testing.T) {
