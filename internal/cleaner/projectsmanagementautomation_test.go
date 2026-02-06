@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
@@ -91,13 +90,7 @@ func TestProjectsManagementAutomationCleaner_BooleanSettingsTests(t *testing.T) 
 			}
 		},
 		ExpectedItems: 1,
-		Constructor: func(verbose, dryRun bool) interface {
-			IsAvailable(ctx context.Context) bool
-			Clean(ctx context.Context) result.Result[domain.CleanResult]
-			ValidateSettings(*domain.OperationSettings) error
-		} {
-			return NewProjectsManagementAutomationCleaner(verbose, dryRun)
-		},
+		Constructor:   NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
 	})
 }
 
@@ -178,13 +171,5 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_StandardTests(t *testing.T) {
-	constructor := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-		ValidateSettings(*domain.OperationSettings) error
-	} {
-		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
-	}
-
-	TestStandardCleaner(t, constructor, "projects-management-automation")
+	TestStandardCleaner(t, NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner), "projects-management-automation")
 }

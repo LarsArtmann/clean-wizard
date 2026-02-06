@@ -386,3 +386,37 @@ func CreateBooleanSettingsCleanerTestFunctions(t *testing.T, config BooleanSetti
 		TestBooleanSettingsCleanerCleanDryRun(t, config, config.Constructor)
 	})
 }
+
+// NewBooleanSettingsCleanerTestConstructor is a helper that creates a CleanerConstructorWithSettings
+// from a cleaner constructor function. This eliminates duplicate interface declarations in test files.
+//
+// Usage:
+//
+//	func TestXxxCleaner_StandardTests(t *testing.T) {
+//	    TestStandardCleaner(t, NewBooleanSettingsCleanerTestConstructor(
+//	        func(verbose, dryRun bool) *XxxCleaner {
+//	            return NewXxxCleaner(verbose, dryRun)
+//	        },
+//	    ), "xxx-tool")
+//	}
+//
+// Type Parameters:
+//   - T: The cleaner type that must implement the cleaner interface
+//
+// Parameters:
+//   - constructor: Function that creates a cleaner with given verbose and dryRun flags
+//
+// Returns a CleanerConstructorWithSettings that can be used with TestStandardCleaner and other helpers
+func NewBooleanSettingsCleanerTestConstructor[T interface {
+	IsAvailable(ctx context.Context) bool
+	Clean(ctx context.Context) result.Result[domain.CleanResult]
+	ValidateSettings(*domain.OperationSettings) error
+}](constructor func(verbose, dryRun bool) T) CleanerConstructorWithSettings {
+	return func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		ValidateSettings(*domain.OperationSettings) error
+	} {
+		return constructor(verbose, dryRun)
+	}
+}
