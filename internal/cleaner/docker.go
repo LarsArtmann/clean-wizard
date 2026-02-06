@@ -15,7 +15,14 @@ import (
 // dockerCommandTimeout is the timeout for Docker operations.
 const dockerCommandTimeout = 2 * time.Minute
 
-// DockerCleaner handles Docker cleanup.
+// DockerResourceType represents Docker resource types for scanning.
+type DockerResourceType string
+
+const (
+	dockerImage    DockerResourceType = "image"
+	dockerContainer DockerResourceType = "container"
+	dockerVolume    DockerResourceType = "volume"
+)
 type DockerCleaner struct {
 	verbose   bool
 	dryRun    bool
@@ -120,6 +127,30 @@ func (dc *DockerCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIt
 	return result.Ok(items)
 }
 
+// scanDockerResources converts Docker resource IDs to scan items.
+func (dc *DockerCleaner) scanDockerResources(ids []string, resourceType DockerResourceType) []domain.ScanItem {
+	items := make([]domain.ScanItem, 0, len(ids))
+
+	for _, id := range ids {
+		if id == "" {
+			continue
+		}
+
+		items = append(items, domain.ScanItem{
+			Path:     fmt.Sprintf("docker:%s:%s", resourceType, id),
+			Size:     0, // Size unknown without inspecting
+			Created:  time.Time{},
+			ScanType: domain.ScanTypeTemp,
+		})
+
+		if dc.verbose {
+			fmt.Printf("Found %s: %s\n", resourceType, id)
+		}
+	}
+
+	return items
+}
+
 // scanDanglingImages scans for dangling Docker images.
 func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[]domain.ScanItem] {
 	cmd := dc.execWithTimeout(ctx, "docker", "images", "-f", "dangling=true", "-q")
@@ -129,24 +160,7 @@ func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[
 	}
 
 	imageIDs := strings.Split(strings.TrimSpace(string(output)), "\n")
-	items := make([]domain.ScanItem, 0, len(imageIDs))
-
-	for _, imageID := range imageIDs {
-		if imageID == "" {
-			continue
-		}
-
-		items = append(items, domain.ScanItem{
-			Path:     fmt.Sprintf("docker:image:%s", imageID),
-			Size:     0, // Size unknown without inspecting
-			Created:  time.Time{},
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if dc.verbose {
-			fmt.Printf("Found dangling image: %s\n", imageID)
-		}
-	}
+	items := dc.scanDockerResources(imageIDs, dockerImage)
 
 	return result.Ok(items)
 }
@@ -160,24 +174,7 @@ func (dc *DockerCleaner) scanUnusedContainers(ctx context.Context) result.Result
 	}
 
 	containerIDs := strings.Split(strings.TrimSpace(string(output)), "\n")
-	items := make([]domain.ScanItem, 0, len(containerIDs))
-
-	for _, containerID := range containerIDs {
-		if containerID == "" {
-			continue
-		}
-
-		items = append(items, domain.ScanItem{
-			Path:     fmt.Sprintf("docker:container:%s", containerID),
-			Size:     0, // Size unknown without inspecting
-			Created:  time.Time{},
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if dc.verbose {
-			fmt.Printf("Found stopped container: %s\n", containerID)
-		}
-	}
+	items := dc.scanDockerResources(containerIDs, dockerContainer)
 
 	return result.Ok(items)
 }
@@ -191,24 +188,7 @@ func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]
 	}
 
 	volumeIDs := strings.Split(strings.TrimSpace(string(output)), "\n")
-	items := make([]domain.ScanItem, 0, len(volumeIDs))
-
-	for _, volumeID := range volumeIDs {
-		if volumeID == "" {
-			continue
-		}
-
-		items = append(items, domain.ScanItem{
-			Path:     fmt.Sprintf("docker:volume:%s", volumeID),
-			Size:     0, // Size unknown without inspecting
-			Created:  time.Time{},
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if dc.verbose {
-			fmt.Printf("Found volume: %s\n", volumeID)
-		}
-	}
+	items := dc.scanDockerResources(volumeIDs, dockerVolume)
 
 	return result.Ok(items)
 }
