@@ -167,23 +167,7 @@ func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel
 	return maxRisk
 }
 
-// maxRiskLevelFromOperations calculates the maximum risk level from a slice of operations.
-func maxRiskLevelFromOperations(operations []domain.CleanupOperation, currentMax domain.RiskLevel) domain.RiskLevel {
-	maxRisk := currentMax
-	for _, op := range operations {
-		if op.RiskLevel == domain.RiskCritical {
-			return domain.RiskCritical
-		}
-		if op.RiskLevel == domain.RiskHigh {
-			maxRisk = domain.RiskHigh
-		} else if op.RiskLevel == domain.RiskMedium && maxRisk == domain.RiskLow {
-			maxRisk = domain.RiskMedium
-		}
-	}
-	return maxRisk
-}
 
-// isPathProtected checks if a path is protected.
 func (cv *ConfigValidator) isPathProtected(protected []string, targetPath string) bool {
 	for _, path := range protected {
 		if strings.HasPrefix(path, targetPath) || strings.HasPrefix(targetPath, path) {
