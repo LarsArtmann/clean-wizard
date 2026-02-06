@@ -309,18 +309,10 @@ func TestAvailableBuildTools(t *testing.T) {
 }
 
 func TestBuildToolType_String(t *testing.T) {
-	TestTypeStringGeneric(t, "BuildToolType", func() []struct {
-		Value BuildToolType
-		Want  string
-	} {
-		return []struct {
-			Value BuildToolType
-			Want  string
-		}{
-			{BuildToolGradle, "gradle"},
-			{BuildToolMaven, "maven"},
-			{BuildToolSBT, "sbt"},
-		}
+	TestTypeString(t, "BuildToolType", []BuildToolType{
+		BuildToolGradle,
+		BuildToolMaven,
+		BuildToolSBT,
 	})
 }
 

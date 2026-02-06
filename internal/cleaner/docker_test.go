@@ -231,18 +231,10 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 }
 
 func TestDockerPruneMode_String(t *testing.T) {
-	TestTypeStringGeneric(t, "DockerPruneMode", func() []struct {
-		Value DockerPruneMode
-		Want  string
-	} {
-		return []struct {
-			Value DockerPruneMode
-			Want  string
-		}{
-			{DockerPruneLight, "light"},
-			{DockerPruneStandard, "standard"},
-			{DockerPruneAggressive, "aggressive"},
-		}
+	TestTypeString(t, "DockerPruneMode", []DockerPruneMode{
+		DockerPruneLight,
+		DockerPruneStandard,
+		DockerPruneAggressive,
 	})
 }
 
