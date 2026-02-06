@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 func TestNewCargoCleaner(t *testing.T) {
@@ -189,15 +188,7 @@ func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_StandardTests(t *testing.T) {
-	constructor := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-		ValidateSettings(*domain.OperationSettings) error
-	} {
-		return NewCargoCleaner(verbose, dryRun)
-	}
-
-	TestStandardCleaner(t, constructor, "Cargo")
+	TestStandardCleaner(t, NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner), "Cargo")
 }
 
 func TestCargoCleaner_Scan(t *testing.T) {
