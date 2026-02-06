@@ -482,9 +482,7 @@ func createCleanerWithError(factory func() (cleaner.Cleaner, error)) cleaner.Cle
 
 // runHomebrewCleaner executes the Homebrew cleaner.
 func runHomebrewCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return cleaner.NewHomebrewCleaner(v, d, domain.HomebrewModeAll)
-	})
+	return runCleanerWithConfig[domain.HomebrewMode](ctx, verbose, dryRun, homebrewCleanerFactory, domain.HomebrewModeAll)
 }
 
 // runTempFilesCleaner executes the TempFiles cleaner.
@@ -511,6 +509,29 @@ func runGenericCleaner(ctx context.Context, verbose, dryRun bool, factory func(b
 	}
 
 	return result.Value(), nil
+}
+
+// runCleanerWithConfig executes a cleaner that requires a single configuration parameter.
+// T is the cleaner configuration type (e.g., domain.HomebrewMode, cleaner.DockerPruneMode).
+func runCleanerWithConfig[T any](
+	ctx context.Context,
+	verbose, dryRun bool,
+	factory func(bool, bool, T) cleaner.Cleaner,
+	config T,
+) (domain.CleanResult, error) {
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return factory(v, d, config)
+	})
+}
+
+// homebrewCleanerFactory creates a Homebrew cleaner with the specified mode.
+func homebrewCleanerFactory(v, d bool, mode domain.HomebrewMode) cleaner.Cleaner {
+	return cleaner.NewHomebrewCleaner(v, d, mode)
+}
+
+// dockerCleanerFactory creates a Docker cleaner with the specified prune mode.
+func dockerCleanerFactory(v, d bool, pruneMode cleaner.DockerPruneMode) cleaner.Cleaner {
+	return cleaner.NewDockerCleaner(v, d, pruneMode)
 }
 
 // runManagerCleaner executes a cleaner with manager-based configuration.
@@ -582,9 +603,7 @@ func runBuildCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cle
 
 // runDockerCleaner executes the Docker cleaner.
 func runDockerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return cleaner.NewDockerCleaner(v, d, cleaner.DockerPruneStandard)
-	})
+	return runCleanerWithConfig[cleaner.DockerPruneMode](ctx, verbose, dryRun, dockerCleanerFactory, cleaner.DockerPruneStandard)
 }
 
 // runSystemCacheCleaner executes the System Cache cleaner.
