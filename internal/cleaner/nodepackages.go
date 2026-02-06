@@ -265,52 +265,44 @@ func (npmc *NodePackageManagerCleaner) Clean(ctx context.Context) result.Result[
 	return result.Ok(cleanResult)
 }
 
+// runPackageManagerCommand executes a package manager command with common error handling.
+func (npmc *NodePackageManagerCleaner) runPackageManagerCommand(ctx context.Context, name string, args ...string) result.Result[domain.CleanResult] {
+	cmd := exec.CommandContext(ctx, name, args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("%s command failed: %w (output: %s)", name, err, string(output)))
+	}
+
+	if npmc.verbose {
+		fmt.Printf("  ✓ %s command completed\n", name)
+	}
+
+	cleanResult := domain.CleanResult{
+		FreedBytes:   0,
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.StrategyConservative,
+	}
+
+	return result.Ok(cleanResult)
+}
+
 // cleanPackageManager cleans cache for a specific package manager.
 func (npmc *NodePackageManagerCleaner) cleanPackageManager(ctx context.Context, pm NodePackageManagerType) result.Result[domain.CleanResult] {
 	switch pm {
 	case NodePackageManagerNPM:
-		cmd := exec.CommandContext(ctx, "npm", "cache", "clean", "--force")
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("npm cache clean failed: %w (output: %s)", err, string(output)))
-		}
-
-		if npmc.verbose {
-			fmt.Println("  ✓ npm cache cleaned")
-		}
+		return npmc.runPackageManagerCommand(ctx, "npm", "cache", "clean", "--force")
 
 	case NodePackageManagerPNPM:
-		cmd := exec.CommandContext(ctx, "pnpm", "store", "prune")
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("pnpm store prune failed: %w (output: %s)", err, string(output)))
-		}
-
-		if npmc.verbose {
-			fmt.Println("  ✓ pnpm store pruned")
-		}
+		return npmc.runPackageManagerCommand(ctx, "pnpm", "store", "prune")
 
 	case NodePackageManagerYarn:
-		cmd := exec.CommandContext(ctx, "yarn", "cache", "clean")
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("yarn cache clean failed: %w (output: %s)", err, string(output)))
-		}
-
-		if npmc.verbose {
-			fmt.Println("  ✓ yarn cache cleaned")
-		}
+		return npmc.runPackageManagerCommand(ctx, "yarn", "cache", "clean")
 
 	case NodePackageManagerBun:
-		cmd := exec.CommandContext(ctx, "bun", "pm", "cache", "rm")
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("bun cache clean failed: %w (output: %s)", err, string(output)))
-		}
-
-		if npmc.verbose {
-			fmt.Println("  ✓ bun cache cleaned")
-		}
+		return npmc.runPackageManagerCommand(ctx, "bun", "pm", "cache", "rm")
 	}
 
 	// Return success without specific byte count (unknown for most PMs)
