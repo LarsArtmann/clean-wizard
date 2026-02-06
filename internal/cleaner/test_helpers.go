@@ -535,6 +535,49 @@ func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](testName, tool
 	}
 }
 
+// BooleanSettingsTestConfig holds all configuration needed to create a BooleanSettingsTests test function.
+// Use CreateBooleanSettingsTest to generate the actual test function.
+type BooleanSettingsTestConfig struct {
+	TestName           string
+	ToolName           string
+	SettingsFieldName  string
+	ExpectedItems      uint
+	Constructor        CleanerConstructorWithSettings
+	CreateSettingsFunc func(bool) *domain.OperationSettings
+}
+
+// CreateBooleanSettingsTest creates a test function for cleaners with boolean settings.
+// This eliminates duplicate test function definitions across test files.
+//
+// Usage:
+//
+//	func TestXxxCleaner_BooleanSettingsTests(t *testing.T) {
+//	    CreateBooleanSettingsTest(t, BooleanSettingsTestConfig{
+//	        TestName:          "Xxx",
+//	        ToolName:          "xxx-tool",
+//	        SettingsFieldName: "xxx settings",
+//	        ExpectedItems:     1,
+//	        Constructor:       NewBooleanSettingsCleanerTestConstructor(NewXxxCleaner),
+//	        CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
+//	            return &domain.OperationSettings{
+//	                XxxSettings: &domain.XxxSettings{
+//	                    Enabled: enabled,
+//	                },
+//	            }
+//	        },
+//	    })
+//	}
+func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
+	CreateBooleanSettingsCleanerTestFunctions(t, BooleanSettingsCleanerTestConfig{
+		TestName:          config.TestName,
+		ToolName:          config.ToolName,
+		SettingsFieldName: config.SettingsFieldName,
+		ExpectedItems:     config.ExpectedItems,
+		Constructor:       config.Constructor,
+		CreateSettings:    config.CreateSettingsFunc,
+	})
+}
+
 // NewTestCleaner creates a cleaner with default test settings (verbose=false, dryRun=false).
 // This eliminates duplicate cleaner initialization code across test files.
 //
