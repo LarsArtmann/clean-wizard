@@ -96,37 +96,30 @@ func TestCargoCleaner_BooleanSettingsTests(t *testing.T) {
 }
 
 func TestCargoCleaner_GetHomeDir(t *testing.T) {
-	// Set HOME explicitly
-	t.Setenv("HOME", "/test/home")
-	home, err := GetHomeDir()
-	if err != nil {
-		t.Errorf("GetHomeDir() error = %v", err)
-	}
-	if home != "/test/home" {
-		t.Errorf("GetHomeDir() = %v, want /test/home", home)
+	testCases := []GetHomeDirTestCase{
+		{
+			Name:      "HOME set",
+			HomeValue: "/test/home",
+			WantErr:   false,
+			WantHome:  "/test/home",
+		},
+		{
+			Name:         "fallback to USERPROFILE",
+			HomeValue:    "",
+			ProfileValue: "C:\\Users\\test",
+			WantErr:      false,
+			WantHome:     "C:\\Users\\test",
+		},
+		{
+			Name:         "no home can be determined",
+			HomeValue:    "",
+			ProfileValue: "",
+			WantErr:      true,
+			WantHome:     "",
+		},
 	}
 
-	// Test fallback on Windows (USERPROFILE)
-	t.Setenv("HOME", "")
-	t.Setenv("USERPROFILE", "C:\\Users\\test")
-	home, err = GetHomeDir()
-	if err != nil {
-		t.Errorf("GetHomeDir() error = %v", err)
-	}
-	if home != "C:\\Users\\test" {
-		t.Errorf("GetHomeDir() = %v, want C:\\Users\\test", home)
-	}
-
-	// Test fallback to empty string when no home can be determined
-	t.Setenv("HOME", "")
-	t.Setenv("USERPROFILE", "")
-	home, err = GetHomeDir()
-	if err == nil {
-		t.Errorf("GetHomeDir() error = %v, want error for missing home", err)
-	}
-	if home != "" {
-		t.Errorf("GetHomeDir() = %v, want empty string", home)
-	}
+	RunGetHomeDirTests(t, testCases)
 }
 
 func TestCargoCleaner_GetDirSize(t *testing.T) {

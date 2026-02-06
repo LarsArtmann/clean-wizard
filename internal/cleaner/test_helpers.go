@@ -525,3 +525,62 @@ func NewTestCleaner[T any](constructor func(verbose, dryRun bool) T) func() T {
 		return constructor(false, false)
 	}
 }
+
+// GetHomeDirTestCase represents a test case for GetHomeDir tests
+type GetHomeDirTestCase struct {
+	Name         string
+	HomeValue    string
+	ProfileValue string
+	WantErr      bool
+	WantHome     string
+}
+
+// RunGetHomeDirTests runs GetHomeDir tests for given test cases.
+// This eliminates duplicate error checking code across GetHomeDir tests.
+//
+// Usage:
+//
+//	func TestXxxCleaner_GetHomeDir(t *testing.T) {
+//	    testCases := []GetHomeDirTestCase{
+//	        {
+//	            Name:      "with HOME set",
+//	            HomeValue: "/test/home",
+//	            WantErr:   false,
+//	            WantHome:  "/test/home",
+//	        },
+//	        {
+//	            Name:         "fallback to USERPROFILE",
+//	            HomeValue:    "",
+//	            ProfileValue: "C:\\Users\\test",
+//	            WantErr:      false,
+//	            WantHome:     "C:\\Users\\test",
+//	        },
+//	    }
+//	    RunGetHomeDirTests(t, testCases)
+//	}
+func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
+	for _, tt := range testCases {
+		t.Run(tt.Name, func(t *testing.T) {
+			t.Setenv("HOME", tt.HomeValue)
+			t.Setenv("USERPROFILE", tt.ProfileValue)
+
+			home, err := GetHomeDir()
+
+			if tt.WantErr {
+				if err == nil {
+					t.Errorf("GetHomeDir() error = %v, want error for missing home", err)
+				}
+				if home != "" {
+					t.Errorf("GetHomeDir() = %v, want empty string", home)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("GetHomeDir() error = %v", err)
+				}
+				if home != tt.WantHome {
+					t.Errorf("GetHomeDir() = %v, want %v", home, tt.WantHome)
+				}
+			}
+		})
+	}
+}
