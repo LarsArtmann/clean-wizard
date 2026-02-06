@@ -57,6 +57,21 @@ func TestDuration(t *testing.T) {
 	}
 }
 
+func runTimeFormattingTests(t *testing.T, tests []struct {
+		name     string
+		t        time.Time
+		expected string
+	}, formatFn func(time.Time) string) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := formatFn(tt.t)
+			if result != tt.expected {
+				t.Errorf("result = %v, want %v", result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestDate(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -68,14 +83,7 @@ func TestDate(t *testing.T) {
 		{"unix epoch", time.Unix(0, 0), "1970-01-01"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Date(tt.t)
-			if result != tt.expected {
-				t.Errorf("Date(%v) = %v, want %v", tt.t, result, tt.expected)
-			}
-		})
-	}
+	runTimeFormattingTests(t, tests, Date)
 }
 
 func TestDateTime(t *testing.T) {
@@ -87,7 +95,7 @@ func TestDateTime(t *testing.T) {
 		{
 			"valid datetime",
 			time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC),
-			"2023-12-25 15:30:45", // Note: depends on local timezone
+			"2023-12-25 15:30:45",
 		},
 		{"zero time", time.Time{}, "never"},
 		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
@@ -96,12 +104,10 @@ func TestDateTime(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := DateTime(tt.t)
-			// For datetime, we need to be more flexible due to timezone differences
 			if tt.expected == "never" && result != "never" {
 				t.Errorf("DateTime(%v) = %v, want %v", tt.t, result, tt.expected)
 			} else if tt.expected != "never" {
-				// Just check that it contains the date part and time part
-				if len(result) < 19 { // YYYY-MM-DD HH:MM:SS = 19 chars
+				if len(result) < 19 {
 					t.Errorf("DateTime(%v) = %v, expected at least 19 characters", tt.t, result)
 				}
 			}
