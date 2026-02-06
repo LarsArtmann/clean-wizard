@@ -374,6 +374,16 @@ func TestStandardCleaner(t *testing.T, constructor CleanerConstructorWithSetting
 	})
 }
 
+// cleanerConstructorWithSettingsAdapter wraps a constructor into CleanerConstructorWithSettings.
+// This eliminates duplicate interface adapter code in test helper functions.
+func cleanerConstructorWithSettingsAdapter[T CleanerWithSettings](
+	constructor func(verbose, dryRun bool) T,
+) CleanerConstructorWithSettings {
+	return func(verbose, dryRun bool) CleanerWithSettings {
+		return constructor(verbose, dryRun)
+	}
+}
+
 // NewCleanerConstructorWithSettings creates a CleanerConstructorWithSettings from a constructor function
 // that takes additional manager types parameter.
 // This eliminates duplicate factory functions in test files.
@@ -391,9 +401,9 @@ func NewCleanerConstructorWithSettings[T CleanerWithSettings, M any](
 	constructor func(verbose, dryRun bool, managers []M) T,
 	availableManagers func() []M,
 ) CleanerConstructorWithSettings {
-	return func(verbose, dryRun bool) CleanerWithSettings {
+	return cleanerConstructorWithSettingsAdapter(func(verbose, dryRun bool) T {
 		return constructor(verbose, dryRun, availableManagers())
-	}
+	})
 }
 
 // CreateBooleanSettingsCleanerTestFunctions creates both ValidateSettings and Clean_DryRun test functions
@@ -447,9 +457,7 @@ func CreateBooleanSettingsCleanerTestFunctions(t *testing.T, config BooleanSetti
 //
 // Returns a CleanerConstructorWithSettings that can be used with TestStandardCleaner and other helpers
 func NewBooleanSettingsCleanerTestConstructor[T CleanerWithSettings](constructor func(verbose, dryRun bool) T) CleanerConstructorWithSettings {
-	return func(verbose, dryRun bool) CleanerWithSettings {
-		return constructor(verbose, dryRun)
-	}
+	return cleanerConstructorWithSettingsAdapter(constructor)
 }
 
 // NewBooleanSettingsCleanerTestConfig creates a BooleanSettingsCleanerTestConfig with standardized values.
