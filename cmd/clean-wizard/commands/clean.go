@@ -519,25 +519,33 @@ func runManagerCleaner[T any](
 	ctx context.Context,
 	verbose, dryRun bool,
 	availableManagers []T,
-	newCleaner func(bool, bool, []T) interface{},
+	factory func(bool, bool, []T) cleaner.Cleaner,
 ) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return newCleaner(v, d, availableManagers).(cleaner.Cleaner)
+		return factory(v, d, availableManagers)
 	})
 }
 
 // runCleanerWithNodeManagers executes the Node package manager cleaner.
 func runCleanerWithNodeManagers(ctx context.Context, verbose, dryRun bool, managers []cleaner.NodePackageManagerType) (domain.CleanResult, error) {
-	return runManagerCleaner(ctx, verbose, dryRun, managers, func(v, d bool, m []cleaner.NodePackageManagerType) interface{} {
-		return cleaner.NewNodePackageManagerCleaner(v, d, m)
-	})
+	return runManagerCleaner(ctx, verbose, dryRun, managers, nodeManagerFactory)
+}
+
+// nodeManagerFactory is a factory function for Node package managers.
+// This adapter bridges the type gap between *NodePackageManagerCleaner and cleaner.Cleaner.
+func nodeManagerFactory(v, d bool, managers []cleaner.NodePackageManagerType) cleaner.Cleaner {
+	return cleaner.NewNodePackageManagerCleaner(v, d, managers)
 }
 
 // runCleanerWithLangVersionManagers executes the Language Version Manager cleaner.
 func runCleanerWithLangVersionManagers(ctx context.Context, verbose, dryRun bool, managers []cleaner.LangVersionManagerType) (domain.CleanResult, error) {
-	return runManagerCleaner(ctx, verbose, dryRun, managers, func(v, d bool, m []cleaner.LangVersionManagerType) interface{} {
-		return cleaner.NewLanguageVersionManagerCleaner(v, d, m)
-	})
+	return runManagerCleaner(ctx, verbose, dryRun, managers, langVersionManagerFactory)
+}
+
+// langVersionManagerFactory is a factory function for Language Version Managers.
+// This adapter bridges the type gap between *LanguageVersionManagerCleaner and cleaner.Cleaner.
+func langVersionManagerFactory(v, d bool, managers []cleaner.LangVersionManagerType) cleaner.Cleaner {
+	return cleaner.NewLanguageVersionManagerCleaner(v, d, managers)
 }
 
 // runNodePackageManagerCleaner executes the Node package manager cleaner.
