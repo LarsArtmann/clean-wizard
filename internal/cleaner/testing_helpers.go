@@ -24,22 +24,13 @@ func TestAvailableTypesGeneric[T comparable](t *stdtesting.T, name string, getAv
 }
 
 // TestTypeStringCases creates test cases for String() method testing
-func TestTypeStringCases[T ~string](cases []T) []struct {
-	Value T
-	Want  string
-} {
-	result := make([]struct {
-		Value T
-		Want  string
-	}, len(cases))
+func TestTypeStringCases[T ~string](cases []T) []testing.ValueTestCase[T, string] {
+	result := make([]testing.ValueTestCase[T, string], len(cases))
 
 	for i, c := range cases {
-		result[i] = struct {
-			Value T
-			Want  string
-		}{
-			Value: c,
-			Want:  string(c),
+		result[i] = testing.ValueTestCase[T, string]{
+			Value:    c,
+			Expected: string(c),
 		}
 	}
 
@@ -47,17 +38,14 @@ func TestTypeStringCases[T ~string](cases []T) []struct {
 }
 
 // TestTypeStringGeneric tests the string representation of a type
-func TestTypeStringGeneric[T ~string](t *stdtesting.T, name string, getTestCases func() []struct {
-	Value T
-	Want  string
-}) {
+func TestTypeStringGeneric[T ~string](t *stdtesting.T, name string, getTestCases func() []testing.ValueTestCase[T, string]) {
 	tests := getTestCases()
 
 	for _, tt := range tests {
-		t.Run(tt.Want, func(t *stdtesting.T) {
+		t.Run(tt.Expected, func(t *stdtesting.T) {
 			got := string(tt.Value)
-			if got != tt.Want {
-				t.Errorf("string(%v) = %v, want %v", tt.Value, got, tt.Want)
+			if got != tt.Expected {
+				t.Errorf("string(%v) = %v, want %v", tt.Value, got, tt.Expected)
 			}
 		})
 	}
@@ -65,10 +53,7 @@ func TestTypeStringGeneric[T ~string](t *stdtesting.T, name string, getTestCases
 
 // TestTypeString tests the String() method of a type with the given cases
 func TestTypeString[T ~string](t *stdtesting.T, name string, cases []T) {
-	TestTypeStringGeneric(t, name, func() []struct {
-		Value T
-		Want  string
-	} {
+	TestTypeStringGeneric(t, name, func() []testing.ValueTestCase[T, string] {
 		return TestTypeStringCases(cases)
 	})
 }
