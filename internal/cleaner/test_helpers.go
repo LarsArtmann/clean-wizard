@@ -413,13 +413,7 @@ func NewCleanerConstructorWithSettings[T CleanerWithSettings, M any](
 //	            }
 //	        },
 //	        ExpectedItems: 1,
-//	        Constructor: func(verbose, dryRun bool) interface {
-//	            IsAvailable(ctx context.Context) bool
-//	            Clean(ctx context.Context) result.Result[domain.CleanResult]
-//	            ValidateSettings(*domain.OperationSettings) error
-//	        } {
-//	            return NewXxxCleaner(verbose, dryRun)
-//	        },
+//	        Constructor:   NewBooleanSettingsCleanerTestConstructor(NewXxxCleaner),
 //	    })
 //	}
 func CreateBooleanSettingsCleanerTestFunctions(t *testing.T, config BooleanSettingsCleanerTestConfig) {
@@ -489,11 +483,7 @@ func NewBooleanSettingsCleanerTestConstructor[T CleanerWithSettings](constructor
 //           ),
 //       )
 //   }
-func NewBooleanSettingsCleanerTestConfig[T interface {
-	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) result.Result[domain.CleanResult]
-	ValidateSettings(*domain.OperationSettings) error
-}](
+func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 	testName string,
 	toolName string,
 	settingsFieldName string,
@@ -526,11 +516,7 @@ func NewBooleanSettingsCleanerTestConfig[T interface {
 //   - createSettings: Function that creates OperationSettings with the specific field configured
 //
 // Returns a configured BooleanSettingsCleanerTestConfig ready for use with CreateBooleanSettingsCleanerTestFunctions
-func NewBooleanSettingsCleanerTestConfigFn[T interface {
-	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) result.Result[domain.CleanResult]
-	ValidateSettings(*domain.OperationSettings) error
-}](testName, toolName, settingsFieldName string, expectedItems uint, constructor func(verbose, dryRun bool) T, createSettings func(bool) *domain.OperationSettings) BooleanSettingsCleanerTestConfig {
+func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](testName, toolName, settingsFieldName string, expectedItems uint, constructor func(verbose, dryRun bool) T, createSettings func(bool) *domain.OperationSettings) BooleanSettingsCleanerTestConfig {
 	return BooleanSettingsCleanerTestConfig{
 		TestName:          testName,
 		ToolName:          toolName,
