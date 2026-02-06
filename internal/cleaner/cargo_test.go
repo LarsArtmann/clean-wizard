@@ -70,7 +70,7 @@ func TestCargoCleaner_IsAvailable(t *testing.T) {
 			Constructor: func() interface {
 				IsAvailable(ctx context.Context) bool
 			} {
-				return NewCargoCleaner(false, false)
+				return NewTestCleaner(NewCargoCleaner)()
 			},
 		},
 	}
