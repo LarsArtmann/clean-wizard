@@ -53,19 +53,14 @@ func withGenerations(cfg *domain.Config, generations int) *domain.Config {
 
 // withRiskLevel adjusts the operation RiskLevel and Enabled flags.
 func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Config {
-	// Find the nix-cleanup profile and its nix-generations operation
-	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" {
-				profile.Operations[i].RiskLevel = level
-				// Auto-disable critical operations in unsafe mode
-				if level == domain.RiskCritical && !cfg.SafeMode.IsEnabled() {
-					profile.Operations[i].Enabled = BoolToProfileStatus(false)
-				}
-				break
-			}
+	WithProfileOperationField(cfg, "nix-cleanup", "nix-generations", func(op *domain.CleanupOperation) bool {
+		op.RiskLevel = level
+		// Auto-disable critical operations in unsafe mode
+		if level == domain.RiskCritical && !cfg.SafeMode.IsEnabled() {
+			op.Enabled = BoolToProfileStatus(false)
 		}
-	}
+		return true
+	})
 	return cfg
 }
 
@@ -166,19 +161,8 @@ func newSecurityErrorValidationThen() []BDDThen {
 
 // withEnabled sets the Enabled flag for nix-generations operation.
 func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
-	WithOperationSettings(cfg, "nix-cleanup", "nix-generations", func(settings *domain.OperationSettings) bool {
-		if settings.NixGenerations == nil {
-			return false
-		}
-		// Apply enabled status to the operation through profile
-		if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
-			for i, op := range profile.Operations {
-				if op.Name == "nix-generations" {
-					profile.Operations[i].Enabled = BoolToProfileStatus(enabled)
-					break
-				}
-			}
-		}
+	WithProfileOperationField(cfg, "nix-cleanup", "nix-generations", func(op *domain.CleanupOperation) bool {
+		op.Enabled = BoolToProfileStatus(enabled)
 		return true
 	})
 	return cfg

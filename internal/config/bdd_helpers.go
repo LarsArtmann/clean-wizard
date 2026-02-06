@@ -109,3 +109,12 @@ func WithNixGenerationsSetting(cfg *domain.Config, profileName, operationName st
 		return settingModifier(settings.NixGenerations)
 	})
 }
+
+// WithProfileOperationField modifies an operation field directly.
+// Takes the config, profile name, operation name, and a modifier function that receives the operation.
+// Returns true if the operation was found and modified.
+func WithProfileOperationField(cfg *domain.Config, profileName, operationName string, fieldModifier func(*domain.CleanupOperation) bool) bool {
+	return ModifyProfileOperation(cfg, profileName, operationName, func(profile *domain.Profile, op *domain.CleanupOperation) bool {
+		return fieldModifier(op)
+	})
+}
