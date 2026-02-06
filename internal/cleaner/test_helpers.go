@@ -246,6 +246,7 @@ type BooleanSettingsCleanerTestConfig struct {
 	SettingsFieldName string
 	CreateSettings    func(bool) *domain.OperationSettings
 	ExpectedItems     uint
+	Constructor       CleanerConstructorWithSettings
 }
 
 // TestBooleanSettingsCleanerValidateSettings runs a standard ValidateSettings test for cleaners with a single boolean settings field.
@@ -348,4 +349,40 @@ func NewCleanerConstructorWithSettings[T interface {
 	} {
 		return constructor(verbose, dryRun, availableManagers())
 	}
+}
+
+// CreateBooleanSettingsCleanerTestFunctions creates both ValidateSettings and Clean_DryRun test functions
+// for cleaners with a boolean settings field. This eliminates duplicate config and constructor code.
+//
+// Usage:
+//	func TestXxxCleaner_BooleanSettingsTests(t *testing.T) {
+//	    CreateBooleanSettingsCleanerTestFunctions(t, BooleanSettingsCleanerTestFunctionsConfig{
+//	        TestName:          "Xxx",
+//	        ToolName:          "xxx-tool",
+//	        SettingsFieldName: "xxx settings",
+//	        CreateSettings: func(enabled bool) *domain.OperationSettings {
+//	            return &domain.OperationSettings{
+//	                XxxSettings: &domain.XxxSettings{
+//	                    Enabled: enabled,
+//	                },
+//	            }
+//	        },
+//	        ExpectedItems: 1,
+//	        Constructor: func(verbose, dryRun bool) interface {
+//	            IsAvailable(ctx context.Context) bool
+//	            Clean(ctx context.Context) result.Result[domain.CleanResult]
+//	            ValidateSettings(*domain.OperationSettings) error
+//	        } {
+//	            return NewXxxCleaner(verbose, dryRun)
+//	        },
+//	    })
+//	}
+func CreateBooleanSettingsCleanerTestFunctions(t *testing.T, config BooleanSettingsCleanerTestConfig) {
+	t.Run("ValidateSettings", func(t *testing.T) {
+		TestBooleanSettingsCleanerValidateSettings(t, config, config.Constructor)
+	})
+
+	t.Run("Clean_DryRun", func(t *testing.T) {
+		TestBooleanSettingsCleanerCleanDryRun(t, config, config.Constructor)
+	})
 }
