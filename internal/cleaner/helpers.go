@@ -101,6 +101,19 @@ func ValidateToolTypes(
 	return nil
 }
 
+// ValidateSettingsWithTypes validates settings that have a types slice field.
+// This is a generic helper to eliminate duplication across similar validators.
+// The getter function extracts the types slice from the settings struct.
+func ValidateSettingsWithTypes[S any](
+	settings S,
+	getSlice func(S) []string,
+	availableTypes []string,
+	typeName string,
+) error {
+	slice := getSlice(settings)
+	return ValidateToolTypes(slice, availableTypes, typeName)
+}
+
 // ValidateLangVersionManagerSettings validates language version manager settings.
 func ValidateLangVersionManagerSettings(settings *domain.OperationSettings) error {
 	if settings == nil || settings.LangVersionManager == nil {
@@ -112,7 +125,12 @@ func ValidateLangVersionManagerSettings(settings *domain.OperationSettings) erro
 		string(LangVersionManagerPYENV),
 		string(LangVersionManagerRBENV),
 	}
-	return ValidateToolTypes(settings.LangVersionManager.ManagerTypes, availableTypes, "manager")
+	return ValidateSettingsWithTypes(
+		settings,
+		func(s *domain.OperationSettings) []string { return s.LangVersionManager.ManagerTypes },
+		availableTypes,
+		"manager",
+	)
 }
 
 // ValidateBuildCacheSettings validates build cache settings.
@@ -126,7 +144,12 @@ func ValidateBuildCacheSettings(settings *domain.OperationSettings) error {
 		string(BuildToolMaven),
 		string(BuildToolSBT),
 	}
-	return ValidateToolTypes(settings.BuildCache.ToolTypes, availableTypes, "tool")
+	return ValidateSettingsWithTypes(
+		settings,
+		func(s *domain.OperationSettings) []string { return s.BuildCache.ToolTypes },
+		availableTypes,
+		"tool",
+	)
 }
 
 // ScanItemFunc is a function that scans for items of type T and returns scan results.
