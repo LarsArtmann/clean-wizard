@@ -277,7 +277,12 @@ func (npmc *NodePackageManagerCleaner) runPackageManagerCommand(ctx context.Cont
 		fmt.Printf("  ✓ %s command completed\n", name)
 	}
 
-	cleanResult := domain.CleanResult{
+	return result.Ok(npmc.createDefaultCleanResult())
+}
+
+// createDefaultCleanResult returns a default CleanResult for package manager operations.
+func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanResult {
+	return domain.CleanResult{
 		FreedBytes:   0,
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
@@ -285,8 +290,6 @@ func (npmc *NodePackageManagerCleaner) runPackageManagerCommand(ctx context.Cont
 		CleanedAt:    time.Now(),
 		Strategy:     domain.StrategyConservative,
 	}
-
-	return result.Ok(cleanResult)
 }
 
 // cleanPackageManager cleans cache for a specific package manager.
@@ -305,15 +308,5 @@ func (npmc *NodePackageManagerCleaner) cleanPackageManager(ctx context.Context, 
 		return npmc.runPackageManagerCommand(ctx, "bun", "pm", "cache", "rm")
 	}
 
-	// Return success without specific byte count (unknown for most PMs)
-	cleanResult := domain.CleanResult{
-		FreedBytes:   0,
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
-	}
-
-	return result.Ok(cleanResult)
+	return result.Ok(npmc.createDefaultCleanResult())
 }
