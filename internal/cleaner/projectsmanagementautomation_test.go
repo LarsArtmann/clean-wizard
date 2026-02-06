@@ -20,18 +20,7 @@ func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
-	testCases := []IsAvailableTestCase{
-		{
-			Name: "default configuration",
-			Constructor: func() interface {
-				IsAvailable(ctx context.Context) bool
-			} {
-				return NewTestCleaner(NewProjectsManagementAutomationCleaner)()
-			},
-		},
-	}
-
-	TestIsAvailableGeneric(t, testCases)
+	TestIsAvailable(t, NewProjectsManagementAutomationCleaner)
 }
 
 func TestProjectsManagementAutomationCleaner_BooleanSettingsTests(t *testing.T) {

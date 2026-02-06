@@ -21,18 +21,7 @@ func TestCargoCleaner_Type(t *testing.T) {
 }
 
 func TestCargoCleaner_IsAvailable(t *testing.T) {
-	testCases := []IsAvailableTestCase{
-		{
-			Name: "default configuration",
-			Constructor: func() interface {
-				IsAvailable(ctx context.Context) bool
-			} {
-				return NewTestCleaner(NewCargoCleaner)()
-			},
-		},
-	}
-
-	TestIsAvailableGeneric(t, testCases)
+	TestIsAvailable(t, NewCargoCleaner)
 }
 
 func TestCargoCleaner_BooleanSettingsTests(t *testing.T) {

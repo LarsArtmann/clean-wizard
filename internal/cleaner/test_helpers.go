@@ -48,6 +48,37 @@ func TestIsAvailableGeneric(t *testing.T, testCases []IsAvailableTestCase) {
 	}
 }
 
+// TestIsAvailable is a helper that creates a standard IsAvailable test for cleaners.
+// This eliminates duplicate test function code across multiple cleaner test files.
+//
+// Usage:
+//
+//	func TestXxxCleaner_IsAvailable(t *testing.T) {
+//	    TestIsAvailable(t, NewXxxCleaner)
+//	}
+//
+// Type Parameters:
+//   - T: The cleaner type that must implement IsAvailable
+//
+// Parameters:
+//   - t: The testing.T object
+//   - newCleanerFunc: Function that creates a new cleaner instance with verbose and dryRun parameters
+func TestIsAvailable[T interface {
+	IsAvailable(ctx context.Context) bool
+}](t *testing.T, newCleanerFunc func(bool, bool) T) {
+	testCases := []IsAvailableTestCase{
+		{
+			Name: "default configuration",
+			Constructor: func() interface {
+				IsAvailable(ctx context.Context) bool
+			} {
+				return NewTestCleaner(newCleanerFunc)()
+			},
+		},
+	}
+	TestIsAvailableGeneric(t, testCases)
+}
+
 // CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings
 type CleanerConstructorWithSettings func(verbose, dryRun bool) interface {
 	IsAvailable(ctx context.Context) bool
