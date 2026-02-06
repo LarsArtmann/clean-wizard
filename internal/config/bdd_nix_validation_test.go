@@ -44,15 +44,10 @@ func newBaseNixConfig(safeMode bool) *domain.Config {
 
 // withGenerations sets/updates the nix-generations operation Generations value.
 func withGenerations(cfg *domain.Config, generations int) *domain.Config {
-	// Find the nix-cleanup profile and its nix-generations operation
-	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
-				profile.Operations[i].Settings.NixGenerations.Generations = generations
-				break
-			}
-		}
-	}
+	WithNixGenerationsSetting(cfg, "nix-cleanup", "nix-generations", func(settings *domain.NixGenerationsSettings) bool {
+		settings.Generations = generations
+		return true
+	})
 	return cfg
 }
 
@@ -76,23 +71,11 @@ func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Confi
 
 // withOptimize sets the Optimize flag for nix-generations.
 func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
-	// Convert boolean to enum
-	var optimizationMode domain.OptimizationMode
-	if optimize {
-		optimizationMode = domain.OptimizationModeEnabled
-	} else {
-		optimizationMode = domain.OptimizationModeDisabled
-	}
-
-	// Find the nix-cleanup profile and its nix-generations operation
-	if profile, exists := cfg.Profiles["nix-cleanup"]; exists {
-		for i, op := range profile.Operations {
-			if op.Name == "nix-generations" && op.Settings != nil && op.Settings.NixGenerations != nil {
-				profile.Operations[i].Settings.NixGenerations.Optimize = optimizationMode
-				break
-			}
-		}
-	}
+	optimizationMode := BoolToOptimizationMode(optimize)
+	WithNixGenerationsSetting(cfg, "nix-cleanup", "nix-generations", func(settings *domain.NixGenerationsSettings) bool {
+		settings.Optimize = optimizationMode
+		return true
+	})
 	return cfg
 }
 

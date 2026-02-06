@@ -97,3 +97,15 @@ func ChainModifiers(modifiers ...ConfigModifier) ConfigModifier {
 		return cfg
 	}
 }
+
+// WithNixGenerationsSetting modifies a specific NixGenerations setting field.
+// Takes the config, profile name, operation name, and a modifier function.
+// Returns true if the operation was found and modified.
+func WithNixGenerationsSetting(cfg *domain.Config, profileName, operationName string, settingModifier func(*domain.NixGenerationsSettings) bool) bool {
+	return WithOperationSettings(cfg, profileName, operationName, func(settings *domain.OperationSettings) bool {
+		if settings.NixGenerations == nil {
+			return false
+		}
+		return settingModifier(settings.NixGenerations)
+	})
+}
