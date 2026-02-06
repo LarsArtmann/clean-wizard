@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-func runValueFormattingTests(t *testing.T, tests []struct {
+func runFormattingTests[T any](t *testing.T, tests []struct {
 		name     string
-		input    any
+		input    T
 		expected string
-	}, formatFn func(any) string) {
+	}, formatFn func(T) string) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := formatFn(tt.input)
@@ -20,10 +20,27 @@ func runValueFormattingTests(t *testing.T, tests []struct {
 	}
 }
 
+func runDateTimeTests(t *testing.T, tests []struct {
+		name     string
+		input    time.Time
+		expected string
+	}, formatFn func(time.Time) string, customCheck func(t *testing.T, result string, tt struct {
+		name     string
+		input    time.Time
+		expected string
+	})) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := formatFn(tt.input)
+			customCheck(t, result, tt)
+		})
+	}
+}
+
 func TestSize(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    any
+		input    int64
 		expected string
 	}{
 		{"bytes", int64(512), "512 B"},
@@ -37,15 +54,15 @@ func TestSize(t *testing.T) {
 		{"negative", int64(-1024), "-1024 B"},
 	}
 
-	runValueFormattingTests(t, tests, func(v any) string {
-		return Size(v.(int64))
+	runFormattingTests(t, tests, func(v int64) string {
+		return Size(v)
 	})
 }
 
 func TestDuration(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    any
+		input    time.Duration
 		expected string
 	}{
 		{"nanoseconds", 500 * time.Nanosecond, "500 ns"},
@@ -57,40 +74,15 @@ func TestDuration(t *testing.T) {
 		{"zero", time.Duration(0), "0 ns"},
 	}
 
-	runValueFormattingTests(t, tests, func(v any) string {
-		return Duration(v.(time.Duration))
+	runFormattingTests(t, tests, func(v time.Duration) string {
+		return Duration(v)
 	})
 }
-
-func runTimeFormattingTests(t *testing.T, tests []struct {
-		name     string
-		t        time.Time
-		expected string
-	}, formatFn func(time.Time) string) {
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := formatFn(tt.t)
-			if result != tt.expected {
-				t.Errorf("result = %v, want %v", result, tt.expected)
-			}
-		})
-	}
-}
-
-var commonTimeTestCases = []struct {
-		name     string
-		t        time.Time
-		expected string
-	}{
-		{"valid datetime", time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC), "2023-12-25 15:30:45"},
-		{"zero time", time.Time{}, "never"},
-		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
-	}
 
 func TestDate(t *testing.T) {
 	tests := []struct {
 		name     string
-		t        time.Time
+		input    time.Time
 		expected string
 	}{
 		{"valid date", time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC), "2023-12-25"},
@@ -98,28 +90,39 @@ func TestDate(t *testing.T) {
 		{"unix epoch", time.Unix(0, 0), "1970-01-01"},
 	}
 
-	runTimeFormattingTests(t, tests, Date)
+	runFormattingTests(t, tests, Date)
 }
 
 func TestDateTime(t *testing.T) {
-	for _, tt := range commonTimeTestCases {
-		t.Run(tt.name, func(t *testing.T) {
-			result := DateTime(tt.t)
-			if tt.expected == "never" && result != "never" {
-				t.Errorf("DateTime(%v) = %v, want %v", tt.t, result, tt.expected)
-			} else if tt.expected != "never" {
-				if len(result) < 19 {
-					t.Errorf("DateTime(%v) = %v, expected at least 19 characters", tt.t, result)
-				}
-			}
-		})
+	tests := []struct {
+		name     string
+		input    time.Time
+		expected string
+	}{
+		{"valid datetime", time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC), "2023-12-25 15:30:45"},
+		{"zero time", time.Time{}, "never"},
+		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
 	}
+
+	runDateTimeTests(t, tests, DateTime, func(t *testing.T, result string, tt struct {
+		name     string
+		input    time.Time
+		expected string
+	}) {
+		if tt.expected == "never" && result != "never" {
+			t.Errorf("DateTime(%v) = %v, want %v", tt.input, result, tt.expected)
+		} else if tt.expected != "never" {
+			if len(result) < 19 {
+				t.Errorf("DateTime(%v) = %v, expected at least 19 characters", tt.input, result)
+			}
+		}
+	})
 }
 
 func TestNumber(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    any
+		input    int64
 		expected string
 	}{
 		{"small number", int64(42), "42"},
@@ -132,7 +135,7 @@ func TestNumber(t *testing.T) {
 		{"hundreds", int64(999), "999"},
 	}
 
-	runValueFormattingTests(t, tests, func(v any) string {
-		return Number(v.(int64))
+	runFormattingTests(t, tests, func(v int64) string {
+		return Number(v)
 	})
 }
