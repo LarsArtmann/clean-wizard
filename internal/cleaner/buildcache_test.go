@@ -331,14 +331,7 @@ func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
 	}
 
-	constructor := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-	} {
-		return cleaner
-	}
-
-	TestDryRunStrategy(t, constructor, "build-cache")
+	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "build-cache")
 }
 
 func TestBuildCacheCleaner_ParseDuration(t *testing.T) {

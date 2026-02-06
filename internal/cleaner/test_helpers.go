@@ -70,6 +70,35 @@ func ToSimpleCleanerConstructor(fullConstructor CleanerConstructorWithSettings) 
 	}
 }
 
+// SimpleCleanerConstructorFromInstance creates a SimpleCleanerConstructor from an existing cleaner instance.
+// This eliminates duplicate interface declarations in test files.
+//
+// Usage:
+//
+//	func TestXxxCleaner_DryRunStrategy(t *testing.T) {
+//	    cleaner := NewXxxCleaner(...)
+//	    TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "xxx")
+//	}
+//
+// Type Parameters:
+//   - T: The cleaner type that must implement the cleaner interface
+//
+// Parameters:
+//   - cleaner: An existing cleaner instance
+//
+// Returns a SimpleCleanerConstructor that returns the given cleaner
+func SimpleCleanerConstructorFromInstance[T interface {
+	IsAvailable(ctx context.Context) bool
+	Clean(ctx context.Context) result.Result[domain.CleanResult]
+}](cleaner T) SimpleCleanerConstructor {
+	return func(verbose, dryRun bool) interface {
+		IsAvailable(ctx context.Context) bool
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	} {
+		return cleaner
+	}
+}
+
 // TestValidateSettings runs a standard validation settings test suite
 func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructorWithSettings, testCases []ValidateSettingsTestCase) {
 	for _, tt := range testCases {

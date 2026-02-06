@@ -259,14 +259,7 @@ func TestSystemCacheCleaner_DryRunStrategy(t *testing.T) {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
 	}
 
-	constructor := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-	} {
-		return cleaner
-	}
-
-	TestDryRunStrategy(t, constructor, "system-cache")
+	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "system-cache")
 }
 
 func TestAvailableSystemCacheTypes(t *testing.T) {

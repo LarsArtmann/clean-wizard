@@ -213,14 +213,7 @@ func TestLanguageVersionManagerCleaner_GetHomeDir(t *testing.T) {
 func TestLanguageVersionManagerCleaner_DryRunStrategy(t *testing.T) {
 	cleaner := NewLanguageVersionManagerCleaner(false, true, AvailableLangVersionManagers())
 
-	constructor := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-	} {
-		return cleaner
-	}
-
-	TestDryRunStrategy(t, constructor, "language-version-manager")
+	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "language-version-manager")
 }
 
 func TestAvailableLangVersionManagers(t *testing.T) {

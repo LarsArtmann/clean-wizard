@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 func TestNewDockerCleaner(t *testing.T) {
@@ -207,14 +206,7 @@ func TestDockerCleaner_Scan(t *testing.T) {
 func TestDockerCleaner_DryRunStrategy(t *testing.T) {
 	cleaner := NewDockerCleaner(false, true, DockerPruneStandard)
 
-	constructor := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-	} {
-		return cleaner
-	}
-
-	TestDryRunStrategy(t, constructor, "docker")
+	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "docker")
 }
 
 func TestDockerCleaner_PruneModes(t *testing.T) {

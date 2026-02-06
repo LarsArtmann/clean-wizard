@@ -275,14 +275,7 @@ func TestGoCleaner_Clean_NoAvailable(t *testing.T) {
 func TestGoCleaner_DryRunStrategy(t *testing.T) {
 	cleaner := NewGoCleanerWithSettings(false, true, cacheTypeFromBools(true, true, true, true, true))
 
-	constructor := func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-	} {
-		return cleaner
-	}
-
-	TestDryRunStrategy(t, constructor, "go")
+	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "go")
 }
 
 func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {
