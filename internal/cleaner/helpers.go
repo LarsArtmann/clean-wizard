@@ -114,40 +114,58 @@ func ValidateSettingsWithTypes[S any](
 	return ValidateToolTypes(slice, availableTypes, typeName)
 }
 
-// ValidateLangVersionManagerSettings validates language version manager settings.
-func ValidateLangVersionManagerSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.LangVersionManager == nil {
+// ValidateOptionalSettingsWithTypes validates optional settings with type validation.
+// It handles the common pattern of checking if a field is nil, and if not,
+// validating its types against available types.
+func ValidateOptionalSettingsWithTypes[F any](
+	settings *domain.OperationSettings,
+	getField func(*domain.OperationSettings) *F,
+	getSlice func(*F) []string,
+	availableTypes []string,
+	typeName string,
+) error {
+	if settings == nil {
 		return nil
 	}
-
-	availableTypes := []string{
-		string(LangVersionManagerNVM),
-		string(LangVersionManagerPYENV),
-		string(LangVersionManagerRBENV),
+	field := getField(settings)
+	if field == nil {
+		return nil
 	}
-	return ValidateSettingsWithTypes(
+	return ValidateToolTypes(getSlice(field), availableTypes, typeName)
+}
+
+// LangVersionManagerAvailableTypes defines all valid language version manager types.
+var LangVersionManagerAvailableTypes = []string{
+	string(LangVersionManagerNVM),
+	string(LangVersionManagerPYENV),
+	string(LangVersionManagerRBENV),
+}
+
+// BuildCacheAvailableTypes defines all valid build cache tool types.
+var BuildCacheAvailableTypes = []string{
+	string(BuildToolGradle),
+	string(BuildToolMaven),
+	string(BuildToolSBT),
+}
+
+// ValidateLangVersionManagerSettings validates language version manager settings.
+func ValidateLangVersionManagerSettings(settings *domain.OperationSettings) error {
+	return ValidateOptionalSettingsWithTypes(
 		settings,
-		func(s *domain.OperationSettings) []string { return s.LangVersionManager.ManagerTypes },
-		availableTypes,
+		func(s *domain.OperationSettings) *domain.LangVersionManagerSettings { return s.LangVersionManager },
+		func(f *domain.LangVersionManagerSettings) []string { return f.ManagerTypes },
+		LangVersionManagerAvailableTypes,
 		"manager",
 	)
 }
 
 // ValidateBuildCacheSettings validates build cache settings.
 func ValidateBuildCacheSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.BuildCache == nil {
-		return nil
-	}
-
-	availableTypes := []string{
-		string(BuildToolGradle),
-		string(BuildToolMaven),
-		string(BuildToolSBT),
-	}
-	return ValidateSettingsWithTypes(
+	return ValidateOptionalSettingsWithTypes(
 		settings,
-		func(s *domain.OperationSettings) []string { return s.BuildCache.ToolTypes },
-		availableTypes,
+		func(s *domain.OperationSettings) *domain.BuildCacheSettings { return s.BuildCache },
+		func(f *domain.BuildCacheSettings) []string { return f.ToolTypes },
+		BuildCacheAvailableTypes,
 		"tool",
 	)
 }
