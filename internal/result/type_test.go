@@ -5,26 +5,28 @@ import (
 	"testing"
 )
 
-func TestResult_Ok(t *testing.T) {
-	testPredicateCases(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, []struct {
+// testPredicateTestCases provides test cases for predicate testing with shared test data.
+func testPredicateTestCases(okExpected bool, errExpected bool) []struct {
+	name     string
+	result   Result[int]
+	expected bool
+} {
+	return []struct {
 		name     string
 		result   Result[int]
 		expected bool
 	}{
-		{"ok result", Ok(42), true},
-		{"error result", Err[int](errors.New("test error")), false},
-	})
+		{"ok result", testOkResult(), okExpected},
+		{"error result", testErrResult(), errExpected},
+	}
+}
+
+func TestResult_Ok(t *testing.T) {
+	testPredicateCases(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, testPredicateTestCases(true, false))
 }
 
 func TestResult_IsErr(t *testing.T) {
-	testPredicateCases(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, []struct {
-		name     string
-		result   Result[int]
-		expected bool
-	}{
-		{"ok result", Ok(42), false},
-		{"error result", Err[int](errors.New("test error")), true},
-	})
+	testPredicateCases(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, testPredicateTestCases(false, true))
 }
 
 // testOkResult returns a successful result for testing.
