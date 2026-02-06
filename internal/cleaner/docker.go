@@ -132,23 +132,28 @@ func (dc *DockerCleaner) scanDockerResources(ids []string, resourceType DockerRe
 	items := make([]domain.ScanItem, 0, len(ids))
 
 	for _, id := range ids {
-		if id == "" {
-			continue
-		}
-
-		items = append(items, domain.ScanItem{
-			Path:     fmt.Sprintf("docker:%s:%s", resourceType, id),
-			Size:     0, // Size unknown without inspecting
-			Created:  time.Time{},
-			ScanType: domain.ScanTypeTemp,
-		})
-
-		if dc.verbose {
-			fmt.Printf("Found %s: %s\n", resourceType, id)
-		}
+		dc.addScanItem(&items, id, resourceType)
 	}
 
 	return items
+}
+
+// addScanItem adds a single scan item to the items slice.
+func (dc *DockerCleaner) addScanItem(items *[]domain.ScanItem, id string, resourceType DockerResourceType) {
+	if id == "" {
+		return
+	}
+
+	*items = append(*items, domain.ScanItem{
+		Path:     fmt.Sprintf("docker:%s:%s", resourceType, id),
+		Size:     0, // Size unknown without inspecting
+		Created:  time.Time{},
+		ScanType: domain.ScanTypeTemp,
+	})
+
+	if dc.verbose {
+		fmt.Printf("Found %s: %s\n", resourceType, id)
+	}
 }
 
 // scanDanglingImages scans for dangling Docker images.
