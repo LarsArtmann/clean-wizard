@@ -535,6 +535,36 @@ func NewBooleanSettingsCleanerTestConfig[T interface {
 	}
 }
 
+// NewBooleanSettingsCleanerTestConfigFn creates a BooleanSettingsCleanerTestConfig from constructor and settings creation function.
+// This eliminates duplicate config boilerplate by combining config creation in one call.
+//
+// Type Parameters:
+//   - T: The cleaner type that must implement the cleaner interface
+//
+// Parameters:
+//   - testName: Name for the test (e.g., "Cargo", "ProjectsManagementAutomation")
+//   - toolName: Tool identifier (e.g., "Cargo", "projects-management-automation")
+//   - settingsFieldName: Human-readable name for the settings field (e.g., "cargo packages")
+//   - expectedItems: Number of expected items for dry-run tests (usually 1)
+//   - constructor: Function that creates a cleaner with given verbose and dryRun flags
+//   - createSettings: Function that creates OperationSettings with the specific field configured
+//
+// Returns a configured BooleanSettingsCleanerTestConfig ready for use with CreateBooleanSettingsCleanerTestFunctions
+func NewBooleanSettingsCleanerTestConfigFn[T interface {
+	IsAvailable(ctx context.Context) bool
+	Clean(ctx context.Context) result.Result[domain.CleanResult]
+	ValidateSettings(*domain.OperationSettings) error
+}](testName, toolName, settingsFieldName string, expectedItems uint, constructor func(verbose, dryRun bool) T, createSettings func(bool) *domain.OperationSettings) BooleanSettingsCleanerTestConfig {
+	return BooleanSettingsCleanerTestConfig{
+		TestName:          testName,
+		ToolName:          toolName,
+		SettingsFieldName: settingsFieldName,
+		ExpectedItems:     expectedItems,
+		Constructor:       NewBooleanSettingsCleanerTestConstructor(constructor),
+		CreateSettings:    createSettings,
+	}
+}
+
 // NewTestCleaner creates a cleaner with default test settings (verbose=false, dryRun=false).
 // This eliminates duplicate cleaner initialization code across test files.
 //
