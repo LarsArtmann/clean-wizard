@@ -470,6 +470,16 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 	return result.Value(), nil
 }
 
+// createCleanerWithError wraps cleaner creation that may return an error.
+// Panics if the factory returns an error (used for invalid configuration).
+func createCleanerWithError(factory func() (cleaner.Cleaner, error)) cleaner.Cleaner {
+	cleaner, err := factory()
+	if err != nil {
+		panic(err) // Invalid configuration, should never happen
+	}
+	return cleaner
+}
+
 // runHomebrewCleaner executes the Homebrew cleaner.
 func runHomebrewCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
@@ -546,11 +556,9 @@ func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 // runGoCleaner executes the Go cleaner.
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		goCleaner, err := cleaner.NewGoCleaner(v, d, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheBuildCache)
-		if err != nil {
-			panic(err) // This should never happen with valid parameters
-		}
-		return goCleaner
+		return createCleanerWithError(func() (cleaner.Cleaner, error) {
+			return cleaner.NewGoCleaner(v, d, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheBuildCache)
+		})
 	})
 }
 
