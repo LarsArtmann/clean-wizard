@@ -68,3 +68,22 @@ func TestTypeString[T ~string](t *testing.T, name string, cases []T) {
 		return TestTypeStringCases(cases)
 	})
 }
+
+// TestEnumString tests that all enum values produce their expected string representation
+// This is a simpler alternative for types where the enum values are string constants
+func TestEnumString[T ~string](t *testing.T, name string, values []T) {
+	expected := map[T]string{}
+	for _, v := range values {
+		expected[v] = string(v)
+	}
+
+	for _, value := range values {
+		t.Run(expected[value], func(t *testing.T) {
+			got := string(value)
+			want := expected[value]
+			if got != want {
+				t.Errorf("string(%[1]v) = %[2]q, want %[3]q", value, got, want)
+			}
+		})
+	}
+}

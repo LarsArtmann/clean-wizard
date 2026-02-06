@@ -225,7 +225,7 @@ func TestAvailableLangVersionManagers(t *testing.T) {
 }
 
 func TestLangVersionManagerType_String(t *testing.T) {
-	TestTypeString(t, "LangVersionManagerType", []LangVersionManagerType{
+	TestEnumString(t, "LangVersionManagerType", []LangVersionManagerType{
 		LangVersionManagerNVM,
 		LangVersionManagerPYENV,
 		LangVersionManagerRBENV,

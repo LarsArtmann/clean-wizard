@@ -231,7 +231,7 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 }
 
 func TestDockerPruneMode_String(t *testing.T) {
-	TestTypeString(t, "DockerPruneMode", []DockerPruneMode{
+	TestEnumString(t, "DockerPruneMode", []DockerPruneMode{
 		DockerPruneLight,
 		DockerPruneStandard,
 		DockerPruneAggressive,
