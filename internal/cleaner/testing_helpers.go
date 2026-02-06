@@ -1,10 +1,14 @@
 package cleaner
 
-import "testing"
+import (
+	stdtesting "testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/testing"
+)
 
 // TestAvailableTypesGeneric tests that the available types function returns the expected list
-func TestAvailableTypesGeneric[T comparable](t *testing.T, name string, getAvailable func() []T, expected []T) {
-	t.Run(name, func(t *testing.T) {
+func TestAvailableTypesGeneric[T comparable](t *stdtesting.T, name string, getAvailable func() []T, expected []T) {
+	t.Run(name, func(t *stdtesting.T) {
 		types := getAvailable()
 
 		if len(types) != len(expected) {
@@ -43,14 +47,14 @@ func TestTypeStringCases[T ~string](cases []T) []struct {
 }
 
 // TestTypeStringGeneric tests the string representation of a type
-func TestTypeStringGeneric[T ~string](t *testing.T, name string, getTestCases func() []struct {
+func TestTypeStringGeneric[T ~string](t *stdtesting.T, name string, getTestCases func() []struct {
 	Value T
 	Want  string
 }) {
 	tests := getTestCases()
 
 	for _, tt := range tests {
-		t.Run(tt.Want, func(t *testing.T) {
+		t.Run(tt.Want, func(t *stdtesting.T) {
 			got := string(tt.Value)
 			if got != tt.Want {
 				t.Errorf("string(%v) = %v, want %v", tt.Value, got, tt.Want)
@@ -60,7 +64,7 @@ func TestTypeStringGeneric[T ~string](t *testing.T, name string, getTestCases fu
 }
 
 // TestTypeString tests the String() method of a type with the given cases
-func TestTypeString[T ~string](t *testing.T, name string, cases []T) {
+func TestTypeString[T ~string](t *stdtesting.T, name string, cases []T) {
 	TestTypeStringGeneric(t, name, func() []struct {
 		Value T
 		Want  string
@@ -71,14 +75,14 @@ func TestTypeString[T ~string](t *testing.T, name string, cases []T) {
 
 // TestEnumString tests that all enum values produce their expected string representation
 // This is a simpler alternative for types where the enum values are string constants
-func TestEnumString[T ~string](t *testing.T, name string, values []T) {
+func TestEnumString[T ~string](t *stdtesting.T, name string, values []T) {
 	expected := map[T]string{}
 	for _, v := range values {
 		expected[v] = string(v)
 	}
 
 	for _, value := range values {
-		t.Run(expected[value], func(t *testing.T) {
+		t.Run(expected[value], func(t *stdtesting.T) {
 			got := string(value)
 			want := expected[value]
 			if got != want {
