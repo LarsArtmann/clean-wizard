@@ -252,38 +252,51 @@ func (ctx *BDDTestContext) shouldSeeWhatWouldBeCleaned() error {
 	return nil
 }
 
+// Validation configuration for clean result field checks
+type fieldValidationConfig struct {
+	getter   func(*domain.CleanResult) int64
+	condition func(int64) bool
+	errorMsg string
+}
+
+const (
+	positiveEstimatedSpaceErr = "expected positive estimated space but got: %d"
+	nonNegativeItemCountErr   = "expected non-negative item count but got: %d"
+)
+
+var (
+	freedBytesValidation = fieldValidationConfig{
+		getter:   func(r *domain.CleanResult) int64 { return r.FreedBytes },
+		condition: func(v int64) bool { return v > 0 },
+		errorMsg: positiveEstimatedSpaceErr,
+	}
+	itemsRemovedValidation = fieldValidationConfig{
+		getter:   func(r *domain.CleanResult) int64 { return r.ItemsRemoved },
+		condition: func(v int64) bool { return v >= 0 },
+		errorMsg: nonNegativeItemCountErr,
+	}
+)
+
 func (ctx *BDDTestContext) shouldSeeEstimatedSpace() error {
-	return ctx.validateCleanResultField(
-		ctx.cleanResult,
-		func(r *domain.CleanResult) int64 { return r.FreedBytes },
-		func(v int64) bool { return v > 0 },
-		"expected positive estimated space but got: %d",
-	)
+	return ctx.validateCleanResultField(ctx.cleanResult, freedBytesValidation)
 }
 
 func (ctx *BDDTestContext) shouldSeeGenerationsCount() error {
-	return ctx.validateCleanResultField(
-		ctx.cleanResult,
-		func(r *domain.CleanResult) int64 { return r.ItemsRemoved },
-		func(v int64) bool { return v >= 0 },
-		"expected non-negative item count but got: %d",
-	)
+	return ctx.validateCleanResultField(ctx.cleanResult, itemsRemovedValidation)
 }
 
 func (ctx *BDDTestContext) validateCleanResultField(
 	r result.Result[domain.CleanResult],
-	getter func(*domain.CleanResult) int64,
-	condition func(int64) bool,
-	errorMsg string,
+	config fieldValidationConfig,
 ) error {
 	result, err := ctx.validateResult(r)
 	if err != nil {
 		return err
 	}
 
-	value := getter(result)
-	if !condition(value) {
-		return fmt.Errorf(errorMsg, value)
+	value := config.getter(result)
+	if !config.condition(value) {
+		return fmt.Errorf(config.errorMsg, value)
 	}
 
 	return nil
