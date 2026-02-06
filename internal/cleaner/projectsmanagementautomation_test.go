@@ -8,9 +8,7 @@ import (
 )
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
-	testNewCleanerConstructor(t, func(verbose, dryRun bool) interface{} {
-		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
-	}, "NewProjectsManagementAutomationCleaner")
+	TestNewCleanerConstructor(t, NewProjectsManagementAutomationCleaner, "NewProjectsManagementAutomationCleaner")
 }
 
 func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {

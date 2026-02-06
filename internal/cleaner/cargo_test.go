@@ -9,9 +9,7 @@ import (
 )
 
 func TestNewCargoCleaner(t *testing.T) {
-	testNewCleanerConstructor(t, func(verbose, dryRun bool) interface{} {
-		return NewCargoCleaner(verbose, dryRun)
-	}, "NewCargoCleaner")
+	TestNewCleanerConstructor(t, NewCargoCleaner, "NewCargoCleaner")
 }
 
 func TestCargoCleaner_Type(t *testing.T) {
