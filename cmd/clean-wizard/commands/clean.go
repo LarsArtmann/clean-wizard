@@ -503,11 +503,33 @@ func runGenericCleaner(ctx context.Context, verbose, dryRun bool, factory func(b
 	return result.Value(), nil
 }
 
+// runCleanerWithNodeManagers executes the Node package manager cleaner.
+func runCleanerWithNodeManagers(ctx context.Context, verbose, dryRun bool, managers []cleaner.NodePackageManagerType) (domain.CleanResult, error) {
+	cleanerInstance := cleaner.NewNodePackageManagerCleaner(verbose, dryRun, managers)
+
+	result := cleanerInstance.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	return result.Value(), nil
+}
+
+// runCleanerWithLangVersionManagers executes the Language Version Manager cleaner.
+func runCleanerWithLangVersionManagers(ctx context.Context, verbose, dryRun bool, managers []cleaner.LangVersionManagerType) (domain.CleanResult, error) {
+	cleanerInstance := cleaner.NewLanguageVersionManagerCleaner(verbose, dryRun, managers)
+
+	result := cleanerInstance.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	return result.Value(), nil
+}
+
 // runNodePackageManagerCleaner executes the Node package manager cleaner.
 func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return cleaner.NewNodePackageManagerCleaner(v, d, cleaner.AvailableNodePackageManagers())
-	})
+	return runCleanerWithNodeManagers(ctx, verbose, dryRun, cleaner.AvailableNodePackageManagers())
 }
 
 // runGoCleaner executes the Go cleaner.
@@ -567,9 +589,7 @@ func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cl
 
 // runLangVersionManagerCleaner executes the Language Version Manager cleaner.
 func runLangVersionManagerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return cleaner.NewLanguageVersionManagerCleaner(v, d, cleaner.AvailableLangVersionManagers())
-	})
+	return runCleanerWithLangVersionManagers(ctx, verbose, dryRun, cleaner.AvailableLangVersionManagers())
 }
 
 // runProjectsManagementAutomationCleaner executes Projects Management Automation cleaner.
