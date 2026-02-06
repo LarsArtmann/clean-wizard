@@ -165,18 +165,7 @@ func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domai
 		return domain.RiskHigh
 	}
 
-	maxRisk := domain.RiskLow
-	for _, op := range profile.Operations {
-		if op.RiskLevel == domain.RiskCritical {
-			return domain.RiskCritical
-		}
-		if op.RiskLevel == domain.RiskHigh {
-			maxRisk = domain.RiskHigh
-		} else if op.RiskLevel == domain.RiskMedium && maxRisk == domain.RiskLow {
-			maxRisk = domain.RiskMedium
-		}
-	}
-	return maxRisk
+	return maxRiskLevelFromOperations(profile.Operations, domain.RiskLow)
 }
 
 func (vm *ValidationMiddleware) makeStringSet(slice []string) map[string]bool {

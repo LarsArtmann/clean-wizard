@@ -159,15 +159,25 @@ func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.Cleanu
 func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel {
 	maxRisk := domain.RiskLow
 	for _, profile := range cfg.Profiles {
-		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskCritical {
-				return domain.RiskCritical
-			}
-			if op.RiskLevel == domain.RiskHigh {
-				maxRisk = domain.RiskHigh
-			} else if op.RiskLevel == domain.RiskMedium && maxRisk == domain.RiskLow {
-				maxRisk = domain.RiskMedium
-			}
+		maxRisk = maxRiskLevelFromOperations(profile.Operations, maxRisk)
+		if maxRisk == domain.RiskCritical {
+			return domain.RiskCritical
+		}
+	}
+	return maxRisk
+}
+
+// maxRiskLevelFromOperations calculates the maximum risk level from a slice of operations.
+func maxRiskLevelFromOperations(operations []domain.CleanupOperation, currentMax domain.RiskLevel) domain.RiskLevel {
+	maxRisk := currentMax
+	for _, op := range operations {
+		if op.RiskLevel == domain.RiskCritical {
+			return domain.RiskCritical
+		}
+		if op.RiskLevel == domain.RiskHigh {
+			maxRisk = domain.RiskHigh
+		} else if op.RiskLevel == domain.RiskMedium && maxRisk == domain.RiskLow {
+			maxRisk = domain.RiskMedium
 		}
 	}
 	return maxRisk
