@@ -502,3 +502,26 @@ func NewBooleanSettingsCleanerTestConfig[T interface {
 		CreateSettings:    createSettings,
 	}
 }
+
+// NewTestCleaner creates a cleaner with default test settings (verbose=false, dryRun=false).
+// This eliminates duplicate cleaner initialization code across test files.
+//
+// Usage:
+//
+//	func TestXxxCleaner_Xxx(t *testing.T) {
+//	    cleaner := NewTestCleaner(NewXxxCleaner)
+//	    // use cleaner...
+//	}
+//
+// Type Parameters:
+//   - T: The cleaner type
+//
+// Parameters:
+//   - constructor: Function that creates a cleaner with given verbose and dryRun flags
+//
+// Returns a function that creates the cleaner with default test settings
+func NewTestCleaner[T any](constructor func(verbose, dryRun bool) T) func() T {
+	return func() T {
+		return constructor(false, false)
+	}
+}

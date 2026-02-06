@@ -55,7 +55,7 @@ func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
-	cleaner := NewProjectsManagementAutomationCleaner(false, false)
+	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	if cleaner.Type() != domain.OperationTypeProjectsManagementAutomation {
 		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeProjectsManagementAutomation)
@@ -69,7 +69,7 @@ func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
 			Constructor: func() interface {
 				IsAvailable(ctx context.Context) bool
 			} {
-				return NewProjectsManagementAutomationCleaner(false, false)
+				return NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 			},
 		},
 	}
@@ -95,7 +95,7 @@ func TestProjectsManagementAutomationCleaner_BooleanSettingsTests(t *testing.T) 
 }
 
 func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
-	cleaner := NewProjectsManagementAutomationCleaner(false, false)
+	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	size := cleaner.estimateCacheSize()
 	expectedSize := int64(100 * 1024 * 1024) // 100MB
@@ -106,7 +106,7 @@ func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
-	cleaner := NewProjectsManagementAutomationCleaner(false, false)
+	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	result := cleaner.Scan(context.Background())
 
@@ -141,7 +141,7 @@ func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_Scan_NotAvailable(t *testing.T) {
-	cleaner := NewProjectsManagementAutomationCleaner(false, false)
+	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	// If tool is not available, should return empty items
 	if !cleaner.IsAvailable(context.Background()) {
@@ -163,7 +163,7 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 	// This test would fail if projects-management-automation is installed
 	// We just verify error handling logic exists
 
-	cleaner := NewProjectsManagementAutomationCleaner(false, false)
+	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	// Can't easily test "tool not available" case without mocking
 	// So we just verify IsAvailable is called
