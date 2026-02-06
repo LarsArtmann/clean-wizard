@@ -79,25 +79,29 @@ func TestIsAvailable[T interface {
 	TestIsAvailableGeneric(t, testCases)
 }
 
-// CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings
-type CleanerConstructorWithSettings func(verbose, dryRun bool) interface {
+// CleanerWithSettings represents a cleaner interface with settings validation
+// This eliminates duplicate interface declarations in test helper functions.
+type CleanerWithSettings interface {
 	IsAvailable(ctx context.Context) bool
 	Clean(ctx context.Context) result.Result[domain.CleanResult]
 	ValidateSettings(*domain.OperationSettings) error
 }
 
+// CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings
+type CleanerConstructorWithSettings func(verbose, dryRun bool) CleanerWithSettings
+
 // SimpleCleanerConstructor is a function type for creating cleaners in tests that only need Clean and IsAvailable
-type SimpleCleanerConstructor func(verbose, dryRun bool) interface {
+type SimpleCleanerConstructor func(verbose, dryRun bool) SimpleCleaner
+
+// SimpleCleaner represents a cleaner interface without settings validation
+type SimpleCleaner interface {
 	IsAvailable(ctx context.Context) bool
 	Clean(ctx context.Context) result.Result[domain.CleanResult]
 }
 
 // ToSimpleCleanerConstructor converts a constructor with additional methods to one that only exposes Clean and IsAvailable
 func ToSimpleCleanerConstructor(fullConstructor CleanerConstructorWithSettings) SimpleCleanerConstructor {
-	return func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-	} {
+	return func(verbose, dryRun bool) SimpleCleaner {
 		return fullConstructor(verbose, dryRun)
 	}
 }
@@ -119,14 +123,8 @@ func ToSimpleCleanerConstructor(fullConstructor CleanerConstructorWithSettings) 
 //   - cleaner: An existing cleaner instance
 //
 // Returns a SimpleCleanerConstructor that returns the given cleaner
-func SimpleCleanerConstructorFromInstance[T interface {
-	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) result.Result[domain.CleanResult]
-}](cleaner T) SimpleCleanerConstructor {
-	return func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-	} {
+func SimpleCleanerConstructorFromInstance[T SimpleCleaner](cleaner T) SimpleCleanerConstructor {
+	return func(verbose, dryRun bool) SimpleCleaner {
 		return cleaner
 	}
 }
@@ -364,13 +362,7 @@ func TestCleanTimingWithConstructor(t *testing.T, constructor SimpleCleanerConst
 //
 // Usage:
 //   func Test<X>Cleaner_StandardTests(t *testing.T) {
-//       TestStandardCleaner(t, func(verbose, dryRun bool) interface {
-//           IsAvailable(ctx context.Context) bool
-//           Clean(ctx context.Context) result.Result[domain.CleanResult]
-//           ValidateSettings(*domain.OperationSettings) error
-//       } {
-//           return NewXCleaner(verbose, dryRun)
-//       }, "ToolName")
+//       TestStandardCleaner(t, NewXCleaner, "ToolName")
 //   }
 func TestStandardCleaner(t *testing.T, constructor CleanerConstructorWithSettings, toolName string) {
 	t.Run("DryRunStrategy", func(t *testing.T) {
@@ -395,19 +387,11 @@ func TestStandardCleaner(t *testing.T, constructor CleanerConstructorWithSetting
 //   - availableManagers: Function that returns the available managers
 //
 // Returns a CleanerConstructorWithSettings that matches the TestValidateSettings signature
-func NewCleanerConstructorWithSettings[T interface {
-	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) result.Result[domain.CleanResult]
-	ValidateSettings(*domain.OperationSettings) error
-}, M any](
+func NewCleanerConstructorWithSettings[T CleanerWithSettings, M any](
 	constructor func(verbose, dryRun bool, managers []M) T,
 	availableManagers func() []M,
 ) CleanerConstructorWithSettings {
-	return func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-		ValidateSettings(*domain.OperationSettings) error
-	} {
+	return func(verbose, dryRun bool) CleanerWithSettings {
 		return constructor(verbose, dryRun, availableManagers())
 	}
 }
@@ -468,16 +452,8 @@ func CreateBooleanSettingsCleanerTestFunctions(t *testing.T, config BooleanSetti
 //   - constructor: Function that creates a cleaner with given verbose and dryRun flags
 //
 // Returns a CleanerConstructorWithSettings that can be used with TestStandardCleaner and other helpers
-func NewBooleanSettingsCleanerTestConstructor[T interface {
-	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) result.Result[domain.CleanResult]
-	ValidateSettings(*domain.OperationSettings) error
-}](constructor func(verbose, dryRun bool) T) CleanerConstructorWithSettings {
-	return func(verbose, dryRun bool) interface {
-		IsAvailable(ctx context.Context) bool
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
-		ValidateSettings(*domain.OperationSettings) error
-	} {
+func NewBooleanSettingsCleanerTestConstructor[T CleanerWithSettings](constructor func(verbose, dryRun bool) T) CleanerConstructorWithSettings {
+	return func(verbose, dryRun bool) CleanerWithSettings {
 		return constructor(verbose, dryRun)
 	}
 }
