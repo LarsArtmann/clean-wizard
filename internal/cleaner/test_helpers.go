@@ -420,3 +420,56 @@ func NewBooleanSettingsCleanerTestConstructor[T interface {
 		return constructor(verbose, dryRun)
 	}
 }
+
+// NewBooleanSettingsCleanerTestConfig creates a BooleanSettingsCleanerTestConfig with standardized values.
+// This eliminates duplicate config boilerplate across test files.
+//
+// Parameters:
+//   - testName: Name for the test (e.g., "Cargo", "ProjectsManagementAutomation")
+//   - toolName: Tool identifier (e.g., "Cargo", "projects-management-automation")
+//   - settingsFieldName: Human-readable name for the settings field (e.g., "cargo packages")
+//   - expectedItems: Number of expected items for dry-run tests (usually 1)
+//   - newCleanerFunc: Function that creates a new cleaner instance
+//
+// Returns a configured BooleanSettingsCleanerTestConfig ready for use with CreateBooleanSettingsCleanerTestFunctions
+//
+// Usage:
+//   func TestXxxCleaner_BooleanSettingsTests(t *testing.T) {
+//       CreateBooleanSettingsCleanerTestFunctions(t,
+//           NewBooleanSettingsCleanerTestConfig(
+//               "Xxx",           // testName
+//               "xxx-tool",      // toolName
+//               "xxx settings",  // settingsFieldName
+//               1,               // expectedItems
+//               NewXxxCleaner,   // newCleanerFunc
+//               func(enabled bool) *domain.OperationSettings {
+//                   return &domain.OperationSettings{
+//                       XxxSettings: &domain.XxxSettings{
+//                           Enabled: enabled,
+//                       },
+//                   }
+//               },
+//           ),
+//       )
+//   }
+func NewBooleanSettingsCleanerTestConfig[T interface {
+	IsAvailable(ctx context.Context) bool
+	Clean(ctx context.Context) result.Result[domain.CleanResult]
+	ValidateSettings(*domain.OperationSettings) error
+}](
+	testName string,
+	toolName string,
+	settingsFieldName string,
+	expectedItems uint,
+	newCleanerFunc func(verbose, dryRun bool) T,
+	createSettings func(bool) *domain.OperationSettings,
+) BooleanSettingsCleanerTestConfig {
+	return BooleanSettingsCleanerTestConfig{
+		TestName:          testName,
+		ToolName:          toolName,
+		SettingsFieldName: settingsFieldName,
+		ExpectedItems:     expectedItems,
+		Constructor:       NewBooleanSettingsCleanerTestConstructor(newCleanerFunc),
+		CreateSettings:    createSettings,
+	}
+}

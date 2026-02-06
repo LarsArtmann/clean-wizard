@@ -78,20 +78,20 @@ func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_BooleanSettingsTests(t *testing.T) {
-	CreateBooleanSettingsCleanerTestFunctions(t, BooleanSettingsCleanerTestConfig{
-		TestName:          "ProjectsManagementAutomation",
-		ToolName:          "projects-management-automation",
-		SettingsFieldName: "projects management automation",
-		CreateSettings: func(enabled bool) *domain.OperationSettings {
+	CreateBooleanSettingsCleanerTestFunctions(t, NewBooleanSettingsCleanerTestConfig(
+		"ProjectsManagementAutomation",
+		"projects-management-automation",
+		"projects management automation",
+		1,
+		NewProjectsManagementAutomationCleaner,
+		func(enabled bool) *domain.OperationSettings {
 			return &domain.OperationSettings{
 				ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
 					ClearCache: enabled,
 				},
 			}
 		},
-		ExpectedItems: 1,
-		Constructor:   NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
-	})
+	))
 }
 
 func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
