@@ -276,15 +276,12 @@ func TestSystemCacheType_String(t *testing.T) {
 		Value SystemCacheType
 		Want  string
 	} {
-		return []struct {
-			Value SystemCacheType
-			Want  string
-		}{
-			{SystemCacheSpotlight, "spotlight"},
-			{SystemCacheXcode, "xcode"},
-			{SystemCacheCocoaPods, "cocoapods"},
-			{SystemCacheHomebrew, "homebrew"},
-		}
+		return TestTypeStringCases([]SystemCacheType{
+			SystemCacheSpotlight,
+			SystemCacheXcode,
+			SystemCacheCocoaPods,
+			SystemCacheHomebrew,
+		})
 	})
 }
 

@@ -242,15 +242,12 @@ func TestNodePackageManagerType_String(t *testing.T) {
 		Value NodePackageManagerType
 		Want  string
 	} {
-		return []struct {
-			Value NodePackageManagerType
-			Want  string
-		}{
-			{NodePackageManagerNPM, "npm"},
-			{NodePackageManagerPNPM, "pnpm"},
-			{NodePackageManagerYarn, "yarn"},
-			{NodePackageManagerBun, "bun"},
-		}
+		return TestTypeStringCases([]NodePackageManagerType{
+			NodePackageManagerNPM,
+			NodePackageManagerPNPM,
+			NodePackageManagerYarn,
+			NodePackageManagerBun,
+		})
 	})
 }
 

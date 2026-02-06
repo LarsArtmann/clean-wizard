@@ -19,6 +19,29 @@ func TestAvailableTypesGeneric[T comparable](t *testing.T, name string, getAvail
 	})
 }
 
+// TestTypeStringCases creates test cases for String() method testing
+func TestTypeStringCases[T ~string](cases []T) []struct {
+	Value T
+	Want  string
+} {
+	result := make([]struct {
+		Value T
+		Want  string
+	}, len(cases))
+
+	for i, c := range cases {
+		result[i] = struct {
+			Value T
+			Want  string
+		}{
+			Value: c,
+			Want:  string(c),
+		}
+	}
+
+	return result
+}
+
 // TestTypeStringGeneric tests the string representation of a type
 func TestTypeStringGeneric[T ~string](t *testing.T, name string, getTestCases func() []struct {
 	Value T
