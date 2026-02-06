@@ -545,17 +545,13 @@ func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 
 // runGoCleaner executes the Go cleaner.
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	goCleaner, err := cleaner.NewGoCleaner(verbose, dryRun, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheBuildCache)
-	if err != nil {
-		return domain.CleanResult{}, fmt.Errorf("failed to create Go cleaner: %w", err)
-	}
-
-	result := goCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		goCleaner, err := cleaner.NewGoCleaner(v, d, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheBuildCache)
+		if err != nil {
+			panic(err) // This should never happen with valid parameters
+		}
+		return goCleaner
+	})
 }
 
 // runCargoCleaner executes the Cargo cleaner.
@@ -567,17 +563,13 @@ func runCargoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanRes
 
 // runBuildCacheCleaner executes the Build Cache cleaner.
 func runBuildCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	buildCacheCleaner, err := cleaner.NewBuildCacheCleaner(verbose, dryRun, "30d", []string{}, []string{})
-	if err != nil {
-		return domain.CleanResult{}, err
-	}
-
-	result := buildCacheCleaner.Clean(ctx)
-	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
-	}
-
-	return result.Value(), nil
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		buildCacheCleaner, err := cleaner.NewBuildCacheCleaner(v, d, "30d", []string{}, []string{})
+		if err != nil {
+			panic(err) // This should never happen with valid parameters
+		}
+		return buildCacheCleaner
+	})
 }
 
 // runDockerCleaner executes the Docker cleaner.
