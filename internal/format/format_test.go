@@ -5,37 +5,47 @@ import (
 	"time"
 )
 
-func TestSize(t *testing.T) {
-	tests := []struct {
+func runValueFormattingTests(t *testing.T, tests []struct {
 		name     string
-		bytes    int64
+		input    any
 		expected string
-	}{
-		{"bytes", 512, "512 B"},
-		{"kilobytes", 1536, "1.5 KB"},
-		{"megabytes", 1572864, "1.5 MB"},
-		{"gigabytes", 1610612736, "1.5 GB"},
-		{"terabytes", 1649267441664, "1.5 TB"},
-		{"petabytes", 1688849860263936, "1.5 PB"},
-		{"exabytes", 1729382256910270464, "1.5 EB"},
-		{"zero", 0, "0 B"},
-		{"negative", -1024, "-1024 B"},
-	}
-
+	}, formatFn func(any) string) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := Size(tt.bytes)
+			result := formatFn(tt.input)
 			if result != tt.expected {
-				t.Errorf("Size(%d) = %v, want %v", tt.bytes, result, tt.expected)
+				t.Errorf("result = %v, want %v", result, tt.expected)
 			}
 		})
 	}
 }
 
+func TestSize(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    any
+		expected string
+	}{
+		{"bytes", int64(512), "512 B"},
+		{"kilobytes", int64(1536), "1.5 KB"},
+		{"megabytes", int64(1572864), "1.5 MB"},
+		{"gigabytes", int64(1610612736), "1.5 GB"},
+		{"terabytes", int64(1649267441664), "1.5 TB"},
+		{"petabytes", int64(1688849860263936), "1.5 PB"},
+		{"exabytes", int64(1729382256910270464), "1.5 EB"},
+		{"zero", int64(0), "0 B"},
+		{"negative", int64(-1024), "-1024 B"},
+	}
+
+	runValueFormattingTests(t, tests, func(v any) string {
+		return Size(v.(int64))
+	})
+}
+
 func TestDuration(t *testing.T) {
 	tests := []struct {
 		name     string
-		duration time.Duration
+		input    any
 		expected string
 	}{
 		{"nanoseconds", 500 * time.Nanosecond, "500 ns"},
@@ -44,17 +54,12 @@ func TestDuration(t *testing.T) {
 		{"seconds", 1500 * time.Millisecond, "1.5 s"},
 		{"minutes", 1500 * time.Second, "25.0 m"},
 		{"hours", 1500 * time.Minute, "25.0 h"},
-		{"zero", 0, "0 ns"},
+		{"zero", time.Duration(0), "0 ns"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Duration(tt.duration)
-			if result != tt.expected {
-				t.Errorf("Duration(%v) = %v, want %v", tt.duration, result, tt.expected)
-			}
-		})
-	}
+	runValueFormattingTests(t, tests, func(v any) string {
+		return Duration(v.(time.Duration))
+	})
 }
 
 func runTimeFormattingTests(t *testing.T, tests []struct {
@@ -114,25 +119,20 @@ func TestDateTime(t *testing.T) {
 func TestNumber(t *testing.T) {
 	tests := []struct {
 		name     string
-		n        int64
+		input    any
 		expected string
 	}{
-		{"small number", 42, "42"},
-		{"thousands", 1234, "1,234"},
-		{"millions", 1234567, "1,234,567"},
-		{"billions", 1234567890, "1,234,567,890"},
-		{"zero", 0, "0"},
-		{"negative", -1234, "-1,234"},
-		{"single digit", 5, "5"},
-		{"hundreds", 999, "999"},
+		{"small number", int64(42), "42"},
+		{"thousands", int64(1234), "1,234"},
+		{"millions", int64(1234567), "1,234,567"},
+		{"billions", int64(1234567890), "1,234,567,890"},
+		{"zero", int64(0), "0"},
+		{"negative", int64(-1234), "-1,234"},
+		{"single digit", int64(5), "5"},
+		{"hundreds", int64(999), "999"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := Number(tt.n)
-			if result != tt.expected {
-				t.Errorf("Number(%d) = %v, want %v", tt.n, result, tt.expected)
-			}
-		})
-	}
+	runValueFormattingTests(t, tests, func(v any) string {
+		return Number(v.(int64))
+	})
 }
