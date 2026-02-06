@@ -58,3 +58,13 @@ func TestTypeStringGeneric[T ~string](t *testing.T, name string, getTestCases fu
 		})
 	}
 }
+
+// TestTypeString tests the String() method of a type with the given cases
+func TestTypeString[T ~string](t *testing.T, name string, cases []T) {
+	TestTypeStringGeneric(t, name, func() []struct {
+		Value T
+		Want  string
+	} {
+		return TestTypeStringCases(cases)
+	})
+}

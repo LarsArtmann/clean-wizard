@@ -238,16 +238,11 @@ func TestNodePackageManagerCleaner_AvailableNodePackageManagers(t *testing.T) {
 }
 
 func TestNodePackageManagerType_String(t *testing.T) {
-	TestTypeStringGeneric(t, "NodePackageManagerType", func() []struct {
-		Value NodePackageManagerType
-		Want  string
-	} {
-		return TestTypeStringCases([]NodePackageManagerType{
-			NodePackageManagerNPM,
-			NodePackageManagerPNPM,
-			NodePackageManagerYarn,
-			NodePackageManagerBun,
-		})
+	TestTypeString(t, "NodePackageManagerType", []NodePackageManagerType{
+		NodePackageManagerNPM,
+		NodePackageManagerPNPM,
+		NodePackageManagerYarn,
+		NodePackageManagerBun,
 	})
 }
 
