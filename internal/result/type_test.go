@@ -6,11 +6,25 @@ import (
 )
 
 func TestResult_Ok(t *testing.T) {
-	testPredicateCases(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, newPredicateTestCases(true, false))
+	testPredicateCases(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, []struct {
+		name     string
+		result   Result[int]
+		expected bool
+	}{
+		{"ok result", Ok(42), true},
+		{"error result", Err[int](errors.New("test error")), false},
+	})
 }
 
 func TestResult_IsErr(t *testing.T) {
-	testPredicateCases(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, newPredicateTestCases(false, true))
+	testPredicateCases(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, []struct {
+		name     string
+		result   Result[int]
+		expected bool
+	}{
+		{"ok result", Ok(42), false},
+		{"error result", Err[int](errors.New("test error")), true},
+	})
 }
 
 // testOkResult returns a successful result for testing.
@@ -23,22 +37,7 @@ func testErrResult() Result[int] {
 	return Err[int](errors.New("test error"))
 }
 
-// newPredicateTestCases creates test cases with expected values for a predicate.
-func newPredicateTestCases(okExpected, errExpected bool) []struct {
-	name     string
-	result   Result[int]
-	expected bool
-} {
-	return []struct {
-		name     string
-		result   Result[int]
-		expected bool
-	}{
-		{"ok result", testOkResult(), okExpected},
-		{"error result", testErrResult(), errExpected},
-	}
-}
-
+// testPredicateCases tests a predicate function against multiple cases.
 func testPredicateCases(t *testing.T, methodName string, predicate func(Result[int]) bool, cases []struct {
 	name     string
 	result   Result[int]
