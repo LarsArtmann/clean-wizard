@@ -8,50 +8,9 @@ import (
 )
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
-	tests := []struct {
-		name    string
-		verbose bool
-		dryRun  bool
-	}{
-		{
-			name:    "standard configuration",
-			verbose: false,
-			dryRun:  false,
-		},
-		{
-			name:    "verbose mode",
-			verbose: true,
-			dryRun:  false,
-		},
-		{
-			name:    "dry-run mode",
-			verbose: false,
-			dryRun:  true,
-		},
-		{
-			name:    "verbose dry-run mode",
-			verbose: true,
-			dryRun:  true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewProjectsManagementAutomationCleaner(tt.verbose, tt.dryRun)
-
-			if cleaner == nil {
-				t.Fatal("NewProjectsManagementAutomationCleaner() returned nil cleaner")
-			}
-
-			if cleaner.verbose != tt.verbose {
-				t.Errorf("verbose = %v, want %v", cleaner.verbose, tt.verbose)
-			}
-
-			if cleaner.dryRun != tt.dryRun {
-				t.Errorf("dryRun = %v, want %v", cleaner.dryRun, tt.dryRun)
-			}
-		})
-	}
+	testNewCleanerConstructor(t, func(verbose, dryRun bool) interface{} {
+		return NewProjectsManagementAutomationCleaner(verbose, dryRun)
+	}, "NewProjectsManagementAutomationCleaner")
 }
 
 func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
