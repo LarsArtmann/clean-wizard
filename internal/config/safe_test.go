@@ -51,37 +51,47 @@ type riskLevelExpected struct {
 	value string
 }
 
-// createRiskLevelExpectedMap creates a map of expected values for RiskLevel method testing.
-func createRiskLevelExpectedMap(pairs ...riskLevelExpected) map[domain.RiskLevel]string {
-	m := make(map[domain.RiskLevel]string)
-	for _, p := range pairs {
-		m[domain.RiskLevel(p.level)] = p.value
+// riskLevelTextValues provides expected text values for String() method testing.
+var riskLevelTextValues = map[domain.RiskLevel]string{
+	domain.RiskLow:         "LOW",
+	domain.RiskMedium:      "MEDIUM",
+	domain.RiskHigh:        "HIGH",
+	domain.RiskCritical:    "CRITICAL",
+	testInvalidRiskUnknown: "UNKNOWN",
+}
+
+// riskLevelEmojiValues provides expected emoji values for Icon() method testing.
+var riskLevelEmojiValues = map[domain.RiskLevel]string{
+	domain.RiskLow:         "🟢",
+	domain.RiskMedium:      "🟡",
+	domain.RiskHigh:        "🟠",
+	domain.RiskCritical:    "🔴",
+	testInvalidRiskUnknown: "⚪",
+}
+
+// testRiskLevelMethodWithValues is a helper function that tests RiskLevel methods with a value map.
+func testRiskLevelMethodWithValues(t *testing.T, methodName string, method func(domain.RiskLevel) string, expected map[domain.RiskLevel]string) {
+	for _, tc := range riskLevelTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := method(tc.level)
+			expect := expected[tc.level]
+			if result != expect {
+				t.Errorf("%s() = %v, want %v", methodName, result, expect)
+			}
+		})
 	}
-	return m
 }
 
 func TestRiskLevel_String(t *testing.T) {
-	expected := createRiskLevelExpectedMap(
-		riskLevelExpected{level: domain.RiskLow, value: "LOW"},
-		riskLevelExpected{level: domain.RiskMedium, value: "MEDIUM"},
-		riskLevelExpected{level: domain.RiskHigh, value: "HIGH"},
-		riskLevelExpected{level: domain.RiskCritical, value: "CRITICAL"},
-		riskLevelExpected{level: testInvalidRiskUnknown, value: "UNKNOWN"},
+	testRiskLevelMethodWithValues(t, "String", func(level domain.RiskLevel) string { return level.String() },
+		riskLevelTextValues,
 	)
-
-	testRiskLevelMethod(t, "String", func(level domain.RiskLevel) string { return level.String() }, expected)
 }
 
 func TestRiskLevel_Icon(t *testing.T) {
-	expected := createRiskLevelExpectedMap(
-		riskLevelExpected{level: domain.RiskLow, value: "🟢"},
-		riskLevelExpected{level: domain.RiskMedium, value: "🟡"},
-		riskLevelExpected{level: domain.RiskHigh, value: "🟠"},
-		riskLevelExpected{level: domain.RiskCritical, value: "🔴"},
-		riskLevelExpected{level: testInvalidRiskUnknown, value: "⚪"},
+	testRiskLevelMethodWithValues(t, "Icon", func(level domain.RiskLevel) string { return level.Icon() },
+		riskLevelEmojiValues,
 	)
-
-	testRiskLevelMethod(t, "Icon", func(level domain.RiskLevel) string { return level.Icon() }, expected)
 }
 
 func TestRiskLevel_IsValid(t *testing.T) {
