@@ -11,13 +11,7 @@ func (vm *ValidationMiddleware) analyzeConfigChanges(current, proposed *domain.C
 	changes := []ConfigChange{}
 
 	// Analyze basic fields
-	if current.SafeMode != proposed.SafeMode {
-		changes = append(changes, *vm.createFieldChange("safe_mode", current.SafeMode, proposed.SafeMode))
-	}
-
-	if current.MaxDiskUsage != proposed.MaxDiskUsage {
-		changes = append(changes, *vm.createFieldChange("max_disk_usage", current.MaxDiskUsage, proposed.MaxDiskUsage))
-	}
+	changes = append(changes, vm.analyzeSimpleFieldChanges(current, proposed)...)
 
 	// Analyze protected paths
 	pathsChanges := vm.analyzePathChanges("protected", current.Protected, proposed.Protected)
@@ -191,6 +185,28 @@ func (vm *ValidationMiddleware) makeStringSet(slice []string) map[string]bool {
 		result[item] = true
 	}
 	return result
+}
+
+// analyzeSimpleFieldChanges analyzes changes for simple comparable fields.
+func (vm *ValidationMiddleware) analyzeSimpleFieldChanges(current, proposed *domain.Config) []ConfigChange {
+	changes := []ConfigChange{}
+
+	fieldComparisons := []struct {
+		name        string
+		currentVal  any
+		proposedVal any
+	}{
+		{"safe_mode", current.SafeMode, proposed.SafeMode},
+		{"max_disk_usage", current.MaxDiskUsage, proposed.MaxDiskUsage},
+	}
+
+	for _, field := range fieldComparisons {
+		if field.currentVal != field.proposedVal {
+			changes = append(changes, *vm.createFieldChange(field.name, field.currentVal, field.proposedVal))
+		}
+	}
+
+	return changes
 }
 
 // createFieldChange creates a ConfigChange for a field comparison.
