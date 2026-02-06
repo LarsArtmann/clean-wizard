@@ -12,23 +12,11 @@ func (vm *ValidationMiddleware) analyzeConfigChanges(current, proposed *domain.C
 
 	// Analyze basic fields
 	if current.SafeMode != proposed.SafeMode {
-		changes = append(changes, ConfigChange{
-			Field:     "safe_mode",
-			OldValue:  current.SafeMode,
-			NewValue:  proposed.SafeMode,
-			Operation: vm.getChangeOperation(current.SafeMode, proposed.SafeMode),
-			Risk:      vm.assessChangeRisk("safe_mode", current.SafeMode, proposed.SafeMode),
-		})
+		changes = append(changes, *vm.createFieldChange("safe_mode", current.SafeMode, proposed.SafeMode))
 	}
 
 	if current.MaxDiskUsage != proposed.MaxDiskUsage {
-		changes = append(changes, ConfigChange{
-			Field:     "max_disk_usage",
-			OldValue:  current.MaxDiskUsage,
-			NewValue:  proposed.MaxDiskUsage,
-			Operation: vm.getChangeOperation(current.MaxDiskUsage, proposed.MaxDiskUsage),
-			Risk:      vm.assessChangeRisk("max_disk_usage", current.MaxDiskUsage, proposed.MaxDiskUsage),
-		})
+		changes = append(changes, *vm.createFieldChange("max_disk_usage", current.MaxDiskUsage, proposed.MaxDiskUsage))
 	}
 
 	// Analyze protected paths
@@ -203,4 +191,15 @@ func (vm *ValidationMiddleware) makeStringSet(slice []string) map[string]bool {
 		result[item] = true
 	}
 	return result
+}
+
+// createFieldChange creates a ConfigChange for a field comparison.
+func (vm *ValidationMiddleware) createFieldChange(field string, oldValue, newValue any) *ConfigChange {
+	return &ConfigChange{
+		Field:     field,
+		OldValue:  oldValue,
+		NewValue:  newValue,
+		Operation: vm.getChangeOperation(oldValue, newValue),
+		Risk:      vm.assessChangeRisk(field, oldValue, newValue),
+	}
 }
