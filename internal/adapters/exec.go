@@ -16,11 +16,11 @@ func (n *NixAdapter) execWithTimeout(ctx context.Context, name string, arg ...st
 	if timeout == 0 {
 		timeout = defaultTimeout
 	}
-	
+
 	// Create timeout context
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	_ = cancel // will be called by cmd.Wait() or context usage
-	
+
 	return exec.CommandContext(timeoutCtx, name, arg...)
 }
 
@@ -29,6 +29,6 @@ func (n *NixAdapter) execWithTimeout(ctx context.Context, name string, arg ...st
 func execBasicWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	timeoutCtx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	_ = cancel // will be called by cmd.Wait() or context usage
-	
+
 	return exec.CommandContext(timeoutCtx, name, arg...)
 }

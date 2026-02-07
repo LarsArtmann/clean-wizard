@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -187,7 +188,7 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose, jsonOut
 	}
 
 	if len(availableConfigs) == 0 {
-		return fmt.Errorf("no cleaners available on this system")
+		return errors.New("no cleaners available on this system")
 	}
 
 	fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableConfigs))
@@ -284,18 +285,18 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose, jsonOut
 	var totalItemsRemoved uint
 	var totalItemsFailed uint
 	var skippedCleaners []string
-	var skippedErrors = make(map[string]error)
+	skippedErrors := make(map[string]error)
 	var failedCleaners []struct {
 		name  string
 		error string
 	}
-	var failedErrors = make(map[string]error)
+	failedErrors := make(map[string]error)
 	cleanerResults := make(map[string]domain.CleanResult)
 
 	for _, cleanerType := range selectedCleaners {
 		result, err := runCleaner(ctx, cleanerType, dryRun, verbose)
 		name := getCleanerName(cleanerType)
-		
+
 		if err != nil {
 			errMsg := err.Error()
 
@@ -425,7 +426,7 @@ func printCleanerResult(name string, result domain.CleanResult, dryRun bool) {
 			details = fmt.Sprintf("cleaned %d item(s), freed %s", result.ItemsRemoved, format.Bytes(int64(result.FreedBytes)))
 		}
 	} else if result.FreedBytes > 0 {
-		details = fmt.Sprintf("freed %s", format.Bytes(int64(result.FreedBytes)))
+		details = "freed " + format.Bytes(int64(result.FreedBytes))
 	} else {
 		details = "no items to clean"
 	}
@@ -457,7 +458,7 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 	nixAdapter := cleaner.NewNixCleaner(verbose, dryRun)
 
 	if !nixAdapter.IsAvailable(ctx) {
-		return domain.CleanResult{}, fmt.Errorf("nix not available on this system")
+		return domain.CleanResult{}, errors.New("nix not available on this system")
 	}
 
 	keepCount := 5

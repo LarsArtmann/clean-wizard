@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -27,7 +28,7 @@ func GetHomeDir() (string, error) {
 		return userProfile, nil
 	}
 
-	return "", fmt.Errorf("unable to determine home directory")
+	return "", errors.New("unable to determine home directory")
 }
 
 // walkDirectory walks the directory tree starting at path, collecting size and modTime.

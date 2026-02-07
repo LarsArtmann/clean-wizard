@@ -20,7 +20,7 @@ Clean Wizard is a production-ready Go CLI application for system cleanup with wo
 cmd/clean-wizard/          # CLI entry points
 internal/domain/           # Domain models (pure, no deps)
 internal/cleaner/          # Cleaning implementations
-internal/adapters/         # External system adapters  
+internal/adapters/         # External system adapters
 internal/config/           # Configuration management
 internal/result/           # Result[T] type (zero deps)
 internal/format/           # Formatting (bytes, JSON)
@@ -77,7 +77,7 @@ Current performance (Apple M2):
 
 ```
 BenchmarkResult_Ok-8         1000000000    0.93 ns/op    0 B/op    0 allocs/op
-BenchmarkResult_Err-8        1000000000    0.76 ns/op    0 B/op    0 allocs/op  
+BenchmarkResult_Err-8        1000000000    0.76 ns/op    0 B/op    0 allocs/op
 BenchmarkResult_IsOk-8       1000000000    0.96 ns/op    0 B/op    0 allocs/op
 BenchmarkResult_Value-8      1000000000    1.06 ns/op    0 B/op    0 allocs/op
 ```
@@ -99,7 +99,7 @@ clean-wizard clean --json --mode quick | jq '.freed_human'
 All external commands have timeout protection:
 
 - **5 minutes**: Homebrew, Node packages, Cargo, Go
-- **2 minutes**: Docker, Projects Management Automation  
+- **2 minutes**: Docker, Projects Management Automation
 - **30 seconds**: golangci-lint
 - **Configurable**: Nix (via adapter)
 
@@ -150,7 +150,7 @@ func (mc *MyCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
     // Add 5-minute timeout
     timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
     defer cancel()
-    
+
     cmd := exec.CommandContext(timeoutCtx, "my-tool", "clean")
     // ... implementation
 }
@@ -171,10 +171,12 @@ protected:
 ## Dependencies
 
 ### Required
+
 - Go 1.25+
 - Git (for version info)
 
 ### Optional (for full functionality)
+
 - Nix
 - Docker
 - Homebrew
@@ -198,12 +200,14 @@ type Result[T any] struct {
 ```
 
 **Pros:**
+
 - Forces error handling at call sites
 - No nil panics
 - Can chain operations
 - Type-safe
 
 **Cons:**
+
 - Non-standard pattern (but worth it)
 
 ### Type-safe enums
@@ -219,11 +223,13 @@ const (
 ```
 
 **Pros:**
+
 - JSON/YAML marshaling built-in
 - String representation always available
 - Type-safe
 
 **Cons:**
+
 - Slightly more verbose
 
 ## Just Commands
@@ -258,6 +264,7 @@ Tests should pass even without tools (mock data), but verify environment.
 ## Performance
 
 Current test suite:
+
 - 37 test files
 - 8,071 lines of test code
 - 0.69:1 test-to-code ratio (target: 1:1)

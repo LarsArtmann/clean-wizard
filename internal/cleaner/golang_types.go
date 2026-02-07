@@ -9,17 +9,17 @@ import (
 type GoCacheType uint16
 
 const (
-	// GoCacheNone represents no cache types - invalid state
+	// GoCacheNone represents no cache types - invalid state.
 	GoCacheNone GoCacheType = 0
-	// GoCacheGOCACHE represents the main Go cache (GOCACHE)
+	// GoCacheGOCACHE represents the main Go cache (GOCACHE).
 	GoCacheGOCACHE GoCacheType = 1 << iota
-	// GoCacheTestCache represents the Go test cache (GOTESTCACHE)
+	// GoCacheTestCache represents the Go test cache (GOTESTCACHE).
 	GoCacheTestCache
-	// GoCacheModCache represents the Go module cache (GOMODCACHE)
+	// GoCacheModCache represents the Go module cache (GOMODCACHE).
 	GoCacheModCache
-	// GoCacheBuildCache represents the Go build cache folders (go-build*)
+	// GoCacheBuildCache represents the Go build cache folders (go-build*).
 	GoCacheBuildCache
-	// GoCacheLintCache represents the lint cache (e.g., golangci-lint)
+	// GoCacheLintCache represents the lint cache (e.g., golangci-lint).
 	GoCacheLintCache
 )
 

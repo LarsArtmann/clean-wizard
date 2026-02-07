@@ -10,8 +10,8 @@ func toGoCacheType(settings *domain.GoPackagesSettings) GoCacheType {
 		return GoCacheNone
 	}
 
-	var cacheType GoCacheType = GoCacheNone
-	
+	cacheType := GoCacheNone
+
 	if settings.CleanCache {
 		cacheType |= GoCacheGOCACHE
 	}
@@ -38,5 +38,5 @@ func fromGoCacheType(cacheType GoCacheType) (cleanCache, cleanTestCache, cleanMo
 	cleanModCache = cacheType.Has(GoCacheModCache)
 	cleanBuildCache = cacheType.Has(GoCacheBuildCache)
 	cleanLintCache = cacheType.Has(GoCacheLintCache)
-	return
+	return cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache
 }

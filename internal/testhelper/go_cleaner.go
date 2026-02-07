@@ -2,6 +2,7 @@ package testhelper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -19,7 +20,7 @@ func GoCleanerTest(ctx context.Context, title string) error {
 		return fmt.Errorf("failed to create Go cleaner: %w", err)
 	}
 	if !goCleaner.IsAvailable(ctx) {
-		return fmt.Errorf("Go is not available")
+		return errors.New("Go is not available")
 	}
 	fmt.Println("✅ Go is available\n")
 

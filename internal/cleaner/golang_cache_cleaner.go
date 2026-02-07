@@ -143,7 +143,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 			Strategy:     domain.StrategyConservative,
 		})
 	}
-	
+
 	itemsRemoved := 0
 	var totalSizeEstimate domain.SizeEstimate
 	for _, match := range matches {

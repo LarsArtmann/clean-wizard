@@ -159,9 +159,9 @@ func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
 func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 	return UnmarshalJSONEnum(data, rl, map[string]RiskLevelType{
 		"LOW":      RiskLevelLowType,
-		"MEDIUM":    RiskLevelMediumType,
-		"HIGH":      RiskLevelHighType,
-		"CRITICAL":  RiskLevelCriticalType,
+		"MEDIUM":   RiskLevelMediumType,
+		"HIGH":     RiskLevelHighType,
+		"CRITICAL": RiskLevelCriticalType,
 	}, "invalid risk level")
 }
 
@@ -302,9 +302,9 @@ func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler.
 func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
 	return UnmarshalJSONEnum(data, co, map[string]ChangeOperationType{
-		"ADDED":     ChangeOperationAddedType,
-		"REMOVED":   ChangeOperationRemovedType,
-		"MODIFIED":  ChangeOperationModifiedType,
+		"ADDED":    ChangeOperationAddedType,
+		"REMOVED":  ChangeOperationRemovedType,
+		"MODIFIED": ChangeOperationModifiedType,
 	}, "invalid change operation")
 }
 
@@ -356,10 +356,10 @@ func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler.
 func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
 	return UnmarshalJSONEnum(data, cs, map[string]CleanStrategyType{
-		"aggressive": StrategyAggressiveType,
+		"aggressive":   StrategyAggressiveType,
 		"conservative": StrategyConservativeType,
-		"dry-run": StrategyDryRunType,
-		"dryrun": StrategyDryRunType,
+		"dry-run":      StrategyDryRunType,
+		"dryrun":       StrategyDryRunType,
 	}, "invalid clean strategy")
 }
 

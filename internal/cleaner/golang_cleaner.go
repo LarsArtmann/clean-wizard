@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"time"
@@ -22,7 +23,9 @@ type CleanStats struct {
 type GoCleaner struct {
 	config   GoCacheConfig
 	scanner  *GoScanner
-	cleaners map[GoCacheType]interface{ Clean(ctx context.Context) result.Result[domain.CleanResult] }
+	cleaners map[GoCacheType]interface {
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	}
 }
 
 // GoCacheConfig holds cleaner configuration.
@@ -35,7 +38,7 @@ type GoCacheConfig struct {
 // NewGoCleaner creates Go cleaner with type-safe cache configuration.
 func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) {
 	if !caches.IsValid() {
-		return nil, fmt.Errorf("at least one cache type must be specified")
+		return nil, errors.New("at least one cache type must be specified")
 	}
 
 	return NewGoCleanerWithSettings(verbose, dryRun, caches), (error)(nil)
@@ -51,7 +54,9 @@ func NewGoCleanerWithSettings(verbose, dryRun bool, caches GoCacheType) *GoClean
 	}
 
 	scanner := NewGoScanner(verbose)
-	cleaners := make(map[GoCacheType]interface{ Clean(ctx context.Context) result.Result[domain.CleanResult] })
+	cleaners := make(map[GoCacheType]interface {
+		Clean(ctx context.Context) result.Result[domain.CleanResult]
+	})
 
 	// Register built-in Go cache cleaners
 	for _, cacheType := range []GoCacheType{GoCacheGOCACHE, GoCacheTestCache, GoCacheModCache, GoCacheBuildCache} {
@@ -96,7 +101,7 @@ func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] 
 // Clean removes Go caches.
 func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !gc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("Go not available"))
+		return result.Err[domain.CleanResult](errors.New("Go not available"))
 	}
 
 	if gc.config.DryRun {
@@ -151,13 +156,13 @@ func (gc *GoCleaner) processCacheResult(
 func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) result.Result[domain.CleanResult] {
 	// Create result with honest size estimate
 	sizeEstimate := domain.SizeEstimate{Known: stats.FreedBytes}
-	
+
 	// Note: conversions.NewCleanResult uses FreedBytes (deprecated), so we update SizeEstimate
 	cleanResult := conversions.NewCleanResult(domain.StrategyConservative, int(stats.Removed), int64(stats.FreedBytes))
 	cleanResult.SizeEstimate = sizeEstimate
 	cleanResult.CleanTime = duration
 	cleanResult.CleanedAt = time.Now()
-	
+
 	return result.Ok(cleanResult)
 }
 

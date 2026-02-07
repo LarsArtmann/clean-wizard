@@ -80,7 +80,7 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 
 	return result.Ok(domain.CleanResult{
 		SizeEstimate: domain.SizeEstimate{Unknown: true}, // Honest: we don't know the size
-		FreedBytes:   0,                                   // Deprecated field
+		FreedBytes:   0,                                  // Deprecated field
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
 		CleanTime:    0,
@@ -93,7 +93,7 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 func (glc *GolangciLintCleaner) CacheDir() string {
 	// Try XDG_CACHE_HOME first
 	if xdgCache := glc.helper.getEnv("XDG_CACHE_HOME"); xdgCache != "" {
-		cacheDir := fmt.Sprintf("%s/golangci-lint", xdgCache)
+		cacheDir := xdgCache + "/golangci-lint"
 		if glc.helper.pathExists(cacheDir) {
 			return cacheDir
 		}
@@ -101,7 +101,7 @@ func (glc *GolangciLintCleaner) CacheDir() string {
 
 	// Fallback to ~/.cache
 	if home := glc.helper.getEnv("HOME"); home != "" {
-		cacheDir := fmt.Sprintf("%s/.cache/golangci-lint", home)
+		cacheDir := home + "/.cache/golangci-lint"
 		if glc.helper.pathExists(cacheDir) {
 			return cacheDir
 		}

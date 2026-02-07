@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -19,10 +20,11 @@ const dockerCommandTimeout = 2 * time.Minute
 type DockerResourceType string
 
 const (
-	dockerImage    DockerResourceType = "image"
+	dockerImage     DockerResourceType = "image"
 	dockerContainer DockerResourceType = "container"
 	dockerVolume    DockerResourceType = "volume"
 )
+
 type DockerCleaner struct {
 	verbose   bool
 	dryRun    bool
@@ -201,7 +203,7 @@ func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]
 // Clean removes Docker resources based on prune mode.
 func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !dc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("Docker not available"))
+		return result.Err[domain.CleanResult](errors.New("Docker not available"))
 	}
 
 	if dc.dryRun {

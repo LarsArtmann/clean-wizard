@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"time"
@@ -71,7 +72,7 @@ func (pc *ProjectsManagementAutomationCleaner) Scan(ctx context.Context) result.
 // Clean removes Projects Management Automation cache.
 func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !pc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("projects-management-automation not available"))
+		return result.Err[domain.CleanResult](errors.New("projects-management-automation not available"))
 	}
 
 	startTime := time.Now()

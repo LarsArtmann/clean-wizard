@@ -61,7 +61,7 @@ func (gs *GoScanner) scanGoModCache(ctx context.Context) []domain.ScanItem {
 }
 
 // addScanItem creates a scan item for a cache directory and appends it to items.
-func (gs *GoScanner) addScanItem(items []domain.ScanItem, path string, cacheName string) []domain.ScanItem {
+func (gs *GoScanner) addScanItem(items []domain.ScanItem, path, cacheName string) []domain.ScanItem {
 	items = append(items, domain.ScanItem{
 		Path:     path,
 		Size:     GetDirSize(path),

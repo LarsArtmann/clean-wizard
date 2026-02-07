@@ -26,7 +26,8 @@ func availableItemsTestHelper[T comparable](t *testing.T, expectedItems []T, ava
 func stringTypesTestHelper[T comparable](t *testing.T, tests []struct {
 	Item T
 	Want string
-}, toString func(T) string, testName string) {
+}, toString func(T) string, testName string,
+) {
 	for _, tt := range tests {
 		t.Run(tt.Want, func(t *testing.T) {
 			got := toString(tt.Item)

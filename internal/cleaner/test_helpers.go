@@ -10,19 +10,19 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// ValidateSettingsTestCase represents a test case for ValidateSettings
+// ValidateSettingsTestCase represents a test case for ValidateSettings.
 type ValidateSettingsTestCase struct {
 	Name     string
 	Settings *domain.OperationSettings
 	WantErr  bool
 }
 
-// IsAvailableConstructor is a function type for creating cleaners in tests that need IsAvailable
+// IsAvailableConstructor is a function type for creating cleaners in tests that need IsAvailable.
 type IsAvailableConstructor func() interface {
 	IsAvailable(ctx context.Context) bool
 }
 
-// IsAvailableTestCase represents a test case for IsAvailable tests
+// IsAvailableTestCase represents a test case for IsAvailable tests.
 type IsAvailableTestCase struct {
 	Name        string
 	Constructor IsAvailableConstructor
@@ -41,7 +41,7 @@ func TestIsAvailableGeneric(t *testing.T, testCases []IsAvailableTestCase) {
 			cleaner := tt.Constructor()
 			available := cleaner.IsAvailable(context.Background())
 
-			if available != true && available != false {
+			if !available && available {
 				t.Errorf("IsAvailable() returned invalid value")
 			}
 		})
@@ -87,19 +87,19 @@ type CleanerWithSettings interface {
 	ValidateSettings(*domain.OperationSettings) error
 }
 
-// CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings
+// CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings.
 type CleanerConstructorWithSettings func(verbose, dryRun bool) CleanerWithSettings
 
-// SimpleCleanerConstructor is a function type for creating cleaners in tests that only need Clean and IsAvailable
+// SimpleCleanerConstructor is a function type for creating cleaners in tests that only need Clean and IsAvailable.
 type SimpleCleanerConstructor func(verbose, dryRun bool) SimpleCleaner
 
-// SimpleCleaner represents a cleaner interface without settings validation
+// SimpleCleaner represents a cleaner interface without settings validation.
 type SimpleCleaner interface {
 	IsAvailable(ctx context.Context) bool
 	Clean(ctx context.Context) result.Result[domain.CleanResult]
 }
 
-// ToSimpleCleanerConstructor converts a constructor with additional methods to one that only exposes Clean and IsAvailable
+// ToSimpleCleanerConstructor converts a constructor with additional methods to one that only exposes Clean and IsAvailable.
 func ToSimpleCleanerConstructor(fullConstructor CleanerConstructorWithSettings) SimpleCleanerConstructor {
 	return func(verbose, dryRun bool) SimpleCleaner {
 		return fullConstructor(verbose, dryRun)
@@ -122,14 +122,14 @@ func ToSimpleCleanerConstructor(fullConstructor CleanerConstructorWithSettings) 
 // Parameters:
 //   - cleaner: An existing cleaner instance
 //
-// Returns a SimpleCleanerConstructor that returns the given cleaner
+// Returns a SimpleCleanerConstructor that returns the given cleaner.
 func SimpleCleanerConstructorFromInstance[T SimpleCleaner](cleaner T) SimpleCleanerConstructor {
 	return func(verbose, dryRun bool) SimpleCleaner {
 		return cleaner
 	}
 }
 
-// TestValidateSettings runs a standard validation settings test suite
+// TestValidateSettings runs a standard validation settings test suite.
 func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructorWithSettings, testCases []ValidateSettingsTestCase) {
 	for _, tt := range testCases {
 		t.Run(tt.Name, func(t *testing.T) {
@@ -143,7 +143,7 @@ func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructorWithSet
 	}
 }
 
-// TestCleanDryRun runs a standard clean dry-run test suite
+// TestCleanDryRun runs a standard clean dry-run test suite.
 func TestCleanDryRun(t *testing.T, newCleanerFunc SimpleCleanerConstructor, toolName string, expectedItemsRemoved uint) {
 	cleaner := newCleanerFunc(false, true)
 
@@ -172,7 +172,7 @@ func TestCleanDryRun(t *testing.T, newCleanerFunc SimpleCleanerConstructor, tool
 	}
 }
 
-// TestDryRunStrategy runs a standard dry-run strategy test suite
+// TestDryRunStrategy runs a standard dry-run strategy test suite.
 func TestDryRunStrategy(t *testing.T, newCleanerFunc SimpleCleanerConstructor, toolName string) {
 	cleaner := newCleanerFunc(false, true)
 
@@ -234,23 +234,23 @@ func CreateBooleanSettingsTestCases(nilName string, settingsFunc func(bool) *dom
 	}
 }
 
-// CleanResultAnalyzer provides methods for analyzing CleanResult in tests
+// CleanResultAnalyzer provides methods for analyzing CleanResult in tests.
 type CleanResultAnalyzer struct {
-	t          *testing.T
+	t           *testing.T
 	cleanResult domain.CleanResult
-	elapsed    time.Duration
+	elapsed     time.Duration
 }
 
-// NewCleanResultAnalyzer creates a new analyzer for the given CleanResult
+// NewCleanResultAnalyzer creates a new analyzer for the given CleanResult.
 func NewCleanResultAnalyzer(t *testing.T, cleanResult domain.CleanResult, elapsed time.Duration) *CleanResultAnalyzer {
 	return &CleanResultAnalyzer{
-		t:          t,
+		t:           t,
 		cleanResult: cleanResult,
-		elapsed:    elapsed,
+		elapsed:     elapsed,
 	}
 }
 
-// VerifyTiming verifies that clean operation timing is correctly recorded
+// VerifyTiming verifies that clean operation timing is correctly recorded.
 func (a *CleanResultAnalyzer) VerifyTiming() {
 	// CleanTime should be recorded
 	if a.cleanResult.CleanTime == 0 {
@@ -273,7 +273,7 @@ func (a *CleanResultAnalyzer) VerifyTiming() {
 	}
 }
 
-// TestCleanTiming runs a standard clean timing test suite
+// TestCleanTiming runs a standard clean timing test suite.
 func TestCleanTiming(
 	t *testing.T,
 	newCleanerFunc SimpleCleanerConstructor,
@@ -361,9 +361,10 @@ func TestCleanTimingWithConstructor(t *testing.T, constructor SimpleCleanerConst
 // This eliminates duplicate constructor code across multiple cleaner test files.
 //
 // Usage:
-//   func Test<X>Cleaner_StandardTests(t *testing.T) {
-//       TestStandardCleaner(t, NewXCleaner, "ToolName")
-//   }
+//
+//	func Test<X>Cleaner_StandardTests(t *testing.T) {
+//	    TestStandardCleaner(t, NewXCleaner, "ToolName")
+//	}
 func TestStandardCleaner(t *testing.T, constructor CleanerConstructorWithSettings, toolName string) {
 	t.Run("DryRunStrategy", func(t *testing.T) {
 		TestDryRunStrategyWithConstructor(t, constructor, toolName)
@@ -396,7 +397,7 @@ func cleanerConstructorWithSettingsAdapter[T CleanerWithSettings](
 //   - constructor: Function that creates a cleaner with given verbose, dryRun, and managers
 //   - availableManagers: Function that returns the available managers
 //
-// Returns a CleanerConstructorWithSettings that matches the TestValidateSettings signature
+// Returns a CleanerConstructorWithSettings that matches the TestValidateSettings signature.
 func NewCleanerConstructorWithSettings[T CleanerWithSettings, M any](
 	constructor func(verbose, dryRun bool, managers []M) T,
 	availableManagers func() []M,
@@ -410,6 +411,7 @@ func NewCleanerConstructorWithSettings[T CleanerWithSettings, M any](
 // for cleaners with a boolean settings field. This eliminates duplicate config and constructor code.
 //
 // Usage:
+//
 //	func TestXxxCleaner_BooleanSettingsTests(t *testing.T) {
 //	    CreateBooleanSettingsCleanerTestFunctions(t, BooleanSettingsCleanerTestFunctionsConfig{
 //	        TestName:          "Xxx",
@@ -455,7 +457,7 @@ func CreateBooleanSettingsCleanerTestFunctions(t *testing.T, config BooleanSetti
 // Parameters:
 //   - constructor: Function that creates a cleaner with given verbose and dryRun flags
 //
-// Returns a CleanerConstructorWithSettings that can be used with TestStandardCleaner and other helpers
+// Returns a CleanerConstructorWithSettings that can be used with TestStandardCleaner and other helpers.
 func NewBooleanSettingsCleanerTestConstructor[T CleanerWithSettings](constructor func(verbose, dryRun bool) T) CleanerConstructorWithSettings {
 	return cleanerConstructorWithSettingsAdapter(constructor)
 }
@@ -470,27 +472,28 @@ func NewBooleanSettingsCleanerTestConstructor[T CleanerWithSettings](constructor
 //   - expectedItems: Number of expected items for dry-run tests (usually 1)
 //   - newCleanerFunc: Function that creates a new cleaner instance
 //
-// Returns a configured BooleanSettingsCleanerTestConfig ready for use with CreateBooleanSettingsCleanerTestFunctions
+// # Returns a configured BooleanSettingsCleanerTestConfig ready for use with CreateBooleanSettingsCleanerTestFunctions
 //
 // Usage:
-//   func TestXxxCleaner_BooleanSettingsTests(t *testing.T) {
-//       CreateBooleanSettingsCleanerTestFunctions(t,
-//           NewBooleanSettingsCleanerTestConfig(
-//               "Xxx",           // testName
-//               "xxx-tool",      // toolName
-//               "xxx settings",  // settingsFieldName
-//               1,               // expectedItems
-//               NewXxxCleaner,   // newCleanerFunc
-//               func(enabled bool) *domain.OperationSettings {
-//                   return &domain.OperationSettings{
-//                       XxxSettings: &domain.XxxSettings{
-//                           Enabled: enabled,
-//                       },
-//                   }
-//               },
-//           ),
-//       )
-//   }
+//
+//	func TestXxxCleaner_BooleanSettingsTests(t *testing.T) {
+//	    CreateBooleanSettingsCleanerTestFunctions(t,
+//	        NewBooleanSettingsCleanerTestConfig(
+//	            "Xxx",           // testName
+//	            "xxx-tool",      // toolName
+//	            "xxx settings",  // settingsFieldName
+//	            1,               // expectedItems
+//	            NewXxxCleaner,   // newCleanerFunc
+//	            func(enabled bool) *domain.OperationSettings {
+//	                return &domain.OperationSettings{
+//	                    XxxSettings: &domain.XxxSettings{
+//	                        Enabled: enabled,
+//	                    },
+//	                }
+//	            },
+//	        ),
+//	    )
+//	}
 func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 	testName string,
 	toolName string,
@@ -523,7 +526,7 @@ func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 //   - constructor: Function that creates a cleaner with given verbose and dryRun flags
 //   - createSettings: Function that creates OperationSettings with the specific field configured
 //
-// Returns a configured BooleanSettingsCleanerTestConfig ready for use with CreateBooleanSettingsCleanerTestFunctions
+// Returns a configured BooleanSettingsCleanerTestConfig ready for use with CreateBooleanSettingsCleanerTestFunctions.
 func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](testName, toolName, settingsFieldName string, expectedItems uint, constructor func(verbose, dryRun bool) T, createSettings func(bool) *domain.OperationSettings) BooleanSettingsCleanerTestConfig {
 	return BooleanSettingsCleanerTestConfig{
 		TestName:          testName,
@@ -594,14 +597,14 @@ func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
 // Parameters:
 //   - constructor: Function that creates a cleaner with given verbose and dryRun flags
 //
-// Returns a function that creates the cleaner with default test settings
+// Returns a function that creates the cleaner with default test settings.
 func NewTestCleaner[T any](constructor func(verbose, dryRun bool) T) func() T {
 	return func() T {
 		return constructor(false, false)
 	}
 }
 
-// GetHomeDirTestCase represents a test case for GetHomeDir tests
+// GetHomeDirTestCase represents a test case for GetHomeDir tests.
 type GetHomeDirTestCase struct {
 	Name         string
 	HomeValue    string

@@ -171,5 +171,3 @@ func TestCargoCleaner_Scan_DefaultCargoHome(t *testing.T) {
 		t.Log("Scan() found 0 items (CARGO_HOME may not exist)")
 	}
 }
-
-

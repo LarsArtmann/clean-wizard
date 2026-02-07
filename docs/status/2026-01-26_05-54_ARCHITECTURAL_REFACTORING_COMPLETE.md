@@ -20,6 +20,7 @@ Successfully completed a comprehensive architectural refactoring of the Go cache
 ### 1. Type Safety Violation → FIXED ✓
 
 **Before:** 5 boolean parameters allowing invalid states
+
 ```go
 type GoCleaner struct {
     cleanCache      bool  // Can all be false = no-op!
@@ -31,6 +32,7 @@ type GoCleaner struct {
 ```
 
 **After:** Type-safe enum with compile-time validation
+
 ```go
 type GoCacheType uint16
 const (
@@ -49,6 +51,7 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 ```
 
 **Files Created:**
+
 - `internal/cleaner/golang_types.go` (80 lines)
 - `internal/cleaner/golang_conversion.go` (35 lines)
 
@@ -59,6 +62,7 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 ### 2. Data Integrity Lie → FIXED ✓
 
 **Before:** Lying about bytes freed
+
 ```go
 // User sees: "✓ golangci-lint cache cleaned: 0 bytes freed"
 // User thinks: "Did it actually work?"
@@ -69,6 +73,7 @@ return result.Ok(domain.CleanResult{
 ```
 
 **After:** Honest size reporting
+
 ```go
 // User sees: "✓ golangci-lint cache cleaned: Unknown bytes freed (tool doesn't report size)"
 // User thinks: "Got it, the tool doesn't provide size info"
@@ -79,6 +84,7 @@ return result.Ok(domain.CleanResult{
 ```
 
 **Domain Type Added:**
+
 ```go
 // SizeEstimate represents an honest size estimate
 type SizeEstimate struct {
@@ -95,6 +101,7 @@ func (se SizeEstimate) String() string {
 ```
 
 **File Modified:**
+
 - `internal/domain/types.go` - Added `SizeEstimate` and updated validation logic
 
 **Impact:** Users trust the system. Honest communication about data quality limitations.
@@ -104,6 +111,7 @@ func (se SizeEstimate) String() string {
 ### 3. File Size Violation → FIXED ✓
 
 **Before:** Monstrous 546-line file (196 lines OVER 350-line limit)
+
 ```
 golang.go: 546 lines ❌
 Limit:      350 lines
@@ -112,14 +120,14 @@ Vilation:   196 lines (56% over!)
 
 **After:** 6 focused files, all under 250 lines
 
-| File | Lines | Purpose | Status |
-|------|-------|---------|--------|
-| `golang_cleaner.go` | 160 | Orchestration & API | ✓ Under limit |
-| `golang_cache_cleaner.go` | 240 | Go built-in cache cleaning | ✓ Under limit |
-| `golang_lint_adapter.go` | 100 | External tool adapters | ✓ Under limit |
-| `golang_scanner.go` | 155 | Scanning & detection | ✓ Under limit |
-| `golang_helpers.go` | 60 | Utility functions | ✓ Under limit |
-| `golang_types.go` | 80 | Type definitions | ✓ Under limit |
+| File                      | Lines | Purpose                    | Status        |
+| ------------------------- | ----- | -------------------------- | ------------- |
+| `golang_cleaner.go`       | 160   | Orchestration & API        | ✓ Under limit |
+| `golang_cache_cleaner.go` | 240   | Go built-in cache cleaning | ✓ Under limit |
+| `golang_lint_adapter.go`  | 100   | External tool adapters     | ✓ Under limit |
+| `golang_scanner.go`       | 155   | Scanning & detection       | ✓ Under limit |
+| `golang_helpers.go`       | 60    | Utility functions          | ✓ Under limit |
+| `golang_types.go`         | 80    | Type definitions           | ✓ Under limit |
 
 **Total:** 795 lines → More code, but properly organized with single responsibilities
 
@@ -130,6 +138,7 @@ Vilation:   196 lines (56% over!)
 ### 4. DRY Violation → FIXED ✓
 
 **Before:** 90 lines of duplicated logic (4 identical blocks)
+
 ```go
 // Pattern repeated 4 times × 25 lines = 100 lines of duplication
 if gc.cleanCache {
@@ -145,6 +154,7 @@ if gc.cleanCache {
 ```
 
 **After:** Single `processCacheResult()` method
+
 ```go
 // Unified processing (10 lines)
 for _, cacheType := range gc.config.Caches.EnabledTypes() {
@@ -192,6 +202,7 @@ type GoCacheConfig struct {
 ```
 
 **Benefits:**
+
 1. **Single Responsibility:** Each component does one thing well
 2. **Composability:** Easy to add new cache types (just add to map)
 3. **Testability:** Can mock `scanner` and `cleaners` independently
@@ -221,6 +232,7 @@ type StaticcheckCleaner struct { /* ... */ }
 ```
 
 **Benefits:**
+
 1. **Decoupled:** Core logic doesn't know about specific tools
 2. **Extensible:** Add new linters without changing core
 3. **Testable:** Can mock lint cleaners in tests
@@ -247,6 +259,7 @@ type SizeEstimate struct {
 ```
 
 **Domain-Driven Design Principles:**
+
 1. **Make illegal states unrepresentable** - Can't have both Known and Unknown
 2. **Model uncertainty explicitly** - Unknown size is a first-class concept
 3. **Preserve invariants** - Validation rules enforced at compile/runtime
@@ -278,6 +291,7 @@ func (gs *GoScanner) scanLintCache() []domain.ScanItem {
 ```
 
 **Detection Strategy:**
+
 1. Check `$XDG_CACHE_HOME/golangci-lint` (modern standard)
 2. Fallback to `$HOME/.cache/golangci-lint` (common location)
 3. Return empty slice if not found (graceful degradation)
@@ -290,31 +304,34 @@ func (gs *GoScanner) scanLintCache() []domain.ScanItem {
 
 All 12 call sites updated to new type-safe API:
 
-| Location | Type | Status |
-|----------|------|--------|
-| `test_go_cleaner_main.go:18` | Main test | ✓ Updated |
-| `test_go_cleaner_main.go:47` | Dry-run test | ✓ Updated |
-| `test/verify_go_cleaner.go:18` | Main test | ✓ Updated |
-| `test/verify_go_cleaner.go:47` | Dry-run test | ✓ Updated |
-| `cmd/clean-wizard/commands/clean.go:96` | Availability check | ✓ Updated |
-| `cmd/clean-wizard/commands/clean.go:487` | Main cleaning | ✓ Updated |
-| `internal/cleaner/golang_test.go` | 9 test cases | ✓ Updated |
+| Location                                 | Type               | Status    |
+| ---------------------------------------- | ------------------ | --------- |
+| `test_go_cleaner_main.go:18`             | Main test          | ✓ Updated |
+| `test_go_cleaner_main.go:47`             | Dry-run test       | ✓ Updated |
+| `test/verify_go_cleaner.go:18`           | Main test          | ✓ Updated |
+| `test/verify_go_cleaner.go:47`           | Dry-run test       | ✓ Updated |
+| `cmd/clean-wizard/commands/clean.go:96`  | Availability check | ✓ Updated |
+| `cmd/clean-wizard/commands/clean.go:487` | Main cleaning      | ✓ Updated |
+| `internal/cleaner/golang_test.go`        | 9 test cases       | ✓ Updated |
 
 **Before:**
+
 ```go
 cleaner.NewGoCleaner(true, false, true, true, false, true, false)
 ```
 
 **After:**
+
 ```go
 // Type-safe flags
-cleaner.NewGoCleaner(true, false, 
+cleaner.NewGoCleaner(true, false,
     cleaner.GoCacheGOCACHE|
     cleaner.GoCacheTestCache|
     cleaner.GoCacheBuildCache)
 ```
 
 **Benefits:**
+
 - Compile-time validation
 - Self-documenting code
 - Prevents parameter order mistakes
@@ -349,6 +366,7 @@ if !glc.IsAvailable(ctx) {
 ## 📈 CODE METRICS
 
 ### Before Refactoring
+
 - **File count:** 1 file
 - **Total lines:** 546 lines
 - **Avg per file:** 546 lines ❌
@@ -358,6 +376,7 @@ if !glc.IsAvailable(ctx) {
 - **Test coverage:** Unknown
 
 ### After Refactoring
+
 - **File count:** 6 files (+ 1 test file + 1 helper file)
 - **Total lines:** 795 lines (+249 lines, better organized)
 - **Avg per file:** 132 lines ✓
@@ -429,10 +448,12 @@ $ go build ./...
 **Root Cause:** Tests wait indefinitely for external commands without context timeouts
 
 **Files Affected:**
+
 - `internal/cleaner/golang_lint_adapter.go` - `golangci-lint cache clean`
 - `internal/cleaner/golang_cache_cleaner.go` - `go clean -cache` etc.
 
 **Solution:**
+
 ```go
 // Add timeouts to contexts
 timeoutCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
@@ -507,6 +528,7 @@ type SizeEstimate struct {
 **Alternative Approaches Considered:**
 
 1. **Option Type (Rust-style):**
+
    ```go
    // Not idiomatic Go, but explicit
    type SizeEstimate interface{}
@@ -515,12 +537,14 @@ type SizeEstimate struct {
    ```
 
 2. **Result Type:**
+
    ```go
    // Could use result.Result for uncertainty
    result.Result[uint64, SizeUnknownError]
    ```
 
 3. **Pointer with Nil:**
+
    ```go
    // Nil = Unknown, non-nil = Known
    FreedBytes *uint64
@@ -534,44 +558,50 @@ type SizeEstimate struct {
 
 **Trade-offs:**
 
-| Approach | Type Safety | Clarity | Go Idiomatic | Nullable |
-|----------|-------------|---------|--------------|----------|
-| Our `SizeEstimate` | ✓ Good | ✓ Clear | ✓ Yes | ✓ Explicit |
-| Option Type | ✓ Excellent | ✓ Clear | ❌ Non-idiomatic | ✓ Built-in |
-| Result Type | ✓ Excellent | ❌ Confusing | ❌ Misuse of Result | ✓ Yes |
-| Nil Pointer | ❌ Risky | ⚠️ Ambiguous | ✓ Very idiomatic | ✓ Yes |
-| Zero Value | ❌ Ambiguous | ❌ Confusing | ✓ Most idiomatic | ❌ No |
+| Approach           | Type Safety  | Clarity      | Go Idiomatic        | Nullable   |
+| ------------------ | ------------ | ------------ | ------------------- | ---------- |
+| Our `SizeEstimate` | ✓ Good       | ✓ Clear      | ✓ Yes               | ✓ Explicit |
+| Option Type        | ✓ Excellent  | ✓ Clear      | ❌ Non-idiomatic    | ✓ Built-in |
+| Result Type        | ✓ Excellent  | ❌ Confusing | ❌ Misuse of Result | ✓ Yes      |
+| Nil Pointer        | ❌ Risky     | ⚠️ Ambiguous | ✓ Very idiomatic    | ✓ Yes      |
+| Zero Value         | ❌ Ambiguous | ❌ Confusing | ✓ Most idiomatic    | ❌ No      |
 
 **Why I Chose Our Approach:**
+
 1. **Explicit:** No ambiguity between "unknown" and "zero"
 2. **Type-safe:** Can't accidentally misuse
 3. **Go idiomatic:** Similar to `sql.NullString`
 4. **Extendable:** Can add `Approximate` flag later if needed
 
 **But I'm Unsure Because:**
+
 1. **Verbose:** Users must check `Unknown` flag
 2. **Dual state:** Both `Known` and `Unknown` fields exist
 3. **No precedent:** Not a common pattern in Go standard library
 4. **Alternative patterns:** Rust's `Option<T>` and Haskell's `Maybe` seem more elegant
 
 **What Does DDD Literature Say?**
+
 - Should we model uncertainty as a first-class concept in the domain?
 - Should we use wrapper types like we're doing?
 - Should we push uncertainty to the edges of the system?
 
 **Specific Context:**
+
 - We're at the boundary with external systems (tools don't report sizes)
 - The uncertainty is inherent, not a failure condition
 - Users need to know whether to trust the size value
 - We might extend this to other cleaners (Nix, Homebrew also have uncertain sizes)
 
 **What I'd Love to Know:**
+
 1. Is there a well-established Go pattern for optional/nullable values that's more elegant than our approach?
 2. Should we use generics (Go 1.18+) to create a generic `Optional[T]` type?
 3. Should we push this concern to the presentation layer instead of domain layer?
 4. How do other Go projects handle "we don't know this value" in domain models?
 
 **Example User Question We're Trying to Answer:**
+
 - User: "How much space did I free?"
 - System: "Unknown - golangci-lint doesn't report cache size" ✅ (honest)
 - System: "0 bytes" ❌ (lie - causes confusion)
@@ -595,6 +625,7 @@ This refactoring successfully addressed all critical architectural violations wh
 - **User-friendly:** Helpful error messages and scan results
 
 **Next Steps:**
+
 1. Fix test timeouts (1 hour)
 2. Full integration testing (2 hours)
 3. Manual verification (1 hour)

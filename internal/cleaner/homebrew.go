@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -58,7 +59,7 @@ func (hbc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings)
 	// Validate unused_only mode
 	if settings.Homebrew.UnusedOnly != domain.HomebrewModeUnusedOnly &&
 		settings.Homebrew.UnusedOnly != domain.HomebrewModeAll {
-		return fmt.Errorf("invalid unused_only mode: must be either 'unused_only' or 'all'")
+		return errors.New("invalid unused_only mode: must be either 'unused_only' or 'all'")
 	}
 
 	return nil
@@ -67,7 +68,7 @@ func (hbc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings)
 // Scan scans for Homebrew packages that can be cleaned.
 func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
 	if !hbc.IsAvailable(ctx) {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("homebrew not available"))
+		return result.Err[[]domain.ScanItem](errors.New("homebrew not available"))
 	}
 
 	items := make([]domain.ScanItem, 0)
@@ -93,7 +94,7 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 			currentVersion := fields[1]
 
 			items = append(items, domain.ScanItem{
-				Path:     fmt.Sprintf("homebrew://%s", packageName),
+				Path:     "homebrew://" + packageName,
 				Size:     0, // Size unknown without checking
 				Created:  time.Time{},
 				ScanType: domain.ScanTypeHomebrew,
@@ -111,7 +112,7 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 // Clean removes old Homebrew packages with proper type safety.
 func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !hbc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("homebrew not available"))
+		return result.Err[domain.CleanResult](errors.New("homebrew not available"))
 	}
 
 	if hbc.dryRun {
@@ -150,12 +151,13 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 
 	for _, cmd := range commands {
 		var cleanCmd *exec.Cmd
-		if cmd == "cleanup" {
+		switch cmd {
+		case "cleanup":
 			cleanCmd = hbc.execWithTimeout(ctx, "brew", "cleanup")
 			if hbc.verbose {
 				fmt.Println("🔧 Running 'brew cleanup'")
 			}
-		} else if cmd == "prune" {
+		case "prune":
 			cleanCmd = hbc.execWithTimeout(ctx, "brew", "prune")
 			if hbc.verbose {
 				fmt.Println("🔧 Running 'brew prune'")

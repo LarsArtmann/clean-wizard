@@ -83,12 +83,13 @@ func CreateTestConfigurations() map[string]*domain.Config {
 //   - Protected: []string{"/System", "/Library"}
 //
 // Example usage:
-//   // Default config
-//   CreateTestConfig()
-//   // Custom max disk usage
-//   CreateTestConfig(WithMaxDiskUsage(75))
-//   // Custom protected paths
-//   CreateTestConfig(WithProtectedPaths([]string{"/System"}))
+//
+//	// Default config
+//	CreateTestConfig()
+//	// Custom max disk usage
+//	CreateTestConfig(WithMaxDiskUsage(75))
+//	// Custom protected paths
+//	CreateTestConfig(WithProtectedPaths([]string{"/System"}))
 func CreateTestConfig(opts ...ConfigOption) *domain.Config {
 	cfg := &domain.Config{
 		Version:      "1.0.0",

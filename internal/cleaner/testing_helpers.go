@@ -6,7 +6,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/testing"
 )
 
-// TestAvailableTypesGeneric tests that the available types function returns the expected list
+// TestAvailableTypesGeneric tests that the available types function returns the expected list.
 func TestAvailableTypesGeneric[T comparable](t *stdtesting.T, name string, getAvailable func() []T, expected []T) {
 	t.Run(name, func(t *stdtesting.T) {
 		types := getAvailable()
@@ -23,7 +23,7 @@ func TestAvailableTypesGeneric[T comparable](t *stdtesting.T, name string, getAv
 	})
 }
 
-// TestTypeStringCases creates test cases for String() method testing
+// TestTypeStringCases creates test cases for String() method testing.
 func TestTypeStringCases[T ~string](cases []T) []testing.ValueTestCase[T, string] {
 	result := make([]testing.ValueTestCase[T, string], len(cases))
 
@@ -37,7 +37,7 @@ func TestTypeStringCases[T ~string](cases []T) []testing.ValueTestCase[T, string
 	return result
 }
 
-// TestTypeStringGeneric tests the string representation of a type
+// TestTypeStringGeneric tests the string representation of a type.
 func TestTypeStringGeneric[T ~string](t *stdtesting.T, name string, getTestCases func() []testing.ValueTestCase[T, string]) {
 	tests := getTestCases()
 
@@ -51,7 +51,7 @@ func TestTypeStringGeneric[T ~string](t *stdtesting.T, name string, getTestCases
 	}
 }
 
-// TestTypeString tests the String() method of a type with the given cases
+// TestTypeString tests the String() method of a type with the given cases.
 func TestTypeString[T ~string](t *stdtesting.T, name string, cases []T) {
 	TestTypeStringGeneric(t, name, func() []testing.ValueTestCase[T, string] {
 		return TestTypeStringCases(cases)
@@ -59,7 +59,7 @@ func TestTypeString[T ~string](t *stdtesting.T, name string, cases []T) {
 }
 
 // TestEnumString tests that all enum values produce their expected string representation
-// This is a simpler alternative for types where the enum values are string constants
+// This is a simpler alternative for types where the enum values are string constants.
 func TestEnumString[T ~string](t *stdtesting.T, name string, values []T) {
 	expected := map[T]string{}
 	for _, v := range values {

@@ -32,7 +32,7 @@ func (h *golangHelpers) getGoEnv(ctx context.Context, key string) (string, error
 	// Create a timeout context to prevent hanging
 	timeoutCtx, cancel := context.WithTimeout(ctx, goEnvTimeout)
 	defer cancel()
-	
+
 	cmd := exec.CommandContext(timeoutCtx, "go", "env", key)
 	output, err := cmd.CombinedOutput()
 	if err != nil {

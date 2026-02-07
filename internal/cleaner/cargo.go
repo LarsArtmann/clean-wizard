@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -66,13 +67,13 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 	if cargoHome == "" {
 		// Fallback to default ~/.cargo
 		if homeDir, err := GetHomeDir(); err == nil && homeDir != "" {
-			cargoHome = fmt.Sprintf("%s/.cargo", homeDir)
+			cargoHome = homeDir + "/.cargo"
 		}
 	}
 
 	if cargoHome != "" {
 		// Add registry cache location
-		registryCache := fmt.Sprintf("%s/registry", cargoHome)
+		registryCache := cargoHome + "/registry"
 		items = append(items, domain.ScanItem{
 			Path:     registryCache,
 			Size:     GetDirSize(registryCache),
@@ -85,7 +86,7 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 		}
 
 		// Add source cache location
-		sourceCache := fmt.Sprintf("%s/git", cargoHome)
+		sourceCache := cargoHome + "/git"
 		items = append(items, domain.ScanItem{
 			Path:     sourceCache,
 			Size:     GetDirSize(sourceCache),
@@ -104,7 +105,7 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 // Clean removes Cargo caches.
 func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !cc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("Cargo not available"))
+		return result.Err[domain.CleanResult](errors.New("Cargo not available"))
 	}
 
 	if cc.dryRun {

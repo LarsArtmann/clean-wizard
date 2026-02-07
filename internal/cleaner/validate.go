@@ -6,7 +6,7 @@ import (
 
 // validateSettings validates that all string items in the slice are valid types.
 // It returns an error if any item is not in the validItems map.
-func validateSettings(items []string, validItems map[string]bool, itemName string, validValuesDescription string) error {
+func validateSettings(items []string, validItems map[string]bool, itemName, validValuesDescription string) error {
 	for _, item := range items {
 		if !validItems[item] {
 			return fmt.Errorf("invalid %s: %s (must be %s)", itemName, item, validValuesDescription)

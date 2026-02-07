@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -126,7 +127,7 @@ func (scc *SystemCacheCleaner) addScanItems(ctx context.Context, homeDir string,
 type cacheTypeConfig struct {
 	pathComponents []string
 	displayName    string
-	scanType        domain.ScanType
+	scanType       domain.ScanType
 }
 
 // systemCacheConfigs maps cache types to their configuration.
@@ -134,22 +135,22 @@ var systemCacheConfigs = map[SystemCacheType]cacheTypeConfig{
 	SystemCacheSpotlight: {
 		pathComponents: []string{"Library", "Metadata", "CoreSpotlight", "SpotlightKnowledgeEvents"},
 		displayName:    "Spotlight metadata",
-		scanType:        domain.ScanTypeTemp,
+		scanType:       domain.ScanTypeTemp,
 	},
 	SystemCacheXcode: {
 		pathComponents: []string{"Library", "Developer", "Xcode", "DerivedData"},
 		displayName:    "Xcode DerivedData",
-		scanType:        domain.ScanTypeTemp,
+		scanType:       domain.ScanTypeTemp,
 	},
 	SystemCacheCocoaPods: {
 		pathComponents: []string{"Library", "Caches", "CocoaPods"},
 		displayName:    "CocoaPods cache",
-		scanType:        domain.ScanTypeTemp,
+		scanType:       domain.ScanTypeTemp,
 	},
 	SystemCacheHomebrew: {
 		pathComponents: []string{"Library", "Caches", "Homebrew"},
 		displayName:    "Homebrew cache",
-		scanType:        domain.ScanTypeTemp,
+		scanType:       domain.ScanTypeTemp,
 	},
 }
 
@@ -174,7 +175,7 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType Sy
 // Clean removes system caches.
 func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !scc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("not available on this platform (requires macOS)"))
+		return result.Err[domain.CleanResult](errors.New("not available on this platform (requires macOS)"))
 	}
 
 	if scc.dryRun {

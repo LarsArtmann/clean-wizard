@@ -42,13 +42,13 @@ func TestGolangHelpers_getDirSize(t *testing.T) {
 	}
 
 	// Create test files
-	os.WriteFile(testDir+"/file1.txt", []byte("12345"), 0644)
-	os.WriteFile(testDir+"/file2.txt", []byte("67890"), 0644)
+	os.WriteFile(testDir+"/file1.txt", []byte("12345"), 0o644)
+	os.WriteFile(testDir+"/file2.txt", []byte("67890"), 0o644)
 
 	// Create a subdirectory with files
 	subDir := testDir + "/subdir"
-	os.Mkdir(subDir, 0755)
-	os.WriteFile(subDir+"/file3.txt", []byte("abcde"), 0644)
+	os.Mkdir(subDir, 0o755)
+	os.WriteFile(subDir+"/file3.txt", []byte("abcde"), 0o644)
 
 	size = GetDirSize(testDir)
 	expectedSize := int64(5 + 5 + 5) // 5+5+5 = 15 bytes
@@ -62,7 +62,7 @@ func TestGolangHelpers_getDirModTime(t *testing.T) {
 
 	// Create a test file
 	testFile := testDir + "/test.txt"
-	os.WriteFile(testFile, []byte("test"), 0644)
+	os.WriteFile(testFile, []byte("test"), 0o644)
 
 	// Should return non-zero time
 	modTime := GetDirModTime(testDir)

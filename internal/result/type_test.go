@@ -6,7 +6,7 @@ import (
 )
 
 // testPredicateTestCases provides test cases for predicate testing with shared test data.
-func testPredicateTestCases(okExpected bool, errExpected bool) []struct {
+func testPredicateTestCases(okExpected, errExpected bool) []struct {
 	name     string
 	result   Result[int]
 	expected bool
@@ -44,7 +44,8 @@ func testPredicateCases(t *testing.T, methodName string, predicate func(Result[i
 	name     string
 	result   Result[int]
 	expected bool
-}) {
+},
+) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			if predicate(tt.result) != tt.expected {

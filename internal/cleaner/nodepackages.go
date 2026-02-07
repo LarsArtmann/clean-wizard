@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"slices"
@@ -214,7 +215,7 @@ func (npmc *NodePackageManagerCleaner) scanHomeDirCache(ctx context.Context, cac
 // Clean removes Node.js package manager caches.
 func (npmc *NodePackageManagerCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !npmc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("no Node.js package managers available"))
+		return result.Err[domain.CleanResult](errors.New("no Node.js package managers available"))
 	}
 
 	if npmc.dryRun {

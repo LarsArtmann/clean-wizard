@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -69,7 +70,7 @@ func (tfc *TempFilesCleaner) ValidateSettings(settings *domain.OperationSettings
 	}
 
 	if settings.TempFiles.OlderThan == "" {
-		return fmt.Errorf("older_than must be specified")
+		return errors.New("older_than must be specified")
 	}
 
 	// Parse older than to validate it's a valid duration using custom parser

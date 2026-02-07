@@ -254,9 +254,9 @@ func (ctx *BDDTestContext) shouldSeeWhatWouldBeCleaned() error {
 
 // Validation configuration for clean result field checks
 type fieldValidationConfig struct {
-	getter   func(*domain.CleanResult) int64
+	getter    func(*domain.CleanResult) int64
 	condition func(int64) bool
-	errorMsg string
+	errorMsg  string
 }
 
 const (
@@ -266,14 +266,14 @@ const (
 
 var (
 	freedBytesValidation = fieldValidationConfig{
-		getter:   func(r *domain.CleanResult) int64 { return r.FreedBytes },
+		getter:    func(r *domain.CleanResult) int64 { return r.FreedBytes },
 		condition: func(v int64) bool { return v > 0 },
-		errorMsg: positiveEstimatedSpaceErr,
+		errorMsg:  positiveEstimatedSpaceErr,
 	}
 	itemsRemovedValidation = fieldValidationConfig{
-		getter:   func(r *domain.CleanResult) int64 { return r.ItemsRemoved },
+		getter:    func(r *domain.CleanResult) int64 { return r.ItemsRemoved },
 		condition: func(v int64) bool { return v >= 0 },
-		errorMsg: nonNegativeItemCountErr,
+		errorMsg:  nonNegativeItemCountErr,
 	}
 )
 

@@ -167,7 +167,6 @@ func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel
 	return maxRisk
 }
 
-
 func (cv *ConfigValidator) isPathProtected(protected []string, targetPath string) bool {
 	for _, path := range protected {
 		if strings.HasPrefix(path, targetPath) || strings.HasPrefix(targetPath, path) {

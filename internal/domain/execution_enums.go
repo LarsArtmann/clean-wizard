@@ -358,8 +358,8 @@ func (hm HomebrewMode) MarshalYAML() (any, error) {
 // Accepts both string and integer representations.
 func (hm *HomebrewMode) UnmarshalYAML(value *yaml.Node) error {
 	return UnmarshalYAMLEnum(value, hm, map[string]HomebrewMode{
-		"ALL":          HomebrewModeAll,
-		"UNUSED_ONLY":  HomebrewModeUnusedOnly,
+		"ALL":         HomebrewModeAll,
+		"UNUSED_ONLY": HomebrewModeUnusedOnly,
 	}, "invalid homebrew mode")
 }
 
