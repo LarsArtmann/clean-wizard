@@ -3,6 +3,8 @@ package cleaner
 import (
 	"reflect"
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // availableItemsTestHelper is a helper function for testing Available* functions.
@@ -34,6 +36,59 @@ func stringTypesTestHelper[T comparable](t *testing.T, tests []struct {
 			if got != tt.Want {
 				t.Errorf("%s(%v) = %v, want %v", testName, tt.Item, got, tt.Want)
 			}
+		})
+	}
+}
+
+// BooleanSettingsCleanerTestCase represents a test case for cleaners with boolean settings.
+type BooleanSettingsCleanerTestCase struct {
+	Name               string
+	Config             BooleanSettingsTestConfig
+}
+
+// TestBooleanSettingsCleaners runs boolean settings tests for all applicable cleaners.
+// This consolidates duplicate test functions across cleaner test files.
+func TestBooleanSettingsCleaners(t *testing.T) {
+	testCases := []BooleanSettingsCleanerTestCase{
+		{
+			Name: "Cargo",
+			Config: BooleanSettingsTestConfig{
+				TestName:          "Cargo",
+				ToolName:          "Cargo",
+				SettingsFieldName: "cargo packages",
+				ExpectedItems:     1,
+				Constructor:       NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner),
+				CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
+					return &domain.OperationSettings{
+						CargoPackages: &domain.CargoPackagesSettings{
+							Autoclean: enabled,
+						},
+					}
+				},
+			},
+		},
+		{
+			Name: "ProjectsManagementAutomation",
+			Config: BooleanSettingsTestConfig{
+				TestName:          "ProjectsManagementAutomation",
+				ToolName:          "projects-management-automation",
+				SettingsFieldName: "projects management automation",
+				ExpectedItems:     1,
+				Constructor:       NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
+				CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
+					return &domain.OperationSettings{
+						ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
+							ClearCache: enabled,
+						},
+					}
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.Name, func(t *testing.T) {
+			CreateBooleanSettingsTest(t, tc.Config)
 		})
 	}
 }

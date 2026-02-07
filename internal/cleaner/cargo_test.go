@@ -24,23 +24,6 @@ func TestCargoCleaner_IsAvailable(t *testing.T) {
 	TestIsAvailable(t, NewCargoCleaner)
 }
 
-func TestCargoCleaner_BooleanSettingsTests(t *testing.T) {
-	CreateBooleanSettingsTest(t, BooleanSettingsTestConfig{
-		TestName:          "Cargo",
-		ToolName:          "Cargo",
-		SettingsFieldName: "cargo packages",
-		ExpectedItems:     1,
-		Constructor:       NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner),
-		CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
-			return &domain.OperationSettings{
-				CargoPackages: &domain.CargoPackagesSettings{
-					Autoclean: enabled,
-				},
-			}
-		},
-	})
-}
-
 func TestCargoCleaner_GetHomeDir(t *testing.T) {
 	testCases := []GetHomeDirTestCase{
 		{
