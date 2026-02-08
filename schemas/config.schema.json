@@ -1,0 +1,570 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/larsartmann/clean-wizard/config.schema.json",
+  "title": "Clean Wizard Configuration Schema",
+  "description": "JSON schema for validating clean-wizard YAML configuration files. Supports both string and integer enum representations for type safety.",
+  "type": "object",
+  "required": ["version", "safe_mode", "max_disk_usage", "protected", "profiles"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Configuration version identifier",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "safe_mode": {
+      "type": "integer",
+      "description": "Safety level for cleanup operations",
+      "enum": [0, 1, 2],
+      "oneOf": [
+        {
+          "const": 0,
+          "description": "DISABLED - No safety checks"
+        },
+        {
+          "const": 1,
+          "description": "ENABLED - Standard safety checks"
+        },
+        {
+          "const": 2,
+          "description": "STRICT - Maximum safety enforcement"
+        }
+      ]
+    },
+    "max_disk_usage": {
+      "type": "integer",
+      "description": "Maximum disk usage percentage (0-100)",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "protected": {
+      "type": "array",
+      "description": "List of protected paths that should never be modified",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "description": "Cleanup profiles with operations",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-z][a-z0-9_-]*$": {
+          "$ref": "#/definitions/profile"
+        }
+      },
+      "additionalProperties": false
+    },
+    "current_profile": {
+      "type": "string",
+      "description": "Currently active profile name"
+    },
+    "last_clean": {
+      "type": "string",
+      "description": "Timestamp of last cleanup (ISO 8601 format)",
+      "format": "date-time"
+    },
+    "updated": {
+      "type": "string",
+      "description": "Timestamp of last configuration update (ISO 8601 format)",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "profile": {
+      "type": "object",
+      "required": ["name", "description", "operations", "enabled"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/operation"
+          }
+        },
+        "enabled": {
+          "type": "integer",
+          "enum": [0, 1],
+          "oneOf": [
+            {
+              "const": 0,
+              "description": "DISABLED"
+            },
+            {
+              "const": 1,
+              "description": "ENABLED"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "operation": {
+      "type": "object",
+      "required": ["name", "description", "risk_level", "enabled"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Operation name identifier"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_level": {
+          "type": "integer",
+          "enum": [0, 1, 2, 3],
+          "oneOf": [
+            {
+              "const": 0,
+              "description": "LOW"
+            },
+            {
+              "const": 1,
+              "description": "MEDIUM"
+            },
+            {
+              "const": 2,
+              "description": "HIGH"
+            },
+            {
+              "const": 3,
+              "description": "CRITICAL"
+            }
+          ]
+        },
+        "enabled": {
+          "type": "integer",
+          "enum": [0, 1],
+          "oneOf": [
+            {
+              "const": 0,
+              "description": "DISABLED"
+            },
+            {
+              "const": 1,
+              "description": "ENABLED"
+            }
+          ]
+        },
+        "settings": {
+          "$ref": "#/definitions/operation_settings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "operation_settings": {
+      "type": "object",
+      "description": "Type-safe operation settings with enum-based configuration",
+      "properties": {
+        "nix_generations": {
+          "$ref": "#/definitions/nix_generations_settings"
+        },
+        "temp_files": {
+          "$ref": "#/definitions/temp_files_settings"
+        },
+        "homebrew": {
+          "$ref": "#/definitions/homebrew_settings"
+        },
+        "node_packages": {
+          "$ref": "#/definitions/node_packages_settings"
+        },
+        "go_packages": {
+          "$ref": "#/definitions/go_packages_settings"
+        },
+        "cargo_packages": {
+          "$ref": "#/definitions/cargo_packages_settings"
+        },
+        "build_cache": {
+          "$ref": "#/definitions/build_cache_settings"
+        },
+        "docker": {
+          "$ref": "#/definitions/docker_settings"
+        },
+        "system_cache": {
+          "$ref": "#/definitions/system_cache_settings"
+        },
+        "lang_version_manager": {
+          "$ref": "#/definitions/lang_version_manager_settings"
+        },
+        "system_temp": {
+          "$ref": "#/definitions/system_temp_settings"
+        },
+        "projects_management_automation": {
+          "$ref": "#/definitions/projects_management_automation_settings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "nix_generations_settings": {
+      "type": "object",
+      "required": ["generations", "optimize"],
+      "properties": {
+        "generations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Number of generations to keep (0 = keep only current)"
+        },
+        "optimize": {
+          "type": "integer",
+          "enum": [0, 1],
+          "oneOf": [
+            {
+              "const": 0,
+              "description": "DISABLED"
+            },
+            {
+              "const": 1,
+              "description": "ENABLED"
+            }
+          ]
+        },
+        "dry_run": {
+          "type": "integer",
+          "enum": [0, 1, 2],
+          "oneOf": [
+            {
+              "const": 0,
+              "description": "DRY_RUN"
+            },
+            {
+              "const": 1,
+              "description": "NORMAL"
+            },
+            {
+              "const": 2,
+              "description": "FORCE"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "temp_files_settings": {
+      "type": "object",
+      "required": ["older_than"],
+      "properties": {
+        "older_than": {
+          "type": "string",
+          "description": "Minimum age for files to clean (e.g., '7d', '24h', '30m')",
+          "pattern": "^\\d+[dhms]$"
+        },
+        "excludes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "homebrew_settings": {
+      "type": "object",
+      "required": ["unused_only"],
+      "properties": {
+        "unused_only": {
+          "type": "integer",
+          "enum": [0, 1],
+          "oneOf": [
+            {
+              "const": 0,
+              "description": "ALL - Clean all packages"
+            },
+            {
+              "const": 1,
+              "description": "UNUSED_ONLY - Clean only unused packages"
+            }
+          ]
+        },
+        "prune": {
+          "type": "string",
+          "description": "Prune command options"
+        }
+      },
+      "additionalProperties": false
+    },
+    "node_packages_settings": {
+      "type": "object",
+      "required": ["package_managers"],
+      "properties": {
+        "package_managers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "enum": [0, 1, 2, 3],
+            "oneOf": [
+              {
+                "const": 0,
+                "description": "NPM"
+              },
+              {
+                "const": 1,
+                "description": "PNPM"
+              },
+              {
+                "const": 2,
+                "description": "YARN"
+              },
+              {
+                "const": 3,
+                "description": "BUN"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "go_packages_settings": {
+      "type": "object",
+      "properties": {
+        "clean_cache": {
+          "$ref": "#/definitions/cache_cleanup_mode"
+        },
+        "clean_test_cache": {
+          "$ref": "#/definitions/cache_cleanup_mode"
+        },
+        "clean_mod_cache": {
+          "$ref": "#/definitions/cache_cleanup_mode"
+        },
+        "clean_build_cache": {
+          "$ref": "#/definitions/cache_cleanup_mode"
+        },
+        "clean_lint_cache": {
+          "$ref": "#/definitions/cache_cleanup_mode"
+        }
+      },
+      "additionalProperties": false
+    },
+    "cargo_packages_settings": {
+      "type": "object",
+      "properties": {
+        "autoclean": {
+          "$ref": "#/definitions/cache_cleanup_mode"
+        }
+      },
+      "additionalProperties": false
+    },
+    "build_cache_settings": {
+      "type": "object",
+      "properties": {
+        "tool_types": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "enum": [0, 1, 2, 3, 4, 5],
+            "oneOf": [
+              {
+                "const": 0,
+                "description": "GO"
+              },
+              {
+                "const": 1,
+                "description": "RUST"
+              },
+              {
+                "const": 2,
+                "description": "NODE"
+              },
+              {
+                "const": 3,
+                "description": "PYTHON"
+              },
+              {
+                "const": 4,
+                "description": "JAVA"
+              },
+              {
+                "const": 5,
+                "description": "SCALA"
+              }
+            ]
+          }
+        },
+        "older_than": {
+          "type": "string",
+          "pattern": "^\\d+[dhms]$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "docker_settings": {
+      "type": "object",
+      "properties": {
+        "prune_mode": {
+          "type": "integer",
+          "enum": [0, 1, 2, 3, 4],
+          "oneOf": [
+            {
+              "const": 0,
+              "description": "ALL - Prune all Docker resources"
+            },
+            {
+              "const": 1,
+              "description": "IMAGES - Prune only Docker images"
+            },
+            {
+              "const": 2,
+              "description": "CONTAINERS - Prune only Docker containers"
+            },
+            {
+              "const": 3,
+              "description": "VOLUMES - Prune only Docker volumes"
+            },
+            {
+              "const": 4,
+              "description": "BUILDS - Prune only Docker build cache"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "system_cache_settings": {
+      "type": "object",
+      "properties": {
+        "cache_types": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "enum": [0, 1, 2, 3, 4, 5, 6, 7],
+            "oneOf": [
+              {
+                "const": 0,
+                "description": "SPOTLIGHT"
+              },
+              {
+                "const": 1,
+                "description": "XCODE"
+              },
+              {
+                "const": 2,
+                "description": "COCOAPODS"
+              },
+              {
+                "const": 3,
+                "description": "HOMEBREW"
+              },
+              {
+                "const": 4,
+                "description": "PIP"
+              },
+              {
+                "const": 5,
+                "description": "NPM"
+              },
+              {
+                "const": 6,
+                "description": "YARN"
+              },
+              {
+                "const": 7,
+                "description": "CCACHE"
+              }
+            ]
+          }
+        },
+        "older_than": {
+          "type": "string",
+          "pattern": "^\\d+[dhms]$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "lang_version_manager_settings": {
+      "type": "object",
+      "properties": {
+        "manager_types": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "enum": [0, 1, 2, 3, 4, 5],
+            "oneOf": [
+              {
+                "const": 0,
+                "description": "NVM"
+              },
+              {
+                "const": 1,
+                "description": "PYENV"
+              },
+              {
+                "const": 2,
+                "description": "GVM"
+              },
+              {
+                "const": 3,
+                "description": "RBENV"
+              },
+              {
+                "const": 4,
+                "description": "SDKMAN"
+              },
+              {
+                "const": 5,
+                "description": "JENV"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "system_temp_settings": {
+      "type": "object",
+      "required": ["paths", "older_than"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "older_than": {
+          "type": "string",
+          "pattern": "^\\d+[dhms]$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "projects_management_automation_settings": {
+      "type": "object",
+      "required": ["clear_cache"],
+      "properties": {
+        "clear_cache": {
+          "$ref": "#/definitions/cache_cleanup_mode"
+        }
+      },
+      "additionalProperties": false
+    },
+    "cache_cleanup_mode": {
+      "type": "integer",
+      "enum": [0, 1],
+      "oneOf": [
+        {
+          "const": 0,
+          "description": "DISABLED"
+        },
+        {
+          "const": 1,
+          "description": "ENABLED"
+        }
+      ]
+    }
+  }
+}

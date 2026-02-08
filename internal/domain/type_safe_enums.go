@@ -38,10 +38,18 @@ func UnmarshalYAMLEnum[T ~int](
 				return nil
 			}
 		}
-		return fmt.Errorf("%s value: %d", errorMsg, i)
+		// Build helpful error message with valid options
+		validStrings := make([]string, 0, len(valueMap))
+		validInts := make([]string, 0, len(valueMap))
+		for key, enumVal := range valueMap {
+			validStrings = append(validStrings, key)
+			validInts = append(validInts, fmt.Sprintf("%d", int(enumVal)))
+		}
+		return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
+			errorMsg, i, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
 	}
 
-	return fmt.Errorf("cannot parse %s: expected string or int", errorMsg)
+	return fmt.Errorf("cannot parse %s: expected string or int\n\nSee docs/YAML_ENUM_FORMATS.md for format examples", errorMsg)
 }
 
 // UnmarshalYAMLEnumWithDefault is like UnmarshalYAMLEnum but returns a default value for invalid inputs.
@@ -96,7 +104,13 @@ func UnmarshalJSONEnum[T any](
 			return nil
 		}
 	}
-	return fmt.Errorf("%s: %s", errorMsg, s)
+	// Build helpful error message with valid options
+	validStrings := make([]string, 0, len(valueMap))
+	for key := range valueMap {
+		validStrings = append(validStrings, key)
+	}
+	return fmt.Errorf("%s: %s\n\nValid string options: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
+		errorMsg, s, strings.Join(validStrings, ", "))
 }
 
 // TypeSafeEnum provides compile-time guaranteed enums with JSON serialization.

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -480,4 +481,105 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 	if unmarshaled.LangVersionManager.ManagerTypes[0] != VersionManagerNvm {
 		t.Errorf("LangVersionManager.ManagerTypes[0] = %v, want %v", unmarshaled.LangVersionManager.ManagerTypes[0], VersionManagerNvm)
 	}
+}
+
+// TestEnumErrorMessages tests that invalid enum values produce helpful error messages.
+func TestEnumErrorMessages(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       string
+		wantStrings []string
+	}{
+		{
+			name:  "invalid DockerPruneMode integer",
+			input: "99",
+			wantStrings: []string{
+				"invalid docker prune mode value: 99",
+				"Strings:",
+				"Integers:",
+				"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS",
+				"0", "1", "2", "3", "4",
+				"docs/YAML_ENUM_FORMATS.md",
+			},
+		},
+		{
+			name:  "invalid BuildToolType integer",
+			input: "99",
+			wantStrings: []string{
+				"invalid build tool type value: 99",
+				"Strings:",
+				"Integers:",
+				"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA",
+				"0", "1", "2", "3", "4", "5",
+				"docs/YAML_ENUM_FORMATS.md",
+			},
+		},
+		{
+			name:  "invalid ProfileStatus binary enum string",
+			input: "DISAABLED",
+			wantStrings: []string{
+				"invalid profile status: DISAABLED",
+				"Valid options: DISABLED (0) or ENABLED (1)",
+				"docs/YAML_ENUM_FORMATS.md",
+			},
+		},
+		{
+			name:  "invalid CacheCleanupMode binary enum integer",
+			input: "99",
+			wantStrings: []string{
+				"invalid cache cleanup mode: 99",
+				"Valid options: DISABLED (0) or ENABLED (1)",
+				"docs/YAML_ENUM_FORMATS.md",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var dockerMode DockerPruneMode
+			var buildTool BuildToolType
+			var profileStatus ProfileStatus
+			var cacheMode CacheCleanupMode
+			var err error
+
+			// Test appropriate enum type based on input
+			switch {
+			case strings.Contains(tt.name, "DockerPruneMode"):
+				err = yaml.Unmarshal([]byte(tt.input), &dockerMode)
+			case strings.Contains(tt.name, "BuildToolType"):
+				err = yaml.Unmarshal([]byte(tt.input), &buildTool)
+			case strings.Contains(tt.name, "ProfileStatus"):
+				err = yaml.Unmarshal([]byte(tt.input), &profileStatus)
+			case strings.Contains(tt.name, "CacheCleanupMode"):
+				err = yaml.Unmarshal([]byte(tt.input), &cacheMode)
+			}
+
+			if err == nil {
+				t.Fatalf("Expected error but got nil")
+			}
+
+			errMsg := err.Error()
+			t.Logf("Error message:\n%s\n", errMsg)
+
+			// Verify all expected strings are in error message
+			for _, want := range tt.wantStrings {
+				if !contains(errMsg, want) {
+					t.Errorf("Error message does not contain expected string %q\nGot: %s", want, errMsg)
+				}
+			}
+		})
+	}
+}
+
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && findSubstring(s, substr) >= 0
+}
+
+func findSubstring(s, substr string) int {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return i
+		}
+	}
+	return -1
 }

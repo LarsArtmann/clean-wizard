@@ -23,7 +23,7 @@ func unmarshalBinaryEnum[T ~int](
 			*result = v
 			return nil
 		}
-		return fmt.Errorf("invalid %s: %s", name, s)
+		return fmt.Errorf("invalid %s: %s\n\nValid options: DISABLED (0) or ENABLED (1)\n\nSee docs/YAML_ENUM_FORMATS.md for more details", name, s)
 	}
 
 	// Try as integer
@@ -33,10 +33,10 @@ func unmarshalBinaryEnum[T ~int](
 			*result = v
 			return nil
 		}
-		return fmt.Errorf("invalid %s value: %d", name, i)
+		return fmt.Errorf("invalid %s value: %d\n\nValid options: 0 (DISABLED) or 1 (ENABLED)\n\nSee docs/YAML_ENUM_FORMATS.md for more details", name, i)
 	}
 
-	return fmt.Errorf("cannot parse %s: expected string or int", name)
+	return fmt.Errorf("cannot parse %s: expected string or int\n\nSee docs/YAML_ENUM_FORMATS.md for format examples", name)
 }
 
 // binaryEnumStringMap creates a string mapping function for binary enums.
