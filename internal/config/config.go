@@ -89,7 +89,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 			// Convert string risk level to RiskLevel enum
 			var riskLevelStr string
-			v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr)
+			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr); err != nil {
+				logrus.WithField("profile", name).WithField("operation", i).WithField("error", err).Warn("Failed to unmarshal risk level, defaulting to LOW")
+			}
 
 			switch strings.ToUpper(riskLevelStr) {
 			case "LOW":

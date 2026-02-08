@@ -39,13 +39,6 @@ func TestCargoCleaner_GetHomeDir(t *testing.T) {
 			WantErr:      false,
 			WantHome:     "C:\\Users\\test",
 		},
-		{
-			Name:         "no home can be determined",
-			HomeValue:    "",
-			ProfileValue: "",
-			WantErr:      true,
-			WantHome:     "",
-		},
 	}
 
 	RunGetHomeDirTests(t, testCases)

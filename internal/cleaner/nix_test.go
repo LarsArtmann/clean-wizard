@@ -70,7 +70,7 @@ func TestNixCleaner_CleanOldGenerations(t *testing.T) {
 }
 
 func TestNixCleaner_GetStoreSize(t *testing.T) {
-	cleaner := NewNixCleaner(false, false)
+	cleaner := NewNixCleaner(false, true) // dry run to avoid expensive system call
 	ctx := context.Background()
 
 	size := cleaner.GetStoreSize(ctx)

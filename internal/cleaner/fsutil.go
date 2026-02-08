@@ -15,17 +15,19 @@ import (
 
 // GetHomeDir returns user's home directory.
 func GetHomeDir() (string, error) {
-	currentUser, err := user.Current()
-	if err == nil {
-		return currentUser.HomeDir, nil
-	}
-
+	// Check environment variables first (allows testing and overrides)
 	if home := os.Getenv("HOME"); home != "" {
 		return home, nil
 	}
 
 	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
 		return userProfile, nil
+	}
+
+	// Fall back to system user
+	currentUser, err := user.Current()
+	if err == nil {
+		return currentUser.HomeDir, nil
 	}
 
 	return "", errors.New("unable to determine home directory")

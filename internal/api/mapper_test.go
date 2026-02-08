@@ -151,6 +151,9 @@ func TestMapCleanResultToPublic_ValidResult(t *testing.T) {
 	// Create domain clean result
 	now := time.Now()
 	domainResult := domain.CleanResult{
+		SizeEstimate: domain.SizeEstimate{
+			Known: 1024 * 1024 * 100, // 100MB - must be set when ItemsRemoved > 0
+		},
 		FreedBytes:   1024 * 1024 * 100, // 100MB
 		ItemsRemoved: 50,
 		ItemsFailed:  2,

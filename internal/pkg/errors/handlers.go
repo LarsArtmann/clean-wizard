@@ -52,7 +52,7 @@ func HandleConfigError(operation string, err error) *CleanWizardError {
 func HandleValidationError(operation string, err error) *CleanWizardError {
 	baseErr := NewError(ErrConfigValidation, "Validation error: "+err.Error())
 	baseErr.Operation = operation
-	baseErr.WithDetail("validation_type", "comprehensive")
+	baseErr = baseErr.WithDetail("validation_type", "comprehensive")
 	return baseErr
 }
 
@@ -78,7 +78,7 @@ func WrapError(err error, code ErrorCode, operation string) *CleanWizardError {
 
 	cleanErr := NewError(code, err.Error())
 	cleanErr.Operation = operation
-	cleanErr.WithDetail("wrapped_error", err.Error())
+	cleanErr = cleanErr.WithDetail("wrapped_error", err.Error())
 
 	// If it's already a CleanWizardError, preserve details
 	wizardErr := &CleanWizardError{}

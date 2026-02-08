@@ -22,7 +22,7 @@ func GoCleanerTest(ctx context.Context, title string) error {
 	if !goCleaner.IsAvailable(ctx) {
 		return errors.New("Go is not available")
 	}
-	fmt.Println("✅ Go is available\n")
+	fmt.Println("✅ Go is available")
 
 	// Test 2: Scan for Go caches
 	fmt.Println("🔍 Scanning for Go caches...")

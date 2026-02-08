@@ -1,6 +1,6 @@
 module github.com/LarsArtmann/clean-wizard
 
-go 1.25.6
+go 1.24.2
 
 require (
 	github.com/caarlos0/env/v6 v6.10.1

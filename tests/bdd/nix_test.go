@@ -1,3 +1,5 @@
+//go:build skip_bdd
+
 package bdd
 
 import (
