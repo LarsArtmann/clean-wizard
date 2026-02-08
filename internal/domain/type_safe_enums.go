@@ -26,7 +26,7 @@ func UnmarshalYAMLEnum[T ~int](
 				return nil
 			}
 		}
-		return fmt.Errorf("%s: %s", errorMsg, s)
+		// String decode succeeded but didn't match - try integer as fallback
 	}
 
 	// Try as integer
@@ -60,7 +60,7 @@ func UnmarshalYAMLEnumWithDefault[T ~int](
 				return enumVal
 			}
 		}
-		return defaultVal
+		// String decode succeeded but didn't match - try integer as fallback
 	}
 
 	// Try as integer
