@@ -17,12 +17,14 @@ Comprehensive schema for validating clean-wizard YAML configurations with full s
 ### Supported Enum Types
 
 #### Binary Enums (0/1 values)
+
 - `safe_mode`: DISABLED (0), ENABLED (1), STRICT (2)
 - `enabled` (profile/operation): DISABLED (0), ENABLED (1)
 - `optimize` (nix_generations): DISABLED (0), ENABLED (1)
 - `cache_cleanup_mode`: DISABLED (0), ENABLED (1)
 
 #### Multi-Value Enums
+
 - `risk_level`: LOW (0), MEDIUM (1), HIGH (2), CRITICAL (3)
 - `execution_mode` / `dry_run`: DRY_RUN (0), NORMAL (1), FORCE (2)
 - `package_managers`: NPM (0), PNPM (1), YARN (2), BUN (3)
@@ -56,7 +58,7 @@ Add to your `.yamllint` configuration:
 extends: default
 rules:
   truthy:
-    allowed-values: ['true', 'false']
+    allowed-values: ["true", "false"]
 ```
 
 Then combine with JSON schema validation:
@@ -128,6 +130,7 @@ done
 ```
 
 Make it executable:
+
 ```bash
 chmod +x .git/hooks/pre-commit
 ```
@@ -135,6 +138,7 @@ chmod +x .git/hooks/pre-commit
 ### Schema Versioning
 
 This schema follows semantic versioning matching the clean-wizard configuration version:
+
 - Major version: Breaking changes to schema structure
 - Minor version: New enum values or optional fields
 - Patch version: Bug fixes, documentation updates
@@ -161,6 +165,7 @@ ajv compile -s schemas/config.schema.json -r draft-07
 ### Common Validation Errors
 
 #### Invalid Enum Value
+
 ```
 Error: 0 is not a valid enum value for field "package_managers[0]"
 Expected: one of NPM (0), PNPM (1), YARN (2), BUN (3)
@@ -169,6 +174,7 @@ Expected: one of NPM (0), PNPM (1), YARN (2), BUN (3)
 **Solution**: Use valid enum integer or string representation.
 
 #### Invalid Duration Format
+
 ```
 Error: "7days" does not match pattern "^\\d+[dhms]$"
 ```
@@ -176,6 +182,7 @@ Error: "7days" does not match pattern "^\\d+[dhms]$"
 **Solution**: Use proper duration format: `7d` (not `7days`), `24h` (not `24hours`), `30m` (not `30minutes`).
 
 #### Missing Required Field
+
 ```
 Error: missing required property "profiles"
 ```

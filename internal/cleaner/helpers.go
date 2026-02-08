@@ -214,7 +214,9 @@ func ValidateLangVersionManagerSettings(settings *domain.OperationSettings) erro
 	return ValidateOptionalSettingsWithTypes(
 		settings,
 		func(s *domain.OperationSettings) *domain.LangVersionManagerSettings { return s.LangVersionManager },
-		func(f *domain.LangVersionManagerSettings) []string { return VersionManagerTypeToStringSlice(f.ManagerTypes) },
+		func(f *domain.LangVersionManagerSettings) []string {
+			return VersionManagerTypeToStringSlice(f.ManagerTypes)
+		},
 		LangVersionManagerAvailableTypes,
 		"manager",
 	)

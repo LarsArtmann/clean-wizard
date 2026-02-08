@@ -53,11 +53,11 @@ func BenchmarkUnmarshalYAML_DockerPruneMode_Int(b *testing.B) {
 	testCases := []int{0, 1, 2, 3, 4}
 
 	for _, tc := range testCases {
-		b.Run(fmt.Sprintf("%d", tc), func(b *testing.B) {
+		b.Run(strconv.Itoa(tc), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				var result DockerPruneMode
 				// Use actual YAML unmarshaling with int
-				yamlData := fmt.Sprintf("%d", tc)
+				yamlData := strconv.Itoa(tc)
 				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
 					b.Fatal(err)
 				}
@@ -269,11 +269,11 @@ func BenchmarkUnmarshalYAML_CacheCleanupMode_Int(b *testing.B) {
 	testCases := []int{0, 1}
 
 	for _, tc := range testCases {
-		b.Run(fmt.Sprintf("%d", tc), func(b *testing.B) {
+		b.Run(strconv.Itoa(tc), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				var result CacheCleanupMode
 				// Use actual YAML unmarshaling with int
-				yamlData := fmt.Sprintf("%d", tc)
+				yamlData := strconv.Itoa(tc)
 				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
 					b.Fatal(err)
 				}
@@ -390,8 +390,7 @@ func BenchmarkFullConfigMarshal(b *testing.B) {
 		},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := yaml.Marshal(config)
 		if err != nil {
 			b.Fatal(err)
@@ -430,8 +429,7 @@ profiles:
           docker:
             prune_mode: 0`
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		var config Config
 		if err := yaml.Unmarshal([]byte(yamlConfig), &config); err != nil {
 			b.Fatal(err)
@@ -481,8 +479,7 @@ func BenchmarkFullConfigRoundTrip(b *testing.B) {
 		},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		yamlBytes, err := yaml.Marshal(config)
 		if err != nil {
 			b.Fatal(err)
@@ -539,8 +536,7 @@ func BenchmarkYAMLDecodeRaw_Int(b *testing.B) {
 	data := []byte("0")
 	var result int
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if err := yaml.Unmarshal(data, &result); err != nil {
 			b.Fatal(err)
 		}
@@ -552,8 +548,7 @@ func BenchmarkYAMLDecodeRaw_String(b *testing.B) {
 	data := []byte("ALL")
 	var result string
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if err := yaml.Unmarshal(data, &result); err != nil {
 			b.Fatal(err)
 		}
@@ -569,8 +564,7 @@ func BenchmarkNodeDecode_Int(b *testing.B) {
 	}
 	var result int
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if err := node.Decode(&result); err != nil {
 			b.Fatal(err)
 		}
@@ -586,8 +580,7 @@ func BenchmarkNodeDecode_String(b *testing.B) {
 	}
 	var result string
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if err := node.Decode(&result); err != nil {
 			b.Fatal(err)
 		}
@@ -639,8 +632,7 @@ func BenchmarkBufferWrite_Config(b *testing.B) {
 		},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		var buf bytes.Buffer
 		if err := yaml.NewEncoder(&buf).Encode(config); err != nil {
 			b.Fatal(err)

@@ -42,8 +42,8 @@ func stringTypesTestHelper[T comparable](t *testing.T, tests []struct {
 
 // BooleanSettingsCleanerTestCase represents a test case for cleaners with boolean settings.
 type BooleanSettingsCleanerTestCase struct {
-	Name               string
-	Config             BooleanSettingsTestConfig
+	Name   string
+	Config BooleanSettingsTestConfig
 }
 
 // TestBooleanSettingsCleaners runs boolean settings tests for all applicable cleaners.

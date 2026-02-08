@@ -32,6 +32,7 @@ Clean Wizard demonstrates **world-class architecture** with exceptional type saf
 ### Strengths (What's Working Well)
 
 #### 1. Type Safety Excellence ⭐⭐⭐⭐⭐
+
 ```go
 // Type-safe enums for all domain concepts
 type SafeMode int
@@ -54,6 +55,7 @@ const (
 **Impact**: Impossible states are unrepresentable. Type errors caught at compile time.
 
 #### 2. Proper Unsigned Types ⭐⭐⭐⭐⭐
+
 ```go
 type CleanResult struct {
     FreedBytes   uint64  // Correct: can't have negative bytes
@@ -65,6 +67,7 @@ type CleanResult struct {
 **Impact**: Domain constraints enforced by type system.
 
 #### 3. Railway Programming Pattern ⭐⭐⭐⭐⭐
+
 ```go
 type Result[T any] struct {
     value T
@@ -82,6 +85,7 @@ func Map[A, B any](r Result[A], fn func(A) B) Result[B] {
 **Impact**: Clean, composable error handling without manual propagation.
 
 #### 4. Clean Architecture ⭐⭐⭐⭐⭐
+
 ```
 cmd/clean-wizard (CLI entry point)
     ↓
@@ -97,6 +101,7 @@ internal/cleaner (Implementation layer)
 **Impact**: Perfect separation of concerns, testable, maintainable.
 
 #### 5. File Organization ⭐⭐⭐⭐⭐
+
 ```
 Most files under 300 lines ✅
 Clear package boundaries ✅
@@ -106,6 +111,7 @@ Logical grouping by domain ✅
 **Impact**: Easy to navigate, low cognitive overhead.
 
 #### 6. Comprehensive Validation ⭐⭐⭐⭐⭐
+
 ```go
 func (cr CleanResult) Validate() error {
     if cr.ItemsRemoved > 0 && !cr.SizeEstimate.Unknown && cr.SizeEstimate.Known == 0 {
@@ -126,6 +132,7 @@ func (cr CleanResult) Validate() error {
 **Problem**: Multiple `bool` fields for "enabled/disabled" states lack semantic clarity.
 
 **Current**:
+
 ```go
 type GoPackagesSettings struct {
     CleanCache      bool `json:"clean_cache"`
@@ -145,6 +152,7 @@ type ProjectsManagementAutomationSettings struct {
 ```
 
 **Improvement**:
+
 ```go
 type CacheCleanupMode int
 const (
@@ -170,6 +178,7 @@ type ProjectsManagementAutomationSettings struct {
 ```
 
 **Benefits**:
+
 - ✅ Self-documenting code (CacheCleanupMode vs bool)
 - ✅ Type-safe (can't accidentally pass true/false)
 - ✅ Extensible (can add partial/smart modes later)
@@ -179,6 +188,7 @@ type ProjectsManagementAutomationSettings struct {
 **Impact**: 6 locations, 2 days to implement, improves type safety and code clarity.
 
 **Files Affected**:
+
 - `internal/domain/operation_settings.go` (add enum)
 - `internal/cleaner/golang_cache_cleaner.go` (update usage)
 - `internal/cleaner/cargo.go` (update usage)
@@ -191,6 +201,7 @@ type ProjectsManagementAutomationSettings struct {
 **Problem**: `[]string` fields for type lists lack compile-time safety.
 
 **Current**:
+
 ```go
 type DockerSettings struct {
     PruneMode string `json:"prune_mode"` // What are valid values?
@@ -210,6 +221,7 @@ type LangVersionManagerSettings struct {
 ```
 
 **Improvement**:
+
 ```go
 type DockerPruneMode int
 const (
@@ -263,6 +275,7 @@ type LangVersionManagerSettings struct {
 ```
 
 **Benefits**:
+
 - ✅ Compile-time validation (can't use invalid types)
 - ✅ Self-documenting (see all valid values at definition)
 - ✅ Refactoring-safe (change in one place)
@@ -272,6 +285,7 @@ type LangVersionManagerSettings struct {
 **Impact**: 4 enums, 8 locations, 3 days to implement, eliminates string-based type errors.
 
 **Files Affected**:
+
 - `internal/domain/operation_settings.go` (add enums)
 - `internal/cleaner/docker.go` (update usage)
 - `internal/cleaner/buildcache.go` (update usage)
@@ -285,6 +299,7 @@ type LangVersionManagerSettings struct {
 **Problem**: Cleaners have duplicated patterns without shared interface.
 
 **Current**:
+
 ```go
 // Each cleaner implements its own Clean() method
 func (c *NixCleaner) Clean(ctx context.Context) Result[domain.CleanResult]
@@ -294,6 +309,7 @@ func (c *GoCacheCleaner) Clean(ctx context.Context) Result[domain.CleanResult]
 ```
 
 **Improvement**:
+
 ```go
 type Cleaner interface {
     Name() string
@@ -310,6 +326,7 @@ func (c *NixCleaner) Estimate(ctx context.Context) Result[domain.SizeEstimate] {
 ```
 
 **Benefits**:
+
 - ✅ Single type for all cleaners
 - ✅ Can iterate over []Cleaner
 - ✅ Easier testing (mock interface)
@@ -319,6 +336,7 @@ func (c *NixCleaner) Estimate(ctx context.Context) Result[domain.SizeEstimate] {
 **Impact**: 11 cleaners, 1 day to implement, enables polymorphism and testing.
 
 **Files Affected**:
+
 - `internal/cleaner/cleaner.go` (new file, define interface)
 - `internal/cleaner/*.go` (implement interface in all cleaners)
 - `internal/adapters/*.go` (use interface for iteration)
@@ -332,6 +350,7 @@ func (c *NixCleaner) Estimate(ctx context.Context) Result[domain.SizeEstimate] {
 **Problem**: Adding new cleaners requires modifying core code (not extensible).
 
 **Current**:
+
 ```go
 // Hardcoded list of cleaners
 cleaners := []Cleaner{
@@ -343,6 +362,7 @@ cleaners := []Cleaner{
 ```
 
 **Improvement**:
+
 ```go
 // Plugin interface
 type Plugin interface {
@@ -376,6 +396,7 @@ func (p *MyCustomCleanerPlugin) Register(r CleanerRegistry) error {
 ```
 
 **Benefits**:
+
 - ✅ Extensible without modifying core code
 - ✅ Community can create plugins
 - ✅ Cleaner core codebase
@@ -385,6 +406,7 @@ func (p *MyCustomCleanerPlugin) Register(r CleanerRegistry) error {
 **Impact**: 5 days to implement, enables third-party extensions and reduces core complexity.
 
 **Files Affected**:
+
 - `internal/plugin/registry.go` (new file, registry)
 - `internal/plugin/plugin.go` (new file, plugin interface)
 - `cmd/clean-wizard/main.go` (load plugins)
@@ -397,6 +419,7 @@ func (p *MyCustomCleanerPlugin) Register(r CleanerRegistry) error {
 **Problem**: 21 functions exceed complexity threshold (13-20 range).
 
 **Top Offenders**:
+
 ```
 20: config.LoadWithContext
 19: config.TestIntegration_ValidationSanitizationPipeline
@@ -421,11 +444,13 @@ func (p *MyCustomCleanerPlugin) Register(r CleanerRegistry) error {
 ```
 
 **Strategy**:
+
 1. Extract helper functions for repeated patterns
 2. Use strategy pattern for complex conditional logic
 3. Split large functions into focused sub-functions
 
 **Example Refactor**:
+
 ```go
 // BEFORE: LoadWithContext (20 complexity)
 func LoadWithContext(ctx context.Context) (*domain.Config, error) {
@@ -464,6 +489,7 @@ func validateAndReturn(config *domain.Config) (*domain.Config, error) { /* extra
 ```
 
 **Benefits**:
+
 - ✅ More readable functions
 - ✅ Easier to test individual parts
 - ✅ Lower cognitive load
@@ -472,6 +498,7 @@ func validateAndReturn(config *domain.Config) (*domain.Config, error) { /* extra
 **Impact**: 21 functions, 3 days to refactor, improves maintainability and testability.
 
 **Files Affected**:
+
 - `internal/config/config.go` (LoadWithContext)
 - `internal/config/enhanced_loader_api.go` (SaveConfig)
 - `internal/config/validator_profile.go` (validateProfileName)
@@ -487,6 +514,7 @@ func validateAndReturn(config *domain.Config) (*domain.Config, error) { /* extra
 **Problem**: 1 HIGH severity issue in `internal/cleaner/validate.go:12`.
 
 **Current**:
+
 ```go
 func ValidateItem(items, validItems []string, item, itemName, validValuesDescription string) error {
     if err := ValidateItems(items, item); err != nil {
@@ -501,6 +529,7 @@ func ValidateItem(items, validItems []string, item, itemName, validValuesDescrip
 ```
 
 **Improvement**:
+
 ```go
 func ValidateItem(items, validItems []string, item, itemName, validValuesDescription string) error {
     if err := ValidateItems(items, item); err != nil {
@@ -528,6 +557,7 @@ func formatValidItems(items []string) string {
 ```
 
 **Benefits**:
+
 - ✅ Context preserved in error messages
 - ✅ Better debugging experience
 - ✅ Improves error handling quality score from 90.1/100 to 95+
@@ -535,6 +565,7 @@ func formatValidItems(items []string) string {
 **Impact**: 1 location, 0.5 days to fix, improves error handling quality.
 
 **Files Affected**:
+
 - `internal/cleaner/validate.go`
 
 ---
@@ -546,6 +577,7 @@ func formatValidItems(items []string) string {
 **Problem**: Current architecture is synchronous, limiting scalability.
 
 **Improvement**:
+
 ```go
 // Event bus for async operations
 type EventBus interface {
@@ -586,6 +618,7 @@ func (s *CleanerService) CleanAllAsync(ctx context.Context) <-chan Event {
 ```
 
 **Benefits**:
+
 - ✅ Parallel execution of cleaners
 - ✅ Better performance
 - ✅ Real-time progress updates
@@ -595,6 +628,7 @@ func (s *CleanerService) CleanAllAsync(ctx context.Context) <-chan Event {
 **Impact**: 7 days to implement, enables parallel execution and better UX.
 
 **Files Affected**:
+
 - `internal/event/event_bus.go` (new file)
 - `internal/event/events.go` (new file)
 - `internal/cleaner/service.go` (async execution)
@@ -607,6 +641,7 @@ func (s *CleanerService) CleanAllAsync(ctx context.Context) <-chan Event {
 **Problem**: Multiple instances running concurrently could conflict.
 
 **Improvement**:
+
 ```go
 type DistributedLock interface {
     TryLock(ctx context.Context, key string, ttl time.Duration) (Lock, error)
@@ -644,6 +679,7 @@ func (c *NixCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 ```
 
 **Benefits**:
+
 - ✅ Safe concurrent execution
 - ✅ Prevents resource conflicts
 - ✅ Supports distributed deployments
@@ -651,6 +687,7 @@ func (c *NixCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 **Impact**: 3 days to implement, enables safe concurrent execution.
 
 **Files Affected**:
+
 - `internal/lock/lock.go` (new file)
 - `internal/lock/redis_lock.go` (new file)
 - `internal/lock/memory_lock.go` (new file, for testing)
@@ -663,6 +700,7 @@ func (c *NixCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 **Problem**: No detection of configuration changes between runs.
 
 **Improvement**:
+
 ```go
 type ConfigDriftDetector interface {
     Detect(config *domain.Config) ([]ConfigChange, error)
@@ -692,6 +730,7 @@ func (h *ConfigHistory) Record(config *domain.Config) error {
 ```
 
 **Benefits**:
+
 - ✅ Audit trail of configuration changes
 - ✅ Detect unauthorized changes
 - ✅ Rollback to previous versions
@@ -699,6 +738,7 @@ func (h *ConfigHistory) Record(config *domain.Config) error {
 **Impact**: 4 days to implement, improves security and auditability.
 
 **Files Affected**:
+
 - `internal/config/drift_detector.go` (new file)
 - `internal/config/history.go` (new file)
 - `internal/config/config.go` (record changes)
@@ -710,6 +750,7 @@ func (h *ConfigHistory) Record(config *domain.Config) error {
 **Problem**: Limited visibility into system performance.
 
 **Improvement**:
+
 ```go
 type MetricsCollector interface {
     IncrementCounter(name string, tags map[string]string)
@@ -738,6 +779,7 @@ func (c *NixCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 ```
 
 **Benefits**:
+
 - ✅ Real-time monitoring
 - ✅ Performance insights
 - ✅ Error rate tracking
@@ -746,6 +788,7 @@ func (c *NixCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 **Impact**: 5 days to implement, improves observability and monitoring.
 
 **Files Affected**:
+
 - `internal/metrics/collector.go` (new file)
 - `internal/metrics/prometheus.go` (new file)
 - All cleaner implementations (add metrics)
@@ -757,6 +800,7 @@ func (c *NixCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 **Problem**: No protection against excessive resource usage.
 
 **Improvement**:
+
 ```go
 type RateLimiter interface {
     Allow(ctx context.Context, key string) bool
@@ -788,6 +832,7 @@ func (c *DockerCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 ```
 
 **Benefits**:
+
 - ✅ Prevents resource exhaustion
 - ✅ Fair resource allocation
 - ✅ System stability
@@ -795,6 +840,7 @@ func (c *DockerCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 **Impact**: 2 days to implement, improves system stability.
 
 **Files Affected**:
+
 - `internal/rate_limiter/limiter.go` (new file)
 - `internal/rate_limiter/token_bucket.go` (new file)
 - Cleaner implementations (add rate limiting)
@@ -806,6 +852,7 @@ func (c *DockerCleaner) Clean(ctx context.Context) Result[domain.CleanResult] {
 **Problem**: No automatic migration between config versions.
 
 **Improvement**:
+
 ```go
 type ConfigMigration interface {
     Migrate(config *domain.Config, from, to string) error
@@ -839,6 +886,7 @@ func (cm *ConfigMigrator) Migrate(config *domain.Config, targetVersion string) e
 ```
 
 **Benefits**:
+
 - ✅ Seamless config upgrades
 - ✅ Backward compatibility
 - ✅ Migration history
@@ -846,6 +894,7 @@ func (cm *ConfigMigrator) Migrate(config *domain.Config, targetVersion string) e
 **Impact**: 3 days to implement, improves upgrade experience.
 
 **Files Affected**:
+
 - `internal/config/migration.go` (new file)
 - `internal/config/migrations/v1_to_v2.go` (new file)
 - `internal/config/config.go` (auto-migrate on load)
@@ -857,6 +906,7 @@ func (cm *ConfigMigrator) Migrate(config *domain.Config, targetVersion string) e
 **Problem**: No mechanism for discovering and installing plugins.
 
 **Improvement**:
+
 ```go
 type PluginRegistry struct {
     plugins []Plugin
@@ -883,6 +933,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 ```
 
 **Benefits**:
+
 - ✅ Community plugins
 - ✅ Easy discovery
 - ✅ One-click installation
@@ -890,6 +941,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Impact**: 5 days to implement, enables plugin ecosystem.
 
 **Files Affected**:
+
 - `internal/plugin/marketplace.go` (new file)
 - `cmd/clean-wizard/commands/plugin.go` (new file)
 - Documentation
@@ -903,6 +955,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Goal**: Implement highest-impact, lowest-effort improvements.
 
 **Tasks**:
+
 1. [ ] Replace "enabled" bool fields with CacheCleanupMode enum (2 days)
 2. [ ] Replace string slices with type-safe enums (3 days)
 3. [ ] Extract generic Cleaner interface (1 day)
@@ -913,6 +966,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Risk**: Low
 
 **Deliverables**:
+
 - Type-safe enums for all settings
 - Generic Cleaner interface
 - Improved error handling (95+ quality score)
@@ -925,6 +979,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Goal**: Add core architectural capabilities.
 
 **Tasks**:
+
 1. [ ] Reduce cyclomatic complexity in 21 functions (3 days)
 2. [ ] Implement plugin architecture (5 days)
 3. [ ] Add comprehensive testing for new features (2 days)
@@ -934,6 +989,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Risk**: Medium
 
 **Deliverables**:
+
 - Refactored functions (<10 complexity)
 - Plugin system with registry
 - Plugin development documentation
@@ -946,6 +1002,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Goal**: Add enterprise-grade features.
 
 **Tasks**:
+
 1. [ ] Event-driven architecture (7 days)
 2. [ ] Distributed locking (3 days)
 3. [ ] Configuration drift detection (4 days)
@@ -959,6 +1016,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Risk**: Medium-High
 
 **Deliverables**:
+
 - Async cleaner execution
 - Distributed lock system
 - Config history & audit trail
@@ -974,6 +1032,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Goal**: Ensure production readiness.
 
 **Tasks**:
+
 1. [ ] Load testing and performance optimization
 2. [ ] Security audit and hardening
 3. [ ] Documentation completion
@@ -986,6 +1045,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 **Risk**: High (critical path)
 
 **Deliverables**:
+
 - Performance benchmarks
 - Security audit report
 - Complete documentation
@@ -1053,6 +1113,7 @@ func (r *PluginRegistry) Install(pluginName string) error {
 ## Architecture Diagram
 
 ### Current Architecture
+
 ```mermaid
 graph TD
     A[cmd/clean-wizard] --> B[internal/adapters]
@@ -1066,6 +1127,7 @@ graph TD
 ```
 
 ### Proposed Architecture (Phase 1-2)
+
 ```mermaid
 graph TD
     A[cmd/clean-wizard] --> B[internal/adapters]
@@ -1078,6 +1140,7 @@ graph TD
 ```
 
 ### Proposed Architecture (Phase 3)
+
 ```mermaid
 graph TD
     A[cmd/clean-wizard] --> B[internal/adapters]
@@ -1109,6 +1172,7 @@ Clean Wizard is **already world-class** with excellent architecture, type safety
 **Recommended Approach**: Implement in phases, starting with Phase 1 (quick wins) to validate the approach, then proceed with Phase 2-4 based on business priorities and resource availability.
 
 **Critical Success Factors**:
+
 - Maintain backward compatibility during refactoring
 - Comprehensive testing at each phase
 - Clear documentation for plugin developers

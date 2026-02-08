@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -86,7 +87,7 @@ type CargoPackagesSettings struct {
 // BuildCacheSettings provides type-safe settings for build cache cleanup.
 type BuildCacheSettings struct {
 	ToolTypes []BuildToolType `json:"tool_types,omitempty" yaml:"tool_types,omitempty"`
-	OlderThan string            `json:"older_than,omitempty" yaml:"older_than,omitempty"`
+	OlderThan string          `json:"older_than,omitempty" yaml:"older_than,omitempty"`
 }
 
 // DockerSettings provides type-safe settings for Docker cleanup.
@@ -97,7 +98,7 @@ type DockerSettings struct {
 // SystemCacheSettings provides type-safe settings for macOS system cache cleanup.
 type SystemCacheSettings struct {
 	CacheTypes []CacheType `json:"cache_types,omitempty" yaml:"cache_types,omitempty"`
-	OlderThan  string     `json:"older_than,omitempty"  yaml:"older_than,omitempty"`
+	OlderThan  string      `json:"older_than,omitempty"  yaml:"older_than,omitempty"`
 }
 
 // LangVersionManagerSettings provides type-safe settings for language version manager cleanup.
@@ -695,13 +696,13 @@ func (ct CacheType) MarshalYAML() (any, error) {
 func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 	return UnmarshalYAMLEnum(value, ct, map[string]CacheType{
 		"SPOTLIGHT": CacheTypeSpotlight,
-		"XCODE":      CacheTypeXcode,
-		"COCOAPODS":  CacheTypeCocoapods,
-		"HOMEBREW":   CacheTypeHomebrew,
-		"PIP":        CacheTypePip,
-		"NPM":        CacheTypeNpm,
-		"YARN":       CacheTypeYarn,
-		"CCACHE":     CacheTypeCcache,
+		"XCODE":     CacheTypeXcode,
+		"COCOAPODS": CacheTypeCocoapods,
+		"HOMEBREW":  CacheTypeHomebrew,
+		"PIP":       CacheTypePip,
+		"NPM":       CacheTypeNpm,
+		"YARN":      CacheTypeYarn,
+		"CCACHE":    CacheTypeCcache,
 	}, "invalid cache type")
 }
 
@@ -768,12 +769,12 @@ func (vm VersionManagerType) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for VersionManagerType.
 func (vm *VersionManagerType) UnmarshalYAML(value *yaml.Node) error {
 	return UnmarshalYAMLEnum(value, vm, map[string]VersionManagerType{
-		"NVM":     VersionManagerNvm,
-		"PYENV":   VersionManagerPyenv,
-		"GVM":     VersionManagerGvm,
-		"RBENV":   VersionManagerRbenv,
-		"SDKMAN":  VersionManagerSdkman,
-		"JENV":    VersionManagerJenv,
+		"NVM":    VersionManagerNvm,
+		"PYENV":  VersionManagerPyenv,
+		"GVM":    VersionManagerGvm,
+		"RBENV":  VersionManagerRbenv,
+		"SDKMAN": VersionManagerSdkman,
+		"JENV":   VersionManagerJenv,
 	}, "invalid version manager type")
 }
 

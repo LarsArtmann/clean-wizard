@@ -3,6 +3,7 @@ package domain
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -43,7 +44,7 @@ func UnmarshalYAMLEnum[T ~int](
 		validInts := make([]string, 0, len(valueMap))
 		for key, enumVal := range valueMap {
 			validStrings = append(validStrings, key)
-			validInts = append(validInts, fmt.Sprintf("%d", int(enumVal)))
+			validInts = append(validInts, strconv.Itoa(int(enumVal)))
 		}
 		return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
 			errorMsg, i, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
