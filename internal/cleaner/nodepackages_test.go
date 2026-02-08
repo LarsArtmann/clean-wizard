@@ -120,7 +120,7 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "valid settings with all PMs",
 			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []string{"npm", "pnpm", "yarn", "bun"},
+					PackageManagers: []domain.PackageManagerType{domain.PackageManagerNpm, domain.PackageManagerPnpm, domain.PackageManagerYarn, domain.PackageManagerBun},
 				},
 			},
 			WantErr: false,
@@ -129,7 +129,7 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "valid settings with single PM",
 			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []string{"npm"},
+					PackageManagers: []domain.PackageManagerType{domain.PackageManagerNpm},
 				},
 			},
 			WantErr: false,
@@ -138,7 +138,7 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "valid settings with no PMs",
 			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []string{},
+					PackageManagers: []domain.PackageManagerType{},
 				},
 			},
 			WantErr: false,
@@ -147,7 +147,7 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "invalid package manager",
 			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []string{"invalid-pm"},
+					PackageManagers: []domain.PackageManagerType{99}, // Invalid value
 				},
 			},
 			WantErr: true,
@@ -156,7 +156,7 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "mixed valid and invalid PMs",
 			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []string{"npm", "invalid-pm"},
+					PackageManagers: []domain.PackageManagerType{domain.PackageManagerNpm, 99}, // Mixed valid and invalid
 				},
 			},
 			WantErr: true,

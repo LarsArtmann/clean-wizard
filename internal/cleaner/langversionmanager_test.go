@@ -106,7 +106,7 @@ func TestLanguageVersionManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "valid settings with all managers",
 			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
-					ManagerTypes: []string{"nvm", "pyenv", "rbenv"},
+					ManagerTypes: []domain.VersionManagerType{domain.VersionManagerNvm, domain.VersionManagerPyenv, domain.VersionManagerRbenv},
 				},
 			},
 			WantErr: false,
@@ -115,7 +115,7 @@ func TestLanguageVersionManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "valid settings with single manager",
 			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
-					ManagerTypes: []string{"nvm"},
+					ManagerTypes: []domain.VersionManagerType{domain.VersionManagerNvm},
 				},
 			},
 			WantErr: false,
@@ -124,7 +124,7 @@ func TestLanguageVersionManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "valid settings with no managers",
 			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
-					ManagerTypes: []string{},
+					ManagerTypes: []domain.VersionManagerType{},
 				},
 			},
 			WantErr: false,
@@ -133,7 +133,7 @@ func TestLanguageVersionManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "invalid manager type",
 			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
-					ManagerTypes: []string{"invalid-manager"},
+					ManagerTypes: []domain.VersionManagerType{999},
 				},
 			},
 			WantErr: true,
@@ -142,7 +142,7 @@ func TestLanguageVersionManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "mixed valid and invalid managers",
 			Settings: &domain.OperationSettings{
 				LangVersionManager: &domain.LangVersionManagerSettings{
-					ManagerTypes: []string{"nvm", "invalid-manager"},
+					ManagerTypes: []domain.VersionManagerType{domain.VersionManagerNvm, 999},
 				},
 			},
 			WantErr: true,

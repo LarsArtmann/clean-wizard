@@ -12,19 +12,19 @@ func toGoCacheType(settings *domain.GoPackagesSettings) GoCacheType {
 
 	cacheType := GoCacheNone
 
-	if settings.CleanCache {
+	if settings.CleanCache.IsEnabled() {
 		cacheType |= GoCacheGOCACHE
 	}
-	if settings.CleanTestCache {
+	if settings.CleanTestCache.IsEnabled() {
 		cacheType |= GoCacheTestCache
 	}
-	if settings.CleanModCache {
+	if settings.CleanModCache.IsEnabled() {
 		cacheType |= GoCacheModCache
 	}
-	if settings.CleanBuildCache {
+	if settings.CleanBuildCache.IsEnabled() {
 		cacheType |= GoCacheBuildCache
 	}
-	if settings.CleanLintCache {
+	if settings.CleanLintCache.IsEnabled() {
 		cacheType |= GoCacheLintCache
 	}
 

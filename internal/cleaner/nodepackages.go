@@ -87,9 +87,10 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 	}
 
 	validPackageManagersMap := toStringMap(AvailableNodePackageManagers())
+	packageManagerStrings := PackageManagerTypeToLowerSlice(settings.NodePackages.PackageManagers)
 
 	return validateSettings(
-		settings.NodePackages.PackageManagers,
+		packageManagerStrings,
 		validPackageManagersMap,
 		"package manager",
 		"npm, pnpm, yarn, or bun",

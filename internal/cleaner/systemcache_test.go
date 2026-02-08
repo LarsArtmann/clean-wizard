@@ -116,7 +116,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with all caches",
 			settings: &domain.OperationSettings{
 				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []string{"spotlight", "xcode", "cocoapods", "homebrew"},
+					CacheTypes: []domain.CacheType{domain.CacheTypeSpotlight, domain.CacheTypeXcode, domain.CacheTypeCocoapods, domain.CacheTypeHomebrew},
 					OlderThan:  "30d",
 				},
 			},
@@ -126,7 +126,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with single cache",
 			settings: &domain.OperationSettings{
 				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []string{"spotlight"},
+					CacheTypes: []domain.CacheType{domain.CacheTypeSpotlight},
 					OlderThan:  "7d",
 				},
 			},
@@ -136,7 +136,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with no caches",
 			settings: &domain.OperationSettings{
 				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []string{},
+					CacheTypes: []domain.CacheType{},
 					OlderThan:  "30d",
 				},
 			},
@@ -146,7 +146,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "invalid cache type",
 			settings: &domain.OperationSettings{
 				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []string{"invalid-cache"},
+					CacheTypes: []domain.CacheType{99}, // Invalid value
 					OlderThan:  "30d",
 				},
 			},
@@ -156,7 +156,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "mixed valid and invalid caches",
 			settings: &domain.OperationSettings{
 				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []string{"spotlight", "invalid-cache"},
+					CacheTypes: []domain.CacheType{domain.CacheTypeSpotlight, 99}, // Mixed valid and invalid
 					OlderThan:  "30d",
 				},
 			},

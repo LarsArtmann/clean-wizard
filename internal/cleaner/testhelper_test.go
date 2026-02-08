@@ -59,9 +59,13 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				ExpectedItems:     1,
 				Constructor:       NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner),
 				CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
+					cleanupMode := domain.CacheCleanupDisabled
+					if enabled {
+						cleanupMode = domain.CacheCleanupEnabled
+					}
 					return &domain.OperationSettings{
 						CargoPackages: &domain.CargoPackagesSettings{
-							Autoclean: enabled,
+							Autoclean: cleanupMode,
 						},
 					}
 				},
@@ -76,9 +80,13 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				ExpectedItems:     1,
 				Constructor:       NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
 				CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
+					cleanupMode := domain.CacheCleanupDisabled
+					if enabled {
+						cleanupMode = domain.CacheCleanupEnabled
+					}
 					return &domain.OperationSettings{
 						ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
-							ClearCache: enabled,
+							ClearCache: cleanupMode,
 						},
 					}
 				},

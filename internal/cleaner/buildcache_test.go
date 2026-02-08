@@ -126,7 +126,7 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with all tools",
 			settings: &domain.OperationSettings{
 				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []string{"gradle", "maven", "sbt"},
+					ToolTypes: []domain.BuildToolType{domain.BuildToolJava, domain.BuildToolScala},
 					OlderThan: "30d",
 				},
 			},
@@ -136,7 +136,7 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with single tool",
 			settings: &domain.OperationSettings{
 				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []string{"gradle"},
+					ToolTypes: []domain.BuildToolType{domain.BuildToolJava},
 					OlderThan: "7d",
 				},
 			},
@@ -146,7 +146,7 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with no tools",
 			settings: &domain.OperationSettings{
 				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []string{},
+					ToolTypes: []domain.BuildToolType{},
 					OlderThan: "30d",
 				},
 			},
@@ -156,7 +156,7 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "invalid tool type",
 			settings: &domain.OperationSettings{
 				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []string{"invalid-tool"},
+					ToolTypes: []domain.BuildToolType{999},
 					OlderThan: "30d",
 				},
 			},
@@ -166,7 +166,7 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "mixed valid and invalid tools",
 			settings: &domain.OperationSettings{
 				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []string{"gradle", "invalid-tool"},
+					ToolTypes: []domain.BuildToolType{domain.BuildToolJava, 999},
 					OlderThan: "30d",
 				},
 			},

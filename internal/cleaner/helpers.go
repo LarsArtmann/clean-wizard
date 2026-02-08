@@ -3,6 +3,7 @@ package cleaner
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
@@ -136,16 +137,76 @@ func ValidateOptionalSettingsWithTypes[F any](
 
 // LangVersionManagerAvailableTypes defines all valid language version manager types.
 var LangVersionManagerAvailableTypes = []string{
-	string(LangVersionManagerNVM),
-	string(LangVersionManagerPYENV),
-	string(LangVersionManagerRBENV),
+	domain.VersionManagerNvm.String(),
+	domain.VersionManagerPyenv.String(),
+	domain.VersionManagerGvm.String(),
+	domain.VersionManagerRbenv.String(),
+	domain.VersionManagerSdkman.String(),
+	domain.VersionManagerJenv.String(),
 }
 
 // BuildCacheAvailableTypes defines all valid build cache tool types.
 var BuildCacheAvailableTypes = []string{
-	string(BuildToolGradle),
-	string(BuildToolMaven),
-	string(BuildToolSBT),
+	domain.BuildToolGo.String(),
+	domain.BuildToolRust.String(),
+	domain.BuildToolNode.String(),
+	domain.BuildToolPython.String(),
+	domain.BuildToolJava.String(),
+	domain.BuildToolScala.String(),
+}
+
+// VersionManagerTypeToStringSlice converts domain.VersionManagerType slice to string slice.
+func VersionManagerTypeToStringSlice(types []domain.VersionManagerType) []string {
+	result := make([]string, len(types))
+	for i, t := range types {
+		result[i] = t.String()
+	}
+	return result
+}
+
+// BuildToolTypeToStringSlice converts domain.BuildToolType slice to string slice.
+func BuildToolTypeToStringSlice(types []domain.BuildToolType) []string {
+	result := make([]string, len(types))
+	for i, t := range types {
+		result[i] = t.String()
+	}
+	return result
+}
+
+// PackageManagerTypeToStringSlice converts domain.PackageManagerType slice to string slice.
+func PackageManagerTypeToStringSlice(types []domain.PackageManagerType) []string {
+	result := make([]string, len(types))
+	for i, t := range types {
+		result[i] = t.String()
+	}
+	return result
+}
+
+// PackageManagerTypeToLowerSlice converts domain.PackageManagerType slice to lowercase string slice.
+func PackageManagerTypeToLowerSlice(types []domain.PackageManagerType) []string {
+	result := make([]string, len(types))
+	for i, t := range types {
+		result[i] = strings.ToLower(t.String())
+	}
+	return result
+}
+
+// CacheTypeToStringSlice converts domain.CacheType slice to string slice.
+func CacheTypeToStringSlice(types []domain.CacheType) []string {
+	result := make([]string, len(types))
+	for i, t := range types {
+		result[i] = t.String()
+	}
+	return result
+}
+
+// CacheTypeToLowerSlice converts domain.CacheType slice to lowercase string slice.
+func CacheTypeToLowerSlice(types []domain.CacheType) []string {
+	result := make([]string, len(types))
+	for i, t := range types {
+		result[i] = strings.ToLower(t.String())
+	}
+	return result
 }
 
 // ValidateLangVersionManagerSettings validates language version manager settings.
@@ -153,7 +214,7 @@ func ValidateLangVersionManagerSettings(settings *domain.OperationSettings) erro
 	return ValidateOptionalSettingsWithTypes(
 		settings,
 		func(s *domain.OperationSettings) *domain.LangVersionManagerSettings { return s.LangVersionManager },
-		func(f *domain.LangVersionManagerSettings) []string { return f.ManagerTypes },
+		func(f *domain.LangVersionManagerSettings) []string { return VersionManagerTypeToStringSlice(f.ManagerTypes) },
 		LangVersionManagerAvailableTypes,
 		"manager",
 	)
@@ -164,7 +225,7 @@ func ValidateBuildCacheSettings(settings *domain.OperationSettings) error {
 	return ValidateOptionalSettingsWithTypes(
 		settings,
 		func(s *domain.OperationSettings) *domain.BuildCacheSettings { return s.BuildCache },
-		func(f *domain.BuildCacheSettings) []string { return f.ToolTypes },
+		func(f *domain.BuildCacheSettings) []string { return BuildToolTypeToStringSlice(f.ToolTypes) },
 		BuildCacheAvailableTypes,
 		"tool",
 	)

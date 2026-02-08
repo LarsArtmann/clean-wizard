@@ -145,10 +145,10 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with all caches",
 			settings: &domain.OperationSettings{
 				GoPackages: &domain.GoPackagesSettings{
-					CleanCache:      true,
-					CleanTestCache:  true,
-					CleanModCache:   true,
-					CleanBuildCache: true,
+					CleanCache:      domain.CacheCleanupEnabled,
+					CleanTestCache:  domain.CacheCleanupEnabled,
+					CleanModCache:   domain.CacheCleanupEnabled,
+					CleanBuildCache: domain.CacheCleanupEnabled,
 				},
 			},
 			wantErr: false,
@@ -157,10 +157,10 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with no caches",
 			settings: &domain.OperationSettings{
 				GoPackages: &domain.GoPackagesSettings{
-					CleanCache:      false,
-					CleanTestCache:  false,
-					CleanModCache:   false,
-					CleanBuildCache: false,
+					CleanCache:      domain.CacheCleanupDisabled,
+					CleanTestCache:  domain.CacheCleanupDisabled,
+					CleanModCache:   domain.CacheCleanupDisabled,
+					CleanBuildCache: domain.CacheCleanupDisabled,
 				},
 			},
 			wantErr: false,
@@ -169,10 +169,10 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with mixed caches",
 			settings: &domain.OperationSettings{
 				GoPackages: &domain.GoPackagesSettings{
-					CleanCache:      true,
-					CleanTestCache:  false,
-					CleanModCache:   true,
-					CleanBuildCache: false,
+					CleanCache:      domain.CacheCleanupEnabled,
+					CleanTestCache:  domain.CacheCleanupDisabled,
+					CleanModCache:   domain.CacheCleanupEnabled,
+					CleanBuildCache: domain.CacheCleanupDisabled,
 				},
 			},
 			wantErr: false,

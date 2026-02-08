@@ -73,16 +73,9 @@ func (dc *DockerCleaner) ValidateSettings(settings *domain.OperationSettings) er
 		return nil // Settings are optional
 	}
 
-	// Validate prune mode
-	validPruneModes := map[DockerPruneMode]bool{
-		DockerPruneLight:      true,
-		DockerPruneStandard:   true,
-		DockerPruneAggressive: true,
-	}
-
-	pruneMode := DockerPruneMode(settings.Docker.PruneMode)
-	if !validPruneModes[pruneMode] {
-		return fmt.Errorf("invalid prune mode: %s (must be light, standard, or aggressive)", settings.Docker.PruneMode)
+	// Validate prune mode using domain enum validation
+	if !settings.Docker.PruneMode.IsValid() {
+		return fmt.Errorf("invalid prune mode: %v (must be a valid DockerPruneMode value)", settings.Docker.PruneMode)
 	}
 
 	return nil

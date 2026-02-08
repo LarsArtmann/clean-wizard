@@ -101,7 +101,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 			name: "valid light mode",
 			settings: &domain.OperationSettings{
 				Docker: &domain.DockerSettings{
-					PruneMode: "light",
+					PruneMode: domain.DockerPruneAll,
 				},
 			},
 			wantErr: false,
@@ -110,7 +110,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 			name: "valid standard mode",
 			settings: &domain.OperationSettings{
 				Docker: &domain.DockerSettings{
-					PruneMode: "standard",
+					PruneMode: domain.DockerPruneImages,
 				},
 			},
 			wantErr: false,
@@ -119,7 +119,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 			name: "valid aggressive mode",
 			settings: &domain.OperationSettings{
 				Docker: &domain.DockerSettings{
-					PruneMode: "aggressive",
+					PruneMode: domain.DockerPruneContainers,
 				},
 			},
 			wantErr: false,
@@ -128,7 +128,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 			name: "invalid prune mode",
 			settings: &domain.OperationSettings{
 				Docker: &domain.DockerSettings{
-					PruneMode: "invalid-mode",
+					PruneMode: domain.DockerPruneMode(999),
 				},
 			},
 			wantErr: true,

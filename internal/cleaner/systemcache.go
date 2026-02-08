@@ -78,9 +78,10 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 	}
 
 	validCacheTypesMap := toStringMap(AvailableSystemCacheTypes())
+	cacheTypeStrings := CacheTypeToLowerSlice(settings.SystemCache.CacheTypes)
 
 	return validateSettings(
-		settings.SystemCache.CacheTypes,
+		cacheTypeStrings,
 		validCacheTypesMap,
 		"cache type",
 		"spotlight, xcode, cocoapods, or homebrew",
