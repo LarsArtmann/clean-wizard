@@ -3,6 +3,7 @@ package domain
 import (
 	"bytes"
 	"fmt"
+	"strconv"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -20,7 +21,7 @@ func BenchmarkMarshalYAML_DockerPruneMode(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_, err := tc.MarshalYAML()
 				if err != nil {
 					b.Fatal(err)
@@ -36,7 +37,7 @@ func BenchmarkUnmarshalYAML_DockerPruneMode_String(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				var result DockerPruneMode
 				// Use actual YAML unmarshaling with string
 				yamlData := fmt.Sprintf(`"%s"`, tc)
@@ -54,7 +55,7 @@ func BenchmarkUnmarshalYAML_DockerPruneMode_Int(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(strconv.Itoa(tc), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				var result DockerPruneMode
 				// Use actual YAML unmarshaling with int
 				yamlData := strconv.Itoa(tc)
@@ -79,7 +80,7 @@ func BenchmarkMarshalYAML_BuildToolType(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_, err := tc.MarshalYAML()
 				if err != nil {
 					b.Fatal(err)
@@ -95,7 +96,7 @@ func BenchmarkUnmarshalYAML_BuildToolType_String(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				var result BuildToolType
 				// Use actual YAML unmarshaling with string
 				yamlData := fmt.Sprintf(`"%s"`, tc)
@@ -122,7 +123,7 @@ func BenchmarkMarshalYAML_CacheType(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_, err := tc.MarshalYAML()
 				if err != nil {
 					b.Fatal(err)
@@ -138,7 +139,7 @@ func BenchmarkUnmarshalYAML_CacheType_String(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				var result CacheType
 				// Use actual YAML unmarshaling with string
 				yamlData := fmt.Sprintf(`"%s"`, tc)
@@ -163,7 +164,7 @@ func BenchmarkMarshalYAML_VersionManagerType(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_, err := tc.MarshalYAML()
 				if err != nil {
 					b.Fatal(err)
@@ -179,7 +180,7 @@ func BenchmarkUnmarshalYAML_VersionManagerType_String(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				var result VersionManagerType
 				// Use actual YAML unmarshaling with string
 				yamlData := fmt.Sprintf(`"%s"`, tc)
@@ -202,7 +203,7 @@ func BenchmarkMarshalYAML_PackageManagerType(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_, err := tc.MarshalYAML()
 				if err != nil {
 					b.Fatal(err)
@@ -218,7 +219,7 @@ func BenchmarkUnmarshalYAML_PackageManagerType_String(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				var result PackageManagerType
 				// Use actual YAML unmarshaling with string
 				yamlData := fmt.Sprintf(`"%s"`, tc)
@@ -236,7 +237,7 @@ func BenchmarkMarshalYAML_CacheCleanupMode(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_, err := tc.MarshalYAML()
 				if err != nil {
 					b.Fatal(err)
@@ -252,7 +253,7 @@ func BenchmarkUnmarshalYAML_CacheCleanupMode_String(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				var result CacheCleanupMode
 				// Use actual YAML unmarshaling with string
 				yamlData := fmt.Sprintf(`"%s"`, tc)
@@ -270,7 +271,7 @@ func BenchmarkUnmarshalYAML_CacheCleanupMode_Int(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(strconv.Itoa(tc), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				var result CacheCleanupMode
 				// Use actual YAML unmarshaling with int
 				yamlData := strconv.Itoa(tc)
@@ -294,7 +295,7 @@ func BenchmarkRoundTrip_DockerPruneMode(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				marshaled, err := tc.MarshalYAML()
 				if err != nil {
 					b.Fatal(err)
@@ -324,7 +325,7 @@ func BenchmarkRoundTrip_CacheCleanupMode(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				marshaled, err := tc.MarshalYAML()
 				if err != nil {
 					b.Fatal(err)
@@ -504,7 +505,7 @@ func BenchmarkEnumString_DockerPruneMode(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_ = tc.String()
 			}
 		})
@@ -524,7 +525,7 @@ func BenchmarkEnumIsValid_DockerPruneMode(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(fmt.Sprintf("%d", tc), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_ = tc.IsValid()
 			}
 		})
@@ -594,7 +595,7 @@ func BenchmarkStringComparison_CaseInsensitive(b *testing.B) {
 	for _, tc := range testCases {
 		b.Run(tc, func(b *testing.B) {
 			target := "ALL"
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				_ = tc == target
 			}
 		})

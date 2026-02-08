@@ -9,9 +9,9 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"gopkg.in/yaml.v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
 
 // TestEnumWorkflow_Integration tests full workflow from YAML config with enums to execution.
@@ -86,15 +86,15 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 	expectedDockerMode domain.DockerPruneMode,
 	expectedCleanCache, expectedTestCache,
 	expectedModCache, expectedBuildCache, expectedLintCache bool,
-	expectedSystemCacheEmpty bool) {
-
+	expectedSystemCacheEmpty bool,
+) {
 	ctx := context.Background()
 
 	// Parse YAML config
 	var config struct {
 		Operations []struct {
-			Type    string `yaml:"type"`
-			Docker   *struct {
+			Type   string `yaml:"type"`
+			Docker *struct {
 				PruneMode interface{} `yaml:"prune_mode"`
 			} `yaml:"docker"`
 			GoPackages *struct {
@@ -260,8 +260,8 @@ operations:
 	// Parse YAML config
 	var config struct {
 		Operations []struct {
-			Type    string `yaml:"type"`
-			Docker   *struct {
+			Type   string `yaml:"type"`
+			Docker *struct {
 				PruneMode interface{} `yaml:"prune_mode"`
 			} `yaml:"docker"`
 			GoPackages *struct {
@@ -488,8 +488,8 @@ func TestEnumValues_ThroughExecution(t *testing.T) {
 
 	// Test Docker cleaner with different prune modes
 	pruneModes := []struct {
-		mode   domain.DockerPruneMode
-		name   string
+		mode domain.DockerPruneMode
+		name string
 	}{
 		{domain.DockerPruneAll, "ALL"},
 		{domain.DockerPruneImages, "IMAGES"},
