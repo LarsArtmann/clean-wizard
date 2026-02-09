@@ -50,7 +50,7 @@ func TestValidationMiddleware(t *testing.T) {
 	t.Run("InvalidCleanRequest", func(t *testing.T) {
 		req := domain.CleanRequest{
 			Items:    []domain.ScanItem{},
-			Strategy: domain.CleanStrategy(999), // Invalid strategy value
+			Strategy: domain.CleanStrategyType(999), // Invalid strategy value
 		}
 
 		result := validator.ValidateCleanRequest(ctx, req)
