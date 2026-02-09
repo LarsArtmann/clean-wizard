@@ -442,3 +442,55 @@ func (rl RiskLevelType) MarshalYAML() (any, error) {
 	}
 	return rl.String(), nil
 }
+
+// SizeEstimateStatusType represents the status of a size estimate with type safety.
+// This replaces the boolean Unknown field, making impossible states unrepresentable.
+type SizeEstimateStatusType int
+
+const (
+	// SizeEstimateStatusKnown represents a known/calculated size.
+	SizeEstimateStatusKnown SizeEstimateStatusType = iota
+	// SizeEstimateStatusUnknown represents an unknown/estimated size.
+	SizeEstimateStatusUnknown
+)
+
+// String returns the string representation of size estimate status.
+func (ses SizeEstimateStatusType) String() string {
+	switch ses {
+	case SizeEstimateStatusKnown:
+		return "KNOWN"
+	case SizeEstimateStatusUnknown:
+		return "UNKNOWN"
+	default:
+		return "INVALID"
+	}
+}
+
+// IsValid checks if size estimate status is valid.
+func (ses SizeEstimateStatusType) IsValid() bool {
+	return ses >= SizeEstimateStatusKnown && ses <= SizeEstimateStatusUnknown
+}
+
+// Values returns all possible size estimate status values.
+func (ses SizeEstimateStatusType) Values() []SizeEstimateStatusType {
+	return []SizeEstimateStatusType{
+		SizeEstimateStatusKnown,
+		SizeEstimateStatusUnknown,
+	}
+}
+
+// MarshalJSON implements json.Marshaler for SizeEstimateStatusType.
+func (ses SizeEstimateStatusType) MarshalJSON() ([]byte, error) {
+	if !ses.IsValid() {
+		return nil, fmt.Errorf("invalid size estimate status: %d", ses)
+	}
+	return json.Marshal(ses.String())
+}
+
+// UnmarshalJSON implements json.Unmarshaler for SizeEstimateStatusType.
+func (ses *SizeEstimateStatusType) UnmarshalJSON(data []byte) error {
+	return UnmarshalJSONEnum(data, ses, map[string]SizeEstimateStatusType{
+		"KNOWN":   SizeEstimateStatusKnown,
+		"UNKNOWN": SizeEstimateStatusUnknown,
+	}, "invalid size estimate status")
+}

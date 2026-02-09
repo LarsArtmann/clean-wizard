@@ -173,13 +173,13 @@ func (sr ScanResult) Validate() error {
 
 // SizeEstimate represents an honest size estimate, handling cases where exact size is unknown.
 type SizeEstimate struct {
-	Known   uint64 `json:"known"`
-	Unknown bool   `json:"unknown"`
+	Known   uint64                  `json:"known"`
+	Status  SizeEstimateStatusType `json:"status"`
 }
 
 // Value returns the known value, or 0 if unknown.
 func (se SizeEstimate) Value() uint64 {
-	if se.Unknown {
+	if se.Status == SizeEstimateStatusUnknown {
 		return 0
 	}
 	return se.Known
@@ -187,12 +187,12 @@ func (se SizeEstimate) Value() uint64 {
 
 // IsKnown returns true if the size is known.
 func (se SizeEstimate) IsKnown() bool {
-	return !se.Unknown
+	return se.Status == SizeEstimateStatusKnown
 }
 
 // String returns a formatted string representation.
 func (se SizeEstimate) String() string {
-	if se.Unknown {
+	if se.Status == SizeEstimateStatusUnknown {
 		return "Unknown"
 	}
 	// Note: format.Bytes would be used here, but we avoid import cycle
@@ -215,7 +215,7 @@ type CleanResult struct {
 func (cr CleanResult) IsValid() bool {
 	// Cannot remove items without size info unless explicitly marked unknown
 	// Note: Some operations legitimately have 0 size (e.g., test cache when path unavailable)
-	if cr.ItemsRemoved > 0 && !cr.SizeEstimate.Unknown && cr.CleanTime == 0 {
+	if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == SizeEstimateStatusKnown && cr.CleanTime == 0 {
 		// If CleanTime is 0, this is likely a synthetic result where size might be 0
 		return true
 	}
@@ -231,8 +231,8 @@ func (cr CleanResult) IsValid() bool {
 func (cr CleanResult) Validate() error {
 	// Cannot remove items without size info unless explicitly marked unknown
 	// Note: Some operations legitimately have 0 size (e.g., test cache when path unavailable)
-	if cr.ItemsRemoved > 0 && !cr.SizeEstimate.Unknown && cr.SizeEstimate.Known == 0 && cr.CleanTime > 0 {
-		return errors.New("cannot have zero SizeEstimate when ItemsRemoved is > 0 (set Unknown: true if size cannot be determined)")
+	if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == SizeEstimateStatusKnown && cr.SizeEstimate.Known == 0 && cr.CleanTime > 0 {
+		return errors.New("cannot have zero SizeEstimate when ItemsRemoved is > 0 (set Status: Unknown if size cannot be determined)")
 	}
 	// Cannot fail items without any activity (removed or sized)
 	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.SizeEstimate.Known == 0 {
