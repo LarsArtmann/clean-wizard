@@ -210,7 +210,7 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 
 		itemsRemoved := 1
 
-		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
+		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
 		return result.Ok(cleanResult)
 	}
 
@@ -231,7 +231,7 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 		ItemsFailed:  cleanResult.ItemsFailed,
 		CleanTime:    duration,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	}
 
 	return result.Ok(finalResult)
@@ -293,6 +293,6 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	})
 }

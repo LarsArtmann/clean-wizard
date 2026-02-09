@@ -56,7 +56,7 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 			ItemsFailed:  0,
 			CleanTime:    0,
 			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
+			Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 		})
 	}
 
@@ -85,7 +85,7 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	})
 }
 

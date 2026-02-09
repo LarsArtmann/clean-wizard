@@ -197,7 +197,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	})
 }
 

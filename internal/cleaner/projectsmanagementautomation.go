@@ -91,7 +91,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 			ItemsFailed:  0,
 			CleanTime:    duration,
 			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyDryRun,
+			Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),
 		}
 		return result.Ok(cleanResult)
 	}
@@ -117,7 +117,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 		ItemsFailed:  0,
 		CleanTime:    duration,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	}
 
 	return result.Ok(finalResult)

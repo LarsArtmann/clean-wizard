@@ -144,7 +144,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 
 	if len(items) == 0 {
 		// Nothing to clean
-		cleanResult := conversions.NewCleanResult(domain.StrategyConservative, 0, 0)
+		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 0, 0)
 		return result.Ok(cleanResult)
 	}
 
@@ -155,7 +155,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 			totalBytes += item.Size
 		}
 
-		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, len(items), totalBytes)
+		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), len(items), totalBytes)
 		return result.Ok(cleanResult)
 	}
 
@@ -186,7 +186,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 		ItemsFailed:  uint(itemsFailed),
 		CleanTime:    duration,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyAggressive,
+		Strategy:     domain.CleanStrategyType(domain.StrategyAggressiveType),
 	}
 
 	return result.Ok(cleanResult)

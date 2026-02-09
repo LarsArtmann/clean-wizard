@@ -125,7 +125,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	if nc.dryRun {
 		// Use centralized conversion for dry-run
 		estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Use 50MB per generation
-		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, toRemove, estimatedBytes)
+		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), toRemove, estimatedBytes)
 		return result.Ok(cleanResult)
 	}
 
@@ -161,14 +161,14 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 		// Combine all results using centralized function
 		combinedResult := conversions.CombineCleanResults(results)
 		combinedResult.CleanTime = time.Since(start)
-		combinedResult.Strategy = domain.StrategyAggressive
+		combinedResult.Strategy = domain.CleanStrategyType(domain.StrategyAggressiveType)
 
 		return result.Ok(combinedResult)
 	}
 
 	// Dry-run or no generations to remove - use centralized conversion
 	estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Estimated
-	cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, toRemove, estimatedBytes)
+	cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), toRemove, estimatedBytes)
 	return result.Ok(cleanResult)
 }
 

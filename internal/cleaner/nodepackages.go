@@ -225,7 +225,7 @@ func (npmc *NodePackageManagerCleaner) Clean(ctx context.Context) result.Result[
 		totalBytes := int64(100 * 1024 * 1024) // Estimate 100MB per available PM
 		itemsRemoved := len(npmc.packageManagers)
 
-		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
+		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
 		return result.Ok(cleanResult)
 	}
 
@@ -261,7 +261,7 @@ func (npmc *NodePackageManagerCleaner) Clean(ctx context.Context) result.Result[
 		ItemsFailed:  uint(itemsFailed),
 		CleanTime:    duration,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	}
 
 	return result.Ok(cleanResult)
@@ -290,7 +290,7 @@ func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanRe
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	}
 }
 

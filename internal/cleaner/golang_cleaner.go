@@ -131,7 +131,7 @@ func (gc *GoCleaner) dryRunClean() result.Result[domain.CleanResult] {
 	totalBytes := uint64(200 * 1024 * 1024) // Estimate 200MB
 	itemsRemoved := gc.config.Caches.Count()
 
-	cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, int64(totalBytes))
+	cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, int64(totalBytes))
 	// Update with honest size estimate
 	cleanResult.SizeEstimate = domain.SizeEstimate{Known: totalBytes}
 	return result.Ok(cleanResult)
@@ -158,7 +158,7 @@ func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) 
 	sizeEstimate := domain.SizeEstimate{Known: stats.FreedBytes}
 
 	// Note: conversions.NewCleanResult uses FreedBytes (deprecated), so we update SizeEstimate
-	cleanResult := conversions.NewCleanResult(domain.StrategyConservative, int(stats.Removed), int64(stats.FreedBytes))
+	cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), int(stats.Removed), int64(stats.FreedBytes))
 	cleanResult.SizeEstimate = sizeEstimate
 	cleanResult.CleanTime = duration
 	cleanResult.CleanedAt = time.Now()

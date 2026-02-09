@@ -126,7 +126,7 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 			ItemsFailed:  0,
 			CleanTime:    0,
 			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyDryRun,
+			Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),
 		}
 		return result.Ok(cleanResult)
 	}
@@ -193,7 +193,7 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 		ItemsFailed:  uint(itemsFailed),
 		CleanTime:    duration,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	}
 
 	return result.Ok(cleanResult)

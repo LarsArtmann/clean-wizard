@@ -184,7 +184,7 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 		totalBytes := int64(1 * 1024 * 1024 * 1024) // Estimate 1GB total
 		itemsRemoved := len(scc.cacheTypes)
 
-		cleanResult := conversions.NewCleanResult(domain.StrategyDryRun, itemsRemoved, totalBytes)
+		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
 		return result.Ok(cleanResult)
 	}
 
@@ -223,7 +223,7 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 		ItemsFailed:  uint(itemsFailed),
 		CleanTime:    duration,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	}
 
 	return result.Ok(cleanResult)
@@ -241,7 +241,7 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 			ItemsFailed:  0,
 			CleanTime:    0,
 			CleanedAt:    time.Now(),
-			Strategy:     domain.StrategyConservative,
+			Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 		})
 	}
 
@@ -260,7 +260,7 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyConservative,
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
 	})
 }
 
