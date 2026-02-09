@@ -476,12 +476,10 @@ func (cm CacheCleanupMode) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for CacheCleanupMode.
 // Accepts both string and integer representations.
 func (cm *CacheCleanupMode) UnmarshalYAML(value *yaml.Node) error {
-	return unmarshalBinaryEnum(
-		value, cm,
-		binaryEnumStringMap(CacheCleanupDisabled, CacheCleanupEnabled),
-		binaryEnumIntMap(CacheCleanupDisabled, CacheCleanupEnabled),
-		"cache cleanup mode",
-	)
+	return UnmarshalYAMLEnum(value, cm, map[string]CacheCleanupMode{
+		"DISABLED": CacheCleanupDisabled,
+		"ENABLED":  CacheCleanupEnabled,
+	}, "invalid cache cleanup mode")
 }
 
 // DockerPruneMode represents Docker prune behavior as a type-safe enum.
