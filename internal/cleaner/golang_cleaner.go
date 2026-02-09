@@ -82,6 +82,11 @@ func (gc *GoCleaner) Type() domain.OperationType {
 	return domain.OperationTypeGoPackages
 }
 
+// Name returns the cleaner name for result tracking.
+func (gc *GoCleaner) Name() string {
+	return "go"
+}
+
 // IsAvailable checks if Go is available.
 func (gc *GoCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := exec.LookPath("go")

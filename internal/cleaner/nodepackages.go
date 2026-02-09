@@ -55,6 +55,11 @@ func (npmc *NodePackageManagerCleaner) Type() domain.OperationType {
 	return domain.OperationTypeNodePackages
 }
 
+// Name returns the cleaner name for result tracking.
+func (npmc *NodePackageManagerCleaner) Name() string {
+	return "node"
+}
+
 // IsAvailable checks if any Node.js package manager is available.
 func (npmc *NodePackageManagerCleaner) IsAvailable(ctx context.Context) bool {
 	return slices.ContainsFunc(npmc.packageManagers, npmc.isPackageManagerAvailable)

@@ -45,6 +45,11 @@ func (dc *DockerCleaner) Type() domain.OperationType {
 	return domain.OperationTypeDocker
 }
 
+// Name returns the unique identifier for this cleaner.
+func (dc *DockerCleaner) Name() string {
+	return "docker"
+}
+
 // execWithTimeout executes a Docker command with timeout.
 func (dc *DockerCleaner) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	timeoutCtx, cancel := context.WithTimeout(ctx, dockerCommandTimeout)

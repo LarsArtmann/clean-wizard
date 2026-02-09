@@ -41,6 +41,11 @@ func (gcc *GoCacheCleaner) IsAvailable(ctx context.Context) bool {
 	return err == nil
 }
 
+// Name returns the cleaner name for result tracking.
+func (gcc *GoCacheCleaner) Name() string {
+	return "golang"
+}
+
 // Clean cleans the specified cache type.
 func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	switch gcc.cacheType {

@@ -57,6 +57,11 @@ func (tfc *TempFilesCleaner) Type() domain.OperationType {
 	return domain.OperationTypeTempFiles
 }
 
+// Name returns the cleaner name for result tracking.
+func (tfc *TempFilesCleaner) Name() string {
+	return "tempfiles"
+}
+
 // IsAvailable checks if temp files cleaner is available.
 func (tfc *TempFilesCleaner) IsAvailable(ctx context.Context) bool {
 	// Temp files cleaner is always available

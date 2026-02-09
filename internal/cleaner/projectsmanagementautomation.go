@@ -30,6 +30,11 @@ func (pc *ProjectsManagementAutomationCleaner) Type() domain.OperationType {
 	return domain.OperationTypeProjectsManagementAutomation
 }
 
+// Name returns the cleaner name for result tracking.
+func (pc *ProjectsManagementAutomationCleaner) Name() string {
+	return "projects"
+}
+
 // IsAvailable checks if projects-management-automation is available.
 func (pc *ProjectsManagementAutomationCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := exec.LookPath("projects-management-automation")

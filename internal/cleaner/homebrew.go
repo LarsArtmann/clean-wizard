@@ -36,6 +36,11 @@ func (hbc *HomebrewCleaner) Type() domain.OperationType {
 	return domain.OperationTypeHomebrew
 }
 
+// Name returns the unique identifier for this cleaner.
+func (hbc *HomebrewCleaner) Name() string {
+	return "homebrew"
+}
+
 // execWithTimeout executes a Homebrew command with timeout.
 func (hbc *HomebrewCleaner) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	timeoutCtx, cancel := context.WithTimeout(ctx, homebrewCommandTimeout)

@@ -69,6 +69,11 @@ func (bcc *BuildCacheCleaner) Type() domain.OperationType {
 	return domain.OperationTypeBuildCache
 }
 
+// Name returns the cleaner name for result tracking.
+func (bcc *BuildCacheCleaner) Name() string {
+	return "buildcache"
+}
+
 // IsAvailable checks if build cache cleaner is available.
 func (bcc *BuildCacheCleaner) IsAvailable(ctx context.Context) bool {
 	// Build cache cleaner is always available (uses file system operations)

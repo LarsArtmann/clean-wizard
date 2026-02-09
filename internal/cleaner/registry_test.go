@@ -31,6 +31,10 @@ func (m *mockCleaner) IsAvailable(ctx context.Context) bool {
 	return m.available
 }
 
+func (m *mockCleaner) Name() string {
+	return m.name
+}
+
 func TestNewRegistry(t *testing.T) {
 	registry := NewRegistry()
 	require.NotNil(t, registry)

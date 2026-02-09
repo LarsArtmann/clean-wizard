@@ -54,6 +54,11 @@ func (lvmc *LanguageVersionManagerCleaner) Type() domain.OperationType {
 	return domain.OperationTypeLangVersionManager
 }
 
+// Name returns the cleaner name for result tracking.
+func (lvmc *LanguageVersionManagerCleaner) Name() string {
+	return "langversion"
+}
+
 // IsAvailable checks if language version manager cleaner is available.
 func (lvmc *LanguageVersionManagerCleaner) IsAvailable(ctx context.Context) bool {
 	// Language version manager cleaner is always available (uses file system operations)

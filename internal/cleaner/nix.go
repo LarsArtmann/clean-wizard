@@ -50,6 +50,11 @@ func (nc *NixCleaner) Type() domain.OperationType {
 	return domain.OperationTypeNixGenerations
 }
 
+// Name returns the unique identifier for this cleaner.
+func (nc *NixCleaner) Name() string {
+	return "nix"
+}
+
 // IsAvailable checks if Nix cleaner is available.
 func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
 	return nc.adapter.IsAvailable(ctx)

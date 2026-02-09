@@ -90,9 +90,7 @@ func (r *Registry) CleanAll(ctx context.Context) map[string]result.Result[domain
 
 	for _, c := range available {
 		res := c.Clean(ctx)
-		// Note: This doesn't capture the name correctly in current implementation
-		// as Cleaner interface doesn't have Name() method
-		results["unknown"] = res
+		results[c.Name()] = res
 	}
 
 	return results

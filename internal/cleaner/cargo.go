@@ -42,6 +42,11 @@ func (cc *CargoCleaner) Type() domain.OperationType {
 	return domain.OperationTypeCargoPackages
 }
 
+// Name returns the cleaner name for result tracking.
+func (cc *CargoCleaner) Name() string {
+	return "cargo"
+}
+
 // IsAvailable checks if Cargo is available.
 func (cc *CargoCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := exec.LookPath("cargo")
