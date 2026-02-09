@@ -425,7 +425,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if !os.Docker.PruneMode.IsValid() {
 			return &ValidationError{
 				Field:   "docker.prune_mode",
-				Message: fmt.Sprintf("prune_mode must be a valid value (ALL, IMAGES, CONTAINERS, VOLUMES, or BUILDS), got: %s", os.Docker.PruneMode.String()),
+				Message: "prune_mode must be a valid value (ALL, IMAGES, CONTAINERS, VOLUMES, or BUILDS), got: " + os.Docker.PruneMode.String(),
 				Value:   os.Docker.PruneMode.String(),
 			}
 		}
@@ -436,35 +436,35 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if !os.GoPackages.CleanCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_cache",
-				Message: fmt.Sprintf("clean_cache must be DISABLED or ENABLED, got: %s", os.GoPackages.CleanCache.String()),
+				Message: "clean_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanCache.String(),
 				Value:   os.GoPackages.CleanCache.String(),
 			}
 		}
 		if !os.GoPackages.CleanTestCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_test_cache",
-				Message: fmt.Sprintf("clean_test_cache must be DISABLED or ENABLED, got: %s", os.GoPackages.CleanTestCache.String()),
+				Message: "clean_test_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanTestCache.String(),
 				Value:   os.GoPackages.CleanTestCache.String(),
 			}
 		}
 		if !os.GoPackages.CleanModCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_mod_cache",
-				Message: fmt.Sprintf("clean_mod_cache must be DISABLED or ENABLED, got: %s", os.GoPackages.CleanModCache.String()),
+				Message: "clean_mod_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanModCache.String(),
 				Value:   os.GoPackages.CleanModCache.String(),
 			}
 		}
 		if !os.GoPackages.CleanBuildCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_build_cache",
-				Message: fmt.Sprintf("clean_build_cache must be DISABLED or ENABLED, got: %s", os.GoPackages.CleanBuildCache.String()),
+				Message: "clean_build_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanBuildCache.String(),
 				Value:   os.GoPackages.CleanBuildCache.String(),
 			}
 		}
 		if !os.GoPackages.CleanLintCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_lint_cache",
-				Message: fmt.Sprintf("clean_lint_cache must be DISABLED or ENABLED, got: %s", os.GoPackages.CleanLintCache.String()),
+				Message: "clean_lint_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanLintCache.String(),
 				Value:   os.GoPackages.CleanLintCache.String(),
 			}
 		}
@@ -476,7 +476,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 			if !cacheType.IsValid() {
 				return &ValidationError{
 					Field:   fmt.Sprintf("system_cache.cache_types[%d]", i),
-					Message: fmt.Sprintf("cache_type must be a valid value (SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, or CCACHE), got: %s", cacheType.String()),
+					Message: "cache_type must be a valid value (SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, or CCACHE), got: " + cacheType.String(),
 					Value:   cacheType.String(),
 				}
 			}
@@ -489,7 +489,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 			if !toolType.IsValid() {
 				return &ValidationError{
 					Field:   fmt.Sprintf("build_cache.tool_types[%d]", i),
-					Message: fmt.Sprintf("tool_type must be a valid value (GO, RUST, NODE, PYTHON, JAVA, or SCALA), got: %s", toolType.String()),
+					Message: "tool_type must be a valid value (GO, RUST, NODE, PYTHON, JAVA, or SCALA), got: " + toolType.String(),
 					Value:   toolType.String(),
 				}
 			}

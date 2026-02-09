@@ -11,8 +11,10 @@
 ## a) FULLY DONE (6 Major Tasks Completed)
 
 ### 1. Cleaner Interface Implementation ✅
+
 **Status**: 100% Complete  
 **Details**: All 13 cleaners now implement both `Clean()` and `IsAvailable()` methods consistently
+
 - Nix Cleaner
 - Homebrew Cleaner
 - TempFiles Cleaner
@@ -26,24 +28,30 @@
 - ProjectsManagementAutomation Cleaner
 
 ### 2. Context Propagation Fix ✅
+
 **Status**: 100% Complete  
 **Details**: Error messages in `internal/cleaner/validate.go` now include:
+
 - Index information
 - Valid options list
 - Full input list
 - Context variables preserved
 
 ### 3. Binary Enum Unification ✅
+
 **Status**: 100% Complete  
-**Details**: 
+**Details**:
+
 - Removed 69 lines of duplicate code
 - Consolidated to `UnmarshalYAMLEnum`
 - Added numeric string handling ("0", "1")
 - All binary enums now use unified unmarshaling
 
 ### 4. Integration Tests for Enum Workflows ✅
+
 **Status**: 100% Complete  
 **Details**: 6 comprehensive test functions, all passing
+
 - `TestEnumWorkflow_IntegerFormat`
 - `TestEnumWorkflow_StringFormat`
 - `TestEnumWorkflow_MixedFormat`
@@ -52,8 +60,10 @@
 - `TestEnumErrorMessages_ThroughWorkflow`
 
 ### 5. Enum Validation at Config Boundaries ✅
+
 **Status**: 100% Complete  
 **Details**: Added validation for:
+
 - RiskLevel enum
 - Enabled enum
 - DockerPruneMode enum
@@ -62,8 +72,10 @@
 - BuildCache enum
 
 ### 6. Docker Cleaner Enum Refactoring ✅
+
 **Status**: 100% Complete  
-**Details**: 
+**Details**:
+
 - Migrated from local enum (aggression levels) to domain enum (resource types)
 - Removed local constants: `DockerPruneLight`, `DockerPruneStandard`, `DockerPruneAggressive`
 - Updated all 26 compilation errors across 4 files
@@ -80,6 +92,7 @@
 | `DockerPruneBuilds` | `docker builder prune -af` | Clean build cache |
 
 **Files Modified**:
+
 - `internal/cleaner/docker.go` - Core implementation
 - `cmd/clean-wizard/commands/clean.go` - CLI integration
 - `internal/cleaner/docker_test.go` - Unit tests
@@ -90,13 +103,16 @@
 ## b) PARTIALLY DONE (1 Task)
 
 ### Complexity Reduction in Top 5 Functions
+
 **Status**: 5% Complete  
-**Details**: 
+**Details**:
+
 - Identified 21 functions with cyclomatic complexity > 10
 - Top offenders documented but no actual refactoring done yet
 - Priority dropped in favor of Docker cleaner architectural fix
 
 **Top 5 Functions to Refactor**:
+
 1. `config.LoadWithContext` (20 complexity)
 2. `config.TestIntegration_ValidationSanitizationPipeline` (19 complexity)
 3. `config.(*ConfigValidator).validateProfileName` (16 complexity)
@@ -110,9 +126,11 @@
 ### HIGH PRIORITY
 
 #### 1. SystemCache Cleaner Refactoring
+
 **Status**: NOT STARTED  
 **Impact**: HIGH  
 **Issue**: Enum inconsistency - local `SystemCacheType` vs domain `CacheType`
+
 - Local enum: Lowercase strings ("spotlight", "xcode", "cocoapods", "homebrew")
 - Domain enum: Uppercase integer representations ("SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW")
 - Scope mismatch: Domain includes additional types ("PIP", "NPM", "YARN", "CCACHE")
@@ -120,16 +138,19 @@
 **Files**: `internal/cleaner/systemcache.go`
 
 #### 2. Extract Generic Cleaner Interface
+
 **Status**: NOT STARTED  
 **Impact**: HIGH  
 **Effort**: 1 day  
-**Details**: 
+**Details**:
+
 - 11+ cleaner implementations with identical patterns
 - No shared interface for polymorphism
 - Can't iterate over cleaners programmatically
 - Hard to mock for testing
 
 **Proposed Interface**:
+
 ```go
 type Cleaner interface {
     Name() string
@@ -143,18 +164,22 @@ type Cleaner interface {
 ### MEDIUM PRIORITY
 
 #### 3. NodePackages Cleaner Refactoring
+
 **Status**: NOT STARTED  
 **Impact**: MEDIUM  
 **Issue**: Type mismatch - local string enum vs domain integer enum
+
 - Local enum: String type ("npm", "pnpm", "yarn", "bun")
 - Domain enum: Integer type with same string values
 
 **Files**: `internal/cleaner/nodepackages.go`
 
 #### 4. BuildCache Cleaner Refactoring
+
 **Status**: NOT STARTED  
 **Impact**: MEDIUM  
 **Issue**: Complete abstraction mismatch
+
 - Local enum: Build tools ("gradle", "maven", "sbt")
 - Domain enum: Languages ("GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA")
 - Different abstractions entirely
@@ -164,9 +189,11 @@ type Cleaner interface {
 ### LOW PRIORITY
 
 #### 5. LangVersionManager Cleaner Refactoring
+
 **Status**: NOT STARTED  
 **Impact**: LOW  
 **Issue**: Subset issue - less critical
+
 - Local enum: ("nvm", "pyenv", "rbenv")
 - Domain enum: ("NVM", "PYENV", "GVM", "RBENV", "SDKMAN", "JENV")
 
@@ -187,11 +214,13 @@ Everything is working correctly. All tests pass. No critical issues.
 ### 1. Architecture Improvements
 
 #### Enum Consistency Across Layers
+
 **Issue**: Local enums in cleaners don't align with domain enums  
 **Impact**: Configuration/validation mismatch with actual cleaner implementation  
 **Solution**: Refactor all cleaners to use domain enums (in progress - 1 of 5 done)
 
 #### Cleaner Interface Extraction
+
 **Issue**: No shared interface for polymorphism  
 **Impact**: Can't iterate over cleaners, no mock interface  
 **Solution**: Extract generic Cleaner interface (Task 2.1 in plan)
@@ -199,6 +228,7 @@ Everything is working correctly. All tests pass. No critical issues.
 ### 2. Error Messages
 
 #### Add File Paths, Line Numbers, Suggested Fixes
+
 **Issue**: Error messages lack context for debugging  
 **Impact**: Difficult troubleshooting  
 **Solution**: Enhance error context preservation
@@ -206,6 +236,7 @@ Everything is working correctly. All tests pass. No critical issues.
 ### 3. Testing
 
 #### Edge Case Coverage
+
 **Issue**: Limited edge case testing for enum unmarshaling  
 **Impact**: Potential for uncaught bugs  
 **Solution**: Add tests for negative integers, out-of-range values, mixed case strings
@@ -213,6 +244,7 @@ Everything is working correctly. All tests pass. No critical issues.
 ### 4. Documentation
 
 #### YAML Enum Format Examples
+
 **Issue**: Documentation exists but could be more comprehensive  
 **Impact**: Developer onboarding friction  
 **Solution**: Add more examples and quick reference guide
@@ -220,6 +252,7 @@ Everything is working correctly. All tests pass. No critical issues.
 ### 5. Performance
 
 #### Validation Caching
+
 **Issue**: No caching for repeated validation operations  
 **Impact**: Unnecessary overhead  
 **Solution**: Implement validation result caching
@@ -227,6 +260,7 @@ Everything is working correctly. All tests pass. No critical issues.
 ### 6. Code Quality
 
 #### Replace Deprecated Strategy Constants
+
 **Issue**: 49 deprecation warnings for Strategy constants  
 **Impact**: Technical debt  
 **Solution**: Migrate to type-safe constants
@@ -234,6 +268,7 @@ Everything is working correctly. All tests pass. No critical issues.
 ### 7. Type Safety
 
 #### Add Utility Enum Methods
+
 **Issue**: Missing helper methods for enum operations  
 **Impact**: Verbose code  
 **Solution**: Add `IsValid()`, `String()`, `MarshalJSON()` consistently
@@ -284,6 +319,7 @@ Everything is working correctly. All tests pass. No critical issues.
 
 **The Problem**:
 BuildCache cleaner has a complete abstraction mismatch between local and domain enums:
+
 - **Local enum**: Build tools ("gradle", "maven", "sbt")
 - **Domain enum**: Languages ("GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA")
 
@@ -291,6 +327,7 @@ This is fundamentally different from the Docker cleaner issue we just resolved. 
 
 **The Question**:
 Should we:
+
 1. **Refactor the cleaner** to use domain enum (languages) and map languages to their build tools?
    - Java → gradle, maven, sbt
    - Scala → sbt
@@ -313,13 +350,16 @@ Should we:
    - Are both needed?
 
 **My Recommendation**: Investigate first. Look at:
+
 - Original design documents
 - How the domain enum is used elsewhere
 - Whether the domain concept is "build tools" or "languages"
 - User expectations (do they think in languages or tools?)
 
 **Context from ENUM_USAGE_ANALYSIS.md**:
+
 > "Clarify the intended abstraction:
+>
 > - If domain should represent languages, refactor buildcache to align
 > - If domain should represent build tools, update domain enum values"
 
@@ -330,18 +370,21 @@ This decision affects the architectural integrity of the entire system and shoul
 ## Current Metrics
 
 ### Test Status
+
 - **Unit Tests**: All passing ✅
 - **Integration Tests**: All passing ✅
 - **Benchmark Tests**: All passing ✅
 - **Coverage**: ~70% average (varies by package)
 
 ### Code Quality
+
 - **Cyclomatic Complexity**: 21 functions > 10 (target: 0)
 - **Lint Warnings**: 0 errors, 49 deprecation warnings
 - **Circular Dependencies**: 0 ✅
 - **Type Safety**: 15+ enum types fully implemented ✅
 
 ### Performance
+
 - **Enum Operations**: Sub-nanosecond ✅
 - **Config Round-Trip**: <10ns ✅
 - **Zero Allocations**: For enum operations ✅

@@ -44,7 +44,7 @@ func TestNewDockerCleaner(t *testing.T) {
 			dryRun:    false,
 			pruneMode: domain.DockerPruneBuilds,
 		},
-		}
+	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -237,7 +237,6 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 		})
 	}
 }
-
 
 func TestDockerCleaner_Clean_Verbose(t *testing.T) {
 	cleaner := NewDockerCleaner(true, false, domain.DockerPruneAll)

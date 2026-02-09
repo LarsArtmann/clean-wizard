@@ -96,6 +96,7 @@ type Cleaner interface {
 ## Non-Cleaner Files (Skipped)
 
 Helper/utility files that are not expected to implement Cleaner interface:
+
 - `cleaner.go` (defines interface)
 - `helpers.go`
 - `test_helpers.go`
@@ -117,6 +118,7 @@ Helper/utility files that are not expected to implement Cleaner interface:
 - **NOT Implementing Cleaner Interface**: 2 (15.4%)
 
 **Critical Findings**:
+
 1. Cleaner interface already exists and is well-designed
 2. Most cleaners already implement it correctly
 3. Two cleaners need fixes:
@@ -124,11 +126,13 @@ Helper/utility files that are not expected to implement Cleaner interface:
    - golang_cache_cleaner.go: Needs IsAvailable() method
 
 **Impact**:
+
 - Without these fixes, nix and golang_cache_cleaner cannot be used polymorphically
 - Cannot iterate over all cleaners as Cleaner interface
 - Cannot create a unified cleaner registry
 
 **Next Steps**:
+
 1. Fix nix.go to implement Cleaner interface
 2. Fix golang_cache_cleaner.go to implement Cleaner interface
 3. Create CleanerRegistry type

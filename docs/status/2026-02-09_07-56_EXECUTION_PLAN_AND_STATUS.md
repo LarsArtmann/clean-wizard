@@ -54,23 +54,28 @@
 ### Phase 1: Immediate Cleanup (Week 1, Days 1-2)
 
 #### Step 1.1: Fix Deprecation Warnings
+
 **Work**: 0.5 days | **Impact**: HIGH | **Files**: ~15 files
 
 **Details**:
+
 - Replace `domain.StrategyDryRun` with `domain.CleanStrategyDryRun`
 - Replace `domain.StrategyConservative` with `domain.CleanStrategyConservative`
 - Replace deprecated RiskLevel constants with RiskLevelType
 - Run tests after each file to verify
 
 **Acceptance Criteria**:
+
 - [ ] Zero deprecation warnings
 - [ ] All tests pass
 - [ ] No behavioral changes
 
 #### Step 1.2: Extract Cleaner Interface
+
 **Work**: 1 day | **Impact**: HIGH | **Files**: 12 files
 
 **Details**:
+
 ```go
 // internal/cleaner/interface.go (NEW)
 package cleaner
@@ -93,6 +98,7 @@ type Cleaner interface {
 ```
 
 **Implementation Order**:
+
 1. Create `interface.go` with interface definition
 2. Update NixCleaner to implement interface (reference implementation)
 3. Update HomebrewCleaner
@@ -102,15 +108,18 @@ type Cleaner interface {
 7. Add tests verifying all cleaners implement interface
 
 **Acceptance Criteria**:
+
 - [ ] All 11 cleaners implement Cleaner interface
 - [ ] Can iterate over []Cleaner
 - [ ] cmd/clean-wizard uses interface
 - [ ] Tests verify interface compliance
 
 #### Step 1.3: Create Cleaner Registry
+
 **Work**: 0.5 days | **Impact**: MEDIUM | **Files**: 2 files
 
 **Details**:
+
 ```go
 // internal/cleaner/registry.go (NEW)
 package cleaner
@@ -164,6 +173,7 @@ func (r *Registry) Available(ctx context.Context) []Cleaner {
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Registry implemented with thread-safety
 - [ ] All cleaners registered on startup
 - [ ] Can filter by availability
@@ -174,9 +184,11 @@ func (r *Registry) Available(ctx context.Context) []Cleaner {
 ### Phase 2: Enum Consistency (Week 1, Days 3-5)
 
 #### Step 2.1: Research Domain.CacheType Usage
+
 **Work**: 0.5 days | **Impact**: HIGH | **Files**: Investigation only
 
 **Investigation Questions**:
+
 - Where is `domain.CacheType` defined?
 - Where is it used outside of SystemCache cleaner?
 - What was the original design intent?
@@ -185,54 +197,65 @@ func (r *Registry) Available(ctx context.Context) []Cleaner {
 **Deliverable**: Analysis document with findings
 
 #### Step 2.2: Refactor SystemCache Cleaner
+
 **Work**: 1 day | **Impact**: HIGH | **Files**: 3 files
 
 **Options Based on Research**:
 
 **Option A**: If CacheType is meant for languages:
+
 - Map languages to system cache types
 - Java/Scala → Xcode cache
 - Node → CocoaPods cache
 - etc.
 
 **Option B**: If CacheType should be cache types:
+
 - Update domain enum to match cleaner
 - Keep lowercase strings
 - Add missing types
 
 **Option C**: Keep both with explicit mapping:
+
 - Create conversion functions
 - Document rationale
 
 **Acceptance Criteria**:
+
 - [ ] SystemCache cleaner uses consistent enum
 - [ ] No case sensitivity issues
 - [ ] All cache types supported
 - [ ] Tests updated and passing
 
 #### Step 2.3: Refactor NodePackages Cleaner
+
 **Work**: 0.5 days | **Impact**: MEDIUM | **Files**: 2 files
 
 **Details**:
+
 - Local enum: string type ("npm", "pnpm", "yarn", "bun")
 - Domain enum: integer type
 - Solution: Use domain enum directly
 
 **Acceptance Criteria**:
+
 - [ ] NodePackages uses domain.PackageManagerType
 - [ ] No type conversions needed
 - [ ] Tests updated
 
 #### Step 2.4: Investigate BuildCache Direction
+
 **Work**: 0.5 days | **Impact**: HIGH | **Files**: Investigation
 
 **Top #1 Question to Answer**:
 Should BuildCache cleaner use:
+
 1. Domain enum (languages) - map languages to build tools?
 2. Local enum (build tools) - update domain to match?
 3. Both with mapping layer?
 
 **Investigation**:
+
 - Check original design docs
 - Check how domain.BuildToolType is used
 - Check user-facing config format
@@ -245,18 +268,21 @@ Should BuildCache cleaner use:
 ### Phase 3: Code Quality (Week 2)
 
 #### Step 3.1: Reduce Complexity in LoadWithContext
+
 **Work**: 1 day | **Impact**: MEDIUM | **Files**: 2 files
 
 **Current**: 20 cyclomatic complexity
 **Target**: <10
 
 **Strategy**:
+
 1. Extract profile loading to separate function
 2. Extract operation processing to separate function
 3. Extract risk level processing to separate function
 4. Use early returns
 
 **Refactor Plan**:
+
 ```go
 // BEFORE
 func LoadWithContext(ctx context.Context) (*domain.Config, error) {
@@ -269,33 +295,36 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
     if err := setupViper(v); err != nil {
         return nil, err
     }
-    
+
     config, err := loadConfigBase(v)
     if err != nil {
         return nil, err
     }
-    
+
     if err := populateProfiles(v, config); err != nil {
         return nil, err
     }
-    
+
     return validateAndReturn(config)
 }
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Complexity < 10
 - [ ] All tests pass
 - [ ] No behavioral changes
 - [ ] Better testability
 
 #### Step 3.2: Reduce Complexity in validateProfileName
+
 **Work**: 0.5 days | **Impact**: MEDIUM | **Files**: 1 file
 
 **Current**: 16 cyclomatic complexity
 **Strategy**: Extract validation rules to separate functions
 
 #### Step 3.3: Reduce Complexity in Remaining Top 3
+
 **Work**: 1 day | **Impact**: MEDIUM | **Files**: 3 files
 
 - TestIntegration_ValidationSanitizationPipeline (19)
@@ -307,9 +336,11 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 ### Phase 4: Testing & Documentation (Week 3)
 
 #### Step 4.1: Add Integration Tests for Remaining Cleaners
+
 **Work**: 2 days | **Impact**: HIGH | **Files**: 5 files
 
 **Cleaners needing tests**:
+
 - SystemCache (after refactoring)
 - NodePackages (after refactoring)
 - BuildCache (after decision)
@@ -317,6 +348,7 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 - TempFiles
 
 **Test Pattern**:
+
 ```go
 func TestCleaner_EnumWorkflow(t *testing.T) {
     // Load config with enum values
@@ -327,9 +359,11 @@ func TestCleaner_EnumWorkflow(t *testing.T) {
 ```
 
 #### Step 4.2: Add Edge Case Tests
+
 **Work**: 1 day | **Impact**: MEDIUM | **Files**: 2 files
 
 **Test Cases**:
+
 - Negative integers for enums
 - Out-of-range integers
 - Mixed case strings
@@ -338,9 +372,11 @@ func TestCleaner_EnumWorkflow(t *testing.T) {
 - Unicode in strings
 
 #### Step 4.3: Create Architecture Documentation
+
 **Work**: 1 day | **Impact**: LOW | **Files**: 1 file
 
 **Content**:
+
 - Overall architecture diagram
 - Layer responsibilities
 - Data flow
@@ -353,43 +389,43 @@ func TestCleaner_EnumWorkflow(t *testing.T) {
 
 ### Pareto 1% → 51% (High Impact, Low Effort)
 
-| # | Task | Work | Impact | Priority |
-|---|------|------|--------|----------|
-| 1 | Fix deprecation warnings | 0.5d | HIGH | CRITICAL |
-| 2 | Extract Cleaner interface | 1d | HIGH | CRITICAL |
-| 3 | Create Cleaner registry | 0.5d | MEDIUM | HIGH |
-| 4 | Research CacheType usage | 0.5d | HIGH | HIGH |
-| 5 | Refactor NodePackages enum | 0.5d | MEDIUM | MEDIUM |
+| #   | Task                       | Work | Impact | Priority |
+| --- | -------------------------- | ---- | ------ | -------- |
+| 1   | Fix deprecation warnings   | 0.5d | HIGH   | CRITICAL |
+| 2   | Extract Cleaner interface  | 1d   | HIGH   | CRITICAL |
+| 3   | Create Cleaner registry    | 0.5d | MEDIUM | HIGH     |
+| 4   | Research CacheType usage   | 0.5d | HIGH   | HIGH     |
+| 5   | Refactor NodePackages enum | 0.5d | MEDIUM | MEDIUM   |
 
 ### Pareto 4% → 64% (High Impact, Medium Effort)
 
-| # | Task | Work | Impact | Priority |
-|---|------|------|--------|----------|
-| 6 | Refactor SystemCache cleaner | 1d | HIGH | HIGH |
-| 7 | Reduce LoadWithContext complexity | 1d | MEDIUM | MEDIUM |
-| 8 | Add integration tests (5 cleaners) | 2d | HIGH | HIGH |
-| 9 | Investigate BuildCache direction | 0.5d | HIGH | HIGH |
-| 10 | Reduce validateProfileName complexity | 0.5d | MEDIUM | MEDIUM |
+| #   | Task                                  | Work | Impact | Priority |
+| --- | ------------------------------------- | ---- | ------ | -------- |
+| 6   | Refactor SystemCache cleaner          | 1d   | HIGH   | HIGH     |
+| 7   | Reduce LoadWithContext complexity     | 1d   | MEDIUM | MEDIUM   |
+| 8   | Add integration tests (5 cleaners)    | 2d   | HIGH   | HIGH     |
+| 9   | Investigate BuildCache direction      | 0.5d | HIGH   | HIGH     |
+| 10  | Reduce validateProfileName complexity | 0.5d | MEDIUM | MEDIUM   |
 
 ### Medium Impact, Medium Effort
 
-| # | Task | Work | Impact | Priority |
-|---|------|------|--------|----------|
-| 11 | Reduce remaining complexity (3 funcs) | 1d | MEDIUM | MEDIUM |
-| 12 | Add edge case tests | 1d | MEDIUM | MEDIUM |
-| 13 | Refactor BuildCache (after decision) | 1d | MEDIUM | MEDIUM |
-| 14 | Refactor LangVersionManager | 0.5d | LOW | LOW |
-| 15 | Create architecture docs | 1d | LOW | LOW |
+| #   | Task                                  | Work | Impact | Priority |
+| --- | ------------------------------------- | ---- | ------ | -------- |
+| 11  | Reduce remaining complexity (3 funcs) | 1d   | MEDIUM | MEDIUM   |
+| 12  | Add edge case tests                   | 1d   | MEDIUM | MEDIUM   |
+| 13  | Refactor BuildCache (after decision)  | 1d   | MEDIUM | MEDIUM   |
+| 14  | Refactor LangVersionManager           | 0.5d | LOW    | LOW      |
+| 15  | Create architecture docs              | 1d   | LOW    | LOW      |
 
 ### Lower Priority
 
-| # | Task | Work | Impact | Priority |
-|---|------|------|--------|----------|
-| 16 | Add benchmark regression detection | 0.5d | LOW | LOW |
-| 17 | Investigate RiskLevelType manual processing | 0.5d | MEDIUM | LOW |
-| 18 | Add dependency injection (samber/do) | 2d | LOW | LOW |
-| 19 | Create enum quick reference | 0.5d | LOW | LOW |
-| 20 | Add fuzz testing | 1d | LOW | LOW |
+| #   | Task                                        | Work | Impact | Priority |
+| --- | ------------------------------------------- | ---- | ------ | -------- |
+| 16  | Add benchmark regression detection          | 0.5d | LOW    | LOW      |
+| 17  | Investigate RiskLevelType manual processing | 0.5d | MEDIUM | LOW      |
+| 18  | Add dependency injection (samber/do)        | 2d   | LOW    | LOW      |
+| 19  | Create enum quick reference                 | 0.5d | LOW    | LOW      |
+| 20  | Add fuzz testing                            | 1d   | LOW    | LOW      |
 
 ---
 
@@ -405,6 +441,7 @@ func TestCleaner_EnumWorkflow(t *testing.T) {
 ### What Libraries Are Available:
 
 **From go.mod check needed:**
+
 - `github.com/samber/do/v2` - Dependency injection (mentioned in memory)
 - `github.com/spf13/viper` - Config loading (already used)
 - `gopkg.in/yaml.v3` - YAML parsing (already used)
@@ -413,11 +450,13 @@ func TestCleaner_EnumWorkflow(t *testing.T) {
 ### Type Model Improvements:
 
 **Current Issues**:
+
 1. Deprecated constants mixed with new type-safe ones
 2. Some enums use integers, some use strings (inconsistency)
 3. No unified way to check if enum is valid
 
 **Proposed Improvements**:
+
 ```go
 // Add to all enum types
 func (e EnumType) IsValid() bool {
@@ -447,6 +486,7 @@ func ValidateEnum(value, min, max int, name string) error {
 **The Dilemma**:
 
 **Local Enum** (current cleaner implementation):
+
 ```go
 type BuildToolType string
 const (
@@ -457,6 +497,7 @@ const (
 ```
 
 **Domain Enum** (current domain definition):
+
 ```go
 type BuildToolType int
 const (
@@ -470,6 +511,7 @@ const (
 ```
 
 **The Problem**:
+
 - Domain enum represents **languages** (JAVA, SCALA)
 - Cleaner enum represents **build tools** (gradle, maven, sbt)
 - These are different abstractions entirely
@@ -479,16 +521,19 @@ const (
 **Options**:
 
 **Option A: Domain Should Represent Languages**
+
 - Refactor cleaner to map languages to their default build tools
 - Java → gradle (default), but could also use maven
 - Loss of precision but consistent with domain
 
 **Option B: Domain Should Represent Build Tools**
+
 - Update domain enum to: GRADLE, MAVEN, SBT
 - More precise but changes domain model
 - May affect other parts of system
 
 **Option C: Both Concepts Needed**
+
 - Languages in domain
 - Build tools in cleaner
 - Explicit mapping between them
@@ -511,9 +556,10 @@ const (
 
 4. **Original intent**: Was there a design decision documented about this?
 
-**My Recommendation**: 
+**My Recommendation**:
 
 Investigate first (Step 2.4), but I'm leaning toward **Option B** (domain should represent build tools) because:
+
 - More precise
 - Aligns with cleaner's actual functionality
 - Users think in tools ("I use Gradle")
@@ -546,17 +592,20 @@ But I need your input on the original design intent before proceeding.
 ## c) NOT STARTED
 
 ### HIGH PRIORITY:
+
 1. Fix 49 deprecation warnings
 2. Extract Cleaner interface
 3. Refactor SystemCache cleaner (enum inconsistency)
 4. Investigate BuildCache architectural direction
 
 ### MEDIUM PRIORITY:
+
 5. Refactor NodePackages cleaner
 6. Reduce complexity in top 5 functions
 7. Add integration tests for remaining cleaners
 
 ### LOW PRIORITY:
+
 8. Refactor BuildCache cleaner (after decision)
 9. Refactor LangVersionManager cleaner
 10. Add dependency injection
@@ -586,11 +635,13 @@ All tests passing, no critical issues.
 ## f) TOP 25 THINGS TO GET DONE NEXT
 
 ### CRITICAL (Do First):
+
 1. Fix 49 deprecation warnings (0.5d, HIGH impact)
 2. Extract Cleaner interface (1d, HIGH impact)
 3. Research domain.CacheType usage (0.5d, HIGH impact)
 
 ### HIGH PRIORITY (Do Next):
+
 4. Refactor SystemCache cleaner (1d, HIGH impact)
 5. Add integration tests for 5 cleaners (2d, HIGH impact)
 6. Investigate BuildCache direction (0.5d, HIGH impact)
@@ -598,6 +649,7 @@ All tests passing, no critical issues.
 8. Reduce LoadWithContext complexity (1d, MEDIUM impact)
 
 ### MEDIUM PRIORITY (Do After):
+
 9. Refactor NodePackages cleaner (0.5d, MEDIUM impact)
 10. Reduce validateProfileName complexity (0.5d, MEDIUM impact)
 11. Reduce remaining 3 high-complexity functions (1d, MEDIUM impact)
@@ -605,6 +657,7 @@ All tests passing, no critical issues.
 13. Refactor BuildCache (after decision) (1d, MEDIUM impact)
 
 ### LOWER PRIORITY:
+
 14. Refactor LangVersionManager (0.5d, LOW impact)
 15. Create architecture documentation (1d, LOW impact)
 16. Add benchmark regression detection (0.5d, LOW impact)
@@ -625,16 +678,19 @@ All tests passing, no critical issues.
 **BuildCache Cleaner: What is the Correct Architectural Direction?**
 
 **Context**:
+
 - Local enum: Build tools ("gradle", "maven", "sbt")
 - Domain enum: Languages ("JAVA", "SCALA", "GO", "RUST", etc.)
 - These represent different abstractions
 
 **Question**: Should we:
+
 1. **Refactor cleaner** to use languages (map JAVA → gradle/maven)?
 2. **Update domain** to use build tools (GRADLE, MAVEN, SBT)?
 3. **Keep both** with explicit mapping layer?
 
 **What I need from you**:
+
 - Original design intent for domain.BuildToolType
 - User perspective: do they think in languages or tools?
 - Scope: should BuildCache support all languages or just Java ecosystem?

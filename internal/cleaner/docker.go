@@ -31,8 +31,6 @@ type DockerCleaner struct {
 	pruneMode domain.DockerPruneMode
 }
 
-
-
 // NewDockerCleaner creates Docker cleaner.
 func NewDockerCleaner(verbose, dryRun bool, pruneMode domain.DockerPruneMode) *DockerCleaner {
 	return &DockerCleaner{

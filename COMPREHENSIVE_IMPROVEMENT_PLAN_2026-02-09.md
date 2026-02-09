@@ -88,6 +88,7 @@ Clean Wizard is a **world-class Go application** (90.1/100 quality score) with e
 **What Works Well:**
 
 ✅ **Type-Safe Enums** - 15+ enum types fully implemented
+
 - RiskLevelType, ValidationLevelType, ChangeOperationType, CleanStrategyType
 - ExecutionMode, SafeMode, ProfileStatus, GenerationStatus, ScanMode
 - OptimizationMode, HomebrewMode
@@ -95,22 +96,26 @@ Clean Wizard is a **world-class Go application** (90.1/100 quality score) with e
 - CacheType, VersionManagerType, PackageManagerType
 
 ✅ **Enum YAML/JSON Support** - Dual format handling
+
 - String format (human-readable): "DISABLED", "ENABLED"
 - Integer format (machine-readable): 0, 1
 - Case-insensitive matching
 - Helpful error messages with valid options
 
 ✅ **JSON Schema** - Comprehensive validation
+
 - Validates all 12 enum types with integer values
 - Pattern validation for duration fields
 - Nested validation for operation settings
 
 ✅ **Benchmark Tests** - Performance baseline established
+
 - Enum marshal/unmarshal: sub-nanosecond
 - Full config round-trip: <10ns
 - Zero allocations for enum operations
 
 ✅ **Documentation** - Well-structured
+
 - YAML_ENUM_FORMATS.md (400+ lines)
 - Config schema documentation
 - Usage examples and migration guides
@@ -118,6 +123,7 @@ Clean Wizard is a **world-class Go application** (90.1/100 quality score) with e
 **What Still Needs Work:**
 
 ❌ **Cleaner Interface Missing** - No polymorphism
+
 ```go
 // Current: Each cleaner has its own Clean() method
 func (c *NixCleaner) Clean(ctx context.Context) Result[domain.CleanResult]
@@ -134,12 +140,14 @@ type Cleaner interface {
 ```
 
 ❌ **High Complexity Functions** - 21 functions >10 cyclomatic complexity
+
 - `config.LoadWithContext`: 20 complexity (nested loops, switch statements)
 - `config.TestIntegration_ValidationSanitizationPipeline`: 19 complexity
 - `config.(*ConfigValidator).validateProfileName`: 16 complexity
 - And 18 more...
 
 ❌ **Manual RiskLevelType Processing** - Inconsistent with other enums
+
 ```go
 // internal/config/config.go:86-108
 var riskLevelStr string
@@ -150,6 +158,7 @@ case "LOW": op.RiskLevel = domain.RiskLow
 ```
 
 ❌ **Context Loss in validate.go** - Error messages lack context
+
 ```go
 // internal/cleaner/validate.go:12
 func ValidateItem(items, validItems []string, item, itemName, validValuesDescription string) error {
@@ -166,15 +175,18 @@ func ValidateItem(items, validItems []string, item, itemName, validValuesDescrip
 ### 2.1 Architecture Improvements (High Impact)
 
 #### Priority 1: Extract Generic Cleaner Interface
+
 **Impact**: HIGH | **Effort**: LOW (1 day) | **ROI**: 9/10
 
 **Current State**:
+
 - 11+ cleaner implementations with identical patterns
 - No shared interface
 - Can't iterate over cleaners programmatically
 - Hard to mock for testing
 
 **Improvement**:
+
 ```go
 // internal/cleaner/interface.go (NEW)
 package cleaner
@@ -216,6 +228,7 @@ func (r *CleanerRegistry) List() []Cleaner {
 ```
 
 **Files to Modify**:
+
 - `internal/cleaner/interface.go` (NEW)
 - `internal/cleaner/nix.go` (implement interface)
 - `internal/cleaner/homebrew.go` (implement interface)
@@ -239,14 +252,17 @@ func (r *CleanerRegistry) List() []Cleaner {
 ---
 
 #### Priority 2: Fix Context Propagation in validate.go
+
 **Impact**: MEDIUM | **Effort**: LOW (0.5 days) | **ROI**: 7/10
 
 **Current State**:
+
 - Error messages lose context
 - Debugging difficult
 - Lower error handling quality score
 
 **Improvement**:
+
 ```go
 // internal/cleaner/validate.go
 package cleaner
@@ -288,14 +304,17 @@ func formatValidItems(items []string) string {
 ---
 
 #### Priority 3: Unify Binary Enum Unmarshaling
+
 **Impact**: MEDIUM | **Effort**: LOW (1 day) | **ROI**: 6/10
 
 **Current State**:
+
 - Binary enums use `unmarshalBinaryEnum()`
 - Standard enums use `UnmarshalYAMLEnum()`
 - Two separate code paths
 
 **Improvement**:
+
 ```go
 // Option 1: Make UnmarshalYAMLEnum work for binary enums
 // internal/domain/type_safe_enums.go
@@ -331,14 +350,17 @@ func UnmarshalYAMLEnumBinary[T ~int](
 ### 2.2 Testing Improvements (High Impact)
 
 #### Priority 4: Add Integration Tests for Enum-Based Configs
+
 **Impact**: HIGH | **Effort**: MEDIUM (2 days) | **ROI**: 8/10
 
 **Current State**:
+
 - Only unit tests for enum unmarshaling
 - No end-to-end workflow tests
 - Can't verify full config→execute→result cycle
 
 **Improvement**:
+
 ```go
 // tests/integration/enum_workflow_test.go (NEW)
 package integration_test
@@ -391,6 +413,7 @@ func TestEnumRoundTrip_JSON(t *testing.T) {
 ```
 
 **Files to Create**:
+
 - `tests/integration/enum_workflow_test.go` (NEW)
 - `tests/integration/testdata/int-enum-config.yaml` (NEW)
 - `tests/integration/testdata/string-enum-config.yaml` (NEW)
@@ -405,15 +428,18 @@ func TestEnumRoundTrip_JSON(t *testing.T) {
 ---
 
 #### Priority 5: Verify All Cleaners Handle Enum Types Correctly
+
 **Impact**: HIGH | **Effort**: MEDIUM (2 days) | **ROI**: 8/10
 
 **Current State**:
+
 - Enum types exist but not verified in practice
 - Cleaners might have hardcoded string comparisons
 - Risk of enum values not being used correctly
 
 **Improvement**:
 For each cleaner (11 total):
+
 1. Review all enum usage
 2. Verify no hardcoded string comparisons
 3. Ensure switch statements use enum constants
@@ -421,6 +447,7 @@ For each cleaner (11 total):
 5. Add integration test with enum-based config
 
 **Files to Review**:
+
 - `internal/cleaner/nix.go`
 - `internal/cleaner/homebrew.go`
 - `internal/cleaner/docker.go`
@@ -443,19 +470,23 @@ For each cleaner (11 total):
 ### 2.3 Code Quality Improvements (Medium Impact)
 
 #### Priority 6: Reduce Cyclomatic Complexity
+
 **Impact**: MEDIUM | **Effort**: MEDIUM (3 days) | **ROI**: 6/10
 
 **Current State**:
+
 - 21 functions exceed 10 cyclomatic complexity
 - Top offenders: LoadWithContext (20), validateProfileName (16)
 
 **Improvement Strategy**:
 For each high-complexity function:
+
 1. Extract helper functions for repeated patterns
 2. Use strategy pattern for complex conditional logic
 3. Split large functions into focused sub-functions (<30 lines each)
 
 **Example Refactor** (LoadWithContext):
+
 ```go
 // BEFORE: LoadWithContext (20 complexity)
 func LoadWithContext(ctx context.Context) (*domain.Config, error) {
@@ -494,6 +525,7 @@ func validateAndReturn(config *domain.Config) (*domain.Config, error) { /* extra
 ```
 
 **Functions to Refactor**:
+
 1. `config.LoadWithContext` (20) → Extract profile loading
 2. `config.TestIntegration_ValidationSanitizationPipeline` (19) → Extract test scenarios
 3. `config.(*ConfigValidator).validateProfileName` (16) → Extract name validation rules
@@ -517,15 +549,18 @@ func validateAndReturn(config *domain.Config) (*domain.Config, error) { /* extra
 ### 2.4 Documentation Improvements (Low Impact)
 
 #### Priority 7: Create Comprehensive Architecture Documentation
+
 **Impact**: LOW | **Effort**: MEDIUM (2 days) | **ROI**: 5/10
 
 **Current State**:
+
 - Scattered documentation across multiple files
 - No central architecture guide
 - Design decisions not documented
 
 **Improvement**:
 Create `ARCHITECTURE.md` covering:
+
 - Overall architecture diagram
 - Layer responsibilities
 - Data flow between layers
@@ -547,11 +582,13 @@ Create `ARCHITECTURE.md` covering:
 ### 3.1 Dependency Injection: samber/do/v2
 
 **Current State**:
+
 - Manual dependency wiring everywhere
 - No DI container
 - Boilerplate code
 
 **Improvement**:
+
 ```go
 import "github.com/samber/do/v2"
 
@@ -579,11 +616,13 @@ func NewService(injector *do.Injector) *Service {
 ### 3.2 Validation: github.com/go-playground/validator/v10
 
 **Current State**:
+
 - Custom validation logic
 - Manual error formatting
 - Scattered validation rules
 
 **Improvement**:
+
 ```go
 type OperationSettings struct {
     NixGenerations *NixGenerationsSettings `json:"nix_generations,omitempty" validate:"omitempty,dive"`
@@ -606,11 +645,13 @@ func (os *OperationSettings) Validate() error {
 ### 3.3 Logging: github.com/sirupsen/logrus (ALREADY USED)
 
 **Current State**:
+
 - logrus is already a dependency
 - Used in some places
 - Not consistent across codebase
 
 **Improvement**:
+
 - Ensure consistent logging patterns
 - Add structured logging
 - Add log levels appropriately
@@ -626,6 +667,7 @@ func (os *OperationSettings) Validate() error {
 ### 3.4 HTTP Client: github.com/go-resty/resty/v2 (ALREADY USED)
 
 **Current State**:
+
 - resty is already a dependency
 - Used in some places
 - Could be more widely adopted
@@ -643,6 +685,7 @@ func (os *OperationSettings) Validate() error {
 ### Phase 1: Critical Blocking Issues (Week 1)
 
 #### Task 1.1: Clean Disk Space ✅ WORKAROUND IDENTIFIED
+
 - **Priority**: CRITICAL
 - **Impact**: UNBLOCKS ALL WORK
 - **Effort**: 0.5 days
@@ -657,6 +700,7 @@ func (os *OperationSettings) Validate() error {
 - **NOTE**: This is blocking test execution, but code changes can still be made
 
 #### Task 1.2: Run Full Test Suite
+
 - **Priority**: CRITICAL
 - **Impact**: ESTABLISHES BASELINE
 - **Effort**: 0.5 days
@@ -673,6 +717,7 @@ func (os *OperationSettings) Validate() error {
 ### Phase 2: High Impact, Low Effort (Week 1-2) - Pareto 1% → 51%
 
 #### Task 2.1: Extract Generic Cleaner Interface
+
 - **Priority**: HIGH
 - **Impact**: Enables polymorphism, reduces duplication
 - **Effort**: 1 day
@@ -686,6 +731,7 @@ func (os *OperationSettings) Validate() error {
   6. Verify all cleaners work correctly
 
 #### Task 2.2: Fix Context Propagation in validate.go
+
 - **Priority**: HIGH
 - **Impact**: Better error messages, easier debugging
 - **Effort**: 0.5 days
@@ -698,6 +744,7 @@ func (os *OperationSettings) Validate() error {
   5. Verify error quality score improvement
 
 #### Task 2.3: Unify Binary Enum Unmarshaling
+
 - **Priority**: MEDIUM
 - **Impact**: Reduces duplication, consistent errors
 - **Effort**: 1 day
@@ -710,6 +757,7 @@ func (os *OperationSettings) Validate() error {
   5. Verify error messages consistent
 
 #### Task 2.4: Add Integration Tests for Enum Workflows
+
 - **Priority**: HIGH
 - **Impact**: Verifies end-to-end functionality
 - **Effort**: 2 days
@@ -731,6 +779,7 @@ func (os *OperationSettings) Validate() error {
 ### Phase 3: High Impact, Medium Effort (Week 2-3) - Pareto 4% → 64%
 
 #### Task 3.1: Verify All Cleaners Handle Enums Correctly
+
 - **Priority**: HIGH
 - **Impact**: Ensures type safety in practice
 - **Effort**: 2 days
@@ -745,6 +794,7 @@ func (os *OperationSettings) Validate() error {
   6. Document findings
 
 #### Task 3.2: Add Enum Validation to Config Boundaries
+
 - **Priority**: HIGH
 - **Impact**: Catches invalid enums at config load time
 - **Effort**: 1 day
@@ -757,6 +807,7 @@ func (os *OperationSettings) Validate() error {
   5. Verify validation catches invalid configs
 
 #### Task 3.3: Reduce Complexity in Top 5 Functions
+
 - **Priority**: MEDIUM
 - **Impact**: Better maintainability
 - **Effort**: 1 day
@@ -776,6 +827,7 @@ func (os *OperationSettings) Validate() error {
 ### Phase 4: Medium Impact, Medium Effort (Week 3-4)
 
 #### Task 4.1: Reduce Complexity in Remaining Functions
+
 - **Priority**: MEDIUM
 - **Impact**: Better maintainability
 - **Effort**: 2 days
@@ -787,6 +839,7 @@ func (os *OperationSettings) Validate() error {
   4. Update complexity metrics
 
 #### Task 4.2: Add Edge Case Tests for Enum Unmarshaling
+
 - **Priority**: MEDIUM
 - **Impact**: Better error handling
 - **Effort**: 1 day
@@ -800,6 +853,7 @@ func (os *OperationSettings) Validate() error {
   6. Verify all tests pass
 
 #### Task 4.3: Test Enum Round-Trip Serialization
+
 - **Priority**: MEDIUM
 - **Impact**: Ensures no data corruption
 - **Effort**: 1 day
@@ -816,6 +870,7 @@ func (os *OperationSettings) Validate() error {
 ### Phase 5: Low Impact, High Effort (Week 5-6)
 
 #### Task 5.1: Create Comprehensive Architecture Documentation
+
 - **Priority**: LOW
 - **Impact**: Better onboarding
 - **Effort**: 2 days
@@ -831,6 +886,7 @@ func (os *OperationSettings) Validate() error {
   8. Document extension points
 
 #### Task 5.2: Investigate and Fix RiskLevelType Manual Processing
+
 - **Priority**: MEDIUM
 - **Impact**: Consistency with other enums
 - **Effort**: 1 day
@@ -843,6 +899,7 @@ func (os *OperationSettings) Validate() error {
   5. Add tests for both approaches
 
 #### Task 5.3: Add Dependency Injection with samber/do/v2
+
 - **Priority**: LOW
 - **Impact**: Less boilerplate, easier testing
 - **Effort**: 2 days
@@ -860,6 +917,7 @@ func (os *OperationSettings) Validate() error {
 ### Phase 6: Final Validation (Week 7)
 
 #### Task 6.1: Verify Full Integration and Run All Tests
+
 - **Priority**: CRITICAL
 - **Impact**: Ensures everything works
 - **Effort**: 1 day
@@ -873,6 +931,7 @@ func (os *OperationSettings) Validate() error {
   7. Document final status
 
 #### Task 6.2: Create Quick Reference Guide for Enum Types
+
 - **Priority**: LOW
 - **Impact**: Easier lookup for developers
 - **Effort**: 0.5 days
@@ -952,12 +1011,14 @@ func (os *OperationSettings) Validate() error {
 **Question**: Should we fix the manual RiskLevelType processing in `internal/config/config.go:86-108` or keep it?
 
 **Context**:
+
 - All other enums use type-safe `UnmarshalYAML()` methods
 - RiskLevelType is defined as an enum in `internal/domain/type_safe_enums.go`
 - But config loader manually processes it as a string
 - This creates inconsistency and potential for errors
 
 **Options**:
+
 1. **Fix it** - Use standard enum unmarshaler
    - Pros: Consistent, type-safe, less code
    - Cons: Need to test Viper compatibility, might break existing configs
@@ -979,11 +1040,13 @@ func (os *OperationSettings) Validate() error {
 **Question**: Should we adopt samber/do/v2 for dependency injection?
 
 **Context**:
+
 - Manual dependency wiring everywhere
 - Boilerplate code
 - Harder to test
 
 **Options**:
+
 1. **Adopt fully** - Use DI container everywhere
    - Pros: Automatic resolution, less boilerplate
    - Cons: Learning curve, adds dependency
@@ -1005,11 +1068,13 @@ func (os *OperationSettings) Validate() error {
 **Question**: Should we implement a plugin architecture for cleaners?
 
 **Context**:
+
 - Currently hardcoded list of cleaners
 - Adding new cleaners requires modifying core code
 - Plugin system mentioned in ARCHITECTURAL_ANALYSIS_2026-02-08_05-48.md
 
 **Options**:
+
 1. **Implement now** - Add plugin system
    - Pros: Extensible, community contributions
    - Cons: Complexity, 5+ days work
@@ -1065,6 +1130,7 @@ Clean Wizard is already **world-class** with excellent architecture and type saf
 4. **Enhance Developer Experience** - Better error messages, documentation
 
 **Recommended Execution**:
+
 - Start with Phase 1 (critical blockers)
 - Prioritize Phase 2 (high impact, low effort) - Pareto 1% → 51%
 - Proceed to Phase 3-4 based on results
@@ -1075,6 +1141,7 @@ Clean Wizard is already **world-class** with excellent architecture and type saf
 ---
 
 **Next Immediate Actions**:
+
 1. Clean disk space ✅ IN PROGRESS
 2. Run full test suite to establish baseline
 3. Begin Phase 2: Extract Cleaner Interface

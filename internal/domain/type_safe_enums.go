@@ -30,19 +30,19 @@ func UnmarshalYAMLEnum[T ~int](
 					if int(enumVal) == i {
 						*target = enumVal
 						return nil
+					}
 				}
+				// Build helpful error message with valid options
+				validStrings := make([]string, 0, len(valueMap))
+				validInts := make([]string, 0, len(valueMap))
+				for key, enumVal := range valueMap {
+					validStrings = append(validStrings, key)
+					validInts = append(validInts, strconv.Itoa(int(enumVal)))
+				}
+				return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
+					errorMsg, i, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
 			}
-			// Build helpful error message with valid options
-			validStrings := make([]string, 0, len(valueMap))
-			validInts := make([]string, 0, len(valueMap))
-			for key, enumVal := range valueMap {
-				validStrings = append(validStrings, key)
-				validInts = append(validInts, strconv.Itoa(int(enumVal)))
-			}
-			return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
-				errorMsg, i, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
 		}
-	}
 
 		// This is a non-numeric string, do case-insensitive lookup
 		upperKey := strings.ToUpper(s)
