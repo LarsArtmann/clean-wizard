@@ -34,6 +34,13 @@ func NewGoCacheCleaner(cacheType GoCacheType, verbose, dryRun bool) *GoCacheClea
 	}
 }
 
+// IsAvailable checks if the Go cache cleaner is available.
+// It verifies that the Go command is installed and accessible.
+func (gcc *GoCacheCleaner) IsAvailable(ctx context.Context) bool {
+	_, err := gcc.helper.getGoEnv(ctx, "GOROOT")
+	return err == nil
+}
+
 // Clean cleans the specified cache type.
 func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	switch gcc.cacheType {

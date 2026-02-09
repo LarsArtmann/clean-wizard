@@ -21,17 +21,25 @@ func boolToGenerationStatus(b bool) domain.GenerationStatus {
 
 // NixCleaner handles Nix package manager cleanup with proper type safety.
 type NixCleaner struct {
-	adapter *adapters.NixAdapter
-	verbose bool
-	dryRun  bool
+	adapter   *adapters.NixAdapter
+	verbose   bool
+	dryRun    bool
+	keepCount int
 }
 
 // NewNixCleaner creates Nix cleaner with proper configuration.
-func NewNixCleaner(verbose, dryRun bool) *NixCleaner {
+func NewNixCleaner(verbose, dryRun bool, keepCount ...int) *NixCleaner {
+	// Default keep count is 5
+	kc := 5
+	if len(keepCount) > 0 {
+		kc = keepCount[0]
+	}
+
 	nc := &NixCleaner{
-		adapter: adapters.NewNixAdapter(0, 0),
-		verbose: verbose,
-		dryRun:  dryRun,
+		adapter:   adapters.NewNixAdapter(0, 0),
+		verbose:   verbose,
+		dryRun:    dryRun,
+		keepCount: kc,
 	}
 	nc.adapter.SetDryRun(dryRun) // Pass dry-run to adapter
 	return nc
@@ -45,6 +53,12 @@ func (nc *NixCleaner) Type() domain.OperationType {
 // IsAvailable checks if Nix cleaner is available.
 func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
 	return nc.adapter.IsAvailable(ctx)
+}
+
+// Clean implements the Cleaner interface.
+// It removes old Nix generations, keeping the configured number of generations.
+func (nc *NixCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+	return nc.CleanOldGenerations(ctx, nc.keepCount)
 }
 
 // GetStoreSize gets Nix store size with type safety.
