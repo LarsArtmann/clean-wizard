@@ -20,6 +20,31 @@ func UnmarshalYAMLEnum[T ~int](
 	// Try as string first
 	var s string
 	if err := value.Decode(&s); err == nil {
+		// Check if this is actually a numeric string (like "0" or "1")
+		// If so, skip string lookup and try integer parsing instead
+		var i int
+		if _, err := fmt.Sscanf(s, "%d", &i); err == nil {
+			// This is a numeric string, use integer parsing
+			if err := value.Decode(&i); err == nil {
+				for _, enumVal := range valueMap {
+					if int(enumVal) == i {
+						*target = enumVal
+						return nil
+				}
+			}
+			// Build helpful error message with valid options
+			validStrings := make([]string, 0, len(valueMap))
+			validInts := make([]string, 0, len(valueMap))
+			for key, enumVal := range valueMap {
+				validStrings = append(validStrings, key)
+				validInts = append(validInts, strconv.Itoa(int(enumVal)))
+			}
+			return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
+				errorMsg, i, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
+		}
+	}
+
+		// This is a non-numeric string, do case-insensitive lookup
 		upperKey := strings.ToUpper(s)
 		for key, enumVal := range valueMap {
 			if strings.ToUpper(key) == upperKey {
@@ -27,27 +52,15 @@ func UnmarshalYAMLEnum[T ~int](
 				return nil
 			}
 		}
-		// String decode succeeded but didn't match - try integer as fallback
-	}
-
-	// Try as integer
-	var i int
-	if err := value.Decode(&i); err == nil {
-		for _, enumVal := range valueMap {
-			if int(enumVal) == i {
-				*target = enumVal
-				return nil
-			}
-		}
-		// Build helpful error message with valid options
+		// String decode succeeded but didn't match - build helpful error
 		validStrings := make([]string, 0, len(valueMap))
 		validInts := make([]string, 0, len(valueMap))
 		for key, enumVal := range valueMap {
 			validStrings = append(validStrings, key)
 			validInts = append(validInts, strconv.Itoa(int(enumVal)))
 		}
-		return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
-			errorMsg, i, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
+		return fmt.Errorf("%s value: %s\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
+			errorMsg, s, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
 	}
 
 	return fmt.Errorf("cannot parse %s: expected string or int\n\nSee docs/YAML_ENUM_FORMATS.md for format examples", errorMsg)
