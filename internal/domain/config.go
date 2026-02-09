@@ -152,6 +152,16 @@ func (op CleanupOperation) Validate() error {
 		return errors.New("Operation description cannot be empty")
 	}
 
+	// Validate RiskLevel enum
+	if !op.RiskLevel.IsValid() {
+		return fmt.Errorf("invalid risk level: %s (must be LOW, MEDIUM, HIGH, or CRITICAL)", op.RiskLevel.String())
+	}
+
+	// Validate Enabled enum
+	if !op.Enabled.IsValid() {
+		return fmt.Errorf("invalid enabled status: %s (must be DISABLED or ENABLED)", op.Enabled.String())
+	}
+
 	// Validate settings if present
 	if op.Settings != nil {
 		opType := GetOperationType(op.Name)
