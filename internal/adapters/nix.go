@@ -109,7 +109,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	// In dry-run mode, return success without actually running GC
 	if n.dryRun {
 		estimatedFreed := int64(100 * 1024 * 1024) // 100MB estimate from GC
-		cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyAggressive, 1, estimatedFreed, 0)
+		cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType), 1, estimatedFreed, 0)
 		return result.Ok(cleanResult)
 	}
 
@@ -137,7 +137,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		0)
 
 	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyAggressive, 1, bytesFreed, time.Since(time.Now()))
+	cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType), 1, bytesFreed, time.Since(time.Now()))
 	return result.Ok(cleanResult)
 }
 
@@ -164,7 +164,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 	if n.dryRun {
 		// Return a success result with estimated bytes freed
 		estimatedFreed := int64(50 * 1024 * 1024) // 50MB estimate per generation
-		cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyConservative, 1, estimatedFreed, 0)
+		cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyConservativeType), 1, estimatedFreed, 0)
 		return result.Ok(cleanResult)
 	}
 
@@ -192,7 +192,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 		0)
 
 	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming(domain.StrategyConservative, 1, bytesFreed, time.Since(time.Now()))
+	cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyConservativeType), 1, bytesFreed, time.Since(time.Now()))
 	return result.Ok(cleanResult)
 }
 

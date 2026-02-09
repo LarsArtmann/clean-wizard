@@ -54,7 +54,7 @@ func BenchmarkCleanResult_Validate(b *testing.B) {
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    testTime,
-		Strategy:     domain.StrategyAggressive,
+		Strategy:     domain.CleanStrategyType(domain.StrategyAggressiveType),
 	}
 	b.ReportAllocs()
 

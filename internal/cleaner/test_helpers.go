@@ -163,8 +163,8 @@ func TestCleanDryRun(t *testing.T, newCleanerFunc SimpleCleanerConstructor, tool
 		t.Errorf("Clean() removed %d items, want %d", cleanResult.ItemsRemoved, expectedItemsRemoved)
 	}
 
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
+	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
+		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
 	}
 
 	if cleanResult.FreedBytes == 0 {
@@ -188,8 +188,8 @@ func TestDryRunStrategy(t *testing.T, newCleanerFunc SimpleCleanerConstructor, t
 
 	cleanResult := result.Value()
 
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
+	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
+		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
 	}
 
 	if cleanResult.ItemsFailed != 0 {

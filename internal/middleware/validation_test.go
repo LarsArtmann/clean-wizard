@@ -40,7 +40,7 @@ func TestValidationMiddleware(t *testing.T) {
 	t.Run("ValidCleanRequest", func(t *testing.T) {
 		req := domain.CleanRequest{
 			Items:    []domain.ScanItem{{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: domain.ScanTypeTemp}},
-			Strategy: domain.StrategyConservative,
+			Strategy: domain.CleanStrategyType(domain.StrategyConservativeType),
 		}
 
 		result := validator.ValidateCleanRequest(ctx, req)

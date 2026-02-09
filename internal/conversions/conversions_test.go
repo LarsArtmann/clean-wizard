@@ -11,7 +11,7 @@ import (
 )
 
 func TestNewCleanResult(t *testing.T) {
-	strategy := domain.StrategyDryRun
+	strategy := domain.CleanStrategyType(domain.StrategyDryRunType)
 	items := 5
 	bytes := int64(1024)
 
@@ -38,7 +38,7 @@ func TestNewCleanResult(t *testing.T) {
 }
 
 func TestNewCleanResultWithTiming(t *testing.T) {
-	strategy := domain.StrategyDryRun
+	strategy := domain.CleanStrategyType(domain.StrategyDryRunType)
 	items := 3
 	bytes := int64(2048)
 	cleanTime := time.Duration(5) * time.Second
@@ -60,7 +60,7 @@ func TestNewCleanResultWithTiming(t *testing.T) {
 }
 
 func TestNewCleanResultWithFailures(t *testing.T) {
-	strategy := domain.StrategyDryRun
+	strategy := domain.CleanStrategyType(domain.StrategyDryRunType)
 	itemsRemoved := 8
 	itemsFailed := 2
 	bytes := int64(4096)
@@ -124,7 +124,7 @@ func TestToCleanResult(t *testing.T) {
 	if value.FreedBytes != uint64(bytes) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
-	if value.Strategy != domain.StrategyConservative {
+	if value.Strategy != domain.CleanStrategyType(domain.StrategyConservativeType) {
 		t.Errorf("Expected strategy 'conservative', got %s", value.Strategy)
 	}
 }
@@ -146,7 +146,7 @@ func TestToCleanResultWithError(t *testing.T) {
 
 func TestToCleanResultWithStrategy(t *testing.T) {
 	bytes := int64(2048)
-	strategy := domain.StrategyDryRun
+	strategy := domain.CleanStrategyType(domain.StrategyDryRunType)
 	bytesResult := result.Ok(bytes)
 
 	cleanResult := ToCleanResultWithStrategy(bytesResult, strategy)
@@ -167,7 +167,7 @@ func TestToCleanResultWithStrategy(t *testing.T) {
 func TestToCleanResultFromItems(t *testing.T) {
 	itemsRemoved := 5
 	bytes := int64(4096)
-	strategy := domain.StrategyDryRun
+	strategy := domain.CleanStrategyType(domain.StrategyDryRunType)
 	bytesResult := result.Ok(bytes)
 
 	cleanResult := ToCleanResultFromItems(itemsRemoved, bytesResult, strategy)
@@ -190,7 +190,7 @@ func TestToCleanResultFromItems(t *testing.T) {
 
 func TestToTimedCleanResult(t *testing.T) {
 	bytes := int64(8192)
-	strategy := domain.StrategyDryRun
+	strategy := domain.CleanStrategyType(domain.StrategyDryRunType)
 	cleanTime := time.Duration(7) * time.Second
 	bytesResult := result.Ok(bytes)
 
@@ -235,8 +235,8 @@ func TestToScanResult(t *testing.T) {
 }
 
 func TestCombineCleanResults(t *testing.T) {
-	result1 := NewCleanResult(domain.StrategyAggressive, 3, int64(1024))
-	result2 := NewCleanResult(domain.StrategyConservative, 5, int64(2048))
+	result1 := NewCleanResult(domain.CleanStrategyType(domain.StrategyAggressiveType), 3, int64(1024))
+	result2 := NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 5, int64(2048))
 
 	results := []domain.CleanResult{result1, result2}
 
@@ -252,14 +252,14 @@ func TestCombineCleanResults(t *testing.T) {
 		t.Errorf("Expected items failed 0, got %d", combined.ItemsFailed)
 	}
 	// When combining different strategies, should default to conservative
-	if combined.Strategy != domain.StrategyConservative {
+	if combined.Strategy != domain.CleanStrategyType(domain.StrategyConservativeType) {
 		t.Errorf("Expected combined strategy to be 'conservative' for mixed strategies, got %s", combined.Strategy)
 	}
 }
 
 func TestCombineCleanResultsWithFailures(t *testing.T) {
-	result1 := NewCleanResultWithFailures(domain.StrategyAggressive, 3, 1, int64(1024), time.Second)
-	result2 := NewCleanResultWithFailures(domain.StrategyConservative, 5, 2, int64(2048), 2*time.Second)
+	result1 := NewCleanResultWithFailures(domain.CleanStrategyType(domain.StrategyAggressiveType), 3, 1, int64(1024), time.Second)
+	result2 := NewCleanResultWithFailures(domain.CleanStrategyType(domain.StrategyConservativeType), 5, 2, int64(2048), 2*time.Second)
 
 	results := []domain.CleanResult{result1, result2}
 
@@ -290,14 +290,14 @@ func TestCombineCleanResultsEmpty(t *testing.T) {
 	if combined.FreedBytes != uint64(0) {
 		t.Errorf("Expected freed bytes 0, got %d", combined.FreedBytes)
 	}
-	if combined.Strategy != domain.StrategyConservative {
+	if combined.Strategy != domain.CleanStrategyType(domain.StrategyConservativeType) {
 		t.Errorf("Expected strategy 'conservative' (default for empty results), got %s", combined.Strategy)
 	}
 }
 
 func TestExtractBytesFromCleanResult(t *testing.T) {
 	bytes := int64(4096)
-	cleanResult := result.Ok(NewCleanResult(domain.StrategyConservative, 1, bytes))
+	cleanResult := result.Ok(NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 1, bytes))
 
 	extracted := ExtractBytesFromCleanResult(cleanResult)
 
@@ -340,7 +340,7 @@ func TestToCleanResultFromError(t *testing.T) {
 }
 
 func TestValidateAndConvertCleanResult(t *testing.T) {
-	validResult := NewCleanResult(domain.StrategyConservative, 1, 1024)
+	validResult := NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 1, 1024)
 
 	result := ValidateAndConvertCleanResult(validResult)
 
@@ -354,7 +354,7 @@ func TestValidateAndConvertCleanResultInvalid(t *testing.T) {
 		SizeEstimate: domain.SizeEstimate{Known: 0, Unknown: false}, // Invalid zero bytes with ItemsRemoved > 0
 		ItemsRemoved: 1,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyDryRun,
+		Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),
 		CleanTime:    time.Second, // Non-zero clean time triggers validation
 	}
 

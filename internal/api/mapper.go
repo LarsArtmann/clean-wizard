@@ -258,11 +258,11 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 // MapStrategyToPublic converts domain strategy enum to public string.
 func MapStrategyToPublic(domainStrategy domain.CleanStrategyType) PublicStrategy {
 	switch domainStrategy {
-	case domain.StrategyAggressive:
+	case domain.CleanStrategyType(domain.StrategyAggressiveType):
 		return PublicStrategyAggressive
-	case domain.StrategyConservative:
+	case domain.CleanStrategyType(domain.StrategyConservativeType):
 		return PublicStrategyConservative
-	case domain.StrategyDryRun:
+	case domain.CleanStrategyType(domain.StrategyDryRunType):
 		return PublicStrategyDryRun
 	default:
 		return PublicStrategyDryRun // Safe default

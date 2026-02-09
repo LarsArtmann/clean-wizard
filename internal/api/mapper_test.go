@@ -159,7 +159,7 @@ func TestMapCleanResultToPublic_ValidResult(t *testing.T) {
 		ItemsFailed:  2,
 		CleanTime:    5 * time.Second,
 		CleanedAt:    now,
-		Strategy:     domain.StrategyAggressive,
+		Strategy:     domain.CleanStrategyType(domain.StrategyAggressiveType),
 	}
 
 	// Map to public

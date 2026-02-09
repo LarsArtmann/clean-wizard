@@ -174,8 +174,8 @@ func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 		t.Errorf("Clean() removed %d items, want > 0", cleanResult.ItemsRemoved)
 	}
 
-	if cleanResult.Strategy != domain.StrategyDryRun {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.StrategyDryRun)
+	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
+		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
 	}
 
 	if cleanResult.FreedBytes == 0 {
