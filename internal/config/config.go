@@ -95,16 +95,16 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 			switch strings.ToUpper(riskLevelStr) {
 			case "LOW":
-				op.RiskLevel = domain.RiskLow
+				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelLowType)
 			case "MEDIUM":
-				op.RiskLevel = domain.RiskMedium
+				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelMediumType)
 			case "HIGH":
-				op.RiskLevel = domain.RiskHigh
+				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelHighType)
 			case "CRITICAL":
-				op.RiskLevel = domain.RiskCritical
+				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelCriticalType)
 			default:
 				logrus.WithField("risk_level", riskLevelStr).Warn("Invalid risk level, defaulting to LOW")
-				op.RiskLevel = domain.RiskLow
+				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelLowType)
 			}
 
 			// Explicitly unmarshal settings for each operation type
@@ -217,7 +217,7 @@ func GetCurrentTime() time.Time {
 }
 
 // newCleanupOperation creates a cleanup operation with the specified parameters.
-func newCleanupOperation(name, description string, riskLevel domain.RiskLevel, opType domain.OperationType) domain.CleanupOperation {
+func newCleanupOperation(name, description string, riskLevel domain.RiskLevelType, opType domain.OperationType) domain.CleanupOperation {
 	return domain.CleanupOperation{
 		Name:        name,
 		Description: description,

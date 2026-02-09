@@ -124,10 +124,14 @@ No nil panics. No unchecked errors.
 ## Adding a New Cleaner
 
 1. Create cleaner in `internal/cleaner/`
-2. Implement `domain.Cleaner` interface
+2. Implement `cleaner.Cleaner` interface (for registry/execution) AND `domain.OperationHandler` interface (for validation)
 3. Add availability check
 4. Add to `GetCleanerConfigs()` in commands/clean.go
 5. Add tests
+
+Note: There are two related interfaces:
+- `cleaner.Cleaner`: Registry/execution focused with `Name()`, `Clean()`, `IsAvailable()`
+- `domain.OperationHandler`: Operation validation with `Type()`, `GetStoreSize()`, `ValidateSettings()`
 
 Example:
 
@@ -137,13 +141,9 @@ type MyCleaner struct {
     dryRun  bool
 }
 
-func (mc *MyCleaner) Type() domain.OperationType {
-    return domain.OperationTypeMyCleaner
-}
-
-func (mc *MyCleaner) IsAvailable(ctx context.Context) bool {
-    _, err := exec.LookPath("my-tool")
-    return err == nil
+// Implement cleaner.Cleaner interface
+func (mc *MyCleaner) Name() string {
+    return "my-cleaner"
 }
 
 func (mc *MyCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {

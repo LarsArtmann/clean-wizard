@@ -2,24 +2,24 @@ package domain
 
 import "context"
 
-// Cleaner interface for all cleaning operations with type-safe settings.
-type Cleaner interface {
+// OperationHandler interface for all cleaning operations with type-safe settings.
+type OperationHandler interface {
 	Type() OperationType
 	IsAvailable(ctx context.Context) bool
 	GetStoreSize(ctx context.Context) int64
 	ValidateSettings(settings *OperationSettings) error
 }
 
-// Cleaner interface for generation-based cleaners (Nix).
+// OperationHandler interface for generation-based cleaners (Nix).
 type GenerationCleaner interface {
-	Cleaner
+	OperationHandler
 	ListGenerations(ctx context.Context) []NixGeneration
 	CleanOldGenerations(ctx context.Context, keepCount int) CleanResult
 }
 
-// Cleaner interface for package-based cleaners (Homebrew).
+// OperationHandler interface for package-based cleaners (Homebrew).
 type PackageCleaner interface {
-	Cleaner
+	OperationHandler
 	ListPackages(ctx context.Context) []string
 	CleanOldPackages(ctx context.Context, settings *OperationSettings) CleanResult
 }

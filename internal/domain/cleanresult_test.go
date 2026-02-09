@@ -17,7 +17,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Valid CleanResult with aggressive strategy",
 			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 1024, Unknown: false},
+				SizeEstimate: SizeEstimate{Known: 1024, Status: SizeEstimateStatusKnown},
 				ItemsRemoved: 5,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
@@ -30,7 +30,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Valid CleanResult with conservative strategy",
 			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 512, Unknown: false},
+				SizeEstimate: SizeEstimate{Known: 512, Status: SizeEstimateStatusKnown},
 				ItemsRemoved: 2,
 				ItemsFailed:  1,
 				CleanTime:    time.Second * 2,
@@ -56,7 +56,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Invalid CleanResult - zero freed bytes with items removed",
 			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 0, Unknown: false},
+				SizeEstimate: SizeEstimate{Known: 0, Status: SizeEstimateStatusKnown},
 				ItemsRemoved: 1,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
@@ -65,12 +65,12 @@ func TestCleanResultValidation(t *testing.T) {
 			},
 			shouldValid: true, // IsValid() returns true (quick check), but Validate() returns error
 			shouldError: true,
-			errorMsg:    "cannot have zero SizeEstimate when ItemsRemoved is > 0 (set Unknown: true if size cannot be determined)",
+			errorMsg:    "cannot have zero SizeEstimate when ItemsRemoved is > 0 (set Status: Unknown if size cannot be determined)",
 		},
 		{
 			name: "Invalid CleanResult - failed items with no freed bytes",
 			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 0, Unknown: false},
+				SizeEstimate: SizeEstimate{Known: 0, Status: SizeEstimateStatusKnown},
 				ItemsRemoved: 0,
 				ItemsFailed:  5,
 				CleanTime:    time.Second,
@@ -84,7 +84,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Invalid CleanResult - zero cleaned at time",
 			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 100, Unknown: false},
+				SizeEstimate: SizeEstimate{Known: 100, Status: SizeEstimateStatusKnown},
 				ItemsRemoved: 1,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
@@ -98,7 +98,7 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Invalid CleanResult - invalid strategy",
 			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 100, Unknown: false},
+				SizeEstimate: SizeEstimate{Known: 100, Status: SizeEstimateStatusKnown},
 				ItemsRemoved: 1,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,

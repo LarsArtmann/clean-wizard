@@ -49,7 +49,7 @@ func BenchmarkResult_Value(b *testing.B) {
 // BenchmarkCleanResult_Validate benchmarks CleanResult validation.
 func BenchmarkCleanResult_Validate(b *testing.B) {
 	cr := domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{Known: 1024, Unknown: false},
+		SizeEstimate: domain.SizeEstimate{Known: 1024, Status: domain.SizeEstimateStatusKnown},
 		ItemsRemoved: 5,
 		ItemsFailed:  0,
 		CleanTime:    0,

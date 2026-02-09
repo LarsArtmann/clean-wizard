@@ -50,7 +50,7 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 			fmt.Println("  💡 Learn more: https://golangci-lint.run/usage/install/")
 		}
 		return result.Ok(domain.CleanResult{
-			SizeEstimate: domain.SizeEstimate{Unknown: true},
+			SizeEstimate: domain.SizeEstimate{Status: domain.SizeEstimateStatusUnknown}, // Honest: we don't know the size
 			FreedBytes:   0, // Deprecated field
 			ItemsRemoved: 0,
 			ItemsFailed:  0,
@@ -79,7 +79,7 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 	}
 
 	return result.Ok(domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{Unknown: true}, // Honest: we don't know the size
+		SizeEstimate: domain.SizeEstimate{Status: domain.SizeEstimateStatusUnknown}, // Honest: we don't know the size
 		FreedBytes:   0,                                  // Deprecated field
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
