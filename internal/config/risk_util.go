@@ -9,12 +9,12 @@ import (
 func maxRiskLevelFromOperations(operations []domain.CleanupOperation, currentMax domain.RiskLevel) domain.RiskLevel {
 	maxRisk := currentMax
 	for _, op := range operations {
-		if op.RiskLevel == domain.RiskCritical {
+		if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
 			return domain.RiskCritical
 		}
-		if op.RiskLevel == domain.RiskHigh {
+		if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelHighType) {
 			maxRisk = domain.RiskHigh
-		} else if op.RiskLevel == domain.RiskMedium && maxRisk == domain.RiskLow {
+		} else if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelMediumType) && maxRisk == domain.RiskLevelType(domain.RiskLevelLowType) {
 			maxRisk = domain.RiskMedium
 		}
 	}

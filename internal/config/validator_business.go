@@ -25,7 +25,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 		// Validate operations within profile
 		for _, op := range profile.Operations {
 			// Validate risk vs safe mode
-			if !cfg.SafeMode.IsEnabled() && op.RiskLevel == domain.RiskCritical {
+			if !cfg.SafeMode.IsEnabled() && op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
 				result.Errors = append(result.Errors, ValidationError{
 					Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", name, op.Name),
 					Rule:       "business_logic",
@@ -100,7 +100,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 	// Validate no profiles have critical operations without explicit consent
 	for name, profile := range cfg.Profiles {
 		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskCritical && !cfg.SafeMode.IsEnabled() {
+			if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) && !cfg.SafeMode.IsEnabled() {
 				result.Errors = append(result.Errors, ValidationError{
 					Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", name, op.Name),
 					Rule:       "security",
@@ -160,7 +160,7 @@ func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel
 	maxRisk := domain.RiskLow
 	for _, profile := range cfg.Profiles {
 		maxRisk = maxRiskLevelFromOperations(profile.Operations, maxRisk)
-		if maxRisk == domain.RiskCritical {
+		if maxRisk == domain.RiskLevelType(domain.RiskLevelCriticalType) {
 			return domain.RiskCritical
 		}
 	}

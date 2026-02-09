@@ -252,17 +252,17 @@ func GetDefaultConfig() *domain.Config {
 		},
 		Profiles: map[string]*domain.Profile{
 			"daily": newProfile("daily", "Quick daily cleanup", []domain.CleanupOperation{
-				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLow, domain.OperationTypeNixGenerations),
-				newCleanupOperation("temp-files", "Clean temporary files", domain.RiskLow, domain.OperationTypeTempFiles),
+				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLevelType(domain.RiskLevelLowType), domain.OperationTypeNixGenerations),
+				newCleanupOperation("temp-files", "Clean temporary files", domain.RiskLevelType(domain.RiskLevelLowType), domain.OperationTypeTempFiles),
 			}),
 			"aggressive": newProfile("aggressive", "Deep aggressive cleanup", []domain.CleanupOperation{
-				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskHigh, domain.OperationTypeNixGenerations),
-				newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
+				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLevelType(domain.RiskLevelHighType), domain.OperationTypeNixGenerations),
+				newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskLevelType(domain.RiskLevelMediumType), domain.OperationTypeHomebrew),
 			}),
 			"comprehensive": newProfile("comprehensive", "Complete system cleanup", []domain.CleanupOperation{
-				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskCritical, domain.OperationTypeNixGenerations),
-				newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskMedium, domain.OperationTypeHomebrew),
-				newCleanupOperation("system-temp", "Clean system temporary files", domain.RiskMedium, domain.OperationTypeSystemTemp),
+				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLevelType(domain.RiskLevelCriticalType), domain.OperationTypeNixGenerations),
+				newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskLevelType(domain.RiskLevelMediumType), domain.OperationTypeHomebrew),
+				newCleanupOperation("system-temp", "Clean system temporary files", domain.RiskLevelType(domain.RiskLevelMediumType), domain.OperationTypeSystemTemp),
 			}),
 		},
 		LastClean: now,

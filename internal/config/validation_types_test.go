@@ -39,7 +39,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 						{
 							Name:        "nix-generations",
 							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLow,
+							RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
 							Enabled:     domain.ProfileStatusEnabled,
 						},
 					},
@@ -62,7 +62,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 						{
 							Name:        "nix-generations",
 							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLow,
+							RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
 							Enabled:     domain.ProfileStatusEnabled,
 						},
 					},
@@ -179,7 +179,7 @@ func CreateDailyProfile(opts ...DailyProfileOption) *domain.Profile {
 			{
 				Name:        "nix-generations",
 				Description: "Clean Nix generations",
-				RiskLevel:   domain.RiskLow,
+				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
 				Enabled:     domain.ProfileStatusEnabled,
 			},
 		},
@@ -202,7 +202,7 @@ func CreateWeeklyProfile() *domain.Profile {
 			{
 				Name:        "nix-generations",
 				Description: "Deep Nix cleanup",
-				RiskLevel:   domain.RiskMedium,
+				RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings: &domain.OperationSettings{
 					NixGenerations: &domain.NixGenerationsSettings{
@@ -242,7 +242,7 @@ func CreateBenchmarkConfig() *domain.Config {
 					{
 						Name:        "nix-generations",
 						Description: "Clean Nix generations",
-						RiskLevel:   domain.RiskLow,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
@@ -254,7 +254,7 @@ func CreateBenchmarkConfig() *domain.Config {
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskMedium,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							TempFiles: &domain.TempFilesSettings{
@@ -266,7 +266,7 @@ func CreateBenchmarkConfig() *domain.Config {
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean Homebrew",
-						RiskLevel:   domain.RiskLow,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							Homebrew: &domain.HomebrewSettings{
@@ -278,7 +278,7 @@ func CreateBenchmarkConfig() *domain.Config {
 					{
 						Name:        "system-temp",
 						Description: "Clean system temp",
-						RiskLevel:   domain.RiskMedium,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							SystemTemp: &domain.SystemTempSettings{
@@ -311,7 +311,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "nix-generations",
 						Description: " Clean Nix generations ",
-						RiskLevel:   domain.RiskLow,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
@@ -323,7 +323,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskMedium,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							TempFiles: &domain.TempFilesSettings{
@@ -335,7 +335,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean Homebrew",
-						RiskLevel:   domain.RiskLow,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							Homebrew: &domain.HomebrewSettings{
@@ -347,7 +347,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "system-temp",
 						Description: "Clean system temp",
-						RiskLevel:   domain.RiskMedium,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							SystemTemp: &domain.SystemTempSettings{

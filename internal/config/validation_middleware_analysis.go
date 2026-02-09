@@ -39,7 +39,7 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 				OldValue:  nil,
 				NewValue:  path,
 				Operation: OperationAdded,
-				Risk:      domain.RiskLow,
+				Risk:      domain.RiskLevelType(domain.RiskLevelLowType),
 			})
 		}
 	}
@@ -52,7 +52,7 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 				OldValue:  path,
 				NewValue:  nil,
 				Operation: OperationRemoved,
-				Risk:      domain.RiskHigh, // Removing protected paths is risky
+				Risk:      domain.RiskLevelType(domain.RiskLevelHighType), // Removing protected paths is risky
 			})
 		}
 	}
@@ -89,7 +89,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 				OldValue:  profile.Name,
 				NewValue:  nil,
 				Operation: OperationRemoved,
-				Risk:      domain.RiskLow, // Removing profiles is generally safe
+				Risk:      domain.RiskLevelType(domain.RiskLevelLowType), // Removing profiles is generally safe
 			})
 		}
 	}
@@ -143,7 +143,7 @@ func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) dom
 		oldVal, oldOk := old.(int)
 		newVal, newOk := new.(int)
 		if !oldOk || !newOk {
-			return domain.RiskHigh // Conservative risk for unexpected types
+			return domain.RiskLevelType(domain.RiskLevelHighType) // Conservative risk for unexpected types
 		}
 		if oldVal < newVal {
 			return domain.RiskMedium
@@ -165,7 +165,7 @@ func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domai
 		return domain.RiskHigh
 	}
 
-	return maxRiskLevelFromOperations(profile.Operations, domain.RiskLow)
+	return maxRiskLevelFromOperations(profile.Operations, domain.RiskLevelType(domain.RiskLevelLowType))
 }
 
 func (vm *ValidationMiddleware) makeStringSet(slice []string) map[string]bool {

@@ -72,7 +72,7 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 	// Safe mode vs risk level consistency
 	if !cfg.SafeMode.IsEnabled() {
 		maxRisk := cv.findMaxRiskLevel(cfg)
-		if maxRisk == domain.RiskCritical {
+		if maxRisk == domain.RiskLevelType(domain.RiskLevelCriticalType) {
 			result.Warnings = append(result.Warnings, ValidationWarning{
 				Field:      "safe_mode",
 				Message:    "Critical risk operations enabled while safe_mode is false",

@@ -86,7 +86,7 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 		t.Errorf("Expected operation name 'nix-cleanup', got %s", operation.Name)
 	}
 
-	if operation.RiskLevel != domain.RiskLow {
+	if operation.RiskLevel != domain.RiskLevelType(domain.RiskLevelLowType) {
 		t.Errorf("Expected risk level LOW, got %v", operation.RiskLevel)
 	}
 }
@@ -105,7 +105,7 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 					{
 						Name:        "test-op",
 						Description: "Test operation",
-						RiskLevel:   domain.RiskMedium,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 					},
@@ -203,10 +203,10 @@ func TestMapRiskLevel_Conversions(t *testing.T) {
 		public PublicRiskLevel
 		domain domain.RiskLevelType
 	}{
-		{PublicRiskLow, domain.RiskLow},
-		{PublicRiskMedium, domain.RiskMedium},
-		{PublicRiskHigh, domain.RiskHigh},
-		{PublicRiskCritical, domain.RiskCritical},
+		{PublicRiskLow, domain.RiskLevelType(domain.RiskLevelLowType)},
+		{PublicRiskMedium, domain.RiskLevelType(domain.RiskLevelMediumType)},
+		{PublicRiskHigh, domain.RiskLevelType(domain.RiskLevelHighType)},
+		{PublicRiskCritical, domain.RiskLevelType(domain.RiskLevelCriticalType)},
 	}
 
 	for _, tc := range testCases {

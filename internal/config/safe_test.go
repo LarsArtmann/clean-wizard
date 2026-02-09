@@ -25,27 +25,27 @@ var riskLevelTestCases = []struct {
 	name  string
 	level domain.RiskLevel
 }{
-	{"low risk", domain.RiskLow},
-	{"medium risk", domain.RiskMedium},
-	{"high risk", domain.RiskHigh},
-	{"critical risk", domain.RiskCritical},
+	{"low risk", domain.RiskLevelType(domain.RiskLevelLowType)},
+	{"medium risk", domain.RiskLevelType(domain.RiskLevelMediumType)},
+	{"high risk", domain.RiskLevelType(domain.RiskLevelHighType)},
+	{"critical risk", domain.RiskLevelType(domain.RiskLevelCriticalType)},
 	{"unknown risk", testInvalidRiskUnknown},
 }
 
 var riskLevelTextValues = map[domain.RiskLevel]string{
-	domain.RiskLow:         "LOW",
-	domain.RiskMedium:      "MEDIUM",
-	domain.RiskHigh:        "HIGH",
-	domain.RiskCritical:    "CRITICAL",
+	domain.RiskLevelType(domain.RiskLevelLowType):         "LOW",
+	domain.RiskLevelType(domain.RiskLevelMediumType):      "MEDIUM",
+	domain.RiskLevelType(domain.RiskLevelHighType):        "HIGH",
+	domain.RiskLevelType(domain.RiskLevelCriticalType):    "CRITICAL",
 	testInvalidRiskUnknown: "UNKNOWN",
 }
 
 // riskLevelEmojiValues provides expected emoji values for Icon() method testing.
 var riskLevelEmojiValues = map[domain.RiskLevel]string{
-	domain.RiskLow:         "🟢",
-	domain.RiskMedium:      "🟡",
-	domain.RiskHigh:        "🟠",
-	domain.RiskCritical:    "🔴",
+	domain.RiskLevelType(domain.RiskLevelLowType):         "🟢",
+	domain.RiskLevelType(domain.RiskLevelMediumType):      "🟡",
+	domain.RiskLevelType(domain.RiskLevelHighType):        "🟠",
+	domain.RiskLevelType(domain.RiskLevelCriticalType):    "🔴",
 	testInvalidRiskUnknown: "⚪",
 }
 
@@ -80,10 +80,10 @@ func TestRiskLevel_IsValid(t *testing.T) {
 		level    domain.RiskLevel
 		expected bool
 	}{
-		{"low risk", domain.RiskLow, true},
-		{"medium risk", domain.RiskMedium, true},
-		{"high risk", domain.RiskHigh, true},
-		{"critical risk", domain.RiskCritical, true},
+		{"low risk", domain.RiskLevelType(domain.RiskLevelLowType), true},
+		{"medium risk", domain.RiskLevelType(domain.RiskLevelMediumType), true},
+		{"high risk", domain.RiskLevelType(domain.RiskLevelHighType), true},
+		{"critical risk", domain.RiskLevelType(domain.RiskLevelCriticalType), true},
 		{"unknown risk", testInvalidRiskUnknown, false},
 		{"negative risk", testInvalidRiskNegative, false},
 		{"too high risk", testInvalidRiskTooHigh, false},
@@ -135,7 +135,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLow).
+					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelLowType)).
 					Done()
 			},
 			expectError: false,
@@ -153,7 +153,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLow).
+					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelLowType)).
 					Done()
 			},
 			expectError: false,
@@ -163,7 +163,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskCritical).
+					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelCriticalType)).
 					Done()
 			},
 			expectError: true,
@@ -210,7 +210,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLow)
+					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelLowType))
 			},
 			expectError: false,
 		},
@@ -228,7 +228,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskHigh)
+					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelHighType))
 			},
 			expectError: false,
 		},

@@ -26,7 +26,7 @@ func newBaseNixConfig(safeMode bool) *domain.Config {
 					{
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskLow,
+						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
 						Enabled:     BoolToProfileStatus(true),
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
@@ -56,7 +56,7 @@ func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Confi
 	WithProfileOperationField(cfg, "nix-cleanup", "nix-generations", func(op *domain.CleanupOperation) bool {
 		op.RiskLevel = level
 		// Auto-disable critical operations in unsafe mode
-		if level == domain.RiskCritical && !cfg.SafeMode.IsEnabled() {
+		if level == domain.RiskLevelType(domain.RiskLevelCriticalType) && !cfg.SafeMode.IsEnabled() {
 			op.Enabled = BoolToProfileStatus(false)
 		}
 		return true
@@ -248,7 +248,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 					{
 						Description: "a configuration with critical Nix operation in unsafe mode",
 						Setup: func() (*domain.Config, error) {
-							return withRiskLevel(withGenerations(withOptimize(newBaseNixConfig(false), false), 1), domain.RiskCritical), nil
+							return withRiskLevel(withGenerations(withOptimize(newBaseNixConfig(false), false), 1), domain.RiskLevelType(domain.RiskLevelCriticalType)), nil
 						},
 					},
 				},

@@ -105,8 +105,8 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 			"/Library",
 		},
 		RequireSafeMode: true,
-		MaxRiskLevel:    domain.RiskHigh,
-		BackupRequired:  domain.RiskMedium,
+		MaxRiskLevel:    domain.RiskLevelType(domain.RiskLevelHighType),
+		BackupRequired:  domain.RiskLevelType(domain.RiskLevelMediumType),
 	}
 }
 
