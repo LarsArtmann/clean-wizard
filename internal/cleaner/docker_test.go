@@ -12,33 +12,39 @@ func TestNewDockerCleaner(t *testing.T) {
 		name      string
 		verbose   bool
 		dryRun    bool
-		pruneMode DockerPruneMode
+		pruneMode domain.DockerPruneMode
 	}{
 		{
-			name:      "light mode",
+			name:      "ALL mode",
 			verbose:   false,
 			dryRun:    false,
-			pruneMode: DockerPruneLight,
+			pruneMode: domain.DockerPruneAll,
 		},
 		{
-			name:      "standard mode",
+			name:      "IMAGES mode",
 			verbose:   true,
 			dryRun:    false,
-			pruneMode: DockerPruneStandard,
+			pruneMode: domain.DockerPruneImages,
 		},
 		{
-			name:      "aggressive mode",
+			name:      "CONTAINERS mode",
 			verbose:   false,
 			dryRun:    true,
-			pruneMode: DockerPruneAggressive,
+			pruneMode: domain.DockerPruneContainers,
 		},
 		{
-			name:      "verbose dry-run",
+			name:      "VOLUMES mode",
 			verbose:   true,
 			dryRun:    true,
-			pruneMode: DockerPruneStandard,
+			pruneMode: domain.DockerPruneVolumes,
 		},
-	}
+		{
+			name:      "BUILDS mode",
+			verbose:   false,
+			dryRun:    false,
+			pruneMode: domain.DockerPruneBuilds,
+		},
+		}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -64,7 +70,7 @@ func TestNewDockerCleaner(t *testing.T) {
 }
 
 func TestDockerCleaner_Type(t *testing.T) {
-	cleaner := NewDockerCleaner(false, false, DockerPruneStandard)
+	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 	if cleaner.Type() != domain.OperationTypeDocker {
 		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeDocker)
@@ -72,7 +78,7 @@ func TestDockerCleaner_Type(t *testing.T) {
 }
 
 func TestDockerCleaner_IsAvailable(t *testing.T) {
-	cleaner := NewDockerCleaner(false, false, DockerPruneStandard)
+	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 	available := cleaner.IsAvailable(context.Background())
 
 	// Result depends on Docker installation
@@ -137,7 +143,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewDockerCleaner(false, false, DockerPruneStandard)
+			cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 			err := cleaner.ValidateSettings(tt.settings)
 			if (err != nil) != tt.wantErr {
@@ -148,7 +154,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 }
 
 func TestDockerCleaner_Clean_DryRun(t *testing.T) {
-	cleaner := NewDockerCleaner(false, true, DockerPruneStandard)
+	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
 
 	// Skip test if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {
@@ -178,7 +184,7 @@ func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 }
 
 func TestDockerCleaner_Clean_NoAvailable(t *testing.T) {
-	cleaner := NewDockerCleaner(false, false, DockerPruneLight)
+	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 	// Can't easily test "Docker not available" case without mocking
 	// So we just verify IsAvailable is called
@@ -186,7 +192,7 @@ func TestDockerCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestDockerCleaner_Scan(t *testing.T) {
-	cleaner := NewDockerCleaner(false, false, DockerPruneStandard)
+	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 	result := cleaner.Scan(context.Background())
 
@@ -204,7 +210,7 @@ func TestDockerCleaner_Scan(t *testing.T) {
 }
 
 func TestDockerCleaner_DryRunStrategy(t *testing.T) {
-	cleaner := NewDockerCleaner(false, true, DockerPruneStandard)
+	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
 
 	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "docker")
 }
@@ -212,11 +218,13 @@ func TestDockerCleaner_DryRunStrategy(t *testing.T) {
 func TestDockerCleaner_PruneModes(t *testing.T) {
 	tests := []struct {
 		name      string
-		pruneMode DockerPruneMode
+		pruneMode domain.DockerPruneMode
 	}{
-		{"light mode", DockerPruneLight},
-		{"standard mode", DockerPruneStandard},
-		{"aggressive mode", DockerPruneAggressive},
+		{"ALL mode", domain.DockerPruneAll},
+		{"IMAGES mode", domain.DockerPruneImages},
+		{"CONTAINERS mode", domain.DockerPruneContainers},
+		{"VOLUMES mode", domain.DockerPruneVolumes},
+		{"BUILDS mode", domain.DockerPruneBuilds},
 	}
 
 	for _, tt := range tests {
@@ -230,16 +238,9 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 	}
 }
 
-func TestDockerPruneMode_String(t *testing.T) {
-	TestTypeString(t, "DockerPruneMode", []DockerPruneMode{
-		DockerPruneLight,
-		DockerPruneStandard,
-		DockerPruneAggressive,
-	})
-}
 
 func TestDockerCleaner_Clean_Verbose(t *testing.T) {
-	cleaner := NewDockerCleaner(true, false, DockerPruneStandard)
+	cleaner := NewDockerCleaner(true, false, domain.DockerPruneAll)
 
 	// Skip if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {
@@ -254,7 +255,7 @@ func TestDockerCleaner_Clean_Verbose(t *testing.T) {
 }
 
 func TestDockerCleaner_Clean_Aggressive(t *testing.T) {
-	cleaner := NewDockerCleaner(false, true, DockerPruneAggressive)
+	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
 
 	// Skip if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {

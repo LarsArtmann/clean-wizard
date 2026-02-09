@@ -138,7 +138,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				assert.True(t, pruneMode.IsValid(), "DockerPruneMode should be valid")
 
 				// Create docker cleaner with enum
-				dockerCleaner := cleaner.NewDockerCleaner(false, true, cleaner.DockerPruneMode(pruneMode.String()))
+				dockerCleaner := cleaner.NewDockerCleaner(false, true, pruneMode)
 				assert.NotNil(t, dockerCleaner, "Docker cleaner should be created")
 
 				// Test cleaner availability
@@ -472,7 +472,7 @@ func TestEnumErrorMessages_ThroughWorkflow(t *testing.T) {
 	require.NoError(t, err, "Should parse valid config")
 
 	// Test with cleaner
-	dockerCleaner := cleaner.NewDockerCleaner(false, true, cleaner.DockerPruneMode(validDockerSettings.PruneMode.String()))
+	dockerCleaner := cleaner.NewDockerCleaner(false, true, validDockerSettings.PruneMode)
 	if dockerCleaner.IsAvailable(ctx) {
 		result := dockerCleaner.Clean(ctx)
 		// Should complete without crashing

@@ -28,20 +28,13 @@ const (
 type DockerCleaner struct {
 	verbose   bool
 	dryRun    bool
-	pruneMode DockerPruneMode
+	pruneMode domain.DockerPruneMode
 }
 
-// DockerPruneMode represents Docker prune mode.
-type DockerPruneMode string
 
-const (
-	DockerPruneLight      DockerPruneMode = "light"      // docker system prune -f
-	DockerPruneStandard   DockerPruneMode = "standard"   // docker system prune -af
-	DockerPruneAggressive DockerPruneMode = "aggressive" // docker system prune -af --volumes
-)
 
 // NewDockerCleaner creates Docker cleaner.
-func NewDockerCleaner(verbose, dryRun bool, pruneMode DockerPruneMode) *DockerCleaner {
+func NewDockerCleaner(verbose, dryRun bool, pruneMode domain.DockerPruneMode) *DockerCleaner {
 	return &DockerCleaner{
 		verbose:   verbose,
 		dryRun:    dryRun,
@@ -203,12 +196,16 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 		// Estimate cache sizes based on typical usage
 		var totalBytes int64
 		switch dc.pruneMode {
-		case DockerPruneLight:
-			totalBytes = int64(100 * 1024 * 1024) // Estimate 100MB
-		case DockerPruneStandard:
-			totalBytes = int64(500 * 1024 * 1024) // Estimate 500MB
-		case DockerPruneAggressive:
-			totalBytes = int64(2 * 1024 * 1024 * 1024) // Estimate 2GB
+		case domain.DockerPruneAll:
+			totalBytes = int64(2 * 1024 * 1024 * 1024) // Estimate 2GB for everything
+		case domain.DockerPruneImages:
+			totalBytes = int64(500 * 1024 * 1024) // Estimate 500MB for images
+		case domain.DockerPruneContainers:
+			totalBytes = int64(100 * 1024 * 1024) // Estimate 100MB for containers
+		case domain.DockerPruneVolumes:
+			totalBytes = int64(100 * 1024 * 1024) // Estimate 100MB for volumes
+		case domain.DockerPruneBuilds:
+			totalBytes = int64(500 * 1024 * 1024) // Estimate 500MB for build cache
 		}
 
 		itemsRemoved := 1
@@ -245,22 +242,34 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 	var args []string
 
 	switch dc.pruneMode {
-	case DockerPruneLight:
-		args = []string{"system", "prune", "-f"}
-		if dc.verbose {
-			fmt.Println("  Running light prune: docker system prune -f")
-		}
-
-	case DockerPruneStandard:
-		args = []string{"system", "prune", "-af"}
-		if dc.verbose {
-			fmt.Println("  Running standard prune: docker system prune -af")
-		}
-
-	case DockerPruneAggressive:
+	case domain.DockerPruneAll:
 		args = []string{"system", "prune", "-af", "--volumes"}
 		if dc.verbose {
-			fmt.Println("  Running aggressive prune: docker system prune -af --volumes")
+			fmt.Println("  Running full prune: docker system prune -af --volumes")
+		}
+
+	case domain.DockerPruneImages:
+		args = []string{"image", "prune", "-af"}
+		if dc.verbose {
+			fmt.Println("  Running image prune: docker image prune -af")
+		}
+
+	case domain.DockerPruneContainers:
+		args = []string{"container", "prune", "-f"}
+		if dc.verbose {
+			fmt.Println("  Running container prune: docker container prune -f")
+		}
+
+	case domain.DockerPruneVolumes:
+		args = []string{"volume", "prune", "-f"}
+		if dc.verbose {
+			fmt.Println("  Running volume prune: docker volume prune -f")
+		}
+
+	case domain.DockerPruneBuilds:
+		args = []string{"builder", "prune", "-af"}
+		if dc.verbose {
+			fmt.Println("  Running builder prune: docker builder prune -af")
 		}
 
 	default:

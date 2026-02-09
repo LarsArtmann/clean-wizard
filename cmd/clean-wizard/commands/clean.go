@@ -115,7 +115,7 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 			Name:        "Docker",
 			Description: "Clean Docker images, containers, and volumes",
 			Icon:        "🐳",
-			Available:   cleaner.NewDockerCleaner(false, false, cleaner.DockerPruneStandard).IsAvailable(ctx),
+			Available:   cleaner.NewDockerCleaner(false, false, domain.DockerPruneAll).IsAvailable(ctx),
 		},
 		{
 			Type:        CleanerTypeSystemCache,
@@ -513,7 +513,7 @@ func runGenericCleaner(ctx context.Context, verbose, dryRun bool, factory func(b
 }
 
 // runCleanerWithConfig executes a cleaner that requires a single configuration parameter.
-// T is the cleaner configuration type (e.g., domain.HomebrewMode, cleaner.DockerPruneMode).
+// T is the cleaner configuration type (e.g., domain.HomebrewMode, domain.DockerPruneMode).
 func runCleanerWithConfig[T any](
 	ctx context.Context,
 	verbose, dryRun bool,
@@ -531,7 +531,7 @@ func homebrewCleanerFactory(v, d bool, mode domain.HomebrewMode) cleaner.Cleaner
 }
 
 // dockerCleanerFactory creates a Docker cleaner with the specified prune mode.
-func dockerCleanerFactory(v, d bool, pruneMode cleaner.DockerPruneMode) cleaner.Cleaner {
+func dockerCleanerFactory(v, d bool, pruneMode domain.DockerPruneMode) cleaner.Cleaner {
 	return cleaner.NewDockerCleaner(v, d, pruneMode)
 }
 
@@ -604,7 +604,7 @@ func runBuildCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cle
 
 // runDockerCleaner executes the Docker cleaner.
 func runDockerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runCleanerWithConfig[cleaner.DockerPruneMode](ctx, verbose, dryRun, dockerCleanerFactory, cleaner.DockerPruneStandard)
+	return runCleanerWithConfig[domain.DockerPruneMode](ctx, verbose, dryRun, dockerCleanerFactory, domain.DockerPruneAll)
 }
 
 // runSystemCacheCleaner executes the System Cache cleaner.
