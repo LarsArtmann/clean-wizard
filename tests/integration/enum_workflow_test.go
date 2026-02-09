@@ -291,7 +291,7 @@ operations:
 				}
 				err := pruneMode.UnmarshalYAML(node)
 				assert.Error(t, err, "Should error on invalid DockerPruneMode")
-				assert.Contains(t, err.Error(), "valid options", "Error should list valid options")
+				assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
 			}
 
 		case "go-packages":
@@ -305,7 +305,7 @@ operations:
 				}
 				err := mode.UnmarshalYAML(node)
 				assert.Error(t, err, "Should error on invalid CacheCleanupMode")
-				assert.Contains(t, err.Error(), "valid options", "Error should list valid options")
+				assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
 			}
 
 		case "system-cache":
@@ -318,7 +318,7 @@ operations:
 						if str == "INVALID_TYPE" {
 							err := cacheType.UnmarshalYAML(node)
 							assert.Error(t, err, "Should error on invalid CacheType")
-							assert.Contains(t, err.Error(), "valid options", "Error should list valid options")
+							assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
 						}
 					}
 				}
@@ -457,20 +457,22 @@ func TestEnumErrorMessages_ThroughWorkflow(t *testing.T) {
 
 	ctx := context.Background()
 
-	// Test invalid Docker prune mode
+	// Test invalid Docker prune mode - should error during YAML unmarshaling
 	invalidConfig := `prune_mode: "INVALID"`
 	var dockerSettings domain.DockerSettings
 	err := yaml.Unmarshal([]byte(invalidConfig), &dockerSettings)
-	require.NoError(t, err, "Should parse config")
+	assert.Error(t, err, "Should error on invalid DockerPruneMode during unmarshaling")
+	assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
+	assert.Contains(t, err.Error(), "INVALID", "Error should show invalid value")
 
-	// Verify error message
-	if !dockerSettings.PruneMode.IsValid() {
-		assert.Contains(t, dockerSettings.PruneMode.String(), "UNKNOWN",
-			"Invalid enum should show UNKNOWN")
-	}
+	// Test valid enum value with cleaner
+	validConfig := `prune_mode: "ALL"`
+	var validDockerSettings domain.DockerSettings
+	err = yaml.Unmarshal([]byte(validConfig), &validDockerSettings)
+	require.NoError(t, err, "Should parse valid config")
 
 	// Test with cleaner
-	dockerCleaner := cleaner.NewDockerCleaner(false, true, cleaner.DockerPruneMode(invalidConfig))
+	dockerCleaner := cleaner.NewDockerCleaner(false, true, cleaner.DockerPruneMode(validDockerSettings.PruneMode.String()))
 	if dockerCleaner.IsAvailable(ctx) {
 		result := dockerCleaner.Clean(ctx)
 		// Should complete without crashing
