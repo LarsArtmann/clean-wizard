@@ -177,7 +177,7 @@ func (dc *DockerCleaner) scanUnusedContainers(ctx context.Context) result.Result
 
 // scanUnusedVolumes scans for unused Docker volumes.
 func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]domain.ScanItem] {
-	cmd := exec.CommandContext(ctx, "docker", "volume", "ls", "-q")
+	cmd := dc.execWithTimeout(ctx, "docker", "volume", "ls", "-q")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to scan volumes: %w", err))

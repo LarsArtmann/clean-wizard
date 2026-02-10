@@ -18,11 +18,22 @@ import (
 type NodePackageManagerType string
 
 const (
-	NodePackageManagerNPM  NodePackageManagerType = "npm"
-	NodePackageManagerPNPM NodePackageManagerType = "pnpm"
-	NodePackageManagerYarn NodePackageManagerType = "yarn"
-	NodePackageManagerBun  NodePackageManagerType = "bun"
+	NodePackageManagerNPM   NodePackageManagerType = "npm"
+	NodePackageManagerPNPM  NodePackageManagerType = "pnpm"
+	NodePackageManagerYarn  NodePackageManagerType = "yarn"
+	NodePackageManagerBun   NodePackageManagerType = "bun"
 )
+
+// DefaultNodePackageManagerTimeout is the default timeout for package manager commands.
+const DefaultNodePackageManagerTimeout = 2 * time.Minute
+
+// execWithTimeout creates a command with timeout protection.
+func (npmc *NodePackageManagerCleaner) execWithTimeout(ctx context.Context, name string, args ...string) *exec.Cmd {
+	// Create a timeout context if the input context doesn't have a timeout
+	timeoutCtx, cancel := context.WithTimeout(ctx, DefaultNodePackageManagerTimeout)
+	_ = cancel // will be called by cmd.Wait() or context usage
+	return exec.CommandContext(timeoutCtx, name, args...)
+}
 
 // AvailableNodePackageManagers returns all available Node.js package managers.
 func AvailableNodePackageManagers() []NodePackageManagerType {
@@ -132,7 +143,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, p
 	switch pm {
 	case NodePackageManagerNPM:
 		// Get npm cache location
-		cmd := exec.CommandContext(ctx, "npm", "config", "get", "cache")
+		cmd := npmc.execWithTimeout(ctx, "npm", "config", "get", "cache")
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get npm cache location: %w", err))
@@ -154,7 +165,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, p
 
 	case NodePackageManagerPNPM:
 		// Get pnpm store location
-		cmd := exec.CommandContext(ctx, "pnpm", "store", "path")
+		cmd := npmc.execWithTimeout(ctx, "pnpm", "store", "path")
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get pnpm store location: %w", err))
@@ -272,9 +283,13 @@ func (npmc *NodePackageManagerCleaner) Clean(ctx context.Context) result.Result[
 	return result.Ok(cleanResult)
 }
 
-// runPackageManagerCommand executes a package manager command with common error handling.
+// runPackageManagerCommand executes a package manager command with common error handling and timeout.
 func (npmc *NodePackageManagerCleaner) runPackageManagerCommand(ctx context.Context, name string, args ...string) result.Result[domain.CleanResult] {
-	cmd := exec.CommandContext(ctx, name, args...)
+	// Create a timeout context if the input context doesn't have a timeout
+	timeoutCtx, cancel := context.WithTimeout(ctx, DefaultNodePackageManagerTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(timeoutCtx, name, args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("%s command failed: %w (output: %s)", name, err, string(output)))

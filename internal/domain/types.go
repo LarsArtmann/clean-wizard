@@ -173,8 +173,8 @@ func (sr ScanResult) Validate() error {
 
 // SizeEstimate represents an honest size estimate, handling cases where exact size is unknown.
 type SizeEstimate struct {
-	Known   uint64                  `json:"known"`
-	Status  SizeEstimateStatusType `json:"status"`
+	Known  uint64                 `json:"known"`
+	Status SizeEstimateStatusType `json:"status"`
 }
 
 // Value returns the known value, or 0 if unknown.

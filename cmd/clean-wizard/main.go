@@ -10,8 +10,12 @@ import (
 func main() {
 	rootCmd := commands.NewRootCmd()
 
-	// Add only the clean command
+	// Add all CLI commands
 	rootCmd.AddCommand(commands.NewCleanCommand())
+	rootCmd.AddCommand(commands.NewScanCommand())
+	rootCmd.AddCommand(commands.NewInitCommand())
+	rootCmd.AddCommand(commands.NewProfileCommand())
+	rootCmd.AddCommand(commands.NewConfigCommand())
 
 	// Handle command execution
 	if err := rootCmd.Execute(); err != nil {

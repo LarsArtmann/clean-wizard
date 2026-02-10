@@ -146,14 +146,14 @@ func TestSizeEstimateStatusType_UnmarshalJSON(t *testing.T) {
 			wantErr:   false,
 		},
 		{
-			name:    "invalid value fails",
+			name:      "invalid value fails",
 			jsonInput: `"INVALID"`,
-			wantErr:  true,
+			wantErr:   true,
 		},
 		{
-			name:    "malformed JSON fails",
+			name:      "malformed JSON fails",
 			jsonInput: `invalid`,
-			wantErr:  true,
+			wantErr:   true,
 		},
 	}
 

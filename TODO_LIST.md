@@ -117,16 +117,17 @@ These commands can HANG FOREVER in production without timeout protection:
 
 **Current State:**
 - USAGE.md documents 5 commands: clean, scan, init, profile, config
-- Only `clean` command implemented (root.go + clean.go)
-- 80% of documented commands not implemented
+- ✅ ALL 5 COMMANDS NOW IMPLEMENTED
+- 100% alignment between documentation and implementation
 
-**Missing Commands:**
-1. `scan` - No scan.go file
-2. `init` - No init.go file
-3. `profile` - No profile.go file
-4. `config` - No config.go file
+**Implementation Status:**
+1. ✅ `clean` - Full implementation with TUI, dry-run, preset modes
+2. ✅ `scan` - Scans for cleanable items, shows size estimates
+3. ✅ `init` - Interactive setup wizard, minimal mode support
+4. ✅ `profile` - Subcommands: list, show, create, delete
+5. ✅ `config` - Subcommands: show, edit, validate, reset
 
-**Required Action**: Implement missing CLI commands or remove from documentation
+**Verification**: `go build ./cmd/clean-wizard/...` succeeds, all --help commands work
 
 ### 🚨 CRITICAL - CLEANER INTERFACE COMPLIANCE ISSUES
 
@@ -417,11 +418,12 @@ These commands can HANG FOREVER in production without timeout protection:
     - **Verification**: Check if langversionmanager.go performs actual cleanup
 
 36. **Implement Missing CLI Commands** (HIGH impact, HIGH effort)
-    - **Status**: NOT_STARTED
+    - **Status**: ✅ COMPLETED & VERIFIED
     - **Description**: Implement scan, init, profile, config commands (4 missing commands)
     - **Target**: `cmd/clean-wizard/commands/` (scan.go, init.go, profile.go, config.go)
     - **Impact**: Closes 80% gap between documentation and implementation
-    - **Verification**: Check if all 5 commands exist and work
+    - **Verification**: All 5 commands exist, build succeeds, --help works for root and subcommands
+    - **Details**: scan (2 flags), init (2 flags), profile (4 subcommands), config (4 subcommands)
 
 37. **Improve Size Reporting Across All Cleaners** (HIGH impact, MEDIUM effort)
     - **Status**: NOT_STARTED
@@ -606,9 +608,13 @@ These commands can HANG FOREVER in production without timeout protection:
    - cargo.go:177 - `cargo-cache --autoclean` (no timeout)
    - Multiple other commands without timeout protection
 
-2. **CLI Command Gap** - 🔴 VERIFIED
-   - Only clean.go exists in cmd/clean-wizard/commands/
-   - scan, init, profile, config missing (80% gap)
+2. **CLI Command Gap** - ✅ VERIFIED FIXED
+   - All 5 commands now implemented: clean, scan, init, profile, config
+   - scan.go:13 - NewScanCommand() implemented
+   - init.go:12 - NewInitCommand() implemented
+   - profile.go:13 - NewProfileCommand() with 4 subcommands
+   - config.go:14 - NewConfigCommand() with 4 subcommands
+   - Build succeeds, all --help commands verified
 
 3. **Language Version Manager NO-OP** - 🔴 VERIFIED
    - Explicit NO-OP in langversionmanager.go:133-154

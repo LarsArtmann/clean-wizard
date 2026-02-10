@@ -33,20 +33,20 @@ var riskLevelTestCases = []struct {
 }
 
 var riskLevelTextValues = map[domain.RiskLevel]string{
-	domain.RiskLevelType(domain.RiskLevelLowType):         "LOW",
-	domain.RiskLevelType(domain.RiskLevelMediumType):      "MEDIUM",
-	domain.RiskLevelType(domain.RiskLevelHighType):        "HIGH",
-	domain.RiskLevelType(domain.RiskLevelCriticalType):    "CRITICAL",
-	testInvalidRiskUnknown: "UNKNOWN",
+	domain.RiskLevelType(domain.RiskLevelLowType):      "LOW",
+	domain.RiskLevelType(domain.RiskLevelMediumType):   "MEDIUM",
+	domain.RiskLevelType(domain.RiskLevelHighType):     "HIGH",
+	domain.RiskLevelType(domain.RiskLevelCriticalType): "CRITICAL",
+	testInvalidRiskUnknown:                             "UNKNOWN",
 }
 
 // riskLevelEmojiValues provides expected emoji values for Icon() method testing.
 var riskLevelEmojiValues = map[domain.RiskLevel]string{
-	domain.RiskLevelType(domain.RiskLevelLowType):         "🟢",
-	domain.RiskLevelType(domain.RiskLevelMediumType):      "🟡",
-	domain.RiskLevelType(domain.RiskLevelHighType):        "🟠",
-	domain.RiskLevelType(domain.RiskLevelCriticalType):    "🔴",
-	testInvalidRiskUnknown: "⚪",
+	domain.RiskLevelType(domain.RiskLevelLowType):      "🟢",
+	domain.RiskLevelType(domain.RiskLevelMediumType):   "🟡",
+	domain.RiskLevelType(domain.RiskLevelHighType):     "🟠",
+	domain.RiskLevelType(domain.RiskLevelCriticalType): "🔴",
+	testInvalidRiskUnknown:                             "⚪",
 }
 
 // testRiskLevelMethod is a helper function that tests RiskLevel methods with a value map.
