@@ -12,7 +12,7 @@ func TestNewLanguageVersionManagerCleaner(t *testing.T) {
 		name         string
 		verbose      bool
 		dryRun       bool
-		managerTypes []LangVersionManagerType
+		managerTypes []domain.VersionManagerType
 	}{
 		{
 			name:         "all managers",
@@ -24,19 +24,19 @@ func TestNewLanguageVersionManagerCleaner(t *testing.T) {
 			name:         "single manager",
 			verbose:      true,
 			dryRun:       false,
-			managerTypes: []LangVersionManagerType{LangVersionManagerNVM},
+			managerTypes: []domain.VersionManagerType{domain.VersionManagerNvm},
 		},
 		{
 			name:         "dry-run mode",
 			verbose:      false,
 			dryRun:       true,
-			managerTypes: []LangVersionManagerType{LangVersionManagerPYENV},
+			managerTypes: []domain.VersionManagerType{domain.VersionManagerPyenv},
 		},
 		{
 			name:         "empty managers (should use all)",
 			verbose:      false,
 			dryRun:       false,
-			managerTypes: []LangVersionManagerType{},
+			managerTypes: []domain.VersionManagerType{},
 		},
 	}
 
@@ -216,21 +216,15 @@ func TestLanguageVersionManagerCleaner_DryRunStrategy(t *testing.T) {
 }
 
 func TestAvailableLangVersionManagers(t *testing.T) {
-	expectedManagers := []LangVersionManagerType{
-		LangVersionManagerNVM,
-		LangVersionManagerPYENV,
-		LangVersionManagerRBENV,
+	expectedManagers := []domain.VersionManagerType{
+		domain.VersionManagerNvm,
+		domain.VersionManagerPyenv,
+		domain.VersionManagerRbenv,
 	}
 	availableItemsTestHelper(t, expectedManagers, AvailableLangVersionManagers, "AvailableLangVersionManagers")
 }
 
-func TestLangVersionManagerType_String(t *testing.T) {
-	TestTypeString(t, "LangVersionManagerType", []LangVersionManagerType{
-		LangVersionManagerNVM,
-		LangVersionManagerPYENV,
-		LangVersionManagerRBENV,
-	})
-}
+
 
 func TestLanguageVersionManagerCleaner_Verbose(t *testing.T) {
 	cleaner := NewLanguageVersionManagerCleaner(true, false, AvailableLangVersionManagers())
@@ -242,14 +236,14 @@ func TestLanguageVersionManagerCleaner_Verbose(t *testing.T) {
 }
 
 func TestLanguageVersionManagerCleaner_SingleManager(t *testing.T) {
-	cleaner := NewLanguageVersionManagerCleaner(false, false, []LangVersionManagerType{LangVersionManagerNVM})
+	cleaner := NewLanguageVersionManagerCleaner(false, false, []domain.VersionManagerType{domain.VersionManagerNvm})
 
 	if len(cleaner.managerTypes) != 1 {
 		t.Errorf("managerTypes count = %d, want 1", len(cleaner.managerTypes))
 	}
 
-	if cleaner.managerTypes[0] != LangVersionManagerNVM {
-		t.Errorf("managerTypes[0] = %v, want %v", cleaner.managerTypes[0], LangVersionManagerNVM)
+	if cleaner.managerTypes[0] != domain.VersionManagerNvm {
+		t.Errorf("managerTypes[0] = %v, want %v", cleaner.managerTypes[0], domain.VersionManagerNvm)
 	}
 }
 

@@ -14,29 +14,20 @@ import (
 type LanguageVersionManagerCleaner struct {
 	verbose      bool
 	dryRun       bool
-	managerTypes []LangVersionManagerType
+	managerTypes []domain.VersionManagerType
 }
 
-// LangVersionManagerType represents different language version manager types.
-type LangVersionManagerType string
-
-const (
-	LangVersionManagerNVM   LangVersionManagerType = "nvm"
-	LangVersionManagerPYENV LangVersionManagerType = "pyenv"
-	LangVersionManagerRBENV LangVersionManagerType = "rbenv"
-)
-
 // AvailableLangVersionManagers returns all available language version manager types.
-func AvailableLangVersionManagers() []LangVersionManagerType {
-	return []LangVersionManagerType{
-		LangVersionManagerNVM,
-		LangVersionManagerPYENV,
-		LangVersionManagerRBENV,
+func AvailableLangVersionManagers() []domain.VersionManagerType {
+	return []domain.VersionManagerType{
+		domain.VersionManagerNvm,
+		domain.VersionManagerPyenv,
+		domain.VersionManagerRbenv,
 	}
 }
 
 // NewLanguageVersionManagerCleaner creates language version manager cleaner.
-func NewLanguageVersionManagerCleaner(verbose, dryRun bool, managerTypes []LangVersionManagerType) *LanguageVersionManagerCleaner {
+func NewLanguageVersionManagerCleaner(verbose, dryRun bool, managerTypes []domain.VersionManagerType) *LanguageVersionManagerCleaner {
 	// Default manager types to all available
 	if len(managerTypes) == 0 {
 		managerTypes = AvailableLangVersionManagers()
@@ -72,7 +63,7 @@ func (lvmc *LanguageVersionManagerCleaner) ValidateSettings(settings *domain.Ope
 
 // Scan scans for language version manager installations.
 func (lvmc *LanguageVersionManagerCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	return scanWithIterator[LangVersionManagerType](
+	return scanWithIterator[domain.VersionManagerType](
 		ctx,
 		lvmc.managerTypes,
 		lvmc.scanLangVersionManager,
@@ -90,11 +81,11 @@ func (lvmc *LanguageVersionManagerCleaner) scanVersionDir(versionsDir, managerNa
 }
 
 // scanLangVersionManager scans installations for a specific language version manager.
-func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Context, managerType LangVersionManagerType, homeDir string) result.Result[[]domain.ScanItem] {
+func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Context, managerType domain.VersionManagerType, homeDir string) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	switch managerType {
-	case LangVersionManagerNVM:
+	case domain.VersionManagerNvm:
 		nvmVersions := filepath.Join(homeDir, ".nvm", "versions", "node")
 		scannedItems, err := lvmc.scanVersionDir(nvmVersions, "NVM")
 		if err != nil {
@@ -102,7 +93,7 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 		}
 		items = append(items, scannedItems...)
 
-	case LangVersionManagerPYENV:
+	case domain.VersionManagerPyenv:
 		pyenvVersions := filepath.Join(homeDir, ".pyenv", "versions")
 		scannedItems, err := lvmc.scanVersionDir(pyenvVersions, "Pyenv")
 		if err != nil {
@@ -110,7 +101,7 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 		}
 		items = append(items, scannedItems...)
 
-	case LangVersionManagerRBENV:
+	case domain.VersionManagerRbenv:
 		rbenvVersions := filepath.Join(homeDir, ".rbenv", "versions")
 		scannedItems, err := lvmc.scanVersionDir(rbenvVersions, "Rbenv")
 		if err != nil {
@@ -124,7 +115,7 @@ func (lvmc *LanguageVersionManagerCleaner) scanLangVersionManager(ctx context.Co
 
 // Clean removes language version manager installations.
 func (lvmc *LanguageVersionManagerCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
-	return cleanWithIterator[LangVersionManagerType](
+	return cleanWithIterator[domain.VersionManagerType](
 		ctx,
 		"language version manager cleaner",
 		lvmc.IsAvailable,
@@ -136,7 +127,7 @@ func (lvmc *LanguageVersionManagerCleaner) Clean(ctx context.Context) result.Res
 }
 
 // cleanLangVersionManager cleans installations for a specific language version manager.
-func (lvmc *LanguageVersionManagerCleaner) cleanLangVersionManager(ctx context.Context, managerType LangVersionManagerType, homeDir string) result.Result[domain.CleanResult] {
+func (lvmc *LanguageVersionManagerCleaner) cleanLangVersionManager(ctx context.Context, managerType domain.VersionManagerType, homeDir string) result.Result[domain.CleanResult] {
 	// This is a NO-OP by default to avoid destructive behavior
 	// In production, you would:
 	// 1. Detect currently active version

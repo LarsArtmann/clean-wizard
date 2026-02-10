@@ -521,13 +521,13 @@ func nodeManagerFactory(v, d bool, managers []domain.PackageManagerType) cleaner
 }
 
 // runCleanerWithLangVersionManagers executes the Language Version Manager cleaner.
-func runCleanerWithLangVersionManagers(ctx context.Context, verbose, dryRun bool, managers []cleaner.LangVersionManagerType) (domain.CleanResult, error) {
+func runCleanerWithLangVersionManagers(ctx context.Context, verbose, dryRun bool, managers []domain.VersionManagerType) (domain.CleanResult, error) {
 	return runManagerCleaner(ctx, verbose, dryRun, managers, langVersionManagerFactory)
 }
 
 // langVersionManagerFactory is a factory function for Language Version Managers.
 // This adapter bridges the type gap between *LanguageVersionManagerCleaner and cleaner.Cleaner.
-func langVersionManagerFactory(v, d bool, managers []cleaner.LangVersionManagerType) cleaner.Cleaner {
+func langVersionManagerFactory(v, d bool, managers []domain.VersionManagerType) cleaner.Cleaner {
 	return cleaner.NewLanguageVersionManagerCleaner(v, d, managers)
 }
 
