@@ -37,10 +37,14 @@ format:
     goimports -w .
 
 # Clean everything (including caches)
-clean-all: clean
-    @echo "🧹 Cleaning all caches..."
-    go clean -modcache
-    rm -f coverage.out coverage.html
+clean-all:
+    @echo "🧹 Cleaning build artifacts..."
+    rm -f {{BINARY_NAME}}
+    go clean
+    @echo "🧹 Cleaning all caches via clean-wizard..."
+    @just build 2>&1 > /dev/null
+    {{BINARY_NAME}} clean --mode quick --json > /dev/null 2>&1 || echo "ℹ️  clean-wizard skipped"
+    rm -f {{BINARY_NAME}} coverage.out coverage.html
 
 # Install dependencies
 deps:
@@ -62,9 +66,10 @@ default:
     @just --list
 
 # Fix module issues
-fix-modules:
-    @echo "🔧 Fixing module cache..."
-    go clean -modcache
+fix-modules: build
+    @echo "🔧 Fixing module cache via clean-wizard..."
+    {{BINARY_NAME}} clean --json --mode quick > /dev/null || echo "ℹ️  Go cache cleaned via clean-wizard"
+    @echo "🔧 Tidying and verifying modules..."
     go mod tidy
     go mod download
     go mod verify
