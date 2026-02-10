@@ -85,8 +85,10 @@ graph TD
 ### PHASE 1: P0 CRITICAL FIXES (Fix NOW - 60 minutes total)
 
 #### MT1.1: Fix line 169 - ValidateSettings test (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 165-180
 # Line 169: Change `NewSystemCacheCleaner(false, false, "30d")` to `NewSystemCacheCleaner(false, false, "30d", nil)`
@@ -105,8 +107,10 @@ This was missed during SystemCache enum refactor from string to int enum.
 ---
 
 #### MT1.2: Fix line 183 - Clean_DryRun test (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 180-195
 # Line 183: Change `NewSystemCacheCleaner(false, true, "30d")` to `NewSystemCacheCleaner(false, true, "30d", nil)`
@@ -125,8 +129,10 @@ This was missed during SystemCache enum refactor from string to int enum.
 ---
 
 #### MT1.3: Fix line 216 - Clean_Aggressive test (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 210-230
 # Line 216: Change `NewSystemCacheCleaner(true, false, "30d")` to `NewSystemCacheCleaner(true, false, "30d", nil)`
@@ -145,8 +151,10 @@ This was missed during SystemCache enum refactor from string to int enum.
 ---
 
 #### MT1.4: Fix line 237 - ValidateSettings invalid cache test (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 230-245
 # Line 237: Change `NewSystemCacheCleaner(false, false, "30d")` to `NewSystemCacheCleaner(false, false, "30d", nil)`
@@ -165,8 +173,10 @@ This was missed during SystemCache enum refactor from string to int enum.
 ---
 
 #### MT1.5: Fix line 256 - Clean_MultiCacheType test (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 245-265
 # Line 256: Change `NewSystemCacheCleaner(false, true, "30d")` to `NewSystemCacheCleaner(false, true, "30d", nil)`
@@ -185,8 +195,10 @@ This was missed during SystemCache enum refactor from string to int enum.
 ---
 
 #### MT1.6: Fix line 298 - ParseDuration test (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 290-315
 # Line 298: Change `NewSystemCacheCleaner(false, false, tt.duration)` to `NewSystemCacheCleaner(false, false, tt.duration, nil)`
@@ -205,8 +217,10 @@ This was missed during SystemCache enum refactor from string to int enum.
 ---
 
 #### MT1.7: Fix line 319 - IsMacOS test (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 315-327
 # Line 319: Change `NewSystemCacheCleaner(false, false, "30d")` to `NewSystemCacheCleaner(false, false, "30d", nil)`
@@ -225,8 +239,10 @@ This was missed during SystemCache enum refactor from string to int enum.
 ---
 
 #### MT1.8: Remove TestAvailableSystemCacheTypes (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 264-272
 # Delete entire function (lines 264-272)
@@ -248,8 +264,10 @@ Lines 264-272 removed.
 ---
 
 #### MT1.9: Remove TestSystemCacheType_String (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Read lines 274-281
 # Delete entire function (lines 274-281)
@@ -273,8 +291,10 @@ Lines 274-281 removed.
 ---
 
 #### MT1.10: Run full test suite (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 go test ./internal/cleaner/... -v 2>&1 | tail -30
 git add internal/cleaner/systemcache_test.go
@@ -294,8 +314,10 @@ git push
 ### PHASE 2: P1 HIGH IMPROVEMENTS (Do today - 90 minutes total)
 
 #### MT2.1: Add TestStringer helper (10 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/testing_helpers.go  # Read entire file
 # Add at end (after line 78) the TestStringer function
@@ -318,8 +340,10 @@ Added generic function for String() method testing with struct-based cases.
 ---
 
 #### MT2.2: Test CacheType.String (10 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 grep -r "CacheType.String()" internal/domain/...  # Check if tests exist
 # If not, create internal/domain/cache_type_test.go with TestCacheType_String
@@ -339,8 +363,10 @@ HOMEBREW, PIP, NPM, YARN, CCACHE, UNKNOWN.
 ---
 
 #### MT2.3: Clean TODO tracking (10 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 grep -rn "✅.*TrimWhitespaceField\|✅.*error detail" docs/
 # Find and fix all false completion claims
@@ -359,8 +385,10 @@ document as PENDING/NOT IMPLEMENTED.
 ---
 
 #### MT2.4: Test AvailableCacheTypes (10 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 view internal/cleaner/systemcache_test.go  # Find good location
 # Add new test function TestSystemCache_AvailableCacheTypes
@@ -385,8 +413,10 @@ git push
 ### PHASE 3: P2 MEDIUM ENHANCEMENTS (This week - 45 minutes total)
 
 #### MT3.3: Pre-commit hook (actual implementation - 10 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/sh
@@ -422,8 +452,10 @@ SystemCache enum refactor that left tests unfixed.
 ---
 
 #### MT3.4: Refactoring checklist (10 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 mkdir -p docs/development
 write docs/development/REFACTORING_CHECKLIST.md
@@ -449,8 +481,10 @@ git push
 ### PHASE 4: VERIFICATION (Final - 10 minutes)
 
 #### MT4.1: Comprehensive test run (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 go test ./... 2>&1 | tail -20
 go test ./... -race 2>&1 | tail -20
@@ -473,8 +507,10 @@ Total work: 16 commits across 4 phases.
 ---
 
 #### MT4.2: Execution summary (5 minutes)
+
 **Status:** ⏳ PENDING
 **Command:**
+
 ```bash
 write docs/planning/2026-02-10_10-51-EXECUTION_SUMMARY.md
 git add docs/planning/2026-02-10_10-51-EXECUTION_SUMMARY.md
@@ -496,29 +532,29 @@ git push
 
 ## MICRO-TASK TABLE
 
-| ID | Description | Phase | Priority | Effort | Status |
-|----|-------------|-------|----------|--------|--------|
-| MT0.0 | Write brutal assessment | 0 | CRITICAL | 10m | ✅ Done |
-| MT0.1 | Write comprehensive plan | 0 | CRITICAL | 10m | ✅ Done |
-| MT0.2 | Write micro-task breakdown | 0 | CRITICAL | 10m | ✅ Done |
-| MT1.1 | Fix line 169 ValidateSettings | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.2 | Fix line 183 Clean_DryRun | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.3 | Fix line 216 Clean_Aggressive | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.4 | Fix line 237 ValidateSettings invalid | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.5 | Fix line 256 Clean_MultiCacheType | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.6 | Fix line 298 ParseDuration | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.7 | Fix line 319 IsMacOS | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.8 | Remove TestAvailableSystemCacheTypes | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.9 | Remove TestSystemCacheType_String | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT1.10 | Run full test suite | 1 | CRITICAL | 5m | ⏳ Pending |
-| MT2.1 | Add TestStringer helper | 2 | HIGH | 10m | ⏳ Pending |
-| MT2.2 | Test CacheType.String | 2 | HIGH | 10m | ⏳ Pending |
-| MT2.3 | Clean TODO tracking | 2 | HIGH | 10m | ⏳ Pending |
-| MT2.4 | Test AvailableCacheTypes | 2 | HIGH | 10m | ⏳ Pending |
-| MT3.3 | Pre-commit hook | 3 | MEDIUM | 10m | ⏳ Pending |
-| MT3.4 | Refactoring checklist | 3 | MEDIUM | 10m | ⏳ Pending |
-| MT4.1 | Comprehensive test run | 4 | CRITICAL | 5m | ⏳ Pending |
-| MT4.2 | Execution summary | 4 | HIGH | 5m | ⏳ Pending |
+| ID     | Description                           | Phase | Priority | Effort | Status     |
+| ------ | ------------------------------------- | ----- | -------- | ------ | ---------- |
+| MT0.0  | Write brutal assessment               | 0     | CRITICAL | 10m    | ✅ Done    |
+| MT0.1  | Write comprehensive plan              | 0     | CRITICAL | 10m    | ✅ Done    |
+| MT0.2  | Write micro-task breakdown            | 0     | CRITICAL | 10m    | ✅ Done    |
+| MT1.1  | Fix line 169 ValidateSettings         | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.2  | Fix line 183 Clean_DryRun             | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.3  | Fix line 216 Clean_Aggressive         | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.4  | Fix line 237 ValidateSettings invalid | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.5  | Fix line 256 Clean_MultiCacheType     | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.6  | Fix line 298 ParseDuration            | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.7  | Fix line 319 IsMacOS                  | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.8  | Remove TestAvailableSystemCacheTypes  | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.9  | Remove TestSystemCacheType_String     | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT1.10 | Run full test suite                   | 1     | CRITICAL | 5m     | ⏳ Pending |
+| MT2.1  | Add TestStringer helper               | 2     | HIGH     | 10m    | ⏳ Pending |
+| MT2.2  | Test CacheType.String                 | 2     | HIGH     | 10m    | ⏳ Pending |
+| MT2.3  | Clean TODO tracking                   | 2     | HIGH     | 10m    | ⏳ Pending |
+| MT2.4  | Test AvailableCacheTypes              | 2     | HIGH     | 10m    | ⏳ Pending |
+| MT3.3  | Pre-commit hook                       | 3     | MEDIUM   | 10m    | ⏳ Pending |
+| MT3.4  | Refactoring checklist                 | 3     | MEDIUM   | 10m    | ⏳ Pending |
+| MT4.1  | Comprehensive test run                | 4     | CRITICAL | 5m     | ⏳ Pending |
+| MT4.2  | Execution summary                     | 4     | HIGH     | 5m     | ⏳ Pending |
 
 **Total Planning:** 30 minutes (✅ COMPLETED)
 **Total Execution:** 130 minutes (⏳ PENDING)

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// mockCleaner is a test implementation of the Cleaner interface
+// mockCleaner is a test implementation of the Cleaner interface.
 type mockCleaner struct {
 	name        string
 	available   bool
@@ -137,7 +137,7 @@ func TestRegistry_Clear(t *testing.T) {
 	assert.Equal(t, 0, registry.Count())
 
 	list := registry.List()
-	assert.Len(t, list, 0)
+	assert.Empty(t, list)
 }
 
 func TestRegistry_CleanAll(t *testing.T) {
@@ -181,7 +181,7 @@ func TestRegistry_ConcurrentAccess(t *testing.T) {
 
 	// Concurrent registrations
 	var wg sync.WaitGroup
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
@@ -195,15 +195,13 @@ func TestRegistry_ConcurrentAccess(t *testing.T) {
 
 	// Concurrent reads
 	var wg2 sync.WaitGroup
-	for i := 0; i < 100; i++ {
-		wg2.Add(1)
-		go func() {
-			defer wg2.Done()
+	for range 100 {
+		wg2.Go(func() {
 			_ = registry.List()
 			_ = registry.Names()
 			_ = registry.Count()
 			_ = registry.Available(ctx)
-		}()
+		})
 	}
 	wg2.Wait()
 

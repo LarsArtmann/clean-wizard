@@ -5,6 +5,7 @@
 **Goal:** Fix all test failures in `internal/cleaner/systemcache_test.go` caused by incomplete enum refactor
 
 **Current State:**
+
 - ✅ Production code updated: `SystemCacheType` (string enum) → `domain.CacheType` (int enum)
 - ❌ Tests broken: 7 `NewSystemCacheCleaner` calls missing 4th parameter
 - ❌ Tests broken: 2 test functions reference non-existent `SystemCacheType`
@@ -12,6 +13,7 @@
 - ❌ Tests: fail with 11 errors
 
 **Customer Value:**
+
 - Restore test coverage to ensure SystemCache cleaner works correctly
 - Enable future changes with confidence tests will catch regressions
 - Maintain code quality and reliability
@@ -23,6 +25,7 @@
 **Status:** ✅ Written to `docs/planning/2026-02-10_10-51-BRUTALLY_HONEST_ASSESSMENT.md`
 
 **Key Findings:**
+
 1. Forgot to update test file during refactor (7 calls broken, 2 tests broken)
 2. Lied about completed TODOs (fake "marked completed" without verification)
 3. Test helpers don't support int enums (`TestTypeString` expects `~string`)
@@ -33,17 +36,20 @@
 ## PHASE 1: P0 CRITICAL FIXES (Fix NOW - 30-120 minutes)
 
 ### Task 1.1: Fix `NewSystemCacheCleaner` calls in ValidateSettings test
+
 **Impact:** BLOCKING - Tests can't compile
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` line 169-180
 2. Add `nil` as 4th parameter to `NewSystemCacheCleaner` call on line 169
 3. Commit with message: "fix(tests): add missing 4th parameter to NewSystemCacheCleaner in ValidateSettings test"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCacheCleaner_ValidateSettings
 ```
@@ -51,17 +57,20 @@ go test ./internal/cleaner/... -run TestSystemCacheCleaner_ValidateSettings
 ---
 
 ### Task 1.2: Fix `NewSystemCacheCleaner` call in Clean_DryRun test
+
 **Impact:** BLOCKING - Tests can't compile
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` line 183-210
 2. Add `nil` as 4th parameter to `NewSystemCacheCleaner` call on line 183
 3. Commit with message: "fix(tests): add missing 4th parameter to NewSystemCacheCleaner in Clean_DryRun test"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCacheCleaner_Clean_DryRun
 ```
@@ -69,18 +78,21 @@ go test ./internal/cleaner/... -run TestSystemCacheCleaner_Clean_DryRun
 ---
 
 ### Task 1.3: Fix `NewSystemCacheCleaner` call in Clean_Aggressive test
+
 **Impact:** BLOCKING - Tests can't compile
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` around line 216
 2. Find `NewSystemCacheCleaner(true, false, "30d")` call
 3. Add `nil` as 4th parameter
 4. Commit with message: "fix(tests): add missing 4th parameter to NewSystemCacheCleaner in Clean_Aggressive test"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCacheCleaner_Clean_Aggressive
 ```
@@ -88,18 +100,21 @@ go test ./internal/cleaner/... -run TestSystemCacheCleaner_Clean_Aggressive
 ---
 
 ### Task 1.4: Fix `NewSystemCacheCleaner` call in ValidateSettings with invalid cache test
+
 **Impact:** BLOCKING - Tests can't compile
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` around line 237
 2. Find `NewSystemCacheCleaner(false, false, "30d")` call
 3. Add `nil` as 4th parameter
 4. Commit with message: "fix(tests): add missing 4th parameter to NewSystemCacheCleaner in ValidateSettings invalid cache test"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCacheCleaner_ValidateSettings
 ```
@@ -107,18 +122,21 @@ go test ./internal/cleaner/... -run TestSystemCacheCleaner_ValidateSettings
 ---
 
 ### Task 1.5: Fix `NewSystemCacheCleaner` call in Clean_MultiCacheType test
+
 **Impact:** BLOCKING - Tests can't compile
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` around line 256
 2. Find `NewSystemCacheCleaner(false, true, "30d")` call
 3. Add `nil` as 4th parameter
 4. Commit with message: "fix(tests): add missing 4th parameter to NewSystemCacheCleaner in Clean_MultiCacheType test"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCacheCleaner_Clean_MultiCacheType
 ```
@@ -126,18 +144,21 @@ go test ./internal/cleaner/... -run TestSystemCacheCleaner_Clean_MultiCacheType
 ---
 
 ### Task 1.6: Fix `NewSystemCacheCleaner` call in ParseDuration test (within loop)
+
 **Impact:** BLOCKING - Tests can't compile
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` around line 298
 2. Find `NewSystemCacheCleaner(false, false, tt.duration)` call inside loop
 3. Add `nil` as 4th parameter
 4. Commit with message: "fix(tests): add missing 4th parameter to NewSystemCacheCleaner in ParseDuration test"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCacheCleaner_ParseDuration
 ```
@@ -145,18 +166,21 @@ go test ./internal/cleaner/... -run TestSystemCacheCleaner_ParseDuration
 ---
 
 ### Task 1.7: Fix `NewSystemCacheCleaner` call in IsMacOS test
+
 **Impact:** BLOCKING - Tests can't compile
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` around line 319
 2. Find `NewSystemCacheCleaner(false, false, "30d")` call
 3. Add `nil` as 4th parameter
 4. Commit with message: "fix(tests): add missing 4th parameter to NewSystemCacheCleaner in IsMacOS test"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCacheCleaner_IsMacOS
 ```
@@ -164,18 +188,21 @@ go test ./internal/cleaner/... -run TestSystemCacheCleaner_IsMacOS
 ---
 
 ### Task 1.8: Remove obsolete TestAvailableSystemCacheTypes test
+
 **Impact:** BLOCKING - References non-existent `SystemCacheType` type
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` lines 264-272
 2. Note: This test references `SystemCacheType` which doesn't exist anymore
 3. Delete entire `TestAvailableSystemCacheTypes` function (lines 264-272)
 4. Commit with message: "refactor(tests): remove TestAvailableSystemCacheTypes for obsolete enum type"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestAvailableSystemCacheTypes 2>&1 | grep -q "no such test"
 ```
@@ -185,18 +212,21 @@ go test ./internal/cleaner/... -run TestAvailableSystemCacheTypes 2>&1 | grep -q
 ---
 
 ### Task 1.9: Remove obsolete TestSystemCacheType_String test
+
 **Impact:** BLOCKING - References non-existent `SystemCacheType` type
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (unblocks test suite)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go` lines 274-281
 2. Note: This test references `SystemCacheType` which doesn't exist anymore
 3. Delete entire `TestSystemCacheType_String` function (lines 274-281)
 4. Commit with message: "refactor(tests): remove TestSystemCacheType_String for obsolete enum type"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCacheType_String 2>&1 | grep -q "no such test"
 ```
@@ -206,12 +236,14 @@ go test ./internal/cleaner/... -run TestSystemCacheType_String 2>&1 | grep -q "n
 ---
 
 ### Task 1.10: Run full test suite to verify all fixes
+
 **Impact:** VERIFICATION - Ensures all P0 tasks complete
 **Effort:** 5 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (validates fix quality)
 
 **Steps:**
+
 1. Run full test suite: `go test ./internal/cleaner/...`
 2. Confirm no compilation errors
 3. Confirm all tests pass (or only skip if not on macOS)
@@ -219,6 +251,7 @@ go test ./internal/cleaner/... -run TestSystemCacheType_String 2>&1 | grep -q "n
 5. Commit with message: "test(verification): all systemcache tests passing after enum refactor fix"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -v 2>&1 | tail -20
 ```
@@ -230,14 +263,17 @@ go test ./internal/cleaner/... -v 2>&1 | tail -20
 ## PHASE 2: P1 HIGH - Test Infrastructure Improvements (Do today - 30-90 minutes)
 
 ### Task 2.1: Add generic test helper for String() methods
+
 **Impact:** MEDIUM - Enables better enum testing for int enums
 **Effort:** 20 minutes
 **Priority:** P1 - HIGH
 **Customer Value:** Medium (better test coverage, reusable)
 
 **Steps:**
+
 1. Read `internal/cleaner/testing_helpers.go`
 2. Add new generic function after line 78:
+
 ```go
 // TestStringer tests that any type implementing fmt.Stringer produces the expected strings
 // This is suitable for int-based enums with custom String() methods.
@@ -257,10 +293,12 @@ func TestStringer[T fmt.Stringer](t *stdtesting.T, name string, cases []struct {
     })
 }
 ```
+
 3. Add import "fmt" if not present
 4. Commit with message: "feat(testing): add TestStringer helper for int enum testing"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestStringer 2>&1
 ```
@@ -268,14 +306,17 @@ go test ./internal/cleaner/... -run TestStringer 2>&1
 ---
 
 ### Task 2.2: Add tests for domain.CacheType.String()
+
 **Impact:** MEDIUM - Ensures string representation is correct
 **Effort:** 15 minutes
 **Priority:** P1 - HIGH
 **Customer Value:** Medium (test coverage for enum strings)
 
 **Steps:**
+
 1. Check if tests already exist: `grep -r "CacheType.String()" internal/domain/...`
 2. If not, create `internal/domain/cache_type_test.go`:
+
 ```go
 package domain
 
@@ -307,10 +348,12 @@ func TestCacheType_String(t *testing.T) {
     }
 }
 ```
+
 3. Run tests to verify: `go test ./internal/domain/... -run TestCacheType_String`
 4. Commit with message: "test(domain): add comprehensive CacheType.String() tests"
 
 **Verification:**
+
 ```bash
 go test ./internal/domain/... -run TestCacheType_String -v
 ```
@@ -318,12 +361,14 @@ go test ./internal/domain/... -run TestCacheType_String -v
 ---
 
 ### Task 2.3: Clean up TODO tracking - remove fake "completed" items
+
 **Impact:** LOW - Documentation hygiene
 **Effort:** 10 minutes
 **Priority:** P1 - HIGH
 **Customer Value:** Medium (accurate documentation)
 
 **Steps:**
+
 1. Search for TODO documentation: `grep -r "TrimWhitespaceField\|error detail utility" docs/...`
 2. Find any files claiming these are "completed"
 3. Update those files to remove false completion claims
@@ -334,6 +379,7 @@ go test ./internal/domain/... -run TestCacheType_String -v
 6. Update conversation summary to reflect reality
 
 **Verification:**
+
 ```bash
 grep -r "✅.*TrimWhitespaceField\|✅.*error detail" docs/... && echo "Still found false claims"
 ```
@@ -341,14 +387,17 @@ grep -r "✅.*TrimWhitespaceField\|✅.*error detail" docs/... && echo "Still fo
 ---
 
 ### Task 2.4: Update systemcache_test.go to use SystemCacheType domain type
+
 **Impact:** HIGH - Better test coverage
 **Effort:** 20 minutes
 **Priority:** P1 - HIGH
 **Customer Value:** Medium (comprehensive enum testing)
 
 **Steps:**
+
 1. Read `internal/cleaner/systemcache_test.go`
 2. Add new test for `domain.CacheType` values:
+
 ```go
 func TestSystemCache_AvailableCacheTypes(t *testing.T) {
     types := AvailableSystemCacheTypes()
@@ -372,10 +421,12 @@ func TestSystemCache_AvailableCacheTypes(t *testing.T) {
     }
 }
 ```
+
 3. Run tests to verify: `go test ./internal/cleaner/... -run TestSystemCache_AvailableCacheTypes`
 4. Commit with message: "test(systemcache): add test for AvailableSystemCacheTypes with domain types"
 
 **Verification:**
+
 ```bash
 go test ./internal/cleaner/... -run TestSystemCache_AvailableCacheTypes -v
 ```
@@ -385,14 +436,17 @@ go test ./internal/cleaner/... -run TestSystemCache_AvailableCacheTypes -v
 ## PHASE 3: P2 MEDIUM - Quality Improvements (This week - 60-120 minutes)
 
 ### Task 3.1: Evaluate and implement TrimWhitespaceField utility or remove
+
 **Impact:** LOW - Either implement or clarify not needed
 **Effort:** 30 minutes (evaluate) + 15 minutes (implement if needed)
 **Priority:** P2 - MEDIUM
 **Customer Value:** Low (nice-to-have utility)
 
 **Steps:**
+
 1. Search for whitespace trimming needs: `grep -r "strings.TrimSpace" internal/... | head -20`
 2. If common pattern found, create utility in `internal/shared/utils/string_utils.go`:
+
 ```go
 package utils
 
@@ -408,11 +462,13 @@ func TrimWhitespaceField(s string) string {
     return trimmed
 }
 ```
+
 3. Update usages to use utility
 4. If no common pattern, document decision in `docs/planning/...`
 5. Commit with message: "feat(utils): implement TrimWhitespaceField utility" OR "docs(eval): TrimWhitespaceField not needed - no common pattern"
 
 **Verification:**
+
 ```bash
 go test ./internal/shared/utils/...
 ```
@@ -420,15 +476,18 @@ go test ./internal/shared/utils/...
 ---
 
 ### Task 3.2: Evaluate and implement error details utility or remove
+
 **Impact:** LOW - Either implement or clarify not needed
 **Effort:** 30 minutes (evaluate) + 30 minutes (implement if needed)
 **Priority:** P2 - MEDIUM
 **Customer Value:** Low (error handling consistency)
 
 **Steps:**
+
 1. Search for error detail patterns: `grep -r "ErrorDetail\|error detail" internal/... | head -20`
 2. Check if existing error handling satisfies needs
 3. If needed, create utility in `internal/shared/utils/error_utils.go`:
+
 ```go
 package utils
 
@@ -457,10 +516,12 @@ func (e ErrorDetail) Error() string {
     return fmt.Sprintf("[%s] %s (field: %s)", e.Code, e.Message, e.Field)
 }
 ```
+
 4. If not needed, document decision
 5. Commit with message: "feat(errors): implement error details utility" OR "docs(eval): error details utility not needed - existing errors sufficient"
 
 **Verification:**
+
 ```bash
 go test ./internal/shared/utils/...
 ```
@@ -468,14 +529,17 @@ go test ./internal/shared/utils/...
 ---
 
 ### Task 3.3: Add pre-commit test hook
+
 **Impact:** HIGH - Prevent future regressions
 **Effort:** 15 minutes
 **Priority:** P2 - HIGH
 **Customer Value:** High (prevents broken commits)
 
 **Steps:**
+
 1. Check for existing pre-commit hooks: `ls -la .git/hooks/pre-commit`
 2. Create `.git/hooks/pre-commit`:
+
 ```bash
 #!/bin/sh
 # Pre-commit hook to run tests before allowing commit
@@ -492,11 +556,13 @@ fi
 
 echo "All tests passed."
 ```
+
 3. Make executable: `chmod +x .git/hooks/pre-commit`
 4. Document in CONTRIBUTING.md or docs/
 5. Commit with message: "ci(git): add pre-commit test hook to prevent broken commits"
 
 **Verification:**
+
 ```bash
 # Create a trivial test that fails
 echo "func TestFail(t *testing.T) { t.Fatal('failed') }" > /tmp/fail_test.go
@@ -508,13 +574,16 @@ ls -la .git/hooks/pre-commit  # Verify exists and is executable
 ---
 
 ### Task 3.4: Create refactoring checklist document
+
 **Impact:** HIGH - Process improvement
 **Effort:** 20 minutes
 **Priority:** P2 - HIGH
 **Customer Value:** High (prevents future mistakes)
 
 **Steps:**
+
 1. Create `docs/development/REFACTORING_CHECKLIST.md`:
+
 ```markdown
 # Refactoring Checklist
 
@@ -560,9 +629,11 @@ ls -la .git/hooks/pre-commit  # Verify exists and is executable
 - ✅ Search references with `lsp_references` before changing signatures
 - ✅ Read entire file before editing it
 ```
+
 2. Commit with message: "docs(development): add refactoring checklist to prevent future mistakes"
 
 **Verification:**
+
 ```bash
 cat docs/development/REFACTORING_CHECKLIST.md | head -20
 ```
@@ -572,12 +643,14 @@ cat docs/development/REFACTORING_CHECKLIST.md | head -20
 ## PHASE 4: VERIFICATION AND DOCUMENTATION (Final - 20 minutes)
 
 ### Task 4.1: Run comprehensive test suite
+
 **Impact:** CRITICAL - Final verification
 **Effort:** 10 minutes
 **Priority:** P0 - CRITICAL
 **Customer Value:** High (validates all work)
 
 **Steps:**
+
 1. Run all tests: `go test ./...`
 2. Check for race conditions: `go test ./... -race`
 3. Verify build: `go build ./...`
@@ -585,6 +658,7 @@ cat docs/development/REFACTORING_CHECKLIST.md | head -20
 5. Commit with message: "test(comprehensive): all tests passing after SystemCache enum refactor fixes"
 
 **Verification:**
+
 ```bash
 go test ./... 2>&1 | tail -10
 ```
@@ -592,40 +666,48 @@ go test ./... 2>&1 | tail -10
 ---
 
 ### Task 4.2: Create final execution summary
+
 **Impact:** MEDIUM - Documentation of work done
 **Effort:** 10 minutes
 **Priority:** P1 - HIGH
 **Customer Value:** Medium (future reference)
 
 **Steps:**
+
 1. Create `docs/planning/2026-02-10_10-51-EXECUTION_SUMMARY.md`:
+
 ```markdown
 # Execution Summary - Fix SystemCache Test Failures
 
 ## Completed Phases
 
 ### Phase 0: Brutally Honest Assessment (✅ COMPLETED)
+
 - Documented all failures and mistakes
 - Found split brains and scope issues
 - Identified lessons learned
 
 ### Phase 1: P0 Critical Fixes (✅ COMPLETED)
+
 - Fixed 7 broken `NewSystemCacheCleaner` calls
 - Removed 2 obsolete test functions
 - All tests passing
 
 ### Phase 2: P1 High Improvements (✅ COMPLETED)
+
 - Added `TestStringer` helper for int enums
 - Added `domain.CacheType.String()` tests
 - Cleaned up TODO tracking
 - Added comprehensive enum tests
 
 ### Phase 3: P2 Medium Enhancements (✅ SKIPPED / COMPLETED)
+
 - Evaluated utility implementations
 - Added pre-commit test hook
 - Created refactoring checklist
 
 ### Phase 4: Verification (✅ COMPLETED)
+
 - All tests passing
 - Race condition clean
 - Build successful
@@ -652,9 +734,11 @@ go test ./... 2>&1 | tail -10
 - docs/development/REFACTORING_CHECKLIST.md
 - .git/hooks/pre-commit
 ```
+
 2. Commit with message: "docs(planning): add execution summary for SystemCache test fixes"
 
 **Verification:**
+
 ```bash
 cat docs/planning/2026-02-10_10-51-EXECUTION_SUMMARY.md | head -30
 ```
@@ -663,28 +747,28 @@ cat docs/planning/2026-02-10_10-51-EXECUTION_SUMMARY.md | head -30
 
 ## TASK BREAKDOWN TABLE
 
-| Task | Phase | Priority | Effort | Impact | Customer Value |
-|------|-------|----------|--------|--------|----------------|
-| 1.1 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.2 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.3 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.4 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.5 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.6 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.7 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.8 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.9 | P0 | CRITICAL | 5m | BLOCKING | High |
-| 1.10 | P0 | CRITICAL | 5m | VERIFICATION | High |
-| 2.1 | P1 | HIGH | 20m | MEDIUM | Medium |
-| 2.2 | P1 | HIGH | 15m | MEDIUM | Medium |
-| 2.3 | P1 | HIGH | 10m | LOW | Medium |
-| 2.4 | P1 | HIGH | 20m | HIGH | Medium |
-| 3.1 | P2 | MEDIUM | 45m | LOW | Low |
-| 3.2 | P2 | MEDIUM | 60m | LOW | Low |
-| 3.3 | P2 | HIGH | 15m | HIGH | High |
-| 3.4 | P2 | HIGH | 20m | HIGH | High |
-| 4.1 | P0 | CRITICAL | 10m | VERIFICATION | High |
-| 4.2 | P1 | HIGH | 10m | MEDIUM | Medium |
+| Task | Phase | Priority | Effort | Impact       | Customer Value |
+| ---- | ----- | -------- | ------ | ------------ | -------------- |
+| 1.1  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.2  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.3  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.4  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.5  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.6  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.7  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.8  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.9  | P0    | CRITICAL | 5m     | BLOCKING     | High           |
+| 1.10 | P0    | CRITICAL | 5m     | VERIFICATION | High           |
+| 2.1  | P1    | HIGH     | 20m    | MEDIUM       | Medium         |
+| 2.2  | P1    | HIGH     | 15m    | MEDIUM       | Medium         |
+| 2.3  | P1    | HIGH     | 10m    | LOW          | Medium         |
+| 2.4  | P1    | HIGH     | 20m    | HIGH         | Medium         |
+| 3.1  | P2    | MEDIUM   | 45m    | LOW          | Low            |
+| 3.2  | P2    | MEDIUM   | 60m    | LOW          | Low            |
+| 3.3  | P2    | HIGH     | 15m    | HIGH         | High           |
+| 3.4  | P2    | HIGH     | 20m    | HIGH         | High           |
+| 4.1  | P0    | CRITICAL | 10m    | VERIFICATION | High           |
+| 4.2  | P1    | HIGH     | 10m    | MEDIUM       | Medium         |
 
 **Total Effort (P0 only):** 1 hour
 **Total Effort (P0+P1):** 2.5 hours
