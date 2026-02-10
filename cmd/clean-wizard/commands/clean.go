@@ -540,7 +540,7 @@ func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
 		return createCleanerWithError(func() (cleaner.Cleaner, error) {
-			return cleaner.NewGoCleaner(v, d, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheBuildCache)
+			return cleaner.NewGoCleaner(v, d, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheModCache|cleaner.GoCacheBuildCache)
 		})
 	})
 }
