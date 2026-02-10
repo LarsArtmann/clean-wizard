@@ -14,16 +14,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// NodePackageManagerType represents different Node.js package managers.
-type NodePackageManagerType string
-
-const (
-	NodePackageManagerNPM  NodePackageManagerType = "npm"
-	NodePackageManagerPNPM NodePackageManagerType = "pnpm"
-	NodePackageManagerYarn NodePackageManagerType = "yarn"
-	NodePackageManagerBun  NodePackageManagerType = "bun"
-)
-
 // DefaultNodePackageManagerTimeout is the default timeout for package manager commands.
 const DefaultNodePackageManagerTimeout = 2 * time.Minute
 
