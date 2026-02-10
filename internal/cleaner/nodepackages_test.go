@@ -12,7 +12,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 		name             string
 		verbose          bool
 		dryRun           bool
-		packageManagers  []NodePackageManagerType
+		packageManagers  []domain.PackageManagerType
 		wantErr          bool
 		wantPackageCount int
 	}{
@@ -28,7 +28,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 			name:             "valid configuration with single PM",
 			verbose:          true,
 			dryRun:           true,
-			packageManagers:  []NodePackageManagerType{NodePackageManagerNPM},
+			packageManagers:  []domain.PackageManagerType{domain.PackageManagerNpm},
 			wantErr:          false,
 			wantPackageCount: 1,
 		},
@@ -36,7 +36,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 			name:             "valid configuration with no PMs",
 			verbose:          false,
 			dryRun:           false,
-			packageManagers:  []NodePackageManagerType{},
+			packageManagers:  []domain.PackageManagerType{},
 			wantErr:          false,
 			wantPackageCount: 0,
 		},
@@ -76,7 +76,7 @@ func TestNodePackageManagerCleaner_Type(t *testing.T) {
 func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 	tests := []struct {
 		name              string
-		packageManagers   []NodePackageManagerType
+		packageManagers   []domain.PackageManagerType
 		shouldBeAvailable bool
 	}{
 		{
@@ -86,7 +86,7 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 		},
 		{
 			name:              "empty package managers",
-			packageManagers:   []NodePackageManagerType{},
+			packageManagers:   []domain.PackageManagerType{},
 			shouldBeAvailable: false,
 		},
 	}
@@ -168,7 +168,7 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 	tests := []struct {
 		name            string
-		packageManagers []NodePackageManagerType
+		packageManagers []domain.PackageManagerType
 		wantItems       uint
 		shouldTest      bool // Only test if PMs are available
 	}{
@@ -180,7 +180,7 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 		},
 		{
 			name:            "dry-run with single PM",
-			packageManagers: []NodePackageManagerType{NodePackageManagerNPM},
+			packageManagers: []domain.PackageManagerType{domain.PackageManagerNpm},
 			wantItems:       1,
 			shouldTest:      false, // Skip if npm not installed
 		},
@@ -219,7 +219,7 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_Clean_NoAvailableManagers(t *testing.T) {
-	cleaner := NewNodePackageManagerCleaner(false, false, []NodePackageManagerType{})
+	cleaner := NewNodePackageManagerCleaner(false, false, []domain.PackageManagerType{})
 
 	result := cleaner.Clean(context.Background())
 	if !result.IsErr() {
@@ -228,23 +228,16 @@ func TestNodePackageManagerCleaner_Clean_NoAvailableManagers(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_AvailableNodePackageManagers(t *testing.T) {
-	expectedPMs := []NodePackageManagerType{
-		NodePackageManagerNPM,
-		NodePackageManagerPNPM,
-		NodePackageManagerYarn,
-		NodePackageManagerBun,
+	expectedPMs := []domain.PackageManagerType{
+		domain.PackageManagerNpm,
+		domain.PackageManagerPnpm,
+		domain.PackageManagerYarn,
+		domain.PackageManagerBun,
 	}
 	TestAvailableTypesGeneric(t, "AvailableNodePackageManagers", AvailableNodePackageManagers, expectedPMs)
 }
 
-func TestNodePackageManagerType_String(t *testing.T) {
-	TestTypeString(t, "NodePackageManagerType", []NodePackageManagerType{
-		NodePackageManagerNPM,
-		NodePackageManagerPNPM,
-		NodePackageManagerYarn,
-		NodePackageManagerBun,
-	})
-}
+
 
 func TestGetHomeDir(t *testing.T) {
 	// This test verifies GetHomeDir doesn't crash

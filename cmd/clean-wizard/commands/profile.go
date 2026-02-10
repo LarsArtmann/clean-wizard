@@ -186,7 +186,7 @@ func runProfileCreateCommand(cmd *cobra.Command, args []string, name, descriptio
 	// Check if profile already exists
 	if _, exists := cfg.Profiles[name]; exists {
 		fmt.Printf("❌ Profile '%s' already exists\n", name)
-		fmt.Println("   Use 'clean-wizard profile delete %s' to remove it first.", name)
+		fmt.Printf("   Use 'clean-wizard profile delete %s' to remove it first.\n", name)
 		return nil
 	}
 

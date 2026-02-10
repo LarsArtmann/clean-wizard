@@ -36,12 +36,12 @@ func (npmc *NodePackageManagerCleaner) execWithTimeout(ctx context.Context, name
 }
 
 // AvailableNodePackageManagers returns all available Node.js package managers.
-func AvailableNodePackageManagers() []NodePackageManagerType {
-	return []NodePackageManagerType{
-		NodePackageManagerNPM,
-		NodePackageManagerPNPM,
-		NodePackageManagerYarn,
-		NodePackageManagerBun,
+func AvailableNodePackageManagers() []domain.PackageManagerType {
+	return []domain.PackageManagerType{
+		domain.PackageManagerNpm,
+		domain.PackageManagerPnpm,
+		domain.PackageManagerYarn,
+		domain.PackageManagerBun,
 	}
 }
 
@@ -49,11 +49,11 @@ func AvailableNodePackageManagers() []NodePackageManagerType {
 type NodePackageManagerCleaner struct {
 	verbose         bool
 	dryRun          bool
-	packageManagers []NodePackageManagerType
+	packageManagers []domain.PackageManagerType
 }
 
 // NewNodePackageManagerCleaner creates Node.js package manager cleaner.
-func NewNodePackageManagerCleaner(verbose, dryRun bool, packageManagers []NodePackageManagerType) *NodePackageManagerCleaner {
+func NewNodePackageManagerCleaner(verbose, dryRun bool, packageManagers []domain.PackageManagerType) *NodePackageManagerCleaner {
 	return &NodePackageManagerCleaner{
 		verbose:         verbose,
 		dryRun:          dryRun,
@@ -77,18 +77,18 @@ func (npmc *NodePackageManagerCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // isPackageManagerAvailable checks if a specific package manager is available.
-func (npmc *NodePackageManagerCleaner) isPackageManagerAvailable(pm NodePackageManagerType) bool {
+func (npmc *NodePackageManagerCleaner) isPackageManagerAvailable(pm domain.PackageManagerType) bool {
 	switch pm {
-	case NodePackageManagerNPM:
+	case domain.PackageManagerNpm:
 		_, err := exec.LookPath("npm")
 		return err == nil
-	case NodePackageManagerPNPM:
+	case domain.PackageManagerPnpm:
 		_, err := exec.LookPath("pnpm")
 		return err == nil
-	case NodePackageManagerYarn:
+	case domain.PackageManagerYarn:
 		_, err := exec.LookPath("yarn")
 		return err == nil
-	case NodePackageManagerBun:
+	case domain.PackageManagerBun:
 		_, err := exec.LookPath("bun")
 		return err == nil
 	default:
@@ -102,8 +102,13 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 		return nil // Settings are optional
 	}
 
-	validPackageManagersMap := toStringMap(AvailableNodePackageManagers())
 	packageManagerStrings := PackageManagerTypeToLowerSlice(settings.NodePackages.PackageManagers)
+	validPackageManagersMap := map[string]bool{
+		"npm":   true,
+		"pnpm": true,
+		"yarn": true,
+		"bun":  true,
+	}
 
 	return validateSettings(
 		packageManagerStrings,
@@ -137,11 +142,11 @@ func (npmc *NodePackageManagerCleaner) Scan(ctx context.Context) result.Result[[
 }
 
 // scanPackageManager scans cache for a specific package manager.
-func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, pm NodePackageManagerType) result.Result[[]domain.ScanItem] {
+func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, pm domain.PackageManagerType) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	switch pm {
-	case NodePackageManagerNPM:
+	case domain.PackageManagerNpm:
 		// Get npm cache location
 		cmd := npmc.execWithTimeout(ctx, "npm", "config", "get", "cache")
 		output, err := cmd.CombinedOutput()
@@ -163,7 +168,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, p
 			}
 		}
 
-	case NodePackageManagerPNPM:
+	case domain.PackageManagerPnpm:
 		// Get pnpm store location
 		cmd := npmc.execWithTimeout(ctx, "pnpm", "store", "path")
 		output, err := cmd.CombinedOutput()
@@ -185,7 +190,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, p
 			}
 		}
 
-	case NodePackageManagerYarn:
+	case domain.PackageManagerYarn:
 		cacheResult := npmc.scanHomeDirCache(ctx, ".yarn/cache", "yarn")
 		if cacheResult.IsOk() {
 			items = append(items, cacheResult.Value()...)
@@ -193,7 +198,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(ctx context.Context, p
 			return cacheResult
 		}
 
-	case NodePackageManagerBun:
+	case domain.PackageManagerBun:
 		cacheResult := npmc.scanHomeDirCache(ctx, ".bun/install/cache", "bun")
 		if cacheResult.IsOk() {
 			items = append(items, cacheResult.Value()...)
@@ -315,18 +320,18 @@ func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanRe
 }
 
 // cleanPackageManager cleans cache for a specific package manager.
-func (npmc *NodePackageManagerCleaner) cleanPackageManager(ctx context.Context, pm NodePackageManagerType) result.Result[domain.CleanResult] {
+func (npmc *NodePackageManagerCleaner) cleanPackageManager(ctx context.Context, pm domain.PackageManagerType) result.Result[domain.CleanResult] {
 	switch pm {
-	case NodePackageManagerNPM:
+	case domain.PackageManagerNpm:
 		return npmc.runPackageManagerCommand(ctx, "npm", "cache", "clean", "--force")
 
-	case NodePackageManagerPNPM:
+	case domain.PackageManagerPnpm:
 		return npmc.runPackageManagerCommand(ctx, "pnpm", "store", "prune")
 
-	case NodePackageManagerYarn:
+	case domain.PackageManagerYarn:
 		return npmc.runPackageManagerCommand(ctx, "yarn", "cache", "clean")
 
-	case NodePackageManagerBun:
+	case domain.PackageManagerBun:
 		return npmc.runPackageManagerCommand(ctx, "bun", "pm", "cache", "rm")
 	}
 

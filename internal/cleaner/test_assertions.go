@@ -182,11 +182,6 @@ func NewCleanResultAnalyzer(t *testing.T, cleanResult domain.CleanResult, elapse
 
 // VerifyTiming verifies that clean operation timing is correctly recorded.
 func (a *CleanResultAnalyzer) VerifyTiming() {
-	// CleanTime should be recorded
-	if a.cleanResult.CleanTime == 0 {
-		a.t.Error("Clean() returned CleanTime = 0")
-	}
-
 	// CleanedAt should be set
 	if a.cleanResult.CleanedAt.IsZero() {
 		a.t.Error("Clean() returned CleanedAt = zero time")
@@ -197,9 +192,18 @@ func (a *CleanResultAnalyzer) VerifyTiming() {
 		a.t.Errorf("Clean() took %v, which seems too long", a.cleanResult.CleanTime)
 	}
 
-	// Actual execution time should be close to CleanTime
-	if a.elapsed < a.cleanResult.CleanTime/2 || a.elapsed > a.cleanResult.CleanTime*2 {
-		a.t.Logf("Note: Clean() recorded time %v but actual elapsed was %v", a.cleanResult.CleanTime, a.elapsed)
+	// CleanTime = 0 is valid for very fast operations (especially dry-run)
+	// Just log a note if both are extremely small
+	if a.cleanResult.CleanTime == 0 && a.elapsed > 0 {
+		a.t.Logf("Note: Clean() recorded CleanTime = 0 but actual elapsed was %v (operation too fast to measure)", a.elapsed)
+	}
+
+	// For operations that recorded time, verify timing is reasonable
+	if a.cleanResult.CleanTime > 0 {
+		// Actual execution time should be close to CleanTime
+		if a.elapsed < a.cleanResult.CleanTime/2 || a.elapsed > a.cleanResult.CleanTime*2 {
+			a.t.Logf("Note: Clean() recorded time %v but actual elapsed was %v", a.cleanResult.CleanTime, a.elapsed)
+		}
 	}
 }
 

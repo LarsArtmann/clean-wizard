@@ -510,13 +510,13 @@ func runManagerCleaner[T any](
 }
 
 // runCleanerWithNodeManagers executes the Node package manager cleaner.
-func runCleanerWithNodeManagers(ctx context.Context, verbose, dryRun bool, managers []cleaner.NodePackageManagerType) (domain.CleanResult, error) {
+func runCleanerWithNodeManagers(ctx context.Context, verbose, dryRun bool, managers []domain.PackageManagerType) (domain.CleanResult, error) {
 	return runManagerCleaner(ctx, verbose, dryRun, managers, nodeManagerFactory)
 }
 
 // nodeManagerFactory is a factory function for Node package managers.
 // This adapter bridges the type gap between *NodePackageManagerCleaner and cleaner.Cleaner.
-func nodeManagerFactory(v, d bool, managers []cleaner.NodePackageManagerType) cleaner.Cleaner {
+func nodeManagerFactory(v, d bool, managers []domain.PackageManagerType) cleaner.Cleaner {
 	return cleaner.NewNodePackageManagerCleaner(v, d, managers)
 }
 
