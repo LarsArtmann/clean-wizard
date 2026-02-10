@@ -93,11 +93,11 @@ func runScanCommand(cmd *cobra.Command, args []string, verbose bool, profile str
 
 // ScanResult holds the scan result for a cleaner.
 type ScanResult struct {
-	Name          string
-	Available     bool
-	ItemsCount    uint
+	Name           string
+	Available      bool
+	ItemsCount     uint
 	BytesCleanable uint64
-	Description   string
+	Description    string
 }
 
 // scanCleaner scans a single cleaner for cleanable items.
@@ -183,7 +183,7 @@ func scanNixCleaner(ctx context.Context, verbose bool) ScanResult {
 	}
 
 	result.Available = true
-	result.ItemsCount = 5 // Estimate
+	result.ItemsCount = 5                        // Estimate
 	result.BytesCleanable = 50 * 1024 * 1024 * 5 // 50MB per generation, 5 generations
 
 	return result
@@ -204,7 +204,7 @@ func scanDockerCleaner(ctx context.Context, verbose bool) ScanResult {
 	}
 
 	result.Available = true
-	result.ItemsCount = 3 // Estimate: images, containers, volumes
+	result.ItemsCount = 3                     // Estimate: images, containers, volumes
 	result.BytesCleanable = 500 * 1024 * 1024 // Estimate 500MB
 
 	return result

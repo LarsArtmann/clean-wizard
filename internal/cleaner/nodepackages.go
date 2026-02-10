@@ -18,10 +18,10 @@ import (
 type NodePackageManagerType string
 
 const (
-	NodePackageManagerNPM   NodePackageManagerType = "npm"
-	NodePackageManagerPNPM  NodePackageManagerType = "pnpm"
-	NodePackageManagerYarn  NodePackageManagerType = "yarn"
-	NodePackageManagerBun   NodePackageManagerType = "bun"
+	NodePackageManagerNPM  NodePackageManagerType = "npm"
+	NodePackageManagerPNPM NodePackageManagerType = "pnpm"
+	NodePackageManagerYarn NodePackageManagerType = "yarn"
+	NodePackageManagerBun  NodePackageManagerType = "bun"
 )
 
 // DefaultNodePackageManagerTimeout is the default timeout for package manager commands.
