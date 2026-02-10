@@ -181,9 +181,9 @@
 | Cleaner          | Issue                                                                       | Severity | Status              |
 | ---------------- | --------------------------------------------------------------------------- | -------- | ------------------- |
 | **Docker**       | Local enum vs domain enum - concept mismatch (aggression vs resource types) | CRITICAL | ✅ FIXED in 5e94e2a |
-| **SystemCache**  | Local lowercase enum vs domain uppercase enum                               | HIGH     | NOT_STARTED         |
-| **NodePackages** | Local string enum vs domain integer enum                                    | MEDIUM   | NOT_STARTED         |
-| **BuildCache**   | Complete mismatch (tools vs languages)                                      | HIGH     | NOT_STARTED         |
+| **SystemCache**  | Uses domain.CacheType correctly (verified)                                  | LOW      | ✅ VERIFIED OK       |
+| **NodePackages** | Local string enum vs domain integer enum                                    | HIGH     | 🔍 REQUIRES REFACTOR |
+| **BuildCache**   | Different abstractions (tools vs languages) - domain has different scope     | HIGH     | 🔍 REQUIRES DECISION |
 
 **Required Action**: Refactor enum systems to align with domain definitions
 
@@ -523,7 +523,7 @@
 | Registry Documentation           | SELF_REFLECTION_AND_PLAN.md         | NOT_STARTED  | Documentation task                                                                              |
 | **NEW - UNSAFE EXEC CALLS**      | 2026-01-28_01-30_EXECUTION_AUDIT.md | 🔴 CRITICAL  | 9 exec calls without timeout - cargo-cache, cargo clean, npm/pnpm/yarn/bun cache commands       |
 | **NEW - Interface Compliance**   | CLEANER_INTERFACE_ANALYSIS.md       | 🔴 CRITICAL  | nix.go missing Clean(ctx), golang_cache_cleaner.go missing IsAvailable()                        |
-| **NEW - Enum Inconsistencies**   | ENUM_USAGE_ANALYSIS.md              | 🟠 HIGH      | Docker FIXED, SystemCache/NodePackages/BuildCache need refactoring                              |
+| **NEW - Enum Inconsistencies**   | ENUM_USAGE_ANALYSIS.md              | 🔍 DOCUMENTED | NodePackages: local string vs domain int; BuildCache: tools vs languages (requires refactor decision) |
 
 ---
 
