@@ -26,7 +26,7 @@ func DefaultRegistry() *Registry {
 	registry.Register("cargo", NewCargoCleaner(false, false))
 
 	// Go cleaner (default: all cache types)
-	goCleaner, _ := NewGoCleaner(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheBuildCache)
+	goCleaner, _ := NewGoCleaner(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
 	registry.Register("go", goCleaner)
 
 	// Node packages cleaner (default: all available package managers)
@@ -71,7 +71,7 @@ func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
 	registry.Register("cargo", NewCargoCleaner(verbose, dryRun))
 
 	// Go cleaner (default: all cache types)
-	goCleaner, _ := NewGoCleaner(verbose, dryRun, GoCacheGOCACHE|GoCacheTestCache|GoCacheBuildCache)
+	goCleaner, _ := NewGoCleaner(verbose, dryRun, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
 	registry.Register("go", goCleaner)
 
 	// Node packages cleaner (default: all available package managers)
