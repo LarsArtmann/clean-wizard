@@ -571,7 +571,7 @@ func runDockerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanRe
 // runSystemCacheCleaner executes the System Cache cleaner.
 func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		systemCacheCleaner, err := cleaner.NewSystemCacheCleaner(v, d, "30d")
+		systemCacheCleaner, err := cleaner.NewSystemCacheCleaner(v, d, "30d", nil)
 		if err != nil {
 			panic(err) // This should never happen with valid parameters
 		}

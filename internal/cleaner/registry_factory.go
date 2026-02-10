@@ -36,8 +36,8 @@ func DefaultRegistry() *Registry {
 	buildCacheCleaner, _ := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	registry.Register("buildcache", buildCacheCleaner)
 
-	// System cache cleaner (default: 30d)
-	systemCacheCleaner, _ := NewSystemCacheCleaner(false, false, "30d")
+	// System cache cleaner (default: 30d, all cache types)
+	systemCacheCleaner, _ := NewSystemCacheCleaner(false, false, "30d", nil)
 	registry.Register("systemcache", systemCacheCleaner)
 
 	// Temp files cleaner (default: 7d, standard temp paths)
@@ -81,8 +81,8 @@ func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
 	buildCacheCleaner, _ := NewBuildCacheCleaner(verbose, dryRun, "30d", []string{}, []string{})
 	registry.Register("buildcache", buildCacheCleaner)
 
-	// System cache cleaner (default: 30d)
-	systemCacheCleaner, _ := NewSystemCacheCleaner(verbose, dryRun, "30d")
+	// System cache cleaner (default: 30d, all cache types)
+	systemCacheCleaner, _ := NewSystemCacheCleaner(verbose, dryRun, "30d", nil)
 	registry.Register("systemcache", systemCacheCleaner)
 
 	// Temp files cleaner (default: 7d, standard temp paths)

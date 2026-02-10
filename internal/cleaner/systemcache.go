@@ -17,40 +17,32 @@ import (
 type SystemCacheCleaner struct {
 	verbose    bool
 	dryRun     bool
-	cacheTypes []SystemCacheType
+	cacheTypes []domain.CacheType
 	olderThan  time.Duration
 }
 
-// SystemCacheType represents different system cache types.
-type SystemCacheType string
-
-const (
-	SystemCacheSpotlight SystemCacheType = "spotlight"
-	SystemCacheXcode     SystemCacheType = "xcode"
-	SystemCacheCocoaPods SystemCacheType = "cocoapods"
-	SystemCacheHomebrew  SystemCacheType = "homebrew"
-)
-
-// AvailableSystemCacheTypes returns all available system cache types.
-func AvailableSystemCacheTypes() []SystemCacheType {
-	return []SystemCacheType{
-		SystemCacheSpotlight,
-		SystemCacheXcode,
-		SystemCacheCocoaPods,
-		SystemCacheHomebrew,
+// AvailableSystemCacheTypes returns all available system cache types for macOS.
+func AvailableSystemCacheTypes() []domain.CacheType {
+	return []domain.CacheType{
+		domain.CacheTypeSpotlight,
+		domain.CacheTypeXcode,
+		domain.CacheTypeCocoapods,
+		domain.CacheTypeHomebrew,
 	}
 }
 
 // NewSystemCacheCleaner creates system cache cleaner.
-func NewSystemCacheCleaner(verbose, dryRun bool, olderThan string) (*SystemCacheCleaner, error) {
+func NewSystemCacheCleaner(verbose, dryRun bool, olderThan string, cacheTypes []domain.CacheType) (*SystemCacheCleaner, error) {
 	// Parse older than duration
 	duration, err := domain.ParseCustomDuration(olderThan)
 	if err != nil {
 		return nil, fmt.Errorf("invalid older_than duration: %w", err)
 	}
 
-	// Default cache types to all available
-	cacheTypes := AvailableSystemCacheTypes()
+	// Default to all available cache types if none specified
+	if len(cacheTypes) == 0 {
+		cacheTypes = AvailableSystemCacheTypes()
+	}
 
 	return &SystemCacheCleaner{
 		verbose:    verbose,
@@ -82,15 +74,23 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 		return nil // Settings are optional
 	}
 
-	validCacheTypesMap := toStringMap(AvailableSystemCacheTypes())
-	cacheTypeStrings := CacheTypeToLowerSlice(settings.SystemCache.CacheTypes)
+	// Create valid cache types map
+	validCacheTypes := make(map[domain.CacheType]bool)
+	for _, ct := range AvailableSystemCacheTypes() {
+		validCacheTypes[ct] = true
+	}
 
-	return validateSettings(
-		cacheTypeStrings,
-		validCacheTypesMap,
-		"cache type",
-		"spotlight, xcode, cocoapods, or homebrew",
-	)
+	// Validate each CacheType in settings
+	for i, ct := range settings.SystemCache.CacheTypes {
+		if !ct.IsValid() {
+			return fmt.Errorf("invalid CacheType at index %d: %d is not a valid cache type", i, ct)
+		}
+		if !validCacheTypes[ct] {
+			return fmt.Errorf("invalid default CacheType at index %d: %d not supported on macOS (valid: spotlight, xcode, cocoapods, homebrew)", i, ct)
+		}
+	}
+
+	return nil
 }
 
 // Scan scans for system caches.
@@ -137,23 +137,23 @@ type cacheTypeConfig struct {
 }
 
 // systemCacheConfigs maps cache types to their configuration.
-var systemCacheConfigs = map[SystemCacheType]cacheTypeConfig{
-	SystemCacheSpotlight: {
+var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
+	domain.CacheTypeSpotlight: {
 		pathComponents: []string{"Library", "Metadata", "CoreSpotlight", "SpotlightKnowledgeEvents"},
 		displayName:    "Spotlight metadata",
 		scanType:       domain.ScanTypeTemp,
 	},
-	SystemCacheXcode: {
+	domain.CacheTypeXcode: {
 		pathComponents: []string{"Library", "Developer", "Xcode", "DerivedData"},
 		displayName:    "Xcode DerivedData",
 		scanType:       domain.ScanTypeTemp,
 	},
-	SystemCacheCocoaPods: {
+	domain.CacheTypeCocoapods: {
 		pathComponents: []string{"Library", "Caches", "CocoaPods"},
 		displayName:    "CocoaPods cache",
 		scanType:       domain.ScanTypeTemp,
 	},
-	SystemCacheHomebrew: {
+	domain.CacheTypeHomebrew: {
 		pathComponents: []string{"Library", "Caches", "Homebrew"},
 		displayName:    "Homebrew cache",
 		scanType:       domain.ScanTypeTemp,
@@ -161,12 +161,12 @@ var systemCacheConfigs = map[SystemCacheType]cacheTypeConfig{
 }
 
 // scanSystemCache scans cache for a specific system cache type.
-func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType SystemCacheType, homeDir string) result.Result[[]domain.ScanItem] {
+func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType domain.CacheType, homeDir string) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	config, exists := systemCacheConfigs[cacheType]
 	if !exists {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("unknown system cache type: %s", cacheType))
+		return result.Err[[]domain.ScanItem](fmt.Errorf("unknown system cache type: %s", cacheType.String()))
 	}
 
 	scanResult := scc.scanCachePathWithConfig(ctx, homeDir, config)
@@ -190,6 +190,11 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 		itemsRemoved := len(scc.cacheTypes)
 
 		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
+		// Set SizeEstimate properly
+		cleanResult.SizeEstimate = domain.SizeEstimate{
+			Known:  uint64(totalBytes),
+			Status: domain.SizeEstimateStatusKnown,
+		}
 		return result.Ok(cleanResult)
 	}
 
@@ -221,8 +226,19 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 		bytesFreed += int64(cleanResult.FreedBytes)
 	}
 
+	var status domain.SizeEstimateStatusType
+	if bytesFreed > 0 {
+		status = domain.SizeEstimateStatusKnown
+	} else {
+		status = domain.SizeEstimateStatusUnknown
+	}
+
 	duration := time.Since(startTime)
 	cleanResult := domain.CleanResult{
+		SizeEstimate: domain.SizeEstimate{
+			Known:  uint64(bytesFreed),
+			Status: status,
+		},
 		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  uint(itemsFailed),
@@ -241,6 +257,10 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 			fmt.Printf("  [DRY RUN] Would remove: %s\n", path)
 		}
 		return result.Ok(domain.CleanResult{
+			SizeEstimate: domain.SizeEstimate{
+				Known:  0,
+				Status: domain.SizeEstimateStatusUnknown,
+			},
 			FreedBytes:   0,
 			ItemsRemoved: 1,
 			ItemsFailed:  0,
@@ -260,6 +280,10 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 	}
 
 	return result.Ok(domain.CleanResult{
+		SizeEstimate: domain.SizeEstimate{
+			Known:  0,
+			Status: domain.SizeEstimateStatusUnknown,
+		},
 		FreedBytes:   0,
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
@@ -282,10 +306,10 @@ func (scc *SystemCacheCleaner) scanCachePathWithConfig(ctx context.Context, home
 }
 
 // cleanSystemCache cleans cache for a specific system cache type.
-func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context, cacheType SystemCacheType, homeDir string) result.Result[domain.CleanResult] {
+func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context, cacheType domain.CacheType, homeDir string) result.Result[domain.CleanResult] {
 	config, exists := systemCacheConfigs[cacheType]
 	if !exists {
-		return result.Err[domain.CleanResult](fmt.Errorf("unknown system cache type: %s", cacheType))
+		return result.Err[domain.CleanResult](fmt.Errorf("unknown system cache type: %s", cacheType.String()))
 	}
 
 	path := filepath.Join(append([]string{homeDir}, config.pathComponents...)...)
