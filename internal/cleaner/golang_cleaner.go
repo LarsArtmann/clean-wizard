@@ -159,8 +159,18 @@ func (gc *GoCleaner) processCacheResult(
 
 // buildCleanResult creates CleanResult from stats.
 func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) result.Result[domain.CleanResult] {
-	// Create result with honest size estimate
-	sizeEstimate := domain.SizeEstimate{Known: stats.FreedBytes}
+	// Create result with honest size estimate - set Status explicitly to avoid validation errors
+	var status domain.SizeEstimateStatusType
+	if stats.FreedBytes > 0 {
+		status = domain.SizeEstimateStatusKnown
+	} else {
+		status = domain.SizeEstimateStatusUnknown
+	}
+
+	sizeEstimate := domain.SizeEstimate{
+		Known:  stats.FreedBytes,
+		Status: status,
+	}
 
 	// Note: conversions.NewCleanResult uses FreedBytes (deprecated), so we update SizeEstimate
 	cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), int(stats.Removed), int64(stats.FreedBytes))
