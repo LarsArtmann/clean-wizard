@@ -25,7 +25,7 @@ func TestNewContext(t *testing.T) {
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 
-	c := NewContext[TestValidationConfig](ctx, value)
+	c := NewContext(ctx, value)
 
 	if c.Context != ctx {
 		t.Errorf("Expected context %v, got %v", ctx, c.Context)
@@ -47,7 +47,7 @@ func TestNewContext(t *testing.T) {
 func TestWithMetadata(t *testing.T) {
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
-	c := NewContext[TestValidationConfig](ctx, value)
+	c := NewContext(ctx, value)
 
 	c.WithMetadata("trace_id", "12345").WithMetadata("span_id", "67890")
 
@@ -67,7 +67,7 @@ func TestWithMetadata(t *testing.T) {
 func TestWithPermissions(t *testing.T) {
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
-	c := NewContext[TestValidationConfig](ctx, value)
+	c := NewContext(ctx, value)
 
 	c.WithPermissions("read", "write", "execute")
 
@@ -95,7 +95,7 @@ func TestWithPermissions(t *testing.T) {
 func TestGetMetadata(t *testing.T) {
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
-	c := NewContext[TestValidationConfig](ctx, value)
+	c := NewContext(ctx, value)
 
 	c.Metadata["trace_id"] = "12345"
 	c.Metadata["span_id"] = "67890"
@@ -114,7 +114,7 @@ func TestGetMetadata(t *testing.T) {
 func TestClone(t *testing.T) {
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
-	c := NewContext[TestValidationConfig](ctx, value)
+	c := NewContext(ctx, value)
 
 	c.WithMetadata("trace_id", "12345").WithPermissions("read", "write")
 
@@ -149,12 +149,12 @@ func TestMerge(t *testing.T) {
 
 	// Create first context
 	value1 := TestValidationConfig{FieldA: "test1", FieldB: 42}
-	c1 := NewContext[TestValidationConfig](ctx, value1)
+	c1 := NewContext(ctx, value1)
 	c1.WithMetadata("trace_id", "12345").WithPermissions("read", "write")
 
 	// Create second context
 	value2 := TestValidationConfig{FieldA: "test2", FieldB: 43}
-	c2 := NewContext[TestValidationConfig](ctx, value2)
+	c2 := NewContext(ctx, value2)
 	c2.WithMetadata("span_id", "67890").WithPermissions("execute")
 
 	// Merge
@@ -195,7 +195,7 @@ func TestMerge(t *testing.T) {
 func TestSetValueType(t *testing.T) {
 	ctx := context.Background()
 	value1 := TestValidationConfig{FieldA: "test1", FieldB: 42}
-	c := NewContext[TestValidationConfig](ctx, value1)
+	c := NewContext(ctx, value1)
 
 	if c.GetValueType().FieldA != "test1" {
 		t.Error("Expected original value in GetValueType()")
@@ -212,7 +212,7 @@ func TestSetValueType(t *testing.T) {
 func TestGetContext(t *testing.T) {
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
-	c := NewContext[TestValidationConfig](ctx, value)
+	c := NewContext(ctx, value)
 
 	if c.GetContext() != ctx {
 		t.Error("Expected GetContext() to return the set context")
@@ -229,9 +229,9 @@ func TestDifferentTypes(t *testing.T) {
 	ctx := context.Background()
 
 	// Create different types of contexts
-	validationCtx := NewContext[TestValidationConfig](ctx, TestValidationConfig{FieldA: "validation"})
-	errorCtx := NewContext[TestErrorConfig](ctx, TestErrorConfig{Code: 500, Message: "error"})
-	sanitizationCtx := NewContext[TestSanitizationConfig](ctx, TestSanitizationConfig{Policy: "strict", Rules: []string{"rule1"}})
+	validationCtx := NewContext(ctx, TestValidationConfig{FieldA: "validation"})
+	errorCtx := NewContext(ctx, TestErrorConfig{Code: 500, Message: "error"})
+	sanitizationCtx := NewContext(ctx, TestSanitizationConfig{Policy: "strict", Rules: []string{"rule1"}})
 
 	// Verify each holds its type correctly
 	if validationCtx.GetValueType().FieldA != "validation" {
@@ -250,7 +250,7 @@ func TestDifferentTypes(t *testing.T) {
 func TestMetadataOperations(t *testing.T) {
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
-	c := NewContext[TestValidationConfig](ctx, value)
+	c := NewContext(ctx, value)
 
 	// Add metadata
 	c.WithMetadata("key1", "value1")
@@ -283,7 +283,7 @@ func TestMetadataOperations(t *testing.T) {
 func TestPermissionsEdgeCases(t *testing.T) {
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
-	c := NewContext[TestValidationConfig](ctx, value)
+	c := NewContext(ctx, value)
 
 	// Test with empty permissions
 	c.WithPermissions()
