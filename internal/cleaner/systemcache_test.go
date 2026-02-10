@@ -47,7 +47,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner, err := NewSystemCacheCleaner(tt.verbose, tt.dryRun, tt.olderThan)
+			cleaner, err := NewSystemCacheCleaner(tt.verbose, tt.dryRun, tt.olderThan, nil)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewSystemCacheCleaner() error = %v, wantErr %v", err, tt.wantErr)
