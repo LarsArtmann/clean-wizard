@@ -44,45 +44,45 @@ func NewErrorWithDetails(code ErrorCode, message string, details *ErrorDetails) 
 
 // ConfigValidateError creates config validation error.
 func ConfigValidateError(message string) error {
-	return NewErrorWithDetails(ErrConfigValidation, message, &ErrorDetails{
-		Operation: "config_validation",
-	})
+	return NewErrorWithDetails(ErrConfigValidation, message, NewErrorDetails().
+		WithOperation("config_validation").
+		Build())
 }
 
 // ConfigLoadError creates config loading error.
 func ConfigLoadError(message string) error {
-	return NewErrorWithDetails(ErrConfigLoad, message, &ErrorDetails{
-		Operation: "config_load",
-	})
+	return NewErrorWithDetails(ErrConfigLoad, message, NewErrorDetails().
+		WithOperation("config_load").
+		Build())
 }
 
 // ConfigSaveError creates config saving error.
 func ConfigSaveError(message string) error {
-	return NewErrorWithDetails(ErrConfigSave, message, &ErrorDetails{
-		Operation: "config_save",
-	})
+	return NewErrorWithDetails(ErrConfigSave, message, NewErrorDetails().
+		WithOperation("config_save").
+		Build())
 }
 
 // NixCommandError creates nix command error.
 func NixCommandError(message string) error {
-	return NewErrorWithDetails(ErrNixCommandFailed, message, &ErrorDetails{
-		Operation: "nix_command",
-	})
+	return NewErrorWithDetails(ErrNixCommandFailed, message, NewErrorDetails().
+		WithOperation("nix_command").
+		Build())
 }
 
 // CleaningError creates cleaning operation error.
 func CleaningError(message string) error {
-	return NewErrorWithDetails(ErrCleaningFailed, message, &ErrorDetails{
-		Operation: "cleaning",
-	})
+	return NewErrorWithDetails(ErrCleaningFailed, message, NewErrorDetails().
+		WithOperation("cleaning").
+		Build())
 }
 
 // ValidationError creates validation error.
 func ValidationError(field, value, expected string) error {
-	return NewErrorWithDetails(ErrInvalidInput, "Validation failed", &ErrorDetails{
-		Field:     field,
-		Value:     value,
-		Expected:  expected,
-		Operation: "validation",
-	})
+	return NewErrorWithDetails(ErrInvalidInput, "Validation failed", NewErrorDetails().
+		WithField(field).
+		WithValue(value).
+		WithExpected(expected).
+		WithOperation("validation").
+		Build())
 }

@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -390,6 +391,194 @@ func TestErrorDetailsBuilder(t *testing.T) {
 		}
 		if len(details.Metadata) != 1 {
 			t.Errorf("Metadata length = %d, want %d", len(details.Metadata), 1)
+		}
+	})
+}
+
+func TestErrorDetailsBuilderIntegration(t *testing.T) {
+	// Integration test: Verify ErrorDetailsBuilder works with error constructors
+	t.Run("config validation error", func(t *testing.T) {
+		err := ValidationError("test_field", "invalid_value", "expected_value")
+
+		var cleanErr *CleanWizardError
+		if !errors.As(err, &cleanErr) {
+			t.Fatal("Expected *CleanWizardError")
+		}
+
+		if cleanErr.Details == nil {
+			t.Fatal("Expected ErrorDetails")
+		}
+
+		if cleanErr.Details.Field != "test_field" {
+			t.Errorf("Field = %q, want %q", cleanErr.Details.Field, "test_field")
+		}
+		if cleanErr.Details.Value != "invalid_value" {
+			t.Errorf("Value = %q, want %q", cleanErr.Details.Value, "invalid_value")
+		}
+		if cleanErr.Details.Expected != "expected_value" {
+			t.Errorf("Expected = %q, want %q", cleanErr.Details.Expected, "expected_value")
+		}
+		if cleanErr.Details.Operation != "validation" {
+			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "validation")
+		}
+	})
+
+	t.Run("config load error", func(t *testing.T) {
+		err := ConfigLoadError("failed to read config file")
+
+		cleanErr, ok := err.(*CleanWizardError)
+		if !ok {
+			t.Fatal("Expected *CleanWizardError")
+		}
+
+		if cleanErr.Details == nil {
+			t.Fatal("Expected ErrorDetails")
+		}
+
+		if cleanErr.Details.Operation != "config_load" {
+			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "config_load")
+		}
+	})
+
+	t.Run("config save error", func(t *testing.T) {
+		err := ConfigSaveError("failed to write config")
+
+		cleanErr, ok := err.(*CleanWizardError)
+		if !ok {
+			t.Fatal("Expected *CleanWizardError")
+		}
+
+		if cleanErr.Details == nil {
+			t.Fatal("Expected ErrorDetails")
+		}
+
+		if cleanErr.Details.Operation != "config_save" {
+			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "config_save")
+		}
+	})
+
+	t.Run("config validation error", func(t *testing.T) {
+		err := ConfigValidateError("invalid profile name")
+
+		cleanErr, ok := err.(*CleanWizardError)
+		if !ok {
+			t.Fatal("Expected *CleanWizardError")
+		}
+
+		if cleanErr.Details == nil {
+			t.Fatal("Expected ErrorDetails")
+		}
+
+		if cleanErr.Details.Operation != "config_validation" {
+			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "config_validation")
+		}
+	})
+
+	t.Run("nix command error", func(t *testing.T) {
+		err := NixCommandError("nix-env failed")
+
+		cleanErr, ok := err.(*CleanWizardError)
+		if !ok {
+			t.Fatal("Expected *CleanWizardError")
+		}
+
+		if cleanErr.Details == nil {
+			t.Fatal("Expected ErrorDetails")
+		}
+
+		if cleanErr.Details.Operation != "nix_command" {
+			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "nix_command")
+		}
+	})
+
+	t.Run("cleaning error", func(t *testing.T) {
+		err := CleaningError("failed to clean cache")
+
+		cleanErr, ok := err.(*CleanWizardError)
+		if !ok {
+			t.Fatal("Expected *CleanWizardError")
+		}
+
+		if cleanErr.Details == nil {
+			t.Fatal("Expected ErrorDetails")
+		}
+
+		if cleanErr.Details.Operation != "cleaning" {
+			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "cleaning")
+		}
+	})
+
+	t.Run("handler validation error with details", func(t *testing.T) {
+		err := HandleValidationErrorWithDetails("test_operation", "test_field", "test_value", "test_reason")
+
+		if err.Details == nil {
+			t.Fatal("Expected ErrorDetails")
+		}
+
+		if err.Details.Operation != "test_operation" {
+			t.Errorf("Operation = %q, want %q", err.Details.Operation, "test_operation")
+		}
+		if err.Details.Field != "test_field" {
+			t.Errorf("Field = %q, want %q", err.Details.Field, "test_field")
+		}
+		if err.Details.Value != "test_value" {
+			t.Errorf("Value = %q, want %q", err.Details.Value, "test_value")
+		}
+		if err.Details.Metadata["reason"] != "test_reason" {
+			t.Errorf("Metadata[reason] = %q, want %q", err.Details.Metadata["reason"], "test_reason")
+		}
+	})
+
+	t.Run("fluent builder chaining", func(t *testing.T) {
+		details := NewErrorDetails().
+			WithField("config.path").
+			WithValue("/invalid/path").
+			WithExpected("valid/path").
+			WithActual("/invalid/path").
+			WithOperation("config_validation").
+			WithFilePath("/path/to/config.go").
+			WithLineNumber(42).
+			WithRetryCount(3).
+			WithDuration("500ms").
+			WithMetadata("env", "production").
+			WithMetadata("user", "admin").
+			Build()
+
+		if details.Field != "config.path" {
+			t.Errorf("Field = %q, want %q", details.Field, "config.path")
+		}
+		if details.Value != "/invalid/path" {
+			t.Errorf("Value = %q, want %q", details.Value, "/invalid/path")
+		}
+		if details.Expected != "valid/path" {
+			t.Errorf("Expected = %q, want %q", details.Expected, "valid/path")
+		}
+		if details.Actual != "/invalid/path" {
+			t.Errorf("Actual = %q, want %q", details.Actual, "/invalid/path")
+		}
+		if details.Operation != "config_validation" {
+			t.Errorf("Operation = %q, want %q", details.Operation, "config_validation")
+		}
+		if details.FilePath != "/path/to/config.go" {
+			t.Errorf("FilePath = %q, want %q", details.FilePath, "/path/to/config.go")
+		}
+		if details.LineNumber != 42 {
+			t.Errorf("LineNumber = %d, want %d", details.LineNumber, 42)
+		}
+		if details.RetryCount != 3 {
+			t.Errorf("RetryCount = %d, want %d", details.RetryCount, 3)
+		}
+		if details.Duration != "500ms" {
+			t.Errorf("Duration = %q, want %q", details.Duration, "500ms")
+		}
+		if len(details.Metadata) != 2 {
+			t.Errorf("Metadata length = %d, want %d", len(details.Metadata), 2)
+		}
+		if details.Metadata["env"] != "production" {
+			t.Errorf("Metadata[env] = %q, want %q", details.Metadata["env"], "production")
+		}
+		if details.Metadata["user"] != "admin" {
+			t.Errorf("Metadata[user] = %q, want %q", details.Metadata["user"], "admin")
 		}
 	})
 }

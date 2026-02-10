@@ -60,14 +60,12 @@ func HandleValidationError(operation string, err error) *CleanWizardError {
 func HandleValidationErrorWithDetails(operation, field string, value any, reason string) *CleanWizardError {
 	return NewErrorWithDetails(ErrConfigValidation,
 		fmt.Sprintf("Validation failed for %s: %s", field, reason),
-		&ErrorDetails{
-			Operation: operation,
-			Field:     field,
-			Value:     fmt.Sprintf("%v", value),
-			Metadata: map[string]string{
-				"reason": reason,
-			},
-		})
+		NewErrorDetails().
+			WithOperation(operation).
+			WithField(field).
+			WithValue(fmt.Sprintf("%v", value)).
+			WithMetadata("reason", reason).
+			Build())
 }
 
 // WrapError wraps existing error with CleanWizardError context.
