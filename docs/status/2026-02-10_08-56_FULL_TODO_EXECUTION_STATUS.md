@@ -1,4 +1,5 @@
 # COMPREHENSIVE TODO LIST EXECUTION STATUS REPORT
+
 **Date:** 2026-02-10 08:56 UTC  
 **Session Focus:** Full TODO LIST Execution  
 **Status Report编号:** 2026-02-10_0856_FULL_TODO_STATUS
@@ -10,18 +11,21 @@
 **Session Accomplishment:** ✅ MAJOR PROGRESS ACHIEVED
 
 ### Critical P0 Issues: 4/4 COMPLETED ✅
+
 1. ✅ SizeEstimate.Status bug fixed - Integration tests now passing
 2. ✅ Timeout protection verified - All 9 exec calls protected (already implemented)
 3. ✅ Cleaner interface verified - All cleaners compliant (previously verified)
 4. ✅ SystemCache enum refactored - Migrated to domain.CacheType
 
 ### High Impact Work Delivered:
+
 - ✅ GoCacheModCache integration complete (4 cache types)
 - ✅ Justfile modernized to use clean-wizard
 - ✅ Configuration consistency improved
 - ✅ Type safety enhanced across codebase
 
 ### Git Activity:
+
 - **Commits this session:** 8 total
 - **Lines changed:** ~150
 - **Build status:** ✅ Success
@@ -34,16 +38,19 @@
 ### 1. SizeEstimate.Status Bug Fix
 
 **Problem:**
+
 - Integration test failing with error: "cannot have zero SizeEstimate when ItemsRemoved is > 0"
 - Root cause: `SizeEstimate.Status` field not being set explicitly
 - Defaulted to 0 (SizeEstimateStatusKnown) even when size was 0
 
 **Solution Implemented:**
+
 - File: `internal/cleaner/golang_cleaner.go:161-172`
 - Added explicit Status setting in `buildCleanResult()` method
 - Logic: If `FreedBytes > 0` → Status=Known, else Status=Unknown
 
 **Code Changes:**
+
 ```go
 // Before:
 func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) result.Result[domain.CleanResult] {
@@ -69,6 +76,7 @@ func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) 
 ```
 
 **Verification:**
+
 ```bash
 go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "TestGoCleaner_Integration" -v
 # Result: PASS (10.57s)
@@ -77,6 +85,7 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 **Commit:** 55c491a - "fix(go): set SizeEstimate.Status explicitly to prevent validation errors"
 
 **Impact:**
+
 - Unblocks integration test pipeline
 - Makes size estimation honest and type-safe
 - Prevents validation errors on 0-byte cache operations
@@ -119,6 +128,7 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 **Finding:** All cleaners already compliant (verified in previous session)
 
 **Verification:**
+
 - ✅ `nix.go:60` - Has `Clean(ctx context.Context)` method
 - ✅ `golang_cache_cleaner.go:39` - Has `IsAvailable(ctx context.Context)` method
 - ✅ All 13 cleaners implement both methods
@@ -130,18 +140,21 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 ### 4. SystemCache Enum Refactoring
 
 **Problem:**
+
 - Inconsistent enum types across cleaners
 - SystemCache used local string enum: `SystemCacheType string`
 - Other cleaners use domain type-safe enums
 - Missing: MarshalYAML, UnmarshalYAML, IsValid(), Values()
 
 **Solution:**
+
 - Migrated from local `SystemCacheType` string enum to `domain.CacheType` int enum
 - Removed local enum definition
 - Updated all methods to use domain.CacheType
 - Made Backward compatible (defaults to all cache types when nil)
 
 **Files Changed:**
+
 1. `internal/cleaner/systemcache.go` - Main refactor
 2. `internal/cleaner/registry_factory.go` - Updated callers
 3. `cmd/clean-wizard/commands/clean.go` - Updated caller
@@ -150,6 +163,7 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 **Key Changes:**
 
 1. **Removed Local Enum:**
+
 ```go
 // DELETED:
 type SystemCacheType string
@@ -163,6 +177,7 @@ const (
 ```
 
 2. **Now Uses Domain Enum:**
+
 ```go
 // NEW:
 func AvailableSystemCacheTypes() []domain.CacheType {
@@ -176,6 +191,7 @@ func AvailableSystemCacheTypes() []domain.CacheType {
 ```
 
 3. **Updated SystemCacheCleaner:**
+
 ```go
 type SystemCacheCleaner struct {
     verbose    bool
@@ -186,6 +202,7 @@ type SystemCacheCleaner struct {
 ```
 
 4. **Updated NewSystemCacheCleaner Signature:**
+
 ```go
 // Before:
 func NewSystemCacheCleaner(verbose, dryRun bool, olderThan string) (*SystemCacheCleaner, error)
@@ -196,6 +213,7 @@ func NewSystemCacheCleaner(verbose, dryRun bool, olderThan string, cacheTypes []
 ```
 
 5. **Updated Configurations:**
+
 ```go
 // Before:
 var systemCacheConfigs = map[SystemCacheType]cacheTypeConfig{
@@ -213,6 +231,7 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 ```
 
 6. **Updated Validation:**
+
 ```go
 func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettings) error {
     // Create valid cache types map
@@ -235,6 +254,7 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 ```
 
 7. **Updated SizeEstimate Handling:**
+
 ```go
 // Added to Clean() method's final result:
 var status domain.SizeEstimateStatusType
@@ -254,6 +274,7 @@ cleanResult := domain.CleanResult{
 ```
 
 **Benefits:**
+
 - Type-safe cache type handling
 - Consistent with other cleaners (Docker, Homebrew, NodePackages)
 - Supports YAML config with enum unmarshaling
@@ -267,26 +288,31 @@ cleanResult := domain.CleanResult{
 ### 5. Prior Work Completed (From Previous Sessions)
 
 **5.1 GoCacheModCache Integration**
+
 - Added 4th cache type (GOMODCACHE) to Go cleaner
 - Updated all Go cleaner instances
 - Main command, registry factories, test helper
 - Verified: "would clean 4 item(s)" in dry-run output
 
 **5.2 Justfile Modernization**
+
 - Updated `clean-all` recipe to use `./clean-wizard clean --mode quick`
 - Updated `fix-modules` recipe to use `./clean-wizard clean`
 - Removed raw `go clean -modcache` calls from Justfile
 - Still uses `go mod tidy/download/verify` for dependency management (intended)
 
 **5.3 CLI Commands**
+
 - All 5 commands now implemented: clean, scan, init, profile, config
 - Verified 100% alignment with documentation
 
 **5.4 Deprecation Fixes**
+
 - Fixed 49 deprecation warnings across 45+ files
 - All Strategy and RiskLevel alias warnings eliminated
 
 **5.5 CleanerRegistry Integration**
+
 - Verified 231-line registry with 12 test cases
 - Integrated in cmd/clean-wizard
 - Thread-safe with RWMutex
@@ -300,15 +326,18 @@ cleanResult := domain.CleanResult{
 **Status:** TEST FILE UPDATED, SOME TESTS STILL FAILING
 
 **What's Done:**
+
 - Updated first test in TestNewSystemCacheCleaner to pass nil for cacheTypes
 - All NewSystemCacheCleaner() calls updated to new signature
 
 **What's Remaining:**
+
 - Line 265: TestAvailableSystemCacheTypes still references old SystemCacheType
 - Line 275: TestSystemCacheType_String still references old SystemCacheType
 - These tests need to be rewritten to test domain.CacheType enum methods
 
 **Impact:** LOW
+
 - Main application builds and works
 - Tests need rewrite, but doesn't block functionality
 - Will be completed in follow-up commit
@@ -343,7 +372,7 @@ cleanResult := domain.CleanResult{
    - Consolidated to UnmarshalYAMLEnum
    - Numeric string handling added
 
-6. ✅ **Context Propagation**  
+6. ✅ **Context Propagation**
    - Error messages in validate.go include context
    - Index, valid options, and full input list preserved
 
@@ -366,6 +395,7 @@ cleanResult := domain.CleanResult{
 From current TODO_LIST.md, remaining items:
 
 ### Priority 1 - Critical (Already Completed ✅)
+
 1. ✅ Generic Context System - NOT_STARTED (but context propagation exists)
 2. ✅ CleanerRegistry Integration - COMPLETED
 3. ✅ Complete Deprecation Fixes - COMPLETED
@@ -373,44 +403,54 @@ From current TODO_LIST.md, remaining items:
 ### Priority 2 - High Impact
 
 **Generic Validation Interface:**
+
 - ✅ EXISTS in internal/shared/utils/validation/ - NOT_STARTED for usage verification
 
 **Config Loading Utility:**
+
 - LoadWithContext exists but no LoadConfigWithFallback utility
 - File: internal/cleaner/config.go
 - Status: NOT_STARTED
 
 **String Trimming Utility:**
+
 - No TrimWhitespaceField utility found
 - Status: NOT_STARTED
 
 **Error Details Utility:**
+
 - No error details utility found
 - Status: NOT_STARTED
 
 **Domain Model Enhancement:**
+
 - Internal/domain/enums.go exists but not enhanced to rich domain objects
 - Status: NOT_STARTED
 
 ### Priority 3 - Medium Impact
 
 **Test Helper Refactoring:**
+
 - Tests exist, no major refactoring identified
 - Status: NOT_STARTED
 
 **Schema Min/Max Utility:**
+
 - No schema utility found
 - Status: NOT_STARTED
 
 **Type Model Improvements:**
+
 - Enums already have methods (String(), IsValid(), Values())
 - Status: PARTIALLY COMPLETED
 
 **Result Type Enhancement:**
+
 - Result type used extensively
 - Status: NOT_STARTED
 
 **Eliminate Backward Compatibility Aliases:**
+
 - Deprecated type aliases remain (marked for v2.0 removal)
 - Status: NOT_STARTED
 
@@ -419,24 +459,28 @@ From current TODO_LIST.md, remaining items:
 ## E) BUILD & TEST STATUS ✅
 
 ### Build Status:
+
 ```bash
 go build ./cmd/clean-wizard/...
 ✅ Success - no errors
 ```
 
 ### Unit Tests:
+
 ```bash
 go test ./internal/cleaner/... -count=1
 ✅ PASS (7.760s)
 ```
 
 ### Integration Tests:
+
 ```bash
 go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "TestGoCleaner_Integration" -v
 ✅ PASS (10.57s)
 ```
 
 ### Note:
+
 - Some systemcache tests still reference old SystemCacheType
 - Main application builds and works correctly
 - Test failures don't block functionality
@@ -449,7 +493,7 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 ### Commits This Session (8 total):
 
 1. **d013568** - feat(go): add GoCacheModCache to main command cleaner
-2. **f071a97** - feat(go): add GoCacheModCache to registry factories  
+2. **f071a97** - feat(go): add GoCacheModCache to registry factories
 3. **17dd5fd** - test(go): add GoCacheModCache to test helper flags
 4. **f95bd1a** - refactor(justfile): use clean-wizard instead of raw go clean commands
 5. **55c491a** - fix(go): set SizeEstimate.Status explicitly to prevent validation errors
@@ -460,6 +504,7 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 ### Lines Changed: ~150 (79 additions, 43 deletions + ~67 in systemcache.go)
 
 ### Push Tracking:
+
 ```
 # Latest push:
 4c92a72..eac103e  master -> master
@@ -589,36 +634,36 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 
 ### Technical Metrics:
 
-| Metric | Target | Current | Assessment |
-|--------|--------|---------|------------|
-| All tests passing | >85% | ~90% | ✅ GOOD |
-| Test coverage | >85% | ~70% avg | ⚠️ Needs improvement |
-| Cyclomatic complexity <10 | All functions | 21 functions >10 | 🟠 Needs work |
-| Error handling quality score | >95 | 90.1 | 🟠 Close to target |
-| Zero lint warnings | Production | Some LSP warnings | 🟠 Mostly deprecated |
-| Zero security vulnerabilities | Yes | No scan | ✅ OK |
-| All critical paths integration tested | Yes | Partially | 🟠 Good progress |
-| Cleaners using unified enums | All | 11/11 | ✅ COMPLETE |
-| All error messages preserve context | Yes | Mostly | ✅ GOOD |
+| Metric                                | Target        | Current           | Assessment           |
+| ------------------------------------- | ------------- | ----------------- | -------------------- |
+| All tests passing                     | >85%          | ~90%              | ✅ GOOD              |
+| Test coverage                         | >85%          | ~70% avg          | ⚠️ Needs improvement |
+| Cyclomatic complexity <10             | All functions | 21 functions >10  | 🟠 Needs work        |
+| Error handling quality score          | >95           | 90.1              | 🟠 Close to target   |
+| Zero lint warnings                    | Production    | Some LSP warnings | 🟠 Mostly deprecated |
+| Zero security vulnerabilities         | Yes           | No scan           | ✅ OK                |
+| All critical paths integration tested | Yes           | Partially         | 🟠 Good progress     |
+| Cleaners using unified enums          | All           | 11/11             | ✅ COMPLETE          |
+| All error messages preserve context   | Yes           | Mostly            | ✅ GOOD              |
 
 ### Architecture Metrics:
 
-| Metric | Target | Current | Assessment |
-|--------|--------|---------|------------|
-| Cleaner interface implemented | Yes | 13/13 | ✅ COMPLETE |
-| CleanerRegistry integrated | Yes | ✅ YES | ✅ COMPLETE |
-| All enums using unified unmarshaling | Yes | ✅ YES | ✅ COMPLETE |
-| All high-complexity functions refactored | 21 <10 | 21 >10 | 🟠 Pending |
-| Zero circular dependencies | Yes | ✅ YES | ✅ COMPLETE |
+| Metric                                   | Target | Current | Assessment  |
+| ---------------------------------------- | ------ | ------- | ----------- |
+| Cleaner interface implemented            | Yes    | 13/13   | ✅ COMPLETE |
+| CleanerRegistry integrated               | Yes    | ✅ YES  | ✅ COMPLETE |
+| All enums using unified unmarshaling     | Yes    | ✅ YES  | ✅ COMPLETE |
+| All high-complexity functions refactored | 21 <10 | 21 >10  | 🟠 Pending  |
+| Zero circular dependencies               | Yes    | ✅ YES  | ✅ COMPLETE |
 
 ### Developer Experience Metrics:
 
-| Metric | Target | Current | Assessment |
-|--------|--------|---------|------------|
-| Build time | <1 min | ~30s | ✅ EXCELLENT |
-| New cleaner addition time | <30 min | ~1-2 hours | 🟠 OK |
-- Error messages are actionable | Yes | Mostly | ✅ GOOD |
-| Configuration format clear and documented | In progress | Partial | 🟠 OK |
+| Metric                                    | Target      | Current    | Assessment   |
+| ----------------------------------------- | ----------- | ---------- | ------------ |
+| Build time                                | <1 min      | ~30s       | ✅ EXCELLENT |
+| New cleaner addition time                 | <30 min     | ~1-2 hours | 🟠 OK        |
+| - Error messages are actionable           | Yes         | Mostly     | ✅ GOOD      |
+| Configuration format clear and documented | In progress | Partial    | 🟠 OK        |
 
 ---
 
@@ -629,12 +674,14 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 **Already Processed (38/91):** ✅ ALL PREVIOUSLY COMPLETED
 
 **Session Progress:**
+
 - ✅ systemcache.go - Refactored to use domain.CacheType
 - ✅ systemcache_test.go - Partially updated for new signature
 - ✅ registry_factory.go - Updated callers
 - ✅ cmd/clean-wizard/commands/clean.go - Updated caller
 
 **Remaining (53/91):** Various documentation and status files not yet processed
+
 - Many are planning/status documents
 - Already completed tasks in those files
 - Not critical for functionality
@@ -725,16 +772,19 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 ## L) RISK ASSESSMENT 🚨
 
 ### High Risk (Mitigated):
+
 - ✅ **Integration test blocking** - FIXED in commit 55c491a
 - ✅ **SizeEstimate validation errors** - FIXED in commit 55c491a
 - ✅ **Unsafe exec calls without timeout** - VERIFIED ALREADY PROTECTED
 
 ### Medium Risk:
+
 - 🟠 **SystemCache tests not fully updated** - Partially done, main app works
 - 🟠 **21 functions with complexity >10** - Need refactoring
 - 🟠 **Test coverage average ~70%** - Need >85%
 
 ### Low Risk:
+
 - 🟢 **Build time** - Excellent at ~30s
 - 🟢 **Code quality** - Good type safety, architecture quality 90.1/100
 - 🟢 **Security** - No known vulnerabilities
@@ -772,18 +822,21 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 ### Session Achievements:
 
 **CRITICAL P0 ISSUES: 4/4 COMPLETED ✅**
+
 1. ✅ SizeEstimate.Status bug - Fixed, integration tests passing
 2. ✅ Timeout protection verified - All exec calls protected
 3. ✅ Cleaner interface verified - All 13 cleaners compliant
 4. ✅ SystemCache enum refactored - Now uses domain.CacheType
 
 **HIGH IMPACT WORK DELIVERED:**
+
 - ✅ GoCacheModCache integrated (4 cache types cleaned)
 - ✅ Justfile modernized to use clean-wizard
 - ✅ Configuration consistency improved
 - ✅ Type safety enhanced across codebase
 
 **QUALITY METRICS:**
+
 - ✅ Build successful
 - ✅ Unit tests passing
 - ✅ Integration tests unblocked
@@ -793,6 +846,7 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
 ### Project Status: 🟢 HEALTHY & IMPROVING
 
 The clean-wizard project is in excellent shape. All critical P0 issues are resolved. The architecture is well-designed with:
+
 - Type-safe enums throughout
 - Clean separation of concerns
 - Good use of generics (Result[T])
@@ -801,6 +855,7 @@ The clean-wizard project is in excellent shape. All critical P0 issues are resol
 - Comprehensive testing infrastructure
 
 ### Next Session Focus:
+
 1. Complete SystemCache test updates (30 min)
 2. Create SizeEstimate constructors (1 hour)
 3. Pick up Priority 1 items from section J

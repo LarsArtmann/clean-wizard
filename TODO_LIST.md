@@ -10,6 +10,7 @@
 ## FILE TRACKING
 
 ### Already Processed
+
 1. ✅ USAGE.md - Status: COMPLETED - No TODOs found (pure documentation)
 2. ✅ README.md - Status: COMPLETED - No TODOs found (pure documentation)
 3. ✅ HOW_TO_USE.md - Status: COMPLETED - No TODOs found (pure documentation)
@@ -80,7 +81,7 @@
 3. **Complete Deprecation Fixes** (MEDIUM impact, 1.85 days work)
    - **Status**: ✅ COMPLETED & VERIFIED
    - **Description**: Fix ~20 test/support files with deprecation warnings (Strategy and RiskLevel aliases)
-   - **Target**: Multiple files in internal/cleaner/*_test.go, conversions/, adapters/, api/, middleware/, tests/
+   - **Target**: Multiple files in internal/cleaner/\*\_test.go, conversions/, adapters/, api/, middleware/, tests/
    - **Subtasks**:
      - ✅ Fix test files (7 files)
      - ✅ Fix conversions package (2 files)
@@ -99,28 +100,30 @@
 
 These commands can HANG FOREVER in production without timeout protection:
 
-| File | Line | Command | Risk Level |
-|------|------|---------|------------|
-| `internal/cleaner/cargo.go` | 164 | `cargo-cache --autoclean` | CRITICAL |
-| `internal/cleaner/cargo.go` | 186 | `cargo clean` | CRITICAL |
-| `internal/cleaner/nodepackages.go` | 137 | `npm config get cache` | HIGH |
-| `internal/cleaner/nodepackages.go` | 159 | `pnpm store path` | HIGH |
-| `internal/cleaner/nodepackages.go` | 279 | `npm cache clean --force` | CRITICAL |
-| `internal/cleaner/nodepackages.go` | 290 | `pnpm store prune` | CRITICAL |
-| `internal/cleaner/nodepackages.go` | 301 | `yarn cache clean` | HIGH |
-| `internal/cleaner/nodepackages.go` | 312 | `bun pm cache rm` | HIGH |
-| `internal/cleaner/projectsmanagementautomation.go` | 99 | `projects-management-automation --clear-cache` | HIGH |
+| File                                               | Line | Command                                        | Risk Level |
+| -------------------------------------------------- | ---- | ---------------------------------------------- | ---------- |
+| `internal/cleaner/cargo.go`                        | 164  | `cargo-cache --autoclean`                      | CRITICAL   |
+| `internal/cleaner/cargo.go`                        | 186  | `cargo clean`                                  | CRITICAL   |
+| `internal/cleaner/nodepackages.go`                 | 137  | `npm config get cache`                         | HIGH       |
+| `internal/cleaner/nodepackages.go`                 | 159  | `pnpm store path`                              | HIGH       |
+| `internal/cleaner/nodepackages.go`                 | 279  | `npm cache clean --force`                      | CRITICAL   |
+| `internal/cleaner/nodepackages.go`                 | 290  | `pnpm store prune`                             | CRITICAL   |
+| `internal/cleaner/nodepackages.go`                 | 301  | `yarn cache clean`                             | HIGH       |
+| `internal/cleaner/nodepackages.go`                 | 312  | `bun pm cache rm`                              | HIGH       |
+| `internal/cleaner/projectsmanagementautomation.go` | 99   | `projects-management-automation --clear-cache` | HIGH       |
 
 **Required Action**: Add context timeout to all Exec calls or wrap with timeout protection
 
 ### 🚨 CRITICAL - CLI COMMAND GAP (From FEATURES_SUMMARY_TABLE.md)
 
 **Current State:**
+
 - USAGE.md documents 5 commands: clean, scan, init, profile, config
 - ✅ ALL 5 COMMANDS NOW IMPLEMENTED
 - 100% alignment between documentation and implementation
 
 **Implementation Status:**
+
 1. ✅ `clean` - Full implementation with TUI, dry-run, preset modes
 2. ✅ `scan` - Scans for cleanable items, shows size estimates
 3. ✅ `init` - Interactive setup wizard, minimal mode support
@@ -133,10 +136,10 @@ These commands can HANG FOREVER in production without timeout protection:
 
 **From CLEANER_INTERFACE_ANALYSIS.md:**
 
-| Cleaner | File | Missing Method | Status |
-|---------|------|----------------|--------|
-| `nix.go` | Missing `Clean(ctx)` method (has `CleanOldGenerations` instead) | NOT COMPLIANT |
-| `golang_cache_cleaner.go` | Missing `IsAvailable()` method | NOT COMPLIANT |
+| Cleaner                   | File                                                            | Missing Method | Status |
+| ------------------------- | --------------------------------------------------------------- | -------------- | ------ |
+| `nix.go`                  | Missing `Clean(ctx)` method (has `CleanOldGenerations` instead) | NOT COMPLIANT  |
+| `golang_cache_cleaner.go` | Missing `IsAvailable()` method                                  | NOT COMPLIANT  |
 
 **Required Action**: Add missing interface methods to non-compliant cleaners
 
@@ -144,23 +147,25 @@ These commands can HANG FOREVER in production without timeout protection:
 
 **From ENUM_USAGE_ANALYSIS.md:**
 
-| Cleaner | Issue | Severity | Status |
-|---------|-------|----------|--------|
-| **Docker** | Local enum vs domain enum - concept mismatch (aggression vs resource types) | CRITICAL | ✅ FIXED in 5e94e2a |
-| **SystemCache** | Local lowercase enum vs domain uppercase enum | HIGH | NOT_STARTED |
-| **NodePackages** | Local string enum vs domain integer enum | MEDIUM | NOT_STARTED |
-| **BuildCache** | Complete mismatch (tools vs languages) | HIGH | NOT_STARTED |
+| Cleaner          | Issue                                                                       | Severity | Status              |
+| ---------------- | --------------------------------------------------------------------------- | -------- | ------------------- |
+| **Docker**       | Local enum vs domain enum - concept mismatch (aggression vs resource types) | CRITICAL | ✅ FIXED in 5e94e2a |
+| **SystemCache**  | Local lowercase enum vs domain uppercase enum                               | HIGH     | NOT_STARTED         |
+| **NodePackages** | Local string enum vs domain integer enum                                    | MEDIUM   | NOT_STARTED         |
+| **BuildCache**   | Complete mismatch (tools vs languages)                                      | HIGH     | NOT_STARTED         |
 
 **Required Action**: Refactor enum systems to align with domain definitions
 
 ### 🟠 HIGH - SIZE REPORTING ISSUES (From FEATURES_SUMMARY_TABLE.md)
 
 **Current State:**
+
 - Most cleaners use hardcoded estimates for dry-run
 - Docker returns 0 bytes freed (parsing not implemented)
 - Cargo doesn't track actual bytes freed
 
 **Affected Cleaners:**
+
 - Docker: Size reporting broken (returns 0)
 - Cargo: Size reporting broken
 - Multiple others: Use hardcoded estimates
@@ -271,7 +276,7 @@ These commands can HANG FOREVER in production without timeout protection:
 
 16. **Reduce validateProfileName Complexity** (MEDIUM impact, 0.5 days work)
     - **Status**: NOT_STARTED
-    - **Description**: Refactor config.(*ConfigValidator).validateProfileName from complexity 16 to <10
+    - **Description**: Refactor config.(\*ConfigValidator).validateProfileName from complexity 16 to <10
     - **Target**: `internal/config/validator.go`
     - **Verification**: Check complexity using golangci-lint
 
@@ -286,117 +291,132 @@ These commands can HANG FOREVER in production without timeout protection:
 **Phase 2: High Impact, Low Effort (Pareto 1% → 51% impact):**
 
 19. **Extract Generic Cleaner Interface** (HIGH impact, 1 day work)
-   - **Status**: NOT_STARTED
-   - **Description**: Create Cleaner interface and CleanerRegistry type to enable polymorphism and reduce duplication
-   - **Target**: `internal/cleaner/interface.go` (new), 11 cleaner files, cmd/clean-wizard/commands/clean.go
-   - **Impact**: Eliminates hardcoded cleaner lists, enables plugin architecture foundation
-   - **Verification**: Check if Cleaner interface exists and all cleaners implement it
+
+- **Status**: NOT_STARTED
+- **Description**: Create Cleaner interface and CleanerRegistry type to enable polymorphism and reduce duplication
+- **Target**: `internal/cleaner/interface.go` (new), 11 cleaner files, cmd/clean-wizard/commands/clean.go
+- **Impact**: Eliminates hardcoded cleaner lists, enables plugin architecture foundation
+- **Verification**: Check if Cleaner interface exists and all cleaners implement it
 
 20. **Fix Context Propagation in validate.go** (HIGH impact, 0.5 days work)
-   - **Status**: NOT_STARTED
-   - **Description**: Update ValidateItem() to preserve context in errors, add formatValidItems() helper
-   - **Target**: `internal/config/validate.go`
-   - **Impact**: Better error messages, easier debugging, improves error handling quality from 90.1/100 to 95+
-   - **Verification**: Check error messages include items/validItems context
+
+- **Status**: NOT_STARTED
+- **Description**: Update ValidateItem() to preserve context in errors, add formatValidItems() helper
+- **Target**: `internal/config/validate.go`
+- **Impact**: Better error messages, easier debugging, improves error handling quality from 90.1/100 to 95+
+- **Verification**: Check error messages include items/validItems context
 
 21. **Unify Binary Enum Unmarshaling** (MEDIUM impact, 1 day work)
-   - **Status**: NOT_STARTED
-   - **Description**: Create UnmarshalYAMLEnumBinary() helper to unify binary and standard enum unmarshaling
-   - **Target**: `internal/domain/type_safe_enums.go`
-   - **Impact**: Reduces code duplication, consistent error messages, easier maintenance
-   - **Verification**: Check if binary enums use unified unmarshaling
+
+- **Status**: NOT_STARTED
+- **Description**: Create UnmarshalYAMLEnumBinary() helper to unify binary and standard enum unmarshaling
+- **Target**: `internal/domain/type_safe_enums.go`
+- **Impact**: Reduces code duplication, consistent error messages, easier maintenance
+- **Verification**: Check if binary enums use unified unmarshaling
 
 22. **Add Integration Tests for Enum Workflows** (HIGH impact, 2 days work)
-   - **Status**: NOT_STARTED
-   - **Description**: Create end-to-end enum workflow tests (integer format, string format, mixed format, round-trip)
-   - **Target**: `tests/integration/enum_workflow_test.go` (new), test configs (3 new)
-   - **Impact**: Verifies end-to-end functionality, confirms no breaking changes, tests actual usage
-   - **Verification**: Check if integration tests exist and pass with `-tags=integration`
+
+- **Status**: NOT_STARTED
+- **Description**: Create end-to-end enum workflow tests (integer format, string format, mixed format, round-trip)
+- **Target**: `tests/integration/enum_workflow_test.go` (new), test configs (3 new)
+- **Impact**: Verifies end-to-end functionality, confirms no breaking changes, tests actual usage
+- **Verification**: Check if integration tests exist and pass with `-tags=integration`
 
 **Phase 3: High Impact, Medium Effort (Pareto 4% → 64% impact):**
 
 23. **Verify All Cleaners Handle Enums Correctly** (HIGH impact, 2 days work)
-   - **Status**: NOT_STARTED
-   - **Description**: Review 11 cleaners for enum usage, verify no hardcoded strings, ensure switch statements use enum constants
-   - **Target**: All 11 cleaner files (nix, homebrew, docker, cargo, golang, nodepackages, buildcache, systemcache, tempfiles, projectsmanagementautomation)
-   - **Impact**: Ensures enums are actually used, catches hardcoded strings, prevents type-safety regressions
-   - **Verification**: Check all cleaners for correct enum usage patterns
+
+- **Status**: NOT_STARTED
+- **Description**: Review 11 cleaners for enum usage, verify no hardcoded strings, ensure switch statements use enum constants
+- **Target**: All 11 cleaner files (nix, homebrew, docker, cargo, golang, nodepackages, buildcache, systemcache, tempfiles, projectsmanagementautomation)
+- **Impact**: Ensures enums are actually used, catches hardcoded strings, prevents type-safety regressions
+- **Verification**: Check all cleaners for correct enum usage patterns
 
 24. **Add Enum Validation to Config Boundaries** (HIGH impact, 1 day work)
-   - **Status**: NOT_STARTED
-   - **Description**: Add enum validation to config.LoadWithContext(), validate all enum values after loading
-   - **Target**: `internal/config/config.go`
-   - **Impact**: Catches invalid enums at config load time, provides helpful error messages
-   - **Verification**: Check if config validation includes enum validation
+
+- **Status**: NOT_STARTED
+- **Description**: Add enum validation to config.LoadWithContext(), validate all enum values after loading
+- **Target**: `internal/config/config.go`
+- **Impact**: Catches invalid enums at config load time, provides helpful error messages
+- **Verification**: Check if config validation includes enum validation
 
 25. **Reduce Complexity in Top 5 Functions** (MEDIUM impact, 1 day work)
-   - **Status**: NOT_STARTED (duplicates existing TODO #15)
-   - **Description**: Refactor LoadWithContext (20→<10), TestIntegration_ValidationSanitizationPipeline (19→<10), validateProfileName (16→<10), ErrorCode.String (15→<10), SaveConfig (15→<10)
-   - **Target**: Multiple files
-   - **Impact**: Better maintainability, more readable functions, easier testing
-   - **Verification**: Check complexity using golangci-lint
+
+- **Status**: NOT_STARTED (duplicates existing TODO #15)
+- **Description**: Refactor LoadWithContext (20→<10), TestIntegration_ValidationSanitizationPipeline (19→<10), validateProfileName (16→<10), ErrorCode.String (15→<10), SaveConfig (15→<10)
+- **Target**: Multiple files
+- **Impact**: Better maintainability, more readable functions, easier testing
+- **Verification**: Check complexity using golangci-lint
 
 **Phase 4: Medium Impact, Medium Effort:**
 
 26. **Reduce Complexity in Remaining Functions** (MEDIUM impact, 2 days work)
-   - **Status**: NOT_STARTED
-   - **Description**: Refactor remaining 16 high-complexity functions (all complexity >10)
-   - **Target**: 16 files across codebase
-   - **Impact**: Better maintainability, lower cognitive load
-   - **Verification**: Check complexity using golangci-lint
+
+- **Status**: NOT_STARTED
+- **Description**: Refactor remaining 16 high-complexity functions (all complexity >10)
+- **Target**: 16 files across codebase
+- **Impact**: Better maintainability, lower cognitive load
+- **Verification**: Check complexity using golangci-lint
 
 27. **Add Edge Case Tests for Enum Unmarshaling** (MEDIUM impact, 1 day work)
-   - **Status**: NOT_STARTED
-   - **Description**: Add tests for negative integers, out-of-range integers, mixed case strings, empty values, null values
-   - **Target**: Existing test files
-   - **Impact**: Better error handling, catches edge cases
-   - **Verification**: Check if edge case tests exist
+
+- **Status**: NOT_STARTED
+- **Description**: Add tests for negative integers, out-of-range integers, mixed case strings, empty values, null values
+- **Target**: Existing test files
+- **Impact**: Better error handling, catches edge cases
+- **Verification**: Check if edge case tests exist
 
 28. **Test Enum Round-Trip Serialization** (MEDIUM impact, 1 day work)
-   - **Status**: NOT_STARTED
-   - **Description**: Test YAML→Go→YAML and JSON→Go→JSON for all enum types
-   - **Target**: Existing test files
-   - **Impact**: Ensures no data corruption, verifies consistent formatting
-   - **Verification**: Check if round-trip tests exist
+
+- **Status**: NOT_STARTED
+- **Description**: Test YAML→Go→YAML and JSON→Go→JSON for all enum types
+- **Target**: Existing test files
+- **Impact**: Ensures no data corruption, verifies consistent formatting
+- **Verification**: Check if round-trip tests exist
 
 **Phase 5: Low Impact, High Effort:**
 
 29. **Create Comprehensive Architecture Documentation** (LOW impact, 2 days work)
-   - **Status**: NOT_STARTED
-   - **Description**: Create ARCHITECTURE.md covering architecture diagram, layer responsibilities, data flow, design decisions, type safety philosophy, testing strategy, extension points
-   - **Target**: `ARCHITECTURE.md` (new)
-   - **Impact**: Better onboarding, preserved design rationale, easier maintenance
-   - **Verification**: Check if ARCHITECTURE.md exists and is comprehensive
+
+- **Status**: NOT_STARTED
+- **Description**: Create ARCHITECTURE.md covering architecture diagram, layer responsibilities, data flow, design decisions, type safety philosophy, testing strategy, extension points
+- **Target**: `ARCHITECTURE.md` (new)
+- **Impact**: Better onboarding, preserved design rationale, easier maintenance
+- **Verification**: Check if ARCHITECTURE.md exists and is comprehensive
 
 30. **Investigate RiskLevelType Manual Processing** (MEDIUM impact, 1 day work)
-   - **Status**: NOT_STARTED
-   - **Description**: Investigate Viper enum support, test using RiskLevelType directly with Viper, fix manual processing if possible
-   - **Target**: `internal/config/config.go:86-108`
-   - **Impact**: Consistency with other enums, less code to maintain
-   - **Verification**: Check if RiskLevelType uses standard enum unmarshaler
+
+- **Status**: NOT_STARTED
+- **Description**: Investigate Viper enum support, test using RiskLevelType directly with Viper, fix manual processing if possible
+- **Target**: `internal/config/config.go:86-108`
+- **Impact**: Consistency with other enums, less code to maintain
+- **Verification**: Check if RiskLevelType uses standard enum unmarshaler
 
 31. **Add Dependency Injection with samber/do/v2** (LOW impact, 2 days work)
-   - **Status**: NOT_STARTED
-   - **Description**: Add samber/do/v2 to go.mod, create DI container in cmd/clean-wizard, update main.go and all services
-   - **Target**: Multiple files
-   - **Impact**: Less boilerplate, easier testing, automatic dependency resolution
-   - **Verification**: Check if samber/do/v2 is used in main.go and services
+
+- **Status**: NOT_STARTED
+- **Description**: Add samber/do/v2 to go.mod, create DI container in cmd/clean-wizard, update main.go and all services
+- **Target**: Multiple files
+- **Impact**: Less boilerplate, easier testing, automatic dependency resolution
+- **Verification**: Check if samber/do/v2 is used in main.go and services
 
 **Phase 6: Final Validation:**
 
 32. **Verify Full Integration and Run All Tests** (CRITICAL, 1 day work)
-   - **Status**: NOT_STARTED
-   - **Description**: Run full test suite (just test), integration tests (go test ./tests/integration -tags=integration), BDD tests (go test ./tests/bdd), benchmarks (go test -bench=. ./tests/benchmark), check coverage (go test -cover ./...)
-   - **Target**: All test suites
-   - **Impact**: Ensures everything works, comprehensive validation
-   - **Verification**: All tests pass, coverage >85%
+
+- **Status**: NOT_STARTED
+- **Description**: Run full test suite (just test), integration tests (go test ./tests/integration -tags=integration), BDD tests (go test ./tests/bdd), benchmarks (go test -bench=. ./tests/benchmark), check coverage (go test -cover ./...)
+- **Target**: All test suites
+- **Impact**: Ensures everything works, comprehensive validation
+- **Verification**: All tests pass, coverage >85%
 
 33. **Create Quick Reference Guide for Enum Types** (LOW impact, 0.5 days work)
-   - **Status**: NOT_STARTED
-   - **Description**: Create docs/ENUM_QUICK_REFERENCE.md listing all 15+ enum types, values, usage examples
-   - **Target**: `docs/ENUM_QUICK_REFERENCE.md` (new)
-   - **Impact**: Easier lookup for developers
-   - **Verification**: Check if ENUM_QUICK_REFERENCE.md exists
+
+- **Status**: NOT_STARTED
+- **Description**: Create docs/ENUM_QUICK_REFERENCE.md listing all 15+ enum types, values, usage examples
+- **Target**: `docs/ENUM_QUICK_REFERENCE.md` (new)
+- **Impact**: Easier lookup for developers
+- **Verification**: Check if ENUM_QUICK_REFERENCE.md exists
 
 ### Priority 6 - Low
 
@@ -450,29 +470,29 @@ These commands can HANG FOREVER in production without timeout protection:
 
 ## TODO STATUS TRACKING
 
-| TODO | Source File | Status | Verification Notes |
-|------|-------------|--------|-------------------|
-| Generic Context System | IMPLEMENTATION_STATUS.md | NOT_STARTED | Need to verify current context types in code |
-| CleanerRegistry Integration | SELF_REFLECTION_AND_PLAN.md | ✅ COMPLETED | Registry implemented with 231 lines, 12 tests, integrated in cmd/clean-wizard/commands/clean.go |
-| Deprecation Fixes (20+ files) | SELF_REFLECTION_AND_PLAN.md | ✅ COMPLETED | 49 warnings eliminated across 45+ files |
-| Backward Compatibility Aliases | IMPLEMENTATION_STATUS.md | NOT_STARTED | Need to check domain types |
-| Domain Model Enhancement | IMPLEMENTATION_STATUS.md | NOT_STARTED | Need to check current domain models |
-| Generic Validation Interface | REFACTORING_PLAN.md | NOT_STARTED | Need to create new utility |
-| Config Loading Utility | REFACTORING_PLAN.md | NOT_STARTED | Need to create new utility |
-| String Trimming Utility | REFACTORING_PLAN.md | NOT_STARTED | Need to create new utility |
-| Error Details Utility | REFACTORING_PLAN.md | NOT_STARTED | Need to create new utility |
-| Test Helper Refactoring | REFACTORING_PLAN.md | NOT_STARTED | Need to refactor existing helpers |
-| Schema Min/Max Utility | REFACTORING_PLAN.md | NOT_STARTED | Need to create new utility |
-| Type Model Improvements | REFACTORING_PLAN.md | NOT_STARTED | Need to check all enum definitions |
-| Result Type Enhancement | REFACTORING_PLAN.md | NOT_STARTED | Need to check current Result type |
-| SystemCache Research | SELF_REFLECTION_AND_PLAN.md | NOT_STARTED | Need to research domain.CacheType usage |
-| LoadWithContext Complexity | SELF_REFLECTION_AND_PLAN.md | NOT_STARTED | Need to check current implementation |
-| validateProfileName Complexity | SELF_REFLECTION_AND_PLAN.md | NOT_STARTED | Need to check current implementation |
-| Additional Complexity Reductions | SELF_REFLECTION_AND_PLAN.md | NOT_STARTED | Need to identify exact functions |
-| Registry Documentation | SELF_REFLECTION_AND_PLAN.md | NOT_STARTED | Documentation task |
-| **NEW - UNSAFE EXEC CALLS** | 2026-01-28_01-30_EXECUTION_AUDIT.md | 🔴 CRITICAL | 9 exec calls without timeout - cargo-cache, cargo clean, npm/pnpm/yarn/bun cache commands |
-| **NEW - Interface Compliance** | CLEANER_INTERFACE_ANALYSIS.md | 🔴 CRITICAL | nix.go missing Clean(ctx), golang_cache_cleaner.go missing IsAvailable() |
-| **NEW - Enum Inconsistencies** | ENUM_USAGE_ANALYSIS.md | 🟠 HIGH | Docker FIXED, SystemCache/NodePackages/BuildCache need refactoring |
+| TODO                             | Source File                         | Status       | Verification Notes                                                                              |
+| -------------------------------- | ----------------------------------- | ------------ | ----------------------------------------------------------------------------------------------- |
+| Generic Context System           | IMPLEMENTATION_STATUS.md            | NOT_STARTED  | Need to verify current context types in code                                                    |
+| CleanerRegistry Integration      | SELF_REFLECTION_AND_PLAN.md         | ✅ COMPLETED | Registry implemented with 231 lines, 12 tests, integrated in cmd/clean-wizard/commands/clean.go |
+| Deprecation Fixes (20+ files)    | SELF_REFLECTION_AND_PLAN.md         | ✅ COMPLETED | 49 warnings eliminated across 45+ files                                                         |
+| Backward Compatibility Aliases   | IMPLEMENTATION_STATUS.md            | NOT_STARTED  | Need to check domain types                                                                      |
+| Domain Model Enhancement         | IMPLEMENTATION_STATUS.md            | NOT_STARTED  | Need to check current domain models                                                             |
+| Generic Validation Interface     | REFACTORING_PLAN.md                 | NOT_STARTED  | Need to create new utility                                                                      |
+| Config Loading Utility           | REFACTORING_PLAN.md                 | NOT_STARTED  | Need to create new utility                                                                      |
+| String Trimming Utility          | REFACTORING_PLAN.md                 | NOT_STARTED  | Need to create new utility                                                                      |
+| Error Details Utility            | REFACTORING_PLAN.md                 | NOT_STARTED  | Need to create new utility                                                                      |
+| Test Helper Refactoring          | REFACTORING_PLAN.md                 | NOT_STARTED  | Need to refactor existing helpers                                                               |
+| Schema Min/Max Utility           | REFACTORING_PLAN.md                 | NOT_STARTED  | Need to create new utility                                                                      |
+| Type Model Improvements          | REFACTORING_PLAN.md                 | NOT_STARTED  | Need to check all enum definitions                                                              |
+| Result Type Enhancement          | REFACTORING_PLAN.md                 | NOT_STARTED  | Need to check current Result type                                                               |
+| SystemCache Research             | SELF_REFLECTION_AND_PLAN.md         | NOT_STARTED  | Need to research domain.CacheType usage                                                         |
+| LoadWithContext Complexity       | SELF_REFLECTION_AND_PLAN.md         | NOT_STARTED  | Need to check current implementation                                                            |
+| validateProfileName Complexity   | SELF_REFLECTION_AND_PLAN.md         | NOT_STARTED  | Need to check current implementation                                                            |
+| Additional Complexity Reductions | SELF_REFLECTION_AND_PLAN.md         | NOT_STARTED  | Need to identify exact functions                                                                |
+| Registry Documentation           | SELF_REFLECTION_AND_PLAN.md         | NOT_STARTED  | Documentation task                                                                              |
+| **NEW - UNSAFE EXEC CALLS**      | 2026-01-28_01-30_EXECUTION_AUDIT.md | 🔴 CRITICAL  | 9 exec calls without timeout - cargo-cache, cargo clean, npm/pnpm/yarn/bun cache commands       |
+| **NEW - Interface Compliance**   | CLEANER_INTERFACE_ANALYSIS.md       | 🔴 CRITICAL  | nix.go missing Clean(ctx), golang_cache_cleaner.go missing IsAvailable()                        |
+| **NEW - Enum Inconsistencies**   | ENUM_USAGE_ANALYSIS.md              | 🟠 HIGH      | Docker FIXED, SystemCache/NodePackages/BuildCache need refactoring                              |
 
 ---
 
@@ -496,20 +516,24 @@ These commands can HANG FOREVER in production without timeout protection:
 ## VERIFICATION CHECKLIST
 
 ### Immediate Actions Required:
+
 - [ ] Add timeout protection to UNSAFE EXEC CALLS (9 commands identified)
 - [ ] Fix Cleaner interface compliance (nix.go, golang_cache_cleaner.go)
 - [ ] Refactor enum inconsistencies (SystemCache, NodePackages, BuildCache)
 
 ### Short-term Actions:
+
 - [ ] Implement Generic Context System
 - [ ] Create missing utilities (validation, config, strings, errors, schema)
 
 ### Long-term Actions:
+
 - [ ] Complete domain model enhancements
 - [ ] Reduce function complexity across codebase
 - [ ] Add comprehensive documentation
 
 ### ✅ VERIFIED COMPLETED:
+
 - [x] CleanerRegistry Implementation (231 lines, 12 tests, fully integrated)
 - [x] Deprecation Fixes (49 warnings eliminated, build clean)
 
@@ -518,6 +542,7 @@ These commands can HANG FOREVER in production without timeout protection:
 ## SUCCESS METRICS (From COMPREHENSIVE_IMPROVEMENT_PLAN)
 
 ### Technical Metrics:
+
 - [ ] All tests passing (current: blocked by disk space)
 - [ ] Test coverage > 85% (current: varies by package, avg ~70%)
 - [ ] Cyclomatic complexity < 10 for all functions (current: 21 functions >10)
@@ -527,6 +552,7 @@ These commands can HANG FOREVER in production without timeout protection:
 - [ ] All critical paths covered by integration tests
 
 ### Architecture Metrics:
+
 - [ ] Cleaner interface implemented and used by all cleaners
 - [ ] All enums using unified unmarshaling
 - [ ] All error messages preserve context
@@ -534,6 +560,7 @@ These commands can HANG FOREVER in production without timeout protection:
 - [ ] Zero circular dependencies (already achieved)
 
 ### Developer Experience Metrics:
+
 - [ ] Onboarding time < 1 hour (with architecture docs)
 - [ ] New cleaner can be added in < 30 minutes
 - [ ] Error messages are actionable
@@ -564,8 +591,7 @@ These commands can HANG FOREVER in production without timeout protection:
 3. **Phase 3** (High Impact, Medium Effort): Verify cleaner enum usage, add enum validation, reduce complexity in top 5 functions
 4. **Phase 4-6**: Based on Phase 2-3 results and business needs
 
-**Total Timeline**: 7 weeks with incremental value delivery every week
----
+## **Total Timeline**: 7 weeks with incremental value delivery every week
 
 ## VERIFICATION RESULTS (2026-02-09)
 

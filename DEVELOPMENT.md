@@ -130,6 +130,7 @@ No nil panics. No unchecked errors.
 5. Add tests
 
 Note: There are two related interfaces:
+
 - `cleaner.Cleaner`: Registry/execution focused with `Name()`, `Clean()`, `IsAvailable()`
 - `domain.OperationHandler`: Operation validation with `Type()`, `GetStoreSize()`, `ValidateSettings()`
 

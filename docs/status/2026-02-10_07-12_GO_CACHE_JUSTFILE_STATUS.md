@@ -1,4 +1,5 @@
 # COMPREHENSIVE STATUS REPORT
+
 **Date:** 2026-02-10 07:12 UTC
 **Session Focus:** GoCacheModCache Integration & Justfile Cleanup
 **Status报告编号:** 2026-02-10_0712_GO_CACHE_JUSTFILE_STATUS
@@ -8,11 +9,13 @@
 ## EXECUTIVE SUMMARY
 
 ### Session Completed: Mixed Results
+
 ✅ **Primary Goal Achieved:** GoCacheModCache successfully integrated
 ⚠️ **Secondary Goal Partially Complete:** Justfile updated but incomplete
 🚨 **Critical Regression:** Integration test failing due to type model bug
 
 ### Key Metrics
+
 - Files Modified: 21
 - Lines Changed: ~79 (42 additions, 37 deletions)
 - Cleaners Affected: 1 (Go)
@@ -28,6 +31,7 @@
 #### Changes Made
 
 **File 1: `cmd/clean-wizard/commands/clean.go`**
+
 ```go
 // Before:
 return cleaner.NewGoCleaner(v, d,
@@ -37,10 +41,12 @@ return cleaner.NewGoCleaner(v, d,
 return cleaner.NewGoCleaner(v, d,
     cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheModCache|cleaner.GoCacheBuildCache)
 ```
+
 **Line:** 543
 **Impact:** Main CLI command now cleans 4 cache types instead of 3
 
 **File 2: `internal/cleaner/registry_factory.go`**
+
 ```go
 // Line 29 - DefaultRegistry():
 goCleaner, _ := NewGoCleaner(false, false,
@@ -50,9 +56,11 @@ goCleaner, _ := NewGoCleaner(false, false,
 goCleaner, _ := NewGoCleaner(verbose, dryRun,
     GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
 ```
+
 **Impact:** Registry factories now include GOMODCACHE by default
 
 **File 3: `internal/testhelper/go_cleaner.go`**
+
 ```go
 // Before:
 var GoCacheFlags = cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.GoCacheBuildCache
@@ -60,22 +68,26 @@ var GoCacheFlags = cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.G
 // After:
 var GoCacheFlags = cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.GoCacheModCache | cleaner.GoCacheBuildCache
 ```
+
 **Impact:** Test helper now tests all 4 cache types
 
 #### Implementation Verification
 
 **Command:**
+
 ```bash
 ./clean-wizard clean --json --mode quick --dry-run
 ```
 
 **Output:**
+
 ```
 🔧 Running Go Packages cleaner...
   ✓ Go Packages cleaner: would clean 4 item(s)  # Was 3 before
 ```
 
 **JSON Result:**
+
 ```json
 {
   "name": "Go Packages",
@@ -88,12 +100,15 @@ var GoCacheFlags = cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.G
 #### GOMODCACHE Execution
 
 **Command Called:**
+
 ```bash
 go clean -modcache
 ```
 
 **Location in Code:**
+
 - `internal/cleaner/golang_cache_cleaner.go:133-135`
+
 ```go
 func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[domain.CleanResult] {
     return gcc.cleanGoCacheEnv(ctx, "GOMODCACHE", "modcache", "  ✓ Go module cache cleaned")
@@ -101,16 +116,19 @@ func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[do
 ```
 
 **Environment Variable Used:**
+
 - `GOMODCACHE` - Standard Go environment variable
 - Example path: `/Users/user/go/pkg/mod`
 
 **Size Estimation:**
+
 ```go
 // Line 116: Calculate size before cleaning
 sizeEstimate = uint64(GetDirSize(cachePath))
 ```
 
 **Timeout Protection:**
+
 - 60-second timeout per cache operation
 - Prevents hanging operations
 - Defined in: `internal/cleaner/golang_cache_cleaner.go:17`
@@ -122,6 +140,7 @@ sizeEstimate = uint64(GetDirSize(cachePath))
 #### Changes Made
 
 **Recipe 1: `clean-all`**
+
 ```just
 # Before:
 clean-all: clean
@@ -139,10 +158,12 @@ clean-all:
     {{BINARY_NAME}} clean --mode quick --json > /dev/null 2>&1 || echo "ℹ️  clean-wizard skipped"
     rm -f {{BINARY_NAME}} coverage.out coverage.html
 ```
+
 **Impact:** Now uses clean-wizard instead of raw go commands
 **Note:** Builds binary if not exists, removes after cleanup
 
 **Recipe 2: `fix-modules`**
+
 ```just
 # Before:
 fix-modules:
@@ -163,6 +184,7 @@ fix-modules: build
     go mod verify
     @echo "✅ Modules fixed"
 ```
+
 **Impact:** Uses clean-wizard before go mod commands
 **Note:** Still calls raw go mod commands (tidy, download, verify)
 
@@ -171,16 +193,19 @@ fix-modules: build
 ### 3. Build Verification
 
 **Command:**
+
 ```bash
 go build -o clean-wizard ./cmd/clean-wizard
 ```
 
 **Result:**
+
 ```
 ✅ Build successful - no errors
 ```
 
 **Dependencies Downloaded:**
+
 - github.com/charmbracelet/huh v0.8.0
 - github.com/charmbracelet/bubbletea v1.3.10
 - github.com/charmbracelet/bubbles v0.21.1
@@ -190,11 +215,13 @@ go build -o clean-wizard ./cmd/clean-wizard
 ### 4. Unit Test Verification
 
 **Command:**
+
 ```bash
 go test -v ./internal/cleaner -run "Go"
 ```
 
 **Result:**
+
 ```
 === RUN   TestGolangHelpers_getHomeDir
 --- PASS: TestGolangHelpers_getHomeDir (0.00s)
@@ -237,6 +264,7 @@ ok  	github.com/LarsArtmann/clean-wizard/internal/cleaner	7.760s
 ```
 
 **Test Summary:**
+
 - Tests executed: 12
 - Tests passed: 12
 - Tests failed: 0
@@ -253,6 +281,7 @@ ok  	github.com/LarsArtmann/clean-wizard/internal/cleaner	7.760s
 **Test:** `tests/integration/cleaner_integration_test.go:54-75`
 
 **Test Code:**
+
 ```go
 goCleaner, err := cleaner.NewGoCleaner(false, false,
     cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache)
@@ -268,6 +297,7 @@ assert.NoError(t, cleanResult.Validate(), "Result validation should pass")
 ```
 
 **Error Message:**
+
 ```
 === RUN   TestGoCleaner_Integration
 --- FAIL: TestGoCleaner_Integration (6.05s)
@@ -284,6 +314,7 @@ assert.NoError(t, cleanResult.Validate(), "Result validation should pass")
 **File:** `internal/cleaner/golang_cleaner.go:161-172`
 
 **Current Code:**
+
 ```go
 func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) result.Result[domain.CleanResult] {
     // Create result with honest size estimate
@@ -304,18 +335,22 @@ func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) 
 ```
 
 **Problem:**
+
 1. `SizeEstimate` struct has two fields: `Known (uint64)` and `Status (SizeEstimateStatusType)`
 2. When `FreedBytes == 0`, the code sets `Known: 0` but **doesn't set Status**
 3. Validation rule (from `internal/domain/types.go:234-236`):
+
 ```go
 if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == SizeEstimateStatusKnown &&
    cr.SizeEstimate.Known == 0 && cr.CleanTime > 0 {
     return errors.New("cannot have zero SizeEstimate when ItemsRemoved is > 0...")
 }
 ```
+
 4. Because `Status` defaults to `SizeEstimateStatusKnown` (0), and `Known` is 0, validation fails!
 
 **Validation Rule Logic:**
+
 ```
 IF (ItemsRemoved > 0 AND Status == Known AND Known == 0 AND CleanTime > 0)
 THEN → ERROR: "cannot have zero SizeEstimate when ItemsRemoved is > 0"
@@ -324,6 +359,7 @@ THEN → ERROR: "cannot have zero SizeEstimate when ItemsRemoved is > 0"
 #### Why This Happens
 
 When cleaning caches with 0 size:
+
 - GOCACHE path unavailable → size = 0
 - GOTESTCACHE always returns 0 (no path)
 - Validation expects: either `Status = Unknown` OR `Known > 0`
@@ -332,6 +368,7 @@ When cleaning caches with 0 size:
 #### Fix Required
 
 **Option 1: Explicitly set Status**
+
 ```go
 func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) result.Result[domain.CleanResult] {
     var status domain.SizeEstimateStatusType
@@ -350,6 +387,7 @@ func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) 
 ```
 
 **Option 2: Set Unknown when size is 0**
+
 ```go
 if stats.FreedBytes == 0 {
     sizeEstimate.Status = domain.SizeEstimateStatusUnknown
@@ -365,59 +403,74 @@ if stats.FreedBytes == 0 {
 #### Raw Go Commands Still Present
 
 **Recipe: `format`** (Line 34-37)
+
 ```just
 format:
     @echo "🎨 Formatting code..."
     go fmt ./...
     goimports -w .
 ```
+
 **Issues:**
+
 - Calls `go fmt` directly
 - Calls `goimports` directly
 - Could potentially use Go cleaner for some aspects
 
 **Recipe: `deps`** (Line 46-49)
+
 ```just
 deps:
     @echo "📦 Installing dependencies..."
     go mod download
     go mod tidy
 ```
+
 **Issues:**
+
 - Calls `go mod download` directly
 - Calls `go mod tidy` directly
 
 **Recipe: `run`** (Line 52-54)
+
 ```just
 run: build
     @echo "🚀 Running {{BINARY_NAME}}..."
     ./{{BINARY_NAME}} --help
 ```
+
 **Issues:**
+
 - Just shows help, doesn't run cleanup
 - Could be replaced with `./clean-wizard clean --mode standard`
 
 **Recipe: `ci`** (Line 57-58)
+
 ```just
 ci: build test
     @echo "✅ CI pipeline completed successfully"
 ```
+
 **Issues:**
+
 - Uses `build` and `test` but doesn't clean caches
 - Could add cleanup step
 
 #### Performance Issue
 
 **Recipe: `clean-all`** (Current Implementation)
+
 ```just
 clean-all:
     @just build 2>&1 > /dev/null  # ← Rebuilds EVERY TIME
     {{BINARY_NAME}} clean --mode quick --json > /dev/null 2>&1
     rm -f {{BINARY_NAME}} coverage.out coverage.html
 ```
+
 **Problem:** Rebuilds binary even if it already exists and is up-to-date
 
 **Optimization Needed:**
+
 ```just
 clean-all:
     @echo "🧹 Cleaning build artifacts..."
@@ -469,6 +522,7 @@ clean-all:
 ### 1. Bug Fixes
 
 #### SizeEstimate.Status Bug
+
 - **File:** `internal/cleaner/golang_cleaner.go:161-172`
 - **Line:** 163
 - **Fix Time:** 30 minutes
@@ -476,6 +530,7 @@ clean-all:
 - **Status:** NOT STARTED
 
 #### Integration Test Update
+
 - **File:** `tests/integration/cleaner_integration_test.go:60`
 - **Fix Time:** 30 minutes
 - **Priority:** P0 - Critical
@@ -484,6 +539,7 @@ clean-all:
 ### 2. Justfile Completion
 
 #### Recipes to Update:
+
 - `format` - Could some parts be cleaner-based?
 - `deps` - Go mod commands are OK for dependency management
 - `run` - Replace with actual cleanup command
@@ -496,18 +552,21 @@ clean-all:
 #### Inconsistent Config Patterns
 
 **Pattern 1: Bit Flags (Go Cleaners)**
+
 ```go
 type GoCacheType uint16
 cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.GoCacheModCache | cleaner.GoCacheBuildCache
 ```
 
 **Pattern 2: Domain Enum (Homebrew)**
+
 ```go
 type HomebrewModeType int
 domain.HomebrewModeAllType
 ```
 
 **Pattern 3: Builder Pattern (Config)**
+
 ```go
 builder := config.NewSafeConfigBuilder().
     SafeMode().
@@ -519,6 +578,7 @@ builder := config.NewSafeConfigBuilder().
 ```
 
 **Pattern 4: Constructor with Config Struct (TempFiles)**
+
 ```go
 func NewTempFilesCleaner(
     verbose, dryRun bool,
@@ -533,6 +593,7 @@ func NewTempFilesCleaner(
 ### 4. Testing Gaps
 
 #### Missing Tests:
+
 - Property-based tests for cache combinations (should test 2^4 = 16 combinations)
 - Integration test for all 4 cache types
 - Regression test for SizeEstimate.Status bug
@@ -547,11 +608,13 @@ func NewTempFilesCleaner(
 ### 1. No Incremental Commits
 
 **What Happened:**
+
 - Changed 21 files in ONE batch
 - Git status shows all files as "modified"
 - One giant change instead of small, focused commits
 
 **Files Changed:**
+
 ```
 Justfile                                       | 19 ++++++++++++-------
 cmd/clean-wizard/commands/clean.go             |  2 +-
@@ -577,6 +640,7 @@ internal/testhelper/go_cleaner.go              |  2 +-
 **Total:** 21 files, ~79 lines changed
 
 **What Should Have Happened:**
+
 ```bash
 # Commit 1: Add GoCacheModCache to main command
 git add cmd/clean-wizard/commands/clean.go
@@ -600,6 +664,7 @@ git commit -m "refactor(justfile): use clean-wizard in fix-modules recipe"
 ```
 
 **Impact:**
+
 - Impossible to rollback specific changes
 - Hard to code review
 - Violates "small, atomic commits" principle
@@ -612,18 +677,21 @@ git commit -m "refactor(justfile): use clean-wizard in fix-modules recipe"
 ### 2. Didn't Fix Integration Test
 
 **What Happened:**
+
 - Found failing integration test
 - Identified root cause (SizeEstimate.Status bug)
 - Wrote analysis in status report
 - BUT DIDN'T ACTUALLY FIX IT
 
 **Why This is Wrong:**
+
 - "Verify everything works" was part of the task
 - Left broken test in the codebase
 - Pushed changes with known failures
 - Violates quality standards
 
 **What Should Have Happened:**
+
 1. Identify bug
 2. Write fix
 3. Run test to verify fix
@@ -637,12 +705,14 @@ git commit -m "refactor(justfile): use clean-wizard in fix-modules recipe"
 ### 3. Type Model Bug Slipped Through
 
 **What Happened:**
+
 - Project has type-safe enum system (`SizeEstimateStatusType`)
 - Implementation doesn't use it (Status field defaults to 0)
 - Validation rule catches the bug
 - But the bug existed before this session
 
 **Root Cause:**
+
 ```go
 // internal/domain/types.go:174-186
 type SizeEstimate struct {
@@ -654,6 +724,7 @@ type SizeEstimate struct {
 **Problem:** Struct has required field that's easy to forget
 
 **Better Design:**
+
 ```go
 // Option 1: Constructor function
 func NewSizeEstimate(bytes uint64) SizeEstimate {
@@ -690,18 +761,21 @@ func (b *SizeEstimateBuilder) Build() (SizeEstimate, error) {
 ### 4. Inconsistent Configuration Patterns
 
 **What Was Discovered:**
+
 - Go cleaner uses bit flags
 - Other cleaners use enums
 - Config package uses builder pattern
 - TempFiles uses constructor with many parameters
 
 **Why This Matters:**
+
 - Inconsistent API surface
 - Hard to learn codebase
 - Easy to make mistakes
 - Hard to add new cleaners
 
 **Example of Confusion:**
+
 ```go
 // Pattern 1: Go cleaner (bit flags)
 goCleaner, _ := cleaner.NewGoCleaner(verbose, dryRun,
@@ -723,18 +797,21 @@ tempFilesCleaner, _ := cleaner.NewTempFilesCleaner(verbose, dryRun, "7d", []stri
 ### Immediate (P0 - Critical)
 
 #### 1. Fix SizeEstimate.Status Bug
+
 - **File:** `internal/cleaner/golang_cleaner.go:161-172`
 - **Fix Time:** 30 minutes
 - **Impact:** Unblocks integration tests
 - **ROI:** Very High (1 bug, many tests blocked)
 
 #### 2. Fix Integration Test
+
 - **File:** `tests/integration/cleaner_integration_test.go:60`
 - **Fix Time:** 30 minutes
 - **Impact:** Test pipeline green
 - **ROI:** High (1 test, confidence boost)
 
 #### 3. Incremental Git Commits
+
 - **Files:** 21 modified files
 - **Time:** 1 day (undo and redo)
 - **Impact:** Better history, easier debugging
@@ -743,24 +820,28 @@ tempFilesCleaner, _ := cleaner.NewTempFilesCleaner(verbose, dryRun, "7d", []stri
 ### High Priority (P1 - High Impact)
 
 #### 4. Standardize Builder Pattern
+
 - **Scope:** All cleaners
 - **Time:** 3 days
 - **Impact:** Consistent API, easier maintenance
 - **ROI:** High (long-term quality)
 
 #### 5. Add Property-Based Tests
+
 - **Scope:** Go cleaner (16 combinations)
 - **Time:** 2 days
 - **Impact:** Catch edge cases
 - **ROI:** High (reliability)
 
 #### 6. Complete Justfile Refactor
+
 - **Scope:** Justfile recipes
 - **Time:** 1 day
 - **Impact:** Developer experience
 - **ROI:** Medium (UX improvement)
 
 #### 7. Update Documentation
+
 - **Scope:** README, docs/
 - **Time:** 4 hours
 - **Impact:** User onboarding
@@ -769,6 +850,7 @@ tempFilesCleaner, _ := cleaner.NewTempFilesCleaner(verbose, dryRun, "7d", []stri
 ### Medium Priority (P2 - Medium Impact)
 
 #### 8. Generic Context System
+
 - **File:** `internal/config/`
 - **Time:** 1 day
 - **From:** TODO_LIST.md
@@ -776,12 +858,14 @@ tempFilesCleaner, _ := cleaner.NewTempFilesCleaner(verbose, dryRun, "7d", []stri
 - **ROI:** Medium (code quality)
 
 #### 9. Error Wrapping Types
+
 - **Scope:** All cleaners
 - **Time:** 1 day
 - **Impact:** Better error handling
 - **ROI:** Medium (debugging)
 
 #### 10. Result Validation Middleware
+
 - **Scope:** All cleaners
 - **Time:** 1 day
 - **Impact:** Automatic validation
@@ -790,30 +874,35 @@ tempFilesCleaner, _ := cleaner.NewTempFilesCleaner(verbose, dryRun, "7d", []stri
 ### Low Priority (P3 - Long-Term)
 
 #### 11. Deprecation Removal
+
 - **Scope:** 20+ files
 - **Time:** 1 day
 - **Impact:** Clean codebase
 - **ROI:** Low (cosmetic)
 
 #### 12. Metrics Collection
+
 - **Scope:** All operations
 - **Time:** 2 days
 - **Impact:** Observability
 - **ROI:** Medium (ops improvement)
 
 #### 13. Plugin System Design
+
 - **Scope:** Architecture
 - **Time:** 3 days
 - **Impact:** Extensibility
 - **ROI:** Low (future feature)
 
 #### 14. Recovery/Rollback
+
 - **Scope:** Cleanup operations
 - **Time:** 2 days
 - **Impact:** Safety
 - **ROI:** Medium (risk reduction)
 
 #### 15. Performance Profiling
+
 - **Scope:** All cleaners
 - **Time:** 2 days
 - **Impact:** Performance
@@ -828,6 +917,7 @@ tempFilesCleaner, _ := cleaner.NewTempFilesCleaner(verbose, dryRun, "7d", []stri
 **Location:** `internal/config/safe.go:61-212`
 
 **API:**
+
 ```go
 // Builder
 builder := config.NewSafeConfigBuilder().
@@ -850,6 +940,7 @@ func (scb *SafeConfigBuilder) Build() (config.SafeConfig, error)
 ```
 
 **Why This is Good:**
+
 - Type-safe
 - Immutable during build
 - Validates at Build() time
@@ -857,6 +948,7 @@ func (scb *SafeConfigBuilder) Build() (config.SafeConfig, error)
 - Error handling in builder
 
 **Apply to Go Cleaner:**
+
 ```go
 // Current (bit flags):
 goCleaner, _ := cleaner.NewGoCleaner(verbose, dryRun,
@@ -878,6 +970,7 @@ goCleaner, _ := cleaner.NewGoCleanerBuilder().
 **Location:** `internal/domain/type_safe_enums.go`
 
 **Available Enums:**
+
 - `RiskLevelType` - Risk assessment
 - `ValidationLevelType` - Validation strictness
 - `ChangeOperationType` - Type of operation (add/remove/modify)
@@ -890,6 +983,7 @@ goCleaner, _ := cleaner.NewGoCleanerBuilder().
 - `DockerPruneModeType` - Docker prune modes
 
 **Standard Enum Methods:**
+
 ```go
 func (t MyEnum) String() string
 func (t MyEnum) IsValid() bool
@@ -899,6 +993,7 @@ func (t *MyEnum) UnmarshalJSON(data []byte) error
 ```
 
 **GoCacheType Has:**
+
 ```go
 func (gt GoCacheType) String() string
 func (gt GoCacheType) IsValid() bool
@@ -908,6 +1003,7 @@ func (gt GoCacheType) EnabledTypes() []GoCacheType
 ```
 
 **Missing:**
+
 - `Values()` method
 - JSON marshaling (not needed for bit flags)
 
@@ -918,6 +1014,7 @@ func (gt GoCacheType) EnabledTypes() []GoCacheType
 **Location:** `internal/result/result.go`
 
 **API:**
+
 ```go
 // Constructor
 func Ok[T any](value T) Result[T]
@@ -932,6 +1029,7 @@ func (r Result[T]) Error() error
 ```
 
 **Usage in Cleaners:**
+
 ```go
 // Good:
 func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
@@ -957,6 +1055,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 ### Question 1: Bit Flags vs Pure Enum for GoCacheType
 
 **Context:**
+
 - Go cleaner uses bit flags: `GoCacheGOCACHE | GoCacheTestCache | ...`
 - Other cleaners use type-safe enums: `HomebrewModeAllType`
 - Project has standardized on type-safe enums
@@ -964,6 +1063,7 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 **Options:**
 
 **Option A: Keep Bit Flags (Minimal Change)**
+
 ```go
 type GoCacheType uint16
 
@@ -983,18 +1083,21 @@ func (gt GoCacheType) ValidCombinations() []GoCacheType {
 ```
 
 **Pros:**
+
 - Minimal change
 - Bitwise operations idiomatic in Go
 - Works with existing code
 - Bitwise is efficient for cache selection
 
 **Cons:**
+
 - Inconsistent with other cleaners
 - `String()` method inefficient (needs switch for all combos)
 - Can't iterate easily
 - No Values() method
 
 **Option B: Pure Enum with Combinations (Consistent)**
+
 ```go
 type GoCacheType int
 
@@ -1023,18 +1126,21 @@ func (gt *GoCacheType) UnmarshalJSON(data []byte) error
 ```
 
 **Pros:**
+
 - Consistent with other cleaners
 - Has standard enum methods
 - Type-safe combinations (no invalid bit patterns)
 - Better JSON support
 
 **Cons:**
+
 - Large enum (16+ values)
 - Verbose to use
 - Not idiomatic in Go
 - Lose bitwise efficiency
 
 **Option C: Hybrid with Builder (Recommended)**
+
 ```go
 // Internal use: bit flags
 type GoCacheType uint16
@@ -1086,6 +1192,7 @@ goCleaner, _ := cleaner.NewGoCleaner(
 ```
 
 **Pros:**
+
 - Clean public API
 - Efficient internal implementation
 - Type-safe (can't create invalid combinations)
@@ -1093,12 +1200,14 @@ goCleaner, _ := cleaner.NewGoCleaner(
 - Consistent with builder pattern in config
 
 **Cons:**
+
 - More code to maintain
 - Need both builder and direct flag access
 
 **Recommendation:** **Option C - Hybrid with Builder**
 
 **Why:**
+
 - Best of both worlds: clean API + efficient implementation
 - Consistent with existing builder pattern in `internal/config/safe.go`
 - Allows gradual migration
@@ -1110,6 +1219,7 @@ goCleaner, _ := cleaner.NewGoCleaner(
 ### Question 2: Standardize All Cleaner Configs?
 
 **Current Patterns:**
+
 1. Go - Bit flags → Should use builder
 2. Homebrew - Enum constructor → Good
 3. Nix - Simple constructor → OK
@@ -1144,12 +1254,14 @@ homebrew := cleaner.NewHomebrewCleaner(verbose, dryRun, domain.HomebrewModeAllTy
 ```
 
 **Benefits:**
+
 - Consistent API
 - Type-safe
 - Fluent composition
 - Clear what each parameter does
 
 **Costs:**
+
 - Refactor 11 cleaners
 - Update all tests
 - Update documentation
@@ -1157,6 +1269,7 @@ homebrew := cleaner.NewHomebrewCleaner(verbose, dryRun, domain.HomebrewModeAllTy
 **Recommendation:** **YES - Standardize on builders**
 
 **Timeline:**
+
 - Phase 1: Build system (1 day)
 - Phase 2: Migrate 2 cleaners (1 day)
 - Phase 3: Migrate remaining cleaners (2 days)
@@ -1169,6 +1282,7 @@ homebrew := cleaner.NewHomebrewCleaner(verbose, dryRun, domain.HomebrewModeAllTy
 ### Question 3: Should CleanResult Be Immutable?
 
 **Current:**
+
 ```go
 type CleanResult struct {
     SizeEstimate SizeEstimate
@@ -1185,6 +1299,7 @@ result.FreedBytes = 123
 ```
 
 **Proposal:**
+
 ```go
 type CleanResult struct {
     sizeEstimate SizeEstimate
@@ -1227,12 +1342,14 @@ func (b *CleanResultBuilder) Build() (CleanResult, error)
 ```
 
 **Pros:**
+
 - Immutability prevents bugs
 - Clear data flow
 - Thread-safe
 - Easier to reason about
 
 **Cons:**
+
 - Verbose
 - More code
 - Not idiomatic Go (Go prefers pragmatism)
@@ -1240,12 +1357,14 @@ func (b *CleanResultBuilder) Build() (CleanResult, error)
 **Recommendation:** **NO - Keep mutable structs**
 
 **Why:**
+
 - Go prefers pragmatic over pure
 - CleanResult already validated before use
 - Builders add complexity
 - Not needed for current use case (single-threaded)
 
 **Alternative:** Make SizeEstimate constructor
+
 ```go
 func NewCleanResult(
     strategy CleanStrategy,
@@ -1454,6 +1573,7 @@ func UnknownSizeCleanResult(
 ### Session Summary
 
 **What Worked:**
+
 - ✅ GoCacheModCache successfully integrated (4 cache types)
 - ✅ Justfile partially updated to use clean-wizard
 - ✅ Build successful
@@ -1461,6 +1581,7 @@ func UnknownSizeCleanResult(
 - ✅ Verified 4 cache types in dry-run
 
 **What Didn't Work:**
+
 - 🚨 Integration test failing due to SizeEstimate.Status bug
 - 🚨 No incremental commits (21 files changed in batch)
 - 🚨 Missing bug fix
@@ -1468,6 +1589,7 @@ func UnknownSizeCleanResult(
 - 🚨 No documentation updates
 
 **What We Learned:**
+
 - Type-safe enums need explicit Status field usage
 - Bit flags vs enum is a valid architectural question
 - Builder pattern should be standardized
@@ -1477,18 +1599,21 @@ func UnknownSizeCleanResult(
 ### Recommendations
 
 #### Immediate Actions (Today)
+
 1. Fix SizeEstimate.Status bug (30 min)
 2. Fix integration test (30 min)
 3. Incremental commits with detailed messages (1 day)
 4. Push changes
 
 #### This Week
+
 5. Update README and documentation (4 hours)
 6. Add usage examples (3 hours)
 7. Complete Justfile refactor (1 day)
 8. Add property-based tests (2 days)
 
 #### This Month
+
 9. Standardize builder pattern (6 days)
 10. Generic Context System (1 day)
 11. Error wrapping (1 day)
@@ -1497,22 +1622,26 @@ func UnknownSizeCleanResult(
 ### Risk Assessment
 
 **High Risk:**
+
 - Integration test failure blocks CI pipeline
 - SizeEstimate.Status bug affects all cleaner results
 - No incremental commits - hard to rollback
 
 **Medium Risk:**
+
 - Inconsistent configuration patterns
 - Bit flags vs enum decision needed
 - Missing documentation
 
 **Low Risk:**
+
 - Justfile performance (annoyance, not blocking)
 - Builder pattern standardization (can wait)
 
 ### Success Criteria
 
 **For This Session:**
+
 - ✅ GOMODCACHE integrated
 - 🚨 Integration test passing (FAILED)
 - ✅ Build working
@@ -1520,6 +1649,7 @@ func UnknownSizeCleanResult(
 - ⚠️ Documentation updated (PARTIAL)
 
 **Overall Project:**
+
 - 90%+ test coverage
 - All cleaners use builder pattern
 - Consistent configuration API
@@ -1536,6 +1666,7 @@ func UnknownSizeCleanResult(
 **Remaining Work:** 40%
 
 **Blockers:**
+
 - SizeEstimate.Status bug
 - Integration test failure
 - No incremental commits
@@ -1543,6 +1674,7 @@ func UnknownSizeCleanResult(
 **Ready to Push:** NO - need to fix bugs first
 
 **Next Session Goals:**
+
 1. Fix SizeEstimate.Status bug
 2. Fix integration test
 3. Revert changes and commit incrementally

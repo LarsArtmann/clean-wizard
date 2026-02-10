@@ -24,16 +24,16 @@ This document outlines a comprehensive plan to achieve architectural excellence 
 
 ### ❌ Critical Issues Identified
 
-| Issue | Severity | Location | Impact |
-|-------|----------|----------|--------|
-| **Boolean instead of Enum** | CRITICAL | `types.go:177` | Type safety violation - Unknown state unrepresentable as enum |
-| **Split Brain - Two Cleaner Interfaces** | CRITICAL | `cleaner.go:11` & `interfaces.go:6` | Interface inconsistency, confusion in codebase |
-| **Deprecated Constants in Use** | HIGH | `config.go:98-107` | Linter warnings, technical debt |
-| **File Too Large** | HIGH | `operation_settings.go:920` | Violates 350-line limit, hard to maintain |
-| **File Too Large** | HIGH | `test_helpers.go:742` | Violates 350-line limit, hard to maintain |
-| **File Too Large** | HIGH | `clean.go:713` | Violates 350-line limit, hard to maintain |
-| **File Too Large** | MEDIUM | `type_safe_enums.go:444` | Borderline, exceeds 350-line guideline |
-| **Missing Test Coverage** | HIGH | `registry_test.go` | No unit test for `Registry.CleanAll` |
+| Issue                                    | Severity | Location                            | Impact                                                        |
+| ---------------------------------------- | -------- | ----------------------------------- | ------------------------------------------------------------- |
+| **Boolean instead of Enum**              | CRITICAL | `types.go:177`                      | Type safety violation - Unknown state unrepresentable as enum |
+| **Split Brain - Two Cleaner Interfaces** | CRITICAL | `cleaner.go:11` & `interfaces.go:6` | Interface inconsistency, confusion in codebase                |
+| **Deprecated Constants in Use**          | HIGH     | `config.go:98-107`                  | Linter warnings, technical debt                               |
+| **File Too Large**                       | HIGH     | `operation_settings.go:920`         | Violates 350-line limit, hard to maintain                     |
+| **File Too Large**                       | HIGH     | `test_helpers.go:742`               | Violates 350-line limit, hard to maintain                     |
+| **File Too Large**                       | HIGH     | `clean.go:713`                      | Violates 350-line limit, hard to maintain                     |
+| **File Too Large**                       | MEDIUM   | `type_safe_enums.go:444`            | Borderline, exceeds 350-line guideline                        |
+| **Missing Test Coverage**                | HIGH     | `registry_test.go`                  | No unit test for `Registry.CleanAll`                          |
 
 ---
 
@@ -114,6 +114,7 @@ These tasks build on the 1% and deliver significant architectural improvements:
 **Lines Changed:** ~40
 
 **Strategy:**
+
 - Keep `Cleaner` interface in `cleaner.go` (implementation package)
 - Remove or deprecate duplicate in `interfaces.go`
 - Update all cleaners to use the unified interface
@@ -181,88 +182,88 @@ These tasks complete the major architectural improvements:
 
 ### Phase 1: Type Safety (Tasks 1-8)
 
-| # | Task | File(s) | Effort | Impact | Priority |
-|---|------|---------|--------|--------|----------|
-| 1 | Create SizeEstimateStatusType enum | `type_safe_enums.go` | 15min | HIGH | P0 |
-| 2 | Replace Unknown bool with Status enum | `types.go` | 15min | CRITICAL | P0 |
-| 3 | Update all SizeEstimate.Usage sites | `*.go` | 20min | HIGH | P1 |
-| 4 | Add SizeEstimateStatusType tests | `type_safe_enums_test.go` | 15min | HIGH | P1 |
-| 5 | Remove deprecated RiskLevel constants | `config.go` | 10min | MEDIUM | P1 |
-| 6 | Fix RiskLevel usage in GetDefaultConfig | `config.go` | 10min | MEDIUM | P1 |
-| 7 | Add Registry.CleanAll unit test | `registry_test.go` | 15min | HIGH | P0 |
-| 8 | Verify build after changes | `go build ./...` | 5min | HIGH | P0 |
+| #   | Task                                    | File(s)                   | Effort | Impact   | Priority |
+| --- | --------------------------------------- | ------------------------- | ------ | -------- | -------- |
+| 1   | Create SizeEstimateStatusType enum      | `type_safe_enums.go`      | 15min  | HIGH     | P0       |
+| 2   | Replace Unknown bool with Status enum   | `types.go`                | 15min  | CRITICAL | P0       |
+| 3   | Update all SizeEstimate.Usage sites     | `*.go`                    | 20min  | HIGH     | P1       |
+| 4   | Add SizeEstimateStatusType tests        | `type_safe_enums_test.go` | 15min  | HIGH     | P1       |
+| 5   | Remove deprecated RiskLevel constants   | `config.go`               | 10min  | MEDIUM   | P1       |
+| 6   | Fix RiskLevel usage in GetDefaultConfig | `config.go`               | 10min  | MEDIUM   | P1       |
+| 7   | Add Registry.CleanAll unit test         | `registry_test.go`        | 15min  | HIGH     | P0       |
+| 8   | Verify build after changes              | `go build ./...`          | 5min   | HIGH     | P0       |
 
 ### Phase 2: Interface Consolidation (Tasks 9-15)
 
-| # | Task | File(s) | Effort | Impact | Priority |
-|---|------|---------|--------|--------|----------|
-| 9 | Audit all Cleaner interface usages | `*.go` | 15min | HIGH | P1 |
-| 10 | Define unified Cleaner interface | `cleaner.go` | 10min | CRITICAL | P0 |
-| 11 | Update domain/interfaces.go | `interfaces.go` | 10min | HIGH | P1 |
-| 12 | Update all cleaner implementations | `*_cleaner.go` | 30min | HIGH | P1 |
-| 13 | Update registry.go interface usage | `registry.go` | 10min | CRITICAL | P0 |
-| 14 | Add integration test for interface | `cleaner_test.go` | 15min | MEDIUM | P2 |
-| 15 | Verify build after changes | `go build ./...` | 5min | HIGH | P0 |
+| #   | Task                               | File(s)           | Effort | Impact   | Priority |
+| --- | ---------------------------------- | ----------------- | ------ | -------- | -------- |
+| 9   | Audit all Cleaner interface usages | `*.go`            | 15min  | HIGH     | P1       |
+| 10  | Define unified Cleaner interface   | `cleaner.go`      | 10min  | CRITICAL | P0       |
+| 11  | Update domain/interfaces.go        | `interfaces.go`   | 10min  | HIGH     | P1       |
+| 12  | Update all cleaner implementations | `*_cleaner.go`    | 30min  | HIGH     | P1       |
+| 13  | Update registry.go interface usage | `registry.go`     | 10min  | CRITICAL | P0       |
+| 14  | Add integration test for interface | `cleaner_test.go` | 15min  | MEDIUM   | P2       |
+| 15  | Verify build after changes         | `go build ./...`  | 5min   | HIGH     | P0       |
 
 ### Phase 3: File Splitting - operation_settings.go (Tasks 16-22)
 
-| # | Task | File(s) | Effort | Impact | Priority |
-|---|------|---------|--------|--------|----------|
-| 16 | Create operation_settings_types.go | `operation_settings_types.go` | 15min | HIGH | P1 |
-| 17 | Create operation_settings_defaults.go | `operation_settings_defaults.go` | 15min | HIGH | P1 |
-| 18 | Create operation_settings_validation.go | `operation_settings_validation.go` | 15min | HIGH | P1 |
-| 19 | Update operation_settings.go to import new files | `operation_settings.go` | 10min | HIGH | P1 |
-| 20 | Update all import sites | `*.go` | 15min | MEDIUM | P2 |
-| 21 | Remove duplicate type definitions | `operation_settings.go` | 10min | MEDIUM | P2 |
-| 22 | Verify build after changes | `go build ./...` | 5min | HIGH | P0 |
+| #   | Task                                             | File(s)                            | Effort | Impact | Priority |
+| --- | ------------------------------------------------ | ---------------------------------- | ------ | ------ | -------- |
+| 16  | Create operation_settings_types.go               | `operation_settings_types.go`      | 15min  | HIGH   | P1       |
+| 17  | Create operation_settings_defaults.go            | `operation_settings_defaults.go`   | 15min  | HIGH   | P1       |
+| 18  | Create operation_settings_validation.go          | `operation_settings_validation.go` | 15min  | HIGH   | P1       |
+| 19  | Update operation_settings.go to import new files | `operation_settings.go`            | 10min  | HIGH   | P1       |
+| 20  | Update all import sites                          | `*.go`                             | 15min  | MEDIUM | P2       |
+| 21  | Remove duplicate type definitions                | `operation_settings.go`            | 10min  | MEDIUM | P2       |
+| 22  | Verify build after changes                       | `go build ./...`                   | 5min   | HIGH   | P0       |
 
 ### Phase 4: File Splitting - test_helpers.go (Tasks 23-29)
 
-| # | Task | File(s) | Effort | Impact | Priority |
-|---|------|---------|--------|--------|----------|
-| 23 | Create test_helpers_mocks.go | `test_helpers_mocks.go` | 15min | HIGH | P2 |
-| 24 | Create test_helpers_factories.go | `test_helpers_factories.go` | 15min | HIGH | P2 |
-| 25 | Create test_helpers_helpers.go | `test_helpers_helpers.go` | 15min | HIGH | P2 |
-| 26 | Update test_helpers.go to import new files | `test_helpers.go` | 10min | MEDIUM | P2 |
-| 27 | Update all test imports | `*_test.go` | 15min | MEDIUM | P2 |
-| 28 | Remove duplicate code | `test_helpers.go` | 10min | MEDIUM | P2 |
-| 29 | Verify build after changes | `go build ./...` | 5min | HIGH | P0 |
+| #   | Task                                       | File(s)                     | Effort | Impact | Priority |
+| --- | ------------------------------------------ | --------------------------- | ------ | ------ | -------- |
+| 23  | Create test_helpers_mocks.go               | `test_helpers_mocks.go`     | 15min  | HIGH   | P2       |
+| 24  | Create test_helpers_factories.go           | `test_helpers_factories.go` | 15min  | HIGH   | P2       |
+| 25  | Create test_helpers_helpers.go             | `test_helpers_helpers.go`   | 15min  | HIGH   | P2       |
+| 26  | Update test_helpers.go to import new files | `test_helpers.go`           | 10min  | MEDIUM | P2       |
+| 27  | Update all test imports                    | `*_test.go`                 | 15min  | MEDIUM | P2       |
+| 28  | Remove duplicate code                      | `test_helpers.go`           | 10min  | MEDIUM | P2       |
+| 29  | Verify build after changes                 | `go build ./...`            | 5min   | HIGH   | P0       |
 
 ### Phase 5: File Splitting - clean.go (Tasks 30-37)
 
-| # | Task | File(s) | Effort | Impact | Priority |
-|---|------|---------|--------|--------|----------|
-| 30 | Create clean.go (entry point only) | `clean.go` | 15min | HIGH | P2 |
-| 31 | Create clean_execution.go | `clean_execution.go` | 15min | HIGH | P2 |
-| 32 | Create clean_result.go | `clean_result.go` | 15min | HIGH | P2 |
-| 33 | Create clean_flags.go | `clean_flags.go` | 15min | MEDIUM | P2 |
-| 34 | Update imports in clean command | `clean.go` | 10min | HIGH | P1 |
-| 35 | Update root.go to use new structure | `root.go` | 10min | MEDIUM | P2 |
-| 36 | Update main.go if needed | `main.go` | 5min | LOW | P3 |
-| 37 | Verify build after changes | `go build ./...` | 5min | HIGH | P0 |
+| #   | Task                                | File(s)              | Effort | Impact | Priority |
+| --- | ----------------------------------- | -------------------- | ------ | ------ | -------- |
+| 30  | Create clean.go (entry point only)  | `clean.go`           | 15min  | HIGH   | P2       |
+| 31  | Create clean_execution.go           | `clean_execution.go` | 15min  | HIGH   | P2       |
+| 32  | Create clean_result.go              | `clean_result.go`    | 15min  | HIGH   | P2       |
+| 33  | Create clean_flags.go               | `clean_flags.go`     | 15min  | MEDIUM | P2       |
+| 34  | Update imports in clean command     | `clean.go`           | 10min  | HIGH   | P1       |
+| 35  | Update root.go to use new structure | `root.go`            | 10min  | MEDIUM | P2       |
+| 36  | Update main.go if needed            | `main.go`            | 5min   | LOW    | P3       |
+| 37  | Verify build after changes          | `go build ./...`     | 5min   | HIGH   | P0       |
 
 ### Phase 6: File Splitting - type_safe_enums.go (Tasks 38-43)
 
-| # | Task | File(s) | Effort | Impact | Priority |
-|---|------|---------|--------|--------|----------|
-| 38 | Extract enum helpers to new file | `type_safe_enum_helpers.go` | 10min | MEDIUM | P2 |
-| 39 | Create type_safe_enum_tests.go | `type_safe_enum_tests.go` | 15min | MEDIUM | P2 |
-| 40 | Update type_safe_enums.go imports | `type_safe_enums.go` | 5min | MEDIUM | P2 |
-| 41 | Add SizeEstimateStatusType to enums | `type_safe_enums.go` | 15min | HIGH | P1 |
-| 42 | Update execution_enums.go if needed | `execution_enums.go` | 10min | LOW | P3 |
-| 43 | Verify build after changes | `go build ./...` | 5min | HIGH | P0 |
+| #   | Task                                | File(s)                     | Effort | Impact | Priority |
+| --- | ----------------------------------- | --------------------------- | ------ | ------ | -------- |
+| 38  | Extract enum helpers to new file    | `type_safe_enum_helpers.go` | 10min  | MEDIUM | P2       |
+| 39  | Create type_safe_enum_tests.go      | `type_safe_enum_tests.go`   | 15min  | MEDIUM | P2       |
+| 40  | Update type_safe_enums.go imports   | `type_safe_enums.go`        | 5min   | MEDIUM | P2       |
+| 41  | Add SizeEstimateStatusType to enums | `type_safe_enums.go`        | 15min  | HIGH   | P1       |
+| 42  | Update execution_enums.go if needed | `execution_enums.go`        | 10min  | LOW    | P3       |
+| 43  | Verify build after changes          | `go build ./...`            | 5min   | HIGH   | P0       |
 
 ### Phase 7: Verification & Cleanup (Tasks 44-50)
 
-| # | Task | File(s) | Effort | Impact | Priority |
-|---|------|---------|--------|--------|----------|
-| 44 | Run full test suite | `go test ./...` | 10min | HIGH | P0 |
-| 45 | Check for remaining linter warnings | `golangci-lint run` | 5min | MEDIUM | P1 |
-| 46 | Verify no deprecated constants remain | `grep -r "RiskLow\|RiskMedium"` | 5min | MEDIUM | P1 |
-| 47 | Check file line counts | `wc -l *.go` | 5min | MEDIUM | P2 |
-| 48 | Update README with new architecture | `README.md` | 15min | LOW | P3 |
-| 49 | Create ARCHITECTURE.md | `ARCHITECTURE.md` | 30min | LOW | P3 |
-| 50 | Final verification | All builds & tests | 10min | HIGH | P0 |
+| #   | Task                                  | File(s)                         | Effort | Impact | Priority |
+| --- | ------------------------------------- | ------------------------------- | ------ | ------ | -------- |
+| 44  | Run full test suite                   | `go test ./...`                 | 10min  | HIGH   | P0       |
+| 45  | Check for remaining linter warnings   | `golangci-lint run`             | 5min   | MEDIUM | P1       |
+| 46  | Verify no deprecated constants remain | `grep -r "RiskLow\|RiskMedium"` | 5min   | MEDIUM | P1       |
+| 47  | Check file line counts                | `wc -l *.go`                    | 5min   | MEDIUM | P2       |
+| 48  | Update README with new architecture   | `README.md`                     | 15min  | LOW    | P3       |
+| 49  | Create ARCHITECTURE.md                | `ARCHITECTURE.md`               | 30min  | LOW    | P3       |
+| 50  | Final verification                    | All builds & tests              | 10min  | HIGH   | P0       |
 
 ---
 
@@ -318,27 +319,27 @@ graph TD
     C --> D[Task 3: Update Usage Sites]
     D --> E[Task 7: Add Registry.CleanAll Test]
     E --> F[Task 8: Verify Build]
-    
+
     F --> G[Interface Consolidation Phase]
     G --> H[Task 9: Audit Interface Usages]
     H --> I[Task 10: Define Unified Interface]
     I --> J[Task 12: Update Cleaner Implementations]
     J --> K[Task 13: Update Registry]
     K --> L[Verify Build]
-    
+
     L --> M[File Splitting Phase]
     M --> N[Tasks 16-22: operation_settings.go]
     N --> O[Tasks 23-29: test_helpers.go]
     O --> P[Tasks 30-37: clean.go]
     P --> Q[Tasks 38-43: type_safe_enums.go]
     Q --> R[Verify All Changes]
-    
+
     R --> S[Final Verification Phase]
     S --> T[Run Full Test Suite]
     T --> U[Check Linter Warnings]
     U --> V[Final Build Verification]
     V --> W[Done: Architectural Excellence Achieved]
-    
+
     style A fill:#e1f5fe
     style G fill:#fff3e0
     style M fill:#f3e5f5
@@ -350,12 +351,12 @@ graph TD
 
 ## Risk Assessment
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Build breaks during refactoring | Medium | High | Verify build after each batch |
-| Tests fail after interface changes | Medium | High | Add integration tests early |
-| Circular dependencies when splitting files | Low | High | Plan imports carefully |
-| Deprecated constants scattered | Medium | Medium | Use grep to find all occurrences |
+| Risk                                       | Probability | Impact | Mitigation                       |
+| ------------------------------------------ | ----------- | ------ | -------------------------------- |
+| Build breaks during refactoring            | Medium      | High   | Verify build after each batch    |
+| Tests fail after interface changes         | Medium      | High   | Add integration tests early      |
+| Circular dependencies when splitting files | Low         | High   | Plan imports carefully           |
+| Deprecated constants scattered             | Medium      | Medium | Use grep to find all occurrences |
 
 ---
 
@@ -380,6 +381,6 @@ graph TD
 
 ---
 
-*Generated with ❤️ by Crush - Senior Software Architect & Product Owner*
+_Generated with ❤️ by Crush - Senior Software Architect & Product Owner_
 
-*Document Version: 1.0 | Last Updated: 2026-02-09 12:46*
+_Document Version: 1.0 | Last Updated: 2026-02-09 12:46_

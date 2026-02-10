@@ -18,27 +18,27 @@ Clean Wizard cleans old caches, temporary files, and unused data across 11 diffe
 
 ### 11 Specialized Cleaners
 
-| Cleaner | Target | Status |
-|---------|--------|--------|
-| **Nix** | Nix store and generations | ✅ Production Ready |
-| **Homebrew** | Homebrew cache and autoremove | ✅ Production Ready |
-| **Docker** | Containers, images, volumes, builds | ✅ Production Ready |
-| **Cargo** | Rust Cargo cache and registries | ✅ Production Ready |
-| **Go** | Go module, test, and build cache | ✅ Production Ready |
-| **Node** | npm, pnpm, yarn, bun package caches | ✅ Production Ready |
-| **BuildCache** | Gradle, Maven, SBT build caches | ✅ Production Ready |
-| **SystemCache** | macOS Spotlight, Xcode, CocoaPods | ✅ Production Ready |
-| **TempFiles** | Age-based temporary files | ✅ Production Ready |
-| **LangVersion** | NVM, Pyenv, Rbenv version managers | 🚧 NO-OP (Planned) |
-| **Projects** | Project automation (development) | 🚧 In Progress |
+| Cleaner         | Target                              | Status              |
+| --------------- | ----------------------------------- | ------------------- |
+| **Nix**         | Nix store and generations           | ✅ Production Ready |
+| **Homebrew**    | Homebrew cache and autoremove       | ✅ Production Ready |
+| **Docker**      | Containers, images, volumes, builds | ✅ Production Ready |
+| **Cargo**       | Rust Cargo cache and registries     | ✅ Production Ready |
+| **Go**          | Go module, test, and build cache    | ✅ Production Ready |
+| **Node**        | npm, pnpm, yarn, bun package caches | ✅ Production Ready |
+| **BuildCache**  | Gradle, Maven, SBT build caches     | ✅ Production Ready |
+| **SystemCache** | macOS Spotlight, Xcode, CocoaPods   | ✅ Production Ready |
+| **TempFiles**   | Age-based temporary files           | ✅ Production Ready |
+| **LangVersion** | NVM, Pyenv, Rbenv version managers  | 🚧 NO-OP (Planned)  |
+| **Projects**    | Project automation (development)    | 🚧 In Progress      |
 
 ### Preset Modes
 
-| Mode | Purpose | What's Cleaned |
-|------|---------|----------------|
-| **Quick** | Daily cleanup | Homebrew, Go, Node, TempFiles, BuildCache |
-| **Standard** | Full cleanup | All available cleaners including Nix and Docker |
-| **Aggressive** | Nuclear cleanup | All cleaners including language versions |
+| Mode           | Purpose         | What's Cleaned                                  |
+| -------------- | --------------- | ----------------------------------------------- |
+| **Quick**      | Daily cleanup   | Homebrew, Go, Node, TempFiles, BuildCache       |
+| **Standard**   | Full cleanup    | All available cleaners including Nix and Docker |
+| **Aggressive** | Nuclear cleanup | All cleaners including language versions        |
 
 ### Interactive TUI
 
@@ -56,12 +56,12 @@ Clean Wizard cleans old caches, temporary files, and unused data across 11 diffe
 
 ### Output Options
 
-| Flag | Output |
-|------|--------|
-| *(default)* | Interactive TUI with forms |
-| `--json` | Machine-readable JSON output |
-| `--dry-run` | Preview mode (no changes) |
-| `--verbose` | Detailed logging |
+| Flag        | Output                       |
+| ----------- | ---------------------------- |
+| _(default)_ | Interactive TUI with forms   |
+| `--json`    | Machine-readable JSON output |
+| `--dry-run` | Preview mode (no changes)    |
+| `--verbose` | Detailed logging             |
 
 ## 🎬 Quick Start
 
@@ -167,20 +167,21 @@ $ clean-wizard clean --json
 ### `clean-wizard clean` (Main Command)
 
 **Synopsis:**
+
 ```bash
 clean-wizard clean [flags]
 ```
 
 **Flags:**
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `--mode, -m` | Preset mode: quick, standard, aggressive | standard |
-| `--config, -c` | Path to config file | ~/.config/clean-wizard/config.yaml |
-| `--dry-run` | Preview without making changes | false |
-| `--json` | Output as JSON | false |
-| `--verbose` | Enable verbose logging | false |
-| `--dry-run` | Simulate deletion | false |
+| Flag           | Description                              | Default                            |
+| -------------- | ---------------------------------------- | ---------------------------------- |
+| `--mode, -m`   | Preset mode: quick, standard, aggressive | standard                           |
+| `--config, -c` | Path to config file                      | ~/.config/clean-wizard/config.yaml |
+| `--dry-run`    | Preview without making changes           | false                              |
+| `--json`       | Output as JSON                           | false                              |
+| `--verbose`    | Enable verbose logging                   | false                              |
+| `--dry-run`    | Simulate deletion                        | false                              |
 
 **Examples:**
 
@@ -273,16 +274,19 @@ clean-wizard clean --mode aggressive
 ### Protected Operations
 
 **Current Generation Protection:**
+
 - Nix current generation is never shown for deletion
 - System always keeps at least the active profile
 
 **Confirmation Requirements:**
+
 - Explicit Yes/No dialog before any deletion
 - Lists exactly what will be removed
 - Shows estimated space to be freed
 - Can be bypassed with `--yes` flag (not recommended)
 
 **Dry-Run Mode:**
+
 ```bash
 # Safe preview - shows what would happen
 clean-wizard clean --dry-run
@@ -296,19 +300,19 @@ clean-wizard clean --dry-run
 
 ### What Each Cleaner Cleans
 
-| Cleaner | Target | Risk Level |
-|---------|--------|------------|
-| Nix | `/nix/store/*-generation` | Low |
-| Homebrew | `~/Library/Caches/Homebrew` | Low |
-| Docker | Containers, images, volumes | Medium |
-| Cargo | `~/.cargo/registry`, `~/.cargo/git` | Low |
-| Go | `go build cache`, `go mod cache` | Low |
-| Node | `~/.npm`, `~/.pnpm`, `~/.cache/yarn`, `~/.bun` | Low |
-| BuildCache | `~/.gradle`, `~/.m2`, `~/.sbt` | Low |
-| SystemCache | `~/Library/Caches/*`, Xcode DerivedData | Medium |
-| TempFiles | `/tmp/*` (age-based) | Low |
-| LangVersion | `~/.nvm/versions`, `~/.pyenv/versions` | **High** |
-| Projects | Project-specific cleanup | Medium |
+| Cleaner     | Target                                         | Risk Level |
+| ----------- | ---------------------------------------------- | ---------- |
+| Nix         | `/nix/store/*-generation`                      | Low        |
+| Homebrew    | `~/Library/Caches/Homebrew`                    | Low        |
+| Docker      | Containers, images, volumes                    | Medium     |
+| Cargo       | `~/.cargo/registry`, `~/.cargo/git`            | Low        |
+| Go          | `go build cache`, `go mod cache`               | Low        |
+| Node        | `~/.npm`, `~/.pnpm`, `~/.cache/yarn`, `~/.bun` | Low        |
+| BuildCache  | `~/.gradle`, `~/.m2`, `~/.sbt`                 | Low        |
+| SystemCache | `~/Library/Caches/*`, Xcode DerivedData        | Medium     |
+| TempFiles   | `/tmp/*` (age-based)                           | Low        |
+| LangVersion | `~/.nvm/versions`, `~/.pyenv/versions`         | **High**   |
+| Projects    | Project-specific cleanup                       | Medium     |
 
 ---
 
@@ -330,7 +334,7 @@ presets:
       - node
       - tempfiles
       - buildcache
-  
+
   standard:
     cleaners:
       - homebrew
@@ -342,7 +346,7 @@ presets:
       - systemcache
       - docker
       - nix
-  
+
   aggressive:
     cleaners:
       - all
@@ -371,9 +375,9 @@ output:
 
 ### Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `CLEAN_WIZARD_CONFIG` | Path to config file |
+| Variable               | Description          |
+| ---------------------- | -------------------- |
+| `CLEAN_WIZARD_CONFIG`  | Path to config file  |
 | `CLEAN_WIZARD_DRY_RUN` | Default dry-run mode |
 | `CLEAN_WIZARD_VERBOSE` | Default verbose mode |
 
@@ -464,12 +468,12 @@ go test -tags=bdd ./tests/integration/...
 
 ### Test Coverage
 
-| Test Type | Count | Status |
-|-----------|-------|--------|
-| Unit Tests | 200+ | ✅ All Passing |
-| Integration Tests | 10+ | ✅ Passing |
-| BDD Tests (Godog) | 5 | ✅ Passing |
-| Benchmark Tests | 15 | ✅ Passing |
+| Test Type         | Count | Status         |
+| ----------------- | ----- | -------------- |
+| Unit Tests        | 200+  | ✅ All Passing |
+| Integration Tests | 10+   | ✅ Passing     |
+| BDD Tests (Godog) | 5     | ✅ Passing     |
+| Benchmark Tests   | 15    | ✅ Passing     |
 
 ### Test Categories
 
@@ -549,24 +553,24 @@ func DefaultRegistry() *Registry {
 
 Clean Wizard and [SystemNix](https://github.com/LarsArtmann/SystemNix) serve similar purposes but with different approaches:
 
-| Feature | SystemNix (justfile) | Clean Wizard (Go) |
-|---------|---------------------|-------------------|
-| Language | POSIX shell | Type-safe Go |
-| Type Safety | ❌ Shell strings | ✅ Compile-time enums |
-| Dry-Run Mode | ❌ Not available | ✅ Preview mode |
-| Interactive TUI | ❌ CLI only | ✅ Beautiful forms |
-| JSON Output | ❌ Not available | ✅ Machine-readable |
-| Registry Pattern | ❌ Manual | ✅ Thread-safe registry |
-| Test Coverage | ❌ Manual | ✅ 200+ tests |
-| Configuration | ❌ Hardcoded | ✅ YAML profiles |
+| Feature          | SystemNix (justfile) | Clean Wizard (Go)       |
+| ---------------- | -------------------- | ----------------------- |
+| Language         | POSIX shell          | Type-safe Go            |
+| Type Safety      | ❌ Shell strings     | ✅ Compile-time enums   |
+| Dry-Run Mode     | ❌ Not available     | ✅ Preview mode         |
+| Interactive TUI  | ❌ CLI only          | ✅ Beautiful forms      |
+| JSON Output      | ❌ Not available     | ✅ Machine-readable     |
+| Registry Pattern | ❌ Manual            | ✅ Thread-safe registry |
+| Test Coverage    | ❌ Manual            | ✅ 200+ tests           |
+| Configuration    | ❌ Hardcoded         | ✅ YAML profiles        |
 
 ### Feature Parity
 
-| Mode | SystemNix | Clean Wizard | Parity |
-|------|-----------|--------------|--------|
-| Quick Mode | ✅ | ~85% | 🟡 Partial |
-| Standard Mode | ✅ | ~75% | 🟡 Partial |
-| Aggressive Mode | ✅ | ~60% | 🔴 Poor |
+| Mode            | SystemNix | Clean Wizard | Parity     |
+| --------------- | --------- | ------------ | ---------- |
+| Quick Mode      | ✅        | ~85%         | 🟡 Partial |
+| Standard Mode   | ✅        | ~75%         | 🟡 Partial |
+| Aggressive Mode | ✅        | ~60%         | 🔴 Poor    |
 
 ### Missing in Clean Wizard
 
@@ -670,4 +674,4 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 **Built with ❤️ for a cleaner macOS experience**
 
-*The ultimate tool for keeping your MacBook clean and fast*
+_The ultimate tool for keeping your MacBook clean and fast_

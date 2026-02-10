@@ -10,14 +10,14 @@
 
 Based on analysis of TODO_LIST.md and FEATURES.md, this project has significant architectural quality but critical gaps:
 
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| Cleaners | 11 total | 2 broken (LangVersionManager, ProjectsMgmt) |
-| CLI Commands | 5 documented | Only 1 implemented (80% gap) |
-| Size Reporting | 11 cleaners | 4 broken (Docker, Cargo, Projects, LangVersion) |
-| Platform Support | macOS primary | Linux support missing (SystemCache) |
-| Enum Consistency | 4 cleaners | 3 have inconsistencies |
-| Files Processed | 38/91 | 53 files remaining |
+| Metric           | Value         | Assessment                                      |
+| ---------------- | ------------- | ----------------------------------------------- |
+| Cleaners         | 11 total      | 2 broken (LangVersionManager, ProjectsMgmt)     |
+| CLI Commands     | 5 documented  | Only 1 implemented (80% gap)                    |
+| Size Reporting   | 11 cleaners   | 4 broken (Docker, Cargo, Projects, LangVersion) |
+| Platform Support | macOS primary | Linux support missing (SystemCache)             |
+| Enum Consistency | 4 cleaners    | 3 have inconsistencies                          |
+| Files Processed  | 38/91         | 53 files remaining                              |
 
 **Overall Assessment:** The codebase has excellent foundation (registry pattern, type-safe enums, adapter pattern) but has critical gaps that need immediate attention.
 
@@ -27,14 +27,14 @@ Based on analysis of TODO_LIST.md and FEATURES.md, this project has significant 
 
 The following tasks deliver 51% of value with minimal effort:
 
-| # | Task | Impact | Effort | Status |
-|---|------|--------|--------|--------|
-| 1 | Fix UNSAFE EXEC CALLS (9 commands) | 🔴 CRITICAL | 30min | PENDING |
-| 2 | Fix Cleaner Interface Compliance | 🔴 CRITICAL | 30min | PENDING |
-| 3 | Fix Size Reporting (Docker, Cargo) | 🟠 HIGH | 1h | PENDING |
-| 4 | Add Timeout to All Exec Calls | 🔴 CRITICAL | 1h | PENDING |
-| 5 | Complete nix.go missing Clean(ctx) | 🔴 CRITICAL | 15min | PENDING |
-| 6 | Complete golang_cache_cleaner.go missing IsAvailable() | 🔴 CRITICAL | 15min | PENDING |
+| #   | Task                                                   | Impact      | Effort | Status  |
+| --- | ------------------------------------------------------ | ----------- | ------ | ------- |
+| 1   | Fix UNSAFE EXEC CALLS (9 commands)                     | 🔴 CRITICAL | 30min  | PENDING |
+| 2   | Fix Cleaner Interface Compliance                       | 🔴 CRITICAL | 30min  | PENDING |
+| 3   | Fix Size Reporting (Docker, Cargo)                     | 🟠 HIGH     | 1h     | PENDING |
+| 4   | Add Timeout to All Exec Calls                          | 🔴 CRITICAL | 1h     | PENDING |
+| 5   | Complete nix.go missing Clean(ctx)                     | 🔴 CRITICAL | 15min  | PENDING |
+| 6   | Complete golang_cache_cleaner.go missing IsAvailable() | 🔴 CRITICAL | 15min  | PENDING |
 
 ---
 
@@ -44,17 +44,17 @@ The following tasks deliver 51% of value with minimal effort:
 
 **Files and Lines Affected:**
 
-| File | Line | Command | Risk |
-|------|------|---------|------|
-| `cargo.go` | 164 | `cargo-cache --autoclean` | CRITICAL |
-| `cargo.go` | 186 | `cargo clean` | CRITICAL |
-| `nodepackages.go` | 137 | `npm config get cache` | HIGH |
-| `nodepackages.go` | 159 | `pnpm store path` | HIGH |
-| `nodepackages.go` | 279 | `npm cache clean --force` | CRITICAL |
-| `nodepackages.go` | 290 | `pnpm store prune` | CRITICAL |
-| `nodepackages.go` | 301 | `yarn cache clean` | HIGH |
-| `nodepackages.go` | 312 | `bun pm cache rm` | HIGH |
-| `projectsmanagementautomation.go` | 99 | `--clear-cache` | HIGH |
+| File                              | Line | Command                   | Risk     |
+| --------------------------------- | ---- | ------------------------- | -------- |
+| `cargo.go`                        | 164  | `cargo-cache --autoclean` | CRITICAL |
+| `cargo.go`                        | 186  | `cargo clean`             | CRITICAL |
+| `nodepackages.go`                 | 137  | `npm config get cache`    | HIGH     |
+| `nodepackages.go`                 | 159  | `pnpm store path`         | HIGH     |
+| `nodepackages.go`                 | 279  | `npm cache clean --force` | CRITICAL |
+| `nodepackages.go`                 | 290  | `pnpm store prune`        | CRITICAL |
+| `nodepackages.go`                 | 301  | `yarn cache clean`        | HIGH     |
+| `nodepackages.go`                 | 312  | `bun pm cache rm`         | HIGH     |
+| `projectsmanagementautomation.go` | 99   | `--clear-cache`           | HIGH     |
 
 **Root Cause:** Commands use `exec.CommandContext(ctx, ...)` but ctx may not have timeout set.
 
@@ -63,12 +63,14 @@ The following tasks deliver 51% of value with minimal effort:
 ### 2. CLI Command Gap (80% Implementation Gap)
 
 **Current State:**
+
 - Only `clean` command exists (clean.go)
 - Missing: `scan`, `init`, `profile`, `config`
 
 **Impact:** Documentation (USAGE.md) promises features that don't exist.
 
 **Fix Options:**
+
 1. **Quick Fix:** Remove commands from documentation (lowest effort)
 2. **Proper Fix:** Implement all missing commands (highest effort, full functionality)
 3. **Hybrid:** Implement minimal stubs for all commands (medium effort)
@@ -94,26 +96,26 @@ The following tasks deliver 51% of value with minimal effort:
 
 ### Task Group A: Size Reporting Improvements
 
-| Cleaner | Current State | Fix | Effort |
-|---------|---------------|-----|--------|
-| Docker | Returns 0 bytes | Parse output for freed bytes | 1h |
-| Cargo | Returns 0 bytes | Parse cargo clean output | 1h |
-| Projects | Hardcoded 100MB | Real size calculation | 30min |
-| LangVersion | N/A (NO-OP) | N/A (removing) | N/A |
+| Cleaner     | Current State   | Fix                          | Effort |
+| ----------- | --------------- | ---------------------------- | ------ |
+| Docker      | Returns 0 bytes | Parse output for freed bytes | 1h     |
+| Cargo       | Returns 0 bytes | Parse cargo clean output     | 1h     |
+| Projects    | Hardcoded 100MB | Real size calculation        | 30min  |
+| LangVersion | N/A (NO-OP)     | N/A (removing)               | N/A    |
 
 ### Task Group B: Enum Consistency
 
-| Cleaner | Issue | Fix | Effort |
-|---------|-------|-----|--------|
-| SystemCache | Local lowercase vs domain uppercase enum | Align with domain | 1h |
-| NodePackages | Local string vs domain integer enum | Use domain enums | 1h |
-| BuildCache | Tools vs Languages abstraction mismatch | Clarify domain | 1h |
+| Cleaner      | Issue                                    | Fix               | Effort |
+| ------------ | ---------------------------------------- | ----------------- | ------ |
+| SystemCache  | Local lowercase vs domain uppercase enum | Align with domain | 1h     |
+| NodePackages | Local string vs domain integer enum      | Use domain enums  | 1h     |
+| BuildCache   | Tools vs Languages abstraction mismatch  | Clarify domain    | 1h     |
 
 ### Task Group C: Platform Support
 
-| Cleaner | Current | Target | Fix | Effort |
-|---------|---------|--------|-----|--------|
-| SystemCache | macOS only | macOS + Linux | Add Linux paths | 2h |
+| Cleaner     | Current    | Target        | Fix             | Effort |
+| ----------- | ---------- | ------------- | --------------- | ------ |
+| SystemCache | macOS only | macOS + Linux | Add Linux paths | 2h     |
 
 ---
 
@@ -203,32 +205,33 @@ gantt
 
 ## Success Metrics
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| Build passes without warnings | 100% | ❓ | PENDING |
-| Tests pass (all packages) | 100% | ❓ | PENDING |
-| Critical exec calls with timeout | 9/9 | 0/9 | PENDING |
-| CLI commands implemented | 5/5 | 1/5 | PENDING |
-| Size reporting accurate | 8/11 | 4/11 | PENDING |
-| Platform support (SystemCache) | macOS+Linux | macOS only | PENDING |
+| Metric                           | Target      | Current    | Status  |
+| -------------------------------- | ----------- | ---------- | ------- |
+| Build passes without warnings    | 100%        | ❓         | PENDING |
+| Tests pass (all packages)        | 100%        | ❓         | PENDING |
+| Critical exec calls with timeout | 9/9         | 0/9        | PENDING |
+| CLI commands implemented         | 5/5         | 1/5        | PENDING |
+| Size reporting accurate          | 8/11        | 4/11       | PENDING |
+| Platform support (SystemCache)   | macOS+Linux | macOS only | PENDING |
 
 ---
 
 ## Risk Assessment
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Build breaks after changes | Medium | High | Test after each change |
-| Tests fail | Medium | High | Run tests before/after each task |
-| Scope creep | High | Medium | Stay focused on planned tasks |
-| Time overrun | Medium | Low | Split tasks if needed |
-| Dependency issues | Low | Medium | Use existing patterns/helpers |
+| Risk                       | Probability | Impact | Mitigation                       |
+| -------------------------- | ----------- | ------ | -------------------------------- |
+| Build breaks after changes | Medium      | High   | Test after each change           |
+| Tests fail                 | Medium      | High   | Run tests before/after each task |
+| Scope creep                | High        | Medium | Stay focused on planned tasks    |
+| Time overrun               | Medium      | Low    | Split tasks if needed            |
+| Dependency issues          | Low         | Medium | Use existing patterns/helpers    |
 
 ---
 
 ## Commands Reference
 
 ### Build & Test Commands
+
 ```bash
 # Build
 just build
@@ -257,4 +260,4 @@ just verify
 
 ---
 
-*Generated by comprehensive analysis of TODO_LIST.md and FEATURES.md*
+_Generated by comprehensive analysis of TODO_LIST.md and FEATURES.md_

@@ -13,6 +13,7 @@
 This report provides a comprehensive update on the Clean Wizard project status following the completion of Phase 3: File Splitting for Maintainability. The project has achieved significant milestones in type safety improvements, interface consolidation, and file organization. All tests pass, the build is clean, and the codebase is in a healthy, maintainable state.
 
 **Key Achievements:**
+
 - Completed Phase 3 file splitting (operation_settings.go: 917 → 412 lines, test_helpers.go: 412 → 10 lines)
 - Created 6 new focused files organized by concern (interfaces, assertions, factories, types, defaults, validation)
 - 81.7% of project files now under 350 lines (98/120 files)
@@ -28,14 +29,15 @@ This report provides a comprehensive update on the Clean Wizard project status f
 
 **Status:** FULLY DONE - All tasks completed successfully
 
-| Task | Description | Result | Lines Changed |
-|------|-------------|--------|---------------|
+| Task                                               | Description                                          | Result  | Lines Changed       |
+| -------------------------------------------------- | ---------------------------------------------------- | ------- | ------------------- |
 | Add `Name()` method to all cleaner implementations | Implemented consistent naming across all 12 cleaners | ✅ DONE | 12 cleaners updated |
-| Fix critical bug in registry.go | Fixed c.Name() usage instead of hardcoded "unknown" | ✅ DONE | 1 file fixed |
-| Add missing Name() implementations | Removed fallbacks and ensured consistent behavior | ✅ DONE | 3 files updated |
-| Create comprehensive planning document | Created docs/planning/ for architecture decisions | ✅ DONE | Planning complete |
+| Fix critical bug in registry.go                    | Fixed c.Name() usage instead of hardcoded "unknown"  | ✅ DONE | 1 file fixed        |
+| Add missing Name() implementations                 | Removed fallbacks and ensured consistent behavior    | ✅ DONE | 3 files updated     |
+| Create comprehensive planning document             | Created docs/planning/ for architecture decisions    | ✅ DONE | Planning complete   |
 
 **Verification:**
+
 ```bash
 go build ./...                           # PASSED - 0 errors
 go test ./... -count=1                   # PASSED - All tests
@@ -47,14 +49,15 @@ go test ./... -count=1                   # PASSED - All tests
 
 **Status:** FULLY DONE - All tasks completed successfully
 
-| Task | Description | Result | Impact |
-|------|-------------|--------|--------|
-| Rename `domain.Cleaner` → `domain.OperationHandler` | Full interface rename for semantic clarity | ✅ DONE | 12+ files updated |
-| Update all 12 cleaner implementations | Renamed receivers and interface references | ✅ DONE | All cleaners updated |
-| Update registry references | Changed registry to use OperationHandler | ✅ DONE | registry.go modified |
-| Deprecation cleanup for CleanStrategy | Added deprecated markers for cleanup | ✅ DONE | Clear migration path |
+| Task                                                | Description                                | Result  | Impact               |
+| --------------------------------------------------- | ------------------------------------------ | ------- | -------------------- |
+| Rename `domain.Cleaner` → `domain.OperationHandler` | Full interface rename for semantic clarity | ✅ DONE | 12+ files updated    |
+| Update all 12 cleaner implementations               | Renamed receivers and interface references | ✅ DONE | All cleaners updated |
+| Update registry references                          | Changed registry to use OperationHandler   | ✅ DONE | registry.go modified |
+| Deprecation cleanup for CleanStrategy               | Added deprecated markers for cleanup       | ✅ DONE | Clear migration path |
 
 **Interface Design:**
+
 ```go
 // OperationHandler represents the core interface for all cleanup operations
 type OperationHandler interface {
@@ -73,14 +76,15 @@ type OperationHandler interface {
 
 #### Domain File Splitting (internal/domain/)
 
-| File | Before | After | Status |
-|------|--------|-------|--------|
-| `operation_settings.go` | 917 lines | 412 lines | ✅ Reduced by 55% |
-| `operation_types.go` | NEW | 161 lines | ✅ NEW - Enum/type definitions |
-| `operation_defaults.go` | NEW | 205 lines | ✅ NEW - Factory functions |
-| `operation_validation.go` | NEW | 147 lines | ✅ NEW - Validation logic |
+| File                      | Before    | After     | Status                         |
+| ------------------------- | --------- | --------- | ------------------------------ |
+| `operation_settings.go`   | 917 lines | 412 lines | ✅ Reduced by 55%              |
+| `operation_types.go`      | NEW       | 161 lines | ✅ NEW - Enum/type definitions |
+| `operation_defaults.go`   | NEW       | 205 lines | ✅ NEW - Factory functions     |
+| `operation_validation.go` | NEW       | 147 lines | ✅ NEW - Validation logic      |
 
 **File Organization:**
+
 ```
 internal/domain/
 ├── operation_settings.go      # Core struct + JSON/YAML tags (412 lines)
@@ -93,14 +97,15 @@ internal/domain/
 
 #### Test Helper File Splitting (internal/cleaner/)
 
-| File | Before | After | Status |
-|------|--------|-------|--------|
-| `test_helpers.go` | 412 lines | 10 lines | ✅ Reduced by 98% |
-| `test_interfaces.go` | NEW | 76 lines | ✅ NEW - Type definitions |
-| `test_assertions.go` | NEW | 261 lines | ✅ NEW - Test functions |
-| `test_factories.go` | NEW | 87 lines | ✅ NEW - Factory functions |
+| File                 | Before    | After     | Status                     |
+| -------------------- | --------- | --------- | -------------------------- |
+| `test_helpers.go`    | 412 lines | 10 lines  | ✅ Reduced by 98%          |
+| `test_interfaces.go` | NEW       | 76 lines  | ✅ NEW - Type definitions  |
+| `test_assertions.go` | NEW       | 261 lines | ✅ NEW - Test functions    |
+| `test_factories.go`  | NEW       | 87 lines  | ✅ NEW - Factory functions |
 
 **File Organization:**
+
 ```
 internal/cleaner/
 ├── test_helpers.go            # Remaining utilities (10 lines)
@@ -111,6 +116,7 @@ internal/cleaner/
 ```
 
 **Verification:**
+
 ```bash
 go build ./...                           # PASSED - 0 errors
 go test ./... -count=1                   # PASSED - All packages
@@ -122,37 +128,37 @@ go test ./... -count=1                   # PASSED - All packages
 
 ### Overall Project Metrics
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Total Go files | 120 | ✅ In scope |
-| Files under 350 lines | 98 | ✅ 81.7% compliant |
-| Files over 350 lines | 22 | ⚠️ 18.3% need attention |
-| Test packages | 14 | ✅ All passing |
-| Build errors | 0 | ✅ Clean |
-| Lint warnings | 4 | 🟢 Minor |
-| Benchmark test files | 5 | ✅ Ready |
+| Metric                | Value | Status                  |
+| --------------------- | ----- | ----------------------- |
+| Total Go files        | 120   | ✅ In scope             |
+| Files under 350 lines | 98    | ✅ 81.7% compliant      |
+| Files over 350 lines  | 22    | ⚠️ 18.3% need attention |
+| Test packages         | 14    | ✅ All passing          |
+| Build errors          | 0     | ✅ Clean                |
+| Lint warnings         | 4     | 🟢 Minor                |
+| Benchmark test files  | 5     | ✅ Ready                |
 
 ### File Size Distribution
 
-| Size Range | Count | Percentage |
-|------------|-------|------------|
-| 0-100 lines | 45 | 37.5% |
-| 101-200 lines | 28 | 23.3% |
-| 201-300 lines | 15 | 12.5% |
-| 301-350 lines | 10 | 8.3% |
-| 351-500 lines | 12 | 10.0% |
-| 501-700 lines | 7 | 5.8% |
-| 700+ lines | 3 | 2.5% |
+| Size Range    | Count | Percentage |
+| ------------- | ----- | ---------- |
+| 0-100 lines   | 45    | 37.5%      |
+| 101-200 lines | 28    | 23.3%      |
+| 201-300 lines | 15    | 12.5%      |
+| 301-350 lines | 10    | 8.3%       |
+| 351-500 lines | 12    | 10.0%      |
+| 501-700 lines | 7     | 5.8%       |
+| 700+ lines    | 3     | 2.5%       |
 
 ### Test Infrastructure Status
 
-| Category | Status | Details |
-|----------|--------|---------|
-| Unit tests | ✅ PASSING | All 14 packages pass |
-| BDD tests | ✅ PASSING | Nix workflow, configuration workflow |
-| Integration tests | ⚠️ PARTIAL | Enum workflows 75% complete |
-| Benchmark tests | ✅ READY | 5 benchmark files, 642 lines |
-| Test coverage | 📊 UNKNOWN | No coverage tool configured |
+| Category          | Status     | Details                              |
+| ----------------- | ---------- | ------------------------------------ |
+| Unit tests        | ✅ PASSING | All 14 packages pass                 |
+| BDD tests         | ✅ PASSING | Nix workflow, configuration workflow |
+| Integration tests | ⚠️ PARTIAL | Enum workflows 75% complete          |
+| Benchmark tests   | ✅ READY   | 5 benchmark files, 642 lines         |
+| Test coverage     | 📊 UNKNOWN | No coverage tool configured          |
 
 ---
 
@@ -163,6 +169,7 @@ go test ./... -count=1                   # PASSED - All packages
 The `Name()` method addition across all 12 cleaner implementations has significantly improved the project's type safety. Each operation now consistently returns its identifier, making the registry more reliable and enabling better error messages.
 
 **Example:**
+
 ```go
 func (c *NixCleaner) Name() string {
     return "nix-generations"
@@ -172,6 +179,7 @@ func (c *NixCleaner) Name() string {
 ### 2. Interface Consolidation ✅
 
 The `OperationHandler` interface provides a clear contract for all cleanup operations. This enables:
+
 - Consistent behavior across all cleaners
 - Easier testing and mocking
 - Clear boundaries between packages
@@ -180,6 +188,7 @@ The `OperationHandler` interface provides a clear contract for all cleanup opera
 ### 3. File Organization ✅
 
 The split of `operation_settings.go` and `test_helpers.go` has dramatically improved code organization:
+
 - Each file has a single, clear responsibility
 - Navigation is easier (smaller files)
 - Code review is faster (smaller diffs)
@@ -188,6 +197,7 @@ The split of `operation_settings.go` and `test_helpers.go` has dramatically impr
 ### 4. Test Infrastructure ✅
 
 The test helper functions are now properly organized:
+
 - `test_interfaces.go` - Type definitions for tests
 - `test_assertions.go` - Reusable test assertions
 - `test_factories.go` - Factory functions for test setup
@@ -211,22 +221,24 @@ git push                                 # ✅ Successful
 
 **22 files still exceed 350 lines** and should be split for consistency and maintainability.
 
-| File | Current Lines | Priority | Suggested Split |
-|------|--------------|----------|-----------------|
-| `cmd/clean-wizard/commands/clean.go` | 713 | HIGH | clean_cmd.go, clean_flags.go, clean_exec.go |
-| `internal/domain/type_safe_enums.go` | 496 | HIGH | enum_definitions.go, enum_methods.go |
-| `internal/domain/enum_benchmark_test.go` | 642 | MEDIUM | Move to tests/benchmark/ |
-| `internal/domain/enum_yaml_test.go` | 591 | MEDIUM | enum_yaml_parse.go, enum_yaml_marshal.go |
-| `tests/integration/enum_workflow_test.go` | 526 | MEDIUM | Extract to dedicated package |
+| File                                      | Current Lines | Priority | Suggested Split                             |
+| ----------------------------------------- | ------------- | -------- | ------------------------------------------- |
+| `cmd/clean-wizard/commands/clean.go`      | 713           | HIGH     | clean_cmd.go, clean_flags.go, clean_exec.go |
+| `internal/domain/type_safe_enums.go`      | 496           | HIGH     | enum_definitions.go, enum_methods.go        |
+| `internal/domain/enum_benchmark_test.go`  | 642           | MEDIUM   | Move to tests/benchmark/                    |
+| `internal/domain/enum_yaml_test.go`       | 591           | MEDIUM   | enum_yaml_parse.go, enum_yaml_marshal.go    |
+| `tests/integration/enum_workflow_test.go` | 526           | MEDIUM   | Extract to dedicated package                |
 
 ### Priority 2: Error Handling Centralization ⚠️
 
 **Current State:** Error definitions scattered across packages:
+
 - `internal/pkg/errors/` - Only 3 error types
 - `internal/errors/` - Empty package
 - `Cleaner implementations` - Inline error definitions
 
 **Recommended State:**
+
 ```
 internal/errors/
 ├── validation.go              # ValidationError, ValidationResult
@@ -240,6 +252,7 @@ internal/errors/
 **Current State:** No versioning for configuration
 
 **Recommended:**
+
 ```go
 type ConfigVersion uint8
 const ConfigVersion1 ConfigVersion = 1
@@ -254,11 +267,13 @@ type Config struct {
 ### Priority 4: Type Safety for Registry Keys ⚠️
 
 **Current State:**
+
 ```go
 registry.Register("nix", cleaner)  // String keys - error-prone
 ```
 
 **Recommended:**
+
 ```go
 type OperationName string
 const OperationNix OperationName = "nix"
@@ -271,16 +286,16 @@ registry.Register(OperationNix, cleaner)  // Type-safe keys
 
 ### Identified Technical Debt Items
 
-| # | Item | Severity | Effort to Fix | Impact |
-|---|------|----------|---------------|--------|
-| 1 | 22 files over 350 lines | 🟠 MEDIUM | 4-6 hours | Maintainability |
-| 2 | Scattered error definitions | 🟠 MEDIUM | 2 hours | Consistency |
-| 3 | String keys in registry | 🟠 MEDIUM | 1 hour | Type safety |
-| 4 | Boolean parameters in constructors | 🟢 LOW | 2 hours | API clarity |
-| 5 | No configuration versioning | 🟠 MEDIUM | 2 hours | Future-proofing |
-| 6 | 4 unused import warnings | 🟢 LOW | 15 min | Code quality |
-| 7 | No OpenAPI documentation | 🟡 LOW | 3 hours | DX |
-| 8 | No contribution guidelines | 🟢 LOW | 1 hour | Onboarding |
+| #   | Item                               | Severity  | Effort to Fix | Impact          |
+| --- | ---------------------------------- | --------- | ------------- | --------------- |
+| 1   | 22 files over 350 lines            | 🟠 MEDIUM | 4-6 hours     | Maintainability |
+| 2   | Scattered error definitions        | 🟠 MEDIUM | 2 hours       | Consistency     |
+| 3   | String keys in registry            | 🟠 MEDIUM | 1 hour        | Type safety     |
+| 4   | Boolean parameters in constructors | 🟢 LOW    | 2 hours       | API clarity     |
+| 5   | No configuration versioning        | 🟠 MEDIUM | 2 hours       | Future-proofing |
+| 6   | 4 unused import warnings           | 🟢 LOW    | 15 min        | Code quality    |
+| 7   | No OpenAPI documentation           | 🟡 LOW    | 3 hours       | DX              |
+| 8   | No contribution guidelines         | 🟢 LOW    | 1 hour        | Onboarding      |
 
 ---
 
@@ -333,12 +348,12 @@ registry.Register(OperationNix, cleaner)  // Type-safe keys
 
 ### Recent Commits
 
-| Commit | Message | Files Changed |
-|--------|---------|---------------|
-| 1fb8e21 | refactor: split large files under 350 lines for maintainability | 8 files |
-| 8ee1b8b | feat(cleaner): add registry factory functions for default cleaner setup | 3 files |
-| b8985c4 | test(cleaner): add comprehensive tests for CleanerRegistry | 4 files |
-| 4fcdc26 | docs(status): add comprehensive milestone report | 1 file |
+| Commit  | Message                                                                 | Files Changed |
+| ------- | ----------------------------------------------------------------------- | ------------- |
+| 1fb8e21 | refactor: split large files under 350 lines for maintainability         | 8 files       |
+| 8ee1b8b | feat(cleaner): add registry factory functions for default cleaner setup | 3 files       |
+| b8985c4 | test(cleaner): add comprehensive tests for CleanerRegistry              | 4 files       |
+| 4fcdc26 | docs(status): add comprehensive milestone report                        | 1 file        |
 
 ### Current Branch Status
 
@@ -361,16 +376,16 @@ Behind: 0 commits
    - 642 lines of hand-written enum benchmark tests
    - 591 lines of YAML unmarshaling tests
    - 496 lines of type-safe enums with repetitive structure
-   
+
    Trade-off: Code generation vs. manual control
-   
+
    Recommendation: Start with hybrid approach (API types + enums only)
 
 2. **Plugin Architecture**
    Should we add a plugin system for external cleaners?
    - Pros: Extensibility, community contributions
    - Cons: Complexity, security considerations
-   
+
    Recommendation: Design for Phase 4
 
 ### Technical Questions
@@ -378,13 +393,13 @@ Behind: 0 commits
 3. **Should we use generated code for tests?**
    - Current: Handwritten tests for better coverage
    - Alternative: Generate test boilerplate
-   
+
    Recommendation: Keep tests handwritten for now
 
 4. **Should we add event sourcing?**
    - Could track operation history
    - Enables undo/replay functionality
-   
+
    Recommendation: Defer until Phase 5
 
 ---
@@ -393,13 +408,13 @@ Behind: 0 commits
 
 ### File Statistics Summary
 
-| Category | Count | Percentage |
-|----------|-------|------------|
-| Total Go files | 120 | 100% |
-| Under 350 lines | 98 | 81.7% |
-| Over 350 lines | 22 | 18.3% |
-| Test files | 45 | 37.5% |
-| Non-test files | 75 | 62.5% |
+| Category        | Count | Percentage |
+| --------------- | ----- | ---------- |
+| Total Go files  | 120   | 100%       |
+| Under 350 lines | 98    | 81.7%      |
+| Over 350 lines  | 22    | 18.3%      |
+| Test files      | 45    | 37.5%      |
+| Non-test files  | 75    | 62.5%      |
 
 ### Test Results
 
@@ -424,20 +439,20 @@ ok  	github.com/LarsArtmann/clean-wizard/internal/testing	1.948s
 
 ## Report Metadata
 
-| Field | Value |
-|-------|-------|
-| Report Version | 1.0 |
-| Created | 2026-02-09 14:10 |
-| Author | Crush AI Assistant |
-| Project | Clean Wizard |
-| Phase | Phase 3 Complete |
-| Total Files | 120 |
-| Compliant Files | 98 (81.7%) |
-| Test Pass Rate | 100% |
-| Build Status | Clean |
+| Field           | Value              |
+| --------------- | ------------------ |
+| Report Version  | 1.0                |
+| Created         | 2026-02-09 14:10   |
+| Author          | Crush AI Assistant |
+| Project         | Clean Wizard       |
+| Phase           | Phase 3 Complete   |
+| Total Files     | 120                |
+| Compliant Files | 98 (81.7%)         |
+| Test Pass Rate  | 100%               |
+| Build Status    | Clean              |
 
 ---
 
 **End of Report**
 
-*For questions or updates, contact the project maintainers or review the git history.*
+_For questions or updates, contact the project maintainers or review the git history._

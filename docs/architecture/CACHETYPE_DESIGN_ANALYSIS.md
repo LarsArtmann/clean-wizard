@@ -16,6 +16,7 @@ The relationship between `domain.CacheType` and `SystemCacheType` has been analy
 **Type**: `int`-based enum (type-safe)
 
 **Values** (8 total):
+
 ```go
 const (
     CacheTypeSpotlight CacheType = iota  // macOS Spotlight
@@ -30,6 +31,7 @@ const (
 ```
 
 **Purpose**: Global enum representing ALL cache types that can be configured in the system. Used in:
+
 - `OperationSettings.SystemCache.CacheTypes` - configuration
 - YAML/JSON serialization
 - Cross-cutting cache type operations
@@ -41,6 +43,7 @@ const (
 **Type**: `string`-based enum
 
 **Values** (4 total):
+
 ```go
 const (
     SystemCacheSpotlight SystemCacheType = "spotlight"

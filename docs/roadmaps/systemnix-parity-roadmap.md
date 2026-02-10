@@ -23,16 +23,16 @@ Clean Wizard currently has the **architectural foundation** to replace SystemNix
 
 ### 1.1 `clean-quick` Comparison
 
-| Feature | SystemNix | Clean Wizard | Status |
-|---------|-----------|--------------|--------|
-| **Homebrew** | ✅ `brew autoremove && brew cleanup` | ✅ `brew cleanup` | ✅ Matching |
-| **npm** | ✅ `npm cache clean --force` | ✅ `npm cache clean --force` | ✅ Matching |
-| **pnpm** | ✅ `pnpm store prune` | ✅ `pnpm store prune` | ✅ Matching |
-| **Go** | ✅ `go clean -cache` | ✅ `go clean -cache -testcache -modcache` | ✅ Better |
-| **Temp Files** | ✅ `/tmp/nix-build-*` | ✅ Configurable age-based | ⚠️ Partial |
-| **Build Cache** | ❌ Not included | ✅ Gradle, Maven, SBT | ✅ Clean Wizard |
-| **Docker Light** | ✅ `docker system prune -f` | ❌ Not implemented | 🔴 **MISSING** |
-| **Nix Temp Files** | ✅ `/tmp/nix-build-*`, `/tmp/nix-shell-*` | ❌ Not implemented | 🔴 **MISSING** |
+| Feature            | SystemNix                                 | Clean Wizard                              | Status          |
+| ------------------ | ----------------------------------------- | ----------------------------------------- | --------------- |
+| **Homebrew**       | ✅ `brew autoremove && brew cleanup`      | ✅ `brew cleanup`                         | ✅ Matching     |
+| **npm**            | ✅ `npm cache clean --force`              | ✅ `npm cache clean --force`              | ✅ Matching     |
+| **pnpm**           | ✅ `pnpm store prune`                     | ✅ `pnpm store prune`                     | ✅ Matching     |
+| **Go**             | ✅ `go clean -cache`                      | ✅ `go clean -cache -testcache -modcache` | ✅ Better       |
+| **Temp Files**     | ✅ `/tmp/nix-build-*`                     | ✅ Configurable age-based                 | ⚠️ Partial      |
+| **Build Cache**    | ❌ Not included                           | ✅ Gradle, Maven, SBT                     | ✅ Clean Wizard |
+| **Docker Light**   | ✅ `docker system prune -f`               | ❌ Not implemented                        | 🔴 **MISSING**  |
+| **Nix Temp Files** | ✅ `/tmp/nix-build-*`, `/tmp/nix-shell-*` | ❌ Not implemented                        | 🔴 **MISSING**  |
 
 ### `clean-quick` Gap: **2 missing features**
 
@@ -40,16 +40,16 @@ Clean Wizard currently has the **architectural foundation** to replace SystemNix
 
 ### 1.2 `clean` (Standard) Comparison
 
-| Feature | SystemNix | Clean Wizard | Status |
-|---------|-----------|--------------|--------|
-| **Everything from quick** | ✅ | ⚠️ Partial | See above |
-| **Nix GC** | ✅ `--delete-older-than 1d` | ✅ Count-based (N generations) | ⚠️ Different strategy |
-| **Nix Store Optimization** | ✅ `nix-store --optimize` | ❌ Not implemented | 🔴 **MISSING** |
-| **Nix Profile Wipe** | ✅ `nix profile wipe-history` | ❌ Not implemented | 🔴 **MISSING** |
-| **Docker Full Prune** | ✅ `docker system prune -af` | ✅ `docker system prune -af --volumes` | ✅ Better |
-| **Xcode Simulators** | ✅ `xcrun simctl delete unavailable` | ❌ Not implemented | 🔴 **MISSING** |
-| **Size Before/After** | ✅ `du -sh` output | ❌ Not implemented | 🔴 **MISSING** |
-| **Disk Space Display** | ✅ `df -h` | ❌ Not implemented | 🔴 **MISSING** |
+| Feature                    | SystemNix                            | Clean Wizard                           | Status                |
+| -------------------------- | ------------------------------------ | -------------------------------------- | --------------------- |
+| **Everything from quick**  | ✅                                   | ⚠️ Partial                             | See above             |
+| **Nix GC**                 | ✅ `--delete-older-than 1d`          | ✅ Count-based (N generations)         | ⚠️ Different strategy |
+| **Nix Store Optimization** | ✅ `nix-store --optimize`            | ❌ Not implemented                     | 🔴 **MISSING**        |
+| **Nix Profile Wipe**       | ✅ `nix profile wipe-history`        | ❌ Not implemented                     | 🔴 **MISSING**        |
+| **Docker Full Prune**      | ✅ `docker system prune -af`         | ✅ `docker system prune -af --volumes` | ✅ Better             |
+| **Xcode Simulators**       | ✅ `xcrun simctl delete unavailable` | ❌ Not implemented                     | 🔴 **MISSING**        |
+| **Size Before/After**      | ✅ `du -sh` output                   | ❌ Not implemented                     | 🔴 **MISSING**        |
+| **Disk Space Display**     | ✅ `df -h`                           | ❌ Not implemented                     | 🔴 **MISSING**        |
 
 ### `clean` Gap: **5 missing features**
 
@@ -57,19 +57,19 @@ Clean Wizard currently has the **architectural foundation** to replace SystemNix
 
 ### 1.3 `clean-aggressive` Comparison
 
-| Feature | SystemNix | Clean Wizard | Status |
-|---------|-----------|--------------|--------|
-| **Everything from clean** | ✅ | ⚠️ Partial | See above |
-| **Nix ALL Generations** | ✅ No threshold | ⚠️ Count-based only | ⚠️ Partial |
-| **Nix ALL Profiles** | ✅ Full wipe | ❌ Not implemented | 🔴 **MISSING** |
-| **NVM Cleanup** | ✅ Deletes `~/.nvm/versions/node/*` | ⚠️ Scans only (NO-OP) | 🔴 **BROKEN** |
-| **Pyenv Cleanup** | ✅ Deletes `~/.pyenv/versions/*` | ⚠️ Scans only (NO-OP) | 🔴 **BROKEN** |
-| **Rbenv Cleanup** | ✅ Deletes `~/.rbenv/versions/*` | ⚠️ Scans only (NO-OP) | 🔴 **BROKEN** |
-| **Full Cache Wipe** | ✅ `rm -rf ~/.cache` | ⚠️ Via BuildCache only | ⚠️ Partial |
-| **Xcode DerivedData** | ✅ Full wipe | ✅ Via SystemCache | ✅ Matching |
-| **Docker with Volumes** | ✅ `--volumes` | ✅ `--volumes` | ✅ Matching |
-| **iOS ALL Simulators** | ✅ `xcrun simctl delete all` | ❌ Not implemented | 🔴 **MISSING** |
-| **Confirmation Prompt** | ✅ Explicit interactive pause | ⚠️ Generic Yes/No | ⚠️ Different |
+| Feature                   | SystemNix                           | Clean Wizard           | Status         |
+| ------------------------- | ----------------------------------- | ---------------------- | -------------- |
+| **Everything from clean** | ✅                                  | ⚠️ Partial             | See above      |
+| **Nix ALL Generations**   | ✅ No threshold                     | ⚠️ Count-based only    | ⚠️ Partial     |
+| **Nix ALL Profiles**      | ✅ Full wipe                        | ❌ Not implemented     | 🔴 **MISSING** |
+| **NVM Cleanup**           | ✅ Deletes `~/.nvm/versions/node/*` | ⚠️ Scans only (NO-OP)  | 🔴 **BROKEN**  |
+| **Pyenv Cleanup**         | ✅ Deletes `~/.pyenv/versions/*`    | ⚠️ Scans only (NO-OP)  | 🔴 **BROKEN**  |
+| **Rbenv Cleanup**         | ✅ Deletes `~/.rbenv/versions/*`    | ⚠️ Scans only (NO-OP)  | 🔴 **BROKEN**  |
+| **Full Cache Wipe**       | ✅ `rm -rf ~/.cache`                | ⚠️ Via BuildCache only | ⚠️ Partial     |
+| **Xcode DerivedData**     | ✅ Full wipe                        | ✅ Via SystemCache     | ✅ Matching    |
+| **Docker with Volumes**   | ✅ `--volumes`                      | ✅ `--volumes`         | ✅ Matching    |
+| **iOS ALL Simulators**    | ✅ `xcrun simctl delete all`        | ❌ Not implemented     | 🔴 **MISSING** |
+| **Confirmation Prompt**   | ✅ Explicit interactive pause       | ⚠️ Generic Yes/No      | ⚠️ Different   |
 
 ### `clean-aggressive` Gap: **8 missing/broken features**
 
@@ -82,6 +82,7 @@ Clean Wizard currently has the **architectural foundation** to replace SystemNix
 **Issue:** `langversionmanager.go` scans for versions but NEVER deletes them.
 
 **SystemNix behavior:**
+
 ```bash
 # This actually frees space
 rm -rf ~/.nvm/versions/node/*
@@ -90,12 +91,14 @@ rm -rf ~/.rbenv/versions/*
 ```
 
 **Clean Wizard current behavior:**
+
 ```go
 // This is a NO-OP by default to avoid destructive behavior
 // Returns (FreedBytes: 0, Warning: "...")
 ```
 
 **Required Work:**
+
 - [ ] Implement actual deletion logic for NVM
 - [ ] Implement actual deletion logic for Pyenv
 - [ ] Implement actual deletion logic for Rbenv
@@ -112,16 +115,19 @@ rm -rf ~/.rbenv/versions/*
 **Issue:** `clean-quick` needs `docker system prune -f` but Clean Wizard only has full prune.
 
 **SystemNix behavior:**
+
 ```bash
 # Light prune - removes stopped containers, networks, images older than undefined
 docker system prune -f
 ```
 
 **Clean Wizard current state:**
+
 - Only has `DockerPruneAll` mode
 - No light prune option
 
 **Required Work:**
+
 - [ ] Add `DockerPruneLight` enum value
 - [ ] Implement light prune command: `docker system prune -f`
 - [ ] Update quick mode preset to include Docker with light prune
@@ -136,15 +142,18 @@ docker system prune -f
 **Issue:** `/tmp/nix-build-*` and `/tmp/nix-shell-*` not cleaned.
 
 **SystemNix behavior:**
+
 ```bash
 rm -rf /tmp/nix-build-* /tmp/nix-shell-*
 ```
 
 **Clean Wizard current state:**
+
 - TempFiles cleaner exists but doesn't include Nix-specific patterns
 - Standard temp paths: `/tmp` with exclusions
 
 **Required Work:**
+
 - [ ] Add Nix-specific temp path pattern to TempFiles cleaner
 - [ ] Auto-detect if running on system with Nix installed
 - [ ] Add `--include-nix-temp` flag to enable Nix temp cleanup
@@ -159,6 +168,7 @@ rm -rf /tmp/nix-build-* /tmp/nix-shell-*
 **Issue:** `nix-store --optimize` not implemented.
 
 **SystemNix behavior:**
+
 ```bash
 nix-store --optimize
 # or with sudo
@@ -166,10 +176,12 @@ sudo -S nix-store --optimize
 ```
 
 **Clean Wizard current state:**
+
 - NixCleaner only does garbage collection
 - No optimization implementation
 
 **Required Work:**
+
 - [ ] Add `--optimize` flag to NixCleaner
 - [ ] Implement `nix-store --optimize` command
 - [ ] Handle sudo prompts gracefully
@@ -184,15 +196,18 @@ sudo -S nix-store --optimize
 **Issue:** `nix profile wipe-history` not implemented.
 
 **SystemNix behavior:**
+
 ```bash
 nix profile wipe-history --profile /Users/$(whoami)/.local/state/nix/profiles/profile
 ```
 
 **Clean Wizard current state:**
+
 - No profile management implemented
 - Only generational cleanup
 
 **Required Work:**
+
 - [ ] Add NixProfileCleaner or extend NixCleaner
 - [ ] Implement `nix profile list` to find profiles
 - [ ] Implement `nix profile wipe-history` for each profile
@@ -207,17 +222,20 @@ nix profile wipe-history --profile /Users/$(whoami)/.local/state/nix/profiles/pr
 **Issue:** SystemNix uses `--delete-older-than 1d`, Clean Wizard uses count-based keep.
 
 **SystemNix behavior:**
+
 ```bash
 nix-collect-garbage -d --delete-older-than 1d
 ```
 
 **Clean Wizard behavior:**
+
 ```go
 // Keeps N generations, deletes older
 NewNixCleaner(verbose, dryRun, keepCount)
 ```
 
 **Required Work:**
+
 - [ ] Add `--older-than` duration flag to NixCleaner
 - [ ] Implement time-based deletion logic
 - [ ] Allow both count-based AND time-based (use whichever is more conservative)
@@ -232,15 +250,18 @@ NewNixCleaner(verbose, dryRun, keepCount)
 **Issue:** `xcrun simctl delete unavailable` not implemented.
 
 **SystemNix behavior:**
+
 ```bash
 xcrun simctl delete unavailable 2>/dev/null || echo "⚠️  Xcode not found"
 ```
 
 **Clean Wizard current state:**
+
 - SystemCacheCleaner has Xcode DerivedData
 - No iOS simulator cleanup
 
 **Required Work:**
+
 - [ ] Add iOS simulator cleanup to SystemCacheCleaner
 - [ ] Implement `xcrun simctl delete unavailable`
 - [ ] Implement `xcrun simctl delete all` for aggressive mode
@@ -255,6 +276,7 @@ xcrun simctl delete unavailable 2>/dev/null || echo "⚠️  Xcode not found"
 **Issue:** SystemNix shows `du -sh /nix/store` before/after. Clean Wizard has estimates.
 
 **SystemNix behavior:**
+
 ```bash
 @echo "📊 Current store size:"
 @du -sh /nix/store
@@ -264,10 +286,12 @@ xcrun simctl delete unavailable 2>/dev/null || echo "⚠️  Xcode not found"
 ```
 
 **Clean Wizard current state:**
+
 - Hardcoded estimates (50MB per generation)
 - No real filesystem queries
 
 **Required Work:**
+
 - [ ] Implement real filesystem size queries for Nix store
 - [ ] Implement real filesystem size queries for Homebrew
 - [ ] Implement real filesystem size queries for Docker
@@ -283,14 +307,17 @@ xcrun simctl delete unavailable 2>/dev/null || echo "⚠️  Xcode not found"
 **Issue:** `df -h /` not implemented.
 
 **SystemNix behavior:**
+
 ```bash
 @df -h / | tail -1 | awk '{print "  Available: " $4 " of " $2 " (" $5 " used)"}'
 ```
 
 **Clean Wizard current state:**
+
 - No disk space display
 
 **Required Work:**
+
 - [ ] Add disk space summary to end of cleanup
 - [ ] Show: Total, Used, Available, Percentage
 - [ ] Highlight freed space
@@ -305,15 +332,18 @@ xcrun simctl delete unavailable 2>/dev/null || echo "⚠️  Xcode not found"
 **Issue:** Aggressive mode needs `xcrun simctl delete all`, not just unavailable.
 
 **SystemNix behavior:**
+
 ```bash
 @echo "📱 Removing all iOS simulators..."
 xcrun simctl delete all 2>/dev/null || true
 ```
 
 **Clean Wizard current state:**
+
 - No iOS simulator cleanup at all
 
 **Required Work:**
+
 - [ ] Implement `xcrun simctl delete all` for aggressive mode
 - [ ] Add confirmation warning (deletes ALL simulators)
 - [ ] Require explicit `--aggressive` flag
@@ -326,12 +356,12 @@ xcrun simctl delete all 2>/dev/null || true
 
 ### Phase 1: Quick Mode Parity (Week 1)
 
-| Task | Effort | Priority |
-|------|--------|----------|
-| Implement Docker light prune (P2) | 2 hours | 🔴 CRITICAL |
-| Implement Nix temp files cleanup (P3) | 1 hour | 🔴 CRITICAL |
-| Update README to match current state | 2 hours | 🟡 MEDIUM |
-| Update quick mode preset to include Docker + Nix temp | 30 min | 🟡 MEDIUM |
+| Task                                                  | Effort  | Priority    |
+| ----------------------------------------------------- | ------- | ----------- |
+| Implement Docker light prune (P2)                     | 2 hours | 🔴 CRITICAL |
+| Implement Nix temp files cleanup (P3)                 | 1 hour  | 🔴 CRITICAL |
+| Update README to match current state                  | 2 hours | 🟡 MEDIUM   |
+| Update quick mode preset to include Docker + Nix temp | 30 min  | 🟡 MEDIUM   |
 
 **Deliverable:** `clean-wizard clean --mode quick` matches SystemNix `clean-quick`
 
@@ -339,15 +369,15 @@ xcrun simctl delete all 2>/dev/null || true
 
 ### Phase 2: Standard Mode Parity (Week 2)
 
-| Task | Effort | Priority |
-|------|--------|----------|
+| Task                                  | Effort  | Priority    |
+| ------------------------------------- | ------- | ----------- |
 | Implement Nix store optimization (P4) | 3 hours | 🔴 CRITICAL |
 | Implement Nix profile management (P5) | 3 hours | 🔴 CRITICAL |
-| Implement time-based GC (P6) | 2 hours | 🟠 HIGH |
-| Implement iOS simulator cleanup (P7) | 2 hours | 🟡 MEDIUM |
-| Implement size reporting (P8) | 2 hours | 🟡 MEDIUM |
-| Implement disk space display (P9) | 1 hour | 🟡 MEDIUM |
-| Update standard mode preset | 30 min | 🟡 MEDIUM |
+| Implement time-based GC (P6)          | 2 hours | 🟠 HIGH     |
+| Implement iOS simulator cleanup (P7)  | 2 hours | 🟡 MEDIUM   |
+| Implement size reporting (P8)         | 2 hours | 🟡 MEDIUM   |
+| Implement disk space display (P9)     | 1 hour  | 🟡 MEDIUM   |
+| Update standard mode preset           | 30 min  | 🟡 MEDIUM   |
 
 **Deliverable:** `clean-wizard clean --mode standard` matches SystemNix `clean`
 
@@ -355,12 +385,12 @@ xcrun simctl delete all 2>/dev/null || true
 
 ### Phase 3: Aggressive Mode Parity (Week 3)
 
-| Task | Effort | Priority |
-|------|--------|----------|
-| Fix Language Version Manager NO-OP (P1) | 5 hours | 🔴 CRITICAL |
-| Implement iOS simulator full delete (P10) | 1 hour | 🟡 MEDIUM |
-| Update aggressive mode preset to include language managers | 30 min | 🟡 MEDIUM |
-| Add aggressive confirmation dialog | 1 hour | 🟡 MEDIUM |
+| Task                                                       | Effort  | Priority    |
+| ---------------------------------------------------------- | ------- | ----------- |
+| Fix Language Version Manager NO-OP (P1)                    | 5 hours | 🔴 CRITICAL |
+| Implement iOS simulator full delete (P10)                  | 1 hour  | 🟡 MEDIUM   |
+| Update aggressive mode preset to include language managers | 30 min  | 🟡 MEDIUM   |
+| Add aggressive confirmation dialog                         | 1 hour  | 🟡 MEDIUM   |
 
 **Deliverable:** `clean-wizard clean --mode aggressive` matches SystemNix `clean-aggressive`
 
@@ -368,12 +398,12 @@ xcrun simctl delete all 2>/dev/null || true
 
 ### Phase 4: Polish (Week 4)
 
-| Task | Effort | Priority |
-|------|--------|----------|
+| Task                                       | Effort  | Priority  |
+| ------------------------------------------ | ------- | --------- |
 | Update README to reflect full capabilities | 2 hours | 🟡 MEDIUM |
-| Add comprehensive documentation | 4 hours | 🟡 MEDIUM |
-| Write BDD tests for all three modes | 4 hours | 🟡 MEDIUM |
-| Create man page / shell completion | 2 hours | 🟢 LOW |
+| Add comprehensive documentation            | 4 hours | 🟡 MEDIUM |
+| Write BDD tests for all three modes        | 4 hours | 🟡 MEDIUM |
+| Create man page / shell completion         | 2 hours | 🟢 LOW    |
 
 **Deliverable:** Production-ready documentation and tests
 
@@ -381,13 +411,13 @@ xcrun simctl delete all 2>/dev/null || true
 
 ## 4. Estimated Timeline
 
-| Phase | Duration | Total Effort |
-|-------|----------|---------------|
-| Phase 1: Quick Mode | 1 week | ~6 hours |
-| Phase 2: Standard Mode | 1 week | ~14 hours |
-| Phase 3: Aggressive Mode | 1 week | ~8 hours |
-| Phase 4: Polish | 1 week | ~12 hours |
-| **Total** | **4 weeks** | **~40 hours** |
+| Phase                    | Duration    | Total Effort  |
+| ------------------------ | ----------- | ------------- |
+| Phase 1: Quick Mode      | 1 week      | ~6 hours      |
+| Phase 2: Standard Mode   | 1 week      | ~14 hours     |
+| Phase 3: Aggressive Mode | 1 week      | ~8 hours      |
+| Phase 4: Polish          | 1 week      | ~12 hours     |
+| **Total**                | **4 weeks** | **~40 hours** |
 
 ---
 
@@ -455,6 +485,7 @@ case "aggressive":
 **Target:** Comprehensive multi-cleaner tool
 
 **Sections to add:**
+
 - [ ] Multi-cleaner overview (11 cleaners)
 - [ ] Preset modes (quick/standard/aggressive)
 - [ ] Full feature matrix
@@ -507,6 +538,7 @@ Feature: Aggressive Mode Language Manager Cleanup
 ## 8. Success Criteria
 
 ### Quick Mode Parity ✅
+
 - [ ] Homebrew cleanup matches SystemNix
 - [ ] Node packages cleanup matches SystemNix
 - [ ] Go cache cleanup matches SystemNix
@@ -515,6 +547,7 @@ Feature: Aggressive Mode Language Manager Cleanup
 - [ ] No Nix store changes in quick mode
 
 ### Standard Mode Parity ✅
+
 - [ ] Nix garbage collection (time-based or count-based)
 - [ ] Nix store optimization works
 - [ ] Nix profile cleanup works
@@ -524,6 +557,7 @@ Feature: Aggressive Mode Language Manager Cleanup
 - [ ] Size before/after displayed
 
 ### Aggressive Mode Parity ✅
+
 - [ ] Language version managers ACTUALLY DELETE
 - [ ] All Nix generations deleted (no keep count)
 - [ ] All Nix profiles wiped
@@ -537,35 +571,35 @@ Feature: Aggressive Mode Language Manager Cleanup
 
 ### Key Files to Modify
 
-| File | Purpose |
-|------|---------|
-| `internal/cleaner/langversionmanager.go` | Fix NO-OP, implement actual deletion |
-| `internal/cleaner/docker.go` | Add light prune mode |
-| `internal/cleaner/tempfiles.go` | Add Nix temp patterns |
-| `internal/cleaner/nix.go` | Add optimization, profile cleanup, time-based GC |
-| `internal/cleaner/systemcache.go` | Add iOS simulator cleanup |
-| `cmd/clean-wizard/commands/clean.go` | Update preset definitions |
-| `README.md` | Complete rewrite |
+| File                                     | Purpose                                          |
+| ---------------------------------------- | ------------------------------------------------ |
+| `internal/cleaner/langversionmanager.go` | Fix NO-OP, implement actual deletion             |
+| `internal/cleaner/docker.go`             | Add light prune mode                             |
+| `internal/cleaner/tempfiles.go`          | Add Nix temp patterns                            |
+| `internal/cleaner/nix.go`                | Add optimization, profile cleanup, time-based GC |
+| `internal/cleaner/systemcache.go`        | Add iOS simulator cleanup                        |
+| `cmd/clean-wizard/commands/clean.go`     | Update preset definitions                        |
+| `README.md`                              | Complete rewrite                                 |
 
 ### New Files to Create
 
-| File | Purpose |
-|------|---------|
-| `docs/features/quick-mode.md` | Quick mode documentation |
-| `docs/features/standard-mode.md` | Standard mode documentation |
+| File                               | Purpose                       |
+| ---------------------------------- | ----------------------------- |
+| `docs/features/quick-mode.md`      | Quick mode documentation      |
+| `docs/features/standard-mode.md`   | Standard mode documentation   |
 | `docs/features/aggressive-mode.md` | Aggressive mode documentation |
-| `docs/testing/bdd-scenarios.md` | BDD test scenarios |
+| `docs/testing/bdd-scenarios.md`    | BDD test scenarios            |
 
 ---
 
 ## 10. Risk Assessment
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Language manager deletion too destructive | Medium | High | Add explicit `--force-aggressive` flag |
-| Nix optimization takes too long | Low | Medium | Add timeout, show progress |
-| iOS simulator deletion causes issues | Medium | Low | Require confirmation |
-| User confusion between modes | Medium | Low | Clear TUI messaging |
+| Risk                                      | Probability | Impact | Mitigation                             |
+| ----------------------------------------- | ----------- | ------ | -------------------------------------- |
+| Language manager deletion too destructive | Medium      | High   | Add explicit `--force-aggressive` flag |
+| Nix optimization takes too long           | Low         | Medium | Add timeout, show progress             |
+| iOS simulator deletion causes issues      | Medium      | Low    | Require confirmation                   |
+| User confusion between modes              | Medium      | Low    | Clear TUI messaging                    |
 
 ---
 
@@ -583,5 +617,5 @@ Clean Wizard has the **foundation** to become your ultimate MacBook cleanup tool
 
 ---
 
-*Document created: 2026-02-09*  
-*For questions or updates, open an issue.*
+_Document created: 2026-02-09_  
+_For questions or updates, open an issue._

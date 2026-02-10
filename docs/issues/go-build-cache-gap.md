@@ -11,6 +11,7 @@
 Go uses `os.TempDir()` for build caches on macOS, which returns `/private/var/folders/*/T` rather than `/tmp`.
 
 ### SystemNix Command
+
 ```bash
 find /private/var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T -name "go-build*" -type d -print0 | xargs -0 trash
 ```
@@ -34,7 +35,8 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 }
 ```
 
-**Coverage:** 
+**Coverage:**
+
 - ✅ `/tmp/go-build*`
 - ✅ `$HOME/Library/Caches/go-build*`
 - ❌ `/private/var/folders/*/T/go-build*` (MISSING)
@@ -45,12 +47,12 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 
 macOS has multiple temp directory locations:
 
-| Location | Purpose | Example |
-|----------|---------|---------|
-| `/tmp` | Standard Unix temp | Symlinked to `/private/tmp` |
-| `/private/var/folders/*/T` | App-specific temp | Go build cache, etc. |
-| `$HOME/Library/Caches/` | User caches | Application caches |
-| `/var/folders/*/T` | Legacy | Some apps still use this |
+| Location                   | Purpose            | Example                     |
+| -------------------------- | ------------------ | --------------------------- |
+| `/tmp`                     | Standard Unix temp | Symlinked to `/private/tmp` |
+| `/private/var/folders/*/T` | App-specific temp  | Go build cache, etc.        |
+| `$HOME/Library/Caches/`    | User caches        | Application caches          |
+| `/var/folders/*/T`         | Legacy             | Some apps still use this    |
 
 **Go on macOS:** Uses `os.TempDir()` which returns `/var/folders/.../T` (or `/private/var/folders/.../T` on newer systems).
 
@@ -58,13 +60,14 @@ macOS has multiple temp directory locations:
 
 ## Impact Assessment
 
-| Scenario | SystemNix | Clean Wizard | Gap |
-|----------|-----------|--------------|-----|
-| Go build cache in `/tmp` | ✅ Cleans | ✅ Cleans | 0 |
-| Go build cache in `~/Library/Caches/` | ❌ Not cleaned | ✅ Cleans | SystemNix gap |
-| Go build cache in `/private/var/folders/*/T` | ✅ Cleans | ❌ Not cleaned | **Clean Wizard gap** |
+| Scenario                                     | SystemNix      | Clean Wizard   | Gap                  |
+| -------------------------------------------- | -------------- | -------------- | -------------------- |
+| Go build cache in `/tmp`                     | ✅ Cleans      | ✅ Cleans      | 0                    |
+| Go build cache in `~/Library/Caches/`        | ❌ Not cleaned | ✅ Cleans      | SystemNix gap        |
+| Go build cache in `/private/var/folders/*/T` | ✅ Cleans      | ❌ Not cleaned | **Clean Wizard gap** |
 
 **Estimated Space at Risk:**
+
 - Go build caches can be **hundreds of MB to several GB**
 - Frequent Go builds → larger cache footprint
 - Large projects (Kubernetes, etc.) → multi-GB caches
@@ -81,20 +84,20 @@ import "os"
 // cleanGoBuildCache removes go-build* folders.
 func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[domain.CleanResult] {
 	buildCachePattern := "go-build*"
-	
+
 	// Use Go's TempDir which returns the correct macOS temp location
 	tempDir := os.TempDir()
-	
+
 	// Also check common cache locations
 	locations := []string{
 		tempDir,
 		"/tmp",
 	}
-	
+
 	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
 		locations = append(locations, homeDir+"/Library/Caches")
 	}
-	
+
 	var allMatches []string
 	for _, dir := range locations {
 		matches, err := filepath.Glob(filepath.Join(dir, buildCachePattern))
@@ -108,11 +111,13 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 ```
 
 **Pros:**
+
 - Uses Go's built-in temp dir detection
 - Cross-platform compatible
 - Future-proof
 
 **Cons:**
+
 - Requires Go 1.17+ for proper macOS temp handling
 
 ---
@@ -123,9 +128,9 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 // cleanGoBuildCache removes go-build* folders.
 func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[domain.CleanResult] {
 	buildCachePattern := "go-build*"
-	
+
 	var locations []string
-	
+
 	// Check macOS-specific temp locations
 	if entries, err := os.ReadDir("/private/var/folders"); err == nil {
 		for _, entry := range entries {
@@ -138,22 +143,24 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 			}
 		}
 	}
-	
+
 	// Fallback to common locations
 	locations = append(locations, "/tmp")
 	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
 		locations = append(locations, homeDir+"/Library/Caches")
 	}
-	
+
 	// ... rest of cleanup logic
 }
 ```
 
 **Pros:**
+
 - Explicit macOS temp dir handling
 - Handles edge cases
 
 **Cons:**
+
 - Platform-specific code
 - Slightly more complex
 
@@ -170,17 +177,19 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 		// Clean the GOCACHE directory directly
 		return gcc.cleanGoCacheDir(gocacheDir)
 	}
-	
+
 	// Fallback to pattern matching
 	// ... existing logic
 }
 ```
 
 **Pros:**
+
 - Uses Go's configured cache location
 - Most accurate
 
 **Cons:**
+
 - Requires Go to be available
 - May miss build caches outside GOCACHE
 
@@ -195,6 +204,7 @@ This is the cleanest solution that works across platforms and uses Go's built-in
 **File:** `internal/cleaner/golang_cache_cleaner.go`
 
 **Lines 132-141:**
+
 ```diff
  // cleanGoBuildCache removes go-build* folders.
  func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[domain.CleanResult] {
@@ -203,16 +213,16 @@ This is the cleanest solution that works across platforms and uses Go's built-in
 -	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
 -		tempDir = homeDir + "/Library/Caches"
 -	}
-+	
++
 +	// Use Go's TempDir for cross-platform compatibility
 +	tempDir := os.TempDir()
-+	
++
 +	// Check multiple locations for comprehensive coverage
 +	locations := []string{tempDir, "/tmp"}
 +	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
 +		locations = append(locations, homeDir+"/Library/Caches")
 +	}
- 
+
  	// Use shell globbing to find build cache folders
 -	matches, err := filepath.Glob(tempDir + "/" + buildCachePattern)
 +	var allMatches []string
@@ -227,6 +237,7 @@ This is the cleanest solution that works across platforms and uses Go's built-in
 ```
 
 **Import change (line 3-10):**
+
 ```diff
  import (
  	"context"
@@ -295,7 +306,7 @@ SystemNix doesn't have age-based cleanup for Go build cache. Clean Wizard could 
 // If we wanted age-based cleanup:
 func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[domain.CleanResult] {
 	// ... existing logic ...
-	
+
 	// Add age-based filtering
 	olderThan := 7 * 24 * time.Hour // 7 days
 	for _, match := range matches {
@@ -303,11 +314,11 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 		if err != nil {
 			continue
 		}
-		
+
 		if time.Since(info.ModTime()) < olderThan {
 			continue // Skip recent builds
 		}
-		
+
 		// Clean old build caches
 	}
 }
@@ -319,15 +330,15 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 
 ## Summary
 
-| Aspect | Value |
-|--------|-------|
-| **Issue** | Clean Wizard misses `/private/var/folders/*/T/go-build*` |
-| **Impact** | May miss hundreds of MB to GB of cache |
-| **Fix** | Use `os.TempDir()` + check common locations |
-| **Effort** | ~1 hour |
-| **Risk** | Low |
-| **Files Modified** | `internal/cleaner/golang_cache_cleaner.go` |
+| Aspect             | Value                                                    |
+| ------------------ | -------------------------------------------------------- |
+| **Issue**          | Clean Wizard misses `/private/var/folders/*/T/go-build*` |
+| **Impact**         | May miss hundreds of MB to GB of cache                   |
+| **Fix**            | Use `os.TempDir()` + check common locations              |
+| **Effort**         | ~1 hour                                                  |
+| **Risk**           | Low                                                      |
+| **Files Modified** | `internal/cleaner/golang_cache_cleaner.go`               |
 
 ---
 
-*Document created: 2026-02-09*
+_Document created: 2026-02-09_
