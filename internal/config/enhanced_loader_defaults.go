@@ -9,9 +9,9 @@ import (
 // getDefaultLoadOptions returns default load options.
 func getDefaultLoadOptions() *ConfigLoadOptions {
 	return &ConfigLoadOptions{
-		ForceRefresh:       false,
-		EnableCache:        true,
-		EnableSanitization: true,
+		ForceRefresh:       RefreshOptionDisabled,
+		EnableCache:        CacheOptionEnabled,
+		EnableSanitization: SanitizeOptionEnabled,
 		ValidationLevel:    domain.ValidationLevelComprehensiveType,
 		Timeout:            30 * time.Second,
 	}
@@ -20,11 +20,11 @@ func getDefaultLoadOptions() *ConfigLoadOptions {
 // getDefaultSaveOptions returns default save options.
 func getDefaultSaveOptions() *ConfigSaveOptions {
 	return &ConfigSaveOptions{
-		EnableSanitization: true,
-		BackupEnabled:      true,
+		EnableSanitization: SanitizeOptionEnabled,
+		BackupEnabled:      BackupOptionEnabled,
 		ValidationLevel:    domain.ValidationLevelComprehensiveType,
-		CreateBackup:       false,
-		ForceSave:          false,
+		CreateBackup:       BackupOptionDisabled,
+		ForceSave:         SaveOptionDisabled,
 	}
 }
 

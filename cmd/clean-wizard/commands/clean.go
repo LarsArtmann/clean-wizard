@@ -32,6 +32,14 @@ const (
 	CleanerTypeProjectsManagementAutomation CleanerType = "projects"
 )
 
+// CleanerAvailability represents the availability status of a cleaner.
+type CleanerAvailability string
+
+const (
+	CleanerAvailabilityAvailable   CleanerAvailability = "available"
+	CleanerAvailabilityUnavailable   CleanerAvailability = "unavailable"
+)
+
 // registryNameToCleanerType maps registry cleaner names to CleanerType.
 var registryNameToCleanerType = map[string]CleanerType{
 	"nix":         CleanerTypeNix,
@@ -70,7 +78,7 @@ type CleanerConfig struct {
 	Name        string
 	Description string
 	Icon        string
-	Available   bool
+	Available   CleanerAvailability
 }
 
 // GetCleanerConfigs returns all cleaner configurations with availability status.
@@ -96,11 +104,19 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 			Name:        getCleanerName(cleanerType),
 			Description: getCleanerDescription(cleanerType),
 			Icon:        getCleanerIcon(cleanerType),
-			Available:   c.IsAvailable(ctx),
+			Available:   toCleanerAvailability(c.IsAvailable(ctx)),
 		})
 	}
 
 	return configs
+}
+
+// toCleanerAvailability converts a boolean availability to the enum type.
+func toCleanerAvailability(available bool) CleanerAvailability {
+	if available {
+		return CleanerAvailabilityAvailable
+	}
+	return CleanerAvailabilityUnavailable
 }
 
 // NewCleanCommand creates a multi-cleaner command with TUI.
@@ -143,7 +159,7 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose, jsonOut
 	// Filter to available cleaners only
 	availableConfigs := make([]CleanerConfig, 0, len(cleanerConfigs))
 	for _, cfg := range cleanerConfigs {
-		if cfg.Available {
+		if cfg.Available == CleanerAvailabilityAvailable {
 			availableConfigs = append(availableConfigs, cfg)
 		}
 	}

@@ -6,6 +6,54 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// RefreshOption represents the force refresh option for config loading.
+type RefreshOption string
+
+const (
+	RefreshOptionDisabled RefreshOption = "disabled"
+	RefreshOptionEnabled  RefreshOption = "enabled"
+)
+
+// CacheOption represents the cache enable option for config loading.
+type CacheOption string
+
+const (
+	CacheOptionDisabled CacheOption = "disabled"
+	CacheOptionEnabled  CacheOption = "enabled"
+)
+
+// SanitizeOption represents the sanitization enable option.
+type SanitizeOption string
+
+const (
+	SanitizeOptionDisabled SanitizeOption = "disabled"
+	SanitizeOptionEnabled  SanitizeOption = "enabled"
+)
+
+// SaveOption represents the force save option for config saving.
+type SaveOption string
+
+const (
+	SaveOptionDisabled SaveOption = "disabled"
+	SaveOptionEnabled  SaveOption = "enabled"
+)
+
+// BackupOption represents the backup option for config saving.
+type BackupOption string
+
+const (
+	BackupOptionDisabled BackupOption = "disabled"
+	BackupOptionEnabled  BackupOption = "enabled"
+)
+
+// MonitoringOption represents the monitoring option.
+type MonitoringOption string
+
+const (
+	MonitoringOptionDisabled MonitoringOption = "disabled"
+	MonitoringOptionEnabled  MonitoringOption = "enabled"
+)
+
 // EnhancedConfigLoader provides comprehensive configuration loading with validation.
 type EnhancedConfigLoader struct {
 	middleware       *ValidationMiddleware
@@ -13,25 +61,25 @@ type EnhancedConfigLoader struct {
 	sanitizer        *ConfigSanitizer
 	cache            *ConfigCache
 	retryPolicy      *RetryPolicy
-	enableMonitoring bool
+	enableMonitoring MonitoringOption
 }
 
 // ConfigLoadOptions provides options for configuration loading.
 type ConfigLoadOptions struct {
-	ForceRefresh       bool                        `json:"force_refresh"`
-	EnableCache        bool                        `json:"enable_cache"`
-	EnableSanitization bool                        `json:"enable_sanitization"`
-	ValidationLevel    domain.ValidationLevelType   `json:"validation_level"`
-	Timeout            time.Duration               `json:"timeout"`
+	ForceRefresh       RefreshOption     `json:"force_refresh"`
+	EnableCache        CacheOption       `json:"enable_cache"`
+	EnableSanitization SanitizeOption    `json:"enable_sanitization"`
+	ValidationLevel    domain.ValidationLevelType `json:"validation_level"`
+	Timeout            time.Duration     `json:"timeout"`
 }
 
 // ConfigSaveOptions provides options for configuration saving.
 type ConfigSaveOptions struct {
-	EnableSanitization bool                      `json:"enable_sanitization"`
-	BackupEnabled      bool                      `json:"backup_enabled"`
+	EnableSanitization SanitizeOption    `json:"enable_sanitization"`
+	BackupEnabled      BackupOption      `json:"backup_enabled"`
 	ValidationLevel    domain.ValidationLevelType `json:"validation_level"`
-	CreateBackup       bool                      `json:"create_backup"`
-	ForceSave          bool                      `json:"force_save"` // Override validation failures
+	CreateBackup       BackupOption      `json:"create_backup"`
+	ForceSave          SaveOption        `json:"force_save"` // Override validation failures
 }
 
 // RetryPolicy defines retry behavior for configuration operations.
@@ -54,7 +102,7 @@ func NewEnhancedConfigLoader(options ...func(*EnhancedConfigLoader)) *EnhancedCo
 		sanitizer:        sanitizer,
 		cache:            NewConfigCache(30 * time.Minute),
 		retryPolicy:      getDefaultRetryPolicy(),
-		enableMonitoring: false,
+		enableMonitoring: MonitoringOptionDisabled,
 	}
 
 	for _, option := range options {
@@ -67,7 +115,11 @@ func NewEnhancedConfigLoader(options ...func(*EnhancedConfigLoader)) *EnhancedCo
 // WithMonitoring enables monitoring output.
 func WithMonitoring(enabled bool) func(*EnhancedConfigLoader) {
 	return func(ecl *EnhancedConfigLoader) {
-		ecl.enableMonitoring = enabled
+		if enabled {
+			ecl.enableMonitoring = MonitoringOptionEnabled
+		} else {
+			ecl.enableMonitoring = MonitoringOptionDisabled
+		}
 	}
 }
 

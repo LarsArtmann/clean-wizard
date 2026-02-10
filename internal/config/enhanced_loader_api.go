@@ -18,7 +18,7 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 	start := time.Now()
 
 	// Check cache first
-	if options.EnableCache && !options.ForceRefresh {
+	if options.EnableCache == CacheOptionEnabled && options.ForceRefresh == RefreshOptionDisabled {
 		if cached := ecl.cache.Get(); cached != nil {
 			return cached, nil
 		}
@@ -38,17 +38,17 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 	}
 
 	// Apply sanitization if enabled
-	if options.EnableSanitization {
+	if options.EnableSanitization == SanitizeOptionEnabled {
 		ecl.sanitizer.SanitizeConfig(config, validationResult)
 	}
 
 	// Update cache
-	if options.EnableCache {
+	if options.EnableCache == CacheOptionEnabled {
 		ecl.cache.Set(config)
 	}
 
 	duration := time.Since(start)
-	if ecl.enableMonitoring {
+	if ecl.enableMonitoring == MonitoringOptionEnabled {
 		fmt.Printf("📊 Config loaded in %v (validation: %s, sanitization: %v)\n",
 			duration, options.ValidationLevel, options.EnableSanitization)
 	}
@@ -63,12 +63,12 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 	}
 
 	// Create backup if requested (independent of monitoring)
-	if options.CreateBackup || options.BackupEnabled {
+	if options.CreateBackup == BackupOptionEnabled || options.BackupEnabled == BackupOptionEnabled {
 		if err := ecl.createBackup(ctx, config); err != nil {
-			if ecl.enableMonitoring {
+			if ecl.enableMonitoring == MonitoringOptionEnabled {
 				fmt.Printf("⚠️ Backup failed: %v\n", err)
 			}
-		} else if ecl.enableMonitoring {
+		} else if ecl.enableMonitoring == MonitoringOptionEnabled {
 			fmt.Printf("💾 Configuration backup created\n")
 		}
 	}
@@ -77,7 +77,7 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
 
 	// Apply sanitization if enabled (after initial validation)
-	if options.EnableSanitization {
+	if options.EnableSanitization == SanitizeOptionEnabled {
 		ecl.sanitizer.SanitizeConfig(config, validationResult)
 		// Re-check validity after sanitization
 		validationResult = ecl.applyValidation(ctx, config, options.ValidationLevel)
@@ -85,8 +85,8 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 
 	// Check final validation state
 	if !validationResult.IsValid {
-		if options.ForceSave {
-			if ecl.enableMonitoring {
+		if options.ForceSave == SaveOptionEnabled {
+			if ecl.enableMonitoring == MonitoringOptionEnabled {
 				fmt.Printf("⚠️ Validation failed, forcing save: %s\n", ecl.formatValidationErrors(validationResult.Errors))
 			}
 		} else {
@@ -103,8 +103,8 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 	// Update cache
 	ecl.cache.Set(config)
 
-	if ecl.enableMonitoring {
-		if options.ForceSave && !validationResult.IsValid {
+	if ecl.enableMonitoring == MonitoringOptionEnabled {
+		if options.ForceSave == SaveOptionEnabled && !validationResult.IsValid {
 			fmt.Printf("💾 Config saved (forced) despite validation failures\n")
 		} else {
 			fmt.Printf("💾 Config saved successfully\n")

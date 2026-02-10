@@ -90,7 +90,7 @@ func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domai
 		return fmt.Errorf("failed to create backup at %s: %w", backupPath, err)
 	}
 
-	if ecl.enableMonitoring {
+	if ecl.enableMonitoring == MonitoringOptionEnabled {
 		fmt.Printf("💾 Configuration backup created\n")
 	}
 	return nil

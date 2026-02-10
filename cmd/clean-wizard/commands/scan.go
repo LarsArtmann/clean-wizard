@@ -42,7 +42,7 @@ func runScanCommand(cmd *cobra.Command, args []string, verbose bool, profile str
 	// Filter to available cleaners only
 	var availableCleaners []CleanerConfig
 	for _, cfg := range cleanerConfigs {
-		if cfg.Available {
+		if cfg.Available == CleanerAvailabilityAvailable {
 			availableCleaners = append(availableCleaners, cfg)
 		}
 	}
@@ -94,7 +94,7 @@ func runScanCommand(cmd *cobra.Command, args []string, verbose bool, profile str
 // ScanResult holds the scan result for a cleaner.
 type ScanResult struct {
 	Name           string
-	Available      bool
+	Available      CleanerAvailability
 	ItemsCount     uint
 	BytesCleanable uint64
 	Description    string
@@ -116,9 +116,9 @@ func scanCleaner(ctx context.Context, cleanerType CleanerType, verbose bool) Sca
 		return result
 	}
 
-	result.Available = c.IsAvailable(ctx)
+	result.Available = toCleanerAvailability(c.IsAvailable(ctx))
 
-	if !result.Available {
+	if result.Available != CleanerAvailabilityAvailable {
 		return result
 	}
 
@@ -178,11 +178,11 @@ func scanNixCleaner(ctx context.Context, verbose bool) ScanResult {
 	nixAdapter := cleaner.NewNixCleaner(verbose, false)
 
 	if !nixAdapter.IsAvailable(ctx) {
-		result.Available = false
+		result.Available = CleanerAvailabilityUnavailable
 		return result
 	}
 
-	result.Available = true
+	result.Available = CleanerAvailabilityAvailable
 	result.ItemsCount = 5                        // Estimate
 	result.BytesCleanable = 50 * 1024 * 1024 * 5 // 50MB per generation, 5 generations
 
@@ -199,11 +199,11 @@ func scanDockerCleaner(ctx context.Context, verbose bool) ScanResult {
 	dockerCleaner := cleaner.NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 	if !dockerCleaner.IsAvailable(ctx) {
-		result.Available = false
+		result.Available = CleanerAvailabilityUnavailable
 		return result
 	}
 
-	result.Available = true
+	result.Available = CleanerAvailabilityAvailable
 	result.ItemsCount = 3                     // Estimate: images, containers, volumes
 	result.BytesCleanable = 500 * 1024 * 1024 // Estimate 500MB
 
@@ -238,7 +238,7 @@ func estimateCleanerSize(cleanerType CleanerType) uint64 {
 
 // printScanResult prints a scan result.
 func printScanResult(result ScanResult, verbose bool) {
-	if !result.Available {
+	if result.Available != CleanerAvailabilityAvailable {
 		if verbose {
 			fmt.Printf("  ⚪ %s: Not available\n", result.Name)
 		}
