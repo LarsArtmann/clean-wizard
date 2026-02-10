@@ -9,7 +9,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 )
 
-var GoCacheFlags = cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.GoCacheBuildCache
+var GoCacheFlags = cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.GoCacheModCache | cleaner.GoCacheBuildCache
 
 func GoCleanerTest(ctx context.Context, title string) error {
 	fmt.Printf("=== %s ===\n\n", title)
