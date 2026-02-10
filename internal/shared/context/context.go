@@ -2,6 +2,8 @@ package context
 
 import (
 	"context"
+	"maps"
+	"slices"
 )
 
 // Context provides a generic, type-safe context holder that can be used across
@@ -65,23 +67,15 @@ func (c *Context[T]) GetMetadata(key string) (string, bool) {
 
 // HasPermission checks if a permission is present.
 func (c *Context[T]) HasPermission(permission string) bool {
-	for _, p := range c.Permissions {
-		if p == permission {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(c.Permissions, permission)
 }
 
 // Clone creates a deep copy of the context.
 func (c *Context[T]) Clone() *Context[T] {
-	metadata := make(map[string]string, len(c.Metadata))
-	for k, v := range c.Metadata {
-		metadata[k] = v
-	}
+	metadata := make(map[string]string)
+	maps.Copy(metadata, c.Metadata)
 
-	permissions := make([]string, len(c.Permissions))
-	copy(permissions, c.Permissions)
+	permissions := slices.Clone(c.Permissions)
 
 	return &Context[T]{
 		Context:     c.Context,
@@ -97,9 +91,7 @@ func (c *Context[T]) Merge(other *Context[T]) *Context[T] {
 	cloned := c.Clone()
 
 	// Merge metadata (other takes precedence on conflicts)
-	for k, v := range other.Metadata {
-		cloned.Metadata[k] = v
-	}
+	maps.Copy(cloned.Metadata, other.Metadata)
 
 	// Merge permissions (append)
 	cloned.Permissions = append(cloned.Permissions, other.Permissions...)
