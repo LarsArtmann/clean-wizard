@@ -13,7 +13,7 @@ type SafeConfig struct {
 	safeMode bool
 	dryRun   bool
 	backup   bool
-	maxRisk  domain.RiskLevel
+	maxRisk  domain.RiskLevelType
 	profiles []SafeProfile
 	created  time.Time
 }
@@ -23,13 +23,13 @@ type SafeProfile struct {
 	name        string
 	description string
 	operations  []SafeOperation
-	maxRisk     domain.RiskLevel
+	maxRisk     domain.RiskLevelType
 }
 
 // SafeOperation represents a validated cleaning operation.
 type SafeOperation struct {
 	name    CleanType
-	risk    domain.RiskLevel
+	risk    domain.RiskLevelType
 	enabled bool
 	backup  bool
 }
@@ -71,7 +71,7 @@ type SafeConfigBuilder struct {
 	safeMode bool
 	dryRun   bool
 	backup   bool
-	maxRisk  domain.RiskLevel
+	maxRisk  domain.RiskLevelType
 	profiles []SafeProfile
 	err      error
 }
@@ -139,12 +139,12 @@ type SafeProfileBuilder struct {
 	description string
 	config      *SafeConfigBuilder
 	operations  []SafeOperation
-	maxRisk     domain.RiskLevel
+	maxRisk     domain.RiskLevelType
 	err         error
 }
 
 // AddOperation adds a safe operation.
-func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLevel) *SafeProfileBuilder {
+func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLevelType) *SafeProfileBuilder {
 	if spb.err != nil {
 		return spb
 	}

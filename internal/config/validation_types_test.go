@@ -18,7 +18,7 @@ type TestSanitizationTestCase struct {
 type TestValidationLevelTestCase struct {
 	name         string
 	config       *domain.Config
-	level        ValidationLevel
+	level        domain.ValidationLevelType
 	expectValid  bool
 	expectErrors int
 }

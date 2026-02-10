@@ -177,3 +177,140 @@ func TestResult_Map(t *testing.T) {
 		})
 	}
 }
+
+func TestResult_AndThen(t *testing.T) {
+	tests := []struct {
+		name     string
+		result   Result[int]
+		fn       func(int) Result[string]
+		expected Result[string]
+	}{
+		{name: "ok result to ok result", result: testOkResult(), fn: func(i int) Result[string] { return Ok("success") }, expected: Ok("success")},
+		{name: "ok result to error result", result: testOkResult(), fn: func(i int) Result[string] { return Err[string](errors.New("chained error")) }, expected: Err[string](errors.New("chained error"))},
+		{name: "error result", result: testErrResult(), fn: func(i int) Result[string] { return Ok("should not be called") }, expected: Err[string](errors.New("test error"))},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := AndThen(tt.result, tt.fn)
+
+			if result.IsOk() != tt.expected.IsOk() {
+				t.Errorf("AndThen() IsOk() = %v, want %v", result.IsOk(), tt.expected.IsOk())
+				return
+			}
+
+			if result.IsOk() {
+				if result.Value() != tt.expected.Value() {
+					t.Errorf("AndThen() Value() = %v, want %v", result.Value(), tt.expected.Value())
+				}
+			} else {
+				if result.Error().Error() != tt.expected.Error().Error() {
+					t.Errorf("AndThen() Error() = %v, want %v", result.Error().Error(), tt.expected.Error().Error())
+				}
+			}
+		})
+	}
+}
+
+func TestResult_FlatMap(t *testing.T) {
+	// FlatMap is an alias for AndThen, so we just verify it works
+	result := FlatMap(Ok(10), func(i int) Result[int] { return Ok(i * 2) })
+	if !result.IsOk() || result.Value() != 20 {
+		t.Errorf("FlatMap() = %v, want Ok(20)", result)
+	}
+}
+
+func TestResult_OrElse(t *testing.T) {
+	tests := []struct {
+		name          string
+		result        Result[int]
+		fallback      Result[int]
+		expectedValue int
+		expectedOk    bool
+	}{
+		{name: "ok result returns original", result: Ok(42), fallback: Ok(99), expectedValue: 42, expectedOk: true},
+		{name: "error result returns fallback", result: testErrResult(), fallback: Ok(99), expectedValue: 99, expectedOk: true},
+		{name: "error result with error fallback", result: testErrResult(), fallback: Err[int](errors.New("fallback error")), expectedValue: 0, expectedOk: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.result.OrElse(tt.fallback)
+
+			if result.IsOk() != tt.expectedOk {
+				t.Errorf("OrElse() IsOk() = %v, want %v", result.IsOk(), tt.expectedOk)
+			}
+
+			if tt.expectedOk && result.Value() != tt.expectedValue {
+				t.Errorf("OrElse() Value() = %v, want %v", result.Value(), tt.expectedValue)
+			}
+		})
+	}
+}
+
+func TestResult_Validate(t *testing.T) {
+	tests := []struct {
+		name          string
+		result        Result[int]
+		predicate     func(int) bool
+		errorMsg      string
+		expectedOk    bool
+		expectedError string
+	}{
+		{name: "valid passes through", result: Ok(42), predicate: func(i int) bool { return i > 0 }, errorMsg: "must be positive", expectedOk: true},
+		{name: "invalid returns error", result: Ok(-5), predicate: func(i int) bool { return i > 0 }, errorMsg: "must be positive", expectedOk: false, expectedError: "must be positive"},
+		{name: "error passes through", result: testErrResult(), predicate: func(i int) bool { return i > 0 }, errorMsg: "must be positive", expectedOk: false, expectedError: "test error"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.result.Validate(tt.predicate, tt.errorMsg)
+
+			if result.IsOk() != tt.expectedOk {
+				t.Errorf("Validate() IsOk() = %v, want %v", result.IsOk(), tt.expectedOk)
+			}
+
+			if !tt.expectedOk && result.IsErr() {
+				if result.Error().Error() != tt.expectedError {
+					t.Errorf("Validate() Error() = %v, want %v", result.Error().Error(), tt.expectedError)
+				}
+			}
+		})
+	}
+}
+
+func TestResult_ValidateWithError(t *testing.T) {
+	customErr := errors.New("custom validation error")
+	result := Ok(10).ValidateWithError(func(i int) bool { return i > 100 }, customErr)
+
+	if result.IsOk() {
+		t.Errorf("ValidateWithError() should have returned error for value 10 with predicate > 100")
+	}
+
+	if result.Error().Error() != customErr.Error() {
+		t.Errorf("ValidateWithError() Error() = %v, want %v", result.Error().Error(), customErr.Error())
+	}
+}
+
+func TestResult_Tap(t *testing.T) {
+	var tappedValue *int
+	okResult := Ok(42).Tap(func(v int) { tappedValue = &v })
+
+	if !okResult.IsOk() || okResult.Value() != 42 {
+		t.Errorf("Tap() should not change the result")
+	}
+
+	if tappedValue == nil || *tappedValue != 42 {
+		t.Errorf("Tap() should have called the function with the value")
+	}
+
+	// Tap should not call the function on error result
+	errResult := testErrResult().Tap(func(v int) {
+		t.Errorf("Tap should not be called on error result")
+	})
+
+	// Tap should return the original error result
+	if !errResult.IsErr() {
+		t.Errorf("Tap() should return the original error result when called on error")
+	}
+}

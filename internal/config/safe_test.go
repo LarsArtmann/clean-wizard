@@ -23,7 +23,7 @@ func contains(s, substr string) bool {
 // riskLevelTestCases provides reusable test cases for RiskLevel method testing.
 var riskLevelTestCases = []struct {
 	name  string
-	level domain.RiskLevel
+	level domain.RiskLevelType
 }{
 	{"low risk", domain.RiskLevelType(domain.RiskLevelLowType)},
 	{"medium risk", domain.RiskLevelType(domain.RiskLevelMediumType)},
@@ -32,7 +32,7 @@ var riskLevelTestCases = []struct {
 	{"unknown risk", testInvalidRiskUnknown},
 }
 
-var riskLevelTextValues = map[domain.RiskLevel]string{
+var riskLevelTextValues = map[domain.RiskLevelType]string{
 	domain.RiskLevelType(domain.RiskLevelLowType):      "LOW",
 	domain.RiskLevelType(domain.RiskLevelMediumType):   "MEDIUM",
 	domain.RiskLevelType(domain.RiskLevelHighType):     "HIGH",
@@ -41,7 +41,7 @@ var riskLevelTextValues = map[domain.RiskLevel]string{
 }
 
 // riskLevelEmojiValues provides expected emoji values for Icon() method testing.
-var riskLevelEmojiValues = map[domain.RiskLevel]string{
+var riskLevelEmojiValues = map[domain.RiskLevelType]string{
 	domain.RiskLevelType(domain.RiskLevelLowType):      "🟢",
 	domain.RiskLevelType(domain.RiskLevelMediumType):   "🟡",
 	domain.RiskLevelType(domain.RiskLevelHighType):     "🟠",
@@ -50,7 +50,7 @@ var riskLevelEmojiValues = map[domain.RiskLevel]string{
 }
 
 // testRiskLevelMethod is a helper function that tests RiskLevel methods with a value map.
-func testRiskLevelMethod(t *testing.T, methodName string, method func(domain.RiskLevel) string, expected map[domain.RiskLevel]string) {
+func testRiskLevelMethod(t *testing.T, methodName string, method func(domain.RiskLevelType) string, expected map[domain.RiskLevelType]string) {
 	for _, tc := range riskLevelTestCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := method(tc.level)
@@ -63,13 +63,13 @@ func testRiskLevelMethod(t *testing.T, methodName string, method func(domain.Ris
 }
 
 func TestRiskLevel_String(t *testing.T) {
-	testRiskLevelMethod(t, "String", func(level domain.RiskLevel) string { return level.String() },
+	testRiskLevelMethod(t, "String", func(level domain.RiskLevelType) string { return level.String() },
 		riskLevelTextValues,
 	)
 }
 
 func TestRiskLevel_Icon(t *testing.T) {
-	testRiskLevelMethod(t, "Icon", func(level domain.RiskLevel) string { return level.Icon() },
+	testRiskLevelMethod(t, "Icon", func(level domain.RiskLevelType) string { return level.Icon() },
 		riskLevelEmojiValues,
 	)
 }
@@ -77,7 +77,7 @@ func TestRiskLevel_Icon(t *testing.T) {
 func TestRiskLevel_IsValid(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    domain.RiskLevel
+		level    domain.RiskLevelType
 		expected bool
 	}{
 		{"low risk", domain.RiskLevelType(domain.RiskLevelLowType), true},

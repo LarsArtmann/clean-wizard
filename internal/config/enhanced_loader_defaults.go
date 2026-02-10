@@ -2,6 +2,8 @@ package config
 
 import (
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // getDefaultLoadOptions returns default load options.
@@ -10,7 +12,7 @@ func getDefaultLoadOptions() *ConfigLoadOptions {
 		ForceRefresh:       false,
 		EnableCache:        true,
 		EnableSanitization: true,
-		ValidationLevel:    ValidationLevelComprehensive,
+		ValidationLevel:    domain.ValidationLevelComprehensiveType,
 		Timeout:            30 * time.Second,
 	}
 }
@@ -20,7 +22,7 @@ func getDefaultSaveOptions() *ConfigSaveOptions {
 	return &ConfigSaveOptions{
 		EnableSanitization: true,
 		BackupEnabled:      true,
-		ValidationLevel:    ValidationLevelComprehensive,
+		ValidationLevel:    domain.ValidationLevelComprehensiveType,
 		CreateBackup:       false,
 		ForceSave:          false,
 	}

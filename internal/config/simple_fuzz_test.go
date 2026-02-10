@@ -2,6 +2,8 @@ package config
 
 import (
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // FuzzBasicConfig tests basic configuration fuzzing.
@@ -35,26 +37,26 @@ func FuzzBasicConfig(f *testing.F) {
 
 // FuzzValidationLevelBasic tests validation level fuzzing.
 func FuzzValidationLevelBasic(f *testing.F) {
-	f.Add(int32(ValidationLevelBasic))
+	f.Add(int32(domain.ValidationLevelBasicType))
 
 	f.Fuzz(func(t *testing.T, data int32) {
 		// Should not panic with any int32 input
-		level := ValidationLevel(data)
+		level := domain.ValidationLevelType(data)
 
-		// String method should not panic
-		_ = level.String()
+		// IsValid method should not panic
+		_ = level.IsValid()
 
 		// Should handle extreme values gracefully
-		if int32(level) > int32(ValidationLevelStrict)+100 || int32(level) < int32(ValidationLevelNone)-100 {
+		if int32(level) > int32(domain.ValidationLevelStrictType)+100 || int32(level) < int32(domain.ValidationLevelNoneType)-100 {
 			// Should still not panic
-			_ = level.String()
+			_ = level.IsValid()
 		}
 
 		// Valid range should produce meaningful strings
-		if level >= ValidationLevelNone && level <= ValidationLevelStrict {
-			str := level.String()
-			if str == "" {
-				t.Logf("Valid level %d produced empty string", level)
+		if level >= domain.ValidationLevelNoneType && level <= domain.ValidationLevelStrictType {
+			isValid := level.IsValid()
+			if !isValid {
+				t.Logf("Valid level %d reported as invalid", level)
 			}
 		}
 	})

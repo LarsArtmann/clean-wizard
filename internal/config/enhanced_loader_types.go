@@ -2,38 +2,9 @@ package config
 
 import (
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
-
-// ValidationLevel defines validation strictness (backward compatibility)
-//
-// IMPORTANT: These integer values MUST remain in sync with domain.ValidationLevelType
-// See: internal/domain/type_safe_enums.go:116-123
-// When changing numeric values, update BOTH locations to prevent drift.
-// Consider aliasing the domain type directly to avoid duplication in the future.
-type ValidationLevel int
-
-const (
-	ValidationLevelNone          ValidationLevel = 0
-	ValidationLevelBasic         ValidationLevel = 1
-	ValidationLevelComprehensive ValidationLevel = 2
-	ValidationLevelStrict        ValidationLevel = 3
-)
-
-// String returns string representation.
-func (vl ValidationLevel) String() string {
-	switch vl {
-	case ValidationLevelNone:
-		return "NONE"
-	case ValidationLevelBasic:
-		return "BASIC"
-	case ValidationLevelComprehensive:
-		return "COMPREHENSIVE"
-	case ValidationLevelStrict:
-		return "STRICT"
-	default:
-		return "UNKNOWN"
-	}
-}
 
 // EnhancedConfigLoader provides comprehensive configuration loading with validation.
 type EnhancedConfigLoader struct {
@@ -47,20 +18,20 @@ type EnhancedConfigLoader struct {
 
 // ConfigLoadOptions provides options for configuration loading.
 type ConfigLoadOptions struct {
-	ForceRefresh       bool            `json:"force_refresh"`
-	EnableCache        bool            `json:"enable_cache"`
-	EnableSanitization bool            `json:"enable_sanitization"`
-	ValidationLevel    ValidationLevel `json:"validation_level"`
-	Timeout            time.Duration   `json:"timeout"`
+	ForceRefresh       bool                        `json:"force_refresh"`
+	EnableCache        bool                        `json:"enable_cache"`
+	EnableSanitization bool                        `json:"enable_sanitization"`
+	ValidationLevel    domain.ValidationLevelType   `json:"validation_level"`
+	Timeout            time.Duration               `json:"timeout"`
 }
 
 // ConfigSaveOptions provides options for configuration saving.
 type ConfigSaveOptions struct {
-	EnableSanitization bool            `json:"enable_sanitization"`
-	BackupEnabled      bool            `json:"backup_enabled"`
-	ValidationLevel    ValidationLevel `json:"validation_level"`
-	CreateBackup       bool            `json:"create_backup"`
-	ForceSave          bool            `json:"force_save"` // Override validation failures
+	EnableSanitization bool                      `json:"enable_sanitization"`
+	BackupEnabled      bool                      `json:"backup_enabled"`
+	ValidationLevel    domain.ValidationLevelType `json:"validation_level"`
+	CreateBackup       bool                      `json:"create_backup"`
+	ForceSave          bool                      `json:"force_save"` // Override validation failures
 }
 
 // RetryPolicy defines retry behavior for configuration operations.

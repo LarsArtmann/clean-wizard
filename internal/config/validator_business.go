@@ -156,12 +156,12 @@ func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.Cleanu
 }
 
 // findMaxRiskLevel finds the maximum risk level in configuration.
-func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel {
-	maxRisk := domain.RiskLow
+func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevelType {
+	maxRisk := domain.RiskLevelType(domain.RiskLevelLowType)
 	for _, profile := range cfg.Profiles {
 		maxRisk = maxRiskLevelFromOperations(profile.Operations, maxRisk)
 		if maxRisk == domain.RiskLevelType(domain.RiskLevelCriticalType) {
-			return domain.RiskCritical
+			return domain.RiskLevelType(domain.RiskLevelCriticalType)
 		}
 	}
 	return maxRisk

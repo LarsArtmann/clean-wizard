@@ -85,51 +85,9 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	// Fix risk levels and settings after unmarshaling (workaround for custom type unmarshaling)
 	for name, profile := range config.Profiles {
 		for i := range profile.Operations {
-			op := &profile.Operations[i] // Get pointer to actual operation
-
-			// Convert string risk level to RiskLevel enum
-			var riskLevelStr string
-			if err := v.UnmarshalKey(fmt.Sprintf("profiles.%s.operations.%d.risk_level", name, i), &riskLevelStr); err != nil {
-				logrus.WithField("profile", name).WithField("operation", i).WithField("error", err).Warn("Failed to unmarshal risk level, defaulting to LOW")
-			}
-
-			switch strings.ToUpper(riskLevelStr) {
-			case "LOW":
-				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelLowType)
-			case "MEDIUM":
-				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelMediumType)
-			case "HIGH":
-				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelHighType)
-			case "CRITICAL":
-				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelCriticalType)
-			default:
-				logrus.WithField("risk_level", riskLevelStr).Warn("Invalid risk level, defaulting to LOW")
-				op.RiskLevel = domain.RiskLevelType(domain.RiskLevelLowType)
-			}
-
-			// Explicitly unmarshal settings for each operation type
-			settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", name, i)
-			settingsMap := v.GetStringMap(settingsKey)
-
-			if len(settingsMap) > 0 {
-				// Check for nix_generations settings
-				if _, exists := settingsMap["nix_generations"]; exists {
-					nixGenSettings := &domain.NixGenerationsSettings{}
-					nixGenKey := settingsKey + ".nix_generations"
-
-					if err := v.UnmarshalKey(nixGenKey, nixGenSettings); err == nil {
-						// Use direct field assignment to actual operation
-						op.Settings = &domain.OperationSettings{}
-						op.Settings.NixGenerations = nixGenSettings
-					} else {
-						logrus.WithError(err).Error("Failed to unmarshal nix_generations settings")
-					}
-				} else {
-					logrus.Debug("No nix_generations settings found")
-				}
-			} else {
-				logrus.Debug("No settings map found")
-			}
+			op := &profile.Operations[i]
+			op.RiskLevel = parseRiskLevel(v, name, i)
+			unmarshalOperationSettings(v, name, i, op)
 		}
 	}
 
@@ -214,6 +172,54 @@ func Save(config *domain.Config) error {
 // GetCurrentTime returns current time (helper for testing).
 func GetCurrentTime() time.Time {
 	return time.Now()
+}
+
+// parseRiskLevel extracts and converts risk level string from viper to domain enum.
+func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) domain.RiskLevelType {
+	var riskLevelStr string
+	key := fmt.Sprintf("profiles.%s.operations.%d.risk_level", profileName, operationIndex)
+	if err := v.UnmarshalKey(key, &riskLevelStr); err != nil {
+		logrus.WithField("profile", profileName).WithField("operation", operationIndex).WithField("error", err).Warn("Failed to unmarshal risk level, defaulting to LOW")
+		return domain.RiskLevelType(domain.RiskLevelLowType)
+	}
+
+	switch strings.ToUpper(riskLevelStr) {
+	case "LOW":
+		return domain.RiskLevelType(domain.RiskLevelLowType)
+	case "MEDIUM":
+		return domain.RiskLevelType(domain.RiskLevelMediumType)
+	case "HIGH":
+		return domain.RiskLevelType(domain.RiskLevelHighType)
+	case "CRITICAL":
+		return domain.RiskLevelType(domain.RiskLevelCriticalType)
+	default:
+		logrus.WithField("risk_level", riskLevelStr).Warn("Invalid risk level, defaulting to LOW")
+		return domain.RiskLevelType(domain.RiskLevelLowType)
+	}
+}
+
+// unmarshalOperationSettings extracts operation settings from viper and populates the operation.
+func unmarshalOperationSettings(v *viper.Viper, profileName string, operationIndex int, op *domain.CleanupOperation) {
+	settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", profileName, operationIndex)
+	settingsMap := v.GetStringMap(settingsKey)
+
+	if len(settingsMap) == 0 {
+		logrus.Debug("No settings map found")
+		return
+	}
+
+	if _, exists := settingsMap["nix_generations"]; exists {
+		nixGenSettings := &domain.NixGenerationsSettings{}
+		nixGenKey := settingsKey + ".nix_generations"
+		if err := v.UnmarshalKey(nixGenKey, nixGenSettings); err == nil {
+			op.Settings = &domain.OperationSettings{}
+			op.Settings.NixGenerations = nixGenSettings
+		} else {
+			logrus.WithError(err).Error("Failed to unmarshal nix_generations settings")
+		}
+	} else {
+		logrus.Debug("No nix_generations settings found")
+	}
 }
 
 // newCleanupOperation creates a cleanup operation with the specified parameters.

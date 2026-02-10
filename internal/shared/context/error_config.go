@@ -2,6 +2,7 @@ package context
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -237,5 +238,53 @@ func FromLegacyErrorDetails(ctx context.Context, legacy *LegacyErrorDetails) *Co
 func NewLegacyErrorDetails() *LegacyErrorDetails {
 	return &LegacyErrorDetails{
 		Metadata: make(map[string]string),
+	}
+}
+
+// LegacySanitizationChange provides backward compatibility with the old SanitizationChange type.
+// DEPRECATED: Use Context[SanitizationConfig] for new code.
+// This type will be removed in v2.0.
+type LegacySanitizationChange struct {
+	Original  any
+	Sanitized any
+	Reason    string
+	Timestamp time.Time
+}
+
+// ToLegacySanitizationChange converts a Context[SanitizationConfig] to the legacy SanitizationChange format.
+// Note: The original/sanitized values cannot be preserved in Context[SanitizationConfig] since they
+// are stored in Metadata as strings. Use this only for backward compatibility.
+func ToLegacySanitizationChange(original, sanitized any, reason string, timestamp time.Time) *LegacySanitizationChange {
+	return &LegacySanitizationChange{
+		Original:  original,
+		Sanitized: sanitized,
+		Reason:    reason,
+		Timestamp: timestamp,
+	}
+}
+
+// FromLegacySanitizationChange creates a Context[SanitizationConfig] from the legacy SanitizationChange format.
+// Note: Only metadata fields are preserved; original/sanitized values are stored as string representations.
+func FromLegacySanitizationChange(ctx context.Context, legacy *LegacySanitizationChange) *Context[SanitizationConfig] {
+	if legacy == nil {
+		return NewContext(ctx, NewSanitizationConfig())
+	}
+
+	config := SanitizationConfig{
+		Rules: make(map[string]string),
+	}
+
+	newCtx := NewContext(ctx, config)
+	newCtx = newCtx.WithMetadata("original", fmt.Sprintf("%v", legacy.Original))
+	newCtx = newCtx.WithMetadata("sanitized", fmt.Sprintf("%v", legacy.Sanitized))
+	newCtx = newCtx.WithMetadata("reason", legacy.Reason)
+	return newCtx
+}
+
+// NewLegacySanitizationChange creates a new LegacySanitizationChange with default values.
+// DEPRECATED: Use Context[SanitizationConfig] for new code.
+func NewLegacySanitizationChange() *LegacySanitizationChange {
+	return &LegacySanitizationChange{
+		Timestamp: time.Now(),
 	}
 }

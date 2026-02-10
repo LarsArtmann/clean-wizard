@@ -29,8 +29,8 @@ type ConfigValidationRules struct {
 	RequireSafeMode       bool     `json:"require_safe_mode"`
 
 	// Risk Constraints
-	MaxRiskLevel   domain.RiskLevel `json:"max_risk_level"`
-	BackupRequired domain.RiskLevel `json:"backup_required"`
+	MaxRiskLevel   domain.RiskLevelType `json:"max_risk_level"`
+	BackupRequired domain.RiskLevelType `json:"backup_required"`
 }
 
 // ValidationRule represents a validation constraint for a specific type.

@@ -31,38 +31,48 @@ func (cv *ConfigValidator) validateProfiles(cfg *domain.Config) error {
 
 // validateProfileName validates profile name format.
 func (cv *ConfigValidator) validateProfileName(name string) error {
-	// Explicitly reject empty names
+	// Reject empty names
 	if name == "" {
 		return errors.New("profile name cannot be empty")
 	}
 
 	// Use configured regex pattern if available
-	if cv.rules.ProfileNamePattern != nil {
-		if cv.rules.ProfileNamePattern.Pattern != "" {
-			if compiledRegex := cv.rules.ProfileNamePattern.GetCompiledRegex(); compiledRegex != nil {
-				if !compiledRegex.MatchString(name) {
-					message := cv.rules.ProfileNamePattern.Message
-					if message == "" {
-						message = fmt.Sprintf("Profile name '%s' does not match pattern: %s", name, cv.rules.ProfileNamePattern.Pattern)
-					}
-					return fmt.Errorf("%s", message)
-				}
-				return nil // Pattern matched successfully
-			} else {
-				// Regex compilation failed, fall back to pattern in error message
-				return fmt.Errorf("profile name pattern '%s' is invalid and cannot be compiled", cv.rules.ProfileNamePattern.Pattern)
-			}
-		}
-		// Pattern field exists but is empty - use default validation
-		return errors.New("profile name pattern is configured but empty")
+	if cv.rules.ProfileNamePattern != nil && cv.rules.ProfileNamePattern.Pattern != "" {
+		return cv.validateProfileNameWithPattern(name)
 	}
 
-	// No pattern rule configured - use reasonable default validation
-	// Only allow alphanumeric characters, underscores, and hyphens
+	// Use default validation
+	return cv.validateProfileNameWithDefault(name)
+}
+
+// validateProfileNameWithPattern validates profile name using configured regex pattern.
+func (cv *ConfigValidator) validateProfileNameWithPattern(name string) error {
+	compiledRegex := cv.rules.ProfileNamePattern.GetCompiledRegex()
+	if compiledRegex == nil {
+		return fmt.Errorf("profile name pattern '%s' is invalid and cannot be compiled", cv.rules.ProfileNamePattern.Pattern)
+	}
+
+	if !compiledRegex.MatchString(name) {
+		message := cv.rules.ProfileNamePattern.Message
+		if message == "" {
+			message = fmt.Sprintf("Profile name '%s' does not match pattern: %s", name, cv.rules.ProfileNamePattern.Pattern)
+		}
+		return fmt.Errorf("%s", message)
+	}
+	return nil
+}
+
+// validateProfileNameWithDefault validates profile name using default character validation.
+func (cv *ConfigValidator) validateProfileNameWithDefault(name string) error {
 	for _, char := range name {
-		if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '_' || char == '-') {
+		if !isValidProfileNameChar(char) {
 			return fmt.Errorf("profile name '%s' contains invalid character: %c (allowed: alphanumeric, underscore, hyphen)", name, char)
 		}
 	}
 	return nil
+}
+
+// isValidProfileNameChar checks if a character is valid for a profile name.
+func isValidProfileNameChar(char rune) bool {
+	return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '_' || char == '-'
 }

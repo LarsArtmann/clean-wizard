@@ -22,7 +22,7 @@ func TestErrorConfigBuilder(t *testing.T) {
 		Metadata:    map[string]string{"key1": "value1", "key2": "value2"},
 	}
 
-	c := NewContext[ErrorConfig](ctx, config)
+	c := NewContext(ctx, config)
 
 	if c.ValueType.Operation != "test_operation" {
 		t.Errorf("Expected Operation 'test_operation', got '%s'", c.ValueType.Operation)
@@ -60,7 +60,7 @@ func TestSanitizationConfigBuilder(t *testing.T) {
 		Metadata:       map[string]string{"policy": "strict"},
 	}
 
-	c := NewContext[SanitizationConfig](ctx, config)
+	c := NewContext(ctx, config)
 
 	if c.ValueType.Operation != "trim_whitespace" {
 		t.Errorf("Expected Operation 'trim_whitespace', got '%s'", c.ValueType.Operation)

@@ -38,7 +38,7 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 				Field:     field,
 				OldValue:  nil,
 				NewValue:  path,
-				Operation: OperationAdded,
+				Operation: domain.ChangeOperationType(domain.ChangeOperationAddedType),
 				Risk:      domain.RiskLevelType(domain.RiskLevelLowType),
 			})
 		}
@@ -51,7 +51,7 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 				Field:     field,
 				OldValue:  path,
 				NewValue:  nil,
-				Operation: OperationRemoved,
+				Operation: domain.ChangeOperationType(domain.ChangeOperationRemovedType),
 				Risk:      domain.RiskLevelType(domain.RiskLevelHighType), // Removing protected paths is risky
 			})
 		}
@@ -75,7 +75,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 				Field:     "profiles." + name,
 				OldValue:  nil,
 				NewValue:  profile.Name,
-				Operation: OperationAdded,
+				Operation: domain.ChangeOperationType(domain.ChangeOperationAddedType),
 				Risk:      vm.assessProfileRisk(profile),
 			})
 		}
@@ -88,7 +88,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 				Field:     "profiles." + name,
 				OldValue:  profile.Name,
 				NewValue:  nil,
-				Operation: OperationRemoved,
+				Operation: domain.ChangeOperationType(domain.ChangeOperationRemovedType),
 				Risk:      domain.RiskLevelType(domain.RiskLevelLowType), // Removing profiles is generally safe
 			})
 		}
@@ -109,7 +109,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 					Field:     "profiles." + name,
 					OldValue:  currentProfile.Name,
 					NewValue:  proposedProfile.Name,
-					Operation: OperationModified,
+					Operation: domain.ChangeOperationType(domain.ChangeOperationModifiedType),
 					Risk:      vm.assessProfileRisk(proposedProfile),
 				})
 			}
@@ -121,23 +121,23 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(current, proposed map[stri
 
 // Helper methods for change analysis
 
-func (vm *ValidationMiddleware) getChangeOperation(old, new any) ChangeOperation {
+func (vm *ValidationMiddleware) getChangeOperation(old, new any) domain.ChangeOperationType {
 	if old == nil && new != nil {
-		return OperationAdded
+		return domain.ChangeOperationType(domain.ChangeOperationAddedType)
 	}
 	if old != nil && new == nil {
-		return OperationRemoved
+		return domain.ChangeOperationType(domain.ChangeOperationRemovedType)
 	}
-	return OperationModified
+	return domain.ChangeOperationType(domain.ChangeOperationModifiedType)
 }
 
-func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) domain.RiskLevel {
+func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) domain.RiskLevelType {
 	switch field {
 	case "safe_mode":
 		if old == true && new == false {
-			return domain.RiskHigh
+			return domain.RiskLevelType(domain.RiskLevelHighType)
 		}
-		return domain.RiskLow
+		return domain.RiskLevelType(domain.RiskLevelLowType)
 	case "max_disk_usage":
 		// Safe type assertions
 		oldVal, oldOk := old.(int)
@@ -146,23 +146,23 @@ func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) dom
 			return domain.RiskLevelType(domain.RiskLevelHighType) // Conservative risk for unexpected types
 		}
 		if oldVal < newVal {
-			return domain.RiskMedium
+			return domain.RiskLevelType(domain.RiskLevelMediumType)
 		}
-		return domain.RiskLow
+		return domain.RiskLevelType(domain.RiskLevelLowType)
 	case "protected":
 		if new == nil {
-			return domain.RiskCritical
+			return domain.RiskLevelType(domain.RiskLevelCriticalType)
 		}
-		return domain.RiskLow
+		return domain.RiskLevelType(domain.RiskLevelLowType)
 	default:
-		return domain.RiskLow
+		return domain.RiskLevelType(domain.RiskLevelLowType)
 	}
 }
 
-func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domain.RiskLevel {
+func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domain.RiskLevelType {
 	// Guard against nil profile
 	if profile == nil {
-		return domain.RiskHigh
+		return domain.RiskLevelType(domain.RiskLevelHighType)
 	}
 
 	return maxRiskLevelFromOperations(profile.Operations, domain.RiskLevelType(domain.RiskLevelLowType))

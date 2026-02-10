@@ -31,7 +31,7 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 	}
 
 	// Apply validation based on level
-	validationResult := ecl.applyValidation(ctx, config, ValidationLevel(options.ValidationLevel))
+	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
 	if !validationResult.IsValid {
 		return nil, pkgerrors.HandleValidationError("LoadConfig",
 			fmt.Errorf("validation failed: %s", ecl.formatValidationErrors(validationResult.Errors)))
@@ -74,13 +74,13 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 	}
 
 	// Always run validation at requested level
-	validationResult := ecl.applyValidation(ctx, config, ValidationLevel(options.ValidationLevel))
+	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
 
 	// Apply sanitization if enabled (after initial validation)
 	if options.EnableSanitization {
 		ecl.sanitizer.SanitizeConfig(config, validationResult)
 		// Re-check validity after sanitization
-		validationResult = ecl.applyValidation(ctx, config, ValidationLevel(options.ValidationLevel))
+		validationResult = ecl.applyValidation(ctx, config, options.ValidationLevel)
 	}
 
 	// Check final validation state
@@ -116,5 +116,5 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 
 // ValidateConfig validates configuration at specified level.
 func (ecl *EnhancedConfigLoader) ValidateConfig(ctx context.Context, config *domain.Config, level domain.ValidationLevelType) *ValidationResult {
-	return ecl.applyValidation(ctx, config, ValidationLevel(level))
+	return ecl.applyValidation(ctx, config, level)
 }

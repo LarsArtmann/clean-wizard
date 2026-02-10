@@ -6,19 +6,8 @@ import (
 	"time"
 )
 
-// Deprecated: Use RiskLevelType directly. Will be removed in v2.0.
-type RiskLevel = RiskLevelType
 
-// Deprecated: Use ValidationLevelType directly. Will be removed in v2.0.
-type ValidationLevel = ValidationLevelType
-
-// Deprecated: Use ChangeOperationType directly. Will be removed in v2.0.
-type ChangeOperation = ChangeOperationType
-
-// Deprecated: Use CleanStrategyType directly. Will be removed in v2.0.
-type CleanStrategy = CleanStrategyType
-
-// Deprecated: Use type-safe constants directly. Will be removed in v2.0.
+// Use type-safe constants directly.
 var (
 	RiskLow      = RiskLevelType(RiskLevelLowType)
 	RiskMedium   = RiskLevelType(RiskLevelMediumType)
@@ -126,7 +115,7 @@ type ScanItem struct {
 // CleanRequest represents cleaning command.
 type CleanRequest struct {
 	Items    []ScanItem    `json:"items"`
-	Strategy CleanStrategy `json:"strategy"`
+	Strategy CleanStrategyType `json:"strategy"`
 }
 
 // Validate returns errors for invalid clean request.
@@ -208,7 +197,7 @@ type CleanResult struct {
 	ItemsFailed  uint          `json:"items_failed"`
 	CleanTime    time.Duration `json:"clean_time"`
 	CleanedAt    time.Time     `json:"cleaned_at"`
-	Strategy     CleanStrategy `json:"strategy"`
+	Strategy     CleanStrategyType `json:"strategy"`
 }
 
 // IsValid checks if clean result is valid.

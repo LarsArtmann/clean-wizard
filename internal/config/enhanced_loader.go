@@ -7,21 +7,22 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/schema"
 )
 
 // applyValidation applies validation at the specified level.
-func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *domain.Config, level ValidationLevel) *ValidationResult {
+func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *domain.Config, level domain.ValidationLevelType) *ValidationResult {
 	switch level {
-	case ValidationLevelNone:
+	case domain.ValidationLevelNoneType:
 		return &ValidationResult{IsValid: true, Timestamp: time.Now()}
-	case ValidationLevelBasic:
+	case domain.ValidationLevelBasicType:
 		return ecl.validator.ValidateConfig(config) // Use existing validator
-	case ValidationLevelComprehensive:
+	case domain.ValidationLevelComprehensiveType:
 		// Add additional validation rules
 		result := ecl.validator.ValidateConfig(config)
 		ecl.applyComprehensiveValidation(config, result)
 		return result
-	case ValidationLevelStrict:
+	case domain.ValidationLevelStrictType:
 		// Apply all validation including strict checks
 		result := ecl.validator.ValidateConfig(config)
 		ecl.applyComprehensiveValidation(config, result)
@@ -150,25 +151,19 @@ func (ecl *EnhancedConfigLoader) mapValidatorRulesToSchemaRules() *ConfigValidat
 	return schemaRules
 }
 
-// getSchemaConstraintValue extracts a float64 value from an optional int pointer constraint,
-// returning the value or a fallback.
-func (ecl *EnhancedConfigLoader) getSchemaConstraintValue(constraint *int, fallback float64) float64 {
-	if constraint != nil {
-		return float64(*constraint)
-	}
-	return fallback
+// getSchemaBounds returns the min/max bounds for max_disk_usage from rules.
+func (ecl *EnhancedConfigLoader) getSchemaBounds() schema.MinMax {
+	return schema.ExtractMinMax(ecl.validator.rules.MaxDiskUsage.Min, ecl.validator.rules.MaxDiskUsage.Max, 10.0, 95.0)
 }
 
 // getSchemaMinimum returns the minimum value for max_disk_usage from rules.
 func (ecl *EnhancedConfigLoader) getSchemaMinimum() *float64 {
-	v := ecl.getSchemaConstraintValue(ecl.validator.rules.MaxDiskUsage.Min, 10.0)
-	return &v
+	return ecl.getSchemaBounds().Min
 }
 
 // getSchemaMaximum returns the maximum value for max_disk_usage from rules.
 func (ecl *EnhancedConfigLoader) getSchemaMaximum() *float64 {
-	v := ecl.getSchemaConstraintValue(ecl.validator.rules.MaxDiskUsage.Max, 95.0)
-	return &v
+	return ecl.getSchemaBounds().Max
 }
 
 // formatValidationErrors formats validation errors for display.
