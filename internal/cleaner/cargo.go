@@ -195,6 +195,17 @@ func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[d
 	)
 }
 
+// getCargoCacheDir returns the Cargo cache directory path.
+func (cc *CargoCleaner) getCargoCacheDir() string {
+	cargoHome := os.Getenv("CARGO_HOME")
+	if cargoHome == "" {
+		if homeDir, err := GetHomeDir(); err == nil && homeDir != "" {
+			cargoHome = homeDir + "/.cargo"
+		}
+	}
+	return cargoHome
+}
+
 // executeCargoCleanCommand is a helper that executes a cargo command and returns a clean result.
 func (cc *CargoCleaner) executeCargoCleanCommand(
 	ctx context.Context,
@@ -203,18 +214,47 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 	errorFormat string,
 	successMessage string,
 ) result.Result[domain.CleanResult] {
-	cmd := cc.execWithTimeout(ctx, cmdName, args...)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf(errorFormat, err, string(output)))
-	}
+	// Calculate cache size before cleaning
+	var bytesFreed int64
+	cacheDir := cc.getCargoCacheDir()
+	if cacheDir != "" {
+		beforeSize := GetDirSize(cacheDir)
 
-	if cc.verbose {
-		fmt.Println(successMessage)
+		// Execute the clean command
+		cmd := cc.execWithTimeout(ctx, cmdName, args...)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf(errorFormat, err, string(output)))
+		}
+
+		// Calculate cache size after cleaning
+		afterSize := GetDirSize(cacheDir)
+		bytesFreed = beforeSize - afterSize
+		if bytesFreed < 0 {
+			bytesFreed = 0 // Ensure non-negative
+		}
+
+		if cc.verbose {
+			fmt.Println(successMessage)
+			fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
+			fmt.Printf("  Cache size after: %d bytes\n", afterSize)
+			fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
+		}
+	} else {
+		// Cache directory not found, just execute command
+		cmd := cc.execWithTimeout(ctx, cmdName, args...)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf(errorFormat, err, string(output)))
+		}
+
+		if cc.verbose {
+			fmt.Println(successMessage)
+		}
 	}
 
 	return result.Ok(domain.CleanResult{
-		FreedBytes:   0,
+		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
 		CleanTime:    0,
