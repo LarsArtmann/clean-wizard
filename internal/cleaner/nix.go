@@ -128,8 +128,15 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 	toRemove := countOldGenerations(generations, keepCount)
 
 	if nc.dryRun {
-		// Use centralized conversion for dry-run
-		estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Use 50MB per generation
+		// Use real store size to calculate average generation size
+		storeSize := nc.GetStoreSize(ctx)
+		// Calculate average generation size (avoid division by zero)
+		var avgSize int64
+		if len(generations) > 0 {
+			avgSize = storeSize / int64(len(generations))
+		}
+		// Estimate bytes to free based on average generation size
+		estimatedBytes := avgSize * int64(toRemove)
 		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), toRemove, estimatedBytes)
 		return result.Ok(cleanResult)
 	}
