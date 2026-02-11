@@ -94,7 +94,7 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 
 	packageManagerStrings := PackageManagerTypeToLowerSlice(settings.NodePackages.PackageManagers)
 	validPackageManagersMap := map[string]bool{
-		"npm":   true,
+		"npm":  true,
 		"pnpm": true,
 		"yarn": true,
 		"bun":  true,
@@ -224,6 +224,58 @@ func (npmc *NodePackageManagerCleaner) scanHomeDirCache(ctx context.Context, cac
 	return result.Ok(items)
 }
 
+// getNpmCacheDir returns the npm cache directory path.
+func (npmc *NodePackageManagerCleaner) getNpmCacheDir(ctx context.Context) (string, error) {
+	cmd := npmc.execWithTimeout(ctx, "npm", "config", "get", "cache")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("failed to get npm cache location: %w", err)
+	}
+
+	cachePath := strings.TrimSpace(string(output))
+	if cachePath == "" {
+		return "", fmt.Errorf("npm cache path is empty")
+	}
+
+	return cachePath, nil
+}
+
+// getPnpmStoreDir returns the pnpm store directory path.
+func (npmc *NodePackageManagerCleaner) getPnpmStoreDir(ctx context.Context) (string, error) {
+	cmd := npmc.execWithTimeout(ctx, "pnpm", "store", "path")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("failed to get pnpm store location: %w", err)
+	}
+
+	storePath := strings.TrimSpace(string(output))
+	if storePath == "" {
+		return "", fmt.Errorf("pnpm store path is empty")
+	}
+
+	return storePath, nil
+}
+
+// getYarnCacheDir returns the yarn cache directory path.
+func (npmc *NodePackageManagerCleaner) getYarnCacheDir() (string, error) {
+	homeDir, err := GetHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	return fmt.Sprintf("%s/.yarn/cache", homeDir), nil
+}
+
+// getBunCacheDir returns the bun cache directory path.
+func (npmc *NodePackageManagerCleaner) getBunCacheDir() (string, error) {
+	homeDir, err := GetHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	return fmt.Sprintf("%s/.bun/install/cache", homeDir), nil
+}
+
 // Clean removes Node.js package manager caches.
 func (npmc *NodePackageManagerCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !npmc.IsAvailable(ctx) {
@@ -313,17 +365,213 @@ func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanRe
 func (npmc *NodePackageManagerCleaner) cleanPackageManager(ctx context.Context, pm domain.PackageManagerType) result.Result[domain.CleanResult] {
 	switch pm {
 	case domain.PackageManagerNpm:
-		return npmc.runPackageManagerCommand(ctx, "npm", "cache", "clean", "--force")
+		return npmc.cleanNpmCache(ctx)
 
 	case domain.PackageManagerPnpm:
-		return npmc.runPackageManagerCommand(ctx, "pnpm", "store", "prune")
+		return npmc.cleanPnpmStore(ctx)
 
 	case domain.PackageManagerYarn:
-		return npmc.runPackageManagerCommand(ctx, "yarn", "cache", "clean")
+		return npmc.cleanYarnCache(ctx)
 
 	case domain.PackageManagerBun:
-		return npmc.runPackageManagerCommand(ctx, "bun", "pm", "cache", "rm")
+		return npmc.cleanBunCache(ctx)
 	}
 
 	return result.Ok(npmc.createDefaultCleanResult())
+}
+
+// cleanNpmCache cleans the npm cache and returns bytes freed.
+func (npmc *NodePackageManagerCleaner) cleanNpmCache(ctx context.Context) result.Result[domain.CleanResult] {
+	cacheDir, err := npmc.getNpmCacheDir(ctx)
+	if err != nil {
+		// Cache directory not found, execute command anyway
+		cmd := npmc.execWithTimeout(ctx, "npm", "cache", "clean", "--force")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf("npm cache clean failed: %w (output: %s)", err, string(output)))
+		}
+
+		if npmc.verbose {
+			fmt.Println("  ✓ npm cache cleaned")
+		}
+
+		return result.Ok(npmc.createDefaultCleanResult())
+	}
+
+	beforeSize := GetDirSize(cacheDir)
+
+	cmd := npmc.execWithTimeout(ctx, "npm", "cache", "clean", "--force")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("npm cache clean failed: %w (output: %s)", err, string(output)))
+	}
+
+	afterSize := GetDirSize(cacheDir)
+	bytesFreed := beforeSize - afterSize
+	if bytesFreed < 0 {
+		bytesFreed = 0
+	}
+
+	if npmc.verbose {
+		fmt.Println("  ✓ npm cache cleaned")
+		fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
+		fmt.Printf("  Cache size after: %d bytes\n", afterSize)
+		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
+	})
+}
+
+// cleanPnpmStore cleans the pnpm store and returns bytes freed.
+func (npmc *NodePackageManagerCleaner) cleanPnpmStore(ctx context.Context) result.Result[domain.CleanResult] {
+	cacheDir, err := npmc.getPnpmStoreDir(ctx)
+	if err != nil {
+		// Store directory not found, execute command anyway
+		cmd := npmc.execWithTimeout(ctx, "pnpm", "store", "prune")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf("pnpm store prune failed: %w (output: %s)", err, string(output)))
+		}
+
+		if npmc.verbose {
+			fmt.Println("  ✓ pnpm store pruned")
+		}
+
+		return result.Ok(npmc.createDefaultCleanResult())
+	}
+
+	beforeSize := GetDirSize(cacheDir)
+
+	cmd := npmc.execWithTimeout(ctx, "pnpm", "store", "prune")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("pnpm store prune failed: %w (output: %s)", err, string(output)))
+	}
+
+	afterSize := GetDirSize(cacheDir)
+	bytesFreed := beforeSize - afterSize
+	if bytesFreed < 0 {
+		bytesFreed = 0
+	}
+
+	if npmc.verbose {
+		fmt.Println("  ✓ pnpm store pruned")
+		fmt.Printf("  Store size before: %d bytes\n", beforeSize)
+		fmt.Printf("  Store size after: %d bytes\n", afterSize)
+		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
+	})
+}
+
+// cleanYarnCache cleans the yarn cache and returns bytes freed.
+func (npmc *NodePackageManagerCleaner) cleanYarnCache(ctx context.Context) result.Result[domain.CleanResult] {
+	cacheDir, err := npmc.getYarnCacheDir()
+	if err != nil {
+		// Cache directory not found, execute command anyway
+		cmd := npmc.execWithTimeout(ctx, "yarn", "cache", "clean")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf("yarn cache clean failed: %w (output: %s)", err, string(output)))
+		}
+
+		if npmc.verbose {
+			fmt.Println("  ✓ yarn cache cleaned")
+		}
+
+		return result.Ok(npmc.createDefaultCleanResult())
+	}
+
+	beforeSize := GetDirSize(cacheDir)
+
+	cmd := npmc.execWithTimeout(ctx, "yarn", "cache", "clean")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("yarn cache clean failed: %w (output: %s)", err, string(output)))
+	}
+
+	afterSize := GetDirSize(cacheDir)
+	bytesFreed := beforeSize - afterSize
+	if bytesFreed < 0 {
+		bytesFreed = 0
+	}
+
+	if npmc.verbose {
+		fmt.Println("  ✓ yarn cache cleaned")
+		fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
+		fmt.Printf("  Cache size after: %d bytes\n", afterSize)
+		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
+	})
+}
+
+// cleanBunCache cleans the bun cache and returns bytes freed.
+func (npmc *NodePackageManagerCleaner) cleanBunCache(ctx context.Context) result.Result[domain.CleanResult] {
+	cacheDir, err := npmc.getBunCacheDir()
+	if err != nil {
+		// Cache directory not found, execute command anyway
+		cmd := npmc.execWithTimeout(ctx, "bun", "pm", "cache", "rm")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result.Err[domain.CleanResult](fmt.Errorf("bun cache clean failed: %w (output: %s)", err, string(output)))
+		}
+
+		if npmc.verbose {
+			fmt.Println("  ✓ bun cache cleaned")
+		}
+
+		return result.Ok(npmc.createDefaultCleanResult())
+	}
+
+	beforeSize := GetDirSize(cacheDir)
+
+	cmd := npmc.execWithTimeout(ctx, "bun", "pm", "cache", "rm")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return result.Err[domain.CleanResult](fmt.Errorf("bun cache clean failed: %w (output: %s)", err, string(output)))
+	}
+
+	afterSize := GetDirSize(cacheDir)
+	bytesFreed := beforeSize - afterSize
+	if bytesFreed < 0 {
+		bytesFreed = 0
+	}
+
+	if npmc.verbose {
+		fmt.Println("  ✓ bun cache cleaned")
+		fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
+		fmt.Printf("  Cache size after: %d bytes\n", afterSize)
+		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
+	}
+
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: 1,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
+	})
 }
