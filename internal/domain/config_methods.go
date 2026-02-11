@@ -9,7 +9,7 @@ import (
 
 // SanitizeConfigResult contains the result of sanitizing a configuration.
 type SanitizeConfigResult struct {
-	Config           *Config
+	Config          *Config
 	Changes         int
 	Warnings        []SanitizationWarning
 	Duration        time.Duration
@@ -38,7 +38,7 @@ func (c *Config) Sanitize(ctx stdctx.Context, level ValidationLevelType) *Saniti
 		Constraints:     make(map[string]string),
 		Metadata: map[string]string{
 			"sanitize_operation": "true",
-			"timestamp":         time.Now().Format(time.RFC3339),
+			"timestamp":          time.Now().Format(time.RFC3339),
 		},
 	}
 
@@ -46,7 +46,7 @@ func (c *Config) Sanitize(ctx stdctx.Context, level ValidationLevelType) *Saniti
 	_ = context.NewContext[context.ValidationConfig](ctx, validationConfig)
 
 	result := &SanitizeConfigResult{
-		Config:           c,
+		Config:          c,
 		Warnings:        []SanitizationWarning{},
 		Timestamp:       time.Now(),
 		ValidationLevel: level,
@@ -129,7 +129,7 @@ func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
 	if c.MaxDiskUsage < 0 {
 		r.Warnings = append(r.Warnings, SanitizationWarning{
 			Field:    "max_disk_usage",
-			Message: "MaxDiskUsage was negative, clamping to 0",
+			Message:  "MaxDiskUsage was negative, clamping to 0",
 			OldValue: c.MaxDiskUsage,
 			NewValue: 0,
 		})
@@ -138,7 +138,7 @@ func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
 	} else if c.MaxDiskUsage > 100 {
 		r.Warnings = append(r.Warnings, SanitizationWarning{
 			Field:    "max_disk_usage",
-			Message: "MaxDiskUsage exceeded 100, clamping to 100",
+			Message:  "MaxDiskUsage exceeded 100, clamping to 100",
 			OldValue: c.MaxDiskUsage,
 			NewValue: 100,
 		})
@@ -160,7 +160,7 @@ func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
 		changes++
 		r.Warnings = append(r.Warnings, SanitizationWarning{
 			Field:    "protected",
-			Message: "Added default protected paths",
+			Message:  "Added default protected paths",
 			OldValue: nil,
 			NewValue: c.Protected,
 		})
@@ -259,8 +259,8 @@ func (c *Config) ApplyProfile(ctx stdctx.Context, profileName string) *ApplyProf
 func (c *Config) ApplyProfileWithContext(ctx stdctx.Context, profileName string) *ApplyProfileResult {
 	// Create validation config using the generic Context system
 	validationConfig := context.ValidationConfig{
-		Profile: profileName,
-		Section: "profile",
+		Profile:     profileName,
+		Section:     "profile",
 		Constraints: make(map[string]string),
 		Metadata: map[string]string{
 			"operation": "apply_profile",
@@ -436,7 +436,7 @@ func (c *Config) SanitizeWithContext(ctx stdctx.Context, level ValidationLevelTy
 		Constraints:     make(map[string]string),
 		Metadata: map[string]string{
 			"sanitize_operation": "true",
-			"context_based":     "true",
+			"context_based":      "true",
 		},
 	}
 

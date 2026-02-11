@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-
 // Use type-safe constants directly.
 var (
 	RiskLow      = RiskLevelType(RiskLevelLowType)
@@ -114,7 +113,7 @@ type ScanItem struct {
 
 // CleanRequest represents cleaning command.
 type CleanRequest struct {
-	Items    []ScanItem    `json:"items"`
+	Items    []ScanItem        `json:"items"`
 	Strategy CleanStrategyType `json:"strategy"`
 }
 
@@ -191,12 +190,12 @@ func (se SizeEstimate) String() string {
 
 // CleanResult represents successful clean outcome.
 type CleanResult struct {
-	SizeEstimate SizeEstimate  `json:"size_estimate"`
-	FreedBytes   uint64        `json:"freed_bytes"` // Deprecated: Use SizeEstimate instead
-	ItemsRemoved uint          `json:"items_removed"`
-	ItemsFailed  uint          `json:"items_failed"`
-	CleanTime    time.Duration `json:"clean_time"`
-	CleanedAt    time.Time     `json:"cleaned_at"`
+	SizeEstimate SizeEstimate      `json:"size_estimate"`
+	FreedBytes   uint64            `json:"freed_bytes"` // Deprecated: Use SizeEstimate instead
+	ItemsRemoved uint              `json:"items_removed"`
+	ItemsFailed  uint              `json:"items_failed"`
+	CleanTime    time.Duration     `json:"clean_time"`
+	CleanedAt    time.Time         `json:"cleaned_at"`
 	Strategy     CleanStrategyType `json:"strategy"`
 }
 

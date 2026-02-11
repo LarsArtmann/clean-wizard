@@ -10,16 +10,16 @@ func TestErrorConfigBuilder(t *testing.T) {
 
 	// Test with struct literal - the expected pattern
 	config := ErrorConfig{
-		Operation:   "test_operation",
-		Field:       "test_field",
-		Value:       "test_value",
-		Expected:    "expected_value",
-		Actual:      "actual_value",
-		Code:        "ERR001",
-		Level:       "error",
-		Severity:    "high",
-		RetryCount:  3,
-		Metadata:    map[string]string{"key1": "value1", "key2": "value2"},
+		Operation:  "test_operation",
+		Field:      "test_field",
+		Value:      "test_value",
+		Expected:   "expected_value",
+		Actual:     "actual_value",
+		Code:       "ERR001",
+		Level:      "error",
+		Severity:   "high",
+		RetryCount: 3,
+		Metadata:   map[string]string{"key1": "value1", "key2": "value2"},
 	}
 
 	c := NewContext(ctx, config)

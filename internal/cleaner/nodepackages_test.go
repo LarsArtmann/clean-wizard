@@ -237,8 +237,6 @@ func TestNodePackageManagerCleaner_AvailableNodePackageManagers(t *testing.T) {
 	TestAvailableTypesGeneric(t, "AvailableNodePackageManagers", AvailableNodePackageManagers, expectedPMs)
 }
 
-
-
 func TestGetHomeDir(t *testing.T) {
 	// This test verifies GetHomeDir doesn't crash
 	// Actual behavior depends on environment variables

@@ -10,13 +10,13 @@ func TestExtractMinMax(t *testing.T) {
 	maxVal := 95
 
 	tests := []struct {
-		name          string
-		min           *int
-		max           *int
-		minFallback   float64
-		maxFallback   float64
-		wantMin       *float64
-		wantMax       *float64
+		name        string
+		min         *int
+		max         *int
+		minFallback float64
+		maxFallback float64
+		wantMin     *float64
+		wantMax     *float64
 	}{
 		{
 			name:        "both values provided",
@@ -77,28 +77,28 @@ func TestExtractMinMax(t *testing.T) {
 
 func TestMinMax_IsEmpty(t *testing.T) {
 	tests := []struct {
-		name     string
-		minMax   MinMax
+		name      string
+		minMax    MinMax
 		wantEmpty bool
 	}{
 		{
-			name:     "both nil is empty",
-			minMax:   MinMax{Min: nil, Max: nil},
+			name:      "both nil is empty",
+			minMax:    MinMax{Min: nil, Max: nil},
 			wantEmpty: true,
 		},
 		{
-			name:     "min only is not empty",
-			minMax:   MinMax{Min: float64Ptr(10), Max: nil},
+			name:      "min only is not empty",
+			minMax:    MinMax{Min: float64Ptr(10), Max: nil},
 			wantEmpty: false,
 		},
 		{
-			name:     "max only is not empty",
-			minMax:   MinMax{Min: nil, Max: float64Ptr(90)},
+			name:      "max only is not empty",
+			minMax:    MinMax{Min: nil, Max: float64Ptr(90)},
 			wantEmpty: false,
 		},
 		{
-			name:     "both present is not empty",
-			minMax:   MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
+			name:      "both present is not empty",
+			minMax:    MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
 			wantEmpty: false,
 		},
 	}
@@ -230,7 +230,7 @@ func TestMinMax_Contains(t *testing.T) {
 func TestToFloat64(t *testing.T) {
 	val := 42
 	tests := []struct {
-		name string
+		name  string
 		input *int
 		want  *float64
 	}{

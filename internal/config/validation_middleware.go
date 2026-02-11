@@ -51,7 +51,7 @@ type ConfigChange struct {
 	Field     string                     `json:"field"`
 	OldValue  any                        `json:"old_value"`
 	NewValue  any                        `json:"new_value"`
-	Operation domain.ChangeOperationType  `json:"operation"`
+	Operation domain.ChangeOperationType `json:"operation"`
 	Risk      domain.RiskLevelType       `json:"risk"`
 }
 

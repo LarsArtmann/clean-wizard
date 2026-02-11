@@ -124,7 +124,7 @@ func (p *Profile) Validate(name string) error {
 type CleanupOperation struct {
 	Name        string             `json:"name"               yaml:"name"`
 	Description string             `json:"description"        yaml:"description"`
-	RiskLevel   RiskLevelType     `json:"risk_level"         yaml:"risk_level"`
+	RiskLevel   RiskLevelType      `json:"risk_level"         yaml:"risk_level"`
 	Enabled     ProfileStatus      `json:"enabled"            yaml:"enabled"`
 	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }

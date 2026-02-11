@@ -24,7 +24,7 @@ func getDefaultSaveOptions() *ConfigSaveOptions {
 		BackupEnabled:      BackupOptionEnabled,
 		ValidationLevel:    domain.ValidationLevelComprehensiveType,
 		CreateBackup:       BackupOptionDisabled,
-		ForceSave:         SaveOptionDisabled,
+		ForceSave:          SaveOptionDisabled,
 	}
 }
 

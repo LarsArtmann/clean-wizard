@@ -224,8 +224,6 @@ func TestAvailableLangVersionManagers(t *testing.T) {
 	availableItemsTestHelper(t, expectedManagers, AvailableLangVersionManagers, "AvailableLangVersionManagers")
 }
 
-
-
 func TestLanguageVersionManagerCleaner_Verbose(t *testing.T) {
 	cleaner := NewLanguageVersionManagerCleaner(true, false, AvailableLangVersionManagers())
 

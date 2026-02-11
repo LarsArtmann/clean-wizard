@@ -91,9 +91,9 @@ func (c *ValidationConfig) WithMetadata(key, value string) *ValidationConfig {
 // ValidationResult contains the result of a validation operation.
 type ValidationResult struct {
 	IsValid   bool
-	Errors   []ValidationError
-	Warnings []ValidationWarning
-	Duration time.Duration
+	Errors    []ValidationError
+	Warnings  []ValidationWarning
+	Duration  time.Duration
 	Timestamp time.Time
 }
 

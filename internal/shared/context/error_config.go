@@ -8,16 +8,16 @@ import (
 
 // ErrorConfig holds configuration for error handling operations.
 type ErrorConfig struct {
-	Operation   string
-	Field       string
-	Value       string
-	Expected    string
-	Actual      string
-	Code        string
-	Level       string
-	Severity    string
-	RetryCount  int
-	Metadata    map[string]string
+	Operation  string
+	Field      string
+	Value      string
+	Expected   string
+	Actual     string
+	Code       string
+	Level      string
+	Severity   string
+	RetryCount int
+	Metadata   map[string]string
 }
 
 // NewErrorConfig creates a new ErrorConfig with default values.
@@ -150,13 +150,13 @@ func (c *SanitizationConfig) WithMetadata(key, value string) *SanitizationConfig
 
 // ErrorResult contains the result of an error handling operation.
 type ErrorResult struct {
-	Handled     bool
-	Recovered   bool
-	Fatal       bool
-	Retryable   bool
-	Duration    time.Duration
-	Timestamp   time.Time
-	Context     *Context[ErrorConfig]
+	Handled   bool
+	Recovered bool
+	Fatal     bool
+	Retryable bool
+	Duration  time.Duration
+	Timestamp time.Time
+	Context   *Context[ErrorConfig]
 }
 
 // NewErrorResult creates a new ErrorResult.
@@ -168,12 +168,12 @@ func NewErrorResult() *ErrorResult {
 
 // SanitizationResultV2 contains the result of a sanitization operation.
 type SanitizationResultV2 struct {
-	Changed    bool
-	Fields     []string
-	Warnings   []string
-	Duration   time.Duration
-	Timestamp  time.Time
-	Context    *Context[SanitizationConfig]
+	Changed   bool
+	Fields    []string
+	Warnings  []string
+	Duration  time.Duration
+	Timestamp time.Time
+	Context   *Context[SanitizationConfig]
 }
 
 // NewSanitizationResultV2 creates a new SanitizationResultV2.
@@ -202,10 +202,10 @@ type LegacyErrorDetails struct {
 // ToLegacyErrorDetails converts a Context[ErrorConfig] to the legacy ErrorDetails format.
 func ToLegacyErrorDetails(c *Context[ErrorConfig]) *LegacyErrorDetails {
 	return &LegacyErrorDetails{
-		Field:      c.ValueType.Field,
-		Value:      c.ValueType.Value,
-		Expected:   c.ValueType.Expected,
-		Actual:     c.ValueType.Actual,
+		Field:     c.ValueType.Field,
+		Value:     c.ValueType.Value,
+		Expected:  c.ValueType.Expected,
+		Actual:    c.ValueType.Actual,
 		Operation: c.ValueType.Operation,
 		Metadata:  c.Metadata,
 	}
