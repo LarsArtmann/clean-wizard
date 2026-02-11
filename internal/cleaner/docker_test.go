@@ -275,3 +275,156 @@ func TestDockerCleaner_Clean_Aggressive(t *testing.T) {
 		t.Errorf("Clean() freed %d bytes, want > 0", cleanResult.FreedBytes)
 	}
 }
+
+// TestParseDockerReclaimedSpace tests parsing of docker prune output
+func TestParseDockerReclaimedSpace(t *testing.T) {
+	tests := []struct {
+		name     string
+		output   string
+		expected int64
+		wantErr  bool
+	}{
+		{
+			name: "valid kB output",
+			output: "Deleted Containers:\nabc123\ndef456\n\nDeleted Images:\nsha256:123\n\nTotal reclaimed space: 1.84kB",
+			expected: int64(1884),
+			wantErr:  false,
+		},
+		{
+			name: "valid MB output",
+			output: "Deleted Containers:\nabc123\n\nTotal reclaimed space: 13.5 MB",
+			expected: int64(13.5 * 1024 * 1024),
+			wantErr:  false,
+		},
+		{
+			name: "valid GB output",
+			output: "Deleted Images:\nsha256:123\n\nTotal reclaimed space: 2.5GB",
+			expected: int64(2.5 * 1024 * 1024 * 1024),
+			wantErr:  false,
+		},
+		{
+			name: "zero bytes output",
+			output: "Total reclaimed space: 0B",
+			expected: 0,
+			wantErr:  false,
+		},
+		{
+			name:     "no reclaimed space line",
+			output:   "Deleted Containers:\nabc123\n",
+			expected: 0,
+			wantErr:  false,
+		},
+		{
+			name: "valid TB output",
+			output: "Deleted Volumes:\nvol1\n\nTotal reclaimed space: 1.2TB",
+			expected: int64(1319413953331),
+			wantErr:  false,
+		},
+		{
+			name: "valid B output",
+			output: "Total reclaimed space: 512B",
+			expected: 512,
+			wantErr:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDockerReclaimedSpace(tt.output)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseDockerReclaimedSpace() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if result != tt.expected {
+				t.Errorf("ParseDockerReclaimedSpace() = %d, want %d", result, tt.expected)
+			}
+		})
+	}
+}
+
+// TestParseDockerSize tests conversion of Docker size strings to bytes
+func TestParseDockerSize(t *testing.T) {
+	tests := []struct {
+		name     string
+		sizeStr  string
+		expected int64
+		wantErr  bool
+	}{
+		{
+			name:     "kilobytes",
+			sizeStr:  "1.84kB",
+			expected: int64(1884),
+			wantErr:  false,
+		},
+		{
+			name:     "megabytes",
+			sizeStr:  "13.5 MB",
+			expected: int64(13.5 * 1024 * 1024),
+			wantErr:  false,
+		},
+		{
+			name:     "gigabytes",
+			sizeStr:  "2.5GB",
+			expected: int64(2.5 * 1024 * 1024 * 1024),
+			wantErr:  false,
+		},
+		{
+			name:     "terabytes",
+			sizeStr:  "1.2TB",
+			expected: int64(1319413953331),
+			wantErr:  false,
+		},
+		{
+			name:     "bytes",
+			sizeStr:  "512B",
+			expected: 512,
+			wantErr:  false,
+		},
+		{
+			name:     "zero bytes",
+			sizeStr:  "0B",
+			expected: 0,
+			wantErr:  false,
+		},
+		{
+			name:     "zero with no unit",
+			sizeStr:  "0",
+			expected: 0,
+			wantErr:  false,
+		},
+		{
+			name:     "empty string",
+			sizeStr:  "",
+			expected: 0,
+			wantErr:  false,
+		},
+		{
+			name:    "invalid unit",
+			sizeStr: "1.5XB",
+			wantErr: true,
+		},
+		{
+			name:    "invalid format",
+			sizeStr: "invalid",
+			wantErr: true,
+		},
+		{
+			name:    "missing unit",
+			sizeStr: "1.5",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDockerSize(tt.sizeStr)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseDockerSize() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && result != tt.expected {
+				t.Errorf("ParseDockerSize() = %d, want %d", result, tt.expected)
+			}
+		})
+	}
+}

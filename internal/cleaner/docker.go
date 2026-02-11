@@ -290,8 +290,14 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 		fmt.Printf("  Output: %s\n", string(output))
 	}
 
+	// Parse reclaimed space from docker output
+	bytesFreed, err := ParseDockerReclaimedSpace(string(output))
+	if err != nil && dc.verbose {
+		fmt.Printf("  Warning: failed to parse reclaimed space: %v\n", err)
+	}
+
 	return result.Ok(domain.CleanResult{
-		FreedBytes:   0, // Bytes freed unknown from prune output
+		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
 		CleanTime:    0,
