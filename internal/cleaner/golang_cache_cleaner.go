@@ -111,12 +111,50 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 		return gcc.executeGoCleanCommand(ctx, cleanFlag, successMessage, 0)
 	}
 
-	var sizeEstimate uint64
+	var bytesFreed int64
 	if !gcc.dryRun {
-		sizeEstimate = uint64(GetDirSize(cachePath))
+		beforeSize := GetDirSize(cachePath)
+
+		// Execute the clean command
+		timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
+		defer cancel()
+
+		cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-"+cleanFlag)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			if timeoutCtx.Err() == context.DeadlineExceeded {
+				return result.Err[domain.CleanResult](fmt.Errorf("go clean -%s timed out after %v", cleanFlag, goCommandTimeout))
+			}
+			return result.Err[domain.CleanResult](fmt.Errorf("go clean -%s failed: %w (output: %s)", cleanFlag, err, string(output)))
+		}
+
+		// Calculate size after cleaning
+		afterSize := GetDirSize(cachePath)
+		bytesFreed = beforeSize - afterSize
+		if bytesFreed < 0 {
+			bytesFreed = 0 // Ensure non-negative
+		}
+
+		if gcc.verbose {
+			fmt.Println(successMessage)
+			fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
+			fmt.Printf("  Cache size after: %d bytes\n", afterSize)
+			fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
+		}
+
+		return result.Ok(domain.CleanResult{
+			SizeEstimate: domain.SizeEstimate{Known: uint64(bytesFreed)},
+			FreedBytes:   uint64(bytesFreed),
+			ItemsRemoved: 1,
+			ItemsFailed:  0,
+			CleanTime:    0,
+			CleanedAt:    time.Now(),
+			Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
+		})
 	}
 
-	return gcc.executeGoCleanCommand(ctx, cleanFlag, successMessage, sizeEstimate)
+	// Dry run - just return estimate
+	return gcc.executeGoCleanCommand(ctx, cleanFlag, successMessage, 0)
 }
 
 // cleanGoCache cleans GOCACHE.
