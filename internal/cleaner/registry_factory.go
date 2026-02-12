@@ -50,6 +50,9 @@ func DefaultRegistry() *Registry {
 	// Projects management automation cleaner
 	registry.Register("projects", NewProjectsManagementAutomationCleaner(false, false))
 
+	// Project executables cleaner
+	registry.Register("project-executables", NewProjectExecutablesCleaner(false, false, []string{".sh"}, []string{}))
+
 	return registry
 }
 
@@ -94,6 +97,9 @@ func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
 
 	// Projects management automation cleaner
 	registry.Register("projects", NewProjectsManagementAutomationCleaner(verbose, dryRun))
+
+	// Project executables cleaner
+	registry.Register("project-executables", NewProjectExecutablesCleaner(verbose, dryRun, []string{".sh"}, []string{}))
 
 	return registry
 }

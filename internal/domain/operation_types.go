@@ -38,6 +38,9 @@ type OperationSettings struct {
 
 	// Projects Management Automation Settings
 	ProjectsManagementAutomation *ProjectsManagementAutomationSettings `json:"projects_management_automation,omitempty" yaml:"projects_management_automation,omitempty"`
+
+	// Project Executables Settings
+	ProjectExecutables *ProjectExecutablesSettings `json:"project_executables,omitempty" yaml:"project_executables,omitempty"`
 }
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup.
@@ -111,6 +114,15 @@ type ProjectsManagementAutomationSettings struct {
 	ClearCache CacheCleanupMode `json:"clear_cache" yaml:"clear_cache"`
 }
 
+// ProjectExecutablesSettings provides type-safe settings for project executables cleanup.
+// This cleaner removes executable files (not shell scripts) from project root directories.
+type ProjectExecutablesSettings struct {
+	// ExcludeExtensions specifies file extensions to exclude from cleanup (default: ".sh")
+	ExcludeExtensions []string `json:"exclude_extensions,omitempty" yaml:"exclude_extensions,omitempty"`
+	// ExcludePatterns specifies glob patterns to exclude from cleanup
+	ExcludePatterns []string `json:"exclude_patterns,omitempty" yaml:"exclude_patterns,omitempty"`
+}
+
 // OperationType represents different types of cleanup operations.
 type OperationType string
 
@@ -127,6 +139,7 @@ const (
 	OperationTypeLangVersionManager           OperationType = "lang-version-manager"
 	OperationTypeSystemTemp                   OperationType = "system-temp"
 	OperationTypeProjectsManagementAutomation OperationType = "projects-management-automation"
+	OperationTypeProjectExecutables           OperationType = "project-executables"
 )
 
 // GetOperationType returns the operation type from operation name.
@@ -156,6 +169,8 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeSystemTemp
 	case "projects-management-automation":
 		return OperationTypeProjectsManagementAutomation
+	case "project-executables":
+		return OperationTypeProjectExecutables
 	default:
 		return OperationType(name) // Fallback for custom types
 	}
