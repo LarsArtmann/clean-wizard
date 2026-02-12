@@ -398,25 +398,17 @@ func (npmc *NodePackageManagerCleaner) cleanNpmCache(ctx context.Context) result
 		return result.Ok(npmc.createDefaultCleanResult())
 	}
 
-	beforeSize := GetDirSize(cacheDir)
-
-	cmd := npmc.execWithTimeout(ctx, "npm", "cache", "clean", "--force")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("npm cache clean failed: %w (output: %s)", err, string(output)))
-	}
-
-	afterSize := GetDirSize(cacheDir)
-	bytesFreed := beforeSize - afterSize
-	if bytesFreed < 0 {
-		bytesFreed = 0
-	}
+	bytesFreed, _, _ := CalculateBytesFreed(cacheDir, func() error {
+		cmd := npmc.execWithTimeout(ctx, "npm", "cache", "clean", "--force")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("npm cache clean failed: %w (output: %s)", err, string(output))
+		}
+		return nil
+	}, npmc.verbose, "Cache")
 
 	if npmc.verbose {
 		fmt.Println("  ✓ npm cache cleaned")
-		fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
-		fmt.Printf("  Cache size after: %d bytes\n", afterSize)
-		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
 	}
 
 	return result.Ok(domain.CleanResult{
@@ -447,25 +439,17 @@ func (npmc *NodePackageManagerCleaner) cleanPnpmStore(ctx context.Context) resul
 		return result.Ok(npmc.createDefaultCleanResult())
 	}
 
-	beforeSize := GetDirSize(cacheDir)
-
-	cmd := npmc.execWithTimeout(ctx, "pnpm", "store", "prune")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("pnpm store prune failed: %w (output: %s)", err, string(output)))
-	}
-
-	afterSize := GetDirSize(cacheDir)
-	bytesFreed := beforeSize - afterSize
-	if bytesFreed < 0 {
-		bytesFreed = 0
-	}
+	bytesFreed, _, _ := CalculateBytesFreed(cacheDir, func() error {
+		cmd := npmc.execWithTimeout(ctx, "pnpm", "store", "prune")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("pnpm store prune failed: %w (output: %s)", err, string(output))
+		}
+		return nil
+	}, npmc.verbose, "Store")
 
 	if npmc.verbose {
 		fmt.Println("  ✓ pnpm store pruned")
-		fmt.Printf("  Store size before: %d bytes\n", beforeSize)
-		fmt.Printf("  Store size after: %d bytes\n", afterSize)
-		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
 	}
 
 	return result.Ok(domain.CleanResult{
@@ -496,25 +480,17 @@ func (npmc *NodePackageManagerCleaner) cleanYarnCache(ctx context.Context) resul
 		return result.Ok(npmc.createDefaultCleanResult())
 	}
 
-	beforeSize := GetDirSize(cacheDir)
-
-	cmd := npmc.execWithTimeout(ctx, "yarn", "cache", "clean")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("yarn cache clean failed: %w (output: %s)", err, string(output)))
-	}
-
-	afterSize := GetDirSize(cacheDir)
-	bytesFreed := beforeSize - afterSize
-	if bytesFreed < 0 {
-		bytesFreed = 0
-	}
+	bytesFreed, _, _ := CalculateBytesFreed(cacheDir, func() error {
+		cmd := npmc.execWithTimeout(ctx, "yarn", "cache", "clean")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("yarn cache clean failed: %w (output: %s)", err, string(output))
+		}
+		return nil
+	}, npmc.verbose, "Cache")
 
 	if npmc.verbose {
 		fmt.Println("  ✓ yarn cache cleaned")
-		fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
-		fmt.Printf("  Cache size after: %d bytes\n", afterSize)
-		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
 	}
 
 	return result.Ok(domain.CleanResult{
@@ -545,25 +521,17 @@ func (npmc *NodePackageManagerCleaner) cleanBunCache(ctx context.Context) result
 		return result.Ok(npmc.createDefaultCleanResult())
 	}
 
-	beforeSize := GetDirSize(cacheDir)
-
-	cmd := npmc.execWithTimeout(ctx, "bun", "pm", "cache", "rm")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("bun cache clean failed: %w (output: %s)", err, string(output)))
-	}
-
-	afterSize := GetDirSize(cacheDir)
-	bytesFreed := beforeSize - afterSize
-	if bytesFreed < 0 {
-		bytesFreed = 0
-	}
+	bytesFreed, _, _ := CalculateBytesFreed(cacheDir, func() error {
+		cmd := npmc.execWithTimeout(ctx, "bun", "pm", "cache", "rm")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("bun cache clean failed: %w (output: %s)", err, string(output))
+		}
+		return nil
+	}, npmc.verbose, "Cache")
 
 	if npmc.verbose {
 		fmt.Println("  ✓ bun cache cleaned")
-		fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
-		fmt.Printf("  Cache size after: %d bytes\n", afterSize)
-		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
 	}
 
 	return result.Ok(domain.CleanResult{

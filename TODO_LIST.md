@@ -1,10 +1,10 @@
 # TODO LIST
 
-**Last Updated:** 2026-02-10  
-**Total MD Files Found:** 91  
-**Files Processed:** 39/91  
-**Files Remaining:** 52  
-**Status Report:** docs/status/2026-02-10_15-41_COMPREHENSIVE_EXECUTION_PLAN_INITIATED.md
+**Last Updated:** 2026-02-11
+**Total MD Files Found:** 91
+**Files Processed:** 40/91
+**Files Remaining:** 51
+**Status Report:** COMPREHENSIVE_REFLECTION_2026-02-11.md
 
 ---
 
@@ -52,6 +52,7 @@
 38. ✅ 2026-02-08_ENUM_CLEANER_VERIFICATION.md - Status: COMPLETED - All cleaners verified to correctly handle enum types with proper type safety (no raw int comparisons)
 39. ✅ 2026-02-09_07-48_DOCKER_REFACTOR_COMPLETE.md - Status: COMPLETED - Docker cleaner refactored from local enum to domain enum, 6 major tasks completed (Cleaner interface, Context propagation, Binary enum unification, Integration tests, Enum validation, Docker refactor)
 40. ✅ 2026-02-10_15-41_COMPREHENSIVE_EXECUTION_PLAN_INITIATED.md - Status: COMPLETED - Full status report documenting verification of critical issues, creation of 139-task execution plan, and initiation of Phase 1
+41. ✅ COMPREHENSIVE_REFLECTION_2026-02-11.md - Status: COMPLETED - Comprehensive reflection on size reporting fixes, identified duplicate code patterns, created 6-phase execution plan with priority matrix
 
 ---
 
@@ -174,6 +175,41 @@
 
 **Status:** ✅ **NO ACTION REQUIRED - ALL CLEANERS COMPLIANT**
 
+### 🚨 HIGH - SIZE REPORTING DUPLICATE CODE ✅ EXTRACTED
+
+**From COMPREHENSIVE_REFLECTION_2026-02-11.md:**
+
+**ORIGINAL REPORT:** Size calculation pattern duplicated 7 times across cleaners
+
+**EXTRACTION RESULT: ✅ SHARED UTILITY CREATED**
+
+| Location | File | Lines | Status |
+|----------|------|-------|--------|
+| executeCargoCleanCommand | cargo.go | 217-235 | ✅ Refactored |
+| Clean | golang_lint_adapter.go | 64-88 | ✅ Refactored |
+| cleanGoCacheEnv | golang_cache_cleaner.go | 116-143 | ✅ Refactored |
+| cleanNpmCache | nodepackages.go | 401-413 | ✅ Refactored |
+| cleanPnpmStore | nodepackages.go | 450-462 | ✅ Refactored |
+| cleanYarnCache | nodepackages.go | 499-511 | ✅ Refactored |
+| cleanBunCache | nodepackages.go | 548-560 | ✅ Refactored |
+
+**Implementation:**
+- Created `CalculateBytesFreed()` in `internal/cleaner/fsutil.go`
+- Consolidates: GetDirSize before/after, subtraction, non-negative check, verbose logging
+- Closure-based cleanup execution for flexible command wrapping
+- All 7 locations now use the shared utility
+
+**Benefits:**
+- Reduces code duplication from 7 locations to 1 implementation
+- Future bug fixes apply automatically to all cleaners
+- Improved maintainability and consistency
+
+**Verification:**
+- ✅ `go build ./...` succeeds
+- ✅ `go test ./...` all tests pass
+- ✅ Verbose output preserved for all cleaners
+- ✅ Error handling preserved with proper cleanup error propagation
+
 ### 🚨 HIGH - ENUM INCONSISTENCIES
 
 **From ENUM_USAGE_ANALYSIS.md:**
@@ -227,36 +263,36 @@
 **From REFACTORING_PLAN.md:**
 
 6. **Generic Validation Interface** (HIGH impact, 2 hours work)
-   - **Status**: NOT_STARTED
+   - **Status**: ✅ COMPLETED
    - **Description**: Create generic Validator interface and ValidateAndWrap utility to eliminate 4 validation duplicates
    - **Target**: `internal/shared/utils/validation/`
    - **Files affected**: 4 files
-   - **Verification**: Check if validation utility exists
+   - **Verification**: ✅ `internal/shared/utils/validation/validation.go` exists with ValidateAndWrap[T]
 
 7. **Config Loading Utility** (HIGH impact, 1 hour work)
-   - **Status**: NOT_STARTED
+   - **Status**: ✅ COMPLETED
    - **Description**: Create LoadConfigWithFallback utility to eliminate 2 config loading duplicates
    - **Target**: `internal/shared/utils/config/`
    - **Files affected**: 2 files
-   - **Verification**: Check if config utility exists
+   - **Verification**: ✅ `internal/shared/utils/config/config.go` exists with LoadConfigWithFallback
 
 8. **String Trimming Utility** (MEDIUM impact, 30 minutes work)
-   - **Status**: NOT_STARTED
+   - **Status**: ✅ COMPLETED
    - **Description**: Create TrimWhitespaceField utility to eliminate 2 string trimming duplicates
    - **Target**: `internal/shared/utils/strings/`
    - **Files affected**: 2 files
-   - **Verification**: Check if string utility exists
+   - **Verification**: ✅ `internal/shared/utils/strings/trimming.go` exists with TrimWhitespaceField
 
 ### Priority 3 - Medium
 
 **From REFACTORING_PLAN.md:**
 
 9. **Error Details Utility** (MEDIUM impact, 2 hours work)
-   - **Status**: NOT_STARTED
+   - **Status**: ✅ COMPLETED
    - **Description**: Create error details utility to eliminate 3 error detail setting duplicates
    - **Target**: `internal/pkg/errors/`
    - **Files affected**: 3 files
-   - **Verification**: Check if error utility exists
+   - **Verification**: ✅ `internal/pkg/errors/detail_helpers.go` exists with ErrorDetailsBuilder
 
 10. **Test Helper Functions Refactoring** (MEDIUM impact, 3 hours work)
     - **Status**: NOT_STARTED
@@ -266,11 +302,11 @@
     - **Verification**: Check BDD helpers for duplication
 
 11. **Schema Min/Max Utility** (LOW impact, 1 hour work)
-    - **Status**: NOT_STARTED
+    - **Status**: ✅ COMPLETED
     - **Description**: Create schema min/max utility to eliminate 2 schema logic duplicates
     - **Target**: `internal/shared/utils/schema/`
     - **Files affected**: 2 files
-    - **Verification**: Check if schema utility exists
+    - **Verification**: ✅ `internal/shared/utils/schema/minmax.go` exists with MinMax struct
 
 12. **Type Model Improvements** (MEDIUM impact, 4 hours work)
     - **Status**: NOT_STARTED

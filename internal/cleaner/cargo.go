@@ -218,27 +218,17 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 	var bytesFreed int64
 	cacheDir := cc.getCargoCacheDir()
 	if cacheDir != "" {
-		beforeSize := GetDirSize(cacheDir)
-
-		// Execute the clean command
-		cmd := cc.execWithTimeout(ctx, cmdName, args...)
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf(errorFormat, err, string(output)))
-		}
-
-		// Calculate cache size after cleaning
-		afterSize := GetDirSize(cacheDir)
-		bytesFreed = beforeSize - afterSize
-		if bytesFreed < 0 {
-			bytesFreed = 0 // Ensure non-negative
-		}
+		bytesFreed, _, _ = CalculateBytesFreed(cacheDir, func() error {
+			cmd := cc.execWithTimeout(ctx, cmdName, args...)
+			output, err := cmd.CombinedOutput()
+			if err != nil {
+				return fmt.Errorf(errorFormat, err, string(output))
+			}
+			return nil
+		}, cc.verbose, "Cache")
 
 		if cc.verbose {
 			fmt.Println(successMessage)
-			fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
-			fmt.Printf("  Cache size after: %d bytes\n", afterSize)
-			fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
 		}
 	} else {
 		// Cache directory not found, just execute command

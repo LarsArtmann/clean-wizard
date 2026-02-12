@@ -64,34 +64,31 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 	var bytesFreed int64
 	cacheDir := glc.CacheDir()
 	if cacheDir != "" {
-		beforeSize := GetDirSize(cacheDir)
+		var cleanupErr error
+		bytesFreed, _, _ = CalculateBytesFreed(cacheDir, func() error {
+			// Create a timeout context to prevent hanging
+			timeoutCtx, cancel := context.WithTimeout(ctx, lintCommandTimeout)
+			defer cancel()
 
-		// Create a timeout context to prevent hanging
-		timeoutCtx, cancel := context.WithTimeout(ctx, lintCommandTimeout)
-		defer cancel()
-
-		cmd := exec.CommandContext(timeoutCtx, "golangci-lint", "cache", "clean")
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			// Check if it's a timeout error
-			if timeoutCtx.Err() == context.DeadlineExceeded {
-				return result.Err[domain.CleanResult](fmt.Errorf("golangci-lint cache clean timed out after %v (command may be hanging)", lintCommandTimeout))
+			cmd := exec.CommandContext(timeoutCtx, "golangci-lint", "cache", "clean")
+			output, err := cmd.CombinedOutput()
+			if err != nil {
+				cleanupErr = err
+				// Check if it's a timeout error
+				if timeoutCtx.Err() == context.DeadlineExceeded {
+					return fmt.Errorf("golangci-lint cache clean timed out after %v (command may be hanging)", lintCommandTimeout)
+				}
+				return fmt.Errorf("golangci-lint cache clean failed: %w (output: %s)", err, string(output))
 			}
-			return result.Err[domain.CleanResult](fmt.Errorf("golangci-lint cache clean failed: %w (output: %s)", err, string(output)))
-		}
+			return nil
+		}, verbose, "Cache")
 
-		// Calculate cache size after cleaning
-		afterSize := GetDirSize(cacheDir)
-		bytesFreed = beforeSize - afterSize
-		if bytesFreed < 0 {
-			bytesFreed = 0 // Ensure non-negative
+		if cleanupErr != nil {
+			return result.Err[domain.CleanResult](cleanupErr)
 		}
 
 		if verbose {
 			fmt.Println("  ✓ golangci-lint cache cleaned")
-			fmt.Printf("  Cache size before: %d bytes\n", beforeSize)
-			fmt.Printf("  Cache size after: %d bytes\n", afterSize)
-			fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
 		}
 	} else {
 		// Cache directory not found, just execute command

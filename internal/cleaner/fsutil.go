@@ -187,3 +187,40 @@ func ScanPath(homeDir string, scanType domain.ScanType, displayName string, verb
 
 	return result
 }
+
+// CalculateBytesFreed calculates the bytes freed from a directory after a cleanup operation.
+// This consolidates the common pattern of:
+// 1. Getting directory size before cleanup
+// 2. Executing the cleanup function
+// 3. Getting directory size after cleanup
+// 4. Calculating the difference (bytes freed)
+// 5. Logging verbose output if requested
+// Returns the bytes freed (always non-negative), beforeSize, and afterSize for logging.
+func CalculateBytesFreed(path string, cleanup func() error, verbose bool, cacheName string) (bytesFreed int64, beforeSize int64, afterSize int64) {
+	beforeSize = GetDirSize(path)
+
+	err := cleanup()
+	if err != nil {
+		// Return 0 bytes freed if cleanup failed, but still calculate size
+		afterSize = GetDirSize(path)
+		bytesFreed = beforeSize - afterSize
+		if bytesFreed < 0 {
+			bytesFreed = 0
+		}
+		return bytesFreed, beforeSize, afterSize
+	}
+
+	afterSize = GetDirSize(path)
+	bytesFreed = beforeSize - afterSize
+	if bytesFreed < 0 {
+		bytesFreed = 0
+	}
+
+	if verbose {
+		fmt.Printf("  %s size before: %d bytes\n", cacheName, beforeSize)
+		fmt.Printf("  %s size after: %d bytes\n", cacheName, afterSize)
+		fmt.Printf("  Bytes freed: %d bytes\n", bytesFreed)
+	}
+
+	return bytesFreed, beforeSize, afterSize
+}
