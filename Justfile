@@ -16,7 +16,9 @@ install-local:
 # Clean build artifacts
 clean:
     @echo "🧹 Cleaning build artifacts..."
-    rm -f {{BINARY_NAME}}
+    rm -rf bin/ {{BINARY_NAME}}
+    find . -name "*.test" -type f -delete
+    rm -f coverage.out coverage.html
     go clean
 
 # Run tests
@@ -38,13 +40,16 @@ format:
 
 # Clean everything (including caches)
 clean-all:
-    @echo "🧹 Cleaning build artifacts..."
-    rm -f {{BINARY_NAME}}
+    @echo "🧹 Cleaning all build artifacts..."
+    rm -rf bin/ {{BINARY_NAME}}
+    find . -name "*.test" -type f -delete
+    rm -f coverage.out coverage.html
+    rm -rf reports/
     go clean
-    @echo "🧹 Cleaning all caches via clean-wizard..."
-    @just build 2>&1 > /dev/null
-    {{BINARY_NAME}} clean --mode quick --json > /dev/null 2>&1 || echo "ℹ️  clean-wizard skipped"
-    rm -f {{BINARY_NAME}} coverage.out coverage.html
+    @echo "🧹 Cleaning caches via clean-wizard..."
+    @go build -o {{BINARY_NAME}} ./cmd/clean-wizard 2>&1 > /dev/null || true
+    @./{{BINARY_NAME}} clean --mode quick --json > /dev/null 2>&1 || echo "ℹ️  clean-wizard skipped"
+    rm -f {{BINARY_NAME}}
 
 # Install dependencies
 deps:
