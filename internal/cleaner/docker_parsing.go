@@ -8,8 +8,8 @@ import (
 // ParseDockerReclaimedSpace extracts "Total reclaimed space: X" from docker prune output.
 // Returns 0 if no reclaimed space is found (which is valid).
 func ParseDockerReclaimedSpace(output string) (int64, error) {
-	lines := strings.Split(output, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(output, "\n")
+	for line := range lines {
 		if strings.Contains(line, "Total reclaimed space:") {
 			// Extract: "Total reclaimed space: 2.5GB"
 			parts := strings.Split(line, ":")

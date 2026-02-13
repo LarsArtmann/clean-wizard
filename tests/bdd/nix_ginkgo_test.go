@@ -15,13 +15,13 @@ import (
 	"github.com/onsi/gomega"
 )
 
-// Test entry point for Ginkgo
+// Test entry point for Ginkgo.
 func TestNixBDDSuite(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "Nix BDD Suite")
 }
 
-// NixTestContext holds test state across scenarios
+// NixTestContext holds test state across scenarios.
 type NixTestContext struct {
 	ctx         context.Context
 	nixCleaner  *cleaner.NixCleaner
@@ -33,9 +33,7 @@ type NixTestContext struct {
 }
 
 var _ = ginkgo.Describe("Nix Store Management", func() {
-	var (
-		testCtx *NixTestContext
-	)
+	var testCtx *NixTestContext
 
 	ginkgo.BeforeEach(func() {
 		testCtx = &NixTestContext{
@@ -161,9 +159,9 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		ginkgo.BeforeEach(func() {
 			// Simulate Nix not being available
 			testCtx.nixCleaner = cleaner.NewNixCleaner(true, false)
-			testCtx.generations = result.Err[[]domain.NixGeneration](fmt.Errorf("Nix is not available"))
-			testCtx.storeSize = result.Err[int64](fmt.Errorf("Nix is not available"))
-			testCtx.cleanResult = result.Err[domain.CleanResult](fmt.Errorf("Nix is not available"))
+			testCtx.generations = result.Err[[]domain.NixGeneration](errors.New("Nix is not available"))
+			testCtx.storeSize = result.Err[int64](errors.New("Nix is not available"))
+			testCtx.cleanResult = result.Err[domain.CleanResult](errors.New("Nix is not available"))
 		})
 
 		ginkgo.It("should show helpful error message", func() {
@@ -182,11 +180,9 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 	})
 })
 
-// Nix Cleaning feature tests
+// Nix Cleaning feature tests.
 var _ = ginkgo.Describe("Nix Store Cleaning", func() {
-	var (
-		nixCtx *NixTestContext
-	)
+	var nixCtx *NixTestContext
 
 	ginkgo.BeforeEach(func() {
 		nixCtx = &NixTestContext{
@@ -201,7 +197,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 		ginkgo.It("should display generation numbers and dates", func() {
 			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			generations := nixCtx.generations.Value()
-			gomega.Expect(len(generations) > 0).To(gomega.BeTrue())
+			gomega.Expect(len(generations)).To(gomega.BeNumerically(">", 0))
 			for _, gen := range generations {
 				gomega.Expect(gen.ID).To(gomega.BeNumerically(">", 0))
 				gomega.Expect(gen.Date).NotTo(gomega.BeZero())
@@ -328,7 +324,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 			nixCtx.generations = nixCtx.nixCleaner.ListGenerations(nixCtx.ctx)
 			// Either success or error, but consistent
 			if nixCtx.generations.IsErr() {
-				gomega.Expect(nixCtx.generations.Error()).NotTo(gomega.BeNil())
+				gomega.Expect(nixCtx.generations.Error()).NotTo(gomega.Succeed())
 			} else {
 				gomega.Expect(nixCtx.generations.Value()).NotTo(gomega.BeNil())
 			}

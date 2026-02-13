@@ -13,14 +13,14 @@ Clean Wizard is a **production-ready** system cleanup tool for macOS with 11 spe
 
 ### Key Metrics
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Test Count | 200+ | ✅ All Passing |
-| Build Status | Clean | ✅ No Errors |
-| Code Coverage | ~70% avg | ⚠️ Good, not comprehensive |
-| Cleaners Implemented | 11 | ✅ 9 Functional |
-| CLI Commands | 5 | ✅ All Implemented |
-| Deprecation Warnings | 0 | ✅ Clean Build |
+| Metric               | Value    | Status                     |
+| -------------------- | -------- | -------------------------- |
+| Test Count           | 200+     | ✅ All Passing             |
+| Build Status         | Clean    | ✅ No Errors               |
+| Code Coverage        | ~70% avg | ⚠️ Good, not comprehensive |
+| Cleaners Implemented | 11       | ✅ 9 Functional            |
+| CLI Commands         | 5        | ✅ All Implemented         |
+| Deprecation Warnings | 0        | ✅ Clean Build             |
 
 ---
 
@@ -87,13 +87,13 @@ bd90f69 cleanup(nodepackages): remove obsolete NodePackageManagerType definition
 
 ### Test Coverage by Package
 
-| Package | Coverage | Notes |
-|---------|----------|-------|
-| internal/cleaner | 75% | Core functionality well tested |
-| internal/config | 80% | Validation and loading tested |
-| internal/domain | 85% | Enums and types comprehensive |
-| internal/pkg/errors | 70% | Error handling covered |
-| internal/result | 90% | Result type extensively tested |
+| Package             | Coverage | Notes                          |
+| ------------------- | -------- | ------------------------------ |
+| internal/cleaner    | 75%      | Core functionality well tested |
+| internal/config     | 80%      | Validation and loading tested  |
+| internal/domain     | 85%      | Enums and types comprehensive  |
+| internal/pkg/errors | 70%      | Error handling covered         |
+| internal/result     | 90%      | Result type extensively tested |
 
 ---
 
@@ -101,24 +101,24 @@ bd90f69 cleanup(nodepackages): remove obsolete NodePackageManagerType definition
 
 ### Production Ready ✅ (9/11)
 
-| Cleaner | Status | Dry-Run | Size Report | Notes |
-|---------|--------|---------|-------------|-------|
-| **Nix** | ✅ Ready | 🧪 Estimate | 🧪 Estimate | Core feature, mature |
-| **Homebrew** | ✅ Ready | 🚧 N/A (brew limitation) | 🧪 Estimate | Well-implemented |
-| **Docker** | ✅ Ready | 🧪 Estimate | 🚧 Returns 0 | Recently refactored |
-| **Go** | ✅ Ready | 🧪 Estimate | ⚠️ Partial | Most sophisticated |
-| **Cargo** | ✅ Ready | 🧪 Estimate | 🚧 Broken | Basic implementation |
-| **Node Packages** | ✅ Ready | 🧪 Estimate | 🧪 Estimate | Multi-PM support |
-| **Build Cache** | ✅ Ready | ✅ Working | ✅ Working | Gradle/Maven/SBT |
-| **System Cache** | ✅ Ready | ✅ Working | ✅ Working | macOS only |
-| **Temp Files** | ✅ Ready | ✅ Working | ✅ Working | Robust implementation |
+| Cleaner           | Status   | Dry-Run                  | Size Report  | Notes                 |
+| ----------------- | -------- | ------------------------ | ------------ | --------------------- |
+| **Nix**           | ✅ Ready | 🧪 Estimate              | 🧪 Estimate  | Core feature, mature  |
+| **Homebrew**      | ✅ Ready | 🚧 N/A (brew limitation) | 🧪 Estimate  | Well-implemented      |
+| **Docker**        | ✅ Ready | 🧪 Estimate              | 🚧 Returns 0 | Recently refactored   |
+| **Go**            | ✅ Ready | 🧪 Estimate              | ⚠️ Partial   | Most sophisticated    |
+| **Cargo**         | ✅ Ready | 🧪 Estimate              | 🚧 Broken    | Basic implementation  |
+| **Node Packages** | ✅ Ready | 🧪 Estimate              | 🧪 Estimate  | Multi-PM support      |
+| **Build Cache**   | ✅ Ready | ✅ Working               | ✅ Working   | Gradle/Maven/SBT      |
+| **System Cache**  | ✅ Ready | ✅ Working               | ✅ Working   | macOS only            |
+| **Temp Files**    | ✅ Ready | ✅ Working               | ✅ Working   | Robust implementation |
 
 ### Non-Functional 🚧 (2/11)
 
-| Cleaner | Status | Issue | Priority |
-|---------|--------|-------|----------|
-| **Lang Version Mgr** | 🚧 NO-OP | Scans but never cleans | P1 |
-| **Projects Mgmt** | 🚧 External | Requires separate tool | P3 |
+| Cleaner              | Status      | Issue                  | Priority |
+| -------------------- | ----------- | ---------------------- | -------- |
+| **Lang Version Mgr** | 🚧 NO-OP    | Scans but never cleans | P1       |
+| **Projects Mgmt**    | 🚧 External | Requires separate tool | P3       |
 
 ### Size Reporting Issues
 
@@ -133,13 +133,13 @@ bd90f69 cleanup(nodepackages): remove obsolete NodePackageManagerType definition
 
 ### All Commands Implemented ✅
 
-| Command | Status | Subcommands | Flags |
-|---------|--------|-------------|-------|
-| **clean** | ✅ Full | - | --mode, --dry-run, --json, --verbose |
-| **scan** | ✅ Full | - | --config, --format |
-| **init** | ✅ Full | - | --minimal, --force |
-| **profile** | ✅ Full | list, show, create, delete | --config |
-| **config** | ✅ Full | show, edit, validate, reset | --config, --format |
+| Command     | Status  | Subcommands                 | Flags                                |
+| ----------- | ------- | --------------------------- | ------------------------------------ |
+| **clean**   | ✅ Full | -                           | --mode, --dry-run, --json, --verbose |
+| **scan**    | ✅ Full | -                           | --config, --format                   |
+| **init**    | ✅ Full | -                           | --minimal, --force                   |
+| **profile** | ✅ Full | list, show, create, delete  | --config                             |
+| **config**  | ✅ Full | show, edit, validate, reset | --config, --format                   |
 
 ### Command Details
 
@@ -174,13 +174,13 @@ clean-wizard config --help       # ✅
 
 ### Critical Issues Resolved ✅
 
-| Issue | Status | Resolution |
-|-------|--------|------------|
-| Unsafe exec calls | ✅ Fixed | All commands have timeout protection |
-| Cleaner interface compliance | ✅ Fixed | All 13 cleaners implement interface |
-| CLI command gap | ✅ Fixed | All 5 commands implemented |
-| Deprecation warnings | ✅ Fixed | 49 warnings eliminated |
-| Enum inconsistencies | ✅ Fixed | All migrated to domain enums |
+| Issue                        | Status   | Resolution                           |
+| ---------------------------- | -------- | ------------------------------------ |
+| Unsafe exec calls            | ✅ Fixed | All commands have timeout protection |
+| Cleaner interface compliance | ✅ Fixed | All 13 cleaners implement interface  |
+| CLI command gap              | ✅ Fixed | All 5 commands implemented           |
+| Deprecation warnings         | ✅ Fixed | 49 warnings eliminated               |
+| Enum inconsistencies         | ✅ Fixed | All migrated to domain enums         |
 
 ---
 
@@ -205,11 +205,11 @@ tempfiles: { older_than: 7d }
 
 ### Environment Variables
 
-| Variable | Purpose | Status |
-|----------|---------|--------|
-| CLEAN_WIZARD_CONFIG | Config file path | ✅ Working |
-| CLEAN_WIZARD_DRY_RUN | Default dry-run | ✅ Working |
-| CLEAN_WIZARD_VERBOSE | Default verbose | ✅ Working |
+| Variable             | Purpose          | Status     |
+| -------------------- | ---------------- | ---------- |
+| CLEAN_WIZARD_CONFIG  | Config file path | ✅ Working |
+| CLEAN_WIZARD_DRY_RUN | Default dry-run  | ✅ Working |
+| CLEAN_WIZARD_VERBOSE | Default verbose  | ✅ Working |
 
 ---
 
@@ -217,41 +217,41 @@ tempfiles: { older_than: 7d }
 
 ### Priority 1 - Critical
 
-| Task | Status | Impact | ETA |
-|------|--------|--------|-----|
-| Generic Context System | ✅ Complete | 90% | Done |
-| CleanerRegistry Integration | ✅ Complete | High | Done |
-| Deprecation Fixes | ✅ Complete | Medium | Done |
+| Task                        | Status      | Impact | ETA  |
+| --------------------------- | ----------- | ------ | ---- |
+| Generic Context System      | ✅ Complete | 90%    | Done |
+| CleanerRegistry Integration | ✅ Complete | High   | Done |
+| Deprecation Fixes           | ✅ Complete | Medium | Done |
 
 ### Priority 2 - High
 
-| Task | Status | Impact | ETA |
-|------|--------|--------|-----|
-| Backward Compatibility Aliases | ⏳ Not Started | 70% | - |
-| Domain Model Enhancement | ⏳ Not Started | 50% | - |
-| Generic Validation Interface | ⏳ Not Started | High | - |
-| Config Loading Utility | ⏳ Not Started | High | - |
+| Task                           | Status         | Impact | ETA |
+| ------------------------------ | -------------- | ------ | --- |
+| Backward Compatibility Aliases | ⏳ Not Started | 70%    | -   |
+| Domain Model Enhancement       | ⏳ Not Started | 50%    | -   |
+| Generic Validation Interface   | ⏳ Not Started | High   | -   |
+| Config Loading Utility         | ⏳ Not Started | High   | -   |
 
 ### Priority 3 - Medium
 
-| Task | Status | Impact | ETA |
-|------|--------|--------|-----|
-| String Trimming Utility | ⏳ Not Started | Medium | - |
-| Error Details Utility | ⏳ Not Started | Medium | - |
-| Test Helper Refactoring | ⏳ Not Started | Medium | - |
-| Schema Min/Max Utility | ⏳ Not Started | Low | - |
-| Type Model Improvements | ⏳ Not Started | Medium | - |
-| Result Type Enhancement | ⏳ Not Started | Medium | - |
+| Task                    | Status         | Impact | ETA |
+| ----------------------- | -------------- | ------ | --- |
+| String Trimming Utility | ⏳ Not Started | Medium | -   |
+| Error Details Utility   | ⏳ Not Started | Medium | -   |
+| Test Helper Refactoring | ⏳ Not Started | Medium | -   |
+| Schema Min/Max Utility  | ⏳ Not Started | Low    | -   |
+| Type Model Improvements | ⏳ Not Started | Medium | -   |
+| Result Type Enhancement | ⏳ Not Started | Medium | -   |
 
 ### Priority 4 - New Features
 
-| Task | Status | Impact | Notes |
-|------|--------|--------|-------|
-| **Git History Cleaner** | 📝 Planned | High | PLAN_GIT_HISTORY_CLEANER.md created |
-| Language Version Mgr Fix | ⏳ Not Started | High | Currently NO-OP |
-| Docker Size Reporting | ⏳ Not Started | Medium | Returns 0 |
-| Cargo Size Reporting | ⏳ Not Started | Medium | Not tracked |
-| Linux SystemCache | ⏳ Not Started | Medium | macOS only currently |
+| Task                     | Status         | Impact | Notes                               |
+| ------------------------ | -------------- | ------ | ----------------------------------- |
+| **Git History Cleaner**  | 📝 Planned     | High   | PLAN_GIT_HISTORY_CLEANER.md created |
+| Language Version Mgr Fix | ⏳ Not Started | High   | Currently NO-OP                     |
+| Docker Size Reporting    | ⏳ Not Started | Medium | Returns 0                           |
+| Cargo Size Reporting     | ⏳ Not Started | Medium | Not tracked                         |
+| Linux SystemCache        | ⏳ Not Started | Medium | macOS only currently                |
 
 ---
 
@@ -304,12 +304,12 @@ Binary size:      ~15 MB
 
 ### Runtime Performance
 
-| Operation | Typical Time | Notes |
-|-----------|--------------|-------|
-| Cleaner scan | < 100ms per cleaner | Availability detection |
-| Dry-run analysis | < 500ms | Size calculation |
-| Actual cleanup | 1-30s | Depends on cleaner |
-| TUI rendering | < 50ms | Interactive forms |
+| Operation        | Typical Time        | Notes                  |
+| ---------------- | ------------------- | ---------------------- |
+| Cleaner scan     | < 100ms per cleaner | Availability detection |
+| Dry-run analysis | < 500ms             | Size calculation       |
+| Actual cleanup   | 1-30s               | Depends on cleaner     |
+| TUI rendering    | < 50ms              | Interactive forms      |
 
 ---
 
@@ -317,13 +317,13 @@ Binary size:      ~15 MB
 
 ### Status: SECURE ✅
 
-| Aspect | Status | Notes |
-|--------|--------|-------|
-| Input validation | ✅ | Schema-based validation |
-| Command injection | ✅ | Parameterized commands |
-| Path traversal | ✅ | Path sanitization |
-| Timeout protection | ✅ | All exec calls protected |
-| Secrets handling | ✅ | No secrets in code |
+| Aspect             | Status | Notes                    |
+| ------------------ | ------ | ------------------------ |
+| Input validation   | ✅     | Schema-based validation  |
+| Command injection  | ✅     | Parameterized commands   |
+| Path traversal     | ✅     | Path sanitization        |
+| Timeout protection | ✅     | All exec calls protected |
+| Secrets handling   | ✅     | No secrets in code       |
 
 ### Safety Features
 
@@ -339,22 +339,22 @@ Binary size:      ~15 MB
 
 ### Complete Documentation ✅
 
-| Document | Status | Location |
-|----------|--------|----------|
-| README | ✅ Complete | README.md |
-| Usage Guide | ✅ Complete | USAGE.md |
-| Development | ✅ Complete | DEVELOPMENT.md |
-| Features | ✅ Complete | FEATURES.md |
-| API Docs | ✅ Complete | docs/*.md |
-| Architecture | ✅ Complete | ARCHITECTURAL_ANALYSIS_*.md |
+| Document     | Status      | Location                     |
+| ------------ | ----------- | ---------------------------- |
+| README       | ✅ Complete | README.md                    |
+| Usage Guide  | ✅ Complete | USAGE.md                     |
+| Development  | ✅ Complete | DEVELOPMENT.md               |
+| Features     | ✅ Complete | FEATURES.md                  |
+| API Docs     | ✅ Complete | docs/\*.md                   |
+| Architecture | ✅ Complete | ARCHITECTURAL*ANALYSIS*\*.md |
 
 ### Planning Documents
 
-| Document | Status | Purpose |
-|----------|--------|---------|
-| TODO_LIST | ✅ Current | Aggregated tasks |
-| COMPREHENSIVE_IMPROVEMENT_PLAN | ✅ Current | 7-week roadmap |
-| PLAN_GIT_HISTORY_CLEANER | ✅ New | Feature specification |
+| Document                       | Status     | Purpose               |
+| ------------------------------ | ---------- | --------------------- |
+| TODO_LIST                      | ✅ Current | Aggregated tasks      |
+| COMPREHENSIVE_IMPROVEMENT_PLAN | ✅ Current | 7-week roadmap        |
+| PLAN_GIT_HISTORY_CLEANER       | ✅ New     | Feature specification |
 
 ---
 
@@ -419,6 +419,6 @@ Clean Wizard is in **excellent shape** with:
 
 ---
 
-*Report generated: 2026-02-11 20:00*  
-*Commit: 35ef3ed*  
-*Status: All systems operational*
+_Report generated: 2026-02-11 20:00_  
+_Commit: 35ef3ed_  
+_Status: All systems operational_

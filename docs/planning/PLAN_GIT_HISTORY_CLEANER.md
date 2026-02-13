@@ -11,6 +11,7 @@
 ## Overview
 
 A specialized cleaner that removes accidentally committed binary files from git history. This is a **destructive but valuable** operation for repositories with:
+
 - Compiled binaries (`main`, `app`, `*.exe`)
 - Build artifacts (`*.o`, `*.a`, `dist/`, `bin/`)
 - Large blobs committed by mistake
@@ -18,16 +19,17 @@ A specialized cleaner that removes accidentally committed binary files from git 
 
 ### Why This Matters
 
-| Problem | Impact |
-|---------|--------|
-| Cloned binaries in history | Repo bloat, slow clones |
-| `go build` output committed | Unnecessary conflicts |
-| `vendor/` committed | 100MB+ repo size |
-| CI artifacts in git | Security risk, bloat |
+| Problem                     | Impact                  |
+| --------------------------- | ----------------------- |
+| Cloned binaries in history  | Repo bloat, slow clones |
+| `go build` output committed | Unnecessary conflicts   |
+| `vendor/` committed         | 100MB+ repo size        |
+| CI artifacts in git         | Security risk, bloat    |
 
 ### Safety-First Design
 
 This cleaner is **intentionally cautious**:
+
 1. **Dry-run by default** - Shows what would be removed
 2. **Explicit confirmation** - Must type repository name to confirm
 3. **Backup requirement** - Requires `--force` without backup
@@ -224,21 +226,21 @@ var DefaultBinaryExtensions = []string{
     ".dll",       // Windows libraries
     ".so",        // Linux shared libraries
     ".dylib",     // macOS libraries
-    
+
     // Build artifacts
     ".o",         // Object files
     ".a",         // Static libraries
     ".out",       // Generic output
-    
+
     // Archives
     ".zip", ".tar", ".gz", ".bz2", ".xz", ".7z",
-    
+
     // Media
     ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov",
-    
+
     // Documents
     ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-    
+
     // Other
     ".bin", ".dat", ".db", ".sqlite",
 }
@@ -396,10 +398,10 @@ func (e *Executor) Execute(
 func detectTool() (HistoryRewriteTool, error) {
     // 1. Prefer git-filter-repo (fast, Python-based)
     //    Check: git filter-repo --version
-    
+
     // 2. Fallback to git-filter-branch (slower, built-in)
     //    Check: git filter-branch --help
-    
+
     // 3. Error if neither available
     //    Provide installation instructions
 }
@@ -414,13 +416,13 @@ func buildFilterRepoArgs(files []domain.BinaryFile) []string {
         "--force",  // Required for non-fresh repos
         "--partial", // Allow running on dirty repos
     }
-    
+
     // Add file-specific filters
     for _, file := range files {
         args = append(args, "--path", file.Path)
         args = append(args, "--invert-paths") // Remove, not keep
     }
-    
+
     return args
 }
 
@@ -442,7 +444,7 @@ func buildFilterBranchCommand(files []domain.BinaryFile) string {
     for i, f := range files {
         paths[i] = f.Path
     }
-    
+
     return fmt.Sprintf(
         "git filter-branch --force --index-filter "+
         "'git rm --cached --ignore-unmatch %s' "+
@@ -487,7 +489,7 @@ func (c *GitHistoryCleaner) IsAvailable(ctx context.Context) bool {
     if err != nil {
         return false
     }
-    
+
     // Check if current directory is git repo
     cmd := exec.CommandContext(ctx, "git", "rev-parse", "--git-dir")
     return cmd.Run() == nil
@@ -502,45 +504,45 @@ func (c *GitHistoryCleaner) Clean(
     if err != nil {
         return result.Error[domain.CleanResult](err)
     }
-    
+
     if len(files) == 0 {
         return result.Success(domain.CleanResult{
             Message: "No binary files found in history",
         })
     }
-    
+
     // 2. Analyze impact
     analyzer := githistory.NewAnalyzer(scanner)
     impact, err := analyzer.AnalyzeImpact(ctx, files)
     if err != nil {
         return result.Error[domain.CleanResult](err)
     }
-    
+
     // 3. Safety checks
     safety := githistory.NewSafetyChecker(c.config.RepoPath)
     report, err := safety.PreFlightChecks(ctx)
     if err != nil {
         return result.Error[domain.CleanResult](err)
     }
-    
+
     if len(report.Blockers) > 0 {
         return result.Error[domain.CleanResult](
             fmt.Errorf("safety blockers: %v", report.Blockers),
         )
     }
-    
+
     // 4. If dry-run, return analysis
     if c.dryRun {
         return c.createDryRunResult(files, impact)
     }
-    
+
     // 5. Execute (requires explicit confirmation via TUI)
     executor := githistory.NewExecutor(c.config.RepoPath, c.verbose, c.dryRun)
     result, err := executor.Execute(ctx, executionOptions)
     if err != nil {
         return result.Error[domain.CleanResult](err)
     }
-    
+
     return c.createSuccessResult(result)
 }
 ```
@@ -552,9 +554,9 @@ func (c *GitHistoryCleaner) Clean(
 ```go
 func DefaultRegistry() *Registry {
     registry := NewRegistry()
-    
+
     // ... existing cleaners ...
-    
+
     // Register Git History cleaner
     registry.Register("githistory", NewGitHistoryCleaner(
         domain.GitHistoryCleanerConfig{
@@ -566,7 +568,7 @@ func DefaultRegistry() *Registry {
         false,
         false,
     ))
-    
+
     return registry
 }
 ```
@@ -589,7 +591,7 @@ func NewGitHistoryCommand() *cobra.Command {
         force           bool // Skip backup requirement
         detectBinaries  bool
     )
-    
+
     cmd := &cobra.Command{
         Use:   "git-history [path]",
         Short: "Remove binary files from git history",
@@ -611,25 +613,25 @@ Examples:
 
   # Force execution without backup check
   clean-wizard git-history --force`,
-        
+
         RunE: func(cmd *cobra.Command, args []string) error {
             // Determine repo path
             path := "."
             if len(args) > 0 {
                 path = args[0]
             }
-            
+
             // Run analysis
             return runGitHistoryClean(path, dryRun, verbose, maxSizeMB, force, detectBinaries)
         },
     }
-    
+
     cmd.Flags().BoolVar(&dryRun, "dry-run", true, "Analyze only, don't modify (default)")
     cmd.Flags().BoolVar(&verbose, "verbose", false, "Show detailed output")
     cmd.Flags().IntVar(&maxSizeMB, "max-size", 10, "Target files larger than this (MB)")
     cmd.Flags().BoolVar(&force, "force", false, "Skip backup requirement (dangerous)")
     cmd.Flags().BoolVar(&detectBinaries, "detect-binaries", true, "Use heuristics to detect binaries")
-    
+
     return cmd
 }
 ```
@@ -641,7 +643,7 @@ Examples:
 ```go
 func main() {
     rootCmd := commands.NewRootCommand()
-    
+
     // Add all commands
     rootCmd.AddCommand(commands.NewCleanCommand())
     rootCmd.AddCommand(commands.NewScanCommand())
@@ -649,7 +651,7 @@ func main() {
     rootCmd.AddCommand(commands.NewProfileCommand())
     rootCmd.AddCommand(commands.NewConfigCommand())
     rootCmd.AddCommand(commands.NewGitHistoryCommand()) // NEW
-    
+
     if err := rootCmd.Execute(); err != nil {
         fmt.Fprintln(os.Stderr, err)
         os.Exit(1)
@@ -716,24 +718,24 @@ func TestGitHistory_Integration(t *testing.T) {
     if testing.Short() {
         t.Skip("Skipping integration test")
     }
-    
+
     // Setup: Create temp repo with binaries
     repo := createTestRepoWithBinaries(t)
     defer cleanup(t, repo)
-    
+
     t.Run("dry_run_reports_binaries", func(t *testing.T) {
         cleaner := createTestCleaner(repo, true) // dry-run
         result := cleaner.Clean(context.Background())
-        
+
         require.True(t, result.IsSuccess())
         assert.Greater(t, result.Value.ItemsFound, 0)
         assert.Equal(t, 0, result.Value.ItemsRemoved) // Nothing actually removed
     })
-    
+
     t.Run("actual_clean_removes_binaries", func(t *testing.T) {
         cleaner := createTestCleaner(repo, false)
         result := cleaner.Clean(context.Background())
-        
+
         require.True(t, result.IsSuccess())
         assert.Greater(t, result.Value.ItemsRemoved, 0)
     })
@@ -859,10 +861,10 @@ const (
 var GitHistoryErrorMessages = map[ErrorCode]string{
     ErrGitNotInstalled: "git is not installed or not in PATH",
     ErrNotAGitRepo:     "not a git repository (or any parent)",
-    ErrUncommittedChanges: 
+    ErrUncommittedChanges:
         "You have uncommitted changes. " +
         "Commit or stash them before rewriting history.",
-    ErrNoFilterTool: 
+    ErrNoFilterTool:
         "Neither git-filter-repo nor git-filter-branch is available.\n" +
         "Install git-filter-repo: https://github.com/newren/git-filter-repo",
     ErrHistoryRewriteFailed: "Failed to rewrite history: %v",
@@ -876,25 +878,25 @@ var GitHistoryErrorMessages = map[ErrorCode]string{
 
 ## Success Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Binary Detection Accuracy | >95% | Test repos with known binaries |
-| False Positive Rate | <5% | Manual review of flagged files |
-| Safety Check Coverage | 100% | All blockers must be detected |
-| Execution Time | <30s for 100MB repo | Benchmark tests |
-| Test Coverage | >85% | go test -cover |
+| Metric                    | Target              | Measurement                    |
+| ------------------------- | ------------------- | ------------------------------ |
+| Binary Detection Accuracy | >95%                | Test repos with known binaries |
+| False Positive Rate       | <5%                 | Manual review of flagged files |
+| Safety Check Coverage     | 100%                | All blockers must be detected  |
+| Execution Time            | <30s for 100MB repo | Benchmark tests                |
+| Test Coverage             | >85%                | go test -cover                 |
 
 ---
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Accidental data loss | Low | Critical | Multi-step confirmation, backup requirement |
-| Team disruption | Medium | High | Force-push warnings, coordination instructions |
-| Tool not available | Medium | Medium | Clear error messages, install instructions |
-| Large repo timeout | Medium | Medium | Progress indicators, resumable operations |
-| False positives | Medium | Low | Manual review, exclude patterns |
+| Risk                 | Likelihood | Impact   | Mitigation                                     |
+| -------------------- | ---------- | -------- | ---------------------------------------------- |
+| Accidental data loss | Low        | Critical | Multi-step confirmation, backup requirement    |
+| Team disruption      | Medium     | High     | Force-push warnings, coordination instructions |
+| Tool not available   | Medium     | Medium   | Clear error messages, install instructions     |
+| Large repo timeout   | Medium     | Medium   | Progress indicators, resumable operations      |
+| False positives      | Medium     | Low      | Manual review, exclude patterns                |
 
 ---
 
@@ -904,7 +906,7 @@ var GitHistoryErrorMessages = map[ErrorCode]string{
 
 **File:** `docs/GIT_HISTORY_CLEANER.md`
 
-```markdown
+````markdown
 # Git History Binary Cleaner
 
 ## When to Use This Tool
@@ -930,20 +932,24 @@ Before running:
    ```bash
    clean-wizard git-history --dry-run
    ```
+````
 
 2. **Review findings** - Check the list of files to be removed
 
 3. **Create backup**:
+
    ```bash
    git clone --mirror . ../myrepo-backup.git
    ```
 
 4. **Execute** (requires confirmation):
+
    ```bash
    clean-wizard git-history
    ```
 
 5. **Force push** (if remote exists):
+
    ```bash
    git push --force-with-lease origin main
    ```
@@ -953,7 +959,8 @@ Before running:
    git fetch origin
    git reset --hard origin/main  # Or reclone
    ```
-```
+
+````
 
 ### Implementation Documentation
 
@@ -981,32 +988,32 @@ See PLAN_GIT_HISTORY_CLEANER.md for full specification.
 3. **Detection Strategy**: Extension + Content
    - Extensions catch obvious binaries
    - Content analysis catches extension-less Go binaries
-```
+````
 
 ---
 
 ## Future Enhancements
 
-| Feature | Priority | Description |
-|---------|----------|-------------|
-| BFG Repo-Cleaner support | Medium | Alternative to filter-repo for Java repos |
-| Interactive file selection | Medium | TUI to pick specific files |
-| Incremental cleaning | Low | Clean only recent history |
-| Automatic backup | Low | Built-in backup creation |
-| LFS migration | Low | Convert binaries to Git LFS |
-| GitHub API integration | Low | Handle PRs on rewritten history |
+| Feature                    | Priority | Description                               |
+| -------------------------- | -------- | ----------------------------------------- |
+| BFG Repo-Cleaner support   | Medium   | Alternative to filter-repo for Java repos |
+| Interactive file selection | Medium   | TUI to pick specific files                |
+| Incremental cleaning       | Low      | Clean only recent history                 |
+| Automatic backup           | Low      | Built-in backup creation                  |
+| LFS migration              | Low      | Convert binaries to Git LFS               |
+| GitHub API integration     | Low      | Handle PRs on rewritten history           |
 
 ---
 
 ## Appendix: Comparison with Existing Tools
 
-| Tool | Pros | Cons | Our Approach |
-|------|------|------|--------------|
-| git-filter-repo | Fast, safe, maintained | Requires Python install | Auto-detect, fallback |
-| git-filter-branch | Built-in, no install | Slow, deprecated | Fallback only |
-| BFG Repo-Cleaner | Very fast for large repos | Java dependency | Future addition |
-| Manual rebase | Full control | Tedious, error-prone | Not supported |
+| Tool              | Pros                      | Cons                    | Our Approach          |
+| ----------------- | ------------------------- | ----------------------- | --------------------- |
+| git-filter-repo   | Fast, safe, maintained    | Requires Python install | Auto-detect, fallback |
+| git-filter-branch | Built-in, no install      | Slow, deprecated        | Fallback only         |
+| BFG Repo-Cleaner  | Very fast for large repos | Java dependency         | Future addition       |
+| Manual rebase     | Full control              | Tedious, error-prone    | Not supported         |
 
 ---
 
-*This plan follows the architectural patterns established in clean-wizard, maintaining type safety, comprehensive testing, and safety-first design principles.*
+_This plan follows the architectural patterns established in clean-wizard, maintaining type safety, comprehensive testing, and safety-first design principles._

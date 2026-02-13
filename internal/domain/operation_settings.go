@@ -279,16 +279,16 @@ func (ct CacheType) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for CacheType.
 func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 	return UnmarshalYAMLEnum(value, ct, map[string]CacheType{
-		"SPOTLIGHT":   CacheTypeSpotlight,
-		"XCODE":       CacheTypeXcode,
-		"COCOAPODS":   CacheTypeCocoapods,
-		"HOMEBREW":    CacheTypeHomebrew,
-		"PIP":         CacheTypePip,
-		"NPM":         CacheTypeNpm,
-		"YARN":        CacheTypeYarn,
-		"CCACHE":      CacheTypeCcache,
-		"XDG_CACHE":   CacheTypeXdgCache,
-		"THUMBNAILS":  CacheTypeThumbnails,
+		"SPOTLIGHT":  CacheTypeSpotlight,
+		"XCODE":      CacheTypeXcode,
+		"COCOAPODS":  CacheTypeCocoapods,
+		"HOMEBREW":   CacheTypeHomebrew,
+		"PIP":        CacheTypePip,
+		"NPM":        CacheTypeNpm,
+		"YARN":       CacheTypeYarn,
+		"CCACHE":     CacheTypeCcache,
+		"XDG_CACHE":  CacheTypeXdgCache,
+		"THUMBNAILS": CacheTypeThumbnails,
 	}, "invalid cache type")
 }
 

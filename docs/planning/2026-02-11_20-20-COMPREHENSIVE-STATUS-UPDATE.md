@@ -11,6 +11,7 @@
 ## a) FULLY DONE ✅
 
 ### Critical Infrastructure (Completed)
+
 1. **Type Safety Migration** ✅
    - All enums migrated to domain types
    - 49 deprecation warnings eliminated
@@ -45,19 +46,19 @@
 
 ### Cleaners Status (9/11 Functional)
 
-| Cleaner | Status | Tests | Notes |
-|---------|--------|--------|-------|
-| Nix | ✅ Production Ready | ✅ Passing | Core feature |
-| Homebrew | ✅ Production Ready | ✅ Passing | Well-implemented |
-| Docker | ✅ Production Ready | ✅ Passing | Recently refactored |
-| Go | ✅ Production Ready | ✅ Passing | Most sophisticated |
-| Cargo | ✅ Production Ready | ✅ Passing | Basic |
-| Node Packages | ✅ Production Ready | ✅ Passing | Multi-PM |
-| Build Cache | ✅ Production Ready | ✅ Passing | Gradle/Maven/SBT |
-| System Cache | ✅ Production Ready | ✅ Passing | macOS only |
-| Temp Files | ✅ Production Ready | ✅ Passing | Robust |
-| Lang Version Mgr | 🚧 NO-OP | ✅ Passing | Scans only |
-| Projects Mgmt | 🚧 External | ✅ Passing | Requires tool |
+| Cleaner          | Status              | Tests      | Notes               |
+| ---------------- | ------------------- | ---------- | ------------------- |
+| Nix              | ✅ Production Ready | ✅ Passing | Core feature        |
+| Homebrew         | ✅ Production Ready | ✅ Passing | Well-implemented    |
+| Docker           | ✅ Production Ready | ✅ Passing | Recently refactored |
+| Go               | ✅ Production Ready | ✅ Passing | Most sophisticated  |
+| Cargo            | ✅ Production Ready | ✅ Passing | Basic               |
+| Node Packages    | ✅ Production Ready | ✅ Passing | Multi-PM            |
+| Build Cache      | ✅ Production Ready | ✅ Passing | Gradle/Maven/SBT    |
+| System Cache     | ✅ Production Ready | ✅ Passing | macOS only          |
+| Temp Files       | ✅ Production Ready | ✅ Passing | Robust              |
+| Lang Version Mgr | 🚧 NO-OP            | ✅ Passing | Scans only          |
+| Projects Mgmt    | 🚧 External         | ✅ Passing | Requires tool       |
 
 ### Documentation Completed ✅
 
@@ -74,37 +75,37 @@
 
 ### Size Reporting Issues
 
-| Cleaner | Status | Issue | Impact |
-|---------|--------|-------|--------|
-| Docker | ⚠️ Partial | Returns 0 bytes freed | Medium |
-| Cargo | ⚠️ Partial | Size not tracked | Medium |
-| Nix | ⚠️ Partial | Uses hardcoded 50MB estimate | Low |
-| Go | ⚠️ Partial | Uses hardcoded 200MB estimate | Low |
-| Node Packages | ⚠️ Partial | Uses hardcoded 100MB per PM | Low |
-| Build Cache | ✅ Working | Accurate reporting | N/A |
-| System Cache | ✅ Working | Accurate reporting | N/A |
-| Temp Files | ✅ Working | Accurate reporting | N/A |
+| Cleaner       | Status     | Issue                         | Impact |
+| ------------- | ---------- | ----------------------------- | ------ |
+| Docker        | ⚠️ Partial | Returns 0 bytes freed         | Medium |
+| Cargo         | ⚠️ Partial | Size not tracked              | Medium |
+| Nix           | ⚠️ Partial | Uses hardcoded 50MB estimate  | Low    |
+| Go            | ⚠️ Partial | Uses hardcoded 200MB estimate | Low    |
+| Node Packages | ⚠️ Partial | Uses hardcoded 100MB per PM   | Low    |
+| Build Cache   | ✅ Working | Accurate reporting            | N/A    |
+| System Cache  | ✅ Working | Accurate reporting            | N/A    |
+| Temp Files    | ✅ Working | Accurate reporting            | N/A    |
 
 ### Coverage Statistics
 
-| Package | Coverage | Status |
-|---------|----------|--------|
-| internal/cleaner | 42.7% | ⚠️ Moderate |
-| internal/domain | 30.5% | ⚠️ Needs improvement |
-| internal/config | 36.8% | ⚠️ Needs improvement |
-| internal/pkg/errors | ~70% | ✅ Good |
-| internal/result | 90% | ✅ Excellent |
-| **Average** | **~54%** | ⚠️ Moderate |
+| Package             | Coverage | Status               |
+| ------------------- | -------- | -------------------- |
+| internal/cleaner    | 42.7%    | ⚠️ Moderate          |
+| internal/domain     | 30.5%    | ⚠️ Needs improvement |
+| internal/config     | 36.8%    | ⚠️ Needs improvement |
+| internal/pkg/errors | ~70%     | ✅ Good              |
+| internal/result     | 90%      | ✅ Excellent         |
+| **Average**         | **~54%** | ⚠️ Moderate          |
 
 ### CLI Command Completeness
 
-| Command | Status | Flags | Subcommands |
-|---------|--------|--------|-------------|
-| clean | ✅ Full | 4 | 0 |
-| scan | ✅ Full | 2 | 0 |
-| init | ✅ Full | 2 | 0 |
-| profile | ✅ Full | 1 | 4 |
-| config | ✅ Full | 2 | 4 |
+| Command | Status  | Flags | Subcommands |
+| ------- | ------- | ----- | ----------- |
+| clean   | ✅ Full | 4     | 0           |
+| scan    | ✅ Full | 2     | 0           |
+| init    | ✅ Full | 2     | 0           |
+| profile | ✅ Full | 1     | 4           |
+| config  | ✅ Full | 2     | 4           |
 
 **Completeness:** 100% (all documented commands implemented)
 
@@ -269,6 +270,7 @@
 ### The ONLY Real Issue
 
 **Size Reporting Inaccuracy** - Not "fucked up", just needs improvement
+
 - Most cleaners use hardcoded estimates
 - Docker returns 0 (parsing not implemented)
 - Cargo doesn't track bytes freed
@@ -349,35 +351,36 @@
 
 ## f) Top #25 Things We Should Get Done Next
 
-| Priority | Task | Impact | Effort | ROI Score |
-|----------|-------|--------|---------|-----------|
-| **P1** | **Fix Docker size reporting** | HIGH | 2h | 🔥🔥🔥🔥🔥 |
-| **P1** | **Fix Cargo size reporting** | HIGH | 1h | 🔥🔥🔥🔥 |
-| **P1** | **Add real size calc for Nix** | HIGH | 1h | 🔥🔥🔥🔥 |
-| **P1** | **Add real size calc for Go** | HIGH | 1h | 🔥🔥🔥🔥 |
-| **P1** | **Add real size calc for Node** | HIGH | 1h | 🔥🔥🔥🔥 |
-| **P2** | **Implement Git History Cleaner** | HIGH | 3-4d | 🔥🔥🔥🔥 |
-| **P2** | **Fix Language Version Manager** | MEDIUM | 1-2d | 🔥🔥🔥🔥 |
-| **P2** | **Create Generic Validation Interface** | MEDIUM | 2h | 🔥🔥🔥 |
-| **P2** | **Create Config Loading Utility** | MEDIUM | 1h | 🔥🔥🔥 |
-| **P2** | **Create String Trimming Utility** | MEDIUM | 0.5h | 🔥🔥🔥 |
-| **P3** | **Create Error Details Utility** | MEDIUM | 2h | 🔥🔥 |
-| **P3** | **Refactor Test Helpers** | MEDIUM | 3h | 🔥🔥 |
-| **P3** | **Create Schema Min/Max Utility** | LOW | 1h | 🔥🔥 |
-| **P3** | **Add IsValid() to enums** | LOW | 2h | 🔥🔥 |
-| **P3** | **Add Values() to enums** | LOW | 2h | 🔥🔥 |
-| **P3** | **Improve test coverage to 85%+** | HIGH | 2-3d | 🔥🔥 |
-| **P4** | **Reduce complexity of 21 functions** | MEDIUM | 2-3d | 🔥 |
-| **P4** | **Implement Domain Model behavior** | MEDIUM | 3d | 🔥 |
-| **P4** | **Add dependency injection** | LOW | 2d | 🔥 |
-| **P4** | **Create ARCHITECTURE.md** | LOW | 0.5d | 🔥 |
-| **P4** | **Create ENUM_QUICK_REFERENCE.md** | LOW | 0.5d | 🔥 |
-| **P5** | **Implement unused BuildToolType values** | LOW | 1d | 🔥 |
-| **P5** | **Implement unused CacheType values** | LOW | 1d | 🔥 |
-| **P5** | **Implement unused VersionManagerType values** | LOW | 1d | 🔥 |
-| **P5** | **Add Linux SystemCache support** | LOW | 1-2d | 🔥 |
+| Priority | Task                                           | Impact | Effort | ROI Score  |
+| -------- | ---------------------------------------------- | ------ | ------ | ---------- |
+| **P1**   | **Fix Docker size reporting**                  | HIGH   | 2h     | 🔥🔥🔥🔥🔥 |
+| **P1**   | **Fix Cargo size reporting**                   | HIGH   | 1h     | 🔥🔥🔥🔥   |
+| **P1**   | **Add real size calc for Nix**                 | HIGH   | 1h     | 🔥🔥🔥🔥   |
+| **P1**   | **Add real size calc for Go**                  | HIGH   | 1h     | 🔥🔥🔥🔥   |
+| **P1**   | **Add real size calc for Node**                | HIGH   | 1h     | 🔥🔥🔥🔥   |
+| **P2**   | **Implement Git History Cleaner**              | HIGH   | 3-4d   | 🔥🔥🔥🔥   |
+| **P2**   | **Fix Language Version Manager**               | MEDIUM | 1-2d   | 🔥🔥🔥🔥   |
+| **P2**   | **Create Generic Validation Interface**        | MEDIUM | 2h     | 🔥🔥🔥     |
+| **P2**   | **Create Config Loading Utility**              | MEDIUM | 1h     | 🔥🔥🔥     |
+| **P2**   | **Create String Trimming Utility**             | MEDIUM | 0.5h   | 🔥🔥🔥     |
+| **P3**   | **Create Error Details Utility**               | MEDIUM | 2h     | 🔥🔥       |
+| **P3**   | **Refactor Test Helpers**                      | MEDIUM | 3h     | 🔥🔥       |
+| **P3**   | **Create Schema Min/Max Utility**              | LOW    | 1h     | 🔥🔥       |
+| **P3**   | **Add IsValid() to enums**                     | LOW    | 2h     | 🔥🔥       |
+| **P3**   | **Add Values() to enums**                      | LOW    | 2h     | 🔥🔥       |
+| **P3**   | **Improve test coverage to 85%+**              | HIGH   | 2-3d   | 🔥🔥       |
+| **P4**   | **Reduce complexity of 21 functions**          | MEDIUM | 2-3d   | 🔥         |
+| **P4**   | **Implement Domain Model behavior**            | MEDIUM | 3d     | 🔥         |
+| **P4**   | **Add dependency injection**                   | LOW    | 2d     | 🔥         |
+| **P4**   | **Create ARCHITECTURE.md**                     | LOW    | 0.5d   | 🔥         |
+| **P4**   | **Create ENUM_QUICK_REFERENCE.md**             | LOW    | 0.5d   | 🔥         |
+| **P5**   | **Implement unused BuildToolType values**      | LOW    | 1d     | 🔥         |
+| **P5**   | **Implement unused CacheType values**          | LOW    | 1d     | 🔥         |
+| **P5**   | **Implement unused VersionManagerType values** | LOW    | 1d     | 🔥         |
+| **P5**   | **Add Linux SystemCache support**              | LOW    | 1-2d   | 🔥         |
 
 **ROI Score Legend:**
+
 - 🔥🔥🔥🔥🔥 = IMMEDIATE (do today)
 - 🔥🔥🔥🔥 = HIGH (do this week)
 - 🔥🔥🔥 = MEDIUM (do this month)
@@ -399,12 +402,12 @@
 I see THREE competing strategic directions:
 
 ### Option A: Feature Expansion (Git History Cleaner)
+
 - **Pros:**
   - Addresses a REAL pain point for Go developers
   - High customer value (reduces repo bloat)
   - Differentiates clean-wizard from other tools
   - Plan is already complete (3-4 day implementation)
-  
 - **Cons:**
   - New code to maintain
   - Increases complexity
@@ -412,24 +415,24 @@ I see THREE competing strategic directions:
   - Not core to "system cleanup" mission
 
 ### Option B: Technical Debt Reduction (Size Reporting + Duplication)
+
 - **Pros:**
   - Improves existing functionality
   - Increases user trust (accurate dry-run)
   - Reduces maintenance burden (less duplication)
   - Foundation for future work
-  
 - **Cons:**
   - No new features
   - Invisible to users (better internals only)
   - Less exciting/marketable
 
 ### Option C: Coverage & Quality (85% coverage + complexity reduction)
+
 - **Pros:**
   - Long-term stability
   - Confidence in changes
   - Professional codebase
   - Easier onboarding
-  
 - **Cons:**
   - Pure engineering work
   - No immediate user value
@@ -490,6 +493,7 @@ I see THREE competing strategic directions:
 Tell me: A, B, or C (or D: something else entirely)
 
 Once you decide, I will:
+
 1. Create comprehensive execution plan (27 tasks of 30-60min each)
 2. Break down further into 150 tasks of 15min each
 3. Execute everything with proper commits and pushes

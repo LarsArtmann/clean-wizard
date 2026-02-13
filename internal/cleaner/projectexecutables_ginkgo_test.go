@@ -12,7 +12,7 @@ import (
 	"github.com/onsi/gomega"
 )
 
-// mockProjectLister implements ProjectLister for testing
+// mockProjectLister implements ProjectLister for testing.
 type mockProjectLister struct {
 	projects []ProjectInfo
 	err      error
@@ -22,14 +22,14 @@ func (m *mockProjectLister) ListProjects(ctx context.Context) ([]ProjectInfo, er
 	return m.projects, m.err
 }
 
-// mockFileOperator implements FileOperator for testing
+// mockFileOperator implements FileOperator for testing.
 type mockFileOperator struct {
-	executables     []string
-	executablesErr  error
-	trashErr        error
-	fileSizes       map[string]int64
-	trashedFiles    []string
-	trashCallCount  int
+	executables    []string
+	executablesErr error
+	trashErr       error
+	fileSizes      map[string]int64
+	trashedFiles   []string
+	trashCallCount int
 	// perDirExecutables allows specifying different executables per directory
 	perDirExecutables map[string][]string
 }
@@ -66,14 +66,12 @@ func (m *mockFileOperator) GetFileSize(path string) int64 {
 	return 0
 }
 
-
-
 var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 	var (
-		ctx             context.Context
-		mockLister      *mockProjectLister
-		mockOperator    *mockFileOperator
-		cleaner         *ProjectExecutablesCleaner
+		ctx          context.Context
+		mockLister   *mockProjectLister
+		mockOperator *mockFileOperator
+		cleaner      *ProjectExecutablesCleaner
 	)
 
 	ginkgo.BeforeEach(func() {
@@ -214,7 +212,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		ginkgo.Context("with nil settings", func() {
 			ginkgo.It("should return nil for nil settings", func() {
 				err := cleaner.ValidateSettings(nil)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 		})
 
@@ -222,7 +220,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			ginkgo.It("should return nil when ProjectExecutables is nil", func() {
 				settings := &domain.OperationSettings{}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 		})
 
@@ -232,7 +230,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					ProjectExecutables: &domain.ProjectExecutablesSettings{},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid exclude extensions", func() {
@@ -242,7 +240,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid exclude patterns", func() {
@@ -252,7 +250,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid combined settings", func() {
@@ -263,7 +261,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 		})
 
@@ -275,7 +273,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).NotTo(gomega.BeNil())
+				gomega.Expect(err).To(gomega.HaveOccurred())
 				gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid exclude pattern"))
 			})
 
@@ -286,7 +284,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).NotTo(gomega.BeNil())
+				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
 		})
 	})
@@ -721,7 +719,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 // ============================================================================
 // INTEGRATION TESTS (requires tools installed)
-// ============================================================================
+// ============================================================================.
 var _ = ginkgo.Describe("ProjectExecutablesCleaner Integration", func() {
 	ginkgo.It("should work with default implementations", func() {
 		cleaner := NewProjectExecutablesCleaner(false, false, nil, nil)
@@ -749,16 +747,16 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner Integration", func() {
 
 		// Create temp directory with executable
 		tmpDir, err := os.MkdirTemp("", "cleaner-test-*")
-		gomega.Expect(err).To(gomega.BeNil())
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
 		defer os.RemoveAll(tmpDir)
 
 		execFile := filepath.Join(tmpDir, "test-executable")
-		err = os.WriteFile(execFile, []byte("#!/bin/sh\necho test"), 0755)
-		gomega.Expect(err).To(gomega.BeNil())
+		err = os.WriteFile(execFile, []byte("#!/bin/sh\necho test"), 0o755)
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
 
 		// Verify file was created as executable
 		info, err := os.Stat(execFile)
-		gomega.Expect(err).To(gomega.BeNil())
-		gomega.Expect(info.Mode()&0111).NotTo(gomega.Equal(os.FileMode(0)))
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
+		gomega.Expect(info.Mode() & 0o111).NotTo(gomega.Equal(os.FileMode(0)))
 	})
 })

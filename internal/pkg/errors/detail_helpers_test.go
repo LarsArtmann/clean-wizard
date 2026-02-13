@@ -426,7 +426,8 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 	t.Run("config load error", func(t *testing.T) {
 		err := ConfigLoadError("failed to read config file")
 
-		cleanErr, ok := err.(*CleanWizardError)
+		cleanErr := &CleanWizardError{}
+		ok := errors.As(err, &cleanErr)
 		if !ok {
 			t.Fatal("Expected *CleanWizardError")
 		}
@@ -443,7 +444,8 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 	t.Run("config save error", func(t *testing.T) {
 		err := ConfigSaveError("failed to write config")
 
-		cleanErr, ok := err.(*CleanWizardError)
+		cleanErr := &CleanWizardError{}
+		ok := errors.As(err, &cleanErr)
 		if !ok {
 			t.Fatal("Expected *CleanWizardError")
 		}
@@ -460,7 +462,8 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 	t.Run("config validation error", func(t *testing.T) {
 		err := ConfigValidateError("invalid profile name")
 
-		cleanErr, ok := err.(*CleanWizardError)
+		cleanErr := &CleanWizardError{}
+		ok := errors.As(err, &cleanErr)
 		if !ok {
 			t.Fatal("Expected *CleanWizardError")
 		}
@@ -477,7 +480,8 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 	t.Run("nix command error", func(t *testing.T) {
 		err := NixCommandError("nix-env failed")
 
-		cleanErr, ok := err.(*CleanWizardError)
+		cleanErr := &CleanWizardError{}
+		ok := errors.As(err, &cleanErr)
 		if !ok {
 			t.Fatal("Expected *CleanWizardError")
 		}
@@ -494,7 +498,8 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 	t.Run("cleaning error", func(t *testing.T) {
 		err := CleaningError("failed to clean cache")
 
-		cleanErr, ok := err.(*CleanWizardError)
+		cleanErr := &CleanWizardError{}
+		ok := errors.As(err, &cleanErr)
 		if !ok {
 			t.Fatal("Expected *CleanWizardError")
 		}

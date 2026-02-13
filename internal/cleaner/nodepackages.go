@@ -234,7 +234,7 @@ func (npmc *NodePackageManagerCleaner) getNpmCacheDir(ctx context.Context) (stri
 
 	cachePath := strings.TrimSpace(string(output))
 	if cachePath == "" {
-		return "", fmt.Errorf("npm cache path is empty")
+		return "", errors.New("npm cache path is empty")
 	}
 
 	return cachePath, nil
@@ -250,7 +250,7 @@ func (npmc *NodePackageManagerCleaner) getPnpmStoreDir(ctx context.Context) (str
 
 	storePath := strings.TrimSpace(string(output))
 	if storePath == "" {
-		return "", fmt.Errorf("pnpm store path is empty")
+		return "", errors.New("pnpm store path is empty")
 	}
 
 	return storePath, nil
@@ -263,7 +263,7 @@ func (npmc *NodePackageManagerCleaner) getYarnCacheDir() (string, error) {
 		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	return fmt.Sprintf("%s/.yarn/cache", homeDir), nil
+	return homeDir + "/.yarn/cache", nil
 }
 
 // getBunCacheDir returns the bun cache directory path.
@@ -273,7 +273,7 @@ func (npmc *NodePackageManagerCleaner) getBunCacheDir() (string, error) {
 		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	return fmt.Sprintf("%s/.bun/install/cache", homeDir), nil
+	return homeDir + "/.bun/install/cache", nil
 }
 
 // Clean removes Node.js package manager caches.

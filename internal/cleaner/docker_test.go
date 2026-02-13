@@ -276,7 +276,7 @@ func TestDockerCleaner_Clean_Aggressive(t *testing.T) {
 	}
 }
 
-// TestParseDockerReclaimedSpace tests parsing of docker prune output
+// TestParseDockerReclaimedSpace tests parsing of docker prune output.
 func TestParseDockerReclaimedSpace(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -285,26 +285,26 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name: "valid kB output",
-			output: "Deleted Containers:\nabc123\ndef456\n\nDeleted Images:\nsha256:123\n\nTotal reclaimed space: 1.84kB",
+			name:     "valid kB output",
+			output:   "Deleted Containers:\nabc123\ndef456\n\nDeleted Images:\nsha256:123\n\nTotal reclaimed space: 1.84kB",
 			expected: int64(1884),
 			wantErr:  false,
 		},
 		{
-			name: "valid MB output",
-			output: "Deleted Containers:\nabc123\n\nTotal reclaimed space: 13.5 MB",
+			name:     "valid MB output",
+			output:   "Deleted Containers:\nabc123\n\nTotal reclaimed space: 13.5 MB",
 			expected: int64(13.5 * 1024 * 1024),
 			wantErr:  false,
 		},
 		{
-			name: "valid GB output",
-			output: "Deleted Images:\nsha256:123\n\nTotal reclaimed space: 2.5GB",
+			name:     "valid GB output",
+			output:   "Deleted Images:\nsha256:123\n\nTotal reclaimed space: 2.5GB",
 			expected: int64(2.5 * 1024 * 1024 * 1024),
 			wantErr:  false,
 		},
 		{
-			name: "zero bytes output",
-			output: "Total reclaimed space: 0B",
+			name:     "zero bytes output",
+			output:   "Total reclaimed space: 0B",
 			expected: 0,
 			wantErr:  false,
 		},
@@ -315,14 +315,14 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "valid TB output",
-			output: "Deleted Volumes:\nvol1\n\nTotal reclaimed space: 1.2TB",
+			name:     "valid TB output",
+			output:   "Deleted Volumes:\nvol1\n\nTotal reclaimed space: 1.2TB",
 			expected: int64(1319413953331),
 			wantErr:  false,
 		},
 		{
-			name: "valid B output",
-			output: "Total reclaimed space: 512B",
+			name:     "valid B output",
+			output:   "Total reclaimed space: 512B",
 			expected: 512,
 			wantErr:  false,
 		},
@@ -342,7 +342,7 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 	}
 }
 
-// TestParseDockerSize tests conversion of Docker size strings to bytes
+// TestParseDockerSize tests conversion of Docker size strings to bytes.
 func TestParseDockerSize(t *testing.T) {
 	tests := []struct {
 		name     string

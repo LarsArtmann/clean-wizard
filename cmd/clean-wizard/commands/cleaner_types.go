@@ -28,16 +28,16 @@ const (
 
 // registryNameToCleanerType maps registry cleaner names to CleanerType.
 var registryNameToCleanerType = map[string]CleanerType{
-	"nix":              CleanerTypeNix,
-	"homebrew":         CleanerTypeHomebrew,
-	"tempfiles":        CleanerTypeTempFiles,
-	"node":             CleanerTypeNodePackages,
-	"go":               CleanerTypeGoPackages,
-	"cargo":            CleanerTypeCargoPackages,
-	"buildcache":       CleanerTypeBuildCache,
-	"docker":           CleanerTypeDocker,
-	"systemcache":      CleanerTypeSystemCache,
-	"langversion":      CleanerTypeLangVersionMgr,
-	"projects":         CleanerTypeProjectsManagementAutomation,
+	"nix":               CleanerTypeNix,
+	"homebrew":          CleanerTypeHomebrew,
+	"tempfiles":         CleanerTypeTempFiles,
+	"node":              CleanerTypeNodePackages,
+	"go":                CleanerTypeGoPackages,
+	"cargo":             CleanerTypeCargoPackages,
+	"buildcache":        CleanerTypeBuildCache,
+	"docker":            CleanerTypeDocker,
+	"systemcache":       CleanerTypeSystemCache,
+	"langversion":       CleanerTypeLangVersionMgr,
+	"projects":          CleanerTypeProjectsManagementAutomation,
 	"compiled-binaries": CleanerTypeCompiledBinaries,
 }

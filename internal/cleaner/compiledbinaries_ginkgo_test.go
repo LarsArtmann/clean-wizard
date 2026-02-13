@@ -12,7 +12,7 @@ import (
 	"github.com/onsi/gomega"
 )
 
-// mockBinaryScanner implements BinaryScanner for testing
+// mockBinaryScanner implements BinaryScanner for testing.
 type mockBinaryScanner struct {
 	binaries    []BinaryInfo
 	scanErr     error
@@ -24,7 +24,7 @@ func (m *mockBinaryScanner) ScanDirectory(ctx context.Context, dir string, categ
 	return m.binaries, m.scanErr
 }
 
-// mockBinaryTrashOperator implements BinaryTrashOperator for testing
+// mockBinaryTrashOperator implements BinaryTrashOperator for testing.
 type mockBinaryTrashOperator struct {
 	trashErr       error
 	trashedFiles   []string
@@ -55,15 +55,13 @@ func (m *mockBinaryTrashOperator) GetFileModTime(path string) (time.Time, error)
 	return time.Time{}, errors.New("file not found")
 }
 
-
-
 var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 	var (
-		ctx           context.Context
-		mockScanner   *mockBinaryScanner
-		mockOperator  *mockBinaryTrashOperator
-		cleaner       *CompiledBinariesCleaner
-		tempDir       string
+		ctx          context.Context
+		mockScanner  *mockBinaryScanner
+		mockOperator *mockBinaryTrashOperator
+		cleaner      *CompiledBinariesCleaner
+		tempDir      string
 	)
 
 	ginkgo.BeforeEach(func() {
@@ -249,7 +247,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		ginkgo.Context("with nil settings", func() {
 			ginkgo.It("should return nil for nil settings", func() {
 				err := cleaner.ValidateSettings(nil)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 		})
 
@@ -257,7 +255,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			ginkgo.It("should return nil when CompiledBinaries is nil", func() {
 				settings := &domain.OperationSettings{}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 		})
 
@@ -267,7 +265,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					CompiledBinaries: &domain.CompiledBinariesSettings{},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid min_size_mb", func() {
@@ -277,7 +275,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid older_than with days", func() {
@@ -287,7 +285,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid older_than with hours", func() {
@@ -297,7 +295,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid exclude patterns", func() {
@@ -307,7 +305,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid include categories", func() {
@@ -317,7 +315,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid combined settings", func() {
@@ -331,7 +329,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			})
 		})
 
@@ -343,7 +341,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).NotTo(gomega.BeNil())
+				gomega.Expect(err).To(gomega.HaveOccurred())
 				gomega.Expect(err.Error()).To(gomega.ContainSubstring("min_size_mb must be >= 0"))
 			})
 
@@ -354,7 +352,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).NotTo(gomega.BeNil())
+				gomega.Expect(err).To(gomega.HaveOccurred())
 				gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid older_than format"))
 			})
 
@@ -365,7 +363,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).NotTo(gomega.BeNil())
+				gomega.Expect(err).To(gomega.HaveOccurred())
 				gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid exclude pattern"))
 			})
 
@@ -376,7 +374,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).NotTo(gomega.BeNil())
+				gomega.Expect(err).To(gomega.HaveOccurred())
 				gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid include category"))
 			})
 		})
@@ -626,59 +624,59 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 	ginkgo.Describe("parseAgeDuration", func() {
 		ginkgo.It("should parse days correctly", func() {
 			d, err := parseAgeDuration("7d")
-			gomega.Expect(err).To(gomega.BeNil())
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			gomega.Expect(d).To(gomega.Equal(7 * 24 * time.Hour))
 		})
 
 		ginkgo.It("should parse hours correctly", func() {
 			d, err := parseAgeDuration("24h")
-			gomega.Expect(err).To(gomega.BeNil())
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			gomega.Expect(d).To(gomega.Equal(24 * time.Hour))
 		})
 
 		ginkgo.It("should parse weeks correctly", func() {
 			d, err := parseAgeDuration("2w")
-			gomega.Expect(err).To(gomega.BeNil())
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			gomega.Expect(d).To(gomega.Equal(14 * 24 * time.Hour))
 		})
 
 		ginkgo.It("should parse months correctly", func() {
 			d, err := parseAgeDuration("1m")
-			gomega.Expect(err).To(gomega.BeNil())
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			gomega.Expect(d).To(gomega.Equal(30 * 24 * time.Hour))
 		})
 
 		ginkgo.It("should parse years correctly", func() {
 			d, err := parseAgeDuration("1y")
-			gomega.Expect(err).To(gomega.BeNil())
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
 			gomega.Expect(d).To(gomega.Equal(365 * 24 * time.Hour))
 		})
 
 		ginkgo.It("should return error for invalid format", func() {
 			_, err := parseAgeDuration("invalid")
-			gomega.Expect(err).NotTo(gomega.BeNil())
+			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 
 		ginkgo.It("should return error for too short format", func() {
 			_, err := parseAgeDuration("d")
-			gomega.Expect(err).NotTo(gomega.BeNil())
+			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 
 		ginkgo.It("should return error for unknown unit", func() {
 			_, err := parseAgeDuration("7x")
-			gomega.Expect(err).NotTo(gomega.BeNil())
+			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 	})
 })
 
 // ============================================================================
 // DEFAULT SCANNER TESTS
-// ============================================================================
+// ============================================================================.
 var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 	var (
-		scanner     *defaultBinaryScanner
-		tempDir     string
-		ctx         context.Context
+		scanner *defaultBinaryScanner
+		tempDir string
+		ctx     context.Context
 	)
 
 	ginkgo.BeforeEach(func() {
@@ -699,56 +697,56 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 		ginkgo.Context("categorization", func() {
 			ginkgo.It("should categorize *.test files as CategoryTest", func() {
 				testFile := filepath.Join(tempDir, "app.test")
-				_ = os.WriteFile(testFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(testFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryTest}, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 				gomega.Expect(binaries[0].Category).To(gomega.Equal(CategoryTest))
 			})
 
 			ginkgo.It("should categorize tmp/* files as CategoryTmp", func() {
 				tmpDir := filepath.Join(tempDir, "tmp")
-				_ = os.MkdirAll(tmpDir, 0755)
+				_ = os.MkdirAll(tmpDir, 0o755)
 				binaryFile := filepath.Join(tmpDir, "build-output")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryTmp}, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 				gomega.Expect(binaries[0].Category).To(gomega.Equal(CategoryTmp))
 			})
 
 			ginkgo.It("should categorize bin/* files as CategoryBin", func() {
 				binDir := filepath.Join(tempDir, "bin")
-				_ = os.MkdirAll(binDir, 0755)
+				_ = os.MkdirAll(binDir, 0o755)
 				binaryFile := filepath.Join(binDir, "myapp")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryBin}, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 				gomega.Expect(binaries[0].Category).To(gomega.Equal(CategoryBin))
 			})
 
 			ginkgo.It("should categorize dist/* files as CategoryDist", func() {
 				distDir := filepath.Join(tempDir, "dist")
-				_ = os.MkdirAll(distDir, 0755)
+				_ = os.MkdirAll(distDir, 0o755)
 				binaryFile := filepath.Join(distDir, "release-binary")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryDist}, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 				gomega.Expect(binaries[0].Category).To(gomega.Equal(CategoryDist))
 			})
 
 			ginkgo.It("should categorize root executables as CategoryRoot", func() {
 				binaryFile := filepath.Join(tempDir, "myapp")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryRoot}, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 				gomega.Expect(binaries[0].Category).To(gomega.Equal(CategoryRoot))
 			})
@@ -757,19 +755,19 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 		ginkgo.Context("size filtering", func() {
 			ginkgo.It("should skip files below minimum size", func() {
 				smallFile := filepath.Join(tempDir, "small.test")
-				_ = os.WriteFile(smallFile, make([]byte, 5*1024*1024), 0755)
+				_ = os.WriteFile(smallFile, make([]byte, 5*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryTest}, 10*1024*1024)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
 
 			ginkgo.It("should include files at or above minimum size", func() {
 				largeFile := filepath.Join(tempDir, "large.test")
-				_ = os.WriteFile(largeFile, make([]byte, 15*1024*1024), 0755)
+				_ = os.WriteFile(largeFile, make([]byte, 15*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryTest}, 10*1024*1024)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 			})
 		})
@@ -777,45 +775,45 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 		ginkgo.Context("directory exclusion", func() {
 			ginkgo.It("should skip node_modules directory", func() {
 				nodeModulesDir := filepath.Join(tempDir, "node_modules", ".bin")
-				_ = os.MkdirAll(nodeModulesDir, 0755)
+				_ = os.MkdirAll(nodeModulesDir, 0o755)
 				binaryFile := filepath.Join(nodeModulesDir, "tool")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, scanner.includeCategories, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
 
 			ginkgo.It("should skip venv directory", func() {
 				venvDir := filepath.Join(tempDir, "venv", "bin")
-				_ = os.MkdirAll(venvDir, 0755)
+				_ = os.MkdirAll(venvDir, 0o755)
 				binaryFile := filepath.Join(venvDir, "python")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, scanner.includeCategories, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
 
 			ginkgo.It("should skip .terraform directory", func() {
 				terraformDir := filepath.Join(tempDir, ".terraform", "providers")
-				_ = os.MkdirAll(terraformDir, 0755)
+				_ = os.MkdirAll(terraformDir, 0o755)
 				binaryFile := filepath.Join(terraformDir, "provider")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, scanner.includeCategories, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
 
 			ginkgo.It("should skip .git directory", func() {
 				gitDir := filepath.Join(tempDir, ".git", "objects")
-				_ = os.MkdirAll(gitDir, 0755)
+				_ = os.MkdirAll(gitDir, 0o755)
 				binaryFile := filepath.Join(gitDir, "some-file")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, scanner.includeCategories, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
 		})
@@ -823,19 +821,19 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 		ginkgo.Context("binary exclusion", func() {
 			ginkgo.It("should skip chromedriver", func() {
 				chromedriver := filepath.Join(tempDir, "chromedriver")
-				_ = os.WriteFile(chromedriver, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(chromedriver, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, scanner.includeCategories, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
 
 			ginkgo.It("should skip geckodriver", func() {
 				geckodriver := filepath.Join(tempDir, "geckodriver")
-				_ = os.WriteFile(geckodriver, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(geckodriver, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, scanner.includeCategories, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
 		})
@@ -843,19 +841,19 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 		ginkgo.Context("executable check", func() {
 			ginkgo.It("should skip non-executable files", func() {
 				nonExecFile := filepath.Join(tempDir, "data.txt")
-				_ = os.WriteFile(nonExecFile, make([]byte, 20*1024*1024), 0644)
+				_ = os.WriteFile(nonExecFile, make([]byte, 20*1024*1024), 0o644)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, scanner.includeCategories, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
 
 			ginkgo.It("should include executable files", func() {
 				execFile := filepath.Join(tempDir, "myapp")
-				_ = os.WriteFile(execFile, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(execFile, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryRoot}, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 			})
 		})
@@ -865,11 +863,11 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 				scanner.excludePatterns = []string{"*.safe"}
 				binary1 := filepath.Join(tempDir, "myapp")
 				binary2 := filepath.Join(tempDir, "important.safe")
-				_ = os.WriteFile(binary1, make([]byte, 20*1024*1024), 0755)
-				_ = os.WriteFile(binary2, make([]byte, 20*1024*1024), 0755)
+				_ = os.WriteFile(binary1, make([]byte, 20*1024*1024), 0o755)
+				_ = os.WriteFile(binary2, make([]byte, 20*1024*1024), 0o755)
 
 				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryRoot}, 0)
-				gomega.Expect(err).To(gomega.BeNil())
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 				gomega.Expect(binaries[0].Path).To(gomega.Equal(binary1))
 			})
@@ -879,7 +877,7 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 
 // ============================================================================
 // INTEGRATION TESTS
-// ============================================================================
+// ============================================================================.
 var _ = ginkgo.Describe("CompiledBinariesCleaner Integration", func() {
 	ginkgo.It("should work with default implementations", func() {
 		cleaner := NewCompiledBinariesCleaner(false, false, 10, "", nil, nil)
@@ -904,15 +902,15 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner Integration", func() {
 		}
 
 		tmpDir, err := os.MkdirTemp("", "integration-test-*")
-		gomega.Expect(err).To(gomega.BeNil())
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
 		defer os.RemoveAll(tmpDir)
 
 		execFile := filepath.Join(tmpDir, "test-binary")
-		err = os.WriteFile(execFile, make([]byte, 15*1024*1024), 0755)
-		gomega.Expect(err).To(gomega.BeNil())
+		err = os.WriteFile(execFile, make([]byte, 15*1024*1024), 0o755)
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
 
 		info, err := os.Stat(execFile)
-		gomega.Expect(err).To(gomega.BeNil())
-		gomega.Expect(info.Mode()&0111).NotTo(gomega.Equal(os.FileMode(0)))
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
+		gomega.Expect(info.Mode() & 0o111).NotTo(gomega.Equal(os.FileMode(0)))
 	})
 })

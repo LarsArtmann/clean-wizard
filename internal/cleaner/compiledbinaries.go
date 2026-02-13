@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -26,11 +27,11 @@ const (
 type BinaryCategory string
 
 const (
-	CategoryTmp   BinaryCategory = "tmp"
-	CategoryTest  BinaryCategory = "test"
-	CategoryBin   BinaryCategory = "bin"
-	CategoryDist  BinaryCategory = "dist"
-	CategoryRoot  BinaryCategory = "root"
+	CategoryTmp  BinaryCategory = "tmp"
+	CategoryTest BinaryCategory = "test"
+	CategoryBin  BinaryCategory = "bin"
+	CategoryDist BinaryCategory = "dist"
+	CategoryRoot BinaryCategory = "root"
 )
 
 // DefaultExcludeDirectories are directories that should never be scanned.
@@ -440,7 +441,7 @@ func (s *defaultBinaryScanner) ScanDirectory(ctx context.Context, dir string, ca
 		}
 
 		// Check if it's an executable
-		if info.Mode()&0111 == 0 {
+		if info.Mode()&0o111 == 0 {
 			return nil
 		}
 
@@ -480,13 +481,11 @@ func (s *defaultBinaryScanner) shouldSkipDirectory(path string) bool {
 	base := filepath.Base(path)
 
 	// Skip excluded directories
-	for _, exclude := range DefaultExcludeDirectories {
-		if base == exclude {
-			if s.verbose {
-				fmt.Printf("Skipping excluded directory: %s\n", path)
-			}
-			return true
+	if slices.Contains(DefaultExcludeDirectories, base) {
+		if s.verbose {
+			fmt.Printf("Skipping excluded directory: %s\n", path)
 		}
+		return true
 	}
 
 	return false

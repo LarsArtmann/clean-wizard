@@ -25,6 +25,7 @@ Conducted comprehensive risk analysis for Language Version Manager cleaner imple
 **Question:** Should we implement actual Language Version Manager cleaning functionality?
 
 **Context:**
+
 - **File:** `internal/cleaner/languages.go`
 - **Current State:** NO-OP (returns success with 0 items, 0 bytes)
 - **User Impact:** Feature appears to work but provides no value
@@ -42,6 +43,7 @@ Conducted comprehensive risk analysis for Language Version Manager cleaner imple
 This is NOT like deleting cache files.
 
 #### Cache Deletion (Safe) ✅
+
 ```
 Delete: ~/.npm/_cacache
 Impact: npm just re-downloads packages
@@ -51,6 +53,7 @@ User Acceptance: High (expected behavior)
 ```
 
 #### Version Deletion (DANGEROUS) ⚠️
+
 ```
 Delete: ~/.nvm/versions/v16.20.0
 Impact: User's Node.js v16 projects BREAK
@@ -68,6 +71,7 @@ User Acceptance: LOW (unexpected, destructive)
 #### 1. Breaking User's Projects 🔴 CRITICAL
 
 **Scenario:**
+
 ```
 User's Environment:
   - project-a/ → uses Node.js v20.11.0 (current)
@@ -106,6 +110,7 @@ Next Day:
 **The Problem:** We have ZERO visibility into version usage
 
 **What We CAN Detect:**
+
 ```bash
 $ ls ~/.nvm/versions/
 v20.11.0
@@ -121,6 +126,7 @@ Modify: 2024-08-15 (created 180 days ago)
 ```
 
 **What We CANNOT Detect:**
+
 - Which version is `project-b/` currently using?
 - Which version is `~/legacy-app/` requiring?
 - Which version is user actively developing with?
@@ -135,6 +141,7 @@ Modify: 2024-08-15 (created 180 days ago)
 How do we define "old version to delete"?
 
 ##### Option A: Age-Based (>X days old)
+
 ```go
 const OldVersionThreshold = 180 * time.Day // 6 months
 
@@ -144,12 +151,14 @@ if time.Since(version.CreatedAt) > OldVersionThreshold {
 ```
 
 **Problems:**
+
 - Legacy projects NEED old versions
 - Node.js v14 is old but required for many existing projects
 - Python 3.8 is old but critical for ML/TensorFlow libraries
 - **Age ≠ Unused**
 
 ##### Option B: Count-Based (Keep latest N)
+
 ```go
 const KeepLatestVersions = 3
 
@@ -159,12 +168,14 @@ if version.Rank > KeepLatestVersions {
 ```
 
 **Problems:**
+
 - User might need 4+ versions for different project requirements
 - Removes v16 even if actively used in project-b
 - Arbitrary threshold (why 3? why not 2 or 5?)
 - Doesn't account for version compatibility requirements
 
 ##### Option C: Usage-Based (Track execution)
+
 ```go
 // Requires background daemon to track:
 //   - nvm use <version>
@@ -177,12 +188,14 @@ if time.Since(version.LastUsed) > 180*time.Day {
 ```
 
 **Problems:**
+
 - Requires background daemon (privacy concern)
 - Hard to implement correctly
 - Still doesn't know about projects on other drives
 - Overkill for a "cache cleaner"
 
 ##### Option D: Manual Selection (User chooses)
+
 ```
 Found 7 Node.js versions:
   [✓] v20.11.0 (current)
@@ -197,6 +210,7 @@ Delete 4 versions? [y/N]
 ```
 
 **Problems:**
+
 - Adds friction and cognitive load
 - User has to know which versions to keep
 - Still destructive if user makes mistake
@@ -209,6 +223,7 @@ Delete 4 versions? [y/N]
 **Scenario:** We deleted Node.js v16.20.0 by mistake
 
 **Recovery Process:**
+
 ```bash
 # Step 1: User discovers broken project
 $ cd ~/project-b
@@ -251,6 +266,7 @@ $ npm start
 Each has different structure and APIs:
 
 #### Node.js (nvm)
+
 ```bash
 ~/.nvm/versions/v16.20.0/
 ~/.nvm/versions/v14.21.0/
@@ -259,6 +275,7 @@ Files: bin, include, lib, share
 ```
 
 #### Python (pyenv)
+
 ```bash
 ~/.pyenv/versions/3.8.18/
 ~/.pyenv/versions/3.9.16/
@@ -267,6 +284,7 @@ Files: bin, include, lib
 ```
 
 #### Ruby (rbenv)
+
 ```bash
 ~/.rbenv/versions/2.7.8/
 ~/.rbenv/versions/3.1.4/
@@ -275,6 +293,7 @@ Files: bin, gems, include, lib
 ```
 
 #### Multi-language (asdf)
+
 ```bash
 ~/.asdf/installs/nodejs/20.11.0/
 ~/.asdf/installs/python/3.11.7/
@@ -326,22 +345,23 @@ func TestLanguageVersionManager_Clean(t *testing.T) {
 
 #### 7. Edge Cases are Dangerous ⚠️
 
-| Edge Case | Risk | Scenario |
-|----------|------|-----------|
-| **Only 1 version exists** | 🔴 CRITICAL | If we delete it, user has NO Node.js/Python/etc. at all! System broken until reinstall. |
-| **Current version is "old"** | 🟡 HIGH | User prefers v14 over v20 (stability/compatibility), we delete v14 because it's "old" |
-| **Corrupted version directory** | 🟡 HIGH | Trying to delete might hang, error out, or partially delete, confusing user |
-| **Projects on external drives** | 🟡 HIGH | We can't scan them, don't know which versions they need |
-| **Multiple users on system** | 🔴 CRITICAL | Delete version User A needs because it's "old" for User B? Permissions mess? |
-| **Version in use during deletion** | 🟢 LOW | Lock files prevent deletion (actually good, but error handling needed) |
-| **Version required by system tools** | 🟡 HIGH | Some dev tools depend on specific versions |
-| **CI/CD requirements** | 🟡 HIGH | CI might need specific version, local dev doesn't use |
+| Edge Case                            | Risk        | Scenario                                                                                |
+| ------------------------------------ | ----------- | --------------------------------------------------------------------------------------- |
+| **Only 1 version exists**            | 🔴 CRITICAL | If we delete it, user has NO Node.js/Python/etc. at all! System broken until reinstall. |
+| **Current version is "old"**         | 🟡 HIGH     | User prefers v14 over v20 (stability/compatibility), we delete v14 because it's "old"   |
+| **Corrupted version directory**      | 🟡 HIGH     | Trying to delete might hang, error out, or partially delete, confusing user             |
+| **Projects on external drives**      | 🟡 HIGH     | We can't scan them, don't know which versions they need                                 |
+| **Multiple users on system**         | 🔴 CRITICAL | Delete version User A needs because it's "old" for User B? Permissions mess?            |
+| **Version in use during deletion**   | 🟢 LOW      | Lock files prevent deletion (actually good, but error handling needed)                  |
+| **Version required by system tools** | 🟡 HIGH     | Some dev tools depend on specific versions                                              |
+| **CI/CD requirements**               | 🟡 HIGH     | CI might need specific version, local dev doesn't use                                   |
 
 ---
 
 #### 8. Trust Damage is IRREVERSIBLE 💔
 
 **Worst Case Scenario:**
+
 ```
 Timeline:
 
@@ -389,6 +409,7 @@ Day 40:
 **Impact:** **PERMANENT REPUTATION DAMAGE**
 
 Unlike cache deletion (which regenerates automatically), version deletion causes:
+
 - Immediate pain
 - Loss of trust
 - Negative reviews
@@ -400,6 +421,7 @@ Unlike cache deletion (which regenerates automatically), version deletion causes
 #### 9. Rollback is IMPOSSIBLE 🚫
 
 **Cache Cleanup (Easy Rollback):**
+
 ```
 Operation: Delete ~/.npm/_cacache
 
@@ -413,6 +435,7 @@ Rollback:
 ```
 
 **Version Cleanup (IMPOSSIBLE Rollback):**
+
 ```
 Operation: Delete ~/.nvm/versions/v16.20.0
 
@@ -438,6 +461,7 @@ Rollback:
 **When is this feature "successful"?**
 
 ##### Success Definition A: Deleted Large Amounts of Space
+
 ```
 Metrics:
   - Deleted 5 versions
@@ -452,6 +476,7 @@ Verdict: Space saved, but project FAILED
 ```
 
 ##### Success Definition B: High User Acceptance
+
 ```
 Metrics:
   - 80% of users clicked "yes" when prompted
@@ -465,6 +490,7 @@ Verdict: High acceptance, but DAMAGING
 ```
 
 ##### Success Definition C: Zero Bug Reports
+
 ```
 Metrics:
   - No bug reports about version deletion
@@ -483,13 +509,13 @@ Verdict: No bugs, but still DAMAGING
 
 ## 📊 Risk Comparison Matrix
 
-| Operation | Risk Level | Recovery Time | User Impact | Trust Damage | Rollback |
-|-----------|------------|---------------|-------------|---------------|----------|
-| **Cache Deletion** (NPM, Docker, Go) | 🟢 LOW | <1 min | Low (regens auto) | Minimal | Automatic |
-| **Docker Prune** | 🟡 MEDIUM | 5-10 min | Medium (rebuild images) | Low | Manual |
-| **Go Build Cache** | 🟢 LOW | <2 min | Low (re-compile) | Minimal | Automatic |
-| **Cargo Cache** | 🟢 LOW | <1 min | Low (re-download) | Minimal | Automatic |
-| **Language Version Deletion** | 🔴 CRITICAL | 5-15 min | HIGH (projects broken) | SEVERE | IMPOSSIBLE |
+| Operation                            | Risk Level  | Recovery Time | User Impact             | Trust Damage | Rollback   |
+| ------------------------------------ | ----------- | ------------- | ----------------------- | ------------ | ---------- |
+| **Cache Deletion** (NPM, Docker, Go) | 🟢 LOW      | <1 min        | Low (regens auto)       | Minimal      | Automatic  |
+| **Docker Prune**                     | 🟡 MEDIUM   | 5-10 min      | Medium (rebuild images) | Low          | Manual     |
+| **Go Build Cache**                   | 🟢 LOW      | <2 min        | Low (re-compile)        | Minimal      | Automatic  |
+| **Cargo Cache**                      | 🟢 LOW      | <1 min        | Low (re-download)       | Minimal      | Automatic  |
+| **Language Version Deletion**        | 🔴 CRITICAL | 5-15 min      | HIGH (projects broken)  | SEVERE       | IMPOSSIBLE |
 
 **Multiplier:** Version deletion is **10x-20x more damaging** than cache cleanup.
 
@@ -499,15 +525,16 @@ Verdict: No bugs, but still DAMAGING
 
 ### Cleaner Type Comparison
 
-| Cleaner | Deletes What? | Impact if Wrong | Recovery | User Acceptance |
-|---------|---------------|----------------|----------|----------------|
-| **NPM Cache** | Temporary package files | Re-download needed | Automatic | High (expected) |
-| **Docker Images** | Container images | Re-build needed | Automatic | High (expected) |
-| **Go Cache** | Build artifacts | Re-compile needed | Automatic | High (expected) |
-| **Cargo Registry** | Crate downloads | Re-download needed | Automatic | High (expected) |
-| **Language Versions** | **LANGUAGE RUNTIME** | **PROJECTS DON'T WORK** | **Manual re-install** | **LOW (unexpected)** |
+| Cleaner               | Deletes What?           | Impact if Wrong         | Recovery              | User Acceptance      |
+| --------------------- | ----------------------- | ----------------------- | --------------------- | -------------------- |
+| **NPM Cache**         | Temporary package files | Re-download needed      | Automatic             | High (expected)      |
+| **Docker Images**     | Container images        | Re-build needed         | Automatic             | High (expected)      |
+| **Go Cache**          | Build artifacts         | Re-compile needed       | Automatic             | High (expected)      |
+| **Cargo Registry**    | Crate downloads         | Re-download needed      | Automatic             | High (expected)      |
+| **Language Versions** | **LANGUAGE RUNTIME**    | **PROJECTS DON'T WORK** | **Manual re-install** | **LOW (unexpected)** |
 
 **Crucial Difference:**
+
 - **Cache cleaners:** Delete DERIVED artifacts (regenerate automatically)
 - **Version cleaner:** Deletes CORE TOOLCHAIN (breaks everything)
 
@@ -518,6 +545,7 @@ Verdict: No bugs, but still DAMAGING
 To implement this safely, we'd need ALL of:
 
 ### 1. Usage Tracking Daemon
+
 ```go
 // Background service that tracks version usage
 type UsageTracker struct {
@@ -552,6 +580,7 @@ $ nvm use 20.11.0
 ---
 
 ### 2. Project Scanning
+
 ```go
 // Scan all projects to find required versions
 func ScanForUsedVersions(homeDir string) []string {
@@ -583,6 +612,7 @@ func ScanForUsedVersions(homeDir string) []string {
 ---
 
 ### 3. Multi-Stage Confirmation
+
 ```go
 // Stage 1: Show what will be deleted
 fmt.Println("Found 7 Node.js versions:\n")
@@ -626,6 +656,7 @@ for _, v := range toDelete {
 ---
 
 ### 4. Rollback/Snapshot Feature
+
 ```go
 // Before deletion, create snapshot
 func CreateSnapshot(versions []Version) (Snapshot, error) {
@@ -693,16 +724,16 @@ func CleanupOldSnapshots() {
 
 ## 📈 Risk Summary Table
 
-| Risk Factor | Severity | Mitigation | Mitigation Effort | Residual Risk |
-|-------------|----------|-------------|-------------------|----------------|
-| **Break user projects** | 🔴 CRITICAL | Usage tracking | High (2-3 days) | 🟡 MEDIUM |
-| **Can't detect usage** | 🔴 CRITICAL | Project scanning | High (1-2 days) | 🟡 MEDIUM |
-| **"Old" is ambiguous** | 🟡 HIGH | Multi-stage confirmation | Medium (1 day) | 🟢 LOW |
-| **Recovery is painful** | 🟡 HIGH | Snapshot/rollback | Very High (2-3 days) | 🟢 LOW |
-| **Complexity (4 managers)** | 🟢 MEDIUM | Code abstraction | Medium (2 days) | 🟢 LOW |
-| **Testing is hard** | 🟢 MEDIUM | Mock environments | Medium (1 day) | 🟡 MEDIUM |
-| **Trust damage** | 🔴 CRITICAL | Conservative defaults | Low (1 day) | 🟡 MEDIUM |
-| **Rollback impossible** | 🟡 HIGH | Snapshot feature | Very High (2-3 days) | 🟢 LOW |
+| Risk Factor                 | Severity    | Mitigation               | Mitigation Effort    | Residual Risk |
+| --------------------------- | ----------- | ------------------------ | -------------------- | ------------- |
+| **Break user projects**     | 🔴 CRITICAL | Usage tracking           | High (2-3 days)      | 🟡 MEDIUM     |
+| **Can't detect usage**      | 🔴 CRITICAL | Project scanning         | High (1-2 days)      | 🟡 MEDIUM     |
+| **"Old" is ambiguous**      | 🟡 HIGH     | Multi-stage confirmation | Medium (1 day)       | 🟢 LOW        |
+| **Recovery is painful**     | 🟡 HIGH     | Snapshot/rollback        | Very High (2-3 days) | 🟢 LOW        |
+| **Complexity (4 managers)** | 🟢 MEDIUM   | Code abstraction         | Medium (2 days)      | 🟢 LOW        |
+| **Testing is hard**         | 🟢 MEDIUM   | Mock environments        | Medium (1 day)       | 🟡 MEDIUM     |
+| **Trust damage**            | 🔴 CRITICAL | Conservative defaults    | Low (1 day)          | 🟡 MEDIUM     |
+| **Rollback impossible**     | 🟡 HIGH     | Snapshot feature         | Very High (2-3 days) | 🟢 LOW        |
 
 **Total Safe Implementation:** 8-12 days of work
 **Minimum Viable Implementation:** ~1 day (with HIGH risk)
@@ -713,6 +744,7 @@ func CleanupOldSnapshots() {
 ## 🎯 Comparison with Real-World Tools
 
 ### Homebrew (package manager for macOS)
+
 ```bash
 $ brew cleanup
 # Removes old versions of installed packages
@@ -727,11 +759,13 @@ Characteristics:
 ```
 
 **Why It's Safe:**
+
 - Deletes PACKAGE VERSIONS (e.g., python@3.10), not language itself
 - Python still available via python@3.11
 - Re-install is one command: `brew install python@3.10`
 
 ### apt (Linux package manager)
+
 ```bash
 $ sudo apt autoremove
 # Removes unused packages and dependencies
@@ -751,12 +785,14 @@ The following packages will be REMOVED:
 ```
 
 **Why It's Safe:**
+
 - Requires sudo (clearly elevates privilege, makes user think)
 - Shows exact list of what will be deleted
 - Packages are replacable with one command
 - Not deleting core system runtimes
 
 ### docker system prune
+
 ```bash
 $ docker system prune -a
 # Removes unused containers, networks, images
@@ -770,11 +806,13 @@ Characteristics:
 ```
 
 **Why It's Safe:**
+
 - Images are reproducible (Dockerfile)
 - Re-build is automatic
 - No user projects depend on specific image hashes (typically)
 
 ### Our Version Cleaner
+
 ```bash
 $ clean-wizard clean --language-versions
 
@@ -788,6 +826,7 @@ Characteristics:
 ```
 
 **Why It's Risky:**
+
 - Deletes RUNTIMES, not packages
 - Projects directly depend on specific versions
 - Recovery is manual and time-consuming
@@ -829,17 +868,17 @@ func Clean(ctx context.Context) result.Result[domain.CleanResult] {
 
 ### Safe Implementation (With All Mitigations) - 8-12 Days
 
-| Component | Effort | Notes |
-|-----------|---------|-------|
-| Usage tracking daemon | 2-3 days | Background service, shell integration |
-| Project scanning | 1-2 days | Recursive filesystem scan |
-| Multi-stage confirmation | 1 day | Interactive CLI, confirmation prompts |
-| Snapshot/rollback | 2-3 days | Tar/untar, lifecycle management |
-| Multi-language support | 2 days | nvm, pyenv, rbenv, asdf detection |
-| Testing (safe scenarios) | 1 day | Mock environments, usage detection |
-| Error handling | 0.5 day | Lock files, permissions, corrupted dirs |
-| Documentation | 0.5 day | Clear warnings, recovery guide |
-| **Total** | **10-13 days** | **~2 weeks** |
+| Component                | Effort         | Notes                                   |
+| ------------------------ | -------------- | --------------------------------------- |
+| Usage tracking daemon    | 2-3 days       | Background service, shell integration   |
+| Project scanning         | 1-2 days       | Recursive filesystem scan               |
+| Multi-stage confirmation | 1 day          | Interactive CLI, confirmation prompts   |
+| Snapshot/rollback        | 2-3 days       | Tar/untar, lifecycle management         |
+| Multi-language support   | 2 days         | nvm, pyenv, rbenv, asdf detection       |
+| Testing (safe scenarios) | 1 day          | Mock environments, usage detection      |
+| Error handling           | 0.5 day        | Lock files, permissions, corrupted dirs |
+| Documentation            | 0.5 day        | Clear warnings, recovery guide          |
+| **Total**                | **10-13 days** | **~2 weeks**                            |
 
 **Effort:** 10-13 days
 **Risk:** 🟡 MEDIUM (after mitigations)
@@ -887,6 +926,7 @@ func Clean(ctx context.Context) result.Result[domain.CleanResult] {
 **Implementation:** ~2 hours
 
 **Tasks:**
+
 1. Remove `internal/cleaner/languages.go` file
 2. Remove from cleaner registry
 3. Remove from UI options/flags
@@ -895,6 +935,7 @@ func Clean(ctx context.Context) result.Result[domain.CleanResult] {
 6. Add user guide documentation
 
 **Benefits:**
+
 - Eliminates misleading NO-OP behavior
 - Removes technical debt
 - Cleaner codebase
@@ -902,6 +943,7 @@ func Clean(ctx context.Context) result.Result[domain.CleanResult] {
 - Redirects users to proper tools
 
 **User Impact:**
+
 - Feature removed (but it didn't work anyway)
 - Clear documentation on how to manage versions manually
 - No confusing NO-OP experience
@@ -912,7 +954,7 @@ func Clean(ctx context.Context) result.Result[domain.CleanResult] {
 
 Add to user guide:
 
-```markdown
+````markdown
 # Language Version Management
 
 clean-wizard focuses on cache cleanup, not language version management.
@@ -921,6 +963,7 @@ For version management, use these tools:
 ## Node.js
 
 Install and manage versions with nvm:
+
 ```bash
 # Install nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -937,10 +980,12 @@ nvm uninstall 14.21.0
 # List installed versions
 nvm ls
 ```
+````
 
 ## Python
 
 Install and manage versions with pyenv:
+
 ```bash
 # Install pyenv
 brew install pyenv
@@ -962,6 +1007,7 @@ pyenv versions
 ## Ruby
 
 Install and manage versions with rbenv:
+
 ```bash
 # Install rbenv
 brew install rbenv
@@ -983,6 +1029,7 @@ rbenv versions
 ## Multi-Language (asdf)
 
 Install and manage all versions with asdf:
+
 ```bash
 # Install asdf
 brew install asdf
@@ -999,6 +1046,7 @@ asdf uninstall nodejs 14.21.0
 # List versions
 asdf list nodejs
 ```
+
 ```
 
 ---
@@ -1219,3 +1267,4 @@ This approach:
 **Recommendation:** 🎯 REMOVE CLEANER ENTIRELY
 **Confidence:** 9/10 (very high)
 **Next Step:** Awaiting user decision
+```

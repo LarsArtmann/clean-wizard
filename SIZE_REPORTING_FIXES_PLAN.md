@@ -108,6 +108,7 @@ return result.Ok(domain.CleanResult{
 **File:** `internal/cleaner/docker_test.go` (add tests)
 
 Test cases:
+
 - Valid sizes: "1.84kB", "13.5 MB", "2.5GB", "0B"
 - Invalid sizes: "", "invalid", "1.5XB"
 - Full prune output parsing
@@ -252,11 +253,13 @@ Calculate pnpm cache directory size before/after clean.
 ## Execution Checklist
 
 ### Before Starting
+
 - [ ] All tests passing (`just test`)
 - [ ] Code compiles (`go build ./...`)
 - [ ] Current state committed
 
 ### Phase 1: Docker
+
 - [ ] Create `docker_parsing.go` with size parser
 - [ ] Update `pruneDocker` to use parser
 - [ ] Add comprehensive tests
@@ -264,6 +267,7 @@ Calculate pnpm cache directory size before/after clean.
 - [ ] Commit "feat(docker): add accurate size reporting"
 
 ### Phase 2: Cargo
+
 - [ ] Implement `getCargoCacheDir` helper
 - [ ] Update `executeCargoCleanCommand` to calculate bytes
 - [ ] Test with mock and real cargo if available
@@ -271,6 +275,7 @@ Calculate pnpm cache directory size before/after clean.
 - [ ] Commit "feat(cargo): add accurate size reporting"
 
 ### Phase 3: Nix
+
 - [ ] Update dry-run to use real store size
 - [ ] Calculate average generation size
 - [ ] Add tests
@@ -278,6 +283,7 @@ Calculate pnpm cache directory size before/after clean.
 - [ ] Commit "feat(nix): use real store size for estimates"
 
 ### Phase 4: Go
+
 - [ ] Parse golangci-lint output
 - [ ] Parse go build cache output
 - [ ] Calculate real bytes freed
@@ -286,6 +292,7 @@ Calculate pnpm cache directory size before/after clean.
 - [ ] Commit "feat(golang): add accurate size reporting"
 
 ### Phase 5: Node
+
 - [ ] Calculate npm cache size
 - [ ] Calculate yarn cache size
 - [ ] Calculate pnpm cache size
@@ -294,6 +301,7 @@ Calculate pnpm cache directory size before/after clean.
 - [ ] Commit "feat(nodepackages): add accurate size reporting"
 
 ### Final Verification
+
 - [ ] All tests pass (`just test`)
 - [ ] Code compiles (`go build ./...`)
 - [ ] Verify size reporting in dry-run
@@ -315,6 +323,7 @@ Calculate pnpm cache directory size before/after clean.
 ## Rollback Plan
 
 If any phase causes issues:
+
 1. Revert the specific commit
 2. Run `just test` to verify rollback
 3. Report issue and continue with other phases

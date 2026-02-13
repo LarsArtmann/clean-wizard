@@ -13,7 +13,7 @@ import (
 // mockGenerations creates mock Nix generations for testing in CI environments.
 func mockGenerations(count int) []domain.NixGeneration {
 	gens := make([]domain.NixGeneration, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		status := domain.GenerationStatusHistorical
 		if i == 0 {
 			status = domain.GenerationStatusCurrent

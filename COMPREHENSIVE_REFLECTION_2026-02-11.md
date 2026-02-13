@@ -9,17 +9,20 @@
 ## Executive Summary
 
 **Completed Work:**
+
 - ✅ Size reporting fixes for 5 cleaners (Docker, Cargo, Nix, Go, Node)
 - ✅ All tests passing (17/17 test packages)
 - ✅ Code committed and pushed to origin
 
 **Critical Finding:**
+
 - All utility functions from REFACTORING_PLAN.md are already implemented
 - Cleaner interface already exists in internal/cleaner/cleaner.go
 - Most TODO_LIST.md items are already resolved or outdated
 - Documentation needs significant updates to reflect current state
 
 **Current Technical Debt:**
+
 - Duplicate size calculation pattern across 5 cleaners (no shared utility)
 - 21 functions with high cyclomatic complexity (>10)
 - 2 cleaners are broken/NO-OP (Language Version Manager, Projects Management)
@@ -35,6 +38,7 @@
 **1. Extracting a Shared Size Calculation Utility** ❌ MEDIUM IMPACT
 
 **Pattern Discovered:**
+
 ```go
 // This pattern is duplicated across:
 // - cargo.go (executeCargoCleanCommand)
@@ -53,6 +57,7 @@ if bytesFreed < 0 {
 ```
 
 **Why This Matters:**
+
 - 5+ locations with identical pattern
 - Any bug fix needs to be applied in 5 places
 - Inconsistent verbose logging format across implementations
@@ -65,11 +70,13 @@ if bytesFreed < 0 {
 **2. Summary Document Not Created** ❌ LOW IMPACT
 
 **Missing:**
+
 - SIZE_REPORTING_FIXES_SUMMARY.md (mentioned in plan, never created)
 - Updated FEATURES.md with new accurate size reporting status
 - Updated TODO_LIST.md with completed work
 
 **Impact:**
+
 - No visibility into what was actually completed
 - Documentation drift from implementation
 - Future sessions can't learn from this work
@@ -79,10 +86,12 @@ if bytesFreed < 0 {
 **3. Dry-Run Estimates Still Inaccurate** ❌ MEDIUM IMPACT
 
 **Current State:**
+
 - Nix: Uses average generation size (better, but still estimate)
 - Other cleaners: Still use hardcoded estimates (100MB, 200MB, 500MB)
 
 **What Should Be Done:**
+
 - Scan cache directories in dry-run mode to get real estimates
 - Or at least make estimates consistent and documented
 
@@ -91,11 +100,13 @@ if bytesFreed < 0 {
 **4. No Integration Tests for Size Reporting** ❌ HIGH IMPACT
 
 **Missing:**
+
 - End-to-end test verifying size reporting works
 - Test with real caches (if available in CI)
 - Verification that bytes freed is non-negative
 
 **Impact:**
+
 - Can't verify fix actually works in production
 - No regression protection
 - User-facing functionality not covered by tests
@@ -107,11 +118,13 @@ if bytesFreed < 0 {
 **1. Task Granularity Was Good** ✅
 
 **What Worked:**
+
 - Each cleaner was fixed in a separate commit
 - Tests run after each phase
 - Easy to rollback if needed
 
 **Continue This Pattern:**
+
 - Keep commits small and focused
 - Test after every change
 - Commit frequently
@@ -121,11 +134,13 @@ if bytesFreed < 0 {
 **2. Code Duplication Not Addressed** ❌
 
 **Problem:**
+
 - Added 250+ lines of nearly identical code
 - Before/after size calculation pattern duplicated 5 times
 - No extraction to shared utility
 
 **Better Approach:**
+
 - Extract shared pattern first
 - Then apply pattern to all cleaners
 - Test shared utility thoroughly
@@ -135,6 +150,7 @@ if bytesFreed < 0 {
 **3. Type Model Improvements Missed** ❌ MEDIUM IMPACT
 
 **Current State:**
+
 ```go
 // domain/types.go has:
 type CleanResult struct {
@@ -145,11 +161,13 @@ type CleanResult struct {
 ```
 
 **Issues:**
+
 - Two fields for similar data (SizeEstimate vs FreedBytes)
 - FreedBytes deprecated but still used everywhere
 - Confusing for developers
 
 **Better Approach:**
+
 - Decide on single source of truth
 - Migrate all usages to SizeEstimate
 - Remove FreedBytes or make private
@@ -159,12 +177,14 @@ type CleanResult struct {
 **4. Verbose Logging Not Consistent** ❌ LOW IMPACT
 
 **Problem:**
+
 - Cargo: "Cache size before/after: X/Y bytes"
 - Go: "Cache size before: X, after: Y, freed: Z bytes"
 - Node: Same as Cargo
 - Docker: No verbose size logging
 
 **Better Approach:**
+
 - Define standard logging format
 - Use consistent field names
 - Easier to parse logs for debugging
@@ -175,20 +195,20 @@ type CleanResult struct {
 
 ### 2.1 Priority by Work vs Impact Matrix
 
-| Priority | Task | Impact | Work | ROI |
-|----------|-------|--------|------|-----|
-| P0 | Extract shared size calculation utility | HIGH | 1h | 9/10 |
-| P1 | Fix Language Version Manager NO-OP | HIGH | 1d | 8/10 |
-| P1 | Remove Projects Management Automation cleaner | HIGH | 2h | 8/10 |
-| P1 | Add integration tests for size reporting | HIGH | 4h | 8/10 |
-| P2 | Reduce complexity in top 5 functions | MEDIUM | 1d | 7/10 |
-| P2 | Refactor enum inconsistencies (NodePackages, BuildCache) | MEDIUM | 1d | 7/10 |
-| P2 | Create summary document for size reporting fixes | MEDIUM | 1h | 6/10 |
-| P3 | Improve dry-run estimates | MEDIUM | 2h | 6/10 |
-| P3 | Unify verbose logging format | LOW | 2h | 5/10 |
-| P3 | Remove backward compatibility aliases | LOW | 1d | 5/10 |
-| P4 | Generic Context System | MEDIUM | 1d | 4/10 |
-| P4 | Domain Model Enhancement | LOW | 3d | 4/10 |
+| Priority | Task                                                     | Impact | Work | ROI  |
+| -------- | -------------------------------------------------------- | ------ | ---- | ---- |
+| P0       | Extract shared size calculation utility                  | HIGH   | 1h   | 9/10 |
+| P1       | Fix Language Version Manager NO-OP                       | HIGH   | 1d   | 8/10 |
+| P1       | Remove Projects Management Automation cleaner            | HIGH   | 2h   | 8/10 |
+| P1       | Add integration tests for size reporting                 | HIGH   | 4h   | 8/10 |
+| P2       | Reduce complexity in top 5 functions                     | MEDIUM | 1d   | 7/10 |
+| P2       | Refactor enum inconsistencies (NodePackages, BuildCache) | MEDIUM | 1d   | 7/10 |
+| P2       | Create summary document for size reporting fixes         | MEDIUM | 1h   | 6/10 |
+| P3       | Improve dry-run estimates                                | MEDIUM | 2h   | 6/10 |
+| P3       | Unify verbose logging format                             | LOW    | 2h   | 5/10 |
+| P3       | Remove backward compatibility aliases                    | LOW    | 1d   | 5/10 |
+| P4       | Generic Context System                                   | MEDIUM | 1d   | 4/10 |
+| P4       | Domain Model Enhancement                                 | LOW    | 3d   | 4/10 |
 
 ---
 
@@ -197,21 +217,25 @@ type CleanResult struct {
 ### 3.1 What Works Well
 
 ✅ **Type-Safe Enums** - 15+ enum types fully implemented
+
 - RiskLevelType, ValidationLevelType, DockerPruneMode, etc.
 - Dual format support (string/int)
 - Comprehensive error messages
 
 ✅ **Result Type** - Generic result.Result[T] pattern
+
 - Railway programming support
 - Map, AndThen, OrElse methods
 - Fluent API for error handling
 
 ✅ **Cleaner Registry** - Polymorphism foundation
+
 - Thread-safe RWMutex implementation
 - Factory functions for different configurations
 - 12+ test cases
 
 ✅ **Utility Functions** - All from REFACTORING_PLAN.md exist
+
 - ValidateAndWrap[T] (generic validation)
 - LoadConfigWithFallback (config loading)
 - TrimWhitespaceField (string trimming)
@@ -219,6 +243,7 @@ type CleanResult struct {
 - MinMax (schema validation)
 
 ✅ **Comprehensive Testing** - 200+ tests
+
 - Unit tests for all packages
 - BDD tests with Godog
 - Integration tests
@@ -230,25 +255,30 @@ type CleanResult struct {
 ### 3.2 What Still Needs Work
 
 ❌ **Duplicate Size Calculation Pattern** - 5+ locations
+
 - Exact same pattern repeated
 - No shared utility
 - Maintenance burden
 
 ❌ **High Complexity Functions** - 21 functions >10 cyclomatic complexity
+
 - config.LoadWithContext: 20
 - TestIntegration_ValidationSanitizationPipeline: 19
 - validateProfileName: 16
 - And 18 more...
 
 ❌ **Broken Cleaners** - 2 out of 11
+
 - Language Version Manager: NO-OP implementation
 - Projects Management Automation: Requires external tool
 
 ❌ **Enum Inconsistencies** - 2 cases
+
 - NodePackages: Local string enum vs domain integer enum
 - BuildCache: Different abstractions (tools vs languages)
 
 ❌ **Type Safety Gaps** - Backward compatibility
+
 - RiskLevel = RiskLevelType alias
 - Similar aliases for other enums
 - Deprecated FreedBytes field
@@ -260,26 +290,31 @@ type CleanResult struct {
 ### 4.1 Currently Used (Good)
 
 ✅ **github.com/sirupsen/logrus** - Structured logging
+
 - Used throughout codebase
 - Good formatter support
 - Field-based logging
 
 ✅ **github.com/charmbracelet/huh** - TUI library
+
 - Beautiful interactive forms
 - Used in clean command
 - Good user experience
 
 ✅ **github.com/spf13/cobra** - CLI framework
+
 - Standard for Go CLIs
 - Used for all commands
 - Good flag handling
 
 ✅ **github.com/spf13/viper** - Configuration management
+
 - YAML/JSON/ENV support
 - Type-safe config loading
 - Hot reload capability
 
 ✅ **github.com/stretchr/testify** - Testing framework
+
 - Comprehensive assertions
 - Mock support
 - Suite support
@@ -289,6 +324,7 @@ type CleanResult struct {
 ### 4.2 Not Used but Could Help
 
 **samber/do/v2** - Dependency Injection
+
 - **Purpose:** DI container for Go
 - **Current State:** Manual wiring everywhere
 - **Impact:** Less boilerplate, easier testing
@@ -297,6 +333,7 @@ type CleanResult struct {
 - **Recommendation:** Defer until architectural cleanup complete
 
 **github.com/olekukonko/tablewriter** - Table formatting
+
 - **Purpose:** Pretty-print tables in CLI
 - **Current State:** Manual formatting
 - **Impact:** Better scan/summary output
@@ -305,6 +342,7 @@ type CleanResult struct {
 - **Recommendation:** Consider for scan command improvements
 
 **github.com/fatih/color** - Colorized output
+
 - **Purpose:** Terminal colors
 - **Current State:** Uses Unicode emoji (✅, ❌)
 - **Impact:** Better cross-platform support
@@ -313,6 +351,7 @@ type CleanResult struct {
 - **Recommendation:** Current emoji approach works well, not needed
 
 **github.com/Masterminds/semver** - Semantic versioning
+
 - **Purpose:** Version comparison and parsing
 - **Current State:** No version handling
 - **Impact:** Could validate tool versions (nix, docker, etc.)
@@ -327,6 +366,7 @@ type CleanResult struct {
 ### 5.1 Current Issues
 
 **Issue 1: Duplicate Size Fields**
+
 ```go
 type CleanResult struct {
     SizeEstimate SizeEstimate `json:"size_estimate"`  // Rich type
@@ -336,11 +376,13 @@ type CleanResult struct {
 ```
 
 **Problem:**
+
 - Two fields for same data
 - Confusing which to use
 - FreedBytes marked deprecated but still widely used
 
 **Solution:**
+
 - Phase 1: Migrate all usages to SizeEstimate
 - Phase 2: Mark FreedBytes as `json:"-"` (hidden)
 - Phase 3: Remove FreedBytes in v2.0
@@ -348,6 +390,7 @@ type CleanResult struct {
 ---
 
 **Issue 2: Anemic Domain Models**
+
 ```go
 // Current: Data-only struct
 type ScanItem struct {
@@ -372,6 +415,7 @@ func (si ScanItem) Validate() error
 ```
 
 **Impact:**
+
 - Behavior attached to data (OOP principle)
 - No helper functions scattered across codebase
 - Better testability (test methods directly)
@@ -381,6 +425,7 @@ func (si ScanItem) Validate() error
 ---
 
 **Issue 3: String vs Int Enums**
+
 ```go
 // NodePackages: Uses local string enum
 func (pm PackageManagerType) String() string {
@@ -400,11 +445,13 @@ const (
 ```
 
 **Problem:**
+
 - Duplicate enum definitions
 - Type mismatches
 - Need conversion functions
 
 **Solution:**
+
 - Remove local enum from NodePackages cleaner
 - Use domain.PackageManagerType everywhere
 - Add String() method to domain type
@@ -414,6 +461,7 @@ const (
 ### 5.2 Proposed Type Model Changes
 
 **1. Add Behavior to ScanItem**
+
 ```go
 // internal/domain/types.go
 
@@ -441,6 +489,7 @@ func (si ScanItem) HumanSize() string {
 ```
 
 **2. Add Behavior to CleanResult**
+
 ```go
 func (cr CleanResult) IsSuccess() bool {
     return cr.ItemsFailed == 0
@@ -464,6 +513,7 @@ func (cr CleanResult) HumanCleanTime() string {
 ```
 
 **3. Add Behavior to NixGeneration**
+
 ```go
 // Already has:
 // - IsValid()
@@ -487,18 +537,21 @@ func (g NixGeneration) IsOlderThan(threshold time.Duration) bool {
 ### Phase 1: Quick Wins (2 hours)
 
 #### Step 1.1: Extract shared size calculation utility (1 hour)
+
 - Create internal/cleaner/size_calculation.go
 - Implement CalculateBytesFreed() function
 - Add unit tests
 - Commit: "refactor(cleaner): extract shared size calculation utility"
 
 #### Step 1.2: Update TODO_LIST.md (30 min)
+
 - Mark size reporting fixes as completed
 - Mark utilities as completed
 - Update status for critical issues
 - Commit: "docs(todo): update status after size reporting fixes"
 
 #### Step 1.3: Create SIZE_REPORTING_FIXES_SUMMARY.md (30 min)
+
 - Document what was completed
 - Include before/after examples
 - List all changes made
@@ -509,12 +562,14 @@ func (g NixGeneration) IsOlderThan(threshold time.Duration) bool {
 ### Phase 2: Clean Up Broken Cleaners (1 day)
 
 #### Step 2.1: Remove Projects Management Automation cleaner (2 hours)
+
 - Justification: Requires external tool nobody has
 - Action: Delete internal/cleaner/projectsmanagementautomation.go
 - Update registry to exclude
 - Commit: "refactor(cleaner): remove Projects Management Automation"
 
 #### Step 2.2: Fix Language Version Manager NO-OP (6 hours)
+
 - Implement actual cleaning for NVM, Pyenv, Rbenv
 - Add dry-run mode
 - Add size calculation
@@ -526,6 +581,7 @@ func (g NixGeneration) IsOlderThan(threshold time.Duration) bool {
 ### Phase 3: Reduce Complexity (2 days)
 
 #### Step 3.1: Refactor LoadWithContext (4 hours)
+
 - Extract profile loading
 - Extract operation processing
 - Extract risk level processing
@@ -534,12 +590,14 @@ func (g NixGeneration) IsOlderThan(threshold time.Duration) bool {
 - Commit: "refactor(config): reduce LoadWithContext complexity"
 
 #### Step 3.2: Refactor validateProfileName (2 hours)
+
 - Extract validation rules
 - Simplify logic
 - Target: Reduce complexity from 16 to <10
 - Commit: "refactor(config): reduce validateProfileName complexity"
 
 #### Step 3.3: Refactor remaining high-complexity functions (10 hours)
+
 - 18 functions >10 complexity
 - Apply same pattern
 - Target: All functions <10
@@ -550,6 +608,7 @@ func (g NixGeneration) IsOlderThan(threshold time.Duration) bool {
 ### Phase 4: Enum Improvements (1 day)
 
 #### Step 4.1: Fix NodePackages enum (4 hours)
+
 - Remove local string enum
 - Use domain.PackageManagerType everywhere
 - Add String() method to domain type
@@ -557,6 +616,7 @@ func (g NixGeneration) IsOlderThan(threshold time.Duration) bool {
 - Commit: "refactor(nodepackages): use domain PackageManagerType"
 
 #### Step 4.2: Fix BuildCache enum (4 hours)
+
 - Decide: tools or languages abstraction
 - Implement unused enum values (Go, Rust, Node, Python)
 - Or remove unused values
@@ -567,11 +627,13 @@ func (g NixGeneration) IsOlderThan(threshold time.Duration) bool {
 ### Phase 5: Add Integration Tests (4 hours)
 
 #### Step 5.1: Create integration test framework (2 hours)
+
 - Create tests/integration/size_reporting_test.go
 - Add test utilities
 - Add mock cache setup/teardown
 
 #### Step 5.2: Add integration tests for each cleaner (2 hours)
+
 - Docker size reporting test
 - Cargo size reporting test
 - Nix size reporting test
@@ -584,12 +646,14 @@ func (g NixGeneration) IsOlderThan(threshold time.Duration) bool {
 ### Phase 6: Documentation (2 hours)
 
 #### Step 6.1: Update FEATURES.md (1 hour)
+
 - Mark size reporting as ✅ ACCURATE
 - Update Language Version Manager status
 - Update Projects Management status
 - Remove or mark as deprecated
 
 #### Step 6.2: Update README.md (1 hour)
+
 - Add section on size reporting accuracy
 - Mention broken cleaners
 - Add roadmap for future improvements
@@ -683,6 +747,7 @@ The size reporting fixes were successfully completed, but there are clear opport
 5. **Update documentation** to keep it current
 
 The codebase has excellent architecture and type safety. The main work remaining is:
+
 - Reducing technical debt (duplication, complexity)
 - Completing partially-implemented features (broken cleaners)
 - Improving test coverage (integration tests)

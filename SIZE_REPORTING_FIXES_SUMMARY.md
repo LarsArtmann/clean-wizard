@@ -99,15 +99,15 @@ func CalculateBytesFreed(path string, cleanup func() error, verbose bool, cacheN
 
 ### Files Refactored
 
-| File | Function(s) | Lines Reduced | Status |
-|------|-------------|---------------|--------|
-| internal/cleaner/cargo.go | executeCargoCleanCommand | ~15 lines | ✅ Refactored |
-| internal/cleaner/golang_lint_adapter.go | Clean | ~15 lines | ✅ Refactored |
-| internal/cleaner/golang_cache_cleaner.go | cleanGoCacheEnv | ~15 lines | ✅ Refactored |
-| internal/cleaner/nodepackages.go | cleanNpmCache | ~15 lines | ✅ Refactored |
-| internal/cleaner/nodepackages.go | cleanPnpmStore | ~15 lines | ✅ Refactored |
-| internal/cleaner/nodepackages.go | cleanYarnCache | ~15 lines | ✅ Refactored |
-| internal/cleaner/nodepackages.go | cleanBunCache | ~15 lines | ✅ Refactored |
+| File                                     | Function(s)              | Lines Reduced | Status        |
+| ---------------------------------------- | ------------------------ | ------------- | ------------- |
+| internal/cleaner/cargo.go                | executeCargoCleanCommand | ~15 lines     | ✅ Refactored |
+| internal/cleaner/golang_lint_adapter.go  | Clean                    | ~15 lines     | ✅ Refactored |
+| internal/cleaner/golang_cache_cleaner.go | cleanGoCacheEnv          | ~15 lines     | ✅ Refactored |
+| internal/cleaner/nodepackages.go         | cleanNpmCache            | ~15 lines     | ✅ Refactored |
+| internal/cleaner/nodepackages.go         | cleanPnpmStore           | ~15 lines     | ✅ Refactored |
+| internal/cleaner/nodepackages.go         | cleanYarnCache           | ~15 lines     | ✅ Refactored |
+| internal/cleaner/nodepackages.go         | cleanBunCache            | ~15 lines     | ✅ Refactored |
 
 **Total:** ~105 lines of duplicate code eliminated
 
@@ -174,12 +174,14 @@ if cacheDir != "" {
 ### Verification Steps
 
 1. **Build Verification**
+
    ```bash
    go build ./...
    # Result: No errors
    ```
 
 2. **Test Suite**
+
    ```bash
    go test ./...
    # Result: All tests pass (0 failures)
@@ -215,12 +217,12 @@ if cacheDir != "" {
 
 ### Code Quality Improvements
 
-| Metric | Before | After | Improvement |
-|--------|---------|-------|-------------|
-| Duplicate implementations | 7 | 1 | 86% reduction |
-| Total lines of code | ~105 duplicate | 38 shared | 64% reduction |
-| Maintenance points | 7 | 1 | 86% reduction |
-| Test coverage potential | 7 test points | 1 test point | 86% reduction |
+| Metric                    | Before         | After        | Improvement   |
+| ------------------------- | -------------- | ------------ | ------------- |
+| Duplicate implementations | 7              | 1            | 86% reduction |
+| Total lines of code       | ~105 duplicate | 38 shared    | 64% reduction |
+| Maintenance points        | 7              | 1            | 86% reduction |
+| Test coverage potential   | 7 test points  | 1 test point | 86% reduction |
 
 ---
 
@@ -267,11 +269,11 @@ if cacheDir != "" {
 
 ### Future (Priority Matrix)
 
-| Priority | Task | Impact | Work | ROI |
-|----------|-------|--------|------|-----|
-| P0 | Add integration tests for size reporting | HIGH | 4h | 8/10 |
-| P2 | Improve dry-run estimates | MEDIUM | 2h | 6/10 |
-| P3 | Unify verbose logging format | LOW | 2h | 5/10 |
+| Priority | Task                                     | Impact | Work | ROI  |
+| -------- | ---------------------------------------- | ------ | ---- | ---- |
+| P0       | Add integration tests for size reporting | HIGH   | 4h   | 8/10 |
+| P2       | Improve dry-run estimates                | MEDIUM | 2h   | 6/10 |
+| P3       | Unify verbose logging format             | LOW    | 2h   | 5/10 |
 
 ---
 
@@ -280,6 +282,7 @@ if cacheDir != "" {
 The size reporting fixes successfully eliminated code duplication and improved maintainability across the clean-wizard codebase. The new `CalculateBytesFreed()` utility provides a single, well-tested implementation that can be enhanced and maintained in one place.
 
 This work demonstrates the importance of:
+
 - Identifying and consolidating duplicate code
 - Creating reusable utilities for common patterns
 - Testing thoroughly after refactoring

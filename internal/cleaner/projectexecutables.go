@@ -346,7 +346,7 @@ func (d *defaultFileOperator) FindExecutableFiles(dir string) ([]string, error) 
 		}
 
 		// Check if file is executable
-		if info.Mode()&0111 == 0 {
+		if info.Mode()&0o111 == 0 {
 			continue
 		}
 

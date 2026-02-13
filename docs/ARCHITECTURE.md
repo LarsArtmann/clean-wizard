@@ -24,13 +24,13 @@ Clean Wizard is built around a **Registry Pattern** with **Type-Safe Enums** and
 
 ### Key Architectural Decisions
 
-| Decision | Rationale |
-|----------|-----------|
-| Type-Safe Enums | Compile-time safety, no string comparisons |
-| Result[T] Type | Explicit error handling without exceptions |
-| Registry Pattern | Thread-safe cleaner management, extensibility |
-| Interface-Based Design | All cleaners implement common interface |
-| Platform Abstraction | Clean separation of macOS/Linux specific code |
+| Decision               | Rationale                                     |
+| ---------------------- | --------------------------------------------- |
+| Type-Safe Enums        | Compile-time safety, no string comparisons    |
+| Result[T] Type         | Explicit error handling without exceptions    |
+| Registry Pattern       | Thread-safe cleaner management, extensibility |
+| Interface-Based Design | All cleaners implement common interface       |
+| Platform Abstraction   | Clean separation of macOS/Linux specific code |
 
 ---
 
@@ -73,6 +73,7 @@ func (c *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 ### 3. Single Responsibility
 
 Each cleaner handles exactly one domain:
+
 - `NixCleaner` - Nix store and generations
 - `HomebrewCleaner` - Homebrew cache and autoremove
 - `DockerCleaner` - Docker containers, images, volumes
@@ -282,16 +283,16 @@ func (c *CleanStrategyType) UnmarshalYAML(value *yaml.Node) error
 
 ### Available Enums
 
-| Enum | Purpose | Values |
-|------|---------|--------|
-| `OperationType` | Cleaner types | Nix, Homebrew, Docker, Cargo, Go, Node, BuildCache, SystemCache, TempFiles, LangVersion |
-| `CleanStrategyType` | Cleaning behavior | DryRun, Conservative, Aggressive |
-| `RiskLevelType` | Risk assessment | Low, Medium, High, Critical |
-| `CacheType` | System cache types | Spotlight, Xcode, Cocoapods, Homebrew, Pip, Npm, Yarn, Ccache, XdgCache, Thumbnails |
-| `BuildToolType` | Build tools | Go, Rust, Node, Python, Java, Scala |
-| `DockerPruneMode` | Docker operations | All, Images, Containers, Volumes, Builds |
-| `PackageManagerType` | Node.js package managers | Npm, Pnpm, Yarn, Bun |
-| `ValidationLevelType` | Validation strictness | None, Basic, Comprehensive, Strict |
+| Enum                  | Purpose                  | Values                                                                                  |
+| --------------------- | ------------------------ | --------------------------------------------------------------------------------------- |
+| `OperationType`       | Cleaner types            | Nix, Homebrew, Docker, Cargo, Go, Node, BuildCache, SystemCache, TempFiles, LangVersion |
+| `CleanStrategyType`   | Cleaning behavior        | DryRun, Conservative, Aggressive                                                        |
+| `RiskLevelType`       | Risk assessment          | Low, Medium, High, Critical                                                             |
+| `CacheType`           | System cache types       | Spotlight, Xcode, Cocoapods, Homebrew, Pip, Npm, Yarn, Ccache, XdgCache, Thumbnails     |
+| `BuildToolType`       | Build tools              | Go, Rust, Node, Python, Java, Scala                                                     |
+| `DockerPruneMode`     | Docker operations        | All, Images, Containers, Volumes, Builds                                                |
+| `PackageManagerType`  | Node.js package managers | Npm, Pnpm, Yarn, Bun                                                                    |
+| `ValidationLevelType` | Validation strictness    | None, Basic, Comprehensive, Strict                                                      |
 
 ### SizeEstimate Pattern
 
@@ -317,12 +318,12 @@ type CleanResult struct {
 
 ### Error Categories
 
-| Category | Handling |
-|----------|----------|
-| Tool not installed | `IsAvailable()` returns false, cleaner skipped |
-| Permission denied | Error returned in Result[T], logged, operation continues |
-| Invalid configuration | Validation fails at load time |
-| Runtime errors | Error returned in Result[T], aggregated in results |
+| Category              | Handling                                                 |
+| --------------------- | -------------------------------------------------------- |
+| Tool not installed    | `IsAvailable()` returns false, cleaner skipped           |
+| Permission denied     | Error returned in Result[T], logged, operation continues |
+| Invalid configuration | Validation fails at load time                            |
+| Runtime errors        | Error returned in Result[T], aggregated in results       |
 
 ### Error Flow
 
@@ -405,10 +406,10 @@ func (scc *SystemCacheCleaner) isLinux() bool {
 
 ### Platform-Specific Cache Types
 
-| Platform | Cache Types |
-|----------|------------|
-| macOS | Spotlight, Xcode, CocoaPods, Homebrew |
-| Linux | XdgCache, Thumbnails, Homebrew, Pip, Npm, Yarn, Ccache |
+| Platform | Cache Types                                            |
+| -------- | ------------------------------------------------------ |
+| macOS    | Spotlight, Xcode, CocoaPods, Homebrew                  |
+| Linux    | XdgCache, Thumbnails, Homebrew, Pip, Npm, Yarn, Ccache |
 
 ### Platform Abstraction Pattern
 
@@ -431,13 +432,13 @@ func AvailableSystemCacheTypes() []domain.CacheType {
 
 ### Test Categories
 
-| Category | Location | Purpose |
-|----------|----------|---------|
-| Unit Tests | `internal/*_test.go` | Individual component testing |
-| Integration Tests | `tests/integration/` | Cross-component testing |
-| BDD Tests | `tests/bdd/` | User scenario testing |
-| Benchmark Tests | `*_benchmark_test.go` | Performance measurement |
-| Fuzz Tests | `*_fuzz_test.go` | Input robustness |
+| Category          | Location              | Purpose                      |
+| ----------------- | --------------------- | ---------------------------- |
+| Unit Tests        | `internal/*_test.go`  | Individual component testing |
+| Integration Tests | `tests/integration/`  | Cross-component testing      |
+| BDD Tests         | `tests/bdd/`          | User scenario testing        |
+| Benchmark Tests   | `*_benchmark_test.go` | Performance measurement      |
+| Fuzz Tests        | `*_fuzz_test.go`      | Input robustness             |
 
 ### Test Commands
 
@@ -535,6 +536,7 @@ func DefaultRegistry() *Registry {
 **Decision**: Use int-based types with validation methods instead of strings
 
 **Consequences**:
+
 - Compile-time type safety
 - No string comparison bugs
 - IDE autocomplete support
@@ -549,6 +551,7 @@ func DefaultRegistry() *Registry {
 **Decision**: Use generic Result[T] type with Ok/Err constructors
 
 **Consequences**:
+
 - Errors are always visible in function signatures
 - Railway-oriented programming patterns
 - No hidden control flow
@@ -563,6 +566,7 @@ func DefaultRegistry() *Registry {
 **Decision**: Central registry with RWMutex protection
 
 **Consequences**:
+
 - Thread-safe cleaner management
 - Easy to add/remove cleaners at runtime
 - Polymorphic operations over all cleaners

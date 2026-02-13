@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// Test types for generic context
+// Test types for generic context.
 type TestValidationConfig struct {
 	FieldA string
 	FieldB int

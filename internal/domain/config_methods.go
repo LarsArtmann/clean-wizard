@@ -198,7 +198,7 @@ func sanitizePath(path string) string {
 // trimAllWhitespace removes all whitespace characters from a string.
 func trimAllWhitespace(s string) string {
 	result := make([]byte, 0, len(s))
-	for i := 0; i < len(s); i++ {
+	for i := range len(s) {
 		b := s[i]
 		if b != ' ' && b != '\t' && b != '\n' && b != '\r' {
 			result = append(result, b)
