@@ -2,6 +2,7 @@
 bin/
 dist/
 tmp/
+clean-wizard
 
 # Go test binaries
 *.test
