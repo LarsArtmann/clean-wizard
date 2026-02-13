@@ -5,7 +5,6 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"testing"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -67,11 +66,7 @@ func (m *mockFileOperator) GetFileSize(path string) int64 {
 	return 0
 }
 
-// Test entry point for Ginkgo
-func TestProjectExecutablesCleaner(t *testing.T) {
-	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "ProjectExecutablesCleaner Suite")
-}
+
 
 var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 	var (

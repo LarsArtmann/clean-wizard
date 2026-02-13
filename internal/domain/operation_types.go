@@ -41,6 +41,9 @@ type OperationSettings struct {
 
 	// Project Executables Settings
 	ProjectExecutables *ProjectExecutablesSettings `json:"project_executables,omitempty" yaml:"project_executables,omitempty"`
+
+	// Compiled Binaries Settings
+	CompiledBinaries *CompiledBinariesSettings `json:"compiled_binaries,omitempty" yaml:"compiled_binaries,omitempty"`
 }
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup.
@@ -123,6 +126,21 @@ type ProjectExecutablesSettings struct {
 	ExcludePatterns []string `json:"exclude_patterns,omitempty" yaml:"exclude_patterns,omitempty"`
 }
 
+// CompiledBinariesSettings provides type-safe settings for compiled binaries cleanup.
+// This cleaner removes large executable files that can be regenerated (build outputs, test binaries).
+type CompiledBinariesSettings struct {
+	// MinSizeMB minimum file size in MB to consider (default: 10)
+	MinSizeMB int `json:"min_size_mb,omitempty" yaml:"min_size_mb,omitempty"`
+	// OlderThan age filter for files (default: "0" = any age)
+	OlderThan string `json:"older_than,omitempty" yaml:"older_than,omitempty"`
+	// BasePaths directories to scan (default: ~/projects or user home)
+	BasePaths []string `json:"base_paths,omitempty" yaml:"base_paths,omitempty"`
+	// ExcludePatterns glob patterns to exclude
+	ExcludePatterns []string `json:"exclude_patterns,omitempty" yaml:"exclude_patterns,omitempty"`
+	// IncludePatterns categories to include: tmp, test, bin, dist, root
+	IncludePatterns []string `json:"include_patterns,omitempty" yaml:"include_patterns,omitempty"`
+}
+
 // OperationType represents different types of cleanup operations.
 type OperationType string
 
@@ -140,6 +158,7 @@ const (
 	OperationTypeSystemTemp                   OperationType = "system-temp"
 	OperationTypeProjectsManagementAutomation OperationType = "projects-management-automation"
 	OperationTypeProjectExecutables           OperationType = "project-executables"
+	OperationTypeCompiledBinaries             OperationType = "compiled-binaries"
 )
 
 // GetOperationType returns the operation type from operation name.
@@ -171,6 +190,8 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeProjectsManagementAutomation
 	case "project-executables":
 		return OperationTypeProjectExecutables
+	case "compiled-binaries":
+		return OperationTypeCompiledBinaries
 	default:
 		return OperationType(name) // Fallback for custom types
 	}
