@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -67,25 +66,12 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		})
 
 		ginkgo.It("should list Nix generations when running scan", func() {
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			// In CI environments, Nix may not be installed, so we accept both success and error
-			if testCtx.generations.IsErr() {
-				// Mock data for CI environment
-				testCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusCurrent},
-					{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: domain.GenerationStatusHistorical},
-				})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 2)
 			gomega.Expect(testCtx.generations.IsOk()).To(gomega.BeTrue())
 		})
 
 		ginkgo.It("should have valid ID for each generation", func() {
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			if testCtx.generations.IsErr() {
-				testCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
 			generations := testCtx.generations.Value()
 			for _, gen := range generations {
 				gomega.Expect(gen.ID).To(gomega.BeNumerically(">", 0))
@@ -93,12 +79,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		})
 
 		ginkgo.It("should have creation date for each generation", func() {
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			if testCtx.generations.IsErr() {
-				testCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
 			generations := testCtx.generations.Value()
 			for _, gen := range generations {
 				gomega.Expect(gen.Date).NotTo(gomega.BeZero())
@@ -114,11 +95,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		})
 
 		ginkgo.It("should complete scan command successfully", func() {
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			if testCtx.generations.IsErr() {
-				// CI environment - mock success
-				testCtx.generations = result.Ok([]domain.NixGeneration{})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 0)
 			gomega.Expect(testCtx.generations.IsOk()).To(gomega.BeTrue())
 		})
 	})
@@ -129,24 +106,13 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		})
 
 		ginkgo.It("should show what would be cleaned in dry-run mode", func() {
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			if testCtx.generations.IsErr() {
-				testCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-					{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: domain.GenerationStatusHistorical},
-				})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 2)
 			testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, 3)
 			gomega.Expect(testCtx.cleanResult.IsOk()).To(gomega.BeTrue())
 		})
 
 		ginkgo.It("should estimate space to be freed", func() {
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			if testCtx.generations.IsErr() {
-				testCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
 			testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, 3)
 			if testCtx.cleanResult.IsOk() {
 				cleanRes := testCtx.cleanResult.Value()
@@ -155,12 +121,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		})
 
 		ginkgo.It("should show how many generations would be removed", func() {
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			if testCtx.generations.IsErr() {
-				testCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
 			testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, 3)
 			if testCtx.cleanResult.IsOk() {
 				cleanRes := testCtx.cleanResult.Value()
@@ -171,12 +132,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		ginkgo.It("should not perform actual cleaning in dry-run mode", func() {
 			testCtx.dryRun = true
 			testCtx.nixCleaner = cleaner.NewNixCleaner(true, true)
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			if testCtx.generations.IsErr() {
-				testCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
 			testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, 3)
 			gomega.Expect(testCtx.dryRun).To(gomega.BeTrue())
 		})
@@ -189,15 +145,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 		ginkgo.It("should keep specified number of generations", func() {
 			keepCount := 3
-			testCtx.generations = testCtx.nixCleaner.ListGenerations(testCtx.ctx)
-			if testCtx.generations.IsErr() {
-				testCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-					{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusHistorical},
-					{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-48 * time.Hour), Current: domain.GenerationStatusHistorical},
-					{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-72 * time.Hour), Current: domain.GenerationStatusHistorical},
-				})
-			}
+			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 4)
 			generations := testCtx.generations.Value()
 			if len(generations) > keepCount {
 				testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, keepCount)
@@ -251,13 +199,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 
 	ginkgo.Describe("List available Nix generations", func() {
 		ginkgo.It("should display generation numbers and dates", func() {
-			nixCtx.generations = nixCtx.nixCleaner.ListGenerations(nixCtx.ctx)
-			if nixCtx.generations.IsErr() {
-				// Mock for CI
-				nixCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			generations := nixCtx.generations.Value()
 			gomega.Expect(len(generations) > 0).To(gomega.BeTrue())
 			for _, gen := range generations {
@@ -267,13 +209,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 		})
 
 		ginkgo.It("should mark current generation", func() {
-			nixCtx.generations = nixCtx.nixCleaner.ListGenerations(nixCtx.ctx)
-			if nixCtx.generations.IsErr() {
-				nixCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-					{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusHistorical},
-				})
-			}
+			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 2)
 			generations := nixCtx.generations.Value()
 			currentCount := 0
 			for _, gen := range generations {
@@ -292,24 +228,13 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 		})
 
 		ginkgo.It("should show which generations would be deleted", func() {
-			nixCtx.generations = nixCtx.nixCleaner.ListGenerations(nixCtx.ctx)
-			if nixCtx.generations.IsErr() {
-				nixCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-					{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusHistorical},
-				})
-			}
+			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 2)
 			nixCtx.cleanResult = nixCtx.nixCleaner.CleanOldGenerations(nixCtx.ctx, 1)
 			gomega.Expect(nixCtx.cleanResult.IsOk()).To(gomega.BeTrue())
 		})
 
 		ginkgo.It("should not delete current generation", func() {
-			nixCtx.generations = nixCtx.nixCleaner.ListGenerations(nixCtx.ctx)
-			if nixCtx.generations.IsErr() {
-				nixCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			generations := nixCtx.generations.Value()
 			// Find current generation
 			var currentGen *domain.NixGeneration
@@ -337,12 +262,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 
 	ginkgo.Describe("Prevent deletion of current generation", func() {
 		ginkgo.It("should keep current generation after cleaning", func() {
-			nixCtx.generations = nixCtx.nixCleaner.ListGenerations(nixCtx.ctx)
-			if nixCtx.generations.IsErr() {
-				nixCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			generations := nixCtx.generations.Value()
 			var currentGenID int64
 			for _, gen := range generations {
@@ -379,12 +299,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 
 	ginkgo.Describe("Clean with backup protection", func() {
 		ginkgo.It("should protect important generations", func() {
-			nixCtx.generations = nixCtx.nixCleaner.ListGenerations(nixCtx.ctx)
-			if nixCtx.generations.IsErr() {
-				nixCtx.generations = result.Ok([]domain.NixGeneration{
-					{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now(), Current: domain.GenerationStatusCurrent},
-				})
-			}
+			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			// Current generation should always be protected
 			generations := nixCtx.generations.Value()
 			for _, gen := range generations {
@@ -405,10 +320,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 
 	ginkgo.Describe("Verify type-safe operations", func() {
 		ginkgo.It("should use type-safe operations", func() {
-			nixCtx.generations = nixCtx.nixCleaner.ListGenerations(nixCtx.ctx)
-			if nixCtx.generations.IsErr() {
-				nixCtx.generations = result.Ok([]domain.NixGeneration{})
-			}
+			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 0)
 			gomega.Expect(nixCtx.generations.IsOk()).To(gomega.BeTrue())
 		})
 

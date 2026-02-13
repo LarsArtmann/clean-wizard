@@ -216,6 +216,10 @@ const (
 	CacheTypeYarn
 	// CacheTypeCcache represents ccache.
 	CacheTypeCcache
+	// CacheTypeXdgCache represents Linux XDG cache directory (~/.cache).
+	CacheTypeXdgCache
+	// CacheTypeThumbnails represents Linux thumbnail cache.
+	CacheTypeThumbnails
 )
 
 // String returns string representation of cache type.
@@ -237,6 +241,10 @@ func (ct CacheType) String() string {
 		return "YARN"
 	case CacheTypeCcache:
 		return "CCACHE"
+	case CacheTypeXdgCache:
+		return "XDG_CACHE"
+	case CacheTypeThumbnails:
+		return "THUMBNAILS"
 	default:
 		return "UNKNOWN"
 	}
@@ -244,7 +252,7 @@ func (ct CacheType) String() string {
 
 // IsValid checks if cache type is valid.
 func (ct CacheType) IsValid() bool {
-	return ct >= CacheTypeSpotlight && ct <= CacheTypeCcache
+	return ct >= CacheTypeSpotlight && ct <= CacheTypeThumbnails
 }
 
 // Values returns all possible cache types.
@@ -258,6 +266,8 @@ func (ct CacheType) Values() []CacheType {
 		CacheTypeNpm,
 		CacheTypeYarn,
 		CacheTypeCcache,
+		CacheTypeXdgCache,
+		CacheTypeThumbnails,
 	}
 }
 
@@ -269,87 +279,17 @@ func (ct CacheType) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for CacheType.
 func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 	return UnmarshalYAMLEnum(value, ct, map[string]CacheType{
-		"SPOTLIGHT": CacheTypeSpotlight,
-		"XCODE":     CacheTypeXcode,
-		"COCOAPODS": CacheTypeCocoapods,
-		"HOMEBREW":  CacheTypeHomebrew,
-		"PIP":       CacheTypePip,
-		"NPM":       CacheTypeNpm,
-		"YARN":      CacheTypeYarn,
-		"CCACHE":    CacheTypeCcache,
+		"SPOTLIGHT":   CacheTypeSpotlight,
+		"XCODE":       CacheTypeXcode,
+		"COCOAPODS":   CacheTypeCocoapods,
+		"HOMEBREW":    CacheTypeHomebrew,
+		"PIP":         CacheTypePip,
+		"NPM":         CacheTypeNpm,
+		"YARN":        CacheTypeYarn,
+		"CCACHE":      CacheTypeCcache,
+		"XDG_CACHE":   CacheTypeXdgCache,
+		"THUMBNAILS":  CacheTypeThumbnails,
 	}, "invalid cache type")
-}
-
-// VersionManagerType represents language version manager types as a type-safe enum.
-type VersionManagerType int
-
-const (
-	// VersionManagerNvm represents Node Version Manager.
-	VersionManagerNvm VersionManagerType = iota
-	// VersionManagerPyenv represents Python Version Manager.
-	VersionManagerPyenv
-	// VersionManagerGvm represents Go Version Manager.
-	VersionManagerGvm
-	// VersionManagerRbenv represents Ruby Version Manager.
-	VersionManagerRbenv
-	// VersionManagerSdkman represents SDKMAN for Java/Kotlin.
-	VersionManagerSdkman
-	// VersionManagerJenv represents Java Environment Manager.
-	VersionManagerJenv
-)
-
-// String returns string representation of version manager type.
-func (vm VersionManagerType) String() string {
-	switch vm {
-	case VersionManagerNvm:
-		return "NVM"
-	case VersionManagerPyenv:
-		return "PYENV"
-	case VersionManagerGvm:
-		return "GVM"
-	case VersionManagerRbenv:
-		return "RBENV"
-	case VersionManagerSdkman:
-		return "SDKMAN"
-	case VersionManagerJenv:
-		return "JENV"
-	default:
-		return "UNKNOWN"
-	}
-}
-
-// IsValid checks if version manager type is valid.
-func (vm VersionManagerType) IsValid() bool {
-	return vm >= VersionManagerNvm && vm <= VersionManagerJenv
-}
-
-// Values returns all possible version manager types.
-func (vm VersionManagerType) Values() []VersionManagerType {
-	return []VersionManagerType{
-		VersionManagerNvm,
-		VersionManagerPyenv,
-		VersionManagerGvm,
-		VersionManagerRbenv,
-		VersionManagerSdkman,
-		VersionManagerJenv,
-	}
-}
-
-// MarshalYAML implements yaml.Marshaler interface for VersionManagerType.
-func (vm VersionManagerType) MarshalYAML() (any, error) {
-	return int(vm), nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler interface for VersionManagerType.
-func (vm *VersionManagerType) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, vm, map[string]VersionManagerType{
-		"NVM":    VersionManagerNvm,
-		"PYENV":  VersionManagerPyenv,
-		"GVM":    VersionManagerGvm,
-		"RBENV":  VersionManagerRbenv,
-		"SDKMAN": VersionManagerSdkman,
-		"JENV":   VersionManagerJenv,
-	}, "invalid version manager type")
 }
 
 // PackageManagerType represents Node.js package manager types as a type-safe enum.

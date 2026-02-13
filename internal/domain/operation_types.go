@@ -30,9 +30,6 @@ type OperationSettings struct {
 	// System Cache Settings
 	SystemCache *SystemCacheSettings `json:"system_cache,omitempty" yaml:"system_cache,omitempty"`
 
-	// Language Version Manager Settings
-	LangVersionManager *LangVersionManagerSettings `json:"lang_version_manager,omitempty" yaml:"lang_version_manager,omitempty"`
-
 	// System Temp Settings
 	SystemTemp *SystemTempSettings `json:"system_temp,omitempty" yaml:"system_temp,omitempty"`
 
@@ -101,11 +98,6 @@ type SystemCacheSettings struct {
 	OlderThan  string      `json:"older_than,omitempty"  yaml:"older_than,omitempty"`
 }
 
-// LangVersionManagerSettings provides type-safe settings for language version manager cleanup.
-type LangVersionManagerSettings struct {
-	ManagerTypes []VersionManagerType `json:"manager_types,omitempty" yaml:"manager_types,omitempty"`
-}
-
 // SystemTempSettings provides type-safe settings for system temp cleanup.
 type SystemTempSettings struct {
 	Paths     []string `json:"paths"      yaml:"paths"`
@@ -154,7 +146,6 @@ const (
 	OperationTypeBuildCache                   OperationType = "build-cache"
 	OperationTypeDocker                       OperationType = "docker"
 	OperationTypeSystemCache                  OperationType = "system-cache"
-	OperationTypeLangVersionManager           OperationType = "lang-version-manager"
 	OperationTypeSystemTemp                   OperationType = "system-temp"
 	OperationTypeProjectsManagementAutomation OperationType = "projects-management-automation"
 	OperationTypeProjectExecutables           OperationType = "project-executables"
@@ -182,8 +173,6 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeDocker
 	case "system-cache":
 		return OperationTypeSystemCache
-	case "lang-version-manager":
-		return OperationTypeLangVersionManager
 	case "system-temp":
 		return OperationTypeSystemTemp
 	case "projects-management-automation":

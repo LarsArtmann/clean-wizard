@@ -15,33 +15,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	configName = ".clean-wizard"
-	configType = "yaml"
-)
-
-// boolToSafeMode converts boolean to SafeMode enum.
-func boolToSafeMode(b bool) domain.SafeMode {
-	if b {
-		return domain.SafeModeEnabled
-	}
-	return domain.SafeModeDisabled
-}
-
-// Load loads the configuration from file or creates default.
-func Load() (*domain.Config, error) {
-	return LoadWithContext(context.Background())
-}
-
-// LoadWithContext loads configuration with context support.
-func LoadWithContext(ctx context.Context) (*domain.Config, error) {
+// setupViper creates and configures a viper instance with defaults.
+func setupViper() *viper.Viper {
 	v := viper.New()
 	v.SetConfigName(configName)
 	v.SetConfigType(configType)
 	v.AddConfigPath("$HOME")
 	v.AddConfigPath("/etc/clean-wizard")
 
-	// Check for CONFIG_PATH environment variable
 	if configPath := os.Getenv("CONFIG_PATH"); configPath != "" {
 		v.SetConfigFile(configPath)
 	}
@@ -50,9 +31,13 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 	v.SetDefault("version", "1.0.0")
 	v.SetDefault("safe_mode", true)
 	v.SetDefault("max_disk_usage_percent", 50)
-	v.SetDefault("protected", []string{"/System", "/Library"}) // Basic protection
+	v.SetDefault("protected", []string{"/System", "/Library"})
 
-	// Try to read configuration file
+	return v
+}
+
+// readConfigFile attempts to read the config file, returning default config if not found.
+func readConfigFile(ctx context.Context, v *viper.Viper) (*domain.Config, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -60,17 +45,19 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		if err := v.ReadInConfig(); err != nil {
 			var configFileNotFoundError viper.ConfigFileNotFoundError
 			if errors.As(err, &configFileNotFoundError) {
-				// Config file not found, return default config
 				return GetDefaultConfig(), nil
 			}
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
+		return nil, nil // File read successfully, continue to unmarshal
 	}
+}
 
-	// Unmarshal profiles section
+// unmarshalConfig unmarshals viper config into domain.Config and validates it.
+func unmarshalConfig(v *viper.Viper) (*domain.Config, error) {
 	var config domain.Config
 
-	// Manually unmarshal fields to avoid YAML tag issues
+	// Unmarshal basic fields
 	config.Version = v.GetString("version")
 	config.SafeMode = boolToSafeMode(v.GetBool("safe_mode"))
 	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
@@ -82,7 +69,19 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
-	// Fix risk levels and settings after unmarshaling (workaround for custom type unmarshaling)
+	// Fix risk levels and settings after unmarshaling
+	fixProfileSettings(v, &config)
+
+	// Validate configuration
+	if err := validateLoadedConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// fixProfileSettings fixes risk levels and settings after unmarshaling.
+func fixProfileSettings(v *viper.Viper, config *domain.Config) {
 	for name, profile := range config.Profiles {
 		for i := range profile.Operations {
 			op := &profile.Operations[i]
@@ -90,31 +89,60 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 			unmarshalOperationSettings(v, name, i, op)
 		}
 	}
+}
 
-	// Removed debug logging for production
-
-	// Enable comprehensive validation - CRITICAL for production safety
+// validateLoadedConfig validates the loaded configuration.
+func validateLoadedConfig(config *domain.Config) error {
 	if err := config.Validate(); err != nil {
-		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+		return pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
-	// Removed debug logging for production
+	validator := NewConfigValidator()
+	if validator == nil {
+		return nil
+	}
 
-	// Apply comprehensive validation with strict enforcement
-	if validator := NewConfigValidator(); validator != nil {
-		validationResult := validator.ValidateConfig(&config)
-		if !validationResult.IsValid {
-			// CRITICAL: Fail fast on validation errors for production safety
-			for _, err := range validationResult.Errors {
-				logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation error")
-			}
-			return nil, fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
+	validationResult := validator.ValidateConfig(config)
+	if !validationResult.IsValid {
+		for _, err := range validationResult.Errors {
+			logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation error")
 		}
+		return fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
 	}
 
-	// Removed debug logging for production
+	return nil
+}
 
-	return &config, nil
+const (
+	configName = ".clean-wizard"
+	configType = "yaml"
+)
+
+// Load loads the configuration from file or creates default.
+func Load() (*domain.Config, error) {
+	return LoadWithContext(context.Background())
+}
+
+// LoadWithContext loads configuration with context support.
+func LoadWithContext(ctx context.Context) (*domain.Config, error) {
+	v := setupViper()
+
+	// Try to read configuration file
+	config, err := readConfigFile(ctx, v)
+	if err != nil || config != nil {
+		return config, err
+	}
+
+	// Unmarshal and process configuration
+	return unmarshalConfig(v)
+}
+
+// boolToSafeMode converts boolean to SafeMode enum.
+func boolToSafeMode(b bool) domain.SafeMode {
+	if b {
+		return domain.SafeModeEnabled
+	}
+	return domain.SafeModeDisabled
 }
 
 // Save saves the configuration to file.

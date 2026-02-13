@@ -85,6 +85,21 @@ func (st ScanType) IsValid() bool {
 	}
 }
 
+// String returns string representation of scan type.
+func (st ScanType) String() string {
+	return string(st)
+}
+
+// Values returns all possible scan types.
+func (st ScanType) Values() []ScanType {
+	return []ScanType{
+		ScanTypeNixStore,
+		ScanTypeHomebrew,
+		ScanTypeSystem,
+		ScanTypeTemp,
+	}
+}
+
 // ScanRequest represents scanning command.
 type ScanRequest struct {
 	Type      ScanType `json:"type"`

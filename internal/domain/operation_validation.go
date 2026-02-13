@@ -141,7 +141,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 				}
 			}
 		}
-	case OperationTypeNodePackages, OperationTypeCargoPackages, OperationTypeLangVersionManager, OperationTypeProjectsManagementAutomation:
+	case OperationTypeNodePackages, OperationTypeCargoPackages, OperationTypeProjectsManagementAutomation:
 		// No enum validation needed for these operation types
 	}
 	return nil

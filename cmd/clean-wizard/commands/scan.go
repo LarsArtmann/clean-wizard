@@ -163,6 +163,8 @@ func getRegistryName(cleanerType CleanerType) string {
 		return "langversion"
 	case CleanerTypeProjectsManagementAutomation:
 		return "projects"
+	case CleanerTypeCompiledBinaries:
+		return "compiled-binaries"
 	default:
 		return ""
 	}
@@ -231,6 +233,8 @@ func estimateCleanerSize(cleanerType CleanerType) uint64 {
 		return 50 * 1024 * 1024 // 50MB
 	case CleanerTypeProjectsManagementAutomation:
 		return 100 * 1024 * 1024 // 100MB
+	case CleanerTypeCompiledBinaries:
+		return 800 * 1024 * 1024 // 800MB
 	default:
 		return 0
 	}

@@ -71,12 +71,6 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 				OlderThan:  "30d",
 			},
 		}
-	case OperationTypeLangVersionManager:
-		settings = &OperationSettings{
-			LangVersionManager: &LangVersionManagerSettings{
-				ManagerTypes: []VersionManagerType{VersionManagerNvm, VersionManagerPyenv, VersionManagerRbenv},
-			},
-		}
 	case OperationTypeSystemTemp:
 		settings = &OperationSettings{
 			SystemTemp: &SystemTempSettings{
@@ -182,15 +176,6 @@ func validateEnumDefaults(settings *OperationSettings, opType OperationType) err
 		for i, ct := range settings.SystemCache.CacheTypes {
 			if !ct.IsValid() {
 				return fmt.Errorf("invalid default CacheType at index %d: %d", i, ct)
-			}
-		}
-	}
-
-	// Validate LangVersionManager
-	if settings.LangVersionManager != nil {
-		for i, vmt := range settings.LangVersionManager.ManagerTypes {
-			if !vmt.IsValid() {
-				return fmt.Errorf("invalid default VersionManagerType at index %d: %d", i, vmt)
 			}
 		}
 	}

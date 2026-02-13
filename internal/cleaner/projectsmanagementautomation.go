@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -141,8 +144,29 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 	return result.Ok(finalResult)
 }
 
+// getCachePath returns the expanded cache directory path.
+func (pc *ProjectsManagementAutomationCleaner) getCachePath() string {
+	cachePath := "~/.config/projects-management-automation/cache"
+	if strings.HasPrefix(cachePath, "~/") {
+		if homeDir, err := os.UserHomeDir(); err == nil {
+			return filepath.Join(homeDir, cachePath[2:])
+		}
+	}
+	return cachePath
+}
+
+// getActualCacheSize returns the actual size of the cache directory.
+func (pc *ProjectsManagementAutomationCleaner) getActualCacheSize() int64 {
+	cachePath := pc.getCachePath()
+	return GetDirSize(cachePath)
+}
+
 // estimateCacheSize estimates the size of the cache.
 func (pc *ProjectsManagementAutomationCleaner) estimateCacheSize() int64 {
-	// Estimate 100MB for typical cache size
+	// Try to get actual size first
+	if actualSize := pc.getActualCacheSize(); actualSize > 0 {
+		return actualSize
+	}
+	// Fallback estimate: 100MB for typical cache size
 	return int64(100 * 1024 * 1024)
 }

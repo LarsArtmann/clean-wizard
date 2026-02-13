@@ -62,56 +62,81 @@ func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.
 		options = getDefaultSaveOptions()
 	}
 
-	// Create backup if requested (independent of monitoring)
-	if options.CreateBackup == BackupOptionEnabled || options.BackupEnabled == BackupOptionEnabled {
-		if err := ecl.createBackup(ctx, config); err != nil {
-			if ecl.enableMonitoring == MonitoringOptionEnabled {
-				fmt.Printf("⚠️ Backup failed: %v\n", err)
-			}
-		} else if ecl.enableMonitoring == MonitoringOptionEnabled {
-			fmt.Printf("💾 Configuration backup created\n")
-		}
-	}
+	ecl.handleBackup(ctx, config, options)
 
-	// Always run validation at requested level
-	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
+	validationResult := ecl.validateAndSanitize(ctx, config, options)
 
-	// Apply sanitization if enabled (after initial validation)
-	if options.EnableSanitization == SanitizeOptionEnabled {
-		ecl.sanitizer.SanitizeConfig(config, validationResult)
-		// Re-check validity after sanitization
-		validationResult = ecl.applyValidation(ctx, config, options.ValidationLevel)
-	}
-
-	// Check final validation state
-	if !validationResult.IsValid {
-		if options.ForceSave == SaveOptionEnabled {
-			if ecl.enableMonitoring == MonitoringOptionEnabled {
-				fmt.Printf("⚠️ Validation failed, forcing save: %s\n", ecl.formatValidationErrors(validationResult.Errors))
-			}
-		} else {
-			return nil, fmt.Errorf("validation failed: %s", ecl.formatValidationErrors(validationResult.Errors))
-		}
-	}
-
-	// Only call saveConfigWithRetry when validation permits saving
-	err := ecl.saveConfigWithRetry(ctx, config, options)
-	if err != nil {
+	if err := ecl.handleValidationFailure(validationResult, options); err != nil {
 		return nil, err
 	}
 
-	// Update cache
-	ecl.cache.Set(config)
-
-	if ecl.enableMonitoring == MonitoringOptionEnabled {
-		if options.ForceSave == SaveOptionEnabled && !validationResult.IsValid {
-			fmt.Printf("💾 Config saved (forced) despite validation failures\n")
-		} else {
-			fmt.Printf("💾 Config saved successfully\n")
-		}
+	if err := ecl.saveConfigWithRetry(ctx, config, options); err != nil {
+		return nil, err
 	}
 
+	ecl.cache.Set(config)
+	ecl.logSaveResult(options, validationResult)
+
 	return config, nil
+}
+
+// handleBackup creates a backup if requested.
+func (ecl *EnhancedConfigLoader) handleBackup(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) {
+	if options.CreateBackup != BackupOptionEnabled && options.BackupEnabled != BackupOptionEnabled {
+		return
+	}
+
+	err := ecl.createBackup(ctx, config)
+	if ecl.enableMonitoring != MonitoringOptionEnabled {
+		return
+	}
+
+	if err != nil {
+		fmt.Printf("⚠️ Backup failed: %v\n", err)
+	} else {
+		fmt.Printf("💾 Configuration backup created\n")
+	}
+}
+
+// validateAndSanitize validates and optionally sanitizes the config.
+func (ecl *EnhancedConfigLoader) validateAndSanitize(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) *ValidationResult {
+	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
+
+	if options.EnableSanitization == SanitizeOptionEnabled {
+		ecl.sanitizer.SanitizeConfig(config, validationResult)
+		validationResult = ecl.applyValidation(ctx, config, options.ValidationLevel)
+	}
+
+	return validationResult
+}
+
+// handleValidationFailure returns error if validation failed and save is not forced.
+func (ecl *EnhancedConfigLoader) handleValidationFailure(validationResult *ValidationResult, options *ConfigSaveOptions) error {
+	if validationResult.IsValid {
+		return nil
+	}
+
+	if options.ForceSave == SaveOptionEnabled {
+		if ecl.enableMonitoring == MonitoringOptionEnabled {
+			fmt.Printf("⚠️ Validation failed, forcing save: %s\n", ecl.formatValidationErrors(validationResult.Errors))
+		}
+		return nil
+	}
+
+	return fmt.Errorf("validation failed: %s", ecl.formatValidationErrors(validationResult.Errors))
+}
+
+// logSaveResult logs the save result if monitoring is enabled.
+func (ecl *EnhancedConfigLoader) logSaveResult(options *ConfigSaveOptions, validationResult *ValidationResult) {
+	if ecl.enableMonitoring != MonitoringOptionEnabled {
+		return
+	}
+
+	if options.ForceSave == SaveOptionEnabled && !validationResult.IsValid {
+		fmt.Printf("💾 Config saved (forced) despite validation failures\n")
+	} else {
+		fmt.Printf("💾 Config saved successfully\n")
+	}
 }
 
 // ValidateConfig validates configuration at specified level.

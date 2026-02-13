@@ -25,7 +25,7 @@ func TestNixCleaningBDD(t *testing.T) {
 		}
 
 		outputStr := string(output)
-		if !contains(outputStr, "✅ Scan completed!") {
+		if !strings.Contains(outputStr, "✅ Scan completed!") {
 			t.Error("❌ Expected scan completion message not found")
 		}
 
@@ -46,15 +46,10 @@ func TestNixCleaningBDD(t *testing.T) {
 		}
 
 		outputStr := string(output)
-		if !contains(outputStr, "✅ Cleanup completed successfully") {
+		if !strings.Contains(outputStr, "✅ Cleanup completed successfully") {
 			t.Error("❌ Expected cleanup completion message not found")
 		}
 
 		t.Logf("✅ Dry-run cleanup completed successfully")
 	})
-}
-
-// contains helper function.
-func contains(s, substr string) bool {
-	return strings.Contains(s, substr)
 }

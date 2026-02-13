@@ -44,9 +44,6 @@ func DefaultRegistry() *Registry {
 	tempFilesCleaner, _ := NewTempFilesCleaner(false, false, "7d", []string{}, []string{filepath.Join("/", "tmp")})
 	registry.Register("tempfiles", tempFilesCleaner)
 
-	// Language version manager cleaner (default: all available managers)
-	registry.Register("langversion", NewLanguageVersionManagerCleaner(false, false, AvailableLangVersionManagers()))
-
 	// Projects management automation cleaner
 	registry.Register("projects", NewProjectsManagementAutomationCleaner(false, false))
 
@@ -95,9 +92,6 @@ func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
 	// Temp files cleaner (default: 7d, standard temp paths)
 	tempFilesCleaner, _ := NewTempFilesCleaner(verbose, dryRun, "7d", []string{}, []string{filepath.Join("/", "tmp")})
 	registry.Register("tempfiles", tempFilesCleaner)
-
-	// Language version manager cleaner (default: all available managers)
-	registry.Register("langversion", NewLanguageVersionManagerCleaner(verbose, dryRun, AvailableLangVersionManagers()))
 
 	// Projects management automation cleaner
 	registry.Register("projects", NewProjectsManagementAutomationCleaner(verbose, dryRun))

@@ -121,85 +121,117 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 	}
 
 	if hbc.dryRun {
-		// Dry-run not supported for Homebrew - print message and return
-		fmt.Println("⚠️  Dry-run mode is not yet supported for Homebrew cleanup.")
-		fmt.Println("   Homebrew does not provide a native dry-run feature.")
-		fmt.Println("   To see what would be cleaned, use: brew cleanup -n (manual check)")
-		cleanResult := domain.CleanResult{
-			FreedBytes:   0,
-			ItemsRemoved: 0,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),
-		}
-		return result.Ok(cleanResult)
+		return hbc.handleDryRun()
 	}
 
-	// Real cleaning implementation
 	startTime := time.Now()
+	cacheDir := hbc.getCacheDir(ctx)
+	commands := hbc.buildCleanupCommands()
 
-	// Determine which cleanup commands to run
-	commands := []string{}
+	itemsRemoved, itemsFailed, bytesFreed := hbc.executeCleanup(ctx, commands, cacheDir)
 
-	// Always run cleanup
-	commands = append(commands, "cleanup")
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   uint64(bytesFreed),
+		ItemsRemoved: uint(itemsRemoved),
+		ItemsFailed:  uint(itemsFailed),
+		CleanTime:    time.Since(startTime),
+		CleanedAt:    time.Now(),
+		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
+	})
+}
 
-	// Prune based on settings
+// handleDryRun returns result for dry-run mode.
+func (hbc *HomebrewCleaner) handleDryRun() result.Result[domain.CleanResult] {
+	fmt.Println("⚠️  Dry-run mode is not yet supported for Homebrew cleanup.")
+	fmt.Println("   Homebrew does not provide a native dry-run feature.")
+	fmt.Println("   To see what would be cleaned, use: brew cleanup -n (manual check)")
+	return result.Ok(domain.CleanResult{
+		FreedBytes:   0,
+		ItemsRemoved: 0,
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),
+	})
+}
+
+// getCacheDir returns the Homebrew cache directory.
+func (hbc *HomebrewCleaner) getCacheDir(ctx context.Context) string {
+	if cacheOutput, err := hbc.execWithTimeout(ctx, "brew", "--cache").Output(); err == nil {
+		return strings.TrimSpace(string(cacheOutput))
+	}
+	return ""
+}
+
+// buildCleanupCommands returns the list of cleanup commands to run.
+func (hbc *HomebrewCleaner) buildCleanupCommands() []string {
+	commands := []string{"cleanup"}
 	if hbc.unusedOnly == domain.HomebrewModeUnusedOnly {
 		commands = append(commands, "prune")
 	}
+	return commands
+}
 
-	itemsRemoved := 0
-	bytesFreed := int64(0)
-	itemsFailed := 0
+// executeCleanup runs cleanup commands and returns results.
+func (hbc *HomebrewCleaner) executeCleanup(ctx context.Context, commands []string, cacheDir string) (itemsRemoved, itemsFailed int, bytesFreed int64) {
+	if cacheDir != "" {
+		bytesFreed, _, _ = CalculateBytesFreed(cacheDir, func() error {
+			itemsRemoved, itemsFailed = hbc.runCleanupCommands(ctx, commands)
+			return nil
+		}, hbc.verbose, "Homebrew Cache")
+	} else {
+		itemsRemoved, itemsFailed = hbc.runCleanupCommands(ctx, commands)
+	}
+	return itemsRemoved, itemsFailed, bytesFreed
+}
 
+// runCleanupCommands executes brew commands and counts removed/failed items.
+func (hbc *HomebrewCleaner) runCleanupCommands(ctx context.Context, commands []string) (itemsRemoved, itemsFailed int) {
 	for _, cmd := range commands {
-		var cleanCmd *exec.Cmd
-		switch cmd {
-		case "cleanup":
-			cleanCmd = hbc.execWithTimeout(ctx, "brew", "cleanup")
-			if hbc.verbose {
-				fmt.Println("🔧 Running 'brew cleanup'")
-			}
-		case "prune":
-			cleanCmd = hbc.execWithTimeout(ctx, "brew", "prune")
-			if hbc.verbose {
-				fmt.Println("🔧 Running 'brew prune'")
-			}
-		}
+		cleanCmd := hbc.execWithTimeout(ctx, "brew", cmd)
+		hbc.logCommandStart(cmd)
 
 		output, err := cleanCmd.CombinedOutput()
 		if err != nil {
 			itemsFailed++
-			if hbc.verbose {
-				fmt.Printf("Warning: 'brew %s' failed: %v\n", cmd, string(output))
-			}
+			hbc.logCommandError(cmd, string(output))
 			continue
 		}
 
-		// Count items removed from output
-		lines := strings.SplitSeq(strings.TrimSpace(string(output)), "\n")
-		for line := range lines {
-			if strings.Contains(line, "removed") || strings.Contains(line, "deleted") {
-				itemsRemoved++
-			}
-		}
+		itemsRemoved += hbc.countRemovedItems(string(output))
+		hbc.logCommandSuccess(cmd)
+	}
+	return itemsRemoved, itemsFailed
+}
 
-		if hbc.verbose {
-			fmt.Printf("✅ 'brew %s' completed\n", cmd)
+// logCommandStart logs command start if verbose.
+func (hbc *HomebrewCleaner) logCommandStart(cmd string) {
+	if hbc.verbose {
+		fmt.Printf("🔧 Running 'brew %s'\n", cmd)
+	}
+}
+
+// logCommandError logs command error if verbose.
+func (hbc *HomebrewCleaner) logCommandError(cmd, output string) {
+	if hbc.verbose {
+		fmt.Printf("Warning: 'brew %s' failed: %s\n", cmd, output)
+	}
+}
+
+// logCommandSuccess logs command success if verbose.
+func (hbc *HomebrewCleaner) logCommandSuccess(cmd string) {
+	if hbc.verbose {
+		fmt.Printf("✅ 'brew %s' completed\n", cmd)
+	}
+}
+
+// countRemovedItems counts items marked as removed in output.
+func (hbc *HomebrewCleaner) countRemovedItems(output string) int {
+	count := 0
+	for line := range strings.SplitSeq(strings.TrimSpace(output), "\n") {
+		if strings.Contains(line, "removed") || strings.Contains(line, "deleted") {
+			count++
 		}
 	}
-
-	duration := time.Since(startTime)
-	cleanResult := domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	}
-
-	return result.Ok(cleanResult)
+	return count
 }

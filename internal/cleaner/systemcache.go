@@ -6,14 +6,16 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// SystemCacheCleaner handles macOS system cache cleanup.
+// SystemCacheCleaner handles system cache cleanup for macOS and Linux.
 type SystemCacheCleaner struct {
 	verbose    bool
 	dryRun     bool
@@ -21,13 +23,29 @@ type SystemCacheCleaner struct {
 	olderThan  time.Duration
 }
 
-// AvailableSystemCacheTypes returns all available system cache types for macOS.
+// AvailableSystemCacheTypes returns all available system cache types for the current platform.
 func AvailableSystemCacheTypes() []domain.CacheType {
-	return []domain.CacheType{
-		domain.CacheTypeSpotlight,
-		domain.CacheTypeXcode,
-		domain.CacheTypeCocoapods,
-		domain.CacheTypeHomebrew,
+	// Use runtime check at call time for accurate platform detection
+	switch runtime.GOOS {
+	case "darwin":
+		return []domain.CacheType{
+			domain.CacheTypeSpotlight,
+			domain.CacheTypeXcode,
+			domain.CacheTypeCocoapods,
+			domain.CacheTypeHomebrew,
+		}
+	case "linux":
+		return []domain.CacheType{
+			domain.CacheTypeXdgCache,
+			domain.CacheTypeThumbnails,
+			domain.CacheTypeHomebrew, // Homebrew works on Linux too
+			domain.CacheTypePip,
+			domain.CacheTypeNpm,
+			domain.CacheTypeYarn,
+			domain.CacheTypeCcache,
+		}
+	default:
+		return []domain.CacheType{}
 	}
 }
 
@@ -64,8 +82,8 @@ func (scc *SystemCacheCleaner) Name() string {
 
 // IsAvailable checks if system cache cleaner is available.
 func (scc *SystemCacheCleaner) IsAvailable(ctx context.Context) bool {
-	// System cache cleaner is only available on macOS
-	return scc.isMacOS()
+	// System cache cleaner is available on macOS and Linux
+	return scc.isMacOS() || scc.isLinux()
 }
 
 // ValidateSettings validates system cache cleaner settings.
@@ -86,7 +104,7 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 			return fmt.Errorf("invalid CacheType at index %d: %d is not a valid cache type", i, ct)
 		}
 		if !validCacheTypes[ct] {
-			return fmt.Errorf("invalid default CacheType at index %d: %d not supported on macOS (valid: spotlight, xcode, cocoapods, homebrew)", i, ct)
+			return fmt.Errorf("invalid default CacheType at index %d: %d not supported on current platform (valid types: %v)", i, ct, validCacheTypes)
 		}
 	}
 
@@ -138,6 +156,7 @@ type cacheTypeConfig struct {
 
 // systemCacheConfigs maps cache types to their configuration.
 var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
+	// macOS-specific cache types
 	domain.CacheTypeSpotlight: {
 		pathComponents: []string{"Library", "Metadata", "CoreSpotlight", "SpotlightKnowledgeEvents"},
 		displayName:    "Spotlight metadata",
@@ -156,6 +175,17 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 	domain.CacheTypeHomebrew: {
 		pathComponents: []string{"Library", "Caches", "Homebrew"},
 		displayName:    "Homebrew cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	// Linux-specific cache types
+	domain.CacheTypeXdgCache: {
+		pathComponents: []string{".cache"},
+		displayName:    "XDG cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeThumbnails: {
+		pathComponents: []string{".cache", "thumbnails"},
+		displayName:    "Thumbnail cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 }
@@ -181,7 +211,7 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType do
 // Clean removes system caches.
 func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !scc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("not available on this platform (requires macOS)"))
+		return result.Err[domain.CleanResult](errors.New("not available on this platform (requires macOS or Linux)"))
 	}
 
 	if scc.dryRun {
@@ -253,15 +283,17 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 // removeCachePath removes a cache directory and returns the appropriate result.
 func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) result.Result[domain.CleanResult] {
 	if scc.dryRun {
+		// Estimate size for dry-run
+		estimatedSize := GetDirSize(path)
 		if scc.verbose {
-			fmt.Printf("  [DRY RUN] Would remove: %s\n", path)
+			fmt.Printf("  [DRY RUN] Would remove: %s (%s)\n", path, format.Bytes(estimatedSize))
 		}
 		return result.Ok(domain.CleanResult{
 			SizeEstimate: domain.SizeEstimate{
-				Known:  0,
-				Status: domain.SizeEstimateStatusUnknown,
+				Known:  uint64(estimatedSize),
+				Status: domain.SizeEstimateStatusKnown,
 			},
-			FreedBytes:   0,
+			FreedBytes:   uint64(estimatedSize),
 			ItemsRemoved: 1,
 			ItemsFailed:  0,
 			CleanTime:    0,
@@ -270,21 +302,24 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 		})
 	}
 
+	// Measure size before removal
+	bytesFreed := GetDirSize(path)
+
 	err := os.RemoveAll(path)
 	if err != nil && !os.IsNotExist(err) {
 		return result.Err[domain.CleanResult](fmt.Errorf("failed to remove %s: %w", path, err))
 	}
 
 	if scc.verbose {
-		fmt.Println("  ✓ " + successMessage)
+		fmt.Printf("  ✓ %s (%s freed)\n", successMessage, format.Bytes(bytesFreed))
 	}
 
 	return result.Ok(domain.CleanResult{
 		SizeEstimate: domain.SizeEstimate{
-			Known:  0,
-			Status: domain.SizeEstimateStatusUnknown,
+			Known:  uint64(bytesFreed),
+			Status: domain.SizeEstimateStatusKnown,
 		},
-		FreedBytes:   0,
+		FreedBytes:   uint64(bytesFreed),
 		ItemsRemoved: 1,
 		ItemsFailed:  0,
 		CleanTime:    0,
@@ -318,6 +353,22 @@ func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context, cacheType d
 
 // isMacOS checks if the system is macOS.
 func (scc *SystemCacheCleaner) isMacOS() bool {
-	// Simple check for macOS
-	return os.Getenv("GOOS") == "darwin" || os.Getenv("OSTYPE") == "darwin"
+	return runtime.GOOS == "darwin"
+}
+
+// isLinux checks if the system is Linux.
+func (scc *SystemCacheCleaner) isLinux() bool {
+	return runtime.GOOS == "linux"
+}
+
+// platform returns the current platform name for logging.
+func (scc *SystemCacheCleaner) platform() string {
+	switch runtime.GOOS {
+	case "darwin":
+		return "macOS"
+	case "linux":
+		return "Linux"
+	default:
+		return runtime.GOOS
+	}
 }

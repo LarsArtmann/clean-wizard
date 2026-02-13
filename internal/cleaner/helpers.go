@@ -11,8 +11,11 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// DryRunBytesPerItem is the estimated bytes freed per item in dry run mode.
+// DryRunBytesPerItem is the estimated bytes freed per item in dry run mode when no size estimator is provided.
 const DryRunBytesPerItem = 300 * 1024 * 1024 // 300MB per item
+
+// SizeEstimatorFunc is a function that estimates the size of an item for dry-run mode.
+type SizeEstimatorFunc[T any] func(item T) int64
 
 // CleanItemFunc is a function that cleans a single item of type T.
 type CleanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[domain.CleanResult]
@@ -22,6 +25,7 @@ type AvailableCheckFunc func(ctx context.Context) bool
 
 // cleanWithIterator is a shared helper function that performs the common clean pattern.
 // It iterates over items, calls the cleanFunc for each, and aggregates results.
+// If sizeEstimator is provided, it uses that for dry-run estimates; otherwise uses DryRunBytesPerItem.
 func cleanWithIterator[T any](
 	ctx context.Context,
 	cleanerName string,
@@ -30,13 +34,21 @@ func cleanWithIterator[T any](
 	cleanFunc CleanItemFunc[T],
 	verbose bool,
 	dryRun bool,
+	sizeEstimator SizeEstimatorFunc[T],
 ) result.Result[domain.CleanResult] {
 	if !availableCheck(ctx) {
 		return result.Err[domain.CleanResult](fmt.Errorf("%s not available", cleanerName))
 	}
 
 	if dryRun {
-		totalBytes := int64(len(items)) * DryRunBytesPerItem
+		var totalBytes int64
+		if sizeEstimator != nil {
+			for _, item := range items {
+				totalBytes += sizeEstimator(item)
+			}
+		} else {
+			totalBytes = int64(len(items)) * DryRunBytesPerItem
+		}
 		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), len(items), totalBytes)
 		return result.Ok(cleanResult)
 	}
@@ -135,16 +147,6 @@ func ValidateOptionalSettingsWithTypes[F any](
 	return ValidateToolTypes(getSlice(field), availableTypes, typeName)
 }
 
-// LangVersionManagerAvailableTypes defines all valid language version manager types.
-var LangVersionManagerAvailableTypes = []string{
-	domain.VersionManagerNvm.String(),
-	domain.VersionManagerPyenv.String(),
-	domain.VersionManagerGvm.String(),
-	domain.VersionManagerRbenv.String(),
-	domain.VersionManagerSdkman.String(),
-	domain.VersionManagerJenv.String(),
-}
-
 // BuildCacheAvailableTypes defines all valid build cache tool types.
 var BuildCacheAvailableTypes = []string{
 	domain.BuildToolGo.String(),
@@ -153,15 +155,6 @@ var BuildCacheAvailableTypes = []string{
 	domain.BuildToolPython.String(),
 	domain.BuildToolJava.String(),
 	domain.BuildToolScala.String(),
-}
-
-// VersionManagerTypeToStringSlice converts domain.VersionManagerType slice to string slice.
-func VersionManagerTypeToStringSlice(types []domain.VersionManagerType) []string {
-	result := make([]string, len(types))
-	for i, t := range types {
-		result[i] = t.String()
-	}
-	return result
 }
 
 // BuildToolTypeToStringSlice converts domain.BuildToolType slice to string slice.
@@ -207,19 +200,6 @@ func CacheTypeToLowerSlice(types []domain.CacheType) []string {
 		result[i] = strings.ToLower(t.String())
 	}
 	return result
-}
-
-// ValidateLangVersionManagerSettings validates language version manager settings.
-func ValidateLangVersionManagerSettings(settings *domain.OperationSettings) error {
-	return ValidateOptionalSettingsWithTypes(
-		settings,
-		func(s *domain.OperationSettings) *domain.LangVersionManagerSettings { return s.LangVersionManager },
-		func(f *domain.LangVersionManagerSettings) []string {
-			return VersionManagerTypeToStringSlice(f.ManagerTypes)
-		},
-		LangVersionManagerAvailableTypes,
-		"manager",
-	)
 }
 
 // ValidateBuildCacheSettings validates build cache settings.

@@ -113,6 +113,8 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		return result.Ok(cleanResult)
 	}
 
+	startTime := time.Now()
+
 	// Get store size before garbage collection
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
@@ -126,6 +128,9 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		return conversions.ToCleanResultFromError(fmt.Errorf("failed to collect garbage: %w", err))
 	}
 
+	// Small delay to ensure async GC operations complete before measuring
+	time.Sleep(500 * time.Millisecond)
+
 	// Get store size after garbage collection
 	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
@@ -137,7 +142,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		0)
 
 	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType), 1, bytesFreed, time.Since(time.Now()))
+	cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType), 1, bytesFreed, time.Since(startTime))
 	return result.Ok(cleanResult)
 }
 
@@ -168,6 +173,8 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 		return result.Ok(cleanResult)
 	}
 
+	startTime := time.Now()
+
 	// Get store size before removal
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
@@ -192,7 +199,7 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 		0)
 
 	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyConservativeType), 1, bytesFreed, time.Since(time.Now()))
+	cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyConservativeType), 1, bytesFreed, time.Since(startTime))
 	return result.Ok(cleanResult)
 }
 

@@ -36,10 +36,10 @@ func runCleaner(ctx context.Context, cleanerType CleanerType, dryRun, verbose bo
 		result, err = runDockerCleaner(ctx, dryRun, verbose)
 	case CleanerTypeSystemCache:
 		result, err = runSystemCacheCleaner(ctx, dryRun, verbose)
-	case CleanerTypeLangVersionMgr:
-		result, err = runLangVersionManagerCleaner(ctx, dryRun, verbose)
 	case CleanerTypeProjectsManagementAutomation:
 		result, err = runProjectsManagementAutomationCleaner(ctx, dryRun, verbose)
+	case CleanerTypeCompiledBinaries:
+		result, err = runCompiledBinariesCleaner(ctx, dryRun, verbose)
 	default:
 		return domain.CleanResult{}, errors.New("unknown cleaner type: " + string(cleanerType))
 	}
@@ -157,17 +157,6 @@ func nodeManagerFactory(v, d bool, managers []domain.PackageManagerType) cleaner
 	return cleaner.NewNodePackageManagerCleaner(v, d, managers)
 }
 
-// runCleanerWithLangVersionManagers executes the Language Version Manager cleaner.
-func runCleanerWithLangVersionManagers(ctx context.Context, verbose, dryRun bool, managers []domain.VersionManagerType) (domain.CleanResult, error) {
-	return runManagerCleaner(ctx, verbose, dryRun, managers, langVersionManagerFactory)
-}
-
-// langVersionManagerFactory is a factory function for Language Version Managers.
-// This adapter bridges the type gap between *LanguageVersionManagerCleaner and cleaner.Cleaner.
-func langVersionManagerFactory(v, d bool, managers []domain.VersionManagerType) cleaner.Cleaner {
-	return cleaner.NewLanguageVersionManagerCleaner(v, d, managers)
-}
-
 // runNodePackageManagerCleaner executes the Node package manager cleaner.
 func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runCleanerWithNodeManagers(ctx, verbose, dryRun, cleaner.AvailableNodePackageManagers())
@@ -216,14 +205,16 @@ func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cl
 	})
 }
 
-// runLangVersionManagerCleaner executes the Language Version Manager cleaner.
-func runLangVersionManagerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runCleanerWithLangVersionManagers(ctx, verbose, dryRun, cleaner.AvailableLangVersionManagers())
-}
-
 // runProjectsManagementAutomationCleaner executes Projects Management Automation cleaner.
 func runProjectsManagementAutomationCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
 		return cleaner.NewProjectsManagementAutomationCleaner(v, d)
+	})
+}
+
+// runCompiledBinariesCleaner executes the Compiled Binaries cleaner.
+func runCompiledBinariesCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewCompiledBinariesCleaner(v, d, cleaner.DefaultMinSizeMB, cleaner.DefaultOlderThan, nil, []string{})
 	})
 }

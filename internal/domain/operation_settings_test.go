@@ -18,7 +18,6 @@ func TestDefaultSettingsValidation(t *testing.T) {
 		OperationTypeBuildCache,
 		OperationTypeDocker,
 		OperationTypeSystemCache,
-		OperationTypeLangVersionManager,
 		OperationTypeSystemTemp,
 		OperationTypeProjectsManagementAutomation,
 	}

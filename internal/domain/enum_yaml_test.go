@@ -43,14 +43,6 @@ func TestEnumYAMLMarshaling(t *testing.T) {
 		{"CacheType Yarn", CacheTypeYarn, "6\n"},
 		{"CacheType Ccache", CacheTypeCcache, "7\n"},
 
-		// VersionManagerType
-		{"VersionManagerType Nvm", VersionManagerNvm, "0\n"},
-		{"VersionManagerType Pyenv", VersionManagerPyenv, "1\n"},
-		{"VersionManagerType Gvm", VersionManagerGvm, "2\n"},
-		{"VersionManagerType Rbenv", VersionManagerRbenv, "3\n"},
-		{"VersionManagerType Sdkman", VersionManagerSdkman, "4\n"},
-		{"VersionManagerType Jenv", VersionManagerJenv, "5\n"},
-
 		// PackageManagerType
 		{"PackageManagerType Npm", PackageManagerNpm, "0\n"},
 		{"PackageManagerType Pnpm", PackageManagerPnpm, "1\n"},
@@ -108,14 +100,6 @@ func TestEnumYAMLUnmarshalingFromString(t *testing.T) {
 		{"CacheType Yarn string", "YARN", new(CacheType), CacheTypeYarn},
 		{"CacheType Ccache string", "CCACHE", new(CacheType), CacheTypeCcache},
 
-		// VersionManagerType
-		{"VersionManagerType Nvm string", "NVM", new(VersionManagerType), VersionManagerNvm},
-		{"VersionManagerType Pyenv string", "PYENV", new(VersionManagerType), VersionManagerPyenv},
-		{"VersionManagerType Gvm string", "GVM", new(VersionManagerType), VersionManagerGvm},
-		{"VersionManagerType Rbenv string", "RBENV", new(VersionManagerType), VersionManagerRbenv},
-		{"VersionManagerType Sdkman string", "SDKMAN", new(VersionManagerType), VersionManagerSdkman},
-		{"VersionManagerType Jenv string", "JENV", new(VersionManagerType), VersionManagerJenv},
-
 		// PackageManagerType
 		{"PackageManagerType Npm string", "NPM", new(PackageManagerType), PackageManagerNpm},
 		{"PackageManagerType Pnpm string", "PNPM", new(PackageManagerType), PackageManagerPnpm},
@@ -139,8 +123,6 @@ func TestEnumYAMLUnmarshalingFromString(t *testing.T) {
 			case *BuildToolType:
 				actual = *v
 			case *CacheType:
-				actual = *v
-			case *VersionManagerType:
 				actual = *v
 			case *PackageManagerType:
 				actual = *v
@@ -190,14 +172,6 @@ func TestEnumYAMLUnmarshalingFromInt(t *testing.T) {
 		{"CacheType Yarn int", "6", new(CacheType), CacheTypeYarn},
 		{"CacheType Ccache int", "7", new(CacheType), CacheTypeCcache},
 
-		// VersionManagerType
-		{"VersionManagerType Nvm int", "0", new(VersionManagerType), VersionManagerNvm},
-		{"VersionManagerType Pyenv int", "1", new(VersionManagerType), VersionManagerPyenv},
-		{"VersionManagerType Gvm int", "2", new(VersionManagerType), VersionManagerGvm},
-		{"VersionManagerType Rbenv int", "3", new(VersionManagerType), VersionManagerRbenv},
-		{"VersionManagerType Sdkman int", "4", new(VersionManagerType), VersionManagerSdkman},
-		{"VersionManagerType Jenv int", "5", new(VersionManagerType), VersionManagerJenv},
-
 		// PackageManagerType
 		{"PackageManagerType Npm int", "0", new(PackageManagerType), PackageManagerNpm},
 		{"PackageManagerType Pnpm int", "1", new(PackageManagerType), PackageManagerPnpm},
@@ -221,8 +195,6 @@ func TestEnumYAMLUnmarshalingFromInt(t *testing.T) {
 			case *BuildToolType:
 				actual = *v
 			case *CacheType:
-				actual = *v
-			case *VersionManagerType:
 				actual = *v
 			case *PackageManagerType:
 				actual = *v
@@ -275,15 +247,6 @@ func TestEnumStringMethod(t *testing.T) {
 		{"CacheType Ccache", CacheTypeCcache, "CCACHE"},
 		{"CacheType Invalid", CacheType(99), "UNKNOWN"},
 
-		// VersionManagerType
-		{"VersionManagerType Nvm", VersionManagerNvm, "NVM"},
-		{"VersionManagerType Pyenv", VersionManagerPyenv, "PYENV"},
-		{"VersionManagerType Gvm", VersionManagerGvm, "GVM"},
-		{"VersionManagerType Rbenv", VersionManagerRbenv, "RBENV"},
-		{"VersionManagerType Sdkman", VersionManagerSdkman, "SDKMAN"},
-		{"VersionManagerType Jenv", VersionManagerJenv, "JENV"},
-		{"VersionManagerType Invalid", VersionManagerType(99), "UNKNOWN"},
-
 		// PackageManagerType
 		{"PackageManagerType Npm", PackageManagerNpm, "NPM"},
 		{"PackageManagerType Pnpm", PackageManagerPnpm, "PNPM"},
@@ -303,8 +266,6 @@ func TestEnumStringMethod(t *testing.T) {
 			case BuildToolType:
 				actual = v.String()
 			case CacheType:
-				actual = v.String()
-			case VersionManagerType:
 				actual = v.String()
 			case PackageManagerType:
 				actual = v.String()
@@ -357,15 +318,6 @@ func TestEnumIsValidMethod(t *testing.T) {
 		{"CacheType Ccache", CacheTypeCcache, true},
 		{"CacheType Invalid", CacheType(99), false},
 
-		// VersionManagerType
-		{"VersionManagerType Nvm", VersionManagerNvm, true},
-		{"VersionManagerType Pyenv", VersionManagerPyenv, true},
-		{"VersionManagerType Gvm", VersionManagerGvm, true},
-		{"VersionManagerType Rbenv", VersionManagerRbenv, true},
-		{"VersionManagerType Sdkman", VersionManagerSdkman, true},
-		{"VersionManagerType Jenv", VersionManagerJenv, true},
-		{"VersionManagerType Invalid", VersionManagerType(99), false},
-
 		// PackageManagerType
 		{"PackageManagerType Npm", PackageManagerNpm, true},
 		{"PackageManagerType Pnpm", PackageManagerPnpm, true},
@@ -385,8 +337,6 @@ func TestEnumIsValidMethod(t *testing.T) {
 			case BuildToolType:
 				actual = v.IsValid()
 			case CacheType:
-				actual = v.IsValid()
-			case VersionManagerType:
 				actual = v.IsValid()
 			case PackageManagerType:
 				actual = v.IsValid()
@@ -424,12 +374,6 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 				CacheTypeXcode,
 			},
 			OlderThan: "30d",
-		},
-		LangVersionManager: &LangVersionManagerSettings{
-			ManagerTypes: []VersionManagerType{
-				VersionManagerNvm,
-				VersionManagerPyenv,
-			},
 		},
 	}
 
@@ -472,14 +416,6 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 	}
 	if unmarshaled.SystemCache.CacheTypes[0] != CacheTypeSpotlight {
 		t.Errorf("SystemCache.CacheTypes[0] = %v, want %v", unmarshaled.SystemCache.CacheTypes[0], CacheTypeSpotlight)
-	}
-
-	// Verify LangVersionManager
-	if len(unmarshaled.LangVersionManager.ManagerTypes) != 2 {
-		t.Errorf("LangVersionManager.ManagerTypes length = %d, want 2", len(unmarshaled.LangVersionManager.ManagerTypes))
-	}
-	if unmarshaled.LangVersionManager.ManagerTypes[0] != VersionManagerNvm {
-		t.Errorf("LangVersionManager.ManagerTypes[0] = %v, want %v", unmarshaled.LangVersionManager.ManagerTypes[0], VersionManagerNvm)
 	}
 }
 

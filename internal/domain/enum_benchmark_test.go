@@ -151,47 +151,6 @@ func BenchmarkUnmarshalYAML_CacheType_String(b *testing.B) {
 	}
 }
 
-// BenchmarkMarshalYAML_VersionManagerType benchmarks marshaling VersionManagerType enum to YAML.
-func BenchmarkMarshalYAML_VersionManagerType(b *testing.B) {
-	testCases := []VersionManagerType{
-		VersionManagerNvm,
-		VersionManagerPyenv,
-		VersionManagerGvm,
-		VersionManagerRbenv,
-		VersionManagerSdkman,
-		VersionManagerJenv,
-	}
-
-	for _, tc := range testCases {
-		b.Run(tc.String(), func(b *testing.B) {
-			for range b.N {
-				_, err := tc.MarshalYAML()
-				if err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
-}
-
-// BenchmarkUnmarshalYAML_VersionManagerType benchmarks unmarshaling VersionManagerType enum.
-func BenchmarkUnmarshalYAML_VersionManagerType_String(b *testing.B) {
-	testCases := []string{"NVM", "PYENV", "GVM", "RBENV", "SDKMAN", "JENV"}
-
-	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
-			for range b.N {
-				var result VersionManagerType
-				// Use actual YAML unmarshaling with string
-				yamlData := fmt.Sprintf(`"%s"`, tc)
-				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
-}
-
 // BenchmarkMarshalYAML_PackageManagerType benchmarks marshaling PackageManagerType enum to YAML.
 func BenchmarkMarshalYAML_PackageManagerType(b *testing.B) {
 	testCases := []PackageManagerType{

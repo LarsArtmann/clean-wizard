@@ -191,6 +191,12 @@ func runCleanCommand(cmd *cobra.Command, args []string, dryRun, verbose, jsonOut
 			continue
 		}
 
+		// Debug: Log individual cleaner contributions
+		if verbose {
+			fmt.Printf("  [DEBUG] %s: %d bytes (%s), %d items\n",
+				name, result.FreedBytes, format.Bytes(int64(result.FreedBytes)), result.ItemsRemoved)
+		}
+
 		totalBytesFreed += result.FreedBytes
 		totalItemsRemoved += result.ItemsRemoved
 		totalItemsFailed += result.ItemsFailed
@@ -336,6 +342,8 @@ func getCleanerName(cleanerType CleanerType) string {
 		return "Language Version Managers"
 	case CleanerTypeProjectsManagementAutomation:
 		return "Projects Management Automation"
+	case CleanerTypeCompiledBinaries:
+		return "Compiled Binaries"
 	default:
 		return string(cleanerType)
 	}
@@ -366,6 +374,8 @@ func getCleanerDescription(cleanerType CleanerType) string {
 		return "Clean NVM, Pyenv, and Rbenv versions (WARNING: Destructive)"
 	case CleanerTypeProjectsManagementAutomation:
 		return "Clear projects-management-automation cache"
+	case CleanerTypeCompiledBinaries:
+		return "Clean compiled binary files in project directories"
 	default:
 		return ""
 	}
@@ -396,6 +406,8 @@ func getCleanerIcon(cleanerType CleanerType) string {
 		return "🗑️"
 	case CleanerTypeProjectsManagementAutomation:
 		return "⚙️"
+	case CleanerTypeCompiledBinaries:
+		return "🔧"
 	default:
 		return ""
 	}
