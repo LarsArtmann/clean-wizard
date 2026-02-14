@@ -3,7 +3,7 @@ package bdd
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"os"
 	"strings"
 	"testing"
