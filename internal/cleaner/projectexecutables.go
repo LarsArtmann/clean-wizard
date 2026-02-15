@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -180,16 +181,11 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 	items := scanResult.Value()
 
 	if len(items) == 0 {
-		cleanResult := domain.CleanResult{
-			SizeEstimate: domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
-			FreedBytes:   0,
-			ItemsRemoved: 0,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-		}
-		return result.Ok(cleanResult)
+		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			0, int64(0),
+			domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
+		))
 	}
 
 	// Calculate total size for dry-run preview
@@ -202,16 +198,11 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 		if p.verbose {
 			fmt.Printf("Would trash %d executable file(s) (%d bytes)\n", len(items), totalBytes)
 		}
-		cleanResult := domain.CleanResult{
-			SizeEstimate: domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
-			FreedBytes:   uint64(totalBytes),
-			ItemsRemoved: uint(len(items)),
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),
-		}
-		return result.Ok(cleanResult)
+		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+			len(items), totalBytes,
+			domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
+		))
 	}
 
 	// Actual cleaning
@@ -239,17 +230,11 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 	}
 
 	duration := time.Since(startTime)
-	cleanResult := domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyAggressiveType),
-	}
-
-	return result.Ok(cleanResult)
+	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
+		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		itemsRemoved, itemsFailed, bytesFreed, duration,
+		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
+	))
 }
 
 // GetStoreSize returns the total size of all executable files found.
