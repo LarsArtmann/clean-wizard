@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -49,15 +50,11 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 			fmt.Println("  💡 Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest")
 			fmt.Println("  💡 Learn more: https://golangci-lint.run/usage/install/")
 		}
-		return result.Ok(domain.CleanResult{
-			SizeEstimate: domain.SizeEstimate{Status: domain.SizeEstimateStatusUnknown}, // Honest: we don't know the size
-			FreedBytes:   0,                                                             // Deprecated field
-			ItemsRemoved: 0,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-		})
+		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			0, int64(0),
+			domain.SizeEstimate{Status: domain.SizeEstimateStatusUnknown},
+		))
 	}
 
 	// Calculate cache size before cleaning
@@ -110,15 +107,11 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 		}
 	}
 
-	return result.Ok(domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{Known: uint64(bytesFreed)},
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, bytesFreed,
+		domain.SizeEstimate{Known: uint64(bytesFreed)},
+	))
 }
 
 // CacheDir returns the lint cache directory path.
