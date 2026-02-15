@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -130,14 +131,13 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 
 	itemsRemoved, itemsFailed, bytesFreed := hbc.executeCleanup(ctx, commands, cacheDir)
 
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    time.Since(startTime),
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResultWithFailures(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		itemsRemoved,
+		itemsFailed,
+		bytesFreed,
+		time.Since(startTime),
+	))
 }
 
 // handleDryRun returns result for dry-run mode.
@@ -145,14 +145,7 @@ func (hbc *HomebrewCleaner) handleDryRun() result.Result[domain.CleanResult] {
 	fmt.Println("⚠️  Dry-run mode is not yet supported for Homebrew cleanup.")
 	fmt.Println("   Homebrew does not provide a native dry-run feature.")
 	fmt.Println("   To see what would be cleaned, use: brew cleanup -n (manual check)")
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   0,
-		ItemsRemoved: 0,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),
-	})
+	return result.Ok(conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), 0, 0))
 }
 
 // getCacheDir returns the Homebrew cache directory.

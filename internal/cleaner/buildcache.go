@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -214,14 +215,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 		fmt.Printf("  ✓ %s cleaned\n", toolName)
 	}
 
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), itemsRemoved, bytesFreed))
 }
 
 // cleanCacheDir removes all items in a cache directory matching a pattern.

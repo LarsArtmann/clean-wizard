@@ -188,6 +188,26 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 		displayName:    "Thumbnail cache",
 		scanType:       domain.ScanTypeTemp,
 	},
+	domain.CacheTypePip: {
+		pathComponents: []string{".cache", "pip"},
+		displayName:    "Pip cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeNpm: {
+		pathComponents: []string{".cache", "npm"},
+		displayName:    "NPM cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeYarn: {
+		pathComponents: []string{".cache", "yarn"},
+		displayName:    "Yarn cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeCcache: {
+		pathComponents: []string{".cache", "ccache"},
+		displayName:    "Ccache",
+		scanType:       domain.ScanTypeTemp,
+	},
 }
 
 // scanSystemCache scans cache for a specific system cache type.

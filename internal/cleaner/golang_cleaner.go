@@ -131,13 +131,26 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 	return gc.buildCleanResult(stats, duration)
 }
 
-// dryRunClean performs dry-run estimation.
+// dryRunClean performs dry-run estimation by scanning actual cache sizes.
 func (gc *GoCleaner) dryRunClean() result.Result[domain.CleanResult] {
-	totalBytes := uint64(200 * 1024 * 1024) // Estimate 200MB
-	itemsRemoved := gc.config.Caches.Count()
+	// Scan actual cache directories to get real sizes
+	scanResult := gc.scanner.Scan(context.Background(), gc.config.Caches)
+	
+	totalBytes := uint64(0)
+	itemsRemoved := 0
+	
+	if scanResult.IsOk() {
+		items := scanResult.Value()
+		itemsRemoved = len(items)
+		for _, item := range items {
+			totalBytes += uint64(item.Size)
+		}
+	} else {
+		// Fallback to counting enabled cache types if scan fails
+		itemsRemoved = gc.config.Caches.Count()
+	}
 
 	cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, int64(totalBytes))
-	// Update with honest size estimate
 	cleanResult.SizeEstimate = domain.SizeEstimate{Known: totalBytes}
 	return result.Ok(cleanResult)
 }

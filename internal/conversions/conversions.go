@@ -96,6 +96,63 @@ func NewCleanResultWithFailures(strategy domain.CleanStrategyType, itemsRemoved,
 	}
 }
 
+// NewCleanResultWithSizeEstimate creates a CleanResult with size estimate for dry-run reporting.
+//
+// Use this function when you need to include size estimate information, typically for dry-run
+// operations where you want to show the user what would be cleaned.
+//
+// Parameters:
+//   - strategy: The cleaning strategy used
+//   - itemsRemoved: Number of items that would be removed
+//   - freedBytes: Total bytes that would be freed
+//   - sizeEstimate: Size estimate with known bytes and status
+//
+// Returns:
+//   - domain.CleanResult: A fully initialized CleanResult with size estimate
+//
+// Example:
+//
+//	estimate := domain.SizeEstimate{Known: 1024*1024*100, Status: domain.SizeEstimateStatusKnown}
+//	result := NewCleanResultWithSizeEstimate(domain.CleanStrategyType(domain.StrategyDryRunType), 5, 1024*1024*100, estimate)
+func NewCleanResultWithSizeEstimate(strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64, sizeEstimate domain.SizeEstimate) domain.CleanResult {
+	return domain.CleanResult{
+		SizeEstimate: sizeEstimate,
+		FreedBytes:   uint64(freedBytes),
+		ItemsRemoved: uint(itemsRemoved),
+		ItemsFailed:  0,
+		CleanTime:    0,
+		CleanedAt:    time.Now(),
+		Strategy:     strategy,
+	}
+}
+
+// NewCleanResultWithTimingAndSize creates a CleanResult with timing and size estimate.
+//
+// Use this function when you need both precise timing and size estimate information.
+// This is useful for real cleaning operations where you tracked time and know the exact bytes freed.
+//
+// Parameters:
+//   - strategy: The cleaning strategy used
+//   - itemsRemoved: Number of items successfully removed
+//   - itemsFailed: Number of items that failed to remove
+//   - freedBytes: Total bytes freed by the operation
+//   - cleanTime: Time duration of the cleaning operation
+//   - sizeEstimate: Size estimate with known bytes and status
+//
+// Returns:
+//   - domain.CleanResult: A fully initialized CleanResult with timing and size estimate
+func NewCleanResultWithTimingAndSize(strategy domain.CleanStrategyType, itemsRemoved, itemsFailed int, freedBytes int64, cleanTime time.Duration, sizeEstimate domain.SizeEstimate) domain.CleanResult {
+	return domain.CleanResult{
+		SizeEstimate: sizeEstimate,
+		FreedBytes:   uint64(freedBytes),
+		ItemsRemoved: uint(itemsRemoved),
+		ItemsFailed:  uint(itemsFailed),
+		CleanTime:    cleanTime,
+		CleanedAt:    time.Now(),
+		Strategy:     strategy,
+	}
+}
+
 // NewScanResult creates a valid ScanResult with all required metrics and metadata.
 //
 // This is the central function for creating scan results throughout the application.

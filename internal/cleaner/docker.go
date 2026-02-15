@@ -369,14 +369,13 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 	cleanResult := pruneResult.Value()
 
 	duration := time.Since(startTime)
-	finalResult := domain.CleanResult{
-		FreedBytes:   cleanResult.FreedBytes,
-		ItemsRemoved: cleanResult.ItemsRemoved,
-		ItemsFailed:  cleanResult.ItemsFailed,
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	}
+	finalResult := conversions.NewCleanResultWithTiming(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		int(cleanResult.ItemsRemoved),
+		int64(cleanResult.FreedBytes),
+		duration,
+	)
+	finalResult.ItemsFailed = cleanResult.ItemsFailed
 
 	return result.Ok(finalResult)
 }
@@ -437,12 +436,5 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 		fmt.Printf("  Warning: failed to parse reclaimed space: %v\n", err)
 	}
 
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 1, bytesFreed))
 }

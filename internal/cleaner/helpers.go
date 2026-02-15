@@ -79,16 +79,13 @@ func cleanWithIterator[T any](
 	}
 
 	duration := time.Since(startTime)
-	cleanResult := domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	}
-
-	return result.Ok(cleanResult)
+	return result.Ok(conversions.NewCleanResultWithFailures(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		itemsRemoved,
+		itemsFailed,
+		bytesFreed,
+		duration,
+	))
 }
 
 // ValidateToolTypes validates configured tool types against a set of available types.

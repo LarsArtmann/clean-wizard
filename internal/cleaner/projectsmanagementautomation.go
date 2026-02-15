@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -104,17 +105,9 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 		// Estimate cache sizes
 		totalBytes := pc.estimateCacheSize()
 		itemsRemoved := 1
-
 		duration := time.Since(startTime)
-		cleanResult := domain.CleanResult{
-			FreedBytes:   uint64(totalBytes),
-			ItemsRemoved: uint(itemsRemoved),
-			ItemsFailed:  0,
-			CleanTime:    duration,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),
-		}
-		return result.Ok(cleanResult)
+
+		return result.Ok(conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes, duration))
 	}
 
 	// Execute projects-management-automation --clear-cache command
@@ -132,16 +125,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 	}
 
 	duration := time.Since(startTime)
-	finalResult := domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  0,
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	}
-
-	return result.Ok(finalResult)
+	return result.Ok(conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyConservativeType), itemsRemoved, bytesFreed, duration))
 }
 
 // getCachePath returns the expanded cache directory path.

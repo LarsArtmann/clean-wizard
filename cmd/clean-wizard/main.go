@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"os"
 
 	"github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands"
+	"github.com/charmbracelet/fang"
 )
 
 func main() {
@@ -17,9 +18,8 @@ func main() {
 	rootCmd.AddCommand(commands.NewProfileCommand())
 	rootCmd.AddCommand(commands.NewConfigCommand())
 
-	// Handle command execution
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Printf("❌ Error: %s\n", err)
+	// Handle command execution with styled output
+	if err := fang.Execute(context.Background(), rootCmd); err != nil {
 		os.Exit(1)
 	}
 }

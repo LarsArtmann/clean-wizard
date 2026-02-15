@@ -114,11 +114,34 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 	}
 
 	if cc.dryRun {
-		// Estimate cache sizes based on typical usage
-		totalBytes := int64(500 * 1024 * 1024) // Estimate 500MB for Cargo
-		itemsRemoved := 1
+		// Calculate actual cache sizes by scanning directories
+		totalBytes := int64(0)
+		itemsRemoved := 0
+
+		// Get CARGO_HOME
+		cargoHome := os.Getenv("CARGO_HOME")
+		if cargoHome == "" {
+			if homeDir, err := GetHomeDir(); err == nil && homeDir != "" {
+				cargoHome = homeDir + "/.cargo"
+			}
+		}
+
+		if cargoHome != "" {
+			registryCache := cargoHome + "/registry"
+			if size := GetDirSize(registryCache); size > 0 {
+				totalBytes += size
+				itemsRemoved++
+			}
+
+			sourceCache := cargoHome + "/git"
+			if size := GetDirSize(sourceCache); size > 0 {
+				totalBytes += size
+				itemsRemoved++
+			}
+		}
 
 		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
+		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)}
 		return result.Ok(cleanResult)
 	}
 

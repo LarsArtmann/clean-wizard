@@ -283,12 +283,26 @@ func (npmc *NodePackageManagerCleaner) Clean(ctx context.Context) result.Result[
 	}
 
 	if npmc.dryRun {
-		// Dry-run not fully supported for all package managers
-		// Estimate cache sizes based on typical usage
-		totalBytes := int64(100 * 1024 * 1024) // Estimate 100MB per available PM
-		itemsRemoved := len(npmc.packageManagers)
+		// Scan actual cache directories to get real sizes
+		scanResult := npmc.Scan(ctx)
+		
+		totalBytes := int64(0)
+		itemsRemoved := 0
+		
+		if scanResult.IsOk() {
+			items := scanResult.Value()
+			itemsRemoved = len(items)
+			for _, item := range items {
+				// Get actual size of each cache directory
+				totalBytes += GetDirSize(item.Path)
+			}
+		} else {
+			// Fallback to counting available package managers if scan fails
+			itemsRemoved = len(npmc.packageManagers)
+		}
 
 		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
+		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)}
 		return result.Ok(cleanResult)
 	}
 
@@ -318,16 +332,10 @@ func (npmc *NodePackageManagerCleaner) Clean(ctx context.Context) result.Result[
 	}
 
 	duration := time.Since(startTime)
-	cleanResult := domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	}
-
-	return result.Ok(cleanResult)
+	return result.Ok(conversions.NewCleanResultWithFailures(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		itemsRemoved, itemsFailed, bytesFreed, duration,
+	))
 }
 
 // runPackageManagerCommand executes a package manager command with common error handling and timeout.
@@ -351,14 +359,10 @@ func (npmc *NodePackageManagerCleaner) runPackageManagerCommand(ctx context.Cont
 
 // createDefaultCleanResult returns a default CleanResult for package manager operations.
 func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanResult {
-	return domain.CleanResult{
-		FreedBytes:   0,
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	}
+	return conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, 0,
+	)
 }
 
 // cleanPackageManager cleans cache for a specific package manager.
@@ -411,14 +415,10 @@ func (npmc *NodePackageManagerCleaner) cleanNpmCache(ctx context.Context) result
 		fmt.Println("  ✓ npm cache cleaned")
 	}
 
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, bytesFreed,
+	))
 }
 
 // cleanPnpmStore cleans the pnpm store and returns bytes freed.
@@ -452,14 +452,10 @@ func (npmc *NodePackageManagerCleaner) cleanPnpmStore(ctx context.Context) resul
 		fmt.Println("  ✓ pnpm store pruned")
 	}
 
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, bytesFreed,
+	))
 }
 
 // cleanYarnCache cleans the yarn cache and returns bytes freed.
@@ -493,14 +489,10 @@ func (npmc *NodePackageManagerCleaner) cleanYarnCache(ctx context.Context) resul
 		fmt.Println("  ✓ yarn cache cleaned")
 	}
 
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, bytesFreed,
+	))
 }
 
 // cleanBunCache cleans the bun cache and returns bytes freed.
@@ -534,12 +526,8 @@ func (npmc *NodePackageManagerCleaner) cleanBunCache(ctx context.Context) result
 		fmt.Println("  ✓ bun cache cleaned")
 	}
 
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, bytesFreed,
+	))
 }

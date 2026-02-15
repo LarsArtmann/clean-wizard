@@ -185,16 +185,13 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 	}
 
 	duration := time.Since(startTime)
-	cleanResult := domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyAggressiveType),
-	}
-
-	return result.Ok(cleanResult)
+	return result.Ok(conversions.NewCleanResultWithFailures(
+		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		itemsRemoved,
+		itemsFailed,
+		bytesFreed,
+		duration,
+	))
 }
 
 // isExcluded checks if a path should be excluded from cleanup.
