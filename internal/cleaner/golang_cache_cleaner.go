@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -87,16 +88,11 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 		fmt.Println(successMessage)
 	}
 
-	size := domain.SizeEstimate{Known: sizeEstimate}
-	return result.Ok(domain.CleanResult{
-		SizeEstimate: size,
-		FreedBytes:   size.Value(), // Deprecated field
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, int64(sizeEstimate),
+		domain.SizeEstimate{Known: sizeEstimate},
+	))
 }
 
 // cleanGoCacheEnv cleans a Go cache specified by environment variable.
@@ -139,15 +135,11 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 			fmt.Println(successMessage)
 		}
 
-		return result.Ok(domain.CleanResult{
-			SizeEstimate: domain.SizeEstimate{Known: uint64(bytesFreed)},
-			FreedBytes:   uint64(bytesFreed),
-			ItemsRemoved: 1,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-		})
+		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			1, bytesFreed,
+			domain.SizeEstimate{Known: uint64(bytesFreed)},
+		))
 	}
 
 	// Dry run - just return estimate
@@ -180,15 +172,11 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 	// Use shell globbing to find build cache folders
 	matches, err := filepath.Glob(tempDir + "/" + buildCachePattern)
 	if err != nil {
-		return result.Ok(domain.CleanResult{
-			SizeEstimate: domain.SizeEstimate{Known: 0},
-			FreedBytes:   0,
-			ItemsRemoved: 0,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-		})
+		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			0, int64(0),
+			domain.SizeEstimate{Known: 0},
+		))
 	}
 
 	itemsRemoved := 0
@@ -223,13 +211,9 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 		fmt.Println("  ✓ Go build cache cleaned")
 	}
 
-	return result.Ok(domain.CleanResult{
-		SizeEstimate: totalSizeEstimate,
-		FreedBytes:   totalSizeEstimate.Value(), // Deprecated field
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		itemsRemoved, int64(totalSizeEstimate.Value()),
+		totalSizeEstimate,
+	))
 }
