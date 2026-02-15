@@ -46,14 +46,14 @@ func TestSize(t *testing.T) {
 		expected string
 	}{
 		{"bytes", int64(512), "512 B"},
-		{"kilobytes", int64(1536), "1.5 KB"},
-		{"megabytes", int64(1572864), "1.5 MB"},
-		{"gigabytes", int64(1610612736), "1.5 GB"},
-		{"terabytes", int64(1649267441664), "1.5 TB"},
-		{"petabytes", int64(1688849860263936), "1.5 PB"},
-		{"exabytes", int64(1729382256910270464), "1.5 EB"},
+		{"kilobytes", int64(1536), "1.5 KiB"},
+		{"megabytes", int64(1572864), "1.5 MiB"},
+		{"gigabytes", int64(1610612736), "1.5 GiB"},
+		{"terabytes", int64(1649267441664), "1.5 TiB"},
+		{"petabytes", int64(1688849860263936), "1.5 PiB"},
+		{"exabytes", int64(1729382256910270464), "1.5 EiB"},
 		{"zero", int64(0), "0 B"},
-		{"negative", int64(-1024), "-1024 B"},
+		{"negative", int64(-1024), "0 B"},
 	}
 
 	runFormattingTests(t, tests, func(v int64) string {

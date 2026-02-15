@@ -2,22 +2,17 @@ package format
 
 import (
 	"fmt"
-	"strconv"
 	"time"
+
+	"github.com/dustin/go-humanize"
 )
 
-// Size formats bytes for human reading.
+// Size formats bytes for human reading using IEC binary prefixes.
 func Size(bytes int64) string {
-	const unit = 1024
-	if bytes < unit {
-		return fmt.Sprintf("%d B", bytes)
+	if bytes < 0 {
+		return "0 B"
 	}
-	div, exp := int64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
+	return humanize.IBytes(uint64(bytes))
 }
 
 // Duration formats duration for human reading.
@@ -55,16 +50,5 @@ func DateTime(t time.Time) string {
 
 // Number formats number with thousand separators.
 func Number(n int64) string {
-	s := strconv.FormatInt(n, 10)
-
-	// Add commas for thousands
-	var result []rune
-	for i, r := range s {
-		if i > 0 && (len(s)-i)%3 == 0 {
-			result = append(result, ',')
-		}
-		result = append(result, r)
-	}
-
-	return string(result)
+	return humanize.Comma(n)
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -144,26 +145,7 @@ func (dc *DockerCleaner) addScanItem(items *[]domain.ScanItem, id string, resour
 	})
 
 	if dc.verbose {
-		fmt.Printf("Found %s: %s (size: %s)\n", resourceType, id, formatBytes(size))
-	}
-}
-
-// formatBytes formats bytes as a human-readable string.
-func formatBytes(bytes int64) string {
-	const (
-		KB = 1024
-		MB = KB * 1024
-		GB = MB * 1024
-	)
-	switch {
-	case bytes >= GB:
-		return fmt.Sprintf("%.2f GB", float64(bytes)/float64(GB))
-	case bytes >= MB:
-		return fmt.Sprintf("%.2f MB", float64(bytes)/float64(MB))
-	case bytes >= KB:
-		return fmt.Sprintf("%.2f KB", float64(bytes)/float64(KB))
-	default:
-		return fmt.Sprintf("%d B", bytes)
+		fmt.Printf("Found %s: %s (size: %s)\n", resourceType, id, format.Bytes(size))
 	}
 }
 
@@ -267,6 +249,58 @@ func (dc *DockerCleaner) parseDockerSizeFromOutput(sizeStr string, resourceType 
 	return size
 }
 
+// estimateSizeFromScan scans Docker resources and returns the total estimated size.
+func (dc *DockerCleaner) estimateSizeFromScan(ctx context.Context) int64 {
+	var totalBytes int64
+
+	switch dc.pruneMode {
+	case domain.DockerPruneAll, domain.DockerPruneImages:
+		if result := dc.scanDanglingImages(ctx); result.IsOk() {
+			for _, item := range result.Value() {
+				totalBytes += item.Size
+			}
+		}
+		if dc.pruneMode != domain.DockerPruneAll {
+			return totalBytes
+		}
+		fallthrough
+	case domain.DockerPruneContainers:
+		if dc.pruneMode == domain.DockerPruneAll || dc.pruneMode == domain.DockerPruneContainers {
+			if result := dc.scanUnusedContainers(ctx); result.IsOk() {
+				for _, item := range result.Value() {
+					totalBytes += item.Size
+				}
+			}
+			if dc.pruneMode != domain.DockerPruneAll {
+				return totalBytes
+			}
+		}
+		fallthrough
+	case domain.DockerPruneVolumes:
+		if dc.pruneMode == domain.DockerPruneAll || dc.pruneMode == domain.DockerPruneVolumes {
+			if result := dc.scanUnusedVolumes(ctx); result.IsOk() {
+				for _, item := range result.Value() {
+					totalBytes += item.Size
+				}
+			}
+			if dc.pruneMode != domain.DockerPruneAll {
+				return totalBytes
+			}
+		}
+		fallthrough
+	case domain.DockerPruneBuilds:
+		// Build cache size estimation - try to get from docker system df
+		cmd := dc.execWithTimeout(ctx, "docker", "system", "df", "--format", "{{.BuildCache}}")
+		if output, err := cmd.CombinedOutput(); err == nil {
+			if size, parseErr := ParseDockerSize(strings.TrimSpace(string(output))); parseErr == nil && size > 0 {
+				totalBytes += size
+			}
+		}
+	}
+
+	return totalBytes
+}
+
 // parseVolumeJSONOutput parses JSON output from docker system df -v for volumes.
 func (dc *DockerCleaner) parseVolumeJSONOutput(output string) []domain.ScanItem {
 	output = strings.TrimSpace(output)
@@ -311,24 +345,16 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 	}
 
 	if dc.dryRun {
-		// Estimate cache sizes based on typical usage
-		var totalBytes int64
-		switch dc.pruneMode {
-		case domain.DockerPruneAll:
-			totalBytes = int64(2 * 1024 * 1024 * 1024) // Estimate 2GB for everything
-		case domain.DockerPruneImages:
-			totalBytes = int64(500 * 1024 * 1024) // Estimate 500MB for images
-		case domain.DockerPruneContainers:
-			totalBytes = int64(100 * 1024 * 1024) // Estimate 100MB for containers
-		case domain.DockerPruneVolumes:
-			totalBytes = int64(100 * 1024 * 1024) // Estimate 100MB for volumes
-		case domain.DockerPruneBuilds:
-			totalBytes = int64(500 * 1024 * 1024) // Estimate 500MB for build cache
-		}
+		// Scan for actual sizes instead of using hardcoded estimates
+		totalBytes := dc.estimateSizeFromScan(ctx)
 
 		itemsRemoved := 1
 
 		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
+		cleanResult.SizeEstimate = domain.SizeEstimate{
+			Known:  uint64(totalBytes),
+			Status:  domain.SizeEstimateStatusKnown,
+		}
 		return result.Ok(cleanResult)
 	}
 
