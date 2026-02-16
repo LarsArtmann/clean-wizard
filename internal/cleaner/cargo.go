@@ -164,15 +164,10 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 			bytesFreed += int64(cacheCleanResult.FreedBytes)
 
 			duration := time.Since(startTime)
-			finalResult := domain.CleanResult{
-				FreedBytes:   uint64(bytesFreed),
-				ItemsRemoved: uint(itemsRemoved),
-				ItemsFailed:  0,
-				CleanTime:    duration,
-				CleanedAt:    time.Now(),
-				Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-			}
-			return result.Ok(finalResult)
+			return result.Ok(conversions.NewCleanResultWithTiming(
+				domain.CleanStrategyType(domain.StrategyConservativeType),
+				itemsRemoved, bytesFreed, duration,
+			))
 		}
 	}
 
@@ -186,16 +181,10 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 	bytesFreed += int64(cleanResult.Value().FreedBytes)
 
 	duration := time.Since(startTime)
-	finalResult := domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  0,
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	}
-
-	return result.Ok(finalResult)
+	return result.Ok(conversions.NewCleanResultWithTiming(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		itemsRemoved, bytesFreed, duration,
+	))
 }
 
 // cleanWithCargoCacheTool cleans using cargo-cache extension.
@@ -266,14 +255,10 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 		}
 	}
 
-	return result.Ok(domain.CleanResult{
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, bytesFreed,
+	))
 }
 
 // hasCargoCacheTool checks if cargo-cache tool is available.

@@ -284,20 +284,11 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	}
 
 	duration := time.Since(startTime)
-	cleanResult := domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{
-			Known:  uint64(bytesFreed),
-			Status: status,
-		},
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: uint(itemsRemoved),
-		ItemsFailed:  uint(itemsFailed),
-		CleanTime:    duration,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	}
-
-	return result.Ok(cleanResult)
+	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		itemsRemoved, itemsFailed, bytesFreed, duration,
+		domain.SizeEstimate{Known: uint64(bytesFreed), Status: status},
+	))
 }
 
 // removeCachePath removes a cache directory and returns the appropriate result.
@@ -308,18 +299,11 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 		if scc.verbose {
 			fmt.Printf("  [DRY RUN] Would remove: %s (%s)\n", path, format.Bytes(estimatedSize))
 		}
-		return result.Ok(domain.CleanResult{
-			SizeEstimate: domain.SizeEstimate{
-				Known:  uint64(estimatedSize),
-				Status: domain.SizeEstimateStatusKnown,
-			},
-			FreedBytes:   uint64(estimatedSize),
-			ItemsRemoved: 1,
-			ItemsFailed:  0,
-			CleanTime:    0,
-			CleanedAt:    time.Now(),
-			Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-		})
+		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			1, estimatedSize,
+			domain.SizeEstimate{Known: uint64(estimatedSize), Status: domain.SizeEstimateStatusKnown},
+		))
 	}
 
 	// Measure size before removal
@@ -334,18 +318,11 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 		fmt.Printf("  ✓ %s (%s freed)\n", successMessage, format.Bytes(bytesFreed))
 	}
 
-	return result.Ok(domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{
-			Known:  uint64(bytesFreed),
-			Status: domain.SizeEstimateStatusKnown,
-		},
-		FreedBytes:   uint64(bytesFreed),
-		ItemsRemoved: 1,
-		ItemsFailed:  0,
-		CleanTime:    0,
-		CleanedAt:    time.Now(),
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
-	})
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, bytesFreed,
+		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
+	))
 }
 
 // scanCachePath scans a cache directory and returns scan items.
