@@ -235,15 +235,27 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	}
 
 	if scc.dryRun {
-		// Estimate cache sizes based on typical usage
-		totalBytes := int64(1 * 1024 * 1024 * 1024) // Estimate 1GB total
-		itemsRemoved := len(scc.cacheTypes)
+		// Scan actual cache directories to get real sizes
+		scanResult := scc.Scan(ctx)
+
+		var totalBytes int64
+		var itemsRemoved int
+
+		if scanResult.IsOk() {
+			items := scanResult.Value()
+			itemsRemoved = len(items)
+			for _, item := range items {
+				totalBytes += item.Size
+			}
+		} else {
+			// Fallback to counting cache types if scan fails
+			itemsRemoved = len(scc.cacheTypes)
+		}
 
 		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
-		// Set SizeEstimate properly
 		cleanResult.SizeEstimate = domain.SizeEstimate{
 			Known:  uint64(totalBytes),
-			Status: domain.SizeEstimateStatusKnown,
+			Status:  domain.SizeEstimateStatusKnown,
 		}
 		return result.Ok(cleanResult)
 	}

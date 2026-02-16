@@ -47,6 +47,68 @@ func (gcc *GoCacheCleaner) Name() string {
 	return "golang"
 }
 
+// Scan scans for the configured cache type and returns scan items.
+func (gcc *GoCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+	items := make([]domain.ScanItem, 0)
+
+	switch gcc.cacheType {
+	case GoCacheGOCACHE:
+		items = append(items, gcc.scanGoEnvCache(ctx, "GOCACHE")...)
+	case GoCacheTestCache:
+		// Test cache doesn't have a separate path - it's part of GOCACHE
+		// We just mark it as scannable without a specific path
+	case GoCacheModCache:
+		items = append(items, gcc.scanGoEnvCache(ctx, "GOMODCACHE")...)
+	case GoCacheBuildCache:
+		items = append(items, gcc.scanGoBuildCache()...)
+	}
+
+	return result.Ok(items)
+}
+
+// scanGoEnvCache scans a Go environment variable cache path.
+func (gcc *GoCacheCleaner) scanGoEnvCache(ctx context.Context, envVar string) []domain.ScanItem {
+	cachePath, err := gcc.helper.getGoEnv(ctx, envVar)
+	if err != nil || cachePath == "" {
+		return []domain.ScanItem{}
+	}
+
+	return []domain.ScanItem{
+		{
+			Path:     cachePath,
+			Size:     GetDirSize(cachePath),
+			Created:  GetDirModTime(cachePath),
+			ScanType: domain.ScanTypeTemp,
+		},
+	}
+}
+
+// scanGoBuildCache scans go-build* folders in temp directories.
+func (gcc *GoCacheCleaner) scanGoBuildCache() []domain.ScanItem {
+	items := make([]domain.ScanItem, 0)
+	buildCachePattern := "go-build*"
+	tempDir := "/tmp"
+	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
+		tempDir = homeDir + "/Library/Caches"
+	}
+
+	matches, err := filepath.Glob(tempDir + "/" + buildCachePattern)
+	if err != nil {
+		return items
+	}
+
+	for _, match := range matches {
+		items = append(items, domain.ScanItem{
+			Path:     match,
+			Size:     GetDirSize(match),
+			Created:  GetDirModTime(match),
+			ScanType: domain.ScanTypeTemp,
+		})
+	}
+
+	return items
+}
+
 // Clean cleans the specified cache type.
 func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	switch gcc.cacheType {
@@ -142,8 +204,13 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 		))
 	}
 
-	// Dry run - just return estimate
-	return gcc.executeGoCleanCommand(ctx, cleanFlag, successMessage, 0)
+	// Dry run - calculate size estimate and return
+	bytesFreed = GetDirSize(cachePath)
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1, bytesFreed,
+		domain.SizeEstimate{Known: uint64(bytesFreed)},
+	))
 }
 
 // cleanGoCache cleans GOCACHE.
@@ -182,11 +249,9 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 	itemsRemoved := 0
 	var totalSizeEstimate domain.SizeEstimate
 	for _, match := range matches {
-		// Calculate size before removal
-		if !gcc.dryRun {
-			bytesFreed := GetDirSize(match)
-			totalSizeEstimate = domain.SizeEstimate{Known: totalSizeEstimate.Known + uint64(bytesFreed)}
-		}
+		// Calculate size before removal (always, for accurate dry-run estimates)
+		bytesFreed := GetDirSize(match)
+		totalSizeEstimate = domain.SizeEstimate{Known: totalSizeEstimate.Known + uint64(bytesFreed)}
 
 		if gcc.dryRun {
 			itemsRemoved++

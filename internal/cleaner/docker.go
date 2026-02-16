@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
@@ -49,13 +50,6 @@ func (dc *DockerCleaner) Type() domain.OperationType {
 // Name returns the unique identifier for this cleaner.
 func (dc *DockerCleaner) Name() string {
 	return "docker"
-}
-
-// execWithTimeout executes a Docker command with timeout.
-func (dc *DockerCleaner) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
-	timeoutCtx, cancel := context.WithTimeout(ctx, dockerCommandTimeout)
-	_ = cancel // will be called by cmd.Wait() or context usage
-	return exec.CommandContext(timeoutCtx, name, arg...)
 }
 
 // IsAvailable checks if Docker is available.
@@ -151,7 +145,7 @@ func (dc *DockerCleaner) addScanItem(items *[]domain.ScanItem, id string, resour
 
 // scanDanglingImages scans for dangling Docker images with size information.
 func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[]domain.ScanItem] {
-	cmd := dc.execWithTimeout(ctx, "docker", "images", "-f", "dangling=true", "--format", "{{.ID}}\t{{.Size}}")
+	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "images", "-f", "dangling=true", "--format", "{{.ID}}\t{{.Size}}")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to scan dangling images: %w", err))
@@ -163,7 +157,7 @@ func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[
 
 // scanUnusedContainers scans for stopped Docker containers with size information.
 func (dc *DockerCleaner) scanUnusedContainers(ctx context.Context) result.Result[[]domain.ScanItem] {
-	cmd := dc.execWithTimeout(ctx, "docker", "ps", "-a", "--filter", "status=exited", "--format", "{{.ID}}\t{{.Size}}")
+	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "ps", "-a", "--filter", "status=exited", "--format", "{{.ID}}\t{{.Size}}")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to scan unused containers: %w", err))
@@ -176,7 +170,7 @@ func (dc *DockerCleaner) scanUnusedContainers(ctx context.Context) result.Result
 // scanUnusedVolumes scans for unused Docker volumes with size information.
 func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]domain.ScanItem] {
 	// Use docker system df -v to get volume sizes
-	cmd := dc.execWithTimeout(ctx, "docker", "system", "df", "-v", "--format", "{{json .Volumes}}")
+	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "system", "df", "-v", "--format", "{{json .Volumes}}")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		// Fallback to basic listing if json format not available
@@ -189,7 +183,7 @@ func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]
 
 // scanVolumesFallback is a fallback method for scanning volumes when system df fails.
 func (dc *DockerCleaner) scanVolumesFallback(ctx context.Context) result.Result[[]domain.ScanItem] {
-	cmd := dc.execWithTimeout(ctx, "docker", "volume", "ls", "-q")
+	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "volume", "ls", "-q")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to scan volumes: %w", err))
@@ -290,7 +284,7 @@ func (dc *DockerCleaner) estimateSizeFromScan(ctx context.Context) int64 {
 		fallthrough
 	case domain.DockerPruneBuilds:
 		// Build cache size estimation - try to get from docker system df
-		cmd := dc.execWithTimeout(ctx, "docker", "system", "df", "--format", "{{.BuildCache}}")
+		cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "system", "df", "--format", "{{.BuildCache}}")
 		if output, err := cmd.CombinedOutput(); err == nil {
 			if size, parseErr := ParseDockerSize(strings.TrimSpace(string(output))); parseErr == nil && size > 0 {
 				totalBytes += size
@@ -419,7 +413,7 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 		return result.Err[domain.CleanResult](fmt.Errorf("unknown Docker prune mode: %s", dc.pruneMode))
 	}
 
-	cmd := dc.execWithTimeout(ctx, "docker", args...)
+	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("docker system prune failed: %w (output: %s)", err, string(output)))

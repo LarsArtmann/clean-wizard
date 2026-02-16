@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -42,13 +43,6 @@ func (hbc *HomebrewCleaner) Name() string {
 	return "homebrew"
 }
 
-// execWithTimeout executes a Homebrew command with timeout.
-func (hbc *HomebrewCleaner) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
-	timeoutCtx, cancel := context.WithTimeout(ctx, homebrewCommandTimeout)
-	_ = cancel // will be called by cmd.Wait() or context usage
-	return exec.CommandContext(timeoutCtx, name, arg...)
-}
-
 // IsAvailable checks if Homebrew cleaner is available.
 func (hbc *HomebrewCleaner) IsAvailable(ctx context.Context) bool {
 	// Check if brew command exists
@@ -80,7 +74,7 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 	items := make([]domain.ScanItem, 0)
 
 	// Get list of outdated packages
-	outdatedCmd := hbc.execWithTimeout(ctx, "brew", "outdated")
+	outdatedCmd := adapters.ExecWithTimeout(ctx, homebrewCommandTimeout, "brew", "outdated")
 	output, err := outdatedCmd.CombinedOutput()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to check for outdated packages: %w", err))
@@ -150,7 +144,7 @@ func (hbc *HomebrewCleaner) handleDryRun() result.Result[domain.CleanResult] {
 
 // getCacheDir returns the Homebrew cache directory.
 func (hbc *HomebrewCleaner) getCacheDir(ctx context.Context) string {
-	if cacheOutput, err := hbc.execWithTimeout(ctx, "brew", "--cache").Output(); err == nil {
+	if cacheOutput, err := adapters.ExecWithTimeout(ctx, homebrewCommandTimeout, "brew", "--cache").Output(); err == nil {
 		return strings.TrimSpace(string(cacheOutput))
 	}
 	return ""
@@ -181,7 +175,7 @@ func (hbc *HomebrewCleaner) executeCleanup(ctx context.Context, commands []strin
 // runCleanupCommands executes brew commands and counts removed/failed items.
 func (hbc *HomebrewCleaner) runCleanupCommands(ctx context.Context, commands []string) (itemsRemoved, itemsFailed int) {
 	for _, cmd := range commands {
-		cleanCmd := hbc.execWithTimeout(ctx, "brew", cmd)
+		cleanCmd := adapters.ExecWithTimeout(ctx, homebrewCommandTimeout, "brew", cmd)
 		hbc.logCommandStart(cmd)
 
 		output, err := cleanCmd.CombinedOutput()

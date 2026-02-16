@@ -18,4 +18,8 @@ type Cleaner interface {
 
 	// IsAvailable checks if the cleaner can run on this system.
 	IsAvailable(ctx context.Context) bool
+
+	// Scan scans for cleanable items and returns them as scan items.
+	// This is used for dry-run estimation and preview functionality.
+	Scan(ctx context.Context) result.Result[[]domain.ScanItem]
 }

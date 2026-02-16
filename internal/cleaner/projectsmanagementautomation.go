@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -17,16 +18,6 @@ import (
 
 // DefaultProjectsAutomationTimeout is the default timeout for automation commands.
 const DefaultProjectsAutomationTimeout = 2 * time.Minute
-
-// execWithTimeout creates a command with timeout protection.
-func (pc *ProjectsManagementAutomationCleaner) execWithTimeout(ctx context.Context, name string, args ...string) *exec.Cmd {
-	if _, hasDeadline := ctx.Deadline(); hasDeadline {
-		return exec.CommandContext(ctx, name, args...)
-	}
-	timeoutCtx, cancel := context.WithTimeout(ctx, DefaultProjectsAutomationTimeout)
-	_ = cancel
-	return exec.CommandContext(timeoutCtx, name, args...)
-}
 
 // ProjectsManagementAutomationCleaner handles projects-management-automation cache cleanup.
 type ProjectsManagementAutomationCleaner struct {
@@ -111,7 +102,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 	}
 
 	// Execute projects-management-automation --clear-cache command
-	cmd := pc.execWithTimeout(ctx, "projects-management-automation", "--clear-cache")
+	cmd := adapters.ExecWithTimeout(ctx, DefaultProjectsAutomationTimeout, "projects-management-automation", "--clear-cache")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[domain.CleanResult](fmt.Errorf("projects-management-automation --clear-cache failed: %w (output: %s)", err, string(output)))

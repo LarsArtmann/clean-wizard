@@ -185,3 +185,49 @@ func GetOperationType(name string) OperationType {
 		return OperationType(name) // Fallback for custom types
 	}
 }
+
+// String returns the string representation of the OperationType.
+func (ot OperationType) String() string {
+	return string(ot)
+}
+
+// IsValid returns true if the OperationType is a known valid type.
+func (ot OperationType) IsValid() bool {
+	switch ot {
+	case OperationTypeNixGenerations,
+		OperationTypeTempFiles,
+		OperationTypeHomebrew,
+		OperationTypeNodePackages,
+		OperationTypeGoPackages,
+		OperationTypeCargoPackages,
+		OperationTypeBuildCache,
+		OperationTypeDocker,
+		OperationTypeSystemCache,
+		OperationTypeSystemTemp,
+		OperationTypeProjectsManagementAutomation,
+		OperationTypeProjectExecutables,
+		OperationTypeCompiledBinaries:
+		return true
+	default:
+		return false
+	}
+}
+
+// Values returns all valid OperationType values.
+func (OperationType) Values() []OperationType {
+	return []OperationType{
+		OperationTypeNixGenerations,
+		OperationTypeTempFiles,
+		OperationTypeHomebrew,
+		OperationTypeNodePackages,
+		OperationTypeGoPackages,
+		OperationTypeCargoPackages,
+		OperationTypeBuildCache,
+		OperationTypeDocker,
+		OperationTypeSystemCache,
+		OperationTypeSystemTemp,
+		OperationTypeProjectsManagementAutomation,
+		OperationTypeProjectExecutables,
+		OperationTypeCompiledBinaries,
+	}
+}

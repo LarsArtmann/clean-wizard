@@ -60,6 +60,28 @@ func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
 	return nc.adapter.IsAvailable(ctx)
 }
 
+// Scan scans for Nix generations and returns them as scan items.
+func (nc *NixCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+	genResult := nc.ListGenerations(ctx)
+	if genResult.IsErr() {
+		return result.Err[[]domain.ScanItem](genResult.Error())
+	}
+
+	generations := genResult.Value()
+	items := make([]domain.ScanItem, 0, len(generations))
+
+	for _, gen := range generations {
+		items = append(items, domain.ScanItem{
+			Path:     gen.Path,
+			Size:     0, // Individual generation size is hard to determine
+			Created:  gen.Date,
+			ScanType: domain.ScanTypeNixStore,
+		})
+	}
+
+	return result.Ok(items)
+}
+
 // Clean implements the Cleaner interface.
 // It removes old Nix generations, keeping the configured number of generations.
 func (nc *NixCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {

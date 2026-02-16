@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -16,13 +17,6 @@ import (
 // CargoCleaner handles Rust/Cargo cleanup.
 
 const cargoCommandTimeout = 5 * time.Minute
-
-// execWithTimeout executes a Cargo command with timeout.
-func (cc *CargoCleaner) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
-	timeoutCtx, cancel := context.WithTimeout(ctx, cargoCommandTimeout)
-	_ = cancel // will be called by cmd.Wait() or context usage
-	return exec.CommandContext(timeoutCtx, name, arg...)
-}
 
 type CargoCleaner struct {
 	verbose bool
@@ -231,7 +225,7 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 	cacheDir := cc.getCargoCacheDir()
 	if cacheDir != "" {
 		bytesFreed, _, _ = CalculateBytesFreed(cacheDir, func() error {
-			cmd := cc.execWithTimeout(ctx, cmdName, args...)
+			cmd := adapters.ExecWithTimeout(ctx, cargoCommandTimeout, cmdName, args...)
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				return fmt.Errorf(errorFormat, err, string(output))
@@ -244,7 +238,7 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 		}
 	} else {
 		// Cache directory not found, just execute command
-		cmd := cc.execWithTimeout(ctx, cmdName, args...)
+		cmd := adapters.ExecWithTimeout(ctx, cargoCommandTimeout, cmdName, args...)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return result.Err[domain.CleanResult](fmt.Errorf(errorFormat, err, string(output)))
