@@ -78,9 +78,9 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **Scanning**               | ✅ Working          | Scans dangling images, stopped containers, volumes |
 | **Prune Modes**            | ✅ Working          | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS           |
 | **System Prune**           | ✅ Working          | `docker system prune -af --volumes`                |
-| **Dry Run Mode**           | ✅ Working            | Scans actual Docker resources for real estimates         |
+| **Dry Run Mode**           | ✅ Working          | Scans actual Docker resources for real estimates   |
 | **Timeout Handling**       | ✅ Working          | 2-minute timeout on operations                     |
-| **Size Reporting**         | ✅ Working            | Parses freed bytes from docker output               |
+| **Size Reporting**         | ✅ Working          | Parses freed bytes from docker output              |
 
 **Notes:**
 
@@ -112,16 +112,16 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### 5. Cargo Cleaner (Rust) 🦀
 
-| Aspect                     | Status                  | Details                                         |
-| -------------------------- | ----------------------- | ----------------------------------------------- |
-| **Overall**                | ✅ FULLY_FUNCTIONAL     | Comprehensive implementation                    |
-| **Availability Detection** | ✅ Working              | Checks for `cargo` command                      |
-| **Scanning**               | ✅ Working              | Scans `~/.cargo/registry` and `~/.cargo/git`    |
-| **Standard Clean**         | ✅ Working              | Runs `cargo clean`                              |
-| **cargo-cache Tool**       | ✅ Working              | Uses `cargo-cache --autoclean` if available     |
-| **Dry Run Mode**           | ✅ Working              | Scans actual registry and git cache sizes       |
-| **Size Reporting**         | ✅ Working              | Calculates bytes freed from cache directories   |
-| **Fallback Logic**         | ✅ Working              | Falls back to manual clean if cargo-cache fails |
+| Aspect                     | Status              | Details                                         |
+| -------------------------- | ------------------- | ----------------------------------------------- |
+| **Overall**                | ✅ FULLY_FUNCTIONAL | Comprehensive implementation                    |
+| **Availability Detection** | ✅ Working          | Checks for `cargo` command                      |
+| **Scanning**               | ✅ Working          | Scans `~/.cargo/registry` and `~/.cargo/git`    |
+| **Standard Clean**         | ✅ Working          | Runs `cargo clean`                              |
+| **cargo-cache Tool**       | ✅ Working          | Uses `cargo-cache --autoclean` if available     |
+| **Dry Run Mode**           | ✅ Working          | Scans actual registry and git cache sizes       |
+| **Size Reporting**         | ✅ Working          | Calculates bytes freed from cache directories   |
+| **Fallback Logic**         | ✅ Working          | Falls back to manual clean if cargo-cache fails |
 
 **Notes:**
 
@@ -174,22 +174,22 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### 8. System Cache Cleaner ⚙️
 
-| Aspect                   | Status                | Details                                                     |
-| ------------------------ | --------------------- | ----------------------------------------------------------- |
-| **Overall**              | ✅ FULLY_FUNCTIONAL   | macOS and Linux support                                     |
-| **Platform Support**     | ✅ Working            | macOS and Linux supported                                   |
-| **Availability Check**   | ✅ Working            | Runtime OS detection                                        |
-| **Spotlight Cache**      | ✅ Working            | `~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents` |
-| **Xcode DerivedData**    | ✅ Working            | `~/Library/Developer/Xcode/DerivedData`                     |
-| **CocoaPods Cache**      | ✅ Working            | `~/Library/Caches/CocoaPods`                                |
-| **Homebrew Cache**       | ✅ Working            | `~/Library/Caches/Homebrew`                                 |
-| **Linux Pip Cache**      | ✅ Working            | `~/.cache/pip`                                              |
-| **Linux npm Cache**      | ✅ Working            | `~/.cache/npm`                                              |
-| **Linux Yarn Cache**     | ✅ Working            | `~/.cache/yarn`                                             |
-| **Linux ccache**         | ✅ Working            | `~/.cache/ccache`                                           |
-| **Age-Based Filtering**  | ✅ Working            | Configurable `older_than` duration                          |
-| **Dry Run Mode**         | ✅ Working            | Correctly previews actions                                  |
-| **Extended Cache Types** | ✅ Working            | Pip, npm, yarn, ccache implemented for Linux                |
+| Aspect                   | Status              | Details                                                     |
+| ------------------------ | ------------------- | ----------------------------------------------------------- |
+| **Overall**              | ✅ FULLY_FUNCTIONAL | macOS and Linux support                                     |
+| **Platform Support**     | ✅ Working          | macOS and Linux supported                                   |
+| **Availability Check**   | ✅ Working          | Runtime OS detection                                        |
+| **Spotlight Cache**      | ✅ Working          | `~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents` |
+| **Xcode DerivedData**    | ✅ Working          | `~/Library/Developer/Xcode/DerivedData`                     |
+| **CocoaPods Cache**      | ✅ Working          | `~/Library/Caches/CocoaPods`                                |
+| **Homebrew Cache**       | ✅ Working          | `~/Library/Caches/Homebrew`                                 |
+| **Linux Pip Cache**      | ✅ Working          | `~/.cache/pip`                                              |
+| **Linux npm Cache**      | ✅ Working          | `~/.cache/npm`                                              |
+| **Linux Yarn Cache**     | ✅ Working          | `~/.cache/yarn`                                             |
+| **Linux ccache**         | ✅ Working          | `~/.cache/ccache`                                           |
+| **Age-Based Filtering**  | ✅ Working          | Configurable `older_than` duration                          |
+| **Dry Run Mode**         | ✅ Working          | Correctly previews actions                                  |
+| **Extended Cache Types** | ✅ Working          | Pip, npm, yarn, ccache implemented for Linux                |
 
 **Notes:**
 
@@ -223,16 +223,16 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### 10. Language Version Manager Cleaner 🗑️
 
-| Aspect              | Status              | Details                                             |
-| ------------------- | ------------------- | --------------------------------------------------- |
-| **Overall**         | 📝 NOT_IMPLEMENTED  | Placeholder only                                    |
-| **Availability**    | ✅ Working          | Always available (file-based)                       |
-| **Scanning**        | ✅ Working          | Scans NVM, Pyenv, Rbenv directories                 |
-| **NVM Support**     | 📝 NOT_IMPLEMENTED  | Scans only, does NOT clean                          |
-| **Pyenv Support**   | 📝 NOT_IMPLEMENTED  | Scans only, does NOT clean                          |
-| **Rbenv Support**   | 📝 NOT_IMPLEMENTED  | Scans only, does NOT clean                          |
-| **Clean Operation** | 📝 NOT_IMPLEMENTED  | NO-OP - prints warning only                         |
-| **Domain Enum**     | 📝 PLANNED          | GVM, SDKMAN, Jenv exist in enum but NOT implemented |
+| Aspect              | Status             | Details                                             |
+| ------------------- | ------------------ | --------------------------------------------------- |
+| **Overall**         | 📝 NOT_IMPLEMENTED | Placeholder only                                    |
+| **Availability**    | ✅ Working         | Always available (file-based)                       |
+| **Scanning**        | ✅ Working         | Scans NVM, Pyenv, Rbenv directories                 |
+| **NVM Support**     | 📝 NOT_IMPLEMENTED | Scans only, does NOT clean                          |
+| **Pyenv Support**   | 📝 NOT_IMPLEMENTED | Scans only, does NOT clean                          |
+| **Rbenv Support**   | 📝 NOT_IMPLEMENTED | Scans only, does NOT clean                          |
+| **Clean Operation** | 📝 NOT_IMPLEMENTED | NO-OP - prints warning only                         |
+| **Domain Enum**     | 📝 PLANNED         | GVM, SDKMAN, Jenv exist in enum but NOT implemented |
 
 **Notes:**
 
@@ -441,6 +441,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 Clean Wizard has a **solid foundation** with excellent architecture and type safety. Most cleaners are now production-ready with accurate dry-run estimates and proper size reporting.
 
 **Recent Improvements:**
+
 - Docker, Go, Cargo, Node cleaners now scan actual cache sizes instead of using hardcoded estimates
 - System Cache cleaner now supports both macOS and Linux
 - Size reporting works correctly for most cleaners

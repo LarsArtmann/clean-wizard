@@ -8,20 +8,20 @@ import (
 )
 
 var (
-	version = ""      // Set via -ldflags at build time
-	commit  = ""      // Set via -ldflags at build time
-	date    = ""      // Set via -ldflags at build time
+	version = ""           // Set via -ldflags at build time
+	commit  = ""           // Set via -ldflags at build time
+	date    = ""           // Set via -ldflags at build time
 	builtBy = "goreleaser" // Set via -ldflags at build time
 )
 
 // Info contains version information.
 type Info struct {
-	Version   string
-	Commit    string
-	Date      string
-	BuiltBy   string
-	IsDirty   bool
-	GitTag    string
+	Version string
+	Commit  string
+	Date    string
+	BuiltBy string
+	IsDirty bool
+	GitTag  string
 }
 
 // Get returns the current version info.

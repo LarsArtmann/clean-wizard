@@ -16,14 +16,14 @@ Successfully integrated **charmbracelet/fang** for styled CLI output with compre
 
 ### Completed This Session
 
-| Item | Status | Details |
-|------|--------|---------|
-| Fang Integration | ✅ DONE | `main.go` uses `fang.Execute()` with `WithVersion`, `WithCommit`, `WithNotifySignal` |
-| Version Package | ✅ DONE | `internal/version/version.go` (140 lines) |
-| Version Tests | ✅ DONE | 10 tests, all passing in 0.479s |
-| CLI --version | ✅ DONE | `clean-wizard version 2026.02.16-dirty (ba2d974)` |
-| Cargo Cleaner Refactor | ✅ DONE | Converted to use conversions helpers |
-| SystemCache Cleaner Refactor | ✅ DONE | Converted to use conversions helpers |
+| Item                         | Status  | Details                                                                              |
+| ---------------------------- | ------- | ------------------------------------------------------------------------------------ |
+| Fang Integration             | ✅ DONE | `main.go` uses `fang.Execute()` with `WithVersion`, `WithCommit`, `WithNotifySignal` |
+| Version Package              | ✅ DONE | `internal/version/version.go` (140 lines)                                            |
+| Version Tests                | ✅ DONE | 10 tests, all passing in 0.479s                                                      |
+| CLI --version                | ✅ DONE | `clean-wizard version 2026.02.16-dirty (ba2d974)`                                    |
+| Cargo Cleaner Refactor       | ✅ DONE | Converted to use conversions helpers                                                 |
+| SystemCache Cleaner Refactor | ✅ DONE | Converted to use conversions helpers                                                 |
 
 ### Test Results
 
@@ -56,13 +56,13 @@ ok      github.com/LarsArtmann/clean-wizard/internal/version    0.479s
 
 ## Files Changed This Session
 
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `cmd/clean-wizard/main.go` | Modified | Added fang integration with version support |
-| `internal/version/version.go` | Created | Version management package |
-| `internal/version/version_test.go` | Created | Comprehensive test suite |
-| `internal/cleaner/cargo.go` | Modified | Refactored to use conversions helpers |
-| `internal/cleaner/systemcache.go` | Modified | Refactored to use conversions helpers |
+| File                               | Change Type | Description                                 |
+| ---------------------------------- | ----------- | ------------------------------------------- |
+| `cmd/clean-wizard/main.go`         | Modified    | Added fang integration with version support |
+| `internal/version/version.go`      | Created     | Version management package                  |
+| `internal/version/version_test.go` | Created     | Comprehensive test suite                    |
+| `internal/cleaner/cargo.go`        | Modified    | Refactored to use conversions helpers       |
+| `internal/cleaner/systemcache.go`  | Modified    | Refactored to use conversions helpers       |
 
 ---
 
@@ -86,13 +86,13 @@ ok      github.com/LarsArtmann/clean-wizard/internal/version    0.479s
 
 ### Key Functions
 
-| Function | Purpose |
-|----------|---------|
-| `Get()` | Returns complete `Info` struct |
-| `Version()` | Returns version string for fang |
-| `Commit()` | Returns commit hash for fang |
-| `Info.String()` | Full formatted version string |
-| `Info.Short()` | Just the version |
+| Function        | Purpose                         |
+| --------------- | ------------------------------- |
+| `Get()`         | Returns complete `Info` struct  |
+| `Version()`     | Returns version string for fang |
+| `Commit()`      | Returns commit hash for fang    |
+| `Info.String()` | Full formatted version string   |
+| `Info.Short()`  | Just the version                |
 
 ---
 
@@ -100,29 +100,29 @@ ok      github.com/LarsArtmann/clean-wizard/internal/version    0.479s
 
 ### Cleaners Status (11 Total)
 
-| Cleaner | Status | Dry-Run | Size Accurate |
-|---------|--------|---------|---------------|
-| Nix | ✅ Production | 🧪 Mock | 🧪 Mock |
-| Homebrew | ✅ Production | 🚧 No | 🧪 Mock |
-| Docker | ✅ Production | ✅ Yes | ✅ Yes |
-| Go | ✅ Production | ✅ Yes | ✅ Yes |
-| Cargo | ✅ Production | ✅ Yes | ✅ Yes |
-| Node Packages | ✅ Production | ✅ Yes | ✅ Yes |
-| Build Cache | ⚠️ Limited | ✅ Yes | ✅ Yes |
-| System Cache | ✅ Production | ✅ Yes | ✅ Yes |
-| Temp Files | ✅ Production | ✅ Yes | ✅ Yes |
-| Lang Version Mgr | 📝 Placeholder | N/A | N/A |
-| Projects Mgmt | 🚧 Non-Functional | 🧪 Mock | 🧪 Mock |
+| Cleaner          | Status            | Dry-Run | Size Accurate |
+| ---------------- | ----------------- | ------- | ------------- |
+| Nix              | ✅ Production     | 🧪 Mock | 🧪 Mock       |
+| Homebrew         | ✅ Production     | 🚧 No   | 🧪 Mock       |
+| Docker           | ✅ Production     | ✅ Yes  | ✅ Yes        |
+| Go               | ✅ Production     | ✅ Yes  | ✅ Yes        |
+| Cargo            | ✅ Production     | ✅ Yes  | ✅ Yes        |
+| Node Packages    | ✅ Production     | ✅ Yes  | ✅ Yes        |
+| Build Cache      | ⚠️ Limited        | ✅ Yes  | ✅ Yes        |
+| System Cache     | ✅ Production     | ✅ Yes  | ✅ Yes        |
+| Temp Files       | ✅ Production     | ✅ Yes  | ✅ Yes        |
+| Lang Version Mgr | 📝 Placeholder    | N/A     | N/A           |
+| Projects Mgmt    | 🚧 Non-Functional | 🧪 Mock | 🧪 Mock       |
 
 ### CLI Commands Status
 
-| Command | Status |
-|---------|--------|
-| `clean-wizard clean` | ✅ Implemented |
-| `clean-wizard scan` | 📝 Planned |
-| `clean-wizard init` | 📝 Planned |
-| `clean-wizard profile` | 📝 Planned |
-| `clean-wizard config` | 📝 Planned |
+| Command                | Status         |
+| ---------------------- | -------------- |
+| `clean-wizard clean`   | ✅ Implemented |
+| `clean-wizard scan`    | 📝 Planned     |
+| `clean-wizard init`    | 📝 Planned     |
+| `clean-wizard profile` | 📝 Planned     |
+| `clean-wizard config`  | 📝 Planned     |
 
 ---
 
@@ -130,36 +130,36 @@ ok      github.com/LarsArtmann/clean-wizard/internal/version    0.479s
 
 ### 1. What Did We Forget?
 
-| Item | Impact | Notes |
-|------|--------|-------|
-| goreleaser.yml | High | Needed for release automation with ldflags |
-| Justfile ldflags | Medium | Local versioned builds not using version injection |
-| CLI command tests | Medium | No tests for command wiring |
-| Integration tests | Medium | Full test suite timed out (possible BDD issue) |
+| Item              | Impact | Notes                                              |
+| ----------------- | ------ | -------------------------------------------------- |
+| goreleaser.yml    | High   | Needed for release automation with ldflags         |
+| Justfile ldflags  | Medium | Local versioned builds not using version injection |
+| CLI command tests | Medium | No tests for command wiring                        |
+| Integration tests | Medium | Full test suite timed out (possible BDD issue)     |
 
 ### 2. What Could We Have Done Better?
 
-| Item | Improvement |
-|------|-------------|
+| Item             | Improvement                                                             |
+| ---------------- | ----------------------------------------------------------------------- |
 | Commit frequency | Should have committed version package separately from cleaner refactors |
-| Test isolation | Should have run tests package-by-package from start |
-| Documentation | Version package could use more inline documentation |
+| Test isolation   | Should have run tests package-by-package from start                     |
+| Documentation    | Version package could use more inline documentation                     |
 
 ### 3. Type Model Improvements
 
-| Current State | Proposed Improvement |
-|---------------|---------------------|
-| `Info` struct is mutable | Consider immutable builder pattern |
-| Version string is free-form | Consider semantic version parsing |
-| No validation on version format | Add `IsValid()` method |
+| Current State                   | Proposed Improvement               |
+| ------------------------------- | ---------------------------------- |
+| `Info` struct is mutable        | Consider immutable builder pattern |
+| Version string is free-form     | Consider semantic version parsing  |
+| No validation on version format | Add `IsValid()` method             |
 
 ### 4. Library Opportunities
 
-| Use Case | Current | Better Alternative |
-|----------|---------|-------------------|
+| Use Case        | Current           | Better Alternative      |
+| --------------- | ----------------- | ----------------------- |
 | Version parsing | Manual string ops | `Masterminds/semver/v3` |
-| Git operations | `exec.Command` | `go-git/go-git/v5` |
-| CLI styling | fang (new) | ✅ Good choice |
+| Git operations  | `exec.Command`    | `go-git/go-git/v5`      |
+| CLI styling     | fang (new)        | ✅ Good choice          |
 
 ---
 
@@ -167,47 +167,47 @@ ok      github.com/LarsArtmann/clean-wizard/internal/version    0.479s
 
 ### Phase 1: Immediate (Next Session)
 
-| # | Task | Effort | Impact | Priority |
-|---|------|--------|--------|----------|
-| 1.1 | Create `.goreleaser.yml` | Low | High | NOW |
-| 1.2 | Update Justfile with ldflags | Low | Medium | NOW |
-| 1.3 | Run full test suite package-by-package | Medium | High | NOW |
-| 1.4 | Fix any failing tests | Medium | High | NOW |
+| #   | Task                                   | Effort | Impact | Priority |
+| --- | -------------------------------------- | ------ | ------ | -------- |
+| 1.1 | Create `.goreleaser.yml`               | Low    | High   | NOW      |
+| 1.2 | Update Justfile with ldflags           | Low    | Medium | NOW      |
+| 1.3 | Run full test suite package-by-package | Medium | High   | NOW      |
+| 1.4 | Fix any failing tests                  | Medium | High   | NOW      |
 
 ### Phase 2: CLI Commands (1-2 Sessions)
 
-| # | Task | Effort | Impact | Priority |
-|---|------|--------|--------|----------|
-| 2.1 | Implement `scan` command | Medium | High | NEXT |
-| 2.2 | Implement `init` command | Medium | Medium | NEXT |
-| 2.3 | Implement `profile` command | Medium | Medium | LATER |
-| 2.4 | Implement `config` command | Medium | Medium | LATER |
+| #   | Task                        | Effort | Impact | Priority |
+| --- | --------------------------- | ------ | ------ | -------- |
+| 2.1 | Implement `scan` command    | Medium | High   | NEXT     |
+| 2.2 | Implement `init` command    | Medium | Medium | NEXT     |
+| 2.3 | Implement `profile` command | Medium | Medium | LATER    |
+| 2.4 | Implement `config` command  | Medium | Medium | LATER    |
 
 ### Phase 3: Cleaner Improvements (2-3 Sessions)
 
-| # | Task | Effort | Impact | Priority |
-|---|------|--------|--------|----------|
-| 3.1 | Fix Nix size estimation (remove mock) | Medium | Medium | SOON |
-| 3.2 | Implement Language Version Manager cleaning | High | Medium | LATER |
-| 3.3 | Remove/refactor Projects Management cleaner | Low | Low | LATER |
+| #   | Task                                        | Effort | Impact | Priority |
+| --- | ------------------------------------------- | ------ | ------ | -------- |
+| 3.1 | Fix Nix size estimation (remove mock)       | Medium | Medium | SOON     |
+| 3.2 | Implement Language Version Manager cleaning | High   | Medium | LATER    |
+| 3.3 | Remove/refactor Projects Management cleaner | Low    | Low    | LATER    |
 
 ### Phase 4: Architecture (3-5 Sessions)
 
-| # | Task | Effort | Impact | Priority |
-|---|------|--------|--------|----------|
-| 4.1 | Generic Context System | High | High | PLANNING |
-| 4.2 | Domain Model Enhancement | High | High | PLANNING |
-| 4.3 | Reduce function complexity (21 functions) | Medium | Medium | LATER |
-| 4.4 | Add samber/do/v2 DI | High | Medium | DEFERRED |
+| #   | Task                                      | Effort | Impact | Priority |
+| --- | ----------------------------------------- | ------ | ------ | -------- |
+| 4.1 | Generic Context System                    | High   | High   | PLANNING |
+| 4.2 | Domain Model Enhancement                  | High   | High   | PLANNING |
+| 4.3 | Reduce function complexity (21 functions) | Medium | Medium | LATER    |
+| 4.4 | Add samber/do/v2 DI                       | High   | Medium | DEFERRED |
 
 ### Phase 5: Quality & Documentation
 
-| # | Task | Effort | Impact | Priority |
-|---|------|--------|--------|----------|
-| 5.1 | Create ARCHITECTURE.md | Medium | Medium | SOON |
-| 5.2 | Complete enum validation | Low | Medium | LATER |
-| 5.3 | Refactor BDD test helpers | Medium | Low | LATER |
-| 5.4 | Remove dead enum values | Low | Low | LATER |
+| #   | Task                      | Effort | Impact | Priority |
+| --- | ------------------------- | ------ | ------ | -------- |
+| 5.1 | Create ARCHITECTURE.md    | Medium | Medium | SOON     |
+| 5.2 | Complete enum validation  | Low    | Medium | LATER    |
+| 5.3 | Refactor BDD test helpers | Medium | Low    | LATER    |
+| 5.4 | Remove dead enum values   | Low    | Low    | LATER    |
 
 ---
 
@@ -266,14 +266,14 @@ New:
 
 ## Metrics
 
-| Metric | Value |
-|--------|-------|
-| Total Cleaners | 11 |
-| Production Ready | 8 (73%) |
-| Total Tests (version package) | 10 |
-| Test Pass Rate | 100% |
-| Uncommitted Files | 5 |
-| Commits Ahead of Origin | 4 |
+| Metric                        | Value   |
+| ----------------------------- | ------- |
+| Total Cleaners                | 11      |
+| Production Ready              | 8 (73%) |
+| Total Tests (version package) | 10      |
+| Test Pass Rate                | 100%    |
+| Uncommitted Files             | 5       |
+| Commits Ahead of Origin       | 4       |
 
 ---
 

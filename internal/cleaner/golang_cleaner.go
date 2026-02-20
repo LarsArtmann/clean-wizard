@@ -135,10 +135,10 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 func (gc *GoCleaner) dryRunClean() result.Result[domain.CleanResult] {
 	// Scan actual cache directories to get real sizes
 	scanResult := gc.scanner.Scan(context.Background(), gc.config.Caches)
-	
+
 	totalBytes := uint64(0)
 	itemsRemoved := 0
-	
+
 	if scanResult.IsOk() {
 		items := scanResult.Value()
 		itemsRemoved = len(items)

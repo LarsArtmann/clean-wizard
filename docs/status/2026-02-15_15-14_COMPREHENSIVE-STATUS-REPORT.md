@@ -13,22 +13,22 @@ The clean-wizard project is in a **TRANSITION STATE** with a critical build brea
 
 ### Critical Blockers
 
-| Issue | File | Lines Affected | Severity |
-|-------|------|----------------|----------|
+| Issue                | File              | Lines Affected          | Severity         |
+| -------------------- | ----------------- | ----------------------- | ---------------- |
 | Extra closing braces | `nodepackages.go` | 340, 424, 462, 500, 538 | 🔴 BUILD BREAKER |
 
 ---
 
 ## A) FULLY DONE ✅
 
-| Task | Commit | Verification |
-|------|--------|--------------|
-| go-humanize integration for Size/Number formatting | `f239b2c` | `internal/format/format.go` uses `humanize.IBytes()`, `humanize.Comma()` |
-| conversions.NewCleanResult* helpers created | Uncommitted | `internal/conversions/conversions.go` has 6 helper functions |
-| Converted 6 cleaner files to use conversions helpers | Uncommitted | homebrew, buildcache, tempfiles, docker, helpers, projectsmanagementautomation |
-| Added `NewCleanResultWithSizeEstimate` helper | Uncommitted | For dry-run results with size estimates |
-| Added `NewCleanResultWithTimingAndSize` helper | Uncommitted | Full-featured result constructor |
-| Fixed `projectsmanagementautomation.go` duration scope | Uncommitted | Line 107-109 now properly declares `duration` in dry-run block |
+| Task                                                   | Commit      | Verification                                                                   |
+| ------------------------------------------------------ | ----------- | ------------------------------------------------------------------------------ |
+| go-humanize integration for Size/Number formatting     | `f239b2c`   | `internal/format/format.go` uses `humanize.IBytes()`, `humanize.Comma()`       |
+| conversions.NewCleanResult\* helpers created           | Uncommitted | `internal/conversions/conversions.go` has 6 helper functions                   |
+| Converted 6 cleaner files to use conversions helpers   | Uncommitted | homebrew, buildcache, tempfiles, docker, helpers, projectsmanagementautomation |
+| Added `NewCleanResultWithSizeEstimate` helper          | Uncommitted | For dry-run results with size estimates                                        |
+| Added `NewCleanResultWithTimingAndSize` helper         | Uncommitted | Full-featured result constructor                                               |
+| Fixed `projectsmanagementautomation.go` duration scope | Uncommitted | Line 107-109 now properly declares `duration` in dry-run block                 |
 
 ### Available Conversion Helpers
 
@@ -47,25 +47,25 @@ CombineCleanResults([]CleanResult)
 
 ## B) PARTIALLY DONE ⚠️
 
-### conversions.NewCleanResult* Consistency Refactoring
+### conversions.NewCleanResult\* Consistency Refactoring
 
 **Progress:** 6/13 cleaner files converted (46%)
 
-| File | Status | Notes |
-|------|--------|-------|
-| `homebrew.go` | ✅ Converted | Uses `NewCleanResultWithFailures`, `NewCleanResult` |
-| `buildcache.go` | ✅ Converted | Uses `NewCleanResult` |
-| `tempfiles.go` | ✅ Converted | Uses `NewCleanResultWithFailures` |
-| `docker.go` | ✅ Converted | Uses `NewCleanResultWithTiming`, `NewCleanResult` |
-| `helpers.go` | ✅ Converted | Uses `NewCleanResultWithFailures` |
-| `projectsmanagementautomation.go` | ✅ Converted | Fixed duration scope issue |
-| `nodepackages.go` | ❌ BROKEN | 5 extra `}` causing syntax errors |
-| `cargo.go` | ⏳ Pending | 3 instances at lines 167, 189, 269 |
-| `systemcache.go` | ⏳ Pending | 4 instances (needs SizeEstimate) |
-| `compiledbinaries.go` | ⏳ Pending | 3 instances (needs SizeEstimate) |
-| `projectexecutables.go` | ⏳ Pending | 3 instances (needs SizeEstimate) |
-| `golang_cache_cleaner.go` | ⏳ Pending | 4 instances |
-| `golang_lint_adapter.go` | ⏳ Pending | 2 instances |
+| File                              | Status       | Notes                                               |
+| --------------------------------- | ------------ | --------------------------------------------------- |
+| `homebrew.go`                     | ✅ Converted | Uses `NewCleanResultWithFailures`, `NewCleanResult` |
+| `buildcache.go`                   | ✅ Converted | Uses `NewCleanResult`                               |
+| `tempfiles.go`                    | ✅ Converted | Uses `NewCleanResultWithFailures`                   |
+| `docker.go`                       | ✅ Converted | Uses `NewCleanResultWithTiming`, `NewCleanResult`   |
+| `helpers.go`                      | ✅ Converted | Uses `NewCleanResultWithFailures`                   |
+| `projectsmanagementautomation.go` | ✅ Converted | Fixed duration scope issue                          |
+| `nodepackages.go`                 | ❌ BROKEN    | 5 extra `}` causing syntax errors                   |
+| `cargo.go`                        | ⏳ Pending   | 3 instances at lines 167, 189, 269                  |
+| `systemcache.go`                  | ⏳ Pending   | 4 instances (needs SizeEstimate)                    |
+| `compiledbinaries.go`             | ⏳ Pending   | 3 instances (needs SizeEstimate)                    |
+| `projectexecutables.go`           | ⏳ Pending   | 3 instances (needs SizeEstimate)                    |
+| `golang_cache_cleaner.go`         | ⏳ Pending   | 4 instances                                         |
+| `golang_lint_adapter.go`          | ⏳ Pending   | 2 instances                                         |
 
 **Remaining Direct CleanResult Constructions:** 19 instances across 7 files
 
@@ -73,23 +73,23 @@ CombineCleanResults([]CleanResult)
 
 ## C) NOT STARTED 📝
 
-| Task | Priority | Estimated Effort | Impact |
-|------|----------|------------------|--------|
-| Standardize error handling with `ToCleanResultFromError` | Medium | Low | Consistency |
-| Standardize availability checks in `Clean()` methods | Medium | Low | Code quality |
-| Create centralized `execWithTimeout` helper | High | Medium | DRY principle |
-| Add `Scan()` to Cleaner interface | High | Medium | API completeness |
-| Add missing type-safe enums | Medium | Medium | Type safety |
-| Extend `cleanWithIterator`/`scanWithIterator` usage | Low | High | Code reuse |
-| Generic Context System (unify ValidationContext, ErrorDetails, SanitizationChange) | High | High | Architecture |
-| Domain Model Enhancement (Validate(), Sanitize(), ApplyProfile()) | Medium | High | Architecture |
-| Fix Docker size reporting (returns 0) | High | Low | User experience |
-| Fix Cargo size reporting | Medium | Low | User experience |
-| Improve dry-run estimates | Medium | Medium | Accuracy |
-| Add Linux support for SystemCache cleaner | Low | Medium | Platform support |
-| Create ARCHITECTURE.md | Low | Low | Documentation |
-| Document CleanerRegistry usage | Low | Low | Documentation |
-| Investigate samber/do/v2 dependency injection | Low | High | Architecture |
+| Task                                                                               | Priority | Estimated Effort | Impact           |
+| ---------------------------------------------------------------------------------- | -------- | ---------------- | ---------------- |
+| Standardize error handling with `ToCleanResultFromError`                           | Medium   | Low              | Consistency      |
+| Standardize availability checks in `Clean()` methods                               | Medium   | Low              | Code quality     |
+| Create centralized `execWithTimeout` helper                                        | High     | Medium           | DRY principle    |
+| Add `Scan()` to Cleaner interface                                                  | High     | Medium           | API completeness |
+| Add missing type-safe enums                                                        | Medium   | Medium           | Type safety      |
+| Extend `cleanWithIterator`/`scanWithIterator` usage                                | Low      | High             | Code reuse       |
+| Generic Context System (unify ValidationContext, ErrorDetails, SanitizationChange) | High     | High             | Architecture     |
+| Domain Model Enhancement (Validate(), Sanitize(), ApplyProfile())                  | Medium   | High             | Architecture     |
+| Fix Docker size reporting (returns 0)                                              | High     | Low              | User experience  |
+| Fix Cargo size reporting                                                           | Medium   | Low              | User experience  |
+| Improve dry-run estimates                                                          | Medium   | Medium           | Accuracy         |
+| Add Linux support for SystemCache cleaner                                          | Low      | Medium           | Platform support |
+| Create ARCHITECTURE.md                                                             | Low      | Low              | Documentation    |
+| Document CleanerRegistry usage                                                     | Low      | Low              | Documentation    |
+| Investigate samber/do/v2 dependency injection                                      | Low      | High             | Architecture     |
 
 ---
 
@@ -100,6 +100,7 @@ CombineCleanResults([]CleanResult)
 **Problem:** Previous multiedit operation added extra `}` after 5 function returns.
 
 **Error Messages:**
+
 ```
 internal/cleaner/nodepackages.go:340:1: syntax error: non-declaration statement outside function body
 internal/cleaner/nodepackages.go:424:1: syntax error: non-declaration statement outside function body
@@ -111,6 +112,7 @@ internal/cleaner/nodepackages.go:538:1: syntax error: non-declaration statement 
 **Root Cause:** Each conversion from inline `domain.CleanResult{...}` to `conversions.NewCleanResult(...)` accidentally added an extra closing brace.
 
 **Locations (need to remove extra `}`):**
+
 - Line 340 (after `Clean()` function)
 - Line 424 (after `cleanNpmCache()`)
 - Line 462 (after `cleanPnpmStore()`)
@@ -156,48 +158,48 @@ internal/cleaner/nodepackages.go:538:1: syntax error: non-declaration statement 
 
 ### Immediate (Do First!)
 
-| # | Task | Blocker? | Effort |
-|---|------|----------|--------|
-| 1 | **FIX nodepackages.go syntax errors** (remove 5 extra `}`) | YES | 2 min |
-| 2 | Run `go build ./...` to verify fix | YES | 1 min |
-| 3 | Commit conversions changes | NO | 2 min |
-| 4 | Push to origin | NO | 1 min |
+| #   | Task                                                       | Blocker? | Effort |
+| --- | ---------------------------------------------------------- | -------- | ------ |
+| 1   | **FIX nodepackages.go syntax errors** (remove 5 extra `}`) | YES      | 2 min  |
+| 2   | Run `go build ./...` to verify fix                         | YES      | 1 min  |
+| 3   | Commit conversions changes                                 | NO       | 2 min  |
+| 4   | Push to origin                                             | NO       | 1 min  |
 
 ### High Priority (This Session)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 5 | Convert remaining 7 cleaner files to conversions helpers | High | 30 min |
-| 6 | Add tests for conversions helpers | Medium | 20 min |
-| 7 | Create centralized `execWithTimeout` helper | High | 30 min |
-| 8 | Fix Docker size reporting | High | 15 min |
+| #   | Task                                                     | Impact | Effort |
+| --- | -------------------------------------------------------- | ------ | ------ |
+| 5   | Convert remaining 7 cleaner files to conversions helpers | High   | 30 min |
+| 6   | Add tests for conversions helpers                        | Medium | 20 min |
+| 7   | Create centralized `execWithTimeout` helper              | High   | 30 min |
+| 8   | Fix Docker size reporting                                | High   | 15 min |
 
 ### Medium Priority (Next Session)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 9 | Add `Scan()` to Cleaner interface | Medium | 1 hr |
-| 10 | Standardize error handling with `ToCleanResultFromError` | Medium | 30 min |
-| 11 | Fix Cargo size reporting | Medium | 15 min |
-| 12 | Improve dry-run estimates with actual scanning | Medium | 1 hr |
-| 13 | Add `IsValid()`, `Values()`, `String()` to all enums | Medium | 1 hr |
+| #   | Task                                                     | Impact | Effort |
+| --- | -------------------------------------------------------- | ------ | ------ |
+| 9   | Add `Scan()` to Cleaner interface                        | Medium | 1 hr   |
+| 10  | Standardize error handling with `ToCleanResultFromError` | Medium | 30 min |
+| 11  | Fix Cargo size reporting                                 | Medium | 15 min |
+| 12  | Improve dry-run estimates with actual scanning           | Medium | 1 hr   |
+| 13  | Add `IsValid()`, `Values()`, `String()` to all enums     | Medium | 1 hr   |
 
 ### Lower Priority (Future)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 14 | Generic Context System | High | 4 hr |
-| 15 | Domain Model Enhancement | Medium | 2 hr |
-| 16 | Reduce LoadWithContext complexity | Low | 1 hr |
-| 17 | Refactor BDD test helpers | Low | 2 hr |
-| 18 | Fix Language Version Manager NO-OP | Low | 1 hr |
-| 19 | Add Linux support for SystemCache | Low | 2 hr |
-| 20 | Create ARCHITECTURE.md | Low | 1 hr |
-| 21 | Document CleanerRegistry usage | Low | 30 min |
-| 22 | Create ENUM_QUICK_REFERENCE.md | Low | 30 min |
-| 23 | Investigate samber/do/v2 DI | Low | 2 hr |
-| 24 | Plugin architecture for cleaners | Low | 8 hr |
-| 25 | Investigate RiskLevelType Viper processing | Low | 1 hr |
+| #   | Task                                       | Impact | Effort |
+| --- | ------------------------------------------ | ------ | ------ |
+| 14  | Generic Context System                     | High   | 4 hr   |
+| 15  | Domain Model Enhancement                   | Medium | 2 hr   |
+| 16  | Reduce LoadWithContext complexity          | Low    | 1 hr   |
+| 17  | Refactor BDD test helpers                  | Low    | 2 hr   |
+| 18  | Fix Language Version Manager NO-OP         | Low    | 1 hr   |
+| 19  | Add Linux support for SystemCache          | Low    | 2 hr   |
+| 20  | Create ARCHITECTURE.md                     | Low    | 1 hr   |
+| 21  | Document CleanerRegistry usage             | Low    | 30 min |
+| 22  | Create ENUM_QUICK_REFERENCE.md             | Low    | 30 min |
+| 23  | Investigate samber/do/v2 DI                | Low    | 2 hr   |
+| 24  | Plugin architecture for cleaners           | Low    | 8 hr   |
+| 25  | Investigate RiskLevelType Viper processing | Low    | 1 hr   |
 
 ---
 
@@ -208,6 +210,7 @@ internal/cleaner/nodepackages.go:538:1: syntax error: non-declaration statement 
 > Should the `Scan()` method return `result.Result[[]ScanItem]` (slice of items) or `result.Result[map[string]ScanItem]` (map by path)?
 
 **Context:**
+
 - Current implementations return slices
 - Map would allow O(1) lookup by path
 - Slice maintains order and allows duplicates
@@ -227,25 +230,25 @@ Untracked: PROJECT_SPLIT_EXECUTIVE_REPORT.md
 
 ### Modified Files
 
-| File | Change Type |
-|------|-------------|
-| `FEATURES.md` | Documentation |
-| `cmd/clean-wizard/main.go` | Code |
-| `go.mod`, `go.sum` | Dependencies |
-| `internal/cleaner/buildcache.go` | Conversions refactor |
-| `internal/cleaner/cargo.go` | Partial refactor? |
-| `internal/cleaner/docker.go` | Conversions refactor |
-| `internal/cleaner/docker_test.go` | Test updates |
-| `internal/cleaner/golang_cleaner.go` | Code |
-| `internal/cleaner/golang_test.go` | Test updates |
-| `internal/cleaner/helpers.go` | Conversions refactor |
-| `internal/cleaner/homebrew.go` | Conversions refactor |
-| `internal/cleaner/nodepackages.go` | BROKEN - needs fix |
-| `internal/cleaner/nodepackages_test.go` | Test updates |
+| File                                               | Change Type          |
+| -------------------------------------------------- | -------------------- |
+| `FEATURES.md`                                      | Documentation        |
+| `cmd/clean-wizard/main.go`                         | Code                 |
+| `go.mod`, `go.sum`                                 | Dependencies         |
+| `internal/cleaner/buildcache.go`                   | Conversions refactor |
+| `internal/cleaner/cargo.go`                        | Partial refactor?    |
+| `internal/cleaner/docker.go`                       | Conversions refactor |
+| `internal/cleaner/docker_test.go`                  | Test updates         |
+| `internal/cleaner/golang_cleaner.go`               | Code                 |
+| `internal/cleaner/golang_test.go`                  | Test updates         |
+| `internal/cleaner/helpers.go`                      | Conversions refactor |
+| `internal/cleaner/homebrew.go`                     | Conversions refactor |
+| `internal/cleaner/nodepackages.go`                 | BROKEN - needs fix   |
+| `internal/cleaner/nodepackages_test.go`            | Test updates         |
 | `internal/cleaner/projectsmanagementautomation.go` | Conversions refactor |
-| `internal/cleaner/systemcache.go` | Partial refactor? |
-| `internal/cleaner/tempfiles.go` | Conversions refactor |
-| `internal/conversions/conversions.go` | New helpers added |
+| `internal/cleaner/systemcache.go`                  | Partial refactor?    |
+| `internal/cleaner/tempfiles.go`                    | Conversions refactor |
+| `internal/conversions/conversions.go`              | New helpers added    |
 
 ---
 

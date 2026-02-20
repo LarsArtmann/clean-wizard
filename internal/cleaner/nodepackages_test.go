@@ -175,13 +175,13 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 		{
 			name:            "dry-run with all PMs",
 			packageManagers: AvailableNodePackageManagers(),
-			wantMinItems:    1, // At least one PM should be available
+			wantMinItems:    1,    // At least one PM should be available
 			shouldTest:      true, // Always test all PMs (at least one should be available)
 		},
 		{
 			name:            "dry-run with single PM",
 			packageManagers: []domain.PackageManagerType{domain.PackageManagerNpm},
-			wantMinItems:    1, // npm should be available
+			wantMinItems:    1,     // npm should be available
 			shouldTest:      false, // Skip if npm not installed
 		},
 	}
