@@ -29,8 +29,8 @@ Clean Wizard cleans old caches, temporary files, and unused data across 11 diffe
 | **BuildCache**  | Gradle, Maven, SBT build caches     | ✅ Production Ready |
 | **SystemCache** | macOS Spotlight, Xcode, CocoaPods   | ✅ Production Ready |
 | **TempFiles**   | Age-based temporary files           | ✅ Production Ready |
-| **LangVersion** | NVM, Pyenv, Rbenv version managers  | 🚧 NO-OP (Planned)  |
-| **Projects**    | Project automation (development)    | 🚧 In Progress      |
+| **LangVersion** | ~~NVM, Pyenv, Rbenv~~ | ❌ Removed |
+| **Projects**    | Project automation | ⚠️ Deprecated |
 
 ### Preset Modes
 
@@ -311,7 +311,7 @@ clean-wizard clean --dry-run
 | BuildCache  | `~/.gradle`, `~/.m2`, `~/.sbt`                 | Low        |
 | SystemCache | `~/Library/Caches/*`, Xcode DerivedData        | Medium     |
 | TempFiles   | `/tmp/*` (age-based)                           | Low        |
-| LangVersion | `~/.nvm/versions`, `~/.pyenv/versions`         | **High**   |
+| ~~LangVersion~~ | ~~`~/.nvm/versions`, `~/.pyenv/versions`~~ | ~~**High**~~ (Removed) |
 | Projects    | Project-specific cleanup                       | Medium     |
 
 ---
@@ -574,7 +574,7 @@ Clean Wizard and [SystemNix](https://github.com/LarsArtmann/SystemNix) serve sim
 
 ### Missing in Clean Wizard
 
-- Language Version Manager (NO-OP, needs implementation)
+- ~~Language Version Manager~~ (removed - too risky for users)
 - Docker light prune (quick mode)
 - Nix store optimization
 - Nix profile management
@@ -587,7 +587,7 @@ Clean Wizard and [SystemNix](https://github.com/LarsArtmann/SystemNix) serve sim
 
 ### Ways to Contribute
 
-1. **Fix Language Version Manager** - Currently NO-OP, needs actual deletion logic
+1. ~~**Language Version Manager**~~ - Removed (too risky for users)
 2. **Implement Docker light prune** - For quick mode parity
 3. **Add Nix store optimization** - `nix-store --optimize`
 4. **Implement iOS simulator cleanup** - `xcrun simctl delete`
@@ -633,7 +633,7 @@ git push origin feature/new-cleaner
 
 ### Short-Term (This Month)
 
-- [ ] Fix Language Version Manager NO-OP
+- [x] ~~Language Version Manager~~ (removed - too risky, see docs/status/2026-02-12_06-41_LANGUAGE_VERSION_MANAGER_RISK_ANALYSIS.md)
 - [ ] Implement Nix store optimization
 - [ ] Implement Nix profile management
 - [ ] Add iOS simulator cleanup

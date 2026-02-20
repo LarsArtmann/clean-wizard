@@ -32,10 +32,10 @@
 
 ### Priority 1 - Critical
 
-| #   | Task                                                                                               | Impact | Status      |
-| --- | -------------------------------------------------------------------------------------------------- | ------ | ----------- |
-| 1   | Generic Context System - unify ValidationContext, ErrorDetails, SanitizationChange into Context[T] | 90%    | NOT_STARTED |
-| 2   | Domain Model Enhancement - add Validate(), Sanitize(), ApplyProfile() to Config struct             | 50%    | NOT_STARTED |
+| #   | Task                                                                                               | Impact | Status          |
+| --- | -------------------------------------------------------------------------------------------------- | ------ | --------------- |
+| 1   | Generic Context System - unify ValidationContext, ErrorDetails, SanitizationChange into Context[T] | 90%    | ✅ DONE         |
+| 2   | Domain Model Enhancement - add Validate(), Sanitize(), ApplyProfile() to Config struct             | 50%    | NOT_STARTED     |
 
 ### Priority 2 - Enum Refactoring
 
@@ -60,20 +60,20 @@
 
 ### Priority 5 - Type Model Improvements
 
-| #   | Task                                           | Status      |
-| --- | ---------------------------------------------- | ----------- |
-| 9   | Add IsValid(), Values(), String() to all enums | NOT_STARTED |
-| 10  | Enhance Result type for validation chaining    | NOT_STARTED |
+| #   | Task                                           | Status          |
+| --- | ---------------------------------------------- | --------------- |
+| 9   | Add IsValid(), Values(), String() to all enums | ✅ DONE         |
+| 10  | Enhance Result type for validation chaining    | NOT_STARTED     |
 
 ### Priority 6 - Cleaner Improvements
 
-| #   | Task                                         | Status      |
-| --- | -------------------------------------------- | ----------- |
-| 11  | Fix Language Version Manager NO-OP           | NOT_STARTED |
-| 12  | Fix Docker size reporting (returns 0)        | NOT_STARTED |
-| 13  | Fix Cargo size reporting                     | NOT_STARTED |
-| 14  | Improve dry-run estimates (hardcoded values) | NOT_STARTED |
-| 15  | Add Linux support for SystemCache cleaner    | NOT_STARTED |
+| #   | Task                                         | Status               |
+| --- | -------------------------------------------- | -------------------- |
+| 11  | Fix Language Version Manager NO-OP           | ✅ DONE (Removed)    |
+| 12  | Fix Docker size reporting (returns 0)        | ✅ DONE (Works)      |
+| 13  | Fix Cargo size reporting                     | ✅ DONE (Works)      |
+| 14  | Improve dry-run estimates (hardcoded values) | NOT_STARTED          |
+| 15  | Add Linux support for SystemCache cleaner    | NOT_STARTED          |
 
 ### Priority 7 - Documentation
 

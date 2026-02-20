@@ -20,6 +20,10 @@ import (
 const DefaultProjectsAutomationTimeout = 2 * time.Minute
 
 // ProjectsManagementAutomationCleaner handles projects-management-automation cache cleanup.
+//
+// Deprecated: This cleaner requires the external 'projects-management-automation' tool
+// which is not commonly available. It will be removed in a future version.
+// Use ProjectExecutablesCleaner or CompiledBinariesCleaner instead.
 type ProjectsManagementAutomationCleaner struct {
 	verbose bool
 	dryRun  bool
