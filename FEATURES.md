@@ -266,19 +266,19 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### Command Structure
 
-| Command                | Status              | Description                    |
-| ---------------------- | ------------------- | ------------------------------ |
-| `clean-wizard clean`   | ✅ FULLY_FUNCTIONAL | Main cleanup command with TUI  |
-| `clean-wizard scan`    | 📝 PLANNED          | Documented but NOT implemented |
-| `clean-wizard init`    | 📝 PLANNED          | Documented but NOT implemented |
-| `clean-wizard profile` | 📝 PLANNED          | Documented but NOT implemented |
-| `clean-wizard config`  | 📝 PLANNED          | Documented but NOT implemented |
+| Command                | Status              | Description                                  |
+| ---------------------- | ------------------- | -------------------------------------------- |
+| `clean-wizard clean`   | ✅ FULLY_FUNCTIONAL | Main cleanup command with TUI                |
+| `clean-wizard scan`    | ✅ FULLY_FUNCTIONAL | Scan and report cleanup opportunities        |
+| `clean-wizard init`    | ✅ FULLY_FUNCTIONAL | Interactive setup wizard                     |
+| `clean-wizard profile` | ✅ FULLY_FUNCTIONAL | Profile management (list/show/create/delete) |
+| `clean-wizard config`  | ✅ FULLY_FUNCTIONAL | Config management (show/edit/validate/reset) |
 
 **Notes:**
 
-- Only `clean` command is actually implemented
-- Other commands documented in USAGE.md but return "unknown command"
-- Significant documentation/implementation gap
+- All 5 CLI commands are fully implemented
+- Commands registered in `cmd/clean-wizard/main.go`
+- Interactive TUI powered by Charmbracelet libraries
 
 ### Clean Command Features
 
@@ -428,11 +428,10 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### For Contributors
 
-1. **Priority 1:** Implement actual cleaning for Language Version Manager
-2. **Priority 2:** Add remaining CLI commands (scan, init, profile, config)
-3. **Priority 3:** Improve size estimation for Nix cleaner (currently uses hardcoded estimate)
-4. **Priority 4:** Implement remaining enum values (BuildToolType, VersionManagerType)
-5. **Priority 5:** Add dry-run support for Homebrew cleaner
+1. **Priority 1:** Improve size estimation for Nix cleaner (currently uses hardcoded estimate)
+2. **Priority 2:** Add dry-run support for Homebrew cleaner
+3. **Priority 3:** Implement remaining enum values (BuildToolType, VersionManagerType)
+4. **Priority 4:** Enhance Projects Management Automation (currently requires external tools)
 
 ---
 
@@ -448,9 +447,9 @@ Clean Wizard has a **solid foundation** with excellent architecture and type saf
 
 **Remaining Gaps:**
 
-- ~18% of cleaners are non-functional or placeholders (Language Version Manager, Projects Management Automation)
-- ~80% of documented CLI commands don't exist
+- ~18% of cleaners are non-functional or placeholders (Projects Management Automation requires external tools)
 - Nix cleaner still uses hardcoded size estimation
+- Homebrew cleaner lacks dry-run support
 
 **Overall Project Status:** ✅ **PRODUCTION READY** - Core cleaners work well with accurate size reporting and dry-run support.
 

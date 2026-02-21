@@ -21,44 +21,44 @@ This plan focuses on the **1% of tasks that deliver 51% of the impact**, followi
 
 ### Phase 1: Critical Fixes (HIGH Impact, LOW Effort)
 
-| # | Task | Impact | Effort | ROI |
-|---|------|--------|--------|-----|
-| 1.1 | Fix Docker size reporting | HIGH | 30min | 10/10 |
-| 1.2 | Fix Cargo size reporting | HIGH | 30min | 10/10 |
-| 1.3 | Add `clean-wizard` binary to .gitignore | LOW | 2min | 9/10 |
+| #   | Task                                    | Impact | Effort | ROI   |
+| --- | --------------------------------------- | ------ | ------ | ----- |
+| 1.1 | Fix Docker size reporting               | HIGH   | 30min  | 10/10 |
+| 1.2 | Fix Cargo size reporting                | HIGH   | 30min  | 10/10 |
+| 1.3 | Add `clean-wizard` binary to .gitignore | LOW    | 2min   | 9/10  |
 
 ### Phase 2: Remove Dead Code (HIGH Impact, MEDIUM Effort)
 
-| # | Task | Impact | Effort | ROI |
-|---|------|--------|--------|-----|
-| 2.1 | Mark Language Version Manager as deprecated | MEDIUM | 15min | 8/10 |
-| 2.2 | Mark Projects Management Automation as deprecated | MEDIUM | 15min | 8/10 |
-| 2.3 | Update README to reflect deprecations | MEDIUM | 15min | 7/10 |
+| #   | Task                                              | Impact | Effort | ROI  |
+| --- | ------------------------------------------------- | ------ | ------ | ---- |
+| 2.1 | Mark Language Version Manager as deprecated       | MEDIUM | 15min  | 8/10 |
+| 2.2 | Mark Projects Management Automation as deprecated | MEDIUM | 15min  | 8/10 |
+| 2.3 | Update README to reflect deprecations             | MEDIUM | 15min  | 7/10 |
 
 ### Phase 3: Type Safety Improvements (MEDIUM Impact, MEDIUM Effort)
 
-| # | Task | Impact | Effort | ROI |
-|---|------|--------|--------|-----|
-| 3.1 | Add IsValid() to all domain enums | MEDIUM | 1h | 7/10 |
-| 3.2 | Add Values() to all domain enums | MEDIUM | 30min | 7/10 |
-| 3.3 | Add String() improvements to enums | LOW | 30min | 5/10 |
-| 3.4 | Refactor NodePackages enum to domain enum | MEDIUM | 2h | 6/10 |
+| #   | Task                                      | Impact | Effort | ROI  |
+| --- | ----------------------------------------- | ------ | ------ | ---- |
+| 3.1 | Add IsValid() to all domain enums         | MEDIUM | 1h     | 7/10 |
+| 3.2 | Add Values() to all domain enums          | MEDIUM | 30min  | 7/10 |
+| 3.3 | Add String() improvements to enums        | LOW    | 30min  | 5/10 |
+| 3.4 | Refactor NodePackages enum to domain enum | MEDIUM | 2h     | 6/10 |
 
 ### Phase 4: Documentation Updates (MEDIUM Impact, LOW Effort)
 
-| # | Task | Impact | Effort | ROI |
-|---|------|--------|--------|-----|
-| 4.1 | Update TODO_LIST.md status markers | MEDIUM | 30min | 8/10 |
-| 4.2 | Create ENUM_QUICK_REFERENCE.md | LOW | 30min | 5/10 |
-| 4.3 | Document CleanerRegistry usage | LOW | 30min | 5/10 |
+| #   | Task                               | Impact | Effort | ROI  |
+| --- | ---------------------------------- | ------ | ------ | ---- |
+| 4.1 | Update TODO_LIST.md status markers | MEDIUM | 30min  | 8/10 |
+| 4.2 | Create ENUM_QUICK_REFERENCE.md     | LOW    | 30min  | 5/10 |
+| 4.3 | Document CleanerRegistry usage     | LOW    | 30min  | 5/10 |
 
 ### Phase 5: Complexity Reduction (LOW Impact, HIGH Effort) - DEFERRED
 
-| # | Task | Impact | Effort | ROI |
-|---|------|--------|--------|-----|
-| 5.1 | Reduce LoadWithContext complexity | LOW | 2h | 4/10 |
-| 5.2 | Reduce validateProfileName complexity | LOW | 1h | 4/10 |
-| 5.3 | Reduce other high-complexity functions | LOW | 4h+ | 3/10 |
+| #   | Task                                   | Impact | Effort | ROI  |
+| --- | -------------------------------------- | ------ | ------ | ---- |
+| 5.1 | Reduce LoadWithContext complexity      | LOW    | 2h     | 4/10 |
+| 5.2 | Reduce validateProfileName complexity  | LOW    | 1h     | 4/10 |
+| 5.3 | Reduce other high-complexity functions | LOW    | 4h+    | 3/10 |
 
 ---
 
@@ -126,6 +126,7 @@ flowchart TD
 **Solution:** Parse the output of `docker system prune -af --volumes` to extract actual bytes freed.
 
 **Approach:**
+
 1. Add output parsing for `docker system prune` command
 2. Extract bytes freed from output (format: "Total reclaimed space: X.XGB")
 3. Update `CleanResult.FreedBytes` with parsed value
@@ -143,6 +144,7 @@ flowchart TD
 **Solution:** Track directory size before/after cleanup.
 
 **Approach:**
+
 1. Get size of `~/.cargo/registry` and `~/.cargo/git` before cleanup
 2. Run `cargo cache --autoclean` or equivalent
 3. Get size after cleanup
@@ -173,6 +175,7 @@ flowchart TD
 **Solution:** Mark as deprecated with clear documentation.
 
 **Approach:**
+
 1. Add deprecation notice to cleaner
 2. Log warning when cleaner is selected
 3. Update status in documentation
@@ -214,6 +217,7 @@ flowchart TD
 **Solution:** Add `IsValid() bool` method to all enum types.
 
 **Example:**
+
 ```go
 func (r RiskLevelType) IsValid() bool {
     return r >= RiskLowType && r <= RiskCriticalType
@@ -253,20 +257,24 @@ func (r RiskLevelType) IsValid() bool {
 After completing each phase:
 
 ### Phase 1 Verification
+
 - [ ] `docker system prune` output parsed correctly
 - [ ] Cargo size reporting returns actual values
 - [ ] Binary no longer appears in git status
 
 ### Phase 2 Verification
+
 - [ ] Deprecated cleaners show warnings
 - [ ] README updated with deprecation notices
 
 ### Phase 3 Verification
+
 - [ ] All enums have IsValid() method
 - [ ] All enums have Values() method
 - [ ] Tests pass for new enum methods
 
 ### Phase 4 Verification
+
 - [ ] TODO_LIST.md reflects current state
 - [ ] Documentation is accurate
 
@@ -274,13 +282,13 @@ After completing each phase:
 
 ## Success Metrics
 
-| Metric | Before | After | Target |
-|--------|--------|-------|--------|
-| Size Reporting Accuracy | ~50% | 95% | 95% |
-| Production Cleaners | 10/13 | 10/13 | 10/13 |
-| NO-OP Cleaners | 2 | 0 (deprecated) | 0 |
-| Enum Type Safety | Partial | Full | Full |
-| Documentation Accuracy | ~70% | 95% | 95% |
+| Metric                  | Before  | After          | Target |
+| ----------------------- | ------- | -------------- | ------ |
+| Size Reporting Accuracy | ~50%    | 95%            | 95%    |
+| Production Cleaners     | 10/13   | 10/13          | 10/13  |
+| NO-OP Cleaners          | 2       | 0 (deprecated) | 0      |
+| Enum Type Safety        | Partial | Full           | Full   |
+| Documentation Accuracy  | ~70%    | 95%            | 95%    |
 
 ---
 

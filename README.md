@@ -29,8 +29,8 @@ Clean Wizard cleans old caches, temporary files, and unused data across 11 diffe
 | **BuildCache**  | Gradle, Maven, SBT build caches     | ✅ Production Ready |
 | **SystemCache** | macOS Spotlight, Xcode, CocoaPods   | ✅ Production Ready |
 | **TempFiles**   | Age-based temporary files           | ✅ Production Ready |
-| **LangVersion** | ~~NVM, Pyenv, Rbenv~~ | ❌ Removed |
-| **Projects**    | Project automation | ⚠️ Deprecated |
+| **LangVersion** | ~~NVM, Pyenv, Rbenv~~               | ❌ Removed          |
+| **Projects**    | Project automation                  | ⚠️ Deprecated       |
 
 ### Preset Modes
 
@@ -300,19 +300,19 @@ clean-wizard clean --dry-run
 
 ### What Each Cleaner Cleans
 
-| Cleaner     | Target                                         | Risk Level |
-| ----------- | ---------------------------------------------- | ---------- |
-| Nix         | `/nix/store/*-generation`                      | Low        |
-| Homebrew    | `~/Library/Caches/Homebrew`                    | Low        |
-| Docker      | Containers, images, volumes                    | Medium     |
-| Cargo       | `~/.cargo/registry`, `~/.cargo/git`            | Low        |
-| Go          | `go build cache`, `go mod cache`               | Low        |
-| Node        | `~/.npm`, `~/.pnpm`, `~/.cache/yarn`, `~/.bun` | Low        |
-| BuildCache  | `~/.gradle`, `~/.m2`, `~/.sbt`                 | Low        |
-| SystemCache | `~/Library/Caches/*`, Xcode DerivedData        | Medium     |
-| TempFiles   | `/tmp/*` (age-based)                           | Low        |
-| ~~LangVersion~~ | ~~`~/.nvm/versions`, `~/.pyenv/versions`~~ | ~~**High**~~ (Removed) |
-| Projects    | Project-specific cleanup                       | Medium     |
+| Cleaner         | Target                                         | Risk Level             |
+| --------------- | ---------------------------------------------- | ---------------------- |
+| Nix             | `/nix/store/*-generation`                      | Low                    |
+| Homebrew        | `~/Library/Caches/Homebrew`                    | Low                    |
+| Docker          | Containers, images, volumes                    | Medium                 |
+| Cargo           | `~/.cargo/registry`, `~/.cargo/git`            | Low                    |
+| Go              | `go build cache`, `go mod cache`               | Low                    |
+| Node            | `~/.npm`, `~/.pnpm`, `~/.cache/yarn`, `~/.bun` | Low                    |
+| BuildCache      | `~/.gradle`, `~/.m2`, `~/.sbt`                 | Low                    |
+| SystemCache     | `~/Library/Caches/*`, Xcode DerivedData        | Medium                 |
+| TempFiles       | `/tmp/*` (age-based)                           | Low                    |
+| ~~LangVersion~~ | ~~`~/.nvm/versions`, `~/.pyenv/versions`~~     | ~~**High**~~ (Removed) |
+| Projects        | Project-specific cleanup                       | Medium                 |
 
 ---
 
