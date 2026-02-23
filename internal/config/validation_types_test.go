@@ -32,19 +32,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 			MaxDiskUsage: 50,
 			Protected:    []string{"/System", "/Library", "/Applications"},
 			Profiles: map[string]*domain.Profile{
-				"daily": {
-					Name:        "daily",
-					Description: "Daily cleanup",
-					Operations: []domain.CleanupOperation{
-						{
-							Name:        "nix-generations",
-							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
-							Enabled:     domain.ProfileStatusEnabled,
-						},
-					},
-					Enabled: domain.ProfileStatusEnabled,
-				},
+				"daily": CreateDailyProfile(),
 			},
 			LastClean: time.Now(),
 			Updated:   time.Now(),
@@ -55,19 +43,7 @@ func CreateTestConfigurations() map[string]*domain.Config {
 			MaxDiskUsage: 150, // Invalid: too high
 			Protected:    []string{"/System"},
 			Profiles: map[string]*domain.Profile{
-				"daily": {
-					Name:        "daily",
-					Description: "Daily cleanup",
-					Operations: []domain.CleanupOperation{
-						{
-							Name:        "nix-generations",
-							Description: "Clean Nix generations",
-							RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
-							Enabled:     domain.ProfileStatusEnabled,
-						},
-					},
-					Enabled: domain.ProfileStatusEnabled,
-				},
+				"daily": CreateDailyProfile(),
 			},
 			LastClean: time.Now(),
 			Updated:   time.Now(),
