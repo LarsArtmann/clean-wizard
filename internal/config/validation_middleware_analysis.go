@@ -32,27 +32,38 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 	proposedSet := vm.makeStringSet(proposed)
 
 	// Check for added paths
-	for _, path := range proposed {
-		if !currentSet[path] {
-			changes = append(changes, ConfigChange{
-				Field:     field,
-				OldValue:  nil,
-				NewValue:  path,
-				Operation: domain.ChangeOperationType(domain.ChangeOperationAddedType),
-				Risk:      domain.RiskLevelType(domain.RiskLevelLowType),
-			})
-		}
-	}
+	changes = append(changes, vm.collectPathChanges(proposed, currentSet, field, domain.ChangeOperationAddedType, domain.RiskLevelLowType, true)...)
 
 	// Check for removed paths
-	for _, path := range current {
-		if !proposedSet[path] {
+	changes = append(changes, vm.collectPathChanges(current, proposedSet, field, domain.ChangeOperationRemovedType, domain.RiskLevelHighType, false)...)
+
+	return changes
+}
+
+// collectPathChanges collects path changes based on operation type.
+// isAdded determines the OldValue/NewValue ordering: true = added (nil→path), false = removed (path→nil).
+func (vm *ValidationMiddleware) collectPathChanges(
+	paths []string,
+	existingSet map[string]bool,
+	field string,
+	operation domain.ChangeOperationType,
+	risk domain.RiskLevelType,
+	isAdded bool,
+) []ConfigChange {
+	changes := []ConfigChange{}
+
+	for _, path := range paths {
+		if !existingSet[path] {
+			oldValue, newValue := any(path), any(nil)
+			if isAdded {
+				oldValue, newValue = nil, path
+			}
 			changes = append(changes, ConfigChange{
 				Field:     field,
-				OldValue:  path,
-				NewValue:  nil,
-				Operation: domain.ChangeOperationType(domain.ChangeOperationRemovedType),
-				Risk:      domain.RiskLevelType(domain.RiskLevelHighType), // Removing protected paths is risky
+				OldValue:  oldValue,
+				NewValue:  newValue,
+				Operation: domain.ChangeOperationType(operation),
+				Risk:      domain.RiskLevelType(risk),
 			})
 		}
 	}

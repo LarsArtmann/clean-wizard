@@ -18,7 +18,88 @@ func BenchmarkMarshalYAML_DockerPruneMode(b *testing.B) {
 		DockerPruneVolumes,
 		DockerPruneBuilds,
 	}
+	runMarshalBenchmark(b, testCases)
+}
 
+// BenchmarkUnmarshalYAML_DockerPruneMode_String benchmarks unmarshaling DockerPruneMode from string YAML.
+func BenchmarkUnmarshalYAML_DockerPruneMode_String(b *testing.B) {
+	testCases := []string{"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS"}
+	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
+		var result DockerPruneMode
+		yamlData := fmt.Sprintf(`"%s"`, tc)
+		return yaml.Unmarshal([]byte(yamlData), &result)
+	})
+}
+
+// runUnmarshalIntBenchmark runs a benchmark for unmarshaling an enum from integer YAML values.
+func runUnmarshalIntBenchmark(b *testing.B, testCases []int, unmarshal func(int) error) {
+	for _, tc := range testCases {
+		b.Run(strconv.Itoa(tc), func(b *testing.B) {
+			for range b.N {
+				if err := unmarshal(tc); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+// runUnmarshalStringBenchmark runs a benchmark for unmarshaling an enum from string YAML values.
+func runUnmarshalStringBenchmark(b *testing.B, testCases []string, unmarshal func(string) error) {
+	for _, tc := range testCases {
+		b.Run(tc, func(b *testing.B) {
+			for range b.N {
+				if err := unmarshal(tc); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+// yamlMarshaler is a constraint for types that can marshal to YAML and have a String method.
+type yamlMarshaler interface {
+	fmt.Stringer
+	MarshalYAML() (any, error)
+}
+
+// yamlRoundTripper is a constraint for types that support full YAML round-trip (marshal + unmarshal).
+type yamlRoundTripper interface {
+	comparable
+	fmt.Stringer
+	MarshalYAML() (any, error)
+}
+
+// runRoundTripBenchmark runs a benchmark for full marshal→unmarshal round-trip.
+func runRoundTripBenchmark[T yamlRoundTripper](b *testing.B, testCases []T) {
+	for _, tc := range testCases {
+		b.Run(tc.String(), func(b *testing.B) {
+			for range b.N {
+				marshaled, err := tc.MarshalYAML()
+				if err != nil {
+					b.Fatal(err)
+				}
+
+				yamlBytes, err := yaml.Marshal(marshaled)
+				if err != nil {
+					b.Fatal(err)
+				}
+
+				var result T
+				if err := yaml.Unmarshal(yamlBytes, &result); err != nil {
+					b.Fatal(err)
+				}
+
+				if result != tc {
+					b.Fatalf("round-trip failed: got %v, want %v", result, tc)
+				}
+			}
+		})
+	}
+}
+
+// runMarshalBenchmark runs a benchmark for marshaling enum values to YAML.
+func runMarshalBenchmark[T yamlMarshaler](b *testing.B, testCases []T) {
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
 			for range b.N {
@@ -31,40 +112,14 @@ func BenchmarkMarshalYAML_DockerPruneMode(b *testing.B) {
 	}
 }
 
-// BenchmarkUnmarshalYAML_DockerPruneMode_String benchmarks unmarshaling DockerPruneMode from string YAML.
-func BenchmarkUnmarshalYAML_DockerPruneMode_String(b *testing.B) {
-	testCases := []string{"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS"}
-
-	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
-			for range b.N {
-				var result DockerPruneMode
-				// Use actual YAML unmarshaling with string
-				yamlData := fmt.Sprintf(`"%s"`, tc)
-				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
-}
-
 // BenchmarkUnmarshalYAML_DockerPruneMode_Int benchmarks unmarshaling DockerPruneMode from integer YAML.
 func BenchmarkUnmarshalYAML_DockerPruneMode_Int(b *testing.B) {
 	testCases := []int{0, 1, 2, 3, 4}
-
-	for _, tc := range testCases {
-		b.Run(strconv.Itoa(tc), func(b *testing.B) {
-			for range b.N {
-				var result DockerPruneMode
-				// Use actual YAML unmarshaling with int
-				yamlData := strconv.Itoa(tc)
-				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runUnmarshalIntBenchmark(b, testCases, func(tc int) error {
+		var result DockerPruneMode
+		yamlData := strconv.Itoa(tc)
+		return yaml.Unmarshal([]byte(yamlData), &result)
+	})
 }
 
 // BenchmarkMarshalYAML_BuildToolType benchmarks marshaling BuildToolType enum to YAML.
@@ -77,35 +132,17 @@ func BenchmarkMarshalYAML_BuildToolType(b *testing.B) {
 		BuildToolJava,
 		BuildToolScala,
 	}
-
-	for _, tc := range testCases {
-		b.Run(tc.String(), func(b *testing.B) {
-			for range b.N {
-				_, err := tc.MarshalYAML()
-				if err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runMarshalBenchmark(b, testCases)
 }
 
 // BenchmarkUnmarshalYAML_BuildToolType_String benchmarks unmarshaling BuildToolType from string YAML.
 func BenchmarkUnmarshalYAML_BuildToolType_String(b *testing.B) {
 	testCases := []string{"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA"}
-
-	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
-			for range b.N {
-				var result BuildToolType
-				// Use actual YAML unmarshaling with string
-				yamlData := fmt.Sprintf(`"%s"`, tc)
-				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
+		var result BuildToolType
+		yamlData := fmt.Sprintf(`"%s"`, tc)
+		return yaml.Unmarshal([]byte(yamlData), &result)
+	})
 }
 
 // BenchmarkMarshalYAML_CacheType benchmarks marshaling CacheType enum to YAML.
@@ -120,35 +157,17 @@ func BenchmarkMarshalYAML_CacheType(b *testing.B) {
 		CacheTypeYarn,
 		CacheTypeCcache,
 	}
-
-	for _, tc := range testCases {
-		b.Run(tc.String(), func(b *testing.B) {
-			for range b.N {
-				_, err := tc.MarshalYAML()
-				if err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runMarshalBenchmark(b, testCases)
 }
 
 // BenchmarkUnmarshalYAML_CacheType benchmarks unmarshaling CacheType enum.
 func BenchmarkUnmarshalYAML_CacheType_String(b *testing.B) {
 	testCases := []string{"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP", "NPM", "YARN", "CCACHE"}
-
-	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
-			for range b.N {
-				var result CacheType
-				// Use actual YAML unmarshaling with string
-				yamlData := fmt.Sprintf(`"%s"`, tc)
-				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
+		var result CacheType
+		yamlData := fmt.Sprintf(`"%s"`, tc)
+		return yaml.Unmarshal([]byte(yamlData), &result)
+	})
 }
 
 // BenchmarkMarshalYAML_PackageManagerType benchmarks marshaling PackageManagerType enum to YAML.
@@ -159,87 +178,43 @@ func BenchmarkMarshalYAML_PackageManagerType(b *testing.B) {
 		PackageManagerYarn,
 		PackageManagerBun,
 	}
-
-	for _, tc := range testCases {
-		b.Run(tc.String(), func(b *testing.B) {
-			for range b.N {
-				_, err := tc.MarshalYAML()
-				if err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runMarshalBenchmark(b, testCases)
 }
 
 // BenchmarkUnmarshalYAML_PackageManagerType benchmarks unmarshaling PackageManagerType enum.
 func BenchmarkUnmarshalYAML_PackageManagerType_String(b *testing.B) {
 	testCases := []string{"NPM", "PNPM", "YARN", "BUN"}
-
-	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
-			for range b.N {
-				var result PackageManagerType
-				// Use actual YAML unmarshaling with string
-				yamlData := fmt.Sprintf(`"%s"`, tc)
-				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
+		var result PackageManagerType
+		yamlData := fmt.Sprintf(`"%s"`, tc)
+		return yaml.Unmarshal([]byte(yamlData), &result)
+	})
 }
 
-// BenchmarkMarshalYAML_BinaryEnums benchmarks marshaling binary enums to YAML.
+// BenchmarkMarshalYAML_CacheCleanupMode benchmarks marshaling CacheCleanupMode enum to YAML.
 func BenchmarkMarshalYAML_CacheCleanupMode(b *testing.B) {
 	testCases := []CacheCleanupMode{CacheCleanupDisabled, CacheCleanupEnabled}
-
-	for _, tc := range testCases {
-		b.Run(tc.String(), func(b *testing.B) {
-			for range b.N {
-				_, err := tc.MarshalYAML()
-				if err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runMarshalBenchmark(b, testCases)
 }
 
 // BenchmarkUnmarshalYAML_BinaryEnums_String benchmarks unmarshaling binary enums from string YAML.
 func BenchmarkUnmarshalYAML_CacheCleanupMode_String(b *testing.B) {
 	testCases := []string{"DISABLED", "ENABLED"}
-
-	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
-			for range b.N {
-				var result CacheCleanupMode
-				// Use actual YAML unmarshaling with string
-				yamlData := fmt.Sprintf(`"%s"`, tc)
-				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
+		var result CacheCleanupMode
+		yamlData := fmt.Sprintf(`"%s"`, tc)
+		return yaml.Unmarshal([]byte(yamlData), &result)
+	})
 }
 
 // BenchmarkUnmarshalYAML_BinaryEnums_Int benchmarks unmarshaling binary enums from integer YAML.
 func BenchmarkUnmarshalYAML_CacheCleanupMode_Int(b *testing.B) {
 	testCases := []int{0, 1}
-
-	for _, tc := range testCases {
-		b.Run(strconv.Itoa(tc), func(b *testing.B) {
-			for range b.N {
-				var result CacheCleanupMode
-				// Use actual YAML unmarshaling with int
-				yamlData := strconv.Itoa(tc)
-				if err := yaml.Unmarshal([]byte(yamlData), &result); err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runUnmarshalIntBenchmark(b, testCases, func(tc int) error {
+		var result CacheCleanupMode
+		yamlData := strconv.Itoa(tc)
+		return yaml.Unmarshal([]byte(yamlData), &result)
+	})
 }
 
 // BenchmarkRoundTrip_DockerPruneMode benchmarks full marshal→unmarshal round-trip for DockerPruneMode.
@@ -251,61 +226,13 @@ func BenchmarkRoundTrip_DockerPruneMode(b *testing.B) {
 		DockerPruneVolumes,
 		DockerPruneBuilds,
 	}
-
-	for _, tc := range testCases {
-		b.Run(tc.String(), func(b *testing.B) {
-			for range b.N {
-				marshaled, err := tc.MarshalYAML()
-				if err != nil {
-					b.Fatal(err)
-				}
-
-				yamlBytes, err := yaml.Marshal(marshaled)
-				if err != nil {
-					b.Fatal(err)
-				}
-
-				var result DockerPruneMode
-				if err := yaml.Unmarshal(yamlBytes, &result); err != nil {
-					b.Fatal(err)
-				}
-
-				if result != tc {
-					b.Fatalf("round-trip failed: got %v, want %v", result, tc)
-				}
-			}
-		})
-	}
+	runRoundTripBenchmark(b, testCases)
 }
 
 // BenchmarkRoundTrip_CacheCleanupMode benchmarks full marshal→unmarshal round-trip for CacheCleanupMode.
 func BenchmarkRoundTrip_CacheCleanupMode(b *testing.B) {
 	testCases := []CacheCleanupMode{CacheCleanupDisabled, CacheCleanupEnabled}
-
-	for _, tc := range testCases {
-		b.Run(tc.String(), func(b *testing.B) {
-			for range b.N {
-				marshaled, err := tc.MarshalYAML()
-				if err != nil {
-					b.Fatal(err)
-				}
-
-				yamlBytes, err := yaml.Marshal(marshaled)
-				if err != nil {
-					b.Fatal(err)
-				}
-
-				var result CacheCleanupMode
-				if err := yaml.Unmarshal(yamlBytes, &result); err != nil {
-					b.Fatal(err)
-				}
-
-				if result != tc {
-					b.Fatalf("round-trip failed: got %v, want %v", result, tc)
-				}
-			}
-		})
-	}
+	runRoundTripBenchmark(b, testCases)
 }
 
 // BenchmarkFullConfigMarshal benchmarks marshaling a complete configuration with enums.
@@ -452,6 +379,22 @@ func BenchmarkFullConfigRoundTrip(b *testing.B) {
 	}
 }
 
+// stringer is a constraint for types that have a String() method.
+type stringer interface {
+	String() string
+}
+
+// runStringMethodBenchmark runs a benchmark for the String() method.
+func runStringMethodBenchmark[T stringer](b *testing.B, testCases []T) {
+	for _, tc := range testCases {
+		b.Run(tc.String(), func(b *testing.B) {
+			for range b.N {
+				_ = tc.String()
+			}
+		})
+	}
+}
+
 // BenchmarkEnumString benchmarks the String() method for all enums.
 func BenchmarkEnumString_DockerPruneMode(b *testing.B) {
 	testCases := []DockerPruneMode{
@@ -461,11 +404,21 @@ func BenchmarkEnumString_DockerPruneMode(b *testing.B) {
 		DockerPruneVolumes,
 		DockerPruneBuilds,
 	}
+	runStringMethodBenchmark(b, testCases)
+}
 
+// validatable is a constraint for types that have an IsValid() method.
+type validatable interface {
+	~int
+	IsValid() bool
+}
+
+// runIsValidBenchmark runs a benchmark for the IsValid() method.
+func runIsValidBenchmark[T validatable](b *testing.B, testCases []T) {
 	for _, tc := range testCases {
-		b.Run(tc.String(), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%d", tc), func(b *testing.B) {
 			for range b.N {
-				_ = tc.String()
+				_ = tc.IsValid()
 			}
 		})
 	}
@@ -481,70 +434,51 @@ func BenchmarkEnumIsValid_DockerPruneMode(b *testing.B) {
 		DockerPruneBuilds,
 		99, // invalid value
 	}
-
-	for _, tc := range testCases {
-		b.Run(fmt.Sprintf("%d", tc), func(b *testing.B) {
-			for range b.N {
-				_ = tc.IsValid()
-			}
-		})
-	}
+	runIsValidBenchmark(b, testCases)
 }
 
-// BenchmarkYAMLDecodeRaw benchmarks raw YAML decoding for comparison.
-func BenchmarkYAMLDecodeRaw_Int(b *testing.B) {
-	data := []byte("0")
-	var result int
-
+// benchmarkYAMLDecodeRaw runs a benchmark for raw YAML decoding into type T.
+func benchmarkYAMLDecodeRaw[T any](b *testing.B, data []byte) {
+	var result T
 	for b.Loop() {
 		if err := yaml.Unmarshal(data, &result); err != nil {
 			b.Fatal(err)
 		}
 	}
+}
+
+// BenchmarkYAMLDecodeRaw_Int benchmarks raw YAML int decoding for comparison.
+func BenchmarkYAMLDecodeRaw_Int(b *testing.B) {
+	benchmarkYAMLDecodeRaw[int](b, []byte("0"))
 }
 
 // BenchmarkYAMLDecodeRaw_String benchmarks raw YAML string decoding for comparison.
 func BenchmarkYAMLDecodeRaw_String(b *testing.B) {
-	data := []byte("ALL")
-	var result string
-
-	for b.Loop() {
-		if err := yaml.Unmarshal(data, &result); err != nil {
-			b.Fatal(err)
-		}
-	}
+	benchmarkYAMLDecodeRaw[string](b, []byte("ALL"))
 }
 
-// BenchmarkNodeDecode benchmarks yaml.Node.Decode performance.
-func BenchmarkNodeDecode_Int(b *testing.B) {
-	yamlData := "0"
+// benchmarkNodeDecode runs a benchmark for yaml.Node.Decode into type T.
+func benchmarkNodeDecode[T any](b *testing.B, yamlData string) {
 	node := &yaml.Node{}
 	if err := yaml.Unmarshal([]byte(yamlData), node); err != nil {
 		b.Fatal(err)
 	}
-	var result int
-
+	var result T
 	for b.Loop() {
 		if err := node.Decode(&result); err != nil {
 			b.Fatal(err)
 		}
 	}
+}
+
+// BenchmarkNodeDecode_Int benchmarks yaml.Node.Decode performance for ints.
+func BenchmarkNodeDecode_Int(b *testing.B) {
+	benchmarkNodeDecode[int](b, "0")
 }
 
 // BenchmarkNodeDecode_String benchmarks yaml.Node.Decode for strings.
 func BenchmarkNodeDecode_String(b *testing.B) {
-	yamlData := `"ALL"`
-	node := &yaml.Node{}
-	if err := yaml.Unmarshal([]byte(yamlData), node); err != nil {
-		b.Fatal(err)
-	}
-	var result string
-
-	for b.Loop() {
-		if err := node.Decode(&result); err != nil {
-			b.Fatal(err)
-		}
-	}
+	benchmarkNodeDecode[string](b, `"ALL"`)
 }
 
 // BenchmarkStringComparison benchmarks string comparison operations used in enum unmarshaling.

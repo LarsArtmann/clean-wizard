@@ -155,6 +155,27 @@ func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[
 	return result.Ok(items)
 }
 
+// scanAndAccumulate handles the common pattern of scanning resources and accumulating their sizes.
+// Returns true if processing should continue (pruneMode is DockerPruneAll), false to return early.
+func (dc *DockerCleaner) scanAndAccumulate(
+	ctx context.Context,
+	checkMode domain.DockerPruneMode,
+	scanFunc func(context.Context) result.Result[[]domain.ScanItem],
+	totalBytes *int64,
+) bool {
+	if dc.pruneMode == domain.DockerPruneAll || dc.pruneMode == checkMode {
+		if result := scanFunc(ctx); result.IsOk() {
+			for _, item := range result.Value() {
+				*totalBytes += item.Size
+			}
+		}
+		if dc.pruneMode != domain.DockerPruneAll {
+			return false
+		}
+	}
+	return true
+}
+
 // scanUnusedContainers scans for stopped Docker containers with size information.
 func (dc *DockerCleaner) scanUnusedContainers(ctx context.Context) result.Result[[]domain.ScanItem] {
 	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "ps", "-a", "--filter", "status=exited", "--format", "{{.ID}}\t{{.Size}}")
@@ -249,37 +270,18 @@ func (dc *DockerCleaner) estimateSizeFromScan(ctx context.Context) int64 {
 
 	switch dc.pruneMode {
 	case domain.DockerPruneAll, domain.DockerPruneImages:
-		if result := dc.scanDanglingImages(ctx); result.IsOk() {
-			for _, item := range result.Value() {
-				totalBytes += item.Size
-			}
-		}
-		if dc.pruneMode != domain.DockerPruneAll {
+		if !dc.scanAndAccumulate(ctx, domain.DockerPruneImages, dc.scanDanglingImages, &totalBytes) {
 			return totalBytes
 		}
 		fallthrough
 	case domain.DockerPruneContainers:
-		if dc.pruneMode == domain.DockerPruneAll || dc.pruneMode == domain.DockerPruneContainers {
-			if result := dc.scanUnusedContainers(ctx); result.IsOk() {
-				for _, item := range result.Value() {
-					totalBytes += item.Size
-				}
-			}
-			if dc.pruneMode != domain.DockerPruneAll {
-				return totalBytes
-			}
+		if !dc.scanAndAccumulate(ctx, domain.DockerPruneContainers, dc.scanUnusedContainers, &totalBytes) {
+			return totalBytes
 		}
 		fallthrough
 	case domain.DockerPruneVolumes:
-		if dc.pruneMode == domain.DockerPruneAll || dc.pruneMode == domain.DockerPruneVolumes {
-			if result := dc.scanUnusedVolumes(ctx); result.IsOk() {
-				for _, item := range result.Value() {
-					totalBytes += item.Size
-				}
-			}
-			if dc.pruneMode != domain.DockerPruneAll {
-				return totalBytes
-			}
+		if !dc.scanAndAccumulate(ctx, domain.DockerPruneVolumes, dc.scanUnusedVolumes, &totalBytes) {
+			return totalBytes
 		}
 		fallthrough
 	case domain.DockerPruneBuilds:

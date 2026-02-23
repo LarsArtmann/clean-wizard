@@ -32,22 +32,32 @@ var riskLevelTestCases = []struct {
 	{"unknown risk", testInvalidRiskUnknown},
 }
 
-var riskLevelTextValues = map[domain.RiskLevelType]string{
-	domain.RiskLevelType(domain.RiskLevelLowType):      "LOW",
-	domain.RiskLevelType(domain.RiskLevelMediumType):   "MEDIUM",
-	domain.RiskLevelType(domain.RiskLevelHighType):     "HIGH",
-	domain.RiskLevelType(domain.RiskLevelCriticalType): "CRITICAL",
-	testInvalidRiskUnknown:                             "UNKNOWN",
+// riskLevelValues defines the ordered risk level keys used for test value maps.
+var riskLevelValues = []domain.RiskLevelType{
+	domain.RiskLevelType(domain.RiskLevelLowType),
+	domain.RiskLevelType(domain.RiskLevelMediumType),
+	domain.RiskLevelType(domain.RiskLevelHighType),
+	domain.RiskLevelType(domain.RiskLevelCriticalType),
+	testInvalidRiskUnknown,
 }
 
-// riskLevelEmojiValues provides expected emoji values for Icon() method testing.
-var riskLevelEmojiValues = map[domain.RiskLevelType]string{
-	domain.RiskLevelType(domain.RiskLevelLowType):      "🟢",
-	domain.RiskLevelType(domain.RiskLevelMediumType):   "🟡",
-	domain.RiskLevelType(domain.RiskLevelHighType):     "🟠",
-	domain.RiskLevelType(domain.RiskLevelCriticalType): "🔴",
-	testInvalidRiskUnknown:                             "⚪",
+// newRiskLevelValueMap creates a map of risk levels to values using the provided value function.
+// The value function receives the index (0-4) and should return the corresponding string value.
+func newRiskLevelValueMap(values ...string) map[domain.RiskLevelType]string {
+	m := make(map[domain.RiskLevelType]string, len(riskLevelValues))
+	for i, level := range riskLevelValues {
+		if i < len(values) {
+			m[level] = values[i]
+		}
+	}
+	return m
 }
+
+// riskLevelTextValues provides expected text values for String() method testing.
+var riskLevelTextValues = newRiskLevelValueMap("LOW", "MEDIUM", "HIGH", "CRITICAL", "UNKNOWN")
+
+// riskLevelEmojiValues provides expected emoji values for Icon() method testing.
+var riskLevelEmojiValues = newRiskLevelValueMap("🟢", "🟡", "🟠", "🔴", "⚪")
 
 // testRiskLevelMethod is a helper function that tests RiskLevel methods with a value map.
 func testRiskLevelMethod(t *testing.T, methodName string, method func(domain.RiskLevelType) string, expected map[domain.RiskLevelType]string) {
@@ -57,6 +67,28 @@ func testRiskLevelMethod(t *testing.T, methodName string, method func(domain.Ris
 			expect := expected[tc.level]
 			if result != expect {
 				t.Errorf("%s() = %v, want %v", methodName, result, expect)
+			}
+		})
+	}
+}
+
+// validatable is an interface for types that can validate themselves.
+type validatable interface {
+	IsValid() bool
+}
+
+// testIsValid is a generic helper function that tests IsValid() methods.
+func testIsValid[T validatable](t *testing.T, tests []struct {
+	name     string
+	value    T
+	expected bool
+},
+) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.value.IsValid()
+			if result != tt.expected {
+				t.Errorf("IsValid() = %v, want %v", result, tt.expected)
 			}
 		})
 	}
@@ -77,7 +109,7 @@ func TestRiskLevel_Icon(t *testing.T) {
 func TestRiskLevel_IsValid(t *testing.T) {
 	tests := []struct {
 		name     string
-		level    domain.RiskLevelType
+		value    domain.RiskLevelType
 		expected bool
 	}{
 		{"low risk", domain.RiskLevelType(domain.RiskLevelLowType), true},
@@ -89,21 +121,14 @@ func TestRiskLevel_IsValid(t *testing.T) {
 		{"too high risk", testInvalidRiskTooHigh, false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.level.IsValid()
-			if result != tt.expected {
-				t.Errorf("IsValid() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	testIsValid(t, tests)
 }
 
 func TestCleanType_IsValid(t *testing.T) {
 	tests := []struct {
-		name      string
-		cleanType CleanType
-		expected  bool
+		name     string
+		value    CleanType
+		expected bool
 	}{
 		{"nix store", CleanTypeNixStore, true},
 		{"homebrew", CleanTypeHomebrew, true},
@@ -113,14 +138,7 @@ func TestCleanType_IsValid(t *testing.T) {
 		{"empty type", CleanType(""), false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.cleanType.IsValid()
-			if result != tt.expected {
-				t.Errorf("IsValid() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	testIsValid(t, tests)
 }
 
 func TestSafeConfigBuilder_Build(t *testing.T) {

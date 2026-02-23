@@ -12,48 +12,7 @@ import (
 // This is useful for availability checks and discovery.
 func DefaultRegistry() *Registry {
 	registry := NewRegistry()
-
-	// Nix cleaner
-	registry.Register("nix", NewNixCleaner(false, false))
-
-	// Homebrew cleaner (default mode: all)
-	registry.Register("homebrew", NewHomebrewCleaner(false, false, domain.HomebrewModeAll))
-
-	// Docker cleaner (default: prune all)
-	registry.Register("docker", NewDockerCleaner(false, false, domain.DockerPruneAll))
-
-	// Cargo cleaner
-	registry.Register("cargo", NewCargoCleaner(false, false))
-
-	// Go cleaner (default: all cache types)
-	goCleaner, _ := NewGoCleaner(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
-	registry.Register("go", goCleaner)
-
-	// Node packages cleaner (default: all available package managers)
-	registry.Register("node", NewNodePackageManagerCleaner(false, false, AvailableNodePackageManagers()))
-
-	// Build cache cleaner (default: 30d, all tools)
-	buildCacheCleaner, _ := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
-	registry.Register("buildcache", buildCacheCleaner)
-
-	// System cache cleaner (default: 30d, all cache types)
-	systemCacheCleaner, _ := NewSystemCacheCleaner(false, false, "30d", nil)
-	registry.Register("systemcache", systemCacheCleaner)
-
-	// Temp files cleaner (default: 7d, standard temp paths)
-	tempFilesCleaner, _ := NewTempFilesCleaner(false, false, "7d", []string{}, []string{filepath.Join("/", "tmp")})
-	registry.Register("tempfiles", tempFilesCleaner)
-
-	// Projects management automation cleaner
-	registry.Register("projects", NewProjectsManagementAutomationCleaner(false, false))
-
-	// Project executables cleaner
-	registry.Register("project-executables", NewProjectExecutablesCleaner(false, false, []string{".sh"}, []string{}))
-
-	// Compiled binaries cleaner (default: 10MB, any age, ~/projects)
-	compiledBinariesCleaner := NewCompiledBinariesCleaner(false, false, DefaultMinSizeMB, DefaultOlderThan, nil, []string{})
-	registry.Register("compiled-binaries", compiledBinariesCleaner)
-
+	registerAllCleaners(registry, false, false)
 	return registry
 }
 
@@ -61,7 +20,13 @@ func DefaultRegistry() *Registry {
 // This should be used when performing clean operations.
 func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
 	registry := NewRegistry()
+	registerAllCleaners(registry, verbose, dryRun)
+	return registry
+}
 
+// registerAllCleaners registers all available cleaners with the given configuration.
+// This helper function eliminates duplication between DefaultRegistry and DefaultRegistryWithConfig.
+func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 	// Nix cleaner
 	registry.Register("nix", NewNixCleaner(verbose, dryRun))
 
@@ -86,8 +51,8 @@ func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
 	registry.Register("buildcache", buildCacheCleaner)
 
 	// System cache cleaner (default: 30d, all cache types)
-	systemCacheCleaner, _ := NewSystemCacheCleaner(verbose, dryRun, "30d", nil)
-	registry.Register("systemcache", systemCacheCleaner)
+	_systemCacheCleaner, _ := NewSystemCacheCleaner(verbose, dryRun, "30d", nil)
+	registry.Register("systemcache", _systemCacheCleaner)
 
 	// Temp files cleaner (default: 7d, standard temp paths)
 	tempFilesCleaner, _ := NewTempFilesCleaner(verbose, dryRun, "7d", []string{}, []string{filepath.Join("/", "tmp")})
@@ -102,8 +67,6 @@ func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
 	// Compiled binaries cleaner (default: 10MB, any age, ~/projects)
 	compiledBinariesCleaner := NewCompiledBinariesCleaner(verbose, dryRun, DefaultMinSizeMB, DefaultOlderThan, nil, []string{})
 	registry.Register("compiled-binaries", compiledBinariesCleaner)
-
-	return registry
 }
 
 // AvailableCleaners returns a list of available cleaner names from the default registry.

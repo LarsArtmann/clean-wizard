@@ -346,16 +346,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 
 // GetStoreSize returns the total size of all compiled binaries found.
 func (c *CompiledBinariesCleaner) GetStoreSize(ctx context.Context) int64 {
-	scanResult := c.Scan(ctx)
-	if scanResult.IsErr() {
-		return 0
-	}
-
-	var total int64
-	for _, item := range scanResult.Value() {
-		total += item.Size
-	}
-	return total
+	return calculateTotalSizeFromScan(c.Scan(ctx))
 }
 
 // parseAgeDuration parses a duration string like "7d", "30d", "1h", etc.
@@ -532,15 +523,7 @@ type defaultBinaryTrashOperator struct {
 }
 
 func (t *defaultBinaryTrashOperator) TrashBinary(ctx context.Context, path string) error {
-	timeoutCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-
-	cmd := exec.CommandContext(timeoutCtx, "trash", path)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("trash failed for %s: %w (output: %s)", path, err, string(output))
-	}
-	return nil
+	return TrashPath(ctx, path)
 }
 
 func (t *defaultBinaryTrashOperator) GetFileSize(path string) int64 {

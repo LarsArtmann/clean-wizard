@@ -336,51 +336,115 @@ func TestErrorDetailsBuilder(t *testing.T) {
 		}
 	})
 
-	t.Run("fluent chaining", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithField("testField").
-			WithValue("testValue").
-			WithExpected("testExpected").
-			WithActual("testActual").
-			WithOperation("testOp").
-			WithFilePath("/test/path").
-			WithLineNumber(100).
-			WithRetryCount(5).
-			WithDuration("1s").
-			WithMetadata("mk", "mv").
-			Build()
+	fluentTests := []struct {
+		name          string
+		field         string
+		value         string
+		expected      string
+		actual        string
+		operation     string
+		filePath      string
+		lineNumber    int
+		retryCount    int
+		duration      string
+		metadataKey1  string
+		metadataVal1  string
+		metadataKey2  string
+		metadataVal2  string
+		metadataCount int
+	}{
+		{
+			name:          "test values",
+			field:         "testField",
+			value:         "testValue",
+			expected:      "testExpected",
+			actual:        "testActual",
+			operation:     "testOp",
+			filePath:      "/test/path",
+			lineNumber:    100,
+			retryCount:    5,
+			duration:      "1s",
+			metadataKey1:  "mk",
+			metadataVal1:  "mv",
+			metadataCount: 1,
+		},
+		{
+			name:          "config values",
+			field:         "config.path",
+			value:         "/invalid/path",
+			expected:      "valid/path",
+			actual:        "/invalid/path",
+			operation:     "config_validation",
+			filePath:      "/path/to/config.go",
+			lineNumber:    42,
+			retryCount:    3,
+			duration:      "500ms",
+			metadataKey1:  "env",
+			metadataVal1:  "production",
+			metadataKey2:  "user",
+			metadataVal2:  "admin",
+			metadataCount: 2,
+		},
+	}
 
-		if details.Field != "testField" {
-			t.Errorf("Field = %q, want %q", details.Field, "testField")
-		}
-		if details.Value != "testValue" {
-			t.Errorf("Value = %q, want %q", details.Value, "testValue")
-		}
-		if details.Expected != "testExpected" {
-			t.Errorf("Expected = %q, want %q", details.Expected, "testExpected")
-		}
-		if details.Actual != "testActual" {
-			t.Errorf("Actual = %q, want %q", details.Actual, "testActual")
-		}
-		if details.Operation != "testOp" {
-			t.Errorf("Operation = %q, want %q", details.Operation, "testOp")
-		}
-		if details.FilePath != "/test/path" {
-			t.Errorf("FilePath = %q, want %q", details.FilePath, "/test/path")
-		}
-		if details.LineNumber != 100 {
-			t.Errorf("LineNumber = %d, want %d", details.LineNumber, 100)
-		}
-		if details.RetryCount != 5 {
-			t.Errorf("RetryCount = %d, want %d", details.RetryCount, 5)
-		}
-		if details.Duration != "1s" {
-			t.Errorf("Duration = %q, want %q", details.Duration, "1s")
-		}
-		if details.Metadata["mk"] != "mv" {
-			t.Errorf("Metadata[mk] = %q, want %q", details.Metadata["mk"], "mv")
-		}
-	})
+	for _, tt := range fluentTests {
+		t.Run("fluent chaining "+tt.name, func(t *testing.T) {
+			builder := NewErrorDetails().
+				WithField(tt.field).
+				WithValue(tt.value).
+				WithExpected(tt.expected).
+				WithActual(tt.actual).
+				WithOperation(tt.operation).
+				WithFilePath(tt.filePath).
+				WithLineNumber(tt.lineNumber).
+				WithRetryCount(tt.retryCount).
+				WithDuration(tt.duration).
+				WithMetadata(tt.metadataKey1, tt.metadataVal1)
+
+			if tt.metadataKey2 != "" {
+				builder = builder.WithMetadata(tt.metadataKey2, tt.metadataVal2)
+			}
+
+			details := builder.Build()
+
+			if details.Field != tt.field {
+				t.Errorf("Field = %q, want %q", details.Field, tt.field)
+			}
+			if details.Value != tt.value {
+				t.Errorf("Value = %q, want %q", details.Value, tt.value)
+			}
+			if details.Expected != tt.expected {
+				t.Errorf("Expected = %q, want %q", details.Expected, tt.expected)
+			}
+			if details.Actual != tt.actual {
+				t.Errorf("Actual = %q, want %q", details.Actual, tt.actual)
+			}
+			if details.Operation != tt.operation {
+				t.Errorf("Operation = %q, want %q", details.Operation, tt.operation)
+			}
+			if details.FilePath != tt.filePath {
+				t.Errorf("FilePath = %q, want %q", details.FilePath, tt.filePath)
+			}
+			if details.LineNumber != tt.lineNumber {
+				t.Errorf("LineNumber = %d, want %d", details.LineNumber, tt.lineNumber)
+			}
+			if details.RetryCount != tt.retryCount {
+				t.Errorf("RetryCount = %d, want %d", details.RetryCount, tt.retryCount)
+			}
+			if details.Duration != tt.duration {
+				t.Errorf("Duration = %q, want %q", details.Duration, tt.duration)
+			}
+			if len(details.Metadata) != tt.metadataCount {
+				t.Errorf("Metadata length = %d, want %d", len(details.Metadata), tt.metadataCount)
+			}
+			if details.Metadata[tt.metadataKey1] != tt.metadataVal1 {
+				t.Errorf("Metadata[%s] = %q, want %q", tt.metadataKey1, details.Metadata[tt.metadataKey1], tt.metadataVal1)
+			}
+			if tt.metadataKey2 != "" && details.Metadata[tt.metadataKey2] != tt.metadataVal2 {
+				t.Errorf("Metadata[%s] = %q, want %q", tt.metadataKey2, details.Metadata[tt.metadataKey2], tt.metadataVal2)
+			}
+		})
+	}
 
 	t.Run("metadata initialized once", func(t *testing.T) {
 		details := NewErrorDetails().
@@ -395,195 +459,86 @@ func TestErrorDetailsBuilder(t *testing.T) {
 	})
 }
 
+func requireCleanWizardError(t *testing.T, err error) *CleanWizardError {
+	t.Helper()
+	var cleanErr *CleanWizardError
+	if !errors.As(err, &cleanErr) {
+		t.Fatal("Expected *CleanWizardError")
+	}
+	return cleanErr
+}
+
+func requireErrorDetails(t *testing.T, err *CleanWizardError) *ErrorDetails {
+	t.Helper()
+	if err.Details == nil {
+		t.Fatal("Expected ErrorDetails")
+	}
+	return err.Details
+}
+
 func TestErrorDetailsBuilderIntegration(t *testing.T) {
 	// Integration test: Verify ErrorDetailsBuilder works with error constructors
 	t.Run("config validation error", func(t *testing.T) {
 		err := ValidationError("test_field", "invalid_value", "expected_value")
 
-		var cleanErr *CleanWizardError
-		if !errors.As(err, &cleanErr) {
-			t.Fatal("Expected *CleanWizardError")
-		}
+		cleanErr := requireCleanWizardError(t, err)
+		details := requireErrorDetails(t, cleanErr)
 
-		if cleanErr.Details == nil {
-			t.Fatal("Expected ErrorDetails")
+		if details.Field != "test_field" {
+			t.Errorf("Field = %q, want %q", details.Field, "test_field")
 		}
-
-		if cleanErr.Details.Field != "test_field" {
-			t.Errorf("Field = %q, want %q", cleanErr.Details.Field, "test_field")
+		if details.Value != "invalid_value" {
+			t.Errorf("Value = %q, want %q", details.Value, "invalid_value")
 		}
-		if cleanErr.Details.Value != "invalid_value" {
-			t.Errorf("Value = %q, want %q", cleanErr.Details.Value, "invalid_value")
+		if details.Expected != "expected_value" {
+			t.Errorf("Expected = %q, want %q", details.Expected, "expected_value")
 		}
-		if cleanErr.Details.Expected != "expected_value" {
-			t.Errorf("Expected = %q, want %q", cleanErr.Details.Expected, "expected_value")
-		}
-		if cleanErr.Details.Operation != "validation" {
-			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "validation")
+		if details.Operation != "validation" {
+			t.Errorf("Operation = %q, want %q", details.Operation, "validation")
 		}
 	})
 
-	t.Run("config load error", func(t *testing.T) {
-		err := ConfigLoadError("failed to read config file")
+	tests := []struct {
+		name      string
+		createErr func(string) error
+		operation string
+	}{
+		{"config load error", ConfigLoadError, "config_load"},
+		{"config save error", ConfigSaveError, "config_save"},
+		{"config validation error", ConfigValidateError, "config_validation"},
+		{"nix command error", NixCommandError, "nix_command"},
+		{"cleaning error", CleaningError, "cleaning"},
+	}
 
-		cleanErr := &CleanWizardError{}
-		ok := errors.As(err, &cleanErr)
-		if !ok {
-			t.Fatal("Expected *CleanWizardError")
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.createErr("test error message")
 
-		if cleanErr.Details == nil {
-			t.Fatal("Expected ErrorDetails")
-		}
+			cleanErr := requireCleanWizardError(t, err)
+			details := requireErrorDetails(t, cleanErr)
 
-		if cleanErr.Details.Operation != "config_load" {
-			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "config_load")
-		}
-	})
-
-	t.Run("config save error", func(t *testing.T) {
-		err := ConfigSaveError("failed to write config")
-
-		cleanErr := &CleanWizardError{}
-		ok := errors.As(err, &cleanErr)
-		if !ok {
-			t.Fatal("Expected *CleanWizardError")
-		}
-
-		if cleanErr.Details == nil {
-			t.Fatal("Expected ErrorDetails")
-		}
-
-		if cleanErr.Details.Operation != "config_save" {
-			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "config_save")
-		}
-	})
-
-	t.Run("config validation error", func(t *testing.T) {
-		err := ConfigValidateError("invalid profile name")
-
-		cleanErr := &CleanWizardError{}
-		ok := errors.As(err, &cleanErr)
-		if !ok {
-			t.Fatal("Expected *CleanWizardError")
-		}
-
-		if cleanErr.Details == nil {
-			t.Fatal("Expected ErrorDetails")
-		}
-
-		if cleanErr.Details.Operation != "config_validation" {
-			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "config_validation")
-		}
-	})
-
-	t.Run("nix command error", func(t *testing.T) {
-		err := NixCommandError("nix-env failed")
-
-		cleanErr := &CleanWizardError{}
-		ok := errors.As(err, &cleanErr)
-		if !ok {
-			t.Fatal("Expected *CleanWizardError")
-		}
-
-		if cleanErr.Details == nil {
-			t.Fatal("Expected ErrorDetails")
-		}
-
-		if cleanErr.Details.Operation != "nix_command" {
-			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "nix_command")
-		}
-	})
-
-	t.Run("cleaning error", func(t *testing.T) {
-		err := CleaningError("failed to clean cache")
-
-		cleanErr := &CleanWizardError{}
-		ok := errors.As(err, &cleanErr)
-		if !ok {
-			t.Fatal("Expected *CleanWizardError")
-		}
-
-		if cleanErr.Details == nil {
-			t.Fatal("Expected ErrorDetails")
-		}
-
-		if cleanErr.Details.Operation != "cleaning" {
-			t.Errorf("Operation = %q, want %q", cleanErr.Details.Operation, "cleaning")
-		}
-	})
+			if details.Operation != tt.operation {
+				t.Errorf("Operation = %q, want %q", details.Operation, tt.operation)
+			}
+		})
+	}
 
 	t.Run("handler validation error with details", func(t *testing.T) {
 		err := HandleValidationErrorWithDetails("test_operation", "test_field", "test_value", "test_reason")
 
-		if err.Details == nil {
-			t.Fatal("Expected ErrorDetails")
-		}
+		details := requireErrorDetails(t, err)
 
-		if err.Details.Operation != "test_operation" {
-			t.Errorf("Operation = %q, want %q", err.Details.Operation, "test_operation")
+		if details.Operation != "test_operation" {
+			t.Errorf("Operation = %q, want %q", details.Operation, "test_operation")
 		}
-		if err.Details.Field != "test_field" {
-			t.Errorf("Field = %q, want %q", err.Details.Field, "test_field")
+		if details.Field != "test_field" {
+			t.Errorf("Field = %q, want %q", details.Field, "test_field")
 		}
-		if err.Details.Value != "test_value" {
-			t.Errorf("Value = %q, want %q", err.Details.Value, "test_value")
+		if details.Value != "test_value" {
+			t.Errorf("Value = %q, want %q", details.Value, "test_value")
 		}
-		if err.Details.Metadata["reason"] != "test_reason" {
-			t.Errorf("Metadata[reason] = %q, want %q", err.Details.Metadata["reason"], "test_reason")
-		}
-	})
-
-	t.Run("fluent builder chaining", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithField("config.path").
-			WithValue("/invalid/path").
-			WithExpected("valid/path").
-			WithActual("/invalid/path").
-			WithOperation("config_validation").
-			WithFilePath("/path/to/config.go").
-			WithLineNumber(42).
-			WithRetryCount(3).
-			WithDuration("500ms").
-			WithMetadata("env", "production").
-			WithMetadata("user", "admin").
-			Build()
-
-		if details.Field != "config.path" {
-			t.Errorf("Field = %q, want %q", details.Field, "config.path")
-		}
-		if details.Value != "/invalid/path" {
-			t.Errorf("Value = %q, want %q", details.Value, "/invalid/path")
-		}
-		if details.Expected != "valid/path" {
-			t.Errorf("Expected = %q, want %q", details.Expected, "valid/path")
-		}
-		if details.Actual != "/invalid/path" {
-			t.Errorf("Actual = %q, want %q", details.Actual, "/invalid/path")
-		}
-		if details.Operation != "config_validation" {
-			t.Errorf("Operation = %q, want %q", details.Operation, "config_validation")
-		}
-		if details.FilePath != "/path/to/config.go" {
-			t.Errorf("FilePath = %q, want %q", details.FilePath, "/path/to/config.go")
-		}
-		if details.LineNumber != 42 {
-			t.Errorf("LineNumber = %d, want %d", details.LineNumber, 42)
-		}
-		if details.RetryCount != 3 {
-			t.Errorf("RetryCount = %d, want %d", details.RetryCount, 3)
-		}
-		if details.Duration != "500ms" {
-			t.Errorf("Duration = %q, want %q", details.Duration, "500ms")
-		}
-		if len(details.Metadata) != 2 {
-			t.Errorf("Metadata length = %d, want %d", len(details.Metadata), 2)
-		}
-		if details.Metadata["env"] != "production" {
-			t.Errorf("Metadata[env] = %q, want %q", details.Metadata["env"], "production")
-		}
-		if details.Metadata["user"] != "admin" {
-			t.Errorf("Metadata[user] = %q, want %q", details.Metadata["user"], "admin")
+		if details.Metadata["reason"] != "test_reason" {
+			t.Errorf("Metadata[reason] = %q, want %q", details.Metadata["reason"], "test_reason")
 		}
 	})
 }

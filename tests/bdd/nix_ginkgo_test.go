@@ -104,8 +104,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		})
 
 		ginkgo.It("should show what would be cleaned in dry-run mode", func() {
-			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 2)
-			testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, 3)
+			testCtx.cleanResult = cleanGenerationsAndVerify(testCtx.ctx, testCtx.nixCleaner, 2, 3)
 			gomega.Expect(testCtx.cleanResult.IsOk()).To(gomega.BeTrue())
 		})
 
@@ -197,7 +196,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 		ginkgo.It("should display generation numbers and dates", func() {
 			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			generations := nixCtx.generations.Value()
-			gomega.Expect(len(generations)).To(gomega.BeNumerically(">", 0))
+			gomega.Expect(generations).ToNot(gomega.BeEmpty())
 			for _, gen := range generations {
 				gomega.Expect(gen.ID).To(gomega.BeNumerically(">", 0))
 				gomega.Expect(gen.Date).NotTo(gomega.BeZero())
@@ -224,8 +223,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 		})
 
 		ginkgo.It("should show which generations would be deleted", func() {
-			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 2)
-			nixCtx.cleanResult = nixCtx.nixCleaner.CleanOldGenerations(nixCtx.ctx, 1)
+			nixCtx.cleanResult = cleanGenerationsAndVerify(nixCtx.ctx, nixCtx.nixCleaner, 2, 1)
 			gomega.Expect(nixCtx.cleanResult.IsOk()).To(gomega.BeTrue())
 		})
 

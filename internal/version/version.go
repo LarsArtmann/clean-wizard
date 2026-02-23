@@ -114,11 +114,11 @@ func (i Info) String() string {
 	}
 
 	if i.Date != "" {
-		sb.WriteString(fmt.Sprintf(" built on %s", i.Date))
+		sb.WriteString(" built on " + i.Date)
 	}
 
 	if i.BuiltBy != "" && i.BuiltBy != "goreleaser" {
-		sb.WriteString(fmt.Sprintf(" by %s", i.BuiltBy))
+		sb.WriteString(" by " + i.BuiltBy)
 	}
 
 	return sb.String()

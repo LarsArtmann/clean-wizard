@@ -1,6 +1,6 @@
 # Clean Wizard Features
 
-> **Last Updated:** 2026-02-15  
+> **Last Updated:** 2026-02-22  
 > **Version:** Based on codebase analysis  
 > **Status:** BRUTALLY HONEST ASSESSMENT
 
@@ -26,7 +26,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ---
 
-## Core Cleaners (11 Total)
+## Core Cleaners (13 Total)
 
 ### 1. Nix Cleaner ❄️
 
@@ -221,7 +221,35 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ---
 
-### 10. Language Version Manager Cleaner 🗑️
+### 10. Git History Cleaner 🕰️
+
+|| Aspect | Status | Details |
+|| -------------------------- | ------------------- | ----------------------------------------------------------- |
+|| **Overall** | ✅ FULLY_FUNCTIONAL | Interactive git history cleaning |
+|| **Availability Detection** | ✅ Working | Checks for `git` and `git-filter-repo` |
+|| **History Scanning** | ✅ Working | Finds large binary blobs in git history |
+|| **Safety Checks** | ✅ Working | Uncommitted changes, remote status, filter-repo availability |
+|| **Interactive Selection** | ✅ Working | Multi-select TUI for choosing files to remove |
+|| **Backup Creation** | ✅ Working | Mirror backup before rewriting |
+|| **History Rewriting** | ✅ Working | Uses `git-filter-repo` for safe rewriting |
+|| **Garbage Collection** | ✅ Working | Runs `git gc --prune=now --aggressive` after rewrite |
+|| **Dry Run Mode** | ✅ Working | Default dry-run mode for safety |
+|| **Multi-Repo Support** | ✅ Working | `--scan-all-projects` to scan `~/projects` |
+|| **Size Estimation** | ✅ Working | Accurate blob sizes from git object database |
+|| **Impact Preview** | ✅ Working | Shows estimated space reclamation before execution |
+
+**Notes:**
+
+- Rewrites git history - requires force-push after use
+- Default dry-run mode prevents accidental history changes
+- Requires `git-filter-repo` tool (`pip install git-filter-repo` or `brew install git-filter-repo`)
+- Automatically excludes images, PDFs, and other common non-binary files
+- Creates mirror backup before any destructive operation
+- Best for cleaning accidentally committed build artifacts, large binaries
+
+---
+
+### 11. Language Version Manager Cleaner 🗑️
 
 | Aspect              | Status             | Details                                             |
 | ------------------- | ------------------ | --------------------------------------------------- |
@@ -243,7 +271,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ---
 
-### 11. Projects Management Automation Cleaner ⚙️
+### 12. Projects Management Automation Cleaner ⚙️
 
 | Aspect                     | Status     | Details                                             |
 | -------------------------- | ---------- | --------------------------------------------------- |
@@ -266,13 +294,14 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### Command Structure
 
-| Command                | Status              | Description                                  |
-| ---------------------- | ------------------- | -------------------------------------------- |
-| `clean-wizard clean`   | ✅ FULLY_FUNCTIONAL | Main cleanup command with TUI                |
-| `clean-wizard scan`    | ✅ FULLY_FUNCTIONAL | Scan and report cleanup opportunities        |
-| `clean-wizard init`    | ✅ FULLY_FUNCTIONAL | Interactive setup wizard                     |
-| `clean-wizard profile` | ✅ FULLY_FUNCTIONAL | Profile management (list/show/create/delete) |
-| `clean-wizard config`  | ✅ FULLY_FUNCTIONAL | Config management (show/edit/validate/reset) |
+| Command                    | Status              | Description                                  |
+| -------------------------- | ------------------- | -------------------------------------------- |
+| `clean-wizard clean`       | ✅ FULLY_FUNCTIONAL | Main cleanup command with TUI                |
+| `clean-wizard scan`        | ✅ FULLY_FUNCTIONAL | Scan and report cleanup opportunities        |
+| `clean-wizard init`        | ✅ FULLY_FUNCTIONAL | Interactive setup wizard                     |
+| `clean-wizard profile`     | ✅ FULLY_FUNCTIONAL | Profile management (list/show/create/delete) |
+| `clean-wizard config`      | ✅ FULLY_FUNCTIONAL | Config management (show/edit/validate/reset) |
+| `clean-wizard git-history` | ✅ FULLY_FUNCTIONAL | Interactive git history binary cleaner       |
 
 **Notes:**
 
@@ -413,6 +442,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | Build Cache      | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools    |
 | System Cache     | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Temp Files       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Git History      | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Lang Version Mgr | ✅        | ✅   | 📝    | 📝      | N/A           | 📝 Not Implemented  |
 | Projects Mgmt    | 🚧        | 🧪   | 🚧    | 🧪      | 🧪            | 🚧 Non-Functional   |
 
@@ -422,8 +452,8 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### For Users
 
-1. **Use with confidence:** Nix, Homebrew, Docker, Go, Cargo, Node, System Cache, Temp Files cleaners
-2. **Use with caution:** Build Cache (limited tool support)
+1. **Use with confidence:** Nix, Homebrew, Docker, Go, Cargo, Node, System Cache, Temp Files, Git History cleaners
+2. **Use with caution:** Build Cache (limited tool support), Git History (rewrites history - requires force-push)
 3. **Don't rely on:** Language Version Manager (not implemented), Projects Management Automation (requires external tool)
 
 ### For Contributors

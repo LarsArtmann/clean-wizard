@@ -77,16 +77,7 @@ func runConfigShowCommand(cmd *cobra.Command, args []string, jsonOutput bool) er
 	fmt.Println()
 
 	// Show profiles summary
-	for name, profile := range cfg.Profiles {
-		status := "enabled"
-		if profile.Enabled == domain.ProfileStatusDisabled {
-			status = "disabled"
-		}
-		fmt.Printf("  📁 %s (%s)\n", name, status)
-		fmt.Printf("     %s\n", profile.Description)
-		fmt.Printf("     Operations: %d\n", len(profile.Operations))
-		fmt.Println()
-	}
+	PrintProfileSummaries(cfg.Profiles, ProfileFormatText)
 
 	return nil
 }

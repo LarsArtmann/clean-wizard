@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
@@ -216,21 +217,14 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			})
 		})
 
-		ginkgo.Context("with empty OperationSettings", func() {
-			ginkgo.It("should return nil when ProjectExecutables is nil", func() {
-				settings := &domain.OperationSettings{}
-				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).ToNot(gomega.HaveOccurred())
-			})
-		})
+		GinkgoValidateEmptySettingsContext(cleaner, "should return nil when ProjectExecutables is nil")
 
 		ginkgo.Context("with valid settings", func() {
 			ginkgo.It("should return nil for valid empty ProjectExecutablesSettings", func() {
 				settings := &domain.OperationSettings{
 					ProjectExecutables: &domain.ProjectExecutablesSettings{},
 				}
-				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid exclude extensions", func() {
@@ -239,8 +233,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 						ExcludeExtensions: []string{".sh", ".bash"},
 					},
 				}
-				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid exclude patterns", func() {
@@ -249,8 +242,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 						ExcludePatterns: []string{"Makefile", "*.config"},
 					},
 				}
-				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid combined settings", func() {
@@ -260,8 +252,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 						ExcludePatterns:   []string{"Makefile"},
 					},
 				}
-				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 		})
 
@@ -272,9 +263,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 						ExcludePatterns: []string{"[invalid"},
 					},
 				}
-				err := cleaner.ValidateSettings(settings)
-				gomega.Expect(err).To(gomega.HaveOccurred())
-				gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid exclude pattern"))
+				GinkgoValidateInvalidExcludePatternTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return error for invalid glob pattern with unclosed bracket", func() {
@@ -300,33 +289,29 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			)
 		})
 
-		ginkgo.Context("when ListProjects fails", func() {
-			ginkgo.It("should return error when project listing fails", func() {
-				mockLister.err = errors.New("failed to list projects")
-				result := cleaner.Scan(ctx)
-				gomega.Expect(result.IsErr()).To(gomega.BeTrue())
-				gomega.Expect(result.Error()).To(gomega.Equal(mockLister.err))
-			})
-		})
+		GinkgoErrorPropagationContext(
+			"when ListProjects fails",
+			"should return error when project listing fails",
+			func() { mockLister.err = errors.New("failed to list projects") },
+			func() result.Result[[]domain.ScanItem] { return cleaner.Scan(ctx) },
+		)
 
 		ginkgo.Context("when no projects found", func() {
 			ginkgo.It("should return empty slice when no projects", func() {
-				mockLister.projects = []ProjectInfo{}
-				result := cleaner.Scan(ctx)
-				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
-				gomega.Expect(result.Value()).To(gomega.BeEmpty())
+				GinkgoNoItemsToScanTest(ctx, cleaner, func() {
+					mockLister.projects = []ProjectInfo{}
+				})
 			})
 		})
 
 		ginkgo.Context("when FindExecutableFiles fails", func() {
 			ginkgo.It("should skip directories that cannot be read", func() {
-				mockLister.projects = []ProjectInfo{
-					{Name: "project1", Path: "/path/to/project1"},
-				}
-				mockOperator.executablesErr = errors.New("cannot read directory")
-				result := cleaner.Scan(ctx)
-				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
-				gomega.Expect(result.Value()).To(gomega.BeEmpty())
+				GinkgoNoItemsToScanTest(ctx, cleaner, func() {
+					mockLister.projects = []ProjectInfo{
+						{Name: "project1", Path: "/path/to/project1"},
+					}
+					mockOperator.executablesErr = errors.New("cannot read directory")
+				})
 			})
 		})
 
@@ -425,23 +410,18 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			)
 		})
 
-		ginkgo.Context("when Scan fails", func() {
-			ginkgo.It("should return error when scan fails", func() {
-				mockLister.err = errors.New("scan failed")
-				result := cleaner.Clean(ctx)
-				gomega.Expect(result.IsErr()).To(gomega.BeTrue())
-				gomega.Expect(result.Error()).To(gomega.Equal(mockLister.err))
-			})
-		})
+		GinkgoErrorPropagationContext(
+			"when Scan fails",
+			"should return error when scan fails",
+			func() { mockLister.err = errors.New("scan failed") },
+			func() result.Result[domain.CleanResult] { return cleaner.Clean(ctx) },
+		)
 
 		ginkgo.Context("with no items to clean", func() {
 			ginkgo.It("should return conservative result when no items found", func() {
-				mockLister.projects = []ProjectInfo{}
-				result := cleaner.Clean(ctx)
-				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
-				cleanResult := result.Value()
-				gomega.Expect(cleanResult.ItemsRemoved).To(gomega.Equal(uint(0)))
-				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyConservative))
+				GinkgoNoItemsToCleanTest(ctx, cleaner, func() {
+					mockLister.projects = []ProjectInfo{}
+				})
 			})
 		})
 

@@ -5,6 +5,17 @@ import (
 	"testing"
 )
 
+// assertFloat64PtrEqual compares two *float64 values and reports errors if they differ.
+// It handles nil pointer comparison correctly.
+func assertFloat64PtrEqual(t *testing.T, name string, got, want *float64) {
+	t.Helper()
+	if (want == nil) != (got == nil) {
+		t.Errorf("%s = %v, want %v", name, got, want)
+	} else if want != nil && *got != *want {
+		t.Errorf("%s = %v, want %v", name, *got, *want)
+	}
+}
+
 func TestExtractMinMax(t *testing.T) {
 	minVal := 10
 	maxVal := 95
@@ -60,17 +71,8 @@ func TestExtractMinMax(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ExtractMinMax(tt.min, tt.max, tt.minFallback, tt.maxFallback)
 
-			if (tt.wantMin == nil) != (result.Min == nil) {
-				t.Errorf("Min = %v, want %v", result.Min, tt.wantMin)
-			} else if tt.wantMin != nil && *result.Min != *tt.wantMin {
-				t.Errorf("Min = %v, want %v", *result.Min, *tt.wantMin)
-			}
-
-			if (tt.wantMax == nil) != (result.Max == nil) {
-				t.Errorf("Max = %v, want %v", result.Max, tt.wantMax)
-			} else if tt.wantMax != nil && *result.Max != *tt.wantMax {
-				t.Errorf("Max = %v, want %v", *result.Max, *tt.wantMax)
-			}
+			assertFloat64PtrEqual(t, "Min", result.Min, tt.wantMin)
+			assertFloat64PtrEqual(t, "Max", result.Max, tt.wantMax)
 		})
 	}
 }
@@ -249,11 +251,7 @@ func TestToFloat64(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := ToFloat64(tt.input)
-			if (tt.want == nil) != (got == nil) {
-				t.Errorf("ToFloat64() = %v, want %v", got, tt.want)
-			} else if tt.want != nil && *got != *tt.want {
-				t.Errorf("ToFloat64() = %v, want %v", *got, *tt.want)
-			}
+			assertFloat64PtrEqual(t, "ToFloat64()", got, tt.want)
 		})
 	}
 }

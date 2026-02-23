@@ -20,6 +20,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewInitCommand())
 	rootCmd.AddCommand(commands.NewProfileCommand())
 	rootCmd.AddCommand(commands.NewConfigCommand())
+	rootCmd.AddCommand(commands.NewGitHistoryCommand())
 
 	// Setup signal handling for graceful shutdown
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

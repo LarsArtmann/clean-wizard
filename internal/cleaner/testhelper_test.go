@@ -1,11 +1,21 @@
 package cleaner
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/onsi/gomega"
 )
+
+// assertValidationError is a helper for testing that ValidateSettings returns expected errors.
+// Consolidates duplicate validation test patterns across ginkgo test files.
+func assertValidationError(cleaner CleanerWithSettings, settings *domain.OperationSettings, expectedErrSubstring string) {
+	err := cleaner.ValidateSettings(settings)
+	gomega.Expect(err).To(gomega.HaveOccurred())
+	gomega.Expect(err.Error()).To(gomega.ContainSubstring(expectedErrSubstring))
+}
 
 // availableItemsTestHelper is a helper function for testing Available* functions.
 // This is called by type-specific test wrappers.
@@ -37,6 +47,43 @@ func stringTypesTestHelper[T comparable](t *testing.T, tests []struct {
 				t.Errorf("%s(%v) = %v, want %v", testName, tt.Item, got, tt.Want)
 			}
 		})
+	}
+}
+
+// AssertNoItemsToCleanResult verifies that a cleaner returns the expected conservative
+// result when there are no items to clean. This consolidates duplicate test patterns
+// across Ginkgo test files.
+func AssertNoItemsToCleanResult(ctx context.Context, cleaner Cleaner, setupEmptyState func()) {
+	setupEmptyState()
+	result := cleaner.Clean(ctx)
+	gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+	cleanResult := result.Value()
+	gomega.Expect(cleanResult.ItemsRemoved).To(gomega.Equal(uint(0)))
+	gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyConservative))
+}
+
+// VerboseDryRunCleaner is an interface for cleaners that have verbose and dryRun fields.
+// Used for testing common cleaner initialization patterns.
+type VerboseDryRunCleaner interface {
+	GetVerbose() bool
+	GetDryRun() bool
+}
+
+// assertCleanerBooleanFields validates that a cleaner's verbose and dryRun fields
+// match the expected values. This eliminates duplicate assertion code across cleaner test files.
+//
+// Usage:
+//
+//	if cleaner != nil {
+//		assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
+//	}
+func assertCleanerBooleanFields(t *testing.T, cleaner VerboseDryRunCleaner, wantVerbose, wantDryRun bool) {
+	t.Helper()
+	if got := cleaner.GetVerbose(); got != wantVerbose {
+		t.Errorf("verbose = %v, want %v", got, wantVerbose)
+	}
+	if got := cleaner.GetDryRun(); got != wantDryRun {
+		t.Errorf("dryRun = %v, want %v", got, wantDryRun)
 	}
 }
 

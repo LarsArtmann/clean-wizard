@@ -55,16 +55,7 @@ func runProfileListCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	for name, profile := range cfg.Profiles {
-		status := "✅"
-		if profile.Enabled == domain.ProfileStatusDisabled {
-			status = "⚪"
-		}
-		fmt.Printf("  %s %s\n", status, name)
-		fmt.Printf("     %s\n", profile.Description)
-		fmt.Printf("     Operations: %d\n", len(profile.Operations))
-		fmt.Println()
-	}
+	PrintProfileSummaries(cfg.Profiles, ProfileFormatEmoji)
 
 	return nil
 }

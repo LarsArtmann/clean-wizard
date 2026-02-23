@@ -63,14 +63,48 @@ func TestEnumYAMLMarshaling(t *testing.T) {
 	}
 }
 
+// enumUnmarshalTestCase represents a single test case for enum YAML unmarshaling.
+type enumUnmarshalTestCase struct {
+	name     string
+	input    string
+	target   any
+	expected any
+}
+
+// runEnumYAMLUnmarshalingTests executes the common test logic for enum unmarshaling.
+func runEnumYAMLUnmarshalingTests(t *testing.T, tests []enumUnmarshalTestCase) {
+	t.Helper()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := yaml.Unmarshal([]byte(tt.input), tt.target); err != nil {
+				t.Fatalf("Unmarshal() error = %v", err)
+			}
+
+			// Get the actual value by dereferencing the pointer
+			var actual any
+			switch v := tt.target.(type) {
+			case *CacheCleanupMode:
+				actual = *v
+			case *DockerPruneMode:
+				actual = *v
+			case *BuildToolType:
+				actual = *v
+			case *CacheType:
+				actual = *v
+			case *PackageManagerType:
+				actual = *v
+			}
+
+			if actual != tt.expected {
+				t.Errorf("Unmarshal() = %v, want %v", actual, tt.expected)
+			}
+		})
+	}
+}
+
 // TestEnumYAMLUnmarshalingFromString tests that all enum types can be unmarshaled from YAML strings.
 func TestEnumYAMLUnmarshalingFromString(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		target   any
-		expected any
-	}{
+	tests := []enumUnmarshalTestCase{
 		// CacheCleanupMode
 		{"CacheCleanupMode Disabled string", "DISABLED", new(CacheCleanupMode), CacheCleanupDisabled},
 		{"CacheCleanupMode Enabled string", "ENABLED", new(CacheCleanupMode), CacheCleanupEnabled},
@@ -107,42 +141,12 @@ func TestEnumYAMLUnmarshalingFromString(t *testing.T) {
 		{"PackageManagerType Bun string", "BUN", new(PackageManagerType), PackageManagerBun},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := yaml.Unmarshal([]byte(tt.input), tt.target); err != nil {
-				t.Fatalf("Unmarshal() error = %v", err)
-			}
-
-			// Get the actual value by dereferencing the pointer
-			var actual any
-			switch v := tt.target.(type) {
-			case *CacheCleanupMode:
-				actual = *v
-			case *DockerPruneMode:
-				actual = *v
-			case *BuildToolType:
-				actual = *v
-			case *CacheType:
-				actual = *v
-			case *PackageManagerType:
-				actual = *v
-			}
-
-			if actual != tt.expected {
-				t.Errorf("Unmarshal() = %v, want %v", actual, tt.expected)
-			}
-		})
-	}
+	runEnumYAMLUnmarshalingTests(t, tests)
 }
 
 // TestEnumYAMLUnmarshalingFromInt tests that all enum types can be unmarshaled from YAML integers.
 func TestEnumYAMLUnmarshalingFromInt(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		target   any
-		expected any
-	}{
+	tests := []enumUnmarshalTestCase{
 		// CacheCleanupMode
 		{"CacheCleanupMode Disabled int", "0", new(CacheCleanupMode), CacheCleanupDisabled},
 		{"CacheCleanupMode Enabled int", "1", new(CacheCleanupMode), CacheCleanupEnabled},
@@ -179,32 +183,7 @@ func TestEnumYAMLUnmarshalingFromInt(t *testing.T) {
 		{"PackageManagerType Bun int", "3", new(PackageManagerType), PackageManagerBun},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := yaml.Unmarshal([]byte(tt.input), tt.target); err != nil {
-				t.Fatalf("Unmarshal() error = %v", err)
-			}
-
-			// Get the actual value by dereferencing the pointer
-			var actual any
-			switch v := tt.target.(type) {
-			case *CacheCleanupMode:
-				actual = *v
-			case *DockerPruneMode:
-				actual = *v
-			case *BuildToolType:
-				actual = *v
-			case *CacheType:
-				actual = *v
-			case *PackageManagerType:
-				actual = *v
-			}
-
-			if actual != tt.expected {
-				t.Errorf("Unmarshal() = %v, want %v", actual, tt.expected)
-			}
-		})
-	}
+	runEnumYAMLUnmarshalingTests(t, tests)
 }
 
 // TestEnumStringMethod tests that all enum types implement String() correctly.

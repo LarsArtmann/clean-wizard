@@ -218,41 +218,31 @@ func (bcc *BuildCacheCleaner) genericClean(
 	return result.Ok(conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), itemsRemoved, bytesFreed))
 }
 
-// cleanCacheDir removes all items in a cache directory matching a pattern.
-func (bcc *BuildCacheCleaner) cleanCacheDir(
-	ctx context.Context,
-	cacheName string,
-	cacheDir string,
-	pattern string,
-) result.Result[domain.CleanResult] {
-	return bcc.genericClean(ctx, cacheName, cacheDir, pattern, cacheName+" cache", os.RemoveAll)
-}
-
-// cleanPartialFiles removes partial files matching a pattern.
-func (bcc *BuildCacheCleaner) cleanPartialFiles(
-	ctx context.Context,
-	toolName string,
-	baseDir string,
-	pattern string,
-) result.Result[domain.CleanResult] {
-	return bcc.genericClean(ctx, toolName, baseDir, pattern, toolName+" partial file", os.Remove)
-}
-
 // cleanBuildTool cleans cache for a specific JVM build tool.
 func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType JVMBuildToolType, homeDir string) result.Result[domain.CleanResult] {
 	switch toolType {
 	case JVMBuildToolGradle:
 		gradleCache := getCachePath(toolType, homeDir)
-		return bcc.cleanCacheDir(ctx, "Gradle", gradleCache, "*")
+		return bcc.genericClean(ctx, "Gradle", gradleCache, "*", "Gradle cache", os.RemoveAll)
 
 	case JVMBuildToolMaven:
 		mavenRepository := getCachePath(toolType, homeDir)
-		return bcc.cleanPartialFiles(ctx, "Maven", mavenRepository, "**/*.part")
+		return bcc.genericClean(ctx, "Maven", mavenRepository, "**/*.part", "Maven partial file", os.Remove)
 
 	case JVMBuildToolSBT:
 		sbtCache := getCachePath(toolType, homeDir)
-		return bcc.cleanCacheDir(ctx, "SBT", sbtCache, "*")
+		return bcc.genericClean(ctx, "SBT", sbtCache, "*", "SBT cache", os.RemoveAll)
 	}
 
 	return result.Err[domain.CleanResult](fmt.Errorf("unknown build tool type: %s", toolType))
+}
+
+// GetVerbose returns the verbose setting for testing purposes.
+func (bcc *BuildCacheCleaner) GetVerbose() bool {
+	return bcc.verbose
+}
+
+// GetDryRun returns the dryRun setting for testing purposes.
+func (bcc *BuildCacheCleaner) GetDryRun() bool {
+	return bcc.dryRun
 }

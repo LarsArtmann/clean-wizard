@@ -41,6 +41,9 @@ type OperationSettings struct {
 
 	// Compiled Binaries Settings
 	CompiledBinaries *CompiledBinariesSettings `json:"compiled_binaries,omitempty" yaml:"compiled_binaries,omitempty"`
+
+	// Git History Settings
+	GitHistory *GitHistorySettings `json:"git_history,omitempty" yaml:"git_history,omitempty"`
 }
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup.
@@ -150,6 +153,7 @@ const (
 	OperationTypeProjectsManagementAutomation OperationType = "projects-management-automation"
 	OperationTypeProjectExecutables           OperationType = "project-executables"
 	OperationTypeCompiledBinaries             OperationType = "compiled-binaries"
+	OperationTypeGitHistory                   OperationType = "git-history"
 )
 
 // GetOperationType returns the operation type from operation name.
@@ -181,6 +185,8 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeProjectExecutables
 	case "compiled-binaries":
 		return OperationTypeCompiledBinaries
+	case "git-history":
+		return OperationTypeGitHistory
 	default:
 		return OperationType(name) // Fallback for custom types
 	}
@@ -206,7 +212,8 @@ func (ot OperationType) IsValid() bool {
 		OperationTypeSystemTemp,
 		OperationTypeProjectsManagementAutomation,
 		OperationTypeProjectExecutables,
-		OperationTypeCompiledBinaries:
+		OperationTypeCompiledBinaries,
+		OperationTypeGitHistory:
 		return true
 	default:
 		return false
@@ -229,5 +236,6 @@ func (OperationType) Values() []OperationType {
 		OperationTypeProjectsManagementAutomation,
 		OperationTypeProjectExecutables,
 		OperationTypeCompiledBinaries,
+		OperationTypeGitHistory,
 	}
 }

@@ -45,3 +45,11 @@ func newTestContext() *NixTestContext {
 		dryRun: true,
 	}
 }
+
+// cleanGenerationsAndVerify gets mock generations and runs CleanOldGenerations,
+// then verifies the result is OK. Returns the clean result for additional assertions.
+func cleanGenerationsAndVerify(ctx context.Context, nixCleaner *cleaner.NixCleaner, minCount, keepCount int) result.Result[domain.CleanResult] {
+	_ = getGenerationsOrMock(ctx, nixCleaner, minCount)
+	cleanResult := nixCleaner.CleanOldGenerations(ctx, keepCount)
+	return cleanResult
+}

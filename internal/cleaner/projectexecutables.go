@@ -239,16 +239,7 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 
 // GetStoreSize returns the total size of all executable files found.
 func (p *ProjectExecutablesCleaner) GetStoreSize(ctx context.Context) int64 {
-	scanResult := p.Scan(ctx)
-	if scanResult.IsErr() {
-		return 0
-	}
-
-	var total int64
-	for _, item := range scanResult.Value() {
-		total += item.Size
-	}
-	return total
+	return calculateTotalSizeFromScan(p.Scan(ctx))
 }
 
 // IsExcludedByExtension checks if the file should be excluded based on its extension.
@@ -361,15 +352,7 @@ func (d *defaultFileOperator) FindExecutableFiles(dir string) ([]string, error) 
 }
 
 func (d *defaultFileOperator) TrashFile(ctx context.Context, path string) error {
-	timeoutCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-
-	cmd := exec.CommandContext(timeoutCtx, "trash", path)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("trash failed for %s: %w (output: %s)", path, err, string(output))
-	}
-	return nil
+	return TrashPath(ctx, path)
 }
 
 func (d *defaultFileOperator) GetFileSize(path string) int64 {

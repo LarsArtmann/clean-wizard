@@ -3,6 +3,7 @@ package cleaner
 import (
 	"context"
 	"fmt"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -241,4 +242,33 @@ func scanWithIterator[T any](
 	}
 
 	return result.Ok(items)
+}
+
+// calculateTotalSizeFromScan calculates the total size from scan results.
+// Returns 0 if the scan resulted in an error.
+func calculateTotalSizeFromScan(scanResult result.Result[[]domain.ScanItem]) int64 {
+	if scanResult.IsErr() {
+		return 0
+	}
+
+	var total int64
+	for _, item := range scanResult.Value() {
+		total += item.Size
+	}
+	return total
+}
+
+// TrashPath moves a file or directory to the system trash using the `trash` command.
+// It applies a 30-second timeout to the operation.
+// This is a shared helper to eliminate duplicate trash implementations across cleaners.
+func TrashPath(ctx context.Context, path string) error {
+	timeoutCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(timeoutCtx, "trash", path)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("trash failed for %s: %w (output: %s)", path, err, string(output))
+	}
+	return nil
 }

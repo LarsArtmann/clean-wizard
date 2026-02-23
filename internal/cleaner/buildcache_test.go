@@ -69,13 +69,7 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 			}
 
 			if cleaner != nil {
-				if cleaner.verbose != tt.verbose {
-					t.Errorf("verbose = %v, want %v", cleaner.verbose, tt.verbose)
-				}
-
-				if cleaner.dryRun != tt.dryRun {
-					t.Errorf("dryRun = %v, want %v", cleaner.dryRun, tt.dryRun)
-				}
+				assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
 			}
 		})
 	}

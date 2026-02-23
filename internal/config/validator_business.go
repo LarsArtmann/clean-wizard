@@ -7,6 +7,18 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// addCriticalRiskError adds a validation error for critical risk operations without safe mode.
+func (cv *ConfigValidator) addCriticalRiskError(result *ValidationResult, profileName string, op domain.CleanupOperation, rule, message, suggestion string) {
+	result.Errors = append(result.Errors, ValidationError{
+		Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", profileName, op.Name),
+		Rule:       rule,
+		Value:      op.RiskLevel,
+		Message:    fmt.Sprintf(message, op.Name),
+		Severity:   SeverityError,
+		Suggestion: suggestion,
+	})
+}
+
 // validateBusinessLogic validates business logic constraints.
 func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *ValidationResult) {
 	for name, profile := range cfg.Profiles {
@@ -26,14 +38,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 		for _, op := range profile.Operations {
 			// Validate risk vs safe mode
 			if !cfg.SafeMode.IsEnabled() && op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
-				result.Errors = append(result.Errors, ValidationError{
-					Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", name, op.Name),
-					Rule:       "business_logic",
-					Value:      op.RiskLevel,
-					Message:    fmt.Sprintf("Critical risk operation '%s' not allowed in unsafe mode", op.Name),
-					Severity:   SeverityError,
-					Suggestion: "Enable safe mode or remove critical risk operation",
-				})
+				cv.addCriticalRiskError(result, name, op, "business_logic", "Critical risk operation '%s' not allowed in unsafe mode", "Enable safe mode or remove critical risk operation")
 			}
 
 			// Validate operation settings
@@ -101,14 +106,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 	for name, profile := range cfg.Profiles {
 		for _, op := range profile.Operations {
 			if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) && !cfg.SafeMode.IsEnabled() {
-				result.Errors = append(result.Errors, ValidationError{
-					Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", name, op.Name),
-					Rule:       "security",
-					Value:      op.RiskLevel,
-					Message:    fmt.Sprintf("Critical risk operation '%s' requires safe mode enabled", op.Name),
-					Severity:   SeverityError,
-					Suggestion: "Enable safe mode or remove critical risk operations",
-				})
+				cv.addCriticalRiskError(result, name, op, "security", "Critical risk operation '%s' requires safe mode enabled", "Enable safe mode or remove critical risk operations")
 			}
 		}
 	}
