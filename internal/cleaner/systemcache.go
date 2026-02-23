@@ -107,8 +107,8 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 		}
 		if !validCacheTypes[ct] {
 			return fmt.Errorf(
-			"invalid default CacheType at index %d: %d not supported on current platform (valid types: %v)",
-			i, ct, validCacheTypes)
+				"invalid default CacheType at index %d: %d not supported on current platform (valid types: %v)",
+				i, ct, validCacheTypes)
 		}
 	}
 

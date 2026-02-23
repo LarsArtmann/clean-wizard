@@ -228,12 +228,18 @@ func TestResult_OrElse(t *testing.T) {
 		expectedValue int
 		expectedOk    bool
 	}{
-		{name: "ok result returns original", result: Ok(42), fallback: Ok(99),
-			expectedValue: 42, expectedOk: true},
-		{name: "error result returns fallback", result: testErrResult(), fallback: Ok(99),
-			expectedValue: 99, expectedOk: true},
-		{name: "error result with error fallback", result: testErrResult(),
-			fallback: Err[int](errors.New("fallback error")), expectedValue: 0, expectedOk: false},
+		{
+			name: "ok result returns original", result: Ok(42), fallback: Ok(99),
+			expectedValue: 42, expectedOk: true,
+		},
+		{
+			name: "error result returns fallback", result: testErrResult(), fallback: Ok(99),
+			expectedValue: 99, expectedOk: true,
+		},
+		{
+			name: "error result with error fallback", result: testErrResult(),
+			fallback: Err[int](errors.New("fallback error")), expectedValue: 0, expectedOk: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -260,15 +266,21 @@ func TestResult_Validate(t *testing.T) {
 		expectedOk    bool
 		expectedError string
 	}{
-		{name: "valid passes through", result: Ok(42),
+		{
+			name: "valid passes through", result: Ok(42),
 			predicate: func(i int) bool { return i > 0 }, errorMsg: "must be positive",
-			expectedOk: true},
-		{name: "invalid returns error", result: Ok(-5),
+			expectedOk: true,
+		},
+		{
+			name: "invalid returns error", result: Ok(-5),
 			predicate: func(i int) bool { return i > 0 }, errorMsg: "must be positive",
-			expectedOk: false, expectedError: "must be positive"},
-		{name: "error passes through", result: testErrResult(),
+			expectedOk: false, expectedError: "must be positive",
+		},
+		{
+			name: "error passes through", result: testErrResult(),
 			predicate: func(i int) bool { return i > 0 }, errorMsg: "must be positive",
-			expectedOk: false, expectedError: "test error"},
+			expectedOk: false, expectedError: "test error",
+		},
 	}
 
 	for _, tt := range tests {

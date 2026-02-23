@@ -32,8 +32,8 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 					found := false
 					for _, field := range sanitizedFields {
 						if field == expectedChange ||
-						len(field) > len(expectedChange) &&
-							field[len(field)-len(expectedChange):] == expectedChange {
+							len(field) > len(expectedChange) &&
+								field[len(field)-len(expectedChange):] == expectedChange {
 							found = true
 							break
 						}
@@ -47,7 +47,7 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 			// Check warnings count using ValidationResult.Warnings
 			if len(validationResult.Warnings) != tt.expectedWarnings {
 				t.Errorf("Expected %d warnings, got %d: %v",
-				tt.expectedWarnings, len(validationResult.Warnings), validationResult.Warnings)
+					tt.expectedWarnings, len(validationResult.Warnings), validationResult.Warnings)
 			}
 		})
 	}

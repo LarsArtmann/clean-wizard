@@ -65,7 +65,7 @@ func UnmarshalYAMLEnum[T ~int](
 			errorMsg, s, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
 	}
 
-	return fmt.Errorf("cannot parse %s: expected string or int\n\n" +
+	return fmt.Errorf("cannot parse %s: expected string or int\n\n"+
 		"See docs/YAML_ENUM_FORMATS.md for format examples", errorMsg)
 }
 

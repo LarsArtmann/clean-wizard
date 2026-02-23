@@ -171,10 +171,10 @@ func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
 // TestBDD_NixGenerationsValidation provides comprehensive BDD tests for Nix generations.
 func TestBDD_NixGenerationsValidation(t *testing.T) {
 	feature := BDDFeature{
-		Name:        "Nix Generations Configuration Validation",
+		Name: "Nix Generations Configuration Validation",
 		Description: "As a system administrator, I want to configure Nix generations cleanup " +
 			"with proper validation and constraints",
-		Background:  "The system should validate all Nix generations settings against business rules and safety constraints",
+		Background: "The system should validate all Nix generations settings against business rules and safety constraints",
 		Scenarios: []BDDScenario{
 			{
 				Name:        "Valid Nix generations within acceptable range",

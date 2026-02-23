@@ -114,7 +114,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 						domain.CacheTypeSpotlight, domain.CacheTypeXcode,
 						domain.CacheTypeCocoapods, domain.CacheTypeHomebrew,
 					},
-					OlderThan:  "30d",
+					OlderThan: "30d",
 				},
 			},
 			wantErr: false,

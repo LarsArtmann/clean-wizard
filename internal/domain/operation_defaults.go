@@ -184,8 +184,8 @@ func validateEnumDefaults(settings *OperationSettings, opType OperationType) err
 	if settings.ProjectsManagementAutomation != nil {
 		if !settings.ProjectsManagementAutomation.ClearCache.IsValid() {
 			return fmt.Errorf(
-			"invalid default CacheCleanupMode in ProjectsManagementAutomation: %d",
-			settings.ProjectsManagementAutomation.ClearCache)
+				"invalid default CacheCleanupMode in ProjectsManagementAutomation: %d",
+				settings.ProjectsManagementAutomation.ClearCache)
 		}
 	}
 

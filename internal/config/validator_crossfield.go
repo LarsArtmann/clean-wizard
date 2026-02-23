@@ -60,7 +60,7 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	// Check profile count limits
 	if cv.rules.MaxProfiles != nil && cv.rules.MaxProfiles.Max != nil && len(cfg.Profiles) > *cv.rules.MaxProfiles.Max {
 		result.Warnings = append(result.Warnings, ValidationWarning{
-			Field:      "profiles",
+			Field: "profiles",
 			Message: fmt.Sprintf("Profile count (%d) exceeds recommended limit (%d)",
 				len(cfg.Profiles), *cv.rules.MaxProfiles.Max),
 			Suggestion: "Consider consolidating profiles to improve maintainability",
@@ -95,10 +95,10 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(
 		if cv.rules.MaxOperations != nil && cv.rules.MaxOperations.Max != nil {
 			if len(profile.Operations) > *cv.rules.MaxOperations.Max {
 				result.Warnings = append(result.Warnings, ValidationWarning{
-					Field:      fmt.Sprintf("profiles.%s.operations", name),
+					Field: fmt.Sprintf("profiles.%s.operations", name),
 					Message: fmt.Sprintf(
-					"Profile '%s' has %d operations, exceeding recommended limit (%d)",
-					name, len(profile.Operations), *cv.rules.MaxOperations.Max),
+						"Profile '%s' has %d operations, exceeding recommended limit (%d)",
+						name, len(profile.Operations), *cv.rules.MaxOperations.Max),
 					Suggestion: "Consider splitting operations into multiple profiles",
 					Context: &ValidationContext{
 						Metadata: map[string]string{

@@ -71,6 +71,82 @@ type enumUnmarshalTestCase struct {
 	expected any
 }
 
+// enumStringTestCases contains test cases for string-based YAML unmarshaling.
+var enumStringTestCases = []enumUnmarshalTestCase{
+	// CacheCleanupMode
+	{"CacheCleanupMode Disabled string", "DISABLED", new(CacheCleanupMode), CacheCleanupDisabled},
+	{"CacheCleanupMode Enabled string", "ENABLED", new(CacheCleanupMode), CacheCleanupEnabled},
+
+	// DockerPruneMode
+	{"DockerPruneMode All string", "ALL", new(DockerPruneMode), DockerPruneAll},
+	{"DockerPruneMode Images string", "IMAGES", new(DockerPruneMode), DockerPruneImages},
+	{"DockerPruneMode Containers string", "CONTAINERS", new(DockerPruneMode), DockerPruneContainers},
+	{"DockerPruneMode Volumes string", "VOLUMES", new(DockerPruneMode), DockerPruneVolumes},
+	{"DockerPruneMode Builds string", "BUILDS", new(DockerPruneMode), DockerPruneBuilds},
+
+	// BuildToolType
+	{"BuildToolType Go string", "GO", new(BuildToolType), BuildToolGo},
+	{"BuildToolType Rust string", "RUST", new(BuildToolType), BuildToolRust},
+	{"BuildToolType Node string", "NODE", new(BuildToolType), BuildToolNode},
+	{"BuildToolType Python string", "PYTHON", new(BuildToolType), BuildToolPython},
+	{"BuildToolType Java string", "JAVA", new(BuildToolType), BuildToolJava},
+	{"BuildToolType Scala string", "SCALA", new(BuildToolType), BuildToolScala},
+
+	// CacheType
+	{"CacheType Spotlight string", "SPOTLIGHT", new(CacheType), CacheTypeSpotlight},
+	{"CacheType Xcode string", "XCODE", new(CacheType), CacheTypeXcode},
+	{"CacheType Cocoapods string", "COCOAPODS", new(CacheType), CacheTypeCocoapods},
+	{"CacheType Homebrew string", "HOMEBREW", new(CacheType), CacheTypeHomebrew},
+	{"CacheType Pip string", "PIP", new(CacheType), CacheTypePip},
+	{"CacheType Npm string", "NPM", new(CacheType), CacheTypeNpm},
+	{"CacheType Yarn string", "YARN", new(CacheType), CacheTypeYarn},
+	{"CacheType Ccache string", "CCACHE", new(CacheType), CacheTypeCcache},
+
+	// PackageManagerType
+	{"PackageManagerType Npm string", "NPM", new(PackageManagerType), PackageManagerNpm},
+	{"PackageManagerType Pnpm string", "PNPM", new(PackageManagerType), PackageManagerPnpm},
+	{"PackageManagerType Yarn string", "YARN", new(PackageManagerType), PackageManagerYarn},
+	{"PackageManagerType Bun string", "BUN", new(PackageManagerType), PackageManagerBun},
+}
+
+// enumIntTestCases contains test cases for integer-based YAML unmarshaling.
+var enumIntTestCases = []enumUnmarshalTestCase{
+	// CacheCleanupMode
+	{"CacheCleanupMode Disabled int", "0", new(CacheCleanupMode), CacheCleanupDisabled},
+	{"CacheCleanupMode Enabled int", "1", new(CacheCleanupMode), CacheCleanupEnabled},
+
+	// DockerPruneMode
+	{"DockerPruneMode All int", "0", new(DockerPruneMode), DockerPruneAll},
+	{"DockerPruneMode Images int", "1", new(DockerPruneMode), DockerPruneImages},
+	{"DockerPruneMode Containers int", "2", new(DockerPruneMode), DockerPruneContainers},
+	{"DockerPruneMode Volumes int", "3", new(DockerPruneMode), DockerPruneVolumes},
+	{"DockerPruneMode Builds int", "4", new(DockerPruneMode), DockerPruneBuilds},
+
+	// BuildToolType
+	{"BuildToolType Go int", "0", new(BuildToolType), BuildToolGo},
+	{"BuildToolType Rust int", "1", new(BuildToolType), BuildToolRust},
+	{"BuildToolType Node int", "2", new(BuildToolType), BuildToolNode},
+	{"BuildToolType Python int", "3", new(BuildToolType), BuildToolPython},
+	{"BuildToolType Java int", "4", new(BuildToolType), BuildToolJava},
+	{"BuildToolType Scala int", "5", new(BuildToolType), BuildToolScala},
+
+	// CacheType
+	{"CacheType Spotlight int", "0", new(CacheType), CacheTypeSpotlight},
+	{"CacheType Xcode int", "1", new(CacheType), CacheTypeXcode},
+	{"CacheType Cocoapods int", "2", new(CacheType), CacheTypeCocoapods},
+	{"CacheType Homebrew int", "3", new(CacheType), CacheTypeHomebrew},
+	{"CacheType Pip int", "4", new(CacheType), CacheTypePip},
+	{"CacheType Npm int", "5", new(CacheType), CacheTypeNpm},
+	{"CacheType Yarn int", "6", new(CacheType), CacheTypeYarn},
+	{"CacheType Ccache int", "7", new(CacheType), CacheTypeCcache},
+
+	// PackageManagerType
+	{"PackageManagerType Npm int", "0", new(PackageManagerType), PackageManagerNpm},
+	{"PackageManagerType Pnpm int", "1", new(PackageManagerType), PackageManagerPnpm},
+	{"PackageManagerType Yarn int", "2", new(PackageManagerType), PackageManagerYarn},
+	{"PackageManagerType Bun int", "3", new(PackageManagerType), PackageManagerBun},
+}
+
 // runEnumYAMLUnmarshalingTests executes the common test logic for enum unmarshaling.
 func runEnumYAMLUnmarshalingTests(t *testing.T, tests []enumUnmarshalTestCase) {
 	t.Helper()
@@ -104,86 +180,12 @@ func runEnumYAMLUnmarshalingTests(t *testing.T, tests []enumUnmarshalTestCase) {
 
 // TestEnumYAMLUnmarshalingFromString tests that all enum types can be unmarshaled from YAML strings.
 func TestEnumYAMLUnmarshalingFromString(t *testing.T) {
-	tests := []enumUnmarshalTestCase{
-		// CacheCleanupMode
-		{"CacheCleanupMode Disabled string", "DISABLED", new(CacheCleanupMode), CacheCleanupDisabled},
-		{"CacheCleanupMode Enabled string", "ENABLED", new(CacheCleanupMode), CacheCleanupEnabled},
-
-		// DockerPruneMode
-		{"DockerPruneMode All string", "ALL", new(DockerPruneMode), DockerPruneAll},
-		{"DockerPruneMode Images string", "IMAGES", new(DockerPruneMode), DockerPruneImages},
-		{"DockerPruneMode Containers string", "CONTAINERS", new(DockerPruneMode), DockerPruneContainers},
-		{"DockerPruneMode Volumes string", "VOLUMES", new(DockerPruneMode), DockerPruneVolumes},
-		{"DockerPruneMode Builds string", "BUILDS", new(DockerPruneMode), DockerPruneBuilds},
-
-		// BuildToolType
-		{"BuildToolType Go string", "GO", new(BuildToolType), BuildToolGo},
-		{"BuildToolType Rust string", "RUST", new(BuildToolType), BuildToolRust},
-		{"BuildToolType Node string", "NODE", new(BuildToolType), BuildToolNode},
-		{"BuildToolType Python string", "PYTHON", new(BuildToolType), BuildToolPython},
-		{"BuildToolType Java string", "JAVA", new(BuildToolType), BuildToolJava},
-		{"BuildToolType Scala string", "SCALA", new(BuildToolType), BuildToolScala},
-
-		// CacheType
-		{"CacheType Spotlight string", "SPOTLIGHT", new(CacheType), CacheTypeSpotlight},
-		{"CacheType Xcode string", "XCODE", new(CacheType), CacheTypeXcode},
-		{"CacheType Cocoapods string", "COCOAPODS", new(CacheType), CacheTypeCocoapods},
-		{"CacheType Homebrew string", "HOMEBREW", new(CacheType), CacheTypeHomebrew},
-		{"CacheType Pip string", "PIP", new(CacheType), CacheTypePip},
-		{"CacheType Npm string", "NPM", new(CacheType), CacheTypeNpm},
-		{"CacheType Yarn string", "YARN", new(CacheType), CacheTypeYarn},
-		{"CacheType Ccache string", "CCACHE", new(CacheType), CacheTypeCcache},
-
-		// PackageManagerType
-		{"PackageManagerType Npm string", "NPM", new(PackageManagerType), PackageManagerNpm},
-		{"PackageManagerType Pnpm string", "PNPM", new(PackageManagerType), PackageManagerPnpm},
-		{"PackageManagerType Yarn string", "YARN", new(PackageManagerType), PackageManagerYarn},
-		{"PackageManagerType Bun string", "BUN", new(PackageManagerType), PackageManagerBun},
-	}
-
-	runEnumYAMLUnmarshalingTests(t, tests)
+	runEnumYAMLUnmarshalingTests(t, enumStringTestCases)
 }
 
 // TestEnumYAMLUnmarshalingFromInt tests that all enum types can be unmarshaled from YAML integers.
 func TestEnumYAMLUnmarshalingFromInt(t *testing.T) {
-	tests := []enumUnmarshalTestCase{
-		// CacheCleanupMode
-		{"CacheCleanupMode Disabled int", "0", new(CacheCleanupMode), CacheCleanupDisabled},
-		{"CacheCleanupMode Enabled int", "1", new(CacheCleanupMode), CacheCleanupEnabled},
-
-		// DockerPruneMode
-		{"DockerPruneMode All int", "0", new(DockerPruneMode), DockerPruneAll},
-		{"DockerPruneMode Images int", "1", new(DockerPruneMode), DockerPruneImages},
-		{"DockerPruneMode Containers int", "2", new(DockerPruneMode), DockerPruneContainers},
-		{"DockerPruneMode Volumes int", "3", new(DockerPruneMode), DockerPruneVolumes},
-		{"DockerPruneMode Builds int", "4", new(DockerPruneMode), DockerPruneBuilds},
-
-		// BuildToolType
-		{"BuildToolType Go int", "0", new(BuildToolType), BuildToolGo},
-		{"BuildToolType Rust int", "1", new(BuildToolType), BuildToolRust},
-		{"BuildToolType Node int", "2", new(BuildToolType), BuildToolNode},
-		{"BuildToolType Python int", "3", new(BuildToolType), BuildToolPython},
-		{"BuildToolType Java int", "4", new(BuildToolType), BuildToolJava},
-		{"BuildToolType Scala int", "5", new(BuildToolType), BuildToolScala},
-
-		// CacheType
-		{"CacheType Spotlight int", "0", new(CacheType), CacheTypeSpotlight},
-		{"CacheType Xcode int", "1", new(CacheType), CacheTypeXcode},
-		{"CacheType Cocoapods int", "2", new(CacheType), CacheTypeCocoapods},
-		{"CacheType Homebrew int", "3", new(CacheType), CacheTypeHomebrew},
-		{"CacheType Pip int", "4", new(CacheType), CacheTypePip},
-		{"CacheType Npm int", "5", new(CacheType), CacheTypeNpm},
-		{"CacheType Yarn int", "6", new(CacheType), CacheTypeYarn},
-		{"CacheType Ccache int", "7", new(CacheType), CacheTypeCcache},
-
-		// PackageManagerType
-		{"PackageManagerType Npm int", "0", new(PackageManagerType), PackageManagerNpm},
-		{"PackageManagerType Pnpm int", "1", new(PackageManagerType), PackageManagerPnpm},
-		{"PackageManagerType Yarn int", "2", new(PackageManagerType), PackageManagerYarn},
-		{"PackageManagerType Bun int", "3", new(PackageManagerType), PackageManagerBun},
-	}
-
-	runEnumYAMLUnmarshalingTests(t, tests)
+	runEnumYAMLUnmarshalingTests(t, enumIntTestCases)
 }
 
 // TestEnumStringMethod tests that all enum types implement String() correctly.

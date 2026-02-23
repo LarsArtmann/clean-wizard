@@ -87,7 +87,7 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 		if profile.Description == "" {
 			profile.Description = "Auto-generated profile description"
 			result.addChange(fmt.Sprintf("profiles.%s.description", name),
-			"", profile.Description, "applied default description")
+				"", profile.Description, "applied default description")
 		}
 
 		// Apply defaults to operations

@@ -142,7 +142,7 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 		// Check if it's a timeout error
 		if timeoutCtx.Err() == context.DeadlineExceeded {
 			return result.Err[domain.CleanResult](
-			fmt.Errorf("go clean -%s timed out after %v (command may be hanging)", cleanFlag, goCommandTimeout))
+				fmt.Errorf("go clean -%s timed out after %v (command may be hanging)", cleanFlag, goCommandTimeout))
 		}
 		return result.Err[domain.CleanResult](fmt.Errorf("go clean -%s failed: %w (output: %s)",
 			cleanFlag, err, string(output)))
