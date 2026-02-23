@@ -115,6 +115,16 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			scanner = NewGitHistoryScanner(tempDir)
 		})
 
+		// Helper function to test filtering scenarios
+		assertFilteredResult := func(option GitHistoryScannerOption, files []domain.GitHistoryFile, expectedCount int, expectedPath string) {
+			scanner = NewGitHistoryScanner(tempDir, option)
+			filtered := scanner.filterFiles(files)
+			gomega.Expect(filtered).To(gomega.HaveLen(expectedCount))
+			if expectedCount > 0 {
+				gomega.Expect(filtered[0].Path).To(gomega.Equal(expectedPath))
+			}
+		}
+
 		ginkgo.Context("extension filtering", func() {
 			ginkgo.It("should exclude files with extensions in excludeExts", func() {
 				files := []domain.GitHistoryFile{
@@ -128,27 +138,21 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			})
 
 			ginkgo.It("should only include files with extensions in includeExts when set", func() {
-				scanner = NewGitHistoryScanner(tempDir, WithIncludeExtensions([]string{".exe"}))
 				files := []domain.GitHistoryFile{
 					{Path: "binary.exe", Extension: ".exe", SizeBytes: 5 * 1024 * 1024},
 					{Path: "library.dll", Extension: ".dll", SizeBytes: 5 * 1024 * 1024},
 				}
-				filtered := scanner.filterFiles(files)
-				gomega.Expect(filtered).To(gomega.HaveLen(1))
-				gomega.Expect(filtered[0].Path).To(gomega.Equal("binary.exe"))
+				assertFilteredResult(WithIncludeExtensions([]string{".exe"}), files, 1, "binary.exe")
 			})
 		})
 
 		ginkgo.Context("path filtering", func() {
 			ginkgo.It("should exclude files matching exclude paths", func() {
-				scanner = NewGitHistoryScanner(tempDir, WithExcludePaths([]string{"vendor/"}))
 				files := []domain.GitHistoryFile{
 					{Path: "vendor/binary", Extension: "", SizeBytes: 5 * 1024 * 1024},
 					{Path: "bin/app", Extension: "", SizeBytes: 5 * 1024 * 1024},
 				}
-				filtered := scanner.filterFiles(files)
-				gomega.Expect(filtered).To(gomega.HaveLen(1))
-				gomega.Expect(filtered[0].Path).To(gomega.Equal("bin/app"))
+				assertFilteredResult(WithExcludePaths([]string{"vendor/"}), files, 1, "bin/app")
 			})
 		})
 

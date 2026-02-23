@@ -259,12 +259,10 @@ func runProfileDeleteCommand(cmd *cobra.Command, args []string, force bool) erro
 
 	// Confirm deletion
 	if !force {
-		fmt.Printf("Delete profile '%s'? This cannot be undone.\n", profileName)
-		fmt.Print("Type 'yes' to confirm: ")
-		var confirm string
-		_, err := fmt.Scanln(&confirm)
-		if err != nil || confirm != "yes" {
-			fmt.Println("   Deletion cancelled.")
+		if !promptForConfirmation(
+			fmt.Sprintf("Delete profile '%s'? This cannot be undone.", profileName),
+			"Deletion cancelled.",
+		) {
 			return nil //nolint:nilerr // intentional: user cancellation is not an error
 		}
 	}

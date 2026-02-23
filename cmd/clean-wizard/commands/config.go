@@ -227,12 +227,10 @@ func runConfigResetCommand(cmd *cobra.Command, args []string, force bool) error 
 		fmt.Println("ℹ️  No configuration file exists.")
 		fmt.Println("   Creating default configuration...")
 	} else if !force {
-		fmt.Printf("Reset configuration to defaults? This will overwrite %s\n", configPath)
-		fmt.Print("Type 'yes' to confirm: ")
-		var confirm string
-		_, err = fmt.Scanln(&confirm)
-		if err != nil || confirm != "yes" {
-			fmt.Println("   Reset cancelled.")
+		if !promptForConfirmation(
+			fmt.Sprintf("Reset configuration to defaults? This will overwrite %s", configPath),
+			"Reset cancelled.",
+		) {
 			return nil //nolint:nilerr // intentional: user cancellation is not an error
 		}
 	}
@@ -254,6 +252,20 @@ func runConfigResetCommand(cmd *cobra.Command, args []string, force bool) error 
 	fmt.Println("   clean-wizard profile create --name custom --description 'My custom profile'")
 
 	return nil
+}
+
+// promptForConfirmation prompts the user to confirm an action by typing 'yes'.
+// Returns true if confirmed, false if cancelled.
+func promptForConfirmation(promptMsg, cancelMsg string) bool {
+	fmt.Printf("%s\n", promptMsg)
+	fmt.Print("Type 'yes' to confirm: ")
+	var confirm string
+	_, err := fmt.Scanln(&confirm)
+	if err != nil || confirm != "yes" {
+		fmt.Printf("   %s\n", cancelMsg)
+		return false
+	}
+	return true
 }
 
 // getConfigPath returns the path to the configuration file.
