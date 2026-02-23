@@ -12,18 +12,15 @@ import (
 
 // NewConfigCommand creates a configuration management command.
 func NewConfigCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "config",
-		Short: "Manage configuration",
-		Long:  `Manage configuration files - show, edit, validate, and reset.`,
-	}
-
-	cmd.AddCommand(NewConfigShowCommand())
-	cmd.AddCommand(NewConfigEditCommand())
-	cmd.AddCommand(NewConfigValidateCommand())
-	cmd.AddCommand(NewConfigResetCommand())
-
-	return cmd
+	return newParentCommand(
+		"config",
+		"Manage configuration",
+		"Manage configuration files - show, edit, validate, and reset.",
+		NewConfigShowCommand,
+		NewConfigEditCommand,
+		NewConfigValidateCommand,
+		NewConfigResetCommand,
+	)
 }
 
 // NewConfigShowCommand creates a command to show the configuration.

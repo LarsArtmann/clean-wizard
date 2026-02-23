@@ -11,18 +11,15 @@ import (
 
 // NewProfileCommand creates a profile management command.
 func NewProfileCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "profile",
-		Short: "Manage cleaning profiles",
-		Long:  `Manage cleaning profiles - list, show, create, and delete profiles.`,
-	}
-
-	cmd.AddCommand(NewProfileListCommand())
-	cmd.AddCommand(NewProfileShowCommand())
-	cmd.AddCommand(NewProfileCreateCommand())
-	cmd.AddCommand(NewProfileDeleteCommand())
-
-	return cmd
+	return newParentCommand(
+		"profile",
+		"Manage cleaning profiles",
+		"Manage cleaning profiles - list, show, create, and delete profiles.",
+		NewProfileListCommand,
+		NewProfileShowCommand,
+		NewProfileCreateCommand,
+		NewProfileDeleteCommand,
+	)
 }
 
 // NewProfileListCommand creates a command to list all profiles.
