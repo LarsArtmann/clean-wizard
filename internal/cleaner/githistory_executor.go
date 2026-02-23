@@ -178,7 +178,7 @@ func (e *GitHistoryExecutor) getRepoSize() (int64, error) {
 
 	err := filepath.Walk(gitDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // Skip files we can't access
 		}
 		if !info.IsDir() {
 			size += info.Size()

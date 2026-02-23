@@ -220,7 +220,7 @@ func DefaultGitHistorySettings() GitHistorySettings {
 	}
 }
 
-// Binary extensions commonly found in git history that should be cleaned.
+// DefaultBinaryExtensions are binary extensions commonly found in git history that should be cleaned.
 var DefaultBinaryExtensions = []string{
 	// Go build outputs (often extensionless)
 	"", // Extensionless binaries

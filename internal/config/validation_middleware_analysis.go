@@ -32,10 +32,12 @@ func (vm *ValidationMiddleware) analyzePathChanges(field string, current, propos
 	proposedSet := vm.makeStringSet(proposed)
 
 	// Check for added paths
-	changes = append(changes, vm.collectPathChanges(proposed, currentSet, field, domain.ChangeOperationAddedType, domain.RiskLevelLowType, true)...)
+	changes = append(changes, vm.collectPathChanges(
+		proposed, currentSet, field, domain.ChangeOperationAddedType, domain.RiskLevelLowType, true)...)
 
 	// Check for removed paths
-	changes = append(changes, vm.collectPathChanges(current, proposedSet, field, domain.ChangeOperationRemovedType, domain.RiskLevelHighType, false)...)
+	changes = append(changes, vm.collectPathChanges(
+		current, proposedSet, field, domain.ChangeOperationRemovedType, domain.RiskLevelHighType, false)...)
 
 	return changes
 }

@@ -54,8 +54,11 @@ func NewCleanResult(strategy domain.CleanStrategyType, itemsRemoved int, freedBy
 //	startTime := time.Now()
 //	// ... perform cleaning ...
 //	cleanTime := time.Since(startTime)
-//	result := NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType), 5, 1024*1024*100, cleanTime)
-func NewCleanResultWithTiming(strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
+//	result := NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType),
+//		5, 1024*1024*100, cleanTime)
+func NewCleanResultWithTiming(
+	strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64, cleanTime time.Duration,
+) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
@@ -83,9 +86,13 @@ func NewCleanResultWithTiming(strategy domain.CleanStrategyType, itemsRemoved in
 //
 // Example:
 //
-//	result := NewCleanResultWithFailures(domain.CleanStrategyType(domain.StrategyConservativeType), 5, 2, 1024*1024*100, time.Second*30)
+//	result := NewCleanResultWithFailures(domain.CleanStrategyType(domain.StrategyConservativeType),
+//		5, 2, 1024*1024*100, time.Second*30)
 //	fmt.Printf("Success: %d, Failed: %d", result.ItemsRemoved, result.ItemsFailed)
-func NewCleanResultWithFailures(strategy domain.CleanStrategyType, itemsRemoved, itemsFailed int, freedBytes int64, cleanTime time.Duration) domain.CleanResult {
+func NewCleanResultWithFailures(
+	strategy domain.CleanStrategyType, itemsRemoved, itemsFailed int, freedBytes int64,
+	cleanTime time.Duration,
+) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
@@ -113,8 +120,12 @@ func NewCleanResultWithFailures(strategy domain.CleanStrategyType, itemsRemoved,
 // Example:
 //
 //	estimate := domain.SizeEstimate{Known: 1024*1024*100, Status: domain.SizeEstimateStatusKnown}
-//	result := NewCleanResultWithSizeEstimate(domain.CleanStrategyType(domain.StrategyDryRunType), 5, 1024*1024*100, estimate)
-func NewCleanResultWithSizeEstimate(strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64, sizeEstimate domain.SizeEstimate) domain.CleanResult {
+//	result := NewCleanResultWithSizeEstimate(domain.CleanStrategyType(domain.StrategyDryRunType),
+//		5, 1024*1024*100, estimate)
+func NewCleanResultWithSizeEstimate(
+	strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64,
+	sizeEstimate domain.SizeEstimate,
+) domain.CleanResult {
 	return domain.CleanResult{
 		SizeEstimate: sizeEstimate,
 		FreedBytes:   uint64(freedBytes),
@@ -141,7 +152,10 @@ func NewCleanResultWithSizeEstimate(strategy domain.CleanStrategyType, itemsRemo
 //
 // Returns:
 //   - domain.CleanResult: A fully initialized CleanResult with timing and size estimate
-func NewCleanResultWithTimingAndSize(strategy domain.CleanStrategyType, itemsRemoved, itemsFailed int, freedBytes int64, cleanTime time.Duration, sizeEstimate domain.SizeEstimate) domain.CleanResult {
+func NewCleanResultWithTimingAndSize(
+	strategy domain.CleanStrategyType, itemsRemoved, itemsFailed int,
+	freedBytes int64, cleanTime time.Duration, sizeEstimate domain.SizeEstimate,
+) domain.CleanResult {
 	return domain.CleanResult{
 		SizeEstimate: sizeEstimate,
 		FreedBytes:   uint64(freedBytes),
@@ -172,7 +186,9 @@ func NewCleanResultWithTimingAndSize(strategy domain.CleanStrategyType, itemsRem
 //	paths := []string{"/nix/store", "/tmp"}
 //	result := NewScanResult(1024*1024*500, 1000, paths, time.Second*10)
 //	fmt.Printf("Scanned %d items in %v", result.TotalItems, result.ScanTime)
-func NewScanResult(totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration) domain.ScanResult {
+func NewScanResult(
+	totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration,
+) domain.ScanResult {
 	return domain.ScanResult{
 		TotalBytes:   totalBytes,
 		TotalItems:   totalItems,
@@ -222,7 +238,9 @@ func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanR
 //
 //	bytesResult := adapter.CollectGarbage(ctx)
 //	cleanResult := ToCleanResultWithStrategy(bytesResult, domain.CleanStrategyType(domain.StrategyAggressiveType))
-func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy domain.CleanStrategyType) result.Result[domain.CleanResult] {
+func ToCleanResultWithStrategy(
+	bytesResult result.Result[int64], strategy domain.CleanStrategyType,
+) result.Result[domain.CleanResult] {
 	if bytesResult.IsErr() {
 		return result.Err[domain.CleanResult](bytesResult.Error())
 	}
@@ -248,12 +266,15 @@ func ToCleanResultWithStrategy(bytesResult result.Result[int64], strategy domain
 // Example:
 //
 //	bytesResult := adapter.CollectGarbage(ctx)
-//	cleanResult := ToCleanResultFromItems(5, bytesResult, domain.CleanStrategyType(domain.StrategyAggressiveType))
+//	cleanResult := ToCleanResultFromItems(5, bytesResult,
+//		domain.CleanStrategyType(domain.StrategyAggressiveType))
 //	if cleanResult.IsOk() {
 //		fmt.Printf("Removed %d items, freed %d bytes",
 //			cleanResult.Value().ItemsRemoved, cleanResult.Value().FreedBytes)
 //	}
-func ToCleanResultFromItems(itemsRemoved int, bytesResult result.Result[int64], strategy domain.CleanStrategyType) result.Result[domain.CleanResult] {
+func ToCleanResultFromItems(
+	itemsRemoved int, bytesResult result.Result[int64], strategy domain.CleanStrategyType,
+) result.Result[domain.CleanResult] {
 	if bytesResult.IsErr() {
 		return result.Err[domain.CleanResult](bytesResult.Error())
 	}
@@ -264,7 +285,9 @@ func ToCleanResultFromItems(itemsRemoved int, bytesResult result.Result[int64], 
 }
 
 // ToTimedCleanResult creates a timed CleanResult from bytes and duration.
-func ToTimedCleanResult(bytesResult result.Result[int64], strategy domain.CleanStrategyType, cleanTime time.Duration) result.Result[domain.CleanResult] {
+func ToTimedCleanResult(
+	bytesResult result.Result[int64], strategy domain.CleanStrategyType, cleanTime time.Duration,
+) result.Result[domain.CleanResult] {
 	if bytesResult.IsErr() {
 		return result.Err[domain.CleanResult](bytesResult.Error())
 	}
@@ -275,7 +298,9 @@ func ToTimedCleanResult(bytesResult result.Result[int64], strategy domain.CleanS
 }
 
 // ToScanResult converts primitive scanning results to domain.ScanResult.
-func ToScanResult(totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration) domain.ScanResult {
+func ToScanResult(
+	totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration,
+) domain.ScanResult {
 	return NewScanResult(totalBytes, totalItems, scannedPaths, scanDuration)
 }
 

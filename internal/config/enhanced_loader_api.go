@@ -57,7 +57,9 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 }
 
 // SaveConfig saves configuration with validation and cache update.
-func (ecl *EnhancedConfigLoader) SaveConfig(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) (*domain.Config, error) {
+func (ecl *EnhancedConfigLoader) SaveConfig(
+	ctx context.Context, config *domain.Config, options *ConfigSaveOptions,
+) (*domain.Config, error) {
 	if options == nil {
 		options = getDefaultSaveOptions()
 	}
@@ -99,7 +101,9 @@ func (ecl *EnhancedConfigLoader) handleBackup(ctx context.Context, config *domai
 }
 
 // validateAndSanitize validates and optionally sanitizes the config.
-func (ecl *EnhancedConfigLoader) validateAndSanitize(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) *ValidationResult {
+func (ecl *EnhancedConfigLoader) validateAndSanitize(
+	ctx context.Context, config *domain.Config, options *ConfigSaveOptions,
+) *ValidationResult {
 	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
 
 	if options.EnableSanitization == SanitizeOptionEnabled {
@@ -143,6 +147,8 @@ func (ecl *EnhancedConfigLoader) logSaveResult(options *ConfigSaveOptions, valid
 }
 
 // ValidateConfig validates configuration at specified level.
-func (ecl *EnhancedConfigLoader) ValidateConfig(ctx context.Context, config *domain.Config, level domain.ValidationLevelType) *ValidationResult {
+func (ecl *EnhancedConfigLoader) ValidateConfig(
+	ctx context.Context, config *domain.Config, level domain.ValidationLevelType,
+) *ValidationResult {
 	return ecl.applyValidation(ctx, config, level)
 }

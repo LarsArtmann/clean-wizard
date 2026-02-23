@@ -106,10 +106,13 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 	}
 
 	// Execute projects-management-automation --clear-cache command
-	cmd := adapters.ExecWithTimeout(ctx, DefaultProjectsAutomationTimeout, "projects-management-automation", "--clear-cache")
+	cmd := adapters.ExecWithTimeout(ctx, DefaultProjectsAutomationTimeout,
+		"projects-management-automation", "--clear-cache")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("projects-management-automation --clear-cache failed: %w (output: %s)", err, string(output)))
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("projects-management-automation --clear-cache failed: %w (output: %s)",
+				err, string(output)))
 	}
 
 	itemsRemoved++

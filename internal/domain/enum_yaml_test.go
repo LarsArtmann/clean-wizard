@@ -373,7 +373,8 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 		t.Errorf("NodePackages.PackageManagers length = %d, want 2", len(unmarshaled.NodePackages.PackageManagers))
 	}
 	if unmarshaled.NodePackages.PackageManagers[0] != PackageManagerNpm {
-		t.Errorf("NodePackages.PackageManagers[0] = %v, want %v", unmarshaled.NodePackages.PackageManagers[0], PackageManagerNpm)
+		t.Errorf("NodePackages.PackageManagers[0] = %v, want %v",
+			unmarshaled.NodePackages.PackageManagers[0], PackageManagerNpm)
 	}
 
 	// Verify BuildCache

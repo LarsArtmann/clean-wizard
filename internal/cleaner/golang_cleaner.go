@@ -106,11 +106,11 @@ func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] 
 // Clean removes Go caches.
 func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !gc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("Go not available"))
+		return result.Err[domain.CleanResult](errors.New("go not available"))
 	}
 
 	if gc.config.DryRun {
-		return gc.dryRunClean()
+		return gc.dryRunClean(ctx)
 	}
 
 	startTime := time.Now()
@@ -132,9 +132,9 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 }
 
 // dryRunClean performs dry-run estimation by scanning actual cache sizes.
-func (gc *GoCleaner) dryRunClean() result.Result[domain.CleanResult] {
+func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.CleanResult] {
 	// Scan actual cache directories to get real sizes
-	scanResult := gc.scanner.Scan(context.Background(), gc.config.Caches)
+	scanResult := gc.scanner.Scan(ctx, gc.config.Caches)
 
 	totalBytes := uint64(0)
 	itemsRemoved := 0

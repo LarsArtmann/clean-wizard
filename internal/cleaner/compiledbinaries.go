@@ -120,7 +120,13 @@ func WithIncludeCategories(categories []BinaryCategory) CompiledBinariesOption {
 }
 
 // NewCompiledBinariesCleaner creates a new CompiledBinariesCleaner.
-func NewCompiledBinariesCleaner(verbose, dryRun bool, minSizeMB int, olderThan string, basePaths, excludePatterns []string, opts ...CompiledBinariesOption) *CompiledBinariesCleaner {
+func NewCompiledBinariesCleaner(
+	verbose, dryRun bool,
+	minSizeMB int,
+	olderThan string,
+	basePaths, excludePatterns []string,
+	opts ...CompiledBinariesOption,
+) *CompiledBinariesCleaner {
 	// Apply defaults
 	if minSizeMB <= 0 {
 		minSizeMB = DefaultMinSizeMB
@@ -399,7 +405,7 @@ func (s *defaultBinaryScanner) ScanDirectory(ctx context.Context, dir string, ca
 
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return nil // Skip files we can't access
+			return nil //nolint:nilerr // Skip files we can't access
 		}
 
 		// Skip directories (but continue walking)

@@ -38,7 +38,7 @@ func GetHomeDir() (string, error) {
 func walkDirectory(path string) (size int64, modTime time.Time, ok bool) {
 	err := filepath.Walk(path, func(_ string, info os.FileInfo, walkErr error) error {
 		if walkErr != nil {
-			return nil
+			return nil //nolint:nilerr // Skip files/dirs we can't access
 		}
 		if !info.IsDir() {
 			size += info.Size()
@@ -106,7 +106,9 @@ func ScanDirectory(path string, scanType domain.ScanType, verbose bool) ScanDire
 }
 
 // appendScanItem appends a scan item for a directory to the items slice with verbose output.
-func appendScanItem(items []domain.ScanItem, path, displayName string, scanType domain.ScanType, verbose bool) []domain.ScanItem {
+func appendScanItem(
+	items []domain.ScanItem, path, displayName string, scanType domain.ScanType, verbose bool,
+) []domain.ScanItem {
 	item := domain.ScanItem{
 		Path:     path,
 		Size:     GetDirSize(path),
@@ -150,8 +152,11 @@ func ScanVersionDirectory(ctx context.Context, versionsDir, managerName string, 
 // 2. Checking if the path exists and is a directory
 // 3. Creating a scan item for the directory
 // If homeDir is empty and pathComponents contains a complete path, it uses that directly.
-// If pattern is provided, it walks the directory to find matching entries instead of scanning the directory itself.
-func ScanPath(homeDir string, scanType domain.ScanType, displayName string, verbose bool, pattern string, pathComponents ...string) ScanDirectoryResult {
+// If pattern is provided, it walks the directory to find matching entries instead of scanning.
+func ScanPath(
+	homeDir string, scanType domain.ScanType, displayName string,
+	verbose bool, pattern string, pathComponents ...string,
+) ScanDirectoryResult {
 	result := ScanDirectoryResult{
 		Items: make([]domain.ScanItem, 0),
 		Found: false,
@@ -196,7 +201,9 @@ func ScanPath(homeDir string, scanType domain.ScanType, displayName string, verb
 // 4. Calculating the difference (bytes freed)
 // 5. Logging verbose output if requested
 // Returns the bytes freed (always non-negative), beforeSize, and afterSize for logging.
-func CalculateBytesFreed(path string, cleanup func() error, verbose bool, cacheName string) (bytesFreed, beforeSize, afterSize int64) {
+func CalculateBytesFreed(
+	path string, cleanup func() error, verbose bool, cacheName string,
+) (bytesFreed, beforeSize, afterSize int64) {
 	beforeSize = GetDirSize(path)
 
 	err := cleanup()

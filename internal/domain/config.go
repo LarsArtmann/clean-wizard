@@ -48,17 +48,17 @@ func (c *Config) Validate() error {
 	}
 
 	if len(c.Protected) == 0 {
-		return errors.New("Protected paths cannot be empty")
+		return errors.New("protected paths cannot be empty")
 	}
 
 	for i, path := range c.Protected {
 		if path == "" {
-			return fmt.Errorf("Protected path %d cannot be empty", i)
+			return fmt.Errorf("protected path %d cannot be empty", i)
 		}
 	}
 
 	if len(c.Profiles) == 0 {
-		return errors.New("Configuration must have at least one profile")
+		return errors.New("configuration must have at least one profile")
 	}
 
 	for name, profile := range c.Profiles {
@@ -146,10 +146,10 @@ func (op CleanupOperation) IsValid() bool {
 // Validate returns errors for invalid cleanup operation.
 func (op CleanupOperation) Validate() error {
 	if op.Name == "" {
-		return errors.New("Operation name cannot be empty")
+		return errors.New("operation name cannot be empty")
 	}
 	if op.Description == "" {
-		return errors.New("Operation description cannot be empty")
+		return errors.New("operation description cannot be empty")
 	}
 
 	// Validate RiskLevel enum
@@ -166,7 +166,7 @@ func (op CleanupOperation) Validate() error {
 	if op.Settings != nil {
 		opType := GetOperationType(op.Name)
 		if err := op.Settings.ValidateSettings(opType); err != nil {
-			return fmt.Errorf("Operation settings validation failed: %w", err)
+			return fmt.Errorf("operation settings validation failed: %w", err)
 		}
 	}
 

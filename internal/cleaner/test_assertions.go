@@ -60,7 +60,9 @@ func TestIsAvailable[T interface {
 }
 
 // TestValidateSettings runs a standard validation settings test suite.
-func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructorWithSettings, testCases []ValidateSettingsTestCase) {
+func TestValidateSettings(
+	t *testing.T, newCleanerFunc CleanerConstructorWithSettings, testCases []ValidateSettingsTestCase,
+) {
 	for _, tt := range testCases {
 		t.Run(tt.Name, func(t *testing.T) {
 			cleaner := newCleanerFunc(false, false)
@@ -74,7 +76,10 @@ func TestValidateSettings(t *testing.T, newCleanerFunc CleanerConstructorWithSet
 }
 
 // TestCleanDryRun runs a standard clean dry-run test suite.
-func TestCleanDryRun(t *testing.T, newCleanerFunc SimpleCleanerConstructor, toolName string, expectedItemsRemoved uint) {
+func TestCleanDryRun(
+	t *testing.T, newCleanerFunc SimpleCleanerConstructor,
+	toolName string, expectedItemsRemoved uint,
+) {
 	cleaner := newCleanerFunc(false, true)
 
 	if !cleaner.IsAvailable(context.Background()) {
@@ -139,7 +144,9 @@ func TestDryRunStrategy(t *testing.T, newCleanerFunc SimpleCleanerConstructor, t
 //   - empty OperationSettings (valid)
 //   - settings with field enabled (valid)
 //   - settings with field disabled (valid)
-func CreateBooleanSettingsTestCases(nilName string, settingsFunc func(bool) *domain.OperationSettings) []ValidateSettingsTestCase {
+func CreateBooleanSettingsTestCases(
+	nilName string, settingsFunc func(bool) *domain.OperationSettings,
+) []ValidateSettingsTestCase {
 	return []ValidateSettingsTestCase{
 		{
 			Name:     "nil settings",
@@ -231,15 +238,19 @@ func TestCleanTiming(
 	NewCleanResultAnalyzer(t, cleanResult.Value(), elapsed).VerifyTiming()
 }
 
-// TestBooleanSettingsCleanerValidateSettings runs a standard ValidateSettings test for cleaners with a single boolean settings field.
-// This eliminates duplicate test code across multiple cleaner test files.
-func TestBooleanSettingsCleanerValidateSettings(t *testing.T, config BooleanSettingsCleanerTestConfig, constructor CleanerConstructorWithSettings) {
+// TestBooleanSettingsCleanerValidateSettings runs a standard ValidateSettings test for cleaners
+// with a single boolean settings field. This eliminates duplicate test code across multiple files.
+func TestBooleanSettingsCleanerValidateSettings(
+	t *testing.T, config BooleanSettingsCleanerTestConfig, constructor CleanerConstructorWithSettings,
+) {
 	testCases := CreateBooleanSettingsTestCases(config.SettingsFieldName, config.CreateSettings)
 	TestValidateSettings(t, constructor, testCases)
 }
 
-// TestBooleanSettingsCleanerCleanDryRun runs a standard Clean_DryRun test for cleaners with expected items removed.
-func TestBooleanSettingsCleanerCleanDryRun(t *testing.T, config BooleanSettingsCleanerTestConfig, constructor CleanerConstructorWithSettings) {
+// TestBooleanSettingsCleanerCleanDryRun runs a standard Clean_DryRun test with expected items.
+func TestBooleanSettingsCleanerCleanDryRun(
+	t *testing.T, config BooleanSettingsCleanerTestConfig, constructor CleanerConstructorWithSettings,
+) {
 	simpleConstructor := ToSimpleCleanerConstructor(constructor)
 	TestCleanDryRun(t, simpleConstructor, config.ToolName, config.ExpectedItems)
 }

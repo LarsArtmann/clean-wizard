@@ -65,7 +65,8 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 	// Check if git-filter-repo is available
 	report.FilterRepoAvailable = c.isFilterRepoAvailable(ctx)
 	if !report.FilterRepoAvailable {
-		report.Blockers = append(report.Blockers, "git-filter-repo is not installed. Install it with: pip install git-filter-repo or brew install git-filter-repo")
+		report.Blockers = append(report.Blockers,
+			"git-filter-repo is not installed. Install it with: pip install git-filter-repo or brew install git-filter-repo")
 	}
 
 	// Check backup capability

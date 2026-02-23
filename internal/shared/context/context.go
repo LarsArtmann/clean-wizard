@@ -25,7 +25,7 @@ import (
 //	}
 type Context[T any] struct {
 	// Base context (optional)
-	Context context.Context
+	Context context.Context //nolint:containedctx // Intentionally wraps context.Context for type-safe context passing
 
 	// ValueType provides type-safe context data
 	ValueType T

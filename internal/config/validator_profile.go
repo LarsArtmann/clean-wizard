@@ -66,7 +66,9 @@ func (cv *ConfigValidator) validateProfileNameWithPattern(name string) error {
 func (cv *ConfigValidator) validateProfileNameWithDefault(name string) error {
 	for _, char := range name {
 		if !isValidProfileNameChar(char) {
-			return fmt.Errorf("profile name '%s' contains invalid character: %c (allowed: alphanumeric, underscore, hyphen)", name, char)
+			return fmt.Errorf(
+				"profile name '%s' contains invalid character: %c (allowed: alphanumeric, underscore, hyphen)",
+				name, char)
 		}
 	}
 	return nil
@@ -74,5 +76,8 @@ func (cv *ConfigValidator) validateProfileNameWithDefault(name string) error {
 
 // isValidProfileNameChar checks if a character is valid for a profile name.
 func isValidProfileNameChar(char rune) bool {
-	return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '_' || char == '-'
+	return (char >= 'a' && char <= 'z') ||
+		(char >= 'A' && char <= 'Z') ||
+		(char >= '0' && char <= '9') ||
+		char == '_' || char == '-'
 }

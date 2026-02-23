@@ -172,7 +172,8 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 
 	if cs.rules.RoundPercentages {
 		original := cfg.MaxDiskUsage
-		cfg.MaxDiskUsage = int(float64(cfg.MaxDiskUsage+RoundingIncrement/2)/RoundingIncrement) * RoundingIncrement // Round to nearest increment
+		// Round to nearest increment
+		cfg.MaxDiskUsage = int(float64(cfg.MaxDiskUsage+RoundingIncrement/2)/RoundingIncrement) * RoundingIncrement
 		if original != cfg.MaxDiskUsage {
 			result.addChange("max_disk_usage", original, cfg.MaxDiskUsage, "rounded to nearest 10%")
 		}

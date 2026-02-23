@@ -108,11 +108,11 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 	}
 
 	if settings.NixGenerations.Generations < 1 {
-		return fmt.Errorf("Generations to keep must be at least 1, got: %d", settings.NixGenerations.Generations)
+		return fmt.Errorf("generations to keep must be at least 1, got: %d", settings.NixGenerations.Generations)
 	}
 
 	if settings.NixGenerations.Generations > 10 {
-		return fmt.Errorf("Generations to keep must not exceed %d, got: %d", 10, settings.NixGenerations.Generations)
+		return fmt.Errorf("generations to keep must not exceed %d, got: %d", 10, settings.NixGenerations.Generations)
 	}
 
 	return nil
@@ -124,11 +124,26 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 	if !nc.adapter.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]domain.NixGeneration{
-			{ID: 300, Path: "/nix/var/nix/profiles/default-300-link", Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusCurrent},
-			{ID: 299, Path: "/nix/var/nix/profiles/default-299-link", Date: time.Now().Add(-48 * time.Hour), Current: domain.GenerationStatusHistorical},
-			{ID: 298, Path: "/nix/var/nix/profiles/default-298-link", Date: time.Now().Add(-72 * time.Hour), Current: domain.GenerationStatusHistorical},
-			{ID: 297, Path: "/nix/var/nix/profiles/default-297-link", Date: time.Now().Add(-96 * time.Hour), Current: domain.GenerationStatusHistorical},
-			{ID: 296, Path: "/nix/var/nix/profiles/default-296-link", Date: time.Now().Add(-120 * time.Hour), Current: domain.GenerationStatusHistorical},
+			{
+				ID: 300, Path: "/nix/var/nix/profiles/default-300-link",
+				Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusCurrent,
+			},
+			{
+				ID: 299, Path: "/nix/var/nix/profiles/default-299-link",
+				Date: time.Now().Add(-48 * time.Hour), Current: domain.GenerationStatusHistorical,
+			},
+			{
+				ID: 298, Path: "/nix/var/nix/profiles/default-298-link",
+				Date: time.Now().Add(-72 * time.Hour), Current: domain.GenerationStatusHistorical,
+			},
+			{
+				ID: 297, Path: "/nix/var/nix/profiles/default-297-link",
+				Date: time.Now().Add(-96 * time.Hour), Current: domain.GenerationStatusHistorical,
+			},
+			{
+				ID: 296, Path: "/nix/var/nix/profiles/default-296-link",
+				Date: time.Now().Add(-120 * time.Hour), Current: domain.GenerationStatusHistorical,
+			},
 		}, "Nix not available - using mock data")
 	}
 

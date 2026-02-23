@@ -34,7 +34,9 @@ func (cs *ConfigSanitizer) sanitizeProfiles(cfg *domain.Config, result *Sanitiza
 }
 
 // sanitizeOperations sanitizes cleanup operations.
-func (cs *ConfigSanitizer) sanitizeOperations(profileName string, operations []domain.CleanupOperation, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeOperations(
+	profileName string, operations []domain.CleanupOperation, result *SanitizationResult,
+) {
 	for i := range operations {
 		op := &operations[i] // Get pointer to mutate slice element in place
 		fieldPrefix := fmt.Sprintf("profiles.%s.operations[%d]", profileName, i)
@@ -84,7 +86,8 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 
 		if profile.Description == "" {
 			profile.Description = "Auto-generated profile description"
-			result.addChange(fmt.Sprintf("profiles.%s.description", name), "", profile.Description, "applied default description")
+			result.addChange(fmt.Sprintf("profiles.%s.description", name),
+			"", profile.Description, "applied default description")
 		}
 
 		// Apply defaults to operations

@@ -39,7 +39,8 @@ func UnmarshalYAMLEnum[T ~int](
 					validStrings = append(validStrings, key)
 					validInts = append(validInts, strconv.Itoa(int(enumVal)))
 				}
-				return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
+				return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\n"+
+					"See docs/YAML_ENUM_FORMATS.md for more details",
 					errorMsg, i, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
 			}
 		}
@@ -59,11 +60,13 @@ func UnmarshalYAMLEnum[T ~int](
 			validStrings = append(validStrings, key)
 			validInts = append(validInts, strconv.Itoa(int(enumVal)))
 		}
-		return fmt.Errorf("%s value: %s\n\nValid options:\n  Strings: %s\n  Integers: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
+		return fmt.Errorf("%s value: %s\n\nValid options:\n  Strings: %s\n  Integers: %s\n\n"+
+			"See docs/YAML_ENUM_FORMATS.md for more details",
 			errorMsg, s, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
 	}
 
-	return fmt.Errorf("cannot parse %s: expected string or int\n\nSee docs/YAML_ENUM_FORMATS.md for format examples", errorMsg)
+	return fmt.Errorf("cannot parse %s: expected string or int\n\n" +
+		"See docs/YAML_ENUM_FORMATS.md for format examples", errorMsg)
 }
 
 // UnmarshalYAMLEnumWithDefault is like UnmarshalYAMLEnum but returns a default value for invalid inputs.

@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+const (
+	bytesPerKB = 1024
+	bytesPerMB = 1024 * 1024
+	bytesPerGB = 1024 * 1024 * 1024
+	bytesPerTB = 1024 * 1024 * 1024 * 1024
+)
+
 // ParseDockerReclaimedSpace extracts "Total reclaimed space: X" from docker prune output.
 // Returns 0 if no reclaimed space is found (which is valid).
 func ParseDockerReclaimedSpace(output string) (int64, error) {
@@ -39,7 +46,7 @@ func ParseDockerSize(sizeStr string) (int64, error) {
 	var number float64
 	var unit string
 	n, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit)
-	if err != nil || n != 2 {
+	if err != nil || n != 2 { //nolint:mnd // 2 is expected number of parsed items
 		return 0, fmt.Errorf("invalid size format: %s", sizeStr)
 	}
 
@@ -48,13 +55,13 @@ func ParseDockerSize(sizeStr string) (int64, error) {
 	case "b":
 		return int64(number), nil
 	case "kb":
-		return int64(number * 1024), nil
+		return int64(number * bytesPerKB), nil
 	case "mb":
-		return int64(number * 1024 * 1024), nil
+		return int64(number * bytesPerMB), nil
 	case "gb":
-		return int64(number * 1024 * 1024 * 1024), nil
+		return int64(number * bytesPerGB), nil
 	case "tb":
-		return int64(number * 1024 * 1024 * 1024 * 1024), nil
+		return int64(number * bytesPerTB), nil
 	default:
 		return 0, fmt.Errorf("unknown size unit: %s", unit)
 	}

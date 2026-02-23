@@ -255,7 +255,9 @@ func unmarshalOperationSettings(v *viper.Viper, profileName string, operationInd
 }
 
 // newCleanupOperation creates a cleanup operation with the specified parameters.
-func newCleanupOperation(name, description string, riskLevel domain.RiskLevelType, opType domain.OperationType) domain.CleanupOperation {
+func newCleanupOperation(
+	name, description string, riskLevel domain.RiskLevelType, opType domain.OperationType,
+) domain.CleanupOperation {
 	return domain.CleanupOperation{
 		Name:        name,
 		Description: description,

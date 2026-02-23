@@ -23,7 +23,7 @@ func TestNixBDDSuite(t *testing.T) {
 
 // NixTestContext holds test state across scenarios.
 type NixTestContext struct {
-	ctx         context.Context
+	ctx         context.Context //nolint:containedctx // Test helper struct, context storage is acceptable
 	nixCleaner  *cleaner.NixCleaner
 	generations result.Result[[]domain.NixGeneration]
 	cleanResult result.Result[domain.CleanResult]
@@ -166,7 +166,9 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		ginkgo.It("should show helpful error message", func() {
 			gomega.Expect(testCtx.generations.IsErr()).To(gomega.BeTrue())
 			errMsg := testCtx.generations.Error().Error()
-			gomega.Expect(strings.Contains(errMsg, "Nix") || strings.Contains(errMsg, "not available") || strings.Contains(errMsg, "command not found")).To(gomega.BeTrue())
+			gomega.Expect(strings.Contains(errMsg, "Nix") ||
+				strings.Contains(errMsg, "not available") ||
+				strings.Contains(errMsg, "command not found")).To(gomega.BeTrue())
 		})
 
 		ginkgo.It("should fail gracefully without stack trace", func() {

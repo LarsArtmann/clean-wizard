@@ -97,9 +97,11 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 		if err != nil {
 			// Check if it's a timeout error
 			if timeoutCtx.Err() == context.DeadlineExceeded {
-				return result.Err[domain.CleanResult](fmt.Errorf("golangci-lint cache clean timed out after %v (command may be hanging)", lintCommandTimeout))
+				return result.Err[domain.CleanResult](
+					fmt.Errorf("golangci-lint cache clean timed out after %v (command may be hanging)", lintCommandTimeout))
 			}
-			return result.Err[domain.CleanResult](fmt.Errorf("golangci-lint cache clean failed: %w (output: %s)", err, string(output)))
+			return result.Err[domain.CleanResult](
+				fmt.Errorf("golangci-lint cache clean failed: %w (output: %s)", err, string(output)))
 		}
 
 		if verbose {

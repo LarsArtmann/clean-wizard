@@ -10,14 +10,14 @@ type OperationHandler interface {
 	ValidateSettings(settings *OperationSettings) error
 }
 
-// OperationHandler interface for generation-based cleaners (Nix).
+// GenerationCleaner is an OperationHandler interface for generation-based cleaners (Nix).
 type GenerationCleaner interface {
 	OperationHandler
 	ListGenerations(ctx context.Context) []NixGeneration
 	CleanOldGenerations(ctx context.Context, keepCount int) CleanResult
 }
 
-// OperationHandler interface for package-based cleaners (Homebrew).
+// PackageCleaner is an OperationHandler interface for package-based cleaners (Homebrew).
 type PackageCleaner interface {
 	OperationHandler
 	ListPackages(ctx context.Context) []string

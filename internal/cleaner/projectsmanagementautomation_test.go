@@ -100,5 +100,7 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_StandardTests(t *testing.T) {
-	TestStandardCleaner(t, NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner), "projects-management-automation")
+	TestStandardCleaner(t,
+		NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
+		"projects-management-automation")
 }

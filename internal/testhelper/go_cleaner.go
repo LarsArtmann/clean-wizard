@@ -20,7 +20,7 @@ func GoCleanerTest(ctx context.Context, title string) error {
 		return fmt.Errorf("failed to create Go cleaner: %w", err)
 	}
 	if !goCleaner.IsAvailable(ctx) {
-		return errors.New("Go is not available")
+		return errors.New("go is not available")
 	}
 	fmt.Println("✅ Go is available")
 

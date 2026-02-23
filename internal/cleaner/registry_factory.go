@@ -65,7 +65,8 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 	registry.Register("project-executables", NewProjectExecutablesCleaner(verbose, dryRun, []string{".sh"}, []string{}))
 
 	// Compiled binaries cleaner (default: 10MB, any age, ~/projects)
-	compiledBinariesCleaner := NewCompiledBinariesCleaner(verbose, dryRun, DefaultMinSizeMB, DefaultOlderThan, nil, []string{})
+	compiledBinariesCleaner := NewCompiledBinariesCleaner(
+		verbose, dryRun, DefaultMinSizeMB, DefaultOlderThan, nil, []string{})
 	registry.Register("compiled-binaries", compiledBinariesCleaner)
 }
 

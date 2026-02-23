@@ -8,7 +8,10 @@ import (
 )
 
 // sanitizeOperationSettings sanitizes operation settings with type safety.
-func (cs *ConfigSanitizer) sanitizeOperationSettings(fieldPrefix, operationName string, settings *domain.OperationSettings, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeOperationSettings(
+	fieldPrefix, operationName string,
+	settings *domain.OperationSettings, result *SanitizationResult,
+) {
 	opType := domain.GetOperationType(operationName)
 
 	// Validate settings first

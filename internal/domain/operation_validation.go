@@ -72,7 +72,8 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if !os.Docker.PruneMode.IsValid() {
 			return &ValidationError{
 				Field:   "docker.prune_mode",
-				Message: "prune_mode must be a valid value (ALL, IMAGES, CONTAINERS, VOLUMES, or BUILDS), got: " + os.Docker.PruneMode.String(),
+				Message: "prune_mode must be a valid value (ALL, IMAGES, CONTAINERS, " +
+					"VOLUMES, or BUILDS), got: " + os.Docker.PruneMode.String(),
 				Value:   os.Docker.PruneMode.String(),
 			}
 		}
@@ -123,7 +124,8 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 			if !cacheType.IsValid() {
 				return &ValidationError{
 					Field:   fmt.Sprintf("system_cache.cache_types[%d]", i),
-					Message: "cache_type must be a valid value (SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, or CCACHE), got: " + cacheType.String(),
+					Message: "cache_type must be a valid value (SPOTLIGHT, XCODE, COCOAPODS, " +
+					"HOMEBREW, PIP, NPM, YARN, or CCACHE), got: " + cacheType.String(),
 					Value:   cacheType.String(),
 				}
 			}

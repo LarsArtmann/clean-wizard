@@ -7,7 +7,9 @@ import (
 )
 
 // sanitizeHomebrewSettings sanitizes Homebrew settings.
-func (cs *ConfigSanitizer) sanitizeHomebrewSettings(fieldPrefix string, settings *domain.HomebrewSettings, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeHomebrewSettings(
+	fieldPrefix string, settings *domain.HomebrewSettings, result *SanitizationResult,
+) {
 	if settings == nil {
 		return
 	}

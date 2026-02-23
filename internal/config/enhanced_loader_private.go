@@ -11,7 +11,9 @@ import (
 )
 
 // loadConfigWithRetry loads configuration with retry logic.
-func (ecl *EnhancedConfigLoader) loadConfigWithRetry(ctx context.Context, options *ConfigLoadOptions) (*domain.Config, error) {
+func (ecl *EnhancedConfigLoader) loadConfigWithRetry(
+	ctx context.Context, options *ConfigLoadOptions,
+) (*domain.Config, error) {
 	var lastErr error
 
 	for attempt := 0; attempt <= ecl.retryPolicy.MaxRetries; attempt++ {

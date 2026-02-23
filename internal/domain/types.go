@@ -43,13 +43,13 @@ func (g NixGeneration) IsValid() bool {
 // Validate returns errors for invalid generation.
 func (g NixGeneration) Validate() error {
 	if g.ID <= 0 {
-		return fmt.Errorf("Generation ID must be positive, got: %d", g.ID)
+		return fmt.Errorf("generation ID must be positive, got: %d", g.ID)
 	}
 	if g.Path == "" {
-		return errors.New("Generation path cannot be empty")
+		return errors.New("generation path cannot be empty")
 	}
 	if g.Date.IsZero() {
-		return errors.New("Generation date cannot be zero")
+		return errors.New("generation date cannot be zero")
 	}
 	return nil
 }
@@ -110,10 +110,10 @@ type ScanRequest struct {
 // Validate returns errors for invalid scan request.
 func (sr ScanRequest) Validate() error {
 	if !sr.Type.IsValid() {
-		return fmt.Errorf("Invalid scan type: %s", sr.Type)
+		return fmt.Errorf("invalid scan type: %s", sr.Type)
 	}
 	if sr.Limit < 0 {
-		return fmt.Errorf("Limit cannot be negative, got: %d", sr.Limit)
+		return fmt.Errorf("limit cannot be negative, got: %d", sr.Limit)
 	}
 	return nil
 }
@@ -135,10 +135,10 @@ type CleanRequest struct {
 // Validate returns errors for invalid clean request.
 func (cr CleanRequest) Validate() error {
 	if !cr.Strategy.IsValid() {
-		return fmt.Errorf("Invalid strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", cr.Strategy)
+		return fmt.Errorf("invalid strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", cr.Strategy)
 	}
 	if len(cr.Items) == 0 {
-		return errors.New("Items cannot be empty")
+		return errors.New("items cannot be empty")
 	}
 	return nil
 }
@@ -160,16 +160,16 @@ func (sr ScanResult) IsValid() bool {
 // Validate returns errors for invalid scan result.
 func (sr ScanResult) Validate() error {
 	if sr.TotalBytes < 0 {
-		return fmt.Errorf("TotalBytes cannot be negative, got: %d", sr.TotalBytes)
+		return fmt.Errorf("totalBytes cannot be negative, got: %d", sr.TotalBytes)
 	}
 	if sr.TotalItems < 0 {
-		return fmt.Errorf("TotalItems cannot be negative, got: %d", sr.TotalItems)
+		return fmt.Errorf("totalItems cannot be negative, got: %d", sr.TotalItems)
 	}
 	if sr.ScanTime < 0 {
-		return fmt.Errorf("ScanTime cannot be negative, got: %d", sr.ScanTime)
+		return fmt.Errorf("scanTime cannot be negative, got: %d", sr.ScanTime)
 	}
 	if sr.ScannedAt.IsZero() {
-		return errors.New("ScannedAt cannot be zero")
+		return errors.New("scannedAt cannot be zero")
 	}
 	return nil
 }
@@ -234,18 +234,20 @@ func (cr CleanResult) IsValid() bool {
 func (cr CleanResult) Validate() error {
 	// Cannot remove items without size info unless explicitly marked unknown
 	// Note: Some operations legitimately have 0 size (e.g., test cache when path unavailable)
-	if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == SizeEstimateStatusKnown && cr.SizeEstimate.Known == 0 && cr.CleanTime > 0 {
-		return errors.New("cannot have zero SizeEstimate when ItemsRemoved is > 0 (set Status: Unknown if size cannot be determined)")
+	if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == SizeEstimateStatusKnown &&
+		cr.SizeEstimate.Known == 0 && cr.CleanTime > 0 {
+		return errors.New("cannot have zero SizeEstimate when ItemsRemoved is > 0 " +
+			"(set Status: Unknown if size cannot be determined)")
 	}
 	// Cannot fail items without any activity (removed or sized)
 	if cr.ItemsFailed > 0 && cr.ItemsRemoved == 0 && cr.SizeEstimate.Known == 0 {
 		return errors.New("cannot have failed items when no items were processed")
 	}
 	if cr.CleanedAt.IsZero() {
-		return errors.New("CleanedAt cannot be zero")
+		return errors.New("cleanedAt cannot be zero")
 	}
 	if !cr.Strategy.IsValid() {
-		return fmt.Errorf("Invalid strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", cr.Strategy)
+		return fmt.Errorf("invalid strategy: %s (must be 'aggressive', 'conservative', or 'dry-run')", cr.Strategy)
 	}
 	return nil
 }

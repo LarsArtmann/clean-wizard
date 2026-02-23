@@ -60,7 +60,10 @@ var riskLevelTextValues = newRiskLevelValueMap("LOW", "MEDIUM", "HIGH", "CRITICA
 var riskLevelEmojiValues = newRiskLevelValueMap("🟢", "🟡", "🟠", "🔴", "⚪")
 
 // testRiskLevelMethod is a helper function that tests RiskLevel methods with a value map.
-func testRiskLevelMethod(t *testing.T, methodName string, method func(domain.RiskLevelType) string, expected map[domain.RiskLevelType]string) {
+func testRiskLevelMethod(
+	t *testing.T, methodName string,
+	method func(domain.RiskLevelType) string, expected map[domain.RiskLevelType]string,
+) {
 	for _, tc := range riskLevelTestCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := method(tc.level)

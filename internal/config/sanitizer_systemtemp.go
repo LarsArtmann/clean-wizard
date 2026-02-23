@@ -9,7 +9,9 @@ import (
 )
 
 // sanitizeSystemTempSettings sanitizes system temp settings.
-func (cs *ConfigSanitizer) sanitizeSystemTempSettings(fieldPrefix string, settings *domain.SystemTempSettings, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeSystemTempSettings(
+	fieldPrefix string, settings *domain.SystemTempSettings, result *SanitizationResult,
+) {
 	if settings == nil {
 		return
 	}

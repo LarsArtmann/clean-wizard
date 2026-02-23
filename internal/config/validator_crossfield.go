@@ -61,14 +61,17 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	if cv.rules.MaxProfiles != nil && cv.rules.MaxProfiles.Max != nil && len(cfg.Profiles) > *cv.rules.MaxProfiles.Max {
 		result.Warnings = append(result.Warnings, ValidationWarning{
 			Field:      "profiles",
-			Message:    fmt.Sprintf("Profile count (%d) exceeds recommended limit (%d)", len(cfg.Profiles), *cv.rules.MaxProfiles.Max),
+			Message: fmt.Sprintf("Profile count (%d) exceeds recommended limit (%d)",
+				len(cfg.Profiles), *cv.rules.MaxProfiles.Max),
 			Suggestion: "Consider consolidating profiles to improve maintainability",
 		})
 	}
 }
 
 // validateCrossFieldConstraints validates relationships between fields.
-func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, result *ValidationResult) {
+func (cv *ConfigValidator) validateCrossFieldConstraints(
+	cfg *domain.Config, result *ValidationResult,
+) {
 	// Safe mode vs risk level consistency
 	if !cfg.SafeMode.IsEnabled() {
 		maxRisk := cv.findMaxRiskLevel(cfg)
@@ -93,7 +96,9 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(cfg *domain.Config, res
 			if len(profile.Operations) > *cv.rules.MaxOperations.Max {
 				result.Warnings = append(result.Warnings, ValidationWarning{
 					Field:      fmt.Sprintf("profiles.%s.operations", name),
-					Message:    fmt.Sprintf("Profile '%s' has %d operations, exceeding recommended limit (%d)", name, len(profile.Operations), *cv.rules.MaxOperations.Max),
+					Message: fmt.Sprintf(
+					"Profile '%s' has %d operations, exceeding recommended limit (%d)",
+					name, len(profile.Operations), *cv.rules.MaxOperations.Max),
 					Suggestion: "Consider splitting operations into multiple profiles",
 					Context: &ValidationContext{
 						Metadata: map[string]string{

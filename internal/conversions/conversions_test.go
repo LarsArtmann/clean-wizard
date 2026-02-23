@@ -351,7 +351,9 @@ func TestValidateAndConvertCleanResult(t *testing.T) {
 
 func TestValidateAndConvertCleanResultInvalid(t *testing.T) {
 	invalidResult := domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown}, // Invalid zero bytes with ItemsRemoved > 0
+		SizeEstimate: domain.SizeEstimate{
+			Known: 0, Status: domain.SizeEstimateStatusKnown, // Invalid: zero bytes with ItemsRemoved > 0
+		},
 		ItemsRemoved: 1,
 		CleanedAt:    time.Now(),
 		Strategy:     domain.CleanStrategyType(domain.StrategyDryRunType),

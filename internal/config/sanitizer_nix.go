@@ -5,7 +5,9 @@ import (
 )
 
 // sanitizeNixGenerationsSettings sanitizes Nix generations settings.
-func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(fieldPrefix string, settings *domain.NixGenerationsSettings, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(
+	fieldPrefix string, settings *domain.NixGenerationsSettings, result *SanitizationResult,
+) {
 	if settings == nil {
 		return
 	}

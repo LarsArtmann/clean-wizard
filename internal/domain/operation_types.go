@@ -34,10 +34,9 @@ type OperationSettings struct {
 	SystemTemp *SystemTempSettings `json:"system_temp,omitempty" yaml:"system_temp,omitempty"`
 
 	// Projects Management Automation Settings
-	ProjectsManagementAutomation *ProjectsManagementAutomationSettings `json:"projects_management_automation,omitempty" yaml:"projects_management_automation,omitempty"`
-
+	ProjectsManagementAutomation *ProjectsManagementAutomationSettings `json:"projects_management_automation,omitempty"`
 	// Project Executables Settings
-	ProjectExecutables *ProjectExecutablesSettings `json:"project_executables,omitempty" yaml:"project_executables,omitempty"`
+	ProjectExecutables *ProjectExecutablesSettings `json:"project_executables,omitempty"`
 
 	// Compiled Binaries Settings
 	CompiledBinaries *CompiledBinariesSettings `json:"compiled_binaries,omitempty" yaml:"compiled_binaries,omitempty"`

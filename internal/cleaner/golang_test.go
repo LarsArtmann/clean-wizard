@@ -73,7 +73,8 @@ func TestNewGoCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleanerWithSettings(tt.verbose, tt.dryRun, cacheTypeFromBools(tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, tt.cleanLintCache))
+			cleaner := NewGoCleanerWithSettings(tt.verbose, tt.dryRun,
+				cacheTypeFromBools(tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, tt.cleanLintCache))
 
 			if cleaner == nil {
 				t.Fatal("NewGoCleaner() returned nil cleaner")
@@ -237,7 +238,8 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleanerWithSettings(false, true, cacheTypeFromBools(tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, false))
+			cleaner := NewGoCleanerWithSettings(false, true,
+				cacheTypeFromBools(tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, false))
 
 			result := cleaner.Clean(context.Background())
 			if result.IsErr() {

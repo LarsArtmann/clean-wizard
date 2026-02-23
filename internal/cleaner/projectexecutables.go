@@ -69,7 +69,10 @@ func WithFileOperator(operator FileOperator) ProjectExecutablesOption {
 }
 
 // NewProjectExecutablesCleaner creates a new ProjectExecutablesCleaner.
-func NewProjectExecutablesCleaner(verbose, dryRun bool, excludeExtensions, excludePatterns []string, opts ...ProjectExecutablesOption) *ProjectExecutablesCleaner {
+func NewProjectExecutablesCleaner(
+	verbose, dryRun bool, excludeExtensions, excludePatterns []string,
+	opts ...ProjectExecutablesOption,
+) *ProjectExecutablesCleaner {
 	// Default to excluding .sh files if not specified
 	if len(excludeExtensions) == 0 {
 		excludeExtensions = []string{".sh"}

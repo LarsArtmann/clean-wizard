@@ -36,7 +36,9 @@ type NodePackageManagerCleaner struct {
 }
 
 // NewNodePackageManagerCleaner creates Node.js package manager cleaner.
-func NewNodePackageManagerCleaner(verbose, dryRun bool, packageManagers []domain.PackageManagerType) *NodePackageManagerCleaner {
+func NewNodePackageManagerCleaner(
+	verbose, dryRun bool, packageManagers []domain.PackageManagerType,
+) *NodePackageManagerCleaner {
 	return &NodePackageManagerCleaner{
 		verbose:         verbose,
 		dryRun:          dryRun,
@@ -359,7 +361,9 @@ func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanRe
 }
 
 // cleanPackageManager cleans cache for a specific package manager.
-func (npmc *NodePackageManagerCleaner) cleanPackageManager(ctx context.Context, pm domain.PackageManagerType) result.Result[domain.CleanResult] {
+func (npmc *NodePackageManagerCleaner) cleanPackageManager(
+	ctx context.Context, pm domain.PackageManagerType,
+) result.Result[domain.CleanResult] {
 	switch pm {
 	case domain.PackageManagerNpm:
 		return npmc.cleanNpmCache(ctx)

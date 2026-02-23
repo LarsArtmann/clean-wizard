@@ -160,7 +160,9 @@ func (hbc *HomebrewCleaner) buildCleanupCommands() []string {
 }
 
 // executeCleanup runs cleanup commands and returns results.
-func (hbc *HomebrewCleaner) executeCleanup(ctx context.Context, commands []string, cacheDir string) (itemsRemoved, itemsFailed int, bytesFreed int64) {
+func (hbc *HomebrewCleaner) executeCleanup(
+	ctx context.Context, commands []string, cacheDir string,
+) (itemsRemoved, itemsFailed int, bytesFreed int64) {
 	if cacheDir != "" {
 		bytesFreed, _, _ = CalculateBytesFreed(cacheDir, func() error {
 			itemsRemoved, itemsFailed = hbc.runCleanupCommands(ctx, commands)

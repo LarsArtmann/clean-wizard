@@ -24,7 +24,9 @@ type TempFilesCleaner struct {
 }
 
 // NewTempFilesCleaner creates temp files cleaner with proper configuration.
-func NewTempFilesCleaner(verbose, dryRun bool, olderThan string, excludes, basePaths []string) (*TempFilesCleaner, error) {
+func NewTempFilesCleaner(
+	verbose, dryRun bool, olderThan string, excludes, basePaths []string,
+) (*TempFilesCleaner, error) {
 	// Parse older than duration using custom duration parser (supports "7d", "24h", etc.)
 	duration, err := domain.ParseCustomDuration(olderThan)
 	if err != nil {
@@ -103,7 +105,7 @@ func (tfc *TempFilesCleaner) Scan(ctx context.Context) result.Result[[]domain.Sc
 		err := filepath.Walk(basePath, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				// Skip files we can't access
-				return nil
+				return nil //nolint:nilerr
 			}
 
 			// Skip directories

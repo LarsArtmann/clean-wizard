@@ -4,7 +4,8 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
-// ToSimpleCleanerConstructor converts a constructor with additional methods to one that only exposes Clean and IsAvailable.
+// ToSimpleCleanerConstructor converts a constructor with additional methods to one that
+// only exposes Clean and IsAvailable.
 func ToSimpleCleanerConstructor(fullConstructor CleanerConstructorWithSettings) SimpleCleanerConstructor {
 	return func(verbose, dryRun bool) SimpleCleaner {
 		return fullConstructor(verbose, dryRun)
@@ -40,7 +41,9 @@ func NewCleanerConstructorWithSettings[T CleanerWithSettings, M any](
 
 // NewBooleanSettingsCleanerTestConstructor is a helper that creates a CleanerConstructorWithSettings
 // from a cleaner constructor function.
-func NewBooleanSettingsCleanerTestConstructor[T CleanerWithSettings](constructor func(verbose, dryRun bool) T) CleanerConstructorWithSettings {
+func NewBooleanSettingsCleanerTestConstructor[T CleanerWithSettings](
+	constructor func(verbose, dryRun bool) T,
+) CleanerConstructorWithSettings {
 	return cleanerConstructorWithSettingsAdapter(constructor)
 }
 

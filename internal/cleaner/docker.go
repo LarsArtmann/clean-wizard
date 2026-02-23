@@ -145,7 +145,8 @@ func (dc *DockerCleaner) addScanItem(items *[]domain.ScanItem, id string, resour
 
 // scanDanglingImages scans for dangling Docker images with size information.
 func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[]domain.ScanItem] {
-	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "images", "-f", "dangling=true", "--format", "{{.ID}}\t{{.Size}}")
+	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout,
+		"docker", "images", "-f", "dangling=true", "--format", "{{.ID}}\t{{.Size}}")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to scan dangling images: %w", err))
@@ -178,7 +179,8 @@ func (dc *DockerCleaner) scanAndAccumulate(
 
 // scanUnusedContainers scans for stopped Docker containers with size information.
 func (dc *DockerCleaner) scanUnusedContainers(ctx context.Context) result.Result[[]domain.ScanItem] {
-	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "ps", "-a", "--filter", "status=exited", "--format", "{{.ID}}\t{{.Size}}")
+	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout,
+		"docker", "ps", "-a", "--filter", "status=exited", "--format", "{{.ID}}\t{{.Size}}")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to scan unused containers: %w", err))
@@ -191,7 +193,8 @@ func (dc *DockerCleaner) scanUnusedContainers(ctx context.Context) result.Result
 // scanUnusedVolumes scans for unused Docker volumes with size information.
 func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]domain.ScanItem] {
 	// Use docker system df -v to get volume sizes
-	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "system", "df", "-v", "--format", "{{json .Volumes}}")
+	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout,
+		"docker", "system", "df", "-v", "--format", "{{json .Volumes}}")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		// Fallback to basic listing if json format not available
@@ -337,7 +340,7 @@ func (dc *DockerCleaner) parseVolumeJSONOutput(output string) []domain.ScanItem 
 // Clean removes Docker resources based on prune mode.
 func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !dc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("Docker not available"))
+		return result.Err[domain.CleanResult](errors.New("docker not available"))
 	}
 
 	if dc.dryRun {

@@ -307,10 +307,7 @@ func (s *GitHistoryScanner) enrichWithCommitInfo(ctx context.Context, files []do
 }
 
 // markDeletedFiles checks which files no longer exist in HEAD.
-func (s *GitHistoryScanner) markDeletedFiles(ctx context.Context, files []domain.GitHistoryFile) {
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-
+func (s *GitHistoryScanner) markDeletedFiles(_ context.Context, files []domain.GitHistoryFile) {
 	for i := range files {
 		fullPath := filepath.Join(s.repoPath, files[i].Path)
 		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
@@ -414,7 +411,7 @@ func (s *GitHistoryScanner) GetRepoSize() (int64, error) {
 
 	err := filepath.Walk(gitDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return nil // Skip files we can't access
+			return nil //nolint:nilerr // Skip files we can't access
 		}
 		if !info.IsDir() {
 			size += info.Size()

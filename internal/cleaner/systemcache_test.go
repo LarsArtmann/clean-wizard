@@ -110,7 +110,10 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "valid settings with all caches",
 			settings: &domain.OperationSettings{
 				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []domain.CacheType{domain.CacheTypeSpotlight, domain.CacheTypeXcode, domain.CacheTypeCocoapods, domain.CacheTypeHomebrew},
+					CacheTypes: []domain.CacheType{
+						domain.CacheTypeSpotlight, domain.CacheTypeXcode,
+						domain.CacheTypeCocoapods, domain.CacheTypeHomebrew,
+					},
 					OlderThan:  "30d",
 				},
 			},

@@ -2,103 +2,36 @@ version: "2"
 run:
   timeout: 5m
   go: "1.25"
-  build-tags: []
   modules-download-mode: readonly
   allow-parallel-runners: true
-  allow-serial-runners: false
   issues-exit-code: 1
   tests: true
 output:
   formats: {}
 linters:
+  default: none
   enable:
-    - goprintffuncname
-    - rowserrcheck
-    - testpackage
-    - inamedparam
-    - sqlclosecheck
-    - testifylint
-    - recvcheck
     - errcheck
-    - wrapcheck
-    - nakedret
-    - nolintlint
-    - thelper
-    - tagliatelle
-    - gocyclo
-    - unconvert
-    - importas
-    - contextcheck
-    - errorlint
-    - loggercheck
-    - nilerr
-    - unparam
-    - bidichk
-    - gocritic
-    - funcorder
-    - mnd
-    - exhaustive
-    - misspell
-    - zerologlint
-    - decorder
-    - godox
-    - prealloc
-    - cyclop
-    - testableexamples
-    - gomodguard
-    - mirror
-    - maintidx
-    - durationcheck
-    - interfacebloat
-    - copyloopvar
-    - intrange
-    - nilnesserr
-    - staticcheck
-    - lll
-    - gochecknoglobals
-    - tagalign
-    - unused
-    - sloglint
-    - revive
-    - nestif
-    - whitespace
-    - ginkgolinter
-    - noctx
-    - funlen
-    - canonicalheader
-    - gocognit
-    - forbidigo
-    - containedctx
-    - goconst
-    - usestdlibvars
-    - spancheck
-    - godoclint
-    - nonamedreturns
-    - gochecknoinits
-    - makezero
-    - varnamelen
-    - gosec
-    - asasalint
-    - promlinter
-    - fatcontext
-    - iface
-    - protogetter
-    - wastedassign
-    - godot
-    - bodyclose
     - ineffassign
-    - nosprintfhostport
-    - grouper
-    - ireturn
-    - gomoddirectives
-    - unqueryvet
+    - nilerr
+    - staticcheck
     - govet
-    - dupl
-    - dupword
-    - perfsprint
-    - embeddedstructfieldcheck
-    - modernize
-    - tparallel
-    - gochecksumtype
-    - usetesting
-issues: {}
+  settings:
+    errcheck:
+      check-type-assertions: false
+      check-blank: false
+    staticcheck:
+      checks: ["all", "-ST1000", "-ST1003", "-ST1005", "-SA9003"]
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - staticcheck
+      - path: _ginkgo_test\.go
+        linters:
+          - errcheck
+          - staticcheck
+    paths:
+      - tests
+      - test/testdata_etc

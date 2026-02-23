@@ -120,7 +120,10 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "valid settings with all PMs",
 			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []domain.PackageManagerType{domain.PackageManagerNpm, domain.PackageManagerPnpm, domain.PackageManagerYarn, domain.PackageManagerBun},
+					PackageManagers: []domain.PackageManagerType{
+						domain.PackageManagerNpm, domain.PackageManagerPnpm,
+						domain.PackageManagerYarn, domain.PackageManagerBun,
+					},
 				},
 			},
 			WantErr: false,

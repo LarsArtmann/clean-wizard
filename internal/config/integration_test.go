@@ -104,7 +104,8 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 		t.Logf("✓ Integration test passed - validation and sanitization pipeline working correctly")
 		t.Logf("  - Validation: %d errors, %d warnings", len(validationResult.Errors), len(validationResult.Warnings))
 		t.Logf("  - Sanitization: %d fields modified, %d warnings", fieldsModified, len(sanitizationResult.Warnings))
-		t.Logf("  - Post-validation: %d errors, %d warnings", len(postValidationResult.Errors), len(postValidationResult.Warnings))
+		t.Logf("  - Post-validation: %d errors, %d warnings",
+			len(postValidationResult.Errors), len(postValidationResult.Warnings))
 		t.Logf("  - Total duration: %v", validationResult.Duration+sanitizationResult.Duration)
 	})
 }

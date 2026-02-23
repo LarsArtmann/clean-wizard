@@ -65,7 +65,8 @@ func TestCleanResultValidation(t *testing.T) {
 			},
 			shouldValid: true, // IsValid() returns true (quick check), but Validate() returns error
 			shouldError: true,
-			errorMsg:    "cannot have zero SizeEstimate when ItemsRemoved is > 0 (set Status: Unknown if size cannot be determined)",
+			errorMsg: "cannot have zero SizeEstimate when ItemsRemoved is > 0 " +
+				"(set Status: Unknown if size cannot be determined)",
 		},
 		{
 			name: "Invalid CleanResult - failed items with no freed bytes",

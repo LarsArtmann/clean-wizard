@@ -50,7 +50,9 @@ func AvailableSystemCacheTypes() []domain.CacheType {
 }
 
 // NewSystemCacheCleaner creates system cache cleaner.
-func NewSystemCacheCleaner(verbose, dryRun bool, olderThan string, cacheTypes []domain.CacheType) (*SystemCacheCleaner, error) {
+func NewSystemCacheCleaner(
+	verbose, dryRun bool, olderThan string, cacheTypes []domain.CacheType,
+) (*SystemCacheCleaner, error) {
 	// Parse older than duration
 	duration, err := domain.ParseCustomDuration(olderThan)
 	if err != nil {
@@ -104,7 +106,9 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 			return fmt.Errorf("invalid CacheType at index %d: %d is not a valid cache type", i, ct)
 		}
 		if !validCacheTypes[ct] {
-			return fmt.Errorf("invalid default CacheType at index %d: %d not supported on current platform (valid types: %v)", i, ct, validCacheTypes)
+			return fmt.Errorf(
+			"invalid default CacheType at index %d: %d not supported on current platform (valid types: %v)",
+			i, ct, validCacheTypes)
 		}
 	}
 

@@ -34,7 +34,10 @@ type CleanerResult struct {
 }
 
 // CleanResultsToJSON converts clean results to JSON output format.
-func CleanResultsToJSON(results map[string]domain.CleanResult, duration time.Duration, dryRun bool, skipped, failed map[string]error) ([]byte, error) {
+func CleanResultsToJSON(
+	results map[string]domain.CleanResult, duration time.Duration,
+	dryRun bool, skipped, failed map[string]error,
+) ([]byte, error) {
 	output := JSONOutput{
 		Success:      len(failed) == 0,
 		CleanedAt:    time.Now(),

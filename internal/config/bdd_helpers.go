@@ -34,9 +34,12 @@ func FindProfileOperation(cfg *domain.Config, profileName, operationName string)
 	return profile, -1
 }
 
-// ModifyProfileOperation applies a modifier to a specific operation
+// ModifyProfileOperation applies a modifier to a specific operation.
 // Returns true if the operation was found and modified.
-func ModifyProfileOperation(cfg *domain.Config, profileName, operationName string, modifier ProfileOperationModifier) bool {
+func ModifyProfileOperation(
+	cfg *domain.Config, profileName, operationName string,
+	modifier ProfileOperationModifier,
+) bool {
 	profile, opIndex := FindProfileOperation(cfg, profileName, operationName)
 	if profile == nil || opIndex == -1 {
 		return false
@@ -119,9 +122,12 @@ func WithNixGenerationsSetting(
 }
 
 // WithProfileOperationField modifies an operation field directly.
-// Takes the config, profile name, operation name, and a modifier function that receives the operation.
+// Takes the config, profile name, operation name, and a modifier function.
 // Returns true if the operation was found and modified.
-func WithProfileOperationField(cfg *domain.Config, profileName, operationName string, fieldModifier func(*domain.CleanupOperation) bool) bool {
+func WithProfileOperationField(
+	cfg *domain.Config, profileName, operationName string,
+	fieldModifier func(*domain.CleanupOperation) bool,
+) bool {
 	return ModifyProfileOperation(cfg, profileName, operationName, func(profile *domain.Profile, op *domain.CleanupOperation) bool {
 		return fieldModifier(op)
 	})

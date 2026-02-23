@@ -6,7 +6,9 @@ import (
 
 // maxRiskLevelFromOperations calculates the maximum risk level from a slice of operations.
 // This function is used across validation middleware and business logic components.
-func maxRiskLevelFromOperations(operations []domain.CleanupOperation, currentMax domain.RiskLevelType) domain.RiskLevelType {
+func maxRiskLevelFromOperations(
+	operations []domain.CleanupOperation, currentMax domain.RiskLevelType,
+) domain.RiskLevelType {
 	maxRisk := currentMax
 	for _, op := range operations {
 		if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {

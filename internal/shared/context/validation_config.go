@@ -122,7 +122,9 @@ func NewValidationResult() *ValidationResult {
 }
 
 // AddError adds an error to the result.
-func (r *ValidationResult) AddError(field, rule, value, message string, ctx *Context[ValidationConfig]) *ValidationResult {
+func (r *ValidationResult) AddError(
+	field, rule, value, message string, ctx *Context[ValidationConfig],
+) *ValidationResult {
 	r.Errors = append(r.Errors, ValidationError{
 		Field:   field,
 		Rule:    rule,

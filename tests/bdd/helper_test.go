@@ -29,7 +29,9 @@ func mockGenerations(count int) []domain.NixGeneration {
 }
 
 // getGenerationsOrMock attempts to list real Nix generations, falling back to mocks on error.
-func getGenerationsOrMock(ctx context.Context, nixCleaner *cleaner.NixCleaner, mockCount int) result.Result[[]domain.NixGeneration] {
+func getGenerationsOrMock(
+	ctx context.Context, nixCleaner *cleaner.NixCleaner, mockCount int,
+) result.Result[[]domain.NixGeneration] {
 	generations := nixCleaner.ListGenerations(ctx)
 	if generations.IsErr() {
 		return result.Ok(mockGenerations(mockCount))
@@ -48,7 +50,9 @@ func newTestContext() *NixTestContext {
 
 // cleanGenerationsAndVerify gets mock generations and runs CleanOldGenerations,
 // then verifies the result is OK. Returns the clean result for additional assertions.
-func cleanGenerationsAndVerify(ctx context.Context, nixCleaner *cleaner.NixCleaner, minCount, keepCount int) result.Result[domain.CleanResult] {
+func cleanGenerationsAndVerify(
+	ctx context.Context, nixCleaner *cleaner.NixCleaner, minCount, keepCount int,
+) result.Result[domain.CleanResult] {
 	_ = getGenerationsOrMock(ctx, nixCleaner, minCount)
 	cleanResult := nixCleaner.CleanOldGenerations(ctx, keepCount)
 	return cleanResult

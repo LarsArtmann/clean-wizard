@@ -120,10 +120,10 @@ func runConfigEditCommand(cmd *cobra.Command, args []string) error {
 	configPath := getConfigPath()
 
 	// Check if config exists, create if not
-	cfg, err := config.Load()
+	_, err := config.Load()
 	if err != nil {
 		fmt.Println("Creating new configuration...")
-		cfg = config.GetDefaultConfig()
+		cfg := config.GetDefaultConfig()
 		if err := config.Save(cfg); err != nil {
 			return fmt.Errorf("failed to create configuration: %w", err)
 		}

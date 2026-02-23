@@ -99,7 +99,10 @@ func runTempFilesCleaner(ctx context.Context, dryRun, verbose bool) (domain.Clea
 }
 
 // runGenericCleaner executes a cleaner using a factory function.
-func runGenericCleaner(ctx context.Context, verbose, dryRun bool, factory func(bool, bool) cleaner.Cleaner) (domain.CleanResult, error) {
+func runGenericCleaner(
+	ctx context.Context, verbose, dryRun bool,
+	factory func(bool, bool) cleaner.Cleaner,
+) (domain.CleanResult, error) {
 	cleanerInstance := factory(verbose, dryRun)
 
 	result := cleanerInstance.Clean(ctx)
@@ -147,7 +150,10 @@ func runManagerCleaner[T any](
 }
 
 // runCleanerWithNodeManagers executes the Node package manager cleaner.
-func runCleanerWithNodeManagers(ctx context.Context, verbose, dryRun bool, managers []domain.PackageManagerType) (domain.CleanResult, error) {
+func runCleanerWithNodeManagers(
+	ctx context.Context, verbose, dryRun bool,
+	managers []domain.PackageManagerType,
+) (domain.CleanResult, error) {
 	return runManagerCleaner(ctx, verbose, dryRun, managers, nodeManagerFactory)
 }
 
@@ -166,7 +172,8 @@ func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
 		return createCleanerWithError(func() (cleaner.Cleaner, error) {
-			return cleaner.NewGoCleaner(v, d, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheModCache|cleaner.GoCacheBuildCache)
+			return cleaner.NewGoCleaner(v, d,
+				cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheModCache|cleaner.GoCacheBuildCache)
 		})
 	})
 }
