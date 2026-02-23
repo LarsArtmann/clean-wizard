@@ -733,40 +733,32 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 			gomega.Expect(binaries).To(gomega.BeEmpty())
 		}
 
+		// createBinaryInSubdir creates a binary file in a subdirectory and returns the file path.
+		createBinaryInSubdir := func(subdir, filename string) {
+			dir := filepath.Join(tempDir, subdir)
+			_ = os.MkdirAll(dir, 0o755)
+			binaryFile := filepath.Join(dir, filename)
+			_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
+		}
+
 		ginkgo.Context("directory exclusion", func() {
 			ginkgo.It("should skip node_modules directory", func() {
-				nodeModulesDir := filepath.Join(tempDir, "node_modules", ".bin")
-				_ = os.MkdirAll(nodeModulesDir, 0o755)
-				binaryFile := filepath.Join(nodeModulesDir, "tool")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
-
+				createBinaryInSubdir(filepath.Join("node_modules", ".bin"), "tool")
 				assertScanEmpty()
 			})
 
 			ginkgo.It("should skip venv directory", func() {
-				venvDir := filepath.Join(tempDir, "venv", "bin")
-				_ = os.MkdirAll(venvDir, 0o755)
-				binaryFile := filepath.Join(venvDir, "python")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
-
+				createBinaryInSubdir(filepath.Join("venv", "bin"), "python")
 				assertScanEmpty()
 			})
 
 			ginkgo.It("should skip .terraform directory", func() {
-				terraformDir := filepath.Join(tempDir, ".terraform", "providers")
-				_ = os.MkdirAll(terraformDir, 0o755)
-				binaryFile := filepath.Join(terraformDir, "provider")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
-
+				createBinaryInSubdir(filepath.Join(".terraform", "providers"), "provider")
 				assertScanEmpty()
 			})
 
 			ginkgo.It("should skip .git directory", func() {
-				gitDir := filepath.Join(tempDir, ".git", "objects")
-				_ = os.MkdirAll(gitDir, 0o755)
-				binaryFile := filepath.Join(gitDir, "some-file")
-				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
-
+				createBinaryInSubdir(filepath.Join(".git", "objects"), "some-file")
 				assertScanEmpty()
 			})
 		})
