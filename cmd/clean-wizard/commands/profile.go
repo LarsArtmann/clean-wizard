@@ -268,7 +268,7 @@ func runProfileDeleteCommand(cmd *cobra.Command, args []string, force bool) erro
 		_, err := fmt.Scanln(&confirm)
 		if err != nil || confirm != "yes" {
 			fmt.Println("   Deletion cancelled.")
-			return nil
+			return nil //nolint:nilerr // intentional: user cancellation is not an error
 		}
 	}
 

@@ -168,7 +168,7 @@ func TestNewCleanerConstructor[T any](t *testing.T, constructor func(bool, bool)
 			cleaner := constructor(tt.verbose, tt.dryRun)
 
 			cleanerValue := reflect.ValueOf(cleaner)
-			if cleanerValue.Kind() == reflect.Ptr {
+			if cleanerValue.Kind() == reflect.Pointer {
 				if cleanerValue.IsNil() {
 					t.Fatalf("%s(%v, %v) returned nil cleaner", cleanerName, tt.verbose, tt.dryRun)
 				}

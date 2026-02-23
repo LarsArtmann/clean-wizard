@@ -45,9 +45,13 @@ func ModifyProfileOperation(cfg *domain.Config, profileName, operationName strin
 	return modifier(profile, &profile.Operations[opIndex])
 }
 
-// WithOperationSettings applies a settings modifier to a specific operation
+// WithOperationSettings applies a settings modifier to a specific operation.
 // Returns true if the operation was found and modified.
-func WithOperationSettings(cfg *domain.Config, profileName, operationName string, settingsModifier func(*domain.OperationSettings) bool) bool {
+func WithOperationSettings(
+	cfg *domain.Config,
+	profileName, operationName string,
+	settingsModifier func(*domain.OperationSettings) bool,
+) bool {
 	return ModifyProfileOperation(cfg, profileName, operationName, func(profile *domain.Profile, op *domain.CleanupOperation) bool {
 		if op.Settings == nil {
 			return false
@@ -101,7 +105,11 @@ func ChainModifiers(modifiers ...ConfigModifier) ConfigModifier {
 // WithNixGenerationsSetting modifies a specific NixGenerations setting field.
 // Takes the config, profile name, operation name, and a modifier function.
 // Returns true if the operation was found and modified.
-func WithNixGenerationsSetting(cfg *domain.Config, profileName, operationName string, settingModifier func(*domain.NixGenerationsSettings) bool) bool {
+func WithNixGenerationsSetting(
+	cfg *domain.Config,
+	profileName, operationName string,
+	settingModifier func(*domain.NixGenerationsSettings) bool,
+) bool {
 	return WithOperationSettings(cfg, profileName, operationName, func(settings *domain.OperationSettings) bool {
 		if settings.NixGenerations == nil {
 			return false

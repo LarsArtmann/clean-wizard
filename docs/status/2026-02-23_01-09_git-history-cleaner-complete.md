@@ -16,24 +16,24 @@ Successfully implemented a comprehensive **Git History Cleaner** feature - an in
 
 ### Core Implementation (2,994 lines)
 
-| Component | File | Lines | Status |
-|-----------|------|-------|--------|
-| Domain Types | `internal/domain/githistory_types.go` | 283 | ✅ Complete |
-| Scanner | `internal/cleaner/githistory_scanner.go` | 426 | ✅ Complete |
-| Safety Checker | `internal/cleaner/githistory_safety.go` | 180 | ✅ Complete |
-| Executor | `internal/cleaner/githistory_executor.go` | 343 | ✅ Complete |
-| Main Cleaner | `internal/cleaner/githistory.go` | 357 | ✅ Complete |
-| CLI Command | `cmd/clean-wizard/commands/githistory.go` | 469 | ✅ Complete |
-| **Total** | | **2,058** | |
+| Component      | File                                      | Lines     | Status      |
+| -------------- | ----------------------------------------- | --------- | ----------- |
+| Domain Types   | `internal/domain/githistory_types.go`     | 283       | ✅ Complete |
+| Scanner        | `internal/cleaner/githistory_scanner.go`  | 426       | ✅ Complete |
+| Safety Checker | `internal/cleaner/githistory_safety.go`   | 180       | ✅ Complete |
+| Executor       | `internal/cleaner/githistory_executor.go` | 343       | ✅ Complete |
+| Main Cleaner   | `internal/cleaner/githistory.go`          | 357       | ✅ Complete |
+| CLI Command    | `cmd/clean-wizard/commands/githistory.go` | 469       | ✅ Complete |
+| **Total**      |                                           | **2,058** |             |
 
 ### Test Suite (~936 lines)
 
-| Test File | Lines | Status |
-|-----------|-------|--------|
-| `githistory_scanner_test.go` | 293 | ✅ All pass |
-| `githistory_safety_test.go` | 131 | ✅ All pass |
-| `githistory_executor_test.go` | 237 | ✅ All pass |
-| `githistory_test.go` | 275 | ✅ All pass |
+| Test File                     | Lines | Status      |
+| ----------------------------- | ----- | ----------- |
+| `githistory_scanner_test.go`  | 293   | ✅ All pass |
+| `githistory_safety_test.go`   | 131   | ✅ All pass |
+| `githistory_executor_test.go` | 237   | ✅ All pass |
+| `githistory_test.go`          | 275   | ✅ All pass |
 
 ### Documentation Updates
 
@@ -50,21 +50,21 @@ Successfully implemented a comprehensive **Git History Cleaner** feature - an in
 
 ## B) ⚠️ PARTIALLY COMPLETE
 
-| Item | Status | Notes |
-|------|--------|-------|
+| Item               | Status  | Notes                                             |
+| ------------------ | ------- | ------------------------------------------------- |
 | Real-world testing | Partial | Dry-run tested, not tested on actual bloated repo |
-| Documentation | Partial | FEATURES.md updated, no dedicated guide yet |
+| Documentation      | Partial | FEATURES.md updated, no dedicated guide yet       |
 
 ---
 
 ## C) 📝 NOT STARTED
 
-| Item | Priority | Effort |
-|------|----------|--------|
-| Git History integration tests | Medium | 1-2 hrs |
-| Git History BDD tests | Low | 2-3 hrs |
-| Dedicated `docs/GIT_HISTORY.md` | Medium | 20 min |
-| `git-filter-repo` auto-install detection | Low | 1 hr |
+| Item                                     | Priority | Effort  |
+| ---------------------------------------- | -------- | ------- |
+| Git History integration tests            | Medium   | 1-2 hrs |
+| Git History BDD tests                    | Low      | 2-3 hrs |
+| Dedicated `docs/GIT_HISTORY.md`          | Medium   | 20 min  |
+| `git-filter-repo` auto-install detection | Low      | 1 hr    |
 
 ---
 
@@ -96,16 +96,19 @@ details := builder.Build()
 ## E) 🎯 IMPROVEMENT OPPORTUNITIES
 
 ### Code Quality
+
 1. **Interface extraction** - Scanner/Safety/Executor could be interfaces
 2. **Error wrapping** - Some errors need better context
 3. **Logging** - Add structured logging for debugging
 
 ### User Experience
+
 4. **Progress indication** - Large repo scans could show progress
 5. **Undo mechanism** - Better restore from backup flow
 6. **Pre-flight disk check** - Warn if low disk space for backup
 
 ### Testing
+
 7. **Integration tests** - Test with real git repos
 8. **Edge cases** - More error path coverage
 9. **BDD scenarios** - Feature-level tests
@@ -116,48 +119,48 @@ details := builder.Build()
 
 ### Immediate (Now)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 1 | Commit & push changes | HIGH | 2 min |
-| 2 | Test on real bloated repo | HIGH | 15 min |
-| 3 | Create `docs/GIT_HISTORY.md` | MEDIUM | 20 min |
+| #   | Task                         | Impact | Effort |
+| --- | ---------------------------- | ------ | ------ |
+| 1   | Commit & push changes        | HIGH   | 2 min  |
+| 2   | Test on real bloated repo    | HIGH   | 15 min |
+| 3   | Create `docs/GIT_HISTORY.md` | MEDIUM | 20 min |
 
 ### This Week
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 4 | Add Git History integration tests | MEDIUM | 1-2 hrs |
-| 5 | Implement Nix accurate size estimation | HIGH | 2-3 hrs |
-| 6 | Add Homebrew dry-run support | MEDIUM | 1-2 hrs |
-| 7 | Extract Scanner/Safety/Executor interfaces | MEDIUM | 2 hrs |
-| 8 | Add progress bar for large repo scans | LOW | 1-2 hrs |
+| #   | Task                                       | Impact | Effort  |
+| --- | ------------------------------------------ | ------ | ------- |
+| 4   | Add Git History integration tests          | MEDIUM | 1-2 hrs |
+| 5   | Implement Nix accurate size estimation     | HIGH   | 2-3 hrs |
+| 6   | Add Homebrew dry-run support               | MEDIUM | 1-2 hrs |
+| 7   | Extract Scanner/Safety/Executor interfaces | MEDIUM | 2 hrs   |
+| 8   | Add progress bar for large repo scans      | LOW    | 1-2 hrs |
 
 ### This Month
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 9 | Add BDD tests for Git History | LOW | 3 hrs |
-| 10 | Implement Language Version Manager cleaner | MEDIUM | 4-6 hrs |
-| 11 | Add auto-detect for `git-filter-repo` | LOW | 1 hr |
-| 12 | Create troubleshooting guide | MEDIUM | 2 hrs |
-| 13 | Add structured logging | MEDIUM | 3-4 hrs |
-| 14 | Improve error messages | MEDIUM | 2-3 hrs |
+| #   | Task                                       | Impact | Effort  |
+| --- | ------------------------------------------ | ------ | ------- |
+| 9   | Add BDD tests for Git History              | LOW    | 3 hrs   |
+| 10  | Implement Language Version Manager cleaner | MEDIUM | 4-6 hrs |
+| 11  | Add auto-detect for `git-filter-repo`      | LOW    | 1 hr    |
+| 12  | Create troubleshooting guide               | MEDIUM | 2 hrs   |
+| 13  | Add structured logging                     | MEDIUM | 3-4 hrs |
+| 14  | Improve error messages                     | MEDIUM | 2-3 hrs |
 
 ### Future
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 15 | Plugin architecture for cleaners | LOW | 1-2 days |
-| 16 | Web UI dashboard | LOW | 3-5 days |
-| 17 | Configuration hot-reload | LOW | 2-3 hrs |
-| 18 | Cleanup scheduling | MEDIUM | 4-6 hrs |
-| 19 | Cross-platform installer | MEDIUM | 1-2 days |
-| 20 | Performance benchmarks | LOW | 2-3 hrs |
-| 21 | Memory usage optimization | LOW | 2-3 hrs |
-| 22 | Add more build tools | MEDIUM | 3-4 hrs |
-| 23 | Projects Management alternatives | LOW | 2-3 hrs |
-| 24 | Improve test coverage to >80% | MEDIUM | 1-2 days |
-| 25 | Add release automation | LOW | 2-3 hrs |
+| #   | Task                             | Impact | Effort   |
+| --- | -------------------------------- | ------ | -------- |
+| 15  | Plugin architecture for cleaners | LOW    | 1-2 days |
+| 16  | Web UI dashboard                 | LOW    | 3-5 days |
+| 17  | Configuration hot-reload         | LOW    | 2-3 hrs  |
+| 18  | Cleanup scheduling               | MEDIUM | 4-6 hrs  |
+| 19  | Cross-platform installer         | MEDIUM | 1-2 days |
+| 20  | Performance benchmarks           | LOW    | 2-3 hrs  |
+| 21  | Memory usage optimization        | LOW    | 2-3 hrs  |
+| 22  | Add more build tools             | MEDIUM | 3-4 hrs  |
+| 23  | Projects Management alternatives | LOW    | 2-3 hrs  |
+| 24  | Improve test coverage to >80%    | MEDIUM | 1-2 days |
+| 25  | Add release automation           | LOW    | 2-3 hrs  |
 
 ---
 
@@ -166,6 +169,7 @@ details := builder.Build()
 **Should we fix the 635 golangci-lint issues now or defer?**
 
 The pre-commit hook found 635 linting issues, mostly style preferences:
+
 - 50 line length (lll)
 - 50 magic numbers (mnd)
 - 50 variable name length (varnamelen)
@@ -175,6 +179,7 @@ The pre-commit hook found 635 linting issues, mostly style preferences:
 - etc.
 
 These are **pre-existing issues** not introduced by this PR. Options:
+
 1. **Fix now** - Would take several hours, delays commit
 2. **Defer** - Commit now, create tech debt ticket
 
@@ -182,15 +187,15 @@ These are **pre-existing issues** not introduced by this PR. Options:
 
 ## Metrics Summary
 
-| Metric | Value |
-|--------|-------|
-| Total Go Code | 33,657 lines |
-| Git History Implementation | 2,994 lines |
-| Core Cleaners | 13 total |
-| Production Ready | 11/13 (85%) |
-| Test Status | ✅ ALL PASS |
-| Build Status | ✅ SUCCESS |
-| Lint Status | ⚠️ 635 issues (pre-existing) |
+| Metric                     | Value                        |
+| -------------------------- | ---------------------------- |
+| Total Go Code              | 33,657 lines                 |
+| Git History Implementation | 2,994 lines                  |
+| Core Cleaners              | 13 total                     |
+| Production Ready           | 11/13 (85%)                  |
+| Test Status                | ✅ ALL PASS                  |
+| Build Status               | ✅ SUCCESS                   |
+| Lint Status                | ⚠️ 635 issues (pre-existing) |
 
 ---
 
@@ -204,6 +209,7 @@ These are **pre-existing issues** not introduced by this PR. Options:
 ```
 
 ### New Files
+
 - `internal/domain/githistory_types.go`
 - `internal/cleaner/githistory.go`
 - `internal/cleaner/githistory_scanner.go`

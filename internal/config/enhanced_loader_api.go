@@ -111,7 +111,10 @@ func (ecl *EnhancedConfigLoader) validateAndSanitize(ctx context.Context, config
 }
 
 // handleValidationFailure returns error if validation failed and save is not forced.
-func (ecl *EnhancedConfigLoader) handleValidationFailure(validationResult *ValidationResult, options *ConfigSaveOptions) error {
+func (ecl *EnhancedConfigLoader) handleValidationFailure(
+	validationResult *ValidationResult,
+	options *ConfigSaveOptions,
+) error {
 	if validationResult.IsValid {
 		return nil
 	}

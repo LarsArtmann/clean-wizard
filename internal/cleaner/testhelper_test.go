@@ -9,8 +9,9 @@ import (
 	"github.com/onsi/gomega"
 )
 
-// assertValidationError is a helper for testing that ValidateSettings returns expected errors.
-// Consolidates duplicate validation test patterns across ginkgo test files.
+// assertValidationError is a helper for testing that ValidateSettings
+// returns expected errors. Consolidates duplicate validation test patterns
+// across ginkgo test files.
 func assertValidationError(cleaner CleanerWithSettings, settings *domain.OperationSettings, expectedErrSubstring string) {
 	err := cleaner.ValidateSettings(settings)
 	gomega.Expect(err).To(gomega.HaveOccurred())

@@ -63,7 +63,8 @@ func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 	}
 }
 
-// NewBooleanSettingsCleanerTestConfigFn creates a BooleanSettingsCleanerTestConfig from constructor and settings creation function.
+// NewBooleanSettingsCleanerTestConfigFn creates a BooleanSettingsCleanerTestConfig
+// from constructor and settings creation function.
 func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](
 	testName, toolName, settingsFieldName string,
 	expectedItems uint,

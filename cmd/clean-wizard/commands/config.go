@@ -53,7 +53,7 @@ func runConfigShowCommand(cmd *cobra.Command, args []string, jsonOutput bool) er
 		fmt.Println("💡 To create configuration, run:")
 		fmt.Println("   clean-wizard init           - Interactive setup")
 		fmt.Println("   clean-wizard init --minimal  - Minimal setup")
-		return nil
+		return nil //nolint:nilerr // intentional: missing config shows help, not error
 	}
 
 	if jsonOutput {
@@ -236,7 +236,7 @@ func runConfigResetCommand(cmd *cobra.Command, args []string, force bool) error 
 		_, err = fmt.Scanln(&confirm)
 		if err != nil || confirm != "yes" {
 			fmt.Println("   Reset cancelled.")
-			return nil
+			return nil //nolint:nilerr // intentional: user cancellation is not an error
 		}
 	}
 

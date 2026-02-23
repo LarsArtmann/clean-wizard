@@ -207,7 +207,11 @@ func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) doma
 	var riskLevelStr string
 	key := fmt.Sprintf("profiles.%s.operations.%d.risk_level", profileName, operationIndex)
 	if err := v.UnmarshalKey(key, &riskLevelStr); err != nil {
-		logrus.WithField("profile", profileName).WithField("operation", operationIndex).WithField("error", err).Warn("Failed to unmarshal risk level, defaulting to LOW")
+		logrus.WithFields(logrus.Fields{
+			"profile":   profileName,
+			"operation": operationIndex,
+			"error":     err,
+		}).Warn("Failed to unmarshal risk level, defaulting to LOW")
 		return domain.RiskLevelType(domain.RiskLevelLowType)
 	}
 
