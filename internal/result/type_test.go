@@ -142,6 +142,26 @@ func TestResult_UnwrapOr(t *testing.T) {
 	}
 }
 
+// assertResultEquals validates that two Result[T] values are equal.
+func assertResultEquals[T comparable](t *testing.T, opName string, got, want Result[T]) {
+	t.Helper()
+
+	if got.IsOk() != want.IsOk() {
+		t.Errorf("%s() IsOk() = %v, want %v", opName, got.IsOk(), want.IsOk())
+		return
+	}
+
+	if got.IsOk() {
+		if got.Value() != want.Value() {
+			t.Errorf("%s() Value() = %v, want %v", opName, got.Value(), want.Value())
+		}
+	} else {
+		if got.Error().Error() != want.Error().Error() {
+			t.Errorf("%s() Error() = %v, want %v", opName, got.Error().Error(), want.Error().Error())
+		}
+	}
+}
+
 func TestResult_Map(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -156,24 +176,7 @@ func TestResult_Map(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mapped := Map(tt.result, tt.fn)
-
-			// Check if both are Ok
-			if mapped.IsOk() != tt.expected.IsOk() {
-				t.Errorf("Map() IsOk() = %v, want %v", mapped.IsOk(), tt.expected.IsOk())
-				return
-			}
-
-			// If both are Ok, check values
-			if mapped.IsOk() {
-				if mapped.Value() != tt.expected.Value() {
-					t.Errorf("Map() Value() = %v, want %v", mapped.Value(), tt.expected.Value())
-				}
-			} else {
-				// If both are Err, check error messages
-				if mapped.Error().Error() != tt.expected.Error().Error() {
-					t.Errorf("Map() Error() = %v, want %v", mapped.Error().Error(), tt.expected.Error().Error())
-				}
-			}
+			assertResultEquals(t, "Map", mapped, tt.expected)
 		})
 	}
 }
@@ -193,21 +196,7 @@ func TestResult_AndThen(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := AndThen(tt.result, tt.fn)
-
-			if result.IsOk() != tt.expected.IsOk() {
-				t.Errorf("AndThen() IsOk() = %v, want %v", result.IsOk(), tt.expected.IsOk())
-				return
-			}
-
-			if result.IsOk() {
-				if result.Value() != tt.expected.Value() {
-					t.Errorf("AndThen() Value() = %v, want %v", result.Value(), tt.expected.Value())
-				}
-			} else {
-				if result.Error().Error() != tt.expected.Error().Error() {
-					t.Errorf("AndThen() Error() = %v, want %v", result.Error().Error(), tt.expected.Error().Error())
-				}
-			}
+			assertResultEquals(t, "AndThen", result, tt.expected)
 		})
 	}
 }
