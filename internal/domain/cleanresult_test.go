@@ -94,7 +94,7 @@ func TestCleanResultValidation(t *testing.T) {
 			},
 			shouldValid: false,
 			shouldError: true,
-			errorMsg:    "CleanedAt cannot be zero",
+			errorMsg:    "cleanedAt cannot be zero",
 		},
 		{
 			name: "Invalid CleanResult - invalid strategy",
@@ -108,7 +108,7 @@ func TestCleanResultValidation(t *testing.T) {
 			},
 			shouldValid: false,
 			shouldError: true,
-			errorMsg:    "Invalid strategy: unknown (must be 'aggressive', 'conservative', or 'dry-run')",
+			errorMsg:    "invalid strategy: unknown (must be 'aggressive', 'conservative', or 'dry-run')",
 		},
 	}
 

@@ -14,6 +14,41 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// yamlUnmarshaler is the interface for types that can unmarshal from YAML
+type yamlUnmarshaler interface {
+	UnmarshalYAML(value *yaml.Node) error
+}
+
+// assertEnumUnmarshalError tests that invalid enum values produce proper error messages.
+// It creates a YAML node from the value and calls UnmarshalYAML on the target enum.
+func assertEnumUnmarshalError(t *testing.T, value interface{}, target yamlUnmarshaler, enumName string) {
+	t.Helper()
+	node := createYAMLNode(value)
+	err := target.UnmarshalYAML(node)
+	assert.Error(t, err, "Should error on invalid %s", enumName)
+	assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
+}
+
+// requireEnumUnmarshal unmarshals an enum value and requires it succeeds.
+// It returns the target for chaining assertions.
+func requireEnumUnmarshal(t *testing.T, value interface{}, target yamlUnmarshaler, enumName string) {
+	t.Helper()
+	node := createYAMLNode(value)
+	err := target.UnmarshalYAML(node)
+	require.NoError(t, err, "Failed to unmarshal %s", enumName)
+}
+
+// createYAMLNode creates a YAML scalar node from a string or int value.
+func createYAMLNode(value interface{}) *yaml.Node {
+	node := &yaml.Node{Kind: yaml.ScalarNode}
+	if str, ok := value.(string); ok {
+		node.Value = str
+	} else if num, ok := value.(int); ok {
+		node.Value = string(rune(num + '0'))
+	}
+	return node
+}
+
 // TestEnumWorkflow_Integration tests full workflow from YAML config with enums to execution.
 func TestEnumWorkflow_Integration(t *testing.T) {
 	if testing.Short() {
@@ -122,14 +157,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 			if op.Docker != nil {
 				// Unmarshal docker prune mode enum
 				var pruneMode domain.DockerPruneMode
-				node := &yaml.Node{Kind: yaml.ScalarNode}
-				if str, ok := op.Docker.PruneMode.(string); ok {
-					node.Value = str
-				} else if num, ok := op.Docker.PruneMode.(int); ok {
-					node.Value = string(rune(num + '0'))
-				}
-				err := pruneMode.UnmarshalYAML(node)
-				require.NoError(t, err, "Failed to unmarshal DockerPruneMode")
+				requireEnumUnmarshal(t, op.Docker.PruneMode, &pruneMode, "DockerPruneMode")
 
 				// Verify enum value
 				assert.Equal(t, expectedDockerMode, pruneMode, "DockerPruneMode should match expected value")
@@ -162,15 +190,9 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 
 				for val := range modes {
 					var mode domain.CacheCleanupMode
-					node := &yaml.Node{Kind: yaml.ScalarNode}
-					if str, ok := val.(string); ok {
-						node.Value = str
-					} else if num, ok := val.(int); ok {
-						node.Value = string(rune(num + '0'))
-					}
+					requireEnumUnmarshal(t, val, &mode, "CacheCleanupMode")
 
-					err := mode.UnmarshalYAML(node)
-					if err == nil {
+					if mode.IsValid() {
 						assert.True(t, mode.IsValid(), "CacheCleanupMode should be valid")
 					}
 				}
@@ -204,15 +226,9 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				var cacheTypes []domain.CacheType
 				for _, ct := range op.SystemCache.CacheTypes {
 					var cacheType domain.CacheType
-					node := &yaml.Node{Kind: yaml.ScalarNode}
-					if str, ok := ct.(string); ok {
-						node.Value = str
-					} else if num, ok := ct.(int); ok {
-						node.Value = string(rune(num + '0'))
-					}
+					requireEnumUnmarshal(t, ct, &cacheType, "CacheType")
 
-					err := cacheType.UnmarshalYAML(node)
-					if err == nil {
+					if cacheType.IsValid() {
 						assert.True(t, cacheType.IsValid(), "CacheType should be valid")
 						cacheTypes = append(cacheTypes, cacheType)
 					}
@@ -283,29 +299,13 @@ operations:
 		case "docker":
 			if op.Docker != nil {
 				var pruneMode domain.DockerPruneMode
-				node := &yaml.Node{Kind: yaml.ScalarNode}
-				if str, ok := op.Docker.PruneMode.(string); ok {
-					node.Value = str
-				} else if num, ok := op.Docker.PruneMode.(int); ok {
-					node.Value = string(rune(num + '0'))
-				}
-				err := pruneMode.UnmarshalYAML(node)
-				assert.Error(t, err, "Should error on invalid DockerPruneMode")
-				assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
+				assertEnumUnmarshalError(t, op.Docker.PruneMode, &pruneMode, "DockerPruneMode")
 			}
 
 		case "go-packages":
 			if op.GoPackages != nil {
 				var mode domain.CacheCleanupMode
-				node := &yaml.Node{Kind: yaml.ScalarNode}
-				if str, ok := op.GoPackages.CleanCache.(string); ok {
-					node.Value = str
-				} else if num, ok := op.GoPackages.CleanCache.(int); ok {
-					node.Value = string(rune(num + '0'))
-				}
-				err := mode.UnmarshalYAML(node)
-				assert.Error(t, err, "Should error on invalid CacheCleanupMode")
-				assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
+				assertEnumUnmarshalError(t, op.GoPackages.CleanCache, &mode, "CacheCleanupMode")
 			}
 
 		case "system-cache":

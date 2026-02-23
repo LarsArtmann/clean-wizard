@@ -34,7 +34,7 @@ func TestValidationMiddleware(t *testing.T) {
 
 		result := validator.ValidateScanRequest(ctx, req)
 		assert.True(t, result.IsErr())
-		assert.Contains(t, result.Error().Error(), "Invalid scan type")
+		assert.Contains(t, result.Error().Error(), "invalid scan type")
 	})
 
 	t.Run("ValidCleanRequest", func(t *testing.T) {
@@ -55,7 +55,7 @@ func TestValidationMiddleware(t *testing.T) {
 
 		result := validator.ValidateCleanRequest(ctx, req)
 		assert.True(t, result.IsErr())
-		assert.Contains(t, result.Error().Error(), "Invalid strategy")
+		assert.Contains(t, result.Error().Error(), "invalid strategy")
 	})
 
 	t.Run("ValidCleanerSettings", func(t *testing.T) {
