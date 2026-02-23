@@ -117,7 +117,9 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 
 		// Helper function to test filtering scenarios
 		assertFilteredResult := func(option GitHistoryScannerOption, files []domain.GitHistoryFile, expectedCount int, expectedPath string) {
-			scanner = NewGitHistoryScanner(tempDir, option)
+			if option != nil {
+				scanner = NewGitHistoryScanner(tempDir, option)
+			}
 			filtered := scanner.filterFiles(files)
 			gomega.Expect(filtered).To(gomega.HaveLen(expectedCount))
 			if expectedCount > 0 {
@@ -132,9 +134,7 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 					{Path: "image.png", Extension: ".png", SizeBytes: 5 * 1024 * 1024},
 					{Path: "binary.exe", Extension: ".exe", SizeBytes: 5 * 1024 * 1024},
 				}
-				filtered := scanner.filterFiles(files)
-				gomega.Expect(filtered).To(gomega.HaveLen(1))
-				gomega.Expect(filtered[0].Path).To(gomega.Equal("binary.exe"))
+				assertFilteredResult(nil, files, 1, "binary.exe")
 			})
 
 			ginkgo.It("should only include files with extensions in includeExts when set", func() {
