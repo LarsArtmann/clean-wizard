@@ -167,6 +167,52 @@ func runEnumMethodTests[T comparable](t *testing.T, tests []enumValueTestCase[T]
 	}
 }
 
+// enumStringer is an interface for enum types that can return their string representation.
+type enumStringer interface {
+	String() string
+}
+
+// enumValidator is an interface for enum types that can validate themselves.
+type enumValidator interface {
+	IsValid() bool
+}
+
+// extractEnumString extracts the string representation from any enum value.
+// Returns empty string if the type is not supported.
+func extractEnumString(v any) string {
+	switch val := v.(type) {
+	case CacheCleanupMode:
+		return val.String()
+	case DockerPruneMode:
+		return val.String()
+	case BuildToolType:
+		return val.String()
+	case CacheType:
+		return val.String()
+	case PackageManagerType:
+		return val.String()
+	}
+	return ""
+}
+
+// extractEnumValidity extracts the validity status from any enum value.
+// Returns false if the type is not supported.
+func extractEnumValidity(v any) bool {
+	switch val := v.(type) {
+	case CacheCleanupMode:
+		return val.IsValid()
+	case DockerPruneMode:
+		return val.IsValid()
+	case BuildToolType:
+		return val.IsValid()
+	case CacheType:
+		return val.IsValid()
+	case PackageManagerType:
+		return val.IsValid()
+	}
+	return false
+}
+
 // runEnumYAMLUnmarshalingTests executes the common test logic for enum unmarshaling.
 func runEnumYAMLUnmarshalingTests(t *testing.T, tests []enumUnmarshalTestCase) {
 	t.Helper()
@@ -252,21 +298,7 @@ func TestEnumStringMethod(t *testing.T) {
 		{"PackageManagerType Invalid", PackageManagerType(99), "UNKNOWN"},
 	}
 
-	runEnumMethodTests(t, tests, func(v any) string {
-		switch val := v.(type) {
-		case CacheCleanupMode:
-			return val.String()
-		case DockerPruneMode:
-			return val.String()
-		case BuildToolType:
-			return val.String()
-		case CacheType:
-			return val.String()
-		case PackageManagerType:
-			return val.String()
-		}
-		return ""
-	}, "String()")
+	runEnumMethodTests(t, tests, extractEnumString, "String()")
 }
 
 // TestEnumIsValidMethod tests that all enum types implement IsValid() correctly.
@@ -313,21 +345,7 @@ func TestEnumIsValidMethod(t *testing.T) {
 		{"PackageManagerType Invalid", PackageManagerType(99), false},
 	}
 
-	runEnumMethodTests(t, tests, func(v any) bool {
-		switch val := v.(type) {
-		case CacheCleanupMode:
-			return val.IsValid()
-		case DockerPruneMode:
-			return val.IsValid()
-		case BuildToolType:
-			return val.IsValid()
-		case CacheType:
-			return val.IsValid()
-		case PackageManagerType:
-			return val.IsValid()
-		}
-		return false
-	}, "IsValid()")
+	runEnumMethodTests(t, tests, extractEnumValidity, "IsValid()")
 }
 
 // TestOperationSettingsWithEnums tests that OperationSettings can be marshaled/unmarshaled with enums.
