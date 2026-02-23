@@ -71,6 +71,13 @@ type enumUnmarshalTestCase struct {
 	expected any
 }
 
+// enumValueTestCase represents a single test case for enum method testing.
+type enumValueTestCase[T comparable] struct {
+	name     string
+	value    any
+	expected T
+}
+
 // enumStringTestCases contains test cases for string-based YAML unmarshaling.
 var enumStringTestCases = []enumUnmarshalTestCase{
 	// CacheCleanupMode
@@ -147,6 +154,19 @@ var enumIntTestCases = []enumUnmarshalTestCase{
 	{"PackageManagerType Bun int", "3", new(PackageManagerType), PackageManagerBun},
 }
 
+// runEnumMethodTests executes common test logic for enum method testing.
+func runEnumMethodTests[T comparable](t *testing.T, tests []enumValueTestCase[T], extract func(any) T, methodName string) {
+	t.Helper()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := extract(tt.value)
+			if actual != tt.expected {
+				t.Errorf("%s = %v, want %v", methodName, actual, tt.expected)
+			}
+		})
+	}
+}
+
 // runEnumYAMLUnmarshalingTests executes the common test logic for enum unmarshaling.
 func runEnumYAMLUnmarshalingTests(t *testing.T, tests []enumUnmarshalTestCase) {
 	t.Helper()
@@ -190,11 +210,7 @@ func TestEnumYAMLUnmarshalingFromInt(t *testing.T) {
 
 // TestEnumStringMethod tests that all enum types implement String() correctly.
 func TestEnumStringMethod(t *testing.T) {
-	tests := []struct {
-		name     string
-		value    any
-		expected string
-	}{
+	tests := []enumValueTestCase[string]{
 		// CacheCleanupMode
 		{"CacheCleanupMode Disabled", CacheCleanupDisabled, "DISABLED"},
 		{"CacheCleanupMode Enabled", CacheCleanupEnabled, "ENABLED"},
@@ -236,36 +252,26 @@ func TestEnumStringMethod(t *testing.T) {
 		{"PackageManagerType Invalid", PackageManagerType(99), "UNKNOWN"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var actual string
-			switch v := tt.value.(type) {
-			case CacheCleanupMode:
-				actual = v.String()
-			case DockerPruneMode:
-				actual = v.String()
-			case BuildToolType:
-				actual = v.String()
-			case CacheType:
-				actual = v.String()
-			case PackageManagerType:
-				actual = v.String()
-			}
-
-			if actual != tt.expected {
-				t.Errorf("String() = %q, want %q", actual, tt.expected)
-			}
-		})
-	}
+	runEnumMethodTests(t, tests, func(v any) string {
+		switch val := v.(type) {
+		case CacheCleanupMode:
+			return val.String()
+		case DockerPruneMode:
+			return val.String()
+		case BuildToolType:
+			return val.String()
+		case CacheType:
+			return val.String()
+		case PackageManagerType:
+			return val.String()
+		}
+		return ""
+	}, "String()")
 }
 
 // TestEnumIsValidMethod tests that all enum types implement IsValid() correctly.
 func TestEnumIsValidMethod(t *testing.T) {
-	tests := []struct {
-		name     string
-		value    any
-		expected bool
-	}{
+	tests := []enumValueTestCase[bool]{
 		// CacheCleanupMode
 		{"CacheCleanupMode Disabled", CacheCleanupDisabled, true},
 		{"CacheCleanupMode Enabled", CacheCleanupEnabled, true},
@@ -307,27 +313,21 @@ func TestEnumIsValidMethod(t *testing.T) {
 		{"PackageManagerType Invalid", PackageManagerType(99), false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var actual bool
-			switch v := tt.value.(type) {
-			case CacheCleanupMode:
-				actual = v.IsValid()
-			case DockerPruneMode:
-				actual = v.IsValid()
-			case BuildToolType:
-				actual = v.IsValid()
-			case CacheType:
-				actual = v.IsValid()
-			case PackageManagerType:
-				actual = v.IsValid()
-			}
-
-			if actual != tt.expected {
-				t.Errorf("IsValid() = %v, want %v", actual, tt.expected)
-			}
-		})
-	}
+	runEnumMethodTests(t, tests, func(v any) bool {
+		switch val := v.(type) {
+		case CacheCleanupMode:
+			return val.IsValid()
+		case DockerPruneMode:
+			return val.IsValid()
+		case BuildToolType:
+			return val.IsValid()
+		case CacheType:
+			return val.IsValid()
+		case PackageManagerType:
+			return val.IsValid()
+		}
+		return false
+	}, "IsValid()")
 }
 
 // TestOperationSettingsWithEnums tests that OperationSettings can be marshaled/unmarshaled with enums.
