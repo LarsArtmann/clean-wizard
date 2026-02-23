@@ -360,6 +360,21 @@ func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanRe
 	)
 }
 
+// execPackageManagerCommand executes a package manager command with the given arguments
+// and returns an error if the command fails.
+func (npmc *NodePackageManagerCleaner) execPackageManagerCommand(
+	ctx context.Context,
+	commandArgs []string,
+	commandName string,
+) error {
+	cmd := adapters.ExecWithTimeout(ctx, DefaultNodePackageManagerTimeout, commandArgs[0], commandArgs[1:]...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("%s failed: %w (output: %s)", commandName, err, string(output))
+	}
+	return nil
+}
+
 // cleanCacheWithFallback handles cache cleaning with directory-based bytes calculation
 // and fallback to direct command execution when directory is not found.
 func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
@@ -372,10 +387,8 @@ func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
 ) result.Result[domain.CleanResult] {
 	if cacheDirErr != nil {
 		// Cache directory not found, execute command anyway
-		cmd := adapters.ExecWithTimeout(ctx, DefaultNodePackageManagerTimeout, commandArgs[0], commandArgs[1:]...)
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("%s failed: %w (output: %s)", commandName, err, string(output)))
+		if err := npmc.execPackageManagerCommand(ctx, commandArgs, commandName); err != nil {
+			return result.Err[domain.CleanResult](err)
 		}
 
 		if npmc.verbose {
@@ -386,12 +399,7 @@ func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
 	}
 
 	bytesFreed, _, _ := CalculateBytesFreed(cacheDir, func() error {
-		cmd := adapters.ExecWithTimeout(ctx, DefaultNodePackageManagerTimeout, commandArgs[0], commandArgs[1:]...)
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return fmt.Errorf("%s failed: %w (output: %s)", commandName, err, string(output))
-		}
-		return nil
+		return npmc.execPackageManagerCommand(ctx, commandArgs, commandName)
 	}, npmc.verbose, cacheLabel)
 
 	if npmc.verbose {
