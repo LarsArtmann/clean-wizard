@@ -173,20 +173,7 @@ func (e *GitHistoryExecutor) runGC(ctx context.Context) error {
 
 // getRepoSize returns the size of the .git directory.
 func (e *GitHistoryExecutor) getRepoSize() (int64, error) {
-	gitDir := filepath.Join(e.repoPath, ".git")
-	var size int64
-
-	err := filepath.Walk(gitDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil //nolint:nilerr // Skip files we can't access
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-
-	return size, err
+	return getGitDirSize(e.repoPath)
 }
 
 // createBackup creates a mirror backup of the repository.
@@ -207,6 +194,24 @@ func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) err
 	}
 
 	return nil
+}
+
+// getGitDirSize returns the size of the .git directory for the given repo path.
+func getGitDirSize(repoPath string) (int64, error) {
+	gitDir := filepath.Join(repoPath, ".git")
+	var size int64
+
+	err := filepath.Walk(gitDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil //nolint:nilerr // Skip files we can't access
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return nil
+	})
+
+	return size, err
 }
 
 // getDefaultBackupPath returns the default backup path.
