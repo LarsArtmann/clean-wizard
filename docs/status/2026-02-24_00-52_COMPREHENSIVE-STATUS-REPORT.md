@@ -10,34 +10,34 @@
 
 ### Linter Fixes (This Session)
 
-| Issue | Files Fixed | Details |
-|-------|-------------|---------|
-| Line length issues | 8+ files | Broke long lines in error messages, function signatures |
-| Contained context | 2 files | Added `nolint:containedctx` directives |
-| Context check | 1 file | Passed context through call chain |
-| Capitalized errors | 3 files | Fixed all error strings to start lowercase |
-| Exported comment format | 2 files | Fixed ST1021/ST1022 violations |
-| golangci.yml v2 syntax | 1 file | Updated to proper v2 config with exclusions |
+| Issue                   | Files Fixed | Details                                                 |
+| ----------------------- | ----------- | ------------------------------------------------------- |
+| Line length issues      | 8+ files    | Broke long lines in error messages, function signatures |
+| Contained context       | 2 files     | Added `nolint:containedctx` directives                  |
+| Context check           | 1 file      | Passed context through call chain                       |
+| Capitalized errors      | 3 files     | Fixed all error strings to start lowercase              |
+| Exported comment format | 2 files     | Fixed ST1021/ST1022 violations                          |
+| golangci.yml v2 syntax  | 1 file      | Updated to proper v2 config with exclusions             |
 
 ### Build & Linter Status
 
-| Check | Status | Result |
-|-------|--------|--------|
-| `go build ./...` | ✅ PASS | Compiles cleanly |
-| `golangci-lint run` | ✅ PASS | 0 issues |
+| Check               | Status  | Result           |
+| ------------------- | ------- | ---------------- |
+| `go build ./...`    | ✅ PASS | Compiles cleanly |
+| `golangci-lint run` | ✅ PASS | 0 issues         |
 
 ### Core Project Items (From TODO_LIST.md)
 
-| Item | Status |
-|------|--------|
-| Generic Context System | ✅ DONE |
+| Item                     | Status  |
+| ------------------------ | ------- |
+| Generic Context System   | ✅ DONE |
 | Domain Model Enhancement | ✅ DONE |
-| Enum Refactoring | ✅ DONE |
-| Complexity Reduction | ✅ DONE |
-| BDD Test Helpers | ✅ DONE |
-| Type Model Improvements | ✅ DONE |
-| Cleaner Improvements | ✅ DONE |
-| Documentation | ✅ DONE |
+| Enum Refactoring         | ✅ DONE |
+| Complexity Reduction     | ✅ DONE |
+| BDD Test Helpers         | ✅ DONE |
+| Type Model Improvements  | ✅ DONE |
+| Cleaner Improvements     | ✅ DONE |
+| Documentation            | ✅ DONE |
 
 ---
 
@@ -45,12 +45,12 @@
 
 ### Test Suite Status
 
-| Package | Status | Notes |
-|---------|--------|-------|
-| internal/cleaner | ⚠️ 1 FAIL | `TestSystemCacheCleaner_Clean_DryRun` fails |
-| internal/domain | ✅ PASS | All tests pass |
-| internal/middleware | ✅ PASS | All tests pass |
-| All other packages | ✅ PASS | 232 Ginkgo specs pass |
+| Package             | Status    | Notes                                       |
+| ------------------- | --------- | ------------------------------------------- |
+| internal/cleaner    | ⚠️ 1 FAIL | `TestSystemCacheCleaner_Clean_DryRun` fails |
+| internal/domain     | ✅ PASS   | All tests pass                              |
+| internal/middleware | ✅ PASS   | All tests pass                              |
+| All other packages  | ✅ PASS   | 232 Ginkgo specs pass                       |
 
 ### Failing Test Details
 
@@ -111,54 +111,55 @@ Minor issue: Initial golangci.yml v2 config syntax was wrong, but fixed.
 
 ### Priority 1 - Critical (Fix Now)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 1 | Fix `TestSystemCacheCleaner_Clean_DryRun` failing test | HIGH | LOW |
-| 2 | Commit linter fixes with detailed message | HIGH | LOW |
-| 3 | Push changes to remote | HIGH | LOW |
+| #   | Task                                                   | Impact | Effort |
+| --- | ------------------------------------------------------ | ------ | ------ |
+| 1   | Fix `TestSystemCacheCleaner_Clean_DryRun` failing test | HIGH   | LOW    |
+| 2   | Commit linter fixes with detailed message              | HIGH   | LOW    |
+| 3   | Push changes to remote                                 | HIGH   | LOW    |
 
 ### Priority 2 - Important (Do Soon)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 4 | Update TODO_LIST.md with current session work | MEDIUM | LOW |
-| 5 | Update FEATURES.md to reflect actual status | MEDIUM | LOW |
-| 6 | Add integration test for SystemCacheCleaner | MEDIUM | MEDIUM |
-| 7 | Consider removing unused helper functions | MEDIUM | LOW |
+| #   | Task                                          | Impact | Effort |
+| --- | --------------------------------------------- | ------ | ------ |
+| 4   | Update TODO_LIST.md with current session work | MEDIUM | LOW    |
+| 5   | Update FEATURES.md to reflect actual status   | MEDIUM | LOW    |
+| 6   | Add integration test for SystemCacheCleaner   | MEDIUM | MEDIUM |
+| 7   | Consider removing unused helper functions     | MEDIUM | LOW    |
 
 ### Priority 3 - Nice to Have (Future)
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 8 | Implement Language Version Manager cleaner | MEDIUM | HIGH |
-| 9 | Add Nix size estimation (currently hardcoded 50MB) | MEDIUM | MEDIUM |
-| 10 | Homebrew dry-run support | LOW | MEDIUM |
-| 11 | Add remaining BuildToolType implementations | LOW | MEDIUM |
-| 12 | Clean up old status reports (50+ files) | LOW | LOW |
+| #   | Task                                               | Impact | Effort |
+| --- | -------------------------------------------------- | ------ | ------ |
+| 8   | Implement Language Version Manager cleaner         | MEDIUM | HIGH   |
+| 9   | Add Nix size estimation (currently hardcoded 50MB) | MEDIUM | MEDIUM |
+| 10  | Homebrew dry-run support                           | LOW    | MEDIUM |
+| 11  | Add remaining BuildToolType implementations        | LOW    | MEDIUM |
+| 12  | Clean up old status reports (50+ files)            | LOW    | LOW    |
 
 ### Priority 4 - Long Term
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 13 | Plugin architecture for cleaners | LOW | HIGH |
-| 14 | Hot reload configuration | LOW | MEDIUM |
-| 15 | Add more cache types to SystemCacheCleaner | LOW | MEDIUM |
-| 16 | Improve test coverage metrics | MEDIUM | MEDIUM |
-| 17 | Add benchmark tests for all cleaners | LOW | MEDIUM |
-| 18 | Document API with examples | MEDIUM | MEDIUM |
-| 19 | Consider dependency injection with samber/do | LOW | HIGH |
-| 20 | Add Windows support | LOW | HIGH |
-| 21 | Internationalization (i18n) | LOW | HIGH |
-| 22 | Add shell completion scripts | LOW | LOW |
-| 23 | Create homebrew formula | LOW | LOW |
-| 24 | Set up CI/CD pipeline | MEDIUM | MEDIUM |
-| 25 | Create release automation | LOW | MEDIUM |
+| #   | Task                                         | Impact | Effort |
+| --- | -------------------------------------------- | ------ | ------ |
+| 13  | Plugin architecture for cleaners             | LOW    | HIGH   |
+| 14  | Hot reload configuration                     | LOW    | MEDIUM |
+| 15  | Add more cache types to SystemCacheCleaner   | LOW    | MEDIUM |
+| 16  | Improve test coverage metrics                | MEDIUM | MEDIUM |
+| 17  | Add benchmark tests for all cleaners         | LOW    | MEDIUM |
+| 18  | Document API with examples                   | MEDIUM | MEDIUM |
+| 19  | Consider dependency injection with samber/do | LOW    | HIGH   |
+| 20  | Add Windows support                          | LOW    | HIGH   |
+| 21  | Internationalization (i18n)                  | LOW    | HIGH   |
+| 22  | Add shell completion scripts                 | LOW    | LOW    |
+| 23  | Create homebrew formula                      | LOW    | LOW    |
+| 24  | Set up CI/CD pipeline                        | MEDIUM | MEDIUM |
+| 25  | Create release automation                    | LOW    | MEDIUM |
 
 ---
 
 ## G) My Top #1 Question I Cannot Figure Out Myself
 
 **Question:** Should the `TestSystemCacheCleaner_Clean_DryRun` test be:
+
 - A) Fixed to work without actual cache files (mock the filesystem)?
 - B) Skipped in CI environments where cache paths don't exist?
 - C) Changed to only verify behavior, not actual bytes freed?
@@ -169,13 +170,13 @@ The test currently expects bytes to be freed, but in a clean test environment, t
 
 ## Session Summary
 
-| Metric | Value |
-|--------|-------|
-| Files Modified | 10+ |
-| Linter Issues Fixed | 38 → 0 |
-| Test Status | 231/232 pass (1 env-dependent) |
-| Build Status | ✅ Clean |
-| Git Status | Clean (ready for commit) |
+| Metric              | Value                          |
+| ------------------- | ------------------------------ |
+| Files Modified      | 10+                            |
+| Linter Issues Fixed | 38 → 0                         |
+| Test Status         | 231/232 pass (1 env-dependent) |
+| Build Status        | ✅ Clean                       |
+| Git Status          | Clean (ready for commit)       |
 
 ---
 
