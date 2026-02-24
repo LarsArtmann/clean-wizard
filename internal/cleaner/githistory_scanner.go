@@ -152,14 +152,13 @@ func (s *GitHistoryScanner) isGitRepo(ctx context.Context) bool {
 
 // findLargeBlobs finds all large blobs in git history.
 func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHistoryFile, error) {
-	// Use git cat-file --batch-check to get all objects with type and size
-	// This is more efficient than individual cat-file calls
+	// Use git rev-list --objects to get all objects with paths
+	// Then use git cat-file --batch-all-objects to get types and sizes
 
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
-	// Get all objects with their types and sizes in one command
-	// git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)'
+	// Get all objects with their paths from rev-list
 	cmd := exec.CommandContext(ctx, "git", "-C", s.repoPath,
 		"rev-list", "--objects", "--all")
 	output, err := cmd.Output()
@@ -167,11 +166,8 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 		return nil, fmt.Errorf("git rev-list failed: %w", err)
 	}
 
-	// Parse object list
+	// Parse object list to build a map of objectHash -> path
 	lines := strings.Split(string(output), "\n")
-	seenPaths := make(map[string]bool) // Avoid duplicates
-
-	// Build a map of blobHash -> path from the output
 	objectPaths := make(map[string]string)
 	for _, line := range lines {
 		if line == "" {
@@ -187,21 +183,17 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 		}
 	}
 
-	// Now get object types and sizes using batch-check
+	// Get all objects with their types and sizes using --batch-all-objects
 	cmd = exec.CommandContext(ctx, "git", "-C", s.repoPath,
-		"cat-file", "--batch-check")
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create stdin pipe: %w", err)
-	}
-
+		"cat-file", "--batch-check", "--batch-all-objects")
 	output, err = cmd.Output()
-	_ = stdin.Close()
 	if err != nil {
 		return nil, fmt.Errorf("git cat-file --batch-check failed: %w", err)
 	}
 
 	var files []domain.GitHistoryFile
+	seenPaths := make(map[string]bool) // Avoid duplicates
+
 	checkLines := strings.Split(string(output), "\n")
 	for _, line := range checkLines {
 		if line == "" {
@@ -217,7 +209,7 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 		objHash := parts[0]
 		objType := parts[1]
 
-		// Skip non-blob objects (trees, commits, tags)
+		// Skip non-blob objects (trees, commits, tags) - this is the key fix!
 		if objType != "blob" {
 			continue
 		}
@@ -265,49 +257,6 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 	s.markDeletedFiles(ctx, files)
 
 	return files, nil
-}
-
-// getBlobInfo gets information about a blob.
-func (s *GitHistoryScanner) getBlobInfo(ctx context.Context, blobHash, path string) (domain.GitHistoryFile, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	// Use cat-file to get type and size
-	cmd := exec.CommandContext(ctx, "git", "-C", s.repoPath,
-		"cat-file", "-s", blobHash)
-	output, err := cmd.Output()
-	if err != nil {
-		return domain.GitHistoryFile{}, fmt.Errorf("git cat-file failed: %w", err)
-	}
-
-	sizeStr := strings.TrimSpace(string(output))
-	size, err := strconv.ParseInt(sizeStr, 10, 64)
-	if err != nil {
-		return domain.GitHistoryFile{}, fmt.Errorf("invalid size: %s", sizeStr)
-	}
-
-	// Check if it's actually a blob (binary-like)
-	cmd = exec.CommandContext(ctx, "git", "-C", s.repoPath,
-		"cat-file", "-t", blobHash)
-	typeOutput, err := cmd.Output()
-	if err != nil {
-		return domain.GitHistoryFile{}, fmt.Errorf("git cat-file -t failed: %w", err)
-	}
-
-	objType := strings.TrimSpace(string(typeOutput))
-	if objType != "blob" {
-		return domain.GitHistoryFile{}, fmt.Errorf("not a blob: %s", objType)
-	}
-
-	// Get extension
-	ext := strings.ToLower(filepath.Ext(path))
-
-	return domain.GitHistoryFile{
-		Path:      path,
-		SizeBytes: size,
-		BlobHash:  blobHash,
-		Extension: ext,
-	}, nil
 }
 
 // enrichWithCommitInfo adds commit hash, date, and author information.
