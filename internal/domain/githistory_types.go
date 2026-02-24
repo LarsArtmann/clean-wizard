@@ -125,6 +125,8 @@ type GitHistorySafetyReport struct {
 	DefaultBackupPath string `json:"default_backup_path,omitempty"`
 	// FilterRepoAvailable indicates if git-filter-repo is installed
 	FilterRepoAvailable bool `json:"filter_repo_available"`
+	// FilterRepoProvider indicates how git-filter-repo is available ("system", "nix", or "")
+	FilterRepoProvider string `json:"filter_repo_provider,omitempty"`
 	// Warnings are non-blocking issues
 	Warnings []string `json:"warnings,omitempty"`
 	// Blockers are issues that must be resolved before proceeding

@@ -62,11 +62,12 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 		}
 	}
 
-	// Check if git-filter-repo is available
+	// Check if git-filter-repo is available (system or via nix)
 	report.FilterRepoAvailable = c.isFilterRepoAvailable(ctx)
+	report.FilterRepoProvider = DetectFilterRepoProvider().String()
 	if !report.FilterRepoAvailable {
 		report.Blockers = append(report.Blockers,
-			"git-filter-repo is not installed. Install it with: pip install git-filter-repo or brew install git-filter-repo")
+			"git-filter-repo is not installed. Install with: brew install git-filter-repo, or ensure nix is available to use it automatically")
 	}
 
 	// Check backup capability
@@ -147,10 +148,10 @@ func (c *GitHistorySafetyChecker) hasUnpushedCommits(ctx context.Context) bool {
 	return len(strings.TrimSpace(string(output))) > 0
 }
 
-// isFilterRepoAvailable checks if git-filter-repo is installed.
+// isFilterRepoAvailable checks if git-filter-repo is installed (system or via nix).
 func (c *GitHistorySafetyChecker) isFilterRepoAvailable(ctx context.Context) bool {
-	cmd := exec.CommandContext(ctx, "git", "filter-repo", "--version")
-	return cmd.Run() == nil
+	provider := DetectFilterRepoProvider()
+	return provider != FilterRepoNone
 }
 
 // getDefaultBackupPath returns the default backup path.

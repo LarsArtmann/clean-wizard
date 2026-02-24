@@ -242,7 +242,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 - Rewrites git history - requires force-push after use
 - Default dry-run mode prevents accidental history changes
-- Requires `git-filter-repo` tool (`pip install git-filter-repo` or `brew install git-filter-repo`)
+- Requires `git-filter-repo` tool: system install (`brew install git-filter-repo`) or via Nix (auto-detected)
 - Automatically excludes images, PDFs, and other common non-binary files
 - Creates mirror backup before any destructive operation
 - Best for cleaning accidentally committed build artifacts, large binaries

@@ -189,17 +189,6 @@ func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult
 	})
 }
 
-// runSimpleCleaner executes a cleaner using a simple factory function.
-// The factory returns a concrete type that implements cleaner.Cleaner.
-func runSimpleCleaner[C cleaner.Cleaner](
-	ctx context.Context, verbose, dryRun bool,
-	factory func(bool, bool) C,
-) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return factory(v, d)
-	})
-}
-
 // runCargoCleaner executes the Cargo cleaner.
 func runCargoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {

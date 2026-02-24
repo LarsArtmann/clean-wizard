@@ -115,7 +115,6 @@ func (e *GitHistoryExecutor) runFilterRepo(ctx context.Context, files []domain.G
 
 	// Build arguments for git-filter-repo
 	args := []string{
-		"filter-repo",
 		"--force", // Required for non-fresh clones
 	}
 
@@ -131,10 +130,15 @@ func (e *GitHistoryExecutor) runFilterRepo(ctx context.Context, files []domain.G
 	args = append(args, "--protect-blobs-from", "HEAD")
 
 	if e.verbose {
-		fmt.Printf("Running: git %s\n", strings.Join(args, " "))
+		provider := DetectFilterRepoProvider()
+		if provider == FilterRepoNix {
+			fmt.Printf("Running: nix run nixpkgs#git-filter-repo -- %s\n", strings.Join(args, " "))
+		} else {
+			fmt.Printf("Running: git filter-repo %s\n", strings.Join(args, " "))
+		}
 	}
 
-	cmd := exec.CommandContext(ctx, "git", args...)
+	cmd := BuildFilterRepoCommand(ctx, args)
 	cmd.Dir = e.repoPath
 
 	output, err := cmd.CombinedOutput()
@@ -301,16 +305,20 @@ func (e *GitHistoryExecutor) StripLargeBlobs(ctx context.Context, sizeMB int) er
 	defer cancel()
 
 	args := []string{
-		"filter-repo",
 		"--force",
 		"--strip-blobs-bigger-than", fmt.Sprintf("%dM", sizeMB),
 	}
 
 	if e.verbose {
-		fmt.Printf("Running: git %s\n", strings.Join(args, " "))
+		provider := DetectFilterRepoProvider()
+		if provider == FilterRepoNix {
+			fmt.Printf("Running: nix run nixpkgs#git-filter-repo -- %s\n", strings.Join(args, " "))
+		} else {
+			fmt.Printf("Running: git filter-repo %s\n", strings.Join(args, " "))
+		}
 	}
 
-	cmd := exec.CommandContext(ctx, "git", args...)
+	cmd := BuildFilterRepoCommand(ctx, args)
 	cmd.Dir = e.repoPath
 
 	output, err := cmd.CombinedOutput()
