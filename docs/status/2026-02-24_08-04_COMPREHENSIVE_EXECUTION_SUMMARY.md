@@ -16,12 +16,12 @@ This session delivered significant architectural improvements to the clean-wizar
 
 ### Tasks Completed
 
-| # | Task | File(s) | Impact |
-|---|------|---------|--------|
-| 1.1 | Remove dead `createCleanerWithError` | `cleaner_implementations.go:73-81` | Eliminated unused panic-based helper |
-| 1.2 | Add `Type()` to `Cleaner` interface | `cleaner.go:11-25` | Interface now complete, all 13 cleaners compliant |
-| 1.3 | Define cleaner name constants | `registry.go:14-26` | 12 constants for type-safe registry keys |
-| 1.4 | Fix magic string registry keys | `registry_factory.go:31-70` | All literals replaced with constants |
+| #   | Task                                 | File(s)                            | Impact                                            |
+| --- | ------------------------------------ | ---------------------------------- | ------------------------------------------------- |
+| 1.1 | Remove dead `createCleanerWithError` | `cleaner_implementations.go:73-81` | Eliminated unused panic-based helper              |
+| 1.2 | Add `Type()` to `Cleaner` interface  | `cleaner.go:11-25`                 | Interface now complete, all 13 cleaners compliant |
+| 1.3 | Define cleaner name constants        | `registry.go:14-26`                | 12 constants for type-safe registry keys          |
+| 1.4 | Fix magic string registry keys       | `registry_factory.go:31-70`        | All literals replaced with constants              |
 
 ### Commits
 
@@ -58,7 +58,7 @@ This session delivered significant architectural improvements to the clean-wizar
 12. **Mixed Testing Frameworks** - Ginkgo + standard Go tests
 13. **Remove Unused Imports** - validate.go only uses fmt
 14. **Simplify Complex Functions** - docker.go:270-301
-15. **Consolidate Factory Functions** - Multiple run*Cleaner functions
+15. **Consolidate Factory Functions** - Multiple run\*Cleaner functions
 
 ---
 
@@ -66,53 +66,55 @@ This session delivered significant architectural improvements to the clean-wizar
 
 ### High Priority (Next Session)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 2.1 | Remove unused `name` variable | 2 min | Cleanup |
-| 2.2 | Add tests for commands package | 30 min | Coverage |
-| 2.3 | Consolidate type mappings | 20 min | Architecture |
+| #   | Task                                 | Effort | Impact          |
+| --- | ------------------------------------ | ------ | --------------- |
+| 2.1 | Remove unused `name` variable        | 2 min  | Cleanup         |
+| 2.2 | Add tests for commands package       | 30 min | Coverage        |
+| 2.3 | Consolidate type mappings            | 20 min | Architecture    |
 | 2.4 | Replace magic numbers with constants | 15 min | Maintainability |
 
 ### Medium Priority
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 3.1 | Simplify switch statements to maps | 25 min | Performance |
-| 3.2 | Consolidate validation patterns | 30 min | DRY |
-| 3.3 | Fix redundant type assertions | 10 min | Code quality |
-| 3.4 | Add missing error wrapping | 20 min | Reliability |
+| #   | Task                               | Effort | Impact       |
+| --- | ---------------------------------- | ------ | ------------ |
+| 3.1 | Simplify switch statements to maps | 25 min | Performance  |
+| 3.2 | Consolidate validation patterns    | 30 min | DRY          |
+| 3.3 | Fix redundant type assertions      | 10 min | Code quality |
+| 3.4 | Add missing error wrapping         | 20 min | Reliability  |
 
 ### Lower Priority
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 4.1 | Centralize error messages | 30 min | Consistency |
-| 4.2 | Add missing tests | 2 hours | Coverage |
-| 4.3 | Consolidate test frameworks | 1 hour | Maintainability |
-| 4.4 | Remove unused imports | 10 min | Cleanup |
+| #   | Task                        | Effort  | Impact          |
+| --- | --------------------------- | ------- | --------------- |
+| 4.1 | Centralize error messages   | 30 min  | Consistency     |
+| 4.2 | Add missing tests           | 2 hours | Coverage        |
+| 4.3 | Consolidate test frameworks | 1 hour  | Maintainability |
+| 4.4 | Remove unused imports       | 10 min  | Cleanup         |
 
 ---
 
 ## Verification Results
 
-| Check | Result |
-|-------|--------|
-| Build | ✅ PASS |
-| Tests | ✅ PASS (short mode) |
-| Linter | ✅ PASS |
-| Push | ✅ DONE |
+| Check  | Result               |
+| ------ | -------------------- |
+| Build  | ✅ PASS              |
+| Tests  | ✅ PASS (short mode) |
+| Linter | ✅ PASS              |
+| Push   | ✅ DONE              |
 
 ---
 
 ## Architecture Improvements Summary
 
 ### Before
+
 - `Cleaner` interface missing `Type()` method (but all implementations had it)
 - Magic strings for registry keys throughout codebase
 - Dead code `createCleanerWithError` function
 - Silent error ignoring in registry factory
 
 ### After
+
 - `Cleaner` interface complete with `Type()` method
 - 12 type-safe constants for registry keys
 - Dead code removed
@@ -122,12 +124,12 @@ This session delivered significant architectural improvements to the clean-wizar
 
 ## Metrics
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Interface completeness | 80% | 100% |
-| Magic strings | 12 | 0 |
-| Dead code functions | 1 | 0 |
-| Silent error ignores | 4 | 0 |
+| Metric                 | Before | After |
+| ---------------------- | ------ | ----- |
+| Interface completeness | 80%    | 100%  |
+| Magic strings          | 12     | 0     |
+| Dead code functions    | 1      | 0     |
+| Silent error ignores   | 4      | 0     |
 
 ---
 
