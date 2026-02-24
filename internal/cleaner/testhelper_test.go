@@ -57,12 +57,7 @@ func stringTypesTestHelper[T comparable](t *testing.T, tests []struct {
 // result when there are no items to clean. This consolidates duplicate test patterns
 // across Ginkgo test files.
 func AssertNoItemsToCleanResult(ctx context.Context, cleaner Cleaner, setupEmptyState func()) {
-	setupEmptyState()
-	result := cleaner.Clean(ctx)
-	gomega.Expect(result.IsOk()).To(gomega.BeTrue())
-	cleanResult := result.Value()
-	gomega.Expect(cleanResult.ItemsRemoved).To(gomega.Equal(uint(0)))
-	gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyConservative))
+	GinkgoNoItemsToCleanTest(ctx, cleaner, setupEmptyState)
 }
 
 // VerboseDryRunCleaner is an interface for cleaners that have verbose and dryRun fields.
