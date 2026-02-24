@@ -152,13 +152,14 @@ func (s *GitHistoryScanner) isGitRepo(ctx context.Context) bool {
 
 // findLargeBlobs finds all large blobs in git history.
 func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHistoryFile, error) {
-	// Use git rev-list to get all objects, then cat-file to get sizes
-	// Command: git rev-list --objects --all | git cat-file --batch-check
+	// Use git cat-file --batch-check to get all objects with type and size
+	// This is more efficient than individual cat-file calls
 
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
-	// Get all objects with their types and sizes
+	// Get all objects with their types and sizes in one command
+	// git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)'
 	cmd := exec.CommandContext(ctx, "git", "-C", s.repoPath,
 		"rev-list", "--objects", "--all")
 	output, err := cmd.Output()
@@ -166,29 +167,64 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 		return nil, fmt.Errorf("git rev-list failed: %w", err)
 	}
 
-	// Parse object list and get blob info
+	// Parse object list
 	lines := strings.Split(string(output), "\n")
-	var files []domain.GitHistoryFile
 	seenPaths := make(map[string]bool) // Avoid duplicates
 
+	// Build a map of blobHash -> path from the output
+	objectPaths := make(map[string]string)
 	for _, line := range lines {
 		if line == "" {
 			continue
 		}
-
 		parts := strings.Fields(line)
 		if len(parts) < 1 {
 			continue
 		}
-
-		blobHash := parts[0]
-		var path string
+		objectHash := parts[0]
 		if len(parts) > 1 {
-			path = parts[1]
+			objectPaths[objectHash] = parts[1]
+		}
+	}
+
+	// Now get object types and sizes using batch-check
+	cmd = exec.CommandContext(ctx, "git", "-C", s.repoPath,
+		"cat-file", "--batch-check")
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create stdin pipe: %w", err)
+	}
+
+	output, err = cmd.Output()
+	_ = stdin.Close()
+	if err != nil {
+		return nil, fmt.Errorf("git cat-file --batch-check failed: %w", err)
+	}
+
+	var files []domain.GitHistoryFile
+	checkLines := strings.Split(string(output), "\n")
+	for _, line := range checkLines {
+		if line == "" {
+			continue
 		}
 
-		// Skip if no path (commit/tree objects)
-		if path == "" {
+		// Format: <hash> <type> <size>
+		parts := strings.Fields(line)
+		if len(parts) < 3 {
+			continue
+		}
+
+		objHash := parts[0]
+		objType := parts[1]
+
+		// Skip non-blob objects (trees, commits, tags)
+		if objType != "blob" {
+			continue
+		}
+
+		// Get path for this blob
+		path, hasPath := objectPaths[objHash]
+		if !hasPath || path == "" {
 			continue
 		}
 
@@ -198,21 +234,25 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 		}
 		seenPaths[path] = true
 
-		// Get blob info
-		file, err := s.getBlobInfo(ctx, blobHash, path)
+		size, err := strconv.ParseInt(parts[2], 10, 64)
 		if err != nil {
-			if s.verbose {
-				fmt.Printf("Warning: failed to get blob info for %s: %v\n", blobHash[:8], err)
-			}
 			continue
 		}
 
 		// Skip if below size threshold
-		if file.SizeBytes < s.minSizeBytes {
+		if size < s.minSizeBytes {
 			continue
 		}
 
-		files = append(files, file)
+		// Get extension
+		ext := strings.ToLower(filepath.Ext(path))
+
+		files = append(files, domain.GitHistoryFile{
+			Path:      path,
+			SizeBytes: size,
+			BlobHash:  objHash,
+			Extension: ext,
+		})
 	}
 
 	// Enrich with commit information
