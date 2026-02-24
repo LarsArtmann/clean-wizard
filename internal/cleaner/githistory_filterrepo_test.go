@@ -4,6 +4,7 @@ import (
 	"context"
 	"os/exec"
 	"testing"
+	"time"
 )
 
 func TestDetectFilterRepoProvider(t *testing.T) {
@@ -17,10 +18,24 @@ func TestDetectFilterRepoProvider(t *testing.T) {
 		t.Errorf("Invalid provider: %d", provider)
 	}
 
-	// If nix is available, provider should not be FilterRepoNone
+	// If git-filter-repo is available as git subcommand, provider should be FilterRepoSystem
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if isSystemInstallAvailable(ctx) {
+		if provider != FilterRepoSystem {
+			t.Errorf("Expected FilterRepoSystem when git filter-repo is available, got %d", provider)
+		}
+	}
+
+	// If nix can access nixpkgs#git-filter-repo (and system install not available), provider should be FilterRepoNix
+	// Note: We don't just check if nix binary exists, we check if nix can actually access git-filter-repo
 	if _, err := exec.LookPath("nix"); err == nil {
-		if provider == FilterRepoNone {
-			t.Error("Expected non-none provider when nix is available")
+		// Only assert non-none if we can actually verify nixpkgs access
+		cmd := exec.CommandContext(ctx, "nix", "eval", "--raw", "nixpkgs#git-filter-repo.name")
+		if cmd.Run() == nil && !isSystemInstallAvailable(ctx) {
+			if provider != FilterRepoNix {
+				t.Errorf("Expected FilterRepoNix when nix can access git-filter-repo, got %d", provider)
+			}
 		}
 	}
 }

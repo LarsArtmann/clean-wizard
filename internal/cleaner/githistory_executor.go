@@ -187,9 +187,17 @@ func (e *GitHistoryExecutor) createBackup(ctx context.Context, backupPath string
 
 // createGitMirrorBackup creates a mirror backup of a git repository.
 // This is a shared helper used by both GitHistoryExecutor and GitHistorySafetyChecker.
+// If the backup path already exists, it will be removed before creating the new backup.
 func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel()
+
+	// Remove existing backup if it exists (from previous run)
+	if _, err := os.Stat(backupPath); err == nil {
+		if err := os.RemoveAll(backupPath); err != nil {
+			return fmt.Errorf("failed to remove existing backup: %w", err)
+		}
+	}
 
 	cmd := exec.CommandContext(ctx, "git", "clone", "--mirror", repoPath, backupPath)
 	output, err := cmd.CombinedOutput()
