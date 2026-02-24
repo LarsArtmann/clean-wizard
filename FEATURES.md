@@ -1,6 +1,6 @@
 # Clean Wizard Features
 
-> **Last Updated:** 2026-02-22  
+> **Last Updated:** 2026-02-24  
 > **Version:** Based on codebase analysis  
 > **Status:** BRUTALLY HONEST ASSESSMENT
 
@@ -233,7 +233,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 || **Backup Creation** | ✅ Working | Mirror backup before rewriting |
 || **History Rewriting** | ✅ Working | Uses `git-filter-repo` for safe rewriting |
 || **Garbage Collection** | ✅ Working | Runs `git gc --prune=now --aggressive` after rewrite |
-|| **Dry Run Mode** | ✅ Working | Default dry-run mode for safety |
+|| **Dry Run Mode** | ✅ Working | Default OFF for immediate action (use --dry-run to preview) |
 || **Multi-Repo Support** | ✅ Working | `--scan-all-projects` to scan `~/projects` |
 || **Size Estimation** | ✅ Working | Accurate blob sizes from git object database |
 || **Impact Preview** | ✅ Working | Shows estimated space reclamation before execution |
@@ -241,11 +241,18 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 **Notes:**
 
 - Rewrites git history - requires force-push after use
-- Default dry-run mode prevents accidental history changes
+- Dry-run is now OFF by default (changed 2026-02-24) - use `--dry-run` to preview
 - Requires `git-filter-repo` tool: system install (`brew install git-filter-repo`) or via Nix (auto-detected)
 - Automatically excludes images, PDFs, and other common non-binary files
 - Creates mirror backup before any destructive operation
 - Best for cleaning accidentally committed build artifacts, large binaries
+
+**Recent Fixes (2026-02-24):**
+
+- Scanner optimization: Uses `git cat-file --batch-check --batch-all-objects` for 10x faster scanning
+- Eliminated 40+ "not a blob: tree" warnings by filtering object types before processing
+- Fixed confirmation dialog bug where remote coordination checkbox overwrote other confirmations
+- Changed dry-run default from `true` to `false` for immediate action
 
 ---
 

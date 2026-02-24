@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path/filepath"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -110,18 +111,22 @@ func runGenericCleaner(
 }
 
 // runGenericCleanerWithError executes a cleaner using a factory function that may return an error.
-// Panics if the factory returns an error (used for invalid configuration).
+// Returns the error to the caller for proper handling.
 func runGenericCleanerWithError(
 	ctx context.Context, verbose, dryRun bool,
 	factory func(bool, bool) (cleaner.Cleaner, error),
 ) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		cleanerInstance, err := factory(v, d)
-		if err != nil {
-			panic(err) // This should never happen with valid parameters
-		}
-		return cleanerInstance
-	})
+	cleanerInstance, err := factory(verbose, dryRun)
+	if err != nil {
+		return domain.CleanResult{}, fmt.Errorf("failed to create cleaner: %w", err)
+	}
+
+	result := cleanerInstance.Clean(ctx)
+	if result.IsErr() {
+		return domain.CleanResult{}, result.Error()
+	}
+
+	return result.Value(), nil
 }
 
 // runCleanerWithConfig executes a cleaner that requires a single configuration parameter.
@@ -181,11 +186,9 @@ func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (do
 
 // runGoCleaner executes the Go cleaner.
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return createCleanerWithError(func() (cleaner.Cleaner, error) {
-			return cleaner.NewGoCleaner(v, d,
-				cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheModCache|cleaner.GoCacheBuildCache)
-		})
+	return runGenericCleanerWithError(ctx, verbose, dryRun, func(v, d bool) (cleaner.Cleaner, error) {
+		return cleaner.NewGoCleaner(v, d,
+			cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheModCache|cleaner.GoCacheBuildCache)
 	})
 }
 

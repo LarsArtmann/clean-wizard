@@ -1,7 +1,7 @@
 # TODO LIST
 
-**Last Updated:** 2026-02-22
-**Status Report:** docs/status/2026-02-13_02-22_COMPREHENSIVE-STATUS-REPORT.md
+**Last Updated:** 2026-02-24
+**Status Report:** docs/status/2026-02-24_04-38_git-history-fixes.md
 
 ---
 
@@ -26,6 +26,9 @@
 | Context Propagation          | Error messages preserve context                          |
 | Enum Validation              | RiskLevel, Enabled, DockerPruneMode, etc.                |
 | Git History Cleaner          | Interactive git history binary cleaning (900+ tests)     |
+| Git History Scanner Fix      | Eliminated 40+ tree object warnings, optimized batch API |
+| Git History Confirmation Fix | Fixed form field overwriting bug with dynamic fields     |
+| Git History Dry-Run Default  | Changed default from true to false for immediate action  |
 
 ---
 
