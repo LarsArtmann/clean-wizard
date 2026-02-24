@@ -202,7 +202,9 @@ func runSimpleCleaner[C cleaner.Cleaner](
 
 // runCargoCleaner executes the Cargo cleaner.
 func runCargoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runSimpleCleaner(ctx, verbose, dryRun, cleaner.NewCargoCleaner)
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewCargoCleaner(v, d)
+	})
 }
 
 // runBuildCacheCleaner executes the Build Cache cleaner.
@@ -226,7 +228,9 @@ func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cl
 
 // runProjectsManagementAutomationCleaner executes Projects Management Automation cleaner.
 func runProjectsManagementAutomationCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runSimpleCleaner(ctx, verbose, dryRun, cleaner.NewProjectsManagementAutomationCleaner)
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewProjectsManagementAutomationCleaner(v, d)
+	})
 }
 
 // runCompiledBinariesCleaner executes the Compiled Binaries cleaner.
