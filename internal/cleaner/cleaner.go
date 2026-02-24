@@ -13,6 +13,10 @@ type Cleaner interface {
 	// Used for result tracking and registry operations.
 	Name() string
 
+	// Type returns the operation type for this cleaner.
+	// Used for categorization and filtering.
+	Type() domain.OperationType
+
 	// Clean executes the cleaning operation and returns the result.
 	Clean(ctx context.Context) result.Result[domain.CleanResult]
 

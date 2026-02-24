@@ -8,6 +8,23 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// Registry cleaner name constants.
+// These are used for consistent naming across the codebase.
+const (
+	CleanerNix            = "nix"
+	CleanerHomebrew       = "homebrew"
+	CleanerDocker         = "docker"
+	CleanerCargo          = "cargo"
+	CleanerGo             = "go"
+	CleanerNode           = "node"
+	CleanerBuildCache     = "buildcache"
+	CleanerSystemCache    = "systemcache"
+	CleanerTempFiles      = "tempfiles"
+	CleanerProjects       = "projects"
+	CleanerProjectExec    = "project-executables"
+	CleanerCompiledBinaries = "compiled-binaries"
+)
+
 // Registry manages all registered cleaners.
 // It provides thread-safe access to cleaner instances and enables
 // polymorphic operations over all cleaners.

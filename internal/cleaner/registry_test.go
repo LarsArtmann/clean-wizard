@@ -35,6 +35,10 @@ func (m *mockCleaner) Name() string {
 	return m.name
 }
 
+func (m *mockCleaner) Type() domain.OperationType {
+	return domain.OperationTypeTempFiles
+}
+
 func (m *mockCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
 	return result.Ok([]domain.ScanItem{
 		{Path: "/test/path", Size: 1024, ScanType: domain.ScanTypeTemp},

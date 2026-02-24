@@ -70,16 +70,6 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 	return result.Value(), nil
 }
 
-// createCleanerWithError wraps cleaner creation that may return an error.
-// Panics if the factory returns an error (used for invalid configuration).
-func createCleanerWithError(factory func() (cleaner.Cleaner, error)) cleaner.Cleaner {
-	cleanerInstance, err := factory()
-	if err != nil {
-		panic(err) // Invalid configuration, should never happen
-	}
-	return cleanerInstance
-}
-
 // runHomebrewCleaner executes the Homebrew cleaner.
 func runHomebrewCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	return runCleanerWithConfig[domain.HomebrewMode](ctx, verbose, dryRun, homebrewCleanerFactory, domain.HomebrewModeAll)
