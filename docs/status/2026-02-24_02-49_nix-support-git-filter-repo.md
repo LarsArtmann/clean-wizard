@@ -15,19 +15,19 @@ Added automatic Nix detection support for `git-filter-repo`, eliminating the Pyt
 
 ### New Files
 
-| File | Purpose |
-|------|---------|
-| `internal/cleaner/githistory_filterrepo.go` | Provider detection logic (system → nix → none) |
-| `internal/cleaner/githistory_filterrepo_test.go` | Unit tests for detection |
+| File                                             | Purpose                                        |
+| ------------------------------------------------ | ---------------------------------------------- |
+| `internal/cleaner/githistory_filterrepo.go`      | Provider detection logic (system → nix → none) |
+| `internal/cleaner/githistory_filterrepo_test.go` | Unit tests for detection                       |
 
 ### Modified Files
 
-| File | Changes |
-|------|---------|
-| `internal/cleaner/githistory_safety.go` | Uses new `DetectFilterRepoProvider()`, reports provider type in safety report |
-| `internal/cleaner/githistory_executor.go` | Uses `BuildFilterRepoCommand()` for provider-aware execution |
-| `internal/domain/githistory_types.go` | Added `FilterRepoProvider` field to `GitHistorySafetyReport` |
-| `FEATURES.md` | Updated documentation to mention Nix support |
+| File                                      | Changes                                                                       |
+| ----------------------------------------- | ----------------------------------------------------------------------------- |
+| `internal/cleaner/githistory_safety.go`   | Uses new `DetectFilterRepoProvider()`, reports provider type in safety report |
+| `internal/cleaner/githistory_executor.go` | Uses `BuildFilterRepoCommand()` for provider-aware execution                  |
+| `internal/domain/githistory_types.go`     | Added `FilterRepoProvider` field to `GitHistorySafetyReport`                  |
+| `FEATURES.md`                             | Updated documentation to mention Nix support                                  |
 
 ---
 
@@ -41,10 +41,10 @@ Added automatic Nix detection support for `git-filter-repo`, eliminating the Pyt
 
 ### Execution Paths
 
-| Provider | Command |
-|----------|---------|
-| System | `git filter-repo <args>` |
-| Nix | `nix run nixpkgs#git-filter-repo -- <args>` |
+| Provider | Command                                     |
+| -------- | ------------------------------------------- |
+| System   | `git filter-repo <args>`                    |
+| Nix      | `nix run nixpkgs#git-filter-repo -- <args>` |
 
 ### API Changes
 
@@ -98,16 +98,19 @@ PASS
 ## User Experience Impact
 
 ### Before
+
 ```
 ❌ git-filter-repo is not installed. Install it with: pip install git-filter-repo or brew install git-filter-repo
 ```
 
 ### After (with Nix available)
+
 ```
 ✅ Using Nix to run git-filter-repo automatically
 ```
 
 ### After (no provider)
+
 ```
 ❌ git-filter-repo is not installed. Install with: brew install git-filter-repo, or ensure nix is available to use it automatically
 ```
@@ -125,11 +128,11 @@ PASS
 
 ## Future Considerations
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| Add `git-filter-branch` fallback | Low | Deprecated but would provide last-resort option |
-| Cache Nix store builds | Low | First run may download git-filter-repo |
-| Support BFG Repo-Cleaner via Nix | Low | Alternative tool for very large repos |
+| Item                             | Priority | Notes                                           |
+| -------------------------------- | -------- | ----------------------------------------------- |
+| Add `git-filter-branch` fallback | Low      | Deprecated but would provide last-resort option |
+| Cache Nix store builds           | Low      | First run may download git-filter-repo          |
+| Support BFG Repo-Cleaner via Nix | Low      | Alternative tool for very large repos           |
 
 ---
 
