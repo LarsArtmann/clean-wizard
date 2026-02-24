@@ -11,17 +11,17 @@ import (
 // Registry cleaner name constants.
 // These are used for consistent naming across the codebase.
 const (
-	CleanerNix            = "nix"
-	CleanerHomebrew       = "homebrew"
-	CleanerDocker         = "docker"
-	CleanerCargo          = "cargo"
-	CleanerGo             = "go"
-	CleanerNode           = "node"
-	CleanerBuildCache     = "buildcache"
-	CleanerSystemCache    = "systemcache"
-	CleanerTempFiles      = "tempfiles"
-	CleanerProjects       = "projects"
-	CleanerProjectExec    = "project-executables"
+	CleanerNix              = "nix"
+	CleanerHomebrew         = "homebrew"
+	CleanerDocker           = "docker"
+	CleanerCargo            = "cargo"
+	CleanerGo               = "go"
+	CleanerNode             = "node"
+	CleanerBuildCache       = "buildcache"
+	CleanerSystemCache      = "systemcache"
+	CleanerTempFiles        = "tempfiles"
+	CleanerProjects         = "projects"
+	CleanerProjectExec      = "project-executables"
 	CleanerCompiledBinaries = "compiled-binaries"
 )
 
