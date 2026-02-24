@@ -115,6 +115,16 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			scanner = NewGitHistoryScanner(tempDir)
 		})
 
+		// Helper function to create test files with standard size
+		createTestFiles := func(paths []string) []domain.GitHistoryFile {
+			files := make([]domain.GitHistoryFile, len(paths))
+			for i, path := range paths {
+				ext := filepath.Ext(path)
+				files[i] = domain.GitHistoryFile{Path: path, Extension: ext, SizeBytes: 5 * 1024 * 1024}
+			}
+			return files
+		}
+
 		// Helper function to test filtering scenarios
 		assertFilteredResult := func(option GitHistoryScannerOption, files []domain.GitHistoryFile, expectedCount int, expectedPath string) {
 			if option != nil {
@@ -129,29 +139,19 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 
 		ginkgo.Context("extension filtering", func() {
 			ginkgo.It("should exclude files with extensions in excludeExts", func() {
-				files := []domain.GitHistoryFile{
-					{Path: "doc.pdf", Extension: ".pdf", SizeBytes: 5 * 1024 * 1024},
-					{Path: "image.png", Extension: ".png", SizeBytes: 5 * 1024 * 1024},
-					{Path: "binary.exe", Extension: ".exe", SizeBytes: 5 * 1024 * 1024},
-				}
+				files := createTestFiles([]string{"doc.pdf", "image.png", "binary.exe"})
 				assertFilteredResult(nil, files, 1, "binary.exe")
 			})
 
 			ginkgo.It("should only include files with extensions in includeExts when set", func() {
-				files := []domain.GitHistoryFile{
-					{Path: "binary.exe", Extension: ".exe", SizeBytes: 5 * 1024 * 1024},
-					{Path: "library.dll", Extension: ".dll", SizeBytes: 5 * 1024 * 1024},
-				}
+				files := createTestFiles([]string{"binary.exe", "library.dll"})
 				assertFilteredResult(WithIncludeExtensions([]string{".exe"}), files, 1, "binary.exe")
 			})
 		})
 
 		ginkgo.Context("path filtering", func() {
 			ginkgo.It("should exclude files matching exclude paths", func() {
-				files := []domain.GitHistoryFile{
-					{Path: "vendor/binary", Extension: "", SizeBytes: 5 * 1024 * 1024},
-					{Path: "bin/app", Extension: "", SizeBytes: 5 * 1024 * 1024},
-				}
+				files := createTestFiles([]string{"vendor/binary", "bin/app"})
 				assertFilteredResult(WithExcludePaths([]string{"vendor/"}), files, 1, "bin/app")
 			})
 		})
@@ -163,35 +163,22 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			}
 
 			ginkgo.It("should include files with known binary extensions", func() {
-				files := []domain.GitHistoryFile{
-					{Path: "app.exe", Extension: ".exe", SizeBytes: 5 * 1024 * 1024},
-					{Path: "lib.dll", Extension: ".dll", SizeBytes: 5 * 1024 * 1024},
-					{Path: "archive.zip", Extension: ".zip", SizeBytes: 5 * 1024 * 1024},
-				}
+				files := createTestFiles([]string{"app.exe", "lib.dll", "archive.zip"})
 				assertFilterCount(files, 3)
 			})
 
 			ginkgo.It("should include extensionless files in binary directories", func() {
-				files := []domain.GitHistoryFile{
-					{Path: "bin/myapp", Extension: "", SizeBytes: 5 * 1024 * 1024},
-					{Path: "dist/release", Extension: "", SizeBytes: 5 * 1024 * 1024},
-					{Path: "build/output", Extension: "", SizeBytes: 5 * 1024 * 1024},
-				}
+				files := createTestFiles([]string{"bin/myapp", "dist/release", "build/output"})
 				assertFilterCount(files, 3)
 			})
 
 			ginkgo.It("should include .test files", func() {
-				files := []domain.GitHistoryFile{
-					{Path: "app.test", Extension: ".test", SizeBytes: 5 * 1024 * 1024},
-				}
+				files := createTestFiles([]string{"app.test"})
 				assertFilterCount(files, 1)
 			})
 
 			ginkgo.It("should exclude files with unknown extensions in non-binary dirs", func() {
-				files := []domain.GitHistoryFile{
-					{Path: "src/main.go", Extension: ".go", SizeBytes: 5 * 1024 * 1024},
-					{Path: "lib/util.ts", Extension: ".ts", SizeBytes: 5 * 1024 * 1024},
-				}
+				files := createTestFiles([]string{"src/main.go", "lib/util.ts"})
 				assertFilterCount(files, 0)
 			})
 		})

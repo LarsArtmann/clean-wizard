@@ -89,12 +89,8 @@ func runTempFilesCleaner(ctx context.Context, dryRun, verbose bool) (domain.Clea
 	defaultTempPaths := []string{filepath.Join("/", "tmp")}
 	defaultExcludes := []string{}
 
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		tempFilesCleaner, err := cleaner.NewTempFilesCleaner(v, d, "7d", defaultExcludes, defaultTempPaths)
-		if err != nil {
-			panic(err) // This should never happen with valid parameters
-		}
-		return tempFilesCleaner
+	return runGenericCleanerWithError(ctx, verbose, dryRun, func(v, d bool) (cleaner.Cleaner, error) {
+		return cleaner.NewTempFilesCleaner(v, d, "7d", defaultExcludes, defaultTempPaths)
 	})
 }
 
@@ -111,6 +107,21 @@ func runGenericCleaner(
 	}
 
 	return result.Value(), nil
+}
+
+// runGenericCleanerWithError executes a cleaner using a factory function that may return an error.
+// Panics if the factory returns an error (used for invalid configuration).
+func runGenericCleanerWithError(
+	ctx context.Context, verbose, dryRun bool,
+	factory func(bool, bool) (cleaner.Cleaner, error),
+) (domain.CleanResult, error) {
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		cleanerInstance, err := factory(v, d)
+		if err != nil {
+			panic(err) // This should never happen with valid parameters
+		}
+		return cleanerInstance
+	})
 }
 
 // runCleanerWithConfig executes a cleaner that requires a single configuration parameter.
@@ -178,21 +189,26 @@ func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult
 	})
 }
 
+// runSimpleCleaner executes a cleaner using a simple factory function.
+// The factory returns a concrete type that implements cleaner.Cleaner.
+func runSimpleCleaner[C cleaner.Cleaner](
+	ctx context.Context, verbose, dryRun bool,
+	factory func(bool, bool) C,
+) (domain.CleanResult, error) {
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return factory(v, d)
+	})
+}
+
 // runCargoCleaner executes the Cargo cleaner.
 func runCargoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return cleaner.NewCargoCleaner(v, d)
-	})
+	return runSimpleCleaner(ctx, verbose, dryRun, cleaner.NewCargoCleaner)
 }
 
 // runBuildCacheCleaner executes the Build Cache cleaner.
 func runBuildCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		buildCacheCleaner, err := cleaner.NewBuildCacheCleaner(v, d, "30d", []string{}, []string{})
-		if err != nil {
-			panic(err) // This should never happen with valid parameters
-		}
-		return buildCacheCleaner
+	return runGenericCleanerWithError(ctx, verbose, dryRun, func(v, d bool) (cleaner.Cleaner, error) {
+		return cleaner.NewBuildCacheCleaner(v, d, "30d", []string{}, []string{})
 	})
 }
 
@@ -203,20 +219,14 @@ func runDockerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanRe
 
 // runSystemCacheCleaner executes the System Cache cleaner.
 func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		systemCacheCleaner, err := cleaner.NewSystemCacheCleaner(v, d, "30d", nil)
-		if err != nil {
-			panic(err) // This should never happen with valid parameters
-		}
-		return systemCacheCleaner
+	return runGenericCleanerWithError(ctx, verbose, dryRun, func(v, d bool) (cleaner.Cleaner, error) {
+		return cleaner.NewSystemCacheCleaner(v, d, "30d", nil)
 	})
 }
 
 // runProjectsManagementAutomationCleaner executes Projects Management Automation cleaner.
 func runProjectsManagementAutomationCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return cleaner.NewProjectsManagementAutomationCleaner(v, d)
-	})
+	return runSimpleCleaner(ctx, verbose, dryRun, cleaner.NewProjectsManagementAutomationCleaner)
 }
 
 // runCompiledBinariesCleaner executes the Compiled Binaries cleaner.
