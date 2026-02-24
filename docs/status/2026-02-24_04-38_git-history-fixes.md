@@ -16,19 +16,22 @@ Fixed three critical issues in the `git-history` command that were preventing pr
 ### 1. Tree Object Warning Spam ✅
 
 **Problem:** Scanner printed 40+ warnings like:
+
 ```
 Warning: failed to get blob info for 035b875d: not a blob: tree
 ```
 
 **Root Cause:** The `findLargeBlobs` function processed ALL objects from `git rev-list --objects --all`, including tree objects (directories), not just blobs (files). It then called `getBlobInfo` which failed for non-blob objects.
 
-**Fix:** 
+**Fix:**
+
 - Changed from sequential `git cat-file` calls to single `git cat-file --batch-check --batch-all-objects` call
 - Filter by object type (`objType != "blob"`) BEFORE processing
 - Removed unused `getBlobInfo` function entirely
 - Result: Zero warnings, same results
 
 **Files Changed:**
+
 - `internal/cleaner/githistory_scanner.go`
 
 ---
@@ -38,21 +41,25 @@ Warning: failed to get blob info for 035b875d: not a blob: tree
 **Problem:** Command defaulted to `--dry-run=true`, requiring users to pass `--dry-run=false` to actually do anything.
 
 **Root Cause:** Line 85 in `cmd/clean-wizard/commands/githistory.go`:
+
 ```go
 cmd.Flags().BoolVar(&dryRun, "dry-run", true, ...)
 ```
 
 **Fix:** Changed default from `true` to `false`:
+
 ```go
 cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Analyze only, don't modify history")
 ```
 
-**Rationale:** 
+**Rationale:**
+
 - Interactive confirmation prompts already provide sufficient safety
 - Users expect commands to DO something by default
 - Dry-run should be opt-in for preview, not the default behavior
 
 **Files Changed:**
+
 - `cmd/clean-wizard/commands/githistory.go`
 
 ---
@@ -62,6 +69,7 @@ cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Analyze only, don't modify histo
 **Problem:** Users clicking "Yes, proceed" resulted in "Cancelled. No changes made."
 
 **Root Cause:** Lines 415-422 in `confirmAction` function:
+
 ```go
 if report.HasRemote {
     form = huh.NewForm(  // <-- OVERWRITES previous form!
@@ -74,9 +82,10 @@ if report.HasRemote {
 }
 ```
 
-This **overwrote** the first form** containing `confirmed`, `understandRisk`, `haveBackup` checkboxes, which remained `false`.
+This **overwrote** the first form\*\* containing `confirmed`, `understandRisk`, `haveBackup` checkboxes, which remained `false`.
 
 **Fix:** Dynamically build form with all required fields in single pass:
+
 ```go
 var confirms []huh.Field
 confirms = append(confirms,
@@ -91,6 +100,7 @@ form := huh.NewForm(huh.NewGroup(confirms...))
 ```
 
 **Files Changed:**
+
 - `cmd/clean-wizard/commands/githistory.go`
 
 ---
@@ -98,13 +108,16 @@ form := huh.NewForm(huh.NewGroup(confirms...))
 ## Verification
 
 ### Test Repository
+
 - Repository: `/Users/larsartmann/projects/AI-von-Art-Bench`
 - Files found: 10 binary files (320 MiB)
 - Before fix: 40+ warnings printed
 - After fix: 0 warnings, clean output
 
 ### Successful Execution
+
 User successfully ran the cleaner on AI-von-Art-Bench repository:
+
 - All 10 binary files removed from history
 - git-filter-repo executed successfully
 - git gc reclaimed objects
@@ -114,11 +127,11 @@ User successfully ran the cleaner on AI-von-Art-Bench repository:
 
 ## Performance Improvement
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Git subprocess calls | O(n) where n = object count | 2 calls total |
-| Warnings printed | 40+ | 0 |
-| Code complexity | High (getBlobInfo function) | Lower (inline processing) |
+| Metric               | Before                      | After                     |
+| -------------------- | --------------------------- | ------------------------- |
+| Git subprocess calls | O(n) where n = object count | 2 calls total             |
+| Warnings printed     | 40+                         | 0                         |
+| Code complexity      | High (getBlobInfo function) | Lower (inline processing) |
 
 ---
 
@@ -143,10 +156,10 @@ User successfully ran the cleaner on AI-von-Art-Bench repository:
 
 ## Files Modified
 
-| File | Lines Changed | Purpose |
-|------|---------------|---------|
-| `internal/cleaner/githistory_scanner.go` | ~60 | Optimize blob scanning |
-| `cmd/clean-wizard/commands/githistory.go` | ~20 | Fix confirmation dialog, default flags |
+| File                                      | Lines Changed | Purpose                                |
+| ----------------------------------------- | ------------- | -------------------------------------- |
+| `internal/cleaner/githistory_scanner.go`  | ~60           | Optimize blob scanning                 |
+| `cmd/clean-wizard/commands/githistory.go` | ~20           | Fix confirmation dialog, default flags |
 
 ---
 
