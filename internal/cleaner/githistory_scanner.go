@@ -194,8 +194,8 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 	var files []domain.GitHistoryFile
 	seenPaths := make(map[string]bool) // Avoid duplicates
 
-	checkLines := strings.Split(string(output), "\n")
-	for _, line := range checkLines {
+	checkLines := strings.SplitSeq(string(output), "\n")
+	for line := range checkLines {
 		if line == "" {
 			continue
 		}

@@ -288,6 +288,7 @@ func TestGetConstraint(t *testing.T) {
 	}
 }
 
+//go:fix inline
 func float64Ptr(v float64) *float64 {
-	return &v
+	return new(v)
 }
