@@ -147,6 +147,7 @@ func (s *GitHistoryScanner) isGitRepo(ctx context.Context) bool {
 
 	cmd := exec.CommandContext(ctx, "git", "rev-parse", "--git-dir")
 	cmd.Dir = s.repoPath
+
 	return cmd.Run() == nil
 }
 
@@ -154,13 +155,13 @@ func (s *GitHistoryScanner) isGitRepo(ctx context.Context) bool {
 func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHistoryFile, error) {
 	// Use git rev-list --objects to get all objects with paths
 	// Then use git cat-file --batch-all-objects to get types and sizes
-
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
 	// Get all objects with their paths from rev-list
 	cmd := exec.CommandContext(ctx, "git", "-C", s.repoPath,
 		"rev-list", "--objects", "--all")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("git rev-list failed: %w", err)
@@ -169,14 +170,17 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 	// Parse object list to build a map of objectHash -> path
 	lines := strings.Split(string(output), "\n")
 	objectPaths := make(map[string]string)
+
 	for _, line := range lines {
 		if line == "" {
 			continue
 		}
+
 		parts := strings.Fields(line)
 		if len(parts) < 1 {
 			continue
 		}
+
 		objectHash := parts[0]
 		if len(parts) > 1 {
 			objectPaths[objectHash] = parts[1]
@@ -186,12 +190,14 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 	// Get all objects with their types and sizes using --batch-all-objects
 	cmd = exec.CommandContext(ctx, "git", "-C", s.repoPath,
 		"cat-file", "--batch-check", "--batch-all-objects")
+
 	output, err = cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("git cat-file --batch-check failed: %w", err)
 	}
 
 	var files []domain.GitHistoryFile
+
 	seenPaths := make(map[string]bool) // Avoid duplicates
 
 	checkLines := strings.SplitSeq(string(output), "\n")
@@ -224,6 +230,7 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 		if seenPaths[path] {
 			continue
 		}
+
 		seenPaths[path] = true
 
 		size, err := strconv.ParseInt(parts[2], 10, 64)
@@ -260,7 +267,10 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 }
 
 // enrichWithCommitInfo adds commit hash, date, and author information.
-func (s *GitHistoryScanner) enrichWithCommitInfo(ctx context.Context, files []domain.GitHistoryFile) ([]domain.GitHistoryFile, error) {
+func (s *GitHistoryScanner) enrichWithCommitInfo(
+	ctx context.Context,
+	files []domain.GitHistoryFile,
+) ([]domain.GitHistoryFile, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
@@ -268,6 +278,7 @@ func (s *GitHistoryScanner) enrichWithCommitInfo(ctx context.Context, files []do
 		// Find the commit that added this file
 		cmd := exec.CommandContext(ctx, "git", "-C", s.repoPath,
 			"log", "--diff-filter=A", "--format=%H %ct %an", "-1", "--", files[i].Path)
+
 		output, err := cmd.Output()
 		if err != nil {
 			continue
@@ -282,11 +293,13 @@ func (s *GitHistoryScanner) enrichWithCommitInfo(ctx context.Context, files []do
 		if len(parts) >= 1 {
 			files[i].CommitHash = parts[0]
 		}
+
 		if len(parts) >= 2 {
 			if ts, err := strconv.ParseInt(parts[1], 10, 64); err == nil {
 				files[i].CommitDate = time.Unix(ts, 0)
 			}
 		}
+
 		if len(parts) >= 3 {
 			files[i].Author = parts[2]
 		}
@@ -326,12 +339,15 @@ func (s *GitHistoryScanner) filterFiles(files []domain.GitHistoryFile) []domain.
 
 		// Check path exclusions
 		excluded := false
+
 		for _, excludePath := range s.excludePaths {
 			if strings.HasPrefix(f.Path, excludePath) || strings.Contains(f.Path, excludePath) {
 				excluded = true
+
 				break
 			}
 		}
+
 		if excluded {
 			continue
 		}
@@ -367,6 +383,7 @@ func (s *GitHistoryScanner) isLikelyBinary(f domain.GitHistoryFile) bool {
 
 		// Check for common binary names
 		binaryNames := []string{"main", "app", "server", "cli", "cmd", "run", "start", "stop"}
+
 		base := filepath.Base(f.Path)
 		if slices.Contains(binaryNames, base) {
 			return true
@@ -389,6 +406,7 @@ func (s *GitHistoryScanner) sortBySize(files []domain.GitHistoryFile) {
 		} else if a.SizeBytes < b.SizeBytes {
 			return 1
 		}
+
 		return 0
 	})
 }

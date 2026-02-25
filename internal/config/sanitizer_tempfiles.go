@@ -34,7 +34,12 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(
 			}
 
 			if original != exclude {
-				result.addChange(fmt.Sprintf("%s.excludes[%d]", fieldPrefix, i), original, exclude, "sanitized exclude path")
+				result.addChange(
+					fmt.Sprintf("%s.excludes[%d]", fieldPrefix, i),
+					original,
+					exclude,
+					"sanitized exclude path",
+				)
 			}
 
 			sanitizedExcludes = append(sanitizedExcludes, exclude)
@@ -44,6 +49,7 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(
 		if cs.rules.RemoveDuplicates {
 			sanitizedExcludes = cs.removeDuplicates(sanitizedExcludes)
 		}
+
 		if cs.rules.SortArrays {
 			cs.sortStrings(sanitizedExcludes)
 		}

@@ -7,6 +7,7 @@ import (
 // WithOperation adds operation context to error.
 func (e *CleanWizardError) WithOperation(operation string) *CleanWizardError {
 	e.Operation = operation
+
 	return e
 }
 
@@ -37,12 +38,14 @@ func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 		// Add to metadata for custom keys
 		e.Details.Metadata = addToMetadata(e.Details.Metadata, key, value)
 	}
+
 	return e
 }
 
 // WithLevel sets error level.
 func (e *CleanWizardError) WithLevel(level ErrorLevel) *CleanWizardError {
 	e.Level = level
+
 	return e
 }
 

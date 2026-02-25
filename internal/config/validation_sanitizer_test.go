@@ -30,16 +30,23 @@ func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 
 				for _, expectedChange := range tt.expectedChanges {
 					found := false
+
 					for _, field := range sanitizedFields {
 						if field == expectedChange ||
 							len(field) > len(expectedChange) &&
 								field[len(field)-len(expectedChange):] == expectedChange {
 							found = true
+
 							break
 						}
 					}
+
 					if !found {
-						t.Errorf("Expected change for field '%s', not found in: %v", expectedChange, sanitizedFields)
+						t.Errorf(
+							"Expected change for field '%s', not found in: %v",
+							expectedChange,
+							sanitizedFields,
+						)
 					}
 				}
 			}

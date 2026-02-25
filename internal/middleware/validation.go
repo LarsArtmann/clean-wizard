@@ -18,19 +18,33 @@ func NewValidationMiddleware() *ValidationMiddleware {
 }
 
 // ValidateScanRequest validates scan request before processing.
-func (vm *ValidationMiddleware) ValidateScanRequest(ctx context.Context, req domain.ScanRequest) result.Result[domain.ScanRequest] {
+func (vm *ValidationMiddleware) ValidateScanRequest(
+	ctx context.Context,
+	req domain.ScanRequest,
+) result.Result[domain.ScanRequest] {
 	return validation.ValidateAndWrap(req, "scan request")
 }
 
 // ValidateCleanRequest validates clean request before processing.
-func (vm *ValidationMiddleware) ValidateCleanRequest(ctx context.Context, req domain.CleanRequest) result.Result[domain.CleanRequest] {
+func (vm *ValidationMiddleware) ValidateCleanRequest(
+	ctx context.Context,
+	req domain.CleanRequest,
+) result.Result[domain.CleanRequest] {
 	return validation.ValidateAndWrap(req, "clean request")
 }
 
 // ValidateCleanerSettings validates cleaner settings with type safety.
-func (vm *ValidationMiddleware) ValidateCleanerSettings(ctx context.Context, cleaner domain.OperationHandler, settings *domain.OperationSettings) result.Result[*domain.OperationSettings] {
-	if err := cleaner.ValidateSettings(settings); err != nil {
-		return result.Err[*domain.OperationSettings](fmt.Errorf("invalid cleaner settings for %s: %w", cleaner.Type(), err))
+func (vm *ValidationMiddleware) ValidateCleanerSettings(
+	ctx context.Context,
+	cleaner domain.OperationHandler,
+	settings *domain.OperationSettings,
+) result.Result[*domain.OperationSettings] {
+	err := cleaner.ValidateSettings(settings)
+	if err != nil {
+		return result.Err[*domain.OperationSettings](
+			fmt.Errorf("invalid cleaner settings for %s: %w", cleaner.Type(), err),
+		)
 	}
+
 	return result.Ok(settings)
 }

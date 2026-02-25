@@ -10,7 +10,10 @@ import (
 )
 
 // LoadConfig loads configuration with comprehensive validation and caching.
-func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *ConfigLoadOptions) (*domain.Config, error) {
+func (ecl *EnhancedConfigLoader) LoadConfig(
+	ctx context.Context,
+	options *ConfigLoadOptions,
+) (*domain.Config, error) {
 	if options == nil {
 		options = getDefaultLoadOptions()
 	}
@@ -33,8 +36,13 @@ func (ecl *EnhancedConfigLoader) LoadConfig(ctx context.Context, options *Config
 	// Apply validation based on level
 	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
 	if !validationResult.IsValid {
-		return nil, pkgerrors.HandleValidationError("LoadConfig",
-			fmt.Errorf("validation failed: %s", ecl.formatValidationErrors(validationResult.Errors)))
+		return nil, pkgerrors.HandleValidationError(
+			"LoadConfig",
+			fmt.Errorf(
+				"validation failed: %s",
+				ecl.formatValidationErrors(validationResult.Errors),
+			),
+		)
 	}
 
 	// Apply sanitization if enabled
@@ -68,11 +76,13 @@ func (ecl *EnhancedConfigLoader) SaveConfig(
 
 	validationResult := ecl.validateAndSanitize(ctx, config, options)
 
-	if err := ecl.handleValidationFailure(validationResult, options); err != nil {
+	err := ecl.handleValidationFailure(validationResult, options)
+	if err != nil {
 		return nil, err
 	}
 
-	if err := ecl.saveConfigWithRetry(ctx, config, options); err != nil {
+	err := ecl.saveConfigWithRetry(ctx, config, options)
+	if err != nil {
 		return nil, err
 	}
 
@@ -83,7 +93,11 @@ func (ecl *EnhancedConfigLoader) SaveConfig(
 }
 
 // handleBackup creates a backup if requested.
-func (ecl *EnhancedConfigLoader) handleBackup(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) {
+func (ecl *EnhancedConfigLoader) handleBackup(
+	ctx context.Context,
+	config *domain.Config,
+	options *ConfigSaveOptions,
+) {
 	if options.CreateBackup != BackupOptionEnabled && options.BackupEnabled != BackupOptionEnabled {
 		return
 	}
@@ -125,8 +139,12 @@ func (ecl *EnhancedConfigLoader) handleValidationFailure(
 
 	if options.ForceSave == SaveOptionEnabled {
 		if ecl.enableMonitoring == MonitoringOptionEnabled {
-			fmt.Printf("⚠️ Validation failed, forcing save: %s\n", ecl.formatValidationErrors(validationResult.Errors))
+			fmt.Printf(
+				"⚠️ Validation failed, forcing save: %s\n",
+				ecl.formatValidationErrors(validationResult.Errors),
+			)
 		}
+
 		return nil
 	}
 
@@ -134,7 +152,10 @@ func (ecl *EnhancedConfigLoader) handleValidationFailure(
 }
 
 // logSaveResult logs the save result if monitoring is enabled.
-func (ecl *EnhancedConfigLoader) logSaveResult(options *ConfigSaveOptions, validationResult *ValidationResult) {
+func (ecl *EnhancedConfigLoader) logSaveResult(
+	options *ConfigSaveOptions,
+	validationResult *ValidationResult,
+) {
 	if ecl.enableMonitoring != MonitoringOptionEnabled {
 		return
 	}

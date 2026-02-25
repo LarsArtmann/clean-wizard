@@ -44,33 +44,56 @@ func newBaseNixConfig(safeMode bool) *domain.Config {
 
 // withGenerations sets/updates the nix-generations operation Generations value.
 func withGenerations(cfg *domain.Config, generations int) *domain.Config {
-	WithNixGenerationsSetting(cfg, "nix-cleanup", "nix-generations", func(settings *domain.NixGenerationsSettings) bool {
-		settings.Generations = generations
-		return true
-	})
+	WithNixGenerationsSetting(
+		cfg,
+		"nix-cleanup",
+		"nix-generations",
+		func(settings *domain.NixGenerationsSettings) bool {
+			settings.Generations = generations
+
+			return true
+		},
+	)
+
 	return cfg
 }
 
 // withRiskLevel adjusts the operation RiskLevel and Enabled flags.
 func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Config {
-	WithProfileOperationField(cfg, "nix-cleanup", "nix-generations", func(op *domain.CleanupOperation) bool {
-		op.RiskLevel = level
-		// Auto-disable critical operations in unsafe mode
-		if level == domain.RiskLevelType(domain.RiskLevelCriticalType) && !cfg.SafeMode.IsEnabled() {
-			op.Enabled = BoolToProfileStatus(false)
-		}
-		return true
-	})
+	WithProfileOperationField(
+		cfg,
+		"nix-cleanup",
+		"nix-generations",
+		func(op *domain.CleanupOperation) bool {
+			op.RiskLevel = level
+			// Auto-disable critical operations in unsafe mode
+			if level == domain.RiskLevelType(domain.RiskLevelCriticalType) &&
+				!cfg.SafeMode.IsEnabled() {
+				op.Enabled = BoolToProfileStatus(false)
+			}
+
+			return true
+		},
+	)
+
 	return cfg
 }
 
 // withOptimize sets the Optimize flag for nix-generations.
 func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	optimizationMode := BoolToOptimizationMode(optimize)
-	WithNixGenerationsSetting(cfg, "nix-cleanup", "nix-generations", func(settings *domain.NixGenerationsSettings) bool {
-		settings.Optimize = optimizationMode
-		return true
-	})
+
+	WithNixGenerationsSetting(
+		cfg,
+		"nix-cleanup",
+		"nix-generations",
+		func(settings *domain.NixGenerationsSettings) bool {
+			settings.Optimize = optimizationMode
+
+			return true
+		},
+	)
+
 	return cfg
 }
 
@@ -83,6 +106,7 @@ func newInvalidValidationThen(errorSubstring string) []BDDThen {
 				if result.IsValid {
 					return errors.New("expected invalid configuration")
 				}
+
 				return nil
 			},
 		},
@@ -92,6 +116,7 @@ func newInvalidValidationThen(errorSubstring string) []BDDThen {
 				if len(result.Errors) == 0 {
 					return errors.New("expected validation errors")
 				}
+
 				return nil
 			},
 		},
@@ -103,6 +128,7 @@ func newInvalidValidationThen(errorSubstring string) []BDDThen {
 						return nil
 					}
 				}
+
 				return fmt.Errorf("expected error mentioning %s constraint", errorSubstring)
 			},
 		},
@@ -118,6 +144,7 @@ func newValidValidationThen() []BDDThen {
 				if !result.IsValid {
 					return fmt.Errorf("expected valid configuration, got errors: %v", result.Errors)
 				}
+
 				return nil
 			},
 		},
@@ -127,6 +154,7 @@ func newValidValidationThen() []BDDThen {
 				if len(result.Errors) > 0 {
 					return fmt.Errorf("expected no errors, got: %v", result.Errors)
 				}
+
 				return nil
 			},
 		},
@@ -142,6 +170,7 @@ func newSecurityErrorValidationThen() []BDDThen {
 				if result.IsValid {
 					return errors.New("expected invalid configuration")
 				}
+
 				return nil
 			},
 		},
@@ -149,11 +178,15 @@ func newSecurityErrorValidationThen() []BDDThen {
 			Description: "security validation error should be present",
 			Validate: func(result *ValidationResult) error {
 				for _, err := range result.Errors {
-					if err.Rule == "security" && strings.Contains(err.Message, "Critical risk operation") {
+					if err.Rule == "security" &&
+						strings.Contains(err.Message, "Critical risk operation") {
 						return nil
 					}
 				}
-				return errors.New("expected security validation error for critical operation in unsafe mode")
+
+				return errors.New(
+					"expected security validation error for critical operation in unsafe mode",
+				)
 			},
 		},
 	}
@@ -161,10 +194,17 @@ func newSecurityErrorValidationThen() []BDDThen {
 
 // withEnabled sets the Enabled flag for nix-generations operation.
 func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
-	WithProfileOperationField(cfg, "nix-cleanup", "nix-generations", func(op *domain.CleanupOperation) bool {
-		op.Enabled = BoolToProfileStatus(enabled)
-		return true
-	})
+	WithProfileOperationField(
+		cfg,
+		"nix-cleanup",
+		"nix-generations",
+		func(op *domain.CleanupOperation) bool {
+			op.Enabled = BoolToProfileStatus(enabled)
+
+			return true
+		},
+	)
+
 	return cfg
 }
 
@@ -192,6 +232,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "the configuration is validated",
 						Action: func(cfg *domain.Config) (*ValidationResult, error) {
 							validator := NewConfigValidator()
+
 							return validator.ValidateConfig(cfg), nil
 						},
 					},
@@ -214,6 +255,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "the configuration is validated",
 						Action: func(cfg *domain.Config) (*ValidationResult, error) {
 							validator := NewConfigValidator()
+
 							return validator.ValidateConfig(cfg), nil
 						},
 					},
@@ -236,6 +278,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "the configuration is validated",
 						Action: func(cfg *domain.Config) (*ValidationResult, error) {
 							validator := NewConfigValidator()
+
 							return validator.ValidateConfig(cfg), nil
 						},
 					},
@@ -249,7 +292,10 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 					{
 						Description: "a configuration with critical Nix operation in unsafe mode",
 						Setup: func() (*domain.Config, error) {
-							return withRiskLevel(withGenerations(withOptimize(newBaseNixConfig(false), false), 1), domain.RiskLevelType(domain.RiskLevelCriticalType)), nil
+							return withRiskLevel(
+								withGenerations(withOptimize(newBaseNixConfig(false), false), 1),
+								domain.RiskLevelType(domain.RiskLevelCriticalType),
+							), nil
 						},
 					},
 				},
@@ -258,6 +304,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						Description: "the configuration is validated",
 						Action: func(cfg *domain.Config) (*ValidationResult, error) {
 							validator := NewConfigValidator()
+
 							return validator.ValidateConfig(cfg), nil
 						},
 					},

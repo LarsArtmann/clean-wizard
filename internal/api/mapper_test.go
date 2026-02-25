@@ -63,7 +63,11 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 	}
 
 	if domainConfig.MaxDiskUsage != int(publicConfig.MaxDiskUsage) {
-		t.Errorf("Expected maxDiskUsage %d, got %d", publicConfig.MaxDiskUsage, domainConfig.MaxDiskUsage)
+		t.Errorf(
+			"Expected maxDiskUsage %d, got %d",
+			publicConfig.MaxDiskUsage,
+			domainConfig.MaxDiskUsage,
+		)
 	}
 
 	// Validate mapped profile
@@ -133,7 +137,11 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 	}
 
 	if publicConfig.MaxDiskUsage != int32(domainConfig.MaxDiskUsage) {
-		t.Errorf("Expected maxDiskUsage %d, got %d", domainConfig.MaxDiskUsage, publicConfig.MaxDiskUsage)
+		t.Errorf(
+			"Expected maxDiskUsage %d, got %d",
+			domainConfig.MaxDiskUsage,
+			publicConfig.MaxDiskUsage,
+		)
 	}
 
 	// Validate mapped profile
@@ -185,7 +193,11 @@ func TestMapCleanResultToPublic_ValidResult(t *testing.T) {
 	}
 
 	if publicResult.ItemsRemoved != uint32(domainResult.ItemsRemoved) {
-		t.Errorf("Expected itemsRemoved %d, got %d", domainResult.ItemsRemoved, publicResult.ItemsRemoved)
+		t.Errorf(
+			"Expected itemsRemoved %d, got %d",
+			domainResult.ItemsRemoved,
+			publicResult.ItemsRemoved,
+		)
 	}
 
 	if publicResult.Strategy != PublicStrategyAggressive {

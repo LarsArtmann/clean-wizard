@@ -17,6 +17,7 @@ func (cs *ConfigSanitizer) sanitizeHomebrewSettings(
 	// Sanitize prune field
 	if cs.rules.TrimWhitespace && settings.Prune != "" {
 		original := settings.Prune
+
 		settings.Prune = strings.TrimSpace(settings.Prune)
 		if original != settings.Prune {
 			result.addChange(fieldPrefix+".prune", original, settings.Prune, "trimmed whitespace")

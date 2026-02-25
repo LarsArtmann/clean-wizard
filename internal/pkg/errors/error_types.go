@@ -40,27 +40,35 @@ func (e *CleanWizardError) Error() string {
 	if e.Details.Field != "" {
 		details = append(details, "field="+e.Details.Field)
 	}
+
 	if e.Details.Value != "" {
 		details = append(details, "value="+e.Details.Value)
 	}
+
 	if e.Details.Expected != "" {
 		details = append(details, "expected="+e.Details.Expected)
 	}
+
 	if e.Details.Actual != "" {
 		details = append(details, "actual="+e.Details.Actual)
 	}
+
 	if e.Details.Operation != "" {
 		details = append(details, "operation="+e.Details.Operation)
 	}
+
 	if e.Details.FilePath != "" {
 		details = append(details, "file="+e.Details.FilePath)
 	}
+
 	if e.Details.LineNumber > 0 {
 		details = append(details, fmt.Sprintf("line=%d", e.Details.LineNumber))
 	}
+
 	if e.Details.RetryCount > 0 {
 		details = append(details, fmt.Sprintf("retry=%d", e.Details.RetryCount))
 	}
+
 	if e.Details.Duration != "" {
 		details = append(details, "duration="+e.Details.Duration)
 	}
@@ -83,5 +91,6 @@ func (e *CleanWizardError) Unwrap() error {
 	if e.Details != nil && e.Details.Value != "" {
 		return fmt.Errorf("wrapped error: %s", e.Details.Value)
 	}
+
 	return nil
 }

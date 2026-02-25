@@ -32,6 +32,7 @@ func TrimWhitespaceField(field TrimmableField, changes SanitizationResult) bool 
 		if changes != nil {
 			changes.AddChange(field.Path, original, trimmed, "trimmed whitespace")
 		}
+
 		return true
 	}
 
@@ -61,12 +62,16 @@ func NewTrimmableFieldsBuilder() *TrimmableFieldsBuilder {
 }
 
 // AddField adds a trimmable field to the builder.
-func (b *TrimmableFieldsBuilder) AddField(name, path string, value *string) *TrimmableFieldsBuilder {
+func (b *TrimmableFieldsBuilder) AddField(
+	name, path string,
+	value *string,
+) *TrimmableFieldsBuilder {
 	b.fields = append(b.fields, TrimmableField{
 		Name:  name,
 		Value: value,
 		Path:  path,
 	})
+
 	return b
 }
 
@@ -83,6 +88,7 @@ func TrimMultipleFields(trimEnabled bool, fields []TrimmableField, changes Sanit
 	}
 
 	changed := 0
+
 	for _, field := range fields {
 		if TrimWhitespaceField(field, changes) {
 			changed++

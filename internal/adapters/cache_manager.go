@@ -70,10 +70,12 @@ func (cm *CacheManager) Stats() CacheStats {
 // Keys returns all keys in the cache.
 func (cm *CacheManager) Keys() []string {
 	items := cm.cache.Items()
+
 	keys := make([]string, 0, len(items))
 	for k := range items {
 		keys = append(keys, k)
 	}
+
 	return keys
 }
 

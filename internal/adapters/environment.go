@@ -64,7 +64,8 @@ type EnvironmentConfig struct {
 func LoadEnvironmentConfig() (*EnvironmentConfig, error) {
 	cfg := &EnvironmentConfig{}
 
-	if err := env.Parse(cfg); err != nil {
+	err := env.Parse(cfg)
+	if err != nil {
 		return nil, err
 	}
 
@@ -75,9 +76,10 @@ func LoadEnvironmentConfig() (*EnvironmentConfig, error) {
 func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error) {
 	cfg := &EnvironmentConfig{}
 
-	if err := env.Parse(cfg, env.Options{
+	err := env.Parse(cfg, env.Options{
 		Prefix: prefix,
-	}); err != nil {
+	})
+	if err != nil {
 		return nil, err
 	}
 
@@ -89,6 +91,7 @@ func GetEnvWithDefault(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
+
 	return defaultValue
 }
 
@@ -99,6 +102,7 @@ func GetEnvBool(key string, defaultValue bool) bool {
 			return parsed
 		}
 	}
+
 	return defaultValue
 }
 
@@ -109,6 +113,7 @@ func GetEnvInt(key string, defaultValue int) int {
 			return parsed
 		}
 	}
+
 	return defaultValue
 }
 
@@ -119,6 +124,7 @@ func GetEnvDuration(key string, defaultValue time.Duration) time.Duration {
 			return parsed
 		}
 	}
+
 	return defaultValue
 }
 
@@ -194,6 +200,7 @@ func (cfg *EnvironmentConfig) ToView() EnvironmentConfigView {
 // ToMap converts config to map for legacy compatibility (deprecated).
 func (cfg *EnvironmentConfig) ToMap() map[string]any {
 	view := cfg.ToView()
+
 	return map[string]any{
 		"debug":                view.Debug,
 		"environment":          view.Environment,

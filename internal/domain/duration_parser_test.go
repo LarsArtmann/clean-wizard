@@ -121,17 +121,26 @@ func TestParseCustomDuration(t *testing.T) {
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("Expected error for input '%s', but got none", tt.input)
+
 					return
 				}
+
 				t.Logf("✓ Expected error for input '%s': %v", tt.input, err)
 			} else {
 				if err != nil {
 					t.Errorf("Unexpected error for input '%s': %v", tt.input, err)
+
 					return
 				}
 
 				if result != tt.expected {
-					t.Errorf("Expected duration %v for input '%s', but got %v", tt.expected, tt.input, result)
+					t.Errorf(
+						"Expected duration %v for input '%s', but got %v",
+						tt.expected,
+						tt.input,
+						result,
+					)
+
 					return
 				}
 
@@ -176,11 +185,13 @@ func TestValidateCustomDuration(t *testing.T) {
 
 			if tt.expectError && err == nil {
 				t.Errorf("Expected error for input '%s', but got none", tt.input)
+
 				return
 			}
 
 			if !tt.expectError && err != nil {
 				t.Errorf("Unexpected error for input '%s': %v", tt.input, err)
+
 				return
 			}
 

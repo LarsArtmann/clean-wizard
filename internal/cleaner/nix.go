@@ -16,6 +16,7 @@ func boolToGenerationStatus(b bool) domain.GenerationStatus {
 	if b {
 		return domain.GenerationStatusCurrent
 	}
+
 	return domain.GenerationStatusHistorical
 }
 
@@ -42,6 +43,7 @@ func NewNixCleaner(verbose, dryRun bool, keepCount ...int) *NixCleaner {
 		keepCount: kc,
 	}
 	nc.adapter.SetDryRun(dryRun) // Pass dry-run to adapter
+
 	return nc
 }
 
@@ -98,6 +100,7 @@ func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	if storeSizeResult.IsErr() {
 		return 0
 	}
+
 	return storeSizeResult.Value()
 }
 
@@ -108,11 +111,18 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 	}
 
 	if settings.NixGenerations.Generations < 1 {
-		return fmt.Errorf("generations to keep must be at least 1, got: %d", settings.NixGenerations.Generations)
+		return fmt.Errorf(
+			"generations to keep must be at least 1, got: %d",
+			settings.NixGenerations.Generations,
+		)
 	}
 
 	if settings.NixGenerations.Generations > 10 {
-		return fmt.Errorf("generations to keep must not exceed %d, got: %d", 10, settings.NixGenerations.Generations)
+		return fmt.Errorf(
+			"generations to keep must not exceed %d, got: %d",
+			10,
+			settings.NixGenerations.Generations,
+		)
 	}
 
 	return nil
@@ -152,7 +162,10 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 }
 
 // CleanOldGenerations removes old Nix generations using centralized conversions.
-func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) result.Result[domain.CleanResult] {
+func (nc *NixCleaner) CleanOldGenerations(
+	ctx context.Context,
+	keepCount int,
+) result.Result[domain.CleanResult] {
 	// Get generations first
 	genResult := nc.ListGenerations(ctx)
 	if genResult.IsErr() {
@@ -174,7 +187,12 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 		}
 		// Estimate bytes to free based on average generation size
 		estimatedBytes := avgSize * int64(toRemove)
-		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), toRemove, estimatedBytes)
+		cleanResult := conversions.NewCleanResult(
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+			toRemove,
+			estimatedBytes,
+		)
+
 		return result.Ok(cleanResult)
 	}
 
@@ -217,7 +235,12 @@ func (nc *NixCleaner) CleanOldGenerations(ctx context.Context, keepCount int) re
 
 	// Dry-run or no generations to remove - use centralized conversion
 	estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Estimated
-	cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), toRemove, estimatedBytes)
+	cleanResult := conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyDryRunType),
+		toRemove,
+		estimatedBytes,
+	)
+
 	return result.Ok(cleanResult)
 }
 
@@ -226,5 +249,6 @@ func countOldGenerations(generations []domain.NixGeneration, keepCount int) int 
 	if len(generations) <= keepCount {
 		return 0
 	}
+
 	return len(generations) - keepCount
 }

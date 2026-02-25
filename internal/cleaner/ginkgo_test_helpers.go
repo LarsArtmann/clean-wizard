@@ -31,6 +31,7 @@ func GinkgoNoItemsToCleanTest(ctx context.Context, cleaner interface {
 }, setupEmptyState func(),
 ) {
 	setupEmptyState()
+
 	result := cleaner.Clean(ctx)
 	gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 	cleanResult := result.Value()
@@ -56,7 +57,10 @@ func GinkgoNoItemsToCleanTest(ctx context.Context, cleaner interface {
 //		}
 //		GinkgoValidateInvalidExcludePatternTest(cleaner, settings)
 //	})
-func GinkgoValidateInvalidExcludePatternTest(cleaner CleanerWithSettings, settings *domain.OperationSettings) {
+func GinkgoValidateInvalidExcludePatternTest(
+	cleaner CleanerWithSettings,
+	settings *domain.OperationSettings,
+) {
 	err := cleaner.ValidateSettings(settings)
 	gomega.Expect(err).To(gomega.HaveOccurred())
 	gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid exclude pattern"))
@@ -79,7 +83,10 @@ func GinkgoValidateInvalidExcludePatternTest(cleaner CleanerWithSettings, settin
 //		}
 //		GinkgoValidateValidSettingsTest(cleaner, settings)
 //	})
-func GinkgoValidateValidSettingsTest(cleaner CleanerWithSettings, settings *domain.OperationSettings) {
+func GinkgoValidateValidSettingsTest(
+	cleaner CleanerWithSettings,
+	settings *domain.OperationSettings,
+) {
 	err := cleaner.ValidateSettings(settings)
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -103,6 +110,7 @@ func GinkgoValidateValidSettingsTest(cleaner CleanerWithSettings, settings *doma
 //	})
 func GinkgoErrorPropagationTest[T any](setupError func(), operation func() result.Result[T]) {
 	setupError()
+
 	res := operation()
 	gomega.Expect(res.IsErr()).To(gomega.BeTrue())
 	gomega.Expect(res.Error()).To(gomega.HaveOccurred())
@@ -161,6 +169,7 @@ func GinkgoNoItemsToScanTest(ctx context.Context, cleaner interface {
 }, setupEmptyState func(),
 ) {
 	setupEmptyState()
+
 	result := cleaner.Scan(ctx)
 	gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 	gomega.Expect(result.Value()).To(gomega.BeEmpty())

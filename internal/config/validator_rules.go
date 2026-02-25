@@ -67,6 +67,7 @@ func (vr *ValidationRule[T]) GetCompiledRegex() *regexp.Regexp {
 			// and validation will fail gracefully in validateProfileName
 		}
 	})
+
 	return vr.compiledRegex
 }
 

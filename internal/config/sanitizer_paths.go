@@ -45,6 +45,7 @@ func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *domain.Config, result *Sa
 				Sanitized: path,
 				Reason:    "protected path must be absolute: " + original,
 			})
+
 			continue // Skip processing invalid path
 		}
 

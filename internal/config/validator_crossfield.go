@@ -10,7 +10,8 @@ import (
 // validateFieldConstraints validates individual fields against rules.
 func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *ValidationResult) {
 	// MaxDiskUsage validation
-	if err := cv.validateMaxDiskUsage(cfg.MaxDiskUsage); err != nil {
+	err := cv.validateMaxDiskUsage(cfg.MaxDiskUsage)
+	if err != nil {
 		minUsage, maxUsage := cv.getMaxDiskUsageBounds()
 
 		// Create descriptive suggestion using actual rule values
@@ -34,7 +35,8 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	}
 
 	// Protected paths validation
-	if err := cv.validateProtectedPaths(cfg.Protected); err != nil {
+	err := cv.validateProtectedPaths(cfg.Protected)
+	if err != nil {
 		result.Errors = append(result.Errors, ValidationError{
 			Field:      "protected",
 			Rule:       "format",
@@ -58,7 +60,8 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	}
 
 	// Check profile count limits
-	if cv.rules.MaxProfiles != nil && cv.rules.MaxProfiles.Max != nil && len(cfg.Profiles) > *cv.rules.MaxProfiles.Max {
+	if cv.rules.MaxProfiles != nil && cv.rules.MaxProfiles.Max != nil &&
+		len(cfg.Profiles) > *cv.rules.MaxProfiles.Max {
 		result.Warnings = append(result.Warnings, ValidationWarning{
 			Field: "profiles",
 			Message: fmt.Sprintf("Profile count (%d) exceeds recommended limit (%d)",

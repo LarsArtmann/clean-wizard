@@ -18,6 +18,7 @@ func Ok[T any](value T) Result[T] {
 // Err creates an error result.
 func Err[T any](err error) Result[T] {
 	var zero T
+
 	return Result[T]{value: zero, err: err}
 }
 
@@ -41,6 +42,7 @@ func (r Result[T]) Value() T {
 	if r.err != nil {
 		panic("attempted to get value from error result: " + r.err.Error())
 	}
+
 	return r.value
 }
 
@@ -48,8 +50,10 @@ func (r Result[T]) Value() T {
 func (r Result[T]) SafeValue() (T, error) {
 	if r.err != nil {
 		var zero T
+
 		return zero, r.err
 	}
+
 	return r.value, nil
 }
 
@@ -58,6 +62,7 @@ func (r Result[T]) Error() error {
 	if r.err == nil {
 		panic("attempted to get error from success result")
 	}
+
 	return r.err
 }
 
@@ -71,6 +76,7 @@ func (r Result[T]) UnwrapOr(default_ T) T {
 	if r.err != nil {
 		return default_
 	}
+
 	return r.value
 }
 
@@ -79,6 +85,7 @@ func Map[T, U any](r Result[T], fn func(T) U) Result[U] {
 	if r.err != nil {
 		return Err[U](r.err)
 	}
+
 	return Ok(fn(r.value))
 }
 
@@ -89,6 +96,7 @@ func AndThen[T, U any](r Result[T], fn func(T) Result[U]) Result[U] {
 	if r.err != nil {
 		return Err[U](r.err)
 	}
+
 	return fn(r.value)
 }
 
@@ -103,6 +111,7 @@ func (r Result[T]) OrElse(fallback Result[T]) Result[T] {
 	if r.err != nil {
 		return fallback
 	}
+
 	return r
 }
 
@@ -113,9 +122,11 @@ func (r Result[T]) Validate(predicate func(T) bool, errorMsg string) Result[T] {
 	if r.err != nil {
 		return r
 	}
+
 	if !predicate(r.value) {
 		return Err[T](errors.New(errorMsg))
 	}
+
 	return r
 }
 
@@ -126,9 +137,11 @@ func (r Result[T]) ValidateWithError(predicate func(T) bool, err error) Result[T
 	if r.err != nil {
 		return r
 	}
+
 	if !predicate(r.value) {
 		return Err[T](err)
 	}
+
 	return r
 }
 
@@ -138,6 +151,7 @@ func (r Result[T]) Tap(fn func(T)) Result[T] {
 	if r.err == nil {
 		fn(r.value)
 	}
+
 	return r
 }
 

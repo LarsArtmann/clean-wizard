@@ -9,6 +9,7 @@ import (
 // It handles nil pointer comparison correctly.
 func assertFloat64PtrEqual(t *testing.T, name string, got, want *float64) {
 	t.Helper()
+
 	if (want == nil) != (got == nil) {
 		t.Errorf("%s = %v, want %v", name, got, want)
 	} else if want != nil && *got != *want {

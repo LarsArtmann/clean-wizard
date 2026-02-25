@@ -82,6 +82,7 @@ func NewConfigSanitizerWithRules(rules *SanitizationRules) *ConfigSanitizer {
 // SanitizeConfig performs comprehensive configuration sanitization.
 func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *ValidationResult) {
 	start := time.Now()
+
 	defer func() {
 		// Update validation result duration if provided
 		if validationResult != nil {
@@ -124,9 +125,13 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 		// Copy sanitization warnings to validation result
 		for _, warning := range result.Warnings {
 			validationResult.Warnings = append(validationResult.Warnings, ValidationWarning{
-				Field:      warning.Field,
-				Message:    warning.Reason,
-				Suggestion: fmt.Sprintf("Value was changed from %v to %v", warning.Original, warning.Sanitized),
+				Field:   warning.Field,
+				Message: warning.Reason,
+				Suggestion: fmt.Sprintf(
+					"Value was changed from %v to %v",
+					warning.Original,
+					warning.Sanitized,
+				),
 				Context: &ValidationContext{
 					Metadata: map[string]string{
 						"original":  fmt.Sprintf("%v", warning.Original),
@@ -144,6 +149,7 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 	// Sanitize version
 	if cs.rules.TrimWhitespace {
 		original := cfg.Version
+
 		cfg.Version = strings.TrimSpace(cfg.Version)
 		if original != cfg.Version {
 			result.addChange("version", original, cfg.Version, "trimmed whitespace")
@@ -152,6 +158,7 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 
 	if cs.rules.NormalizeCase {
 		original := cfg.Version
+
 		cfg.Version = strings.ToLower(cfg.Version)
 		if original != cfg.Version {
 			result.addChange("version", original, cfg.Version, "normalized to lowercase")
@@ -163,17 +170,29 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 		original := cfg.MaxDiskUsage
 		if cfg.MaxDiskUsage < MinDiskUsagePercent {
 			cfg.MaxDiskUsage = MinDiskUsagePercent
-			result.addWarning("max_disk_usage", original, cfg.MaxDiskUsage, "clamped to minimum value")
+			result.addWarning(
+				"max_disk_usage",
+				original,
+				cfg.MaxDiskUsage,
+				"clamped to minimum value",
+			)
 		} else if cfg.MaxDiskUsage > MaxDiskUsagePercent {
 			cfg.MaxDiskUsage = MaxDiskUsagePercent
-			result.addWarning("max_disk_usage", original, cfg.MaxDiskUsage, "clamped to maximum value")
+			result.addWarning(
+				"max_disk_usage",
+				original,
+				cfg.MaxDiskUsage,
+				"clamped to maximum value",
+			)
 		}
 	}
 
 	if cs.rules.RoundPercentages {
 		original := cfg.MaxDiskUsage
 		// Round to nearest increment
-		cfg.MaxDiskUsage = int(float64(cfg.MaxDiskUsage+RoundingIncrement/2)/RoundingIncrement) * RoundingIncrement
+		cfg.MaxDiskUsage = int(
+			float64(cfg.MaxDiskUsage+RoundingIncrement/2)/RoundingIncrement,
+		) * RoundingIncrement
 		if original != cfg.MaxDiskUsage {
 			result.addChange("max_disk_usage", original, cfg.MaxDiskUsage, "rounded to nearest 10%")
 		}
@@ -229,12 +248,17 @@ func getDefaultSanitizationRules() *SanitizationRules {
 }
 
 // sanitizeOlderThan sanitizes the OlderThan field with whitespace trimming and duration validation.
-func (cs *ConfigSanitizer) sanitizeOlderThan(fieldPrefix string, olderThan *string, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeOlderThan(
+	fieldPrefix string,
+	olderThan *string,
+	result *SanitizationResult,
+) {
 	if !cs.rules.TrimWhitespace || *olderThan == "" {
 		return
 	}
 
 	original := *olderThan
+
 	*olderThan = strings.TrimSpace(*olderThan)
 	if original != *olderThan {
 		result.addChange(fieldPrefix+".older_than", original, *olderThan, "trimmed whitespace")
@@ -242,6 +266,11 @@ func (cs *ConfigSanitizer) sanitizeOlderThan(fieldPrefix string, olderThan *stri
 
 	// Validate duration format using custom parser
 	if _, err := domain.ParseCustomDuration(*olderThan); err != nil {
-		result.addWarning(fieldPrefix+".older_than", *olderThan, *olderThan, fmt.Sprintf("invalid duration format: %v", err))
+		result.addWarning(
+			fieldPrefix+".older_than",
+			*olderThan,
+			*olderThan,
+			fmt.Sprintf("invalid duration format: %v", err),
+		)
 	}
 }

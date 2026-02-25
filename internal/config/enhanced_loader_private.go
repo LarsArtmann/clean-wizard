@@ -29,6 +29,7 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(
 		// Use existing Load function with timeout context
 		timeoutCtx, cancel := context.WithTimeout(ctx, options.Timeout)
 		config, err := LoadWithContext(timeoutCtx)
+
 		cancel()
 
 		if err == nil {
@@ -42,11 +43,19 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(
 		}
 	}
 
-	return nil, fmt.Errorf("failed to load config after %d attempts: %w", ecl.retryPolicy.MaxRetries+1, lastErr)
+	return nil, fmt.Errorf(
+		"failed to load config after %d attempts: %w",
+		ecl.retryPolicy.MaxRetries+1,
+		lastErr,
+	)
 }
 
 // saveConfigWithRetry saves configuration with retry logic.
-func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config *domain.Config, options *ConfigSaveOptions) error {
+func (ecl *EnhancedConfigLoader) saveConfigWithRetry(
+	ctx context.Context,
+	config *domain.Config,
+	options *ConfigSaveOptions,
+) error {
 	var lastErr error
 
 	for attempt := 0; attempt <= ecl.retryPolicy.MaxRetries; attempt++ {
@@ -71,7 +80,11 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(ctx context.Context, config
 		}
 	}
 
-	return fmt.Errorf("failed to save config after %d attempts: %w", ecl.retryPolicy.MaxRetries+1, lastErr)
+	return fmt.Errorf(
+		"failed to save config after %d attempts: %w",
+		ecl.retryPolicy.MaxRetries+1,
+		lastErr,
+	)
 }
 
 // createBackup creates a backup of the current configuration.
@@ -95,6 +108,7 @@ func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domai
 	if ecl.enableMonitoring == MonitoringOptionEnabled {
 		fmt.Printf("💾 Configuration backup created\n")
 	}
+
 	return nil
 }
 
@@ -104,6 +118,7 @@ func (ecl *EnhancedConfigLoader) shouldRetry(err error) bool {
 	if err.Error() == "validation failed" {
 		return false
 	}
+
 	return true
 }
 

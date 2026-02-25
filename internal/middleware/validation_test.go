@@ -39,7 +39,9 @@ func TestValidationMiddleware(t *testing.T) {
 
 	t.Run("ValidCleanRequest", func(t *testing.T) {
 		req := domain.CleanRequest{
-			Items:    []domain.ScanItem{{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: domain.ScanTypeTemp}},
+			Items: []domain.ScanItem{
+				{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: domain.ScanTypeTemp},
+			},
 			Strategy: domain.CleanStrategyType(domain.StrategyConservativeType),
 		}
 
@@ -96,8 +98,13 @@ func (m *mockCleaner) GetStoreSize(ctx context.Context) int64 {
 }
 
 func (m *mockCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings != nil && settings.NixGenerations != nil && settings.NixGenerations.Generations < 1 {
-		return fmt.Errorf("Generations to keep must be at least 1, got: %d", settings.NixGenerations.Generations)
+	if settings != nil && settings.NixGenerations != nil &&
+		settings.NixGenerations.Generations < 1 {
+		return fmt.Errorf(
+			"Generations to keep must be at least 1, got: %d",
+			settings.NixGenerations.Generations,
+		)
 	}
+
 	return nil
 }

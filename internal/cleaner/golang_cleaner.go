@@ -90,6 +90,7 @@ func (gc *GoCleaner) Name() string {
 // IsAvailable checks if Go is available.
 func (gc *GoCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := exec.LookPath("go")
+
 	return err == nil
 }
 
@@ -120,6 +121,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 		cleaner, ok := gc.cleaners[cacheType]
 		if !ok {
 			gc.logWarning("no cleaner for cache type: %v", cacheType)
+
 			continue
 		}
 
@@ -128,6 +130,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 	}
 
 	duration := time.Since(startTime)
+
 	return gc.buildCleanResult(stats, duration)
 }
 
@@ -141,6 +144,7 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.Clean
 
 	if scanResult.IsOk() {
 		items := scanResult.Value()
+
 		itemsRemoved = len(items)
 		for _, item := range items {
 			totalBytes += uint64(item.Size)
@@ -150,8 +154,13 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.Clean
 		itemsRemoved = gc.config.Caches.Count()
 	}
 
-	cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, int64(totalBytes))
+	cleanResult := conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyDryRunType),
+		itemsRemoved,
+		int64(totalBytes),
+	)
 	cleanResult.SizeEstimate = domain.SizeEstimate{Known: totalBytes}
+
 	return result.Ok(cleanResult)
 }
 
@@ -163,6 +172,7 @@ func (gc *GoCleaner) processCacheResult(
 ) {
 	if r.IsErr() {
 		stats.Failed++
+
 		gc.logWarning("failed to clean %s: %v", cacheName, r.Error())
 	} else if r.IsOk() && r.Value().ItemsRemoved > 0 {
 		stats.Removed += r.Value().ItemsRemoved
@@ -171,7 +181,10 @@ func (gc *GoCleaner) processCacheResult(
 }
 
 // buildCleanResult creates CleanResult from stats.
-func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) result.Result[domain.CleanResult] {
+func (gc *GoCleaner) buildCleanResult(
+	stats CleanStats,
+	duration time.Duration,
+) result.Result[domain.CleanResult] {
 	// Create result with honest size estimate - set Status explicitly to avoid validation errors
 	var status domain.SizeEstimateStatusType
 	if stats.FreedBytes > 0 {
@@ -186,7 +199,11 @@ func (gc *GoCleaner) buildCleanResult(stats CleanStats, duration time.Duration) 
 	}
 
 	// Note: conversions.NewCleanResult uses FreedBytes (deprecated), so we update SizeEstimate
-	cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), int(stats.Removed), int64(stats.FreedBytes))
+	cleanResult := conversions.NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		int(stats.Removed),
+		int64(stats.FreedBytes),
+	)
 	cleanResult.SizeEstimate = sizeEstimate
 	cleanResult.CleanTime = duration
 	cleanResult.CleanedAt = time.Now()

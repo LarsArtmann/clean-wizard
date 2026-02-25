@@ -11,7 +11,11 @@ import (
 )
 
 // applyValidation applies validation at the specified level.
-func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *domain.Config, level domain.ValidationLevelType) *ValidationResult {
+func (ecl *EnhancedConfigLoader) applyValidation(
+	ctx context.Context,
+	config *domain.Config,
+	level domain.ValidationLevelType,
+) *ValidationResult {
 	switch level {
 	case domain.ValidationLevelNoneType:
 		return &ValidationResult{IsValid: true, Timestamp: time.Now()}
@@ -21,12 +25,14 @@ func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *do
 		// Add additional validation rules
 		result := ecl.validator.ValidateConfig(config)
 		ecl.applyComprehensiveValidation(config, result)
+
 		return result
 	case domain.ValidationLevelStrictType:
 		// Apply all validation including strict checks
 		result := ecl.validator.ValidateConfig(config)
 		ecl.applyComprehensiveValidation(config, result)
 		ecl.applyStrictValidation(config, result)
+
 		return result
 	default:
 		return ecl.validator.ValidateConfig(config)
@@ -34,7 +40,10 @@ func (ecl *EnhancedConfigLoader) applyValidation(ctx context.Context, config *do
 }
 
 // applyComprehensiveValidation applies comprehensive validation rules.
-func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *domain.Config, result *ValidationResult) {
+func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(
+	config *domain.Config,
+	result *ValidationResult,
+) {
 	// Additional comprehensive validation rules
 
 	// Check for configuration consistency
@@ -57,7 +66,10 @@ func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(config *domain.Con
 }
 
 // applyStrictValidation applies strict validation rules.
-func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, result *ValidationResult) {
+func (ecl *EnhancedConfigLoader) applyStrictValidation(
+	config *domain.Config,
+	result *ValidationResult,
+) {
 	// Strict validation rules that might fail
 
 	// Require explicit profiles (no auto-generation)
@@ -81,6 +93,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(config *domain.Config, re
 			requiredPaths = []string{"/System", "/Library"} // Final fallback
 		}
 	}
+
 	for _, required := range requiredPaths {
 		if !ecl.isPathProtected(config.Protected, required) {
 			result.Errors = append(result.Errors, ValidationError{
@@ -102,12 +115,14 @@ func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *domain.Config
 		if profile == nil {
 			continue
 		}
+
 		for _, op := range profile.Operations {
 			if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
 				return true
 			}
 		}
 	}
+
 	return false
 }
 
@@ -153,7 +168,12 @@ func (ecl *EnhancedConfigLoader) mapValidatorRulesToSchemaRules() *ConfigValidat
 
 // getSchemaBounds returns the min/max bounds for max_disk_usage from rules.
 func (ecl *EnhancedConfigLoader) getSchemaBounds() schema.MinMax {
-	return schema.ExtractMinMax(ecl.validator.rules.MaxDiskUsage.Min, ecl.validator.rules.MaxDiskUsage.Max, 10.0, 95.0)
+	return schema.ExtractMinMax(
+		ecl.validator.rules.MaxDiskUsage.Min,
+		ecl.validator.rules.MaxDiskUsage.Max,
+		10.0,
+		95.0,
+	)
 }
 
 // getSchemaMinimum returns the minimum value for max_disk_usage from rules.

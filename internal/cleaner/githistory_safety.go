@@ -39,13 +39,17 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 	report.IsGitRepo = c.isGitRepo(ctx)
 	if !report.IsGitRepo {
 		report.Blockers = append(report.Blockers, "Not a git repository")
+
 		return report
 	}
 
 	// Check for uncommitted changes
 	report.HasUncommittedChanges = c.hasUncommittedChanges(ctx)
 	if report.HasUncommittedChanges {
-		report.Blockers = append(report.Blockers, "You have uncommitted changes. Commit or stash them first.")
+		report.Blockers = append(
+			report.Blockers,
+			"You have uncommitted changes. Commit or stash them first.",
+		)
 	}
 
 	// Get branch info
@@ -58,16 +62,22 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 	if report.HasRemote {
 		report.HasUnpushedCommits = c.hasUnpushedCommits(ctx)
 		if report.HasUnpushedCommits {
-			report.Warnings = append(report.Warnings, "You have unpushed commits that will be rewritten.")
+			report.Warnings = append(
+				report.Warnings,
+				"You have unpushed commits that will be rewritten.",
+			)
 		}
 	}
 
 	// Check if git-filter-repo is available (system or via nix)
 	report.FilterRepoAvailable = c.isFilterRepoAvailable(ctx)
+
 	report.FilterRepoProvider = DetectFilterRepoProvider().String()
 	if !report.FilterRepoAvailable {
-		report.Blockers = append(report.Blockers,
-			"git-filter-repo is not installed. Install with: brew install git-filter-repo, or ensure nix is available to use it automatically")
+		report.Blockers = append(
+			report.Blockers,
+			"git-filter-repo is not installed. Install with: brew install git-filter-repo, or ensure nix is available to use it automatically",
+		)
 	}
 
 	// Check backup capability
@@ -80,6 +90,7 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 // isGitRepo checks if the path is a git repository.
 func (c *GitHistorySafetyChecker) isGitRepo(ctx context.Context) bool {
 	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath, "rev-parse", "--git-dir")
+
 	return cmd.Run() == nil
 }
 
@@ -93,35 +104,53 @@ func (c *GitHistorySafetyChecker) hasUncommittedChanges(ctx context.Context) boo
 
 	// Check for unstaged changes
 	cmd = exec.CommandContext(ctx, "git", "-C", c.repoPath, "diff", "--quiet")
+
 	return cmd.Run() != nil
 }
 
 // getCurrentBranch returns the current branch name.
 func (c *GitHistorySafetyChecker) getCurrentBranch(ctx context.Context) string {
 	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath, "branch", "--show-current")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return "unknown"
 	}
+
 	return strings.TrimSpace(string(output))
 }
 
 // checkRemote checks for remote configuration.
-func (c *GitHistorySafetyChecker) checkRemote(ctx context.Context, report *domain.GitHistorySafetyReport) {
+func (c *GitHistorySafetyChecker) checkRemote(
+	ctx context.Context,
+	report *domain.GitHistorySafetyReport,
+) {
 	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath, "remote")
+
 	output, err := cmd.Output()
 	if err != nil || len(output) == 0 {
 		report.HasRemote = false
+
 		return
 	}
 
 	report.HasRemote = true
+
 	remotes := strings.Fields(string(output))
 	if len(remotes) > 0 {
 		report.RemoteName = remotes[0]
 
 		// Get remote URL
-		cmd = exec.CommandContext(ctx, "git", "-C", c.repoPath, "remote", "get-url", report.RemoteName)
+		cmd = exec.CommandContext(
+			ctx,
+			"git",
+			"-C",
+			c.repoPath,
+			"remote",
+			"get-url",
+			report.RemoteName,
+		)
+
 		urlOutput, err := cmd.Output()
 		if err == nil {
 			report.RemoteURL = strings.TrimSpace(string(urlOutput))
@@ -141,16 +170,19 @@ func (c *GitHistorySafetyChecker) checkRemote(ctx context.Context, report *domai
 func (c *GitHistorySafetyChecker) hasUnpushedCommits(ctx context.Context) bool {
 	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath,
 		"log", "@{u}..HEAD", "--oneline")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return false // No upstream configured
 	}
+
 	return len(strings.TrimSpace(string(output))) > 0
 }
 
 // isFilterRepoAvailable checks if git-filter-repo is installed (system or via nix).
 func (c *GitHistorySafetyChecker) isFilterRepoAvailable(ctx context.Context) bool {
 	provider := DetectFilterRepoProvider()
+
 	return provider != FilterRepoNone
 }
 
@@ -168,6 +200,7 @@ func (c *GitHistorySafetyChecker) canCreateBackup(backupPath string) bool {
 
 	// Check if we can write to parent directory
 	parent := filepath.Dir(backupPath)
+
 	info, err := os.Stat(parent)
 	if err != nil {
 		return false

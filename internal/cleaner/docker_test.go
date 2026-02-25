@@ -159,6 +159,7 @@ func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 	// Skip test if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {
 		t.Skipf("Skipping test: Docker not available")
+
 		return
 	}
 
@@ -175,7 +176,11 @@ func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 	}
 
 	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
+		t.Errorf(
+			"Clean() strategy = %v, want %v",
+			cleanResult.Strategy,
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+		)
 	}
 
 	if cleanResult.FreedBytes == 0 {
@@ -246,6 +251,7 @@ func TestDockerCleaner_Clean_Verbose(t *testing.T) {
 	// Skip if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {
 		t.Skipf("Skipping test: Docker not available")
+
 		return
 	}
 
@@ -261,6 +267,7 @@ func TestDockerCleaner_Clean_Aggressive(t *testing.T) {
 	// Skip if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {
 		t.Skipf("Skipping test: Docker not available")
+
 		return
 	}
 
@@ -337,8 +344,10 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 			result, err := ParseDockerReclaimedSpace(tt.output)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseDockerReclaimedSpace() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if result != tt.expected {
 				t.Errorf("ParseDockerReclaimedSpace() = %d, want %d", result, tt.expected)
 			}
@@ -424,8 +433,10 @@ func TestParseDockerSize(t *testing.T) {
 			result, err := ParseDockerSize(tt.sizeStr)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseDockerSize() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !tt.wantErr && result != tt.expected {
 				t.Errorf("ParseDockerSize() = %d, want %d", result, tt.expected)
 			}

@@ -56,7 +56,12 @@ var DefaultExcludeBinaries = []string{
 
 // BinaryScanner defines the interface for scanning compiled binaries.
 type BinaryScanner interface {
-	ScanDirectory(ctx context.Context, dir string, categories []BinaryCategory, minSize int64) ([]BinaryInfo, error)
+	ScanDirectory(
+		ctx context.Context,
+		dir string,
+		categories []BinaryCategory,
+		minSize int64,
+	) ([]BinaryInfo, error)
 }
 
 // BinaryTrashOperator defines the interface for trashing binaries.
@@ -131,9 +136,11 @@ func NewCompiledBinariesCleaner(
 	if minSizeMB <= 0 {
 		minSizeMB = DefaultMinSizeMB
 	}
+
 	if olderThan == "" {
 		olderThan = DefaultOlderThan
 	}
+
 	if len(basePaths) == 0 {
 		homeDir, _ := os.UserHomeDir()
 		if homeDir != "" {
@@ -142,13 +149,19 @@ func NewCompiledBinariesCleaner(
 	}
 
 	cleaner := &CompiledBinariesCleaner{
-		verbose:           verbose,
-		dryRun:            dryRun,
-		minSizeMB:         minSizeMB,
-		olderThan:         olderThan,
-		basePaths:         basePaths,
-		excludePatterns:   excludePatterns,
-		includeCategories: []BinaryCategory{CategoryTmp, CategoryTest, CategoryBin, CategoryDist, CategoryRoot},
+		verbose:         verbose,
+		dryRun:          dryRun,
+		minSizeMB:       minSizeMB,
+		olderThan:       olderThan,
+		basePaths:       basePaths,
+		excludePatterns: excludePatterns,
+		includeCategories: []BinaryCategory{
+			CategoryTmp,
+			CategoryTest,
+			CategoryBin,
+			CategoryDist,
+			CategoryRoot,
+		},
 	}
 
 	// Apply options
@@ -164,6 +177,7 @@ func NewCompiledBinariesCleaner(
 			verbose:           verbose,
 		}
 	}
+
 	if cleaner.trashOperator == nil {
 		cleaner.trashOperator = &defaultBinaryTrashOperator{verbose: verbose}
 	}
@@ -184,6 +198,7 @@ func (c *CompiledBinariesCleaner) Name() string {
 // IsAvailable checks if trash command is available.
 func (c *CompiledBinariesCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := exec.LookPath("trash")
+
 	return err == nil
 }
 
@@ -224,7 +239,10 @@ func (c *CompiledBinariesCleaner) ValidateSettings(settings *domain.OperationSet
 	}
 	for _, cat := range s.IncludePatterns {
 		if !validCategories[cat] {
-			return fmt.Errorf("invalid include category %q, must be one of: tmp, test, bin, dist, root", cat)
+			return fmt.Errorf(
+				"invalid include category %q, must be one of: tmp, test, bin, dist, root",
+				cat,
+			)
 		}
 	}
 
@@ -236,11 +254,13 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]doma
 	minSizeBytes := int64(c.minSizeMB) * 1024 * 1024
 
 	var allBinaries []BinaryInfo
+
 	for _, basePath := range c.basePaths {
 		if _, err := os.Stat(basePath); os.IsNotExist(err) {
 			if c.verbose {
 				fmt.Printf("Skipping non-existent path: %s\n", basePath)
 			}
+
 			continue
 		}
 
@@ -249,6 +269,7 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]doma
 			if c.verbose {
 				fmt.Printf("Warning: failed to scan %s: %v\n", basePath, err)
 			}
+
 			continue
 		}
 
@@ -257,12 +278,15 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]doma
 			ageDuration, err := parseAgeDuration(c.olderThan)
 			if err == nil {
 				cutoff := time.Now().Add(-ageDuration)
+
 				var filtered []BinaryInfo
+
 				for _, b := range binaries {
 					if b.ModTime.Before(cutoff) {
 						filtered = append(filtered, b)
 					}
 				}
+
 				binaries = filtered
 			}
 		}
@@ -309,8 +333,13 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 
 	if c.dryRun {
 		if c.verbose {
-			fmt.Printf("Would trash %d compiled binary file(s) (%.2f MB)\n", len(items), float64(totalBytes)/(1024*1024))
+			fmt.Printf(
+				"Would trash %d compiled binary file(s) (%.2f MB)\n",
+				len(items),
+				float64(totalBytes)/(1024*1024),
+			)
 		}
+
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			domain.CleanStrategyType(domain.StrategyDryRunType),
 			len(items), totalBytes,
@@ -328,9 +357,11 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 		err := c.trashOperator.TrashBinary(ctx, item.Path)
 		if err != nil {
 			itemsFailed++
+
 			if c.verbose {
 				fmt.Printf("Warning: %v\n", err)
 			}
+
 			continue
 		}
 
@@ -343,6 +374,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 	}
 
 	duration := time.Since(startTime)
+
 	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
 		domain.CleanStrategyType(domain.StrategyAggressiveType),
 		itemsRemoved, itemsFailed, bytesFreed, duration,
@@ -362,6 +394,7 @@ func parseAgeDuration(s string) (time.Duration, error) {
 	}
 
 	var multiplier time.Duration
+
 	unit := s[len(s)-1:]
 
 	switch unit {
@@ -395,7 +428,12 @@ type defaultBinaryScanner struct {
 	verbose           bool
 }
 
-func (s *defaultBinaryScanner) ScanDirectory(ctx context.Context, dir string, categories []BinaryCategory, minSize int64) ([]BinaryInfo, error) {
+func (s *defaultBinaryScanner) ScanDirectory(
+	ctx context.Context,
+	dir string,
+	categories []BinaryCategory,
+	minSize int64,
+) ([]BinaryInfo, error) {
 	var binaries []BinaryInfo
 
 	categorySet := make(map[BinaryCategory]bool)
@@ -414,6 +452,7 @@ func (s *defaultBinaryScanner) ScanDirectory(ctx context.Context, dir string, ca
 			if s.shouldSkipDirectory(path) {
 				return filepath.SkipDir
 			}
+
 			return nil
 		}
 
@@ -467,6 +506,7 @@ func (s *defaultBinaryScanner) shouldSkipDirectory(path string) bool {
 		if s.verbose {
 			fmt.Printf("Skipping excluded directory: %s\n", path)
 		}
+
 		return true
 	}
 
@@ -512,6 +552,7 @@ func (s *defaultBinaryScanner) isExcludedByPattern(path string) bool {
 		if err != nil {
 			continue
 		}
+
 		if matched {
 			return true
 		}
@@ -521,6 +562,7 @@ func (s *defaultBinaryScanner) isExcludedByPattern(path string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -537,6 +579,7 @@ func (t *defaultBinaryTrashOperator) GetFileSize(path string) int64 {
 	if err != nil {
 		return 0
 	}
+
 	return info.Size()
 }
 
@@ -545,5 +588,6 @@ func (t *defaultBinaryTrashOperator) GetFileModTime(path string) (time.Time, err
 	if err != nil {
 		return time.Time{}, err
 	}
+
 	return info.ModTime(), nil
 }

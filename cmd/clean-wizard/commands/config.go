@@ -50,6 +50,7 @@ func runConfigShowCommand(cmd *cobra.Command, args []string, jsonOutput bool) er
 		fmt.Println("💡 To create configuration, run:")
 		fmt.Println("   clean-wizard init           - Interactive setup")
 		fmt.Println("   clean-wizard init --minimal  - Minimal setup")
+
 		return nil //nolint:nilerr // intentional: missing config shows help, not error
 	}
 
@@ -66,9 +67,11 @@ func runConfigShowCommand(cmd *cobra.Command, args []string, jsonOutput bool) er
 	fmt.Printf("Protected Paths: %d\n", len(cfg.Protected))
 	fmt.Println()
 	fmt.Println("Protected Paths:")
+
 	for _, path := range cfg.Protected {
 		fmt.Printf("   • %s\n", path)
 	}
+
 	fmt.Println()
 	fmt.Printf("Profiles: %d\n", len(cfg.Profiles))
 	fmt.Println()
@@ -87,15 +90,19 @@ func showConfigJSON(cfg *domain.Config) error {
 	fmt.Printf("  \"safe_mode\": \"%s\",\n", cfg.SafeMode.String())
 	fmt.Printf("  \"max_disk_usage\": %d,\n", cfg.MaxDiskUsage)
 	fmt.Printf("  \"protected\": [")
+
 	for i, path := range cfg.Protected {
 		if i > 0 {
 			fmt.Print(", ")
 		}
+
 		fmt.Printf("\"%s\"", path)
 	}
+
 	fmt.Println("],")
 	fmt.Printf("  \"profiles\": {")
 	fmt.Println("}")
+
 	return nil
 }
 
@@ -109,6 +116,7 @@ func NewConfigEditCommand() *cobra.Command {
 			return runConfigEditCommand(cmd, args)
 		},
 	}
+
 	return cmd
 }
 
@@ -120,10 +128,13 @@ func runConfigEditCommand(cmd *cobra.Command, args []string) error {
 	_, err := config.Load()
 	if err != nil {
 		fmt.Println("Creating new configuration...")
+
 		cfg := config.GetDefaultConfig()
-		if err := config.Save(cfg); err != nil {
+		err := config.Save(cfg)
+		if err != nil {
 			return fmt.Errorf("failed to create configuration: %w", err)
 		}
+
 		fmt.Println("✅ Configuration created.")
 		fmt.Println()
 	}
@@ -136,6 +147,7 @@ func runConfigEditCommand(cmd *cobra.Command, args []string) error {
 		fmt.Println()
 		fmt.Println("💡 To edit manually:")
 		fmt.Printf("   %s %s\n", getPreferredEditor(), configPath)
+
 		return nil
 	}
 
@@ -187,6 +199,7 @@ func runConfigValidateCommand(cmd *cobra.Command, args []string, configPath stri
 		fmt.Println()
 		fmt.Println("💡 To create a valid configuration:")
 		fmt.Println("   clean-wizard init --minimal")
+
 		return err
 	}
 
@@ -228,10 +241,10 @@ func runConfigResetCommand(cmd *cobra.Command, args []string, force bool) error 
 		fmt.Println("   Creating default configuration...")
 	} else if !force {
 		if !promptForConfirmation(
-			fmt.Sprintf("Reset configuration to defaults? This will overwrite %s", configPath),
+			"Reset configuration to defaults? This will overwrite "+configPath,
 			"Reset cancelled.",
 		) {
-			return nil //nolint:nilerr // intentional: user cancellation is not an error
+			return nil
 		}
 	}
 
@@ -259,12 +272,16 @@ func runConfigResetCommand(cmd *cobra.Command, args []string, force bool) error 
 func promptForConfirmation(promptMsg, cancelMsg string) bool {
 	fmt.Printf("%s\n", promptMsg)
 	fmt.Print("Type 'yes' to confirm: ")
+
 	var confirm string
+
 	_, err := fmt.Scanln(&confirm)
 	if err != nil || confirm != "yes" {
 		fmt.Printf("   %s\n", cancelMsg)
+
 		return false
 	}
+
 	return true
 }
 

@@ -39,7 +39,10 @@ type ExecuteOptions struct {
 }
 
 // Execute runs the history rewrite.
-func (e *GitHistoryExecutor) Execute(ctx context.Context, opts ExecuteOptions) (*domain.GitHistoryRewriteResult, error) {
+func (e *GitHistoryExecutor) Execute(
+	ctx context.Context,
+	opts ExecuteOptions,
+) (*domain.GitHistoryRewriteResult, error) {
 	start := time.Now()
 
 	if len(opts.FilesToRemove) == 0 {
@@ -50,16 +53,22 @@ func (e *GitHistoryExecutor) Execute(ctx context.Context, opts ExecuteOptions) (
 	oldSize, _ := e.getRepoSize()
 
 	// Create backup if requested
-	var backupCreated bool
-	var backupPath string
+	var (
+		backupCreated bool
+		backupPath    string
+	)
+
 	if opts.CreateBackup && !e.dryRun {
 		backupPath = opts.BackupPath
 		if backupPath == "" {
 			backupPath = e.getDefaultBackupPath()
 		}
-		if err := e.createBackup(ctx, backupPath); err != nil {
+		err := e.createBackup(ctx, backupPath)
+
+		if err != nil {
 			return nil, fmt.Errorf("failed to create backup: %w", err)
 		}
+
 		backupCreated = true
 	}
 
@@ -83,7 +92,8 @@ func (e *GitHistoryExecutor) Execute(ctx context.Context, opts ExecuteOptions) (
 
 	// Run garbage collection
 	if !opts.SkipGC {
-		if err := e.runGC(ctx); err != nil && e.verbose {
+		err := e.runGC(ctx)
+		if err != nil && e.verbose {
 			fmt.Printf("Warning: garbage collection failed: %v\n", err)
 		}
 	}
@@ -109,7 +119,10 @@ func (e *GitHistoryExecutor) Execute(ctx context.Context, opts ExecuteOptions) (
 }
 
 // runFilterRepo executes git-filter-repo to remove the specified files.
-func (e *GitHistoryExecutor) runFilterRepo(ctx context.Context, files []domain.GitHistoryFile) (int, error) {
+func (e *GitHistoryExecutor) runFilterRepo(
+	ctx context.Context,
+	files []domain.GitHistoryFile,
+) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
 	defer cancel()
 
@@ -167,6 +180,7 @@ func (e *GitHistoryExecutor) runGC(ctx context.Context) error {
 	// Run aggressive garbage collection
 	cmd = exec.CommandContext(ctx, "git", "-C", e.repoPath,
 		"gc", "--prune=now", "--aggressive")
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%w\nOutput: %s", err, string(output))
@@ -194,12 +208,14 @@ func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) err
 
 	// Remove existing backup if it exists (from previous run)
 	if _, err := os.Stat(backupPath); err == nil {
-		if err := os.RemoveAll(backupPath); err != nil {
+		err := os.RemoveAll(backupPath)
+		if err != nil {
 			return fmt.Errorf("failed to remove existing backup: %w", err)
 		}
 	}
 
 	cmd := exec.CommandContext(ctx, "git", "clone", "--mirror", repoPath, backupPath)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("backup failed: %w\nOutput: %s", err, string(output))
@@ -211,15 +227,18 @@ func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) err
 // getGitDirSize returns the size of the .git directory for the given repo path.
 func getGitDirSize(repoPath string) (int64, error) {
 	gitDir := filepath.Join(repoPath, ".git")
+
 	var size int64
 
 	err := filepath.Walk(gitDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil //nolint:nilerr // Skip files we can't access
 		}
+
 		if !info.IsDir() {
 			size += info.Size()
 		}
+
 		return nil
 	})
 
@@ -237,6 +256,7 @@ func (e *GitHistoryExecutor) calculateTotalSize(files []domain.GitHistoryFile) i
 	for _, f := range files {
 		total += f.SizeBytes
 	}
+
 	return total
 }
 
@@ -252,11 +272,15 @@ func (e *GitHistoryExecutor) parseCommitCount(output string) int {
 			}
 		}
 	}
+
 	return 0
 }
 
 // EstimateImpact estimates the impact of removing files without executing.
-func (e *GitHistoryExecutor) EstimateImpact(ctx context.Context, files []domain.GitHistoryFile) (*ImpactEstimate, error) {
+func (e *GitHistoryExecutor) EstimateImpact(
+	ctx context.Context,
+	files []domain.GitHistoryFile,
+) (*ImpactEstimate, error) {
 	// Get current repo size
 	oldSize, err := e.getRepoSize()
 	if err != nil {
@@ -304,6 +328,7 @@ func (e *GitHistoryExecutor) RemoveFilesFromHistory(ctx context.Context, paths [
 		FilesToRemove: files,
 		CreateBackup:  true,
 	})
+
 	return err
 }
 
@@ -339,26 +364,34 @@ func (e *GitHistoryExecutor) StripLargeBlobs(ctx context.Context, sizeMB int) er
 }
 
 // GetFilesToRemoveFromSelection filters scan results by user selection.
-func GetFilesToRemoveFromSelection(allFiles []domain.GitHistoryFile, selectedIndices []int) []domain.GitHistoryFile {
+func GetFilesToRemoveFromSelection(
+	allFiles []domain.GitHistoryFile,
+	selectedIndices []int,
+) []domain.GitHistoryFile {
 	result := make([]domain.GitHistoryFile, 0, len(selectedIndices))
 	for _, idx := range selectedIndices {
 		if idx >= 0 && idx < len(allFiles) {
 			result = append(result, allFiles[idx])
 		}
 	}
+
 	return result
 }
 
 // GetUniquePaths returns unique paths from files.
 func GetUniquePaths(files []domain.GitHistoryFile) []string {
 	seen := make(map[string]bool)
+
 	var paths []string
+
 	for _, f := range files {
 		if !seen[f.Path] {
 			seen[f.Path] = true
 			paths = append(paths, f.Path)
 		}
 	}
+
 	slices.Sort(paths)
+
 	return paths
 }

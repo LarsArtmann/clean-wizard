@@ -7,7 +7,12 @@ import (
 )
 
 // TestAvailableTypesGeneric tests that the available types function returns the expected list.
-func TestAvailableTypesGeneric[T comparable](t *stdtesting.T, name string, getAvailable func() []T, expected []T) {
+func TestAvailableTypesGeneric[T comparable](
+	t *stdtesting.T,
+	name string,
+	getAvailable func() []T,
+	expected []T,
+) {
 	t.Run(name, func(t *stdtesting.T) {
 		types := getAvailable()
 
@@ -38,7 +43,11 @@ func TestTypeStringCases[T ~string](cases []T) []testing.ValueTestCase[T, string
 }
 
 // TestTypeStringGeneric tests the string representation of a type.
-func TestTypeStringGeneric[T ~string](t *stdtesting.T, name string, getTestCases func() []testing.ValueTestCase[T, string]) {
+func TestTypeStringGeneric[T ~string](
+	t *stdtesting.T,
+	name string,
+	getTestCases func() []testing.ValueTestCase[T, string],
+) {
 	tests := getTestCases()
 
 	for _, tt := range tests {
@@ -69,6 +78,7 @@ func TestEnumString[T ~string](t *stdtesting.T, name string, values []T) {
 	for _, value := range values {
 		t.Run(expected[value], func(t *stdtesting.T) {
 			got := string(value)
+
 			want := expected[value]
 			if got != want {
 				t.Errorf("string(%[1]v) = %[2]q, want %[3]q", value, got, want)

@@ -61,6 +61,7 @@ func NewBDDTestRunner(t *testing.T, feature BDDFeature) *BDDTestRunner {
 func (b *BDDTestRunner) RunFeature() {
 	b.t.Logf("Feature: %s", b.feature.Name)
 	b.t.Logf("Description: %s", b.feature.Description)
+
 	if b.feature.Background != "" {
 		b.t.Logf("Background: %s", b.feature.Background)
 	}
@@ -78,27 +79,35 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 	// Guard checks for required steps
 	if len(scenario.Given) == 0 {
 		b.t.Errorf("scenario must define at least one Given step")
+
 		return
 	}
+
 	if len(scenario.When) == 0 {
 		b.t.Errorf("scenario must define at least one When step")
+
 		return
 	}
 
 	// Setup Given conditions
-	var cfg *domain.Config
-	var setupErr error
+	var (
+		cfg      *domain.Config
+		setupErr error
+	)
 
 	for i, given := range scenario.Given {
 		b.t.Logf("  Given %d: %s", i+1, given.Description)
+
 		if given.Setup == nil {
 			b.t.Errorf("Given step %d has no setup function", i+1)
+
 			return
 		}
 
 		cfg, setupErr = given.Setup()
 		if setupErr != nil {
 			b.t.Errorf("Given setup failed: %v", setupErr)
+
 			return
 		}
 	}
@@ -106,23 +115,29 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 	// Ensure config was created by Given steps
 	if cfg == nil {
 		b.t.Errorf("Given steps did not produce a config")
+
 		return
 	}
 
 	// Execute When actions
-	var result *ValidationResult
-	var actionErr error
+	var (
+		result    *ValidationResult
+		actionErr error
+	)
 
 	for i, when := range scenario.When {
 		b.t.Logf("  When %d: %s", i+1, when.Description)
+
 		if when.Action == nil {
 			b.t.Errorf("When step %d has no action function", i+1)
+
 			return
 		}
 
 		result, actionErr = when.Action(cfg)
 		if actionErr != nil {
 			b.t.Errorf("When action failed: %v", actionErr)
+
 			return
 		}
 	}
@@ -130,19 +145,24 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 	// Ensure result was created by When steps
 	if result == nil {
 		b.t.Errorf("When steps did not produce a result")
+
 		return
 	}
 
 	// Validate Then expectations
 	for i, then := range scenario.Then {
 		b.t.Logf("  Then %d: %s", i+1, then.Description)
+
 		if then.Validate == nil {
 			b.t.Errorf("Then step %d has no validation function", i+1)
+
 			return
 		}
 
-		if err := then.Validate(result); err != nil {
+		err := then.Validate(result)
+		if err != nil {
 			b.t.Errorf("Then validation failed: %v", err)
+
 			return
 		}
 	}

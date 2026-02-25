@@ -16,10 +16,20 @@ func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(
 	original := settings.Generations
 	if settings.Generations < 1 {
 		settings.Generations = 1
-		result.addChange(fieldPrefix+".generations", original, settings.Generations, "clamped to minimum value")
+		result.addChange(
+			fieldPrefix+".generations",
+			original,
+			settings.Generations,
+			"clamped to minimum value",
+		)
 	} else if settings.Generations > 10 {
 		settings.Generations = 10
-		result.addChange(fieldPrefix+".generations", original, settings.Generations, "clamped to maximum value")
+		result.addChange(
+			fieldPrefix+".generations",
+			original,
+			settings.Generations,
+			"clamped to maximum value",
+		)
 	}
 
 	result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".nix_generations")

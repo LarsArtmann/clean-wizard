@@ -11,14 +11,23 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 	testRules := &ConfigValidationRules{
 		MaxDiskUsage: &ValidationRule[int]{
 			Required: true,
-			Min:      func() *int { i := 10; return &i }(),
-			Max:      func() *int { i := 95; return &i }(),
-			Message:  "Max disk usage must be between 10% and 95%",
+			Min: func() *int {
+				i := 10
+				return &i
+			}(),
+			Max: func() *int {
+				i := 95
+				return &i
+			}(),
+			Message: "Max disk usage must be between 10% and 95%",
 		},
 		MinProtectedPaths: &ValidationRule[int]{
 			Required: true,
-			Min:      func() *int { i := 1; return &i }(),
-			Message:  "At least one protected path is required",
+			Min: func() *int {
+				i := 1
+				return &i
+			}(),
+			Message: "At least one protected path is required",
 		},
 		ProfileNamePattern: &ValidationRule[string]{
 			Required: true,
@@ -81,6 +90,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 
 			if result.IsValid != tt.expectValid {
 				t.Errorf("Expected validity: %v, got: %v", tt.expectValid, result.IsValid)
+
 				if !result.IsValid {
 					for _, err := range result.Errors {
 						t.Logf("Error: %s - %s", err.Field, err.Message)
@@ -90,12 +100,15 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 
 			if !tt.expectValid && tt.expectError != "" {
 				found := false
+
 				for _, err := range result.Errors {
 					if err.Field == tt.expectError {
 						found = true
+
 						break
 					}
 				}
+
 				if !found {
 					t.Errorf("Expected error in field: %s", tt.expectError)
 				}
@@ -164,6 +177,7 @@ func TestConfigValidator_ValidateField(t *testing.T) {
 			if tt.expectError && err == nil {
 				t.Errorf("Expected error for field: %s", tt.field)
 			}
+
 			if !tt.expectError && err != nil {
 				t.Errorf("Unexpected error for field %s: %v", tt.field, err)
 			}

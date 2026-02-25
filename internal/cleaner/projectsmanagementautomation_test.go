@@ -8,14 +8,22 @@ import (
 )
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
-	TestNewCleanerConstructor(t, NewProjectsManagementAutomationCleaner, "NewProjectsManagementAutomationCleaner")
+	TestNewCleanerConstructor(
+		t,
+		NewProjectsManagementAutomationCleaner,
+		"NewProjectsManagementAutomationCleaner",
+	)
 }
 
 func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	if cleaner.Type() != domain.OperationTypeProjectsManagementAutomation {
-		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeProjectsManagementAutomation)
+		t.Errorf(
+			"Type() = %v, want %v",
+			cleaner.Type(),
+			domain.OperationTypeProjectsManagementAutomation,
+		)
 	}
 }
 
@@ -56,12 +64,19 @@ func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
 			if item.Path == "" {
 				t.Error("Scan() returned item with empty path")
 			}
+
 			if item.Size == 0 {
 				t.Logf("Scan() returned item with zero size: %s", item.Path)
 			}
+
 			if item.ScanType != domain.ScanTypeSystem {
-				t.Errorf("Scan() returned item with ScanType = %v, want %v", item.ScanType, domain.ScanTypeSystem)
+				t.Errorf(
+					"Scan() returned item with ScanType = %v, want %v",
+					item.ScanType,
+					domain.ScanTypeSystem,
+				)
 			}
+
 			if item.Created.IsZero() {
 				t.Error("Scan() returned item with zero Created time")
 			}
@@ -91,7 +106,6 @@ func TestProjectsManagementAutomationCleaner_Scan_NotAvailable(t *testing.T) {
 func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 	// This test would fail if projects-management-automation is installed
 	// We just verify error handling logic exists
-
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	// Can't easily test "tool not available" case without mocking

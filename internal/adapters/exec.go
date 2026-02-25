@@ -14,7 +14,12 @@ const defaultTimeout = DefaultTimeout
 
 // ExecWithTimeout creates a command with the specified timeout.
 // If the context already has a deadline, respects the earlier deadline.
-func ExecWithTimeout(ctx context.Context, timeout time.Duration, name string, args ...string) *exec.Cmd {
+func ExecWithTimeout(
+	ctx context.Context,
+	timeout time.Duration,
+	name string,
+	args ...string,
+) *exec.Cmd {
 	// If context already has a deadline, use the existing context
 	if _, hasDeadline := ctx.Deadline(); hasDeadline {
 		return exec.CommandContext(ctx, name, args...)

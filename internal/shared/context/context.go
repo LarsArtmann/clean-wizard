@@ -50,18 +50,21 @@ func NewContext[T any](ctx context.Context, value T) *Context[T] {
 // WithMetadata adds metadata to the context.
 func (c *Context[T]) WithMetadata(key, value string) *Context[T] {
 	c.Metadata[key] = value
+
 	return c
 }
 
 // WithPermissions adds permissions to the context.
 func (c *Context[T]) WithPermissions(permissions ...string) *Context[T] {
 	c.Permissions = append(c.Permissions, permissions...)
+
 	return c
 }
 
 // GetMetadata retrieves a metadata value by key.
 func (c *Context[T]) GetMetadata(key string) (string, bool) {
 	val, ok := c.Metadata[key]
+
 	return val, ok
 }
 
@@ -102,6 +105,7 @@ func (c *Context[T]) Merge(other *Context[T]) *Context[T] {
 // SetValueType updates the value type.
 func (c *Context[T]) SetValueType(value T) *Context[T] {
 	c.ValueType = value
+
 	return c
 }
 
@@ -115,5 +119,6 @@ func (c *Context[T]) GetContext() context.Context {
 	if c.Context != nil {
 		return c.Context
 	}
+
 	return context.Background()
 }

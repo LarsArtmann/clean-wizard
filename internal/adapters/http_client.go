@@ -33,6 +33,7 @@ func NewHTTPClient() *HTTPClient {
 // WithTimeout sets the request timeout.
 func (hc *HTTPClient) WithTimeout(timeout time.Duration) *HTTPClient {
 	hc.client.SetTimeout(timeout)
+
 	return hc
 }
 
@@ -41,21 +42,25 @@ func (hc *HTTPClient) WithRetry(count int, waitTime, maxWaitTime time.Duration) 
 	hc.client.SetRetryCount(count).
 		SetRetryWaitTime(waitTime).
 		SetRetryMaxWaitTime(maxWaitTime)
+
 	return hc
 }
 
 // WithAuth sets authentication header.
 func (hc *HTTPClient) WithAuth(authType, token string) *HTTPClient {
 	hc.client.SetAuthToken(token)
+
 	if authType == "Bearer" {
 		hc.client.SetAuthToken("Bearer " + token)
 	}
+
 	return hc
 }
 
 // WithHeader adds a default header.
 func (hc *HTTPClient) WithHeader(key, value string) *HTTPClient {
 	hc.client.SetHeader(key, value)
+
 	return hc
 }
 
@@ -64,14 +69,21 @@ func (hc *HTTPClient) Get(ctx context.Context, url string) (*HTTPResponse, error
 	return hc.doRequest(ctx, url, nil, "GET")
 }
 
-func (hc *HTTPClient) doRequest(ctx context.Context, url string, body any, method string) (*HTTPResponse, error) {
+func (hc *HTTPClient) doRequest(
+	ctx context.Context,
+	url string,
+	body any,
+	method string,
+) (*HTTPResponse, error) {
 	req := hc.client.R().SetContext(ctx)
 	if body != nil {
 		req.SetBody(body)
 	}
 
-	var resp *resty.Response
-	var err error
+	var (
+		resp *resty.Response
+		err  error
+	)
 
 	switch method {
 	case "GET":
@@ -89,6 +101,7 @@ func (hc *HTTPClient) doRequest(ctx context.Context, url string, body any, metho
 	if err != nil {
 		return nil, err
 	}
+
 	return &HTTPResponse{
 		StatusCode: resp.StatusCode(),
 		Body:       string(resp.Body()),

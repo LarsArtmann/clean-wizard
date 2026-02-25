@@ -19,29 +19,39 @@ func UnmarshalYAMLEnum[T ~int](
 ) error {
 	// Try as string first
 	var s string
-	if err := value.Decode(&s); err == nil {
+	err := value.Decode(&s)
+	if err == nil {
 		// Check if this is actually a numeric string (like "0" or "1")
 		// If so, skip string lookup and try integer parsing instead
 		var i int
 		if _, err := fmt.Sscanf(s, "%d", &i); err == nil {
 			// This is a numeric string, use integer parsing
-			if err := value.Decode(&i); err == nil {
+			err := value.Decode(&i)
+			if err == nil {
 				for _, enumVal := range valueMap {
 					if int(enumVal) == i {
 						*target = enumVal
+
 						return nil
 					}
 				}
 				// Build helpful error message with valid options
 				validStrings := make([]string, 0, len(valueMap))
+
 				validInts := make([]string, 0, len(valueMap))
 				for key, enumVal := range valueMap {
 					validStrings = append(validStrings, key)
 					validInts = append(validInts, strconv.Itoa(int(enumVal)))
 				}
-				return fmt.Errorf("%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\n"+
-					"See docs/YAML_ENUM_FORMATS.md for more details",
-					errorMsg, i, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
+
+				return fmt.Errorf(
+					"%s value: %d\n\nValid options:\n  Strings: %s\n  Integers: %s\n\n"+
+						"See docs/YAML_ENUM_FORMATS.md for more details",
+					errorMsg,
+					i,
+					strings.Join(validStrings, ", "),
+					strings.Join(validInts, ", "),
+				)
 			}
 		}
 
@@ -50,16 +60,19 @@ func UnmarshalYAMLEnum[T ~int](
 		for key, enumVal := range valueMap {
 			if strings.ToUpper(key) == upperKey {
 				*target = enumVal
+
 				return nil
 			}
 		}
 		// String decode succeeded but didn't match - build helpful error
 		validStrings := make([]string, 0, len(valueMap))
+
 		validInts := make([]string, 0, len(valueMap))
 		for key, enumVal := range valueMap {
 			validStrings = append(validStrings, key)
 			validInts = append(validInts, strconv.Itoa(int(enumVal)))
 		}
+
 		return fmt.Errorf("%s value: %s\n\nValid options:\n  Strings: %s\n  Integers: %s\n\n"+
 			"See docs/YAML_ENUM_FORMATS.md for more details",
 			errorMsg, s, strings.Join(validStrings, ", "), strings.Join(validInts, ", "))
@@ -78,7 +91,8 @@ func UnmarshalYAMLEnumWithDefault[T ~int](
 	errorMsg string,
 ) T {
 	var s string
-	if err := value.Decode(&s); err == nil {
+	err := value.Decode(&s)
+	if err == nil {
 		upperKey := strings.ToUpper(s)
 		for key, enumVal := range valueMap {
 			if strings.ToUpper(key) == upperKey {
@@ -90,12 +104,14 @@ func UnmarshalYAMLEnumWithDefault[T ~int](
 
 	// Try as integer
 	var i int
-	if err := value.Decode(&i); err == nil {
+	err := value.Decode(&i)
+	if err == nil {
 		for _, enumVal := range valueMap {
 			if int(enumVal) == i {
 				return enumVal
 			}
 		}
+
 		return defaultVal
 	}
 
@@ -110,7 +126,8 @@ func UnmarshalJSONEnum[T any](
 	errorMsg string,
 ) error {
 	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
+	err := json.Unmarshal(data, &s)
+	if err != nil {
 		return err
 	}
 
@@ -118,6 +135,7 @@ func UnmarshalJSONEnum[T any](
 	for key, value := range valueMap {
 		if strings.ToUpper(key) == upperKey {
 			*target = value
+
 			return nil
 		}
 	}
@@ -126,8 +144,13 @@ func UnmarshalJSONEnum[T any](
 	for key := range valueMap {
 		validStrings = append(validStrings, key)
 	}
-	return fmt.Errorf("%s: %s\n\nValid string options: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
-		errorMsg, s, strings.Join(validStrings, ", "))
+
+	return fmt.Errorf(
+		"%s: %s\n\nValid string options: %s\n\nSee docs/YAML_ENUM_FORMATS.md for more details",
+		errorMsg,
+		s,
+		strings.Join(validStrings, ", "),
+	)
 }
 
 // TypeSafeEnum provides compile-time guaranteed enums with JSON serialization.
@@ -183,6 +206,7 @@ func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
 	if !rl.IsValid() {
 		return nil, fmt.Errorf("invalid risk level: %d", rl)
 	}
+
 	return json.Marshal(rl.String())
 }
 
@@ -270,6 +294,7 @@ func (vl ValidationLevelType) MarshalJSON() ([]byte, error) {
 	if !vl.IsValid() {
 		return nil, fmt.Errorf("invalid validation level: %d", vl)
 	}
+
 	return json.Marshal(vl.String())
 }
 
@@ -327,6 +352,7 @@ func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
 	if !co.IsValid() {
 		return nil, fmt.Errorf("invalid change operation: %d", co)
 	}
+
 	return json.Marshal(co.String())
 }
 
@@ -381,6 +407,7 @@ func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
 	if !cs.IsValid() {
 		return nil, fmt.Errorf("invalid clean strategy: %d", cs)
 	}
+
 	return json.Marshal(cs.String())
 }
 
@@ -413,13 +440,17 @@ func (cs CleanStrategyType) Icon() string {
 // UnmarshalYAML implements yaml.Unmarshaler for RiskLevelType.
 func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
 	var s string
-	if err := value.Decode(&s); err != nil {
+	err := value.Decode(&s)
+	if err != nil {
 		// If string unmarshaling fails, try integer
 		var i int
-		if err := value.Decode(&i); err == nil {
+		err := value.Decode(&i)
+		if err == nil {
 			*rl = RiskLevelType(i)
+
 			return nil
 		}
+
 		return err
 	}
 
@@ -435,6 +466,7 @@ func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
 	default:
 		return fmt.Errorf("invalid risk level: %s (must be LOW, MEDIUM, HIGH, or CRITICAL)", s)
 	}
+
 	return nil
 }
 
@@ -443,6 +475,7 @@ func (rl RiskLevelType) MarshalYAML() (any, error) {
 	if !rl.IsValid() {
 		return nil, fmt.Errorf("invalid risk level: %d", rl)
 	}
+
 	return rl.String(), nil
 }
 
@@ -487,6 +520,7 @@ func (ses SizeEstimateStatusType) MarshalJSON() ([]byte, error) {
 	if !ses.IsValid() {
 		return nil, fmt.Errorf("invalid size estimate status: %d", ses)
 	}
+
 	return json.Marshal(ses.String())
 }
 

@@ -151,7 +151,12 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 
 	if len(items) == 0 {
 		// Nothing to clean
-		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 0, 0)
+		cleanResult := conversions.NewCleanResult(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			0,
+			0,
+		)
+
 		return result.Ok(cleanResult)
 	}
 
@@ -162,7 +167,12 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 			totalBytes += item.Size
 		}
 
-		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), len(items), totalBytes)
+		cleanResult := conversions.NewCleanResult(
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+			len(items),
+			totalBytes,
+		)
+
 		return result.Ok(cleanResult)
 	}
 
@@ -176,9 +186,11 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 		err := os.Remove(item.Path)
 		if err != nil {
 			itemsFailed++
+
 			if tfc.verbose {
 				fmt.Printf("Warning: failed to remove %s: %v\n", item.Path, err)
 			}
+
 			continue
 		}
 
@@ -187,6 +199,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 	}
 
 	duration := time.Since(startTime)
+
 	return result.Ok(conversions.NewCleanResultWithFailures(
 		domain.CleanStrategyType(domain.StrategyAggressiveType),
 		itemsRemoved,

@@ -62,7 +62,8 @@ func (c *Config) Validate() error {
 	}
 
 	for name, profile := range c.Profiles {
-		if err := profile.Validate(name); err != nil {
+		err := profile.Validate(name)
+		if err != nil {
 			return err
 		}
 	}
@@ -83,9 +84,11 @@ func (p *Profile) IsValid(name string) bool {
 	if p.Name == "" {
 		return false
 	}
+
 	if p.Description == "" {
 		return false
 	}
+
 	if len(p.Operations) == 0 {
 		return false
 	}
@@ -104,15 +107,18 @@ func (p *Profile) Validate(name string) error {
 	if p.Name == "" {
 		return fmt.Errorf("Profile %s: name cannot be empty", name)
 	}
+
 	if p.Description == "" {
 		return fmt.Errorf("Profile %s: description cannot be empty", name)
 	}
+
 	if len(p.Operations) == 0 {
 		return fmt.Errorf("Profile %s: must have at least one operation", name)
 	}
 
 	for i, op := range p.Operations {
-		if err := op.Validate(); err != nil {
+		err := op.Validate()
+		if err != nil {
 			return fmt.Errorf("Profile %s: operation %d invalid: %w", name, i, err)
 		}
 	}
@@ -134,12 +140,15 @@ func (op CleanupOperation) IsValid() bool {
 	if op.Name == "" {
 		return false
 	}
+
 	if op.Description == "" {
 		return false
 	}
+
 	if !op.RiskLevel.IsValid() {
 		return false
 	}
+
 	return true
 }
 
@@ -148,24 +157,32 @@ func (op CleanupOperation) Validate() error {
 	if op.Name == "" {
 		return errors.New("operation name cannot be empty")
 	}
+
 	if op.Description == "" {
 		return errors.New("operation description cannot be empty")
 	}
 
 	// Validate RiskLevel enum
 	if !op.RiskLevel.IsValid() {
-		return fmt.Errorf("invalid risk level: %s (must be LOW, MEDIUM, HIGH, or CRITICAL)", op.RiskLevel.String())
+		return fmt.Errorf(
+			"invalid risk level: %s (must be LOW, MEDIUM, HIGH, or CRITICAL)",
+			op.RiskLevel.String(),
+		)
 	}
 
 	// Validate Enabled enum
 	if !op.Enabled.IsValid() {
-		return fmt.Errorf("invalid enabled status: %s (must be DISABLED or ENABLED)", op.Enabled.String())
+		return fmt.Errorf(
+			"invalid enabled status: %s (must be DISABLED or ENABLED)",
+			op.Enabled.String(),
+		)
 	}
 
 	// Validate settings if present
 	if op.Settings != nil {
 		opType := GetOperationType(op.Name)
-		if err := op.Settings.ValidateSettings(opType); err != nil {
+		err := op.Settings.ValidateSettings(opType)
+		if err != nil {
 			return fmt.Errorf("operation settings validation failed: %w", err)
 		}
 	}

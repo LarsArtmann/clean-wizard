@@ -15,7 +15,8 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(
 	opType := domain.GetOperationType(operationName)
 
 	// Validate settings first
-	if err := settings.ValidateSettings(opType); err != nil {
+	err := settings.ValidateSettings(opType)
+	if err != nil {
 		// Convert validation errors to warnings since the result type doesn't have an Errors field
 		validationErr := &domain.ValidationError{}
 		if errors.As(err, &validationErr) {
@@ -33,6 +34,7 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(
 				Reason:    fmt.Sprintf("validation error: %v", err),
 			})
 		}
+
 		return
 	}
 

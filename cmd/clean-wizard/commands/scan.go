@@ -11,8 +11,10 @@ import (
 
 // NewScanCommand creates a command that scans for cleanable items.
 func NewScanCommand() *cobra.Command {
-	var verbose bool
-	var profile string
+	var (
+		verbose bool
+		profile string
+	)
 
 	cmd := &cobra.Command{
 		Use:   "scan",
@@ -41,6 +43,7 @@ func runScanCommand(cmd *cobra.Command, args []string, verbose bool, profile str
 
 	// Filter to available cleaners only
 	var availableCleaners []CleanerConfig
+
 	for _, cfg := range cleanerConfigs {
 		if cfg.Available == CleanerAvailabilityAvailable {
 			availableCleaners = append(availableCleaners, cfg)
@@ -49,18 +52,24 @@ func runScanCommand(cmd *cobra.Command, args []string, verbose bool, profile str
 
 	if len(availableCleaners) == 0 {
 		fmt.Println("ℹ️  No cleanable items found on this system.")
-		fmt.Println("   Install package managers (Nix, Homebrew, Docker, etc.) to see cleaning options.")
+		fmt.Println(
+			"   Install package managers (Nix, Homebrew, Docker, etc.) to see cleaning options.",
+		)
+
 		return nil
 	}
 
 	fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableCleaners))
 
 	// Scan each cleaner and collect results
-	var totalCleanable uint64
-	var scanResults []ScanResult
+	var (
+		totalCleanable uint64
+		scanResults    []ScanResult
+	)
 
 	for _, cfg := range availableCleaners {
 		result := scanCleaner(ctx, cfg.Type, verbose)
+
 		scanResults = append(scanResults, result)
 		if result.BytesCleanable > 0 {
 			totalCleanable += result.BytesCleanable
@@ -181,6 +190,7 @@ func scanNixCleaner(ctx context.Context, verbose bool) ScanResult {
 
 	if !nixAdapter.IsAvailable(ctx) {
 		result.Available = CleanerAvailabilityUnavailable
+
 		return result
 	}
 
@@ -202,6 +212,7 @@ func scanDockerCleaner(ctx context.Context, verbose bool) ScanResult {
 
 	if !dockerCleaner.IsAvailable(ctx) {
 		result.Available = CleanerAvailabilityUnavailable
+
 		return result
 	}
 
@@ -246,6 +257,7 @@ func printScanResult(result ScanResult, verbose bool) {
 		if verbose {
 			fmt.Printf("  ⚪ %s: Not available\n", result.Name)
 		}
+
 		return
 	}
 
@@ -254,6 +266,7 @@ func printScanResult(result ScanResult, verbose bool) {
 
 	if result.BytesCleanable > 0 {
 		fmt.Printf("     Cleanable: %s", formatBytes(int64(result.BytesCleanable)))
+
 		if result.ItemsCount > 0 {
 			fmt.Printf(" (%d item(s))\n", result.ItemsCount)
 		} else {

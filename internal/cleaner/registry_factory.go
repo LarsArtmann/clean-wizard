@@ -14,6 +14,7 @@ import (
 func DefaultRegistry() *Registry {
 	registry := NewRegistry()
 	registerAllCleaners(registry, false, false)
+
 	return registry
 }
 
@@ -22,6 +23,7 @@ func DefaultRegistry() *Registry {
 func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
 	registry := NewRegistry()
 	registerAllCleaners(registry, verbose, dryRun)
+
 	return registry
 }
 
@@ -42,20 +44,29 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 	registry.Register(CleanerCargo, NewCargoCleaner(verbose, dryRun))
 
 	// Go cleaner (default: all cache types)
-	goCleaner, err := NewGoCleaner(verbose, dryRun, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
+	goCleaner, err := NewGoCleaner(
+		verbose,
+		dryRun,
+		GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache,
+	)
 	if err != nil {
 		panic(fmt.Sprintf("failed to create Go cleaner: %v", err))
 	}
+
 	registry.Register(CleanerGo, goCleaner)
 
 	// Node packages cleaner (default: all available package managers)
-	registry.Register(CleanerNode, NewNodePackageManagerCleaner(verbose, dryRun, AvailableNodePackageManagers()))
+	registry.Register(
+		CleanerNode,
+		NewNodePackageManagerCleaner(verbose, dryRun, AvailableNodePackageManagers()),
+	)
 
 	// Build cache cleaner (default: 30d, all tools)
 	buildCacheCleaner, err := NewBuildCacheCleaner(verbose, dryRun, "30d", []string{}, []string{})
 	if err != nil {
 		panic(fmt.Sprintf("failed to create BuildCache cleaner: %v", err))
 	}
+
 	registry.Register(CleanerBuildCache, buildCacheCleaner)
 
 	// System cache cleaner (default: 30d, all cache types)
@@ -63,20 +74,31 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 	if err != nil {
 		panic(fmt.Sprintf("failed to create SystemCache cleaner: %v", err))
 	}
+
 	registry.Register(CleanerSystemCache, systemCacheCleaner)
 
 	// Temp files cleaner (default: 7d, standard temp paths)
-	tempFilesCleaner, err := NewTempFilesCleaner(verbose, dryRun, "7d", []string{}, []string{filepath.Join("/", "tmp")})
+	tempFilesCleaner, err := NewTempFilesCleaner(
+		verbose,
+		dryRun,
+		"7d",
+		[]string{},
+		[]string{filepath.Join("/", "tmp")},
+	)
 	if err != nil {
 		panic(fmt.Sprintf("failed to create TempFiles cleaner: %v", err))
 	}
+
 	registry.Register(CleanerTempFiles, tempFilesCleaner)
 
 	// Projects management automation cleaner
 	registry.Register(CleanerProjects, NewProjectsManagementAutomationCleaner(verbose, dryRun))
 
 	// Project executables cleaner
-	registry.Register(CleanerProjectExec, NewProjectExecutablesCleaner(verbose, dryRun, []string{".sh"}, []string{}))
+	registry.Register(
+		CleanerProjectExec,
+		NewProjectExecutablesCleaner(verbose, dryRun, []string{".sh"}, []string{}),
+	)
 
 	// Compiled binaries cleaner (default: 10MB, any age, ~/projects)
 	compiledBinariesCleaner := NewCompiledBinariesCleaner(

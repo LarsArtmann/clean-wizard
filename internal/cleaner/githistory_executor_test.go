@@ -53,7 +53,10 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 
 		ginkgo.Context("with no files to remove", func() {
 			ginkgo.It("should return error", func() {
-				_, err := executor.Execute(ctx, ExecuteOptions{FilesToRemove: []domain.GitHistoryFile{}})
+				_, err := executor.Execute(
+					ctx,
+					ExecuteOptions{FilesToRemove: []domain.GitHistoryFile{}},
+				)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 				gomega.Expect(err.Error()).To(gomega.ContainSubstring("no files to remove"))
 			})

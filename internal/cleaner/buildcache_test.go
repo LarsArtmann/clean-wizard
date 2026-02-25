@@ -57,10 +57,17 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner, err := NewBuildCacheCleaner(tt.verbose, tt.dryRun, tt.olderThan, tt.excludes, tt.basePaths)
+			cleaner, err := NewBuildCacheCleaner(
+				tt.verbose,
+				tt.dryRun,
+				tt.olderThan,
+				tt.excludes,
+				tt.basePaths,
+			)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewBuildCacheCleaner() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
@@ -202,7 +209,11 @@ func TestBuildCacheCleaner_Clean_DryRun(t *testing.T) {
 	}
 
 	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
+		t.Errorf(
+			"Clean() strategy = %v, want %v",
+			cleanResult.Strategy,
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+		)
 	}
 
 	if cleanResult.FreedBytes == 0 {
@@ -287,6 +298,7 @@ func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
 
 	// Test with temp directory
 	tmpDir := t.TempDir()
+
 	modTime = GetDirModTime(tmpDir)
 	if modTime.IsZero() {
 		t.Error("GetDirModTime() for temp dir returned zero time")
@@ -337,7 +349,11 @@ func TestBuildCacheCleaner_ParseDuration(t *testing.T) {
 			cleaner, err := NewBuildCacheCleaner(false, false, tt.duration, []string{}, []string{})
 
 			if tt.wantValid && err != nil {
-				t.Errorf("NewBuildCacheCleaner() with duration %s should succeed, got error: %v", tt.duration, err)
+				t.Errorf(
+					"NewBuildCacheCleaner() with duration %s should succeed, got error: %v",
+					tt.duration,
+					err,
+				)
 			}
 
 			if !tt.wantValid && err == nil {

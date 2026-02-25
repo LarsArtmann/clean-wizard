@@ -76,30 +76,36 @@ func generateVersion() string {
 // getGitCommit returns the current git commit hash.
 func getGitCommit() string {
 	cmd := exec.Command("git", "rev-parse", "--short", "HEAD")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return "unknown"
 	}
+
 	return strings.TrimSpace(string(output))
 }
 
 // getGitTag returns the current git tag if available.
 func getGitTag() string {
 	cmd := exec.Command("git", "describe", "--tags", "--exact-match", "HEAD")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return ""
 	}
+
 	return strings.TrimSpace(string(output))
 }
 
 // isGitDirty returns true if there are uncommitted changes.
 func isGitDirty() bool {
 	cmd := exec.Command("git", "status", "--porcelain")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return false
 	}
+
 	return len(strings.TrimSpace(string(output))) > 0
 }
 

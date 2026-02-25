@@ -44,6 +44,7 @@ func (cc *CargoCleaner) Name() string {
 // IsAvailable checks if Cargo is available.
 func (cc *CargoCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := exec.LookPath("cargo")
+
 	return err == nil
 }
 
@@ -134,8 +135,13 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 			}
 		}
 
-		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
+		cleanResult := conversions.NewCleanResult(
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+			itemsRemoved,
+			totalBytes,
+		)
 		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)}
+
 		return result.Ok(cleanResult)
 	}
 
@@ -149,7 +155,10 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 		cacheToolResult := cc.cleanWithCargoCacheTool(ctx)
 		if cacheToolResult.IsErr() {
 			if cc.verbose {
-				fmt.Printf("Warning: cargo-cache tool failed, falling back to manual clean: %v\n", cacheToolResult.Error())
+				fmt.Printf(
+					"Warning: cargo-cache tool failed, falling back to manual clean: %v\n",
+					cacheToolResult.Error(),
+				)
 			}
 			// Fall through to manual clean
 		} else {
@@ -158,6 +167,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 			bytesFreed += int64(cacheCleanResult.FreedBytes)
 
 			duration := time.Since(startTime)
+
 			return result.Ok(conversions.NewCleanResultWithTiming(
 				domain.CleanStrategyType(domain.StrategyConservativeType),
 				itemsRemoved, bytesFreed, duration,
@@ -168,13 +178,16 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 	// Manual cleanup using cargo clean command
 	cleanResult := cc.cleanWithCargoClean(ctx)
 	if cleanResult.IsErr() {
-		return result.Err[domain.CleanResult](fmt.Errorf("cargo clean failed: %w", cleanResult.Error()))
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("cargo clean failed: %w", cleanResult.Error()),
+		)
 	}
 
 	itemsRemoved++
 	bytesFreed += int64(cleanResult.Value().FreedBytes)
 
 	duration := time.Since(startTime)
+
 	return result.Ok(conversions.NewCleanResultWithTiming(
 		domain.CleanStrategyType(domain.StrategyConservativeType),
 		itemsRemoved, bytesFreed, duration,
@@ -182,7 +195,9 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 }
 
 // cleanWithCargoCacheTool cleans using cargo-cache extension.
-func (cc *CargoCleaner) cleanWithCargoCacheTool(ctx context.Context) result.Result[domain.CleanResult] {
+func (cc *CargoCleaner) cleanWithCargoCacheTool(
+	ctx context.Context,
+) result.Result[domain.CleanResult] {
 	return cc.executeCargoCleanCommand(
 		ctx,
 		"cargo-cache", []string{"--autoclean"},
@@ -209,6 +224,7 @@ func (cc *CargoCleaner) getCargoCacheDir() string {
 			cargoHome = homeDir + "/.cargo"
 		}
 	}
+
 	return cargoHome
 }
 
@@ -222,14 +238,17 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 ) result.Result[domain.CleanResult] {
 	// Calculate cache size before cleaning
 	var bytesFreed int64
+
 	cacheDir := cc.getCargoCacheDir()
 	if cacheDir != "" {
 		bytesFreed, _, _ = CalculateBytesFreed(cacheDir, func() error {
 			cmd := adapters.ExecWithTimeout(ctx, cargoCommandTimeout, cmdName, args...)
+
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				return fmt.Errorf(errorFormat, err, string(output))
 			}
+
 			return nil
 		}, cc.verbose, "Cache")
 
@@ -239,6 +258,7 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 	} else {
 		// Cache directory not found, just execute command
 		cmd := adapters.ExecWithTimeout(ctx, cargoCommandTimeout, cmdName, args...)
+
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return result.Err[domain.CleanResult](fmt.Errorf(errorFormat, err, string(output)))
@@ -258,5 +278,6 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 // hasCargoCacheTool checks if cargo-cache tool is available.
 func (cc *CargoCleaner) hasCargoCacheTool() bool {
 	_, err := exec.LookPath("cargo-cache")
+
 	return err == nil
 }

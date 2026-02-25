@@ -26,7 +26,10 @@ import (
 //	        Constructor:   NewBooleanSettingsCleanerTestConstructor(NewXxxCleaner),
 //	    })
 //	}
-func CreateBooleanSettingsCleanerTestFunctions(t *testing.T, config BooleanSettingsCleanerTestConfig) {
+func CreateBooleanSettingsCleanerTestFunctions(
+	t *testing.T,
+	config BooleanSettingsCleanerTestConfig,
+) {
 	t.Run("ValidateSettings", func(t *testing.T) {
 		TestBooleanSettingsCleanerValidateSettings(t, config, config.Constructor)
 	})
@@ -103,6 +106,7 @@ func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
 				if err == nil {
 					t.Errorf("GetHomeDir() error = %v, want error for missing home", err)
 				}
+
 				if home != "" {
 					t.Errorf("GetHomeDir() = %v, want empty string", home)
 				}
@@ -110,6 +114,7 @@ func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
 				if err != nil {
 					t.Errorf("GetHomeDir() error = %v", err)
 				}
+
 				if home != tt.WantHome {
 					t.Errorf("GetHomeDir() = %v, want %v", home, tt.WantHome)
 				}
@@ -135,7 +140,11 @@ func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
 //   - t: The testing.T object
 //   - constructor: Function that creates a cleaner with given verbose and dryRun flags
 //   - cleanerName: Name of the cleaner for error messages
-func TestNewCleanerConstructor[T any](t *testing.T, constructor func(bool, bool) T, cleanerName string) {
+func TestNewCleanerConstructor[T any](
+	t *testing.T,
+	constructor func(bool, bool) T,
+	cleanerName string,
+) {
 	tests := []struct {
 		name    string
 		verbose bool
@@ -172,6 +181,7 @@ func TestNewCleanerConstructor[T any](t *testing.T, constructor func(bool, bool)
 				if cleanerValue.IsNil() {
 					t.Fatalf("%s(%v, %v) returned nil cleaner", cleanerName, tt.verbose, tt.dryRun)
 				}
+
 				cleanerValue = cleanerValue.Elem()
 			} else {
 				cleanerValue = cleanerValue.Elem()
@@ -181,6 +191,7 @@ func TestNewCleanerConstructor[T any](t *testing.T, constructor func(bool, bool)
 			if !verboseField.IsValid() {
 				t.Fatalf("%s cleaner does not have 'verbose' field", cleanerName)
 			}
+
 			if verboseField.Bool() != tt.verbose {
 				t.Errorf("verbose = %v, want %v", verboseField.Bool(), tt.verbose)
 			}
@@ -189,6 +200,7 @@ func TestNewCleanerConstructor[T any](t *testing.T, constructor func(bool, bool)
 			if !dryRunField.IsValid() {
 				t.Fatalf("%s cleaner does not have 'dryRun' field", cleanerName)
 			}
+
 			if dryRunField.Bool() != tt.dryRun {
 				t.Errorf("dryRun = %v, want %v", dryRunField.Bool(), tt.dryRun)
 			}

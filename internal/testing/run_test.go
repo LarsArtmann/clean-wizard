@@ -24,6 +24,7 @@ func TestRunTestCasesDifferentTypes(t *testing.T) {
 		if tc.Input {
 			return 1
 		}
+
 		return 0
 	})
 }

@@ -39,12 +39,15 @@ func (f GitHistoryFile) Validate() error {
 	if f.Path == "" {
 		return errors.New("path cannot be empty")
 	}
+
 	if f.SizeBytes <= 0 {
 		return fmt.Errorf("size must be positive, got: %d", f.SizeBytes)
 	}
+
 	if f.BlobHash == "" {
 		return errors.New("blob hash cannot be empty")
 	}
+
 	return nil
 }
 
@@ -180,6 +183,7 @@ func (m GitHistoryMode) MarshalJSON() ([]byte, error) {
 	if !m.IsValid() {
 		return nil, fmt.Errorf("invalid git history mode: %d", m)
 	}
+
 	return json.Marshal(m.String())
 }
 

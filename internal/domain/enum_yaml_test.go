@@ -56,6 +56,7 @@ func TestEnumYAMLMarshaling(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Marshal() error = %v", err)
 			}
+
 			if string(data) != tt.expected {
 				t.Errorf("Marshal() = %q, want %q", string(data), tt.expected)
 			}
@@ -87,7 +88,12 @@ var enumStringTestCases = []enumUnmarshalTestCase{
 	// DockerPruneMode
 	{"DockerPruneMode All string", "ALL", new(DockerPruneMode), DockerPruneAll},
 	{"DockerPruneMode Images string", "IMAGES", new(DockerPruneMode), DockerPruneImages},
-	{"DockerPruneMode Containers string", "CONTAINERS", new(DockerPruneMode), DockerPruneContainers},
+	{
+		"DockerPruneMode Containers string",
+		"CONTAINERS",
+		new(DockerPruneMode),
+		DockerPruneContainers,
+	},
 	{"DockerPruneMode Volumes string", "VOLUMES", new(DockerPruneMode), DockerPruneVolumes},
 	{"DockerPruneMode Builds string", "BUILDS", new(DockerPruneMode), DockerPruneBuilds},
 
@@ -155,8 +161,14 @@ var enumIntTestCases = []enumUnmarshalTestCase{
 }
 
 // runEnumMethodTests executes common test logic for enum method testing.
-func runEnumMethodTests[T comparable](t *testing.T, tests []enumValueTestCase[T], extract func(any) T, methodName string) {
+func runEnumMethodTests[T comparable](
+	t *testing.T,
+	tests []enumValueTestCase[T],
+	extract func(any) T,
+	methodName string,
+) {
 	t.Helper()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			actual := extract(tt.value)
@@ -192,6 +204,7 @@ func extractEnumString(v any) string {
 	case PackageManagerType:
 		return val.String()
 	}
+
 	return ""
 }
 
@@ -210,20 +223,24 @@ func extractEnumValidity(v any) bool {
 	case PackageManagerType:
 		return val.IsValid()
 	}
+
 	return false
 }
 
 // runEnumYAMLUnmarshalingTests executes the common test logic for enum unmarshaling.
 func runEnumYAMLUnmarshalingTests(t *testing.T, tests []enumUnmarshalTestCase) {
 	t.Helper()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := yaml.Unmarshal([]byte(tt.input), tt.target); err != nil {
+			err := yaml.Unmarshal([]byte(tt.input), tt.target)
+			if err != nil {
 				t.Fatalf("Unmarshal() error = %v", err)
 			}
 
 			// Get the actual value by dereferencing the pointer
 			var actual any
+
 			switch v := tt.target.(type) {
 			case *CacheCleanupMode:
 				actual = *v
@@ -390,8 +407,12 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 
 	// Verify NodePackages
 	if len(unmarshaled.NodePackages.PackageManagers) != 2 {
-		t.Errorf("NodePackages.PackageManagers length = %d, want 2", len(unmarshaled.NodePackages.PackageManagers))
+		t.Errorf(
+			"NodePackages.PackageManagers length = %d, want 2",
+			len(unmarshaled.NodePackages.PackageManagers),
+		)
 	}
+
 	if unmarshaled.NodePackages.PackageManagers[0] != PackageManagerNpm {
 		t.Errorf("NodePackages.PackageManagers[0] = %v, want %v",
 			unmarshaled.NodePackages.PackageManagers[0], PackageManagerNpm)
@@ -401,8 +422,13 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 	if len(unmarshaled.BuildCache.ToolTypes) != 2 {
 		t.Errorf("BuildCache.ToolTypes length = %d, want 2", len(unmarshaled.BuildCache.ToolTypes))
 	}
+
 	if unmarshaled.BuildCache.ToolTypes[0] != BuildToolJava {
-		t.Errorf("BuildCache.ToolTypes[0] = %v, want %v", unmarshaled.BuildCache.ToolTypes[0], BuildToolJava)
+		t.Errorf(
+			"BuildCache.ToolTypes[0] = %v, want %v",
+			unmarshaled.BuildCache.ToolTypes[0],
+			BuildToolJava,
+		)
 	}
 
 	// Verify Docker
@@ -412,10 +438,18 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 
 	// Verify SystemCache
 	if len(unmarshaled.SystemCache.CacheTypes) != 2 {
-		t.Errorf("SystemCache.CacheTypes length = %d, want 2", len(unmarshaled.SystemCache.CacheTypes))
+		t.Errorf(
+			"SystemCache.CacheTypes length = %d, want 2",
+			len(unmarshaled.SystemCache.CacheTypes),
+		)
 	}
+
 	if unmarshaled.SystemCache.CacheTypes[0] != CacheTypeSpotlight {
-		t.Errorf("SystemCache.CacheTypes[0] = %v, want %v", unmarshaled.SystemCache.CacheTypes[0], CacheTypeSpotlight)
+		t.Errorf(
+			"SystemCache.CacheTypes[0] = %v, want %v",
+			unmarshaled.SystemCache.CacheTypes[0],
+			CacheTypeSpotlight,
+		)
 	}
 }
 
@@ -478,13 +512,16 @@ func TestEnumErrorMessages(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var dockerMode DockerPruneMode
-			var buildTool BuildToolType
-			var profileStatus ProfileStatus
-			var cacheMode CacheCleanupMode
-			var err error
+			var (
+				dockerMode    DockerPruneMode
+				buildTool     BuildToolType
+				profileStatus ProfileStatus
+				cacheMode     CacheCleanupMode
+				err           error
+			)
 
 			// Test appropriate enum type based on input
+
 			switch {
 			case strings.Contains(tt.name, "DockerPruneMode"):
 				err = yaml.Unmarshal([]byte(tt.input), &dockerMode)
@@ -506,7 +543,11 @@ func TestEnumErrorMessages(t *testing.T) {
 			// Verify all expected strings are in error message
 			for _, want := range tt.wantStrings {
 				if !contains(errMsg, want) {
-					t.Errorf("Error message does not contain expected string %q\nGot: %s", want, errMsg)
+					t.Errorf(
+						"Error message does not contain expected string %q\nGot: %s",
+						want,
+						errMsg,
+					)
 				}
 			}
 		})
@@ -523,5 +564,6 @@ func findSubstring(s, substr string) int {
 			return i
 		}
 	}
+
 	return -1
 }

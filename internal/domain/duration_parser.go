@@ -36,6 +36,7 @@ func ParseCustomDuration(durationStr string) (time.Duration, error) {
 // parseDaysDuration parses duration with "d" suffix.
 func parseDaysDuration(durationStr string) (time.Duration, error) {
 	re := regexp.MustCompile(`^(\d+(?:\.\d+)?)d$`)
+
 	matches := re.FindStringSubmatch(durationStr)
 	if len(matches) != 2 {
 		return 0, fmt.Errorf("invalid days duration format: %s", durationStr)
@@ -57,7 +58,10 @@ func parseDaysDuration(durationStr string) (time.Duration, error) {
 func parseComplexDuration(durationStr string) (time.Duration, error) {
 	// This could be extended to support complex formats
 	// For now, focus on the most common case: days only
-	return 0, fmt.Errorf("unsupported duration format: %s (supported formats: '7d', '24h', '30m', '1h30m')", durationStr)
+	return 0, fmt.Errorf(
+		"unsupported duration format: %s (supported formats: '7d', '24h', '30m', '1h30m')",
+		durationStr,
+	)
 }
 
 // ValidateCustomDuration checks if a duration string is valid for this system.
@@ -67,5 +71,6 @@ func ValidateCustomDuration(durationStr string) error {
 	}
 
 	_, err := ParseCustomDuration(durationStr)
+
 	return err
 }

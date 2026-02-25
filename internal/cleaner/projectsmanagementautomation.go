@@ -30,7 +30,9 @@ type ProjectsManagementAutomationCleaner struct {
 }
 
 // NewProjectsManagementAutomationCleaner creates Projects Management Automation cleaner.
-func NewProjectsManagementAutomationCleaner(verbose, dryRun bool) *ProjectsManagementAutomationCleaner {
+func NewProjectsManagementAutomationCleaner(
+	verbose, dryRun bool,
+) *ProjectsManagementAutomationCleaner {
 	return &ProjectsManagementAutomationCleaner{
 		verbose: verbose,
 		dryRun:  dryRun,
@@ -50,11 +52,14 @@ func (pc *ProjectsManagementAutomationCleaner) Name() string {
 // IsAvailable checks if projects-management-automation is available.
 func (pc *ProjectsManagementAutomationCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := exec.LookPath("projects-management-automation")
+
 	return err == nil
 }
 
 // ValidateSettings validates Projects Management Automation cleaner settings.
-func (pc *ProjectsManagementAutomationCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (pc *ProjectsManagementAutomationCleaner) ValidateSettings(
+	settings *domain.OperationSettings,
+) error {
 	if settings == nil || settings.ProjectsManagementAutomation == nil {
 		return nil // Settings are optional
 	}
@@ -64,7 +69,9 @@ func (pc *ProjectsManagementAutomationCleaner) ValidateSettings(settings *domain
 }
 
 // Scan scans for Projects Management Automation cache.
-func (pc *ProjectsManagementAutomationCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (pc *ProjectsManagementAutomationCleaner) Scan(
+	ctx context.Context,
+) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	if !pc.IsAvailable(ctx) {
@@ -87,9 +94,13 @@ func (pc *ProjectsManagementAutomationCleaner) Scan(ctx context.Context) result.
 }
 
 // Clean removes Projects Management Automation cache.
-func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (pc *ProjectsManagementAutomationCleaner) Clean(
+	ctx context.Context,
+) result.Result[domain.CleanResult] {
 	if !pc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("projects-management-automation not available"))
+		return result.Err[domain.CleanResult](
+			errors.New("projects-management-automation not available"),
+		)
 	}
 
 	startTime := time.Now()
@@ -102,12 +113,20 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 		itemsRemoved := 1
 		duration := time.Since(startTime)
 
-		return result.Ok(conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes, duration))
+		return result.Ok(
+			conversions.NewCleanResultWithTiming(
+				domain.CleanStrategyType(domain.StrategyDryRunType),
+				itemsRemoved,
+				totalBytes,
+				duration,
+			),
+		)
 	}
 
 	// Execute projects-management-automation --clear-cache command
 	cmd := adapters.ExecWithTimeout(ctx, DefaultProjectsAutomationTimeout,
 		"projects-management-automation", "--clear-cache")
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return result.Err[domain.CleanResult](
@@ -123,7 +142,15 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(ctx context.Context) result
 	}
 
 	duration := time.Since(startTime)
-	return result.Ok(conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyConservativeType), itemsRemoved, bytesFreed, duration))
+
+	return result.Ok(
+		conversions.NewCleanResultWithTiming(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			itemsRemoved,
+			bytesFreed,
+			duration,
+		),
+	)
 }
 
 // getCachePath returns the expanded cache directory path.
@@ -134,12 +161,14 @@ func (pc *ProjectsManagementAutomationCleaner) getCachePath() string {
 			return filepath.Join(homeDir, cachePath[2:])
 		}
 	}
+
 	return cachePath
 }
 
 // getActualCacheSize returns the actual size of the cache directory.
 func (pc *ProjectsManagementAutomationCleaner) getActualCacheSize() int64 {
 	cachePath := pc.getCachePath()
+
 	return GetDirSize(cachePath)
 }
 

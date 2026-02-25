@@ -40,11 +40,12 @@ type filterRepoDetector struct {
 var detector filterRepoDetector
 
 // DetectFilterRepoProvider detects how git-filter-repo can be run.
-// Priority: system install > nix > none
+// Priority: system install > nix > none.
 func DetectFilterRepoProvider() FilterRepoProvider {
 	detector.once.Do(func() {
 		detector.provider = detectProvider()
 	})
+
 	return detector.provider
 }
 
@@ -73,6 +74,7 @@ func detectProvider() FilterRepoProvider {
 func isSystemInstallAvailable(ctx context.Context) bool {
 	// git filter-repo --version (as git subcommand)
 	cmd := exec.CommandContext(ctx, "git", "filter-repo", "--version")
+
 	return cmd.Run() == nil
 }
 
@@ -85,6 +87,7 @@ func isNixAvailable(ctx context.Context) bool {
 	// Verify nix can access nixpkgs (without actually running git-filter-repo)
 	// Use nix eval to check if the package exists (faster than nix run)
 	cmd := exec.CommandContext(ctx, "nix", "eval", "--raw", "nixpkgs#git-filter-repo.name")
+
 	return cmd.Run() == nil
 }
 
@@ -97,10 +100,12 @@ func BuildFilterRepoCommand(ctx context.Context, args []string) *exec.Cmd {
 		// nix run nixpkgs#git-filter-repo -- <args>
 		nixArgs := []string{"run", "nixpkgs#git-filter-repo", "--"}
 		nixArgs = append(nixArgs, args...)
+
 		return exec.CommandContext(ctx, "nix", nixArgs...)
 	default:
 		// System install or fallback: git filter-repo <args>
 		gitArgs := append([]string{"filter-repo"}, args...)
+
 		return exec.CommandContext(ctx, "git", gitArgs...)
 	}
 }
@@ -119,9 +124,11 @@ func GetInstallHint() string {
 		if _, err := exec.LookPath("nix"); err == nil {
 			return "Run 'nix run nixpkgs#git-filter-repo -- --help' to verify nix can access it, or install with: brew install git-filter-repo"
 		}
+
 		if _, err := exec.LookPath("brew"); err == nil {
 			return "Install with: brew install git-filter-repo"
 		}
+
 		return "Install with: pip install git-filter-repo or see https://github.com/newren/git-filter-repo"
 	}
 }

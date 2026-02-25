@@ -59,7 +59,11 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 			}
 
 			if len(cleaner.packageManagers) != tt.wantPackageCount {
-				t.Errorf("packageManagers count = %d, want %d", len(cleaner.packageManagers), tt.wantPackageCount)
+				t.Errorf(
+					"packageManagers count = %d, want %d",
+					len(cleaner.packageManagers),
+					tt.wantPackageCount,
+				)
 			}
 		})
 	}
@@ -104,7 +108,10 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
-	factory := NewCleanerConstructorWithSettings(NewNodePackageManagerCleaner, AvailableNodePackageManagers)
+	factory := NewCleanerConstructorWithSettings(
+		NewNodePackageManagerCleaner,
+		AvailableNodePackageManagers,
+	)
 	testCases := []ValidateSettingsTestCase{
 		{
 			Name:     "nil settings",
@@ -159,7 +166,10 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 			Name: "mixed valid and invalid PMs",
 			Settings: &domain.OperationSettings{
 				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []domain.PackageManagerType{domain.PackageManagerNpm, 99}, // Mixed valid and invalid
+					PackageManagers: []domain.PackageManagerType{
+						domain.PackageManagerNpm,
+						99,
+					}, // Mixed valid and invalid
 				},
 			},
 			WantErr: true,
@@ -196,6 +206,7 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 			// Skip test if no PMs are available
 			if !cleaner.IsAvailable(context.Background()) {
 				t.Skipf("Skipping test: no available package managers")
+
 				return
 			}
 
@@ -208,15 +219,27 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 
 			// Items removed depends on which PMs are actually installed
 			if cleanResult.ItemsRemoved < tt.wantMinItems {
-				t.Errorf("Clean() removed %d items, want at least %d", cleanResult.ItemsRemoved, tt.wantMinItems)
+				t.Errorf(
+					"Clean() removed %d items, want at least %d",
+					cleanResult.ItemsRemoved,
+					tt.wantMinItems,
+				)
 			}
 
 			if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
-				t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
+				t.Errorf(
+					"Clean() strategy = %v, want %v",
+					cleanResult.Strategy,
+					domain.CleanStrategyType(domain.StrategyDryRunType),
+				)
 			}
 
 			// FreedBytes may be 0 if cache directories are empty
-			t.Logf("Clean() freed %d bytes from %d items", cleanResult.FreedBytes, cleanResult.ItemsRemoved)
+			t.Logf(
+				"Clean() freed %d bytes from %d items",
+				cleanResult.FreedBytes,
+				cleanResult.ItemsRemoved,
+			)
 		})
 	}
 }
@@ -237,7 +260,12 @@ func TestNodePackageManagerCleaner_AvailableNodePackageManagers(t *testing.T) {
 		domain.PackageManagerYarn,
 		domain.PackageManagerBun,
 	}
-	TestAvailableTypesGeneric(t, "AvailableNodePackageManagers", AvailableNodePackageManagers, expectedPMs)
+	TestAvailableTypesGeneric(
+		t,
+		"AvailableNodePackageManagers",
+		AvailableNodePackageManagers,
+		expectedPMs,
+	)
 }
 
 func TestGetHomeDir(t *testing.T) {
@@ -246,10 +274,12 @@ func TestGetHomeDir(t *testing.T) {
 
 	// Set HOME explicitly
 	t.Setenv("HOME", "/test/home")
+
 	home, err := GetHomeDir()
 	if err != nil {
 		t.Errorf("GetHomeDir() error = %v", err)
 	}
+
 	if home != "/test/home" {
 		t.Errorf("GetHomeDir() = %v, want /test/home", home)
 	}
@@ -257,10 +287,12 @@ func TestGetHomeDir(t *testing.T) {
 	// Test fallback on Windows (USERPROFILE)
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "C:\\Users\\test")
+
 	home, err = GetHomeDir()
 	if err != nil {
 		t.Errorf("GetHomeDir() error = %v", err)
 	}
+
 	if home != "C:\\Users\\test" {
 		t.Errorf("GetHomeDir() = %v, want C:\\Users\\test", home)
 	}
@@ -268,6 +300,7 @@ func TestGetHomeDir(t *testing.T) {
 	// Test error case (only applies if user.Current() would fail)
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "")
+
 	_, err = GetHomeDir()
 	// On systems where user.Current() succeeds, this won't error
 	// This test only validates that error handling exists

@@ -42,13 +42,16 @@ func readConfigFile(ctx context.Context, v *viper.Viper) (*domain.Config, error)
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	default:
-		if err := v.ReadInConfig(); err != nil {
+		err := v.ReadInConfig()
+		if err != nil {
 			var configFileNotFoundError viper.ConfigFileNotFoundError
 			if errors.As(err, &configFileNotFoundError) {
 				return GetDefaultConfig(), nil
 			}
+
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
+
 		return nil, nil // File read successfully, continue to unmarshal
 	}
 }
@@ -64,8 +67,10 @@ func unmarshalConfig(v *viper.Viper) (*domain.Config, error) {
 	config.Protected = v.GetStringSlice("protected")
 
 	// Unmarshal profiles section
-	if err := v.UnmarshalKey("profiles", &config.Profiles); err != nil {
+	err := v.UnmarshalKey("profiles", &config.Profiles)
+	if err != nil {
 		logrus.WithError(err).Error("Failed to unmarshal profiles")
+
 		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
@@ -73,7 +78,8 @@ func unmarshalConfig(v *viper.Viper) (*domain.Config, error) {
 	fixProfileSettings(v, &config)
 
 	// Validate configuration
-	if err := validateLoadedConfig(&config); err != nil {
+	err := validateLoadedConfig(&config)
+	if err != nil {
 		return nil, err
 	}
 
@@ -93,7 +99,8 @@ func fixProfileSettings(v *viper.Viper, config *domain.Config) {
 
 // validateLoadedConfig validates the loaded configuration.
 func validateLoadedConfig(config *domain.Config) error {
-	if err := config.Validate(); err != nil {
+	err := config.Validate()
+	if err != nil {
 		return pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
 
@@ -105,9 +112,15 @@ func validateLoadedConfig(config *domain.Config) error {
 	validationResult := validator.ValidateConfig(config)
 	if !validationResult.IsValid {
 		for _, err := range validationResult.Errors {
-			logrus.WithField("field", err.Field).WithError(fmt.Errorf("%s", err.Message)).Error("Configuration validation error")
+			logrus.WithField("field", err.Field).
+				WithError(fmt.Errorf("%s", err.Message)).
+				Error("Configuration validation error")
 		}
-		return fmt.Errorf("configuration validation failed with %d errors", len(validationResult.Errors))
+
+		return fmt.Errorf(
+			"configuration validation failed with %d errors",
+			len(validationResult.Errors),
+		)
 	}
 
 	return nil
@@ -142,6 +155,7 @@ func boolToSafeMode(b bool) domain.SafeMode {
 	if b {
 		return domain.SafeModeEnabled
 	}
+
 	return domain.SafeModeDisabled
 }
 
@@ -176,6 +190,7 @@ func Save(config *domain.Config) error {
 			v.Set(opKey+".description", op.Description)
 			v.Set(opKey+".risk_level", op.RiskLevel.String())
 			v.Set(opKey+".enabled", op.Enabled.String())
+
 			if op.Settings != nil {
 				v.Set(opKey+".settings", op.Settings)
 			}
@@ -184,16 +199,19 @@ func Save(config *domain.Config) error {
 
 	// Ensure config directory exists
 	configDir := filepath.Dir(configPath)
-	if err := os.MkdirAll(configDir, 0o755); err != nil {
+	err := os.MkdirAll(configDir, 0o755)
+	if err != nil {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
 
 	// Write configuration file
-	if err := v.WriteConfigAs(configPath); err != nil {
+	err := v.WriteConfigAs(configPath)
+	if err != nil {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
 
 	logrus.WithField("config_path", configPath).Info("Configuration saved successfully")
+
 	return nil
 }
 
@@ -205,13 +223,16 @@ func GetCurrentTime() time.Time {
 // parseRiskLevel extracts and converts risk level string from viper to domain enum.
 func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) domain.RiskLevelType {
 	var riskLevelStr string
+
 	key := fmt.Sprintf("profiles.%s.operations.%d.risk_level", profileName, operationIndex)
-	if err := v.UnmarshalKey(key, &riskLevelStr); err != nil {
+	err := v.UnmarshalKey(key, &riskLevelStr)
+	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"profile":   profileName,
 			"operation": operationIndex,
 			"error":     err,
 		}).Warn("Failed to unmarshal risk level, defaulting to LOW")
+
 		return domain.RiskLevelType(domain.RiskLevelLowType)
 	}
 
@@ -226,24 +247,33 @@ func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) doma
 		return domain.RiskLevelType(domain.RiskLevelCriticalType)
 	default:
 		logrus.WithField("risk_level", riskLevelStr).Warn("Invalid risk level, defaulting to LOW")
+
 		return domain.RiskLevelType(domain.RiskLevelLowType)
 	}
 }
 
 // unmarshalOperationSettings extracts operation settings from viper and populates the operation.
-func unmarshalOperationSettings(v *viper.Viper, profileName string, operationIndex int, op *domain.CleanupOperation) {
+func unmarshalOperationSettings(
+	v *viper.Viper,
+	profileName string,
+	operationIndex int,
+	op *domain.CleanupOperation,
+) {
 	settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", profileName, operationIndex)
 	settingsMap := v.GetStringMap(settingsKey)
 
 	if len(settingsMap) == 0 {
 		logrus.Debug("No settings map found")
+
 		return
 	}
 
 	if _, exists := settingsMap["nix_generations"]; exists {
 		nixGenSettings := &domain.NixGenerationsSettings{}
+
 		nixGenKey := settingsKey + ".nix_generations"
-		if err := v.UnmarshalKey(nixGenKey, nixGenSettings); err == nil {
+		err := v.UnmarshalKey(nixGenKey, nixGenSettings)
+		if err == nil {
 			op.Settings = &domain.OperationSettings{}
 			op.Settings.NixGenerations = nixGenSettings
 		} else {
@@ -292,18 +322,61 @@ func GetDefaultConfig() *domain.Config {
 		},
 		Profiles: map[string]*domain.Profile{
 			"daily": newProfile("daily", "Quick daily cleanup", []domain.CleanupOperation{
-				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLevelType(domain.RiskLevelLowType), domain.OperationTypeNixGenerations),
-				newCleanupOperation("temp-files", "Clean temporary files", domain.RiskLevelType(domain.RiskLevelLowType), domain.OperationTypeTempFiles),
+				newCleanupOperation(
+					"nix-generations",
+					"Clean old Nix generations",
+					domain.RiskLevelType(domain.RiskLevelLowType),
+					domain.OperationTypeNixGenerations,
+				),
+				newCleanupOperation(
+					"temp-files",
+					"Clean temporary files",
+					domain.RiskLevelType(domain.RiskLevelLowType),
+					domain.OperationTypeTempFiles,
+				),
 			}),
-			"aggressive": newProfile("aggressive", "Deep aggressive cleanup", []domain.CleanupOperation{
-				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLevelType(domain.RiskLevelHighType), domain.OperationTypeNixGenerations),
-				newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskLevelType(domain.RiskLevelMediumType), domain.OperationTypeHomebrew),
-			}),
-			"comprehensive": newProfile("comprehensive", "Complete system cleanup", []domain.CleanupOperation{
-				newCleanupOperation("nix-generations", "Clean old Nix generations", domain.RiskLevelType(domain.RiskLevelCriticalType), domain.OperationTypeNixGenerations),
-				newCleanupOperation("homebrew-cleanup", "Clean old Homebrew packages", domain.RiskLevelType(domain.RiskLevelMediumType), domain.OperationTypeHomebrew),
-				newCleanupOperation("system-temp", "Clean system temporary files", domain.RiskLevelType(domain.RiskLevelMediumType), domain.OperationTypeSystemTemp),
-			}),
+			"aggressive": newProfile(
+				"aggressive",
+				"Deep aggressive cleanup",
+				[]domain.CleanupOperation{
+					newCleanupOperation(
+						"nix-generations",
+						"Clean old Nix generations",
+						domain.RiskLevelType(domain.RiskLevelHighType),
+						domain.OperationTypeNixGenerations,
+					),
+					newCleanupOperation(
+						"homebrew-cleanup",
+						"Clean old Homebrew packages",
+						domain.RiskLevelType(domain.RiskLevelMediumType),
+						domain.OperationTypeHomebrew,
+					),
+				},
+			),
+			"comprehensive": newProfile(
+				"comprehensive",
+				"Complete system cleanup",
+				[]domain.CleanupOperation{
+					newCleanupOperation(
+						"nix-generations",
+						"Clean old Nix generations",
+						domain.RiskLevelType(domain.RiskLevelCriticalType),
+						domain.OperationTypeNixGenerations,
+					),
+					newCleanupOperation(
+						"homebrew-cleanup",
+						"Clean old Homebrew packages",
+						domain.RiskLevelType(domain.RiskLevelMediumType),
+						domain.OperationTypeHomebrew,
+					),
+					newCleanupOperation(
+						"system-temp",
+						"Clean system temporary files",
+						domain.RiskLevelType(domain.RiskLevelMediumType),
+						domain.OperationTypeSystemTemp,
+					),
+				},
+			),
 		},
 		LastClean: now,
 		Updated:   now,

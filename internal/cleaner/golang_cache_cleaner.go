@@ -39,6 +39,7 @@ func NewGoCacheCleaner(cacheType GoCacheType, verbose, dryRun bool) *GoCacheClea
 // It verifies that the Go command is installed and accessible.
 func (gcc *GoCacheCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := gcc.helper.getGoEnv(ctx, "GOROOT")
+
 	return err == nil
 }
 
@@ -87,6 +88,7 @@ func (gcc *GoCacheCleaner) scanGoEnvCache(ctx context.Context, envVar string) []
 func (gcc *GoCacheCleaner) scanGoBuildCache() []domain.ScanItem {
 	items := make([]domain.ScanItem, 0)
 	buildCachePattern := "go-build*"
+
 	tempDir := "/tmp"
 	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
 		tempDir = homeDir + "/Library/Caches"
@@ -121,7 +123,9 @@ func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.Clean
 	case GoCacheBuildCache:
 		return gcc.cleanGoBuildCache(ctx)
 	default:
-		return result.Err[domain.CleanResult](fmt.Errorf("unsupported cache type: %v", gcc.cacheType))
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("unsupported cache type: %v", gcc.cacheType),
+		)
 	}
 }
 
@@ -137,13 +141,20 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 	defer cancel()
 
 	cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-"+cleanFlag)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		// Check if it's a timeout error
-		if timeoutCtx.Err() == context.DeadlineExceeded {
+		if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
 			return result.Err[domain.CleanResult](
-				fmt.Errorf("go clean -%s timed out after %v (command may be hanging)", cleanFlag, goCommandTimeout))
+				fmt.Errorf(
+					"go clean -%s timed out after %v (command may be hanging)",
+					cleanFlag,
+					goCommandTimeout,
+				),
+			)
 		}
+
 		return result.Err[domain.CleanResult](fmt.Errorf("go clean -%s failed: %w (output: %s)",
 			cleanFlag, err, string(output)))
 	}
@@ -172,22 +183,37 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 	}
 
 	var bytesFreed int64
+
 	if !gcc.dryRun {
 		var cleanupErr error
+
 		bytesFreed, _, _ = CalculateBytesFreed(cachePath, func() error {
 			// Execute the clean command
 			timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
 			defer cancel()
 
 			cmd := exec.CommandContext(timeoutCtx, "go", "clean", "-"+cleanFlag)
+
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				cleanupErr = err
-				if timeoutCtx.Err() == context.DeadlineExceeded {
-					return fmt.Errorf("go clean -%s timed out after %v", cleanFlag, goCommandTimeout)
+
+				if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
+					return fmt.Errorf(
+						"go clean -%s timed out after %v",
+						cleanFlag,
+						goCommandTimeout,
+					)
 				}
-				return fmt.Errorf("go clean -%s failed: %w (output: %s)", cleanFlag, err, string(output))
+
+				return fmt.Errorf(
+					"go clean -%s failed: %w (output: %s)",
+					cleanFlag,
+					err,
+					string(output),
+				)
 			}
+
 			return nil
 		}, gcc.verbose, "Cache")
 
@@ -208,6 +234,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 
 	// Dry run - calculate size estimate and return
 	bytesFreed = GetDirSize(cachePath)
+
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 		domain.CleanStrategyType(domain.StrategyConservativeType),
 		1, bytesFreed,
@@ -231,8 +258,11 @@ func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[do
 }
 
 // cleanGoBuildCache removes go-build* folders.
-func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[domain.CleanResult] {
+func (gcc *GoCacheCleaner) cleanGoBuildCache(
+	ctx context.Context,
+) result.Result[domain.CleanResult] {
 	buildCachePattern := "go-build*"
+
 	tempDir := "/tmp"
 	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
 		tempDir = homeDir + "/Library/Caches"
@@ -249,7 +279,9 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 	}
 
 	itemsRemoved := 0
+
 	var totalSizeEstimate domain.SizeEstimate
+
 	for _, match := range matches {
 		// Calculate size before removal (always, for accurate dry-run estimates)
 		bytesFreed := GetDirSize(match)
@@ -257,6 +289,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 
 		if gcc.dryRun {
 			itemsRemoved++
+
 			continue
 		}
 
@@ -265,10 +298,12 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 			if gcc.verbose {
 				fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
 			}
+
 			continue
 		}
 
 		itemsRemoved++
+
 		if gcc.verbose {
 			fmt.Printf("  ✓ Removed build cache: %s\n", match)
 		}

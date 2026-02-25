@@ -20,7 +20,9 @@ func ToFloat64(v *int) *float64 {
 	if v == nil {
 		return nil
 	}
+
 	result := float64(*v)
+
 	return &result
 }
 
@@ -29,6 +31,7 @@ func GetConstraint(constraint *float64, fallback float64) float64 {
 	if constraint != nil {
 		return *constraint
 	}
+
 	return fallback
 }
 
@@ -45,7 +48,9 @@ func extractFloat64(v *int, fallback float64) *float64 {
 	if v == nil {
 		return &fallback
 	}
+
 	result := float64(*v)
+
 	return &result
 }
 
@@ -67,6 +72,7 @@ func (m MinMax) Range() float64 {
 	if m.Min == nil || m.Max == nil {
 		return math.NaN()
 	}
+
 	return *m.Max - *m.Min
 }
 
@@ -75,8 +81,10 @@ func (m MinMax) Contains(value float64) bool {
 	if m.Min != nil && value < *m.Min {
 		return false
 	}
+
 	if m.Max != nil && value > *m.Max {
 		return false
 	}
+
 	return true
 }

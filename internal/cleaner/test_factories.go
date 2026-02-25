@@ -6,7 +6,9 @@ import (
 
 // ToSimpleCleanerConstructor converts a constructor with additional methods to one that
 // only exposes Clean and IsAvailable.
-func ToSimpleCleanerConstructor(fullConstructor CleanerConstructorWithSettings) SimpleCleanerConstructor {
+func ToSimpleCleanerConstructor(
+	fullConstructor CleanerConstructorWithSettings,
+) SimpleCleanerConstructor {
 	return func(verbose, dryRun bool) SimpleCleaner {
 		return fullConstructor(verbose, dryRun)
 	}

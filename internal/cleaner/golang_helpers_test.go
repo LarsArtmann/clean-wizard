@@ -10,6 +10,7 @@ func TestGolangHelpers_getHomeDir(t *testing.T) {
 
 	// Set HOME explicitly
 	t.Setenv("HOME", "/test/home")
+
 	home := helper.getHomeDir()
 	if home != "/test/home" {
 		t.Errorf("getHomeDir() = %v, want /test/home", home)
@@ -18,6 +19,7 @@ func TestGolangHelpers_getHomeDir(t *testing.T) {
 	// Test fallback on Windows (USERPROFILE)
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "C:\\Users\\test")
+
 	home = helper.getHomeDir()
 	if home != "C:\\Users\\test" {
 		t.Errorf("getHomeDir() = %v, want C:\\Users\\test", home)
@@ -26,6 +28,7 @@ func TestGolangHelpers_getHomeDir(t *testing.T) {
 	// Test fallback to system user (when no env vars set)
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "")
+
 	home = helper.getHomeDir()
 	// On systems where user.Current() succeeds, this will return the real home
 	// The function handles errors by returning empty string
@@ -53,6 +56,7 @@ func TestGolangHelpers_getDirSize(t *testing.T) {
 	os.WriteFile(subDir+"/file3.txt", []byte("abcde"), 0o644)
 
 	size = GetDirSize(testDir)
+
 	expectedSize := int64(5 + 5 + 5) // 5+5+5 = 15 bytes
 	if size != expectedSize {
 		t.Errorf("GetDirSize() = %v, want %v", size, expectedSize)

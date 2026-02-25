@@ -19,6 +19,7 @@ func boolToGenerationStatus(b bool) domain.GenerationStatus {
 	if b {
 		return domain.GenerationStatusCurrent
 	}
+
 	return domain.GenerationStatusHistorical
 }
 
@@ -51,12 +52,14 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 
 	// Use nix-env without --profile to let it use the default user profile
 	cmd := n.execWithTimeout(ctx, "nix-env", "--list-generations")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return result.Err[[]domain.NixGeneration](fmt.Errorf("failed to list generations: %w", err))
 	}
 
 	var generations []domain.NixGeneration
+
 	lines := strings.SplitSeq(string(output), "\n")
 
 	for line := range lines {
@@ -67,7 +70,9 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 
 		gen, err := n.ParseGeneration(line)
 		if err != nil {
-			return result.Err[[]domain.NixGeneration](fmt.Errorf("failed to parse generation: %w", err))
+			return result.Err[[]domain.NixGeneration](
+				fmt.Errorf("failed to parse generation: %w", err),
+			)
 		}
 
 		generations = append(generations, gen)
@@ -85,6 +90,7 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 
 	// Real system call for production mode
 	cmd := n.execWithTimeout(ctx, "du", "-sb", "/nix/store")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return result.Err[int64](fmt.Errorf("failed to get store size: %w", err))
@@ -109,7 +115,13 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	// In dry-run mode, return success without actually running GC
 	if n.dryRun {
 		estimatedFreed := int64(100 * 1024 * 1024) // 100MB estimate from GC
-		cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType), 1, estimatedFreed, 0)
+		cleanResult := conversions.NewCleanResultWithTiming(
+			domain.CleanStrategyType(domain.StrategyAggressiveType),
+			1,
+			estimatedFreed,
+			0,
+		)
+
 		return result.Ok(cleanResult)
 	}
 
@@ -118,11 +130,14 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	// Get store size before garbage collection
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get pre-gc store size: %w", err))
+		return conversions.ToCleanResultFromError(
+			fmt.Errorf("failed to get pre-gc store size: %w", err),
+		)
 	}
 
 	// Run actual nix-collect-garbage command
 	cmd := n.execWithTimeout(ctx, "nix-collect-garbage", "-d")
+
 	err = cmd.Run()
 	if err != nil {
 		return conversions.ToCleanResultFromError(fmt.Errorf("failed to collect garbage: %w", err))
@@ -134,7 +149,9 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	// Get store size after garbage collection
 	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to get post-gc store size: %w", err))
+		return conversions.ToCleanResultFromError(
+			fmt.Errorf("failed to get post-gc store size: %w", err),
+		)
 	}
 
 	bytesFreed := max(beforeSize-afterSize,
@@ -142,13 +159,20 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		0)
 
 	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType), 1, bytesFreed, time.Since(startTime))
+	cleanResult := conversions.NewCleanResultWithTiming(
+		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		1,
+		bytesFreed,
+		time.Since(startTime),
+	)
+
 	return result.Ok(cleanResult)
 }
 
 // getActualStoreSize helper function to get real store size.
 func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 	cmd := n.execWithTimeout(ctx, "du", "-sb", "/nix/store")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return 0, err
@@ -164,12 +188,21 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 
 // RemoveGeneration removes specific Nix generation.
 // In dry-run mode, returns a success result without actually deleting.
-func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Result[domain.CleanResult] {
+func (n *NixAdapter) RemoveGeneration(
+	ctx context.Context,
+	genID int,
+) result.Result[domain.CleanResult] {
 	// In dry-run mode, return success without actually removing
 	if n.dryRun {
 		// Return a success result with estimated bytes freed
 		estimatedFreed := int64(50 * 1024 * 1024) // 50MB estimate per generation
-		cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyConservativeType), 1, estimatedFreed, 0)
+		cleanResult := conversions.NewCleanResultWithTiming(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			1,
+			estimatedFreed,
+			0,
+		)
+
 		return result.Ok(cleanResult)
 	}
 
@@ -184,9 +217,12 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 
 	// Remove the specific generation
 	cmd := n.execWithTimeout(ctx, "nix-env", "--delete-generations", strconv.Itoa(genID))
+
 	err = cmd.Run()
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to remove generation %d: %w", genID, err))
+		return conversions.ToCleanResultFromError(
+			fmt.Errorf("failed to remove generation %d: %w", genID, err),
+		)
 	}
 
 	// Get store size after removal
@@ -201,7 +237,13 @@ func (n *NixAdapter) RemoveGeneration(ctx context.Context, genID int) result.Res
 		0)
 
 	// Use centralized conversion with proper timing
-	cleanResult := conversions.NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyConservativeType), 1, bytesFreed, time.Since(startTime))
+	cleanResult := conversions.NewCleanResultWithTiming(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1,
+		bytesFreed,
+		time.Since(startTime),
+	)
+
 	return result.Ok(cleanResult)
 }
 
@@ -224,6 +266,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 
 	// Parse date and time from second and third fields
 	dateTimeStr := fmt.Sprintf("%s %s", fields[1], fields[2])
+
 	date, err := time.Parse("2006-01-02 15:04:05", dateTimeStr)
 	if err != nil {
 		return domain.NixGeneration{}, fmt.Errorf("invalid date/time: %s %s", fields[1], fields[2])
@@ -237,6 +280,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 	if err != nil {
 		return domain.NixGeneration{}, fmt.Errorf("failed to get home directory: %w", err)
 	}
+
 	path := fmt.Sprintf("%s/.local/state/nix/profiles/profile-%d-link", homeDir, id)
 
 	// Check if this is the current generation
@@ -254,7 +298,8 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
 	// Check if nix command exists
 	versionCmd := n.execWithTimeout(ctx, "nix", "--version")
-	if err := versionCmd.Run(); err != nil {
+	err := versionCmd.Run()
+	if err != nil {
 		return false
 	}
 

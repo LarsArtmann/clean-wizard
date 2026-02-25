@@ -19,13 +19,16 @@ func GoCleanerTest(ctx context.Context, title string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create Go cleaner: %w", err)
 	}
+
 	if !goCleaner.IsAvailable(ctx) {
 		return errors.New("go is not available")
 	}
+
 	fmt.Println("✅ Go is available")
 
 	// Test 2: Scan for Go caches
 	fmt.Println("🔍 Scanning for Go caches...")
+
 	scanResult := goCleaner.Scan(ctx)
 	if scanResult.IsErr() {
 		return fmt.Errorf("scan failed: %w", scanResult.Error())
@@ -36,25 +39,30 @@ func GoCleanerTest(ctx context.Context, title string) error {
 		fmt.Println("ℹ️  No Go caches found")
 	} else {
 		fmt.Printf("✅ Found %d cache location(s):\n", len(items))
+
 		for i, item := range items {
 			fmt.Printf("  %d. %s\n", i+1, item.Path)
 			fmt.Printf("     Size: %s\n", format.Bytes(int64(item.Size)))
 		}
 	}
+
 	fmt.Println()
 
 	// Test 3: Dry-run clean
 	fmt.Println("🧹 Testing dry-run clean...")
+
 	dryRunCleaner, err := cleaner.NewGoCleaner(true, true, GoCacheFlags)
 	if err != nil {
 		return fmt.Errorf("failed to create Go cleaner: %w", err)
 	}
+
 	cleanResult := dryRunCleaner.Clean(ctx)
 	if cleanResult.IsErr() {
 		return fmt.Errorf("clean failed: %w", cleanResult.Error())
 	}
 
 	result := cleanResult.Value()
+
 	fmt.Printf("✅ Dry-run complete:\n")
 	fmt.Printf("   Items would be cleaned: %d\n", result.ItemsRemoved)
 	fmt.Printf("   Strategy: %s\n", result.Strategy)

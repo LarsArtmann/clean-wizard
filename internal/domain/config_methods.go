@@ -65,6 +65,7 @@ func (c *Config) Sanitize(ctx stdctx.Context, level ValidationLevelType) *Saniti
 	}
 
 	result.Duration = time.Since(start)
+
 	return result
 }
 
@@ -85,6 +86,7 @@ func (r *SanitizeConfigResult) applyComprehensiveSanitization(c *Config) {
 	// Sanitize version string
 	if c.Version != "" {
 		original := c.Version
+
 		sanitized := sanitizeString(original)
 		if sanitized != original {
 			c.Version = sanitized
@@ -102,6 +104,7 @@ func (r *SanitizeConfigResult) applyComprehensiveSanitization(c *Config) {
 
 	// Remove duplicate protected paths
 	seen := make(map[string]bool)
+
 	uniquePaths := make([]string, 0, len(c.Protected))
 	for _, path := range c.Protected {
 		if !seen[path] {
@@ -109,6 +112,7 @@ func (r *SanitizeConfigResult) applyComprehensiveSanitization(c *Config) {
 			uniquePaths = append(uniquePaths, path)
 		}
 	}
+
 	if len(uniquePaths) != len(c.Protected) {
 		c.Protected = uniquePaths
 		changes++
@@ -149,15 +153,19 @@ func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
 	// Ensure at least one default protected path exists
 	defaultProtected := []string{"/System", "/Applications", "/Library"}
 	hasSystemPath := false
+
 	for _, path := range c.Protected {
 		if path == "/System" || path == "/System/" {
 			hasSystemPath = true
+
 			break
 		}
 	}
+
 	if !hasSystemPath && len(c.Protected) == 0 {
 		c.Protected = append([]string{"/System"}, defaultProtected[1:]...)
 		changes++
+
 		r.Warnings = append(r.Warnings, SanitizationWarning{
 			Field:    "protected",
 			Message:  "Added default protected paths",
@@ -172,6 +180,7 @@ func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
 			profile.Name = sanitizeString(profile.Name)
 			changes++
 		}
+
 		if sanitizeString(profile.Description) != profile.Description {
 			profile.Description = sanitizeString(profile.Description)
 			changes++
@@ -185,6 +194,7 @@ func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
 func sanitizeString(s string) string {
 	// Trim whitespace
 	s = trimAllWhitespace(s)
+
 	return s
 }
 
@@ -192,6 +202,7 @@ func sanitizeString(s string) string {
 func sanitizePath(path string) string {
 	// Trim whitespace
 	sanitized := trimAllWhitespace(path)
+
 	return sanitized
 }
 
@@ -204,6 +215,7 @@ func trimAllWhitespace(s string) string {
 			result = append(result, b)
 		}
 	}
+
 	return string(result)
 }
 
@@ -232,6 +244,7 @@ func (c *Config) ApplyProfile(ctx stdctx.Context, profileName string) *ApplyProf
 	if !exists {
 		result.Applied = false
 		result.Duration = time.Since(start)
+
 		return result
 	}
 
@@ -239,6 +252,7 @@ func (c *Config) ApplyProfile(ctx stdctx.Context, profileName string) *ApplyProf
 	if !profile.Enabled.IsEnabled() {
 		result.Applied = false
 		result.Duration = time.Since(start)
+
 		return result
 	}
 
@@ -252,11 +266,15 @@ func (c *Config) ApplyProfile(ctx stdctx.Context, profileName string) *ApplyProf
 	}
 
 	result.Duration = time.Since(start)
+
 	return result
 }
 
 // ApplyProfileWithContext applies a profile using the generic Context system.
-func (c *Config) ApplyProfileWithContext(ctx stdctx.Context, profileName string) *ApplyProfileResult {
+func (c *Config) ApplyProfileWithContext(
+	ctx stdctx.Context,
+	profileName string,
+) *ApplyProfileResult {
 	// Create validation config using the generic Context system
 	validationConfig := context.ValidationConfig{
 		Profile:     profileName,
@@ -315,6 +333,7 @@ func (c *Config) EstimateImpact(ctx stdctx.Context, profileName string) *Estimat
 			Status: SizeEstimateStatusUnknown,
 		}
 		result.Duration = time.Since(start)
+
 		return result
 	}
 
@@ -360,6 +379,7 @@ func (c *Config) EstimateImpact(ctx stdctx.Context, profileName string) *Estimat
 	// Calculate total size
 	totalKnown := uint64(0)
 	allUnknown := true
+
 	for _, size := range result.ByRiskLevel {
 		totalKnown += size.Known
 		if size.Status == SizeEstimateStatusKnown {
@@ -378,6 +398,7 @@ func (c *Config) EstimateImpact(ctx stdctx.Context, profileName string) *Estimat
 	}
 
 	result.Duration = time.Since(start)
+
 	return result
 }
 
@@ -427,7 +448,10 @@ func getOperationDescription(op CleanupOperation) string {
 }
 
 // SanitizeWithContext sanitizes configuration using the generic Context system.
-func (c *Config) SanitizeWithContext(ctx stdctx.Context, level ValidationLevelType) *SanitizeConfigResult {
+func (c *Config) SanitizeWithContext(
+	ctx stdctx.Context,
+	level ValidationLevelType,
+) *SanitizeConfigResult {
 	// Create validation config using the generic Context system
 	validationConfig := context.ValidationConfig{
 		ValidationLevel: level.String(),

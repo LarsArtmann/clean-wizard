@@ -66,6 +66,7 @@ func FuzzResultStringOperations(f *testing.F) {
 			if i > 100 { // Prevent excessive loops
 				break
 			}
+
 			_ = r // Should not panic on any unicode
 		}
 	})

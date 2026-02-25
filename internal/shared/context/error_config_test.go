@@ -80,7 +80,10 @@ func TestSanitizationConfigBuilder(t *testing.T) {
 
 	// Check config's metadata (not context's metadata)
 	if c.ValueType.Metadata["policy"] != "strict" {
-		t.Errorf("Expected config metadata policy='strict', got '%s'", c.ValueType.Metadata["policy"])
+		t.Errorf(
+			"Expected config metadata policy='strict', got '%s'",
+			c.ValueType.Metadata["policy"],
+		)
 	}
 }
 

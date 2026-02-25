@@ -17,6 +17,7 @@ func (cv *ConfigValidator) validateMaxDiskUsage(value any) error {
 	if usage < min {
 		return fmt.Errorf("max_disk_usage (%d) below minimum (%d)", usage, min)
 	}
+
 	if usage > max {
 		return fmt.Errorf("max_disk_usage (%d) above maximum (%d)", usage, max)
 	}
@@ -32,10 +33,12 @@ func (cv *ConfigValidator) getMaxDiskUsageBounds() (min, max int) {
 		if cv.rules.MaxDiskUsage.Min != nil {
 			min = *cv.rules.MaxDiskUsage.Min
 		}
+
 		if cv.rules.MaxDiskUsage.Max != nil {
 			max = *cv.rules.MaxDiskUsage.Max
 		}
 	}
+
 	return min, max
 }
 
@@ -55,6 +58,7 @@ func (cv *ConfigValidator) validateProtectedPaths(value any) error {
 		if path == "" {
 			return fmt.Errorf("protected[%d] cannot be empty", i)
 		}
+
 		if !filepath.IsAbs(path) {
 			return fmt.Errorf("protected[%d] must be absolute path: %s", i, path)
 		}

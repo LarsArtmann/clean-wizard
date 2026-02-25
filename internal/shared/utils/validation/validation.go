@@ -19,14 +19,20 @@ func ValidateAndWrap[T Validator](item T, itemType string) result.Result[T] {
 
 // ValidateWithCustomError provides a generic validation wrapper with custom error message.
 func ValidateWithCustomError[T Validator](item T, errorMsg string) result.Result[T] {
-	if err := item.Validate(); err != nil {
+	err := item.Validate()
+	if err != nil {
 		return result.Err[T](fmt.Errorf("%s: %w", errorMsg, err))
 	}
+
 	return result.Ok(item)
 }
 
 // ValidateAndConvert provides a generic validation and conversion pattern
 // Useful when you need to validate and then convert to a different type.
-func ValidateAndConvert[T Validator, U any](item T, converter func(T) U, itemType string) result.Result[U] {
+func ValidateAndConvert[T Validator, U any](
+	item T,
+	converter func(T) U,
+	itemType string,
+) result.Result[U] {
 	return result.Map(ValidateWithCustomError(item, "invalid "+itemType), converter)
 }

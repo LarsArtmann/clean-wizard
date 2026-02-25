@@ -40,12 +40,14 @@ func (gt GoCacheType) Count() int {
 		count++
 		gt &= gt - 1 // Clear the lowest set bit
 	}
+
 	return count
 }
 
 // EnabledTypes returns a slice of all enabled cache types.
 func (gt GoCacheType) EnabledTypes() []GoCacheType {
 	var types []GoCacheType
+
 	allTypes := []GoCacheType{
 		GoCacheGOCACHE,
 		GoCacheTestCache,
@@ -58,6 +60,7 @@ func (gt GoCacheType) EnabledTypes() []GoCacheType {
 			types = append(types, t)
 		}
 	}
+
 	return types
 }
 
@@ -66,20 +69,26 @@ func (gt GoCacheType) String() string {
 	if gt == GoCacheGOCACHE {
 		return "Go Cache (GOCACHE)"
 	}
+
 	if gt == GoCacheTestCache {
 		return "Go Test Cache (GOTESTCACHE)"
 	}
+
 	if gt == GoCacheModCache {
 		return "Go Module Cache (GOMODCACHE)"
 	}
+
 	if gt == GoCacheBuildCache {
 		return "Go Build Cache (go-build)"
 	}
+
 	if gt == GoCacheLintCache {
 		return "Lint Cache (golangci-lint)"
 	}
+
 	if gt.Count() > 1 {
 		return fmt.Sprintf("Multiple caches (%d)", gt.Count())
 	}
+
 	return "Unknown cache"
 }

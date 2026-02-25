@@ -45,6 +45,7 @@ func HandleNixNotAvailable(operation string) *CleanWizardError {
 func HandleConfigError(operation string, err error) *CleanWizardError {
 	baseErr := NewError(ErrConfigLoad, "Configuration error: "+err.Error())
 	baseErr.Operation = operation
+
 	return baseErr
 }
 
@@ -53,11 +54,16 @@ func HandleValidationError(operation string, err error) *CleanWizardError {
 	baseErr := NewError(ErrConfigValidation, "Validation error: "+err.Error())
 	baseErr.Operation = operation
 	baseErr = baseErr.WithDetail("validation_type", "comprehensive")
+
 	return baseErr
 }
 
 // HandleValidationErrorWithDetails standardizes validation errors with detailed context.
-func HandleValidationErrorWithDetails(operation, field string, value any, reason string) *CleanWizardError {
+func HandleValidationErrorWithDetails(
+	operation, field string,
+	value any,
+	reason string,
+) *CleanWizardError {
 	return NewErrorWithDetails(ErrConfigValidation,
 		fmt.Sprintf("Validation failed for %s: %s", field, reason),
 		NewErrorDetails().
@@ -92,5 +98,6 @@ func WrapError(err error, code ErrorCode, operation string) *CleanWizardError {
 // IsNixAvailable checks if Nix is available on the system.
 func IsNixAvailable() bool {
 	_, err := exec.LookPath("nix")
+
 	return err == nil
 }

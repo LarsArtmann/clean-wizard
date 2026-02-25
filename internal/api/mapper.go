@@ -17,6 +17,7 @@ func boolToSafeMode(b bool) domain.SafeMode {
 	if b {
 		return domain.SafeModeEnabled
 	}
+
 	return domain.SafeModeDisabled
 }
 
@@ -25,6 +26,7 @@ func boolToProfileStatus(b bool) domain.ProfileStatus {
 	if b {
 		return domain.ProfileStatusEnabled
 	}
+
 	return domain.ProfileStatusDisabled
 }
 
@@ -51,6 +53,7 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 		if err != nil {
 			return result.Err[*domain.Config](fmt.Errorf("failed to map profile %s: %w", name, err))
 		}
+
 		profiles[name] = domainProfile
 	}
 
@@ -64,7 +67,8 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 	}
 
 	// Validate domain config
-	if err := config.Validate(); err != nil {
+	err := config.Validate()
+	if err != nil {
 		return result.Err[*domain.Config](fmt.Errorf("domain config validation failed: %w", err))
 	}
 
@@ -108,6 +112,7 @@ func MapProfileToDomain(publicProfile *PublicProfile) (*domain.Profile, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to map operation %d: %w", i, err)
 		}
+
 		operations[i] = *domainOp
 	}
 
@@ -156,7 +161,9 @@ func MapOperationToDomain(publicOperation *PublicOperation) (*domain.CleanupOper
 		Description: publicOperation.Description,
 		RiskLevel:   riskLevel,
 		Enabled:     boolToProfileStatus(publicOperation.Enabled),
-		Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations), // Simplified for PoC
+		Settings: domain.DefaultSettings(
+			domain.OperationTypeNixGenerations,
+		), // Simplified for PoC
 	}, nil
 }
 
@@ -211,7 +218,12 @@ func MapRiskLevelToDomain(publicRisk PublicRiskLevel) (domain.RiskLevelType, err
 	case PublicRiskCritical:
 		return domain.RiskLevelType(domain.RiskLevelCriticalType), nil
 	default:
-		return domain.RiskLevelType(domain.RiskLevelLowType), fmt.Errorf("unknown risk level: %s", publicRisk)
+		return domain.RiskLevelType(
+				domain.RiskLevelLowType,
+			), fmt.Errorf(
+				"unknown risk level: %s",
+				publicRisk,
+			)
 	}
 }
 
@@ -247,7 +259,8 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 	}
 
 	// Add validation errors if any
-	if err := domainResult.Validate(); err != nil {
+	err := domainResult.Validate()
+	if err != nil {
 		publicResult.Errors = []string{err.Error()}
 		publicResult.Success = false
 	}

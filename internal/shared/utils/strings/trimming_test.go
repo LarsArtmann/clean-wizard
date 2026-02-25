@@ -42,9 +42,12 @@ func TestTrimWhitespaceField(t *testing.T) {
 		{
 			name: "trims leading and trailing whitespace",
 			field: TrimmableField{
-				Name:  "test",
-				Path:  "test.path",
-				Value: func() *string { s := "  hello world  "; return &s }(),
+				Name: "test",
+				Path: "test.path",
+				Value: func() *string {
+					s := "  hello world  "
+					return &s
+				}(),
 			},
 			changes:       &MockSanitizationResult{},
 			expectChange:  true,
@@ -53,9 +56,12 @@ func TestTrimWhitespaceField(t *testing.T) {
 		{
 			name: "does not change already trimmed string",
 			field: TrimmableField{
-				Name:  "test",
-				Path:  "test.path",
-				Value: func() *string { s := "hello world"; return &s }(),
+				Name: "test",
+				Path: "test.path",
+				Value: func() *string {
+					s := "hello world"
+					return &s
+				}(),
 			},
 			changes:       &MockSanitizationResult{},
 			expectChange:  false,
@@ -64,9 +70,12 @@ func TestTrimWhitespaceField(t *testing.T) {
 		{
 			name: "handles empty string",
 			field: TrimmableField{
-				Name:  "test",
-				Path:  "test.path",
-				Value: func() *string { s := ""; return &s }(),
+				Name: "test",
+				Path: "test.path",
+				Value: func() *string {
+					s := ""
+					return &s
+				}(),
 			},
 			changes:       &MockSanitizationResult{},
 			expectChange:  false,
@@ -75,9 +84,12 @@ func TestTrimWhitespaceField(t *testing.T) {
 		{
 			name: "handles string with only whitespace",
 			field: TrimmableField{
-				Name:  "test",
-				Path:  "test.path",
-				Value: func() *string { s := "   \t\n   "; return &s }(),
+				Name: "test",
+				Path: "test.path",
+				Value: func() *string {
+					s := "   \t\n   "
+					return &s
+				}(),
 			},
 			changes:       &MockSanitizationResult{},
 			expectChange:  true,
@@ -129,9 +141,12 @@ func TestTrimIfEnabled(t *testing.T) {
 			name:        "trims when enabled",
 			trimEnabled: true,
 			field: TrimmableField{
-				Name:  "test",
-				Path:  "test.path",
-				Value: func() *string { s := "  hello  "; return &s }(),
+				Name: "test",
+				Path: "test.path",
+				Value: func() *string {
+					s := "  hello  "
+					return &s
+				}(),
 			},
 			changes:      &MockSanitizationResult{},
 			expectChange: true,
@@ -140,9 +155,12 @@ func TestTrimIfEnabled(t *testing.T) {
 			name:        "does not trim when disabled",
 			trimEnabled: false,
 			field: TrimmableField{
-				Name:  "test",
-				Path:  "test.path",
-				Value: func() *string { s := "  hello  "; return &s }(),
+				Name: "test",
+				Path: "test.path",
+				Value: func() *string {
+					s := "  hello  "
+					return &s
+				}(),
 			},
 			changes:      &MockSanitizationResult{},
 			expectChange: false,

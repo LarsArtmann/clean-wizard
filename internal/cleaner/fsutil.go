@@ -40,17 +40,21 @@ func walkDirectory(path string) (size int64, modTime time.Time, ok bool) {
 		if walkErr != nil {
 			return nil //nolint:nilerr // Skip files/dirs we can't access
 		}
+
 		if !info.IsDir() {
 			size += info.Size()
 		}
+
 		if info.ModTime().After(modTime) {
 			modTime = info.ModTime()
 		}
+
 		return nil
 	})
 	if err != nil {
 		return 0, time.Time{}, false
 	}
+
 	return size, modTime, true
 }
 
@@ -60,6 +64,7 @@ func GetDirSize(path string) int64 {
 	if !ok {
 		return 0
 	}
+
 	return size
 }
 
@@ -69,6 +74,7 @@ func GetDirModTime(path string) time.Time {
 	if !ok {
 		return time.Time{}
 	}
+
 	return modTime
 }
 
@@ -126,7 +132,11 @@ func appendScanItem(
 
 // ScanVersionDirectory scans a version directory for a language version manager.
 // It returns scan items for each version subdirectory found.
-func ScanVersionDirectory(ctx context.Context, versionsDir, managerName string, verbose bool) result.Result[[]domain.ScanItem] {
+func ScanVersionDirectory(
+	ctx context.Context,
+	versionsDir, managerName string,
+	verbose bool,
+) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	info, err := os.Stat(versionsDir)
@@ -136,7 +146,9 @@ func ScanVersionDirectory(ctx context.Context, versionsDir, managerName string, 
 
 	matches, err := filepath.Glob(filepath.Join(versionsDir, "*"))
 	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to find %s versions: %w", managerName, err))
+		return result.Err[[]domain.ScanItem](
+			fmt.Errorf("failed to find %s versions: %w", managerName, err),
+		)
 	}
 
 	for _, match := range matches {
@@ -176,6 +188,7 @@ func ScanPath(
 		if pattern != "" {
 			// Walk the directory to find matching entries
 			walkPattern := filepath.Join(fullPath, pattern)
+
 			matches, err := filepath.Glob(walkPattern)
 			if err != nil {
 				return result
@@ -211,6 +224,7 @@ func CalculateBytesFreed(
 		// Return 0 bytes freed if cleanup failed, but still calculate size
 		afterSize = GetDirSize(path)
 		bytesFreed = max(beforeSize-afterSize, 0)
+
 		return bytesFreed, beforeSize, afterSize
 	}
 

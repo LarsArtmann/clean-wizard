@@ -30,60 +30,70 @@ func NewErrorConfig() ErrorConfig {
 // WithOperation sets the operation name.
 func (c *ErrorConfig) WithOperation(operation string) *ErrorConfig {
 	c.Operation = operation
+
 	return c
 }
 
 // WithField sets the field name.
 func (c *ErrorConfig) WithField(field string) *ErrorConfig {
 	c.Field = field
+
 	return c
 }
 
 // WithValue sets the actual value.
 func (c *ErrorConfig) WithValue(value string) *ErrorConfig {
 	c.Value = value
+
 	return c
 }
 
 // WithExpected sets the expected value.
 func (c *ErrorConfig) WithExpected(expected string) *ErrorConfig {
 	c.Expected = expected
+
 	return c
 }
 
 // WithActual sets the actual value (alias for WithValue).
 func (c *ErrorConfig) WithActual(actual string) *ErrorConfig {
 	c.Actual = actual
+
 	return c
 }
 
 // WithCode sets the error code.
 func (c *ErrorConfig) WithCode(code string) *ErrorConfig {
 	c.Code = code
+
 	return c
 }
 
 // WithLevel sets the error level.
 func (c *ErrorConfig) WithLevel(level string) *ErrorConfig {
 	c.Level = level
+
 	return c
 }
 
 // WithSeverity sets the severity.
 func (c *ErrorConfig) WithSeverity(severity string) *ErrorConfig {
 	c.Severity = severity
+
 	return c
 }
 
 // WithRetryCount sets the retry count.
 func (c *ErrorConfig) WithRetryCount(count int) *ErrorConfig {
 	c.RetryCount = count
+
 	return c
 }
 
 // WithMetadata adds metadata.
 func (c *ErrorConfig) WithMetadata(key, value string) *ErrorConfig {
 	c.Metadata[key] = value
+
 	return c
 }
 
@@ -109,42 +119,49 @@ func NewSanitizationConfig() SanitizationConfig {
 // WithOperation sets the operation name.
 func (c *SanitizationConfig) WithOperation(operation string) *SanitizationConfig {
 	c.Operation = operation
+
 	return c
 }
 
 // WithField sets the field name.
 func (c *SanitizationConfig) WithField(field string) *SanitizationConfig {
 	c.Field = field
+
 	return c
 }
 
 // WithRule sets a sanitization rule.
 func (c *SanitizationConfig) WithRule(key, value string) *SanitizationConfig {
 	c.Rules[key] = value
+
 	return c
 }
 
 // WithTrimWhitespace enables whitespace trimming.
 func (c *SanitizationConfig) WithTrimWhitespace(enabled bool) *SanitizationConfig {
 	c.TrimWhitespace = enabled
+
 	return c
 }
 
 // WithNormalizeCase enables case normalization.
 func (c *SanitizationConfig) WithNormalizeCase(enabled bool) *SanitizationConfig {
 	c.NormalizeCase = enabled
+
 	return c
 }
 
 // WithClampValues enables value clamping.
 func (c *SanitizationConfig) WithClampValues(enabled bool) *SanitizationConfig {
 	c.ClampValues = enabled
+
 	return c
 }
 
 // WithMetadata adds metadata.
 func (c *SanitizationConfig) WithMetadata(key, value string) *SanitizationConfig {
 	c.Metadata[key] = value
+
 	return c
 }
 
@@ -230,6 +247,7 @@ func FromLegacyErrorDetails(ctx context.Context, legacy *LegacyErrorDetails) *Co
 	for k, v := range legacy.Metadata {
 		newCtx = newCtx.WithMetadata(k, v)
 	}
+
 	return newCtx
 }
 
@@ -254,7 +272,11 @@ type LegacySanitizationChange struct {
 // ToLegacySanitizationChange converts a Context[SanitizationConfig] to the legacy SanitizationChange format.
 // Note: The original/sanitized values cannot be preserved in Context[SanitizationConfig] since they
 // are stored in Metadata as strings. Use this only for backward compatibility.
-func ToLegacySanitizationChange(original, sanitized any, reason string, timestamp time.Time) *LegacySanitizationChange {
+func ToLegacySanitizationChange(
+	original, sanitized any,
+	reason string,
+	timestamp time.Time,
+) *LegacySanitizationChange {
 	return &LegacySanitizationChange{
 		Original:  original,
 		Sanitized: sanitized,
@@ -265,7 +287,10 @@ func ToLegacySanitizationChange(original, sanitized any, reason string, timestam
 
 // FromLegacySanitizationChange creates a Context[SanitizationConfig] from the legacy SanitizationChange format.
 // Note: Only metadata fields are preserved; original/sanitized values are stored as string representations.
-func FromLegacySanitizationChange(ctx context.Context, legacy *LegacySanitizationChange) *Context[SanitizationConfig] {
+func FromLegacySanitizationChange(
+	ctx context.Context,
+	legacy *LegacySanitizationChange,
+) *Context[SanitizationConfig] {
 	if legacy == nil {
 		return NewContext(ctx, NewSanitizationConfig())
 	}
@@ -278,6 +303,7 @@ func FromLegacySanitizationChange(ctx context.Context, legacy *LegacySanitizatio
 	newCtx = newCtx.WithMetadata("original", fmt.Sprintf("%v", legacy.Original))
 	newCtx = newCtx.WithMetadata("sanitized", fmt.Sprintf("%v", legacy.Sanitized))
 	newCtx = newCtx.WithMetadata("reason", legacy.Reason)
+
 	return newCtx
 }
 

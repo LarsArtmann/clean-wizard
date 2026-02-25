@@ -20,6 +20,7 @@ type mockCleaner struct {
 
 func (m *mockCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	m.cleanCalled = true
+
 	return result.Ok(domain.CleanResult{
 		ItemsRemoved: 1,
 		FreedBytes:   1024,
@@ -195,11 +196,14 @@ func TestRegistry_ConcurrentAccess(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := range 100 {
 		wg.Add(1)
+
 		go func(i int) {
 			defer wg.Done()
+
 			registry.Register(string(rune(i)), &mockCleaner{name: string(rune(i))})
 		}(i)
 	}
+
 	wg.Wait()
 
 	// Verify all registered
@@ -215,6 +219,7 @@ func TestRegistry_ConcurrentAccess(t *testing.T) {
 			_ = registry.Available(ctx)
 		})
 	}
+
 	wg2.Wait()
 
 	// No panic means thread-safety is working

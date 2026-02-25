@@ -20,6 +20,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 
 		// Step 2: Sanitization
 		sanitizer := NewConfigSanitizer()
+
 		var sanitizationResult ValidationResult
 		sanitizer.SanitizeConfig(cfg, &sanitizationResult)
 
@@ -31,7 +32,10 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 		postValidationResult := validator.ValidateConfig(cfg)
 
 		if !postValidationResult.IsValid {
-			t.Errorf("Configuration should remain valid after sanitization, got errors: %v", postValidationResult.Errors)
+			t.Errorf(
+				"Configuration should remain valid after sanitization, got errors: %v",
+				postValidationResult.Errors,
+			)
 		}
 
 		// Verify sanitization effects
@@ -46,11 +50,13 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 
 		// Check for duplicate removal in protected paths
 		protectedPathCount := 0
+
 		for _, path := range cfg.Protected {
 			if path == "/System" {
 				protectedPathCount++
 			}
 		}
+
 		if protectedPathCount > 1 {
 			t.Errorf("Duplicate protected paths should be removed")
 		}
@@ -61,7 +67,10 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 		}
 
 		if cfg.Profiles["daily"].Name != "Daily Cleanup" {
-			t.Errorf("Expected sanitized profile name 'Daily Cleanup', got: %s", cfg.Profiles["daily"].Name)
+			t.Errorf(
+				"Expected sanitized profile name 'Daily Cleanup', got: %s",
+				cfg.Profiles["daily"].Name,
+			)
 		}
 
 		// Verify operation name sanitization
@@ -84,11 +93,13 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 
 			// Check for duplicate removal in excludes
 			excludeCount := 0
+
 			for _, exclude := range tempFilesSettings.Excludes {
 				if exclude == "/tmp/keep" {
 					excludeCount++
 				}
 			}
+
 			if excludeCount > 1 {
 				t.Errorf("Duplicate temp files excludes should be removed")
 			}
@@ -102,8 +113,16 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 
 		// Log successful integration
 		t.Logf("✓ Integration test passed - validation and sanitization pipeline working correctly")
-		t.Logf("  - Validation: %d errors, %d warnings", len(validationResult.Errors), len(validationResult.Warnings))
-		t.Logf("  - Sanitization: %d fields modified, %d warnings", fieldsModified, len(sanitizationResult.Warnings))
+		t.Logf(
+			"  - Validation: %d errors, %d warnings",
+			len(validationResult.Errors),
+			len(validationResult.Warnings),
+		)
+		t.Logf(
+			"  - Sanitization: %d fields modified, %d warnings",
+			fieldsModified,
+			len(sanitizationResult.Warnings),
+		)
 		t.Logf("  - Post-validation: %d errors, %d warnings",
 			len(postValidationResult.Errors), len(postValidationResult.Warnings))
 		t.Logf("  - Total duration: %v", validationResult.Duration+sanitizationResult.Duration)

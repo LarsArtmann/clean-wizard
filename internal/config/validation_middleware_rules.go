@@ -11,7 +11,8 @@ import (
 func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChange) error {
 	for _, change := range changes {
 		// Rule: Cannot remove critical protected paths
-		if change.Field == "protected" && change.Operation == domain.ChangeOperationType(domain.ChangeOperationRemovedType) {
+		if change.Field == "protected" &&
+			change.Operation == domain.ChangeOperationType(domain.ChangeOperationRemovedType) {
 			criticalPaths := []string{"/", "/System", "/usr", "/etc"}
 			for _, critical := range criticalPaths {
 				if change.OldValue == critical {
@@ -24,7 +25,9 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 		if change.Field == "safe_mode" && change.OldValue == true && change.NewValue == false {
 			// Check if safe mode confirmation is required
 			if vm.options != nil && vm.options.RequireSafeModeConfirmation {
-				return errors.New("disabling safe mode requires explicit confirmation (use --confirm-safe-mode-disable)")
+				return errors.New(
+					"disabling safe mode requires explicit confirmation (use --confirm-safe-mode-disable)",
+				)
 			}
 
 			// Log warning in production environments
@@ -39,12 +42,16 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 }
 
 // validateOperationSettings validates operation-specific settings with type safety.
-func (vm *ValidationMiddleware) validateOperationSettings(operationName string, op domain.CleanupOperation) error {
+func (vm *ValidationMiddleware) validateOperationSettings(
+	operationName string,
+	op domain.CleanupOperation,
+) error {
 	// Use the already-validated settings from the operation
 	if op.Settings == nil {
 		return nil // Settings are optional
 	}
 
 	opType := domain.GetOperationType(operationName)
+
 	return op.Settings.ValidateSettings(opType)
 }

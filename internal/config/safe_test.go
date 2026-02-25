@@ -50,6 +50,7 @@ func newRiskLevelValueMap(values ...string) map[domain.RiskLevelType]string {
 			m[level] = values[i]
 		}
 	}
+
 	return m
 }
 
@@ -67,6 +68,7 @@ func testRiskLevelMethod(
 	for _, tc := range riskLevelTestCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := method(tc.level)
+
 			expect := expected[tc.level]
 			if result != expect {
 				t.Errorf("%s() = %v, want %v", methodName, result, expect)
@@ -98,7 +100,10 @@ func testIsValid[T validatable](t *testing.T, tests []struct {
 }
 
 func TestRiskLevel_String(t *testing.T) {
-	testRiskLevelMethod(t, "String", func(level domain.RiskLevelType) string { return level.String() },
+	testRiskLevelMethod(
+		t,
+		"String",
+		func(level domain.RiskLevelType) string { return level.String() },
 		riskLevelTextValues,
 	)
 }
@@ -199,16 +204,20 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			if tt.expectError {
 				if err == nil {
 					t.Error("expected error but got none")
+
 					return
 				}
+
 				if tt.errorMsg != "" && err.Error() != tt.errorMsg {
 					t.Errorf("expected error message %q, got %q", tt.errorMsg, err.Error())
 				}
+
 				return
 			}
 
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
+
 				return
 			}
 
@@ -263,25 +272,34 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			if tt.expectError {
 				if err == nil {
 					t.Error("expected error but got none")
+
 					return
 				}
+
 				if tt.errorMsg != "" {
 					errMsg := err.Error()
 					if !contains(errMsg, tt.errorMsg) {
-						t.Errorf("expected error message containing %q, got %q", tt.errorMsg, errMsg)
+						t.Errorf(
+							"expected error message containing %q, got %q",
+							tt.errorMsg,
+							errMsg,
+						)
 					}
 				}
+
 				return
 			}
 
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
+
 				return
 			}
 
 			// Check if the profile was created correctly
 			if len(config.profiles) == 0 {
 				t.Error("expected at least one profile")
+
 				return
 			}
 

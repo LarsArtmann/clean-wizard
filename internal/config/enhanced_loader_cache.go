@@ -27,8 +27,10 @@ func NewConfigCache(ttl time.Duration) *ConfigCache {
 // Get retrieves cached configuration if valid and not expired.
 func (cc *ConfigCache) Get() *domain.Config {
 	cc.mu.RLock()
+
 	if cc.config == nil || time.Since(cc.loadedAt) > cc.ttl {
 		cc.mu.RUnlock()
+
 		return nil
 	}
 
@@ -42,6 +44,7 @@ func (cc *ConfigCache) Get() *domain.Config {
 		cc.mu.Lock()
 		cc.config = nil // Invalidate cache
 		cc.mu.Unlock()
+
 		return nil
 	}
 

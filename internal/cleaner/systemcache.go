@@ -105,10 +105,14 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 		if !ct.IsValid() {
 			return fmt.Errorf("invalid CacheType at index %d: %d is not a valid cache type", i, ct)
 		}
+
 		if !validCacheTypes[ct] {
 			return fmt.Errorf(
 				"invalid default CacheType at index %d: %d not supported on current platform (valid types: %v)",
-				i, ct, validCacheTypes)
+				i,
+				ct,
+				validCacheTypes,
+			)
 		}
 	}
 
@@ -136,6 +140,7 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.
 			if scc.verbose {
 				fmt.Printf("Warning: failed to scan %s: %v\n", cacheType, result.Error())
 			}
+
 			continue
 		}
 
@@ -146,8 +151,14 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.
 }
 
 // addScanItems appends scan items from a cache path to the items slice.
-func (scc *SystemCacheCleaner) addScanItems(ctx context.Context, homeDir string, scanType domain.ScanType, pathComponents ...string) result.Result[[]domain.ScanItem] {
+func (scc *SystemCacheCleaner) addScanItems(
+	ctx context.Context,
+	homeDir string,
+	scanType domain.ScanType,
+	pathComponents ...string,
+) result.Result[[]domain.ScanItem] {
 	path := filepath.Join(append([]string{homeDir}, pathComponents...)...)
+
 	return scc.scanCachePath(ctx, path, scanType)
 }
 
@@ -162,9 +173,14 @@ type cacheTypeConfig struct {
 var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 	// macOS-specific cache types
 	domain.CacheTypeSpotlight: {
-		pathComponents: []string{"Library", "Metadata", "CoreSpotlight", "SpotlightKnowledgeEvents"},
-		displayName:    "Spotlight metadata",
-		scanType:       domain.ScanTypeTemp,
+		pathComponents: []string{
+			"Library",
+			"Metadata",
+			"CoreSpotlight",
+			"SpotlightKnowledgeEvents",
+		},
+		displayName: "Spotlight metadata",
+		scanType:    domain.ScanTypeTemp,
 	},
 	domain.CacheTypeXcode: {
 		pathComponents: []string{"Library", "Developer", "Xcode", "DerivedData"},
@@ -215,18 +231,25 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 }
 
 // scanSystemCache scans cache for a specific system cache type.
-func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType domain.CacheType, homeDir string) result.Result[[]domain.ScanItem] {
+func (scc *SystemCacheCleaner) scanSystemCache(
+	ctx context.Context,
+	cacheType domain.CacheType,
+	homeDir string,
+) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	config, exists := systemCacheConfigs[cacheType]
 	if !exists {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("unknown system cache type: %s", cacheType.String()))
+		return result.Err[[]domain.ScanItem](
+			fmt.Errorf("unknown system cache type: %s", cacheType.String()),
+		)
 	}
 
 	scanResult := scc.scanCachePathWithConfig(ctx, homeDir, config)
 	if scanResult.IsErr() {
 		return result.Err[[]domain.ScanItem](scanResult.Error())
 	}
+
 	items = append(items, scanResult.Value()...)
 
 	return result.Ok(items)
@@ -235,18 +258,23 @@ func (scc *SystemCacheCleaner) scanSystemCache(ctx context.Context, cacheType do
 // Clean removes system caches.
 func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !scc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("not available on this platform (requires macOS or Linux)"))
+		return result.Err[domain.CleanResult](
+			errors.New("not available on this platform (requires macOS or Linux)"),
+		)
 	}
 
 	if scc.dryRun {
 		// Scan actual cache directories to get real sizes
 		scanResult := scc.Scan(ctx)
 
-		var totalBytes int64
-		var itemsRemoved int
+		var (
+			totalBytes   int64
+			itemsRemoved int
+		)
 
 		if scanResult.IsOk() {
 			items := scanResult.Value()
+
 			itemsRemoved = len(items)
 			for _, item := range items {
 				totalBytes += item.Size
@@ -256,11 +284,16 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 			itemsRemoved = len(scc.cacheTypes)
 		}
 
-		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), itemsRemoved, totalBytes)
+		cleanResult := conversions.NewCleanResult(
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+			itemsRemoved,
+			totalBytes,
+		)
 		cleanResult.SizeEstimate = domain.SizeEstimate{
 			Known:  uint64(totalBytes),
 			Status: domain.SizeEstimateStatusKnown,
 		}
+
 		return result.Ok(cleanResult)
 	}
 
@@ -281,9 +314,11 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 		result := scc.cleanSystemCache(ctx, cacheType, homeDir)
 		if result.IsErr() {
 			itemsFailed++
+
 			if scc.verbose {
 				fmt.Printf("Warning: failed to clean %s: %v\n", cacheType, result.Error())
 			}
+
 			continue
 		}
 
@@ -300,6 +335,7 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	}
 
 	duration := time.Since(startTime)
+
 	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
 		domain.CleanStrategyType(domain.StrategyConservativeType),
 		itemsRemoved, itemsFailed, bytesFreed, duration,
@@ -308,17 +344,24 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 }
 
 // removeCachePath removes a cache directory and returns the appropriate result.
-func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) result.Result[domain.CleanResult] {
+func (scc *SystemCacheCleaner) removeCachePath(
+	path, successMessage string,
+) result.Result[domain.CleanResult] {
 	if scc.dryRun {
 		// Estimate size for dry-run
 		estimatedSize := GetDirSize(path)
 		if scc.verbose {
 			fmt.Printf("  [DRY RUN] Would remove: %s (%s)\n", path, format.Bytes(estimatedSize))
 		}
+
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			domain.CleanStrategyType(domain.StrategyConservativeType),
-			1, estimatedSize,
-			domain.SizeEstimate{Known: uint64(estimatedSize), Status: domain.SizeEstimateStatusKnown},
+			1,
+			estimatedSize,
+			domain.SizeEstimate{
+				Known:  uint64(estimatedSize),
+				Status: domain.SizeEstimateStatusKnown,
+			},
 		))
 	}
 
@@ -342,25 +385,48 @@ func (scc *SystemCacheCleaner) removeCachePath(path, successMessage string) resu
 }
 
 // scanCachePath scans a cache directory and returns scan items.
-func (scc *SystemCacheCleaner) scanCachePath(ctx context.Context, path string, scanType domain.ScanType) result.Result[[]domain.ScanItem] {
+func (scc *SystemCacheCleaner) scanCachePath(
+	ctx context.Context,
+	path string,
+	scanType domain.ScanType,
+) result.Result[[]domain.ScanItem] {
 	scanResult := ScanDirectory(path, scanType, scc.verbose)
+
 	return result.Ok(scanResult.Items)
 }
 
 // scanCachePathWithConfig scans a cache directory using configuration and returns scan items.
-func (scc *SystemCacheCleaner) scanCachePathWithConfig(ctx context.Context, homeDir string, config cacheTypeConfig) result.Result[[]domain.ScanItem] {
-	scanResult := ScanPath(homeDir, config.scanType, config.displayName, scc.verbose, "", config.pathComponents...)
+func (scc *SystemCacheCleaner) scanCachePathWithConfig(
+	ctx context.Context,
+	homeDir string,
+	config cacheTypeConfig,
+) result.Result[[]domain.ScanItem] {
+	scanResult := ScanPath(
+		homeDir,
+		config.scanType,
+		config.displayName,
+		scc.verbose,
+		"",
+		config.pathComponents...)
+
 	return result.Ok(scanResult.Items)
 }
 
 // cleanSystemCache cleans cache for a specific system cache type.
-func (scc *SystemCacheCleaner) cleanSystemCache(ctx context.Context, cacheType domain.CacheType, homeDir string) result.Result[domain.CleanResult] {
+func (scc *SystemCacheCleaner) cleanSystemCache(
+	ctx context.Context,
+	cacheType domain.CacheType,
+	homeDir string,
+) result.Result[domain.CleanResult] {
 	config, exists := systemCacheConfigs[cacheType]
 	if !exists {
-		return result.Err[domain.CleanResult](fmt.Errorf("unknown system cache type: %s", cacheType.String()))
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("unknown system cache type: %s", cacheType.String()),
+		)
 	}
 
 	path := filepath.Join(append([]string{homeDir}, config.pathComponents...)...)
+
 	return scc.removeCachePath(path, config.displayName+" cleaned")
 }
 

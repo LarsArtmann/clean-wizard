@@ -152,6 +152,7 @@ func (c *GitHistoryCleaner) IsAvailable(ctx context.Context) bool {
 
 	// Check if we're in a git repo
 	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath, "rev-parse", "--git-dir")
+
 	return cmd.Run() == nil
 }
 
@@ -202,6 +203,7 @@ func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 		if err != nil {
 			return result.Err[domain.CleanResult](fmt.Errorf("scan failed: %w", err))
 		}
+
 		c.selectedFiles = scanResult.Files
 	}
 
@@ -216,7 +218,9 @@ func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 	// Run safety checks
 	safetyReport := c.safetyChecker.Check(ctx)
 	if !safetyReport.CanProceed() {
-		return result.Err[domain.CleanResult](fmt.Errorf("safety checks failed: %s", safetyReport.Blockers))
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("safety checks failed: %s", safetyReport.Blockers),
+		)
 	}
 
 	// Calculate total size
@@ -230,6 +234,7 @@ func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 			fmt.Printf("Would remove %d binary file(s) from git history (%.2f MB)\n",
 				len(c.selectedFiles), float64(totalBytes)/(1024*1024))
 		}
+
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			domain.CleanStrategyType(domain.StrategyDryRunType),
 			len(c.selectedFiles), totalBytes,
@@ -249,6 +254,7 @@ func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 	if c.verbose {
 		fmt.Printf("Removed %d file(s) from history, reclaimed %.2f MB\n",
 			len(execResult.FilesRemoved), float64(execResult.BytesReclaimed)/(1024*1024))
+
 		if execResult.BackupCreated {
 			fmt.Printf("Backup created at: %s\n", execResult.BackupPath)
 		}
@@ -256,8 +262,12 @@ func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 		domain.CleanStrategyType(domain.StrategyAggressiveType),
-		len(execResult.FilesRemoved), execResult.BytesRemoved,
-		domain.SizeEstimate{Known: uint64(execResult.BytesReclaimed), Status: domain.SizeEstimateStatusKnown},
+		len(execResult.FilesRemoved),
+		execResult.BytesRemoved,
+		domain.SizeEstimate{
+			Known:  uint64(execResult.BytesReclaimed),
+			Status: domain.SizeEstimateStatusKnown,
+		},
 	))
 }
 
@@ -267,6 +277,7 @@ func (c *GitHistoryCleaner) GetStoreSize(ctx context.Context) int64 {
 	if err != nil {
 		return 0
 	}
+
 	return size
 }
 
@@ -276,7 +287,9 @@ func (c *GitHistoryCleaner) GetSafetyReport(ctx context.Context) *domain.GitHist
 }
 
 // GetScanResult performs a full scan and returns the result.
-func (c *GitHistoryCleaner) GetScanResult(ctx context.Context) (*domain.GitHistoryScanResult, error) {
+func (c *GitHistoryCleaner) GetScanResult(
+	ctx context.Context,
+) (*domain.GitHistoryScanResult, error) {
 	return c.scanner.Scan(ctx)
 }
 
@@ -287,8 +300,10 @@ func (c *GitHistoryCleaner) EstimateImpact(ctx context.Context) (*ImpactEstimate
 		if err != nil {
 			return nil, err
 		}
+
 		c.selectedFiles = scanResult.Files
 	}
+
 	return c.executor.EstimateImpact(ctx, c.selectedFiles)
 }
 
@@ -312,6 +327,7 @@ func getDefaultBackupPath(repoPath string) string {
 	absPath, _ := filepath.Abs(repoPath)
 	parent := filepath.Dir(absPath)
 	base := filepath.Base(absPath)
+
 	return filepath.Join(parent, base+"-backup.git")
 }
 
@@ -340,6 +356,7 @@ func FindGitRepositories(basePath string, maxDepth int) ([]string, error) {
 		gitDir := fullPath + "/.git"
 		if info, err := os.Stat(gitDir); err == nil && info.IsDir() {
 			repos = append(repos, fullPath)
+
 			continue // Don't search inside git repos
 		}
 
@@ -349,6 +366,7 @@ func FindGitRepositories(basePath string, maxDepth int) ([]string, error) {
 			if err != nil {
 				continue
 			}
+
 			repos = append(repos, subRepos...)
 		}
 	}

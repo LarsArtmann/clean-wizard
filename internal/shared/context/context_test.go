@@ -182,7 +182,8 @@ func TestMerge(t *testing.T) {
 		t.Errorf("Expected 3 permissions after merge, got %d", len(merged.Permissions))
 	}
 
-	if !merged.HasPermission("read") || !merged.HasPermission("write") || !merged.HasPermission("execute") {
+	if !merged.HasPermission("read") || !merged.HasPermission("write") ||
+		!merged.HasPermission("execute") {
 		t.Error("Merged context should have all permissions from both contexts")
 	}
 
@@ -231,7 +232,10 @@ func TestDifferentTypes(t *testing.T) {
 	// Create different types of contexts
 	validationCtx := NewContext(ctx, TestValidationConfig{FieldA: "validation"})
 	errorCtx := NewContext(ctx, TestErrorConfig{Code: 500, Message: "error"})
-	sanitizationCtx := NewContext(ctx, TestSanitizationConfig{Policy: "strict", Rules: []string{"rule1"}})
+	sanitizationCtx := NewContext(
+		ctx,
+		TestSanitizationConfig{Policy: "strict", Rules: []string{"rule1"}},
+	)
 
 	// Verify each holds its type correctly
 	if validationCtx.GetValueType().FieldA != "validation" {
@@ -274,6 +278,7 @@ func TestMetadataOperations(t *testing.T) {
 
 	// Test WithMetadata with empty string
 	c.WithMetadata("key4", "")
+
 	val, ok = c.GetMetadata("key4")
 	if !ok || val != "" {
 		t.Error("Should allow empty string values")
@@ -287,6 +292,7 @@ func TestPermissionsEdgeCases(t *testing.T) {
 
 	// Test with empty permissions
 	c.WithPermissions()
+
 	if len(c.Permissions) != 0 {
 		t.Error("Expected 0 permissions")
 	}
@@ -298,6 +304,7 @@ func TestPermissionsEdgeCases(t *testing.T) {
 
 	// Test with duplicate permissions
 	c.WithPermissions("read", "read", "read")
+
 	if len(c.Permissions) != 3 {
 		t.Error("Should allow duplicate permissions")
 	}
@@ -309,6 +316,7 @@ func TestPermissionsEdgeCases(t *testing.T) {
 
 	// Test with empty string permission
 	c.WithPermissions("")
+
 	if !c.HasPermission("") {
 		t.Error("Should allow empty string permissions")
 	}

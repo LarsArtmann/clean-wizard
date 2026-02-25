@@ -26,6 +26,7 @@ func TestNixCleaner_ListGenerations(t *testing.T) {
 					if len(generations) == 0 {
 						t.Error("expected at least one generation")
 					}
+
 					t.Logf("Found %d generations", len(generations))
 				} else {
 					t.Logf("List generations failed: %v", result.Error())
@@ -60,6 +61,7 @@ func TestNixCleaner_CleanOldGenerations(t *testing.T) {
 
 	if result.IsOk() {
 		opResult := result.Value()
+
 		t.Logf("Operation completed successfully")
 		t.Logf("Items removed: %d", opResult.ItemsRemoved)
 		t.Logf("Freed bytes: %d", opResult.FreedBytes)
@@ -81,9 +83,12 @@ func TestNixCleaner_ParseGeneration(t *testing.T) {
 	adapter := adapters.NewNixAdapter(0, 0)
 
 	// Test parsing valid generation line
-	gen, err := adapter.ParseGeneration("   1234  (2023-01-01)   /nix/var/nix/profiles/system-1234-link   current")
+	gen, err := adapter.ParseGeneration(
+		"   1234  (2023-01-01)   /nix/var/nix/profiles/system-1234-link   current",
+	)
 	if err != nil {
 		t.Logf("Parse generation failed (expected for CI): %v", err)
+
 		return
 	}
 

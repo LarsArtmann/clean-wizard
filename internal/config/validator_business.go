@@ -40,7 +40,8 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 		// Validate operations within profile
 		for _, op := range profile.Operations {
 			// Validate risk vs safe mode
-			if !cfg.SafeMode.IsEnabled() && op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
+			if !cfg.SafeMode.IsEnabled() &&
+				op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
 				cv.addCriticalRiskError(result, name, op, "business_logic",
 					"Critical risk operation '%s' not allowed in unsafe mode",
 					"Enable safe mode or remove critical risk operation")
@@ -49,12 +50,21 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 			// Validate operation settings
 			if op.Settings != nil {
 				opType := domain.GetOperationType(op.Name)
-				if err := op.Settings.ValidateSettings(opType); err != nil {
+				err := op.Settings.ValidateSettings(opType)
+				if err != nil {
 					result.Errors = append(result.Errors, ValidationError{
-						Field:      fmt.Sprintf("profiles.%s.operations.%s.settings", name, op.Name),
-						Rule:       "validation",
-						Value:      op.Settings,
-						Message:    fmt.Sprintf("Invalid settings for operation '%s': %v", op.Name, err),
+						Field: fmt.Sprintf(
+							"profiles.%s.operations.%s.settings",
+							name,
+							op.Name,
+						),
+						Rule:  "validation",
+						Value: op.Settings,
+						Message: fmt.Sprintf(
+							"Invalid settings for operation '%s': %v",
+							op.Name,
+							err,
+						),
 						Severity:   SeverityError,
 						Suggestion: "Fix operation settings according to validation rules",
 					})
@@ -66,7 +76,8 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 	// Validate protected paths don't conflict with operation targets
 	for _, profile := range cfg.Profiles {
 		for _, op := range profile.Operations {
-			if err := cv.validateProtectedPathsConflict(cfg.Protected, op); err != nil {
+			err := cv.validateProtectedPathsConflict(cfg.Protected, op)
+			if err != nil {
 				result.Warnings = append(result.Warnings, ValidationWarning{
 					Field:      fmt.Sprintf("profiles.%s.operations.%s", profile.Name, op.Name),
 					Message:    fmt.Sprintf("Operation may affect protected paths: %v", err),
@@ -78,7 +89,10 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 }
 
 // validateSecurityConstraints validates security-related constraints.
-func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, result *ValidationResult) {
+func (cv *ConfigValidator) validateSecurityConstraints(
+	cfg *domain.Config,
+	result *ValidationResult,
+) {
 	// Validate no protected paths contain dangerous patterns
 	for _, path := range cfg.Protected {
 		if path == "/" {
@@ -110,7 +124,8 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 	// Validate no profiles have critical operations without explicit consent
 	for name, profile := range cfg.Profiles {
 		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) && !cfg.SafeMode.IsEnabled() {
+			if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) &&
+				!cfg.SafeMode.IsEnabled() {
 				cv.addCriticalRiskError(result, name, op, "security",
 					"Critical risk operation '%s' requires safe mode enabled",
 					"Enable safe mode or remove critical risk operations")
@@ -120,7 +135,10 @@ func (cv *ConfigValidator) validateSecurityConstraints(cfg *domain.Config, resul
 }
 
 // validateProtectedPathsConflict checks if operations might affect protected paths.
-func (cv *ConfigValidator) validateProtectedPathsConflict(protected []string, op domain.CleanupOperation) error {
+func (cv *ConfigValidator) validateProtectedPathsConflict(
+	protected []string,
+	op domain.CleanupOperation,
+) error {
 	switch op.Name {
 	case "temp-files":
 		// Check if temp files cleanup might affect protected paths
@@ -135,16 +153,25 @@ func (cv *ConfigValidator) validateProtectedPathsConflict(protected []string, op
 }
 
 // checkTempFilesConflict checks for temp files conflicts.
-func (cv *ConfigValidator) checkTempFilesConflict(protected []string, op domain.CleanupOperation) error {
+func (cv *ConfigValidator) checkTempFilesConflict(
+	protected []string,
+	op domain.CleanupOperation,
+) error {
 	if op.Settings != nil && op.Settings.TempFiles != nil {
 		for _, exclude := range op.Settings.TempFiles.Excludes {
 			for _, protectedPath := range protected {
-				if strings.HasPrefix(exclude, protectedPath) || strings.HasPrefix(protectedPath, exclude) {
-					return fmt.Errorf("temp files exclude '%s' conflicts with protected path '%s'", exclude, protectedPath)
+				if strings.HasPrefix(exclude, protectedPath) ||
+					strings.HasPrefix(protectedPath, exclude) {
+					return fmt.Errorf(
+						"temp files exclude '%s' conflicts with protected path '%s'",
+						exclude,
+						protectedPath,
+					)
 				}
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -153,10 +180,12 @@ func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.Cleanu
 	// Nix operations typically affect /nix/store, check if protected paths overlap
 	nixStorePath := "/nix/store"
 	for _, protectedPath := range protected {
-		if strings.HasPrefix(protectedPath, nixStorePath) || strings.HasPrefix(nixStorePath, protectedPath) {
+		if strings.HasPrefix(protectedPath, nixStorePath) ||
+			strings.HasPrefix(nixStorePath, protectedPath) {
 			return fmt.Errorf("nix operations may conflict with protected path '%s'", protectedPath)
 		}
 	}
+
 	return nil
 }
 
@@ -169,6 +198,7 @@ func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel
 			return domain.RiskLevelType(domain.RiskLevelCriticalType)
 		}
 	}
+
 	return maxRisk
 }
 
@@ -178,5 +208,6 @@ func (cv *ConfigValidator) isPathProtected(protected []string, targetPath string
 			return true
 		}
 	}
+
 	return false
 }

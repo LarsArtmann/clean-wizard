@@ -43,6 +43,7 @@ func TestSetStringField(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var target string
+
 			wasExact := setStringField(&target, tt.inputValue)
 
 			assert.Equal(t, tt.expectValue, target)
@@ -84,6 +85,7 @@ func TestSetStringFieldStrict(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var target string
+
 			wasSet := setStringFieldStrict(&target, tt.inputValue)
 
 			if tt.expectUnchanged {
@@ -91,6 +93,7 @@ func TestSetStringFieldStrict(t *testing.T) {
 			} else {
 				assert.Equal(t, tt.expectValue, target)
 			}
+
 			assert.Equal(t, tt.expectSet, wasSet)
 		})
 	}
@@ -136,6 +139,7 @@ func TestSetIntField(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var target int
+
 			wasSet := setIntField(&target, tt.inputValue)
 
 			if tt.expectUnchanged {
@@ -143,6 +147,7 @@ func TestSetIntField(t *testing.T) {
 			} else {
 				assert.Equal(t, tt.expectValue, target)
 			}
+
 			assert.Equal(t, tt.expectSet, wasSet)
 		})
 	}
@@ -202,14 +207,18 @@ func TestEnsureDetails(t *testing.T) {
 		expectField  string
 	}{
 		{
-			name:         "initializes nil details",
-			inputDetails: func() **ErrorDetails { var d *ErrorDetails; return &d }(),
-			expectField:  "",
+			name: "initializes nil details",
+			inputDetails: func() **ErrorDetails {
+				var d *ErrorDetails
+				return &d
+			}(),
+			expectField: "",
 		},
 		{
 			name: "keeps existing details",
 			inputDetails: func() **ErrorDetails {
 				d := &ErrorDetails{Field: "existing"}
+
 				return &d
 			}(),
 			expectField: "existing",
@@ -233,10 +242,12 @@ func TestErrorDetailsBuilder(t *testing.T) {
 		if builder == nil {
 			t.Fatal("NewErrorDetails returned nil")
 		}
+
 		details := builder.Build()
 		if details == nil {
 			t.Fatal("Build returned nil")
 		}
+
 		if details.Metadata == nil {
 			t.Error("Metadata should be initialized")
 		}
@@ -331,6 +342,7 @@ func TestErrorDetailsBuilder(t *testing.T) {
 		if details.Metadata["key1"] != "value1" {
 			t.Errorf("Metadata[key1] = %q, want %q", details.Metadata["key1"], "value1")
 		}
+
 		if details.Metadata["key2"] != "value2" {
 			t.Errorf("Metadata[key2] = %q, want %q", details.Metadata["key2"], "value2")
 		}
@@ -410,38 +422,59 @@ func TestErrorDetailsBuilder(t *testing.T) {
 			if details.Field != tt.field {
 				t.Errorf("Field = %q, want %q", details.Field, tt.field)
 			}
+
 			if details.Value != tt.value {
 				t.Errorf("Value = %q, want %q", details.Value, tt.value)
 			}
+
 			if details.Expected != tt.expected {
 				t.Errorf("Expected = %q, want %q", details.Expected, tt.expected)
 			}
+
 			if details.Actual != tt.actual {
 				t.Errorf("Actual = %q, want %q", details.Actual, tt.actual)
 			}
+
 			if details.Operation != tt.operation {
 				t.Errorf("Operation = %q, want %q", details.Operation, tt.operation)
 			}
+
 			if details.FilePath != tt.filePath {
 				t.Errorf("FilePath = %q, want %q", details.FilePath, tt.filePath)
 			}
+
 			if details.LineNumber != tt.lineNumber {
 				t.Errorf("LineNumber = %d, want %d", details.LineNumber, tt.lineNumber)
 			}
+
 			if details.RetryCount != tt.retryCount {
 				t.Errorf("RetryCount = %d, want %d", details.RetryCount, tt.retryCount)
 			}
+
 			if details.Duration != tt.duration {
 				t.Errorf("Duration = %q, want %q", details.Duration, tt.duration)
 			}
+
 			if len(details.Metadata) != tt.metadataCount {
 				t.Errorf("Metadata length = %d, want %d", len(details.Metadata), tt.metadataCount)
 			}
+
 			if details.Metadata[tt.metadataKey1] != tt.metadataVal1 {
-				t.Errorf("Metadata[%s] = %q, want %q", tt.metadataKey1, details.Metadata[tt.metadataKey1], tt.metadataVal1)
+				t.Errorf(
+					"Metadata[%s] = %q, want %q",
+					tt.metadataKey1,
+					details.Metadata[tt.metadataKey1],
+					tt.metadataVal1,
+				)
 			}
+
 			if tt.metadataKey2 != "" && details.Metadata[tt.metadataKey2] != tt.metadataVal2 {
-				t.Errorf("Metadata[%s] = %q, want %q", tt.metadataKey2, details.Metadata[tt.metadataKey2], tt.metadataVal2)
+				t.Errorf(
+					"Metadata[%s] = %q, want %q",
+					tt.metadataKey2,
+					details.Metadata[tt.metadataKey2],
+					tt.metadataVal2,
+				)
 			}
 		})
 	}
@@ -453,6 +486,7 @@ func TestErrorDetailsBuilder(t *testing.T) {
 		if details.Metadata == nil {
 			t.Error("Metadata should not be nil")
 		}
+
 		if len(details.Metadata) != 1 {
 			t.Errorf("Metadata length = %d, want %d", len(details.Metadata), 1)
 		}
@@ -461,18 +495,22 @@ func TestErrorDetailsBuilder(t *testing.T) {
 
 func requireCleanWizardError(t *testing.T, err error) *CleanWizardError {
 	t.Helper()
+
 	var cleanErr *CleanWizardError
 	if !errors.As(err, &cleanErr) {
 		t.Fatal("Expected *CleanWizardError")
 	}
+
 	return cleanErr
 }
 
 func requireErrorDetails(t *testing.T, err *CleanWizardError) *ErrorDetails {
 	t.Helper()
+
 	if err.Details == nil {
 		t.Fatal("Expected ErrorDetails")
 	}
+
 	return err.Details
 }
 
@@ -487,12 +525,15 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 		if details.Field != "test_field" {
 			t.Errorf("Field = %q, want %q", details.Field, "test_field")
 		}
+
 		if details.Value != "invalid_value" {
 			t.Errorf("Value = %q, want %q", details.Value, "invalid_value")
 		}
+
 		if details.Expected != "expected_value" {
 			t.Errorf("Expected = %q, want %q", details.Expected, "expected_value")
 		}
+
 		if details.Operation != "validation" {
 			t.Errorf("Operation = %q, want %q", details.Operation, "validation")
 		}
@@ -524,19 +565,27 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 	}
 
 	t.Run("handler validation error with details", func(t *testing.T) {
-		err := HandleValidationErrorWithDetails("test_operation", "test_field", "test_value", "test_reason")
+		err := HandleValidationErrorWithDetails(
+			"test_operation",
+			"test_field",
+			"test_value",
+			"test_reason",
+		)
 
 		details := requireErrorDetails(t, err)
 
 		if details.Operation != "test_operation" {
 			t.Errorf("Operation = %q, want %q", details.Operation, "test_operation")
 		}
+
 		if details.Field != "test_field" {
 			t.Errorf("Field = %q, want %q", details.Field, "test_field")
 		}
+
 		if details.Value != "test_value" {
 			t.Errorf("Value = %q, want %q", details.Value, "test_value")
 		}
+
 		if details.Metadata["reason"] != "test_reason" {
 			t.Errorf("Metadata[reason] = %q, want %q", details.Metadata["reason"], "test_reason")
 		}

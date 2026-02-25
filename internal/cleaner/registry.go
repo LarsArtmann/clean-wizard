@@ -45,6 +45,7 @@ func NewRegistry() *Registry {
 func (r *Registry) Register(name string, c Cleaner) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	r.cleaners[name] = c
 }
 
@@ -53,7 +54,9 @@ func (r *Registry) Register(name string, c Cleaner) {
 func (r *Registry) Get(name string) (Cleaner, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
+
 	c, ok := r.cleaners[name]
+
 	return c, ok
 }
 
@@ -62,10 +65,12 @@ func (r *Registry) Get(name string) (Cleaner, bool) {
 func (r *Registry) List() []Cleaner {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
+
 	list := make([]Cleaner, 0, len(r.cleaners))
 	for _, c := range r.cleaners {
 		list = append(list, c)
 	}
+
 	return list
 }
 
@@ -73,10 +78,12 @@ func (r *Registry) List() []Cleaner {
 func (r *Registry) Names() []string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
+
 	names := make([]string, 0, len(r.cleaners))
 	for name := range r.cleaners {
 		names = append(names, name)
 	}
+
 	return names
 }
 
@@ -84,18 +91,21 @@ func (r *Registry) Names() []string {
 func (r *Registry) Count() int {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
+
 	return len(r.cleaners)
 }
 
 // Available returns all cleaners that are available on the current system.
 func (r *Registry) Available(ctx context.Context) []Cleaner {
 	all := r.List()
+
 	available := make([]Cleaner, 0, len(all))
 	for _, c := range all {
 		if c.IsAvailable(ctx) {
 			available = append(available, c)
 		}
 	}
+
 	return available
 }
 
@@ -117,6 +127,7 @@ func (r *Registry) CleanAll(ctx context.Context) map[string]result.Result[domain
 func (r *Registry) Unregister(name string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	delete(r.cleaners, name)
 }
 
@@ -124,5 +135,6 @@ func (r *Registry) Unregister(name string) {
 func (r *Registry) Clear() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	r.cleaners = make(map[string]Cleaner)
 }

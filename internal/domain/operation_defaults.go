@@ -7,6 +7,7 @@ import (
 // DefaultSettings returns default settings for given operation type.
 func DefaultSettings(opType OperationType) *OperationSettings {
 	var settings *OperationSettings
+
 	switch opType {
 	case OperationTypeNixGenerations:
 		settings = &OperationSettings{
@@ -32,7 +33,12 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 	case OperationTypeNodePackages:
 		settings = &OperationSettings{
 			NodePackages: &NodePackagesSettings{
-				PackageManagers: []PackageManagerType{PackageManagerNpm, PackageManagerPnpm, PackageManagerYarn, PackageManagerBun},
+				PackageManagers: []PackageManagerType{
+					PackageManagerNpm,
+					PackageManagerPnpm,
+					PackageManagerYarn,
+					PackageManagerBun,
+				},
 			},
 		}
 	case OperationTypeGoPackages:
@@ -67,8 +73,13 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 	case OperationTypeSystemCache:
 		settings = &OperationSettings{
 			SystemCache: &SystemCacheSettings{
-				CacheTypes: []CacheType{CacheTypeSpotlight, CacheTypeXcode, CacheTypeCocoapods, CacheTypeHomebrew},
-				OlderThan:  "30d",
+				CacheTypes: []CacheType{
+					CacheTypeSpotlight,
+					CacheTypeXcode,
+					CacheTypeCocoapods,
+					CacheTypeHomebrew,
+				},
+				OlderThan: "30d",
 			},
 		}
 	case OperationTypeSystemTemp:
@@ -89,7 +100,8 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 	}
 
 	// Validate all enum defaults
-	if err := validateEnumDefaults(settings, opType); err != nil {
+	err := validateEnumDefaults(settings, opType)
+	if err != nil {
 		panic(fmt.Sprintf("DefaultSettings validation failed for %s: %v", opType, err))
 	}
 
@@ -106,10 +118,17 @@ func validateEnumDefaults(settings *OperationSettings, opType OperationType) err
 	// Validate NixGenerations
 	if settings.NixGenerations != nil {
 		if !settings.NixGenerations.Optimize.IsValid() {
-			return fmt.Errorf("invalid default OptimizationMode in NixGenerations: %d", settings.NixGenerations.Optimize)
+			return fmt.Errorf(
+				"invalid default OptimizationMode in NixGenerations: %d",
+				settings.NixGenerations.Optimize,
+			)
 		}
+
 		if !settings.NixGenerations.DryRun.IsValid() {
-			return fmt.Errorf("invalid default ExecutionMode in NixGenerations: %d", settings.NixGenerations.DryRun)
+			return fmt.Errorf(
+				"invalid default ExecutionMode in NixGenerations: %d",
+				settings.NixGenerations.DryRun,
+			)
 		}
 	}
 
@@ -132,26 +151,48 @@ func validateEnumDefaults(settings *OperationSettings, opType OperationType) err
 	// Validate GoPackages
 	if settings.GoPackages != nil {
 		if !settings.GoPackages.CleanCache.IsValid() {
-			return fmt.Errorf("invalid default CacheCleanupMode for CleanCache: %d", settings.GoPackages.CleanCache)
+			return fmt.Errorf(
+				"invalid default CacheCleanupMode for CleanCache: %d",
+				settings.GoPackages.CleanCache,
+			)
 		}
+
 		if !settings.GoPackages.CleanTestCache.IsValid() {
-			return fmt.Errorf("invalid default CacheCleanupMode for CleanTestCache: %d", settings.GoPackages.CleanTestCache)
+			return fmt.Errorf(
+				"invalid default CacheCleanupMode for CleanTestCache: %d",
+				settings.GoPackages.CleanTestCache,
+			)
 		}
+
 		if !settings.GoPackages.CleanModCache.IsValid() {
-			return fmt.Errorf("invalid default CacheCleanupMode for CleanModCache: %d", settings.GoPackages.CleanModCache)
+			return fmt.Errorf(
+				"invalid default CacheCleanupMode for CleanModCache: %d",
+				settings.GoPackages.CleanModCache,
+			)
 		}
+
 		if !settings.GoPackages.CleanBuildCache.IsValid() {
-			return fmt.Errorf("invalid default CacheCleanupMode for CleanBuildCache: %d", settings.GoPackages.CleanBuildCache)
+			return fmt.Errorf(
+				"invalid default CacheCleanupMode for CleanBuildCache: %d",
+				settings.GoPackages.CleanBuildCache,
+			)
 		}
+
 		if !settings.GoPackages.CleanLintCache.IsValid() {
-			return fmt.Errorf("invalid default CacheCleanupMode for CleanLintCache: %d", settings.GoPackages.CleanLintCache)
+			return fmt.Errorf(
+				"invalid default CacheCleanupMode for CleanLintCache: %d",
+				settings.GoPackages.CleanLintCache,
+			)
 		}
 	}
 
 	// Validate CargoPackages
 	if settings.CargoPackages != nil {
 		if !settings.CargoPackages.Autoclean.IsValid() {
-			return fmt.Errorf("invalid default CacheCleanupMode in CargoPackages: %d", settings.CargoPackages.Autoclean)
+			return fmt.Errorf(
+				"invalid default CacheCleanupMode in CargoPackages: %d",
+				settings.CargoPackages.Autoclean,
+			)
 		}
 	}
 

@@ -126,8 +126,11 @@ func WithEmptyProfiles() ConfigOption {
 func GetSanitizationTestCases() []TestSanitizationTestCase {
 	return []TestSanitizationTestCase{
 		{
-			name:             "whitespace cleanup",
-			config:           CreateTestConfig(WithVersion("  1.0.0  "), WithProfileName("  daily  ")),
+			name: "whitespace cleanup",
+			config: CreateTestConfig(
+				WithVersion("  1.0.0  "),
+				WithProfileName("  daily  "),
+			),
 			expectedChanges:  []string{"version", "profiles.daily.name"},
 			expectedWarnings: 0,
 		},
@@ -138,8 +141,10 @@ func GetSanitizationTestCases() []TestSanitizationTestCase {
 			expectedWarnings: 1,
 		},
 		{
-			name:             "duplicate paths",
-			config:           CreateTestConfig(WithProtectedPaths([]string{"/System", "/Library", "/System"})),
+			name: "duplicate paths",
+			config: CreateTestConfig(
+				WithProtectedPaths([]string{"/System", "/Library", "/System"}),
+			),
 			expectedChanges:  []string{"profiles.daily.operations[0].settings"},
 			expectedWarnings: 0,
 		},

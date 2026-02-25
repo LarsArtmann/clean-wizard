@@ -30,11 +30,12 @@ func main() {
 	info := version.Get()
 
 	// Handle command execution with styled output
-	if err := fang.Execute(ctx, rootCmd,
+	err := fang.Execute(ctx, rootCmd,
 		fang.WithVersion(info.Version),
 		fang.WithCommit(info.Commit),
 		fang.WithNotifySignal(os.Interrupt, syscall.SIGTERM),
-	); err != nil {
+	)
+	if err != nil {
 		os.Exit(1)
 	}
 }

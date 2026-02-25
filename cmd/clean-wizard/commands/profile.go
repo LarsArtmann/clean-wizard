@@ -49,6 +49,7 @@ func runProfileListCommand(cmd *cobra.Command, args []string) error {
 	if len(cfg.Profiles) == 0 {
 		fmt.Println("   No profiles configured.")
 		fmt.Println("   Run 'clean-wizard init' to create profiles.")
+
 		return nil
 	}
 
@@ -95,9 +96,11 @@ func runProfileShowCommand(cmd *cobra.Command, args []string, detailed bool) err
 			fmt.Printf("❌ Profile '%s' not found\n", profileName)
 			fmt.Println()
 			fmt.Println("Available profiles:")
+
 			for name := range defaultCfg.Profiles {
 				fmt.Printf("   • %s\n", name)
 			}
+
 			return nil
 		}
 	}
@@ -113,6 +116,7 @@ func runProfileShowCommand(cmd *cobra.Command, args []string, detailed bool) err
 	if detailed {
 		fmt.Println("Operations:")
 		fmt.Println("━━━━━━━━━━━━")
+
 		for i, op := range profile.Operations {
 			fmt.Printf("\n  %d. %s\n", i+1, op.Name)
 			fmt.Printf("     Description: %s\n", op.Description)
@@ -126,8 +130,10 @@ func runProfileShowCommand(cmd *cobra.Command, args []string, detailed bool) err
 
 // NewProfileCreateCommand creates a command to create a new profile.
 func NewProfileCreateCommand() *cobra.Command {
-	var name string
-	var description string
+	var (
+		name        string
+		description string
+	)
 
 	cmd := &cobra.Command{
 		Use:   "create",
@@ -150,6 +156,7 @@ func runProfileCreateCommand(cmd *cobra.Command, args []string, name, descriptio
 	if name == "" {
 		fmt.Println("Creating new profile...")
 		fmt.Print("Enter profile name: ")
+
 		_, err := fmt.Scanln(&name)
 		if err != nil {
 			// Use default name if scan fails
@@ -159,6 +166,7 @@ func runProfileCreateCommand(cmd *cobra.Command, args []string, name, descriptio
 
 	if description == "" {
 		fmt.Print("Enter profile description: ")
+
 		_, err := fmt.Scanln(&description)
 		if err != nil {
 			description = "Custom cleaning profile"
@@ -175,6 +183,7 @@ func runProfileCreateCommand(cmd *cobra.Command, args []string, name, descriptio
 	if _, exists := cfg.Profiles[name]; exists {
 		fmt.Printf("❌ Profile '%s' already exists\n", name)
 		fmt.Printf("   Use 'clean-wizard profile delete %s' to remove it first.\n", name)
+
 		return nil
 	}
 
@@ -247,6 +256,7 @@ func runProfileDeleteCommand(cmd *cobra.Command, args []string, force bool) erro
 	_, ok := cfg.Profiles[profileName]
 	if !ok {
 		fmt.Printf("❌ Profile '%s' not found\n", profileName)
+
 		return nil
 	}
 
@@ -254,6 +264,7 @@ func runProfileDeleteCommand(cmd *cobra.Command, args []string, force bool) erro
 	if len(cfg.Profiles) <= 1 {
 		fmt.Println("❌ Cannot delete the last profile.")
 		fmt.Println("   At least one profile must exist.")
+
 		return nil
 	}
 
@@ -263,7 +274,7 @@ func runProfileDeleteCommand(cmd *cobra.Command, args []string, force bool) erro
 			fmt.Sprintf("Delete profile '%s'? This cannot be undone.", profileName),
 			"Deletion cancelled.",
 		) {
-			return nil //nolint:nilerr // intentional: user cancellation is not an error
+			return nil
 		}
 	}
 

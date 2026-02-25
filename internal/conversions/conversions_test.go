@@ -20,18 +20,23 @@ func TestNewCleanResult(t *testing.T) {
 	if cleanResult.Strategy != strategy {
 		t.Errorf("Expected strategy %s, got %s", strategy.String(), cleanResult.Strategy.String())
 	}
+
 	if cleanResult.ItemsRemoved != uint(items) {
 		t.Errorf("Expected items %d, got %d", items, cleanResult.ItemsRemoved)
 	}
+
 	if cleanResult.FreedBytes != uint64(bytes) {
 		t.Errorf("Expected bytes %d, got %d", bytes, cleanResult.FreedBytes)
 	}
+
 	if cleanResult.ItemsFailed != 0 {
 		t.Errorf("Expected items failed 0, got %d", cleanResult.ItemsFailed)
 	}
+
 	if cleanResult.CleanTime != 0 {
 		t.Errorf("Expected clean time 0, got %d", cleanResult.CleanTime)
 	}
+
 	if cleanResult.CleanedAt.IsZero() {
 		t.Error("Expected cleaned at to be set, got zero time")
 	}
@@ -48,12 +53,15 @@ func TestNewCleanResultWithTiming(t *testing.T) {
 	if cleanResult.CleanTime != cleanTime {
 		t.Errorf("Expected clean time %v, got %v", cleanTime, cleanResult.CleanTime)
 	}
+
 	if cleanResult.Strategy != strategy {
 		t.Errorf("Expected strategy %s, got %s", strategy.String(), cleanResult.Strategy.String())
 	}
+
 	if cleanResult.ItemsRemoved != uint(items) {
 		t.Errorf("Expected items %d, got %d", items, cleanResult.ItemsRemoved)
 	}
+
 	if cleanResult.FreedBytes != uint64(bytes) {
 		t.Errorf("Expected bytes %d, got %d", bytes, cleanResult.FreedBytes)
 	}
@@ -71,15 +79,19 @@ func TestNewCleanResultWithFailures(t *testing.T) {
 	if cleanResult.Strategy != strategy {
 		t.Errorf("Expected strategy %s, got %s", strategy.String(), cleanResult.Strategy.String())
 	}
+
 	if cleanResult.ItemsRemoved != uint(itemsRemoved) {
 		t.Errorf("Expected items removed %d, got %d", itemsRemoved, cleanResult.ItemsRemoved)
 	}
+
 	if cleanResult.ItemsFailed != uint(itemsFailed) {
 		t.Errorf("Expected items failed %d, got %d", itemsFailed, cleanResult.ItemsFailed)
 	}
+
 	if cleanResult.FreedBytes != uint64(bytes) {
 		t.Errorf("Expected bytes %d, got %d", bytes, cleanResult.FreedBytes)
 	}
+
 	if cleanResult.CleanTime != cleanTime {
 		t.Errorf("Expected clean time %v, got %v", cleanTime, cleanResult.CleanTime)
 	}
@@ -96,15 +108,23 @@ func TestNewScanResult(t *testing.T) {
 	if scanResult.TotalBytes != totalBytes {
 		t.Errorf("Expected total bytes %d, got %d", totalBytes, scanResult.TotalBytes)
 	}
+
 	if scanResult.TotalItems != totalItems {
 		t.Errorf("Expected total items %d, got %d", totalItems, scanResult.TotalItems)
 	}
+
 	if len(scanResult.ScannedPaths) != len(scannedPaths) {
-		t.Errorf("Expected %d scanned paths, got %d", len(scannedPaths), len(scanResult.ScannedPaths))
+		t.Errorf(
+			"Expected %d scanned paths, got %d",
+			len(scannedPaths),
+			len(scanResult.ScannedPaths),
+		)
 	}
+
 	if scanResult.ScanTime != scanDuration {
 		t.Errorf("Expected scan time %v, got %v", scanDuration, scanResult.ScanTime)
 	}
+
 	if scanResult.ScannedAt.IsZero() {
 		t.Error("Expected scanned at to be set, got zero time")
 	}
@@ -124,6 +144,7 @@ func TestToCleanResult(t *testing.T) {
 	if value.FreedBytes != uint64(bytes) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
+
 	if value.Strategy != domain.CleanStrategyType(domain.StrategyConservativeType) {
 		t.Errorf("Expected strategy 'conservative', got %s", value.Strategy)
 	}
@@ -159,6 +180,7 @@ func TestToCleanResultWithStrategy(t *testing.T) {
 	if value.FreedBytes != uint64(bytes) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
+
 	if value.Strategy.String() != strategy.String() {
 		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
 	}
@@ -180,9 +202,11 @@ func TestToCleanResultFromItems(t *testing.T) {
 	if value.ItemsRemoved != uint(itemsRemoved) {
 		t.Errorf("Expected items removed %d, got %d", itemsRemoved, value.ItemsRemoved)
 	}
+
 	if value.FreedBytes != uint64(bytes) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
+
 	if value.Strategy.String() != strategy.String() {
 		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
 	}
@@ -204,9 +228,11 @@ func TestToTimedCleanResult(t *testing.T) {
 	if value.FreedBytes != uint64(bytes) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
+
 	if value.Strategy.String() != strategy.String() {
 		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
 	}
+
 	if value.CleanTime != cleanTime {
 		t.Errorf("Expected clean time %v, got %v", cleanTime, value.CleanTime)
 	}
@@ -223,20 +249,35 @@ func TestToScanResult(t *testing.T) {
 	if scanResult.TotalBytes != totalBytes {
 		t.Errorf("Expected total bytes %d, got %d", totalBytes, scanResult.TotalBytes)
 	}
+
 	if scanResult.TotalItems != totalItems {
 		t.Errorf("Expected total items %d, got %d", totalItems, scanResult.TotalItems)
 	}
+
 	if len(scanResult.ScannedPaths) != len(scannedPaths) {
-		t.Errorf("Expected %d scanned paths, got %d", len(scannedPaths), len(scanResult.ScannedPaths))
+		t.Errorf(
+			"Expected %d scanned paths, got %d",
+			len(scannedPaths),
+			len(scanResult.ScannedPaths),
+		)
 	}
+
 	if scanResult.ScanTime != scanDuration {
 		t.Errorf("Expected scan time %v, got %v", scanDuration, scanResult.ScanTime)
 	}
 }
 
 func TestCombineCleanResults(t *testing.T) {
-	result1 := NewCleanResult(domain.CleanStrategyType(domain.StrategyAggressiveType), 3, int64(1024))
-	result2 := NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 5, int64(2048))
+	result1 := NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		3,
+		int64(1024),
+	)
+	result2 := NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		5,
+		int64(2048),
+	)
 
 	results := []domain.CleanResult{result1, result2}
 
@@ -245,21 +286,38 @@ func TestCombineCleanResults(t *testing.T) {
 	if combined.ItemsRemoved != uint(8) { // 3 + 5
 		t.Errorf("Expected items removed 8, got %d", combined.ItemsRemoved)
 	}
+
 	if combined.FreedBytes != uint64(3072) { // 1024 + 2048
 		t.Errorf("Expected freed bytes 3072, got %d", combined.FreedBytes)
 	}
+
 	if combined.ItemsFailed != uint(0) {
 		t.Errorf("Expected items failed 0, got %d", combined.ItemsFailed)
 	}
 	// When combining different strategies, should default to conservative
 	if combined.Strategy != domain.CleanStrategyType(domain.StrategyConservativeType) {
-		t.Errorf("Expected combined strategy to be 'conservative' for mixed strategies, got %s", combined.Strategy)
+		t.Errorf(
+			"Expected combined strategy to be 'conservative' for mixed strategies, got %s",
+			combined.Strategy,
+		)
 	}
 }
 
 func TestCombineCleanResultsWithFailures(t *testing.T) {
-	result1 := NewCleanResultWithFailures(domain.CleanStrategyType(domain.StrategyAggressiveType), 3, 1, int64(1024), time.Second)
-	result2 := NewCleanResultWithFailures(domain.CleanStrategyType(domain.StrategyConservativeType), 5, 2, int64(2048), 2*time.Second)
+	result1 := NewCleanResultWithFailures(
+		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		3,
+		1,
+		int64(1024),
+		time.Second,
+	)
+	result2 := NewCleanResultWithFailures(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		5,
+		2,
+		int64(2048),
+		2*time.Second,
+	)
 
 	results := []domain.CleanResult{result1, result2}
 
@@ -268,12 +326,15 @@ func TestCombineCleanResultsWithFailures(t *testing.T) {
 	if combined.ItemsRemoved != uint(8) { // 3 + 5
 		t.Errorf("Expected items removed 8, got %d", combined.ItemsRemoved)
 	}
+
 	if combined.ItemsFailed != uint(3) { // 1 + 2
 		t.Errorf("Expected items failed 3, got %d", combined.ItemsFailed)
 	}
+
 	if combined.FreedBytes != uint64(3072) { // 1024 + 2048
 		t.Errorf("Expected freed bytes 3072, got %d", combined.FreedBytes)
 	}
+
 	if combined.CleanTime != 2*time.Second { // max(1s, 2s)
 		t.Errorf("Expected clean time 2s, got %v", combined.CleanTime)
 	}
@@ -287,17 +348,24 @@ func TestCombineCleanResultsEmpty(t *testing.T) {
 	if combined.ItemsRemoved != uint(0) {
 		t.Errorf("Expected items removed 0, got %d", combined.ItemsRemoved)
 	}
+
 	if combined.FreedBytes != uint64(0) {
 		t.Errorf("Expected freed bytes 0, got %d", combined.FreedBytes)
 	}
+
 	if combined.Strategy != domain.CleanStrategyType(domain.StrategyConservativeType) {
-		t.Errorf("Expected strategy 'conservative' (default for empty results), got %s", combined.Strategy)
+		t.Errorf(
+			"Expected strategy 'conservative' (default for empty results), got %s",
+			combined.Strategy,
+		)
 	}
 }
 
 func TestExtractBytesFromCleanResult(t *testing.T) {
 	bytes := int64(4096)
-	cleanResult := result.Ok(NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 1, bytes))
+	cleanResult := result.Ok(
+		NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 1, bytes),
+	)
 
 	extracted := ExtractBytesFromCleanResult(cleanResult)
 
@@ -340,7 +408,11 @@ func TestToCleanResultFromError(t *testing.T) {
 }
 
 func TestValidateAndConvertCleanResult(t *testing.T) {
-	validResult := NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 1, 1024)
+	validResult := NewCleanResult(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		1,
+		1024,
+	)
 
 	result := ValidateAndConvertCleanResult(validResult)
 

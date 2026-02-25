@@ -15,7 +15,10 @@ type ProfileOperationModifier func(*domain.Profile, *domain.CleanupOperation) bo
 
 // FindProfileOperation finds a specific operation within a profile by name
 // Returns the operation index, or -1 if not found.
-func FindProfileOperation(cfg *domain.Config, profileName, operationName string) (*domain.Profile, int) {
+func FindProfileOperation(
+	cfg *domain.Config,
+	profileName, operationName string,
+) (*domain.Profile, int) {
 	if cfg == nil {
 		return nil, -1
 	}
@@ -55,12 +58,18 @@ func WithOperationSettings(
 	profileName, operationName string,
 	settingsModifier func(*domain.OperationSettings) bool,
 ) bool {
-	return ModifyProfileOperation(cfg, profileName, operationName, func(profile *domain.Profile, op *domain.CleanupOperation) bool {
-		if op.Settings == nil {
-			return false
-		}
-		return settingsModifier(op.Settings)
-	})
+	return ModifyProfileOperation(
+		cfg,
+		profileName,
+		operationName,
+		func(profile *domain.Profile, op *domain.CleanupOperation) bool {
+			if op.Settings == nil {
+				return false
+			}
+
+			return settingsModifier(op.Settings)
+		},
+	)
 }
 
 // BoolToSafeMode converts boolean to SafeMode enum (standardized across tests).
@@ -68,6 +77,7 @@ func BoolToSafeMode(b bool) domain.SafeMode {
 	if b {
 		return domain.SafeModeEnabled
 	}
+
 	return domain.SafeModeDisabled
 }
 
@@ -76,6 +86,7 @@ func BoolToProfileStatus(b bool) domain.ProfileStatus {
 	if b {
 		return domain.ProfileStatusEnabled
 	}
+
 	return domain.ProfileStatusDisabled
 }
 
@@ -84,6 +95,7 @@ func BoolToOptimizationMode(b bool) domain.OptimizationMode {
 	if b {
 		return domain.OptimizationModeEnabled
 	}
+
 	return domain.OptimizationModeDisabled
 }
 
@@ -92,6 +104,7 @@ func BoolToGenerationStatus(b bool) domain.GenerationStatus {
 	if b {
 		return domain.GenerationStatusCurrent
 	}
+
 	return domain.GenerationStatusHistorical
 }
 
@@ -101,6 +114,7 @@ func ChainModifiers(modifiers ...ConfigModifier) ConfigModifier {
 		for _, modifier := range modifiers {
 			cfg = modifier(cfg)
 		}
+
 		return cfg
 	}
 }
@@ -113,12 +127,18 @@ func WithNixGenerationsSetting(
 	profileName, operationName string,
 	settingModifier func(*domain.NixGenerationsSettings) bool,
 ) bool {
-	return WithOperationSettings(cfg, profileName, operationName, func(settings *domain.OperationSettings) bool {
-		if settings.NixGenerations == nil {
-			return false
-		}
-		return settingModifier(settings.NixGenerations)
-	})
+	return WithOperationSettings(
+		cfg,
+		profileName,
+		operationName,
+		func(settings *domain.OperationSettings) bool {
+			if settings.NixGenerations == nil {
+				return false
+			}
+
+			return settingModifier(settings.NixGenerations)
+		},
+	)
 }
 
 // WithProfileOperationField modifies an operation field directly.
@@ -128,7 +148,12 @@ func WithProfileOperationField(
 	cfg *domain.Config, profileName, operationName string,
 	fieldModifier func(*domain.CleanupOperation) bool,
 ) bool {
-	return ModifyProfileOperation(cfg, profileName, operationName, func(profile *domain.Profile, op *domain.CleanupOperation) bool {
-		return fieldModifier(op)
-	})
+	return ModifyProfileOperation(
+		cfg,
+		profileName,
+		operationName,
+		func(profile *domain.Profile, op *domain.CleanupOperation) bool {
+			return fieldModifier(op)
+		},
+	)
 }

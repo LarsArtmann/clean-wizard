@@ -31,60 +31,70 @@ func NewValidationConfig() ValidationConfig {
 // WithConfigPath sets the config path.
 func (c *ValidationConfig) WithConfigPath(path string) *ValidationConfig {
 	c.ConfigPath = path
+
 	return c
 }
 
 // WithValidationLevel sets the validation level.
 func (c *ValidationConfig) WithValidationLevel(level string) *ValidationConfig {
 	c.ValidationLevel = level
+
 	return c
 }
 
 // WithProfile sets the profile.
 func (c *ValidationConfig) WithProfile(profile string) *ValidationConfig {
 	c.Profile = profile
+
 	return c
 }
 
 // WithSection sets the section.
 func (c *ValidationConfig) WithSection(section string) *ValidationConfig {
 	c.Section = section
+
 	return c
 }
 
 // WithMinValue sets the minimum value.
 func (c *ValidationConfig) WithMinValue(value any) *ValidationConfig {
 	c.MinValue = value
+
 	return c
 }
 
 // WithMaxValue sets the maximum value.
 func (c *ValidationConfig) WithMaxValue(value any) *ValidationConfig {
 	c.MaxValue = value
+
 	return c
 }
 
 // WithAllowedValues sets the allowed values.
 func (c *ValidationConfig) WithAllowedValues(values ...string) *ValidationConfig {
 	c.AllowedValues = values
+
 	return c
 }
 
 // WithReferencedField sets the referenced field.
 func (c *ValidationConfig) WithReferencedField(field string) *ValidationConfig {
 	c.ReferencedField = field
+
 	return c
 }
 
 // WithConstraints sets the constraints.
 func (c *ValidationConfig) WithConstraints(constraints map[string]string) *ValidationConfig {
 	c.Constraints = constraints
+
 	return c
 }
 
 // WithMetadata adds metadata.
 func (c *ValidationConfig) WithMetadata(key, value string) *ValidationConfig {
 	c.Metadata[key] = value
+
 	return c
 }
 
@@ -133,16 +143,21 @@ func (r *ValidationResult) AddError(
 		Context: ctx,
 	})
 	r.IsValid = false
+
 	return r
 }
 
 // AddWarning adds a warning to the result.
-func (r *ValidationResult) AddWarning(field, message string, ctx *Context[ValidationConfig]) *ValidationResult {
+func (r *ValidationResult) AddWarning(
+	field, message string,
+	ctx *Context[ValidationConfig],
+) *ValidationResult {
 	r.Warnings = append(r.Warnings, ValidationWarning{
 		Field:   field,
 		Message: message,
 		Context: ctx,
 	})
+
 	return r
 }
 
@@ -151,6 +166,7 @@ func (c *Context[ValidationConfig]) Execute(validator func() *ValidationResult) 
 	if validator != nil {
 		return validator()
 	}
+
 	return NewValidationResult()
 }
 
@@ -188,7 +204,10 @@ func ToLegacyValidationContext(c *Context[ValidationConfig]) *LegacyValidationCo
 }
 
 // FromLegacyValidationContext creates a Context[ValidationConfig] from the legacy ValidationContext format.
-func FromLegacyValidationContext(ctx context.Context, legacy *LegacyValidationContext) *Context[ValidationConfig] {
+func FromLegacyValidationContext(
+	ctx context.Context,
+	legacy *LegacyValidationContext,
+) *Context[ValidationConfig] {
 	if legacy == nil {
 		return NewContext(ctx, NewValidationConfig())
 	}
@@ -210,6 +229,7 @@ func FromLegacyValidationContext(ctx context.Context, legacy *LegacyValidationCo
 	for k, v := range legacy.Metadata {
 		newCtx = newCtx.WithMetadata(k, v)
 	}
+
 	return newCtx
 }
 

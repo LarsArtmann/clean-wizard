@@ -27,6 +27,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if os.NixGenerations == nil {
 			return nil // Optional settings
 		}
+
 		if os.NixGenerations.Generations < 0 || os.NixGenerations.Generations > 10 {
 			return &ValidationError{
 				Field:   "nix_generations.generations",
@@ -38,6 +39,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if os.TempFiles == nil {
 			return nil
 		}
+
 		if os.TempFiles.OlderThan == "" {
 			return &ValidationError{
 				Field:   "temp_files.older_than",
@@ -45,6 +47,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 				Value:   os.TempFiles.OlderThan,
 			}
 		}
+
 		if _, err := ParseCustomDuration(os.TempFiles.OlderThan); err != nil {
 			return &ValidationError{
 				Field:   "temp_files.older_than",
@@ -58,6 +61,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if os.SystemTemp == nil {
 			return nil
 		}
+
 		if len(os.SystemTemp.Paths) == 0 {
 			return &ValidationError{
 				Field:   "system_temp.paths",
@@ -69,6 +73,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if os.Docker == nil {
 			return nil
 		}
+
 		if !os.Docker.PruneMode.IsValid() {
 			return &ValidationError{
 				Field: "docker.prune_mode",
@@ -81,6 +86,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if os.GoPackages == nil {
 			return nil
 		}
+
 		if !os.GoPackages.CleanCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_cache",
@@ -88,6 +94,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 				Value:   os.GoPackages.CleanCache.String(),
 			}
 		}
+
 		if !os.GoPackages.CleanTestCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_test_cache",
@@ -95,6 +102,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 				Value:   os.GoPackages.CleanTestCache.String(),
 			}
 		}
+
 		if !os.GoPackages.CleanModCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_mod_cache",
@@ -102,6 +110,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 				Value:   os.GoPackages.CleanModCache.String(),
 			}
 		}
+
 		if !os.GoPackages.CleanBuildCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_build_cache",
@@ -109,6 +118,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 				Value:   os.GoPackages.CleanBuildCache.String(),
 			}
 		}
+
 		if !os.GoPackages.CleanLintCache.IsValid() {
 			return &ValidationError{
 				Field:   "go_packages.clean_lint_cache",
@@ -120,6 +130,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if os.SystemCache == nil {
 			return nil
 		}
+
 		for i, cacheType := range os.SystemCache.CacheTypes {
 			if !cacheType.IsValid() {
 				return &ValidationError{
@@ -134,6 +145,7 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 		if os.BuildCache == nil {
 			return nil
 		}
+
 		for i, toolType := range os.BuildCache.ToolTypes {
 			if !toolType.IsValid() {
 				return &ValidationError{
@@ -143,8 +155,11 @@ func (os *OperationSettings) ValidateSettings(opType OperationType) error {
 				}
 			}
 		}
-	case OperationTypeNodePackages, OperationTypeCargoPackages, OperationTypeProjectsManagementAutomation:
+	case OperationTypeNodePackages,
+		OperationTypeCargoPackages,
+		OperationTypeProjectsManagementAutomation:
 		// No enum validation needed for these operation types
 	}
+
 	return nil
 }

@@ -11,7 +11,8 @@ import (
 func (cv *ConfigValidator) validateProfiles(cfg *domain.Config) error {
 	for name, profile := range cfg.Profiles {
 		// Validate profile name
-		if err := cv.validateProfileName(name); err != nil {
+		err := cv.validateProfileName(name)
+		if err != nil {
 			return fmt.Errorf("profile %s: %w", name, err)
 		}
 
@@ -21,7 +22,8 @@ func (cv *ConfigValidator) validateProfiles(cfg *domain.Config) error {
 		}
 
 		// Validate profile struct
-		if err := profile.Validate(name); err != nil {
+		err := profile.Validate(name)
+		if err != nil {
 			return fmt.Errorf("profile %s: %w", name, err)
 		}
 	}
@@ -49,16 +51,25 @@ func (cv *ConfigValidator) validateProfileName(name string) error {
 func (cv *ConfigValidator) validateProfileNameWithPattern(name string) error {
 	compiledRegex := cv.rules.ProfileNamePattern.GetCompiledRegex()
 	if compiledRegex == nil {
-		return fmt.Errorf("profile name pattern '%s' is invalid and cannot be compiled", cv.rules.ProfileNamePattern.Pattern)
+		return fmt.Errorf(
+			"profile name pattern '%s' is invalid and cannot be compiled",
+			cv.rules.ProfileNamePattern.Pattern,
+		)
 	}
 
 	if !compiledRegex.MatchString(name) {
 		message := cv.rules.ProfileNamePattern.Message
 		if message == "" {
-			message = fmt.Sprintf("Profile name '%s' does not match pattern: %s", name, cv.rules.ProfileNamePattern.Pattern)
+			message = fmt.Sprintf(
+				"Profile name '%s' does not match pattern: %s",
+				name,
+				cv.rules.ProfileNamePattern.Pattern,
+			)
 		}
+
 		return fmt.Errorf("%s", message)
 	}
+
 	return nil
 }
 
@@ -68,9 +79,12 @@ func (cv *ConfigValidator) validateProfileNameWithDefault(name string) error {
 		if !isValidProfileNameChar(char) {
 			return fmt.Errorf(
 				"profile name '%s' contains invalid character: %c (allowed: alphanumeric, underscore, hyphen)",
-				name, char)
+				name,
+				char,
+			)
 		}
 	}
+
 	return nil
 }
 

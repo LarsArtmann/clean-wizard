@@ -2,26 +2,132 @@ version: "2"
 run:
   timeout: 5m
   go: "1.25"
+  build-tags: []
   modules-download-mode: readonly
   allow-parallel-runners: true
+  allow-serial-runners: false
   issues-exit-code: 1
   tests: true
 output:
   formats: {}
 linters:
-  default: none
   enable:
+    - goconst
+    - iface
+    - prealloc
+    - contextcheck
+    - gocyclo
+    - decorder
+    - modernize
+    - importas
+    - unparam
+    - nilnesserr
+    - misspell
     - errcheck
-    - ineffassign
-    - nilerr
-    - staticcheck
     - govet
+    - forcetypeassert
+    - makezero
+    - asasalint
+    - funcorder
+    - reassign
+    - gosmopolitan
+    - wsl_v5
+    - rowserrcheck
+    - nakedret
+    - bidichk
+    - nilnil
+    - usetesting
+    - whitespace
+    - embeddedstructfieldcheck
+    - nlreturn
+    - mirror
+    - promlinter
+    - dupl
+    - inamedparam
+    - maintidx
+    - cyclop
+    - predeclared
+    - gomodguard
+    - copyloopvar
+    - goheader
+    - staticcheck
+    - wastedassign
+    - grouper
+    - gocheckcompilerdirectives
+    - mnd
+    - nonamedreturns
+    - ginkgolinter
+    - godox
+    - errorlint
+    - gochecknoglobals
+    - err113
+    - dogsled
+    - dupword
+    - durationcheck
+    - recvcheck
+    - sqlclosecheck
+    - depguard
+    - nolintlint
+    - canonicalheader
+    - godoclint
+    - unqueryvet
+    - revive
+    - gocognit
+    - containedctx
+    - protogetter
+    - paralleltest
+    - tagalign
+    - iotamixing
+    - varnamelen
+    - forbidigo
+    - exptostd
+    - godot
+    - testifylint
+    - gochecksumtype
+    - tagliatelle
+    - tparallel
+    - spancheck
+    - gomoddirectives
+    - interfacebloat
+    - goprintffuncname
+    - noinlineerr
+    - nilerr
+    - funlen
+    - wrapcheck
+    - arangolint
+    - ireturn
+    - gocritic
+    - testpackage
+    - exhaustive
+    - exhaustruct
+    - unconvert
+    - nosprintfhostport
+    - testableexamples
+    - usestdlibvars
+    - zerologlint
+    - errname
+    - thelper
+    - unused
+    - bodyclose
+    - asciicheck
+    - fatcontext
+    - intrange
+    - ineffassign
+    - gochecknoinits
+    - nestif
+    - perfsprint
+  default: none
   settings:
     errcheck:
-      check-type-assertions: false
       check-blank: false
+      check-type-assertions: false
     staticcheck:
-      checks: ["all", "-ST1000", "-ST1003", "-ST1005", "-SA9003"]
+      checks:
+        - all
+        - -ST1000
+        - -ST1003
+        - -ST1005
+        - -SA9003
   exclusions:
     rules:
       - path: _test\.go
@@ -35,3 +141,7 @@ linters:
     paths:
       - tests
       - test/testdata_etc
+formatters:
+  enable:
+    - golines
+issues: {}

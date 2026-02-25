@@ -22,11 +22,21 @@ func testPredicateTestCases(okExpected, errExpected bool) []struct {
 }
 
 func TestResult_Ok(t *testing.T) {
-	testPredicateCases(t, "IsOk", func(r Result[int]) bool { return r.IsOk() }, testPredicateTestCases(true, false))
+	testPredicateCases(
+		t,
+		"IsOk",
+		func(r Result[int]) bool { return r.IsOk() },
+		testPredicateTestCases(true, false),
+	)
 }
 
 func TestResult_IsErr(t *testing.T) {
-	testPredicateCases(t, "IsErr", func(r Result[int]) bool { return r.IsErr() }, testPredicateTestCases(false, true))
+	testPredicateCases(
+		t,
+		"IsErr",
+		func(r Result[int]) bool { return r.IsErr() },
+		testPredicateTestCases(false, true),
+	)
 }
 
 // testOkResult returns a successful result for testing.
@@ -40,11 +50,15 @@ func testErrResult() Result[int] {
 }
 
 // testPredicateCases tests a predicate function against multiple cases.
-func testPredicateCases(t *testing.T, methodName string, predicate func(Result[int]) bool, cases []struct {
-	name     string
-	result   Result[int]
-	expected bool
-},
+func testPredicateCases(
+	t *testing.T,
+	methodName string,
+	predicate func(Result[int]) bool,
+	cases []struct {
+		name     string
+		result   Result[int]
+		expected bool
+	},
 ) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -148,6 +162,7 @@ func assertResultEquals[T comparable](t *testing.T, opName string, got, want Res
 
 	if got.IsOk() != want.IsOk() {
 		t.Errorf("%s() IsOk() = %v, want %v", opName, got.IsOk(), want.IsOk())
+
 		return
 	}
 
@@ -157,7 +172,12 @@ func assertResultEquals[T comparable](t *testing.T, opName string, got, want Res
 		}
 	} else {
 		if got.Error().Error() != want.Error().Error() {
-			t.Errorf("%s() Error() = %v, want %v", opName, got.Error().Error(), want.Error().Error())
+			t.Errorf(
+				"%s() Error() = %v, want %v",
+				opName,
+				got.Error().Error(),
+				want.Error().Error(),
+			)
 		}
 	}
 }
@@ -169,8 +189,18 @@ func TestResult_Map(t *testing.T) {
 		fn       func(int) string
 		expected Result[string]
 	}{
-		{name: "ok result", result: testOkResult(), fn: func(i int) string { return "42" }, expected: Ok("42")},
-		{name: "error result", result: testErrResult(), fn: func(i int) string { return "42" }, expected: Err[string](errors.New("test error"))},
+		{
+			name:     "ok result",
+			result:   testOkResult(),
+			fn:       func(i int) string { return "42" },
+			expected: Ok("42"),
+		},
+		{
+			name:     "error result",
+			result:   testErrResult(),
+			fn:       func(i int) string { return "42" },
+			expected: Err[string](errors.New("test error")),
+		},
 	}
 
 	for _, tt := range tests {
@@ -188,9 +218,24 @@ func TestResult_AndThen(t *testing.T) {
 		fn       func(int) Result[string]
 		expected Result[string]
 	}{
-		{name: "ok result to ok result", result: testOkResult(), fn: func(i int) Result[string] { return Ok("success") }, expected: Ok("success")},
-		{name: "ok result to error result", result: testOkResult(), fn: func(i int) Result[string] { return Err[string](errors.New("chained error")) }, expected: Err[string](errors.New("chained error"))},
-		{name: "error result", result: testErrResult(), fn: func(i int) Result[string] { return Ok("should not be called") }, expected: Err[string](errors.New("test error"))},
+		{
+			name:     "ok result to ok result",
+			result:   testOkResult(),
+			fn:       func(i int) Result[string] { return Ok("success") },
+			expected: Ok("success"),
+		},
+		{
+			name:     "ok result to error result",
+			result:   testOkResult(),
+			fn:       func(i int) Result[string] { return Err[string](errors.New("chained error")) },
+			expected: Err[string](errors.New("chained error")),
+		},
+		{
+			name:     "error result",
+			result:   testErrResult(),
+			fn:       func(i int) Result[string] { return Ok("should not be called") },
+			expected: Err[string](errors.New("test error")),
+		},
 	}
 
 	for _, tt := range tests {
@@ -282,7 +327,11 @@ func TestResult_Validate(t *testing.T) {
 
 			if !tt.expectedOk && result.IsErr() {
 				if result.Error().Error() != tt.expectedError {
-					t.Errorf("Validate() Error() = %v, want %v", result.Error().Error(), tt.expectedError)
+					t.Errorf(
+						"Validate() Error() = %v, want %v",
+						result.Error().Error(),
+						tt.expectedError,
+					)
 				}
 			}
 		})
@@ -298,12 +347,17 @@ func TestResult_ValidateWithError(t *testing.T) {
 	}
 
 	if result.Error().Error() != customErr.Error() {
-		t.Errorf("ValidateWithError() Error() = %v, want %v", result.Error().Error(), customErr.Error())
+		t.Errorf(
+			"ValidateWithError() Error() = %v, want %v",
+			result.Error().Error(),
+			customErr.Error(),
+		)
 	}
 }
 
 func TestResult_Tap(t *testing.T) {
 	var tappedValue *int
+
 	okResult := Ok(42).Tap(func(v int) { tappedValue = &v })
 
 	if !okResult.IsOk() || okResult.Value() != 42 {

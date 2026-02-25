@@ -10,8 +10,10 @@ import (
 
 // NewInitCommand creates an interactive setup wizard command.
 func NewInitCommand() *cobra.Command {
-	var force bool
-	var minimal bool
+	var (
+		force   bool
+		minimal bool
+	)
 
 	cmd := &cobra.Command{
 		Use:   "init",
@@ -40,10 +42,13 @@ func runInitCommand(cmd *cobra.Command, args []string, force, minimal bool) erro
 		fmt.Println("⚠️  Configuration already exists!")
 		fmt.Println("   Use --force to overwrite or --minimal to create a basic config.")
 		fmt.Printf("\n   Current profiles: ")
+
 		for name := range cfg.Profiles {
 			fmt.Printf("%s ", name)
 		}
+
 		fmt.Println()
+
 		return nil
 	}
 
@@ -65,7 +70,8 @@ func createMinimalConfig() error {
 		"daily": daily,
 	}
 
-	if err := config.Save(cfg); err != nil {
+	err := config.Save(cfg)
+	if err != nil {
 		return fmt.Errorf("failed to save configuration: %w", err)
 	}
 
@@ -145,7 +151,8 @@ func createInteractiveConfig() error {
 		},
 	}
 
-	if err := config.Save(cfg); err != nil {
+	err := config.Save(cfg)
+	if err != nil {
 		return fmt.Errorf("failed to save configuration: %w", err)
 	}
 
@@ -154,14 +161,17 @@ func createInteractiveConfig() error {
 	fmt.Println("📁 Configuration saved to: ~/.clean-wizard.yaml")
 	fmt.Println()
 	fmt.Println("📋 Available profiles:")
+
 	for name, profile := range cfg.Profiles {
 		status := "enabled"
 		if profile.Enabled == domain.ProfileStatusDisabled {
 			status = "disabled"
 		}
+
 		fmt.Printf("   • %s (%s)\n", name, status)
 		fmt.Printf("     %s\n", profile.Description)
 	}
+
 	fmt.Println()
 	fmt.Println("💡 To get started:")
 	fmt.Println("   clean-wizard clean              - Run daily cleanup")

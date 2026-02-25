@@ -23,11 +23,13 @@ func ParseDockerReclaimedSpace(output string) (int64, error) {
 			if len(parts) != 2 {
 				continue
 			}
+
 			sizeStr := strings.TrimSpace(parts[1])
 			// Parse size string (e.g., "2.5GB", "100MB", "1.84kB", "0B")
 			return ParseDockerSize(sizeStr)
 		}
 	}
+
 	return 0, nil // No space found (0 is valid)
 }
 
@@ -43,10 +45,13 @@ func ParseDockerSize(sizeStr string) (int64, error) {
 	}
 
 	// Parse number and unit
-	var number float64
-	var unit string
+	var (
+		number float64
+		unit   string
+	)
+
 	n, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit)
-	if err != nil || n != 2 { //nolint:mnd // 2 is expected number of parsed items
+	if err != nil || n != 2 {
 		return 0, fmt.Errorf("invalid size format: %s", sizeStr)
 	}
 

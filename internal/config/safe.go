@@ -79,18 +79,21 @@ type SafeConfigBuilder struct {
 // SafeMode enables safe mode.
 func (scb *SafeConfigBuilder) SafeMode() *SafeConfigBuilder {
 	scb.safeMode = true
+
 	return scb
 }
 
 // DryRun enables dry-run mode.
 func (scb *SafeConfigBuilder) DryRun() *SafeConfigBuilder {
 	scb.dryRun = true
+
 	return scb
 }
 
 // Backup enables backup mode.
 func (scb *SafeConfigBuilder) Backup() *SafeConfigBuilder {
 	scb.backup = true
+
 	return scb
 }
 
@@ -144,23 +147,29 @@ type SafeProfileBuilder struct {
 }
 
 // AddOperation adds a safe operation.
-func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLevelType) *SafeProfileBuilder {
+func (spb *SafeProfileBuilder) AddOperation(
+	opType CleanType,
+	risk domain.RiskLevelType,
+) *SafeProfileBuilder {
 	if spb.err != nil {
 		return spb
 	}
 
 	if !opType.IsValid() {
 		spb.err = fmt.Errorf("invalid clean type: %s", opType)
+
 		return spb
 	}
 
 	if !risk.IsValid() {
 		spb.err = fmt.Errorf("invalid risk level: %s", risk)
+
 		return spb
 	}
 
 	if risk.IsHigherThan(domain.RiskLevelType(domain.RiskLevelHighType)) && spb.err == nil {
 		spb.err = errors.New("cannot add critical risk operation to profile")
+
 		return spb
 	}
 
@@ -183,16 +192,19 @@ func (spb *SafeProfileBuilder) AddOperation(opType CleanType, risk domain.RiskLe
 func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 	if spb.err != nil {
 		spb.config.err = spb.err
+
 		return spb.config
 	}
 
 	if len(spb.operations) == 0 {
 		spb.config.err = errors.New("profile must have at least one operation")
+
 		return spb.config
 	}
 
 	if spb.maxRisk.IsHigherThan(domain.RiskLevelType(domain.RiskLevelHighType)) {
 		spb.config.err = errors.New("profile risk level cannot exceed HIGH")
+
 		return spb.config
 	}
 

@@ -44,17 +44,20 @@ func (m *mockFileOperator) FindExecutableFiles(dir string) ([]string, error) {
 	}
 	// Otherwise, filter executables that belong to this directory
 	var result []string
+
 	for _, exec := range m.executables {
 		if filepath.Dir(exec) == dir {
 			result = append(result, exec)
 		}
 	}
+
 	return result, m.executablesErr
 }
 
 func (m *mockFileOperator) TrashFile(ctx context.Context, path string) error {
 	m.trashCallCount++
 	m.trashedFiles = append(m.trashedFiles, path)
+
 	return m.trashErr
 }
 
@@ -64,6 +67,7 @@ func (m *mockFileOperator) GetFileSize(path string) int64 {
 			return size
 		}
 	}
+
 	return 0
 }
 
@@ -94,10 +98,13 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				gomega.Expect(cleaner.excludeExtensions).To(gomega.Equal([]string{".sh"}))
 			})
 
-			ginkgo.It("should create cleaner with empty exclude extensions defaulting to .sh", func() {
-				cleaner = NewProjectExecutablesCleaner(false, false, []string{}, nil)
-				gomega.Expect(cleaner.excludeExtensions).To(gomega.Equal([]string{".sh"}))
-			})
+			ginkgo.It(
+				"should create cleaner with empty exclude extensions defaulting to .sh",
+				func() {
+					cleaner = NewProjectExecutablesCleaner(false, false, []string{}, nil)
+					gomega.Expect(cleaner.excludeExtensions).To(gomega.Equal([]string{".sh"}))
+				},
+			)
 		})
 
 		ginkgo.Context("with custom configuration", func() {
@@ -107,8 +114,14 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			})
 
 			ginkgo.It("should accept custom exclude patterns", func() {
-				cleaner = NewProjectExecutablesCleaner(false, false, nil, []string{"Makefile", "*.config"})
-				gomega.Expect(cleaner.excludePatterns).To(gomega.Equal([]string{"Makefile", "*.config"}))
+				cleaner = NewProjectExecutablesCleaner(
+					false,
+					false,
+					nil,
+					[]string{"Makefile", "*.config"},
+				)
+				gomega.Expect(cleaner.excludePatterns).
+					To(gomega.Equal([]string{"Makefile", "*.config"}))
 			})
 
 			ginkgo.It("should set verbose flag correctly", func() {
@@ -125,17 +138,33 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		ginkgo.Context("with functional options", func() {
 			ginkgo.It("should accept custom ProjectLister via option", func() {
 				mockLister.projects = []ProjectInfo{{Name: "test", Path: "/test"}}
-				cleaner = NewProjectExecutablesCleaner(false, false, nil, nil, WithProjectLister(mockLister))
+				cleaner = NewProjectExecutablesCleaner(
+					false,
+					false,
+					nil,
+					nil,
+					WithProjectLister(mockLister),
+				)
 				gomega.Expect(cleaner.projectLister).To(gomega.Equal(mockLister))
 			})
 
 			ginkgo.It("should accept custom FileOperator via option", func() {
-				cleaner = NewProjectExecutablesCleaner(false, false, nil, nil, WithFileOperator(mockOperator))
+				cleaner = NewProjectExecutablesCleaner(
+					false,
+					false,
+					nil,
+					nil,
+					WithFileOperator(mockOperator),
+				)
 				gomega.Expect(cleaner.fileOperator).To(gomega.Equal(mockOperator))
 			})
 
 			ginkgo.It("should accept both options together", func() {
-				cleaner = NewProjectExecutablesCleaner(true, true, []string{".sh"}, []string{"Makefile"},
+				cleaner = NewProjectExecutablesCleaner(
+					true,
+					true,
+					[]string{".sh"},
+					[]string{"Makefile"},
 					WithProjectLister(mockLister),
 					WithFileOperator(mockOperator),
 				)
@@ -217,7 +246,10 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			})
 		})
 
-		GinkgoValidateEmptySettingsContext(cleaner, "should return nil when ProjectExecutables is nil")
+		GinkgoValidateEmptySettingsContext(
+			cleaner,
+			"should return nil when ProjectExecutables is nil",
+		)
 
 		ginkgo.Context("with valid settings", func() {
 			ginkgo.It("should return nil for valid empty ProjectExecutablesSettings", func() {
@@ -320,7 +352,10 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				mockLister.projects = []ProjectInfo{
 					{Name: "project1", Path: "/path/to/project1"},
 				}
-				mockOperator.executables = []string{"/path/to/project1/binary1", "/path/to/project1/binary2"}
+				mockOperator.executables = []string{
+					"/path/to/project1/binary1",
+					"/path/to/project1/binary2",
+				}
 				mockOperator.fileSizes = map[string]int64{
 					"/path/to/project1/binary1": 1024,
 					"/path/to/project1/binary2": 2048,
@@ -338,7 +373,10 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				}
 				// First call returns project1 files, need to simulate per-project behavior
 				// For simplicity, we test with a single set of executables
-				mockOperator.executables = []string{"/path/to/project1/binary1", "/path/to/project2/binary2"}
+				mockOperator.executables = []string{
+					"/path/to/project1/binary1",
+					"/path/to/project2/binary2",
+				}
 				result := cleaner.Scan(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				gomega.Expect(result.Value()).To(gomega.HaveLen(2))
@@ -591,7 +629,12 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 	ginkgo.Describe("IsExcludedByPattern", func() {
 		ginkgo.BeforeEach(func() {
-			cleaner = NewProjectExecutablesCleaner(false, false, nil, []string{"Makefile", "*.config", "test_*"})
+			cleaner = NewProjectExecutablesCleaner(
+				false,
+				false,
+				nil,
+				[]string{"Makefile", "*.config", "test_*"},
+			)
 		})
 
 		ginkgo.It("should match exact filename pattern", func() {

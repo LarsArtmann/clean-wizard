@@ -19,6 +19,7 @@ const goEnvTimeout = 10 * time.Second
 // pathExists checks if a path exists.
 func (h *golangHelpers) pathExists(path string) bool {
 	_, err := os.Stat(path)
+
 	return err == nil
 }
 
@@ -34,12 +35,18 @@ func (h *golangHelpers) getGoEnv(ctx context.Context, key string) (string, error
 	defer cancel()
 
 	cmd := exec.CommandContext(timeoutCtx, "go", "env", key)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		// Check if it's a timeout error
-		if timeoutCtx.Err() == context.DeadlineExceeded {
-			return "", fmt.Errorf("go env %s timed out after %v (command may be hanging)", key, goEnvTimeout)
+		if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
+			return "", fmt.Errorf(
+				"go env %s timed out after %v (command may be hanging)",
+				key,
+				goEnvTimeout,
+			)
 		}
+
 		return "", fmt.Errorf("failed to get Go env %s: %w", key, err)
 	}
 
@@ -52,5 +59,6 @@ func (h *golangHelpers) getHomeDir() string {
 	if err != nil {
 		return ""
 	}
+
 	return home
 }

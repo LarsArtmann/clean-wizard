@@ -81,7 +81,12 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 	for name, profile := range cfg.Profiles {
 		if profile.Name == "" {
 			profile.Name = name
-			result.addChange(fmt.Sprintf("profiles.%s.name", name), "", profile.Name, "applied default profile name")
+			result.addChange(
+				fmt.Sprintf("profiles.%s.name", name),
+				"",
+				profile.Name,
+				"applied default profile name",
+			)
 		}
 
 		if profile.Description == "" {
@@ -98,7 +103,12 @@ func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *Sanitizatio
 			if op.Settings == nil {
 				opType := domain.GetOperationType(op.Name)
 				op.Settings = domain.DefaultSettings(opType)
-				result.addChange(fieldPrefix+".settings", nil, op.Settings, "initialized type-safe settings")
+				result.addChange(
+					fieldPrefix+".settings",
+					nil,
+					op.Settings,
+					"initialized type-safe settings",
+				)
 			}
 		}
 	}

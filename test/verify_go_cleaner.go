@@ -11,7 +11,8 @@ import (
 func main() {
 	ctx := context.Background()
 
-	if err := testhelper.GoCleanerTest(ctx, "Go Cache Cleaner Verification"); err != nil {
+	err := testhelper.GoCleanerTest(ctx, "Go Cache Cleaner Verification")
+	if err != nil {
 		fmt.Printf("❌ %v\n", err)
 		os.Exit(1)
 	}

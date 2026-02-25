@@ -136,12 +136,15 @@ func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidatio
 	if tsvr.MaxDiskUsage != nil {
 		copied.MaxDiskUsage = tsvr.copyNumericRule(tsvr.MaxDiskUsage)
 	}
+
 	if tsvr.MinProtectedPaths != nil {
 		copied.MinProtectedPaths = tsvr.copyNumericRule(tsvr.MinProtectedPaths)
 	}
+
 	if tsvr.MaxProfiles != nil {
 		copied.MaxProfiles = tsvr.copyNumericRule(tsvr.MaxProfiles)
 	}
+
 	if tsvr.MaxOperations != nil {
 		copied.MaxOperations = tsvr.copyNumericRule(tsvr.MaxOperations)
 	}
@@ -150,6 +153,7 @@ func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidatio
 	if tsvr.ProfileNamePattern != nil {
 		copied.ProfileNamePattern = tsvr.copyStringRule(tsvr.ProfileNamePattern)
 	}
+
 	if tsvr.PathPattern != nil {
 		copied.PathPattern = tsvr.copyStringRule(tsvr.PathPattern)
 	}
@@ -158,7 +162,9 @@ func (tsvr *TypeSafeValidationRules) GetTypeSafeSchemaRules() *TypeSafeValidatio
 }
 
 // Helper methods for deep copying.
-func (tsvr *TypeSafeValidationRules) copyNumericRule(rule *NumericValidationRule) *NumericValidationRule {
+func (tsvr *TypeSafeValidationRules) copyNumericRule(
+	rule *NumericValidationRule,
+) *NumericValidationRule {
 	copied := &NumericValidationRule{
 		Required: rule.Required,
 		Message:  rule.Message,
@@ -167,14 +173,18 @@ func (tsvr *TypeSafeValidationRules) copyNumericRule(rule *NumericValidationRule
 		min := *rule.Min
 		copied.Min = &min
 	}
+
 	if rule.Max != nil {
 		max := *rule.Max
 		copied.Max = &max
 	}
+
 	return copied
 }
 
-func (tsvr *TypeSafeValidationRules) copyStringRule(rule *StringValidationRule) *StringValidationRule {
+func (tsvr *TypeSafeValidationRules) copyStringRule(
+	rule *StringValidationRule,
+) *StringValidationRule {
 	return &StringValidationRule{
 		Required: rule.Required,
 		Pattern:  rule.Pattern,

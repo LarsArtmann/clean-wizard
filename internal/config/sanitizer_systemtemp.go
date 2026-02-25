@@ -38,11 +38,17 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(
 					Sanitized: path,
 					Reason:    "system temp path must be absolute: " + original,
 				})
+
 				continue // Skip processing invalid path
 			}
 
 			if original != path {
-				result.addChange(fmt.Sprintf("%s.paths[%d]", fieldPrefix, i), original, path, "sanitized system temp path")
+				result.addChange(
+					fmt.Sprintf("%s.paths[%d]", fieldPrefix, i),
+					original,
+					path,
+					"sanitized system temp path",
+				)
 			}
 
 			sanitizedPaths = append(sanitizedPaths, path)
@@ -52,6 +58,7 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(
 		if cs.rules.RemoveDuplicates {
 			sanitizedPaths = cs.removeDuplicates(sanitizedPaths)
 		}
+
 		if cs.rules.SortArrays {
 			cs.sortStrings(sanitizedPaths)
 		}

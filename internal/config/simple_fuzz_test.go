@@ -30,6 +30,7 @@ func FuzzBasicConfig(f *testing.F) {
 			if i > 1000 { // Prevent excessive loops
 				break
 			}
+
 			_ = char // Should not panic
 		}
 	})
@@ -47,7 +48,8 @@ func FuzzValidationLevelBasic(f *testing.F) {
 		_ = level.IsValid()
 
 		// Should handle extreme values gracefully
-		if int32(level) > int32(domain.ValidationLevelStrictType)+100 || int32(level) < int32(domain.ValidationLevelNoneType)-100 {
+		if int32(level) > int32(domain.ValidationLevelStrictType)+100 ||
+			int32(level) < int32(domain.ValidationLevelNoneType)-100 {
 			// Should still not panic
 			_ = level.IsValid()
 		}
@@ -93,6 +95,7 @@ func FuzzStringOperations(f *testing.F) {
 			if i > 100 { // Prevent excessive loops
 				break
 			}
+
 			_ = r // Should not panic on any unicode
 		}
 	})
@@ -138,6 +141,7 @@ func FuzzSliceOperations(f *testing.F) {
 			if i > 100 { // Prevent excessive loops
 				break
 			}
+
 			_ = r // Should not panic on any unicode
 		}
 	})

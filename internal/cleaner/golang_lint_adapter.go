@@ -38,6 +38,7 @@ func NewGolangciLintCleaner(verbose bool) *GolangciLintCleaner {
 // IsAvailable checks if golangci-lint is installed.
 func (glc *GolangciLintCleaner) IsAvailable(ctx context.Context) bool {
 	_, err := exec.LookPath("golangci-lint")
+
 	return err == nil
 }
 
@@ -47,9 +48,12 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 	if !glc.IsAvailable(ctx) {
 		if verbose {
 			fmt.Println("  ⚠️  golangci-lint not found, skipping cache cleanup")
-			fmt.Println("  💡 Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest")
+			fmt.Println(
+				"  💡 Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
+			)
 			fmt.Println("  💡 Learn more: https://golangci-lint.run/usage/install/")
 		}
+
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			domain.CleanStrategyType(domain.StrategyConservativeType),
 			0, int64(0),
@@ -59,24 +63,36 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 
 	// Calculate cache size before cleaning
 	var bytesFreed int64
+
 	cacheDir := glc.CacheDir()
 	if cacheDir != "" {
 		var cleanupErr error
+
 		bytesFreed, _, _ = CalculateBytesFreed(cacheDir, func() error {
 			// Create a timeout context to prevent hanging
 			timeoutCtx, cancel := context.WithTimeout(ctx, lintCommandTimeout)
 			defer cancel()
 
 			cmd := exec.CommandContext(timeoutCtx, "golangci-lint", "cache", "clean")
+
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				cleanupErr = err
 				// Check if it's a timeout error
-				if timeoutCtx.Err() == context.DeadlineExceeded {
-					return fmt.Errorf("golangci-lint cache clean timed out after %v (command may be hanging)", lintCommandTimeout)
+				if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
+					return fmt.Errorf(
+						"golangci-lint cache clean timed out after %v (command may be hanging)",
+						lintCommandTimeout,
+					)
 				}
-				return fmt.Errorf("golangci-lint cache clean failed: %w (output: %s)", err, string(output))
+
+				return fmt.Errorf(
+					"golangci-lint cache clean failed: %w (output: %s)",
+					err,
+					string(output),
+				)
 			}
+
 			return nil
 		}, verbose, "Cache")
 
@@ -93,15 +109,26 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 		defer cancel()
 
 		cmd := exec.CommandContext(timeoutCtx, "golangci-lint", "cache", "clean")
+
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			// Check if it's a timeout error
-			if timeoutCtx.Err() == context.DeadlineExceeded {
+			if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
 				return result.Err[domain.CleanResult](
-					fmt.Errorf("golangci-lint cache clean timed out after %v (command may be hanging)", lintCommandTimeout))
+					fmt.Errorf(
+						"golangci-lint cache clean timed out after %v (command may be hanging)",
+						lintCommandTimeout,
+					),
+				)
 			}
+
 			return result.Err[domain.CleanResult](
-				fmt.Errorf("golangci-lint cache clean failed: %w (output: %s)", err, string(output)))
+				fmt.Errorf(
+					"golangci-lint cache clean failed: %w (output: %s)",
+					err,
+					string(output),
+				),
+			)
 		}
 
 		if verbose {

@@ -12,6 +12,7 @@ func Size(bytes int64) string {
 	if bytes < 0 {
 		return "0 B"
 	}
+
 	return humanize.IBytes(uint64(bytes))
 }
 
@@ -20,15 +21,19 @@ func Duration(d time.Duration) string {
 	if d < time.Millisecond {
 		return fmt.Sprintf("%.0f ns", float64(d.Nanoseconds()))
 	}
+
 	if d < time.Second {
 		return fmt.Sprintf("%.1f ms", float64(d.Nanoseconds())/1e6)
 	}
+
 	if d < time.Minute {
 		return fmt.Sprintf("%.1f s", d.Seconds())
 	}
+
 	if d < time.Hour {
 		return fmt.Sprintf("%.1f m", d.Minutes())
 	}
+
 	return fmt.Sprintf("%.1f h", d.Hours())
 }
 
@@ -37,6 +42,7 @@ func Date(t time.Time) string {
 	if t.IsZero() {
 		return "never"
 	}
+
 	return t.Format("2006-01-02")
 }
 
@@ -45,6 +51,7 @@ func DateTime(t time.Time) string {
 	if t.IsZero() {
 		return "never"
 	}
+
 	return t.Format("2006-01-02 15:04:05")
 }
 

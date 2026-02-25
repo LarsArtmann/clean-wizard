@@ -26,7 +26,9 @@ func BenchmarkUnmarshalYAML_DockerPruneMode_String(b *testing.B) {
 	testCases := []string{"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS"}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
 		var result DockerPruneMode
+
 		yamlData := fmt.Sprintf(`"%s"`, tc)
+
 		return yaml.Unmarshal([]byte(yamlData), &result)
 	})
 }
@@ -36,7 +38,8 @@ func runUnmarshalIntBenchmark(b *testing.B, testCases []int, unmarshal func(int)
 	for _, tc := range testCases {
 		b.Run(strconv.Itoa(tc), func(b *testing.B) {
 			for range b.N {
-				if err := unmarshal(tc); err != nil {
+				err := unmarshal(tc)
+				if err != nil {
 					b.Fatal(err)
 				}
 			}
@@ -49,7 +52,8 @@ func runUnmarshalStringBenchmark(b *testing.B, testCases []string, unmarshal fun
 	for _, tc := range testCases {
 		b.Run(tc, func(b *testing.B) {
 			for range b.N {
-				if err := unmarshal(tc); err != nil {
+				err := unmarshal(tc)
+				if err != nil {
 					b.Fatal(err)
 				}
 			}
@@ -117,7 +121,9 @@ func BenchmarkUnmarshalYAML_DockerPruneMode_Int(b *testing.B) {
 	testCases := []int{0, 1, 2, 3, 4}
 	runUnmarshalIntBenchmark(b, testCases, func(tc int) error {
 		var result DockerPruneMode
+
 		yamlData := strconv.Itoa(tc)
+
 		return yaml.Unmarshal([]byte(yamlData), &result)
 	})
 }
@@ -140,7 +146,9 @@ func BenchmarkUnmarshalYAML_BuildToolType_String(b *testing.B) {
 	testCases := []string{"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA"}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
 		var result BuildToolType
+
 		yamlData := fmt.Sprintf(`"%s"`, tc)
+
 		return yaml.Unmarshal([]byte(yamlData), &result)
 	})
 }
@@ -162,10 +170,21 @@ func BenchmarkMarshalYAML_CacheType(b *testing.B) {
 
 // BenchmarkUnmarshalYAML_CacheType benchmarks unmarshaling CacheType enum.
 func BenchmarkUnmarshalYAML_CacheType_String(b *testing.B) {
-	testCases := []string{"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP", "NPM", "YARN", "CCACHE"}
+	testCases := []string{
+		"SPOTLIGHT",
+		"XCODE",
+		"COCOAPODS",
+		"HOMEBREW",
+		"PIP",
+		"NPM",
+		"YARN",
+		"CCACHE",
+	}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
 		var result CacheType
+
 		yamlData := fmt.Sprintf(`"%s"`, tc)
+
 		return yaml.Unmarshal([]byte(yamlData), &result)
 	})
 }
@@ -186,7 +205,9 @@ func BenchmarkUnmarshalYAML_PackageManagerType_String(b *testing.B) {
 	testCases := []string{"NPM", "PNPM", "YARN", "BUN"}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
 		var result PackageManagerType
+
 		yamlData := fmt.Sprintf(`"%s"`, tc)
+
 		return yaml.Unmarshal([]byte(yamlData), &result)
 	})
 }
@@ -202,7 +223,9 @@ func BenchmarkUnmarshalYAML_CacheCleanupMode_String(b *testing.B) {
 	testCases := []string{"DISABLED", "ENABLED"}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
 		var result CacheCleanupMode
+
 		yamlData := fmt.Sprintf(`"%s"`, tc)
+
 		return yaml.Unmarshal([]byte(yamlData), &result)
 	})
 }
@@ -212,7 +235,9 @@ func BenchmarkUnmarshalYAML_CacheCleanupMode_Int(b *testing.B) {
 	testCases := []int{0, 1}
 	runUnmarshalIntBenchmark(b, testCases, func(tc int) error {
 		var result CacheCleanupMode
+
 		yamlData := strconv.Itoa(tc)
+
 		return yaml.Unmarshal([]byte(yamlData), &result)
 	})
 }
@@ -318,7 +343,8 @@ profiles:
 
 	for b.Loop() {
 		var config Config
-		if err := yaml.Unmarshal([]byte(yamlConfig), &config); err != nil {
+		err := yaml.Unmarshal([]byte(yamlConfig), &config)
+		if err != nil {
 			b.Fatal(err)
 		}
 	}
@@ -441,7 +467,8 @@ func BenchmarkEnumIsValid_DockerPruneMode(b *testing.B) {
 func benchmarkYAMLDecodeRaw[T any](b *testing.B, data []byte) {
 	var result T
 	for b.Loop() {
-		if err := yaml.Unmarshal(data, &result); err != nil {
+		err := yaml.Unmarshal(data, &result)
+		if err != nil {
 			b.Fatal(err)
 		}
 	}
@@ -460,12 +487,15 @@ func BenchmarkYAMLDecodeRaw_String(b *testing.B) {
 // benchmarkNodeDecode runs a benchmark for yaml.Node.Decode into type T.
 func benchmarkNodeDecode[T any](b *testing.B, yamlData string) {
 	node := &yaml.Node{}
-	if err := yaml.Unmarshal([]byte(yamlData), node); err != nil {
+	err := yaml.Unmarshal([]byte(yamlData), node)
+	if err != nil {
 		b.Fatal(err)
 	}
+
 	var result T
 	for b.Loop() {
-		if err := node.Decode(&result); err != nil {
+		err := node.Decode(&result)
+		if err != nil {
 			b.Fatal(err)
 		}
 	}
@@ -528,7 +558,8 @@ func BenchmarkBufferWrite_Config(b *testing.B) {
 
 	for b.Loop() {
 		var buf bytes.Buffer
-		if err := yaml.NewEncoder(&buf).Encode(config); err != nil {
+		err := yaml.NewEncoder(&buf).Encode(config)
+		if err != nil {
 			b.Fatal(err)
 		}
 	}

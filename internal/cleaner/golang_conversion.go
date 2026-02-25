@@ -15,15 +15,19 @@ func toGoCacheType(settings *domain.GoPackagesSettings) GoCacheType {
 	if settings.CleanCache.IsEnabled() {
 		cacheType |= GoCacheGOCACHE
 	}
+
 	if settings.CleanTestCache.IsEnabled() {
 		cacheType |= GoCacheTestCache
 	}
+
 	if settings.CleanModCache.IsEnabled() {
 		cacheType |= GoCacheModCache
 	}
+
 	if settings.CleanBuildCache.IsEnabled() {
 		cacheType |= GoCacheBuildCache
 	}
+
 	if settings.CleanLintCache.IsEnabled() {
 		cacheType |= GoCacheLintCache
 	}
@@ -32,11 +36,14 @@ func toGoCacheType(settings *domain.GoPackagesSettings) GoCacheType {
 }
 
 // fromGoCacheType converts GoCacheType back to individual bools for backward compatibility.
-func fromGoCacheType(cacheType GoCacheType) (cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache bool) {
+func fromGoCacheType(
+	cacheType GoCacheType,
+) (cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache bool) {
 	cleanCache = cacheType.Has(GoCacheGOCACHE)
 	cleanTestCache = cacheType.Has(GoCacheTestCache)
 	cleanModCache = cacheType.Has(GoCacheModCache)
 	cleanBuildCache = cacheType.Has(GoCacheBuildCache)
 	cleanLintCache = cacheType.Has(GoCacheLintCache)
+
 	return cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache
 }

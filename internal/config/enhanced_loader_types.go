@@ -130,6 +130,7 @@ func WithRetryPolicy(policy *RetryPolicy) func(*EnhancedConfigLoader) {
 		if policy == nil {
 			return
 		}
+
 		ecl.retryPolicy = policy
 	}
 }

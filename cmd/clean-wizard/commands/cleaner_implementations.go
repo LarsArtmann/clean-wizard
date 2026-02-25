@@ -11,12 +11,18 @@ import (
 )
 
 // runCleaner runs a specific cleaner and returns the result.
-func runCleaner(ctx context.Context, cleanerType CleanerType, dryRun, verbose bool) (domain.CleanResult, error) {
+func runCleaner(
+	ctx context.Context,
+	cleanerType CleanerType,
+	dryRun, verbose bool,
+) (domain.CleanResult, error) {
 	name := getCleanerName(cleanerType)
 	_ = name // Avoid unused variable warning
 
-	var result domain.CleanResult
-	var err error
+	var (
+		result domain.CleanResult
+		err    error
+	)
 
 	switch cleanerType {
 	case CleanerTypeNix:
@@ -72,7 +78,13 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 
 // runHomebrewCleaner executes the Homebrew cleaner.
 func runHomebrewCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runCleanerWithConfig[domain.HomebrewMode](ctx, verbose, dryRun, homebrewCleanerFactory, domain.HomebrewModeAll)
+	return runCleanerWithConfig[domain.HomebrewMode](
+		ctx,
+		verbose,
+		dryRun,
+		homebrewCleanerFactory,
+		domain.HomebrewModeAll,
+	)
 }
 
 // runTempFilesCleaner executes the TempFiles cleaner.
@@ -80,9 +92,14 @@ func runTempFilesCleaner(ctx context.Context, dryRun, verbose bool) (domain.Clea
 	defaultTempPaths := []string{filepath.Join("/", "tmp")}
 	defaultExcludes := []string{}
 
-	return runGenericCleanerWithError(ctx, verbose, dryRun, func(v, d bool) (cleaner.Cleaner, error) {
-		return cleaner.NewTempFilesCleaner(v, d, "7d", defaultExcludes, defaultTempPaths)
-	})
+	return runGenericCleanerWithError(
+		ctx,
+		verbose,
+		dryRun,
+		func(v, d bool) (cleaner.Cleaner, error) {
+			return cleaner.NewTempFilesCleaner(v, d, "7d", defaultExcludes, defaultTempPaths)
+		},
+	)
 }
 
 // runGenericCleaner executes a cleaner using a factory function.
@@ -170,16 +187,27 @@ func nodeManagerFactory(v, d bool, managers []domain.PackageManagerType) cleaner
 }
 
 // runNodePackageManagerCleaner executes the Node package manager cleaner.
-func runNodePackageManagerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
+func runNodePackageManagerCleaner(
+	ctx context.Context,
+	dryRun, verbose bool,
+) (domain.CleanResult, error) {
 	return runCleanerWithNodeManagers(ctx, verbose, dryRun, cleaner.AvailableNodePackageManagers())
 }
 
 // runGoCleaner executes the Go cleaner.
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleanerWithError(ctx, verbose, dryRun, func(v, d bool) (cleaner.Cleaner, error) {
-		return cleaner.NewGoCleaner(v, d,
-			cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheModCache|cleaner.GoCacheBuildCache)
-	})
+	return runGenericCleanerWithError(
+		ctx,
+		verbose,
+		dryRun,
+		func(v, d bool) (cleaner.Cleaner, error) {
+			return cleaner.NewGoCleaner(
+				v,
+				d,
+				cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache|cleaner.GoCacheModCache|cleaner.GoCacheBuildCache,
+			)
+		},
+	)
 }
 
 // runCargoCleaner executes the Cargo cleaner.
@@ -191,33 +219,62 @@ func runCargoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanRes
 
 // runBuildCacheCleaner executes the Build Cache cleaner.
 func runBuildCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleanerWithError(ctx, verbose, dryRun, func(v, d bool) (cleaner.Cleaner, error) {
-		return cleaner.NewBuildCacheCleaner(v, d, "30d", []string{}, []string{})
-	})
+	return runGenericCleanerWithError(
+		ctx,
+		verbose,
+		dryRun,
+		func(v, d bool) (cleaner.Cleaner, error) {
+			return cleaner.NewBuildCacheCleaner(v, d, "30d", []string{}, []string{})
+		},
+	)
 }
 
 // runDockerCleaner executes the Docker cleaner.
 func runDockerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runCleanerWithConfig[domain.DockerPruneMode](ctx, verbose, dryRun, dockerCleanerFactory, domain.DockerPruneAll)
+	return runCleanerWithConfig[domain.DockerPruneMode](
+		ctx,
+		verbose,
+		dryRun,
+		dockerCleanerFactory,
+		domain.DockerPruneAll,
+	)
 }
 
 // runSystemCacheCleaner executes the System Cache cleaner.
 func runSystemCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runGenericCleanerWithError(ctx, verbose, dryRun, func(v, d bool) (cleaner.Cleaner, error) {
-		return cleaner.NewSystemCacheCleaner(v, d, "30d", nil)
-	})
+	return runGenericCleanerWithError(
+		ctx,
+		verbose,
+		dryRun,
+		func(v, d bool) (cleaner.Cleaner, error) {
+			return cleaner.NewSystemCacheCleaner(v, d, "30d", nil)
+		},
+	)
 }
 
 // runProjectsManagementAutomationCleaner executes Projects Management Automation cleaner.
-func runProjectsManagementAutomationCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
+func runProjectsManagementAutomationCleaner(
+	ctx context.Context,
+	dryRun, verbose bool,
+) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
 		return cleaner.NewProjectsManagementAutomationCleaner(v, d)
 	})
 }
 
 // runCompiledBinariesCleaner executes the Compiled Binaries cleaner.
-func runCompiledBinariesCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
+func runCompiledBinariesCleaner(
+	ctx context.Context,
+	dryRun, verbose bool,
+) (domain.CleanResult, error) {
 	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return cleaner.NewCompiledBinariesCleaner(v, d, cleaner.DefaultMinSizeMB, cleaner.DefaultOlderThan, nil, []string{})
+		return cleaner.NewCompiledBinariesCleaner(
+			v,
+			d,
+			cleaner.DefaultMinSizeMB,
+			cleaner.DefaultOlderThan,
+			nil,
+			[]string{},
+		)
 	})
 }

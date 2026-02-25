@@ -22,7 +22,12 @@ func assertValidationError(
 
 // availableItemsTestHelper is a helper function for testing Available* functions.
 // This is called by type-specific test wrappers.
-func availableItemsTestHelper[T comparable](t *testing.T, expectedItems []T, availableFn func() []T, testName string) {
+func availableItemsTestHelper[T comparable](
+	t *testing.T,
+	expectedItems []T,
+	availableFn func() []T,
+	testName string,
+) {
 	items := availableFn()
 
 	if len(items) != len(expectedItems) {
@@ -75,11 +80,17 @@ type VerboseDryRunCleaner interface {
 //	if cleaner != nil {
 //		assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
 //	}
-func assertCleanerBooleanFields(t *testing.T, cleaner VerboseDryRunCleaner, wantVerbose, wantDryRun bool) {
+func assertCleanerBooleanFields(
+	t *testing.T,
+	cleaner VerboseDryRunCleaner,
+	wantVerbose, wantDryRun bool,
+) {
 	t.Helper()
+
 	if got := cleaner.GetVerbose(); got != wantVerbose {
 		t.Errorf("verbose = %v, want %v", got, wantVerbose)
 	}
+
 	if got := cleaner.GetDryRun(); got != wantDryRun {
 		t.Errorf("dryRun = %v, want %v", got, wantDryRun)
 	}
@@ -108,6 +119,7 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 					if enabled {
 						cleanupMode = domain.CacheCleanupEnabled
 					}
+
 					return &domain.OperationSettings{
 						CargoPackages: &domain.CargoPackagesSettings{
 							Autoclean: cleanupMode,
@@ -123,12 +135,15 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				ToolName:          "projects-management-automation",
 				SettingsFieldName: "projects management automation",
 				ExpectedItems:     1,
-				Constructor:       NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
+				Constructor: NewBooleanSettingsCleanerTestConstructor(
+					NewProjectsManagementAutomationCleaner,
+				),
 				CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
 					cleanupMode := domain.CacheCleanupDisabled
 					if enabled {
 						cleanupMode = domain.CacheCleanupEnabled
 					}
+
 					return &domain.OperationSettings{
 						ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
 							ClearCache: cleanupMode,

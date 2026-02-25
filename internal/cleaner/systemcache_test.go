@@ -51,6 +51,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewSystemCacheCleaner() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
@@ -153,8 +154,11 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 			name: "mixed valid and invalid caches",
 			settings: &domain.OperationSettings{
 				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []domain.CacheType{domain.CacheTypeSpotlight, 99}, // Mixed valid and invalid
-					OlderThan:  "30d",
+					CacheTypes: []domain.CacheType{
+						domain.CacheTypeSpotlight,
+						99,
+					}, // Mixed valid and invalid
+					OlderThan: "30d",
 				},
 			},
 			wantErr: true,
@@ -185,6 +189,7 @@ func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 	// Skip test if not on macOS
 	if !cleaner.IsAvailable(context.Background()) {
 		t.Skipf("Skipping test: SystemCacheCleaner only available on macOS")
+
 		return
 	}
 
@@ -201,7 +206,11 @@ func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 	}
 
 	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
+		t.Errorf(
+			"Clean() strategy = %v, want %v",
+			cleanResult.Strategy,
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+		)
 	}
 
 	if cleanResult.FreedBytes == 0 {
@@ -276,7 +285,11 @@ func TestSystemCacheCleaner_ParseDuration(t *testing.T) {
 			cleaner, err := NewSystemCacheCleaner(false, false, tt.duration, nil)
 
 			if tt.wantValid && err != nil {
-				t.Errorf("NewSystemCacheCleaner() with duration %s should succeed, got error: %v", tt.duration, err)
+				t.Errorf(
+					"NewSystemCacheCleaner() with duration %s should succeed, got error: %v",
+					tt.duration,
+					err,
+				)
 			}
 
 			if !tt.wantValid && err == nil {

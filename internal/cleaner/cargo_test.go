@@ -70,6 +70,7 @@ func TestCargoCleaner_GetDirModTime(t *testing.T) {
 
 	// Test with temp directory
 	tmpDir := t.TempDir()
+
 	modTime = GetDirModTime(tmpDir)
 	if modTime.IsZero() {
 		t.Error("GetDirModTime() for temp dir returned zero time")
@@ -94,7 +95,6 @@ func TestCargoCleaner_HasCargoCacheTool(t *testing.T) {
 func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
 	// This test would fail if Cargo is installed
 	// We just verify the error handling logic exists
-
 	cleaner := NewCargoCleaner(false, false)
 
 	// Can't easily test "Cargo not available" case without mocking
@@ -111,6 +111,7 @@ func TestCargoCleaner_Scan(t *testing.T) {
 
 	// Test scan with CARGO_HOME set
 	t.Setenv("CARGO_HOME", "/test/cargo")
+
 	result := cleaner.Scan(context.Background())
 
 	if result.IsErr() {

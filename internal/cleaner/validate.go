@@ -10,13 +10,18 @@ func formatValidItems(validItems map[string]bool) string {
 	for item := range validItems {
 		items = append(items, item)
 	}
+
 	return fmt.Sprintf("%v", items)
 }
 
 // validateSettings validates that all string items in the slice are valid types.
 // It returns an error if any item is not in the validItems map.
 // The error message includes full context of invalid items and valid options.
-func validateSettings(items []string, validItems map[string]bool, itemName, validValuesDescription string) error {
+func validateSettings(
+	items []string,
+	validItems map[string]bool,
+	itemName, validValuesDescription string,
+) error {
 	for i, item := range items {
 		if !validItems[item] {
 			return fmt.Errorf(
@@ -29,6 +34,7 @@ func validateSettings(items []string, validItems map[string]bool, itemName, vali
 			)
 		}
 	}
+
 	return nil
 }
 
@@ -38,5 +44,6 @@ func toStringMap[T ~string](items []T) map[string]bool {
 	for _, item := range items {
 		result[string(item)] = true
 	}
+
 	return result
 }

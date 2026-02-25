@@ -8,23 +8,30 @@ import (
 )
 
 // cacheTypeFromBools converts old boolean parameters to GoCacheType enum.
-func cacheTypeFromBools(cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache bool) GoCacheType {
+func cacheTypeFromBools(
+	cleanCache, cleanTestCache, cleanModCache, cleanBuildCache, cleanLintCache bool,
+) GoCacheType {
 	var caches GoCacheType
 	if cleanCache {
 		caches |= GoCacheGOCACHE
 	}
+
 	if cleanTestCache {
 		caches |= GoCacheTestCache
 	}
+
 	if cleanModCache {
 		caches |= GoCacheModCache
 	}
+
 	if cleanBuildCache {
 		caches |= GoCacheBuildCache
 	}
+
 	if cleanLintCache {
 		caches |= GoCacheLintCache
 	}
+
 	return caches
 }
 
@@ -73,8 +80,17 @@ func TestNewGoCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleanerWithSettings(tt.verbose, tt.dryRun,
-				cacheTypeFromBools(tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, tt.cleanLintCache))
+			cleaner := NewGoCleanerWithSettings(
+				tt.verbose,
+				tt.dryRun,
+				cacheTypeFromBools(
+					tt.cleanCache,
+					tt.cleanTestCache,
+					tt.cleanModCache,
+					tt.cleanBuildCache,
+					tt.cleanLintCache,
+				),
+			)
 
 			if cleaner == nil {
 				t.Fatal("NewGoCleaner() returned nil cleaner")
@@ -89,26 +105,46 @@ func TestNewGoCleaner(t *testing.T) {
 			}
 
 			if cleaner.config.Caches.Has(GoCacheGOCACHE) != tt.cleanCache {
-				t.Errorf("cleanCache = %v, want %v", cleaner.config.Caches.Has(GoCacheGOCACHE), tt.cleanCache)
+				t.Errorf(
+					"cleanCache = %v, want %v",
+					cleaner.config.Caches.Has(GoCacheGOCACHE),
+					tt.cleanCache,
+				)
 			}
 
 			if cleaner.config.Caches.Has(GoCacheTestCache) != tt.cleanTestCache {
-				t.Errorf("cleanTestCache = %v, want %v", cleaner.config.Caches.Has(GoCacheTestCache), tt.cleanTestCache)
+				t.Errorf(
+					"cleanTestCache = %v, want %v",
+					cleaner.config.Caches.Has(GoCacheTestCache),
+					tt.cleanTestCache,
+				)
 			}
 
 			if cleaner.config.Caches.Has(GoCacheModCache) != tt.cleanModCache {
-				t.Errorf("cleanModCache = %v, want %v", cleaner.config.Caches.Has(GoCacheModCache), tt.cleanModCache)
+				t.Errorf(
+					"cleanModCache = %v, want %v",
+					cleaner.config.Caches.Has(GoCacheModCache),
+					tt.cleanModCache,
+				)
 			}
 
 			if cleaner.config.Caches.Has(GoCacheBuildCache) != tt.cleanBuildCache {
-				t.Errorf("cleanBuildCache = %v, want %v", cleaner.config.Caches.Has(GoCacheBuildCache), tt.cleanBuildCache)
+				t.Errorf(
+					"cleanBuildCache = %v, want %v",
+					cleaner.config.Caches.Has(GoCacheBuildCache),
+					tt.cleanBuildCache,
+				)
 			}
 		})
 	}
 }
 
 func TestGoCleaner_Type(t *testing.T) {
-	cleaner := NewGoCleanerWithSettings(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
+	cleaner := NewGoCleanerWithSettings(
+		false,
+		false,
+		GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache,
+	)
 
 	if cleaner.Type() != domain.OperationTypeGoPackages {
 		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeGoPackages)
@@ -116,7 +152,11 @@ func TestGoCleaner_Type(t *testing.T) {
 }
 
 func TestGoCleaner_IsAvailable(t *testing.T) {
-	cleaner := NewGoCleanerWithSettings(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
+	cleaner := NewGoCleanerWithSettings(
+		false,
+		false,
+		GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache,
+	)
 	available := cleaner.IsAvailable(context.Background())
 
 	// Result depends on Go installation
@@ -182,7 +222,11 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleanerWithSettings(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
+			cleaner := NewGoCleanerWithSettings(
+				false,
+				false,
+				GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache,
+			)
 
 			err := cleaner.ValidateSettings(tt.settings)
 			if (err != nil) != tt.wantErr {
@@ -238,8 +282,17 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner := NewGoCleanerWithSettings(false, true,
-				cacheTypeFromBools(tt.cleanCache, tt.cleanTestCache, tt.cleanModCache, tt.cleanBuildCache, false))
+			cleaner := NewGoCleanerWithSettings(
+				false,
+				true,
+				cacheTypeFromBools(
+					tt.cleanCache,
+					tt.cleanTestCache,
+					tt.cleanModCache,
+					tt.cleanBuildCache,
+					false,
+				),
+			)
 
 			result := cleaner.Clean(context.Background())
 			if result.IsErr() {
@@ -251,17 +304,29 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 			if tt.wantExactItems > 0 || tt.wantMinItems == 0 {
 				// Exact match required (for "no caches" case)
 				if cleanResult.ItemsRemoved != tt.wantExactItems {
-					t.Errorf("Clean() removed %d items, want %d", cleanResult.ItemsRemoved, tt.wantExactItems)
+					t.Errorf(
+						"Clean() removed %d items, want %d",
+						cleanResult.ItemsRemoved,
+						tt.wantExactItems,
+					)
 				}
 			} else {
 				// Minimum match (actual depends on what caches exist on system)
 				if cleanResult.ItemsRemoved < tt.wantMinItems {
-					t.Errorf("Clean() removed %d items, want at least %d", cleanResult.ItemsRemoved, tt.wantMinItems)
+					t.Errorf(
+						"Clean() removed %d items, want at least %d",
+						cleanResult.ItemsRemoved,
+						tt.wantMinItems,
+					)
 				}
 			}
 
 			if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
-				t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
+				t.Errorf(
+					"Clean() strategy = %v, want %v",
+					cleanResult.Strategy,
+					domain.CleanStrategyType(domain.StrategyDryRunType),
+				)
 			}
 
 			if cleanResult.FreedBytes == 0 && cleanResult.ItemsRemoved > 0 {
@@ -274,8 +339,11 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 func TestGoCleaner_Clean_NoAvailable(t *testing.T) {
 	// This test would fail if Go is installed
 	// We just verify the error handling logic
-
-	cleaner := NewGoCleanerWithSettings(false, false, GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache)
+	cleaner := NewGoCleanerWithSettings(
+		false,
+		false,
+		GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache,
+	)
 
 	// Can't easily test "Go not available" case without mocking
 	// So we just verify IsAvailable is called
@@ -283,7 +351,11 @@ func TestGoCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestGoCleaner_DryRunStrategy(t *testing.T) {
-	cleaner := NewGoCleanerWithSettings(false, true, cacheTypeFromBools(true, true, true, true, true))
+	cleaner := NewGoCleanerWithSettings(
+		false,
+		true,
+		cacheTypeFromBools(true, true, true, true, true),
+	)
 
 	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "go")
 }
@@ -294,7 +366,11 @@ func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {
 	result := lintCleaner.Clean(context.Background())
 	if result.IsErr() {
 		// golangci-lint might not be installed, which is acceptable
-		t.Logf("lintCleaner.Clean() returned error (golangci-lint may not be installed): %v", result.Error())
+		t.Logf(
+			"lintCleaner.Clean() returned error (golangci-lint may not be installed): %v",
+			result.Error(),
+		)
+
 		return
 	}
 

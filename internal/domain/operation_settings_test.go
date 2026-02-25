@@ -34,6 +34,7 @@ func TestDefaultSettingsValidation(t *testing.T) {
 
 	// Test that a custom type returns empty settings without panic
 	customType := OperationType("custom-operation")
+
 	settings := DefaultSettings(customType)
 	if settings == nil {
 		t.Fatal("DefaultSettings(custom) returned nil")

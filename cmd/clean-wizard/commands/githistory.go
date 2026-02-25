@@ -74,11 +74,21 @@ Examples:
 			if len(args) > 0 {
 				path = args[0]
 			}
+
 			if scanPath != "" {
 				path = scanPath
 			}
 
-			return runGitHistoryWizard(path, dryRun, verbose, minSizeMB, maxFiles, force, createBackup, scanAllProjects)
+			return runGitHistoryWizard(
+				path,
+				dryRun,
+				verbose,
+				minSizeMB,
+				maxFiles,
+				force,
+				createBackup,
+				scanAllProjects,
+			)
 		},
 	}
 
@@ -86,10 +96,12 @@ Examples:
 	cmd.Flags().BoolVar(&verbose, "verbose", false, "Show detailed output")
 	cmd.Flags().IntVar(&minSizeMB, "min-size", 1, "Minimum file size in MB to consider")
 	cmd.Flags().IntVar(&maxFiles, "max-files", 100, "Maximum number of files to display")
-	cmd.Flags().StringVar(&scanPath, "path", "", "Path to git repository (default: current directory)")
+	cmd.Flags().
+		StringVar(&scanPath, "path", "", "Path to git repository (default: current directory)")
 	cmd.Flags().BoolVar(&force, "force", false, "Skip confirmation prompts (dangerous)")
 	cmd.Flags().BoolVar(&createBackup, "backup", true, "Create backup before rewriting")
-	cmd.Flags().BoolVar(&scanAllProjects, "scan-all-projects", false, "Scan all projects under ~/projects")
+	cmd.Flags().
+		BoolVar(&scanAllProjects, "scan-all-projects", false, "Scan all projects under ~/projects")
 
 	return cmd
 }
@@ -108,12 +120,14 @@ func runGitHistoryWizard(
 
 	// Step 1: Select repositories
 	var repos []string
+
 	if scanAllProjects {
 		homeDir, _ := os.UserHomeDir()
 		projectsPath := filepath.Join(homeDir, "projects")
 		fmt.Printf("📁 Scanning for git repositories in %s...\n", projectsPath)
 
 		var err error
+
 		repos, err = cleaner.FindGitRepositories(projectsPath, 3)
 		if err != nil {
 			return fmt.Errorf("failed to find repositories: %w", err)
@@ -128,6 +142,7 @@ func runGitHistoryWizard(
 		// Let user select which repos to clean
 		if !force {
 			var selectedRepos []string
+
 			form := huh.NewForm(
 				huh.NewGroup(
 					huh.NewMultiSelect[string]().
@@ -138,14 +153,17 @@ func runGitHistoryWizard(
 							for i, repo := range repos {
 								opts[i] = huh.NewOption(filepath.Base(repo)+" ("+repo+")", repo)
 							}
+
 							return opts
 						}()...).
 						Value(&selectedRepos),
 				),
 			)
-			if err := form.Run(); err != nil {
+			err := form.Run()
+			if err != nil {
 				return fmt.Errorf("selection error: %w", err)
 			}
+
 			repos = selectedRepos
 		}
 	} else {
@@ -156,8 +174,19 @@ func runGitHistoryWizard(
 
 	// Process each repository
 	for _, repoPath := range repos {
-		if err := processRepository(ctx, repoPath, dryRun, verbose, minSizeMB, maxFiles, force, createBackup); err != nil {
+		err := processRepository(
+			ctx,
+			repoPath,
+			dryRun,
+			verbose,
+			minSizeMB,
+			maxFiles,
+			force,
+			createBackup,
+		)
+		if err != nil {
 			fmt.Printf("❌ Error processing %s: %v\n\n", repoPath, err)
+
 			continue
 		}
 	}
@@ -192,15 +221,19 @@ func processRepository(
 
 	// Run safety checks
 	fmt.Print("🔒 Running safety checks... ")
+
 	safetyReport := c.GetSafetyReport(ctx)
 
 	if len(safetyReport.Blockers) > 0 {
 		fmt.Println(warningStyle.Render("BLOCKED"))
+
 		for _, blocker := range safetyReport.Blockers {
 			fmt.Printf("   ❌ %s\n", blocker)
 		}
+
 		return errors.New("safety checks failed")
 	}
+
 	fmt.Println(successStyle.Render("PASSED"))
 
 	// Show warnings
@@ -212,6 +245,7 @@ func processRepository(
 
 	// Scan for binary files
 	fmt.Print("🔍 Scanning git history for binary files... ")
+
 	scanResult, err := c.GetScanResult(ctx)
 	if err != nil {
 		return fmt.Errorf("scan failed: %w", err)
@@ -219,9 +253,19 @@ func processRepository(
 
 	if len(scanResult.Files) == 0 {
 		fmt.Println(successStyle.Render("No large binaries found!"))
+
 		return nil
 	}
-	fmt.Println(successStyle.Render(fmt.Sprintf("Found %d file(s) (%s)", len(scanResult.Files), format.Bytes(scanResult.TotalBytes))))
+
+	fmt.Println(
+		successStyle.Render(
+			fmt.Sprintf(
+				"Found %d file(s) (%s)",
+				len(scanResult.Files),
+				format.Bytes(scanResult.TotalBytes),
+			),
+		),
+	)
 
 	// Step 2: Show found files and let user select
 	selectedFiles, err := selectFilesToClean(scanResult.Files, force)
@@ -231,6 +275,7 @@ func processRepository(
 
 	if len(selectedFiles) == 0 {
 		fmt.Println("❌ No files selected. Nothing to do.")
+
 		return nil
 	}
 
@@ -252,11 +297,13 @@ func processRepository(
 	fmt.Printf("   Repository:      %s\n", repoPath)
 	fmt.Printf("   Files to remove: %d\n", len(selectedFiles))
 	fmt.Printf("   Total size:      %s\n", format.Bytes(selectedSize))
+
 	if impact != nil {
 		fmt.Printf("   Current size:    %.1f MB\n", impact.CurrentRepoSizeMB)
 		fmt.Printf("   Estimated new:   %.1f MB\n", impact.EstimatedNewSizeMB)
 		fmt.Printf("   Space saved:     %.1f MB\n", impact.SpaceReclaimedMB)
 	}
+
 	fmt.Println()
 
 	if dryRun {
@@ -268,6 +315,7 @@ func processRepository(
 	if !force && !dryRun {
 		if !confirmAction(repoPath, len(selectedFiles), selectedSize, safetyReport) {
 			fmt.Println("❌ Cancelled. No changes made.")
+
 			return nil
 		}
 	}
@@ -276,6 +324,7 @@ func processRepository(
 	c.SetSelectedFiles(selectedFiles)
 
 	fmt.Println("\n🧹 Starting cleanup...")
+
 	result := c.Clean(ctx)
 
 	if result.IsErr() {
@@ -284,6 +333,7 @@ func processRepository(
 
 	// Show results
 	cleanResult := result.Value()
+
 	fmt.Println()
 	fmt.Println(successStyle.Render("✅ Cleanup completed!"))
 	fmt.Printf("   Files processed: %d\n", cleanResult.ItemsRemoved)
@@ -298,10 +348,15 @@ func processRepository(
 		fmt.Println(infoStyle.Render("💡 Run without --dry-run to actually remove files"))
 	} else {
 		fmt.Println()
+
 		if safetyReport.HasRemote {
 			fmt.Println(warningStyle.Render("⚠️  Next steps:"))
 			fmt.Println("   1. Verify the repository is in good state")
-			fmt.Printf("   2. Force push: git push --force-with-lease %s %s\n", safetyReport.RemoteName, safetyReport.CurrentBranch)
+			fmt.Printf(
+				"   2. Force push: git push --force-with-lease %s %s\n",
+				safetyReport.RemoteName,
+				safetyReport.CurrentBranch,
+			)
 			fmt.Println("   3. Notify team members to reclone or reset")
 		}
 	}
@@ -310,7 +365,10 @@ func processRepository(
 }
 
 // selectFilesToClean shows an interactive multi-select for files.
-func selectFilesToClean(files []domain.GitHistoryFile, force bool) ([]domain.GitHistoryFile, error) {
+func selectFilesToClean(
+	files []domain.GitHistoryFile,
+	force bool,
+) ([]domain.GitHistoryFile, error) {
 	if force {
 		// In force mode, select all files
 		return files, nil
@@ -323,6 +381,7 @@ func selectFilesToClean(files []domain.GitHistoryFile, force bool) ([]domain.Git
 		} else if a.SizeBytes < b.SizeBytes {
 			return 1
 		}
+
 		return 0
 	})
 
@@ -333,12 +392,14 @@ func selectFilesToClean(files []domain.GitHistoryFile, force bool) ([]domain.Git
 	}
 
 	var selectedIndices []int
+
 	options := make([]huh.Option[int], len(files))
 	for i, f := range files {
 		status := ""
 		if f.IsDeleted {
 			status = " [deleted in HEAD]"
 		}
+
 		label := fmt.Sprintf("%s (%.1f MB)%s",
 			f.Path, f.SizeMB(), status)
 		options[i] = huh.NewOption(label, i)
@@ -355,7 +416,8 @@ func selectFilesToClean(files []domain.GitHistoryFile, force bool) ([]domain.Git
 		),
 	)
 
-	if err := form.Run(); err != nil {
+	err := form.Run()
+	if err != nil {
 		return nil, err
 	}
 
@@ -369,11 +431,18 @@ func selectFilesToClean(files []domain.GitHistoryFile, force bool) ([]domain.Git
 }
 
 // confirmAction shows a confirmation dialog.
-func confirmAction(repoPath string, fileCount int, totalSize int64, report *domain.GitHistorySafetyReport) bool {
+func confirmAction(
+	repoPath string,
+	fileCount int,
+	totalSize int64,
+	report *domain.GitHistorySafetyReport,
+) bool {
 	// Build warning message
 	var warnMsg strings.Builder
 	warnMsg.WriteString("⚠️  WARNING: DESTRUCTIVE OPERATION\n\n")
-	warnMsg.WriteString(fmt.Sprintf("You are about to rewrite git history for:\n  %s\n\n", repoPath))
+	warnMsg.WriteString(
+		fmt.Sprintf("You are about to rewrite git history for:\n  %s\n\n", repoPath),
+	)
 	warnMsg.WriteString("This will:\n")
 	warnMsg.WriteString(fmt.Sprintf("  • Remove %d binary files from history\n", fileCount))
 	warnMsg.WriteString(fmt.Sprintf("  • Free approximately %s\n", format.Bytes(totalSize)))
@@ -397,6 +466,7 @@ func confirmAction(repoPath string, fileCount int, totalSize int64, report *doma
 
 	// Build form with all required confirmations
 	var confirms []huh.Field
+
 	confirmOpts := []huh.Option[bool]{
 		huh.NewOption("Yes, proceed", true),
 		huh.NewOption("No, cancel", false),
@@ -424,7 +494,8 @@ func confirmAction(repoPath string, fileCount int, totalSize int64, report *doma
 
 	form := huh.NewForm(huh.NewGroup(confirms...))
 
-	if err := form.Run(); err != nil {
+	err := form.Run()
+	if err != nil {
 		return false
 	}
 

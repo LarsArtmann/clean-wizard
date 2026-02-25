@@ -43,6 +43,7 @@ func cleanWithIterator[T any](
 
 	if dryRun {
 		var totalBytes int64
+
 		if sizeEstimator != nil {
 			for _, item := range items {
 				totalBytes += sizeEstimator(item)
@@ -50,7 +51,13 @@ func cleanWithIterator[T any](
 		} else {
 			totalBytes = int64(len(items)) * DryRunBytesPerItem
 		}
-		cleanResult := conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), len(items), totalBytes)
+
+		cleanResult := conversions.NewCleanResult(
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+			len(items),
+			totalBytes,
+		)
+
 		return result.Ok(cleanResult)
 	}
 
@@ -68,9 +75,11 @@ func cleanWithIterator[T any](
 		result := cleanFunc(ctx, item, homeDir)
 		if result.IsErr() {
 			itemsFailed++
+
 			if verbose {
 				fmt.Printf("Warning: failed to clean %v: %v\n", item, result.Error())
 			}
+
 			continue
 		}
 
@@ -80,6 +89,7 @@ func cleanWithIterator[T any](
 	}
 
 	duration := time.Since(startTime)
+
 	return result.Ok(conversions.NewCleanResultWithFailures(
 		domain.CleanStrategyType(domain.StrategyConservativeType),
 		itemsRemoved,
@@ -122,6 +132,7 @@ func ValidateSettingsWithTypes[S any](
 	typeName string,
 ) error {
 	slice := getSlice(settings)
+
 	return ValidateToolTypes(slice, availableTypes, typeName)
 }
 
@@ -138,10 +149,12 @@ func ValidateOptionalSettingsWithTypes[F any](
 	if settings == nil {
 		return nil
 	}
+
 	field := getField(settings)
 	if field == nil {
 		return nil
 	}
+
 	return ValidateToolTypes(getSlice(field), availableTypes, typeName)
 }
 
@@ -161,6 +174,7 @@ func BuildToolTypeToStringSlice(types []domain.BuildToolType) []string {
 	for i, t := range types {
 		result[i] = t.String()
 	}
+
 	return result
 }
 
@@ -170,6 +184,7 @@ func PackageManagerTypeToStringSlice(types []domain.PackageManagerType) []string
 	for i, t := range types {
 		result[i] = t.String()
 	}
+
 	return result
 }
 
@@ -179,6 +194,7 @@ func PackageManagerTypeToLowerSlice(types []domain.PackageManagerType) []string 
 	for i, t := range types {
 		result[i] = strings.ToLower(t.String())
 	}
+
 	return result
 }
 
@@ -188,6 +204,7 @@ func CacheTypeToStringSlice(types []domain.CacheType) []string {
 	for i, t := range types {
 		result[i] = t.String()
 	}
+
 	return result
 }
 
@@ -197,6 +214,7 @@ func CacheTypeToLowerSlice(types []domain.CacheType) []string {
 	for i, t := range types {
 		result[i] = strings.ToLower(t.String())
 	}
+
 	return result
 }
 
@@ -235,6 +253,7 @@ func scanWithIterator[T any](
 			if verbose {
 				fmt.Printf("Warning: failed to scan %v: %v\n", item, result.Error())
 			}
+
 			continue
 		}
 
@@ -255,6 +274,7 @@ func calculateTotalSizeFromScan(scanResult result.Result[[]domain.ScanItem]) int
 	for _, item := range scanResult.Value() {
 		total += item.Size
 	}
+
 	return total
 }
 
@@ -266,9 +286,11 @@ func TrashPath(ctx context.Context, path string) error {
 	defer cancel()
 
 	cmd := exec.CommandContext(timeoutCtx, "trash", path)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("trash failed for %s: %w (output: %s)", path, err, string(output))
 	}
+
 	return nil
 }

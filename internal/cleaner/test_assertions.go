@@ -61,7 +61,9 @@ func TestIsAvailable[T interface {
 
 // TestValidateSettings runs a standard validation settings test suite.
 func TestValidateSettings(
-	t *testing.T, newCleanerFunc CleanerConstructorWithSettings, testCases []ValidateSettingsTestCase,
+	t *testing.T,
+	newCleanerFunc CleanerConstructorWithSettings,
+	testCases []ValidateSettingsTestCase,
 ) {
 	for _, tt := range testCases {
 		t.Run(tt.Name, func(t *testing.T) {
@@ -84,6 +86,7 @@ func TestCleanDryRun(
 
 	if !cleaner.IsAvailable(context.Background()) {
 		t.Skipf("Skipping test: %s not available", toolName)
+
 		return
 	}
 
@@ -95,11 +98,19 @@ func TestCleanDryRun(
 	cleanResult := result.Value()
 
 	if cleanResult.ItemsRemoved != expectedItemsRemoved {
-		t.Errorf("Clean() removed %d items, want %d", cleanResult.ItemsRemoved, expectedItemsRemoved)
+		t.Errorf(
+			"Clean() removed %d items, want %d",
+			cleanResult.ItemsRemoved,
+			expectedItemsRemoved,
+		)
 	}
 
 	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
+		t.Errorf(
+			"Clean() strategy = %v, want %v",
+			cleanResult.Strategy,
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+		)
 	}
 
 	if cleanResult.FreedBytes == 0 {
@@ -113,6 +124,7 @@ func TestDryRunStrategy(t *testing.T, newCleanerFunc SimpleCleanerConstructor, t
 
 	if !cleaner.IsAvailable(context.Background()) {
 		t.Skipf("Skipping test: %s not available", toolName)
+
 		return
 	}
 
@@ -124,7 +136,11 @@ func TestDryRunStrategy(t *testing.T, newCleanerFunc SimpleCleanerConstructor, t
 	cleanResult := result.Value()
 
 	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
-		t.Errorf("Clean() strategy = %v, want %v", cleanResult.Strategy, domain.CleanStrategyType(domain.StrategyDryRunType))
+		t.Errorf(
+			"Clean() strategy = %v, want %v",
+			cleanResult.Strategy,
+			domain.CleanStrategyType(domain.StrategyDryRunType),
+		)
 	}
 
 	if cleanResult.ItemsFailed != 0 {
@@ -179,7 +195,11 @@ type CleanResultAnalyzer struct {
 }
 
 // NewCleanResultAnalyzer creates a new analyzer for the given CleanResult.
-func NewCleanResultAnalyzer(t *testing.T, cleanResult domain.CleanResult, elapsed time.Duration) *CleanResultAnalyzer {
+func NewCleanResultAnalyzer(
+	t *testing.T,
+	cleanResult domain.CleanResult,
+	elapsed time.Duration,
+) *CleanResultAnalyzer {
 	return &CleanResultAnalyzer{
 		t:           t,
 		cleanResult: cleanResult,
@@ -202,14 +222,21 @@ func (a *CleanResultAnalyzer) VerifyTiming() {
 	// CleanTime = 0 is valid for very fast operations (especially dry-run)
 	// Just log a note if both are extremely small
 	if a.cleanResult.CleanTime == 0 && a.elapsed > 0 {
-		a.t.Logf("Note: Clean() recorded CleanTime = 0 but actual elapsed was %v (operation too fast to measure)", a.elapsed)
+		a.t.Logf(
+			"Note: Clean() recorded CleanTime = 0 but actual elapsed was %v (operation too fast to measure)",
+			a.elapsed,
+		)
 	}
 
 	// For operations that recorded time, verify timing is reasonable
 	if a.cleanResult.CleanTime > 0 {
 		// Actual execution time should be close to CleanTime
 		if a.elapsed < a.cleanResult.CleanTime/2 || a.elapsed > a.cleanResult.CleanTime*2 {
-			a.t.Logf("Note: Clean() recorded time %v but actual elapsed was %v", a.cleanResult.CleanTime, a.elapsed)
+			a.t.Logf(
+				"Note: Clean() recorded time %v but actual elapsed was %v",
+				a.cleanResult.CleanTime,
+				a.elapsed,
+			)
 		}
 	}
 }
@@ -224,6 +251,7 @@ func TestCleanTiming(
 
 	if !cleaner.IsAvailable(context.Background()) {
 		t.Skipf("Skipping test: %s not available", toolName)
+
 		return
 	}
 
@@ -241,7 +269,9 @@ func TestCleanTiming(
 // TestBooleanSettingsCleanerValidateSettings runs a standard ValidateSettings test for cleaners
 // with a single boolean settings field. This eliminates duplicate test code across multiple files.
 func TestBooleanSettingsCleanerValidateSettings(
-	t *testing.T, config BooleanSettingsCleanerTestConfig, constructor CleanerConstructorWithSettings,
+	t *testing.T,
+	config BooleanSettingsCleanerTestConfig,
+	constructor CleanerConstructorWithSettings,
 ) {
 	testCases := CreateBooleanSettingsTestCases(config.SettingsFieldName, config.CreateSettings)
 	TestValidateSettings(t, constructor, testCases)
@@ -249,24 +279,38 @@ func TestBooleanSettingsCleanerValidateSettings(
 
 // TestBooleanSettingsCleanerCleanDryRun runs a standard Clean_DryRun test with expected items.
 func TestBooleanSettingsCleanerCleanDryRun(
-	t *testing.T, config BooleanSettingsCleanerTestConfig, constructor CleanerConstructorWithSettings,
+	t *testing.T,
+	config BooleanSettingsCleanerTestConfig,
+	constructor CleanerConstructorWithSettings,
 ) {
 	simpleConstructor := ToSimpleCleanerConstructor(constructor)
 	TestCleanDryRun(t, simpleConstructor, config.ToolName, config.ExpectedItems)
 }
 
 // TestDryRunStrategyWithConstructor is a helper that creates a DryRunStrategy test.
-func TestDryRunStrategyWithConstructor(t *testing.T, constructor CleanerConstructorWithSettings, toolName string) {
+func TestDryRunStrategyWithConstructor(
+	t *testing.T,
+	constructor CleanerConstructorWithSettings,
+	toolName string,
+) {
 	TestDryRunStrategy(t, ToSimpleCleanerConstructor(constructor), toolName)
 }
 
 // TestCleanTimingWithConstructor is a helper that creates a Clean_Timing test.
-func TestCleanTimingWithConstructor(t *testing.T, constructor SimpleCleanerConstructor, toolName string) {
+func TestCleanTimingWithConstructor(
+	t *testing.T,
+	constructor SimpleCleanerConstructor,
+	toolName string,
+) {
 	TestCleanTiming(t, constructor, toolName)
 }
 
 // TestStandardCleaner is a helper that runs DryRunStrategy and Clean_Timing tests.
-func TestStandardCleaner(t *testing.T, constructor CleanerConstructorWithSettings, toolName string) {
+func TestStandardCleaner(
+	t *testing.T,
+	constructor CleanerConstructorWithSettings,
+	toolName string,
+) {
 	t.Run("DryRunStrategy", func(t *testing.T) {
 		TestDryRunStrategyWithConstructor(t, constructor, toolName)
 	})

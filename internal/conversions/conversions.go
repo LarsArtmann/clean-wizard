@@ -24,7 +24,11 @@ import (
 //
 //	result := NewCleanResult(domain.CleanStrategyType(domain.StrategyAggressiveType), 5, 1024*1024*100)
 //	fmt.Printf("Freed %d bytes", result.FreedBytes)
-func NewCleanResult(strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64) domain.CleanResult {
+func NewCleanResult(
+	strategy domain.CleanStrategyType,
+	itemsRemoved int,
+	freedBytes int64,
+) domain.CleanResult {
 	return domain.CleanResult{
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
@@ -219,7 +223,10 @@ func NewScanResult(
 //		fmt.Printf("Freed %d bytes", cleanResult.Value().FreedBytes)
 //	}
 func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanResult] {
-	return ToCleanResultWithStrategy(bytesResult, domain.CleanStrategyType(domain.StrategyConservativeType))
+	return ToCleanResultWithStrategy(
+		bytesResult,
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+	)
 }
 
 // ToCleanResultWithStrategy converts primitive Result[int64] to domain.Result[domain.CleanResult] with custom strategy.
@@ -247,6 +254,7 @@ func ToCleanResultWithStrategy(
 
 	bytes := bytesResult.Value()
 	cleanResult := NewCleanResult(strategy, 1, bytes)
+
 	return result.Ok(cleanResult)
 }
 
@@ -281,6 +289,7 @@ func ToCleanResultFromItems(
 
 	bytes := bytesResult.Value()
 	cleanResult := NewCleanResult(strategy, itemsRemoved, bytes)
+
 	return result.Ok(cleanResult)
 }
 
@@ -294,6 +303,7 @@ func ToTimedCleanResult(
 
 	bytes := bytesResult.Value()
 	cleanResult := NewCleanResultWithTiming(strategy, 1, bytes, cleanTime)
+
 	return result.Ok(cleanResult)
 }
 
@@ -324,10 +334,12 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	for _, result := range results {
 		totalItems += int(result.ItemsRemoved)
 		totalFailed += int(result.ItemsFailed)
+
 		totalBytes += result.FreedBytes
 		if result.CleanTime > maxTime {
 			maxTime = result.CleanTime
 		}
+
 		if result.Strategy != firstStrategy {
 			allSameStrategy = false
 		}
@@ -340,16 +352,25 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 		combinedStrategy = domain.CleanStrategyType(domain.StrategyConservativeType)
 	}
 
-	return NewCleanResultWithFailures(combinedStrategy, totalItems, totalFailed, int64(totalBytes), maxTime)
+	return NewCleanResultWithFailures(
+		combinedStrategy,
+		totalItems,
+		totalFailed,
+		int64(totalBytes),
+		maxTime,
+	)
 }
 
 // ExtractBytesFromCleanResult extracts int64 from domain.CleanResult (for adapter compatibility).
-func ExtractBytesFromCleanResult(cleanResult result.Result[domain.CleanResult]) result.Result[int64] {
+func ExtractBytesFromCleanResult(
+	cleanResult result.Result[domain.CleanResult],
+) result.Result[int64] {
 	if cleanResult.IsErr() {
 		return result.Err[int64](cleanResult.Error())
 	}
 
 	cleanValue := cleanResult.Value()
+
 	return result.Ok[int64](int64(cleanValue.FreedBytes))
 }
 
@@ -366,7 +387,9 @@ func ToScanResultFromError(err error) result.Result[domain.ScanResult] {
 // VALIDATION HELPERS
 
 // ValidateAndConvertCleanResult ensures CleanResult is valid before returning.
-func ValidateAndConvertCleanResult(cleanResult domain.CleanResult) result.Result[domain.CleanResult] {
+func ValidateAndConvertCleanResult(
+	cleanResult domain.CleanResult,
+) result.Result[domain.CleanResult] {
 	return validation.ValidateAndWrap(cleanResult, "CleanResult")
 }
 

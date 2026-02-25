@@ -67,5 +67,6 @@ func toCleanerAvailability(available bool) CleanerAvailability {
 	if available {
 		return CleanerAvailabilityAvailable
 	}
+
 	return CleanerAvailabilityUnavailable
 }

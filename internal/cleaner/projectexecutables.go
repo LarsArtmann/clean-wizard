@@ -94,6 +94,7 @@ func NewProjectExecutablesCleaner(
 	if cleaner.projectLister == nil {
 		cleaner.projectLister = &defaultProjectLister{}
 	}
+
 	if cleaner.fileOperator == nil {
 		cleaner.fileOperator = &defaultFileOperator{
 			excludeExtensions: excludeExtensions,
@@ -119,6 +120,7 @@ func (p *ProjectExecutablesCleaner) Name() string {
 func (p *ProjectExecutablesCleaner) IsAvailable(ctx context.Context) bool {
 	_, errPMA := exec.LookPath("projects-management-automation")
 	_, errTrash := exec.LookPath("trash")
+
 	return errPMA == nil && errTrash == nil
 }
 
@@ -154,6 +156,7 @@ func (p *ProjectExecutablesCleaner) Scan(ctx context.Context) result.Result[[]do
 			if p.verbose {
 				fmt.Printf("Warning: %v\n", err)
 			}
+
 			continue
 		}
 
@@ -201,6 +204,7 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 		if p.verbose {
 			fmt.Printf("Would trash %d executable file(s) (%d bytes)\n", len(items), totalBytes)
 		}
+
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			domain.CleanStrategyType(domain.StrategyDryRunType),
 			len(items), totalBytes,
@@ -218,9 +222,11 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 		err := p.fileOperator.TrashFile(ctx, item.Path)
 		if err != nil {
 			itemsFailed++
+
 			if p.verbose {
 				fmt.Printf("Warning: %v\n", err)
 			}
+
 			continue
 		}
 
@@ -233,6 +239,7 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 	}
 
 	duration := time.Since(startTime)
+
 	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
 		domain.CleanStrategyType(domain.StrategyAggressiveType),
 		itemsRemoved, itemsFailed, bytesFreed, duration,
@@ -262,6 +269,7 @@ func isExcludedByExtension(filename string, excludeExtensions []string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -272,10 +280,12 @@ func isExcludedByPattern(filename string, excludePatterns []string) bool {
 		if err != nil {
 			continue
 		}
+
 		if matched {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -287,7 +297,15 @@ func (d *defaultProjectLister) ListProjects(ctx context.Context) ([]ProjectInfo,
 	timeoutCtx, cancel := context.WithTimeout(ctx, DefaultProjectExecutablesTimeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(timeoutCtx, "projects-management-automation", "list", "--output", "json", "--json")
+	cmd := exec.CommandContext(
+		timeoutCtx,
+		"projects-management-automation",
+		"list",
+		"--output",
+		"json",
+		"--json",
+	)
+
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("failed to list projects: %w", err)
@@ -314,6 +332,7 @@ func (d *defaultFileOperator) FindExecutableFiles(dir string) ([]string, error) 
 	}
 
 	var executables []string
+
 	for _, entry := range entries {
 		if entry.IsDir() {
 			continue
@@ -337,6 +356,7 @@ func (d *defaultFileOperator) FindExecutableFiles(dir string) ([]string, error) 
 			if d.verbose {
 				fmt.Printf("  Skipping (extension excluded): %s\n", fullPath)
 			}
+
 			continue
 		}
 
@@ -345,6 +365,7 @@ func (d *defaultFileOperator) FindExecutableFiles(dir string) ([]string, error) 
 			if d.verbose {
 				fmt.Printf("  Skipping (pattern excluded): %s\n", fullPath)
 			}
+
 			continue
 		}
 
@@ -363,5 +384,6 @@ func (d *defaultFileOperator) GetFileSize(path string) int64 {
 	if err != nil {
 		return 0
 	}
+
 	return info.Size()
 }

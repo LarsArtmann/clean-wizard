@@ -112,8 +112,10 @@ func TestSizeEstimateStatusType_MarshalJSON(t *testing.T) {
 			data, err := json.Marshal(tt.status)
 			if tt.wantErr {
 				assert.Error(t, err)
+
 				return
 			}
+
 			require.NoError(t, err)
 			assert.Equal(t, tt.expected, string(data))
 		})
@@ -160,11 +162,14 @@ func TestSizeEstimateStatusType_UnmarshalJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var status SizeEstimateStatusType
+
 			err := json.Unmarshal([]byte(tt.jsonInput), &status)
 			if tt.wantErr {
 				assert.Error(t, err)
+
 				return
 			}
+
 			require.NoError(t, err)
 			assert.Equal(t, tt.expected, status)
 		})
@@ -194,6 +199,7 @@ func TestSizeEstimateStatusType_JSONRoundTrip(t *testing.T) {
 
 			// Unmarshal
 			var result SizeEstimateStatusType
+
 			err = json.Unmarshal(data, &result)
 			require.NoError(t, err)
 

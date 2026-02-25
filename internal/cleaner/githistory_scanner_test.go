@@ -52,13 +52,19 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			})
 
 			ginkgo.It("should accept exclude extensions option", func() {
-				scanner = NewGitHistoryScanner(tempDir, WithExcludeExtensions([]string{".custom", ".special"}))
+				scanner = NewGitHistoryScanner(
+					tempDir,
+					WithExcludeExtensions([]string{".custom", ".special"}),
+				)
 				gomega.Expect(scanner.excludeExts[".custom"]).To(gomega.BeTrue())
 				gomega.Expect(scanner.excludeExts[".special"]).To(gomega.BeTrue())
 			})
 
 			ginkgo.It("should accept include extensions option", func() {
-				scanner = NewGitHistoryScanner(tempDir, WithIncludeExtensions([]string{".exe", ".dll"}))
+				scanner = NewGitHistoryScanner(
+					tempDir,
+					WithIncludeExtensions([]string{".exe", ".dll"}),
+				)
 				gomega.Expect(scanner.includeExts[".exe"]).To(gomega.BeTrue())
 				gomega.Expect(scanner.includeExts[".dll"]).To(gomega.BeTrue())
 			})
@@ -120,8 +126,13 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			files := make([]domain.GitHistoryFile, len(paths))
 			for i, path := range paths {
 				ext := filepath.Ext(path)
-				files[i] = domain.GitHistoryFile{Path: path, Extension: ext, SizeBytes: 5 * 1024 * 1024}
+				files[i] = domain.GitHistoryFile{
+					Path:      path,
+					Extension: ext,
+					SizeBytes: 5 * 1024 * 1024,
+				}
 			}
+
 			return files
 		}
 
@@ -145,7 +156,12 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 
 			ginkgo.It("should only include files with extensions in includeExts when set", func() {
 				files := createTestFiles([]string{"binary.exe", "library.dll"})
-				assertFilteredResult(WithIncludeExtensions([]string{".exe"}), files, 1, "binary.exe")
+				assertFilteredResult(
+					WithIncludeExtensions([]string{".exe"}),
+					files,
+					1,
+					"binary.exe",
+				)
 			})
 		})
 
@@ -250,7 +266,8 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 		ginkgo.It("should return false for source files", func() {
 			for _, ext := range []string{".go", ".ts", ".js", ".py", ".rs", ".java"} {
 				f := domain.GitHistoryFile{Path: "file" + ext, Extension: ext}
-				gomega.Expect(scanner.isLikelyBinary(f)).To(gomega.BeFalse(), "Should not detect "+ext)
+				gomega.Expect(scanner.isLikelyBinary(f)).
+					To(gomega.BeFalse(), "Should not detect "+ext)
 			}
 		})
 	})

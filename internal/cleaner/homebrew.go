@@ -47,6 +47,7 @@ func (hbc *HomebrewCleaner) Name() string {
 func (hbc *HomebrewCleaner) IsAvailable(ctx context.Context) bool {
 	// Check if brew command exists
 	_, err := exec.LookPath("brew")
+
 	return err == nil
 }
 
@@ -75,9 +76,12 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 
 	// Get list of outdated packages
 	outdatedCmd := adapters.ExecWithTimeout(ctx, homebrewCommandTimeout, "brew", "outdated")
+
 	output, err := outdatedCmd.CombinedOutput()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to check for outdated packages: %w", err))
+		return result.Err[[]domain.ScanItem](
+			fmt.Errorf("failed to check for outdated packages: %w", err),
+		)
 	}
 
 	// Parse output
@@ -101,7 +105,11 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 			})
 
 			if hbc.verbose {
-				fmt.Printf("Found outdated package: %s (current: %s)\n", packageName, currentVersion)
+				fmt.Printf(
+					"Found outdated package: %s (current: %s)\n",
+					packageName,
+					currentVersion,
+				)
 			}
 		}
 	}
@@ -139,14 +147,19 @@ func (hbc *HomebrewCleaner) handleDryRun() result.Result[domain.CleanResult] {
 	fmt.Println("⚠️  Dry-run mode is not yet supported for Homebrew cleanup.")
 	fmt.Println("   Homebrew does not provide a native dry-run feature.")
 	fmt.Println("   To see what would be cleaned, use: brew cleanup -n (manual check)")
-	return result.Ok(conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), 0, 0))
+
+	return result.Ok(
+		conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), 0, 0),
+	)
 }
 
 // getCacheDir returns the Homebrew cache directory.
 func (hbc *HomebrewCleaner) getCacheDir(ctx context.Context) string {
-	if cacheOutput, err := adapters.ExecWithTimeout(ctx, homebrewCommandTimeout, "brew", "--cache").Output(); err == nil {
+	if cacheOutput, err := adapters.ExecWithTimeout(ctx, homebrewCommandTimeout, "brew", "--cache").
+		Output(); err == nil {
 		return strings.TrimSpace(string(cacheOutput))
 	}
+
 	return ""
 }
 
@@ -156,6 +169,7 @@ func (hbc *HomebrewCleaner) buildCleanupCommands() []string {
 	if hbc.unusedOnly == domain.HomebrewModeUnusedOnly {
 		commands = append(commands, "prune")
 	}
+
 	return commands
 }
 
@@ -166,16 +180,21 @@ func (hbc *HomebrewCleaner) executeCleanup(
 	if cacheDir != "" {
 		bytesFreed, _, _ = CalculateBytesFreed(cacheDir, func() error {
 			itemsRemoved, itemsFailed = hbc.runCleanupCommands(ctx, commands)
+
 			return nil
 		}, hbc.verbose, "Homebrew Cache")
 	} else {
 		itemsRemoved, itemsFailed = hbc.runCleanupCommands(ctx, commands)
 	}
+
 	return itemsRemoved, itemsFailed, bytesFreed
 }
 
 // runCleanupCommands executes brew commands and counts removed/failed items.
-func (hbc *HomebrewCleaner) runCleanupCommands(ctx context.Context, commands []string) (itemsRemoved, itemsFailed int) {
+func (hbc *HomebrewCleaner) runCleanupCommands(
+	ctx context.Context,
+	commands []string,
+) (itemsRemoved, itemsFailed int) {
 	for _, cmd := range commands {
 		cleanCmd := adapters.ExecWithTimeout(ctx, homebrewCommandTimeout, "brew", cmd)
 		hbc.logCommandStart(cmd)
@@ -183,13 +202,16 @@ func (hbc *HomebrewCleaner) runCleanupCommands(ctx context.Context, commands []s
 		output, err := cleanCmd.CombinedOutput()
 		if err != nil {
 			itemsFailed++
+
 			hbc.logCommandError(cmd, string(output))
+
 			continue
 		}
 
 		itemsRemoved += hbc.countRemovedItems(string(output))
 		hbc.logCommandSuccess(cmd)
 	}
+
 	return itemsRemoved, itemsFailed
 }
 
@@ -217,10 +239,12 @@ func (hbc *HomebrewCleaner) logCommandSuccess(cmd string) {
 // countRemovedItems counts items marked as removed in output.
 func (hbc *HomebrewCleaner) countRemovedItems(output string) int {
 	count := 0
+
 	for line := range strings.SplitSeq(strings.TrimSpace(output), "\n") {
 		if strings.Contains(line, "removed") || strings.Contains(line, "deleted") {
 			count++
 		}
 	}
+
 	return count
 }

@@ -18,9 +18,11 @@ func (tv TestValidator) Validate() error {
 	if !tv.Valid {
 		return errors.New("invalid test validator")
 	}
+
 	if tv.Name == "" {
 		return errors.New("name cannot be empty")
 	}
+
 	return nil
 }
 

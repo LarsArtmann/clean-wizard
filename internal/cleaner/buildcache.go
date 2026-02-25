@@ -40,7 +40,11 @@ func AvailableBuildTools() []JVMBuildToolType {
 }
 
 // NewBuildCacheCleaner creates build cache cleaner.
-func NewBuildCacheCleaner(verbose, dryRun bool, olderThan string, excludes, basePaths []string) (*BuildCacheCleaner, error) {
+func NewBuildCacheCleaner(
+	verbose, dryRun bool,
+	olderThan string,
+	excludes, basePaths []string,
+) (*BuildCacheCleaner, error) {
 	// Parse older than duration
 	duration, err := domain.ParseCustomDuration(olderThan)
 	if err != nil {
@@ -106,17 +110,29 @@ func getCachePath(toolType JVMBuildToolType, homeDir string) string {
 	case JVMBuildToolSBT:
 		return filepath.Join(homeDir, ".ivy2", "cache")
 	}
+
 	return ""
 }
 
 // scanBuildTool scans cache for a specific JVM build tool.
-func (bcc *BuildCacheCleaner) scanBuildTool(ctx context.Context, toolType JVMBuildToolType, homeDir string) result.Result[[]domain.ScanItem] {
+func (bcc *BuildCacheCleaner) scanBuildTool(
+	ctx context.Context,
+	toolType JVMBuildToolType,
+	homeDir string,
+) result.Result[[]domain.ScanItem] {
 	items := make([]domain.ScanItem, 0)
 
 	switch toolType {
 	case JVMBuildToolGradle:
 		gradleCache := getCachePath(toolType, homeDir)
-		scanResult := ScanPath("", domain.ScanTypeTemp, "Gradle cache", bcc.verbose, "*", gradleCache)
+		scanResult := ScanPath(
+			"",
+			domain.ScanTypeTemp,
+			"Gradle cache",
+			bcc.verbose,
+			"*",
+			gradleCache,
+		)
 		items = append(items, scanResult.Items...)
 
 	case JVMBuildToolMaven:
@@ -153,14 +169,17 @@ func (bcc *BuildCacheCleaner) estimateBuildToolSize(toolType JVMBuildToolType) i
 	if err != nil {
 		return DryRunBytesPerItem
 	}
+
 	cachePath := getCachePath(toolType, homeDir)
 	if cachePath == "" {
 		return DryRunBytesPerItem
 	}
+
 	size := GetDirSize(cachePath)
 	if size > 0 {
 		return size
 	}
+
 	return DryRunBytesPerItem
 }
 
@@ -184,6 +203,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 
 	itemsRemoved := 0
 	bytesFreed := int64(0)
+
 	for _, match := range matches {
 		if !bcc.dryRun {
 			bytesFreed += GetDirSize(match)
@@ -191,9 +211,11 @@ func (bcc *BuildCacheCleaner) genericClean(
 
 		if bcc.dryRun {
 			itemsRemoved++
+
 			if bcc.verbose {
 				fmt.Printf("  ✓ Would remove %s: %s\n", verboseMsg, filepath.Base(match))
 			}
+
 			continue
 		}
 
@@ -202,10 +224,12 @@ func (bcc *BuildCacheCleaner) genericClean(
 			if bcc.verbose {
 				fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
 			}
+
 			continue
 		}
 
 		itemsRemoved++
+
 		if bcc.verbose {
 			fmt.Printf("  ✓ Removed %s: %s\n", verboseMsg, filepath.Base(match))
 		}
@@ -215,22 +239,42 @@ func (bcc *BuildCacheCleaner) genericClean(
 		fmt.Printf("  ✓ %s cleaned\n", toolName)
 	}
 
-	return result.Ok(conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), itemsRemoved, bytesFreed))
+	return result.Ok(
+		conversions.NewCleanResult(
+			domain.CleanStrategyType(domain.StrategyConservativeType),
+			itemsRemoved,
+			bytesFreed,
+		),
+	)
 }
 
 // cleanBuildTool cleans cache for a specific JVM build tool.
-func (bcc *BuildCacheCleaner) cleanBuildTool(ctx context.Context, toolType JVMBuildToolType, homeDir string) result.Result[domain.CleanResult] {
+func (bcc *BuildCacheCleaner) cleanBuildTool(
+	ctx context.Context,
+	toolType JVMBuildToolType,
+	homeDir string,
+) result.Result[domain.CleanResult] {
 	switch toolType {
 	case JVMBuildToolGradle:
 		gradleCache := getCachePath(toolType, homeDir)
+
 		return bcc.genericClean(ctx, "Gradle", gradleCache, "*", "Gradle cache", os.RemoveAll)
 
 	case JVMBuildToolMaven:
 		mavenRepository := getCachePath(toolType, homeDir)
-		return bcc.genericClean(ctx, "Maven", mavenRepository, "**/*.part", "Maven partial file", os.Remove)
+
+		return bcc.genericClean(
+			ctx,
+			"Maven",
+			mavenRepository,
+			"**/*.part",
+			"Maven partial file",
+			os.Remove,
+		)
 
 	case JVMBuildToolSBT:
 		sbtCache := getCachePath(toolType, homeDir)
+
 		return bcc.genericClean(ctx, "SBT", sbtCache, "*", "SBT cache", os.RemoveAll)
 	}
 

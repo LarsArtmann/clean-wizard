@@ -98,6 +98,7 @@ func (l *DefaultValidationLogger) LogValidation(result *ValidationResult) {
 			fmt.Printf("✅ Configuration validation passed in %v\n", result.Duration)
 		} else {
 			fmt.Printf("❌ Configuration validation failed with %d errors\n", len(result.Errors))
+
 			for _, err := range result.Errors {
 				fmt.Printf("  - %s: %s\n", err.Field, err.Message)
 			}
@@ -123,7 +124,9 @@ func NewValidationMiddleware() *ValidationMiddleware {
 }
 
 // NewValidationMiddlewareWithOptions creates middleware with custom options.
-func NewValidationMiddlewareWithOptions(options ...func(*ValidationMiddlewareOptions)) *ValidationMiddleware {
+func NewValidationMiddlewareWithOptions(
+	options ...func(*ValidationMiddlewareOptions),
+) *ValidationMiddleware {
 	opts := &ValidationMiddlewareOptions{
 		RequireSafeModeConfirmation: false,
 		EnableDetailedLogging:       true,
@@ -181,7 +184,10 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 }
 
 // ValidateAndSaveConfig validates and saves configuration.
-func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *domain.Config) (*domain.Config, error) {
+func (vm *ValidationMiddleware) ValidateAndSaveConfig(
+	ctx context.Context,
+	cfg *domain.Config,
+) (*domain.Config, error) {
 	// Perform comprehensive validation first
 	validationResult := vm.validator.ValidateConfig(cfg)
 	vm.logger.LogValidation(validationResult)
@@ -192,7 +198,8 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 	}
 
 	// Save configuration
-	if err := Save(cfg); err != nil {
+	err := Save(cfg)
+	if err != nil {
 		return nil, pkgerrors.HandleConfigError("ValidateAndSaveConfig", err)
 	}
 
@@ -201,7 +208,10 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(ctx context.Context, cfg *
 }
 
 // ValidateConfigChange validates a specific configuration change.
-func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, current, proposed *domain.Config) *ConfigChangeResult {
+func (vm *ValidationMiddleware) ValidateConfigChange(
+	ctx context.Context,
+	current, proposed *domain.Config,
+) *ConfigChangeResult {
 	changeResult := &ConfigChangeResult{
 		IsValid:   true,
 		Changes:   []ConfigChange{},
@@ -216,6 +226,7 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 
 	if !validationResult.IsValid {
 		changeResult.Errors = validationResult.Errors
+
 		return changeResult
 	}
 
@@ -224,7 +235,8 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 	changeResult.Changes = changes
 
 	// Validate changes against business rules
-	if err := vm.validateChangeBusinessRules(changes); err != nil {
+	err := vm.validateChangeBusinessRules(changes)
+	if err != nil {
 		changeResult.IsValid = false
 		changeResult.Errors = append(changeResult.Errors, ValidationError{
 			Field:    "business_rules",
@@ -233,6 +245,7 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 			Message:  err.Error(),
 			Severity: SeverityError,
 		})
+
 		return changeResult
 	}
 
@@ -240,16 +253,22 @@ func (vm *ValidationMiddleware) ValidateConfigChange(ctx context.Context, curren
 }
 
 // ValidateProfileOperation validates a specific profile operation with type safety.
-func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, profileName, operationName string, settings *domain.OperationSettings) *ProfileOperationResult {
+func (vm *ValidationMiddleware) ValidateProfileOperation(
+	ctx context.Context,
+	profileName, operationName string,
+	settings *domain.OperationSettings,
+) *ProfileOperationResult {
 	result := &ProfileOperationResult{
 		IsValid:   true,
 		Timestamp: time.Now(),
 	}
 
 	// Validate profile name
-	if err := vm.validator.validateProfileName(profileName); err != nil {
+	err := vm.validator.validateProfileName(profileName)
+	if err != nil {
 		result.IsValid = false
 		result.Error = err
+
 		return result
 	}
 
@@ -263,20 +282,25 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(ctx context.Context, pr
 	}
 
 	// Validate operation
-	if err := tempOp.Validate(); err != nil {
+	err := tempOp.Validate()
+	if err != nil {
 		result.IsValid = false
 		result.Error = err
+
 		return result
 	}
 
 	// Validate operation-specific settings
-	if err := vm.validateOperationSettings(operationName, tempOp); err != nil {
+	err := vm.validateOperationSettings(operationName, tempOp)
+	if err != nil {
 		result.IsValid = false
 		result.Error = err
+
 		return result
 	}
 
 	result.Operation = &tempOp
+
 	return result
 }
 
@@ -288,8 +312,10 @@ func (vm *ValidationMiddleware) formatValidationErrors(errors []ValidationError)
 
 	var message strings.Builder
 	message.WriteString(fmt.Sprintf("Validation failed (%d errors):", len(errors)))
+
 	for i, err := range errors {
 		message.WriteString(fmt.Sprintf("\n%d. %s: %s", i+1, err.Field, err.Message))
 	}
+
 	return message.String()
 }

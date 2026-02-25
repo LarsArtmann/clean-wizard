@@ -36,9 +36,16 @@ func TestNewTempFilesCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaner, err := NewTempFilesCleaner(false, false, tt.olderThan, tt.excludes, tt.basePaths)
+			cleaner, err := NewTempFilesCleaner(
+				false,
+				false,
+				tt.olderThan,
+				tt.excludes,
+				tt.basePaths,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewTempFilesCleaner() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
@@ -66,6 +73,7 @@ func TestTempFilesCleaner_Scan(t *testing.T) {
 
 	// Create old file
 	oldFile := filepath.Join(tmpDir, "old_file.txt")
+
 	err := os.WriteFile(oldFile, []byte("test"), 0o644)
 	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
@@ -73,6 +81,7 @@ func TestTempFilesCleaner_Scan(t *testing.T) {
 
 	// Set modification time to 2 days ago
 	oldTime := time.Now().Add(-48 * time.Hour)
+
 	err = os.Chtimes(oldFile, oldTime, oldTime)
 	if err != nil {
 		t.Fatalf("failed to set file time: %v", err)
@@ -80,6 +89,7 @@ func TestTempFilesCleaner_Scan(t *testing.T) {
 
 	// Create recent file
 	recentFile := filepath.Join(tmpDir, "recent_file.txt")
+
 	err = os.WriteFile(recentFile, []byte("test"), 0o644)
 	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
@@ -115,6 +125,7 @@ func TestTempFilesCleaner_Clean_DryRun(t *testing.T) {
 
 	// Create old file
 	oldFile := filepath.Join(tmpDir, "old_file.txt")
+
 	err := os.WriteFile(oldFile, []byte("test"), 0o644)
 	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
@@ -122,6 +133,7 @@ func TestTempFilesCleaner_Clean_DryRun(t *testing.T) {
 
 	// Set modification time to 2 days ago
 	oldTime := time.Now().Add(-48 * time.Hour)
+
 	err = os.Chtimes(oldFile, oldTime, oldTime)
 	if err != nil {
 		t.Fatalf("failed to set file time: %v", err)
@@ -158,6 +170,7 @@ func TestTempFilesCleaner_Clean_Real(t *testing.T) {
 
 	// Create old file
 	oldFile := filepath.Join(tmpDir, "old_file.txt")
+
 	err := os.WriteFile(oldFile, []byte("test"), 0o644)
 	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
@@ -165,6 +178,7 @@ func TestTempFilesCleaner_Clean_Real(t *testing.T) {
 
 	// Set modification time to 2 days ago
 	oldTime := time.Now().Add(-48 * time.Hour)
+
 	err = os.Chtimes(oldFile, oldTime, oldTime)
 	if err != nil {
 		t.Fatalf("failed to set file time: %v", err)

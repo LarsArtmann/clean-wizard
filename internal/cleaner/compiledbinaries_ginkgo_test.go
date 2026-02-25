@@ -19,8 +19,14 @@ type mockBinaryScanner struct {
 	scanCallDir string
 }
 
-func (m *mockBinaryScanner) ScanDirectory(ctx context.Context, dir string, categories []BinaryCategory, minSize int64) ([]BinaryInfo, error) {
+func (m *mockBinaryScanner) ScanDirectory(
+	ctx context.Context,
+	dir string,
+	categories []BinaryCategory,
+	minSize int64,
+) ([]BinaryInfo, error) {
 	m.scanCallDir = dir
+
 	return m.binaries, m.scanErr
 }
 
@@ -36,6 +42,7 @@ type mockBinaryTrashOperator struct {
 func (m *mockBinaryTrashOperator) TrashBinary(ctx context.Context, path string) error {
 	m.trashCallCount++
 	m.trashedFiles = append(m.trashedFiles, path)
+
 	return m.trashErr
 }
 
@@ -43,6 +50,7 @@ func (m *mockBinaryTrashOperator) GetFileSize(path string) int64 {
 	if m.fileSizes != nil {
 		return m.fileSizes[path]
 	}
+
 	return 0
 }
 
@@ -52,6 +60,7 @@ func (m *mockBinaryTrashOperator) GetFileModTime(path string) (time.Time, error)
 			return t, nil
 		}
 	}
+
 	return time.Time{}, errors.New("file not found")
 }
 
@@ -175,7 +184,13 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 
 			ginkgo.It("should accept multiple options together", func() {
-				cleaner = NewCompiledBinariesCleaner(true, true, 20, "30d", []string{"/path"}, []string{},
+				cleaner = NewCompiledBinariesCleaner(
+					true,
+					true,
+					20,
+					"30d",
+					[]string{"/path"},
+					[]string{},
 					WithBinaryScanner(mockScanner),
 					WithBinaryTrashOperator(mockOperator),
 				)
@@ -252,7 +267,10 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		})
 
 		ginkgo.Context("with empty OperationSettings", func() {
-			GinkgoValidateEmptySettingsTest(cleaner, "should return nil when CompiledBinaries is nil")
+			GinkgoValidateEmptySettingsTest(
+				cleaner,
+				"should return nil when CompiledBinaries is nil",
+			)
 		})
 
 		ginkgo.Context("with valid settings", func() {
@@ -420,7 +438,13 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		ginkgo.Context("with non-existent paths", func() {
 			ginkgo.It("should skip non-existent base paths", func() {
 				GinkgoNoItemsToScanTest(ctx, cleaner, func() {
-					cleaner = NewCompiledBinariesCleaner(false, false, 10, "", []string{"/non/existent/path"}, nil,
+					cleaner = NewCompiledBinariesCleaner(
+						false,
+						false,
+						10,
+						"",
+						[]string{"/non/existent/path"},
+						nil,
 						WithBinaryScanner(mockScanner),
 					)
 				})
@@ -433,8 +457,18 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 				recentTime := time.Now().Add(-1 * 24 * time.Hour)
 
 				mockScanner.binaries = []BinaryInfo{
-					{Path: "/old/binary", Size: 20 * 1024 * 1024, ModTime: oldTime, Category: CategoryTest},
-					{Path: "/recent/binary", Size: 20 * 1024 * 1024, ModTime: recentTime, Category: CategoryTest},
+					{
+						Path:     "/old/binary",
+						Size:     20 * 1024 * 1024,
+						ModTime:  oldTime,
+						Category: CategoryTest,
+					},
+					{
+						Path:     "/recent/binary",
+						Size:     20 * 1024 * 1024,
+						ModTime:  recentTime,
+						Category: CategoryTest,
+					},
 				}
 
 				cleaner = NewCompiledBinariesCleaner(false, false, 10, "7d", []string{tempDir}, nil,
@@ -647,7 +681,13 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 
 	ginkgo.BeforeEach(func() {
 		scanner = &defaultBinaryScanner{
-			includeCategories: []BinaryCategory{CategoryTmp, CategoryTest, CategoryBin, CategoryDist, CategoryRoot},
+			includeCategories: []BinaryCategory{
+				CategoryTmp,
+				CategoryTest,
+				CategoryBin,
+				CategoryDist,
+				CategoryRoot,
+			},
 		}
 		tempDir, _ = os.MkdirTemp("", "scanner-test-*")
 		ctx = context.Background()
@@ -711,7 +751,12 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 				smallFile := filepath.Join(tempDir, "small.test")
 				_ = os.WriteFile(smallFile, make([]byte, 5*1024*1024), 0o755)
 
-				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryTest}, 10*1024*1024)
+				binaries, err := scanner.ScanDirectory(
+					ctx,
+					tempDir,
+					[]BinaryCategory{CategoryTest},
+					10*1024*1024,
+				)
 				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.BeEmpty())
 			})
@@ -720,7 +765,12 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 				largeFile := filepath.Join(tempDir, "large.test")
 				_ = os.WriteFile(largeFile, make([]byte, 15*1024*1024), 0o755)
 
-				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryTest}, 10*1024*1024)
+				binaries, err := scanner.ScanDirectory(
+					ctx,
+					tempDir,
+					[]BinaryCategory{CategoryTest},
+					10*1024*1024,
+				)
 				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 			})
@@ -791,7 +841,12 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 				execFile := filepath.Join(tempDir, "myapp")
 				_ = os.WriteFile(execFile, make([]byte, 20*1024*1024), 0o755)
 
-				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryRoot}, 0)
+				binaries, err := scanner.ScanDirectory(
+					ctx,
+					tempDir,
+					[]BinaryCategory{CategoryRoot},
+					0,
+				)
 				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 			})
@@ -805,7 +860,12 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 				_ = os.WriteFile(binary1, make([]byte, 20*1024*1024), 0o755)
 				_ = os.WriteFile(binary2, make([]byte, 20*1024*1024), 0o755)
 
-				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{CategoryRoot}, 0)
+				binaries, err := scanner.ScanDirectory(
+					ctx,
+					tempDir,
+					[]BinaryCategory{CategoryRoot},
+					0,
+				)
 				gomega.Expect(err).ToNot(gomega.HaveOccurred())
 				gomega.Expect(binaries).To(gomega.HaveLen(1))
 				gomega.Expect(binaries[0].Path).To(gomega.Equal(binary1))
