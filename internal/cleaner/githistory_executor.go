@@ -64,7 +64,6 @@ func (e *GitHistoryExecutor) Execute(
 			backupPath = e.getDefaultBackupPath()
 		}
 		err := e.createBackup(ctx, backupPath)
-
 		if err != nil {
 			return nil, fmt.Errorf("failed to create backup: %w", err)
 		}

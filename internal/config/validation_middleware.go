@@ -282,7 +282,7 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(
 	}
 
 	// Validate operation
-	err := tempOp.Validate()
+	err = tempOp.Validate()
 	if err != nil {
 		result.IsValid = false
 		result.Error = err
@@ -291,7 +291,7 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(
 	}
 
 	// Validate operation-specific settings
-	err := vm.validateOperationSettings(operationName, tempOp)
+	err = vm.validateOperationSettings(operationName, tempOp)
 	if err != nil {
 		result.IsValid = false
 		result.Error = err

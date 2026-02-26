@@ -81,7 +81,7 @@ func (ecl *EnhancedConfigLoader) SaveConfig(
 		return nil, err
 	}
 
-	err := ecl.saveConfigWithRetry(ctx, config, options)
+	err = ecl.saveConfigWithRetry(ctx, config, options)
 	if err != nil {
 		return nil, err
 	}

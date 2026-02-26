@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"time"

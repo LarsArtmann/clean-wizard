@@ -104,7 +104,7 @@ func UnmarshalYAMLEnumWithDefault[T ~int](
 
 	// Try as integer
 	var i int
-	err := value.Decode(&i)
+	err = value.Decode(&i)
 	if err == nil {
 		for _, enumVal := range valueMap {
 			if int(enumVal) == i {

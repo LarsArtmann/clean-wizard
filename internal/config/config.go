@@ -78,7 +78,7 @@ func unmarshalConfig(v *viper.Viper) (*domain.Config, error) {
 	fixProfileSettings(v, &config)
 
 	// Validate configuration
-	err := validateLoadedConfig(&config)
+	err = validateLoadedConfig(&config)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func Save(config *domain.Config) error {
 	}
 
 	// Write configuration file
-	err := v.WriteConfigAs(configPath)
+	err = v.WriteConfigAs(configPath)
 	if err != nil {
 		return pkgerrors.HandleConfigError("Save", err)
 	}

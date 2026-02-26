@@ -22,7 +22,7 @@ func (cv *ConfigValidator) validateProfiles(cfg *domain.Config) error {
 		}
 
 		// Validate profile struct
-		err := profile.Validate(name)
+		err = profile.Validate(name)
 		if err != nil {
 			return fmt.Errorf("profile %s: %w", name, err)
 		}

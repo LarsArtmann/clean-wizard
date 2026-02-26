@@ -35,7 +35,7 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	}
 
 	// Protected paths validation
-	err := cv.validateProtectedPaths(cfg.Protected)
+	err = cv.validateProtectedPaths(cfg.Protected)
 	if err != nil {
 		result.Errors = append(result.Errors, ValidationError{
 			Field:      "protected",
