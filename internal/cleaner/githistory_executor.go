@@ -14,20 +14,51 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+const (
+	// FilterRepoTimeout is the timeout for git-filter-repo operations.
+	FilterRepoTimeout = 10 * time.Minute
+	// GarbageCollectionTimeout is the timeout for git garbage collection.
+	GarbageCollectionTimeout = 5 * time.Minute
+	// BackupTimeout is the timeout for creating repository backups.
+	BackupTimeout = 5 * time.Minute
+	// BytesPerMB is the number of bytes in a megabyte.
+	BytesPerMB = 1024 * 1024
+	// DefaultPackRatio is the default pack file compression ratio estimate.
+	DefaultPackRatio = 0.7
+)
+
 // GitHistoryExecutor executes git history rewrites using git-filter-repo.
 type GitHistoryExecutor struct {
-	repoPath string
-	verbose  bool
-	dryRun   bool
+	repoPath  string
+	verbose   bool
+	dryRun    bool
+	packRatio float64 // Pack file compression ratio for size estimation
+}
+
+// GitHistoryExecutorOption is a functional option for the executor.
+type GitHistoryExecutorOption func(*GitHistoryExecutor)
+
+// WithPackRatio sets the pack file compression ratio for size estimation.
+func WithPackRatio(ratio float64) GitHistoryExecutorOption {
+	return func(e *GitHistoryExecutor) {
+		e.packRatio = ratio
+	}
 }
 
 // NewGitHistoryExecutor creates a new executor.
-func NewGitHistoryExecutor(repoPath string, verbose, dryRun bool) *GitHistoryExecutor {
-	return &GitHistoryExecutor{
-		repoPath: repoPath,
-		verbose:  verbose,
-		dryRun:   dryRun,
+func NewGitHistoryExecutor(repoPath string, verbose, dryRun bool, opts ...GitHistoryExecutorOption) *GitHistoryExecutor {
+	e := &GitHistoryExecutor{
+		repoPath:  repoPath,
+		verbose:   verbose,
+		dryRun:    dryRun,
+		packRatio: DefaultPackRatio,
 	}
+
+	for _, opt := range opts {
+		opt(e)
+	}
+
+	return e
 }
 
 // ExecuteOptions configures the history rewrite.
@@ -122,7 +153,7 @@ func (e *GitHistoryExecutor) runFilterRepo(
 	ctx context.Context,
 	files []domain.GitHistoryFile,
 ) (int, error) {
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+	ctx, cancel := context.WithTimeout(ctx, FilterRepoTimeout)
 	defer cancel()
 
 	// Build arguments for git-filter-repo
@@ -166,7 +197,7 @@ func (e *GitHistoryExecutor) runFilterRepo(
 
 // runGC runs git garbage collection.
 func (e *GitHistoryExecutor) runGC(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	ctx, cancel := context.WithTimeout(ctx, GarbageCollectionTimeout)
 	defer cancel()
 
 	// Run reflog expire first
@@ -202,7 +233,7 @@ func (e *GitHistoryExecutor) createBackup(ctx context.Context, backupPath string
 // This is a shared helper used by both GitHistoryExecutor and GitHistorySafetyChecker.
 // If the backup path already exists, it will be removed before creating the new backup.
 func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	ctx, cancel := context.WithTimeout(ctx, BackupTimeout)
 	defer cancel()
 
 	// Remove existing backup if it exists (from previous run)
@@ -292,14 +323,13 @@ func (e *GitHistoryExecutor) EstimateImpact(
 	// Estimate commits affected (rough estimate based on file count)
 	commitsEstimate := len(files) * 2 // Assume each file touches ~2 commits on average
 
-	// Estimated new size (files represent roughly 70% of their size in pack files)
-	packRatio := 0.7
-	estimatedNewSize := max(oldSize-int64(float64(totalFileBytes)*packRatio), 0)
+	// Estimated new size (files represent roughly packRatio of their size in pack files)
+	estimatedNewSize := max(oldSize-int64(float64(totalFileBytes)*e.packRatio), 0)
 
 	return &ImpactEstimate{
-		CurrentRepoSizeMB:  float64(oldSize) / (1024 * 1024),
-		EstimatedNewSizeMB: float64(estimatedNewSize) / (1024 * 1024),
-		SpaceReclaimedMB:   float64(oldSize-estimatedNewSize) / (1024 * 1024),
+		CurrentRepoSizeMB:  float64(oldSize) / float64(BytesPerMB),
+		EstimatedNewSizeMB: float64(estimatedNewSize) / float64(BytesPerMB),
+		SpaceReclaimedMB:   float64(oldSize-estimatedNewSize) / float64(BytesPerMB),
 		FilesToRemove:      len(files),
 		EstimatedCommits:   commitsEstimate,
 		EstimatedDuration:  time.Duration(len(files)) * time.Second,
@@ -333,7 +363,7 @@ func (e *GitHistoryExecutor) RemoveFilesFromHistory(ctx context.Context, paths [
 
 // StripLargeBlobs removes all blobs larger than the specified size.
 func (e *GitHistoryExecutor) StripLargeBlobs(ctx context.Context, sizeMB int) error {
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+	ctx, cancel := context.WithTimeout(ctx, FilterRepoTimeout)
 	defer cancel()
 
 	args := []string{

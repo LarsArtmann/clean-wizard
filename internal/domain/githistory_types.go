@@ -130,6 +130,14 @@ type GitHistorySafetyReport struct {
 	FilterRepoAvailable bool `json:"filter_repo_available"`
 	// FilterRepoProvider indicates how git-filter-repo is available ("system", "nix", or "")
 	FilterRepoProvider string `json:"filter_repo_provider,omitempty"`
+	// HasLFS indicates if Git LFS is configured for this repository
+	HasLFS bool `json:"has_lfs"`
+	// HasSubmodules indicates if the repository contains submodules
+	HasSubmodules bool `json:"has_submodules"`
+	// IsProtectedBranch indicates if current branch is a protected branch (main, master, production)
+	IsProtectedBranch bool `json:"is_protected_branch"`
+	// HasSufficientDiskSpace indicates if there's enough disk space for backup
+	HasSufficientDiskSpace bool `json:"has_sufficient_disk_space"`
 	// Warnings are non-blocking issues
 	Warnings []string `json:"warnings,omitempty"`
 	// Blockers are issues that must be resolved before proceeding

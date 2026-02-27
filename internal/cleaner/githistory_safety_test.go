@@ -97,7 +97,7 @@ var _ = ginkgo.Describe("GitHistorySafetyChecker", func() {
 	ginkgo.Describe("isFilterRepoAvailable", func() {
 		ginkgo.It("should return a boolean", func() {
 			// This depends on whether git-filter-repo is installed
-			result := checker.isFilterRepoAvailable(ctx)
+			result := checker.isFilterRepoAvailable()
 			_ = result // Just verify it doesn't panic
 		})
 	})

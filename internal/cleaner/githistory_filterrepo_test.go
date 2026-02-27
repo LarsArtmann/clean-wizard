@@ -55,7 +55,7 @@ func TestFilterRepoProvider_String(t *testing.T) {
 		{FilterRepoNone, "none"},
 		{FilterRepoSystem, "system"},
 		{FilterRepoNix, "nix"},
-		{FilterRepoProvider(99), "none"},
+		{FilterRepoProvider(99), "unknown"},
 	}
 
 	for _, tt := range tests {

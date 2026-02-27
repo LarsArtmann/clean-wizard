@@ -14,6 +14,14 @@ import (
 
 // GitHistoryCleaner removes binary files from git history.
 // This is a destructive operation that rewrites history.
+const (
+	// GitHistoryDefaultMinSizeMB is the default minimum file size in MB to consider.
+	GitHistoryDefaultMinSizeMB = 1
+	// GitHistoryDefaultMaxFiles is the default maximum number of files to show.
+	GitHistoryDefaultMaxFiles = 100
+	// GitHistoryDefaultMaxSearchDepth is the default maximum depth for repository search.
+	GitHistoryDefaultMaxSearchDepth = 3
+)
 type GitHistoryCleaner struct {
 	verbose       bool
 	dryRun        bool
@@ -38,8 +46,8 @@ type GitHistoryCleanerOption func(*GitHistoryCleaner)
 func NewGitHistoryCleaner(opts ...GitHistoryCleanerOption) *GitHistoryCleaner {
 	c := &GitHistoryCleaner{
 		repoPath:     ".",
-		minSizeMB:    1,
-		maxFiles:     100,
+		minSizeMB:    GitHistoryDefaultMinSizeMB,
+		maxFiles:     GitHistoryDefaultMaxFiles,
 		createBackup: true,
 	}
 
@@ -197,22 +205,13 @@ func (c *GitHistoryCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 
 // Clean removes selected files from git history.
 func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
-	// If no files pre-selected, scan first
-	if len(c.selectedFiles) == 0 {
-		scanResult, err := c.scanner.Scan(ctx)
-		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("scan failed: %w", err))
-		}
-
-		c.selectedFiles = scanResult.Files
+	// Ensure files are selected
+	if err := c.ensureSelectedFiles(ctx); err != nil {
+		return result.Err[domain.CleanResult](err)
 	}
 
 	if len(c.selectedFiles) == 0 {
-		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
-			0, 0,
-			domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
-		))
+		return c.emptyResult()
 	}
 
 	// Run safety checks
@@ -223,26 +222,64 @@ func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 		)
 	}
 
-	// Calculate total size
-	var totalBytes int64
-	for _, f := range c.selectedFiles {
-		totalBytes += f.SizeBytes
-	}
+	totalBytes := c.calculateTotalBytes()
 
 	if c.dryRun {
-		if c.verbose {
-			fmt.Printf("Would remove %d binary file(s) from git history (%.2f MB)\n",
-				len(c.selectedFiles), float64(totalBytes)/(1024*1024))
-		}
-
-		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
-			len(c.selectedFiles), totalBytes,
-			domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
-		))
+		return c.executeDryRun(totalBytes)
 	}
 
-	// Execute the history rewrite
+	return c.executeClean(ctx, totalBytes)
+}
+
+// ensureSelectedFiles scans for files if none are pre-selected.
+func (c *GitHistoryCleaner) ensureSelectedFiles(ctx context.Context) error {
+	if len(c.selectedFiles) == 0 {
+		scanResult, err := c.scanner.Scan(ctx)
+		if err != nil {
+			return fmt.Errorf("scan failed: %w", err)
+		}
+
+		c.selectedFiles = scanResult.Files
+	}
+
+	return nil
+}
+
+// emptyResult returns a result for when there are no files to clean.
+func (c *GitHistoryCleaner) emptyResult() result.Result[domain.CleanResult] {
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.CleanStrategyType(domain.StrategyConservativeType),
+		0, 0,
+		domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
+	))
+}
+
+// calculateTotalBytes calculates the total size of selected files.
+func (c *GitHistoryCleaner) calculateTotalBytes() int64 {
+	var total int64
+	for _, f := range c.selectedFiles {
+		total += f.SizeBytes
+	}
+
+	return total
+}
+
+// executeDryRun returns a result for dry run mode.
+func (c *GitHistoryCleaner) executeDryRun(totalBytes int64) result.Result[domain.CleanResult] {
+	if c.verbose {
+		fmt.Printf("Would remove %d binary file(s) from git history (%.2f MB)\n",
+			len(c.selectedFiles), float64(totalBytes)/float64(BytesPerMB))
+	}
+
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.CleanStrategyType(domain.StrategyDryRunType),
+		len(c.selectedFiles), totalBytes,
+		domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
+	))
+}
+
+// executeClean performs the actual history rewrite.
+func (c *GitHistoryCleaner) executeClean(ctx context.Context, totalBytes int64) result.Result[domain.CleanResult] {
 	execResult, err := c.executor.Execute(ctx, ExecuteOptions{
 		FilesToRemove: c.selectedFiles,
 		CreateBackup:  c.createBackup,
@@ -253,7 +290,7 @@ func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 
 	if c.verbose {
 		fmt.Printf("Removed %d file(s) from history, reclaimed %.2f MB\n",
-			len(execResult.FilesRemoved), float64(execResult.BytesReclaimed)/(1024*1024))
+			len(execResult.FilesRemoved), float64(execResult.BytesReclaimed)/float64(BytesPerMB))
 
 		if execResult.BackupCreated {
 			fmt.Printf("Backup created at: %s\n", execResult.BackupPath)
@@ -337,7 +374,7 @@ func FindGitRepositories(basePath string, maxDepth int) ([]string, error) {
 
 	// Limit search depth
 	if maxDepth <= 0 {
-		maxDepth = 3
+		maxDepth = GitHistoryDefaultMaxSearchDepth
 	}
 
 	entries, err := os.ReadDir(basePath)

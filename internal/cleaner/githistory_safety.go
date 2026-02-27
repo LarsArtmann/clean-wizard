@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -25,9 +26,21 @@ func NewGitHistorySafetyChecker(repoPath string, verbose bool) *GitHistorySafety
 	}
 }
 
+// Protected branch names that require extra caution.
+var protectedBranches = map[string]bool{
+	"main":       true,
+	"master":     true,
+	"production": true,
+	"staging":    true,
+	"develop":    true,
+}
+
+// SafetyCheckTimeout is the default timeout for safety checks.
+const SafetyCheckTimeout = 30 * time.Second
+
 // Check performs all safety checks and returns a report.
 func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistorySafetyReport {
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, SafetyCheckTimeout)
 	defer cancel()
 
 	report := &domain.GitHistorySafetyReport{
@@ -55,6 +68,15 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 	// Get branch info
 	report.CurrentBranch = c.getCurrentBranch(ctx)
 
+	// Check if on a protected branch
+	report.IsProtectedBranch = protectedBranches[report.CurrentBranch]
+	if report.IsProtectedBranch {
+		report.Warnings = append(
+			report.Warnings,
+			"You are on a protected branch ("+report.CurrentBranch+"). Consider creating a feature branch first.",
+		)
+	}
+
 	// Check remote status
 	c.checkRemote(ctx, report)
 
@@ -70,8 +92,7 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 	}
 
 	// Check if git-filter-repo is available (system or via nix)
-	report.FilterRepoAvailable = c.isFilterRepoAvailable(ctx)
-
+	report.FilterRepoAvailable = c.isFilterRepoAvailable()
 	report.FilterRepoProvider = DetectFilterRepoProvider().String()
 	if !report.FilterRepoAvailable {
 		report.Blockers = append(
@@ -84,6 +105,27 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 	report.DefaultBackupPath = c.getDefaultBackupPath()
 	report.CanCreateBackup = c.canCreateBackup(report.DefaultBackupPath)
 
+	// Check for Git LFS
+	report.HasLFS = c.hasLFS()
+	if report.HasLFS {
+		report.Warnings = append(
+			report.Warnings,
+			"Git LFS is configured. History rewriting may affect LFS objects.",
+		)
+	}
+
+	// Check for submodules
+	report.HasSubmodules = c.hasSubmodules()
+	if report.HasSubmodules {
+		report.Warnings = append(
+			report.Warnings,
+			"Repository contains submodules. Ensure submodules are handled appropriately.",
+		)
+	}
+
+	// Check disk space for backup
+	report.HasSufficientDiskSpace = c.hasSufficientDiskSpace()
+
 	return report
 }
 
@@ -94,7 +136,7 @@ func (c *GitHistorySafetyChecker) isGitRepo(ctx context.Context) bool {
 	return cmd.Run() == nil
 }
 
-// hasUncommittedChanges checks for uncommitted changes.
+// hasUncommittedChanges checks for uncommitted changes including untracked files.
 func (c *GitHistorySafetyChecker) hasUncommittedChanges(ctx context.Context) bool {
 	// Check for staged changes
 	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath, "diff", "--cached", "--quiet")
@@ -104,8 +146,18 @@ func (c *GitHistorySafetyChecker) hasUncommittedChanges(ctx context.Context) boo
 
 	// Check for unstaged changes
 	cmd = exec.CommandContext(ctx, "git", "-C", c.repoPath, "diff", "--quiet")
+	if cmd.Run() != nil {
+		return true
+	}
 
-	return cmd.Run() != nil
+	// Check for untracked files
+	cmd = exec.CommandContext(ctx, "git", "-C", c.repoPath, "ls-files", "--others", "--exclude-standard")
+	output, err := cmd.Output()
+	if err != nil {
+		return false // If we can't check, assume clean
+	}
+
+	return len(strings.TrimSpace(string(output))) > 0
 }
 
 // getCurrentBranch returns the current branch name.
@@ -180,7 +232,7 @@ func (c *GitHistorySafetyChecker) hasUnpushedCommits(ctx context.Context) bool {
 }
 
 // isFilterRepoAvailable checks if git-filter-repo is installed (system or via nix).
-func (c *GitHistorySafetyChecker) isFilterRepoAvailable(ctx context.Context) bool {
+func (c *GitHistorySafetyChecker) isFilterRepoAvailable() bool {
 	provider := DetectFilterRepoProvider()
 
 	return provider != FilterRepoNone
@@ -209,7 +261,48 @@ func (c *GitHistorySafetyChecker) canCreateBackup(backupPath string) bool {
 	return info.IsDir() && info.Mode().Perm()&0o200 != 0
 }
 
+// hasLFS checks if Git LFS is configured in the repository.
+func (c *GitHistorySafetyChecker) hasLFS() bool {
+	gitattributesPath := filepath.Join(c.repoPath, ".gitattributes")
+	content, err := os.ReadFile(gitattributesPath)
+	if err != nil {
+		return false
+	}
+
+	return strings.Contains(string(content), "filter=lfs")
+}
+
+// hasSubmodules checks if the repository contains submodules.
+func (c *GitHistorySafetyChecker) hasSubmodules() bool {
+	gitmodulesPath := filepath.Join(c.repoPath, ".gitmodules")
+	_, err := os.Stat(gitmodulesPath)
+
+	return err == nil
+}
+
+// hasSufficientDiskSpace checks if there's enough disk space for backup.
+func (c *GitHistorySafetyChecker) hasSufficientDiskSpace() bool {
+	return hasSufficientDiskSpace(c.repoPath)
+}
+
 // CreateBackup creates a backup of the repository.
 func (c *GitHistorySafetyChecker) CreateBackup(ctx context.Context, backupPath string) error {
 	return createGitMirrorBackup(ctx, c.repoPath, backupPath)
+}
+
+// hasSufficientDiskSpace checks if there's enough disk space at the given path.
+// Returns true if there's at least 1GB available or if the check fails (fail-open).
+func hasSufficientDiskSpace(path string) bool {
+	var stat syscall.Statfs_t
+	if err := syscall.Statfs(path, &stat); err != nil {
+		return true // Fail-open: assume sufficient space if we can't check
+	}
+
+	// Calculate available space in bytes
+	availableBytes := stat.Bavail * uint64(stat.Bsize)
+
+	// Require at least 1GB of free space
+	const minRequiredBytes = 1 * 1024 * 1024 * 1024
+
+	return availableBytes >= minRequiredBytes
 }

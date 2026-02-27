@@ -22,12 +22,14 @@ const (
 // String returns the provider name.
 func (p FilterRepoProvider) String() string {
 	switch p {
+	case FilterRepoNone:
+		return "none"
 	case FilterRepoSystem:
 		return "system"
 	case FilterRepoNix:
 		return "nix"
 	default:
-		return "none"
+		return "unknown"
 	}
 }
 
@@ -98,12 +100,22 @@ func BuildFilterRepoCommand(ctx context.Context, args []string) *exec.Cmd {
 	switch provider {
 	case FilterRepoNix:
 		// nix run nixpkgs#git-filter-repo -- <args>
-		nixArgs := []string{"run", "nixpkgs#git-filter-repo", "--"}
+		nixArgs := make([]string, 0, 3+len(args))
+		nixArgs = append(nixArgs, "run", "nixpkgs#git-filter-repo", "--")
 		nixArgs = append(nixArgs, args...)
 
 		return exec.CommandContext(ctx, "nix", nixArgs...)
+	case FilterRepoSystem:
+		// System install: git filter-repo <args>
+		gitArgs := append([]string{"filter-repo"}, args...)
+
+		return exec.CommandContext(ctx, "git", gitArgs...)
+	case FilterRepoNone:
+		// Fallback: still try git filter-repo (will likely fail)
+		gitArgs := append([]string{"filter-repo"}, args...)
+
+		return exec.CommandContext(ctx, "git", gitArgs...)
 	default:
-		// System install or fallback: git filter-repo <args>
 		gitArgs := append([]string{"filter-repo"}, args...)
 
 		return exec.CommandContext(ctx, "git", gitArgs...)
@@ -119,7 +131,7 @@ func GetInstallHint() string {
 		return "Using nix to run git-filter-repo"
 	case FilterRepoSystem:
 		return "git-filter-repo is installed system-wide"
-	default:
+	case FilterRepoNone:
 		// Check what's available to give a good hint
 		if _, err := exec.LookPath("nix"); err == nil {
 			return "Run 'nix run nixpkgs#git-filter-repo -- --help' to verify nix can access it, or install with: brew install git-filter-repo"
@@ -129,6 +141,8 @@ func GetInstallHint() string {
 			return "Install with: brew install git-filter-repo"
 		}
 
+		return "Install with: pip install git-filter-repo or see https://github.com/newren/git-filter-repo"
+	default:
 		return "Install with: pip install git-filter-repo or see https://github.com/newren/git-filter-repo"
 	}
 }
