@@ -22,6 +22,7 @@ const (
 	// GitHistoryDefaultMaxSearchDepth is the default maximum depth for repository search.
 	GitHistoryDefaultMaxSearchDepth = 3
 )
+
 type GitHistoryCleaner struct {
 	verbose       bool
 	dryRun        bool
