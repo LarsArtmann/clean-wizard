@@ -246,6 +246,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		ginkgo.It("should work with cancelled context", func() {
 			cancelledCtx, cancel := context.WithCancel(context.Background())
 			cancel()
+
 			result := cleaner.IsAvailable(cancelledCtx)
 			_ = result
 		})
@@ -902,6 +903,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner Integration", func() {
 
 		tmpDir, err := os.MkdirTemp("", "integration-test-*")
 		gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
 		defer os.RemoveAll(tmpDir)
 
 		execFile := filepath.Join(tmpDir, "test-binary")

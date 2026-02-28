@@ -210,6 +210,7 @@ func TestEnsureDetails(t *testing.T) {
 			name: "initializes nil details",
 			inputDetails: func() **ErrorDetails {
 				var d *ErrorDetails
+
 				return &d
 			}(),
 			expectField: "",

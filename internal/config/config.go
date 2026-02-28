@@ -52,7 +52,7 @@ func readConfigFile(ctx context.Context, v *viper.Viper) (*domain.Config, error)
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
 
-		return nil, nil // File read successfully, continue to unmarshal
+		return nil, nil //nolint:nilnil // intentional: signals "file read successfully, continue to unmarshal"
 	}
 }
 
@@ -199,6 +199,7 @@ func Save(config *domain.Config) error {
 
 	// Ensure config directory exists
 	configDir := filepath.Dir(configPath)
+
 	err := os.MkdirAll(configDir, 0o755)
 	if err != nil {
 		return pkgerrors.HandleConfigError("Save", err)
@@ -225,6 +226,7 @@ func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) doma
 	var riskLevelStr string
 
 	key := fmt.Sprintf("profiles.%s.operations.%d.risk_level", profileName, operationIndex)
+
 	err := v.UnmarshalKey(key, &riskLevelStr)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -272,6 +274,7 @@ func unmarshalOperationSettings(
 		nixGenSettings := &domain.NixGenerationsSettings{}
 
 		nixGenKey := settingsKey + ".nix_generations"
+
 		err := v.UnmarshalKey(nixGenKey, nixGenSettings)
 		if err == nil {
 			op.Settings = &domain.OperationSettings{}

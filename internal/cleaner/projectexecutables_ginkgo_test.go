@@ -415,6 +415,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				before := time.Now()
 				result := cleaner.Scan(ctx)
 				after := time.Now()
+
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				items := result.Value()
 				gomega.Expect(items[0].Created).To(gomega.BeTemporally(">=", before))
@@ -432,6 +433,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					{Name: "project1", Path: "/path/to/project1"},
 				}
 				mockOperator.executables = []string{"/path/to/project1/binary1"}
+
 				gomega.Expect(func() { cleaner.Scan(ctx) }).NotTo(gomega.Panic())
 			})
 		})
@@ -771,6 +773,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner Integration", func() {
 		// Create temp directory with executable
 		tmpDir, err := os.MkdirTemp("", "cleaner-test-*")
 		gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
 		defer os.RemoveAll(tmpDir)
 
 		execFile := filepath.Join(tmpDir, "test-executable")

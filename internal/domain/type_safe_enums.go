@@ -19,6 +19,7 @@ func UnmarshalYAMLEnum[T ~int](
 ) error {
 	// Try as string first
 	var s string
+
 	err := value.Decode(&s)
 	if err == nil {
 		// Check if this is actually a numeric string (like "0" or "1")
@@ -91,6 +92,7 @@ func UnmarshalYAMLEnumWithDefault[T ~int](
 	errorMsg string,
 ) T {
 	var s string
+
 	err := value.Decode(&s)
 	if err == nil {
 		upperKey := strings.ToUpper(s)
@@ -104,6 +106,7 @@ func UnmarshalYAMLEnumWithDefault[T ~int](
 
 	// Try as integer
 	var i int
+
 	err = value.Decode(&i)
 	if err == nil {
 		for _, enumVal := range valueMap {
@@ -126,6 +129,7 @@ func UnmarshalJSONEnum[T any](
 	errorMsg string,
 ) error {
 	var s string
+
 	err := json.Unmarshal(data, &s)
 	if err != nil {
 		return err
@@ -440,10 +444,12 @@ func (cs CleanStrategyType) Icon() string {
 // UnmarshalYAML implements yaml.Unmarshaler for RiskLevelType.
 func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
 	var s string
+
 	err := value.Decode(&s)
 	if err != nil {
 		// If string unmarshaling fails, try integer
 		var i int
+
 		err := value.Decode(&i)
 		if err == nil {
 			*rl = RiskLevelType(i)

@@ -2,12 +2,13 @@ package cleaner
 
 import (
 	"context"
-	"os/exec"
 	"testing"
 	"time"
 )
 
 func TestDetectFilterRepoProvider(t *testing.T) {
+	t.Parallel()
+
 	// Reset detector for clean test
 	ResetDetector()
 
@@ -18,32 +19,26 @@ func TestDetectFilterRepoProvider(t *testing.T) {
 		t.Errorf("Invalid provider: %d", provider)
 	}
 
-	// If git-filter-repo is available as git subcommand, provider should be FilterRepoSystem
+	// Verify the provider matches what we can detect
+	// Note: We don't assert specific values because the test environment varies
+	// Instead, we verify that the detection logic is consistent
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if isSystemInstallAvailable(ctx) {
-		if provider != FilterRepoSystem {
-			t.Errorf(
-				"Expected FilterRepoSystem when git filter-repo is available, got %d",
-				provider,
-			)
-		}
+	systemAvailable := isSystemInstallAvailable(ctx)
+	nixAvailable := isNixAvailable(ctx)
+
+	// Verify detection priority: system > nix > none
+	if systemAvailable && provider != FilterRepoSystem {
+		t.Errorf("System install available but provider is %s, expected system", provider)
 	}
 
-	// If nix can access nixpkgs#git-filter-repo (and system install not available), provider should be FilterRepoNix
-	// Note: We don't just check if nix binary exists, we check if nix can actually access git-filter-repo
-	if _, err := exec.LookPath("nix"); err == nil {
-		// Only assert non-none if we can actually verify nixpkgs access
-		cmd := exec.CommandContext(ctx, "nix", "eval", "--raw", "nixpkgs#git-filter-repo.name")
-		if cmd.Run() == nil && !isSystemInstallAvailable(ctx) {
-			if provider != FilterRepoNix {
-				t.Errorf(
-					"Expected FilterRepoNix when nix can access git-filter-repo, got %d",
-					provider,
-				)
-			}
-		}
+	if !systemAvailable && nixAvailable && provider != FilterRepoNix {
+		t.Errorf("Nix available (no system) but provider is %s, expected nix", provider)
+	}
+
+	if !systemAvailable && !nixAvailable && provider != FilterRepoNone {
+		t.Errorf("No provider available but provider is %s, expected none", provider)
 	}
 }
 

@@ -343,6 +343,7 @@ profiles:
 
 	for b.Loop() {
 		var config Config
+
 		err := yaml.Unmarshal([]byte(yamlConfig), &config)
 		if err != nil {
 			b.Fatal(err)
@@ -487,6 +488,7 @@ func BenchmarkYAMLDecodeRaw_String(b *testing.B) {
 // benchmarkNodeDecode runs a benchmark for yaml.Node.Decode into type T.
 func benchmarkNodeDecode[T any](b *testing.B, yamlData string) {
 	node := &yaml.Node{}
+
 	err := yaml.Unmarshal([]byte(yamlData), node)
 	if err != nil {
 		b.Fatal(err)
@@ -558,6 +560,7 @@ func BenchmarkBufferWrite_Config(b *testing.B) {
 
 	for b.Loop() {
 		var buf bytes.Buffer
+
 		err := yaml.NewEncoder(&buf).Encode(config)
 		if err != nil {
 			b.Fatal(err)

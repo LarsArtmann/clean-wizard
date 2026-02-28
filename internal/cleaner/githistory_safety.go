@@ -93,6 +93,7 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 
 	// Check if git-filter-repo is available (system or via nix)
 	report.FilterRepoAvailable = c.isFilterRepoAvailable()
+
 	report.FilterRepoProvider = DetectFilterRepoProvider().String()
 	if !report.FilterRepoAvailable {
 		report.Blockers = append(
@@ -151,7 +152,16 @@ func (c *GitHistorySafetyChecker) hasUncommittedChanges(ctx context.Context) boo
 	}
 
 	// Check for untracked files
-	cmd = exec.CommandContext(ctx, "git", "-C", c.repoPath, "ls-files", "--others", "--exclude-standard")
+	cmd = exec.CommandContext(
+		ctx,
+		"git",
+		"-C",
+		c.repoPath,
+		"ls-files",
+		"--others",
+		"--exclude-standard",
+	)
+
 	output, err := cmd.Output()
 	if err != nil {
 		return false // If we can't check, assume clean
@@ -264,6 +274,7 @@ func (c *GitHistorySafetyChecker) canCreateBackup(backupPath string) bool {
 // hasLFS checks if Git LFS is configured in the repository.
 func (c *GitHistorySafetyChecker) hasLFS() bool {
 	gitattributesPath := filepath.Join(c.repoPath, ".gitattributes")
+
 	content, err := os.ReadFile(gitattributesPath)
 	if err != nil {
 		return false
@@ -294,7 +305,9 @@ func (c *GitHistorySafetyChecker) CreateBackup(ctx context.Context, backupPath s
 // Returns true if there's at least 1GB available or if the check fails (fail-open).
 func hasSufficientDiskSpace(path string) bool {
 	var stat syscall.Statfs_t
-	if err := syscall.Statfs(path, &stat); err != nil {
+
+	err := syscall.Statfs(path, &stat)
+	if err != nil {
 		return true // Fail-open: assume sufficient space if we can't check
 	}
 

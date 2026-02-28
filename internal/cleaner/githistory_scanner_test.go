@@ -141,8 +141,10 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			if option != nil {
 				scanner = NewGitHistoryScanner(tempDir, option)
 			}
+
 			filtered := scanner.filterFiles(files)
 			gomega.Expect(filtered).To(gomega.HaveLen(expectedCount))
+
 			if expectedCount > 0 {
 				gomega.Expect(filtered[0].Path).To(gomega.Equal(expectedPath))
 			}
@@ -219,6 +221,7 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 
 		ginkgo.It("should handle empty slice", func() {
 			files := []domain.GitHistoryFile{}
+
 			gomega.Expect(func() { scanner.sortBySize(files) }).NotTo(gomega.Panic())
 		})
 
@@ -294,6 +297,7 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			scanner = NewGitHistoryScanner(tempDir)
 			cancelCtx, cancel := context.WithCancel(context.Background())
 			cancel()
+
 			_, err := scanner.Scan(cancelCtx)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})

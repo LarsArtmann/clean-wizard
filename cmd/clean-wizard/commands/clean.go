@@ -43,8 +43,8 @@ func NewCleanCommand() *cobra.Command {
 
 // runCleanCommand executes the clean command with multi-cleaner TUI.
 func runCleanCommand(
-	cmd *cobra.Command,
-	args []string,
+	_ *cobra.Command,
+	_ []string,
 	dryRun, verbose, jsonOutput bool,
 	mode string,
 ) error {
@@ -293,29 +293,6 @@ func runCleanCommand(
 	}
 
 	return nil
-}
-
-// printCleanerResult displays detailed results for a cleaner.
-func printCleanerResult(name string, result domain.CleanResult, dryRun bool) {
-	details := ""
-
-	if result.ItemsRemoved > 0 {
-		if dryRun {
-			details = fmt.Sprintf("would clean %d item(s)", result.ItemsRemoved)
-		} else {
-			details = fmt.Sprintf(
-				"cleaned %d item(s), freed %s",
-				result.ItemsRemoved,
-				format.Bytes(int64(result.FreedBytes)),
-			)
-		}
-	} else if result.FreedBytes > 0 {
-		details = "freed " + format.Bytes(int64(result.FreedBytes))
-	} else {
-		details = "no items to clean"
-	}
-
-	fmt.Printf("  ✓ %s cleaner: %s\n", name, details)
 }
 
 // isNotAvailableError checks if an error indicates a cleaner is not available.

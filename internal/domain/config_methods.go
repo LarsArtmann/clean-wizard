@@ -123,11 +123,9 @@ func (r *SanitizeConfigResult) applyComprehensiveSanitization(c *Config) {
 
 // applyStrictSanitization performs strict sanitization with all validations.
 func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
-	changes := 0
-
 	// Apply comprehensive sanitization first
 	r.applyComprehensiveSanitization(c)
-	changes = r.Changes
+	changes := r.Changes
 
 	// Clamp MaxDiskUsage to valid range
 	if c.MaxDiskUsage < 0 {

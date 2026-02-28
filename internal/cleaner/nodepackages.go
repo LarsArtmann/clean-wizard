@@ -324,8 +324,10 @@ func (npmc *NodePackageManagerCleaner) Clean(
 		// Scan actual cache directories to get real sizes
 		scanResult := npmc.Scan(ctx)
 
-		totalBytes := int64(0)
-		itemsRemoved := 0
+		var (
+			totalBytes   int64
+			itemsRemoved int
+		)
 
 		if scanResult.IsOk() {
 			items := scanResult.Value()

@@ -78,7 +78,7 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 
 // runHomebrewCleaner executes the Homebrew cleaner.
 func runHomebrewCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runCleanerWithConfig[domain.HomebrewMode](
+	return runCleanerWithConfig(
 		ctx,
 		verbose,
 		dryRun,
@@ -231,7 +231,7 @@ func runBuildCacheCleaner(ctx context.Context, dryRun, verbose bool) (domain.Cle
 
 // runDockerCleaner executes the Docker cleaner.
 func runDockerCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
-	return runCleanerWithConfig[domain.DockerPruneMode](
+	return runCleanerWithConfig(
 		ctx,
 		verbose,
 		dryRun,

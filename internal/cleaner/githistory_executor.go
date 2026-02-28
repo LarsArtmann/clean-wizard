@@ -46,7 +46,11 @@ func WithPackRatio(ratio float64) GitHistoryExecutorOption {
 }
 
 // NewGitHistoryExecutor creates a new executor.
-func NewGitHistoryExecutor(repoPath string, verbose, dryRun bool, opts ...GitHistoryExecutorOption) *GitHistoryExecutor {
+func NewGitHistoryExecutor(
+	repoPath string,
+	verbose, dryRun bool,
+	opts ...GitHistoryExecutorOption,
+) *GitHistoryExecutor {
 	e := &GitHistoryExecutor{
 		repoPath:  repoPath,
 		verbose:   verbose,
@@ -94,6 +98,7 @@ func (e *GitHistoryExecutor) Execute(
 		if backupPath == "" {
 			backupPath = e.getDefaultBackupPath()
 		}
+
 		err := e.createBackup(ctx, backupPath)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create backup: %w", err)

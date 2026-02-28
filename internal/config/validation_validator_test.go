@@ -13,10 +13,12 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			Required: true,
 			Min: func() *int {
 				i := 10
+
 				return &i
 			}(),
 			Max: func() *int {
 				i := 95
+
 				return &i
 			}(),
 			Message: "Max disk usage must be between 10% and 95%",
@@ -25,6 +27,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			Required: true,
 			Min: func() *int {
 				i := 1
+
 				return &i
 			}(),
 			Message: "At least one protected path is required",

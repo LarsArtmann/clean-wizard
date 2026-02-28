@@ -116,7 +116,7 @@ func (i Info) String() string {
 	sb.WriteString(i.Version)
 
 	if i.Commit != "" && i.Commit != "unknown" {
-		sb.WriteString(fmt.Sprintf(" (commit: %s)", i.Commit))
+		fmt.Fprintf(&sb, " (commit: %s)", i.Commit)
 	}
 
 	if i.Date != "" {

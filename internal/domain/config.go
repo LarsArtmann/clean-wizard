@@ -181,6 +181,7 @@ func (op CleanupOperation) Validate() error {
 	// Validate settings if present
 	if op.Settings != nil {
 		opType := GetOperationType(op.Name)
+
 		err := op.Settings.ValidateSettings(opType)
 		if err != nil {
 			return fmt.Errorf("operation settings validation failed: %w", err)

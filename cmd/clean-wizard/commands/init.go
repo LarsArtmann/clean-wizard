@@ -31,7 +31,7 @@ func NewInitCommand() *cobra.Command {
 }
 
 // runInitCommand executes the init command.
-func runInitCommand(cmd *cobra.Command, args []string, force, minimal bool) error {
+func runInitCommand(_ *cobra.Command, _ []string, force, minimal bool) error {
 	fmt.Println("🧹 Clean Wizard Setup")
 	fmt.Println("======================")
 	fmt.Println()

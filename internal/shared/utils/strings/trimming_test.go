@@ -46,6 +46,7 @@ func TestTrimWhitespaceField(t *testing.T) {
 				Path: "test.path",
 				Value: func() *string {
 					s := "  hello world  "
+
 					return &s
 				}(),
 			},
@@ -60,6 +61,7 @@ func TestTrimWhitespaceField(t *testing.T) {
 				Path: "test.path",
 				Value: func() *string {
 					s := "hello world"
+
 					return &s
 				}(),
 			},
@@ -74,6 +76,7 @@ func TestTrimWhitespaceField(t *testing.T) {
 				Path: "test.path",
 				Value: func() *string {
 					s := ""
+
 					return &s
 				}(),
 			},
@@ -88,6 +91,7 @@ func TestTrimWhitespaceField(t *testing.T) {
 				Path: "test.path",
 				Value: func() *string {
 					s := "   \t\n   "
+
 					return &s
 				}(),
 			},
@@ -145,6 +149,7 @@ func TestTrimIfEnabled(t *testing.T) {
 				Path: "test.path",
 				Value: func() *string {
 					s := "  hello  "
+
 					return &s
 				}(),
 			},
@@ -159,6 +164,7 @@ func TestTrimIfEnabled(t *testing.T) {
 				Path: "test.path",
 				Value: func() *string {
 					s := "  hello  "
+
 					return &s
 				}(),
 			},

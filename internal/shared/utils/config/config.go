@@ -36,7 +36,7 @@ func loadConfig(
 			return nil, err
 		}
 
-		return nil, nil
+		return nil, nil //nolint:nilnil // intentional: graceful degradation - continue without config
 	}
 
 	logger.Info("Using configuration from ~/.clean-wizard.yaml")

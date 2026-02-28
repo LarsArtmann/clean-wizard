@@ -311,10 +311,10 @@ func (vm *ValidationMiddleware) formatValidationErrors(errors []ValidationError)
 	}
 
 	var message strings.Builder
-	message.WriteString(fmt.Sprintf("Validation failed (%d errors):", len(errors)))
+	fmt.Fprintf(&message, "Validation failed (%d errors):", len(errors))
 
 	for i, err := range errors {
-		message.WriteString(fmt.Sprintf("\n%d. %s: %s", i+1, err.Field, err.Message))
+		fmt.Fprintf(&message, "\n%d. %s: %s", i+1, err.Field, err.Message)
 	}
 
 	return message.String()

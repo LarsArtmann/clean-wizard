@@ -50,6 +50,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 			// Validate operation settings
 			if op.Settings != nil {
 				opType := domain.GetOperationType(op.Name)
+
 				err := op.Settings.ValidateSettings(opType)
 				if err != nil {
 					result.Errors = append(result.Errors, ValidationError{

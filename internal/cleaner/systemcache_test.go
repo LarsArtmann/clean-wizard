@@ -186,9 +186,9 @@ func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
 	}
 
-	// Skip test if not on macOS
+	// Skip test if not on macOS or Linux
 	if !cleaner.IsAvailable(context.Background()) {
-		t.Skipf("Skipping test: SystemCacheCleaner only available on macOS")
+		t.Skipf("Skipping test: SystemCacheCleaner only available on macOS/Linux")
 
 		return
 	}
@@ -200,11 +200,7 @@ func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 
 	cleanResult := result.Value()
 
-	// Dry-run should report at least 1 item if on macOS (exact count depends on actual cache dirs)
-	if cleanResult.ItemsRemoved < 1 {
-		t.Errorf("Clean() removed %d items, want >= 1", cleanResult.ItemsRemoved)
-	}
-
+	// Verify dry-run strategy
 	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
 		t.Errorf(
 			"Clean() strategy = %v, want %v",
@@ -213,9 +209,13 @@ func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 		)
 	}
 
-	if cleanResult.FreedBytes == 0 {
-		t.Errorf("Clean() freed %d bytes, want > 0", cleanResult.FreedBytes)
+	// Note: ItemsRemoved and FreedBytes depend on actual cache directories and files
+	// We only assert if items were found; 0 items/bytes is valid if caches are empty
+	if cleanResult.ItemsRemoved > 0 && cleanResult.FreedBytes == 0 {
+		t.Errorf("Clean() removed %d items but freed 0 bytes", cleanResult.ItemsRemoved)
 	}
+
+	t.Logf("Dry-run found %d items, %d bytes", cleanResult.ItemsRemoved, cleanResult.FreedBytes)
 }
 
 func TestSystemCacheCleaner_Scan(t *testing.T) {

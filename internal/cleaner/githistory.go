@@ -207,7 +207,8 @@ func (c *GitHistoryCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 // Clean removes selected files from git history.
 func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	// Ensure files are selected
-	if err := c.ensureSelectedFiles(ctx); err != nil {
+	err := c.ensureSelectedFiles(ctx)
+	if err != nil {
 		return result.Err[domain.CleanResult](err)
 	}
 
@@ -280,7 +281,10 @@ func (c *GitHistoryCleaner) executeDryRun(totalBytes int64) result.Result[domain
 }
 
 // executeClean performs the actual history rewrite.
-func (c *GitHistoryCleaner) executeClean(ctx context.Context, totalBytes int64) result.Result[domain.CleanResult] {
+func (c *GitHistoryCleaner) executeClean(
+	ctx context.Context,
+	totalBytes int64,
+) result.Result[domain.CleanResult] {
 	execResult, err := c.executor.Execute(ctx, ExecuteOptions{
 		FilesToRemove: c.selectedFiles,
 		CreateBackup:  c.createBackup,

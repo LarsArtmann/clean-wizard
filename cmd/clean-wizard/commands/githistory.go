@@ -159,6 +159,7 @@ func runGitHistoryWizard(
 						Value(&selectedRepos),
 				),
 			)
+
 			err := form.Run()
 			if err != nil {
 				return fmt.Errorf("selection error: %w", err)
@@ -440,12 +441,10 @@ func confirmAction(
 	// Build warning message
 	var warnMsg strings.Builder
 	warnMsg.WriteString("⚠️  WARNING: DESTRUCTIVE OPERATION\n\n")
-	warnMsg.WriteString(
-		fmt.Sprintf("You are about to rewrite git history for:\n  %s\n\n", repoPath),
-	)
+	fmt.Fprintf(&warnMsg, "You are about to rewrite git history for:\n  %s\n\n", repoPath)
 	warnMsg.WriteString("This will:\n")
-	warnMsg.WriteString(fmt.Sprintf("  • Remove %d binary files from history\n", fileCount))
-	warnMsg.WriteString(fmt.Sprintf("  • Free approximately %s\n", format.Bytes(totalSize)))
+	fmt.Fprintf(&warnMsg, "  • Remove %d binary files from history\n", fileCount)
+	fmt.Fprintf(&warnMsg, "  • Free approximately %s\n", format.Bytes(totalSize))
 	warnMsg.WriteString("  • Require force-push to remote\n\n")
 
 	if report.HasRemote {

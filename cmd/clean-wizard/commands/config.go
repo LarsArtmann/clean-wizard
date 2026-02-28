@@ -42,7 +42,7 @@ func NewConfigShowCommand() *cobra.Command {
 }
 
 // runConfigShowCommand executes the config show command.
-func runConfigShowCommand(cmd *cobra.Command, args []string, jsonOutput bool) error {
+func runConfigShowCommand(_ *cobra.Command, _ []string, jsonOutput bool) error {
 	cfg, err := config.Load()
 	if err != nil {
 		fmt.Println("❌ No configuration found.")
@@ -121,7 +121,7 @@ func NewConfigEditCommand() *cobra.Command {
 }
 
 // runConfigEditCommand executes the config edit command.
-func runConfigEditCommand(cmd *cobra.Command, args []string) error {
+func runConfigEditCommand(_ *cobra.Command, _ []string) error {
 	configPath := getConfigPath()
 
 	// Check if config exists, create if not
@@ -130,6 +130,7 @@ func runConfigEditCommand(cmd *cobra.Command, args []string) error {
 		fmt.Println("Creating new configuration...")
 
 		cfg := config.GetDefaultConfig()
+
 		err := config.Save(cfg)
 		if err != nil {
 			return fmt.Errorf("failed to create configuration: %w", err)
@@ -189,7 +190,7 @@ func NewConfigValidateCommand() *cobra.Command {
 }
 
 // runConfigValidateCommand executes the config validate command.
-func runConfigValidateCommand(cmd *cobra.Command, args []string, configPath string) error {
+func runConfigValidateCommand(_ *cobra.Command, _ []string, _ string) error {
 	fmt.Println("🔍 Validating configuration...")
 
 	cfg, err := config.Load()
@@ -231,7 +232,7 @@ func NewConfigResetCommand() *cobra.Command {
 }
 
 // runConfigResetCommand executes the config reset command.
-func runConfigResetCommand(cmd *cobra.Command, args []string, force bool) error {
+func runConfigResetCommand(_ *cobra.Command, _ []string, force bool) error {
 	configPath := getConfigPath()
 
 	// Check if config exists

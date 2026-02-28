@@ -19,8 +19,10 @@ var _ = ginkgo.Describe("GitHistory Integration", func() {
 
 	ginkgo.BeforeEach(func() {
 		var err error
+
 		tempRepoDir, err = os.MkdirTemp("", "githistory-integration-test-*")
 		gomega.Expect(err).NotTo(gomega.HaveOccurred())
+
 		ctx = context.Background()
 	})
 
@@ -48,7 +50,11 @@ var _ = ginkgo.Describe("GitHistory Integration", func() {
 
 			ginkgo.It("should detect uncommitted changes", func() {
 				// Create uncommitted file
-				_ = os.WriteFile(filepath.Join(tempRepoDir, "uncommitted.txt"), []byte("test"), 0o644)
+				_ = os.WriteFile(
+					filepath.Join(tempRepoDir, "uncommitted.txt"),
+					[]byte("test"),
+					0o644,
+				)
 
 				checker := NewGitHistorySafetyChecker(tempRepoDir, false)
 				report := checker.Check(ctx)
@@ -96,8 +102,13 @@ var _ = ginkgo.Describe("GitHistory Integration", func() {
 
 			ginkgo.It("should detect submodules when .gitmodules exists", func() {
 				// Create .gitmodules
-				_ = os.WriteFile(filepath.Join(tempRepoDir, ".gitmodules"),
-					[]byte("[submodule \"test\"]\npath = test\nurl = https://example.com/test.git"), 0o644)
+				_ = os.WriteFile(
+					filepath.Join(tempRepoDir, ".gitmodules"),
+					[]byte(
+						"[submodule \"test\"]\npath = test\nurl = https://example.com/test.git",
+					),
+					0o644,
+				)
 
 				checker := NewGitHistorySafetyChecker(tempRepoDir, false)
 				report := checker.Check(ctx)
@@ -156,14 +167,20 @@ var _ = ginkgo.Describe("GitHistory Integration", func() {
 
 				// Find the binary file in results
 				found := false
+
 				for _, f := range result.Files {
 					if f.Path == "large.bin" {
 						found = true
-						gomega.Expect(f.SizeBytes).To(gomega.BeNumerically(">=", int64(2*1024*1024)))
+
+						gomega.Expect(f.SizeBytes).
+							To(gomega.BeNumerically(">=", int64(2*1024*1024)))
+
 						break
 					}
 				}
-				gomega.Expect(found).To(gomega.BeTrue(), "large.bin should be found in scan results")
+
+				gomega.Expect(found).
+					To(gomega.BeTrue(), "large.bin should be found in scan results")
 			})
 		})
 
@@ -271,7 +288,12 @@ func runGitCommand(dir string, args ...string) {
 
 	cmd := exec.CommandContext(ctx, "git", args...)
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "GIT_AUTHOR_DATE=2024-01-01T00:00:00", "GIT_COMMITTER_DATE=2024-01-01T00:00:00")
+
+	cmd.Env = append(
+		os.Environ(),
+		"GIT_AUTHOR_DATE=2024-01-01T00:00:00",
+		"GIT_COMMITTER_DATE=2024-01-01T00:00:00",
+	)
 
 	output, err := cmd.CombinedOutput()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred(), "git command failed: %s", string(output))
