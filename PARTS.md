@@ -5,14 +5,14 @@
 
 ## Executive Summary
 
-| Component | Recommendation | Rationale |
-|-----------|---------------|-----------|
-| Result[T] | **Keep Internal** | samber/mo covers this well; no unique value |
-| Type-Safe Enums | **Consider Extraction** | YAML/JSON helpers + pattern are valuable together |
-| Human Duration Parser | **Consider Extraction** | Fills gap in stdlib (days support) |
-| Cleaner Registry | **Keep Internal** | Domain-specific, generic registries exist |
-| Format Utilities | **Keep Internal** | Thin wrapper around go-humanize |
-| Config Validation | **Keep Internal** | Domain-specific rules |
+| Component             | Recommendation          | Rationale                                         |
+| --------------------- | ----------------------- | ------------------------------------------------- |
+| Result[T]             | **Keep Internal**       | samber/mo covers this well; no unique value       |
+| Type-Safe Enums       | **Consider Extraction** | YAML/JSON helpers + pattern are valuable together |
+| Human Duration Parser | **Consider Extraction** | Fills gap in stdlib (days support)                |
+| Cleaner Registry      | **Keep Internal**       | Domain-specific, generic registries exist         |
+| Format Utilities      | **Keep Internal**       | Thin wrapper around go-humanize                   |
+| Config Validation     | **Keep Internal**       | Domain-specific rules                             |
 
 ---
 
@@ -64,12 +64,12 @@ func (r Result[T]) Tap(fn func(T)) Result[T]
 
 ### Alternatives
 
-| Library | Stars | Features | Notes |
-|---------|-------|----------|-------|
-| **samber/mo** | ~3k | Option, Result, Either, Future, IO | Most popular; comprehensive FP types |
-| larsartmann/uniflow | - | Railway-oriented errors | Policy-recommended for error handling |
-| TeaEntityLab/fpGo | ~200 | Monad, FP features | Less maintained |
-| markphelps/optional | ~400 | Optional types only | No Result type |
+| Library             | Stars | Features                           | Notes                                 |
+| ------------------- | ----- | ---------------------------------- | ------------------------------------- |
+| **samber/mo**       | ~3k   | Option, Result, Either, Future, IO | Most popular; comprehensive FP types  |
+| larsartmann/uniflow | -     | Railway-oriented errors            | Policy-recommended for error handling |
+| TeaEntityLab/fpGo   | ~200  | Monad, FP features                 | Less maintained                       |
+| markphelps/optional | ~400  | Optional types only                | No Result type                        |
 
 ### samber/mo Result Comparison
 
@@ -85,12 +85,14 @@ type Result[T any] struct {
 ```
 
 **Our implementation adds:**
+
 - `SafeValue()` - non-panicking extraction with error
 - `SafeError()` - non-panicking error extraction
 - `Validate()` / `ValidateWithError()` - predicate-based validation
 - `Tap()` - side effects without breaking chain
 
 **samber/mo adds:**
+
 - `MapError()` - transform error type
 - `Fold()` - combine both branches
 - `Match()` - pattern matching
@@ -100,6 +102,7 @@ type Result[T any] struct {
 ### Unique Value Proposition
 
 **Minimal.** Our implementation is clean but samber/mo is:
+
 - More comprehensive (Option, Either, Future, IO in one package)
 - Battle-tested with larger community
 - Policy-recommended (`HOW_TO_GOLANG.md` line 191-196)
@@ -121,6 +124,7 @@ Int-based enums with compile-time safety, YAML/JSON serialization, validation, a
 ### Current Implementation
 
 **Pattern (per enum):**
+
 ```go
 type RiskLevelType int
 
@@ -141,6 +145,7 @@ func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error
 ```
 
 **Generic Helpers:**
+
 ```go
 func UnmarshalYAMLEnum[T ~int](value *yaml.Node, target *T, valueMap map[string]T, errorMsg string) error
 func UnmarshalYAMLEnumWithDefault[T ~int](...) T
@@ -148,6 +153,7 @@ func UnmarshalJSONEnum[T any](data []byte, target *T, valueMap map[string]T, err
 ```
 
 **Features:**
+
 - Case-insensitive string parsing
 - Integer representation support
 - Helpful error messages with valid options
@@ -155,22 +161,24 @@ func UnmarshalJSONEnum[T any](data []byte, target *T, valueMap map[string]T, err
 - TypeSafeEnum interface for generics
 
 **15+ enums defined:**
+
 - RiskLevelType, ValidationLevelType, ChangeOperationType
 - CleanStrategyType, SizeEstimateStatusType
 - PlatformType, CleanerType, etc.
 
 ### Alternatives
 
-| Tool/Library | Type | Features | Notes |
-|--------------|------|----------|-------|
-| **go-enum** (abice/go-enum) | Code Gen | YAML/JSON/sql, String(), Values(), IsValid() | Most popular (~400 stars) |
-| **enumer** (dmarkham/enumer) | Code Gen | String, JSON, YAML, SQL, Text | Well-maintained |
-| **stringer** (golang.org/x/tools) | Code Gen | String() only | Official, minimal |
-| **go-enum-encoding** | Code Gen | JSON, YAML, BSON | Focused on serialization |
+| Tool/Library                      | Type     | Features                                     | Notes                     |
+| --------------------------------- | -------- | -------------------------------------------- | ------------------------- |
+| **go-enum** (abice/go-enum)       | Code Gen | YAML/JSON/sql, String(), Values(), IsValid() | Most popular (~400 stars) |
+| **enumer** (dmarkham/enumer)      | Code Gen | String, JSON, YAML, SQL, Text                | Well-maintained           |
+| **stringer** (golang.org/x/tools) | Code Gen | String() only                                | Official, minimal         |
+| **go-enum-encoding**              | Code Gen | JSON, YAML, BSON                             | Focused on serialization  |
 
 ### go-enum Generated Code Comparison
 
 go-enum generates similar boilerplate but typically:
+
 - Requires build step (`go generate`)
 - Generates to separate files
 - Doesn't include our helpful error messages with docs references
@@ -221,23 +229,25 @@ func ValidateCustomDuration(durationStr string) error
 ```
 
 **Supported formats:**
+
 - Standard Go durations: "24h", "30m", "1h30m"
 - Days: "7d", "0.5d" (converts to hours)
 - Whitespace trimming
 
 **Not supported:**
+
 - Combined: "7d12h" (planned but not implemented)
 - Weeks: "1w"
 - Months/Years: variable length, complex
 
 ### Alternatives
 
-| Library | Features | Notes |
-|---------|----------|-------|
-| **time.ParseDuration** (stdlib) | ns, us, ms, s, m, h | No days, weeks |
-| **github.com/xeonx/timeago** | "2d", "1w", natural language | Focused on "ago" format |
-| **github.com/hako/durafmt** | Formatting, not parsing | Converts duration to string |
-| **github.com/cenkalti/backoff** | Exponential backoff durations | Different use case |
+| Library                         | Features                      | Notes                       |
+| ------------------------------- | ----------------------------- | --------------------------- |
+| **time.ParseDuration** (stdlib) | ns, us, ms, s, m, h           | No days, weeks              |
+| **github.com/xeonx/timeago**    | "2d", "1w", natural language  | Focused on "ago" format     |
+| **github.com/hako/durafmt**     | Formatting, not parsing       | Converts duration to string |
+| **github.com/cenkalti/backoff** | Exponential backoff durations | Different use case          |
 
 **Gap in ecosystem:** No widely-used library for parsing "7d" format.
 
@@ -306,6 +316,7 @@ func (r *Registry) Clear()
 ```
 
 **Cleaner Interface:**
+
 ```go
 type Cleaner interface {
     Name() string
@@ -318,16 +329,17 @@ type Cleaner interface {
 
 ### Alternatives
 
-| Library | Purpose | Notes |
-|---------|---------|-------|
+| Library                 | Purpose           | Notes                   |
+| ----------------------- | ----------------- | ----------------------- |
 | **hashicorp/go-plugin** | RPC-based plugins | Overkill for in-process |
-| **google/wire** | Compile-time DI | Different purpose |
-| **samber/do/v2** | DI container | Policy-recommended |
-| Manual sync.Map | Concurrent maps | More primitives |
+| **google/wire**         | Compile-time DI   | Different purpose       |
+| **samber/do/v2**        | DI container      | Policy-recommended      |
+| Manual sync.Map         | Concurrent maps   | More primitives         |
 
 ### Unique Value Proposition
 
 **LOW.** This is a domain-specific registry. Generic patterns:
+
 - `map[string]T` with `sync.RWMutex` is a well-known pattern
 - DI frameworks like `samber/do` handle registration differently
 - `hashicorp/go-plugin` is for out-of-process plugins
@@ -337,6 +349,7 @@ The registry is well-designed but tightly coupled to the Cleaner domain.
 ### Recommendation
 
 **KEEP INTERNAL** — The registry is domain-specific. If we wanted to extract it, we'd need to:
+
 1. Genericize the interface type
 2. Remove domain-specific methods like `CleanAll`, `Available`
 
@@ -364,14 +377,15 @@ func Number(n int64) string        // "1,234,567"
 
 ### Alternatives
 
-| Library | Features | Notes |
-|---------|----------|-------|
+| Library                           | Features                     | Notes               |
+| --------------------------------- | ---------------------------- | ------------------- |
 | **github.com/dustin/go-humanize** | Bytes, time, numbers, commas | What we already use |
-| **github.com/labstack/gommon** | Random utilities | Broader scope |
+| **github.com/labstack/gommon**    | Random utilities             | Broader scope       |
 
 ### Current Usage
 
 We're a thin wrapper around `go-humanize`:
+
 ```go
 func Size(bytes int64) string {
     return humanize.IBytes(uint64(bytes))
@@ -410,11 +424,11 @@ Multi-level configuration validation with structured results.
 
 ### Alternatives
 
-| Library | Features | Notes |
-|---------|----------|-------|
-| **go-playground/validator** | Struct tags, extensive rules | Most popular |
-| **huma validation** | Schema-based | Fromhuma framework |
-| **github.com/go-ozzo/ozzo-validation** | Rule-based | Flexible |
+| Library                                | Features                     | Notes              |
+| -------------------------------------- | ---------------------------- | ------------------ |
+| **go-playground/validator**            | Struct tags, extensive rules | Most popular       |
+| **huma validation**                    | Schema-based                 | Fromhuma framework |
+| **github.com/go-ozzo/ozzo-validation** | Rule-based                   | Flexible           |
 
 ### Unique Value Proposition
 
@@ -428,14 +442,14 @@ Multi-level configuration validation with structured results.
 
 ## Summary Table
 
-| Component | Lines | Extract? | Library Name | Priority |
-|-----------|-------|----------|--------------|----------|
-| Result[T] | 161 | No | - | - |
-| Type-Safe Enum Helpers | ~100 | Maybe | `go-enum-helpers` | Low |
-| Human Duration Parser | 76 | **Yes** | `go-duration` | **High** |
-| Cleaner Registry | 140 | No | - | - |
-| Format Utilities | 61 | No | - | - |
-| Config Validation | - | No | - | - |
+| Component              | Lines | Extract? | Library Name      | Priority |
+| ---------------------- | ----- | -------- | ----------------- | -------- |
+| Result[T]              | 161   | No       | -                 | -        |
+| Type-Safe Enum Helpers | ~100  | Maybe    | `go-enum-helpers` | Low      |
+| Human Duration Parser  | 76    | **Yes**  | `go-duration`     | **High** |
+| Cleaner Registry       | 140   | No       | -                 | -        |
+| Format Utilities       | 61    | No       | -                 | -        |
+| Config Validation      | -     | No       | -                 | -        |
 
 ---
 
