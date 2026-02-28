@@ -22,7 +22,7 @@ func LoadConfigOrContinue(ctx context.Context, logger *logrus.Logger) (*domain.C
 }
 
 // loadConfig is a helper that loads configuration and optionally propagates errors.
-// When propagateErrors is true, errors are returned; otherwise, errors are logged and nil config is returned.
+// When propagateErrors is true, errors are returned; otherwise, default config is returned.
 func loadConfig(
 	ctx context.Context,
 	logger *logrus.Logger,
@@ -30,13 +30,14 @@ func loadConfig(
 ) (*domain.Config, error) {
 	loadedCfg, err := config.LoadWithContext(ctx)
 	if err != nil {
-		logger.Warnf("Could not load default configuration: %v", err)
+		logger.Warnf("Could not load configuration, using defaults: %v", err)
 
 		if propagateErrors {
 			return nil, err
 		}
 
-		return nil, nil //nolint:nilnil // intentional: graceful degradation - continue without config
+		// Graceful degradation: return default config
+		return config.GetDefaultConfig(), nil
 	}
 
 	logger.Info("Using configuration from ~/.clean-wizard.yaml")

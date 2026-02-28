@@ -15,6 +15,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+// ErrConfigShouldUnmarshal is returned when the config file was read successfully
+// and should be unmarshaled from viper.
+var ErrConfigShouldUnmarshal = errors.New("config file read successfully, proceed to unmarshal")
+
 // setupViper creates and configures a viper instance with defaults.
 func setupViper() *viper.Viper {
 	v := viper.New()
@@ -52,7 +56,7 @@ func readConfigFile(ctx context.Context, v *viper.Viper) (*domain.Config, error)
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
 
-		return nil, nil //nolint:nilnil // intentional: signals "file read successfully, continue to unmarshal"
+		return nil, ErrConfigShouldUnmarshal
 	}
 }
 
@@ -142,12 +146,16 @@ func LoadWithContext(ctx context.Context) (*domain.Config, error) {
 
 	// Try to read configuration file
 	config, err := readConfigFile(ctx, v)
-	if err != nil || config != nil {
-		return config, err
+	if err != nil {
+		if errors.Is(err, ErrConfigShouldUnmarshal) {
+			// File read successfully, unmarshal and process configuration
+			return unmarshalConfig(v)
+		}
+
+		return nil, err
 	}
 
-	// Unmarshal and process configuration
-	return unmarshalConfig(v)
+	return config, nil
 }
 
 // boolToSafeMode converts boolean to SafeMode enum.
