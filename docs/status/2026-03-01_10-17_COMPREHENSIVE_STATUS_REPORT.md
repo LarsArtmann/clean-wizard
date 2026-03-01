@@ -8,15 +8,15 @@
 
 ## Executive Summary
 
-| Metric | Value |
-|--------|-------|
-| Go Files | 185 |
-| Packages | 25 |
-| Cleaner Implementations | 13 |
-| Test Packages | 18 (passing) |
-| Linter Warnings | 2,359 |
-| Build Status | ✅ PASSING |
-| Test Status | ✅ ALL PASSING |
+| Metric                  | Value          |
+| ----------------------- | -------------- |
+| Go Files                | 185            |
+| Packages                | 25             |
+| Cleaner Implementations | 13             |
+| Test Packages           | 18 (passing)   |
+| Linter Warnings         | 2,359          |
+| Build Status            | ✅ PASSING     |
+| Test Status             | ✅ ALL PASSING |
 
 ---
 
@@ -24,22 +24,22 @@
 
 ### Core Features (100% Complete)
 
-| Feature | Location | Verification |
-|---------|----------|--------------|
-| CleanerRegistry Integration | `internal/cleaner/registry.go` | 231 lines, 12 tests |
-| 13 Cleaner Implementations | `internal/cleaner/*.go` | All implement Cleaner interface |
-| CLI Commands (5) | `cmd/clean-wizard/commands/` | clean, scan, init, profile, config |
-| Timeout Protection | All exec calls | Context timeout on all external commands |
-| Size Reporting Deduplication | `fsutil.go` | `CalculateBytesFreed()` |
-| Git History Cleaner | `githistory_*.go` | 900+ tests, interactive mode |
-| Domain Enum System | `internal/domain/enums.go` | All enums have IsValid(), Values(), String() |
-| Result Type with Chaining | `internal/result/` | Validate, AndThen, FlatMap, OrElse, Map, Tap |
-| Generic Context System | `internal/shared/context/` | ValidationContext, ErrorDetails unified |
-| BDD Test Framework | `tests/bdd/` | Full Ginkgo-based BDD suite |
-| Config Loading Utility | `internal/shared/utils/config/` | LoadConfigWithFallback, LoadConfigOrContinue |
-| Error Details Utility | `internal/pkg/errors/detail_helpers.go` | Comprehensive error context |
-| String Trimming Utility | `internal/shared/utils/strings/trimming.go` | Safe string operations |
-| Schema Min/Max Utility | `internal/shared/utils/schema/minmax.go` | Validation helpers |
+| Feature                      | Location                                    | Verification                                 |
+| ---------------------------- | ------------------------------------------- | -------------------------------------------- |
+| CleanerRegistry Integration  | `internal/cleaner/registry.go`              | 231 lines, 12 tests                          |
+| 13 Cleaner Implementations   | `internal/cleaner/*.go`                     | All implement Cleaner interface              |
+| CLI Commands (5)             | `cmd/clean-wizard/commands/`                | clean, scan, init, profile, config           |
+| Timeout Protection           | All exec calls                              | Context timeout on all external commands     |
+| Size Reporting Deduplication | `fsutil.go`                                 | `CalculateBytesFreed()`                      |
+| Git History Cleaner          | `githistory_*.go`                           | 900+ tests, interactive mode                 |
+| Domain Enum System           | `internal/domain/enums.go`                  | All enums have IsValid(), Values(), String() |
+| Result Type with Chaining    | `internal/result/`                          | Validate, AndThen, FlatMap, OrElse, Map, Tap |
+| Generic Context System       | `internal/shared/context/`                  | ValidationContext, ErrorDetails unified      |
+| BDD Test Framework           | `tests/bdd/`                                | Full Ginkgo-based BDD suite                  |
+| Config Loading Utility       | `internal/shared/utils/config/`             | LoadConfigWithFallback, LoadConfigOrContinue |
+| Error Details Utility        | `internal/pkg/errors/detail_helpers.go`     | Comprehensive error context                  |
+| String Trimming Utility      | `internal/shared/utils/strings/trimming.go` | Safe string operations                       |
+| Schema Min/Max Utility       | `internal/shared/utils/schema/minmax.go`    | Validation helpers                           |
 
 ### 13 Cleaners (All Working)
 
@@ -71,23 +71,23 @@
 
 ### Linter Warnings (2,359 remaining)
 
-| Category | Count | Priority | Effort |
-|----------|-------|----------|--------|
-| varnamelen | 50 | Low | Config tweak |
-| tagliatelle | 50 | Low | Config tweak |
-| revive | 50 | Medium | Mixed fixes |
-| paralleltest | 50 | Medium | Test refactoring |
-| mnd (magic numbers) | 50 | Low | Extract constants |
-| funcorder | 50 | Low | Reorder functions |
-| exhaustruct | 50 | Low | Config tweak |
-| depguard | 50 | Low | Config tweak |
-| funlen | 40 | Medium | Split functions |
-| cyclop (complexity) | 36 | High | Refactor needed |
-| wrapcheck | 29 | Medium | Wrap external errors |
-| unused | 24 | Low | Remove dead code |
-| gochecknoglobals | 20 | Low | Config tweak |
-| testpackage | 18 | Low | Config tweak |
-| recvcheck | 16 | Low | Config tweak |
+| Category            | Count | Priority | Effort               |
+| ------------------- | ----- | -------- | -------------------- |
+| varnamelen          | 50    | Low      | Config tweak         |
+| tagliatelle         | 50    | Low      | Config tweak         |
+| revive              | 50    | Medium   | Mixed fixes          |
+| paralleltest        | 50    | Medium   | Test refactoring     |
+| mnd (magic numbers) | 50    | Low      | Extract constants    |
+| funcorder           | 50    | Low      | Reorder functions    |
+| exhaustruct         | 50    | Low      | Config tweak         |
+| depguard            | 50    | Low      | Config tweak         |
+| funlen              | 40    | Medium   | Split functions      |
+| cyclop (complexity) | 36    | High     | Refactor needed      |
+| wrapcheck           | 29    | Medium   | Wrap external errors |
+| unused              | 24    | Low      | Remove dead code     |
+| gochecknoglobals    | 20    | Low      | Config tweak         |
+| testpackage         | 18    | Low      | Config tweak         |
+| recvcheck           | 16    | Low      | Config tweak         |
 
 ### Dependency Management
 
@@ -100,12 +100,12 @@
 
 ### Potential Improvements (Deferred)
 
-| Task | Reason |
-|------|--------|
-| Plugin Architecture | Over-engineering for current needs |
-| samber/do/v2 DI | Constructor pattern sufficient |
-| mapstructure decode hooks | Manual enum parsing works fine |
-| Linux SystemCache paths | Already implemented (XDG, etc.) |
+| Task                      | Reason                             |
+| ------------------------- | ---------------------------------- |
+| Plugin Architecture       | Over-engineering for current needs |
+| samber/do/v2 DI           | Constructor pattern sufficient     |
+| mapstructure decode hooks | Manual enum parsing works fine     |
+| Linux SystemCache paths   | Already implemented (XDG, etc.)    |
 
 ---
 
@@ -113,11 +113,11 @@
 
 ### Issues Fixed This Session
 
-| Issue | Root Cause | Fix |
-|-------|------------|-----|
-| go mod tidy failed | gomega v1.39.x removed internal packages | Pinned to v1.36.3 |
-| Stale LSP diagnostics | LSP cache not refreshed | Ignored stale warnings |
-| nilnil warnings (2) | Intentional API patterns | Added sentinel error + default config return |
+| Issue                 | Root Cause                               | Fix                                          |
+| --------------------- | ---------------------------------------- | -------------------------------------------- |
+| go mod tidy failed    | gomega v1.39.x removed internal packages | Pinned to v1.36.3                            |
+| Stale LSP diagnostics | LSP cache not refreshed                  | Ignored stale warnings                       |
+| nilnil warnings (2)   | Intentional API patterns                 | Added sentinel error + default config return |
 
 ### No Current Blockers
 
@@ -154,58 +154,58 @@
 
 ### Priority 1: Quick Wins (1-2 hours total)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 1 | Add `.golangci.yml` to suppress false positives | 15min | High |
-| 2 | Remove unused code (24 items) | 30min | Medium |
-| 3 | Extract magic numbers to named constants | 30min | Medium |
-| 4 | Fix simple wrapcheck warnings | 20min | Medium |
+| #   | Task                                            | Effort | Impact |
+| --- | ----------------------------------------------- | ------ | ------ |
+| 1   | Add `.golangci.yml` to suppress false positives | 15min  | High   |
+| 2   | Remove unused code (24 items)                   | 30min  | Medium |
+| 3   | Extract magic numbers to named constants        | 30min  | Medium |
+| 4   | Fix simple wrapcheck warnings                   | 20min  | Medium |
 
 ### Priority 2: Code Quality (2-4 hours)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 5 | Refactor top 5 highest complexity functions | 1hr | High |
-| 6 | Add `t.Parallel()` to tests where safe | 30min | Medium |
-| 7 | Reorder functions for funcorder compliance | 30min | Low |
-| 8 | Add package comments for revive | 20min | Low |
+| #   | Task                                        | Effort | Impact |
+| --- | ------------------------------------------- | ------ | ------ |
+| 5   | Refactor top 5 highest complexity functions | 1hr    | High   |
+| 6   | Add `t.Parallel()` to tests where safe      | 30min  | Medium |
+| 7   | Reorder functions for funcorder compliance  | 30min  | Low    |
+| 8   | Add package comments for revive             | 20min  | Low    |
 
 ### Priority 3: Architecture (4-8 hours)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 9 | Extract common cleaner patterns to shared base | 2hr | High |
-| 10 | Unify error types across packages | 2hr | High |
-| 11 | Add integration tests for CLI commands | 2hr | High |
-| 12 | Document public API with examples | 2hr | Medium |
+| #   | Task                                           | Effort | Impact |
+| --- | ---------------------------------------------- | ------ | ------ |
+| 9   | Extract common cleaner patterns to shared base | 2hr    | High   |
+| 10  | Unify error types across packages              | 2hr    | High   |
+| 11  | Add integration tests for CLI commands         | 2hr    | High   |
+| 12  | Document public API with examples              | 2hr    | Medium |
 
 ### Priority 4: Testing (2-4 hours)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 13 | Increase test coverage on low-coverage files | 2hr | High |
-| 14 | Add fuzz tests for parsing functions | 1hr | Medium |
-| 15 | Add benchmark tests for hot paths | 1hr | Medium |
+| #   | Task                                         | Effort | Impact |
+| --- | -------------------------------------------- | ------ | ------ |
+| 13  | Increase test coverage on low-coverage files | 2hr    | High   |
+| 14  | Add fuzz tests for parsing functions         | 1hr    | Medium |
+| 15  | Add benchmark tests for hot paths            | 1hr    | Medium |
 
 ### Priority 5: Documentation (1-2 hours)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 16 | Update README with current features | 30min | High |
-| 17 | Add CONTRIBUTING.md | 30min | Medium |
-| 18 | Add CHANGELOG.md | 30min | Medium |
-| 19 | Document cleaner configuration options | 30min | Medium |
+| #   | Task                                   | Effort | Impact |
+| --- | -------------------------------------- | ------ | ------ |
+| 16  | Update README with current features    | 30min  | High   |
+| 17  | Add CONTRIBUTING.md                    | 30min  | Medium |
+| 18  | Add CHANGELOG.md                       | 30min  | Medium |
+| 19  | Document cleaner configuration options | 30min  | Medium |
 
 ### Priority 6: Future Features (Future consideration)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 20 | Add Windows support for cleaners | 4hr | Medium |
-| 21 | Add progress bars for long operations | 2hr | Medium |
-| 22 | Add scheduled cleanup mode | 2hr | Medium |
-| 23 | Add configuration profiles | 2hr | Medium |
-| 24 | Add remote config support | 3hr | Low |
-| 25 | Add telemetry/opt-out | 2hr | Low |
+| #   | Task                                  | Effort | Impact |
+| --- | ------------------------------------- | ------ | ------ |
+| 20  | Add Windows support for cleaners      | 4hr    | Medium |
+| 21  | Add progress bars for long operations | 2hr    | Medium |
+| 22  | Add scheduled cleanup mode            | 2hr    | Medium |
+| 23  | Add configuration profiles            | 2hr    | Medium |
+| 24  | Add remote config support             | 3hr    | Low    |
+| 25  | Add telemetry/opt-out                 | 2hr    | Low    |
 
 ---
 
@@ -218,6 +218,7 @@
 - Is it a **library** (needs stable public API, versioning)?
 
 **Why it matters:**
+
 - Personal tool: Current state is 95% done, just polish
 - Enterprise tool: Need robustness, docs, error messages, telemetry
 - Library: Need API stability guarantees, semantic versioning, deprecation policy
@@ -248,12 +249,12 @@
 
 ## Files Changed This Session
 
-| File | Change |
-|------|--------|
-| `internal/config/config.go` | Added `ErrConfigShouldUnmarshal` sentinel error, refactored LoadWithContext |
-| `internal/shared/utils/config/config.go` | Return default config for graceful degradation |
-| `go.mod` | Already had correct ginkgo/gomega versions |
+| File                                     | Change                                                                      |
+| ---------------------------------------- | --------------------------------------------------------------------------- |
+| `internal/config/config.go`              | Added `ErrConfigShouldUnmarshal` sentinel error, refactored LoadWithContext |
+| `internal/shared/utils/config/config.go` | Return default config for graceful degradation                              |
+| `go.mod`                                 | Already had correct ginkgo/gomega versions                                  |
 
 ---
 
-*Generated by Crush AI Assistant*
+_Generated by Crush AI Assistant_
