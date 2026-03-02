@@ -1,0 +1,12 @@
+{
+  "groups": [
+    {
+      "duplicate_id": "dup_1772430621044558000_1012",
+      "strategy": "extract_constant",
+      "false_positive": false,
+      "reason": "",
+      "files_modified": ["/Users/larsartmann/projects/clean-wizard/internal/format/format_test.go"],
+      "new_abstraction": "dateTimeTestStruct"
+    }
+  ]
+}

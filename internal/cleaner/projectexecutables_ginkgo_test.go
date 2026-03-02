@@ -310,15 +310,20 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 	})
 
+	// setupDefaultCleaner initializes the cleaner with default test configuration.
+	setupDefaultCleaner := func(mockLister *mockProjectLister, mockOperator *mockFileOperator) {
+		cleaner = NewProjectExecutablesCleaner(false, false, []string{".sh"}, nil,
+			WithProjectLister(mockLister),
+			WithFileOperator(mockOperator),
+		)
+	}
+
 	// ============================================================================
 	// Scan METHOD TESTS (10 specs)
 	// ============================================================================
 	ginkgo.Describe("Scan", func() {
 		ginkgo.BeforeEach(func() {
-			cleaner = NewProjectExecutablesCleaner(false, false, []string{".sh"}, nil,
-				WithProjectLister(mockLister),
-				WithFileOperator(mockOperator),
-			)
+			setupDefaultCleaner(mockLister, mockOperator)
 		})
 
 		GinkgoErrorPropagationContext(
@@ -444,10 +449,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 	// ============================================================================
 	ginkgo.Describe("Clean", func() {
 		ginkgo.BeforeEach(func() {
-			cleaner = NewProjectExecutablesCleaner(false, false, []string{".sh"}, nil,
-				WithProjectLister(mockLister),
-				WithFileOperator(mockOperator),
-			)
+			setupDefaultCleaner(mockLister, mockOperator)
 		})
 
 		GinkgoErrorPropagationContext(
@@ -669,10 +671,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 	// ============================================================================
 	ginkgo.Describe("GetStoreSize", func() {
 		ginkgo.BeforeEach(func() {
-			cleaner = NewProjectExecutablesCleaner(false, false, []string{".sh"}, nil,
-				WithProjectLister(mockLister),
-				WithFileOperator(mockOperator),
-			)
+			setupDefaultCleaner(mockLister, mockOperator)
 		})
 
 		ginkgo.It("should return 0 when scan fails", func() {

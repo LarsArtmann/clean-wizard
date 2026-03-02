@@ -48,20 +48,12 @@ func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(
 
 	// Check for configuration consistency
 	if config.SafeMode.IsEnabled() && ecl.hasCriticalRiskOperations(config) {
-		result.Warnings = append(result.Warnings, ValidationWarning{
-			Field:      "safe_mode",
-			Message:    "Safe mode is enabled but critical risk operations exist",
-			Suggestion: "Review critical operations or consider increasing risk tolerance",
-		})
+		result.Warnings = append(result.Warnings, *ecl.createSafeModeWarning())
 	}
 
 	// Check for performance implications
 	if len(config.Profiles) > 20 {
-		result.Warnings = append(result.Warnings, ValidationWarning{
-			Field:      "profiles",
-			Message:    "Large number of profiles may impact performance",
-			Suggestion: "Consider consolidating similar profiles",
-		})
+		result.Warnings = append(result.Warnings, *ecl.createProfilesWarning())
 	}
 }
 

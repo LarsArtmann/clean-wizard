@@ -21,15 +21,17 @@ func runFormattingTests[T any](t *testing.T, tests []struct {
 	}
 }
 
+type dateTimeTestStruct struct {
+	name     string
+	input    time.Time
+	expected string
+}
+
 func runDateTimeTests(t *testing.T, tests []struct {
 	name     string
 	input    time.Time
 	expected string
-}, formatFn func(time.Time) string, customCheck func(t *testing.T, result string, tt struct {
-	name     string
-	input    time.Time
-	expected string
-}),
+}, formatFn func(time.Time) string, customCheck func(t *testing.T, result string, tt dateTimeTestStruct),
 ) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -106,12 +108,7 @@ func TestDateTime(t *testing.T) {
 		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
 	}
 
-	runDateTimeTests(t, tests, DateTime, func(t *testing.T, result string, tt struct {
-		name     string
-		input    time.Time
-		expected string
-	},
-	) {
+	runDateTimeTests(t, tests, DateTime, func(t *testing.T, result string, tt dateTimeTestStruct) {
 		if tt.expected == "never" && result != "never" {
 			t.Errorf("DateTime(%v) = %v, want %v", tt.input, result, tt.expected)
 		} else if tt.expected != "never" {

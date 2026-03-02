@@ -67,10 +67,7 @@ func (dc *DockerCleaner) ValidateSettings(settings *domain.OperationSettings) er
 
 	// Validate prune mode using domain enum validation
 	if !settings.Docker.PruneMode.IsValid() {
-		return fmt.Errorf(
-			"invalid prune mode: %v (must be a valid DockerPruneMode value)",
-			settings.Docker.PruneMode,
-		)
+		return fmt.Errorf("invalid DockerPruneMode: %d", settings.Docker.PruneMode)
 	}
 
 	return nil
