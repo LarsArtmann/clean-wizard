@@ -207,6 +207,22 @@ func WithDailyProfileName(name string) DailyProfileOption {
 	}
 }
 
+// createHomebrewOperation creates a homebrew cleanup operation.
+func createHomebrewOperation() domain.CleanupOperation {
+	return domain.CleanupOperation{
+		Name:        "homebrew-cleanup",
+		Description: "Clean Homebrew",
+		RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+		Enabled:     domain.ProfileStatusEnabled,
+		Settings: &domain.OperationSettings{
+			Homebrew: &domain.HomebrewSettings{
+				UnusedOnly: domain.HomebrewModeUnusedOnly,
+				Prune:      "30d",
+			},
+		},
+	}
+}
+
 // CreateBenchmarkConfig creates a configuration suitable for benchmarking.
 // This includes a daily profile with multiple operations covering all operation types.
 func CreateBenchmarkConfig() *domain.Config {
@@ -244,18 +260,7 @@ func CreateBenchmarkConfig() *domain.Config {
 							},
 						},
 					},
-					{
-						Name:        "homebrew-cleanup",
-						Description: "Clean Homebrew",
-						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							Homebrew: &domain.HomebrewSettings{
-								UnusedOnly: domain.HomebrewModeUnusedOnly,
-								Prune:      "30d",
-							},
-						},
-					},
+					createHomebrewOperation(),
 					{
 						Name:        "system-temp",
 						Description: "Clean system temp",

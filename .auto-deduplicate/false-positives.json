@@ -1,0 +1,11 @@
+[
+  {
+    "fingerprint": "a85776fe5e22647efb7d006c377b8377e47d2327a2ece23712a1065472e23fd9",
+    "files": [
+      "/Users/larsartmann/projects/clean-wizard/internal/shared/utils/schema/minmax_test.go"
+    ],
+    "reason": "These are consecutive test cases in a table-driven test, not code duplication. Each test case has the same structure but different test data (different names, values, and expected results). This is the standard Go testing pattern and should not be refactored.",
+    "marked_at": "2026-03-02T07:10:42.607164+01:00",
+    "marked_by": "auto-deduplicate"
+  }
+]
