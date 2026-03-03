@@ -137,10 +137,16 @@ func (c *GitHistorySafetyChecker) isGitRepo(ctx context.Context) bool {
 	return cmd.Run() == nil
 }
 
+// newGitCommand creates a new git command with the given arguments.
+func (c *GitHistorySafetyChecker) newGitCommand(ctx context.Context, args ...string) *exec.Cmd {
+	allArgs := append([]string{"git", "-C", c.repoPath}, args...)
+	return exec.CommandContext(ctx, allArgs[0], allArgs[1:]...)
+}
+
 // hasUncommittedChanges checks for uncommitted changes including untracked files.
 func (c *GitHistorySafetyChecker) hasUncommittedChanges(ctx context.Context) bool {
 	// Check for staged changes
-	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath, "diff", "--cached", "--quiet")
+	cmd := c.newGitCommand(ctx, "diff", "--cached", "--quiet")
 	if cmd.Run() != nil {
 		return true
 	}
