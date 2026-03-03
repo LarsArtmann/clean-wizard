@@ -410,19 +410,7 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 		// Scan for actual sizes instead of using hardcoded estimates
 		totalBytes := dc.estimateSizeFromScan(ctx)
 
-		itemsRemoved := 1
-
-		cleanResult := conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
-			itemsRemoved,
-			totalBytes,
-		)
-		cleanResult.SizeEstimate = domain.SizeEstimate{
-			Known:  uint64(totalBytes),
-			Status: domain.SizeEstimateStatusKnown,
-		}
-
-		return result.Ok(cleanResult)
+		return result.Ok(dc.newDryRunResult(totalBytes, 1))
 	}
 
 	// Real cleaning implementation

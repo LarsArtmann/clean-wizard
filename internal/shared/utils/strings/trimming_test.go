@@ -31,6 +31,17 @@ func (m *MockSanitizationResult) AddChange(path string, original, newValue any, 
 	})
 }
 
+func newTrimmableField(name, path, value string) TrimmableField {
+	return TrimmableField{
+		Name: name,
+		Path: path,
+		Value: func() *string {
+			s := value
+			return &s
+		}(),
+	}
+}
+
 func TestTrimWhitespaceField(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -40,61 +51,29 @@ func TestTrimWhitespaceField(t *testing.T) {
 		expectedValue string
 	}{
 		{
-			name: "trims leading and trailing whitespace",
-			field: TrimmableField{
-				Name: "test",
-				Path: "test.path",
-				Value: func() *string {
-					s := "  hello world  "
-
-					return &s
-				}(),
-			},
+			name:          "trims leading and trailing whitespace",
+			field:         newTrimmableField("test", "test.path", "  hello world  "),
 			changes:       &MockSanitizationResult{},
 			expectChange:  true,
 			expectedValue: "hello world",
 		},
 		{
-			name: "does not change already trimmed string",
-			field: TrimmableField{
-				Name: "test",
-				Path: "test.path",
-				Value: func() *string {
-					s := "hello world"
-
-					return &s
-				}(),
-			},
+			name:          "does not change already trimmed string",
+			field:         newTrimmableField("test", "test.path", "hello world"),
 			changes:       &MockSanitizationResult{},
 			expectChange:  false,
 			expectedValue: "hello world",
 		},
 		{
-			name: "handles empty string",
-			field: TrimmableField{
-				Name: "test",
-				Path: "test.path",
-				Value: func() *string {
-					s := ""
-
-					return &s
-				}(),
-			},
+			name:          "handles empty string",
+			field:         newTrimmableField("test", "test.path", ""),
 			changes:       &MockSanitizationResult{},
 			expectChange:  false,
 			expectedValue: "",
 		},
 		{
-			name: "handles string with only whitespace",
-			field: TrimmableField{
-				Name: "test",
-				Path: "test.path",
-				Value: func() *string {
-					s := "   \t\n   "
-
-					return &s
-				}(),
-			},
+			name:          "handles string with only whitespace",
+			field:         newTrimmableField("test", "test.path", "   \t\n   "),
 			changes:       &MockSanitizationResult{},
 			expectChange:  true,
 			expectedValue: "",
@@ -142,32 +121,16 @@ func TestTrimIfEnabled(t *testing.T) {
 		expectChange bool
 	}{
 		{
-			name:        "trims when enabled",
-			trimEnabled: true,
-			field: TrimmableField{
-				Name: "test",
-				Path: "test.path",
-				Value: func() *string {
-					s := "  hello  "
-
-					return &s
-				}(),
-			},
+			name:         "trims when enabled",
+			trimEnabled:  true,
+			field:        newTrimmableField("test", "test.path", "  hello  "),
 			changes:      &MockSanitizationResult{},
 			expectChange: true,
 		},
 		{
-			name:        "does not trim when disabled",
-			trimEnabled: false,
-			field: TrimmableField{
-				Name: "test",
-				Path: "test.path",
-				Value: func() *string {
-					s := "  hello  "
-
-					return &s
-				}(),
-			},
+			name:         "does not trim when disabled",
+			trimEnabled:  false,
+			field:        newTrimmableField("test", "test.path", "  hello  "),
 			changes:      &MockSanitizationResult{},
 			expectChange: false,
 		},

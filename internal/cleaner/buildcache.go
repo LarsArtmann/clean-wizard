@@ -187,6 +187,14 @@ type CacheCleanerFunc func(ctx context.Context, toolType JVMBuildToolType, homeD
 
 type RemoveFunc func(path string) error
 
+// printVerbose prints a verbose message if verbose mode is enabled.
+func (bcc *BuildCacheCleaner) printVerbose(action, verboseMsg, baseName string) {
+	if !bcc.verbose {
+		return
+	}
+	fmt.Printf("  ✓ %s %s: %s\n", action, verboseMsg, baseName)
+}
+
 // genericClean handles common cleanup logic for both cache directories and partial files.
 func (bcc *BuildCacheCleaner) genericClean(
 	ctx context.Context,
@@ -212,9 +220,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 		if bcc.dryRun {
 			itemsRemoved++
 
-			if bcc.verbose {
-				fmt.Printf("  ✓ Would remove %s: %s\n", verboseMsg, filepath.Base(match))
-			}
+			bcc.printVerbose("Would remove", verboseMsg, filepath.Base(match))
 
 			continue
 		}
@@ -230,9 +236,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 
 		itemsRemoved++
 
-		if bcc.verbose {
-			fmt.Printf("  ✓ Removed %s: %s\n", verboseMsg, filepath.Base(match))
-		}
+		bcc.printVerbose("Removed", verboseMsg, filepath.Base(match))
 	}
 
 	if bcc.verbose && itemsRemoved > 0 {

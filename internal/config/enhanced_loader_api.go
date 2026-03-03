@@ -66,7 +66,9 @@ func (ecl *EnhancedConfigLoader) LoadConfig(
 
 // SaveConfig saves configuration with validation and cache update.
 func (ecl *EnhancedConfigLoader) SaveConfig(
-	ctx context.Context, config *domain.Config, options *ConfigSaveOptions,
+	ctx context.Context,
+	config *domain.Config,
+	options *ConfigSaveOptions,
 ) (*domain.Config, error) {
 	if options == nil {
 		options = getDefaultSaveOptions()
@@ -116,7 +118,9 @@ func (ecl *EnhancedConfigLoader) handleBackup(
 
 // validateAndSanitize validates and optionally sanitizes the config.
 func (ecl *EnhancedConfigLoader) validateAndSanitize(
-	ctx context.Context, config *domain.Config, options *ConfigSaveOptions,
+	ctx context.Context,
+	config *domain.Config,
+	options *ConfigSaveOptions,
 ) *ValidationResult {
 	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
 

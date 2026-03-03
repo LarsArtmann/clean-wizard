@@ -9,6 +9,47 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// benchmarkTestConfig is a shared Config instance used across benchmark tests.
+var benchmarkTestConfig = &Config{
+	Version:      "1.0.0",
+	SafeMode:     SafeModeEnabled,
+	MaxDiskUsage: 50,
+	Protected:    []string{"/System", "/Library"},
+	Profiles: map[string]*Profile{
+		"daily": {
+			Name:        "daily",
+			Description: "Daily cleanup",
+			Enabled:     ProfileStatusEnabled,
+			Operations: []CleanupOperation{
+				{
+					Name:        "nix-generations",
+					Description: "Clean Nix generations",
+					RiskLevel:   RiskLevelType(RiskLevelLowType),
+					Enabled:     ProfileStatusEnabled,
+					Settings: &OperationSettings{
+						NixGenerations: &NixGenerationsSettings{
+							Generations: 1,
+							Optimize:    OptimizationModeDisabled,
+							DryRun:      ExecutionModeNormal,
+						},
+					},
+				},
+				{
+					Name:        "docker",
+					Description: "Clean Docker resources",
+					RiskLevel:   RiskLevelType(RiskLevelMediumType),
+					Enabled:     ProfileStatusEnabled,
+					Settings: &OperationSettings{
+						Docker: &DockerSettings{
+							PruneMode: DockerPruneAll,
+						},
+					},
+				},
+			},
+		},
+	},
+}
+
 // BenchmarkMarshalYAML_DockerPruneMode benchmarks marshaling DockerPruneMode enum to YAML.
 func BenchmarkMarshalYAML_DockerPruneMode(b *testing.B) {
 	testCases := []DockerPruneMode{
@@ -35,22 +76,18 @@ func BenchmarkUnmarshalYAML_DockerPruneMode_String(b *testing.B) {
 
 // runUnmarshalIntBenchmark runs a benchmark for unmarshaling an enum from integer YAML values.
 func runUnmarshalIntBenchmark(b *testing.B, testCases []int, unmarshal func(int) error) {
-	for _, tc := range testCases {
-		b.Run(strconv.Itoa(tc), func(b *testing.B) {
-			for range b.N {
-				err := unmarshal(tc)
-				if err != nil {
-					b.Fatal(err)
-				}
-			}
-		})
-	}
+	runUnmarshalBenchmark(b, testCases, strconv.Itoa, unmarshal)
 }
 
 // runUnmarshalStringBenchmark runs a benchmark for unmarshaling an enum from string YAML values.
 func runUnmarshalStringBenchmark(b *testing.B, testCases []string, unmarshal func(string) error) {
+	runUnmarshalBenchmark(b, testCases, func(s string) string { return s }, unmarshal)
+}
+
+// runUnmarshalBenchmark runs a benchmark for unmarshaling enum values with a custom label function.
+func runUnmarshalBenchmark[T any](b *testing.B, testCases []T, labelFunc func(T) string, unmarshal func(T) error) {
 	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
+		b.Run(labelFunc(tc), func(b *testing.B) {
 			for range b.N {
 				err := unmarshal(tc)
 				if err != nil {

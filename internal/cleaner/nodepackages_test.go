@@ -50,13 +50,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 				t.Fatal("NewNodePackageManagerCleaner() returned nil cleaner")
 			}
 
-			if cleaner.verbose != tt.verbose {
-				t.Errorf("verbose = %v, want %v", cleaner.verbose, tt.verbose)
-			}
-
-			if cleaner.dryRun != tt.dryRun {
-				t.Errorf("dryRun = %v, want %v", cleaner.dryRun, tt.dryRun)
-			}
+			assertCleanerFields(t, cleaner, tt.verbose, tt.dryRun)
 
 			if len(cleaner.packageManagers) != tt.wantPackageCount {
 				t.Errorf(

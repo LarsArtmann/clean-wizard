@@ -59,10 +59,7 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 		}
 	case OperationTypeBuildCache:
 		settings = &OperationSettings{
-			BuildCache: &BuildCacheSettings{
-				ToolTypes: []BuildToolType{BuildToolJava, BuildToolScala},
-				OlderThan: "30d",
-			},
+			BuildCache: defaultBuildCacheSettings(),
 		}
 	case OperationTypeDocker:
 		settings = &OperationSettings{

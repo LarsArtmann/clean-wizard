@@ -380,10 +380,5 @@ func (d *defaultFileOperator) TrashFile(ctx context.Context, path string) error 
 }
 
 func (d *defaultFileOperator) GetFileSize(path string) int64 {
-	info, err := os.Stat(path)
-	if err != nil {
-		return 0
-	}
-
-	return info.Size()
+	return getFileSize(path)
 }

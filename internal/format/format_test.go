@@ -84,7 +84,7 @@ func TestDuration(t *testing.T) {
 }
 
 func TestDate(t *testing.T) {
-	tests := []struct {
+	dateTests := []struct {
 		name     string
 		input    time.Time
 		expected string
@@ -94,11 +94,11 @@ func TestDate(t *testing.T) {
 		{"unix epoch", time.Unix(0, 0), "1970-01-01"},
 	}
 
-	runFormattingTests(t, tests, Date)
+	runFormattingTests(t, dateTests, Date)
 }
 
 func TestDateTime(t *testing.T) {
-	tests := []struct {
+	dateTimeTests := []struct {
 		name     string
 		input    time.Time
 		expected string
@@ -108,7 +108,7 @@ func TestDateTime(t *testing.T) {
 		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
 	}
 
-	runDateTimeTests(t, tests, DateTime, func(t *testing.T, result string, tt dateTimeTestStruct) {
+	runDateTimeTests(t, dateTimeTests, DateTime, func(t *testing.T, result string, tt dateTimeTestStruct) {
 		if tt.expected == "never" && result != "never" {
 			t.Errorf("DateTime(%v) = %v, want %v", tt.input, result, tt.expected)
 		} else if tt.expected != "never" {

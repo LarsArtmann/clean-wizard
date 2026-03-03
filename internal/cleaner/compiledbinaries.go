@@ -575,12 +575,7 @@ func (t *defaultBinaryTrashOperator) TrashBinary(ctx context.Context, path strin
 }
 
 func (t *defaultBinaryTrashOperator) GetFileSize(path string) int64 {
-	info, err := os.Stat(path)
-	if err != nil {
-		return 0
-	}
-
-	return info.Size()
+	return getFileSize(path)
 }
 
 func (t *defaultBinaryTrashOperator) GetFileModTime(path string) (time.Time, error) {

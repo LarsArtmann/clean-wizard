@@ -54,13 +54,7 @@ func TestNewDockerCleaner(t *testing.T) {
 				t.Fatal("NewDockerCleaner() returned nil cleaner")
 			}
 
-			if cleaner.verbose != tt.verbose {
-				t.Errorf("verbose = %v, want %v", cleaner.verbose, tt.verbose)
-			}
-
-			if cleaner.dryRun != tt.dryRun {
-				t.Errorf("dryRun = %v, want %v", cleaner.dryRun, tt.dryRun)
-			}
+			assertCleanerFields(t, cleaner, tt.verbose, tt.dryRun)
 
 			if cleaner.pruneMode != tt.pruneMode {
 				t.Errorf("pruneMode = %v, want %v", cleaner.pruneMode, tt.pruneMode)
