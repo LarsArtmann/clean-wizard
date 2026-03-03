@@ -9,6 +9,20 @@ import (
 	"github.com/onsi/gomega"
 )
 
+// assertResultOk verifies that a result is OK and panics if not.
+// This eliminates duplicate assertion code across multiple Ginkgo test files.
+//
+// Parameters:
+//   - result: The result to check (must have IsOk() method)
+//
+// Usage:
+//
+//	result := cleaner.Scan(ctx)
+//	assertResultOk(result)
+func assertResultOk[T any](result result.Result[T]) {
+	gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+}
+
 // GinkgoNoItemsToCleanTest tests the "no items to clean" scenario for Ginkgo-based cleaner tests.
 // This eliminates duplicate test code across multiple Ginkgo test files.
 //
@@ -33,7 +47,7 @@ func GinkgoNoItemsToCleanTest(ctx context.Context, cleaner interface {
 	setupEmptyState()
 
 	result := cleaner.Clean(ctx)
-	gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+	assertResultOk(result)
 	cleanResult := result.Value()
 	gomega.Expect(cleanResult.ItemsRemoved).To(gomega.Equal(uint(0)))
 	gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyConservative))
