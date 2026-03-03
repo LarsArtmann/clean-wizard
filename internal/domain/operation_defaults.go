@@ -229,3 +229,18 @@ func validateEnumDefaults(settings *OperationSettings, opType OperationType) err
 
 	return nil
 }
+
+// defaultBuildCacheSettings returns default settings for build cache cleanup.
+func defaultBuildCacheSettings() *BuildCacheSettings {
+	return &BuildCacheSettings{
+		ToolTypes: []BuildToolType{
+			BuildToolGo,
+			BuildToolRust,
+			BuildToolNode,
+			BuildToolPython,
+			BuildToolJava,
+			BuildToolScala,
+		},
+		OlderThan: "30d",
+	}
+}

@@ -191,3 +191,21 @@ func (ecl *EnhancedConfigLoader) formatValidationErrors(errors []ValidationError
 
 	return fmt.Sprintf("%d validation errors: %s", len(errors), fmt.Sprintf("%v", messages))
 }
+
+// createSafeModeWarning creates a warning for safe mode with critical risk operations.
+func (ecl *EnhancedConfigLoader) createSafeModeWarning() *ValidationWarning {
+	return &ValidationWarning{
+		Field:      "safe_mode",
+		Message:    "Safe mode is enabled but configuration contains critical risk operations",
+		Suggestion: "Consider disabling safe mode or reviewing critical operations",
+	}
+}
+
+// createProfilesWarning creates a warning for excessive profile count.
+func (ecl *EnhancedConfigLoader) createProfilesWarning() *ValidationWarning {
+	return &ValidationWarning{
+		Field:      "profiles",
+		Message:    "Large number of profiles may impact performance",
+		Suggestion: "Consider consolidating profiles or reducing count below 20",
+	}
+}

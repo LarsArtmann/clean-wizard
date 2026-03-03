@@ -13,6 +13,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	fileutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/fileutil"
 )
 
 const (
@@ -575,7 +576,7 @@ func (t *defaultBinaryTrashOperator) TrashBinary(ctx context.Context, path strin
 }
 
 func (t *defaultBinaryTrashOperator) GetFileSize(path string) int64 {
-	return getFileSize(path)
+	return fileutil.GetFileSize(path)
 }
 
 func (t *defaultBinaryTrashOperator) GetFileModTime(path string) (time.Time, error) {
