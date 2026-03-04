@@ -174,9 +174,6 @@ func (e *GitHistoryExecutor) runFilterRepo(
 	// Invert paths (remove instead of keep)
 	args = append(args, "--invert-paths")
 
-	// Don't strip leading directories
-	args = append(args, "--protect-blobs-from", "HEAD")
-
 	if e.verbose {
 		provider := DetectFilterRepoProvider()
 		if provider == FilterRepoNix {

@@ -299,48 +299,8 @@ func BenchmarkRoundTrip_CacheCleanupMode(b *testing.B) {
 
 // BenchmarkFullConfigMarshal benchmarks marshaling a complete configuration with enums.
 func BenchmarkFullConfigMarshal(b *testing.B) {
-	config := &Config{
-		Version:      "1.0.0",
-		SafeMode:     SafeModeEnabled,
-		MaxDiskUsage: 50,
-		Protected:    []string{"/System", "/Library"},
-		Profiles: map[string]*Profile{
-			"daily": {
-				Name:        "daily",
-				Description: "Daily cleanup",
-				Enabled:     ProfileStatusEnabled,
-				Operations: []CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   RiskLevelType(RiskLevelLowType),
-						Enabled:     ProfileStatusEnabled,
-						Settings: &OperationSettings{
-							NixGenerations: &NixGenerationsSettings{
-								Generations: 1,
-								Optimize:    OptimizationModeDisabled,
-								DryRun:      ExecutionModeNormal,
-							},
-						},
-					},
-					{
-						Name:        "docker",
-						Description: "Clean Docker resources",
-						RiskLevel:   RiskLevelType(RiskLevelMediumType),
-						Enabled:     ProfileStatusEnabled,
-						Settings: &OperationSettings{
-							Docker: &DockerSettings{
-								PruneMode: DockerPruneAll,
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
 	for b.Loop() {
-		_, err := yaml.Marshal(config)
+		_, err := yaml.Marshal(benchmarkTestConfig)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -390,48 +350,8 @@ profiles:
 
 // BenchmarkFullConfigRoundTrip benchmarks marshal→unmarshal round-trip for complete configuration.
 func BenchmarkFullConfigRoundTrip(b *testing.B) {
-	config := &Config{
-		Version:      "1.0.0",
-		SafeMode:     SafeModeEnabled,
-		MaxDiskUsage: 50,
-		Protected:    []string{"/System", "/Library"},
-		Profiles: map[string]*Profile{
-			"daily": {
-				Name:        "daily",
-				Description: "Daily cleanup",
-				Enabled:     ProfileStatusEnabled,
-				Operations: []CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   RiskLevelType(RiskLevelLowType),
-						Enabled:     ProfileStatusEnabled,
-						Settings: &OperationSettings{
-							NixGenerations: &NixGenerationsSettings{
-								Generations: 1,
-								Optimize:    OptimizationModeDisabled,
-								DryRun:      ExecutionModeNormal,
-							},
-						},
-					},
-					{
-						Name:        "docker",
-						Description: "Clean Docker resources",
-						RiskLevel:   RiskLevelType(RiskLevelMediumType),
-						Enabled:     ProfileStatusEnabled,
-						Settings: &OperationSettings{
-							Docker: &DockerSettings{
-								PruneMode: DockerPruneAll,
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
 	for b.Loop() {
-		yamlBytes, err := yaml.Marshal(config)
+		yamlBytes, err := yaml.Marshal(benchmarkTestConfig)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -566,39 +486,10 @@ func BenchmarkStringComparison_CaseInsensitive(b *testing.B) {
 
 // BenchmarkBufferWrite benchmarks writing YAML to buffer.
 func BenchmarkBufferWrite_Config(b *testing.B) {
-	config := &Config{
-		Version:      "1.0.0",
-		SafeMode:     SafeModeEnabled,
-		MaxDiskUsage: 50,
-		Protected:    []string{"/System", "/Library"},
-		Profiles: map[string]*Profile{
-			"daily": {
-				Name:        "daily",
-				Description: "Daily cleanup",
-				Enabled:     ProfileStatusEnabled,
-				Operations: []CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   RiskLevelType(RiskLevelLowType),
-						Enabled:     ProfileStatusEnabled,
-						Settings: &OperationSettings{
-							NixGenerations: &NixGenerationsSettings{
-								Generations: 1,
-								Optimize:    OptimizationModeDisabled,
-								DryRun:      ExecutionModeNormal,
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
 	for b.Loop() {
 		var buf bytes.Buffer
 
-		err := yaml.NewEncoder(&buf).Encode(config)
+		err := yaml.NewEncoder(&buf).Encode(benchmarkTestConfig)
 		if err != nil {
 			b.Fatal(err)
 		}
