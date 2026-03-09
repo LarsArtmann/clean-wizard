@@ -15,11 +15,11 @@ import (
 
 // GitHistoryTestContext holds test state across scenarios.
 type GitHistoryTestContext struct {
-	ctx            context.Context
-	repoPath       string
-	cleaner        *cleaner.GitHistoryCleaner
-	safetyReport   *domain.GitHistorySafetyReport
-	scanResult     *domain.GitHistoryScanResult
+	ctx              context.Context
+	repoPath         string
+	cleaner          *cleaner.GitHistoryCleaner
+	safetyReport     *domain.GitHistorySafetyReport
+	scanResult       *domain.GitHistoryScanResult
 	hasGitFilterRepo bool
 }
 
