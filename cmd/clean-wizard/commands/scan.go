@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
 	"github.com/spf13/cobra"
 )
 
@@ -230,25 +230,12 @@ func printScanTable(results []ScanResult, _ bool) {
 		sizeStr := format.Bytes(int64(r.BytesCleanable))
 		rows = append(rows, []string{
 			r.Icon + " " + r.Name,
-			fmt.Sprintf("%d", r.ItemsCount),
+			strconv.FormatUint(uint64(r.ItemsCount), 10),
 			sizeStr,
 		})
 	}
 
-	t := table.New().
-		Border(lipgloss.NormalBorder()).
-		BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("238"))).
-		StyleFunc(func(row, col int) lipgloss.Style {
-			if row == 0 {
-				return lipgloss.NewStyle().
-					Foreground(lipgloss.Color("212")).
-					Bold(true).
-					Padding(0, 1)
-			}
-			return lipgloss.NewStyle().Padding(0, 1)
-		}).
-		Headers("Cleaner", "Items", "Size").
-		Rows(rows...)
+	t := newResultsTable(rows...)
 
 	fmt.Println(t)
 }
@@ -270,7 +257,7 @@ func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
 		Summary scanJSONSummary  `json:"summary"`
 	}
 
-	var jsonResults []scanJSONResult
+	jsonResults := make([]scanJSONResult, 0, len(results))
 	for _, r := range results {
 		jsonResults = append(jsonResults, scanJSONResult{
 			Name:      r.Name,

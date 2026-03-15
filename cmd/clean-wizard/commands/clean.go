@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
 	"github.com/spf13/cobra"
 )
 
@@ -565,7 +565,7 @@ func printCleanResultsTable(results map[string]domain.CleanResult, totalBytes ui
 		if result.FreedBytes > 0 || result.ItemsRemoved > 0 {
 			rows = append(rows, []string{
 				name,
-				fmt.Sprintf("%d", result.ItemsRemoved),
+				strconv.FormatUint(uint64(result.ItemsRemoved), 10),
 				format.Bytes(int64(result.FreedBytes)),
 			})
 		}
@@ -577,22 +577,9 @@ func printCleanResultsTable(results map[string]domain.CleanResult, totalBytes ui
 	}
 
 	// Add summary row
-	t := table.New().
-		Border(lipgloss.NormalBorder()).
-		BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("238"))).
-		StyleFunc(func(row, col int) lipgloss.Style {
-			if row == 0 {
-				return lipgloss.NewStyle().
-					Foreground(lipgloss.Color("212")).
-					Bold(true).
-					Padding(0, 1)
-			}
-			return lipgloss.NewStyle().Padding(0, 1)
-		}).
-		Headers("Cleaner", "Items", "Size").
-		Rows(rows...)
+	t := newResultsTable(rows...)
 
 	fmt.Println(t)
 	fmt.Println()
-	fmt.Printf("📊 Total: %s freed, %d items in %s\n", format.Bytes(int64(totalBytes)), totalItems, format.Duration(duration))
+	fmt.Printf("📊 Total: %s freed, %s items in %s\n", format.Bytes(int64(totalBytes)), strconv.FormatUint(uint64(totalItems), 10), format.Duration(duration))
 }
