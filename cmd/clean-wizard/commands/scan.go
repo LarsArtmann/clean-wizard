@@ -2,11 +2,26 @@ package commands
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/format"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 	"github.com/spf13/cobra"
+)
+
+var (
+	scanTitleStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("212")).
+			Bold(true).
+			MarginBottom(1)
+	scanHeaderStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("81")).
+			Bold(true)
+	scanMutedStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("241"))
 )
 
 // NewScanCommand creates a command that scans for cleanable items.
@@ -14,6 +29,7 @@ func NewScanCommand() *cobra.Command {
 	var (
 		verbose bool
 		profile string
+		jsonOut bool
 	)
 
 	cmd := &cobra.Command{
@@ -21,22 +37,25 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(cmd, args, verbose, profile)
+			return runScanCommand(verbose, profile, jsonOut)
 		},
 	}
 
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Show detailed scan information")
 	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Filter results by profile")
+	cmd.Flags().BoolVarP(&jsonOut, "json", "j", false, "Output in JSON format")
 
 	return cmd
 }
 
 // runScanCommand executes the scan command.
-func runScanCommand(cmd *cobra.Command, args []string, verbose bool, profile string) error {
+func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	ctx := context.Background()
 
-	fmt.Println("🔍 Scanning system for cleanable items...")
-	fmt.Println()
+	if !jsonOutput {
+		fmt.Println(scanTitleStyle.Render("🔍 Scanning system for cleanable items..."))
+		fmt.Println()
+	}
 
 	// Get cleaner configurations
 	cleanerConfigs := GetCleanerConfigs(ctx)
@@ -59,37 +78,40 @@ func runScanCommand(cmd *cobra.Command, args []string, verbose bool, profile str
 		return nil
 	}
 
-	fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableCleaners))
+	if !jsonOutput {
+		fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableCleaners))
+	}
 
-	// Scan each cleaner and collect results
+	// Scan each cleaner and collect results using real Scan method
 	var (
 		totalCleanable uint64
+		totalItems     uint
 		scanResults    []ScanResult
 	)
 
 	for _, cfg := range availableCleaners {
-		result := scanCleaner(ctx, cfg.Type, verbose)
-
+		result := scanCleanerReal(ctx, cfg.Type, verbose)
 		scanResults = append(scanResults, result)
 		if result.BytesCleanable > 0 {
 			totalCleanable += result.BytesCleanable
+			totalItems += result.ItemsCount
 		}
 	}
 
-	// Print summary
-	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	fmt.Println("📊 Scan Results")
-	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	fmt.Println()
-
-	for _, result := range scanResults {
-		printScanResult(result, verbose)
+	// Output JSON if requested
+	if jsonOutput {
+		outputScanJSON(scanResults, totalCleanable, totalItems)
+		return nil
 	}
 
+	// Print table output
+	printScanTable(scanResults, verbose)
+
+	// Print summary
 	fmt.Println()
-	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	fmt.Printf("💡 Total cleanable: %s\n", formatBytes(int64(totalCleanable)))
-	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Println(scanHeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	fmt.Printf("💡 Total cleanable: %s (%d items)\n", format.Bytes(int64(totalCleanable)), totalItems)
+	fmt.Println(scanHeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 
 	if totalCleanable > 0 {
 		fmt.Println()
@@ -107,13 +129,15 @@ type ScanResult struct {
 	ItemsCount     uint
 	BytesCleanable uint64
 	Description    string
+	Icon           string
 }
 
-// scanCleaner scans a single cleaner for cleanable items.
-func scanCleaner(ctx context.Context, cleanerType CleanerType, verbose bool) ScanResult {
+// scanCleanerReal scans a cleaner using the real Scan method from the cleaner interface.
+func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool) ScanResult {
 	result := ScanResult{
 		Name:        getCleanerName(cleanerType),
 		Description: getCleanerDescription(cleanerType),
+		Icon:        getCleanerIcon(cleanerType),
 	}
 
 	// Get cleaner from registry
@@ -122,6 +146,7 @@ func scanCleaner(ctx context.Context, cleanerType CleanerType, verbose bool) Sca
 
 	c, ok := registry.Get(name)
 	if !ok {
+		result.Available = CleanerAvailabilityUnavailable
 		return result
 	}
 
@@ -131,18 +156,23 @@ func scanCleaner(ctx context.Context, cleanerType CleanerType, verbose bool) Sca
 		return result
 	}
 
-	// Run scan by calling the cleaner's Scan method if available
-	// For now, we'll use the existing patterns
-	switch cleanerType {
-	case CleanerTypeNix:
-		result = scanNixCleaner(ctx, verbose)
-	case CleanerTypeDocker:
-		result = scanDockerCleaner(ctx, verbose)
-	default:
-		// Generic estimation for other cleaners
-		result.ItemsCount = 1
-		result.BytesCleanable = estimateCleanerSize(cleanerType)
+	// Use the real Scan method
+	scanRes := c.Scan(ctx)
+	items, err := scanRes.Unwrap()
+	if err != nil {
+		if verbose {
+			fmt.Printf("  ⚠️  Scan error for %s: %v\n", result.Name, err)
+		}
+		return result
 	}
+
+	result.ItemsCount = uint(len(items))
+
+	var totalSize int64
+	for _, item := range items {
+		totalSize += item.Size
+	}
+	result.BytesCleanable = uint64(totalSize)
 
 	return result
 }
@@ -179,120 +209,89 @@ func getRegistryName(cleanerType CleanerType) string {
 	}
 }
 
-// scanNixCleaner scans the Nix cleaner.
-func scanNixCleaner(ctx context.Context, verbose bool) ScanResult {
-	result := ScanResult{
-		Name:        "Nix",
-		Description: "Clean old Nix store generations and optimize store",
-	}
-
-	nixAdapter := cleaner.NewNixCleaner(verbose, false)
-
-	if !nixAdapter.IsAvailable(ctx) {
-		result.Available = CleanerAvailabilityUnavailable
-
-		return result
-	}
-
-	result.Available = CleanerAvailabilityAvailable
-	result.ItemsCount = 5                        // Estimate
-	result.BytesCleanable = 50 * 1024 * 1024 * 5 // 50MB per generation, 5 generations
-
-	return result
-}
-
-// scanDockerCleaner scans the Docker cleaner.
-func scanDockerCleaner(ctx context.Context, verbose bool) ScanResult {
-	result := ScanResult{
-		Name:        "Docker",
-		Description: "Clean Docker images, containers, and volumes",
-	}
-
-	dockerCleaner := cleaner.NewDockerCleaner(false, false, domain.DockerPruneAll)
-
-	if !dockerCleaner.IsAvailable(ctx) {
-		result.Available = CleanerAvailabilityUnavailable
-
-		return result
-	}
-
-	result.Available = CleanerAvailabilityAvailable
-	result.ItemsCount = 3                     // Estimate: images, containers, volumes
-	result.BytesCleanable = 500 * 1024 * 1024 // Estimate 500MB
-
-	return result
-}
-
-// estimateCleanerSize returns a size estimate for a cleaner type.
-func estimateCleanerSize(cleanerType CleanerType) uint64 {
-	switch cleanerType {
-	case CleanerTypeNix:
-		return 250 * 1024 * 1024 // 250MB
-	case CleanerTypeHomebrew:
-		return 150 * 1024 * 1024 // 150MB
-	case CleanerTypeNodePackages:
-		return 100 * 1024 * 1024 // 100MB
-	case CleanerTypeGoPackages:
-		return 200 * 1024 * 1024 // 200MB
-	case CleanerTypeCargoPackages:
-		return 500 * 1024 * 1024 // 500MB
-	case CleanerTypeBuildCache:
-		return 300 * 1024 * 1024 // 300MB
-	case CleanerTypeSystemCache:
-		return 400 * 1024 * 1024 // 400MB
-	case CleanerTypeLangVersionMgr:
-		return 50 * 1024 * 1024 // 50MB
-	case CleanerTypeProjectsManagementAutomation:
-		return 100 * 1024 * 1024 // 100MB
-	case CleanerTypeCompiledBinaries:
-		return 800 * 1024 * 1024 // 800MB
-	default:
-		return 0
-	}
-}
-
-// printScanResult prints a scan result.
-func printScanResult(result ScanResult, verbose bool) {
-	if result.Available != CleanerAvailabilityAvailable {
-		if verbose {
-			fmt.Printf("  ⚪ %s: Not available\n", result.Name)
+// printScanTable prints scan results as a formatted table.
+func printScanTable(results []ScanResult, _ bool) {
+	// Filter to only available cleaners with items
+	var availableResults []ScanResult
+	for _, r := range results {
+		if r.Available == CleanerAvailabilityAvailable && r.BytesCleanable > 0 {
+			availableResults = append(availableResults, r)
 		}
+	}
 
+	if len(availableResults) == 0 {
+		fmt.Println(scanMutedStyle.Render("No cleanable items found."))
 		return
 	}
 
-	fmt.Printf("  📦 %s\n", result.Name)
-	fmt.Printf("     %s\n", result.Description)
-
-	if result.BytesCleanable > 0 {
-		fmt.Printf("     Cleanable: %s", formatBytes(int64(result.BytesCleanable)))
-
-		if result.ItemsCount > 0 {
-			fmt.Printf(" (%d item(s))\n", result.ItemsCount)
-		} else {
-			fmt.Println()
-		}
-	} else {
-		fmt.Printf("     Items: %d\n", result.ItemsCount)
+	// Build table rows
+	var rows [][]string
+	for _, r := range availableResults {
+		sizeStr := format.Bytes(int64(r.BytesCleanable))
+		rows = append(rows, []string{
+			r.Icon + " " + r.Name,
+			fmt.Sprintf("%d", r.ItemsCount),
+			sizeStr,
+		})
 	}
+
+	t := table.New().
+		Border(lipgloss.NormalBorder()).
+		BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("238"))).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			if row == 0 {
+				return lipgloss.NewStyle().
+					Foreground(lipgloss.Color("212")).
+					Bold(true).
+					Padding(0, 1)
+			}
+			return lipgloss.NewStyle().Padding(0, 1)
+		}).
+		Headers("Cleaner", "Items", "Size").
+		Rows(rows...)
+
+	fmt.Println(t)
 }
 
-// formatBytes formats bytes into human-readable string.
-func formatBytes(bytes int64) string {
-	const (
-		KB = 1024
-		MB = KB * 1024
-		GB = MB * 1024
-	)
-
-	switch {
-	case bytes >= GB:
-		return fmt.Sprintf("%.2f GB", float64(bytes)/float64(GB))
-	case bytes >= MB:
-		return fmt.Sprintf("%.2f MB", float64(bytes)/float64(MB))
-	case bytes >= KB:
-		return fmt.Sprintf("%.2f KB", float64(bytes)/float64(KB))
-	default:
-		return fmt.Sprintf("%d B", bytes)
+// outputScanJSON outputs scan results in JSON format.
+func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
+	type scanJSONResult struct {
+		Name      string `json:"name"`
+		Items     uint   `json:"items"`
+		Bytes     uint64 `json:"bytes"`
+		Available bool   `json:"available"`
 	}
+	type scanJSONSummary struct {
+		TotalBytes uint64 `json:"total_bytes"`
+		TotalItems uint   `json:"total_items"`
+	}
+	type scanJSONOutput struct {
+		Results []scanJSONResult `json:"results"`
+		Summary scanJSONSummary  `json:"summary"`
+	}
+
+	var jsonResults []scanJSONResult
+	for _, r := range results {
+		jsonResults = append(jsonResults, scanJSONResult{
+			Name:      r.Name,
+			Items:     r.ItemsCount,
+			Bytes:     r.BytesCleanable,
+			Available: r.Available == CleanerAvailabilityAvailable,
+		})
+	}
+
+	output := scanJSONOutput{
+		Results: jsonResults,
+		Summary: scanJSONSummary{
+			TotalBytes: totalBytes,
+			TotalItems: totalItems,
+		},
+	}
+
+	jsonBytes, err := json.MarshalIndent(output, "", "  ")
+	if err != nil {
+		fmt.Printf("{\"error\": %q}\n", err.Error())
+		return
+	}
+	fmt.Println(string(jsonBytes))
 }

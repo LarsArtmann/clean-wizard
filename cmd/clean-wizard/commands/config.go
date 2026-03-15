@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -84,25 +85,12 @@ func runConfigShowCommand(_ *cobra.Command, _ []string, jsonOutput bool) error {
 
 // showConfigJSON outputs config in JSON format.
 func showConfigJSON(cfg *domain.Config) error {
-	// Simple JSON output - could be enhanced with proper JSON marshaling
-	fmt.Println("{")
-	fmt.Printf("  \"version\": \"%s\",\n", cfg.Version)
-	fmt.Printf("  \"safe_mode\": \"%s\",\n", cfg.SafeMode.String())
-	fmt.Printf("  \"max_disk_usage\": %d,\n", cfg.MaxDiskUsage)
-	fmt.Printf("  \"protected\": [")
-
-	for i, path := range cfg.Protected {
-		if i > 0 {
-			fmt.Print(", ")
-		}
-
-		fmt.Printf("\"%s\"", path)
+	// Use proper JSON marshaling for complete output
+	jsonBytes, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal configuration to JSON: %w", err)
 	}
-
-	fmt.Println("],")
-	fmt.Printf("  \"profiles\": {")
-	fmt.Println("}")
-
+	fmt.Println(string(jsonBytes))
 	return nil
 }
 

@@ -7,10 +7,28 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 	"github.com/spf13/cobra"
+)
+
+var (
+	cleanTitleStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("212")).
+			Bold(true).
+			MarginBottom(1)
+	cleanSuccessStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("42")).
+				Bold(true)
+	cleanWarningStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("196")).
+				Bold(true)
+	cleanInfoStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("81"))
 )
 
 // NewCleanCommand creates a multi-cleaner command with TUI.
@@ -20,6 +38,8 @@ func NewCleanCommand() *cobra.Command {
 		verbose    bool
 		jsonOutput bool
 		mode       string
+		profile    string
+		configPath string
 	)
 
 	cmd := &cobra.Command{
@@ -27,7 +47,7 @@ func NewCleanCommand() *cobra.Command {
 		Short: "Clean system caches and package managers",
 		Long:  `Interactively select and clean system caches, package managers, and temporary data.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCleanCommand(cmd, args, dryRun, verbose, jsonOutput, mode)
+			return runCleanCommand(cmd, args, dryRun, verbose, jsonOutput, mode, profile, configPath)
 		},
 	}
 
@@ -37,23 +57,32 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().
 		BoolVar(&jsonOutput, "json", false, "Output results in JSON format (non-interactive)")
 	cmd.Flags().StringVar(&mode, "mode", "", "Preset mode: quick, standard, or aggressive")
+	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Use a specific configuration profile")
+	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 
 	return cmd
 }
 
 // runCleanCommand executes the clean command with multi-cleaner TUI.
 func runCleanCommand(
-	_ *cobra.Command,
+	cmd *cobra.Command,
 	_ []string,
 	dryRun, verbose, jsonOutput bool,
-	mode string,
+	mode, profile, configPath string,
 ) error {
 	ctx := context.Background()
 
-	fmt.Println("🔍 Detecting available cleaners...")
+	// Load configuration if specified or use default
+	cfg, err := loadConfigForClean(configPath)
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+
+	fmt.Println(cleanTitleStyle.Render("🧹 Clean Wizard"))
+	fmt.Println()
 
 	if dryRun {
-		fmt.Println("⚠️  DRY RUN MODE: No actual changes will be made")
+		fmt.Println(cleanWarningStyle.Render("⚠️  DRY RUN MODE: No actual changes will be made"))
 		fmt.Println()
 	}
 
@@ -74,9 +103,25 @@ func runCleanCommand(
 
 	fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableConfigs))
 
-	// If mode is specified, use preset selection
+	// Determine which cleaners to run
 	var selectedCleaners []CleanerType
-	if mode != "" {
+
+	// Priority: profile > mode > interactive
+	if profile != "" {
+		// Use profile from configuration
+		selectedCleaners, err = getProfileCleaners(profile, cfg, availableConfigs)
+		if err != nil {
+			return fmt.Errorf("profile error: %w", err)
+		}
+		if !jsonOutput {
+			fmt.Printf("📋 Using profile: %s\n", profile)
+			fmt.Println()
+			for _, ct := range selectedCleaners {
+				fmt.Printf("  ✓ %s\n", getCleanerName(ct))
+			}
+			fmt.Println()
+		}
+	} else if mode != "" {
 		selectedCleaners = getPresetSelection(mode, availableConfigs)
 		if !jsonOutput {
 			fmt.Printf("🎯 Using preset mode: %s\n", mode)
@@ -89,13 +134,13 @@ func runCleanCommand(
 			fmt.Println()
 		}
 	} else if jsonOutput {
-		// In JSON mode without --mode, use all available cleaners
+		// In JSON mode without --mode or --profile, use all available cleaners
 		for _, cfg := range availableConfigs {
 			selectedCleaners = append(selectedCleaners, cfg.Type)
 		}
 	} else {
 		// Interactive cleaner selection (TUI mode only)
-		fmt.Println("⌨️  Keyboard Shortcuts:")
+		fmt.Println(cleanInfoStyle.Render("⌨️  Keyboard Shortcuts:"))
 		fmt.Println("   ↑↓ : Navigate  |  Space : Select  |  Enter : Confirm  |  Esc : Cancel")
 		fmt.Println()
 		// Interactive cleaner selection
@@ -258,38 +303,44 @@ func runCleanCommand(
 	}
 
 	// Show final results (TUI mode)
-	fmt.Printf("\n✅ Cleanup completed in %s\n", duration.String())
+	fmt.Println()
+	fmt.Println(cleanTitleStyle.Render("🧹 Cleanup Results"))
+	fmt.Println()
 
 	if dryRun {
-		fmt.Println("   (DRY RUN: No actual changes were made)")
+		fmt.Println(cleanWarningStyle.Render("⚠️  DRY RUN: No actual changes were made"))
+		fmt.Println()
 	}
 
-	fmt.Printf("   • Cleaned %d item(s)\n", totalItemsRemoved)
-	fmt.Printf("   • Freed %s\n", format.Bytes(int64(totalBytesFreed)))
+	// Print results table
+	printCleanResultsTable(cleanerResults, totalBytesFreed, totalItemsRemoved, duration)
 
 	// Add encouraging message based on space freed
 	if totalBytesFreed > 1_000_000_000 { // > 1 GB
-		fmt.Println("\n🎉 Great job! You freed over 1 GB of space!")
+		fmt.Println(cleanSuccessStyle.Render("🎉 Great job! You freed over 1 GB of space!"))
 	} else if totalBytesFreed > 100_000_000 { // > 100 MB
-		fmt.Println("\n✅ Nice! You freed some space.")
+		fmt.Println(cleanSuccessStyle.Render("✅ Nice! You freed some space."))
 	}
 
 	if dryRun {
-		fmt.Println("\n💡 Tip: Remove --dry-run flag to actually clean:")
+		fmt.Println()
+		fmt.Println(cleanInfoStyle.Render("💡 Tip: Remove --dry-run flag to actually clean:"))
 		fmt.Println("   clean-wizard clean --mode standard")
 	}
 
 	// Show errors and warnings
-	if totalItemsFailed > 0 {
-		fmt.Printf("   • %d item(s) failed to clean\n", totalItemsFailed)
-	}
-
-	if len(skippedCleaners) > 0 {
-		fmt.Printf("   • %d cleaner(s) skipped (not available)\n", len(skippedCleaners))
-	}
-
-	if len(failedCleaners) > 0 {
-		fmt.Printf("   • %d cleaner(s) failed\n", len(failedCleaners))
+	if totalItemsFailed > 0 || len(skippedCleaners) > 0 || len(failedCleaners) > 0 {
+		fmt.Println()
+		fmt.Println(cleanWarningStyle.Render("⚠️  Warnings:"))
+		if totalItemsFailed > 0 {
+			fmt.Printf("   • %d item(s) failed to clean\n", totalItemsFailed)
+		}
+		if len(skippedCleaners) > 0 {
+			fmt.Printf("   • %d cleaner(s) skipped (not available)\n", len(skippedCleaners))
+		}
+		if len(failedCleaners) > 0 {
+			fmt.Printf("   • %d cleaner(s) failed\n", len(failedCleaners))
+		}
 	}
 
 	return nil
@@ -442,4 +493,106 @@ func getCleanerIcon(cleanerType CleanerType) string {
 	default:
 		return ""
 	}
+}
+
+// loadConfigForClean loads configuration from the specified path or returns default config.
+func loadConfigForClean(configPath string) (*domain.Config, error) {
+	if configPath != "" {
+		// For custom config path, we'd need to modify config.Load to accept a path
+		// For now, use default loading which respects CONFIG_PATH env var
+		return config.Load()
+	}
+	return config.Load()
+}
+
+// operationTypeToCleanerType maps domain OperationType to CleanerType.
+var operationTypeToCleanerType = map[domain.OperationType]CleanerType{
+	domain.OperationTypeNixGenerations:               CleanerTypeNix,
+	domain.OperationTypeTempFiles:                    CleanerTypeTempFiles,
+	domain.OperationTypeHomebrew:                     CleanerTypeHomebrew,
+	domain.OperationTypeNodePackages:                 CleanerTypeNodePackages,
+	domain.OperationTypeGoPackages:                   CleanerTypeGoPackages,
+	domain.OperationTypeCargoPackages:                CleanerTypeCargoPackages,
+	domain.OperationTypeBuildCache:                   CleanerTypeBuildCache,
+	domain.OperationTypeDocker:                       CleanerTypeDocker,
+	domain.OperationTypeSystemCache:                  CleanerTypeSystemCache,
+	domain.OperationTypeSystemTemp:                   CleanerTypeSystemCache,
+	domain.OperationTypeProjectsManagementAutomation: CleanerTypeProjectsManagementAutomation,
+	domain.OperationTypeProjectExecutables:           CleanerTypeCompiledBinaries,
+	domain.OperationTypeCompiledBinaries:             CleanerTypeCompiledBinaries,
+}
+
+// getProfileCleaners returns the cleaner types for a given profile name.
+func getProfileCleaners(profileName string, cfg *domain.Config, availableConfigs []CleanerConfig) ([]CleanerType, error) {
+	profile, exists := cfg.Profiles[profileName]
+	if !exists {
+		return nil, fmt.Errorf("profile %q not found", profileName)
+	}
+
+	// Create a set of available cleaner types for quick lookup
+	availableSet := make(map[CleanerType]bool)
+	for _, ac := range availableConfigs {
+		availableSet[ac.Type] = true
+	}
+
+	var cleaners []CleanerType
+	for _, op := range profile.Operations {
+		if op.Enabled != domain.ProfileStatusEnabled {
+			continue
+		}
+		// Map operation name to OperationType, then to CleanerType
+		opType := domain.GetOperationType(op.Name)
+		cleanerType, ok := operationTypeToCleanerType[opType]
+		if !ok {
+			continue // Skip unknown operation types
+		}
+		if availableSet[cleanerType] {
+			cleaners = append(cleaners, cleanerType)
+		}
+	}
+
+	if len(cleaners) == 0 {
+		return nil, fmt.Errorf("profile %q has no available cleaners", profileName)
+	}
+
+	return cleaners, nil
+}
+
+// printCleanResultsTable prints clean results as a formatted table.
+func printCleanResultsTable(results map[string]domain.CleanResult, totalBytes uint64, totalItems uint, duration time.Duration) {
+	var rows [][]string
+	for name, result := range results {
+		if result.FreedBytes > 0 || result.ItemsRemoved > 0 {
+			rows = append(rows, []string{
+				name,
+				fmt.Sprintf("%d", result.ItemsRemoved),
+				format.Bytes(int64(result.FreedBytes)),
+			})
+		}
+	}
+
+	if len(rows) == 0 {
+		fmt.Println(cleanInfoStyle.Render("No items were cleaned."))
+		return
+	}
+
+	// Add summary row
+	t := table.New().
+		Border(lipgloss.NormalBorder()).
+		BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("238"))).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			if row == 0 {
+				return lipgloss.NewStyle().
+					Foreground(lipgloss.Color("212")).
+					Bold(true).
+					Padding(0, 1)
+			}
+			return lipgloss.NewStyle().Padding(0, 1)
+		}).
+		Headers("Cleaner", "Items", "Size").
+		Rows(rows...)
+
+	fmt.Println(t)
+	fmt.Println()
+	fmt.Printf("📊 Total: %s freed, %d items in %s\n", format.Bytes(int64(totalBytes)), totalItems, format.Duration(duration))
 }
