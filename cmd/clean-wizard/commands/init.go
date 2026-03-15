@@ -7,20 +7,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
-)
-
-var (
-	initTitleStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("212")).
-			Bold(true).
-			MarginBottom(1)
-	initSuccessStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("42")).
-				Bold(true)
-	initInfoStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("81"))
 )
 
 // NewInitCommand creates an interactive setup wizard command.
@@ -47,7 +34,7 @@ func NewInitCommand() *cobra.Command {
 
 // runInitCommand executes the init command.
 func runInitCommand(force, minimal bool) error {
-	fmt.Println(initTitleStyle.Render("🧹 Clean Wizard Setup"))
+	fmt.Println(TitleStyle.Render("🧹 Clean Wizard Setup"))
 	fmt.Println()
 
 	// Check if config already exists
@@ -94,7 +81,7 @@ func runInitCommand(force, minimal bool) error {
 
 // createMinimalConfig creates a minimal configuration.
 func createMinimalConfig() error {
-	fmt.Println(initInfoStyle.Render("Creating minimal configuration..."))
+	fmt.Println(InfoStyle.Render("Creating minimal configuration..."))
 
 	cfg := config.GetDefaultConfig()
 	// Keep only the daily profile for minimal config
@@ -109,9 +96,9 @@ func createMinimalConfig() error {
 	}
 
 	fmt.Println()
-	fmt.Println(initSuccessStyle.Render("✅ Minimal configuration created successfully!"))
+	fmt.Println(SuccessStyle.Render("✅ Minimal configuration created successfully!"))
 	fmt.Println()
-	fmt.Println(initInfoStyle.Render("📁 Configuration saved to: ~/.clean-wizard.yaml"))
+	fmt.Println(InfoStyle.Render("📁 Configuration saved to: ~/.clean-wizard.yaml"))
 	fmt.Println()
 	fmt.Println("💡 To get started:")
 	fmt.Println("   clean-wizard clean              - Run daily cleanup")
@@ -124,7 +111,7 @@ func createMinimalConfig() error {
 
 // createInteractiveConfig creates a configuration interactively using huh forms.
 func createInteractiveConfig() error {
-	fmt.Println(initInfoStyle.Render("Let's create the perfect cleaning configuration for your system!"))
+	fmt.Println(InfoStyle.Render("Let's create the perfect cleaning configuration for your system!"))
 	fmt.Println()
 
 	// Interactive form for configuration options
@@ -258,9 +245,9 @@ func createInteractiveConfig() error {
 
 	// Show success message
 	fmt.Println()
-	fmt.Println(initSuccessStyle.Render("✅ Configuration created successfully!"))
+	fmt.Println(SuccessStyle.Render("✅ Configuration created successfully!"))
 	fmt.Println()
-	fmt.Println(initInfoStyle.Render("📁 Configuration saved to: ~/.clean-wizard.yaml"))
+	fmt.Println(InfoStyle.Render("📁 Configuration saved to: ~/.clean-wizard.yaml"))
 	fmt.Println()
 	fmt.Println("📋 Available profiles:")
 

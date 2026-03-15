@@ -14,23 +14,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
-)
-
-var (
-	warningStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("196")).
-			Bold(true)
-	successStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("42")).
-			Bold(true)
-	infoStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("81"))
-	titleStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("212")).
-			Bold(true).
-			Padding(1, 0)
 )
 
 // NewGitHistoryCommand creates the git-history subcommand.
@@ -115,7 +99,7 @@ func runGitHistoryWizard(
 ) error {
 	ctx := context.Background()
 
-	fmt.Println(titleStyle.Render("🔮 Git History Binary Cleaner"))
+	fmt.Println(TitleStyle.Render("🔮 Git History Binary Cleaner"))
 	fmt.Println()
 
 	// Step 1: Select repositories
@@ -203,7 +187,7 @@ func processRepository(
 	minSizeMB, maxFiles int,
 	force, createBackup bool,
 ) error {
-	fmt.Println(infoStyle.Render("\n📂 Repository: " + repoPath))
+	fmt.Println(InfoStyle.Render("\n📂 Repository: " + repoPath))
 
 	// Create cleaner
 	c := cleaner.NewGitHistoryCleaner(
@@ -226,7 +210,7 @@ func processRepository(
 	safetyReport := c.GetSafetyReport(ctx)
 
 	if len(safetyReport.Blockers) > 0 {
-		fmt.Println(warningStyle.Render("BLOCKED"))
+		fmt.Println(WarningStyle.Render("BLOCKED"))
 
 		for _, blocker := range safetyReport.Blockers {
 			fmt.Printf("   ❌ %s\n", blocker)
@@ -235,7 +219,7 @@ func processRepository(
 		return errors.New("safety checks failed")
 	}
 
-	fmt.Println(successStyle.Render("PASSED"))
+	fmt.Println(SuccessStyle.Render("PASSED"))
 
 	// Show warnings
 	if len(safetyReport.Warnings) > 0 {
@@ -253,13 +237,13 @@ func processRepository(
 	}
 
 	if len(scanResult.Files) == 0 {
-		fmt.Println(successStyle.Render("No large binaries found!"))
+		fmt.Println(SuccessStyle.Render("No large binaries found!"))
 
 		return nil
 	}
 
 	fmt.Println(
-		successStyle.Render(
+		SuccessStyle.Render(
 			fmt.Sprintf(
 				"Found %d file(s) (%s)",
 				len(scanResult.Files),
@@ -294,7 +278,7 @@ func processRepository(
 
 	// Show summary
 	fmt.Println()
-	fmt.Println(titleStyle.Render("📊 Summary"))
+	fmt.Println(TitleStyle.Render("📊 Summary"))
 	fmt.Printf("   Repository:      %s\n", repoPath)
 	fmt.Printf("   Files to remove: %d\n", len(selectedFiles))
 	fmt.Printf("   Total size:      %s\n", format.Bytes(selectedSize))
@@ -308,7 +292,7 @@ func processRepository(
 	fmt.Println()
 
 	if dryRun {
-		fmt.Println(infoStyle.Render("🔍 DRY RUN MODE - No changes will be made"))
+		fmt.Println(InfoStyle.Render("🔍 DRY RUN MODE - No changes will be made"))
 		fmt.Println()
 	}
 
@@ -336,7 +320,7 @@ func processRepository(
 	cleanResult := result.Value()
 
 	fmt.Println()
-	fmt.Println(successStyle.Render("✅ Cleanup completed!"))
+	fmt.Println(SuccessStyle.Render("✅ Cleanup completed!"))
 	fmt.Printf("   Files processed: %d\n", cleanResult.ItemsRemoved)
 	fmt.Printf("   Space freed:     %s\n", format.Bytes(int64(cleanResult.FreedBytes)))
 
@@ -346,12 +330,12 @@ func processRepository(
 
 	if dryRun {
 		fmt.Println()
-		fmt.Println(infoStyle.Render("💡 Run without --dry-run to actually remove files"))
+		fmt.Println(InfoStyle.Render("💡 Run without --dry-run to actually remove files"))
 	} else {
 		fmt.Println()
 
 		if safetyReport.HasRemote {
-			fmt.Println(warningStyle.Render("⚠️  Next steps:"))
+			fmt.Println(WarningStyle.Render("⚠️  Next steps:"))
 			fmt.Println("   1. Verify the repository is in good state")
 			fmt.Printf(
 				"   2. Force push: git push --force-with-lease %s %s\n",
@@ -448,7 +432,7 @@ func confirmAction(
 	warnMsg.WriteString("  • Require force-push to remote\n\n")
 
 	if report.HasRemote {
-		warnMsg.WriteString(warningStyle.Render("Team Impact:\n"))
+		warnMsg.WriteString(WarningStyle.Render("Team Impact:\n"))
 		warnMsg.WriteString("  Other team members will need to reclone or reset.\n")
 		warnMsg.WriteString("  Coordinate with your team before proceeding.\n\n")
 	}

@@ -35,7 +35,7 @@ func NewProfileListCommand() *cobra.Command {
 }
 
 // runProfileListCommand executes the profile list command.
-func runProfileListCommand(cmd *cobra.Command, args []string) error {
+func runProfileListCommand(_ *cobra.Command, _ []string) error {
 	cfg, err := config.Load()
 	if err != nil {
 		// If config doesn't exist, show default profiles
@@ -78,7 +78,7 @@ func NewProfileShowCommand() *cobra.Command {
 }
 
 // runProfileShowCommand executes the profile show command.
-func runProfileShowCommand(cmd *cobra.Command, args []string, detailed bool) error {
+func runProfileShowCommand(_ *cobra.Command, args []string, detailed bool) error {
 	profileName := args[0]
 
 	cfg, err := config.Load()

@@ -8,20 +8,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
-)
-
-var (
-	scanTitleStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("212")).
-			Bold(true).
-			MarginBottom(1)
-	scanHeaderStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("81")).
-			Bold(true)
-	scanMutedStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("241"))
 )
 
 // NewScanCommand creates a command that scans for cleanable items.
@@ -53,7 +40,7 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	ctx := context.Background()
 
 	if !jsonOutput {
-		fmt.Println(scanTitleStyle.Render("🔍 Scanning system for cleanable items..."))
+		fmt.Println(TitleStyle.Render("🔍 Scanning system for cleanable items..."))
 		fmt.Println()
 	}
 
@@ -109,9 +96,9 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 
 	// Print summary
 	fmt.Println()
-	fmt.Println(scanHeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 	fmt.Printf("💡 Total cleanable: %s (%d items)\n", format.Bytes(int64(totalCleanable)), totalItems)
-	fmt.Println(scanHeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 
 	if totalCleanable > 0 {
 		fmt.Println()
@@ -220,7 +207,7 @@ func printScanTable(results []ScanResult, _ bool) {
 	}
 
 	if len(availableResults) == 0 {
-		fmt.Println(scanMutedStyle.Render("No cleanable items found."))
+		fmt.Println(MutedStyle.Render("No cleanable items found."))
 		return
 	}
 

@@ -12,23 +12,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
-)
-
-var (
-	cleanTitleStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("212")).
-			Bold(true).
-			MarginBottom(1)
-	cleanSuccessStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("42")).
-				Bold(true)
-	cleanWarningStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("196")).
-				Bold(true)
-	cleanInfoStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("81"))
 )
 
 // NewCleanCommand creates a multi-cleaner command with TUI.
@@ -65,7 +49,7 @@ func NewCleanCommand() *cobra.Command {
 
 // runCleanCommand executes the clean command with multi-cleaner TUI.
 func runCleanCommand(
-	cmd *cobra.Command,
+	_ *cobra.Command,
 	_ []string,
 	dryRun, verbose, jsonOutput bool,
 	mode, profile, configPath string,
@@ -78,11 +62,11 @@ func runCleanCommand(
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
 
-	fmt.Println(cleanTitleStyle.Render("🧹 Clean Wizard"))
+	fmt.Println(TitleStyle.Render("🧹 Clean Wizard"))
 	fmt.Println()
 
 	if dryRun {
-		fmt.Println(cleanWarningStyle.Render("⚠️  DRY RUN MODE: No actual changes will be made"))
+		fmt.Println(WarningStyle.Render("⚠️  DRY RUN MODE: No actual changes will be made"))
 		fmt.Println()
 	}
 
@@ -140,7 +124,7 @@ func runCleanCommand(
 		}
 	} else {
 		// Interactive cleaner selection (TUI mode only)
-		fmt.Println(cleanInfoStyle.Render("⌨️  Keyboard Shortcuts:"))
+		fmt.Println(InfoStyle.Render("⌨️  Keyboard Shortcuts:"))
 		fmt.Println("   ↑↓ : Navigate  |  Space : Select  |  Enter : Confirm  |  Esc : Cancel")
 		fmt.Println()
 		// Interactive cleaner selection
@@ -304,11 +288,11 @@ func runCleanCommand(
 
 	// Show final results (TUI mode)
 	fmt.Println()
-	fmt.Println(cleanTitleStyle.Render("🧹 Cleanup Results"))
+	fmt.Println(TitleStyle.Render("🧹 Cleanup Results"))
 	fmt.Println()
 
 	if dryRun {
-		fmt.Println(cleanWarningStyle.Render("⚠️  DRY RUN: No actual changes were made"))
+		fmt.Println(WarningStyle.Render("⚠️  DRY RUN: No actual changes were made"))
 		fmt.Println()
 	}
 
@@ -317,21 +301,21 @@ func runCleanCommand(
 
 	// Add encouraging message based on space freed
 	if totalBytesFreed > 1_000_000_000 { // > 1 GB
-		fmt.Println(cleanSuccessStyle.Render("🎉 Great job! You freed over 1 GB of space!"))
+		fmt.Println(SuccessStyle.Render("🎉 Great job! You freed over 1 GB of space!"))
 	} else if totalBytesFreed > 100_000_000 { // > 100 MB
-		fmt.Println(cleanSuccessStyle.Render("✅ Nice! You freed some space."))
+		fmt.Println(SuccessStyle.Render("✅ Nice! You freed some space."))
 	}
 
 	if dryRun {
 		fmt.Println()
-		fmt.Println(cleanInfoStyle.Render("💡 Tip: Remove --dry-run flag to actually clean:"))
+		fmt.Println(InfoStyle.Render("💡 Tip: Remove --dry-run flag to actually clean:"))
 		fmt.Println("   clean-wizard clean --mode standard")
 	}
 
 	// Show errors and warnings
 	if totalItemsFailed > 0 || len(skippedCleaners) > 0 || len(failedCleaners) > 0 {
 		fmt.Println()
-		fmt.Println(cleanWarningStyle.Render("⚠️  Warnings:"))
+		fmt.Println(WarningStyle.Render("⚠️  Warnings:"))
 		if totalItemsFailed > 0 {
 			fmt.Printf("   • %d item(s) failed to clean\n", totalItemsFailed)
 		}
@@ -572,7 +556,7 @@ func printCleanResultsTable(results map[string]domain.CleanResult, totalBytes ui
 	}
 
 	if len(rows) == 0 {
-		fmt.Println(cleanInfoStyle.Render("No items were cleaned."))
+		fmt.Println(InfoStyle.Render("No items were cleaned."))
 		return
 	}
 
