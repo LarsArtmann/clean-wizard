@@ -39,6 +39,8 @@ format:
     goimports -w .
 
 # Clean everything (including caches)
+# NOTE: This skips Go cache cleaning if other Go processes are running to avoid cache corruption.
+# This is a safety measure - if you need to clean Go caches, ensure no other Go processes are running first.
 clean-all:
     @echo "🧹 Cleaning all build artifacts..."
     rm -rf bin/ {{BINARY_NAME}}
@@ -46,7 +48,7 @@ clean-all:
     rm -f coverage.out coverage.html
     rm -rf reports/
     go clean
-    @echo "🧹 Cleaning caches via clean-wizard..."
+    @echo "🧹 Cleaning caches via clean-wizard (skipping Go caches if processes are running)..."
     @go build -o {{BINARY_NAME}} ./cmd/clean-wizard 2>&1 > /dev/null || true
     @./{{BINARY_NAME}} clean --mode quick --json > /dev/null 2>&1 || echo "ℹ️  clean-wizard skipped"
     rm -f {{BINARY_NAME}}

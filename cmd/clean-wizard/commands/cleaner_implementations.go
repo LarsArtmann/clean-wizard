@@ -4,7 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -195,7 +199,16 @@ func runNodePackageManagerCleaner(
 }
 
 // runGoCleaner executes the Go cleaner.
+// Skips cleaning if other Go processes are running to avoid cache corruption.
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
+	if hasOtherGoProcesses() {
+		return domain.CleanResult{}, errors.New(
+			"other Go processes detected (e.g., running tests, builds, or IDE operations). " +
+				"Skipping Go cache cleaning to avoid cache corruption. " +
+				"Please wait for other Go operations to complete and try again.",
+		)
+	}
+
 	return runGenericCleanerWithError(
 		ctx,
 		verbose,
@@ -208,6 +221,52 @@ func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult
 			)
 		},
 	)
+}
+
+// hasOtherGoProcesses checks if there are other Go processes running
+// that might be using the Go cache.
+func hasOtherGoProcesses() bool {
+	// Check for common Go-related processes
+	goProcesses := []string{"go", "gopls", "golangci-lint", "dlv"}
+
+	for _, proc := range goProcesses {
+		if isProcessRunning(proc) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// isProcessRunning checks if a process with the given name is currently running.
+// This is a platform-independent check that looks for other instances.
+func isProcessRunning(name string) bool {
+	// Use pgrep on Unix systems to check for processes
+	// Exclude the current clean-wizard process itself
+	cmd := exec.Command("pgrep", "-x", name)
+	output, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+
+	// Parse output to get PIDs
+	pids := strings.Fields(string(output))
+
+	// Get current process PID
+	currentPID := os.Getpid()
+
+	// Check if any found PID is not the current process
+	for _, pidStr := range pids {
+		pid, err := strconv.Atoi(pidStr)
+		if err != nil {
+			continue
+		}
+		if pid != currentPID {
+			return true
+		}
+	}
+
+	return false
 }
 
 // runCargoCleaner executes the Cargo cleaner.
