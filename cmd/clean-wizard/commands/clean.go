@@ -31,7 +31,16 @@ func NewCleanCommand() *cobra.Command {
 		Short: "Clean system caches and package managers",
 		Long:  `Interactively select and clean system caches, package managers, and temporary data.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCleanCommand(cmd, args, dryRun, verbose, jsonOutput, mode, profile, configPath)
+			return runCleanCommand(
+				cmd,
+				args,
+				dryRun,
+				verbose,
+				jsonOutput,
+				mode,
+				profile,
+				configPath,
+			)
 		},
 	}
 
@@ -97,12 +106,15 @@ func runCleanCommand(
 		if err != nil {
 			return fmt.Errorf("profile error: %w", err)
 		}
+
 		if !jsonOutput {
 			fmt.Printf("📋 Using profile: %s\n", profile)
 			fmt.Println()
+
 			for _, ct := range selectedCleaners {
 				fmt.Printf("  ✓ %s\n", getCleanerName(ct))
 			}
+
 			fmt.Println()
 		}
 	} else if mode != "" {
@@ -316,12 +328,15 @@ func runCleanCommand(
 	if totalItemsFailed > 0 || len(skippedCleaners) > 0 || len(failedCleaners) > 0 {
 		fmt.Println()
 		fmt.Println(WarningStyle.Render("⚠️  Warnings:"))
+
 		if totalItemsFailed > 0 {
 			fmt.Printf("   • %d item(s) failed to clean\n", totalItemsFailed)
 		}
+
 		if len(skippedCleaners) > 0 {
 			fmt.Printf("   • %d cleaner(s) skipped (not available)\n", len(skippedCleaners))
 		}
+
 		if len(failedCleaners) > 0 {
 			fmt.Printf("   • %d cleaner(s) failed\n", len(failedCleaners))
 		}
@@ -486,6 +501,7 @@ func loadConfigForClean(configPath string) (*domain.Config, error) {
 		// For now, use default loading which respects CONFIG_PATH env var
 		return config.Load()
 	}
+
 	return config.Load()
 }
 
@@ -507,7 +523,11 @@ var operationTypeToCleanerType = map[domain.OperationType]CleanerType{
 }
 
 // getProfileCleaners returns the cleaner types for a given profile name.
-func getProfileCleaners(profileName string, cfg *domain.Config, availableConfigs []CleanerConfig) ([]CleanerType, error) {
+func getProfileCleaners(
+	profileName string,
+	cfg *domain.Config,
+	availableConfigs []CleanerConfig,
+) ([]CleanerType, error) {
 	profile, exists := cfg.Profiles[profileName]
 	if !exists {
 		return nil, fmt.Errorf("profile %q not found", profileName)
@@ -520,16 +540,19 @@ func getProfileCleaners(profileName string, cfg *domain.Config, availableConfigs
 	}
 
 	var cleaners []CleanerType
+
 	for _, op := range profile.Operations {
 		if op.Enabled != domain.ProfileStatusEnabled {
 			continue
 		}
 		// Map operation name to OperationType, then to CleanerType
 		opType := domain.GetOperationType(op.Name)
+
 		cleanerType, ok := operationTypeToCleanerType[opType]
 		if !ok {
 			continue // Skip unknown operation types
 		}
+
 		if availableSet[cleanerType] {
 			cleaners = append(cleaners, cleanerType)
 		}
@@ -543,8 +566,14 @@ func getProfileCleaners(profileName string, cfg *domain.Config, availableConfigs
 }
 
 // printCleanResultsTable prints clean results as a formatted table.
-func printCleanResultsTable(results map[string]domain.CleanResult, totalBytes uint64, totalItems uint, duration time.Duration) {
+func printCleanResultsTable(
+	results map[string]domain.CleanResult,
+	totalBytes uint64,
+	totalItems uint,
+	duration time.Duration,
+) {
 	var rows [][]string
+
 	for name, result := range results {
 		if result.FreedBytes > 0 || result.ItemsRemoved > 0 {
 			rows = append(rows, []string{
@@ -557,6 +586,7 @@ func printCleanResultsTable(results map[string]domain.CleanResult, totalBytes ui
 
 	if len(rows) == 0 {
 		fmt.Println(InfoStyle.Render("No items were cleaned."))
+
 		return
 	}
 
@@ -565,5 +595,10 @@ func printCleanResultsTable(results map[string]domain.CleanResult, totalBytes ui
 
 	fmt.Println(t)
 	fmt.Println()
-	fmt.Printf("📊 Total: %s freed, %s items in %s\n", format.Bytes(int64(totalBytes)), strconv.FormatUint(uint64(totalItems), 10), format.Duration(duration))
+	fmt.Printf(
+		"📊 Total: %s freed, %s items in %s\n",
+		format.Bytes(int64(totalBytes)),
+		strconv.FormatUint(uint64(totalItems), 10),
+		format.Duration(duration),
+	)
 }

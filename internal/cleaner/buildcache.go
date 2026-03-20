@@ -192,6 +192,7 @@ func (bcc *BuildCacheCleaner) printVerbose(action, verboseMsg, baseName string) 
 	if !bcc.verbose {
 		return
 	}
+
 	fmt.Printf("  ✓ %s %s: %s\n", action, verboseMsg, baseName)
 }
 

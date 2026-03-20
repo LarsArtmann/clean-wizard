@@ -37,6 +37,7 @@ func newTrimmableField(name, path, value string) TrimmableField {
 		Path: path,
 		Value: func() *string {
 			s := value
+
 			return &s
 		}(),
 	}

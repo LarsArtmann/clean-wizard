@@ -108,15 +108,20 @@ func TestDateTime(t *testing.T) {
 		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
 	}
 
-	runDateTimeTests(t, dateTimeTests, DateTime, func(t *testing.T, result string, tt dateTimeTestStruct) {
-		if tt.expected == "never" && result != "never" {
-			t.Errorf("DateTime(%v) = %v, want %v", tt.input, result, tt.expected)
-		} else if tt.expected != "never" {
-			if len(result) < 19 {
-				t.Errorf("DateTime(%v) = %v, expected at least 19 characters", tt.input, result)
+	runDateTimeTests(
+		t,
+		dateTimeTests,
+		DateTime,
+		func(t *testing.T, result string, tt dateTimeTestStruct) {
+			if tt.expected == "never" && result != "never" {
+				t.Errorf("DateTime(%v) = %v, want %v", tt.input, result, tt.expected)
+			} else if tt.expected != "never" {
+				if len(result) < 19 {
+					t.Errorf("DateTime(%v) = %v, expected at least 19 characters", tt.input, result)
+				}
 			}
-		}
-	})
+		},
+	)
 }
 
 func TestNumber(t *testing.T) {

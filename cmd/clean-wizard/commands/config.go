@@ -90,7 +90,9 @@ func showConfigJSON(cfg *domain.Config) error {
 	if err != nil {
 		return fmt.Errorf("failed to marshal configuration to JSON: %w", err)
 	}
+
 	fmt.Println(string(jsonBytes))
+
 	return nil
 }
 

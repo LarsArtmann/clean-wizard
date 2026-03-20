@@ -20,6 +20,7 @@ func DetectFilterRepoProvider() FilterRepoProvider {
 	if _, err := exec.LookPath("nix"); err == nil {
 		return FilterRepoNix
 	}
+
 	return FilterRepoSystem
 }
 

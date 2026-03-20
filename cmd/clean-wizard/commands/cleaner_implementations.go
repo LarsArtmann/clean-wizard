@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -229,13 +230,7 @@ func hasOtherGoProcesses() bool {
 	// Check for common Go-related processes
 	goProcesses := []string{"go", "gopls", "golangci-lint", "dlv"}
 
-	for _, proc := range goProcesses {
-		if isProcessRunning(proc) {
-			return true
-		}
-	}
-
-	return false
+	return slices.ContainsFunc(goProcesses, isProcessRunning)
 }
 
 // isProcessRunning checks if a process with the given name is currently running.
@@ -244,6 +239,7 @@ func isProcessRunning(name string) bool {
 	// Use pgrep on Unix systems to check for processes
 	// Exclude the current clean-wizard process itself
 	cmd := exec.Command("pgrep", "-x", name)
+
 	output, err := cmd.Output()
 	if err != nil {
 		return false
@@ -261,6 +257,7 @@ func isProcessRunning(name string) bool {
 		if err != nil {
 			continue
 		}
+
 		if pid != currentPID {
 			return true
 		}

@@ -85,7 +85,12 @@ func runUnmarshalStringBenchmark(b *testing.B, testCases []string, unmarshal fun
 }
 
 // runUnmarshalBenchmark runs a benchmark for unmarshaling enum values with a custom label function.
-func runUnmarshalBenchmark[T any](b *testing.B, testCases []T, labelFunc func(T) string, unmarshal func(T) error) {
+func runUnmarshalBenchmark[T any](
+	b *testing.B,
+	testCases []T,
+	labelFunc func(T) string,
+	unmarshal func(T) error,
+) {
 	for _, tc := range testCases {
 		b.Run(labelFunc(tc), func(b *testing.B) {
 			for range b.N {

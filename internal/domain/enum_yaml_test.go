@@ -89,11 +89,72 @@ type enumTypeInfo struct {
 
 // enumTypeDefinitions contains all enum type definitions for test case generation.
 var enumTypeDefinitions = []enumTypeInfo{
-	{name: "CacheCleanupMode", typeName: "CacheCleanupMode", values: []string{"DISABLED", "ENABLED", "0", "1"}},
-	{name: "DockerPruneMode", typeName: "DockerPruneMode", values: []string{"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS", "0", "1", "2", "3", "4"}},
-	{name: "BuildToolType", typeName: "BuildToolType", values: []string{"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA", "0", "1", "2", "3", "4", "5"}},
-	{name: "CacheType", typeName: "CacheType", values: []string{"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP", "NPM", "YARN", "CCACHE", "0", "1", "2", "3", "4", "5", "6", "7"}},
-	{name: "PackageManagerType", typeName: "PackageManagerType", values: []string{"NPM", "PNPM", "YARN", "BUN", "0", "1", "2", "3"}},
+	{
+		name:     "CacheCleanupMode",
+		typeName: "CacheCleanupMode",
+		values:   []string{"DISABLED", "ENABLED", "0", "1"},
+	},
+	{
+		name:     "DockerPruneMode",
+		typeName: "DockerPruneMode",
+		values: []string{
+			"ALL",
+			"IMAGES",
+			"CONTAINERS",
+			"VOLUMES",
+			"BUILDS",
+			"0",
+			"1",
+			"2",
+			"3",
+			"4",
+		},
+	},
+	{
+		name:     "BuildToolType",
+		typeName: "BuildToolType",
+		values: []string{
+			"GO",
+			"RUST",
+			"NODE",
+			"PYTHON",
+			"JAVA",
+			"SCALA",
+			"0",
+			"1",
+			"2",
+			"3",
+			"4",
+			"5",
+		},
+	},
+	{
+		name:     "CacheType",
+		typeName: "CacheType",
+		values: []string{
+			"SPOTLIGHT",
+			"XCODE",
+			"COCOAPODS",
+			"HOMEBREW",
+			"PIP",
+			"NPM",
+			"YARN",
+			"CCACHE",
+			"0",
+			"1",
+			"2",
+			"3",
+			"4",
+			"5",
+			"6",
+			"7",
+		},
+	},
+	{
+		name:     "PackageManagerType",
+		typeName: "PackageManagerType",
+		values:   []string{"NPM", "PNPM", "YARN", "BUN", "0", "1", "2", "3"},
+	},
 }
 
 // generateEnumUnmarshalTestCases generates test cases for enum YAML unmarshaling.
@@ -102,16 +163,18 @@ func generateEnumUnmarshalTestCases(useInt bool) []enumUnmarshalTestCase {
 
 	for _, enumType := range enumTypeDefinitions {
 		var stringVals []string
+
 		count := len(enumType.values) / 2
 		if useInt {
-			for i := 0; i < count; i++ {
-				stringVals = append(stringVals, fmt.Sprintf("%d", i))
+			for i := range count {
+				stringVals = append(stringVals, strconv.Itoa(i))
 			}
 		} else {
 			stringVals = enumType.values[:count]
 		}
 
 		var typePtr any
+
 		switch enumType.typeName {
 		case "CacheCleanupMode":
 			typePtr = new(CacheCleanupMode)
@@ -127,6 +190,7 @@ func generateEnumUnmarshalTestCases(useInt bool) []enumUnmarshalTestCase {
 
 		for i, val := range stringVals {
 			var expected any
+
 			switch enumType.typeName {
 			case "CacheCleanupMode":
 				expected = CacheCleanupMode(i)
@@ -144,6 +208,7 @@ func generateEnumUnmarshalTestCases(useInt bool) []enumUnmarshalTestCase {
 			if useInt {
 				suffix = "int"
 			}
+
 			cases = append(cases, enumUnmarshalTestCase{
 				name:     fmt.Sprintf("%s %s %s", enumType.name, val, suffix),
 				input:    val,

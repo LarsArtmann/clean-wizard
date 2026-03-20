@@ -51,6 +51,7 @@ func runInitCommand(force, minimal bool) error {
 		fmt.Println()
 
 		var overwrite bool
+
 		confirmForm := huh.NewForm(
 			huh.NewGroup(
 				huh.NewConfirm().
@@ -62,12 +63,14 @@ func runInitCommand(force, minimal bool) error {
 			),
 		)
 
-		if err := confirmForm.Run(); err != nil {
+		err := confirmForm.Run()
+		if err != nil {
 			return fmt.Errorf("confirmation error: %w", err)
 		}
 
 		if !overwrite {
 			fmt.Println("❌ Cancelled. No changes made.")
+
 			return nil
 		}
 	}
@@ -111,7 +114,9 @@ func createMinimalConfig() error {
 
 // createInteractiveConfig creates a configuration interactively using huh forms.
 func createInteractiveConfig() error {
-	fmt.Println(InfoStyle.Render("Let's create the perfect cleaning configuration for your system!"))
+	fmt.Println(
+		InfoStyle.Render("Let's create the perfect cleaning configuration for your system!"),
+	)
 	fmt.Println()
 
 	// Interactive form for configuration options
@@ -170,7 +175,8 @@ func createInteractiveConfig() error {
 			),
 		)
 
-		if err := cleanerForm.Run(); err != nil {
+		err := cleanerForm.Run()
+		if err != nil {
 			return fmt.Errorf("cleaner selection error: %w", err)
 		}
 
@@ -187,7 +193,8 @@ func createInteractiveConfig() error {
 				),
 			)
 
-			if err := warningForm.Run(); err != nil {
+			err := warningForm.Run()
+			if err != nil {
 				return fmt.Errorf("docker warning error: %w", err)
 			}
 
@@ -205,7 +212,13 @@ func createInteractiveConfig() error {
 			"daily": createDailyProfile(),
 		}
 	case "custom":
-		cfg.Profiles = createCustomProfile(includeNix, includeHomebrew, includeDocker, includeNode, includeGo)
+		cfg.Profiles = createCustomProfile(
+			includeNix,
+			includeHomebrew,
+			includeDocker,
+			includeNode,
+			includeGo,
+		)
 	case "full":
 		// Full setup: all profiles
 		cfg.Profiles = map[string]*domain.Profile{
@@ -216,7 +229,8 @@ func createInteractiveConfig() error {
 	}
 
 	// Ask about safe mode
-	var safeMode bool = true
+	var safeMode = true
+
 	safeModeForm := huh.NewForm(
 		huh.NewGroup(
 			huh.NewConfirm().
@@ -375,7 +389,9 @@ func createAggressiveProfile() *domain.Profile {
 }
 
 // createCustomProfile creates a custom profile based on user selections.
-func createCustomProfile(includeNix, includeHomebrew, includeDocker, includeNode, includeGo bool) map[string]*domain.Profile {
+func createCustomProfile(
+	includeNix, includeHomebrew, includeDocker, includeNode, includeGo bool,
+) map[string]*domain.Profile {
 	operations := make([]domain.CleanupOperation, 0)
 
 	if includeNix {

@@ -10,5 +10,6 @@ func GetFileSize(path string) int64 {
 	if err != nil {
 		return 0
 	}
+
 	return info.Size()
 }

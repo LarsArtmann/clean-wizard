@@ -140,6 +140,7 @@ func (c *GitHistorySafetyChecker) isGitRepo(ctx context.Context) bool {
 // newGitCommand creates a new git command with the given arguments.
 func (c *GitHistorySafetyChecker) newGitCommand(ctx context.Context, args ...string) *exec.Cmd {
 	allArgs := append([]string{"git", "-C", c.repoPath}, args...)
+
 	return exec.CommandContext(ctx, allArgs[0], allArgs[1:]...)
 }
 

@@ -78,6 +78,7 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 
 	for _, cfg := range availableCleaners {
 		result := scanCleanerReal(ctx, cfg.Type, verbose)
+
 		scanResults = append(scanResults, result)
 		if result.BytesCleanable > 0 {
 			totalCleanable += result.BytesCleanable
@@ -88,6 +89,7 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	// Output JSON if requested
 	if jsonOutput {
 		outputScanJSON(scanResults, totalCleanable, totalItems)
+
 		return nil
 	}
 
@@ -97,7 +99,11 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	// Print summary
 	fmt.Println()
 	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
-	fmt.Printf("💡 Total cleanable: %s (%d items)\n", format.Bytes(int64(totalCleanable)), totalItems)
+	fmt.Printf(
+		"💡 Total cleanable: %s (%d items)\n",
+		format.Bytes(int64(totalCleanable)),
+		totalItems,
+	)
 	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 
 	if totalCleanable > 0 {
@@ -134,6 +140,7 @@ func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool)
 	c, ok := registry.Get(name)
 	if !ok {
 		result.Available = CleanerAvailabilityUnavailable
+
 		return result
 	}
 
@@ -145,11 +152,13 @@ func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool)
 
 	// Use the real Scan method
 	scanRes := c.Scan(ctx)
+
 	items, err := scanRes.Unwrap()
 	if err != nil {
 		if verbose {
 			fmt.Printf("  ⚠️  Scan error for %s: %v\n", result.Name, err)
 		}
+
 		return result
 	}
 
@@ -159,6 +168,7 @@ func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool)
 	for _, item := range items {
 		totalSize += item.Size
 	}
+
 	result.BytesCleanable = uint64(totalSize)
 
 	return result
@@ -200,6 +210,7 @@ func getRegistryName(cleanerType CleanerType) string {
 func printScanTable(results []ScanResult, _ bool) {
 	// Filter to only available cleaners with items
 	var availableResults []ScanResult
+
 	for _, r := range results {
 		if r.Available == CleanerAvailabilityAvailable && r.BytesCleanable > 0 {
 			availableResults = append(availableResults, r)
@@ -208,11 +219,13 @@ func printScanTable(results []ScanResult, _ bool) {
 
 	if len(availableResults) == 0 {
 		fmt.Println(MutedStyle.Render("No cleanable items found."))
+
 		return
 	}
 
 	// Build table rows
 	var rows [][]string
+
 	for _, r := range availableResults {
 		sizeStr := format.Bytes(int64(r.BytesCleanable))
 		rows = append(rows, []string{
@@ -235,10 +248,12 @@ func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
 		Bytes     uint64 `json:"bytes"`
 		Available bool   `json:"available"`
 	}
+
 	type scanJSONSummary struct {
 		TotalBytes uint64 `json:"total_bytes"`
 		TotalItems uint   `json:"total_items"`
 	}
+
 	type scanJSONOutput struct {
 		Results []scanJSONResult `json:"results"`
 		Summary scanJSONSummary  `json:"summary"`
@@ -265,7 +280,9 @@ func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
 	jsonBytes, err := json.MarshalIndent(output, "", "  ")
 	if err != nil {
 		fmt.Printf("{\"error\": %q}\n", err.Error())
+
 		return
 	}
+
 	fmt.Println(string(jsonBytes))
 }
