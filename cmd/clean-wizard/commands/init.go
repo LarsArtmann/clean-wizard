@@ -229,7 +229,7 @@ func createInteractiveConfig() error {
 	}
 
 	// Ask about safe mode
-	var safeMode = true
+	safeMode := true
 
 	safeModeForm := huh.NewForm(
 		huh.NewGroup(

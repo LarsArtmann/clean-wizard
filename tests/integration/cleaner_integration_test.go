@@ -57,7 +57,11 @@ func TestGoCleaner_Integration(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	goCleaner, err := cleaner.NewGoCleaner(false, false, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache)
+	goCleaner, err := cleaner.NewGoCleaner(
+		false,
+		false,
+		cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache,
+	)
 	require.NoError(t, err)
 
 	// Check if Go is available
@@ -113,7 +117,13 @@ func TestMultiCleaner_Integration(t *testing.T) {
 	}
 
 	// Add temp cleaner separately to handle error
-	tempCleaner, err := cleaner.NewTempFilesCleaner(false, false, "7d", []string{}, []string{"/tmp"})
+	tempCleaner, err := cleaner.NewTempFilesCleaner(
+		false,
+		false,
+		"7d",
+		[]string{},
+		[]string{"/tmp"},
+	)
 	if err == nil {
 		cleaners = append(cleaners, struct {
 			name    string
@@ -140,7 +150,13 @@ func TestCleanerTimeout_Integration(t *testing.T) {
 	defer cancel()
 
 	// Use a cleaner that should complete within 1 second
-	tempCleaner, err := cleaner.NewTempFilesCleaner(false, false, "7d", []string{}, []string{"/tmp"})
+	tempCleaner, err := cleaner.NewTempFilesCleaner(
+		false,
+		false,
+		"7d",
+		[]string{},
+		[]string{"/tmp"},
+	)
 	require.NoError(t, err)
 
 	result := tempCleaner.Clean(ctx)

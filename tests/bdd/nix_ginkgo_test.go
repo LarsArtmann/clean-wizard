@@ -137,7 +137,10 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 	ginkgo.Describe("Clean old Nix generations for real", func() {
 		ginkgo.BeforeEach(func() {
-			testCtx.nixCleaner = cleaner.NewNixCleaner(false, true) // not verbose, dryRun for safety
+			testCtx.nixCleaner = cleaner.NewNixCleaner(
+				false,
+				true,
+			) // not verbose, dryRun for safety
 		})
 
 		ginkgo.It("should keep specified number of generations", func() {
@@ -158,7 +161,9 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		ginkgo.BeforeEach(func() {
 			// Simulate Nix not being available
 			testCtx.nixCleaner = cleaner.NewNixCleaner(true, false)
-			testCtx.generations = result.Err[[]domain.NixGeneration](errors.New("Nix is not available"))
+			testCtx.generations = result.Err[[]domain.NixGeneration](
+				errors.New("Nix is not available"),
+			)
 			testCtx.storeSize = result.Err[int64](errors.New("Nix is not available"))
 			testCtx.cleanResult = result.Err[domain.CleanResult](errors.New("Nix is not available"))
 		})

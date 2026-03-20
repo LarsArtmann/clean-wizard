@@ -36,8 +36,8 @@ func TestExtractMinMax(t *testing.T) {
 			max:         &maxVal,
 			minFallback: 0,
 			maxFallback: 100,
-			wantMin:     float64Ptr(10),
-			wantMax:     float64Ptr(95),
+			wantMin:     new(float64(10)),
+			wantMax:     new(float64(95)),
 		},
 		{
 			name:        "nil min uses fallback",
@@ -45,8 +45,8 @@ func TestExtractMinMax(t *testing.T) {
 			max:         &maxVal,
 			minFallback: 5,
 			maxFallback: 100,
-			wantMin:     float64Ptr(5),
-			wantMax:     float64Ptr(95),
+			wantMin:     new(float64(5)),
+			wantMax:     new(float64(95)),
 		},
 		{
 			name:        "nil max uses fallback",
@@ -54,8 +54,8 @@ func TestExtractMinMax(t *testing.T) {
 			max:         nil,
 			minFallback: 0,
 			maxFallback: 90,
-			wantMin:     float64Ptr(10),
-			wantMax:     float64Ptr(90),
+			wantMin:     new(float64(10)),
+			wantMax:     new(float64(90)),
 		},
 		{
 			name:        "both nil uses fallbacks",
@@ -63,8 +63,8 @@ func TestExtractMinMax(t *testing.T) {
 			max:         nil,
 			minFallback: 0,
 			maxFallback: 100,
-			wantMin:     float64Ptr(0),
-			wantMax:     float64Ptr(100),
+			wantMin:     new(float64(0)),
+			wantMax:     new(float64(100)),
 		},
 	}
 
@@ -91,17 +91,17 @@ func TestMinMax_IsEmpty(t *testing.T) {
 		},
 		{
 			name:      "min only is not empty",
-			minMax:    MinMax{Min: float64Ptr(10), Max: nil},
+			minMax:    MinMax{Min: new(float64(10)), Max: nil},
 			wantEmpty: false,
 		},
 		{
 			name:      "max only is not empty",
-			minMax:    MinMax{Min: nil, Max: float64Ptr(90)},
+			minMax:    MinMax{Min: nil, Max: new(float64(90))},
 			wantEmpty: false,
 		},
 		{
 			name:      "both present is not empty",
-			minMax:    MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
+			minMax:    MinMax{Min: new(float64(10)), Max: new(float64(90))},
 			wantEmpty: false,
 		},
 	}
@@ -123,17 +123,17 @@ func TestMinMax_Range(t *testing.T) {
 	}{
 		{
 			name:   "valid range",
-			minMax: MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
+			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
 			want:   80,
 		},
 		{
 			name:   "nil min returns NaN",
-			minMax: MinMax{Min: nil, Max: float64Ptr(90)},
+			minMax: MinMax{Min: nil, Max: new(float64(90))},
 			want:   math.NaN(),
 		},
 		{
 			name:   "nil max returns NaN",
-			minMax: MinMax{Min: float64Ptr(10), Max: nil},
+			minMax: MinMax{Min: new(float64(10)), Max: nil},
 			want:   math.NaN(),
 		},
 	}
@@ -161,55 +161,55 @@ func TestMinMax_Contains(t *testing.T) {
 	}{
 		{
 			name:   "value in range",
-			minMax: MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
+			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
 			value:  50,
 			want:   true,
 		},
 		{
 			name:   "value below min",
-			minMax: MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
+			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
 			value:  5,
 			want:   false,
 		},
 		{
 			name:   "value above max",
-			minMax: MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
+			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
 			value:  95,
 			want:   false,
 		},
 		{
 			name:   "value at min boundary",
-			minMax: MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
+			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
 			value:  10,
 			want:   true,
 		},
 		{
 			name:   "value at max boundary",
-			minMax: MinMax{Min: float64Ptr(10), Max: float64Ptr(90)},
+			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
 			value:  90,
 			want:   true,
 		},
 		{
 			name:   "only min constraint - below",
-			minMax: MinMax{Min: float64Ptr(10), Max: nil},
+			minMax: MinMax{Min: new(float64(10)), Max: nil},
 			value:  5,
 			want:   false,
 		},
 		{
 			name:   "only min constraint - above",
-			minMax: MinMax{Min: float64Ptr(10), Max: nil},
+			minMax: MinMax{Min: new(float64(10)), Max: nil},
 			value:  50,
 			want:   true,
 		},
 		{
 			name:   "only max constraint - below",
-			minMax: MinMax{Min: nil, Max: float64Ptr(90)},
+			minMax: MinMax{Min: nil, Max: new(float64(90))},
 			value:  50,
 			want:   true,
 		},
 		{
 			name:   "only max constraint - above",
-			minMax: MinMax{Min: nil, Max: float64Ptr(90)},
+			minMax: MinMax{Min: nil, Max: new(float64(90))},
 			value:  95,
 			want:   false,
 		},
@@ -240,7 +240,7 @@ func TestToFloat64(t *testing.T) {
 		{
 			name:  "converts value",
 			input: &val,
-			want:  float64Ptr(42),
+			want:  new(float64(42)),
 		},
 		{
 			name:  "nil returns nil",

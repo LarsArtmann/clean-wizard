@@ -21,7 +21,12 @@ type yamlUnmarshaler interface {
 
 // assertEnumUnmarshalError tests that invalid enum values produce proper error messages.
 // It creates a YAML node from the value and calls UnmarshalYAML on the target enum.
-func assertEnumUnmarshalError(t *testing.T, value interface{}, target yamlUnmarshaler, enumName string) {
+func assertEnumUnmarshalError(
+	t *testing.T,
+	value interface{},
+	target yamlUnmarshaler,
+	enumName string,
+) {
 	t.Helper()
 	node := createYAMLNode(value)
 	err := target.UnmarshalYAML(node)
@@ -31,7 +36,12 @@ func assertEnumUnmarshalError(t *testing.T, value interface{}, target yamlUnmars
 
 // requireEnumUnmarshal unmarshals an enum value and requires it succeeds.
 // It returns the target for chaining assertions.
-func requireEnumUnmarshal(t *testing.T, value interface{}, target yamlUnmarshaler, enumName string) {
+func requireEnumUnmarshal(
+	t *testing.T,
+	value interface{},
+	target yamlUnmarshaler,
+	enumName string,
+) {
 	t.Helper()
 	node := createYAMLNode(value)
 	err := target.UnmarshalYAML(node)
@@ -160,7 +170,12 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				requireEnumUnmarshal(t, op.Docker.PruneMode, &pruneMode, "DockerPruneMode")
 
 				// Verify enum value
-				assert.Equal(t, expectedDockerMode, pruneMode, "DockerPruneMode should match expected value")
+				assert.Equal(
+					t,
+					expectedDockerMode,
+					pruneMode,
+					"DockerPruneMode should match expected value",
+				)
 
 				// Verify enum is valid
 				assert.True(t, pruneMode.IsValid(), "DockerPruneMode should be valid")
@@ -239,7 +254,11 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				}
 
 				// Create system cache cleaner
-				systemCleaner, err := cleaner.NewSystemCacheCleaner(false, true, op.SystemCache.OlderThan)
+				systemCleaner, err := cleaner.NewSystemCacheCleaner(
+					false,
+					true,
+					op.SystemCache.OlderThan,
+				)
 				require.NoError(t, err, "Failed to create system cache cleaner")
 
 				// Test cleaner availability
@@ -318,7 +337,12 @@ operations:
 						if str == "INVALID_TYPE" {
 							err := cacheType.UnmarshalYAML(node)
 							assert.Error(t, err, "Should error on invalid CacheType")
-							assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
+							assert.Contains(
+								t,
+								err.Error(),
+								"Valid options",
+								"Error should list valid options",
+							)
 						}
 					}
 				}
@@ -423,14 +447,26 @@ func TestEnumRoundtrip_ThroughConfig(t *testing.T) {
 	assert.Equal(t, originalSettings.Docker.PruneMode, unmarshaledSettings.Docker.PruneMode,
 		"DockerPruneMode should be preserved through roundtrip")
 
-	assert.Equal(t, originalSettings.GoPackages.CleanCache, unmarshaledSettings.GoPackages.CleanCache,
-		"CleanCache should be preserved through roundtrip")
+	assert.Equal(
+		t,
+		originalSettings.GoPackages.CleanCache,
+		unmarshaledSettings.GoPackages.CleanCache,
+		"CleanCache should be preserved through roundtrip",
+	)
 
-	assert.Equal(t, originalSettings.GoPackages.CleanTestCache, unmarshaledSettings.GoPackages.CleanTestCache,
-		"CleanTestCache should be preserved through roundtrip")
+	assert.Equal(
+		t,
+		originalSettings.GoPackages.CleanTestCache,
+		unmarshaledSettings.GoPackages.CleanTestCache,
+		"CleanTestCache should be preserved through roundtrip",
+	)
 
-	assert.Equal(t, len(originalSettings.SystemCache.CacheTypes), len(unmarshaledSettings.SystemCache.CacheTypes),
-		"CacheTypes count should be preserved through roundtrip")
+	assert.Equal(
+		t,
+		len(originalSettings.SystemCache.CacheTypes),
+		len(unmarshaledSettings.SystemCache.CacheTypes),
+		"CacheTypes count should be preserved through roundtrip",
+	)
 
 	for i, ct := range originalSettings.SystemCache.CacheTypes {
 		assert.Equal(t, ct, unmarshaledSettings.SystemCache.CacheTypes[i],
@@ -504,7 +540,11 @@ func TestEnumValues_ThroughExecution(t *testing.T) {
 			assert.True(t, pm.mode.IsValid(), "%s should be valid", pm.name)
 
 			// Create cleaner with enum
-			dockerCleaner := cleaner.NewDockerCleaner(false, true, cleaner.DockerPruneMode(pm.mode.String()))
+			dockerCleaner := cleaner.NewDockerCleaner(
+				false,
+				true,
+				cleaner.DockerPruneMode(pm.mode.String()),
+			)
 			assert.NotNil(t, dockerCleaner, "Docker cleaner should be created")
 
 			// Verify settings validation

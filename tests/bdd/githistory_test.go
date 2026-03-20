@@ -106,7 +106,11 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 			// Make initial commit
 			createAndCommitFile(testCtx.repoPath, "README.md", "# Test Repository")
 			// Create uncommitted file
-			_ = os.WriteFile(filepath.Join(testCtx.repoPath, "uncommitted.txt"), []byte("test"), 0o644)
+			_ = os.WriteFile(
+				filepath.Join(testCtx.repoPath, "uncommitted.txt"),
+				[]byte("test"),
+				0o644,
+			)
 			testCtx.safetyReport = testCtx.cleaner.GetSafetyReport(testCtx.ctx)
 			gomega.Expect(testCtx.safetyReport.HasUncommittedChanges).To(gomega.BeTrue())
 		})
@@ -121,7 +125,8 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 			createAndCommitFile(testCtx.repoPath, "README.md", "# Test Repository")
 			testCtx.safetyReport = testCtx.cleaner.GetSafetyReport(testCtx.ctx)
 			// FilterRepoAvailable should match our detection
-			gomega.Expect(testCtx.safetyReport.FilterRepoAvailable).To(gomega.Equal(testCtx.hasGitFilterRepo))
+			gomega.Expect(testCtx.safetyReport.FilterRepoAvailable).
+				To(gomega.Equal(testCtx.hasGitFilterRepo))
 		})
 
 		ginkgo.It("should provide helpful install hint when git-filter-repo not available", func() {
