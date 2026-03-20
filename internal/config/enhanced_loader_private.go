@@ -100,7 +100,7 @@ func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domai
 	}
 
 	// Write backup copy
-	err = os.WriteFile(backupPath, configData, 0o644)
+	err = os.WriteFile(backupPath, configData, ConfigFilePermission)
 	if err != nil {
 		return fmt.Errorf("failed to create backup at %s: %w", backupPath, err)
 	}

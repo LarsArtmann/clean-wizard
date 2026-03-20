@@ -14,6 +14,11 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+const (
+	// HomebrewMinFieldsForVersion is the minimum number of fields needed to parse version info.
+	HomebrewMinFieldsForVersion = 2
+)
+
 // homebrewCommandTimeout is the timeout for Homebrew operations.
 const homebrewCommandTimeout = 5 * time.Minute
 
@@ -93,7 +98,7 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 
 		// Parse package name and versions
 		fields := strings.Fields(line)
-		if len(fields) >= 2 {
+		if len(fields) >= HomebrewMinFieldsForVersion {
 			packageName := fields[0]
 			currentVersion := fields[1]
 

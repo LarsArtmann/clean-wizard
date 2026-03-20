@@ -52,7 +52,8 @@ func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(
 	}
 
 	// Check for performance implications
-	if len(config.Profiles) > 20 {
+	const maxProfileCountWarning = 20
+	if len(config.Profiles) > MaxProfileCountWarning {
 		result.Warnings = append(result.Warnings, *ecl.createProfilesWarning())
 	}
 }

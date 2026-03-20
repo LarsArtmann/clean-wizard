@@ -25,6 +25,8 @@ const (
 	dockerImage     DockerResourceType = "image"
 	dockerContainer DockerResourceType = "container"
 	dockerVolume    DockerResourceType = "volume"
+	// DockerParseTabSplitCount is the expected split count for parsing Docker output with tab delimiter.
+	DockerParseTabSplitCount = 2
 )
 
 type DockerCleaner struct {
@@ -254,7 +256,7 @@ func (dc *DockerCleaner) parseDockerResourceOutput(
 			continue
 		}
 
-		parts := strings.SplitN(line, "\t", 2)
+		parts := strings.SplitN(line, "\t", DockerParseTabSplitCount)
 		if len(parts) < 1 || parts[0] == "" {
 			continue
 		}

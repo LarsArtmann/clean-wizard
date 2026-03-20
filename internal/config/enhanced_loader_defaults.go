@@ -1,8 +1,6 @@
 package config
 
 import (
-	"time"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -13,7 +11,7 @@ func getDefaultLoadOptions() *ConfigLoadOptions {
 		EnableCache:        CacheOptionEnabled,
 		EnableSanitization: SanitizeOptionEnabled,
 		ValidationLevel:    domain.ValidationLevelComprehensiveType,
-		Timeout:            30 * time.Second,
+		Timeout:            DefaultLoadTimeout,
 	}
 }
 
@@ -31,9 +29,9 @@ func getDefaultSaveOptions() *ConfigSaveOptions {
 // getDefaultRetryPolicy returns default retry policy.
 func getDefaultRetryPolicy() *RetryPolicy {
 	return &RetryPolicy{
-		MaxRetries:    3,
-		InitialDelay:  100 * time.Millisecond,
-		MaxDelay:      5 * time.Second,
-		BackoffFactor: 2.0,
+		MaxRetries:    DefaultMaxRetries,
+		InitialDelay:  DefaultInitialRetryDelay,
+		MaxDelay:      DefaultMaxRetryDelay,
+		BackoffFactor: DefaultBackoffFactor,
 	}
 }

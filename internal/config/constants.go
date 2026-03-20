@@ -1,34 +1,58 @@
 package config
 
+import (
+	"time"
+)
+
 // Configuration constants for Clean Wizard
 // Centralized to eliminate magic numbers and ensure consistency
 
 // Disk usage constraints.
 const (
-	MinDiskUsagePercent     = 10 // Minimum allowed disk usage percentage
-	MaxDiskUsagePercent     = 95 // Maximum allowed disk usage percentage
-	DefaultDiskUsagePercent = 50 // Default disk usage percentage
-	RoundingIncrement       = 10 // Round percentages to nearest increment
+	MinDiskUsagePercent = 10 // Minimum allowed disk usage percentage
+	MaxDiskUsagePercent = 95 // Maximum allowed disk usage percentage
+	DefaultMaxDiskUsage = 50 // Default disk usage percentage
+	RoundingIncrement   = 10 // Round percentages to nearest increment
 )
 
 // Retry policy constants.
 const (
-	DefaultMaxRetries    = 3    // Default maximum retry attempts
-	DefaultInitialDelay  = 100  // Default initial delay in milliseconds
-	DefaultMaxDelay      = 5000 // Default maximum delay in milliseconds
-	DefaultBackoffFactor = 2.0  // Default exponential backoff factor
+	DefaultMaxRetries        = 3 // Default maximum retry attempts
+	DefaultInitialRetryDelay = 100 * time.Millisecond
+	DefaultMaxRetryDelay     = 5 * time.Second
+	DefaultBackoffFactor     = 2.0 // Default exponential backoff factor
 )
 
-// Nix store constants.
+// Load timeout constants.
 const (
-	MockStoreSizeGB      = 300 // Mock Nix store size in GB
-	MaxGenerations       = 10  // Maximum number of generations to keep
-	MockGenerationSizeMB = 50  // Mock generation size in MB
+	DefaultLoadTimeout = 30 * time.Second // Default timeout for configuration loading
+)
+
+// Cache constants.
+const (
+	DefaultCacheDuration = 30 * time.Minute // Default cache duration
+)
+
+// Nix generation constants.
+const (
+	DefaultNixMaxGenerations = 10 // Default maximum generations to keep
+	MaxNixGenerations        = 10 // Maximum allowed generations to keep
+	MockNixStoreSizeGB       = 300
+	MockNixGenerationSizeMB  = 50
+)
+
+// File permission constants.
+const (
+	ConfigFilePermission = 0o644 // rw-r--r--
+	ConfigDirPermission  = 0o755 // rwxr-xr-x
 )
 
 // Validation constants.
 const (
-	MinProtectedPaths = 1   // Minimum number of protected paths required
-	MaxProfiles       = 50  // Maximum number of profiles allowed
-	MaxOperations     = 100 // Maximum number of operations per profile
+	MinProtectedPaths      = 1   // Minimum number of protected paths required
+	MaxProfiles            = 50  // Maximum number of profiles allowed
+	MaxOperations          = 100 // Maximum number of operations per profile
+	MaxProfileCountWarning = 20  // Warning threshold for profile count
+	SchemaMinDiskUsage     = 10.0
+	SchemaMaxDiskUsage     = 95.0
 )

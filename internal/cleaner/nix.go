@@ -11,14 +11,14 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// boolToGenerationStatus converts boolean to GenerationStatus enum.
-func boolToGenerationStatus(b bool) domain.GenerationStatus {
-	if b {
-		return domain.GenerationStatusCurrent
-	}
-
-	return domain.GenerationStatusHistorical
-}
+const (
+	// NixMockStoreSizeGB is the mock store size in GB for unavailable Nix.
+	NixMockStoreSizeGB = 300
+	// NixMaxGenerationsToKeep is the maximum allowed generations to keep.
+	NixMaxGenerationsToKeep = 10
+	// NixDryRunBytesPerGeneration is the estimated bytes freed per generation in dry-run mode.
+	NixDryRunBytesPerGeneration = 50 * 1024 * 1024
+)
 
 // NixCleaner handles Nix package manager cleanup with proper type safety.
 type NixCleaner struct {
@@ -93,7 +93,7 @@ func (nc *NixCleaner) Clean(ctx context.Context) result.Result[domain.CleanResul
 // GetStoreSize gets Nix store size with type safety.
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	if !nc.adapter.IsAvailable(ctx) {
-		return int64(300 * 1024 * 1024 * 1024) // Mock store size
+		return int64(NixMockStoreSizeGB * 1024 * 1024 * 1024)
 	}
 
 	storeSizeResult := nc.adapter.GetStoreSize(ctx)
@@ -117,10 +117,10 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 		)
 	}
 
-	if settings.NixGenerations.Generations > 10 {
+	if settings.NixGenerations.Generations > NixMaxGenerationsToKeep {
 		return fmt.Errorf(
 			"generations to keep must not exceed %d, got: %d",
-			10,
+			NixMaxGenerationsToKeep,
 			settings.NixGenerations.Generations,
 		)
 	}
@@ -234,7 +234,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 	}
 
 	// Dry-run or no generations to remove - use centralized conversion
-	estimatedBytes := int64(toRemove * 50 * 1024 * 1024) // Estimated
+	estimatedBytes := int64(toRemove) * NixDryRunBytesPerGeneration
 	cleanResult := conversions.NewCleanResult(
 		domain.CleanStrategyType(domain.StrategyDryRunType),
 		toRemove,

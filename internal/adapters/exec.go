@@ -51,12 +51,3 @@ func (n *NixAdapter) execWithTimeout(ctx context.Context, name string, arg ...st
 
 	return exec.CommandContext(timeoutCtx, name, arg...)
 }
-
-// execBasicWithTimeout executes a command with default timeout.
-// Used by adapters without timeout configuration.
-func execBasicWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
-	timeoutCtx, cancel := context.WithTimeout(ctx, defaultTimeout)
-	_ = cancel // will be called by cmd.Wait() or context usage
-
-	return exec.CommandContext(timeoutCtx, name, arg...)
-}

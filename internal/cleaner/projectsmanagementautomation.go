@@ -16,8 +16,12 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// DefaultProjectsAutomationTimeout is the default timeout for automation commands.
-const DefaultProjectsAutomationTimeout = 2 * time.Minute
+const (
+	// DefaultProjectsAutomationTimeout is the default timeout for automation commands.
+	DefaultProjectsAutomationTimeout = 2 * time.Minute
+	// DefaultProjectsAutomationCacheSizeMB is the default cache size estimate in MB.
+	DefaultProjectsAutomationCacheSizeMB = 100
+)
 
 // ProjectsManagementAutomationCleaner handles projects-management-automation cache cleanup.
 //
@@ -178,6 +182,6 @@ func (pc *ProjectsManagementAutomationCleaner) estimateCacheSize() int64 {
 	if actualSize := pc.getActualCacheSize(); actualSize > 0 {
 		return actualSize
 	}
-	// Fallback estimate: 100MB for typical cache size
-	return int64(100 * 1024 * 1024)
+	// Fallback estimate: typical cache size
+	return int64(DefaultProjectsAutomationCacheSizeMB * 1024 * 1024)
 }

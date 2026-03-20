@@ -23,6 +23,16 @@ const (
 	DefaultOlderThan = "0"
 	// DefaultCompiledBinariesTimeout is the default timeout for file operations.
 	DefaultCompiledBinariesTimeout = 5 * time.Minute
+	// MinAgeStringLength is the minimum length for age duration strings.
+	MinAgeStringLength = 2
+	// DurationUnitDays represents days in hours.
+	DurationUnitDays = 24 * time.Hour
+	// DurationUnitWeeks represents weeks in hours.
+	DurationUnitWeeks = 7 * 24 * time.Hour
+	// DurationUnitMonths represents months in hours (30 days).
+	DurationUnitMonths = 30 * 24 * time.Hour
+	// DurationUnitYears represents years in hours.
+	DurationUnitYears = 365 * 24 * time.Hour
 )
 
 // BinaryCategory represents a category of compiled binaries to clean.
@@ -390,7 +400,7 @@ func (c *CompiledBinariesCleaner) GetStoreSize(ctx context.Context) int64 {
 
 // parseAgeDuration parses a duration string like "7d", "30d", "1h", etc.
 func parseAgeDuration(s string) (time.Duration, error) {
-	if len(s) < 2 {
+	if len(s) < MinAgeStringLength {
 		return 0, fmt.Errorf("invalid duration format: %s", s)
 	}
 
@@ -400,15 +410,15 @@ func parseAgeDuration(s string) (time.Duration, error) {
 
 	switch unit {
 	case "d":
-		multiplier = 24 * time.Hour
+		multiplier = DurationUnitDays
 	case "h":
 		multiplier = time.Hour
 	case "w":
-		multiplier = 7 * 24 * time.Hour
+		multiplier = DurationUnitWeeks
 	case "m":
-		multiplier = 30 * 24 * time.Hour
+		multiplier = DurationUnitMonths
 	case "y":
-		multiplier = 365 * 24 * time.Hour
+		multiplier = DurationUnitYears
 	default:
 		return 0, fmt.Errorf("unknown duration unit: %s", unit)
 	}

@@ -241,7 +241,7 @@ func getDefaultSanitizationRules() *SanitizationRules {
 		RemoveDuplicates:      true,
 		AddDefaults:           true,
 		DefaultSafeMode:       domain.SafeModeEnabled,
-		DefaultMaxDiskUsage:   50,
+		DefaultMaxDiskUsage:   DefaultMaxDiskUsage,
 		DefaultBackup:         24 * time.Hour,
 		DefaultProtectedPaths: []string{"/System", "/Applications", "/Library"},
 	}

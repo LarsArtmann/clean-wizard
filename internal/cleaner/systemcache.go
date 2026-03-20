@@ -150,18 +150,6 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.
 	return result.Ok(items)
 }
 
-// addScanItems appends scan items from a cache path to the items slice.
-func (scc *SystemCacheCleaner) addScanItems(
-	ctx context.Context,
-	homeDir string,
-	scanType domain.ScanType,
-	pathComponents ...string,
-) result.Result[[]domain.ScanItem] {
-	path := filepath.Join(append([]string{homeDir}, pathComponents...)...)
-
-	return scc.scanCachePath(ctx, path, scanType)
-}
-
 // cacheTypeConfig holds configuration for each system cache type.
 type cacheTypeConfig struct {
 	pathComponents []string
@@ -384,17 +372,6 @@ func (scc *SystemCacheCleaner) removeCachePath(
 	))
 }
 
-// scanCachePath scans a cache directory and returns scan items.
-func (scc *SystemCacheCleaner) scanCachePath(
-	ctx context.Context,
-	path string,
-	scanType domain.ScanType,
-) result.Result[[]domain.ScanItem] {
-	scanResult := ScanDirectory(path, scanType, scc.verbose)
-
-	return result.Ok(scanResult.Items)
-}
-
 // scanCachePathWithConfig scans a cache directory using configuration and returns scan items.
 func (scc *SystemCacheCleaner) scanCachePathWithConfig(
 	ctx context.Context,
@@ -438,18 +415,6 @@ func (scc *SystemCacheCleaner) isMacOS() bool {
 // isLinux checks if the system is Linux.
 func (scc *SystemCacheCleaner) isLinux() bool {
 	return runtime.GOOS == "linux"
-}
-
-// platform returns the current platform name for logging.
-func (scc *SystemCacheCleaner) platform() string {
-	switch runtime.GOOS {
-	case "darwin":
-		return "macOS"
-	case "linux":
-		return "Linux"
-	default:
-		return runtime.GOOS
-	}
 }
 
 // GetVerbose returns the verbose setting for testing purposes.

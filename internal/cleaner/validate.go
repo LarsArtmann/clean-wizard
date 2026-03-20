@@ -37,13 +37,3 @@ func validateSettings(
 
 	return nil
 }
-
-// toStringMap converts a slice of types to a map with string keys.
-func toStringMap[T ~string](items []T) map[string]bool {
-	result := make(map[string]bool, len(items))
-	for _, item := range items {
-		result[string(item)] = true
-	}
-
-	return result
-}

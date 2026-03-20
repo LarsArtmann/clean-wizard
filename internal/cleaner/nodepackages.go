@@ -387,32 +387,6 @@ func (npmc *NodePackageManagerCleaner) Clean(
 	))
 }
 
-// runPackageManagerCommand executes a package manager command with common error handling and timeout.
-func (npmc *NodePackageManagerCleaner) runPackageManagerCommand(
-	ctx context.Context,
-	name string,
-	args ...string,
-) result.Result[domain.CleanResult] {
-	// Create a timeout context if the input context doesn't have a timeout
-	timeoutCtx, cancel := context.WithTimeout(ctx, DefaultNodePackageManagerTimeout)
-	defer cancel()
-
-	cmd := exec.CommandContext(timeoutCtx, name, args...)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return result.Err[domain.CleanResult](
-			fmt.Errorf("%s command failed: %w (output: %s)", name, err, string(output)),
-		)
-	}
-
-	if npmc.verbose {
-		fmt.Printf("  ✓ %s command completed\n", name)
-	}
-
-	return result.Ok(npmc.createDefaultCleanResult())
-}
-
 // createDefaultCleanResult returns a default CleanResult for package manager operations.
 func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanResult {
 	return conversions.NewCleanResult(

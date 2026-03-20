@@ -9,6 +9,11 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+const (
+	// DefaultAPITimeoutSeconds is the default timeout for API operations in seconds.
+	DefaultAPITimeoutSeconds = 300 // 5 minutes
+)
+
 // === MAPPING LAYER: API ↔ DOMAIN TYPES ===
 // Converts between public API types and internal domain models
 
@@ -191,7 +196,7 @@ func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationS
 	publicSettings := OperationSettings{
 		DryRun:              true, // Safe default
 		Verbose:             false,
-		TimeoutSeconds:      300, // 5 minutes
+		TimeoutSeconds:      DefaultAPITimeoutSeconds,
 		ConfirmBeforeDelete: false,
 	}
 

@@ -12,8 +12,12 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// DryRunBytesPerItem is the estimated bytes freed per item in dry run mode when no size estimator is provided.
-const DryRunBytesPerItem = 300 * 1024 * 1024 // 300MB per item
+const (
+	// DryRunBytesPerItem is the estimated bytes freed per item in dry run mode when no size estimator is provided.
+	DryRunBytesPerItem = 300 * 1024 * 1024 // 300MB per item
+	// TrashPathTimeout is the timeout for trash operations.
+	TrashPathTimeout = 30 * time.Second
+)
 
 // SizeEstimatorFunc is a function that estimates the size of an item for dry-run mode.
 type SizeEstimatorFunc[T any] func(item T) int64
@@ -282,7 +286,7 @@ func calculateTotalSizeFromScan(scanResult result.Result[[]domain.ScanItem]) int
 // It applies a 30-second timeout to the operation.
 // This is a shared helper to eliminate duplicate trash implementations across cleaners.
 func TrashPath(ctx context.Context, path string) error {
-	timeoutCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	timeoutCtx, cancel := context.WithTimeout(ctx, TrashPathTimeout)
 	defer cancel()
 
 	cmd := exec.CommandContext(timeoutCtx, "trash", path)

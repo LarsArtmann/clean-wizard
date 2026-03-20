@@ -34,7 +34,7 @@ func setupViper() *viper.Viper {
 	// Set defaults
 	v.SetDefault("version", "1.0.0")
 	v.SetDefault("safe_mode", true)
-	v.SetDefault("max_disk_usage_percent", 50)
+	v.SetDefault("max_disk_usage_percent", DefaultMaxDiskUsage)
 	v.SetDefault("protected", []string{"/System", "/Library"})
 
 	return v
@@ -208,7 +208,7 @@ func Save(config *domain.Config) error {
 	// Ensure config directory exists
 	configDir := filepath.Dir(configPath)
 
-	err := os.MkdirAll(configDir, 0o755)
+	err := os.MkdirAll(configDir, ConfigDirPermission)
 	if err != nil {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
@@ -325,7 +325,7 @@ func GetDefaultConfig() *domain.Config {
 	return &domain.Config{
 		Version:      "1.0.0",
 		SafeMode:     domain.SafeModeEnabled, // Default to safe mode
-		MaxDiskUsage: 50,
+		MaxDiskUsage: DefaultMaxDiskUsage,
 		Protected: []string{
 			"/System",
 			"/Applications",

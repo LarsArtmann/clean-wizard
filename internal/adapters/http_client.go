@@ -8,6 +8,21 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+const (
+	// HTTPDefaultTimeout is the default request timeout.
+	HTTPDefaultTimeout = 30 * time.Second
+	// HTTPDefaultRetryCount is the default number of retry attempts.
+	HTTPDefaultRetryCount = 3
+	// HTTPDefaultRetryWaitTime is the default wait time between retries.
+	HTTPDefaultRetryWaitTime = 1 * time.Second
+	// HTTPDefaultRetryMaxWaitTime is the default maximum wait time between retries.
+	HTTPDefaultRetryMaxWaitTime = 10 * time.Second
+	// HTTPClientErrorMinStatus is the minimum status code for client errors (4xx).
+	HTTPClientErrorMinStatus = 400
+	// HTTPServerErrorMinStatus is the minimum status code for server errors (5xx).
+	HTTPServerErrorMinStatus = 500
+)
+
 // HTTPClient provides a modern HTTP client with built-in features.
 type HTTPClient struct {
 	client *resty.Client
@@ -19,10 +34,10 @@ func NewHTTPClient() *HTTPClient {
 
 	// Set sensible defaults
 	client.
-		SetTimeout(30*time.Second).
-		SetRetryCount(3).
-		SetRetryWaitTime(1*time.Second).
-		SetRetryMaxWaitTime(10*time.Second).
+		SetTimeout(HTTPDefaultTimeout).
+		SetRetryCount(HTTPDefaultRetryCount).
+		SetRetryWaitTime(HTTPDefaultRetryWaitTime).
+		SetRetryMaxWaitTime(HTTPDefaultRetryMaxWaitTime).
 		SetHeader("User-Agent", "clean-wizard/1.0.0")
 
 	return &HTTPClient{
@@ -140,7 +155,7 @@ func (hr *HTTPResponse) IsSuccess() bool {
 
 // IsError returns true if status code indicates error (4xx, 5xx).
 func (hr *HTTPResponse) IsError() bool {
-	return hr.StatusCode >= 400
+	return hr.StatusCode >= HTTPClientErrorMinStatus
 }
 
 // IsClientError returns true if status code indicates client error (4xx).
@@ -150,5 +165,5 @@ func (hr *HTTPResponse) IsClientError() bool {
 
 // IsServerError returns true if status code indicates server error (5xx).
 func (hr *HTTPResponse) IsServerError() bool {
-	return hr.StatusCode >= 500
+	return hr.StatusCode >= HTTPServerErrorMinStatus
 }

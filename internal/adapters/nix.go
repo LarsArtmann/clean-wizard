@@ -14,6 +14,17 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+const (
+	// NixDryRunStoreSizeGB is the estimated Nix store size for dry-run mode.
+	NixDryRunStoreSizeGB = 50
+	// NixGCPostDelay is the delay after garbage collection to allow async operations.
+	NixGCPostDelay = 500 * time.Millisecond
+	// NixDryRunGenerationSizeMB is the estimated size per generation in dry-run mode.
+	NixDryRunGenerationSizeMB = 50
+	// NixDryRunGCSizeMB is the estimated size freed from GC in dry-run mode.
+	NixDryRunGCSizeMB = 100
+)
+
 // boolToGenerationStatus converts boolean to GenerationStatus enum.
 func boolToGenerationStatus(b bool) domain.GenerationStatus {
 	if b {
@@ -85,7 +96,7 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	// If dry-run, return estimated size without system calls
 	if n.dryRun {
-		return result.Ok(int64(50 * 1024 * 1024 * 1024)) // 50GB estimate
+		return result.Ok(int64(NixDryRunStoreSizeGB * 1024 * 1024 * 1024))
 	}
 
 	// Real system call for production mode
@@ -114,7 +125,7 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
 	// In dry-run mode, return success without actually running GC
 	if n.dryRun {
-		estimatedFreed := int64(100 * 1024 * 1024) // 100MB estimate from GC
+		estimatedFreed := int64(NixDryRunGCSizeMB * 1024 * 1024)
 		cleanResult := conversions.NewCleanResultWithTiming(
 			domain.CleanStrategyType(domain.StrategyAggressiveType),
 			1,
@@ -144,7 +155,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	}
 
 	// Small delay to ensure async GC operations complete before measuring
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(NixGCPostDelay)
 
 	// Get store size after garbage collection
 	afterSize, err := n.getActualStoreSize(ctx)
@@ -195,7 +206,7 @@ func (n *NixAdapter) RemoveGeneration(
 	// In dry-run mode, return success without actually removing
 	if n.dryRun {
 		// Return a success result with estimated bytes freed
-		estimatedFreed := int64(50 * 1024 * 1024) // 50MB estimate per generation
+		estimatedFreed := int64(NixDryRunGenerationSizeMB * 1024 * 1024)
 		cleanResult := conversions.NewCleanResultWithTiming(
 			domain.CleanStrategyType(domain.StrategyConservativeType),
 			1,

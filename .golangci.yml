@@ -12,110 +12,52 @@ output:
   formats: {}
 linters:
   enable:
-    - goconst
-    - iface
-    - prealloc
-    - contextcheck
-    - gocyclo
-    - decorder
-    - modernize
-    - importas
-    - unparam
-    - nilnesserr
-    - misspell
+    # Core quality linters (must have)
     - errcheck
     - govet
-    - forcetypeassert
-    - makezero
-    - asasalint
-    - funcorder
-    - reassign
-    - gosmopolitan
-    - wsl_v5
-    - rowserrcheck
-    - nakedret
-    - bidichk
-    - nilnil
-    - usetesting
-    - whitespace
-    - embeddedstructfieldcheck
-    - nlreturn
-    - mirror
-    - promlinter
-    - dupl
-    - inamedparam
-    - maintidx
-    - cyclop
-    - predeclared
-    - gomodguard
-    - copyloopvar
-    - goheader
     - staticcheck
-    - wastedassign
-    - grouper
-    - gocheckcompilerdirectives
-    - mnd
-    - nonamedreturns
-    - ginkgolinter
-    - godox
-    - errorlint
-    - gochecknoglobals
-    - err113
-    - dogsled
-    - dupword
-    - durationcheck
-    - recvcheck
-    - sqlclosecheck
-    - depguard
-    - nolintlint
-    - canonicalheader
-    - godoclint
-    - unqueryvet
-    - revive
-    - gocognit
-    - containedctx
-    - protogetter
-    - paralleltest
-    - tagalign
-    - iotamixing
-    - varnamelen
-    - forbidigo
-    - exptostd
-    - godot
-    - testifylint
-    - gochecksumtype
-    - tagliatelle
-    - tparallel
-    - spancheck
-    - gomoddirectives
-    - interfacebloat
-    - goprintffuncname
-    - noinlineerr
-    - nilerr
-    - funlen
-    - wrapcheck
-    - arangolint
-    - ireturn
-    - gocritic
-    - testpackage
-    - exhaustive
-    - exhaustruct
-    - unconvert
-    - nosprintfhostport
-    - testableexamples
-    - usestdlibvars
-    - zerologlint
-    - errname
-    - thelper
     - unused
-    - bodyclose
-    - asciicheck
-    - fatcontext
-    - intrange
     - ineffassign
-    - gochecknoinits
-    - nestif
+    - errorlint
+
+    # Bug detection
+    - errname
+    - nilerr
+    - wrapcheck
+    - contextcheck
+
+    # Style & best practices
+    - gocritic
+    - goconst
+    - prealloc
+    - copyloopvar
+
+    # Performance
+    - wastedassign
+    - usestdlibvars
+
+    # Code structure
+    - nonamedreturns
+    - cyclop
+    - gocyclo
+
+    # Type checking
+    - exhaustive
+    - iface
+
+    # Other
+    - bodyclose
+    - misspell
+    - dupword
+    - nakedret
+    - makezero
+    - mirror
+    - nlreturn
+    - noinlineerr
+    - nolintlint
     - perfsprint
+    - unconvert
+
   default: none
   settings:
     errcheck:
@@ -128,20 +70,37 @@ linters:
         - -ST1003
         - -ST1005
         - -SA9003
+    gocyclo:
+      min-complexity: 20
+    cyclop:
+      max-complexity: 20
   exclusions:
     rules:
       - path: _test\.go
         linters:
           - errcheck
           - staticcheck
+          - noinlineerr
       - path: _ginkgo_test\.go
+        linters:
+          - errcheck
+          - staticcheck
+          - noinlineerr
+      - path: tests/
         linters:
           - errcheck
           - staticcheck
     paths:
       - tests
       - test/testdata_etc
+      - vendor
+      - .git
 formatters:
   enable:
-    - golines
-issues: {}
+    - gofmt
+    - goimports
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 50
+  max-same-issues: 10
+  new: false

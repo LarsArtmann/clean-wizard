@@ -15,6 +15,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	// BytesThresholdGB is the threshold in bytes for displaying GB success message.
+	BytesThresholdGB = 1_000_000_000
+	// BytesThresholdMB is the threshold in bytes for displaying MB success message.
+	BytesThresholdMB = 100_000_000
+)
+
 // NewCleanCommand creates a multi-cleaner command with TUI.
 func NewCleanCommand() *cobra.Command {
 	var (
@@ -312,9 +319,9 @@ func runCleanCommand(
 	printCleanResultsTable(cleanerResults, totalBytesFreed, totalItemsRemoved, duration)
 
 	// Add encouraging message based on space freed
-	if totalBytesFreed > 1_000_000_000 { // > 1 GB
+	if totalBytesFreed > BytesThresholdGB {
 		fmt.Println(SuccessStyle.Render("🎉 Great job! You freed over 1 GB of space!"))
-	} else if totalBytesFreed > 100_000_000 { // > 100 MB
+	} else if totalBytesFreed > BytesThresholdMB {
 		fmt.Println(SuccessStyle.Render("✅ Nice! You freed some space."))
 	}
 
