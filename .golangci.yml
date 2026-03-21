@@ -1,163 +1,169 @@
 version: "2"
 run:
-    timeout: 5m
-    go: "1.25"
-    build-tags: []
-    modules-download-mode: readonly
-    allow-parallel-runners: true
-    allow-serial-runners: false
-    issues-exit-code: 1
-    tests: true
+  timeout: 5m
+  go: "1.25"
+  build-tags: []
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+  allow-serial-runners: false
+  issues-exit-code: 1
+  tests: true
 output:
-    formats: {}
+  formats: {}
 linters:
-    enable:
-        - funlen
-        - asciicheck
-        - intrange
-        - errorlint
-        - unparam
-        - testpackage
-        - gochecknoinits
-        - maintidx
-        - goconst
-        - usetesting
-        - reassign
-        - goprintffuncname
-        - recvcheck
-        - tparallel
-        - bidichk
-        - funcorder
-        - nilnesserr
-        - whitespace
-        - grouper
-        - importas
-        - copyloopvar
-        - testableexamples
-        - gocheckcompilerdirectives
-        - contextcheck
-        - prealloc
-        - exhaustruct
-        - nestif
-        - promlinter
-        - tagalign
-        - dogsled
-        - goheader
-        - gochecksumtype
-        - nilerr
-        - unqueryvet
-        - mnd
-        - containedctx
-        - godot
-        - depguard
-        - ireturn
-        - nilnil
-        - errcheck
-        - godox
-        - sqlclosecheck
-        - makezero
-        - wsl_v5
-        - wrapcheck
-        - staticcheck
-        - unused
-        - errname
-        - gocyclo
-        - exptostd
-        - asasalint
-        - nonamedreturns
-        - ineffassign
-        - iotamixing
-        - fatcontext
-        - exhaustive
-        - misspell
-        - nolintlint
-        - gomoddirectives
-        - varnamelen
-        - cyclop
-        - gochecknoglobals
-        - tagliatelle
-        - embeddedstructfieldcheck
-        - govet
-        - gocritic
-        - perfsprint
-        - arangolint
-        - protogetter
-        - usestdlibvars
-        - forcetypeassert
-        - dupword
-        - interfacebloat
-        - predeclared
-        - gocognit
-        - unconvert
-        - zerologlint
-        - decorder
-        - spancheck
-        - godoclint
-        - revive
-        - nlreturn
-        - dupl
-        - paralleltest
-        - rowserrcheck
-        - wastedassign
-        - gomodguard
-        - thelper
-        - forbidigo
-        - testifylint
-        - durationcheck
-        - inamedparam
-        - bodyclose
-        - nakedret
-        - err113
-        - modernize
-        - gosmopolitan
-        - noinlineerr
-        - nosprintfhostport
-        - mirror
-        - iface
-        - ginkgolinter
-        - canonicalheader
-    default: none
-    settings:
-        cyclop:
-            max-complexity: 20
-        errcheck:
-            check-blank: false
-            check-type-assertions: false
-        gocyclo:
-            min-complexity: 20
-        staticcheck:
-            checks:
-                - all
-                - -ST1000
-                - -ST1003
-                - -ST1005
-                - -SA9003
-    exclusions:
-        rules:
-            - path: _test\.go
-              linters:
-                - errcheck
-                - staticcheck
-                - noinlineerr
-            - path: _ginkgo_test\.go
-              linters:
-                - errcheck
-                - staticcheck
-                - noinlineerr
-            - path: tests/
-              linters:
-                - errcheck
-                - staticcheck
-        paths:
-            - tests
-            - test/testdata_etc
-            - vendor
-            - .git
+  enable:
+    - embeddedstructfieldcheck
+    - arangolint
+    - unused
+    - exptostd
+    - promlinter
+    - asciicheck
+    - unparam
+    - goconst
+    - gocheckcompilerdirectives
+    - sqlclosecheck
+    - gochecksumtype
+    - ineffassign
+    - gochecknoglobals
+    - protogetter
+    - unconvert
+    - decorder
+    - godoclint
+    - gosec
+    - intrange
+    - errorlint
+    - mnd
+    - godot
+    - usestdlibvars
+    - forcetypeassert
+    - predeclared
+    - zerologlint
+    - goprintffuncname
+    - recvcheck
+    - containedctx
+    - exhaustive
+    - nolintlint
+    - perfsprint
+    - forbidigo
+    - nosprintfhostport
+    - exhaustruct
+    - maintidx
+    - prealloc
+    - dogsled
+    - nilnil
+    - errcheck
+    - wsl_v5
+    - wrapcheck
+    - unqueryvet
+    - errname
+    - nonamedreturns
+    - gocritic
+    - interfacebloat
+    - revive
+    - paralleltest
+    - inamedparam
+    - fatcontext
+    - usetesting
+    - nilnesserr
+    - copyloopvar
+    - staticcheck
+    - asasalint
+    - gomoddirectives
+    - nakedret
+    - depguard
+    - iotamixing
+    - govet
+    - dupword
+    - canonicalheader
+    - errchkjson
+    - reassign
+    - contextcheck
+    - varnamelen
+    - cyclop
+    - dupl
+    - rowserrcheck
+    - err113
+    - gosmopolitan
+    - nestif
+    - gocognit
+    - mirror
+    - noctx
+    - gochecknoinits
+    - importas
+    - makezero
+    - sloglint
+    - gocyclo
+    - spancheck
+    - nlreturn
+    - wastedassign
+    - testifylint
+    - noinlineerr
+    - ginkgolinter
+    - musttag
+    - whitespace
+    - grouper
+    - testableexamples
+    - goheader
+    - gomodguard
+    - durationcheck
+    - iface
+    - loggercheck
+    - testpackage
+    - funcorder
+    - tagalign
+    - nilerr
+    - misspell
+    - thelper
+    - bodyclose
+    - modernize
+    - funlen
+    - tparallel
+    - bidichk
+    - ireturn
+    - godox
+    - tagliatelle
+  default: none
+  settings:
+    cyclop:
+      max-complexity: 20
+    errcheck:
+      check-blank: false
+      check-type-assertions: false
+    gocyclo:
+      min-complexity: 20
+    staticcheck:
+      checks:
+        - all
+        - -ST1000
+        - -ST1003
+        - -ST1005
+        - -SA9003
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - staticcheck
+          - noinlineerr
+      - path: _ginkgo_test\.go
+        linters:
+          - errcheck
+          - staticcheck
+          - noinlineerr
+      - path: tests/
+        linters:
+          - errcheck
+          - staticcheck
+    paths:
+      - tests
+      - test/testdata_etc
+      - vendor
+      - .git
 formatters:
-    enable:
-        - goimports
-        - golines
-        - gofmt
+  enable:
+    - goimports
+    - golines
+    - gofmt
 issues:
-    max-issues-per-linter: 50
-    max-same-issues: 10
+  max-issues-per-linter: 50
+  max-same-issues: 10
