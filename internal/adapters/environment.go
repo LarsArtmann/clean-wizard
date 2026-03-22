@@ -48,8 +48,8 @@ type NixSettings struct {
 
 // DiskSettings holds disk usage configuration.
 type DiskSettings struct {
-	MaxUsagePercent int `env:"MAX_DISK_USAGE_PERCENT" envDefault:"50"`
-	MinUsagePercent int `env:"MIN_DISK_USAGE_PERCENT" envDefault:"10"`
+	MaxUsagePercent   int `env:"MAX_DISK_USAGE_PERCENT" envDefault:"50"`
+	MinUsagePercent   int `env:"MIN_DISK_USAGE_PERCENT" envDefault:"10"`
 	RoundingIncrement int `env:"ROUNDING_INCREMENT"     envDefault:"10"`
 }
 
