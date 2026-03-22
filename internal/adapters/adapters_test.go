@@ -129,14 +129,14 @@ func TestEnvironmentConfig(t *testing.T) {
 	require.NotNil(t, cfg)
 
 	// Test default values
-	assert.False(t, cfg.Debug)
-	assert.Equal(t, "development", cfg.Environment)
-	assert.Equal(t, "info", cfg.LogLevel)
-	assert.Equal(t, 4, cfg.MaxConcurrency)
-	assert.Equal(t, 30*time.Second, cfg.Timeout)
-	assert.Equal(t, 10.0, cfg.RateLimitRPS)
-	assert.True(t, cfg.CacheEnabled)
-	assert.Equal(t, 5*time.Minute, cfg.CacheTTL)
+	assert.False(t, cfg.App.Debug)
+	assert.Equal(t, "development", cfg.App.Environment)
+	assert.Equal(t, "info", cfg.App.LogLevel)
+	assert.Equal(t, 4, cfg.Performance.MaxConcurrency)
+	assert.Equal(t, 30*time.Second, cfg.Performance.Timeout)
+	assert.Equal(t, 10.0, cfg.Performance.RateLimitRPS)
+	assert.True(t, cfg.Cache.Enabled)
+	assert.Equal(t, 5*time.Minute, cfg.Cache.TTL)
 }
 
 func TestEnvironmentConfig_Validate(t *testing.T) {

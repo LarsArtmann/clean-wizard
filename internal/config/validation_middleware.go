@@ -32,8 +32,8 @@ type ValidationMiddlewareOptions struct {
 	Environment                 string `json:"environment"` // "development", "production", etc.
 }
 
-// DefaultValidationLogger provides default logging implementation.
-type DefaultValidationLogger struct {
+// ConsoleValidationLogger provides console-based logging implementation.
+type ConsoleValidationLogger struct {
 	enableDetailedLogging bool
 }
 
@@ -63,9 +63,9 @@ type ProfileOperationResult struct {
 	Timestamp time.Time                `json:"timestamp"`
 }
 
-// NewDefaultValidationLogger creates a default validation logger.
-func NewDefaultValidationLogger(enableDetailed bool) *DefaultValidationLogger {
-	return &DefaultValidationLogger{
+// NewConsoleValidationLogger creates a console-based validation logger.
+func NewConsoleValidationLogger(enableDetailed bool) *ConsoleValidationLogger {
+	return &ConsoleValidationLogger{
 		enableDetailedLogging: enableDetailed,
 	}
 }
@@ -92,7 +92,7 @@ func WithDetailedLogging(enable bool) func(*ValidationMiddlewareOptions) {
 }
 
 // LogValidation logs validation results.
-func (l *DefaultValidationLogger) LogValidation(result *ValidationResult) {
+func (l *ConsoleValidationLogger) LogValidation(result *ValidationResult) {
 	if l.enableDetailedLogging {
 		if result.IsValid {
 			fmt.Printf("✅ Configuration validation passed in %v\n", result.Duration)
@@ -107,14 +107,14 @@ func (l *DefaultValidationLogger) LogValidation(result *ValidationResult) {
 }
 
 // LogSanitization logs sanitization results.
-func (l *DefaultValidationLogger) LogSanitization(result *SanitizationResult) {
+func (l *ConsoleValidationLogger) LogSanitization(result *SanitizationResult) {
 	if l.enableDetailedLogging && len(result.SanitizedFields) > 0 {
 		fmt.Printf("🔧 Configuration sanitized %d fields\n", len(result.SanitizedFields))
 	}
 }
 
 // LogError logs validation errors.
-func (l *DefaultValidationLogger) LogError(field, operation string, err error) {
+func (l *ConsoleValidationLogger) LogError(field, operation string, err error) {
 	fmt.Printf("⚠️  Validation error in %s.%s: %v\n", operation, field, err)
 }
 
@@ -138,7 +138,7 @@ func NewValidationMiddlewareWithOptions(
 	}
 
 	validator := NewConfigValidator()
-	logger := NewDefaultValidationLogger(opts.EnableDetailedLogging)
+	logger := NewConsoleValidationLogger(opts.EnableDetailedLogging)
 
 	return &ValidationMiddleware{
 		validator: validator,

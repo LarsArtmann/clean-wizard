@@ -25,10 +25,11 @@ func validateSettings(
 	for i, item := range items {
 		if !validItems[item] {
 			return fmt.Errorf(
-				"invalid %s '%s' at index %d. Valid options are: %s. Input items: %v",
+				"invalid %s '%s' at index %d (%s). Valid options are: %s. Input items: %v",
 				itemName,
 				item,
 				i,
+				validValuesDescription,
 				formatValidItems(validItems),
 				items,
 			)
