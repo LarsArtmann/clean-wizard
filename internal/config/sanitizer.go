@@ -58,12 +58,8 @@ type SanitizationResult struct {
 }
 
 // SanitizationWarning represents a sanitization warning.
-type SanitizationWarning struct {
-	Field     string `json:"field"`
-	Original  any    `json:"original"`
-	Sanitized any    `json:"sanitized"`
-	Reason    string `json:"reason"`
-}
+// Deprecated: Use domain.SanitizationWarning instead. This alias exists for backward compatibility.
+type SanitizationWarning = domain.SanitizationWarning
 
 // NewConfigSanitizer creates a configuration sanitizer with default rules.
 func NewConfigSanitizer() *ConfigSanitizer {
