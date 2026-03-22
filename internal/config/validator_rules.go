@@ -48,12 +48,12 @@ type ValidationRule[T comparable] struct {
 }
 
 // ValidationSeverity represents error severity levels.
-type ValidationSeverity string
+type ValidationSeverity = domain.ValidationSeverity
 
 const (
-	SeverityError   ValidationSeverity = "error"
-	SeverityWarning ValidationSeverity = "warning"
-	SeverityInfo    ValidationSeverity = "info"
+	SeverityError   = domain.SeverityError
+	SeverityWarning = domain.SeverityWarning
+	SeverityInfo    = domain.SeverityInfo
 )
 
 // GetCompiledRegex returns the compiled regex pattern, creating it once if needed.

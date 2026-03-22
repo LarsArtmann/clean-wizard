@@ -19,31 +19,31 @@ This audit reveals a codebase with **strong architectural foundations** but sign
 
 ### ✅ FULLY DONE
 
-| Task | Impact | Details |
-|------|--------|---------|
-| Branching-Flow Analysis | High | context: 88.5/100, compose: 98/100, phantom: 891 violations |
-| SanitizationWarning Split Brain | Critical | Unified into domain package as single source of truth |
-| EnvironmentConfig Refactoring | High | Split 31-field struct into 9 focused domain structs |
-| DefaultValidationLogger Rename | Medium | Eliminated base-naming anti-pattern |
-| Error Context Enhancement | Medium | Added validValuesDescription to error messages |
+| Task                            | Impact   | Details                                                     |
+| ------------------------------- | -------- | ----------------------------------------------------------- |
+| Branching-Flow Analysis         | High     | context: 88.5/100, compose: 98/100, phantom: 891 violations |
+| SanitizationWarning Split Brain | Critical | Unified into domain package as single source of truth       |
+| EnvironmentConfig Refactoring   | High     | Split 31-field struct into 9 focused domain structs         |
+| DefaultValidationLogger Rename  | Medium   | Eliminated base-naming anti-pattern                         |
+| Error Context Enhancement       | Medium   | Added validValuesDescription to error messages              |
 
 ### 🔄 PARTIALLY DONE
 
-| Task | Status | Blockers |
-|------|--------|----------|
-| ValidationError Consolidation | Identified | Similar split brain exists (config vs domain) |
-| File Size Reduction | In Progress | 30 files exceed 350-line limit |
-| Boolean-to-Enum Conversion | Planned | 10+ bools in SanitizationRules need enums |
+| Task                          | Status      | Blockers                                      |
+| ----------------------------- | ----------- | --------------------------------------------- |
+| ValidationError Consolidation | Identified  | Similar split brain exists (config vs domain) |
+| File Size Reduction           | In Progress | 30 files exceed 350-line limit                |
+| Boolean-to-Enum Conversion    | Planned     | 10+ bools in SanitizationRules need enums     |
 
 ### ❌ NOT STARTED
 
-| Task | Priority | Effort |
-|------|----------|--------|
-| BDD Tests for Nix | High | 2-3 days |
-| Protected Paths Constants | Medium | 2 hours |
-| Error Handling Standardization | Medium | 1 day |
-| Docker.go Split | Medium | 4 hours |
-| TypeSpec Code Generation Review | Low | 1 day |
+| Task                            | Priority | Effort   |
+| ------------------------------- | -------- | -------- |
+| BDD Tests for Nix               | High     | 2-3 days |
+| Protected Paths Constants       | Medium   | 2 hours  |
+| Error Handling Standardization  | Medium   | 1 day    |
+| Docker.go Split                 | Medium   | 4 hours  |
+| TypeSpec Code Generation Review | Low      | 1 day    |
 
 ---
 
@@ -53,10 +53,10 @@ This audit reveals a codebase with **strong architectural foundations** but sign
 
 Split brains occur when the same concept is defined in multiple places with slight variations, leading to maintenance nightmares.
 
-| Type | Location 1 | Location 2 | Fields Match? |
-|------|-----------|-----------|---------------|
-| SanitizationWarning | `domain/config_methods.go:21` | `config/sanitizer.go:61` | ❌ NO (Fixed) |
-| ValidationError | `config/validator.go:53` | `domain/operation_validation.go:8` | ❌ NO |
+| Type                | Location 1                    | Location 2                         | Fields Match? |
+| ------------------- | ----------------------------- | ---------------------------------- | ------------- |
+| SanitizationWarning | `domain/config_methods.go:21` | `config/sanitizer.go:61`           | ❌ NO (Fixed) |
+| ValidationError     | `config/validator.go:53`      | `domain/operation_validation.go:8` | ❌ NO         |
 
 **Impact:** Developers use different types interchangeably, causing subtle bugs and serialization issues.
 
@@ -66,15 +66,15 @@ Split brains occur when the same concept is defined in multiple places with slig
 
 Files exceeding 350 lines violate the Single Responsibility Principle.
 
-| File | Lines | Over | Suggested Split |
-|------|-------|------|-----------------|
-| `internal/cleaner/compiledbinaries_ginkgo_test.go` | 917 | +567 | Split by test type (unit/integration) |
-| `internal/cleaner/docker.go` | 524 | +174 | Extract resource handlers (images/containers/volumes) |
-| `internal/cleaner/compiledbinaries.go` | 599 | +249 | Separate scanning logic from cleaning |
-| `cmd/clean-wizard/commands/clean.go` | 611 | +261 | Split CLI handlers from business logic |
-| `internal/domain/config_methods.go` | 470 | +120 | Split Sanitize/Validate/ApplyProfile into separate files |
-| `internal/domain/type_safe_enums.go` | 539 | +189 | One enum per file |
-| `internal/config/config.go` | 395 | +45 | Separate Load/Save/Defaults |
+| File                                               | Lines | Over | Suggested Split                                          |
+| -------------------------------------------------- | ----- | ---- | -------------------------------------------------------- |
+| `internal/cleaner/compiledbinaries_ginkgo_test.go` | 917   | +567 | Split by test type (unit/integration)                    |
+| `internal/cleaner/docker.go`                       | 524   | +174 | Extract resource handlers (images/containers/volumes)    |
+| `internal/cleaner/compiledbinaries.go`             | 599   | +249 | Separate scanning logic from cleaning                    |
+| `cmd/clean-wizard/commands/clean.go`               | 611   | +261 | Split CLI handlers from business logic                   |
+| `internal/domain/config_methods.go`                | 470   | +120 | Split Sanitize/Validate/ApplyProfile into separate files |
+| `internal/domain/type_safe_enums.go`               | 539   | +189 | One enum per file                                        |
+| `internal/config/config.go`                        | 395   | +45  | Separate Load/Save/Defaults                              |
 
 ### 🟡 HIGH: Boolean Blindness
 
@@ -109,12 +109,12 @@ const (
 
 Magic strings scattered throughout the codebase:
 
-| String | Locations | Should Be |
-|--------|-----------|-----------|
-| `"/System"` | `config_methods.go:152`, `validator_business.go:41` | `constants.ProtectedSystemPath` |
-| `"/Library"` | `config_methods.go:152`, `validator_business.go:41` | `constants.ProtectedLibraryPath` |
-| `"/Applications"` | `config_methods.go:152` | `constants.ProtectedApplicationsPath` |
-| `"docker"` | `docker.go:158` | `constants.DockerBinaryName` |
+| String            | Locations                                           | Should Be                             |
+| ----------------- | --------------------------------------------------- | ------------------------------------- |
+| `"/System"`       | `config_methods.go:152`, `validator_business.go:41` | `constants.ProtectedSystemPath`       |
+| `"/Library"`      | `config_methods.go:152`, `validator_business.go:41` | `constants.ProtectedLibraryPath`      |
+| `"/Applications"` | `config_methods.go:152`                             | `constants.ProtectedApplicationsPath` |
+| `"docker"`        | `docker.go:158`                                     | `constants.DockerBinaryName`          |
 
 ### 🟠 MEDIUM: Error Handling Inconsistency
 
@@ -125,6 +125,7 @@ Multiple error handling patterns coexist:
 3. **Domain-specific** (`domain.NewValidationError`)
 
 Files using non-centralized errors:
+
 - `internal/cleaner/golang_cleaner.go:41, 110`
 - `internal/cleaner/tempfiles.go:80`
 - `internal/cleaner/docker.go:408`
@@ -171,48 +172,48 @@ Files using non-centralized errors:
 
 ### Critical (Do First)
 
-| # | Task | Impact | Effort | Customer Value |
-|---|------|--------|--------|----------------|
-| 1 | Consolidate ValidationError split brain | 🔴 Critical | 30 min | Prevents bugs |
-| 2 | Extract protected paths constants | 🔴 Critical | 1 hour | Safety |
-| 3 | Convert SanitizationRules bools to enums | 🟡 High | 4 hours | Type safety |
-| 4 | Split type_safe_enums.go (539 lines) | 🟡 High | 3 hours | Maintainability |
-| 5 | Split config_methods.go (470 lines) | 🟡 High | 3 hours | Maintainability |
-| 6 | Split docker.go (524 lines) | 🟡 High | 4 hours | Maintainability |
+| #   | Task                                     | Impact      | Effort  | Customer Value  |
+| --- | ---------------------------------------- | ----------- | ------- | --------------- |
+| 1   | Consolidate ValidationError split brain  | 🔴 Critical | 30 min  | Prevents bugs   |
+| 2   | Extract protected paths constants        | 🔴 Critical | 1 hour  | Safety          |
+| 3   | Convert SanitizationRules bools to enums | 🟡 High     | 4 hours | Type safety     |
+| 4   | Split type_safe_enums.go (539 lines)     | 🟡 High     | 3 hours | Maintainability |
+| 5   | Split config_methods.go (470 lines)      | 🟡 High     | 3 hours | Maintainability |
+| 6   | Split docker.go (524 lines)              | 🟡 High     | 4 hours | Maintainability |
 
 ### High Priority
 
-| # | Task | Impact | Effort | Customer Value |
-|---|------|--------|--------|----------------|
-| 7 | Add BDD tests for Nix cleaner | 🟡 High | 2 days | Reliability |
-| 8 | Standardize error handling | 🟡 High | 1 day | Consistency |
-| 9 | Split clean.go (611 lines) | 🟡 High | 3 hours | Maintainability |
-| 10 | Split compiledbinaries.go (599 lines) | 🟡 High | 4 hours | Maintainability |
-| 11 | Add parallel execution to Ginkgo tests | 🟡 High | 2 hours | Test speed |
-| 12 | Create constants for docker commands | 🟡 High | 1 hour | Maintainability |
+| #   | Task                                   | Impact  | Effort  | Customer Value  |
+| --- | -------------------------------------- | ------- | ------- | --------------- |
+| 7   | Add BDD tests for Nix cleaner          | 🟡 High | 2 days  | Reliability     |
+| 8   | Standardize error handling             | 🟡 High | 1 day   | Consistency     |
+| 9   | Split clean.go (611 lines)             | 🟡 High | 3 hours | Maintainability |
+| 10  | Split compiledbinaries.go (599 lines)  | 🟡 High | 4 hours | Maintainability |
+| 11  | Add parallel execution to Ginkgo tests | 🟡 High | 2 hours | Test speed      |
+| 12  | Create constants for docker commands   | 🟡 High | 1 hour  | Maintainability |
 
 ### Medium Priority
 
-| # | Task | Impact | Effort | Customer Value |
-|---|------|--------|--------|----------------|
-| 13 | Split config.go (395 lines) | 🟠 Medium | 2 hours | Maintainability |
-| 14 | Split compiledbinaries_ginkgo_test.go | 🟠 Medium | 3 hours | Test speed |
-| 15 | Extract string trimming utilities | 🟠 Medium | 2 hours | Reusability |
-| 16 | Create phantom types for paths | 🟠 Medium | 3 hours | Type safety |
-| 17 | Review TypeSpec for generation | 🟠 Medium | 1 day | Code generation |
-| 18 | Add uint usage for non-negative values | 🟠 Medium | 2 hours | Type safety |
+| #   | Task                                   | Impact    | Effort  | Customer Value  |
+| --- | -------------------------------------- | --------- | ------- | --------------- |
+| 13  | Split config.go (395 lines)            | 🟠 Medium | 2 hours | Maintainability |
+| 14  | Split compiledbinaries_ginkgo_test.go  | 🟠 Medium | 3 hours | Test speed      |
+| 15  | Extract string trimming utilities      | 🟠 Medium | 2 hours | Reusability     |
+| 16  | Create phantom types for paths         | 🟠 Medium | 3 hours | Type safety     |
+| 17  | Review TypeSpec for generation         | 🟠 Medium | 1 day   | Code generation |
+| 18  | Add uint usage for non-negative values | 🟠 Medium | 2 hours | Type safety     |
 
 ### Lower Priority
 
-| # | Task | Impact | Effort | Customer Value |
-|---|------|--------|--------|----------------|
-| 19 | Fix remaining linter warnings | 🟢 Low | 2 days | Code quality |
-| 20 | Add integration tests for Docker | 🟢 Low | 1 day | Reliability |
-| 21 | Document architecture decisions | 🟢 Low | 1 day | Team onboarding |
-| 22 | Create ADRs for major decisions | 🟢 Low | 1 day | Documentation |
-| 23 | Add performance benchmarks | 🟢 Low | 3 hours | Performance |
-| 24 | Review plugin architecture | 🟢 Low | 1 day | Extensibility |
-| 25 | Add property-based tests | 🟢 Low | 2 days | Reliability |
+| #   | Task                             | Impact | Effort  | Customer Value  |
+| --- | -------------------------------- | ------ | ------- | --------------- |
+| 19  | Fix remaining linter warnings    | 🟢 Low | 2 days  | Code quality    |
+| 20  | Add integration tests for Docker | 🟢 Low | 1 day   | Reliability     |
+| 21  | Document architecture decisions  | 🟢 Low | 1 day   | Team onboarding |
+| 22  | Create ADRs for major decisions  | 🟢 Low | 1 day   | Documentation   |
+| 23  | Add performance benchmarks       | 🟢 Low | 3 hours | Performance     |
+| 24  | Review plugin architecture       | 🟢 Low | 1 day   | Extensibility   |
+| 25  | Add property-based tests         | 🟢 Low | 2 days  | Reliability     |
 
 ---
 
@@ -262,22 +263,22 @@ External Tools (nix, docker, brew, etc.)
 
 ### Direct Value (User-Facing)
 
-| Feature | Status | Value |
-|---------|--------|-------|
-| 13 Cleaners | ✅ Working | High |
-| Interactive TUI | ✅ Working | High |
-| Dry-run mode | ✅ Working | High |
-| Profile system | ✅ Working | Medium |
-| Git History cleaner | ✅ Working | High |
+| Feature             | Status     | Value  |
+| ------------------- | ---------- | ------ |
+| 13 Cleaners         | ✅ Working | High   |
+| Interactive TUI     | ✅ Working | High   |
+| Dry-run mode        | ✅ Working | High   |
+| Profile system      | ✅ Working | Medium |
+| Git History cleaner | ✅ Working | High   |
 
 ### Indirect Value (Developer Experience)
 
-| Aspect | Status | Impact |
-|--------|--------|--------|
-| Type Safety | ✅ Strong | Reduces bugs |
-| Test Coverage | ⚠️ Moderate | Needs BDD |
-| Documentation | ✅ Good | Well documented |
-| Maintainability | ⚠️ Fair | File size issues |
+| Aspect          | Status      | Impact           |
+| --------------- | ----------- | ---------------- |
+| Type Safety     | ✅ Strong   | Reduces bugs     |
+| Test Coverage   | ⚠️ Moderate | Needs BDD        |
+| Documentation   | ✅ Good     | Well documented  |
+| Maintainability | ⚠️ Fair     | File size issues |
 
 ---
 
@@ -288,11 +289,13 @@ External Tools (nix, docker, brew, etc.)
 **"What is the intended boundary between `config` and `domain` packages?"**
 
 Currently:
+
 - `config` imports `domain` (correct direction)
 - But `domain.Config` has methods like `Sanitize()`, `Validate()`, `ApplyProfile()` that use types from `config` package
 - This creates an implicit circular dependency risk
 
 **Options:**
+
 1. Move all validation/sanitization logic to `config` package, keep `domain` as pure data
 2. Create a `config/application` layer that orchestrates between `config` and `domain`
 3. Keep as-is but document the boundary clearly
@@ -333,6 +336,7 @@ Clean Wizard has a **solid architectural foundation** with excellent type safety
 4. **Inconsistent error handling** - Needs standardization
 
 **Next Steps:**
+
 1. Merge the SanitizationWarning fix ✅
 2. Fix ValidationError split brain
 3. Extract protected paths constants
@@ -342,5 +346,5 @@ The codebase is **production-ready** but needs **consolidation** to achieve exce
 
 ---
 
-*Report generated by Senior Software Architect (AI)*  
-*Methodology: Branching-flow analysis, static analysis, manual code review*
+_Report generated by Senior Software Architect (AI)_  
+_Methodology: Branching-flow analysis, static analysis, manual code review_

@@ -4,11 +4,38 @@ import (
 	"fmt"
 )
 
-// ValidationError represents a settings validation error.
+// ValidationSeverity represents error severity levels.
+type ValidationSeverity string
+
+const (
+	SeverityError   ValidationSeverity = "error"
+	SeverityWarning ValidationSeverity = "warning"
+	SeverityInfo    ValidationSeverity = "info"
+)
+
+// ValidationContext provides strongly-typed validation context information.
+type ValidationContext struct {
+	ConfigPath      string            `json:"config_path,omitempty"`
+	ValidationLevel string            `json:"validation_level,omitempty"`
+	Profile         string            `json:"profile,omitempty"`
+	Section         string            `json:"section,omitempty"`
+	MinValue        any               `json:"min_value,omitempty"`
+	MaxValue        any               `json:"max_value,omitempty"`
+	AllowedValues   []string          `json:"allowed_values,omitempty"`
+	ReferencedField string            `json:"referenced_field,omitempty"`
+	Constraints     map[string]string `json:"constraints,omitempty"`
+	Metadata        map[string]string `json:"metadata,omitempty"`
+}
+
+// ValidationError represents a validation error with comprehensive context.
 type ValidationError struct {
-	Field   string `json:"field"`
-	Message string `json:"message"`
-	Value   any    `json:"value"`
+	Field      string             `json:"field"`
+	Rule       string             `json:"rule,omitempty"`
+	Value      any                `json:"value"`
+	Message    string             `json:"message"`
+	Severity   ValidationSeverity `json:"severity,omitempty"`
+	Suggestion string             `json:"suggestion,omitempty"`
+	Context    *ValidationContext `json:"context,omitempty"`
 }
 
 func (e *ValidationError) Error() string {
