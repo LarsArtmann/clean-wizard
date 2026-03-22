@@ -35,7 +35,7 @@ func setupViper() *viper.Viper {
 	v.SetDefault("version", "1.0.0")
 	v.SetDefault("safe_mode", true)
 	v.SetDefault("max_disk_usage_percent", DefaultMaxDiskUsage)
-	v.SetDefault("protected", []string{"/System", "/Library"})
+	v.SetDefault("protected", []string{domain.PathSystem, domain.PathLibrary})
 
 	return v
 }

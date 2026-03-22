@@ -239,7 +239,7 @@ func getDefaultSanitizationRules() *SanitizationRules {
 		DefaultSafeMode:       domain.SafeModeEnabled,
 		DefaultMaxDiskUsage:   DefaultMaxDiskUsage,
 		DefaultBackup:         24 * time.Hour,
-		DefaultProtectedPaths: []string{"/System", "/Applications", "/Library"},
+		DefaultProtectedPaths: domain.DefaultProtectedPaths(),
 	}
 }
 

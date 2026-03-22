@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -38,7 +40,7 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 			Value:      cfg.Protected,
 			Message:    "Protected paths cannot be empty",
 			Severity:   SeverityError,
-			Suggestion: "Add system paths like /System, /Applications, /Library",
+			Suggestion: fmt.Sprintf("Add system paths like %s, %s, %s", domain.PathSystem, domain.PathApplications, domain.PathLibrary),
 		})
 	}
 }

@@ -152,11 +152,11 @@ func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
 	}
 
 	// Ensure at least one default protected path exists
-	defaultProtected := []string{"/System", "/Applications", "/Library"}
+	defaultProtected := DefaultProtectedPaths()
 	hasSystemPath := false
 
 	for _, path := range c.Protected {
-		if path == "/System" || path == "/System/" {
+		if path == PathSystem || path == PathSystem+"/" {
 			hasSystemPath = true
 
 			break
@@ -164,7 +164,7 @@ func (r *SanitizeConfigResult) applyStrictSanitization(c *Config) {
 	}
 
 	if !hasSystemPath && len(c.Protected) == 0 {
-		c.Protected = append([]string{"/System"}, defaultProtected[1:]...)
+		c.Protected = append([]string{PathSystem}, defaultProtected[1:]...)
 		changes++
 
 		r.Warnings = append(r.Warnings, SanitizationWarning{

@@ -13,7 +13,7 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 		// Rule: Cannot remove critical protected paths
 		if change.Field == "protected" &&
 			change.Operation == domain.ChangeOperationType(domain.ChangeOperationRemovedType) {
-			criticalPaths := []string{"/", "/System", "/usr", "/etc"}
+			criticalPaths := domain.CriticalSystemPaths()
 			for _, critical := range criticalPaths {
 				if change.OldValue == critical {
 					return fmt.Errorf("cannot remove critical protected path: %s", critical)
