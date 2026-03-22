@@ -4,9 +4,9 @@ This document clarifies the intended boundary between `internal/config` and `int
 
 ## Overview
 
-| Package | Responsibility | Imports |
-|---------|---------------|---------|
-| `domain` | Pure data structures, enums, validation logic | Standard library only |
+| Package  | Responsibility                                   | Imports                         |
+| -------- | ------------------------------------------------ | ------------------------------- |
+| `domain` | Pure data structures, enums, validation logic    | Standard library only           |
 | `config` | Configuration loading, persistence, sanitization | `domain`, `viper`, `pkg/errors` |
 
 ## Design Principles
@@ -14,6 +14,7 @@ This document clarifies the intended boundary between `internal/config` and `int
 ### 1. Domain Package is the Source of Truth
 
 The `domain` package contains:
+
 - **Core types**: `Config`, `Profile`, `OperationSettings`
 - **Enums**: `RiskLevelType`, `OperationType`, `SafeMode`
 - **Validation**: `ValidationError`, `ValidationContext`, `ValidationSeverity`
@@ -44,6 +45,7 @@ type ValidationSeverity = domain.ValidationSeverity
 ```
 
 This pattern:
+
 - Avoids code duplication (split brain prevention)
 - Maintains clear dependency direction
 - Allows config to extend domain types with infrastructure concerns
@@ -58,6 +60,7 @@ config ──imports──> domain
 ```
 
 **Important**: Domain should NOT import config. If you find yourself needing this:
+
 - Move shared types to domain
 - Create an orchestration layer in config
 - Use dependency injection
@@ -102,13 +105,13 @@ protected := domain.DefaultProtectedPaths()
 
 ### Fixed Split Brains
 
-| Type | Location | Status |
-|------|----------|--------|
-| `SanitizationWarning` | `domain` only | ✅ Fixed |
-| `ValidationError` | `domain` + type alias in config | ✅ Fixed |
-| `ValidationSeverity` | `domain` + type alias in config | ✅ Fixed |
-| `ValidationContext` | `domain` + type alias in config | ✅ Fixed |
-| System paths | `domain/system_paths.go` | ✅ Fixed |
+| Type                  | Location                        | Status   |
+| --------------------- | ------------------------------- | -------- |
+| `SanitizationWarning` | `domain` only                   | ✅ Fixed |
+| `ValidationError`     | `domain` + type alias in config | ✅ Fixed |
+| `ValidationSeverity`  | `domain` + type alias in config | ✅ Fixed |
+| `ValidationContext`   | `domain` + type alias in config | ✅ Fixed |
+| System paths          | `domain/system_paths.go`        | ✅ Fixed |
 
 ### Type Aliases in Config Package
 
@@ -138,12 +141,12 @@ const (
 
 ### When to Extend vs Create
 
-| Scenario | Action |
-|----------|--------|
-| Adding validation severity levels | Extend `domain.ValidationSeverity` |
-| Adding config-specific metadata | New type in `config` |
-| Adding new enum values | Add to domain, update config aliases if needed |
-| Adding helper methods for persistence | Add to `config`, use domain types |
+| Scenario                              | Action                                         |
+| ------------------------------------- | ---------------------------------------------- |
+| Adding validation severity levels     | Extend `domain.ValidationSeverity`             |
+| Adding config-specific metadata       | New type in `config`                           |
+| Adding new enum values                | Add to domain, update config aliases if needed |
+| Adding helper methods for persistence | Add to `config`, use domain types              |
 
 ## Migration Path
 

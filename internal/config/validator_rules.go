@@ -107,12 +107,12 @@ func getDefaultValidationRules() *ConfigValidationRules {
 			Pattern:  "^[a-zA-Z0-9_-]+$",
 			Message:  "Profile names must be alphanumeric with underscores and hyphens",
 		},
-		UniquePaths:    true,
-		UniqueProfiles: true,
-		ProtectedSystemPaths: domain.AllProtectedSystemPaths(),
+		UniquePaths:           true,
+		UniqueProfiles:        true,
+		ProtectedSystemPaths:  domain.AllProtectedSystemPaths(),
 		DefaultProtectedPaths: domain.DefaultProtectedPaths(),
-		RequireSafeMode: true,
-		MaxRiskLevel:    domain.RiskLevelType(domain.RiskLevelHighType),
-		BackupRequired:  domain.RiskLevelType(domain.RiskLevelMediumType),
+		RequireSafeMode:       true,
+		MaxRiskLevel:          domain.RiskLevelType(domain.RiskLevelHighType),
+		BackupRequired:        domain.RiskLevelType(domain.RiskLevelMediumType),
 	}
 }

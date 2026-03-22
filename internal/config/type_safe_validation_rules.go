@@ -86,13 +86,13 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 			Pattern:  "^/.*",
 			Message:  "Paths must be absolute (starting with '/')",
 		},
-		UniquePaths:    true,
-		UniqueProfiles: true,
-		ProtectedSystemPaths: domain.AllProtectedSystemPaths(),
+		UniquePaths:           true,
+		UniqueProfiles:        true,
+		ProtectedSystemPaths:  domain.AllProtectedSystemPaths(),
 		DefaultProtectedPaths: domain.DefaultProtectedPaths(),
-		RequireSafeMode: true,
-		MaxRiskLevel:    domain.RiskLevelType(domain.RiskLevelHighType),
-		BackupRequired:  domain.RiskLevelType(domain.RiskLevelMediumType),
+		RequireSafeMode:       true,
+		MaxRiskLevel:          domain.RiskLevelType(domain.RiskLevelHighType),
+		BackupRequired:        domain.RiskLevelType(domain.RiskLevelMediumType),
 	}
 }
 

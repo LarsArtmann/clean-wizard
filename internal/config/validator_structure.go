@@ -35,12 +35,17 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 	// Protected paths validation
 	if len(cfg.Protected) == 0 {
 		result.Errors = append(result.Errors, ValidationError{
-			Field:      "protected",
-			Rule:       "required",
-			Value:      cfg.Protected,
-			Message:    "Protected paths cannot be empty",
-			Severity:   SeverityError,
-			Suggestion: fmt.Sprintf("Add system paths like %s, %s, %s", domain.PathSystem, domain.PathApplications, domain.PathLibrary),
+			Field:    "protected",
+			Rule:     "required",
+			Value:    cfg.Protected,
+			Message:  "Protected paths cannot be empty",
+			Severity: SeverityError,
+			Suggestion: fmt.Sprintf(
+				"Add system paths like %s, %s, %s",
+				domain.PathSystem,
+				domain.PathApplications,
+				domain.PathLibrary,
+			),
 		})
 	}
 }
