@@ -27,3 +27,10 @@ type Cleaner interface {
 	// This is used for dry-run estimation and preview functionality.
 	Scan(ctx context.Context) result.Result[[]domain.ScanItem]
 }
+
+// NixStoreSizer defines the interface for cleaners that can report store size.
+type NixStoreSizer interface {
+	// GetStoreSize returns the size of the Nix store in bytes.
+	// Returns 0 if Nix is not available.
+	GetStoreSize(ctx context.Context) int64
+}

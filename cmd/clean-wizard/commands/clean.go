@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
@@ -218,6 +219,17 @@ func runCleanCommand(
 
 	fmt.Println()
 
+	// Get disk usage before cleanup
+	diskBefore, _ := cleaner.GetDiskUsage("/")
+	if !jsonOutput {
+		fmt.Printf(
+			"📊 Disk usage before: %s %s\n",
+			cleaner.DiskUsageBar(diskBefore, 15),
+			cleaner.FormatDiskUsage(diskBefore),
+		)
+		fmt.Println()
+	}
+
 	startTime := time.Now()
 
 	// Aggregate results from all cleaners
@@ -323,6 +335,30 @@ func runCleanCommand(
 		fmt.Println(SuccessStyle.Render("🎉 Great job! You freed over 1 GB of space!"))
 	} else if totalBytesFreed > BytesThresholdMB {
 		fmt.Println(SuccessStyle.Render("✅ Nice! You freed some space."))
+	}
+
+	// Show disk usage after cleanup (skip in dry-run and JSON modes)
+	if !dryRun && !jsonOutput {
+		diskAfter, err := cleaner.GetDiskUsage("/")
+		if err == nil {
+			fmt.Println()
+
+			if diskAfter.UsedPercent < diskBefore.UsedPercent {
+				freedPercent := diskBefore.UsedPercent - diskAfter.UsedPercent
+				fmt.Printf(
+					"📊 Disk usage after:  %s %s (-%.1f%%)\n",
+					cleaner.DiskUsageBar(
+						diskAfter,
+						15,
+					),
+					cleaner.FormatDiskUsage(diskAfter),
+					freedPercent,
+				)
+			} else {
+				fmt.Printf("📊 Disk usage after:  %s %s\n",
+					cleaner.DiskUsageBar(diskAfter, 15), cleaner.FormatDiskUsage(diskAfter))
+			}
+		}
 	}
 
 	if dryRun {

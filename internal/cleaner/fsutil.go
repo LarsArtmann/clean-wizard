@@ -7,10 +7,13 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+
+	"golang.org/x/sys/unix"
 )
 
 // GetHomeDir returns user's home directory.
@@ -238,4 +241,79 @@ func CalculateBytesFreed(
 	}
 
 	return bytesFreed, beforeSize, afterSize
+}
+
+// DiskUsage represents disk usage information for a filesystem.
+type DiskUsage struct {
+	Total       int64
+	Used        int64
+	Free        int64
+	UsedPercent float64
+}
+
+// GetDiskUsage returns disk usage information for the filesystem containing path.
+// Uses golang.org/x/sys/unix for cross-platform support.
+func GetDiskUsage(path string) (DiskUsage, error) {
+	var stat unix.Statfs_t
+
+	err := unix.Statfs(path, &stat)
+	if err != nil {
+		return DiskUsage{}, fmt.Errorf("failed to get disk usage for %s: %w", path, err)
+	}
+
+	total := int64(stat.Blocks) * int64(stat.Bsize)
+	free := int64(stat.Bfree) * int64(stat.Bsize)
+	used := total - free
+
+	usedPercent := 0.0
+	if total > 0 {
+		usedPercent = float64(used) / float64(total) * 100
+	}
+
+	return DiskUsage{
+		Total:       total,
+		Used:        used,
+		Free:        free,
+		UsedPercent: usedPercent,
+	}, nil
+}
+
+// FormatDiskUsage returns a formatted string showing disk usage like "229G 224G 4.8G 98%"
+// Format: "total used free percent" all in human-readable format.
+func FormatDiskUsage(du DiskUsage) string {
+	return fmt.Sprintf(
+		"%.0fG %.0fG %.1fG %.0f%%",
+		float64(du.Total)/(1024*1024*1024),
+		float64(du.Used)/(1024*1024*1024),
+		float64(du.Free)/(1024*1024*1024),
+		du.UsedPercent,
+	)
+}
+
+// DiskUsageBar returns a visual bar representation of disk usage.
+func DiskUsageBar(du DiskUsage, width int) string {
+	if width <= 0 {
+		width = 20
+	}
+
+	filled := int(float64(width) * du.UsedPercent / 100)
+	empty := width - filled
+
+	var bar strings.Builder
+
+	for i := 0; i < filled && i < width; i++ {
+		if du.UsedPercent >= 90 {
+			bar.WriteString("█") // Red for high usage
+		} else if du.UsedPercent >= 75 {
+			bar.WriteString("▓") // Yellow for medium-high
+		} else {
+			bar.WriteString("▓")
+		}
+	}
+
+	for i := 0; i < empty && filled+i < width; i++ {
+		bar.WriteString("░")
+	}
+
+	return fmt.Sprintf("[%s] %.0f%%", bar.String(), du.UsedPercent)
 }

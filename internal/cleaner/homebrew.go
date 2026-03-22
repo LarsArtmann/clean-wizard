@@ -205,15 +205,20 @@ func (hbc *HomebrewCleaner) runCleanupCommands(
 		hbc.logCommandStart(cmd)
 
 		output, err := cleanCmd.CombinedOutput()
+		// Filter out confusing Homebrew warnings
+		filteredOutput := filterConfusingWarnings(string(output))
+
 		if err != nil {
 			itemsFailed++
 
-			hbc.logCommandError(cmd, string(output))
+			// Filter error output too
+			filteredError := filterConfusingWarnings(string(output))
+			hbc.logCommandError(cmd, filteredError)
 
 			continue
 		}
 
-		itemsRemoved += hbc.countRemovedItems(string(output))
+		itemsRemoved += hbc.countRemovedItems(filteredOutput)
 		hbc.logCommandSuccess(cmd)
 	}
 
@@ -252,4 +257,26 @@ func (hbc *HomebrewCleaner) countRemovedItems(output string) int {
 	}
 
 	return count
+}
+
+// filterConfusingWarnings removes confusing Homebrew warning messages that users don't need to see.
+// Examples: "Warning: Skipping ca-certificates: most recent version 2026-03-19 not installed"
+// These are normal brew cleanup behavior and don't indicate problems.
+func filterConfusingWarnings(output string) string {
+	var filteredLines []string
+
+	for line := range strings.SplitSeq(strings.TrimSpace(output), "\n") {
+		// Skip "Skipping" warnings - these are normal brew cleanup behavior
+		if strings.Contains(line, "Skipping") && strings.Contains(line, "not installed") {
+			continue
+		}
+		// Skip empty lines that might result from filtering
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+
+		filteredLines = append(filteredLines, line)
+	}
+
+	return strings.Join(filteredLines, "\n")
 }

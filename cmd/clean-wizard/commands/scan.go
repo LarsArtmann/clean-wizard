@@ -104,6 +104,18 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 		format.Bytes(int64(totalCleanable)),
 		totalItems,
 	)
+
+	// Show Nix store size if available
+	nixRegistry := cleaner.DefaultRegistry()
+	if nixCleaner, ok := nixRegistry.Get("nix"); ok && nixCleaner.IsAvailable(ctx) {
+		if nixSizer, ok := nixCleaner.(cleaner.NixStoreSizer); ok {
+			storeSize := nixSizer.GetStoreSize(ctx)
+			if storeSize > 0 {
+				fmt.Printf("❄️  Nix store size: %s\n", format.Bytes(storeSize))
+			}
+		}
+	}
+
 	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 
 	if totalCleanable > 0 {
