@@ -85,28 +85,48 @@ func (gcc *GoCacheCleaner) scanGoEnvCache(ctx context.Context, envVar string) []
 	}
 }
 
+// getGoBuildCacheLocations returns all potential go-build cache locations.
+// This ensures comprehensive coverage across different platforms and configurations.
+func (gcc *GoCacheCleaner) getGoBuildCacheLocations() []string {
+	locations := []string{
+		os.TempDir(), // Platform-specific temp (e.g., /private/var/folders/... on macOS)
+		"/tmp",       // Standard Unix temp
+	}
+
+	// Add macOS-specific Library/Caches location
+	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
+		locations = append(locations, filepath.Join(homeDir, "Library", "Caches"))
+	}
+
+	return locations
+}
+
 // scanGoBuildCache scans go-build* folders in temp directories.
 func (gcc *GoCacheCleaner) scanGoBuildCache() []domain.ScanItem {
 	items := make([]domain.ScanItem, 0)
 	buildCachePattern := "go-build*"
+	seen := make(map[string]bool) // Prevent duplicates
 
-	tempDir := "/tmp"
-	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
-		tempDir = homeDir + "/Library/Caches"
-	}
+	for _, tempDir := range gcc.getGoBuildCacheLocations() {
+		matches, err := filepath.Glob(filepath.Join(tempDir, buildCachePattern))
+		if err != nil {
+			continue
+		}
 
-	matches, err := filepath.Glob(tempDir + "/" + buildCachePattern)
-	if err != nil {
-		return items
-	}
+		for _, match := range matches {
+			// Skip duplicates (same file found via different paths like symlinks)
+			if seen[match] {
+				continue
+			}
+			seen[match] = true
 
-	for _, match := range matches {
-		items = append(items, domain.ScanItem{
-			Path:     match,
-			Size:     GetDirSize(match),
-			Created:  GetDirModTime(match),
-			ScanType: domain.ScanTypeTemp,
-		})
+			items = append(items, domain.ScanItem{
+				Path:     match,
+				Size:     GetDirSize(match),
+				Created:  GetDirModTime(match),
+				ScanType: domain.ScanTypeTemp,
+			})
+		}
 	}
 
 	return items
@@ -258,55 +278,52 @@ func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[do
 	return gcc.cleanGoCacheEnv(ctx, "GOMODCACHE", "modcache", "  ✓ Go module cache cleaned")
 }
 
-// cleanGoBuildCache removes go-build* folders.
+// cleanGoBuildCache removes go-build* folders from all temp locations.
 func (gcc *GoCacheCleaner) cleanGoBuildCache(
 	ctx context.Context,
 ) result.Result[domain.CleanResult] {
 	buildCachePattern := "go-build*"
-
-	tempDir := "/tmp"
-	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
-		tempDir = homeDir + "/Library/Caches"
-	}
-
-	// Use shell globbing to find build cache folders
-	matches, err := filepath.Glob(tempDir + "/" + buildCachePattern)
-	if err != nil {
-		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
-			0, int64(0),
-			domain.SizeEstimate{Known: 0},
-		))
-	}
-
+	seen := make(map[string]bool) // Prevent cleaning same path twice
 	itemsRemoved := 0
-
 	var totalSizeEstimate domain.SizeEstimate
 
-	for _, match := range matches {
-		// Calculate size before removal (always, for accurate dry-run estimates)
-		bytesFreed := GetDirSize(match)
-		totalSizeEstimate = domain.SizeEstimate{Known: totalSizeEstimate.Known + uint64(bytesFreed)}
-
-		if gcc.dryRun {
-			itemsRemoved++
-
+	for _, tempDir := range gcc.getGoBuildCacheLocations() {
+		matches, err := filepath.Glob(filepath.Join(tempDir, buildCachePattern))
+		if err != nil {
 			continue
 		}
 
-		err := os.RemoveAll(match)
-		if err != nil {
-			if gcc.verbose {
-				fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
+		for _, match := range matches {
+			// Skip duplicates
+			if seen[match] {
+				continue
+			}
+			seen[match] = true
+
+			// Calculate size before removal (always, for accurate dry-run estimates)
+			bytesFreed := GetDirSize(match)
+			totalSizeEstimate = domain.SizeEstimate{Known: totalSizeEstimate.Known + uint64(bytesFreed)}
+
+			if gcc.dryRun {
+				itemsRemoved++
+
+				continue
 			}
 
-			continue
-		}
+			err := os.RemoveAll(match)
+			if err != nil {
+				if gcc.verbose {
+					fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
+				}
 
-		itemsRemoved++
+				continue
+			}
 
-		if gcc.verbose {
-			fmt.Printf("  ✓ Removed build cache: %s\n", match)
+			itemsRemoved++
+
+			if gcc.verbose {
+				fmt.Printf("  ✓ Removed build cache: %s\n", match)
+			}
 		}
 	}
 
