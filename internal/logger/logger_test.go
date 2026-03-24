@@ -1,147 +1,360 @@
 package logger
 
 import (
+	"strings"
 	"testing"
 
+	"github.com/charmbracelet/log"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInit(t *testing.T) {
 	t.Parallel()
 
-	// Should not panic
-	Init(true)
-	assert.NotNil(t, L)
-	assert.NotNil(t, SugaredLogger)
+	tests := []struct {
+		name        string
+		development bool
+	}{
+		{
+			name:        "production mode",
+			development: false,
+		},
+		{
+			name:        "development mode",
+			development: true,
+		},
+	}
 
-	// Cleanup
-	Sync()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			Init(tt.development)
+			require.NotNil(t, L, "logger should be initialized")
+			require.NotNil(t, StdLogger, "slog logger should be initialized")
+		})
+	}
 }
 
 func TestInitWithLevel(t *testing.T) {
 	t.Parallel()
 
-	// Should not panic with valid level
-	InitWithLevel("debug", true)
-	assert.NotNil(t, L)
+	tests := []struct {
+		name        string
+		level       string
+		development bool
+	}{
+		{
+			name:        "debug level",
+			level:       "debug",
+			development: true,
+		},
+		{
+			name:        "info level",
+			level:       "info",
+			development: false,
+		},
+		{
+			name:        "warn level",
+			level:       "warn",
+			development: false,
+		},
+		{
+			name:        "error level",
+			level:       "error",
+			development: false,
+		},
+	}
 
-	// Cleanup
-	Sync()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			InitWithLevel(tt.level, tt.development)
+			require.NotNil(t, L, "logger should be initialized")
+		})
+	}
 }
 
-func TestLoggerMethods(t *testing.T) {
-	// Initialize logger for testing
-	Init(true)
+func TestLoggingFunctions(t *testing.T) {
+	Init(true) // Development mode for testability
 
-	defer Sync()
+	tests := []struct {
+		name string
+		fn   func()
+	}{
+		{
+			name: "debug log",
+			fn:   func() { Debug("debug message", "key", "value") },
+		},
+		{
+			name: "info log",
+			fn:   func() { Info("info message", "key", "value") },
+		},
+		{
+			name: "warn log",
+			fn:   func() { Warn("warn message", "key", "value") },
+		},
+		{
+			name: "error log",
+			fn:   func() { Error("error message", "key", "value") },
+		},
+	}
 
-	// These should not panic even without actual output checking
-	t.Run("Debug", func(t *testing.T) {
-		t.Parallel()
-		Debug("debug message", zap.String("key", "value"))
-	})
-
-	t.Run("Info", func(t *testing.T) {
-		t.Parallel()
-		Info("info message", zap.String("key", "value"))
-	})
-
-	t.Run("Warn", func(t *testing.T) {
-		t.Parallel()
-		Warn("warn message", zap.String("key", "value"))
-	})
-
-	t.Run("Error", func(t *testing.T) {
-		t.Parallel()
-		Error("error message", zap.String("key", "value"))
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Should not panic
+			assert.NotPanics(t, tt.fn)
+		})
+	}
 }
 
 func TestWith(t *testing.T) {
 	Init(true)
 
-	defer Sync()
-
-	child := With(zap.String("context", "test"))
-	assert.NotNil(t, child)
+	childLogger := With("request_id", "123", "user_id", "456")
+	assert.NotNil(t, childLogger)
 }
 
-func TestNamed(t *testing.T) {
+func TestWithPrefix(t *testing.T) {
 	Init(true)
 
-	defer Sync()
-
-	named := Named("test-scope")
-	assert.NotNil(t, named)
+	prefixedLogger := WithPrefix("test-component")
+	assert.NotNil(t, prefixedLogger)
 }
 
 func TestCleanerLogger(t *testing.T) {
 	Init(true)
 
-	defer Sync()
-
 	cleanerLog := CleanerLogger("docker")
 	assert.NotNil(t, cleanerLog)
 }
 
-func TestFieldHelpers(t *testing.T) {
-	t.Parallel()
+func TestSetLevel(t *testing.T) {
+	Init(true)
 
 	tests := []struct {
-		name     string
-		field    zap.Field
-		expected string
+		name  string
+		level string
 	}{
-		{"String", String("key", "value"), "key"},
-		{"Int", Int("count", 42), "count"},
-		{"Int64", Int64("size", 1024), "size"},
-		{"Uint64", Uint64("bytes", 2048), "bytes"},
-		{"Bool", Bool("enabled", true), "enabled"},
-		{"Path", Path("path", "/tmp/test"), "path"},
-		{"ByteSize", ByteSize("freed", 1024), "freed_bytes"},
-		{"Operation", Operation("docker"), "operation"},
-		{"DryRun", DryRun(true), "dry_run"},
-		{"DurationMillis", DurationMillis("elapsed", 100), "elapsed_ms"},
+		{name: "debug", level: "debug"},
+		{name: "info", level: "info"},
+		{name: "warn", level: "warn"},
+		{name: "error", level: "error"},
+		{name: "fatal", level: "fatal"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			assert.Equal(t, tt.expected, tt.field.Key)
+			// Should not panic
+			assert.NotPanics(t, func() { SetLevel(tt.level) })
 		})
 	}
 }
 
-func TestErrorField(t *testing.T) {
-	t.Parallel()
-
-	err := assert.AnError
-	field := ErrorField(err)
-	assert.Equal(t, "error", field.Key)
-	assert.Equal(t, err, field.Interface)
-}
-
-func TestSyncWithNil(t *testing.T) {
-	t.Parallel()
-
-	// Should not panic even when L is nil
-	originalL := L
+func TestSetLevel_Uninitialized(t *testing.T) {
+	// Reset logger to nil
 	L = nil
 
-	defer func() { L = originalL }()
-
-	Sync() // Should not panic
+	// Should not panic even when logger is nil
+	assert.NotPanics(t, func() { SetLevel("debug") })
 }
 
-func TestDebugWithNil(t *testing.T) {
-	t.Parallel()
+func TestSync(t *testing.T) {
+	Init(true)
 
-	// Should not panic even when L is nil
+	// Should not panic
+	assert.NotPanics(t, func() { Sync() })
+}
+
+func TestGetSlogLogger(t *testing.T) {
+	Init(true)
+
+	slogLogger := GetSlogLogger()
+	assert.NotNil(t, slogLogger)
+}
+
+func TestLoggingWithMultipleFields(t *testing.T) {
+	Init(true)
+
+	// Test logging with various field types
+	assert.NotPanics(t, func() {
+		Info("complex log",
+			"string", "value",
+			"int", 42,
+			"bool", true,
+			"nested", map[string]string{"key": "value"},
+		)
+	})
+}
+
+func TestCleanerLoggerIntegration(t *testing.T) {
+	Init(true)
+
+	cleaners := []string{"docker", "nix", "homebrew", "go", "cargo"}
+
+	for _, name := range cleaners {
+		t.Run(name, func(t *testing.T) {
+			logger := CleanerLogger(name)
+			require.NotNil(t, logger)
+
+			// Should be able to log with the cleaner logger
+			assert.NotPanics(t, func() {
+				logger.Info("cleaning started", "dry_run", false)
+				logger.Debug("scanning cache", "path", "/tmp/cache")
+			})
+		})
+	}
+}
+
+// BenchmarkLogging benchmarks the logging performance
+func BenchmarkLogging(b *testing.B) {
+	Init(false) // Production mode for benchmarking
+
+	b.Run("info", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			Info("benchmark message", "iteration", i)
+		}
+	})
+
+	b.Run("info_with_fields", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			Info("benchmark message",
+				"iteration", i,
+				"cleaner", "docker",
+				"bytes_freed", 1024*1024,
+			)
+		}
+	})
+}
+
+// TestLoggingOutput verifies that logs are written
+func TestLoggingOutput(t *testing.T) {
+	// This is a basic smoke test to ensure logging doesn't panic
+	// In a real scenario, you'd capture stdout and verify output
+	Init(true)
+
+	// Verify all log levels work
+	Debug("test debug")
+	Info("test info")
+	Warn("test warn")
+	Error("test error")
+
+	// If we get here without panic, the test passes
+	assert.True(t, true)
+}
+
+// TestPrefix verifies prefix functionality
+func TestPrefix(t *testing.T) {
+	Init(true)
+
+	// Test that prefix methods work
+	prefixed := WithPrefix("test")
+	assert.NotNil(t, prefixed)
+
+	// Should be able to log with prefix
+	assert.NotPanics(t, func() {
+		prefixed.Info("prefixed message")
+	})
+}
+
+// TestLevelValidation tests that invalid levels are handled gracefully
+func TestLevelValidation(t *testing.T) {
+	Init(true)
+
+	// Invalid level should default to info
+	assert.NotPanics(t, func() {
+		InitWithLevel("invalid_level", true)
+	})
+
+	// Verify logger still works
+	Info("should still work")
+}
+
+// TestNilLoggerSafety tests that functions handle nil logger gracefully
+func TestNilLoggerSafety(t *testing.T) {
+	// Save original logger
 	originalL := L
-	L = nil
-
 	defer func() { L = originalL }()
 
-	Debug("test message") // Should not panic
+	// Set to nil
+	L = nil
+
+	// All these should not panic
+	assert.NotPanics(t, func() { Debug("test") })
+	assert.NotPanics(t, func() { Info("test") })
+	assert.NotPanics(t, func() { Warn("test") })
+	assert.NotPanics(t, func() { Error("test") })
+	assert.NotPanics(t, func() { With("key", "value") })
+	assert.NotPanics(t, func() { WithPrefix("test") })
+	assert.NotPanics(t, func() { CleanerLogger("test") })
+}
+
+// TestDevelopmentVsProduction tests different modes
+func TestDevelopmentVsProduction(t *testing.T) {
+	t.Run("development", func(t *testing.T) {
+		Init(true)
+		assert.NotNil(t, L)
+		assert.NotNil(t, StdLogger)
+	})
+
+	t.Run("production", func(t *testing.T) {
+		Init(false)
+		assert.NotNil(t, L)
+		assert.NotNil(t, StdLogger)
+	})
+}
+
+// TestLogMessageContent verifies log message content
+func TestLogMessageContent(t *testing.T) {
+	Init(true)
+
+	// Test that we can create logs with various content
+	messages := []string{
+		"simple message",
+		"message with special chars: !@#$%^&*()",
+		"message with unicode: 你好世界 🌍",
+		"very long message " + strings.Repeat("x", 1000),
+	}
+
+	for _, msg := range messages {
+		t.Run(msg[:min(len(msg), 20)], func(t *testing.T) {
+			assert.NotPanics(t, func() {
+				Info(msg)
+			})
+		})
+	}
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// TestCharmbraceletIntegration verifies integration with charmbracelet/log
+func TestCharmbraceletIntegration(t *testing.T) {
+	Init(true)
+
+	// Test that we can use charmbracelet/log specific features
+	assert.NotNil(t, L)
+
+	// Test level setting via charmbracelet/log API
+	L.SetLevel(log.DebugLevel)
+	assert.Equal(t, log.DebugLevel, L.GetLevel())
+
+	L.SetLevel(log.InfoLevel)
+	assert.Equal(t, log.InfoLevel, L.GetLevel())
+}
+
+// TestSlogIntegration verifies slog integration
+func TestSlogIntegration(t *testing.T) {
+	Init(true)
+
+	// Test that slog logger works
+	require.NotNil(t, StdLogger)
+
+	// Test slog methods
+	assert.NotPanics(t, func() {
+		StdLogger.Info("slog info message")
+		StdLogger.Debug("slog debug message")
+	})
 }

@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/logger"
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -73,7 +73,7 @@ func unmarshalConfig(v *viper.Viper) (*domain.Config, error) {
 	// Unmarshal profiles section
 	err := v.UnmarshalKey("profiles", &config.Profiles)
 	if err != nil {
-		logrus.WithError(err).Error("Failed to unmarshal profiles")
+		logger.Error("Failed to unmarshal profiles", "error", err)
 
 		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 	}
@@ -116,9 +116,9 @@ func validateLoadedConfig(config *domain.Config) error {
 	validationResult := validator.ValidateConfig(config)
 	if !validationResult.IsValid {
 		for _, err := range validationResult.Errors {
-			logrus.WithField("field", err.Field).
-				WithError(fmt.Errorf("%s", err.Message)).
-				Error("Configuration validation error")
+			logger.Error("Configuration validation error",
+				"field", err.Field,
+				"error", err.Message)
 		}
 
 		return fmt.Errorf(
@@ -219,7 +219,7 @@ func Save(config *domain.Config) error {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
 
-	logrus.WithField("config_path", configPath).Info("Configuration saved successfully")
+	logger.Info("Configuration saved successfully", "config_path", configPath)
 
 	return nil
 }
@@ -237,11 +237,10 @@ func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) doma
 
 	err := v.UnmarshalKey(key, &riskLevelStr)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"profile":   profileName,
-			"operation": operationIndex,
-			"error":     err,
-		}).Warn("Failed to unmarshal risk level, defaulting to LOW")
+		logger.Warn("Failed to unmarshal risk level, defaulting to LOW",
+			"profile", profileName,
+			"operation", operationIndex,
+			"error", err)
 
 		return domain.RiskLevelType(domain.RiskLevelLowType)
 	}
@@ -256,7 +255,7 @@ func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) doma
 	case "CRITICAL":
 		return domain.RiskLevelType(domain.RiskLevelCriticalType)
 	default:
-		logrus.WithField("risk_level", riskLevelStr).Warn("Invalid risk level, defaulting to LOW")
+		logger.Warn("Invalid risk level, defaulting to LOW", "risk_level", riskLevelStr)
 
 		return domain.RiskLevelType(domain.RiskLevelLowType)
 	}
@@ -273,7 +272,7 @@ func unmarshalOperationSettings(
 	settingsMap := v.GetStringMap(settingsKey)
 
 	if len(settingsMap) == 0 {
-		logrus.Debug("No settings map found")
+		logger.Debug("No settings map found")
 
 		return
 	}
@@ -288,10 +287,10 @@ func unmarshalOperationSettings(
 			op.Settings = &domain.OperationSettings{}
 			op.Settings.NixGenerations = nixGenSettings
 		} else {
-			logrus.WithError(err).Error("Failed to unmarshal nix_generations settings")
+			logger.Error("Failed to unmarshal nix_generations settings", "error", err)
 		}
 	} else {
-		logrus.Debug("No nix_generations settings found")
+		logger.Debug("No nix_generations settings found")
 	}
 }
 

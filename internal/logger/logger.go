@@ -1,7 +1,8 @@
 // Package logger provides structured logging for Clean Wizard.
 //
-// This package wraps zap (https://github.com/uber-go/zap) to provide
-// structured, leveled logging throughout the application.
+// This package wraps charmbracelet/log (https://github.com/charmbracelet/log)
+// to provide beautiful, colorful, structured logging throughout the application.
+// It integrates seamlessly with the existing charmbracelet ecosystem (huh, lipgloss, bubbletea).
 //
 // Usage:
 //
@@ -12,227 +13,181 @@
 //	    defer logger.Sync()
 //
 //	    logger.Info("application started",
-//	        zap.String("version", version.Version),
+//	        "version", version.Version,
 //	    )
 //	}
 package logger
 
 import (
+	"log/slog"
 	"os"
 	"time"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/charmbracelet/log"
 )
 
 // L is the global logger instance.
 // Use this for all logging throughout the application.
-var L *zap.Logger
+var L *log.Logger
 
-// SugaredLogger provides a slower but more ergonomic API.
-// Use for simple logging where performance is not critical.
-var SugaredLogger *zap.SugaredLogger
+// StdLogger provides a standard slog.Logger for interoperability.
+var StdLogger *slog.Logger
 
 // Init initializes the global logger.
 //
-// In development mode, logs are human-readable with colors.
+// In development mode, logs are colorful and human-readable.
 // In production mode, logs are JSON-formatted for structured parsing.
 //
 // Example:
 //
-//	logger.Init(true)  // Development: console output with colors
+//	logger.Init(true)  // Development: colorful console output
 //	logger.Init(false) // Production: JSON output
 func Init(development bool) {
-	var config zap.Config
-
+	level := log.InfoLevel
 	if development {
-		config = zap.NewDevelopmentConfig()
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-	} else {
-		config = zap.NewProductionConfig()
-		config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
+		level = log.DebugLevel
 	}
 
-	// Always log to stdout, never stderr for normal operation
-	config.OutputPaths = []string{"stdout"}
-	config.ErrorOutputPaths = []string{"stderr"}
-
-	var err error
-
-	L, err = config.Build(
-		zap.AddCallerSkip(1), // Skip this wrapper in caller info
-	)
-	if err != nil {
-		// Fallback to stdlib log if zap fails
-		panic("failed to initialize logger: " + err.Error())
+	formatter := log.JSONFormatter
+	if development {
+		formatter = log.TextFormatter
 	}
 
-	SugaredLogger = L.Sugar()
+	L = log.NewWithOptions(os.Stdout, log.Options{
+		Level:           level,
+		Formatter:       formatter,
+		ReportTimestamp: true,
+		TimeFormat:      time.RFC3339,
+		Prefix:          "clean-wizard",
+	})
+
+	// Create slog handler from charmbracelet/log
+	StdLogger = slog.New(L)
 }
 
 // InitWithLevel initializes the logger with a specific level.
 //
-// Valid levels: debug, info, warn, error, dpanic, panic, fatal.
-func InitWithLevel(level string, development bool) {
-	var config zap.Config
+// Valid levels: debug, info, warn, error, fatal.
+func InitWithLevel(levelStr string, development bool) {
+	level := log.InfoLevel
+	switch levelStr {
+	case "debug":
+		level = log.DebugLevel
+	case "info":
+		level = log.InfoLevel
+	case "warn":
+		level = log.WarnLevel
+	case "error":
+		level = log.ErrorLevel
+	case "fatal":
+		level = log.FatalLevel
+	}
 
+	formatter := log.JSONFormatter
 	if development {
-		config = zap.NewDevelopmentConfig()
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	} else {
-		config = zap.NewProductionConfig()
+		formatter = log.TextFormatter
 	}
 
-	// Parse and set level
-	lvl := zap.InfoLevel
-	if err := lvl.UnmarshalText([]byte(level)); err == nil {
-		config.Level = zap.NewAtomicLevelAt(lvl)
-	}
+	L = log.NewWithOptions(os.Stdout, log.Options{
+		Level:           level,
+		Formatter:       formatter,
+		ReportTimestamp: true,
+		TimeFormat:      time.RFC3339,
+		Prefix:          "clean-wizard",
+	})
 
-	config.OutputPaths = []string{"stdout"}
-	config.ErrorOutputPaths = []string{"stderr"}
-
-	var err error
-
-	L, err = config.Build(zap.AddCallerSkip(1))
-	if err != nil {
-		panic("failed to initialize logger: " + err.Error())
-	}
-
-	SugaredLogger = L.Sugar()
+	StdLogger = slog.New(L)
 }
 
 // Sync flushes any buffered log entries.
 // Call this before program exit.
 func Sync() {
-	if L != nil {
-		_ = L.Sync()
-	}
+	// charmbracelet/log doesn't require explicit flushing
 }
 
 // Debug logs a debug message.
-func Debug(msg string, fields ...zap.Field) {
+func Debug(msg string, keyvals ...any) {
 	if L != nil {
-		L.Debug(msg, fields...)
+		L.Debug(msg, keyvals...)
 	}
 }
 
 // Info logs an info message.
-func Info(msg string, fields ...zap.Field) {
+func Info(msg string, keyvals ...any) {
 	if L != nil {
-		L.Info(msg, fields...)
+		L.Info(msg, keyvals...)
 	}
 }
 
 // Warn logs a warning message.
-func Warn(msg string, fields ...zap.Field) {
+func Warn(msg string, keyvals ...any) {
 	if L != nil {
-		L.Warn(msg, fields...)
+		L.Warn(msg, keyvals...)
 	}
 }
 
 // Error logs an error message.
-func Error(msg string, fields ...zap.Field) {
+func Error(msg string, keyvals ...any) {
 	if L != nil {
-		L.Error(msg, fields...)
+		L.Error(msg, keyvals...)
 	}
 }
 
 // Fatal logs a fatal message and exits.
-func Fatal(msg string, fields ...zap.Field) {
+func Fatal(msg string, keyvals ...any) {
 	if L != nil {
-		L.Fatal(msg, fields...)
+		L.Fatal(msg, keyvals...)
 	} else {
 		os.Exit(1)
 	}
 }
 
 // With creates a child logger with additional fields.
-func With(fields ...zap.Field) *zap.Logger {
+func With(keyvals ...any) *log.Logger {
 	if L != nil {
-		return L.With(fields...)
+		return L.With(keyvals...)
 	}
-
 	return nil
 }
 
-// Named creates a child logger with a sub-scope name.
-func Named(name string) *zap.Logger {
+// WithPrefix creates a child logger with a sub-scope name.
+func WithPrefix(name string) *log.Logger {
 	if L != nil {
-		return L.Named(name)
+		return L.WithPrefix(name)
 	}
-
-	return nil
+	// Return a new logger that discards output when L is nil
+	return log.New(os.Stdout)
 }
 
 // CleanerLogger returns a logger for a specific cleaner.
-func CleanerLogger(name string) *zap.Logger {
-	return Named("cleaner").With(zap.String("cleaner_name", name))
+func CleanerLogger(name string) *log.Logger {
+	if L != nil {
+		return WithPrefix("cleaner").With("cleaner_name", name)
+	}
+	return nil
 }
 
-// Common field helpers
-
-// String creates a string field.
-func String(key, val string) zap.Field {
-	return zap.String(key, val)
-}
-
-// Int creates an int field.
-func Int(key string, val int) zap.Field {
-	return zap.Int(key, val)
-}
-
-// Int64 creates an int64 field.
-func Int64(key string, val int64) zap.Field {
-	return zap.Int64(key, val)
-}
-
-// Uint64 creates a uint64 field.
-func Uint64(key string, val uint64) zap.Field {
-	return zap.Uint64(key, val)
-}
-
-// Bool creates a bool field.
-func Bool(key string, val bool) zap.Field {
-	return zap.Bool(key, val)
-}
-
-// Duration creates a duration field.
-func Duration(key string, val any) zap.Field {
-	if d, ok := val.(time.Duration); ok {
-		return zap.Duration(key, d)
+// SetLevel changes the log level at runtime.
+func SetLevel(level string) {
+	if L == nil {
+		return
 	}
 
-	return zap.String(key, "invalid duration")
+	switch level {
+	case "debug":
+		L.SetLevel(log.DebugLevel)
+	case "info":
+		L.SetLevel(log.InfoLevel)
+	case "warn":
+		L.SetLevel(log.WarnLevel)
+	case "error":
+		L.SetLevel(log.ErrorLevel)
+	case "fatal":
+		L.SetLevel(log.FatalLevel)
+	}
 }
 
-// Error creates an error field.
-func ErrorField(err error) zap.Field {
-	return zap.Error(err)
-}
-
-// Path creates a path field (sanitized for security).
-func Path(key, val string) zap.Field {
-	return zap.String(key, val)
-}
-
-// ByteSize creates a human-readable byte size field.
-func ByteSize(key string, bytes int64) zap.Field {
-	return zap.Int64(key+"_bytes", bytes)
-}
-
-// Operation creates an operation type field.
-func Operation(opType string) zap.Field {
-	return zap.String("operation", opType)
-}
-
-// DryRun indicates if this is a dry-run operation.
-func DryRun(val bool) zap.Field {
-	return zap.Bool("dry_run", val)
-}
-
-// DurationMillis creates a duration field in milliseconds.
-func DurationMillis(key string, ms int64) zap.Field {
-	return zap.Int64(key+"_ms", ms)
+// GetSlogLogger returns the standard slog.Logger for interoperability.
+func GetSlogLogger() *slog.Logger {
+	return StdLogger
 }

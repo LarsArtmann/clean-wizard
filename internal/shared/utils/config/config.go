@@ -4,20 +4,20 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/charmbracelet/log"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/sirupsen/logrus"
 )
 
 // LoadConfigWithFallback loads configuration with proper error handling and user feedback
 // This eliminates duplicate config loading patterns across commands.
-func LoadConfigWithFallback(ctx context.Context, logger *logrus.Logger) (*domain.Config, error) {
+func LoadConfigWithFallback(ctx context.Context, logger *log.Logger) (*domain.Config, error) {
 	return loadConfig(ctx, logger, true)
 }
 
 // LoadConfigOrContinue loads configuration but allows caller to continue on error
 // Returns (config, error) where error can be ignored for graceful degradation.
-func LoadConfigOrContinue(ctx context.Context, logger *logrus.Logger) (*domain.Config, error) {
+func LoadConfigOrContinue(ctx context.Context, logger *log.Logger) (*domain.Config, error) {
 	return loadConfig(ctx, logger, false)
 }
 
@@ -25,12 +25,12 @@ func LoadConfigOrContinue(ctx context.Context, logger *logrus.Logger) (*domain.C
 // When propagateErrors is true, errors are returned; otherwise, default config is returned.
 func loadConfig(
 	ctx context.Context,
-	logger *logrus.Logger,
+	logger *log.Logger,
 	propagateErrors bool,
 ) (*domain.Config, error) {
 	loadedCfg, err := config.LoadWithContext(ctx)
 	if err != nil {
-		logger.Warnf("Could not load configuration, using defaults: %v", err)
+		logger.Warn("Could not load configuration, using defaults", "error", err)
 
 		if propagateErrors {
 			return nil, err
