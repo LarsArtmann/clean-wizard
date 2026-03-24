@@ -72,6 +72,7 @@ func (r *Registry) CleanAllParallel(ctx context.Context, maxConcurrency int) map
 ```
 
 Features:
+
 - Configurable concurrency (semaphore pattern)
 - Context cancellation support
 - Per-cleaner execution metrics
@@ -101,6 +102,7 @@ type CleanerMetrics struct {
 ```
 
 Features:
+
 - Automatic tracking via `TrackedCleaner` wrapper
 - `MetricsEnabledRegistry` with built-in collection
 - Per-cleaner and aggregated metrics
@@ -111,14 +113,14 @@ Features:
 
 ## 📊 METRICS
 
-| Metric                  | Before | After |
-| ----------------------- | ------ | ----- |
-| Logging Libraries       | 2      | 1     |
-| Cleaners                | 13     | 13    |
-| Interfaces              | 2      | 4     |
-| Parallel Execution      | ❌     | ✅    |
-| Metrics Collection      | ❌     | ✅    |
-| Build Status            | ✅     | ✅    |
+| Metric             | Before | After |
+| ------------------ | ------ | ----- |
+| Logging Libraries  | 2      | 1     |
+| Cleaners           | 13     | 13    |
+| Interfaces         | 2      | 4     |
+| Parallel Execution | ❌     | ✅    |
+| Metrics Collection | ❌     | ✅    |
+| Build Status       | ✅     | ✅    |
 
 ---
 
@@ -142,23 +144,23 @@ Features:
 
 ## 📁 NEW FILES
 
-| File                              | Lines | Purpose                          |
-| --------------------------------- | ----- | -------------------------------- |
-| `internal/cleaner/parallel.go`    | 168   | Parallel execution engine        |
-| `internal/cleaner/metrics.go`     | 236   | Metrics collection system        |
+| File                           | Lines | Purpose                   |
+| ------------------------------ | ----- | ------------------------- |
+| `internal/cleaner/parallel.go` | 168   | Parallel execution engine |
+| `internal/cleaner/metrics.go`  | 236   | Metrics collection system |
 
 ---
 
 ## 🔧 MODIFIED FILES
 
-| File                                        | Changes              |
-| ------------------------------------------- | -------------------- |
-| `internal/cleaner/cleaner.go`               | +17 (AgeBasedCleaner) |
-| `internal/cleaner/golang_cache_cleaner_test.go` | +15 (new tests)   |
-| `internal/shared/utils/config/config.go`    | Import order fix     |
-| `internal/shared/utils/config/config_test.go` | io.Discard fix      |
-| `internal/logger/logger.go`                 | +3 lines             |
-| `internal/logger/logger_test.go`            | +24 lines            |
+| File                                            | Changes               |
+| ----------------------------------------------- | --------------------- |
+| `internal/cleaner/cleaner.go`                   | +17 (AgeBasedCleaner) |
+| `internal/cleaner/golang_cache_cleaner_test.go` | +15 (new tests)       |
+| `internal/shared/utils/config/config.go`        | Import order fix      |
+| `internal/shared/utils/config/config_test.go`   | io.Discard fix        |
+| `internal/logger/logger.go`                     | +3 lines              |
+| `internal/logger/logger_test.go`                | +24 lines             |
 
 ---
 

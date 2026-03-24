@@ -9,18 +9,18 @@
 
 ## 📊 EXECUTIVE SUMMARY
 
-| Metric                  | Value                          |
-| ----------------------- | ------------------------------ |
-| **Total Go Files**      | 194                            |
-| **Source Files**        | 139                            |
-| **Test Files**          | 55                             |
-| **Lines of Code**       | ~21,332                        |
-| **Test Functions**      | 271                            |
-| **Production Cleaners** | 13                             |
-| **Build Status**        | ✅ PASSING                     |
-| **gopls Warnings**      | 45 info-level                  |
-| **TODO/FIXME Comments** | 0                              |
-| **Dependencies**        | 61 direct                      |
+| Metric                  | Value         |
+| ----------------------- | ------------- |
+| **Total Go Files**      | 194           |
+| **Source Files**        | 139           |
+| **Test Files**          | 55            |
+| **Lines of Code**       | ~21,332       |
+| **Test Functions**      | 271           |
+| **Production Cleaners** | 13            |
+| **Build Status**        | ✅ PASSING    |
+| **gopls Warnings**      | 45 info-level |
+| **TODO/FIXME Comments** | 0             |
+| **Dependencies**        | 61 direct     |
 
 **Overall Status:** PRODUCTION READY with **ENHANCED ARCHITECTURE**
 
@@ -91,6 +91,7 @@ type MetricsCollector struct {
 ```
 
 Features:
+
 - ✅ Per-cleaner metrics (invocations, successes, failures)
 - ✅ Duration tracking per operation
 - ✅ Bytes freed tracking
@@ -101,10 +102,10 @@ Features:
 
 ### 6. Production-Ready Cleaners (11/13)
 
-| Cleaner           | Status              | Size Reporting | Dry-Run  |
-| ----------------- | ------------------- | -------------- | -------- |
-| Nix               | ✅ FULLY FUNCTIONAL | 🧪 MOCKED      | 🧪 MOCKED |
-| Homebrew          | ✅ FULLY FUNCTIONAL | ✅ Working     | 🚧 N/A   |
+| Cleaner           | Status              | Size Reporting | Dry-Run    |
+| ----------------- | ------------------- | -------------- | ---------- |
+| Nix               | ✅ FULLY FUNCTIONAL | 🧪 MOCKED      | 🧪 MOCKED  |
+| Homebrew          | ✅ FULLY FUNCTIONAL | ✅ Working     | 🚧 N/A     |
 | Docker            | ✅ FULLY FUNCTIONAL | ✅ Working     | ✅ Working |
 | Go                | ✅ FULLY FUNCTIONAL | ✅ Working     | ✅ Working |
 | Cargo             | ✅ FULLY FUNCTIONAL | ✅ Working     | ✅ Working |
@@ -117,18 +118,18 @@ Features:
 
 ### 7. Core Architecture ✅
 
-| Pattern                  | Status              | Details                                    |
-| ------------------------ | ------------------- | ------------------------------------------ |
-| Registry Pattern         | ✅ FULLY_FUNCTIONAL | Clean registry for all cleaners            |
-| Result Type              | ✅ FULLY_FUNCTIONAL | Generic result.Result[T] type              |
-| Context System           | ✅ FULLY_FUNCTIONAL | Context propagation throughout             |
-| Type-Safe Enums          | ✅ FULLY_FUNCTIONAL | 8+ enum types with macro framework         |
-| Validation Middleware    | ✅ FULLY_FUNCTIONAL | Comprehensive validation rules             |
-| CLI Commands             | ✅ FULLY_FUNCTIONAL | 6/6: clean, scan, init, profile, config, git-history |
-| Enum Macro Framework     | ✅ FULLY_FUNCTIONAL | Reduces 40+ lines to ~10 per enum          |
-| Parallel Execution       | ✅ FULLY_FUNCTIONAL | Concurrent cleaner execution               |
-| Metrics Collection       | ✅ FULLY_FUNCTIONAL | Observability and performance tracking     |
-| AgeBasedCleaner          | ✅ FULLY_FUNCTIONAL | Interface for age-based filtering          |
+| Pattern               | Status              | Details                                              |
+| --------------------- | ------------------- | ---------------------------------------------------- |
+| Registry Pattern      | ✅ FULLY_FUNCTIONAL | Clean registry for all cleaners                      |
+| Result Type           | ✅ FULLY_FUNCTIONAL | Generic result.Result[T] type                        |
+| Context System        | ✅ FULLY_FUNCTIONAL | Context propagation throughout                       |
+| Type-Safe Enums       | ✅ FULLY_FUNCTIONAL | 8+ enum types with macro framework                   |
+| Validation Middleware | ✅ FULLY_FUNCTIONAL | Comprehensive validation rules                       |
+| CLI Commands          | ✅ FULLY_FUNCTIONAL | 6/6: clean, scan, init, profile, config, git-history |
+| Enum Macro Framework  | ✅ FULLY_FUNCTIONAL | Reduces 40+ lines to ~10 per enum                    |
+| Parallel Execution    | ✅ FULLY_FUNCTIONAL | Concurrent cleaner execution                         |
+| Metrics Collection    | ✅ FULLY_FUNCTIONAL | Observability and performance tracking               |
+| AgeBasedCleaner       | ✅ FULLY_FUNCTIONAL | Interface for age-based filtering                    |
 
 ### 8. Testing Infrastructure ✅
 
@@ -165,11 +166,13 @@ Features:
 **Status:** Framework exists, migration not started
 
 **Files:**
+
 - `internal/domain/enum_macros.go` - ✅ Complete (101 lines)
 - `internal/domain/enum_macros_test.go` - ✅ Complete
 - Migration of existing enums - ⏳ Not Started
 
 **What Would Change:**
+
 ```go
 // Before: ~40 lines per enum (String, IsValid, Values, MarshalYAML, UnmarshalYAML)
 // After: ~10 lines using macros
@@ -179,6 +182,7 @@ func (r RiskLevelType) IsValid() bool  { return EnumIsValid(r, RiskLevelCritical
 ```
 
 **Why Not Done:**
+
 - Existing enums work correctly
 - Migration is cosmetic (reduces boilerplate)
 - Risk of introducing bugs for limited benefit
@@ -193,6 +197,7 @@ func (r RiskLevelType) IsValid() bool  { return EnumIsValid(r, RiskLevelCritical
 **Status:** Interface defined, no implementations yet
 
 Cleaners with `olderThan` field that should implement `AgeBasedCleaner`:
+
 - `BuildCacheCleaner` - Has `olderThan time.Duration`
 - `SystemCacheCleaner` - Has `olderThan time.Duration`
 - `TempFilesCleaner` - Has `olderThan time.Duration`
@@ -235,6 +240,7 @@ VersionManagerRbenv, VersionManagerSDKMAN, VersionManagerJenv
 **Status:** Not started
 
 **Effort:** 4 hours
+
 - Cobra supports completions
 - Need to define completion logic for all commands
 
@@ -243,6 +249,7 @@ VersionManagerRbenv, VersionManagerSDKMAN, VersionManagerJenv
 **Status:** Not started
 
 **Effort:** 4 hours
+
 - Generate from cobra commands
 - Add to documentation
 
@@ -254,13 +261,13 @@ VersionManagerRbenv, VersionManagerSDKMAN, VersionManagerJenv
 
 ### Previous Critical Issues - NOW FIXED ✅
 
-| Issue                        | Status      | Resolution                                        |
-| ---------------------------- | ----------- | ------------------------------------------------- |
-| Dual logging systems         | ✅ FIXED    | Migrated to charmbracelet/log                     |
-| Build failures               | ✅ FIXED    | All builds pass                                   |
-| Test compilation             | ✅ FIXED    | All tests compile                                 |
-| Go cache macOS detection     | ✅ FIXED    | Uses os.TempDir(), comprehensive tests added      |
-| Uncommitted changes          | ✅ FIXED    | All changes committed                             |
+| Issue                    | Status   | Resolution                                   |
+| ------------------------ | -------- | -------------------------------------------- |
+| Dual logging systems     | ✅ FIXED | Migrated to charmbracelet/log                |
+| Build failures           | ✅ FIXED | All builds pass                              |
+| Test compilation         | ✅ FIXED | All tests compile                            |
+| Go cache macOS detection | ✅ FIXED | Uses os.TempDir(), comprehensive tests added |
+| Uncommitted changes      | ✅ FIXED | All changes committed                        |
 
 ---
 
@@ -280,13 +287,14 @@ VersionManagerRbenv, VersionManagerSDKMAN, VersionManagerJenv
 
 **Inconsistencies:**
 
-| Issue                    | Count | Severity | Action                        |
-| ------------------------ | ----- | -------- | ----------------------------- |
-| gopls unusedparams       | 45    | Info     | Cosmetic, can ignore          |
-| File size >350 lines     | 14    | Warning  | Consider splitting            |
-| errors.As simplification | 1     | Hint     | Optional optimization         |
+| Issue                    | Count | Severity | Action                |
+| ------------------------ | ----- | -------- | --------------------- |
+| gopls unusedparams       | 45    | Info     | Cosmetic, can ignore  |
+| File size >350 lines     | 14    | Warning  | Consider splitting    |
+| errors.As simplification | 1     | Hint     | Optional optimization |
 
 **Recommendation:**
+
 - unusedparams: Info-level warnings, don't affect functionality
 - File sizes: Split only if files become hard to navigate
 - errors.As: Nice-to-have, not critical
@@ -295,34 +303,35 @@ VersionManagerRbenv, VersionManagerSDKMAN, VersionManagerJenv
 
 14 files exceed 350-line limit:
 
-| File                                              | Lines | Over |
-| ------------------------------------------------- | ----- | ---- |
-| `internal/cleaner/compiledbinaries.go`            | 599   | +249 |
-| `internal/domain/type_safe_enums.go`              | 539   | +189 |
-| `internal/cleaner/nodepackages.go`                 | 524   | +174 |
-| `internal/cleaner/docker.go`                      | 524   | +174 |
-| `internal/domain/config_methods.go`               | 473   | +123 |
-| `internal/cleaner/systemcache.go`                 | 428   | +78  |
-| `internal/cleaner/githistory_executor.go`         | 428   | +78  |
-| `internal/cleaner/githistory.go`                  | 417   | +67  |
-| `internal/cleaner/githistory_scanner.go`          | 417   | +67  |
-| `internal/conversions/conversions.go`             | 399   | +49  |
-| `internal/config/config.go`                       | 394   | +44  |
-| `internal/cleaner/projectexecutables.go`          | 385   | +35  |
-| `internal/domain/execution_enums.go`              | 377   | +27  |
-| `internal/domain/operation_settings.go`           | 353   | +3   |
+| File                                      | Lines | Over |
+| ----------------------------------------- | ----- | ---- |
+| `internal/cleaner/compiledbinaries.go`    | 599   | +249 |
+| `internal/domain/type_safe_enums.go`      | 539   | +189 |
+| `internal/cleaner/nodepackages.go`        | 524   | +174 |
+| `internal/cleaner/docker.go`              | 524   | +174 |
+| `internal/domain/config_methods.go`       | 473   | +123 |
+| `internal/cleaner/systemcache.go`         | 428   | +78  |
+| `internal/cleaner/githistory_executor.go` | 428   | +78  |
+| `internal/cleaner/githistory.go`          | 417   | +67  |
+| `internal/cleaner/githistory_scanner.go`  | 417   | +67  |
+| `internal/conversions/conversions.go`     | 399   | +49  |
+| `internal/config/config.go`               | 394   | +44  |
+| `internal/cleaner/projectexecutables.go`  | 385   | +35  |
+| `internal/domain/execution_enums.go`      | 377   | +27  |
+| `internal/domain/operation_settings.go`   | 353   | +3   |
 
 **Recommendation:**
+
 - Focus on files >400 lines for splitting
 - Low priority - doesn't affect functionality
 
 ### 4. Performance Gaps
 
-| Issue                      | Status  | Impact  | Solution                         |
-| -------------------------- | ------- | ------- | -------------------------------- |
-| Cleaners run sequentially    | ✅ FIXED | High    | ParallelExecutor now available   |
-| No caching of scan results | ⏳       | Medium  | Add caching layer                |
-| Repeated os.Stat calls     | ⏳       | Low     | Cache file metadata              |
+| Issue                      | Status   | Impact | Solution                       |
+| -------------------------- | -------- | ------ | ------------------------------ |
+| Cleaners run sequentially  | ✅ FIXED | High   | ParallelExecutor now available |
+| No caching of scan results | ⏳       | Medium | Add caching layer              |
+| Repeated os.Stat calls     | ⏳       | Low    | Cache file metadata            |
 
 **Recommendation:** Implement caching for scan results
 
@@ -332,55 +341,55 @@ VersionManagerRbenv, VersionManagerSDKMAN, VersionManagerJenv
 
 ### CRITICAL (Fix This Week)
 
-| #   | Task                                                 | Impact | Effort | Priority   |
-| --- | ---------------------------------------------------- | ------ | ------ | ---------- |
+| #   | Task                                               | Impact | Effort | Priority   |
+| --- | -------------------------------------------------- | ------ | ------ | ---------- |
 | 1   | **Implement AgeBasedCleaner on existing cleaners** | Medium | 4h     | ⭐⭐⭐⭐⭐ |
-|     | - BuildCacheCleaner, SystemCacheCleaner, etc.        |        |        |            |
-| 2   | **Add caching for scan results**                     | High   | 6h     | ⭐⭐⭐⭐⭐ |
-|     | - Cache file metadata, invalidate on changes         |        |        |            |
+|     | - BuildCacheCleaner, SystemCacheCleaner, etc.      |        |        |            |
+| 2   | **Add caching for scan results**                   | High   | 6h     | ⭐⭐⭐⭐⭐ |
+|     | - Cache file metadata, invalidate on changes       |        |        |            |
 
 ### HIGH PRIORITY (This Week)
 
 | #   | Task                                   | Impact | Effort | Priority |
 | --- | -------------------------------------- | ------ | ------ | -------- |
-| 3   | Migrate enums to use macro framework   | Medium | 8h     | ⭐⭐⭐⭐   |
-|     | - Start with most-used enums             |        |        |          |
-| 4   | Implement remaining BuildToolType      | Low    | 6h     | ⭐⭐⭐    |
-|     | - Go, Rust, Node, Python support         |        |        |          |
-| 5   | Implement remaining VersionManagerType | Low    | 4h     | ⭐⭐⭐    |
-|     | - GVM, SDKMAN, Jenv (if safe)           |        |        |          |
+| 3   | Migrate enums to use macro framework   | Medium | 8h     | ⭐⭐⭐⭐ |
+|     | - Start with most-used enums           |        |        |          |
+| 4   | Implement remaining BuildToolType      | Low    | 6h     | ⭐⭐⭐   |
+|     | - Go, Rust, Node, Python support       |        |        |          |
+| 5   | Implement remaining VersionManagerType | Low    | 4h     | ⭐⭐⭐   |
+|     | - GVM, SDKMAN, Jenv (if safe)          |        |        |          |
 
 ### MEDIUM PRIORITY (Next 2 Weeks)
 
-| #   | Task                                     | Impact | Effort | Priority |
-| --- | ---------------------------------------- | ------ | ------ | -------- |
-| 6   | Fix file size violations (>400 lines)    | Low    | 10h    | ⭐⭐     |
-|     | - Split largest files first               |        |        |          |
-| 7   | Add shell completions                      | Low    | 4h     | ⭐⭐     |
-| 8   | Add man pages                            | Low    | 4h     | ⭐⭐     |
-| 9   | Add performance timing hooks             | Low    | 3h     | ⭐⭐     |
-| 10  | Improve Nix hardcoded size estimates     | Low    | 2h     | ⭐⭐     |
-| 11  | Fix gopls unusedparams (cosmetic)        | Low    | 2h     | ⭐      |
+| #   | Task                                  | Impact | Effort | Priority |
+| --- | ------------------------------------- | ------ | ------ | -------- |
+| 6   | Fix file size violations (>400 lines) | Low    | 10h    | ⭐⭐     |
+|     | - Split largest files first           |        |        |          |
+| 7   | Add shell completions                 | Low    | 4h     | ⭐⭐     |
+| 8   | Add man pages                         | Low    | 4h     | ⭐⭐     |
+| 9   | Add performance timing hooks          | Low    | 3h     | ⭐⭐     |
+| 10  | Improve Nix hardcoded size estimates  | Low    | 2h     | ⭐⭐     |
+| 11  | Fix gopls unusedparams (cosmetic)     | Low    | 2h     | ⭐       |
 
 ### LOWER PRIORITY (Backlog)
 
-| #   | Task                                     | Impact | Effort | Priority |
-| --- | ---------------------------------------- | ------ | ------ | -------- |
-| 12  | Improve Homebrew dry-run support         | Low    | 3h     | ⭐      |
-|     | - Limited by Homebrew itself              |        |        |          |
-| 13  | Create ProgressReporter abstraction      | Medium | 4h     | ⭐      |
-| 14  | Add tracing for long operations        | Low    | 4h     | ⭐      |
-| 15  | Unify error wrapping styles              | Low    | 4h     | ⭐      |
-| 16  | Implement verbose log levels           | Low    | 2h     | ⭐      |
-| 17  | Add user feedback mechanism            | Low    | 4h     | ⭐      |
-| 18  | Implement SizeEstimator strategy       | Low    | 6h     | ⭐      |
-| 19  | Add config profiles beyond risk        | Low    | 6h     | ⭐      |
-| 20  | Evaluate samber/mo for Result[T]       | Low    | 4h     | ⭐      |
-| 21  | Add plugin architecture                | Low    | 20h    | ⭐      |
-| 22  | Consider WASM build target               | Low    | 8h     | ⭐      |
-| 23  | Add benchmark regression tests         | Low    | 4h     | ⭐      |
-| 24  | Create integration test suite          | Medium | 10h    | ⭐      |
-| 25  | Add GitHub Actions CI/CD               | Low    | 4h     | ⭐      |
+| #   | Task                                | Impact | Effort | Priority |
+| --- | ----------------------------------- | ------ | ------ | -------- |
+| 12  | Improve Homebrew dry-run support    | Low    | 3h     | ⭐       |
+|     | - Limited by Homebrew itself        |        |        |          |
+| 13  | Create ProgressReporter abstraction | Medium | 4h     | ⭐       |
+| 14  | Add tracing for long operations     | Low    | 4h     | ⭐       |
+| 15  | Unify error wrapping styles         | Low    | 4h     | ⭐       |
+| 16  | Implement verbose log levels        | Low    | 2h     | ⭐       |
+| 17  | Add user feedback mechanism         | Low    | 4h     | ⭐       |
+| 18  | Implement SizeEstimator strategy    | Low    | 6h     | ⭐       |
+| 19  | Add config profiles beyond risk     | Low    | 6h     | ⭐       |
+| 20  | Evaluate samber/mo for Result[T]    | Low    | 4h     | ⭐       |
+| 21  | Add plugin architecture             | Low    | 20h    | ⭐       |
+| 22  | Consider WASM build target          | Low    | 8h     | ⭐       |
+| 23  | Add benchmark regression tests      | Low    | 4h     | ⭐       |
+| 24  | Create integration test suite       | Medium | 10h    | ⭐       |
+| 25  | Add GitHub Actions CI/CD            | Low    | 4h     | ⭐       |
 
 ---
 
@@ -391,6 +400,7 @@ VersionManagerRbenv, VersionManagerSDKMAN, VersionManagerJenv
 **Question:** What is the RIGHT balance for testing in this project?
 
 **Current State:**
+
 - 271 test functions
 - 55 test files
 - Tests compile and pass
@@ -430,6 +440,7 @@ VersionManagerRbenv, VersionManagerSDKMAN, VersionManagerJenv
 **Why This Matters:**
 
 Testing strategy affects:
+
 - Development velocity (slow tests = slow feedback)
 - CI reliability (flaky tests = ignored failures)
 - Refactoring confidence (good tests = safe changes)
@@ -438,6 +449,7 @@ Testing strategy affects:
 **My Recommendation:**
 
 Maintain current mix but add:
+
 - Coverage reporting (target: 70-80%)
 - Integration test suite (run nightly, not on every PR)
 - Property-based tests for validation logic
@@ -463,28 +475,28 @@ But I need YOUR decision on priorities.
 
 ### Dependencies
 
-| Library            | Version | Purpose          | Status |
-| ------------------ | ------- | ---------------- | ------ |
-| charmbracelet/log  | v1.0.0  | Logging          | ✅     |
-| cobra              | v1.10.2 | CLI              | ✅     |
-| viper              | v1.21.0 | Config           | ✅     |
-| bubbletea          | v1.3.10 | TUI              | ✅     |
-| huh                | v1.0.0  | Forms            | ✅     |
-| lipgloss           | v1.1.0  | Styling          | ✅     |
-| testify            | v1.11.1 | Testing          | ✅     |
-| ginkgo             | v2.28.1 | BDD Testing      | ✅     |
-| gomega             | v1.39.1 | Assertions       | ✅     |
+| Library           | Version | Purpose     | Status |
+| ----------------- | ------- | ----------- | ------ |
+| charmbracelet/log | v1.0.0  | Logging     | ✅     |
+| cobra             | v1.10.2 | CLI         | ✅     |
+| viper             | v1.21.0 | Config      | ✅     |
+| bubbletea         | v1.3.10 | TUI         | ✅     |
+| huh               | v1.0.0  | Forms       | ✅     |
+| lipgloss          | v1.1.0  | Styling     | ✅     |
+| testify           | v1.11.1 | Testing     | ✅     |
+| ginkgo            | v2.28.1 | BDD Testing | ✅     |
+| gomega            | v1.39.1 | Assertions  | ✅     |
 
 ### Test Coverage
 
-| Package                | Tests | Status       |
-| ---------------------- | ----- | ------------ |
-| internal/cleaner       | 271+  | ✅ EXTENSIVE |
-| internal/config        | 50+   | ✅ GOOD      |
-| internal/domain        | 30+   | ✅ GOOD      |
-| internal/result        | 20+   | ✅ GOOD      |
-| internal/cleaner/parallel | 0    | 📝 NEW       |
-| internal/cleaner/metrics | 0     | 📝 NEW       |
+| Package                   | Tests | Status       |
+| ------------------------- | ----- | ------------ |
+| internal/cleaner          | 271+  | ✅ EXTENSIVE |
+| internal/config           | 50+   | ✅ GOOD      |
+| internal/domain           | 30+   | ✅ GOOD      |
+| internal/result           | 20+   | ✅ GOOD      |
+| internal/cleaner/parallel | 0     | 📝 NEW       |
+| internal/cleaner/metrics  | 0     | 📝 NEW       |
 
 **Note:** New files (parallel.go, metrics.go) need tests added.
 
