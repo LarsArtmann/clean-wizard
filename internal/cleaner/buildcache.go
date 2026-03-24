@@ -92,7 +92,7 @@ func (bcc *BuildCacheCleaner) ValidateSettings(settings *domain.OperationSetting
 
 // Scan scans for build tool caches.
 func (bcc *BuildCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	return scanWithIterator[JVMBuildToolType](
+	return scanWithIterator(
 		ctx,
 		bcc.toolTypes,
 		bcc.scanBuildTool,
@@ -151,7 +151,7 @@ func (bcc *BuildCacheCleaner) scanBuildTool(
 
 // Clean removes build tool caches.
 func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
-	return cleanWithIterator[JVMBuildToolType](
+	return cleanWithIterator(
 		ctx,
 		"build cache cleaner",
 		bcc.IsAvailable,
