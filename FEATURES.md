@@ -401,6 +401,9 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **Middleware**           | ✅ FULLY_FUNCTIONAL  | Validation middleware                      |
 | **Type-Safe Enums**      | ✅ FULLY_FUNCTIONAL  | Compile-time enum safety                   |
 | **Dependency Injection** | 🔧 NEEDS_IMPROVEMENT | Some hardcoded dependencies                |
+| **AgeBasedCleaner**      | ✅ FULLY_FUNCTIONAL  | Interface for age-based filtering          |
+| **Parallel Execution**   | ✅ FULLY_FUNCTIONAL  | Concurrent cleaner execution               |
+| **Metrics Collection**   | ✅ FULLY_FUNCTIONAL  | Observability and performance tracking     |
 
 ---
 
@@ -416,9 +419,8 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
    - Depends on tool most users won't have
    - Effectively non-functional
 
-3. **Most CLI commands not implemented** 🚧
-   - Only `clean` works
-   - `scan`, `init`, `profile`, `config` documented but missing
+3. ~~**Most CLI commands not implemented**~~ ✅ FIXED
+   - All 6 commands fully implemented: `clean`, `scan`, `init`, `profile`, `config`, `git-history`
 
 ### Minor Issues
 
