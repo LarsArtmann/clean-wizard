@@ -73,6 +73,7 @@ func (pe *ParallelExecutor) Execute(
 
 	// Use semaphore pattern for concurrency control
 	semaphore := make(chan struct{}, maxConcurrency)
+
 	var wg sync.WaitGroup
 
 	for i, c := range cleaners {

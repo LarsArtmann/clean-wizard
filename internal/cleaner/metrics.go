@@ -149,6 +149,7 @@ func (mc *MetricsCollector) Reset() {
 // TrackedCleaner wraps a cleaner with metrics collection.
 type TrackedCleaner struct {
 	Cleaner
+
 	collector *MetricsCollector
 }
 
@@ -162,15 +163,15 @@ func NewTrackedCleaner(c Cleaner, collector *MetricsCollector) *TrackedCleaner {
 
 // Clean executes the cleaner and records metrics.
 func (tc *TrackedCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
-	start := tc.collector.RecordStart(tc.Cleaner.Name())
+	start := tc.collector.RecordStart(tc.Name())
 	res := tc.Cleaner.Clean(ctx)
 
 	if res.IsOk() {
 		result, _ := res.Unwrap()
-		tc.collector.RecordSuccess(tc.Cleaner.Name(), start, result)
+		tc.collector.RecordSuccess(tc.Name(), start, result)
 	} else {
 		_, err := res.Unwrap()
-		tc.collector.RecordFailure(tc.Cleaner.Name(), start, err)
+		tc.collector.RecordFailure(tc.Name(), start, err)
 	}
 
 	return res
@@ -179,6 +180,7 @@ func (tc *TrackedCleaner) Clean(ctx context.Context) result.Result[domain.CleanR
 // MetricsEnabledRegistry extends Registry with metrics collection.
 type MetricsEnabledRegistry struct {
 	*Registry
+
 	collector *MetricsCollector
 }
 

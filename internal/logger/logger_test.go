@@ -324,14 +324,6 @@ func TestLogMessageContent(t *testing.T) {
 	}
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-
-	return b
-}
-
 // TestCharmbraceletIntegration verifies integration with charmbracelet/log.
 func TestCharmbraceletIntegration(t *testing.T) {
 	Init(true)
