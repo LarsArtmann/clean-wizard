@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"context"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -33,4 +34,20 @@ type NixStoreSizer interface {
 	// GetStoreSize returns the size of the Nix store in bytes.
 	// Returns 0 if Nix is not available.
 	GetStoreSize(ctx context.Context) int64
+}
+
+// AgeBasedCleaner extends Cleaner with age-based filtering capabilities.
+// Cleaners that implement this interface can filter items by age during cleanup.
+type AgeBasedCleaner interface {
+	Cleaner
+
+	// SetMaxAge sets the maximum age for items to be considered for cleanup.
+	// Items older than this duration will be cleaned.
+	SetMaxAge(duration time.Duration)
+
+	// GetMaxAge returns the current maximum age setting.
+	GetMaxAge() time.Duration
+
+	// SupportsAgeFiltering returns true if this cleaner supports age-based filtering.
+	SupportsAgeFiltering() bool
 }

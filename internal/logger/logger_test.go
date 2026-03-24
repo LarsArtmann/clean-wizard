@@ -204,18 +204,18 @@ func TestCleanerLoggerIntegration(t *testing.T) {
 	}
 }
 
-// BenchmarkLogging benchmarks the logging performance
+// BenchmarkLogging benchmarks the logging performance.
 func BenchmarkLogging(b *testing.B) {
 	Init(false) // Production mode for benchmarking
 
 	b.Run("info", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
+		for i := range b.N {
 			Info("benchmark message", "iteration", i)
 		}
 	})
 
 	b.Run("info_with_fields", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
+		for i := range b.N {
 			Info("benchmark message",
 				"iteration", i,
 				"cleaner", "docker",
@@ -225,7 +225,7 @@ func BenchmarkLogging(b *testing.B) {
 	})
 }
 
-// TestLoggingOutput verifies that logs are written
+// TestLoggingOutput verifies that logs are written.
 func TestLoggingOutput(t *testing.T) {
 	// This is a basic smoke test to ensure logging doesn't panic
 	// In a real scenario, you'd capture stdout and verify output
@@ -241,7 +241,7 @@ func TestLoggingOutput(t *testing.T) {
 	assert.True(t, true)
 }
 
-// TestPrefix verifies prefix functionality
+// TestPrefix verifies prefix functionality.
 func TestPrefix(t *testing.T) {
 	Init(true)
 
@@ -255,7 +255,7 @@ func TestPrefix(t *testing.T) {
 	})
 }
 
-// TestLevelValidation tests that invalid levels are handled gracefully
+// TestLevelValidation tests that invalid levels are handled gracefully.
 func TestLevelValidation(t *testing.T) {
 	Init(true)
 
@@ -268,10 +268,11 @@ func TestLevelValidation(t *testing.T) {
 	Info("should still work")
 }
 
-// TestNilLoggerSafety tests that functions handle nil logger gracefully
+// TestNilLoggerSafety tests that functions handle nil logger gracefully.
 func TestNilLoggerSafety(t *testing.T) {
 	// Save original logger
 	originalL := L
+
 	defer func() { L = originalL }()
 
 	// Set to nil
@@ -287,7 +288,7 @@ func TestNilLoggerSafety(t *testing.T) {
 	assert.NotPanics(t, func() { CleanerLogger("test") })
 }
 
-// TestDevelopmentVsProduction tests different modes
+// TestDevelopmentVsProduction tests different modes.
 func TestDevelopmentVsProduction(t *testing.T) {
 	t.Run("development", func(t *testing.T) {
 		Init(true)
@@ -302,7 +303,7 @@ func TestDevelopmentVsProduction(t *testing.T) {
 	})
 }
 
-// TestLogMessageContent verifies log message content
+// TestLogMessageContent verifies log message content.
 func TestLogMessageContent(t *testing.T) {
 	Init(true)
 
@@ -327,10 +328,11 @@ func min(a, b int) int {
 	if a < b {
 		return a
 	}
+
 	return b
 }
 
-// TestCharmbraceletIntegration verifies integration with charmbracelet/log
+// TestCharmbraceletIntegration verifies integration with charmbracelet/log.
 func TestCharmbraceletIntegration(t *testing.T) {
 	Init(true)
 
@@ -345,7 +347,7 @@ func TestCharmbraceletIntegration(t *testing.T) {
 	assert.Equal(t, log.InfoLevel, L.GetLevel())
 }
 
-// TestSlogIntegration verifies slog integration
+// TestSlogIntegration verifies slog integration.
 func TestSlogIntegration(t *testing.T) {
 	Init(true)
 

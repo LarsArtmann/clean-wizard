@@ -34,7 +34,13 @@ func TestGoCacheCleaner_getGoBuildCacheLocations(t *testing.T) {
 			locations := cleaner.getGoBuildCacheLocations()
 
 			require.NotNil(t, locations)
-			assert.GreaterOrEqual(t, len(locations), tt.wantDirs, "should return at least %d locations", tt.wantDirs)
+			assert.GreaterOrEqual(
+				t,
+				len(locations),
+				tt.wantDirs,
+				"should return at least %d locations",
+				tt.wantDirs,
+			)
 
 			// Verify os.TempDir() is included
 			assert.Contains(t, locations, os.TempDir(), "should include os.TempDir()")
@@ -47,7 +53,12 @@ func TestGoCacheCleaner_getGoBuildCacheLocations(t *testing.T) {
 				homeDir := cleaner.helper.getHomeDir()
 				if homeDir != "" {
 					macosCache := filepath.Join(homeDir, "Library", "Caches")
-					assert.Contains(t, locations, macosCache, "on macOS, should include ~/Library/Caches")
+					assert.Contains(
+						t,
+						locations,
+						macosCache,
+						"on macOS, should include ~/Library/Caches",
+					)
 				}
 			}
 		})

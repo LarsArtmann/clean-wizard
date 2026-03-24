@@ -70,6 +70,7 @@ func Init(development bool) {
 // Valid levels: debug, info, warn, error, fatal.
 func InitWithLevel(levelStr string, development bool) {
 	level := log.InfoLevel
+
 	switch levelStr {
 	case "debug":
 		level = log.DebugLevel
@@ -147,6 +148,7 @@ func With(keyvals ...any) *log.Logger {
 	if L != nil {
 		return L.With(keyvals...)
 	}
+
 	return nil
 }
 
@@ -164,6 +166,7 @@ func CleanerLogger(name string) *log.Logger {
 	if L != nil {
 		return WithPrefix("cleaner").With("cleaner_name", name)
 	}
+
 	return nil
 }
 
