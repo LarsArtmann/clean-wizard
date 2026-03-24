@@ -1,36 +1,37 @@
-> 🚨 **PROJECT ORIGIN**
->
-> This project originated from: [Setup-Mac](https://github.com/LarsArtmann/Setup-Mac)
->
-> **GitHub Issue:** [Setup-Mac #111](https://github.com/LarsArtmann/Setup-Mac/issues/111)
-
 # Clean Wizard
+
+**A comprehensive system cleanup tool for macOS that safely removes old caches, temporary files, and unused data across 12 different cleanup targets — from Nix generations to Homebrew, Docker containers to Go build caches.**
 
 [![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-200%2B-green.svg)](https://github.com/LarsArtmann/clean-wizard/actions)
 
-**A comprehensive system cleanup tool for macOS with type-safe architecture and interactive TUI.**
+### Key Features
 
-Clean Wizard cleans old caches, temporary files, and unused data across 11 different cleanup targets — from Nix generations to Homebrew, Docker containers to Go build caches, npm packages to language version managers.
+- **Interactive TUI** — Beautiful multi-select interface powered by Charm Bracelet
+- **12 Specialized Cleaners** — Nix, Homebrew, Docker, Cargo, Go, Node, Build Caches, System Caches, Temp Files, Project Automation, Executables, Compiled Binaries
+- **Dry-Run Mode** — Preview what would be cleaned before making any changes
+- **Type-Safe Architecture** — Compile-time safety with Go enums and interfaces
+- **Safety First** — Confirmation dialogs, protected generations, availability detection
 
 ## ✨ Features
 
-### 11 Specialized Cleaners
+### 12 Specialized Cleaners
 
-| Cleaner         | Target                              | Status              |
-| --------------- | ----------------------------------- | ------------------- |
-| **Nix**         | Nix store and generations           | ✅ Production Ready |
-| **Homebrew**    | Homebrew cache and autoremove       | ✅ Production Ready |
-| **Docker**      | Containers, images, volumes, builds | ✅ Production Ready |
-| **Cargo**       | Rust Cargo cache and registries     | ✅ Production Ready |
-| **Go**          | Go module, test, and build cache    | ✅ Production Ready |
-| **Node**        | npm, pnpm, yarn, bun package caches | ✅ Production Ready |
-| **BuildCache**  | Gradle, Maven, SBT build caches     | ✅ Production Ready |
-| **SystemCache** | macOS Spotlight, Xcode, CocoaPods   | ✅ Production Ready |
-| **TempFiles**   | Age-based temporary files           | ✅ Production Ready |
-| **LangVersion** | ~~NVM, Pyenv, Rbenv~~               | ❌ Removed          |
-| **Projects**    | Project automation                  | ⚠️ Deprecated       |
+| Cleaner              | Target                              | Status              |
+| -------------------- | ----------------------------------- | ------------------- |
+| **Nix**              | Nix store and generations           | ✅ Production Ready |
+| **Homebrew**         | Homebrew cache and autoremove       | ✅ Production Ready |
+| **Docker**           | Containers, images, volumes, builds | ✅ Production Ready |
+| **Cargo**            | Rust Cargo cache and registries     | ✅ Production Ready |
+| **Go**               | Go module, test, and build cache    | ✅ Production Ready |
+| **Node**             | npm, pnpm, yarn, bun package caches | ✅ Production Ready |
+| **BuildCache**       | Gradle, Maven, SBT build caches     | ✅ Production Ready |
+| **SystemCache**      | macOS Spotlight, Xcode, CocoaPods   | ✅ Production Ready |
+| **TempFiles**        | Age-based temporary files           | ✅ Production Ready |
+| **Projects**         | Project automation                  | ⚠️ Deprecated       |
+| **ProjectExec**      | Old shell scripts in ~/projects     | ✅ Production Ready |
+| **CompiledBinaries** | Large compiled binaries             | ✅ Production Ready |
 
 ### Preset Modes
 
@@ -669,6 +670,14 @@ git push origin feature/new-cleaner
 ## 📜 License
 
 MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+### Project Origin
+
+This project originated from: [Setup-Mac](https://github.com/LarsArtmann/Setup-Mac)
+
+**GitHub Issue:** [Setup-Mac #111](https://github.com/LarsArtmann/Setup-Mac/issues/111)
 
 ---
 

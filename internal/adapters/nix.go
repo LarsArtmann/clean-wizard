@@ -201,7 +201,7 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 // In dry-run mode, returns a success result without actually deleting.
 func (n *NixAdapter) RemoveGeneration(
 	ctx context.Context,
-	genID int,
+	genID domain.NixGenerationID,
 ) result.Result[domain.CleanResult] {
 	// In dry-run mode, return success without actually removing
 	if n.dryRun {
@@ -227,7 +227,7 @@ func (n *NixAdapter) RemoveGeneration(
 	}
 
 	// Remove the specific generation
-	cmd := n.execWithTimeout(ctx, "nix-env", "--delete-generations", strconv.Itoa(genID))
+	cmd := n.execWithTimeout(ctx, "nix-env", "--delete-generations", strconv.Itoa(int(genID)))
 
 	err = cmd.Run()
 	if err != nil {
@@ -298,7 +298,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 	isCurrent := strings.Contains(line, "current")
 
 	return domain.NixGeneration{
-		ID:      id,
+		ID:      domain.NixGenerationID(id),
 		Path:    path,
 		Date:    date,
 		Current: boolToGenerationStatus(isCurrent),

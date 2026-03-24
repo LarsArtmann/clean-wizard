@@ -28,6 +28,7 @@ func TestEnumString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := EnumString(tt.val, strings)
 			assert.Equal(t, tt.expected, result)
 		})
@@ -53,6 +54,7 @@ func TestEnumIsValid(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := EnumIsValid(tt.val, tt.maxVal)
 			assert.Equal(t, tt.expected, result)
 		})
@@ -82,7 +84,9 @@ func TestEnumUnmarshalJSON(t *testing.T) {
 
 	t.Run("valid lowercase", func(t *testing.T) {
 		t.Parallel()
+
 		var val int
+
 		err := EnumUnmarshalJSON([]byte(`"medium"`), &val, strings, "test")
 		require.NoError(t, err)
 		assert.Equal(t, 1, val)
@@ -90,7 +94,9 @@ func TestEnumUnmarshalJSON(t *testing.T) {
 
 	t.Run("valid uppercase", func(t *testing.T) {
 		t.Parallel()
+
 		var val int
+
 		err := EnumUnmarshalJSON([]byte(`"HIGH"`), &val, strings, "test")
 		require.NoError(t, err)
 		assert.Equal(t, 2, val)
@@ -98,7 +104,9 @@ func TestEnumUnmarshalJSON(t *testing.T) {
 
 	t.Run("invalid value", func(t *testing.T) {
 		t.Parallel()
+
 		var val int
+
 		err := EnumUnmarshalJSON([]byte(`"INVALID"`), &val, strings, "test")
 		assert.Error(t, err)
 	})
@@ -120,8 +128,11 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 
 	t.Run("valid lowercase", func(t *testing.T) {
 		t.Parallel()
+
 		node := &yaml.Node{Kind: yaml.ScalarNode, Value: "medium"}
+
 		var val int
+
 		err := EnumUnmarshalYAML(node, &val, strings, "test")
 		require.NoError(t, err)
 		assert.Equal(t, 1, val)
@@ -129,8 +140,11 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 
 	t.Run("invalid value", func(t *testing.T) {
 		t.Parallel()
+
 		node := &yaml.Node{Kind: yaml.ScalarNode, Value: "INVALID"}
+
 		var val int
+
 		err := EnumUnmarshalYAML(node, &val, strings, "test")
 		assert.Error(t, err)
 	})
@@ -147,7 +161,7 @@ func TestEnumValueMaps(t *testing.T) {
 	assert.NotEmpty(t, OperationTypeStrings)
 }
 
-// Example of using macros for a custom enum
+// Example of using macros for a custom enum.
 type testEnum int
 
 const (
@@ -158,12 +172,13 @@ const (
 
 var testEnumStrings = []string{"A", "B", "C"}
 
-func (e testEnum) String() string { return EnumString(e, testEnumStrings) }
-func (e testEnum) IsValid() bool  { return EnumIsValid(e, testEnumC) }
+func (e testEnum) String() string     { return EnumString(e, testEnumStrings) }
+func (e testEnum) IsValid() bool      { return EnumIsValid(e, testEnumC) }
 func (e testEnum) Values() []testEnum { return EnumValues[testEnum](testEnumC) }
 func (e testEnum) MarshalJSON() ([]byte, error) {
 	return EnumMarshalJSON(e, testEnumStrings)
 }
+
 func (e *testEnum) UnmarshalJSON(data []byte) error {
 	return EnumUnmarshalJSON(data, (*int)(e), testEnumStrings, "testEnum")
 }
@@ -192,12 +207,14 @@ func TestCustomEnumWithMacros(t *testing.T) {
 
 	t.Run("JSON roundtrip", func(t *testing.T) {
 		t.Parallel()
+
 		original := testEnumB
 		data, err := json.Marshal(original)
 		require.NoError(t, err)
 		assert.Equal(t, `"B"`, string(data))
 
 		var decoded testEnum
+
 		err = json.Unmarshal(data, &decoded)
 		require.NoError(t, err)
 		assert.Equal(t, original, decoded)

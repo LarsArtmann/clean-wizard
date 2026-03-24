@@ -47,7 +47,7 @@ func FuzzNixGenerationCreation(f *testing.F) {
 		}
 
 		gen := NixGeneration{
-			ID:      len(data), // Convert string length to ID
+			ID:      NixGenerationID(len(data)), // Convert string length to ID
 			Path:    "/nix/store/" + data,
 			Date:    time.Time{},   // Zero value for fuzzing
 			Current: currentStatus, // Random current status

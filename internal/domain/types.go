@@ -27,9 +27,21 @@ var (
 	StrategyDryRun       = CleanStrategyType(StrategyDryRunType)
 )
 
+// Strong ID types for compile-time type safety on identifiers.
+type (
+	// NixGenerationID is a strong ID type for Nix generation identifiers.
+	NixGenerationID int
+
+	// DockerResourceID is a strong ID type for Docker resource identifiers.
+	DockerResourceID string
+
+	// ValidationValidID is a strong ID type for validation description identifiers.
+	ValidationValidID string
+)
+
 // NixGeneration represents Nix store generation.
 type NixGeneration struct {
-	ID      int              `json:"id"`
+	ID      NixGenerationID  `json:"id"`
 	Path    string           `json:"path"`
 	Date    time.Time        `json:"date"`
 	Current GenerationStatus `json:"current"`

@@ -118,6 +118,7 @@ func (gcc *GoCacheCleaner) scanGoBuildCache() []domain.ScanItem {
 			if seen[match] {
 				continue
 			}
+
 			seen[match] = true
 
 			items = append(items, domain.ScanItem{
@@ -285,6 +286,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(
 	buildCachePattern := "go-build*"
 	seen := make(map[string]bool) // Prevent cleaning same path twice
 	itemsRemoved := 0
+
 	var totalSizeEstimate domain.SizeEstimate
 
 	for _, tempDir := range gcc.getGoBuildCacheLocations() {
@@ -298,11 +300,14 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(
 			if seen[match] {
 				continue
 			}
+
 			seen[match] = true
 
 			// Calculate size before removal (always, for accurate dry-run estimates)
 			bytesFreed := GetDirSize(match)
-			totalSizeEstimate = domain.SizeEstimate{Known: totalSizeEstimate.Known + uint64(bytesFreed)}
+			totalSizeEstimate = domain.SizeEstimate{
+				Known: totalSizeEstimate.Known + uint64(bytesFreed),
+			}
 
 			if gcc.dryRun {
 				itemsRemoved++

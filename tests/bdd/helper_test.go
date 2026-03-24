@@ -19,7 +19,7 @@ func mockGenerations(count int) []domain.NixGeneration {
 			status = domain.GenerationStatusCurrent
 		}
 		gens[i] = domain.NixGeneration{
-			ID:      300 - i,
+			ID:      domain.NixGenerationID(300 - i),
 			Path:    fmt.Sprintf("/nix/var/nix/profiles/default-%d-link", 300-i),
 			Date:    time.Now().Add(-time.Duration(i*24) * time.Hour),
 			Current: status,

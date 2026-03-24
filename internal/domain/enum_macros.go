@@ -70,6 +70,7 @@ func EnumUnmarshalJSON[T ~int](
 	name string,
 ) error {
 	var s string
+
 	err := json.Unmarshal(data, &s)
 	if err != nil {
 		return fmt.Errorf("%s must be a string: %w", name, err)
@@ -100,6 +101,7 @@ func EnumUnmarshalYAML[T ~int](
 	name string,
 ) error {
 	var s string
+
 	err := value.Decode(&s)
 	if err != nil {
 		return fmt.Errorf("%s must be a string: %w", name, err)

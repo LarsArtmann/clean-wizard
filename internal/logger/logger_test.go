@@ -33,6 +33,7 @@ func TestInitWithLevel(t *testing.T) {
 func TestLoggerMethods(t *testing.T) {
 	// Initialize logger for testing
 	Init(true)
+
 	defer Sync()
 
 	// These should not panic even without actual output checking
@@ -59,6 +60,7 @@ func TestLoggerMethods(t *testing.T) {
 
 func TestWith(t *testing.T) {
 	Init(true)
+
 	defer Sync()
 
 	child := With(zap.String("context", "test"))
@@ -67,6 +69,7 @@ func TestWith(t *testing.T) {
 
 func TestNamed(t *testing.T) {
 	Init(true)
+
 	defer Sync()
 
 	named := Named("test-scope")
@@ -75,6 +78,7 @@ func TestNamed(t *testing.T) {
 
 func TestCleanerLogger(t *testing.T) {
 	Init(true)
+
 	defer Sync()
 
 	cleanerLog := CleanerLogger("docker")
@@ -124,6 +128,7 @@ func TestSyncWithNil(t *testing.T) {
 	// Should not panic even when L is nil
 	originalL := L
 	L = nil
+
 	defer func() { L = originalL }()
 
 	Sync() // Should not panic
@@ -135,6 +140,7 @@ func TestDebugWithNil(t *testing.T) {
 	// Should not panic even when L is nil
 	originalL := L
 	L = nil
+
 	defer func() { L = originalL }()
 
 	Debug("test message") // Should not panic

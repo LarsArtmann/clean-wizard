@@ -59,6 +59,7 @@ func Init(development bool) {
 	config.ErrorOutputPaths = []string{"stderr"}
 
 	var err error
+
 	L, err = config.Build(
 		zap.AddCallerSkip(1), // Skip this wrapper in caller info
 	)
@@ -72,7 +73,7 @@ func Init(development bool) {
 
 // InitWithLevel initializes the logger with a specific level.
 //
-// Valid levels: debug, info, warn, error, dpanic, panic, fatal
+// Valid levels: debug, info, warn, error, dpanic, panic, fatal.
 func InitWithLevel(level string, development bool) {
 	var config zap.Config
 
@@ -93,6 +94,7 @@ func InitWithLevel(level string, development bool) {
 	config.ErrorOutputPaths = []string{"stderr"}
 
 	var err error
+
 	L, err = config.Build(zap.AddCallerSkip(1))
 	if err != nil {
 		panic("failed to initialize logger: " + err.Error())
@@ -151,6 +153,7 @@ func With(fields ...zap.Field) *zap.Logger {
 	if L != nil {
 		return L.With(fields...)
 	}
+
 	return nil
 }
 
@@ -159,6 +162,7 @@ func Named(name string) *zap.Logger {
 	if L != nil {
 		return L.Named(name)
 	}
+
 	return nil
 }
 
@@ -195,10 +199,11 @@ func Bool(key string, val bool) zap.Field {
 }
 
 // Duration creates a duration field.
-func Duration(key string, val interface{}) zap.Field {
+func Duration(key string, val any) zap.Field {
 	if d, ok := val.(time.Duration); ok {
 		return zap.Duration(key, d)
 	}
+
 	return zap.String(key, "invalid duration")
 }
 

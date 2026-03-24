@@ -125,7 +125,7 @@ func (dc *DockerCleaner) scanDockerResources(
 	items := make([]domain.ScanItem, 0, len(ids))
 
 	for _, id := range ids {
-		dc.addScanItem(&items, id, resourceType, 0)
+		dc.addScanItem(&items, domain.DockerResourceID(id), resourceType, 0)
 	}
 
 	return items
@@ -134,7 +134,7 @@ func (dc *DockerCleaner) scanDockerResources(
 // addScanItem adds a single scan item to the items slice.
 func (dc *DockerCleaner) addScanItem(
 	items *[]domain.ScanItem,
-	id string,
+	id domain.DockerResourceID,
 	resourceType DockerResourceType,
 	size int64,
 ) {
@@ -268,7 +268,7 @@ func (dc *DockerCleaner) parseDockerResourceOutput(
 			size = dc.parseDockerSizeFromOutput(parts[1], resourceType)
 		}
 
-		dc.addScanItem(&items, id, resourceType, size)
+		dc.addScanItem(&items, domain.DockerResourceID(id), resourceType, size)
 	}
 
 	return items
@@ -393,7 +393,7 @@ func (dc *DockerCleaner) parseVolumeJSONOutput(output string) []domain.ScanItem 
 
 		volumeName := output[nameIdx : nameIdx+endIdx]
 		if volumeName != "" {
-			dc.addScanItem(&items, volumeName, dockerVolume, 0)
+			dc.addScanItem(&items, domain.DockerResourceID(volumeName), dockerVolume, 0)
 		}
 
 		idx = nameIdx + endIdx + 1
