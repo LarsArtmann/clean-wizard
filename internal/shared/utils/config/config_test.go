@@ -2,11 +2,11 @@ package config
 
 import (
 	"context"
-	"os"
+	"io"
 	"testing"
 
-	"github.com/charmbracelet/log"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/charmbracelet/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,7 +31,7 @@ func TestLoadConfigOrContinue_ContextCancel(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel() // Cancel immediately
 
-	logger := log.New(os.Discard)
+	logger := log.New(io.Discard)
 
 	_, err := LoadConfigOrContinue(ctx, logger)
 	assert.NoError(t, err, "Should return no error for graceful continuation")

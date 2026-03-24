@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/charmbracelet/log"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/charmbracelet/log"
 )
 
 // LoadConfigWithFallback loads configuration with proper error handling and user feedback
