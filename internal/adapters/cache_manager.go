@@ -53,9 +53,9 @@ func (cm *CacheManager) ItemCount() int {
 // CacheStats provides cache statistics.
 type CacheStats struct {
 	Items     int     `json:"items"`
-	HitCount  uint64  `json:"hit_count"`
-	MissCount uint64  `json:"miss_count"`
-	HitRate   float64 `json:"hit_rate"`
+	HitCount  uint64  `json:"hitCount"`
+	MissCount uint64  `json:"missCount"`
+	HitRate   float64 `json:"hitRate"`
 }
 
 // Stats returns cache performance statistics.

@@ -185,21 +185,21 @@ func (cfg *EnvironmentConfig) ValidateEnvironmentConfig() error {
 type EnvironmentConfigView struct {
 	Debug               bool          `json:"debug"`
 	Environment         string        `json:"environment"`
-	LogLevel            string        `json:"log_level"`
+	LogLevel            string        `json:"logLevel"`
 	Version             string        `json:"version"`
-	MaxConcurrency      int           `json:"max_concurrency"`
+	MaxConcurrency      int           `json:"maxConcurrency"`
 	Timeout             time.Duration `json:"timeout"`
-	RateLimitRPS        float64       `json:"rate_limit_rps"`
-	CacheEnabled        bool          `json:"cache_enabled"`
-	CacheTTL            time.Duration `json:"cache_ttl"`
-	HTTPTimeout         time.Duration `json:"http_timeout"`
-	NixPath             string        `json:"nix_path"`
-	MaxNixGenerations   int           `json:"max_nix_generations"`
-	SafeMode            bool          `json:"safe_mode"`
-	RequireConfirmation bool          `json:"require_confirmation"`
-	TempDir             string        `json:"temp_dir"`
-	ConfigFile          string        `json:"config_file"`
-	StateDirectory      string        `json:"state_directory"`
+	RateLimitRPS        float64       `json:"rateLimitRps"`
+	CacheEnabled        bool          `json:"cacheEnabled"`
+	CacheTTL            time.Duration `json:"cacheTtl"`
+	HTTPTimeout         time.Duration `json:"httpTimeout"`
+	NixPath             string        `json:"nixPath"`
+	MaxNixGenerations   int           `json:"maxNixGenerations"`
+	SafeMode            bool          `json:"safeMode"`
+	RequireConfirmation bool          `json:"requireConfirmation"`
+	TempDir             string        `json:"tempDir"`
+	ConfigFile          string        `json:"configFile"`
+	StateDirectory      string        `json:"stateDirectory"`
 }
 
 // ToView converts config to strongly-typed view for logging/debugging.
@@ -230,22 +230,22 @@ func (cfg *EnvironmentConfig) ToMap() map[string]any {
 	view := cfg.ToView()
 
 	return map[string]any{
-		"debug":                view.Debug,
-		"environment":          view.Environment,
-		"log_level":            view.LogLevel,
-		"version":              view.Version,
-		"max_concurrency":      view.MaxConcurrency,
-		"timeout":              view.Timeout.String(),
-		"rate_limit_rps":       view.RateLimitRPS,
-		"cache_enabled":        view.CacheEnabled,
-		"cache_ttl":            view.CacheTTL.String(),
-		"http_timeout":         view.HTTPTimeout.String(),
-		"nix_path":             view.NixPath,
-		"max_nix_generations":  view.MaxNixGenerations,
-		"safe_mode":            view.SafeMode,
-		"require_confirmation": view.RequireConfirmation,
-		"temp_dir":             view.TempDir,
-		"config_file":          view.ConfigFile,
-		"state_directory":      view.StateDirectory,
+		"debug":               view.Debug,
+		"environment":         view.Environment,
+		"logLevel":           view.LogLevel,
+		"version":            view.Version,
+		"maxConcurrency":     view.MaxConcurrency,
+		"timeout":            view.Timeout.String(),
+		"rateLimitRps":      view.RateLimitRPS,
+		"cacheEnabled":       view.CacheEnabled,
+		"cacheTtl":          view.CacheTTL.String(),
+		"httpTimeout":        view.HTTPTimeout.String(),
+		"nixPath":            view.NixPath,
+		"maxNixGenerations": view.MaxNixGenerations,
+		"safeMode":           view.SafeMode,
+		"requireConfirmation": view.RequireConfirmation,
+		"tempDir":            view.TempDir,
+		"configFile":         view.ConfigFile,
+		"stateDirectory":      view.StateDirectory,
 	}
 }

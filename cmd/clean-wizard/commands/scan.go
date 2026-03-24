@@ -262,8 +262,8 @@ func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
 	}
 
 	type scanJSONSummary struct {
-		TotalBytes uint64 `json:"total_bytes"`
-		TotalItems uint   `json:"total_items"`
+		TotalBytes uint64 `json:"totalBytes"`
+		TotalItems uint   `json:"totalItems"`
 	}
 
 	type scanJSONOutput struct {

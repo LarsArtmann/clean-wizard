@@ -142,7 +142,7 @@ func (hc *HTTPClient) Delete(ctx context.Context, url string) (*HTTPResponse, er
 
 // HTTPResponse wraps resty response.
 type HTTPResponse struct {
-	StatusCode int                 `json:"status_code"`
+	StatusCode int                 `json:"statusCode"`
 	Body       string              `json:"body"`
 	Headers    map[string][]string `json:"headers"`
 	Request    *resty.Request      `json:"request"`
