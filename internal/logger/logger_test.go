@@ -10,8 +10,6 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		name        string
 		development bool
@@ -36,8 +34,6 @@ func TestInit(t *testing.T) {
 }
 
 func TestInitWithLevel(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		name        string
 		level       string
