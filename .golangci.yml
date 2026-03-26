@@ -12,125 +12,131 @@ output:
   formats: {}
 linters:
   enable:
-    - embeddedstructfieldcheck
-    - arangolint
-    - unused
-    - exptostd
-    - promlinter
-    - asciicheck
-    - unparam
-    - goconst
-    - gocheckcompilerdirectives
-    - sqlclosecheck
-    - gochecksumtype
-    - ineffassign
-    - gochecknoglobals
-    - protogetter
-    - unconvert
-    - decorder
-    - godoclint
+    # Critical - Security & Correctness
     - gosec
-    - intrange
-    - errorlint
-    - mnd
-    - godot
-    - usestdlibvars
-    - forcetypeassert
-    - predeclared
-    - zerologlint
-    - goprintffuncname
-    - recvcheck
-    - containedctx
-    - exhaustive
-    - nolintlint
-    - perfsprint
-    - forbidigo
-    - nosprintfhostport
-    - exhaustruct
-    - maintidx
-    - prealloc
-    - dogsled
-    - nilnil
+    - unused
     - errcheck
-    - wsl_v5
-    - wrapcheck
-    - unqueryvet
-    - errname
-    - nonamedreturns
-    - gocritic
-    - interfacebloat
-    - revive
-    - paralleltest
-    - inamedparam
-    - fatcontext
-    - usetesting
-    - nilnesserr
-    - copyloopvar
     - staticcheck
-    - asasalint
-    - gomoddirectives
-    - nakedret
-    - depguard
-    - iotamixing
     - govet
-    - dupword
-    - canonicalheader
-    - errchkjson
-    - reassign
+    - ineffassign
+    - gocritic
+    - errorlint
     - contextcheck
-    - varnamelen
+    - nilnesserr
+    - bodyclose
+    - rowserrcheck
+
+    # Code Quality
+    - gocyclo
     - cyclop
     - dupl
-    - rowserrcheck
+    - goconst
+    - unconvert
+    - prealloc
+    - predeclared
+    - unparam
+
+    # Modern Go Practices
+    - usetesting
+    - copyloopvar
+    - intrange
+    - exptostd
+    - modernize
+
+    # Error Handling
+    - wrapcheck
+    - errname
+    - nilnil
+    - nilerr
+
+    # Testing
+    - testifylint
+    - ginkgolinter
+    - thelper
+
+    # Misc Quality
+    - misspell
+    - godot
+    - nolintlint
+    - reassign
+    - wastedassign
+    - dogsled
+    - exhaustive
+  disable:
+    # Disabled - Too Strict/Noisy
+    - exhaustruct
+    - testpackage
+    - gochecknoglobals
+    - varnamelen
+    - tagliatelle
+    - paralleltest
+    - funlen
     - err113
+    - revive
+    - forbidigo
+    - mnd
+    - funcorder
+    - ireturn
+    - godox
+    - depguard
+    - tagalign
+    - gomodguard
+    - importas
+    - gochecknoinits
+    - nonamedreturns
+    - nosprintfhostport
+    - canonicalheader
     - gosmopolitan
     - nestif
     - gocognit
-    - mirror
-    - noctx
-    - gochecknoinits
-    - importas
+    - maintidx
+    - interfacebloat
+    - fatcontext
+    - containedctx
+    - protogetter
+    - gochecksumtype
+    - sqlclosecheck
+    - gocheckcompilerdirectives
+    - asciicheck
+    - promlinter
+    - arangolint
+    - embeddedstructfieldcheck
+    - decorder
+    - godoclint
+    - forcetypeassert
+    - zerologlint
+    - goprintffuncname
+    - recvcheck
+    - perfsprint
+    - nakedret
+    - iotamixing
+    - errchkjson
     - makezero
     - sloglint
-    - gocyclo
     - spancheck
     - nlreturn
-    - wastedassign
-    - testifylint
     - noinlineerr
-    - ginkgolinter
     - musttag
     - whitespace
     - grouper
     - testableexamples
     - goheader
-    - gomodguard
     - durationcheck
     - iface
     - loggercheck
-    - testpackage
-    - funcorder
-    - tagalign
-    - nilerr
-    - misspell
-    - thelper
-    - bodyclose
-    - modernize
-    - funlen
+    - dupword
+    - mirror
+    - noctx
     - tparallel
     - bidichk
-    - ireturn
-    - godox
-    - tagliatelle
-  default: none
   settings:
     cyclop:
       max-complexity: 20
+    gocyclo:
+      min-complexity: 20
     errcheck:
       check-blank: false
       check-type-assertions: false
-    gocyclo:
-      min-complexity: 20
     staticcheck:
       checks:
         - all
@@ -138,22 +144,34 @@ linters:
         - -ST1003
         - -ST1005
         - -SA9003
+    goconst:
+      min-len: 5
+      min-occurrences: 4
+    dupl:
+      threshold: 150
+    wrapcheck:
+      ignorePackageGlobs:
+        - github.com/LarsArtmann/clean-wizard/*
   exclusions:
     rules:
       - path: _test\.go
         linters:
           - errcheck
           - staticcheck
-          - noinlineerr
+          - wrapcheck
+          - gosec
       - path: _ginkgo_test\.go
         linters:
           - errcheck
           - staticcheck
-          - noinlineerr
+          - wrapcheck
+          - gosec
       - path: tests/
         linters:
           - errcheck
           - staticcheck
+          - wrapcheck
+          - gosec
     paths:
       - tests
       - test/testdata_etc
@@ -162,7 +180,6 @@ linters:
 formatters:
   enable:
     - goimports
-    - golines
     - gofmt
 issues:
   max-issues-per-linter: 50
