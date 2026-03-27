@@ -127,7 +127,7 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 func validateEnumDefaults(
 	settings *OperationSettings,
 	opType OperationType,
-) error { //nolint:gocyclo,cyclop // exhaustive validation for many enum types
+) error {
 	if settings == nil {
 		return fmt.Errorf("nil settings for operation type: %s", opType)
 	}
