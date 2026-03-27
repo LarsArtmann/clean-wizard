@@ -168,7 +168,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 			len(items),
 			totalBytes,
 		)

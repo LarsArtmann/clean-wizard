@@ -357,7 +357,7 @@ func (scc *SystemCacheCleaner) removeCachePath(
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		1, bytesFreed,
 		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
 	))
