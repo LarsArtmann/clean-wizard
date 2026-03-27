@@ -12,47 +12,54 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/logger"
 	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
-	"github.com/spf13/viper"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 )
 
 // ErrConfigShouldUnmarshal is returned when the config file was read successfully
-// and should be unmarshaled from viper.
+// and should be unmarshaled from koanf.
 var ErrConfigShouldUnmarshal = errors.New("config file read successfully, proceed to unmarshal")
 
-// setupViper creates and configures a viper instance with defaults.
-func setupViper() *viper.Viper {
-	v := viper.New()
-	v.SetConfigName(configName)
-	v.SetConfigType(configType)
-	v.AddConfigPath("$HOME")
-	v.AddConfigPath("/etc/clean-wizard")
+const (
+	configName = ".clean-wizard"
+	configType = "yaml"
+)
 
-	if configPath := os.Getenv("CONFIG_PATH"); configPath != "" {
-		v.SetConfigFile(configPath)
-	}
+// setupKoanf creates and configures a koanf instance with defaults.
+func setupKoanf() *koanf.Koanf {
+	k := koanf.New(".")
 
 	// Set defaults
-	v.SetDefault("version", "1.0.0")
-	v.SetDefault("safe_mode", true)
-	v.SetDefault("max_disk_usage_percent", DefaultMaxDiskUsage)
-	v.SetDefault("protected", []string{domain.PathSystem, domain.PathLibrary})
+	_ = k.Set("version", "1.0.0")
+	_ = k.Set("safe_mode", true)
+	_ = k.Set("max_disk_usage_percent", DefaultMaxDiskUsage)
+	_ = k.Set("protected", []string{domain.PathSystem, domain.PathLibrary})
 
-	return v
+	return k
+}
+
+// getConfigPath returns the config file path to use.
+func getConfigPath() string {
+	if configPath := os.Getenv("CONFIG_PATH"); configPath != "" {
+		return configPath
+	}
+	return filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 }
 
 // readConfigFile attempts to read the config file, returning default config if not found.
-func readConfigFile(ctx context.Context, v *viper.Viper) (*domain.Config, error) {
+func readConfigFile(ctx context.Context, k *koanf.Koanf) (*domain.Config, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	default:
-		err := v.ReadInConfig()
+		configPath := getConfigPath()
+
+		err := k.Load(file.Provider(configPath), yaml.Parser())
 		if err != nil {
-			var configFileNotFoundError viper.ConfigFileNotFoundError
-			if errors.As(err, &configFileNotFoundError) {
+			if os.IsNotExist(err) {
 				return GetDefaultConfig(), nil
 			}
-
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
 
@@ -60,29 +67,31 @@ func readConfigFile(ctx context.Context, v *viper.Viper) (*domain.Config, error)
 	}
 }
 
-// unmarshalConfig unmarshals viper config into domain.Config and validates it.
-func unmarshalConfig(v *viper.Viper) (*domain.Config, error) {
+// unmarshalConfig unmarshals koanf config into domain.Config and validates it.
+func unmarshalConfig(k *koanf.Koanf) (*domain.Config, error) {
 	var config domain.Config
 
 	// Unmarshal basic fields
-	config.Version = v.GetString("version")
-	config.SafeMode = boolToSafeMode(v.GetBool("safe_mode"))
-	config.MaxDiskUsage = v.GetInt("max_disk_usage_percent")
-	config.Protected = v.GetStringSlice("protected")
+	config.Version = k.String("version")
+	config.SafeMode = boolToSafeMode(k.Bool("safe_mode"))
+	config.MaxDiskUsage = k.Int("max_disk_usage_percent")
+	config.Protected = k.Strings("protected")
 
 	// Unmarshal profiles section
-	err := v.UnmarshalKey("profiles", &config.Profiles)
-	if err != nil {
-		logger.Error("Failed to unmarshal profiles", "error", err)
-
-		return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+	profilesKey := "profiles"
+	if k.Exists(profilesKey) {
+		err := k.Unmarshal(profilesKey, &config.Profiles)
+		if err != nil {
+			logger.Error("Failed to unmarshal profiles", "error", err)
+			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+		}
 	}
 
 	// Fix risk levels and settings after unmarshaling
-	fixProfileSettings(v, &config)
+	fixProfileSettings(k, &config)
 
 	// Validate configuration
-	err = validateLoadedConfig(&config)
+	err := validateLoadedConfig(&config)
 	if err != nil {
 		return nil, err
 	}
@@ -91,12 +100,12 @@ func unmarshalConfig(v *viper.Viper) (*domain.Config, error) {
 }
 
 // fixProfileSettings fixes risk levels and settings after unmarshaling.
-func fixProfileSettings(v *viper.Viper, config *domain.Config) {
+func fixProfileSettings(k *koanf.Koanf, config *domain.Config) {
 	for name, profile := range config.Profiles {
 		for i := range profile.Operations {
 			op := &profile.Operations[i]
-			op.RiskLevel = parseRiskLevel(v, name, i)
-			unmarshalOperationSettings(v, name, i, op)
+			op.RiskLevel = parseRiskLevel(k, name, i)
+			unmarshalOperationSettings(k, name, i, op)
 		}
 	}
 }
@@ -130,11 +139,6 @@ func validateLoadedConfig(config *domain.Config) error {
 	return nil
 }
 
-const (
-	configName = ".clean-wizard"
-	configType = "yaml"
-)
-
 // Load loads the configuration from file or creates default.
 func Load() (*domain.Config, error) {
 	return LoadWithContext(context.Background())
@@ -142,14 +146,14 @@ func Load() (*domain.Config, error) {
 
 // LoadWithContext loads configuration with context support.
 func LoadWithContext(ctx context.Context) (*domain.Config, error) {
-	v := setupViper()
+	k := setupKoanf()
 
 	// Try to read configuration file
-	config, err := readConfigFile(ctx, v)
+	config, err := readConfigFile(ctx, k)
 	if err != nil {
 		if errors.Is(err, ErrConfigShouldUnmarshal) {
 			// File read successfully, unmarshal and process configuration
-			return unmarshalConfig(v)
+			return unmarshalConfig(k)
 		}
 
 		return nil, err
@@ -169,41 +173,45 @@ func boolToSafeMode(b bool) domain.SafeMode {
 
 // Save saves the configuration to file.
 func Save(config *domain.Config) error {
-	v := viper.New()
-
-	// Set configuration file properties
-	v.SetConfigName(configName)
-	v.SetConfigType(configType)
-
 	// Set configuration path
 	configPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 
-	// Set configuration values
-	v.Set("version", config.Version)
-	v.Set("safe_mode", config.SafeMode.String())
-	v.Set("max_disk_usage_percent", config.MaxDiskUsage)
-	v.Set("protected", config.Protected)
-	v.Set("last_clean", config.LastClean)
-	v.Set("updated", config.Updated)
-
-	// Set profiles
-	for name, profile := range config.Profiles {
-		v.Set("profiles."+name+".name", profile.Name)
-		v.Set("profiles."+name+".description", profile.Description)
-		v.Set("profiles."+name+".enabled", profile.Enabled.String())
-
-		for i, op := range profile.Operations {
-			opKey := fmt.Sprintf("profiles.%s.operations.%d", name, i)
-			v.Set(opKey+".name", op.Name)
-			v.Set(opKey+".description", op.Description)
-			v.Set(opKey+".risk_level", op.RiskLevel.String())
-			v.Set(opKey+".enabled", op.Enabled.String())
-
-			if op.Settings != nil {
-				v.Set(opKey+".settings", op.Settings)
-			}
-		}
+	// Build the config map for YAML output
+	configMap := map[string]interface{}{
+		"version":               config.Version,
+		"safe_mode":             config.SafeMode.String(),
+		"max_disk_usage_percent": config.MaxDiskUsage,
+		"protected":             config.Protected,
+		"last_clean":            config.LastClean,
+		"updated":               config.Updated,
 	}
+
+	// Build profiles map
+	profilesMap := make(map[string]interface{})
+	for name, profile := range config.Profiles {
+		profileMap := map[string]interface{}{
+			"name":        profile.Name,
+			"description": profile.Description,
+			"enabled":     profile.Enabled.String(),
+		}
+
+		operations := make([]interface{}, len(profile.Operations))
+		for i, op := range profile.Operations {
+			opMap := map[string]interface{}{
+				"name":        op.Name,
+				"description": op.Description,
+				"risk_level":  op.RiskLevel.String(),
+				"enabled":     op.Enabled.String(),
+			}
+			if op.Settings != nil {
+				opMap["settings"] = op.Settings
+			}
+			operations[i] = opMap
+		}
+		profileMap["operations"] = operations
+		profilesMap[name] = profileMap
+	}
+	configMap["profiles"] = profilesMap
 
 	// Ensure config directory exists
 	configDir := filepath.Dir(configPath)
@@ -213,8 +221,14 @@ func Save(config *domain.Config) error {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
 
+	// Marshal to YAML
+	yamlData, err := yaml.Parser().Marshal(configMap)
+	if err != nil {
+		return pkgerrors.HandleConfigError("Save", err)
+	}
+
 	// Write configuration file
-	err = v.WriteConfigAs(configPath)
+	err = os.WriteFile(configPath, yamlData, ConfigFilePermission)
 	if err != nil {
 		return pkgerrors.HandleConfigError("Save", err)
 	}
@@ -229,19 +243,15 @@ func GetCurrentTime() time.Time {
 	return time.Now()
 }
 
-// parseRiskLevel extracts and converts risk level string from viper to domain enum.
-func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) domain.RiskLevelType {
-	var riskLevelStr string
-
+// parseRiskLevel extracts and converts risk level string from koanf to domain enum.
+func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) domain.RiskLevelType {
 	key := fmt.Sprintf("profiles.%s.operations.%d.risk_level", profileName, operationIndex)
 
-	err := v.UnmarshalKey(key, &riskLevelStr)
-	if err != nil {
-		logger.Warn("Failed to unmarshal risk level, defaulting to LOW",
+	riskLevelStr := k.String(key)
+	if riskLevelStr == "" {
+		logger.Warn("No risk level found, defaulting to LOW",
 			"profile", profileName,
-			"operation", operationIndex,
-			"error", err)
-
+			"operation", operationIndex)
 		return domain.RiskLevelType(domain.RiskLevelLowType)
 	}
 
@@ -256,33 +266,29 @@ func parseRiskLevel(v *viper.Viper, profileName string, operationIndex int) doma
 		return domain.RiskLevelType(domain.RiskLevelCriticalType)
 	default:
 		logger.Warn("Invalid risk level, defaulting to LOW", "risk_level", riskLevelStr)
-
 		return domain.RiskLevelType(domain.RiskLevelLowType)
 	}
 }
 
-// unmarshalOperationSettings extracts operation settings from viper and populates the operation.
+// unmarshalOperationSettings extracts operation settings from koanf and populates the operation.
 func unmarshalOperationSettings(
-	v *viper.Viper,
+	k *koanf.Koanf,
 	profileName string,
 	operationIndex int,
 	op *domain.CleanupOperation,
 ) {
 	settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", profileName, operationIndex)
-	settingsMap := v.GetStringMap(settingsKey)
 
-	if len(settingsMap) == 0 {
+	if !k.Exists(settingsKey) {
 		logger.Debug("No settings map found")
-
 		return
 	}
 
-	if _, exists := settingsMap["nix_generations"]; exists {
+	// Check if nix_generations settings exist
+	nixGenKey := settingsKey + ".nix_generations"
+	if k.Exists(nixGenKey) {
 		nixGenSettings := &domain.NixGenerationsSettings{}
-
-		nixGenKey := settingsKey + ".nix_generations"
-
-		err := v.UnmarshalKey(nixGenKey, nixGenSettings)
+		err := k.Unmarshal(nixGenKey, nixGenSettings)
 		if err == nil {
 			op.Settings = &domain.OperationSettings{}
 			op.Settings.NixGenerations = nixGenSettings

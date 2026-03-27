@@ -2,8 +2,9 @@ package cleaner
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
+
+	"github.com/cockroachdb/errors"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
@@ -11,26 +12,32 @@ import (
 // DefaultRegistry creates a new registry with all cleaners registered.
 // Cleaners are created with default settings (verbose=false, dryRun=false).
 // This is useful for availability checks and discovery.
-func DefaultRegistry() *Registry {
+// Returns an error if any cleaner fails to initialize.
+func DefaultRegistry() (*Registry, error) {
 	registry := NewRegistry()
-	registerAllCleaners(registry, false, false)
+	if err := registerAllCleaners(registry, false, false); err != nil {
+		return nil, errors.Wrap(err, "failed to create default registry")
+	}
 
-	return registry
+	return registry, nil
 }
 
 // DefaultRegistryWithConfig creates a registry with cleaners configured for actual cleaning.
 // This should be used when performing clean operations.
-func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
+// Returns an error if any cleaner fails to initialize.
+func DefaultRegistryWithConfig(verbose, dryRun bool) (*Registry, error) {
 	registry := NewRegistry()
-	registerAllCleaners(registry, verbose, dryRun)
+	if err := registerAllCleaners(registry, verbose, dryRun); err != nil {
+		return nil, errors.Wrap(err, "failed to create registry with config")
+	}
 
-	return registry
+	return registry, nil
 }
 
 // registerAllCleaners registers all available cleaners with the given configuration.
 // This helper function eliminates duplication between DefaultRegistry and DefaultRegistryWithConfig.
-// Panics if any cleaner fails to initialize - this indicates a programming error in defaults.
-func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
+// Returns an error if any cleaner fails to initialize.
+func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 	// Nix cleaner
 	registry.Register(CleanerNix, NewNixCleaner(verbose, dryRun))
 
@@ -50,7 +57,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 		GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache,
 	)
 	if err != nil {
-		panic(fmt.Sprintf("failed to create Go cleaner: %v", err))
+		return errors.Wrap(err, "failed to create Go cleaner")
 	}
 
 	registry.Register(CleanerGo, goCleaner)
@@ -64,7 +71,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 	// Build cache cleaner (default: 30d, all tools)
 	buildCacheCleaner, err := NewBuildCacheCleaner(verbose, dryRun, "30d", []string{}, []string{})
 	if err != nil {
-		panic(fmt.Sprintf("failed to create BuildCache cleaner: %v", err))
+		return errors.Wrap(err, "failed to create BuildCache cleaner")
 	}
 
 	registry.Register(CleanerBuildCache, buildCacheCleaner)
@@ -72,7 +79,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 	// System cache cleaner (default: 30d, all cache types)
 	systemCacheCleaner, err := NewSystemCacheCleaner(verbose, dryRun, "30d", nil)
 	if err != nil {
-		panic(fmt.Sprintf("failed to create SystemCache cleaner: %v", err))
+		return errors.Wrap(err, "failed to create SystemCache cleaner")
 	}
 
 	registry.Register(CleanerSystemCache, systemCacheCleaner)
@@ -86,7 +93,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 		[]string{filepath.Join("/", "tmp")},
 	)
 	if err != nil {
-		panic(fmt.Sprintf("failed to create TempFiles cleaner: %v", err))
+		return errors.Wrap(err, "failed to create TempFiles cleaner")
 	}
 
 	registry.Register(CleanerTempFiles, tempFilesCleaner)
@@ -104,12 +111,18 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) {
 	compiledBinariesCleaner := NewCompiledBinariesCleaner(
 		verbose, dryRun, DefaultMinSizeMB, DefaultOlderThan, nil, []string{})
 	registry.Register(CleanerCompiledBinaries, compiledBinariesCleaner)
+
+	return nil
 }
 
 // AvailableCleaners returns a list of available cleaner names from the default registry.
 // This is a convenience function for quick availability checks.
-func AvailableCleaners(ctx context.Context) []string {
-	registry := DefaultRegistry()
+// Returns an error if the registry cannot be created.
+func AvailableCleaners(ctx context.Context) ([]string, error) {
+	registry, err := DefaultRegistry()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get available cleaners")
+	}
 	available := registry.Available(ctx)
 	names := make([]string, 0, len(available))
 
@@ -121,5 +134,5 @@ func AvailableCleaners(ctx context.Context) []string {
 		}
 	}
 
-	return names
+	return names, nil
 }

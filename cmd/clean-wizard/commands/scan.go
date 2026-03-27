@@ -106,12 +106,14 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	)
 
 	// Show Nix store size if available
-	nixRegistry := cleaner.DefaultRegistry()
-	if nixCleaner, ok := nixRegistry.Get("nix"); ok && nixCleaner.IsAvailable(ctx) {
-		if nixSizer, ok := nixCleaner.(cleaner.NixStoreSizer); ok {
-			storeSize := nixSizer.GetStoreSize(ctx)
-			if storeSize > 0 {
-				fmt.Printf("❄️  Nix store size: %s\n", format.Bytes(storeSize))
+	nixRegistry, err := cleaner.DefaultRegistry()
+	if err == nil {
+		if nixCleaner, ok := nixRegistry.Get("nix"); ok && nixCleaner.IsAvailable(ctx) {
+			if nixSizer, ok := nixCleaner.(cleaner.NixStoreSizer); ok {
+				storeSize := nixSizer.GetStoreSize(ctx)
+				if storeSize > 0 {
+					fmt.Printf("❄️  Nix store size: %s\n", format.Bytes(storeSize))
+				}
 			}
 		}
 	}
@@ -146,7 +148,12 @@ func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool)
 	}
 
 	// Get cleaner from registry
-	registry := cleaner.DefaultRegistry()
+	registry, err := cleaner.DefaultRegistry()
+	if err != nil {
+		result.Available = CleanerAvailabilityUnavailable
+
+		return result
+	}
 	name := getRegistryName(cleanerType)
 
 	c, ok := registry.Get(name)

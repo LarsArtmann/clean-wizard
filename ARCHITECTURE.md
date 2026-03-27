@@ -119,6 +119,22 @@ result := result.Ok(data).
     AndThen(processData).
     Tap(logSuccess)
 
+// Pattern matching
+value := result.Match(
+    func(v int) string { return fmt.Sprintf("success: %d", v) },
+    func(e error) string { return fmt.Sprintf("error: %v", e) },
+)
+
+// Conditional branching
+result.When(func(v int) { log.Printf("Value: %d", v) })
+result.Unless(func(e error) { log.Printf("Error: %v", e) })
+result.Filter(func(v int) bool { return v > 0 }, "must be positive")
+
+// Fold/Reduce operations
+results := []Result[int]{Ok(1), Ok(2), Ok(3)}
+sum := Fold(results, 0, func(acc, v int) int { return acc + v })
+all := FoldAll(results)
+
 // Safe unwrapping
 value, err := result.SafeValue()
 value := result.UnwrapOr(defaultValue)
@@ -128,8 +144,76 @@ value := result.UnwrapOr(defaultValue)
 
 - `Map()` — Transform success values
 - `AndThen()` / `FlatMap()` — Chain operations that return Result
-- `Validate()` — Add validation predicates
+- `Match()` — Pattern matching on Ok/Err branches
+- `When()` / `Unless()` — Conditional side effects
+- `Filter()` — Predicate-based validation
+- `Fold()` / `FoldAll()` — Reduce slice of Results to single Result
+- `Sequence()` / `Traverse()` — Convert slice of Results
 - `OrElse()` — Provide fallback results
+
+### 5. BranchFlow Type
+
+Complex conditional branching flows (`internal/result/branch_flow.go`):
+
+```go
+// Conditional branching with fallback
+flow := NewBranchFlow[int]().
+    Branch(func() bool { return isAdmin }, func() Result[int] { return Ok(42) }).
+    Branch(func() bool { return isUser }, func() Result[int] { return Ok(10) }).
+    Fallback(func() Result[int] { return Ok(1) })
+
+result := flow.Execute()
+
+// Value-based branching
+cases := []Case[int, string]{
+    {Predicate: func(i int) bool { return i < 0 }, Execute: func() Result[string] { return Ok("negative") }},
+    {Predicate: func(i int) bool { return i == 0 }, Execute: func() Result[string] { return Ok("zero") }},
+    {Predicate: func(i int) bool { return i > 0 }, Execute: func() Result[string] { return Ok("positive") }},
+}
+result := SwitchFlow(value, cases, func() Result[string] { return Ok("unknown") })
+```
+
+### 6. FlowBuilder & Pipeline
+
+Pipeline composition (`internal/result/flow_builder.go`):
+
+```go
+// Sequential pipeline
+pipeline := NewFlowBuilder[CleanResult]().
+    Step("scan", func(ctx context.Context) Result[CleanResult] { return Scan(ctx) }).
+    Step("validate", func(ctx context.Context, r CleanResult) Result[CleanResult] { return Validate(ctx, r) }).
+    Step("clean", func(ctx context.Context, r CleanResult) Result[CleanResult] { return Clean(ctx, r) })
+
+result := pipeline.Execute(ctx)
+
+// Parallel execution
+parallel := NewParallelFlow[CleanResult]().
+    Add("docker", func(ctx context.Context) Result[CleanResult] { return CleanDocker(ctx) }).
+    Add("go", func(ctx context.Context) Result[CleanResult] { return CleanGo(ctx) }).
+    Add("cargo", func(ctx context.Context) Result[CleanResult] { return CleanCargo(ctx) })
+
+results := parallel.Execute(ctx)
+successful := parallel.Successful()
+failed := parallel.Failed()
+```
+
+### 7. Context[T] Branching
+
+Context composition and branching (`internal/shared/context/context.go`):
+
+```go
+// Conditional context modification
+ctx := NewContext[ValidationConfig](ctx, config)
+ctx = ctx.Branch(isStrict, func(c *Context[ValidationConfig]) *Context[ValidationConfig] {
+    return c.WithMetadata("strict_mode", "true")
+})
+
+// Join multiple contexts
+merged := Join(ctx1, ctx2, ctx3)
+
+// Transform value type
+strCtx := Transform[int, string](intCtx, func(i int) string { return strconv.Itoa(i) })
+```
 
 ---
 
@@ -257,5 +341,7 @@ go test ./...
 | `internal/domain/operation_settings.go`        | Operation-specific enums                   |
 | `internal/domain/types.go`                     | Domain types (CleanResult, ScanItem, etc.) |
 | `internal/result/type.go`                      | Result[T] railway type                     |
-| `internal/shared/context/context.go`           | Generic Context[T] system                  |
+| `internal/result/branch_flow.go`               | BranchFlow and SwitchFlow                  |
+| `internal/result/flow_builder.go`              | FlowBuilder and Pipeline                   |
+| `internal/shared/context/context.go`           | Generic Context[T] with branching          |
 | `internal/shared/context/validation_config.go` | Validation context types                   |

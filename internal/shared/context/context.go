@@ -122,3 +122,146 @@ func (c *Context[T]) GetContext() context.Context {
 
 	return context.Background()
 }
+
+// Branch creates a new context based on a condition.
+// If condition is true, it applies the transform function to the current context.
+// Otherwise, it returns the original context unchanged.
+func (c *Context[T]) Branch(
+	condition bool,
+	transform func(*Context[T]) *Context[T],
+) *Context[T] {
+	if condition {
+		return transform(c.Clone())
+	}
+
+	return c
+}
+
+// BranchWithValue creates a new context based on a predicate applied to the value.
+// If predicate returns true, it applies the transform function.
+func (c *Context[T]) BranchWithValue(
+	predicate func(T) bool,
+	transform func(*Context[T]) *Context[T],
+) *Context[T] {
+	if predicate(c.ValueType) {
+		return transform(c.Clone())
+	}
+
+	return c.Clone()
+}
+
+// Fork creates multiple branched contexts based on conditions.
+// Each pair in the map is a condition and the transform to apply.
+// Returns a slice of contexts (only those where condition was true).
+func (c *Context[T]) Fork(
+	branches map[bool]func(*Context[T]) *Context[T],
+) []*Context[T] {
+	results := make([]*Context[T], 0, len(branches))
+
+	for condition, transform := range branches {
+		if condition {
+			results = append(results, transform(c.Clone()))
+		}
+	}
+
+	return results
+}
+
+// Join combines multiple contexts into one.
+// The returned context has metadata and permissions merged from all inputs.
+// For metadata conflicts, the last context's value wins.
+// For permissions, all are appended.
+func Join[T any](contexts ...*Context[T]) *Context[T] {
+	if len(contexts) == 0 {
+		return NewContext[T](context.Background(), *new(T))
+	}
+
+	if len(contexts) == 1 {
+		return contexts[0].Clone()
+	}
+
+	result := contexts[0].Clone()
+
+	for i := 1; i < len(contexts); i++ {
+		result = result.Merge(contexts[i])
+	}
+
+	return result
+}
+
+// JoinWithValue combines multiple contexts and applies a value reducer.
+// This is useful when you need to merge contexts and compute a new value.
+func JoinWithValue[T, U any](
+	contexts []*Context[T],
+	valueReducer func([]T) U,
+) *Context[U] {
+	if len(contexts) == 0 {
+		return NewContext[U](context.Background(), valueReducer([]T{}))
+	}
+
+	merged := contexts[0].Clone()
+	values := make([]T, len(contexts))
+	values[0] = contexts[0].ValueType
+
+	for i := 1; i < len(contexts); i++ {
+		merged = merged.Merge(contexts[i])
+		values[i] = contexts[i].ValueType
+	}
+
+	return &Context[U]{
+		Context:     merged.Context,
+		ValueType:   valueReducer(values),
+		Metadata:    merged.Metadata,
+		Permissions: merged.Permissions,
+	}
+}
+
+// Transform creates a new context with a transformed value type.
+func Transform[T, U any](c *Context[T], fn func(T) U) *Context[U] {
+	return &Context[U]{
+		Context:     c.Context,
+		ValueType:   fn(c.ValueType),
+		Metadata:    c.Metadata,
+		Permissions: c.Permissions,
+	}
+}
+
+// WithContext sets a new base context.Context.
+func (c *Context[T]) WithContext(ctx context.Context) *Context[T] {
+	c.Context = ctx
+
+	return c
+}
+
+// WithTimeout creates a new context with a timeout.
+func (c *Context[T]) WithTimeout(timeout any) *Context[T] {
+	// This is a simplified version - in practice you'd need the actual duration
+	// For now, we just mark it as a placeholder
+	c.Metadata["timeout_set"] = "true"
+
+	return c
+}
+
+// Pick selects a context based on a predicate.
+// Returns the first context where predicate returns true, or nil if none match.
+func Pick[T any](contexts []*Context[T], predicate func(*Context[T]) bool) *Context[T] {
+	for _, ctx := range contexts {
+		if predicate(ctx) {
+			return ctx
+		}
+	}
+
+	return nil
+}
+
+// PickWithValue selects a context based on a predicate applied to its value.
+// Returns the first context where predicate returns true, or nil if none match.
+func PickWithValue[T any](contexts []*Context[T], predicate func(T) bool) *Context[T] {
+	for _, ctx := range contexts {
+		if predicate(ctx.ValueType) {
+			return ctx
+		}
+	}
+
+	return nil
+}

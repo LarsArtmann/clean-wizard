@@ -5,6 +5,19 @@ import (
 	"time"
 )
 
+// makeTestCleanResult creates a CleanResult for testing with common defaults.
+// This reduces duplication across test cases while maintaining readability.
+func makeTestCleanResult(known uint64, itemsRemoved, itemsFailed uint, strategy CleanStrategyType) CleanResult {
+	return CleanResult{
+		SizeEstimate: SizeEstimate{Known: known, Status: SizeEstimateStatusKnown},
+		ItemsRemoved: itemsRemoved,
+		ItemsFailed:  itemsFailed,
+		CleanTime:    time.Second,
+		CleanedAt:    time.Now(),
+		Strategy:     strategy,
+	}
+}
+
 // TestCleanResultValidation tests the enhanced CleanResult validation.
 func TestCleanResultValidation(t *testing.T) {
 	tests := []struct {
@@ -15,28 +28,14 @@ func TestCleanResultValidation(t *testing.T) {
 		errorMsg    string
 	}{
 		{
-			name: "Valid CleanResult with aggressive strategy",
-			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 1024, Status: SizeEstimateStatusKnown},
-				ItemsRemoved: 5,
-				ItemsFailed:  0,
-				CleanTime:    time.Second,
-				CleanedAt:    time.Now(),
-				Strategy:     CleanStrategyType(StrategyAggressiveType),
-			},
+			name:        "Valid CleanResult with aggressive strategy",
+			result:      makeTestCleanResult(1024, 5, 0, StrategyAggressive),
 			shouldValid: true,
 			shouldError: false,
 		},
 		{
-			name: "Valid CleanResult with conservative strategy",
-			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 512, Status: SizeEstimateStatusKnown},
-				ItemsRemoved: 2,
-				ItemsFailed:  1,
-				CleanTime:    time.Second * 2,
-				CleanedAt:    time.Now(),
-				Strategy:     CleanStrategyType(StrategyConservativeType),
-			},
+			name:        "Valid CleanResult with conservative strategy",
+			result:      makeTestCleanResult(512, 2, 1, StrategyConservative),
 			shouldValid: true,
 			shouldError: false,
 		},
@@ -54,30 +53,16 @@ func TestCleanResultValidation(t *testing.T) {
 			shouldError: false,
 		},
 		{
-			name: "Invalid CleanResult - zero freed bytes with items removed",
-			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 0, Status: SizeEstimateStatusKnown},
-				ItemsRemoved: 1,
-				ItemsFailed:  0,
-				CleanTime:    time.Second,
-				CleanedAt:    time.Now(),
-				Strategy:     CleanStrategyType(StrategyAggressiveType),
-			},
+			name:        "Invalid CleanResult - zero freed bytes with items removed",
+			result:      makeTestCleanResult(0, 1, 0, StrategyAggressive),
 			shouldValid: true, // IsValid() returns true (quick check), but Validate() returns error
 			shouldError: true,
 			errorMsg: "cannot have zero SizeEstimate when ItemsRemoved is > 0 " +
 				"(set Status: Unknown if size cannot be determined)",
 		},
 		{
-			name: "Invalid CleanResult - failed items with no freed bytes",
-			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 0, Status: SizeEstimateStatusKnown},
-				ItemsRemoved: 0,
-				ItemsFailed:  5,
-				CleanTime:    time.Second,
-				CleanedAt:    time.Now(),
-				Strategy:     CleanStrategyType(StrategyConservativeType),
-			},
+			name:        "Invalid CleanResult - failed items with no freed bytes",
+			result:      makeTestCleanResult(0, 0, 5, StrategyConservative),
 			shouldValid: false,
 			shouldError: true,
 			errorMsg:    "cannot have failed items when no items were processed",

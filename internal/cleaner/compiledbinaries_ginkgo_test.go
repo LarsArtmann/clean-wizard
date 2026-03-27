@@ -396,12 +396,9 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		})
 
 		ginkgo.Context("when scan succeeds", func() {
-			ginkgo.It("should return scan items from scanner", func() {
-				mockScanner.binaries = []BinaryInfo{
-					{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
-					{Path: "/path/to/binary2", Size: 15 * 1024 * 1024, Category: CategoryBin},
-				}
-				result := cleaner.Scan(ctx)
+		ginkgo.It("should return scan items from scanner", func() {
+			mockScanner.binaries = StandardTestBinaries()
+			result := cleaner.Scan(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				items := result.Value()
 				gomega.Expect(items).To(gomega.HaveLen(2))
@@ -498,10 +495,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 		// Helper function to test that Clean correctly reports freed bytes for two binaries.
 		assertFreedBytesForTwoBinaries := func() {
-			mockScanner.binaries = []BinaryInfo{
-				{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
-				{Path: "/path/to/binary2", Size: 15 * 1024 * 1024, Category: CategoryBin},
-			}
+			mockScanner.binaries = StandardTestBinaries()
 			result := cleaner.Clean(ctx)
 			gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 			cleanResult := result.Value()
@@ -542,10 +536,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 		ginkgo.Context("in normal mode", func() {
 			ginkgo.It("should call TrashBinary for each item", func() {
-				mockScanner.binaries = []BinaryInfo{
-					{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
-					{Path: "/path/to/binary2", Size: 15 * 1024 * 1024, Category: CategoryBin},
-				}
+				mockScanner.binaries = StandardTestBinaries()
 				result := cleaner.Clean(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				gomega.Expect(mockOperator.trashCallCount).To(gomega.Equal(2))
@@ -568,10 +559,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 
 			ginkgo.It("should handle trash failures gracefully", func() {
-				mockScanner.binaries = []BinaryInfo{
-					{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
-					{Path: "/path/to/binary2", Size: 15 * 1024 * 1024, Category: CategoryBin},
-				}
+				mockScanner.binaries = StandardTestBinaries()
 				mockOperator.trashErr = errors.New("trash failed")
 				result := cleaner.Clean(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
@@ -622,12 +610,9 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		})
 
 		ginkgo.It("should return total size of all binaries", func() {
-			mockScanner.binaries = []BinaryInfo{
-				{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
-				{Path: "/path/to/binary2", Size: 15 * 1024 * 1024, Category: CategoryBin},
-			}
+			mockScanner.binaries = StandardTestBinaries()
 			size := cleaner.GetStoreSize(ctx)
-			gomega.Expect(size).To(gomega.Equal(int64(35 * 1024 * 1024)))
+			gomega.Expect(size).To(gomega.Equal(StandardTestBinariesTotalSize()))
 		})
 	})
 

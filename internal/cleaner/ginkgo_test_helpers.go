@@ -226,3 +226,19 @@ func GinkgoValidateEmptySettingsContext(cleaner CleanerWithSettings, itName stri
 		GinkgoValidateEmptySettingsTest(cleaner, itName)
 	})
 }
+
+// StandardTestBinaries returns a slice of BinaryInfo for testing.
+// This eliminates duplicate binary setup code across compiled binaries tests.
+//
+// Returns two test binaries with sizes 20MB and 15MB respectively.
+func StandardTestBinaries() []BinaryInfo {
+	return []BinaryInfo{
+		{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
+		{Path: "/path/to/binary2", Size: 15 * 1024 * 1024, Category: CategoryBin},
+	}
+}
+
+// StandardTestBinariesTotalSize returns the total size of StandardTestBinaries.
+func StandardTestBinariesTotalSize() int64 {
+	return 35 * 1024 * 1024
+}
