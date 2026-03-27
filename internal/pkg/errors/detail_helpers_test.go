@@ -237,7 +237,7 @@ func TestEnsureDetails(t *testing.T) {
 	}
 }
 
-func TestErrorDetailsBuilder(t *testing.T) {
+func TestErrorDetailsBuilder(t *testing.T) { //nolint:cyclop // table-driven test with many cases
 	t.Run("basic construction", func(t *testing.T) {
 		builder := NewErrorDetails()
 		if builder == nil {

@@ -43,7 +43,9 @@ func (e *ValidationError) Error() string {
 }
 
 // ValidateSettings validates settings for the given operation type.
-func (os *OperationSettings) ValidateSettings(opType OperationType) error {
+func (os *OperationSettings) ValidateSettings(
+	opType OperationType,
+) error { //nolint:gocyclo,cyclop // exhaustive validation for many settings types
 	// Handle nil settings
 	if os == nil {
 		return nil // Optional settings

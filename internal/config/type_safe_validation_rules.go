@@ -91,8 +91,8 @@ func NewTypeSafeValidationRules() *TypeSafeValidationRules {
 		ProtectedSystemPaths:  domain.AllProtectedSystemPaths(),
 		DefaultProtectedPaths: domain.DefaultProtectedPaths(),
 		RequireSafeMode:       true,
-		MaxRiskLevel:          domain.RiskLevelType(domain.RiskLevelHighType),
-		BackupRequired:        domain.RiskLevelType(domain.RiskLevelMediumType),
+		MaxRiskLevel:          domain.RiskLevelHighType,
+		BackupRequired:        domain.RiskLevelMediumType,
 	}
 }
 

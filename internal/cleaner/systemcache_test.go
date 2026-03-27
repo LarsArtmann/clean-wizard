@@ -201,11 +201,11 @@ func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 	cleanResult := result.Value()
 
 	// Verify dry-run strategy
-	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
+	if cleanResult.Strategy != domain.StrategyDryRunType {
 		t.Errorf(
 			"Clean() strategy = %v, want %v",
 			cleanResult.Strategy,
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 		)
 	}
 

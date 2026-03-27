@@ -37,7 +37,7 @@ var benchmarkTestConfig = &Config{
 				{
 					Name:        "docker",
 					Description: "Clean Docker resources",
-					RiskLevel:   RiskLevelType(RiskLevelMediumType),
+					RiskLevel:   RiskLevelMediumType,
 					Enabled:     ProfileStatusEnabled,
 					Settings: &OperationSettings{
 						Docker: &DockerSettings{

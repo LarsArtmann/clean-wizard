@@ -518,7 +518,7 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 // newDryRunResult creates a CleanResult for dry-run mode with the estimated size.
 func (dc *DockerCleaner) newDryRunResult(totalBytes int64, itemsCount int) domain.CleanResult {
 	return conversions.NewCleanResult(
-		domain.CleanStrategyType(domain.StrategyDryRunType),
+		domain.StrategyDryRunType,
 		itemsCount,
 		totalBytes,
 	)

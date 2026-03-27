@@ -330,7 +330,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 
 	if len(items) == 0 {
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
+			domain.StrategyConservativeType,
 			0, int64(0),
 			domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
 		))
@@ -352,7 +352,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 		}
 
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 			len(items), totalBytes,
 			domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
 		))
@@ -387,7 +387,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
-		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		domain.StrategyAggressiveType,
 		itemsRemoved, itemsFailed, bytesFreed, duration,
 		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
 	))

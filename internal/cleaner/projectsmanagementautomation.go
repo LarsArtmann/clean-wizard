@@ -119,7 +119,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 
 		return result.Ok(
 			conversions.NewCleanResultWithTiming(
-				domain.CleanStrategyType(domain.StrategyDryRunType),
+				domain.StrategyDryRunType,
 				itemsRemoved,
 				totalBytes,
 				duration,
@@ -149,7 +149,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 
 	return result.Ok(
 		conversions.NewCleanResultWithTiming(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
+			domain.StrategyConservativeType,
 			itemsRemoved,
 			bytesFreed,
 			duration,

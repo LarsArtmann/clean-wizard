@@ -42,7 +42,7 @@ func GoCleanerTest(ctx context.Context, title string) error {
 
 		for i, item := range items {
 			fmt.Printf("  %d. %s\n", i+1, item.Path)
-			fmt.Printf("     Size: %s\n", format.Bytes(int64(item.Size)))
+			fmt.Printf("     Size: %s\n", format.Bytes(item.Size))
 		}
 	}
 

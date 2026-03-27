@@ -108,7 +108,7 @@ func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *domain.Config
 		}
 
 		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
+			if op.RiskLevel == domain.RiskLevelCriticalType {
 				return true
 			}
 		}

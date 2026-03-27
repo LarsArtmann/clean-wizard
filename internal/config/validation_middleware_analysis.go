@@ -82,8 +82,8 @@ func (vm *ValidationMiddleware) collectPathChanges(
 				Field:     field,
 				OldValue:  oldValue,
 				NewValue:  newValue,
-				Operation: domain.ChangeOperationType(operation),
-				Risk:      domain.RiskLevelType(risk),
+				Operation: operation,
+				Risk:      risk,
 			})
 		}
 	}
@@ -109,7 +109,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 				Field:     "profiles." + name,
 				OldValue:  nil,
 				NewValue:  profile.Name,
-				Operation: domain.ChangeOperationType(domain.ChangeOperationAddedType),
+				Operation: domain.ChangeOperationAddedType,
 				Risk:      vm.assessProfileRisk(profile),
 			})
 		}
@@ -122,10 +122,8 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 				Field:     "profiles." + name,
 				OldValue:  profile.Name,
 				NewValue:  nil,
-				Operation: domain.ChangeOperationType(domain.ChangeOperationRemovedType),
-				Risk: domain.RiskLevelType(
-					domain.RiskLevelLowType,
-				), // Removing profiles is generally safe
+				Operation: domain.ChangeOperationRemovedType,
+				Risk:      domain.RiskLevelLowType, // Removing profiles is generally safe
 			})
 		}
 	}
@@ -145,7 +143,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 					Field:     "profiles." + name,
 					OldValue:  currentProfile.Name,
 					NewValue:  proposedProfile.Name,
-					Operation: domain.ChangeOperationType(domain.ChangeOperationModifiedType),
+					Operation: domain.ChangeOperationModifiedType,
 					Risk:      vm.assessProfileRisk(proposedProfile),
 				})
 			}
@@ -159,60 +157,60 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 
 func (vm *ValidationMiddleware) getChangeOperation(old, newVal any) domain.ChangeOperationType {
 	if old == nil && newVal != nil {
-		return domain.ChangeOperationType(domain.ChangeOperationAddedType)
+		return domain.ChangeOperationAddedType
 	}
 
 	if old != nil && newVal == nil {
-		return domain.ChangeOperationType(domain.ChangeOperationRemovedType)
+		return domain.ChangeOperationRemovedType
 	}
 
-	return domain.ChangeOperationType(domain.ChangeOperationModifiedType)
+	return domain.ChangeOperationModifiedType
 }
 
-func (vm *ValidationMiddleware) assessChangeRisk(field string, old, newVal any) domain.RiskLevelType {
+func (vm *ValidationMiddleware) assessChangeRisk(
+	field string, old, newVal any,
+) domain.RiskLevelType {
 	switch field {
 	case "safe_mode":
 		if old == true && newVal == false {
-			return domain.RiskLevelType(domain.RiskLevelHighType)
+			return domain.RiskLevelHighType
 		}
 
-		return domain.RiskLevelType(domain.RiskLevelLowType)
+		return domain.RiskLevelLowType
 	case "max_disk_usage":
 		// Safe type assertions
 		oldVal, oldOk := old.(int)
 
 		newValCast, newOk := newVal.(int)
 		if !oldOk || !newOk {
-			return domain.RiskLevelType(
-				domain.RiskLevelHighType,
-			) // Conservative risk for unexpected types
+			return domain.RiskLevelHighType
 		}
 
 		if oldVal < newValCast {
-			return domain.RiskLevelType(domain.RiskLevelMediumType)
+			return domain.RiskLevelMediumType
 		}
 
-		return domain.RiskLevelType(domain.RiskLevelLowType)
+		return domain.RiskLevelLowType
 	case "protected":
 		if newVal == nil {
-			return domain.RiskLevelType(domain.RiskLevelCriticalType)
+			return domain.RiskLevelCriticalType
 		}
 
-		return domain.RiskLevelType(domain.RiskLevelLowType)
+		return domain.RiskLevelLowType
 	default:
-		return domain.RiskLevelType(domain.RiskLevelLowType)
+		return domain.RiskLevelLowType
 	}
 }
 
 func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domain.RiskLevelType {
 	// Guard against nil profile
 	if profile == nil {
-		return domain.RiskLevelType(domain.RiskLevelHighType)
+		return domain.RiskLevelHighType
 	}
 
 	return maxRiskLevelFromOperations(
 		profile.Operations,
-		domain.RiskLevelType(domain.RiskLevelLowType),
+		domain.RiskLevelLowType,
 	)
 }
 

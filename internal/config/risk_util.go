@@ -12,14 +12,14 @@ func maxRiskLevelFromOperations(
 	maxRisk := currentMax
 
 	for _, op := range operations {
-		if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
-			return domain.RiskLevelType(domain.RiskLevelCriticalType)
+		if op.RiskLevel == domain.RiskLevelCriticalType {
+			return domain.RiskLevelCriticalType
 		}
 
-		if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelHighType) {
-			maxRisk = domain.RiskLevelType(domain.RiskLevelHighType)
-		} else if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelMediumType) && maxRisk == domain.RiskLevelType(domain.RiskLevelLowType) {
-			maxRisk = domain.RiskLevelType(domain.RiskLevelMediumType)
+		if op.RiskLevel == domain.RiskLevelHighType {
+			maxRisk = domain.RiskLevelHighType
+		} else if op.RiskLevel == domain.RiskLevelMediumType && maxRisk == domain.RiskLevelLowType {
+			maxRisk = domain.RiskLevelMediumType
 		}
 	}
 

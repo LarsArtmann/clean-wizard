@@ -41,7 +41,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 		for _, op := range profile.Operations {
 			// Validate risk vs safe mode
 			if !cfg.SafeMode.IsEnabled() &&
-				op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) {
+				op.RiskLevel == domain.RiskLevelCriticalType {
 				cv.addCriticalRiskError(result, name, op, "business_logic",
 					"Critical risk operation '%s' not allowed in unsafe mode",
 					"Enable safe mode or remove critical risk operation")
@@ -125,7 +125,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(
 	// Validate no profiles have critical operations without explicit consent
 	for name, profile := range cfg.Profiles {
 		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskLevelType(domain.RiskLevelCriticalType) &&
+			if op.RiskLevel == domain.RiskLevelCriticalType &&
 				!cfg.SafeMode.IsEnabled() {
 				cv.addCriticalRiskError(result, name, op, "security",
 					"Critical risk operation '%s' requires safe mode enabled",
@@ -192,11 +192,11 @@ func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.Cleanu
 
 // findMaxRiskLevel finds the maximum risk level in configuration.
 func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevelType {
-	maxRisk := domain.RiskLevelType(domain.RiskLevelLowType)
+	maxRisk := domain.RiskLevelLowType
 	for _, profile := range cfg.Profiles {
 		maxRisk = maxRiskLevelFromOperations(profile.Operations, maxRisk)
-		if maxRisk == domain.RiskLevelType(domain.RiskLevelCriticalType) {
-			return domain.RiskLevelType(domain.RiskLevelCriticalType)
+		if maxRisk == domain.RiskLevelCriticalType {
+			return domain.RiskLevelCriticalType
 		}
 	}
 

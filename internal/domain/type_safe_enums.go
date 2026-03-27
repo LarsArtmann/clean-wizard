@@ -186,7 +186,7 @@ func (rl RiskLevelType) String() string {
 	case RiskLevelCriticalType:
 		return "CRITICAL"
 	default:
-		return "UNKNOWN"
+		return stringUnknown
 	}
 }
 
@@ -274,7 +274,7 @@ func (vl ValidationLevelType) String() string {
 	case ValidationLevelStrictType:
 		return "STRICT"
 	default:
-		return "UNKNOWN"
+		return stringUnknown
 	}
 }
 
@@ -333,7 +333,7 @@ func (co ChangeOperationType) String() string {
 	case ChangeOperationModifiedType:
 		return "MODIFIED"
 	default:
-		return "UNKNOWN"
+		return stringUnknown
 	}
 }
 
@@ -502,7 +502,7 @@ func (ses SizeEstimateStatusType) String() string {
 	case SizeEstimateStatusKnown:
 		return "KNOWN"
 	case SizeEstimateStatusUnknown:
-		return "UNKNOWN"
+		return "UNKNOWN" //nolint:goconst // valid enum value for unknown status
 	default:
 		return "INVALID"
 	}

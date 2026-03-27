@@ -221,11 +221,11 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 				)
 			}
 
-			if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
+			if cleanResult.Strategy != domain.StrategyDryRunType {
 				t.Errorf(
 					"Clean() strategy = %v, want %v",
 					cleanResult.Strategy,
-					domain.CleanStrategyType(domain.StrategyDryRunType),
+					domain.StrategyDryRunType,
 				)
 			}
 

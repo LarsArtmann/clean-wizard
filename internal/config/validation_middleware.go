@@ -276,7 +276,7 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(
 	tempOp := domain.CleanupOperation{
 		Name:        operationName,
 		Description: "Validation operation",
-		RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType), // Default to low for validation
+		RiskLevel:   domain.RiskLevelLowType, // Default to low for validation
 		Enabled:     domain.ProfileStatusEnabled,
 		Settings:    settings,
 	}

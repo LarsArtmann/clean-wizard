@@ -22,8 +22,8 @@ func runFormattingTests[T any](t *testing.T, tests []struct {
 	}
 }
 
-type dateTimeTestStruct struct { //nolint:unused // name field needed for type compatibility with anonymous struct
-	name     string
+type dateTimeTestStruct struct {
+	name     string //nolint:unused // needed for type compatibility with anonymous struct
 	input    time.Time
 	expected string
 }

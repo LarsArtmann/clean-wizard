@@ -25,19 +25,19 @@ var riskLevelTestCases = []struct {
 	name  string
 	level domain.RiskLevelType
 }{
-	{"low risk", domain.RiskLevelType(domain.RiskLevelLowType)},
-	{"medium risk", domain.RiskLevelType(domain.RiskLevelMediumType)},
-	{"high risk", domain.RiskLevelType(domain.RiskLevelHighType)},
-	{"critical risk", domain.RiskLevelType(domain.RiskLevelCriticalType)},
+	{"low risk", domain.RiskLevelLowType},
+	{"medium risk", domain.RiskLevelMediumType},
+	{"high risk", domain.RiskLevelHighType},
+	{"critical risk", domain.RiskLevelCriticalType},
 	{"unknown risk", testInvalidRiskUnknown},
 }
 
 // riskLevelValues defines the ordered risk level keys used for test value maps.
 var riskLevelValues = []domain.RiskLevelType{
-	domain.RiskLevelType(domain.RiskLevelLowType),
-	domain.RiskLevelType(domain.RiskLevelMediumType),
-	domain.RiskLevelType(domain.RiskLevelHighType),
-	domain.RiskLevelType(domain.RiskLevelCriticalType),
+	domain.RiskLevelLowType,
+	domain.RiskLevelMediumType,
+	domain.RiskLevelHighType,
+	domain.RiskLevelCriticalType,
 	testInvalidRiskUnknown,
 }
 
@@ -122,10 +122,10 @@ func TestRiskLevel_IsValid(t *testing.T) {
 		value    domain.RiskLevelType
 		expected bool
 	}{
-		{"low risk", domain.RiskLevelType(domain.RiskLevelLowType), true},
-		{"medium risk", domain.RiskLevelType(domain.RiskLevelMediumType), true},
-		{"high risk", domain.RiskLevelType(domain.RiskLevelHighType), true},
-		{"critical risk", domain.RiskLevelType(domain.RiskLevelCriticalType), true},
+		{"low risk", domain.RiskLevelLowType, true},
+		{"medium risk", domain.RiskLevelMediumType, true},
+		{"high risk", domain.RiskLevelHighType, true},
+		{"critical risk", domain.RiskLevelCriticalType, true},
 		{"unknown risk", testInvalidRiskUnknown, false},
 		{"negative risk", testInvalidRiskNegative, false},
 		{"too high risk", testInvalidRiskTooHigh, false},
@@ -163,7 +163,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelLowType)).
+					AddOperation(CleanTypeNixStore, domain.RiskLevelLowType).
 					Done()
 			},
 			expectError: false,
@@ -179,7 +179,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelLowType)).
+					AddOperation(CleanTypeNixStore, domain.RiskLevelLowType).
 					Done()
 			},
 			expectError: false,
@@ -240,7 +240,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelLowType))
+					AddOperation(CleanTypeNixStore, domain.RiskLevelLowType)
 			},
 			expectError: false,
 		},
@@ -258,7 +258,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelHighType))
+					AddOperation(CleanTypeNixStore, domain.RiskLevelHighType)
 			},
 			expectError: false,
 		},

@@ -136,7 +136,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 			itemsRemoved,
 			totalBytes,
 		)
@@ -169,7 +169,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 			duration := time.Since(startTime)
 
 			return result.Ok(conversions.NewCleanResultWithTiming(
-				domain.CleanStrategyType(domain.StrategyConservativeType),
+				domain.StrategyConservativeType,
 				itemsRemoved, bytesFreed, duration,
 			))
 		}
@@ -189,7 +189,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithTiming(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		itemsRemoved, bytesFreed, duration,
 	))
 }
@@ -270,7 +270,7 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 	}
 
 	return result.Ok(conversions.NewCleanResult(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		1, bytesFreed,
 	))
 }

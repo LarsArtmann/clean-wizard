@@ -56,7 +56,7 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 		}
 
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
+			domain.StrategyConservativeType,
 			0, int64(0),
 			domain.SizeEstimate{Status: domain.SizeEstimateStatusUnknown},
 		))
@@ -138,7 +138,7 @@ func (glc *GolangciLintCleaner) Clean(ctx context.Context) result.Result[domain.
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		1, bytesFreed,
 		domain.SizeEstimate{Known: uint64(bytesFreed)},
 	))

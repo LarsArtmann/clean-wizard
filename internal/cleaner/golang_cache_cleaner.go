@@ -196,7 +196,7 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		1, int64(sizeEstimate),
 		domain.SizeEstimate{Known: sizeEstimate},
 	))
@@ -258,7 +258,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 		}
 
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
+			domain.StrategyConservativeType,
 			1, bytesFreed,
 			domain.SizeEstimate{Known: uint64(bytesFreed)},
 		))
@@ -347,7 +347,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		itemsRemoved, int64(totalSizeEstimate.Value()),
 		totalSizeEstimate,
 	))

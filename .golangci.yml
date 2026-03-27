@@ -64,6 +64,12 @@ linters:
       min-occurrences: 4
     gocyclo:
       min-complexity: 20
+    gosec:
+      excludes:
+        - G115 # integer overflow conversion - common in size calculations
+        - G204 # subprocess launched with variable - intentional for CLI tools
+        - G304 # file inclusion via variable - intentional for config files
+        - G703 # path traversal - intentional for disk cleaner
     staticcheck:
       checks:
         - all
@@ -71,6 +77,12 @@ linters:
         - -ST1003
         - -ST1005
         - -SA9003
+    wrapcheck:
+      ignore-sig-globs:
+        - github.com/LarsArtmann/clean-wizard/* # internal packages don't need wrapping
+        - github.com/caarlos0/env/* # env parsing errors are self-explanatory
+        - github.com/go-resty/resty/* # HTTP client errors are self-explanatory
+        - os/exec.* # command execution errors are self-explanatory
   exclusions:
     rules:
       - path: _test\.go
@@ -79,18 +91,33 @@ linters:
           - staticcheck
           - wrapcheck
           - gosec
+          - unconvert
+          - unparam
+          - dupl
+          - gocyclo
+          - goconst
       - path: _ginkgo_test\.go
         linters:
           - errcheck
           - staticcheck
           - wrapcheck
           - gosec
+          - unconvert
+          - unparam
+          - dupl
+          - gocyclo
+          - goconst
       - path: tests/
         linters:
           - errcheck
           - staticcheck
           - wrapcheck
           - gosec
+          - unconvert
+          - unparam
+          - dupl
+          - gocyclo
+          - goconst
     paths:
       - tests
       - test/testdata_etc

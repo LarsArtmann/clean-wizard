@@ -188,7 +188,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 		// Estimate bytes to free based on average generation size
 		estimatedBytes := avgSize * int64(toRemove)
 		cleanResult := conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 			toRemove,
 			estimatedBytes,
 		)
@@ -228,7 +228,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 		// Combine all results using centralized function
 		combinedResult := conversions.CombineCleanResults(results)
 		combinedResult.CleanTime = time.Since(start)
-		combinedResult.Strategy = domain.CleanStrategyType(domain.StrategyAggressiveType)
+		combinedResult.Strategy = domain.StrategyAggressiveType
 
 		return result.Ok(combinedResult)
 	}
@@ -236,7 +236,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 	// Dry-run or no generations to remove - use centralized conversion
 	estimatedBytes := int64(toRemove) * NixDryRunBytesPerGeneration
 	cleanResult := conversions.NewCleanResult(
-		domain.CleanStrategyType(domain.StrategyDryRunType),
+		domain.StrategyDryRunType,
 		toRemove,
 		estimatedBytes,
 	)

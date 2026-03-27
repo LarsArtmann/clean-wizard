@@ -27,7 +27,7 @@ type SystemCacheCleaner struct {
 func AvailableSystemCacheTypes() []domain.CacheType {
 	// Use runtime check at call time for accurate platform detection
 	switch runtime.GOOS {
-	case "darwin":
+	case "darwin": //nolint:goconst // standard Go runtime constant
 		return []domain.CacheType{
 			domain.CacheTypeSpotlight,
 			domain.CacheTypeXcode,
@@ -264,7 +264,7 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 			itemsRemoved,
 			totalBytes,
 		)
@@ -316,7 +316,7 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		itemsRemoved, itemsFailed, bytesFreed, duration,
 		domain.SizeEstimate{Known: uint64(bytesFreed), Status: status},
 	))

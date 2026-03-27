@@ -62,7 +62,7 @@ func (ct CleanType) IsValid() bool {
 func NewSafeConfigBuilder() *SafeConfigBuilder {
 	return &SafeConfigBuilder{
 		profiles: []SafeProfile{},
-		maxRisk:  domain.RiskLevelType(domain.RiskLevelLowType),
+		maxRisk:  domain.RiskLevelLowType,
 	}
 }
 
@@ -108,7 +108,7 @@ func (scb *SafeConfigBuilder) AddProfile(name, description string) *SafeProfileB
 		description: description,
 		config:      scb,
 		operations:  []SafeOperation{},
-		maxRisk:     domain.RiskLevelType(domain.RiskLevelLowType),
+		maxRisk:     domain.RiskLevelLowType,
 	}
 }
 
@@ -167,7 +167,7 @@ func (spb *SafeProfileBuilder) AddOperation(
 		return spb
 	}
 
-	if risk.IsHigherThan(domain.RiskLevelType(domain.RiskLevelHighType)) && spb.err == nil {
+	if risk.IsHigherThan(domain.RiskLevelHighType) && spb.err == nil {
 		spb.err = errors.New("cannot add critical risk operation to profile")
 
 		return spb
@@ -177,7 +177,7 @@ func (spb *SafeProfileBuilder) AddOperation(
 		name:    opType,
 		risk:    risk,
 		enabled: true,
-		backup:  risk.IsHigherOrEqualThan(domain.RiskLevelType(domain.RiskLevelMediumType)),
+		backup:  risk.IsHigherOrEqualThan(domain.RiskLevelMediumType),
 	}
 
 	spb.operations = append(spb.operations, op)
@@ -202,7 +202,7 @@ func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 		return spb.config
 	}
 
-	if spb.maxRisk.IsHigherThan(domain.RiskLevelType(domain.RiskLevelHighType)) {
+	if spb.maxRisk.IsHigherThan(domain.RiskLevelHighType) {
 		spb.config.err = errors.New("profile risk level cannot exceed HIGH")
 
 		return spb.config

@@ -105,11 +105,11 @@ func TestCleanDryRun(
 		)
 	}
 
-	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
+	if cleanResult.Strategy != domain.StrategyDryRunType {
 		t.Errorf(
 			"Clean() strategy = %v, want %v",
 			cleanResult.Strategy,
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 		)
 	}
 
@@ -135,11 +135,11 @@ func TestDryRunStrategy(t *testing.T, newCleanerFunc SimpleCleanerConstructor, t
 
 	cleanResult := result.Value()
 
-	if cleanResult.Strategy != domain.CleanStrategyType(domain.StrategyDryRunType) {
+	if cleanResult.Strategy != domain.StrategyDryRunType {
 		t.Errorf(
 			"Clean() strategy = %v, want %v",
 			cleanResult.Strategy,
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 		)
 	}
 

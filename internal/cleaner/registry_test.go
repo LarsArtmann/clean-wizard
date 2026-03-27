@@ -24,7 +24,7 @@ func (m *mockCleaner) Clean(ctx context.Context) result.Result[domain.CleanResul
 	return result.Ok(domain.CleanResult{
 		ItemsRemoved: 1,
 		FreedBytes:   1024,
-		Strategy:     domain.CleanStrategyType(domain.StrategyConservativeType),
+		Strategy:     domain.StrategyConservativeType,
 	})
 }
 

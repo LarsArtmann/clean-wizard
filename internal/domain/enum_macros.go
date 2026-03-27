@@ -32,7 +32,7 @@ import (
 func EnumString[T ~int](val T, stringsMap []string) string {
 	idx := int(val)
 	if idx < 0 || idx >= len(stringsMap) {
-		return "UNKNOWN"
+		return stringUnknown
 	}
 
 	return stringsMap[idx]

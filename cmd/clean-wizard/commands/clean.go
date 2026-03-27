@@ -65,7 +65,7 @@ func NewCleanCommand() *cobra.Command {
 }
 
 // runCleanCommand executes the clean command with multi-cleaner TUI.
-func runCleanCommand(
+func runCleanCommand( //nolint:gocyclo,cyclop // CLI command with many options and branches
 	_ *cobra.Command,
 	_ []string,
 	dryRun, verbose, jsonOutput bool,

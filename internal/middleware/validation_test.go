@@ -42,7 +42,7 @@ func TestValidationMiddleware(t *testing.T) {
 			Items: []domain.ScanItem{
 				{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: domain.ScanTypeTemp},
 			},
-			Strategy: domain.CleanStrategyType(domain.StrategyConservativeType),
+			Strategy: domain.StrategyConservativeType,
 		}
 
 		result := validator.ValidateCleanRequest(ctx, req)

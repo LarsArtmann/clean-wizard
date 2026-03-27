@@ -124,7 +124,10 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 
 // validateEnumDefaults validates all enum values in default settings.
 // This is called from DefaultSettings to ensure defaults are valid.
-func validateEnumDefaults(settings *OperationSettings, opType OperationType) error {
+func validateEnumDefaults(
+	settings *OperationSettings,
+	opType OperationType,
+) error { //nolint:gocyclo,cyclop // exhaustive validation for many enum types
 	if settings == nil {
 		return fmt.Errorf("nil settings for operation type: %s", opType)
 	}

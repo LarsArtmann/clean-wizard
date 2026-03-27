@@ -165,7 +165,7 @@ func (bt BuildToolType) String() string {
 	case BuildToolScala:
 		return "SCALA"
 	default:
-		return "UNKNOWN"
+		return stringUnknown
 	}
 }
 
@@ -253,7 +253,7 @@ func (ct CacheType) String() string {
 	case CacheTypeThumbnails:
 		return "THUMBNAILS"
 	default:
-		return "UNKNOWN"
+		return stringUnknown
 	}
 }
 
@@ -325,7 +325,7 @@ func (pm PackageManagerType) String() string {
 	case PackageManagerBun:
 		return "BUN"
 	default:
-		return "UNKNOWN"
+		return stringUnknown
 	}
 }
 
