@@ -171,8 +171,8 @@ func (c *Context[ValidationConfig]) Execute(validator func() *ValidationResult) 
 }
 
 // LegacyValidationContext provides backward compatibility with the old ValidationContext type.
-// DEPRECATED: Use Context[ValidationConfig] for new code.
-// This type will be removed in v2.0.
+//
+// Deprecated: Use Context[ValidationConfig] for new code. This type will be removed in v2.0.
 type LegacyValidationContext struct {
 	ConfigPath      string
 	ValidationLevel string
@@ -234,7 +234,8 @@ func FromLegacyValidationContext(
 }
 
 // NewLegacyValidationContext creates a new LegacyValidationContext with default values.
-// DEPRECATED: Use NewContext[ValidationConfig] for new code.
+//
+// Deprecated: Use NewContext[ValidationConfig] for new code.
 func NewLegacyValidationContext() *LegacyValidationContext {
 	return &LegacyValidationContext{
 		Constraints:   make(map[string]string),

@@ -14,15 +14,22 @@ const (
 	CacheCleanupEnabled
 )
 
+// String constants for cache cleanup mode representation.
+const (
+	stringDisabled = "DISABLED"
+	stringEnabled  = "ENABLED"
+	stringUnknown  = "UNKNOWN"
+)
+
 // String returns string representation of cache cleanup mode.
 func (cm CacheCleanupMode) String() string {
 	switch cm {
 	case CacheCleanupDisabled:
-		return "DISABLED"
+		return stringDisabled
 	case CacheCleanupEnabled:
-		return "ENABLED"
+		return stringEnabled
 	default:
-		return "UNKNOWN"
+		return stringUnknown
 	}
 }
 
@@ -88,7 +95,7 @@ func (pm DockerPruneMode) String() string {
 	case DockerPruneBuilds:
 		return "BUILDS"
 	default:
-		return "UNKNOWN"
+		return stringUnknown
 	}
 }
 

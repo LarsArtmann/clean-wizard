@@ -28,9 +28,7 @@ func NewProfileListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List all profiles",
 		Long:  `List all available cleaning profiles.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runProfileListCommand(cmd, args)
-		},
+		RunE:  runProfileListCommand,
 	}
 }
 

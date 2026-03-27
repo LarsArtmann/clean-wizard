@@ -63,6 +63,8 @@ func (gcc *GoCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.Scan
 		items = append(items, gcc.scanGoEnvCache(ctx, "GOMODCACHE")...)
 	case GoCacheBuildCache:
 		items = append(items, gcc.scanGoBuildCache()...)
+	case GoCacheNone, GoCacheLintCache:
+		// No scan items for these cache types
 	}
 
 	return result.Ok(items)
@@ -144,6 +146,14 @@ func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.Clean
 		return gcc.cleanGoModCache(ctx)
 	case GoCacheBuildCache:
 		return gcc.cleanGoBuildCache(ctx)
+	case GoCacheNone:
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("no cache type specified"),
+		)
+	case GoCacheLintCache:
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("lint cache cleaning not yet implemented"),
+		)
 	default:
 		return result.Err[domain.CleanResult](
 			fmt.Errorf("unsupported cache type: %v", gcc.cacheType),

@@ -58,6 +58,7 @@ type SanitizationResult struct {
 }
 
 // SanitizationWarning represents a sanitization warning.
+//
 // Deprecated: Use domain.SanitizationWarning instead. This alias exists for backward compatibility.
 type SanitizationWarning = domain.SanitizationWarning
 

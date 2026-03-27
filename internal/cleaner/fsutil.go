@@ -304,10 +304,8 @@ func DiskUsageBar(du DiskUsage, width int) string {
 	for i := 0; i < filled && i < width; i++ {
 		if du.UsedPercent >= 90 {
 			bar.WriteString("█") // Red for high usage
-		} else if du.UsedPercent >= 75 {
-			bar.WriteString("▓") // Yellow for medium-high
 		} else {
-			bar.WriteString("▓")
+			bar.WriteString("▓") // Yellow for medium-high or lower
 		}
 	}
 

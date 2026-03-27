@@ -52,6 +52,8 @@ func runCleaner(
 		result, err = runProjectsManagementAutomationCleaner(ctx, dryRun, verbose)
 	case CleanerTypeCompiledBinaries:
 		result, err = runCompiledBinariesCleaner(ctx, dryRun, verbose)
+	case CleanerTypeLangVersionMgr:
+		return domain.CleanResult{}, errors.New("langversion cleaner is not implemented yet")
 	default:
 		return domain.CleanResult{}, errors.New("unknown cleaner type: " + string(cleanerType))
 	}

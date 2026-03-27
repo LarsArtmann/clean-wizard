@@ -108,7 +108,8 @@ func runCleanCommand(
 	var selectedCleaners []CleanerType
 
 	// Priority: profile > mode > interactive
-	if profile != "" {
+	switch {
+	case profile != "":
 		// Use profile from configuration
 		selectedCleaners, err = getProfileCleaners(profile, cfg, availableConfigs)
 		if err != nil {
@@ -125,7 +126,7 @@ func runCleanCommand(
 
 			fmt.Println()
 		}
-	} else if mode != "" {
+	case mode != "":
 		selectedCleaners = getPresetSelection(mode, availableConfigs)
 		if !jsonOutput {
 			fmt.Printf("🎯 Using preset mode: %s\n", mode)
@@ -137,12 +138,12 @@ func runCleanCommand(
 
 			fmt.Println()
 		}
-	} else if jsonOutput {
+	case jsonOutput:
 		// In JSON mode without --mode or --profile, use all available cleaners
 		for _, cfg := range availableConfigs {
 			selectedCleaners = append(selectedCleaners, cfg.Type)
 		}
-	} else {
+	default:
 		// Interactive cleaner selection (TUI mode only)
 		fmt.Println(InfoStyle.Render("⌨️  Keyboard Shortcuts:"))
 		fmt.Println("   ↑↓ : Navigate  |  Space : Select  |  Enter : Confirm  |  Esc : Cancel")

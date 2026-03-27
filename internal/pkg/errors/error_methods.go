@@ -72,6 +72,12 @@ func (e *CleanWizardError) IsRetryable() bool {
 		return true
 	case ErrConfigLoad, ErrConfigSave:
 		return true
+	case ErrUnknown, ErrInvalidInput, ErrNotFound, ErrPermissionDenied:
+		return false
+	case ErrConfigValidation, ErrNixNotAvailable, ErrNixStoreCorrupted:
+		return false
+	case ErrCleaningTimeout, ErrCleanupRollback:
+		return false
 	default:
 		return false
 	}
@@ -84,6 +90,12 @@ func (e *CleanWizardError) IsUserFriendly() bool {
 		return true
 	case ErrInvalidInput, ErrNotFound:
 		return true
+	case ErrUnknown, ErrConfigLoad, ErrConfigSave:
+		return false
+	case ErrNixNotAvailable, ErrNixCommandFailed, ErrNixStoreCorrupted:
+		return false
+	case ErrCleaningFailed, ErrCleaningTimeout, ErrCleanupRollback:
+		return false
 	default:
 		return false
 	}

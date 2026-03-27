@@ -201,8 +201,8 @@ func NewSanitizationResultV2() *SanitizationResultV2 {
 }
 
 // LegacyErrorDetails provides backward compatibility with the old ErrorDetails type.
-// DEPRECATED: Use Context[ErrorConfig] for new code.
-// This type will be removed in v2.0.
+//
+// Deprecated: Use Context[ErrorConfig] for new code. This type will be removed in v2.0.
 type LegacyErrorDetails struct {
 	Field      string
 	Value      string
@@ -252,7 +252,8 @@ func FromLegacyErrorDetails(ctx context.Context, legacy *LegacyErrorDetails) *Co
 }
 
 // NewLegacyErrorDetails creates a new LegacyErrorDetails with default values.
-// DEPRECATED: Use NewContext[ErrorConfig] for new code.
+//
+// Deprecated: Use NewContext[ErrorConfig] for new code.
 func NewLegacyErrorDetails() *LegacyErrorDetails {
 	return &LegacyErrorDetails{
 		Metadata: make(map[string]string),
@@ -260,8 +261,8 @@ func NewLegacyErrorDetails() *LegacyErrorDetails {
 }
 
 // LegacySanitizationChange provides backward compatibility with the old SanitizationChange type.
-// DEPRECATED: Use Context[SanitizationConfig] for new code.
-// This type will be removed in v2.0.
+//
+// Deprecated: Use Context[SanitizationConfig] for new code. This type will be removed in v2.0.
 type LegacySanitizationChange struct {
 	Original  any
 	Sanitized any
@@ -308,7 +309,8 @@ func FromLegacySanitizationChange(
 }
 
 // NewLegacySanitizationChange creates a new LegacySanitizationChange with default values.
-// DEPRECATED: Use Context[SanitizationConfig] for new code.
+//
+// Deprecated: Use Context[SanitizationConfig] for new code.
 func NewLegacySanitizationChange() *LegacySanitizationChange {
 	return &LegacySanitizationChange{
 		Timestamp: time.Now(),

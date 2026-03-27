@@ -102,9 +102,7 @@ func NewConfigEditCommand() *cobra.Command {
 		Use:   "edit",
 		Short: "Edit configuration",
 		Long:  `Open configuration file in the default editor.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runConfigEditCommand(cmd, args)
-		},
+		RunE:  runConfigEditCommand,
 	}
 
 	return cmd

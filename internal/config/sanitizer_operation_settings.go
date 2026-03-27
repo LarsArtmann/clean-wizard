@@ -52,6 +52,19 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(
 	case domain.OperationTypeSystemTemp:
 		cs.sanitizeSystemTempSettings(fieldPrefix, settings.SystemTemp, result)
 
+	case domain.OperationTypeNodePackages,
+		domain.OperationTypeGoPackages,
+		domain.OperationTypeCargoPackages,
+		domain.OperationTypeBuildCache,
+		domain.OperationTypeDocker,
+		domain.OperationTypeSystemCache,
+		domain.OperationTypeProjectsManagementAutomation,
+		domain.OperationTypeProjectExecutables,
+		domain.OperationTypeCompiledBinaries,
+		domain.OperationTypeGitHistory:
+		// These operation types have no specific sanitization logic yet
+		// Fall through to default handling
+
 	default:
 		// For custom operation types, just record that they were processed
 		result.Warnings = append(result.Warnings, SanitizationWarning{

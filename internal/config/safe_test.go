@@ -167,10 +167,8 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name: "build config with no profiles",
-			builderFunc: func() *SafeConfigBuilder {
-				return NewSafeConfigBuilder()
-			},
+			name:        "build config with no profiles",
+			builderFunc: NewSafeConfigBuilder,
 			expectError: true,
 			errorMsg:    "config must have at least one profile",
 		},

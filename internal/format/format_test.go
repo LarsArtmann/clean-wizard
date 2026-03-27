@@ -58,9 +58,7 @@ func TestSize(t *testing.T) {
 		{"negative", int64(-1024), "0 B"},
 	}
 
-	runFormattingTests(t, tests, func(v int64) string {
-		return Size(v)
-	})
+	runFormattingTests(t, tests, Size)
 }
 
 func TestDuration(t *testing.T) {
@@ -78,9 +76,7 @@ func TestDuration(t *testing.T) {
 		{"zero", time.Duration(0), "0 ns"},
 	}
 
-	runFormattingTests(t, tests, func(v time.Duration) string {
-		return Duration(v)
-	})
+	runFormattingTests(t, tests, Duration)
 }
 
 func TestDate(t *testing.T) {
@@ -140,7 +136,5 @@ func TestNumber(t *testing.T) {
 		{"hundreds", int64(999), "999"},
 	}
 
-	runFormattingTests(t, tests, func(v int64) string {
-		return Number(v)
-	})
+	runFormattingTests(t, tests, Number)
 }

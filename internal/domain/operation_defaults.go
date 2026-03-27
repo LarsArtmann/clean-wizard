@@ -92,6 +92,23 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 				ClearCache: CacheCleanupEnabled,
 			},
 		}
+	case OperationTypeProjectExecutables:
+		settings = &OperationSettings{
+			ProjectExecutables: &ProjectExecutablesSettings{
+				ExcludeExtensions: []string{".sh"},
+			},
+		}
+	case OperationTypeCompiledBinaries:
+		settings = &OperationSettings{
+			CompiledBinaries: &CompiledBinariesSettings{
+				MinSizeMB: 10,
+				OlderThan: "0",
+			},
+		}
+	case OperationTypeGitHistory:
+		settings = &OperationSettings{
+			GitHistory: &GitHistorySettings{},
+		}
 	default:
 		return &OperationSettings{} // Empty settings for custom types
 	}

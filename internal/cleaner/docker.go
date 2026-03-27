@@ -117,6 +117,7 @@ func (dc *DockerCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIt
 }
 
 // scanDockerResources converts Docker resource IDs to scan items.
+//
 // Deprecated: Use scan-specific methods that include size parsing.
 func (dc *DockerCleaner) scanDockerResources(
 	ids []string,
