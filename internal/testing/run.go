@@ -39,6 +39,7 @@ type TestCase[T any, E any] struct {
 //   - tests: Slice of TestCase to run
 //   - testFn: Function that takes a test case and returns the actual result
 func RunTestCases[T, E any](t *testing.T, tests []TestCase[T, E], testFn func(TestCase[T, E]) E) {
+	t.Helper()
 	for _, tc := range tests {
 		t.Run(tc.Name, func(t *testing.T) {
 			result := testFn(tc)
@@ -85,6 +86,7 @@ func RunValueTestCases[T, E any](
 	tests []ValueTestCase[T, E],
 	testFn func(ValueTestCase[T, E]) E,
 ) {
+	t.Helper()
 	for _, tc := range tests {
 		t.Run(fmt.Sprintf("%v", tc.Expected), func(t *testing.T) {
 			result := testFn(tc)

@@ -36,6 +36,7 @@ func main() {
 		fang.WithNotifySignal(os.Interrupt, syscall.SIGTERM),
 	)
 	if err != nil {
+		cancel()
 		os.Exit(1)
 	}
 }

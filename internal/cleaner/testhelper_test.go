@@ -28,6 +28,7 @@ func availableItemsTestHelper[T comparable](
 	availableFn func() []T,
 	testName string,
 ) {
+	t.Helper()
 	items := availableFn()
 
 	if len(items) != len(expectedItems) {

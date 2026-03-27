@@ -30,6 +30,7 @@ func CreateBooleanSettingsCleanerTestFunctions(
 	t *testing.T,
 	config BooleanSettingsCleanerTestConfig,
 ) {
+	t.Helper()
 	t.Run("ValidateSettings", func(t *testing.T) {
 		TestBooleanSettingsCleanerValidateSettings(t, config, config.Constructor)
 	})
@@ -61,6 +62,7 @@ func CreateBooleanSettingsCleanerTestFunctions(
 //	    })
 //	}
 func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
+	t.Helper()
 	CreateBooleanSettingsCleanerTestFunctions(t, BooleanSettingsCleanerTestConfig{
 		TestName:          config.TestName,
 		ToolName:          config.ToolName,
@@ -95,6 +97,7 @@ func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
 //	    RunGetHomeDirTests(t, testCases)
 //	}
 func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
+	t.Helper()
 	for _, tt := range testCases {
 		t.Run(tt.Name, func(t *testing.T) {
 			t.Setenv("HOME", tt.HomeValue)

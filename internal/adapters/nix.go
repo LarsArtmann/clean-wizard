@@ -310,10 +310,5 @@ func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
 	// Check if nix command exists
 	versionCmd := n.execWithTimeout(ctx, "nix", "--version")
 
-	err := versionCmd.Run()
-	if err != nil {
-		return false
-	}
-
-	return true
+	return versionCmd.Run() == nil
 }

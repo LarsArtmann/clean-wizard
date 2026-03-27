@@ -65,6 +65,7 @@ func testRiskLevelMethod(
 	t *testing.T, methodName string,
 	method func(domain.RiskLevelType) string, expected map[domain.RiskLevelType]string,
 ) {
+	t.Helper()
 	for _, tc := range riskLevelTestCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := method(tc.level)
@@ -89,6 +90,7 @@ func testIsValid[T validatable](t *testing.T, tests []struct {
 	expected bool
 },
 ) {
+	t.Helper()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := tt.value.IsValid()

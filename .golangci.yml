@@ -1,109 +1,106 @@
 version: "2"
 run:
-    timeout: 5m
-    go: 1.26.1
-    build-tags: []
-    modules-download-mode: readonly
-    allow-parallel-runners: true
-    allow-serial-runners: false
-    issues-exit-code: 1
-    tests: true
+  timeout: 5m
+  go: 1.26.1
+  build-tags: []
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+  allow-serial-runners: false
+  issues-exit-code: 1
+  tests: true
 output:
-    formats: {}
+  formats: {}
 linters:
-    enable:
-        - prealloc
-        - godot
-        - staticcheck
-        - unconvert
-        - unparam
-        - exptostd
-        - errname
-        - misspell
-        - wastedassign
-        - contextcheck
-        - goconst
-        - usetesting
-        - copyloopvar
-        - nolintlint
-        - nilnesserr
-        - gocyclo
-        - intrange
-        - testifylint
-        - unused
-        - gocritic
-        - bodyclose
-        - dupl
-        - nilnil
-        - reassign
-        - errcheck
-        - rowserrcheck
-        - cyclop
-        - wrapcheck
-        - gosec
-        - errorlint
-        - modernize
-        - thelper
-        - dogsled
-        - exhaustive
-        - ineffassign
-        - predeclared
-        - nilerr
-        - ginkgolinter
-        - govet
-    settings:
-        cyclop:
-            max-complexity: 20
-        dupl:
-            threshold: 150
-        errcheck:
-            check-blank: false
-            check-type-assertions: false
-        goconst:
-            min-len: 5
-            min-occurrences: 4
-        gocyclo:
-            min-complexity: 20
-        staticcheck:
-            checks:
-                - all
-                - -ST1000
-                - -ST1003
-                - -ST1005
-                - -SA9003
-        wrapcheck:
-            ignorePackageGlobs:
-                - github.com/LarsArtmann/clean-wizard/*
-    exclusions:
-        rules:
-            - path: _test\.go
-              linters:
-                - errcheck
-                - staticcheck
-                - wrapcheck
-                - gosec
-            - path: _ginkgo_test\.go
-              linters:
-                - errcheck
-                - staticcheck
-                - wrapcheck
-                - gosec
-            - path: tests/
-              linters:
-                - errcheck
-                - staticcheck
-                - wrapcheck
-                - gosec
-        paths:
-            - tests
-            - test/testdata_etc
-            - vendor
-            - .git
+  enable:
+    - prealloc
+    - godot
+    - staticcheck
+    - unconvert
+    - unparam
+    - exptostd
+    - errname
+    - misspell
+    - wastedassign
+    - contextcheck
+    - goconst
+    - usetesting
+    - copyloopvar
+    - nolintlint
+    - nilnesserr
+    - gocyclo
+    - intrange
+    - testifylint
+    - unused
+    - gocritic
+    - bodyclose
+    - dupl
+    - nilnil
+    - reassign
+    - errcheck
+    - rowserrcheck
+    - cyclop
+    - wrapcheck
+    - gosec
+    - errorlint
+    - modernize
+    - thelper
+    - dogsled
+    - exhaustive
+    - ineffassign
+    - predeclared
+    - nilerr
+    - ginkgolinter
+    - govet
+  settings:
+    cyclop:
+      max-complexity: 20
+    dupl:
+      threshold: 150
+    errcheck:
+      check-blank: false
+      check-type-assertions: false
+    goconst:
+      min-len: 5
+      min-occurrences: 4
+    gocyclo:
+      min-complexity: 20
+    staticcheck:
+      checks:
+        - all
+        - -ST1000
+        - -ST1003
+        - -ST1005
+        - -SA9003
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - staticcheck
+          - wrapcheck
+          - gosec
+      - path: _ginkgo_test\.go
+        linters:
+          - errcheck
+          - staticcheck
+          - wrapcheck
+          - gosec
+      - path: tests/
+        linters:
+          - errcheck
+          - staticcheck
+          - wrapcheck
+          - gosec
+    paths:
+      - tests
+      - test/testdata_etc
+      - vendor
+      - .git
 formatters:
-    enable:
-        - goimports
-        - gofmt
-        - golines
+  enable:
+    - goimports
+    - gofmt
+    - golines
 issues:
-    max-issues-per-linter: 50
-    max-same-issues: 10
+  max-issues-per-linter: 50
+  max-same-issues: 10

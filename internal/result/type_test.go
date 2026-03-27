@@ -60,6 +60,7 @@ func testPredicateCases(
 		expected bool
 	},
 ) {
+	t.Helper()
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			if predicate(tt.result) != tt.expected {

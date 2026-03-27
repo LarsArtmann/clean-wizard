@@ -200,6 +200,7 @@ func NewCleanResultAnalyzer(
 	cleanResult domain.CleanResult,
 	elapsed time.Duration,
 ) *CleanResultAnalyzer {
+	t.Helper()
 	return &CleanResultAnalyzer{
 		t:           t,
 		cleanResult: cleanResult,

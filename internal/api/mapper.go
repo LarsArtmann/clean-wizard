@@ -215,17 +215,15 @@ func MapOperationSettingsToPublic(settings *domain.OperationSettings) OperationS
 func MapRiskLevelToDomain(publicRisk PublicRiskLevel) (domain.RiskLevelType, error) {
 	switch publicRisk {
 	case PublicRiskLow:
-		return domain.RiskLevelType(domain.RiskLevelLowType), nil
+		return domain.RiskLevelLowType, nil
 	case PublicRiskMedium:
-		return domain.RiskLevelType(domain.RiskLevelMediumType), nil
+		return domain.RiskLevelMediumType, nil
 	case PublicRiskHigh:
-		return domain.RiskLevelType(domain.RiskLevelHighType), nil
+		return domain.RiskLevelHighType, nil
 	case PublicRiskCritical:
-		return domain.RiskLevelType(domain.RiskLevelCriticalType), nil
+		return domain.RiskLevelCriticalType, nil
 	default:
-		return domain.RiskLevelType(
-				domain.RiskLevelLowType,
-			), fmt.Errorf(
+		return domain.RiskLevelLowType, fmt.Errorf(
 				"unknown risk level: %s",
 				publicRisk,
 			)
@@ -235,13 +233,13 @@ func MapRiskLevelToDomain(publicRisk PublicRiskLevel) (domain.RiskLevelType, err
 // MapRiskLevelToPublic converts domain risk level enum to public string.
 func MapRiskLevelToPublic(domainRisk domain.RiskLevelType) PublicRiskLevel {
 	switch domainRisk {
-	case domain.RiskLevelType(domain.RiskLevelLowType):
+	case domain.RiskLevelLowType:
 		return PublicRiskLow
-	case domain.RiskLevelType(domain.RiskLevelMediumType):
+	case domain.RiskLevelMediumType:
 		return PublicRiskMedium
-	case domain.RiskLevelType(domain.RiskLevelHighType):
+	case domain.RiskLevelHighType:
 		return PublicRiskHigh
-	case domain.RiskLevelType(domain.RiskLevelCriticalType):
+	case domain.RiskLevelCriticalType:
 		return PublicRiskCritical
 	default:
 		return PublicRiskLow // Default fallback

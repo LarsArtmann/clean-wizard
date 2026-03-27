@@ -345,9 +345,18 @@ func TestSwitchFlow(t *testing.T) {
 	t.Run("matches first predicate", func(t *testing.T) {
 		value := 5
 		cases := []Case[int, string]{
-			{Predicate: func(i int) bool { return i < 0 }, Execute: func() Result[string] { return Ok("negative") }},
-			{Predicate: func(i int) bool { return i == 0 }, Execute: func() Result[string] { return Ok("zero") }},
-			{Predicate: func(i int) bool { return i > 0 }, Execute: func() Result[string] { return Ok("positive") }},
+			{
+				Predicate: func(i int) bool { return i < 0 },
+				Execute:   func() Result[string] { return Ok("negative") },
+			},
+			{
+				Predicate: func(i int) bool { return i == 0 },
+				Execute:   func() Result[string] { return Ok("zero") },
+			},
+			{
+				Predicate: func(i int) bool { return i > 0 },
+				Execute:   func() Result[string] { return Ok("positive") },
+			},
 		}
 		defaultCase := func() Result[string] { return Ok("unknown") }
 

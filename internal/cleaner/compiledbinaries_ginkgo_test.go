@@ -396,9 +396,9 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		})
 
 		ginkgo.Context("when scan succeeds", func() {
-		ginkgo.It("should return scan items from scanner", func() {
-			mockScanner.binaries = StandardTestBinaries()
-			result := cleaner.Scan(ctx)
+			ginkgo.It("should return scan items from scanner", func() {
+				mockScanner.binaries = StandardTestBinaries()
+				result := cleaner.Scan(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				items := result.Value()
 				gomega.Expect(items).To(gomega.HaveLen(2))

@@ -7,7 +7,11 @@ import (
 
 // makeTestCleanResult creates a CleanResult for testing with common defaults.
 // This reduces duplication across test cases while maintaining readability.
-func makeTestCleanResult(known uint64, itemsRemoved, itemsFailed uint, strategy CleanStrategyType) CleanResult {
+func makeTestCleanResult(
+	known uint64,
+	itemsRemoved, itemsFailed uint,
+	strategy CleanStrategyType,
+) CleanResult {
 	return CleanResult{
 		SizeEstimate: SizeEstimate{Known: known, Status: SizeEstimateStatusKnown},
 		ItemsRemoved: itemsRemoved,

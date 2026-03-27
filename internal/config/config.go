@@ -177,27 +177,27 @@ func Save(config *domain.Config) error {
 	configPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 
 	// Build the config map for YAML output
-	configMap := map[string]interface{}{
-		"version":               config.Version,
-		"safe_mode":             config.SafeMode.String(),
+	configMap := map[string]any{
+		"version":                config.Version,
+		"safe_mode":              config.SafeMode.String(),
 		"max_disk_usage_percent": config.MaxDiskUsage,
-		"protected":             config.Protected,
-		"last_clean":            config.LastClean,
-		"updated":               config.Updated,
+		"protected":              config.Protected,
+		"last_clean":             config.LastClean,
+		"updated":                config.Updated,
 	}
 
 	// Build profiles map
-	profilesMap := make(map[string]interface{})
+	profilesMap := make(map[string]any)
 	for name, profile := range config.Profiles {
-		profileMap := map[string]interface{}{
+		profileMap := map[string]any{
 			"name":        profile.Name,
 			"description": profile.Description,
 			"enabled":     profile.Enabled.String(),
 		}
 
-		operations := make([]interface{}, len(profile.Operations))
+		operations := make([]any, len(profile.Operations))
 		for i, op := range profile.Operations {
-			opMap := map[string]interface{}{
+			opMap := map[string]any{
 				"name":        op.Name,
 				"description": op.Description,
 				"risk_level":  op.RiskLevel.String(),
