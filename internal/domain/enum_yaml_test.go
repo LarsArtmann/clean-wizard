@@ -247,16 +247,6 @@ func runEnumMethodTests[T comparable](
 	}
 }
 
-// enumStringer is an interface for enum types that can return their string representation.
-type enumStringer interface {
-	String() string
-}
-
-// enumValidator is an interface for enum types that can validate themselves.
-type enumValidator interface {
-	IsValid() bool
-}
-
 // extractEnumString extracts the string representation from any enum value.
 // Returns empty string if the type is not supported.
 func extractEnumString(v any) string {

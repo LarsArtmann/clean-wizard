@@ -16,11 +16,12 @@ type TestSanitizationTestCase struct {
 
 // TestValidationLevelTestCase defines validation level test cases.
 type TestValidationLevelTestCase struct {
-	name         string
-	config       *domain.Config
-	level        domain.ValidationLevelType
-	expectValid  bool
-	expectErrors int
+	name       string
+	config     *domain.Config
+	level      domain.ValidationLevelType
+	// Fields below are unused but kept for potential future use
+	// expectValid  bool
+	// expectErrors int
 }
 
 // CreateTestConfigurations creates test configurations for validation testing.

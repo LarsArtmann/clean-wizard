@@ -192,22 +192,6 @@ func newSecurityErrorValidationThen() []BDDThen {
 	}
 }
 
-// withEnabled sets the Enabled flag for nix-generations operation.
-func withEnabled(cfg *domain.Config, enabled bool) *domain.Config {
-	WithProfileOperationField(
-		cfg,
-		"nix-cleanup",
-		"nix-generations",
-		func(op *domain.CleanupOperation) bool {
-			op.Enabled = BoolToProfileStatus(enabled)
-
-			return true
-		},
-	)
-
-	return cfg
-}
-
 // TestBDD_NixGenerationsValidation provides comprehensive BDD tests for Nix generations.
 func TestBDD_NixGenerationsValidation(t *testing.T) {
 	feature := BDDFeature{

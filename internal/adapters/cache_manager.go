@@ -1,7 +1,6 @@
 package adapters
 
 import (
-	"sync"
 	"time"
 
 	"github.com/maypok86/otter/v2"
@@ -23,7 +22,6 @@ type CacheManager struct {
 	cache           *otter.Cache[string, *cacheItem]
 	defaultExpiry   time.Duration
 	cleanupInterval time.Duration
-	mu              sync.RWMutex
 }
 
 // NewCacheManager creates a new cache manager
