@@ -246,7 +246,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 
 	return result.Ok(
 		conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
+			domain.StrategyConservativeType,
 			itemsRemoved,
 			bytesFreed,
 		),

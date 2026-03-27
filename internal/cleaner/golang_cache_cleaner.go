@@ -268,7 +268,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 	bytesFreed = GetDirSize(cachePath)
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		1, bytesFreed,
 		domain.SizeEstimate{Known: uint64(bytesFreed)},
 	))

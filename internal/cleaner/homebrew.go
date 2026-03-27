@@ -154,7 +154,7 @@ func (hbc *HomebrewCleaner) handleDryRun() result.Result[domain.CleanResult] {
 	fmt.Println("   To see what would be cleaned, use: brew cleanup -n (manual check)")
 
 	return result.Ok(
-		conversions.NewCleanResult(domain.CleanStrategyType(domain.StrategyDryRunType), 0, 0),
+		conversions.NewCleanResult(domain.StrategyDryRunType, 0, 0),
 	)
 }
 
