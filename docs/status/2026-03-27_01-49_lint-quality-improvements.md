@@ -16,14 +16,14 @@ The project is in **good health** with all tests passing and build succeeding. T
 
 ### Completed This Session
 
-| Task | Files Changed | Status |
-|------|---------------|--------|
-| Deprecated comment format fixes | `docker.go`, `sanitizer.go` | Fixed 2 instances with proper paragraph format |
-| Unlambda simplifications | `config.go`, `profile.go`, `safe_test.go`, `format_test.go` | Replaced 6 lambda wrappers with direct function refs |
-| Constant extraction | `operation_settings.go` | Added `stringDisabled`, `stringEnabled`, `stringUnknown` |
-| ifElseChain to switch | `clean.go:111` | Converted to `switch { case ... }` pattern |
-| dupBranchBody fix | `fsutil.go:307` | Simplified duplicate branch logic |
-| Exhaustive switch cases | 8 locations | All enum switches now handle all cases |
+| Task                            | Files Changed                                               | Status                                                   |
+| ------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------- |
+| Deprecated comment format fixes | `docker.go`, `sanitizer.go`                                 | Fixed 2 instances with proper paragraph format           |
+| Unlambda simplifications        | `config.go`, `profile.go`, `safe_test.go`, `format_test.go` | Replaced 6 lambda wrappers with direct function refs     |
+| Constant extraction             | `operation_settings.go`                                     | Added `stringDisabled`, `stringEnabled`, `stringUnknown` |
+| ifElseChain to switch           | `clean.go:111`                                              | Converted to `switch { case ... }` pattern               |
+| dupBranchBody fix               | `fsutil.go:307`                                             | Simplified duplicate branch logic                        |
+| Exhaustive switch cases         | 8 locations                                                 | All enum switches now handle all cases                   |
 
 ### Build & Test Status
 
@@ -40,22 +40,22 @@ BDD:      ✅ 211.593s (passing)
 
 ### Remaining goconst Issues (5 instances)
 
-| File | Line | String | Occurrences | Notes |
-|------|------|--------|-------------|-------|
-| `systemcache.go` | 30 | `darwin` | 4 | Platform detection |
-| `operation_settings.go` | 168 | `UNKNOWN` | 15 | Already have `stringUnknown`, need to use it |
-| `format_test.go` | 112 | `never` | 5 | Test data |
-| `error_config_test.go` | 31 | `test_field` | 4 | Test data |
-| `error_config_test.go` | 35 | `test_value` | 4 | Test data |
+| File                    | Line | String       | Occurrences | Notes                                        |
+| ----------------------- | ---- | ------------ | ----------- | -------------------------------------------- |
+| `systemcache.go`        | 30   | `darwin`     | 4           | Platform detection                           |
+| `operation_settings.go` | 168  | `UNKNOWN`    | 15          | Already have `stringUnknown`, need to use it |
+| `format_test.go`        | 112  | `never`      | 5           | Test data                                    |
+| `error_config_test.go`  | 31   | `test_field` | 4           | Test data                                    |
+| `error_config_test.go`  | 35   | `test_value` | 4           | Test data                                    |
 
 ### Cyclomatic Complexity Issues (4 functions > 20)
 
-| Function | Location | Complexity | Target |
-|----------|----------|------------|--------|
-| `runCleanCommand` | `clean.go:68` | 45 | < 20 |
-| `ValidateSettings` | `operation_validation.go:46` | 33 | < 20 |
-| `TestErrorDetailsBuilder` | `detail_helpers_test.go:240` | 32 | < 20 |
-| `validateEnumDefaults` | `operation_defaults.go:127` | 28 | < 20 |
+| Function                  | Location                     | Complexity | Target |
+| ------------------------- | ---------------------------- | ---------- | ------ |
+| `runCleanCommand`         | `clean.go:68`                | 45         | < 20   |
+| `ValidateSettings`        | `operation_validation.go:46` | 33         | < 20   |
+| `TestErrorDetailsBuilder` | `detail_helpers_test.go:240` | 32         | < 20   |
+| `validateEnumDefaults`    | `operation_defaults.go:127`  | 28         | < 20   |
 
 ---
 
@@ -63,11 +63,11 @@ BDD:      ✅ 211.593s (passing)
 
 ### Security (Gosec) - Mostly False Positives
 
-| Type | Count | Assessment |
-|------|-------|------------|
-| G115 (integer overflow) | 12 | Mostly safe conversions in controlled contexts |
-| G204 (subprocess with variable) | 5 | Intentional - CLI tool runs user commands |
-| G703 (path traversal) | 1 | Expected behavior for disk cleaner |
+| Type                            | Count | Assessment                                     |
+| ------------------------------- | ----- | ---------------------------------------------- |
+| G115 (integer overflow)         | 12    | Mostly safe conversions in controlled contexts |
+| G204 (subprocess with variable) | 5     | Intentional - CLI tool runs user commands      |
+| G703 (path traversal)           | 1     | Expected behavior for disk cleaner             |
 
 ### Architecture Improvements
 
@@ -215,4 +215,4 @@ BDD:      ✅ 211.593s (passing)
 
 ---
 
-*Report generated by Crush AI Assistant*
+_Report generated by Crush AI Assistant_
