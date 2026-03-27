@@ -8,23 +8,23 @@ import (
 
 // Use type-safe constants directly.
 var (
-	RiskLow      = RiskLevelType(RiskLevelLowType)
-	RiskMedium   = RiskLevelType(RiskLevelMediumType)
-	RiskHigh     = RiskLevelType(RiskLevelHighType)
-	RiskCritical = RiskLevelType(RiskLevelCriticalType)
+	RiskLow      = RiskLevelLowType
+	RiskMedium   = RiskLevelMediumType
+	RiskHigh     = RiskLevelHighType
+	RiskCritical = RiskLevelCriticalType
 
-	ValidationLevelNone          = ValidationLevelType(ValidationLevelNoneType)
-	ValidationLevelBasic         = ValidationLevelType(ValidationLevelBasicType)
-	ValidationLevelComprehensive = ValidationLevelType(ValidationLevelComprehensiveType)
-	ValidationLevelStrict        = ValidationLevelType(ValidationLevelStrictType)
+	ValidationLevelNone          = ValidationLevelNoneType
+	ValidationLevelBasic         = ValidationLevelBasicType
+	ValidationLevelComprehensive = ValidationLevelComprehensiveType
+	ValidationLevelStrict        = ValidationLevelStrictType
 
-	OperationAdded    = ChangeOperationType(ChangeOperationAddedType)
-	OperationRemoved  = ChangeOperationType(ChangeOperationRemovedType)
-	OperationModified = ChangeOperationType(ChangeOperationModifiedType)
+	OperationAdded    = ChangeOperationAddedType
+	OperationRemoved  = ChangeOperationRemovedType
+	OperationModified = ChangeOperationModifiedType
 
-	StrategyAggressive   = CleanStrategyType(StrategyAggressiveType)
-	StrategyConservative = CleanStrategyType(StrategyConservativeType)
-	StrategyDryRun       = CleanStrategyType(StrategyDryRunType)
+	StrategyAggressive   = StrategyAggressiveType
+	StrategyConservative = StrategyConservativeType
+	StrategyDryRun       = StrategyDryRunType
 )
 
 // Strong ID types for compile-time type safety on identifiers.

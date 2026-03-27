@@ -23,7 +23,6 @@ func TestPrintConfigSuccess(t *testing.T) {
 	// This test just ensures the function doesn't panic and prints expected format
 	PrintConfigSuccess(cfg)
 	// We can't easily test stdout in this context, but we ensure no panic occurs
-	assert.True(t, true)
 }
 
 func TestLoadConfigOrContinue_ContextCancel(t *testing.T) {

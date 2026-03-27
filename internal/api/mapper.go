@@ -224,9 +224,9 @@ func MapRiskLevelToDomain(publicRisk PublicRiskLevel) (domain.RiskLevelType, err
 		return domain.RiskLevelCriticalType, nil
 	default:
 		return domain.RiskLevelLowType, fmt.Errorf(
-				"unknown risk level: %s",
-				publicRisk,
-			)
+			"unknown risk level: %s",
+			publicRisk,
+		)
 	}
 }
 

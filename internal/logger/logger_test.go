@@ -234,7 +234,6 @@ func TestLoggingOutput(t *testing.T) {
 	Error("test error")
 
 	// If we get here without panic, the test passes
-	assert.True(t, true)
 }
 
 // TestPrefix verifies prefix functionality.

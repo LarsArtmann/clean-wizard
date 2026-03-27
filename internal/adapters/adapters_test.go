@@ -134,7 +134,7 @@ func TestEnvironmentConfig(t *testing.T) {
 	assert.Equal(t, "info", cfg.App.LogLevel)
 	assert.Equal(t, 4, cfg.Performance.MaxConcurrency)
 	assert.Equal(t, 30*time.Second, cfg.Performance.Timeout)
-	assert.Equal(t, 10.0, cfg.Performance.RateLimitRPS)
+	assert.InEpsilon(t, 10.0, cfg.Performance.RateLimitRPS, 0.01)
 	assert.True(t, cfg.Cache.Enabled)
 	assert.Equal(t, 5*time.Minute, cfg.Cache.TTL)
 }
@@ -169,42 +169,42 @@ func TestEnvironmentConfig_Getters(t *testing.T) {
 func TestErrorConstructors(t *testing.T) {
 	// Test ErrInvalidConfig
 	err := adapters.ErrInvalidConfig("test error")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "configuration error: test error")
 
 	// Test ErrInvalidArgument
 	err = adapters.ErrInvalidArgument("arg", "test message")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid argument 'arg': test message")
 
 	// Test ErrNotFound
 	err = adapters.ErrNotFound("resource")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "resource not found: resource")
 
 	// Test ErrTimeout
 	err = adapters.ErrTimeout("operation")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "operation timeout: operation")
 
 	// Test ErrRateLimit
 	err = adapters.ErrRateLimit(10.5)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "rate limit exceeded: 10.50 requests/second")
 
 	// Test ErrCacheMiss
 	err = adapters.ErrCacheMiss("key")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "cache miss: key 'key' not found")
 
 	// Test ErrNotImplemented
 	err = adapters.ErrNotImplemented("feature")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "feature not implemented: feature")
 
 	// Test ErrUnauthorized
 	err = adapters.ErrUnauthorized("action")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "unauthorized: action")
 
 	// Test ErrForbidden

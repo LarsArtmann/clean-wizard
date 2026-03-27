@@ -24,7 +24,6 @@ func main() {
 
 	// Setup signal handling for graceful shutdown
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer cancel()
 
 	// Get version info
 	info := version.Get()
@@ -35,8 +34,8 @@ func main() {
 		fang.WithCommit(info.Commit),
 		fang.WithNotifySignal(os.Interrupt, syscall.SIGTERM),
 	)
+	cancel()
 	if err != nil {
-		cancel()
 		os.Exit(1)
 	}
 }
