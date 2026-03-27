@@ -209,11 +209,11 @@ func TestErrorConstructors(t *testing.T) {
 
 	// Test ErrForbidden
 	err = adapters.ErrForbidden("action")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "forbidden: action")
 
 	// Test ErrServiceUnavailable
 	err = adapters.ErrServiceUnavailable("service")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "service unavailable: service")
 }

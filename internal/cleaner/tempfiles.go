@@ -152,7 +152,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 	if len(items) == 0 {
 		// Nothing to clean
 		cleanResult := conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
+			domain.StrategyConservativeType,
 			0,
 			0,
 		)
@@ -201,7 +201,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
-		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		domain.StrategyAggressiveType,
 		itemsRemoved,
 		itemsFailed,
 		bytesFreed,

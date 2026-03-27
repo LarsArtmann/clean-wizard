@@ -157,7 +157,7 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.Clean
 	}
 
 	cleanResult := conversions.NewCleanResult(
-		domain.CleanStrategyType(domain.StrategyDryRunType),
+		domain.StrategyDryRunType,
 		itemsRemoved,
 		int64(totalBytes),
 	)
@@ -202,7 +202,7 @@ func (gc *GoCleaner) buildCleanResult(
 
 	// Note: conversions.NewCleanResult uses FreedBytes (deprecated), so we update SizeEstimate
 	cleanResult := conversions.NewCleanResult(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		int(stats.Removed),
 		int64(stats.FreedBytes),
 	)

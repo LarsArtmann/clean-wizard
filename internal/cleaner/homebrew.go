@@ -139,7 +139,7 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 	itemsRemoved, itemsFailed, bytesFreed := hbc.executeCleanup(ctx, commands, cacheDir)
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		itemsRemoved,
 		itemsFailed,
 		bytesFreed,

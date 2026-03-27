@@ -343,7 +343,7 @@ func (npmc *NodePackageManagerCleaner) Clean(
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 			itemsRemoved,
 			totalBytes,
 		)
@@ -382,7 +382,7 @@ func (npmc *NodePackageManagerCleaner) Clean(
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		itemsRemoved, itemsFailed, bytesFreed, duration,
 	))
 }
@@ -390,7 +390,7 @@ func (npmc *NodePackageManagerCleaner) Clean(
 // createDefaultCleanResult returns a default CleanResult for package manager operations.
 func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanResult {
 	return conversions.NewCleanResult(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		1, 0,
 	)
 }
@@ -449,7 +449,7 @@ func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
 	}
 
 	return result.Ok(conversions.NewCleanResult(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		1, bytesFreed,
 	))
 }

@@ -51,7 +51,7 @@ func TestCleanResultValidation(t *testing.T) {
 				ItemsFailed:  0,
 				CleanTime:    0,
 				CleanedAt:    time.Now(),
-				Strategy:     CleanStrategyType(StrategyDryRunType),
+				Strategy:     StrategyDryRunType,
 			},
 			shouldValid: true,
 			shouldError: false,
@@ -79,7 +79,7 @@ func TestCleanResultValidation(t *testing.T) {
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
 				CleanedAt:    time.Time{}, // Zero time
-				Strategy:     CleanStrategyType(StrategyDryRunType),
+				Strategy:     StrategyDryRunType,
 			},
 			shouldValid: false,
 			shouldError: true,

@@ -127,7 +127,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	if n.dryRun {
 		estimatedFreed := int64(NixDryRunGCSizeMB * 1024 * 1024)
 		cleanResult := conversions.NewCleanResultWithTiming(
-			domain.CleanStrategyType(domain.StrategyAggressiveType),
+			domain.StrategyAggressiveType,
 			1,
 			estimatedFreed,
 			0,
@@ -171,7 +171,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 
 	// Use centralized conversion with proper timing
 	cleanResult := conversions.NewCleanResultWithTiming(
-		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		domain.StrategyAggressiveType,
 		1,
 		bytesFreed,
 		time.Since(startTime),
@@ -208,7 +208,7 @@ func (n *NixAdapter) RemoveGeneration(
 		// Return a success result with estimated bytes freed
 		estimatedFreed := int64(NixDryRunGenerationSizeMB * 1024 * 1024)
 		cleanResult := conversions.NewCleanResultWithTiming(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
+			domain.StrategyConservativeType,
 			1,
 			estimatedFreed,
 			0,
@@ -249,7 +249,7 @@ func (n *NixAdapter) RemoveGeneration(
 
 	// Use centralized conversion with proper timing
 	cleanResult := conversions.NewCleanResultWithTiming(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		1,
 		bytesFreed,
 		time.Since(startTime),

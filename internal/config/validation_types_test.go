@@ -14,16 +14,6 @@ type TestSanitizationTestCase struct {
 	expectedWarnings int
 }
 
-// TestValidationLevelTestCase defines validation level test cases.
-type TestValidationLevelTestCase struct {
-	name       string
-	config     *domain.Config
-	level      domain.ValidationLevelType
-	// Fields below are unused but kept for potential future use
-	// expectValid  bool
-	// expectErrors int
-}
-
 // CreateTestConfigurations creates test configurations for validation testing.
 func CreateTestConfigurations() map[string]*domain.Config {
 	return map[string]*domain.Config{

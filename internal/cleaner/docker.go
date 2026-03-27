@@ -430,7 +430,7 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 
 	duration := time.Since(startTime)
 	finalResult := conversions.NewCleanResultWithTiming(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		int(cleanResult.ItemsRemoved),
 		int64(cleanResult.FreedBytes),
 		duration,
@@ -508,7 +508,7 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 
 	return result.Ok(
 		conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyConservativeType),
+			domain.StrategyConservativeType,
 			1,
 			bytesFreed,
 		),

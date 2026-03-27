@@ -202,4 +202,3 @@ func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevel
 
 	return maxRisk
 }
-

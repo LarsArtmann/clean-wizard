@@ -252,21 +252,21 @@ func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) doma
 		logger.Warn("No risk level found, defaulting to LOW",
 			"profile", profileName,
 			"operation", operationIndex)
-		return domain.RiskLevelType(domain.RiskLevelLowType)
+		return domain.RiskLevelLowType
 	}
 
 	switch strings.ToUpper(riskLevelStr) {
 	case "LOW":
-		return domain.RiskLevelType(domain.RiskLevelLowType)
+		return domain.RiskLevelLowType
 	case "MEDIUM":
-		return domain.RiskLevelType(domain.RiskLevelMediumType)
+		return domain.RiskLevelMediumType
 	case "HIGH":
-		return domain.RiskLevelType(domain.RiskLevelHighType)
+		return domain.RiskLevelHighType
 	case "CRITICAL":
-		return domain.RiskLevelType(domain.RiskLevelCriticalType)
+		return domain.RiskLevelCriticalType
 	default:
 		logger.Warn("Invalid risk level, defaulting to LOW", "risk_level", riskLevelStr)
-		return domain.RiskLevelType(domain.RiskLevelLowType)
+		return domain.RiskLevelLowType
 	}
 }
 

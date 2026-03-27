@@ -95,7 +95,7 @@ func (cm *CacheManager) Clear() {
 
 // ItemCount returns the number of items in cache.
 func (cm *CacheManager) ItemCount() int {
-	return int(cm.cache.EstimatedSize())
+	return cm.cache.EstimatedSize()
 }
 
 // CacheStats provides cache statistics.
@@ -117,7 +117,7 @@ func (cm *CacheManager) Stats() CacheStats {
 	}
 
 	return CacheStats{
-		Items:     int(estimatedSize),
+		Items:     estimatedSize,
 		HitCount:  stats.Hits,
 		MissCount: stats.Misses,
 		HitRate:   hitRate,

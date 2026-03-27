@@ -76,7 +76,7 @@ func (pc *ProjectsManagementAutomationCleaner) ValidateSettings(
 func (pc *ProjectsManagementAutomationCleaner) Scan(
 	ctx context.Context,
 ) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+	items := make([]domain.ScanItem, 0, 1)
 
 	if !pc.IsAvailable(ctx) {
 		return result.Ok(items)

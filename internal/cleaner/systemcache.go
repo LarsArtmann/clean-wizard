@@ -224,8 +224,6 @@ func (scc *SystemCacheCleaner) scanSystemCache(
 	cacheType domain.CacheType,
 	homeDir string,
 ) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
-
 	config, exists := systemCacheConfigs[cacheType]
 	if !exists {
 		return result.Err[[]domain.ScanItem](
@@ -233,14 +231,7 @@ func (scc *SystemCacheCleaner) scanSystemCache(
 		)
 	}
 
-	scanResult := scc.scanCachePathWithConfig(ctx, homeDir, config)
-	if scanResult.IsErr() {
-		return result.Err[[]domain.ScanItem](scanResult.Error())
-	}
-
-	items = append(items, scanResult.Value()...)
-
-	return result.Ok(items)
+	return scc.scanCachePathWithConfig(ctx, homeDir, config)
 }
 
 // Clean removes system caches.

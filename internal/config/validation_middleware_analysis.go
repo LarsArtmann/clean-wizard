@@ -10,7 +10,7 @@ import (
 func (vm *ValidationMiddleware) analyzeConfigChanges(
 	current, proposed *domain.Config,
 ) []ConfigChange {
-	changes := []ConfigChange{}
+	changes := make([]ConfigChange, 0) //nolint:prealloc // capacity not easily determined
 
 	// Analyze basic fields
 	changes = append(changes, vm.analyzeSimpleFieldChanges(current, proposed)...)
@@ -31,7 +31,7 @@ func (vm *ValidationMiddleware) analyzePathChanges(
 	field string,
 	current, proposed []string,
 ) []ConfigChange {
-	changes := []ConfigChange{}
+	changes := make([]ConfigChange, 0) //nolint:prealloc // capacity not easily determined
 
 	currentSet := vm.makeStringSet(current)
 	proposedSet := vm.makeStringSet(proposed)

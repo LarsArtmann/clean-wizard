@@ -24,7 +24,7 @@ var benchmarkTestConfig = &Config{
 				{
 					Name:        "nix-generations",
 					Description: "Clean Nix generations",
-					RiskLevel:   RiskLevelType(RiskLevelLowType),
+					RiskLevel:   RiskLevelLowType,
 					Enabled:     ProfileStatusEnabled,
 					Settings: &OperationSettings{
 						NixGenerations: &NixGenerationsSettings{

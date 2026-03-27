@@ -57,7 +57,7 @@ func cleanWithIterator[T any](
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.CleanStrategyType(domain.StrategyDryRunType),
+			domain.StrategyDryRunType,
 			len(items),
 			totalBytes,
 		)
@@ -95,7 +95,7 @@ func cleanWithIterator[T any](
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		itemsRemoved,
 		itemsFailed,
 		bytesFreed,
