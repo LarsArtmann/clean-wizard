@@ -47,10 +47,10 @@ func EnumIsValid[T ~int](val, maxVal T) bool {
 // EnumValues is a macro for generating Values() method.
 // Returns a slice of all enum values from 0 to max.
 func EnumValues[T ~int](maxVal T) []T {
-	max := int(maxVal)
+	maxInt := int(maxVal)
 
-	values := make([]T, max+1)
-	for i := 0; i <= max; i++ {
+	values := make([]T, maxInt+1)
+	for i := 0; i <= maxInt; i++ {
 		values[i] = T(i)
 	}
 

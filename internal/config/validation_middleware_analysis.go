@@ -157,22 +157,22 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 
 // Helper methods for change analysis
 
-func (vm *ValidationMiddleware) getChangeOperation(old, new any) domain.ChangeOperationType {
-	if old == nil && new != nil {
+func (vm *ValidationMiddleware) getChangeOperation(old, newVal any) domain.ChangeOperationType {
+	if old == nil && newVal != nil {
 		return domain.ChangeOperationType(domain.ChangeOperationAddedType)
 	}
 
-	if old != nil && new == nil {
+	if old != nil && newVal == nil {
 		return domain.ChangeOperationType(domain.ChangeOperationRemovedType)
 	}
 
 	return domain.ChangeOperationType(domain.ChangeOperationModifiedType)
 }
 
-func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) domain.RiskLevelType {
+func (vm *ValidationMiddleware) assessChangeRisk(field string, old, newVal any) domain.RiskLevelType {
 	switch field {
 	case "safe_mode":
-		if old == true && new == false {
+		if old == true && newVal == false {
 			return domain.RiskLevelType(domain.RiskLevelHighType)
 		}
 
@@ -181,20 +181,20 @@ func (vm *ValidationMiddleware) assessChangeRisk(field string, old, new any) dom
 		// Safe type assertions
 		oldVal, oldOk := old.(int)
 
-		newVal, newOk := new.(int)
+		newValCast, newOk := newVal.(int)
 		if !oldOk || !newOk {
 			return domain.RiskLevelType(
 				domain.RiskLevelHighType,
 			) // Conservative risk for unexpected types
 		}
 
-		if oldVal < newVal {
+		if oldVal < newValCast {
 			return domain.RiskLevelType(domain.RiskLevelMediumType)
 		}
 
 		return domain.RiskLevelType(domain.RiskLevelLowType)
 	case "protected":
-		if new == nil {
+		if newVal == nil {
 			return domain.RiskLevelType(domain.RiskLevelCriticalType)
 		}
 

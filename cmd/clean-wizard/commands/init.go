@@ -295,21 +295,21 @@ func createDailyProfile() *domain.Profile {
 			{
 				Name:        "temp-files",
 				Description: "Clean temporary files",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 			},
 			{
 				Name:        "go-packages",
 				Description: "Clean Go module cache",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeGoPackages),
 			},
 			{
 				Name:        "node-packages",
 				Description: "Clean Node.js package caches",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeNodePackages),
 			},
@@ -327,28 +327,28 @@ func createWeeklyProfile() *domain.Profile {
 			{
 				Name:        "docker",
 				Description: "Clean Docker images, containers, and volumes",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+				RiskLevel:   domain.RiskLevelMediumType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeDocker),
 			},
 			{
 				Name:        "go-packages",
 				Description: "Clean Go build cache",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeGoPackages),
 			},
 			{
 				Name:        "node-packages",
 				Description: "Clean Node.js package caches",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeNodePackages),
 			},
 			{
 				Name:        "homebrew-cleanup",
 				Description: "Clean Homebrew cache",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 			},
@@ -366,21 +366,21 @@ func createAggressiveProfile() *domain.Profile {
 			{
 				Name:        "nix-generations",
 				Description: "Clean old Nix generations",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelHighType),
+				RiskLevel:   domain.RiskLevelHighType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 			},
 			{
 				Name:        "homebrew-cleanup",
 				Description: "Clean old Homebrew packages",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+				RiskLevel:   domain.RiskLevelMediumType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 			},
 			{
 				Name:        "docker",
 				Description: "Clean all unused Docker resources",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelHighType),
+				RiskLevel:   domain.RiskLevelHighType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeDocker),
 			},
@@ -398,7 +398,7 @@ func createCustomProfile(
 		operations = append(operations, domain.CleanupOperation{
 			Name:        "nix-generations",
 			Description: "Clean old Nix generations",
-			RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+			RiskLevel:   domain.RiskLevelMediumType,
 			Enabled:     domain.ProfileStatusEnabled,
 			Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 		})
@@ -408,7 +408,7 @@ func createCustomProfile(
 		operations = append(operations, domain.CleanupOperation{
 			Name:        "homebrew-cleanup",
 			Description: "Clean Homebrew cache and unused packages",
-			RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+			RiskLevel:   domain.RiskLevelLowType,
 			Enabled:     domain.ProfileStatusEnabled,
 			Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 		})
@@ -418,7 +418,7 @@ func createCustomProfile(
 		operations = append(operations, domain.CleanupOperation{
 			Name:        "docker",
 			Description: "Clean Docker images, containers, and volumes",
-			RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+			RiskLevel:   domain.RiskLevelMediumType,
 			Enabled:     domain.ProfileStatusEnabled,
 			Settings:    domain.DefaultSettings(domain.OperationTypeDocker),
 		})
@@ -428,7 +428,7 @@ func createCustomProfile(
 		operations = append(operations, domain.CleanupOperation{
 			Name:        "node-packages",
 			Description: "Clean Node.js package caches",
-			RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+			RiskLevel:   domain.RiskLevelLowType,
 			Enabled:     domain.ProfileStatusEnabled,
 			Settings:    domain.DefaultSettings(domain.OperationTypeNodePackages),
 		})
@@ -438,7 +438,7 @@ func createCustomProfile(
 		operations = append(operations, domain.CleanupOperation{
 			Name:        "go-packages",
 			Description: "Clean Go module and build caches",
-			RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+			RiskLevel:   domain.RiskLevelLowType,
 			Enabled:     domain.ProfileStatusEnabled,
 			Settings:    domain.DefaultSettings(domain.OperationTypeGoPackages),
 		})
@@ -448,7 +448,7 @@ func createCustomProfile(
 	operations = append(operations, domain.CleanupOperation{
 		Name:        "temp-files",
 		Description: "Clean temporary files",
-		RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+		RiskLevel:   domain.RiskLevelLowType,
 		Enabled:     domain.ProfileStatusEnabled,
 		Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 	})

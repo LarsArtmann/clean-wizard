@@ -13,33 +13,33 @@ func (cv *ConfigValidator) validateMaxDiskUsage(value any) error {
 		return fmt.Errorf("max_disk_usage must be an integer, got %T", value)
 	}
 
-	min, max := cv.getMaxDiskUsageBounds()
-	if usage < min {
-		return fmt.Errorf("max_disk_usage (%d) below minimum (%d)", usage, min)
+	minVal, maxVal := cv.getMaxDiskUsageBounds()
+	if usage < minVal {
+		return fmt.Errorf("max_disk_usage (%d) below minimum (%d)", usage, minVal)
 	}
 
-	if usage > max {
-		return fmt.Errorf("max_disk_usage (%d) above maximum (%d)", usage, max)
+	if usage > maxVal {
+		return fmt.Errorf("max_disk_usage (%d) above maximum (%d)", usage, maxVal)
 	}
 
 	return nil
 }
 
 // getMaxDiskUsageBounds safely returns min and max bounds for max disk usage.
-func (cv *ConfigValidator) getMaxDiskUsageBounds() (min, max int) {
-	min, max = 0, 100 // Safe defaults
+func (cv *ConfigValidator) getMaxDiskUsageBounds() (minVal, maxVal int) {
+	minVal, maxVal = 0, 100 // Safe defaults
 
 	if cv.rules.MaxDiskUsage != nil {
 		if cv.rules.MaxDiskUsage.Min != nil {
-			min = *cv.rules.MaxDiskUsage.Min
+			minVal = *cv.rules.MaxDiskUsage.Min
 		}
 
 		if cv.rules.MaxDiskUsage.Max != nil {
-			max = *cv.rules.MaxDiskUsage.Max
+			maxVal = *cv.rules.MaxDiskUsage.Max
 		}
 	}
 
-	return min, max
+	return minVal, maxVal
 }
 
 // validateProtectedPaths validates protected paths array.

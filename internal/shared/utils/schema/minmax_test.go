@@ -288,4 +288,3 @@ func TestGetConstraint(t *testing.T) {
 		})
 	}
 }
-

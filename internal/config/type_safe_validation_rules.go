@@ -156,13 +156,13 @@ func (tsvr *TypeSafeValidationRules) copyNumericRule(
 		Message:  rule.Message,
 	}
 	if rule.Min != nil {
-		min := *rule.Min
-		copied.Min = &min
+		minVal := *rule.Min
+		copied.Min = &minVal
 	}
 
 	if rule.Max != nil {
-		max := *rule.Max
-		copied.Max = &max
+		maxVal := *rule.Max
+		copied.Max = &maxVal
 	}
 
 	return copied

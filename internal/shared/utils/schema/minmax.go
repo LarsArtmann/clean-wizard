@@ -11,8 +11,8 @@ type MinMax struct {
 }
 
 // NewMinMax creates a new MinMax with the provided min and max values.
-func NewMinMax(min, max *float64) MinMax {
-	return MinMax{Min: min, Max: max}
+func NewMinMax(minVal, maxVal *float64) MinMax {
+	return MinMax{Min: minVal, Max: maxVal}
 }
 
 // ToFloat64 safely converts an int pointer to float64 pointer.
@@ -36,10 +36,10 @@ func GetConstraint(constraint *float64, fallback float64) float64 {
 }
 
 // ExtractMinMax extracts min and max values from int pointers, converting to float64.
-func ExtractMinMax(min, max *int, minFallback, maxFallback float64) MinMax {
+func ExtractMinMax(minVal, maxVal *int, minFallback, maxFallback float64) MinMax {
 	return MinMax{
-		Min: extractFloat64(min, minFallback),
-		Max: extractFloat64(max, maxFallback),
+		Min: extractFloat64(minVal, minFallback),
+		Max: extractFloat64(maxVal, maxFallback),
 	}
 }
 
@@ -55,10 +55,10 @@ func extractFloat64(v *int, fallback float64) *float64 {
 }
 
 // DefaultMinMax returns default min/max values when constraints are not specified.
-func DefaultMinMax(min, max float64) MinMax {
+func DefaultMinMax(minVal, maxVal float64) MinMax {
 	return MinMax{
-		Min: &min,
-		Max: &max,
+		Min: &minVal,
+		Max: &maxVal,
 	}
 }
 

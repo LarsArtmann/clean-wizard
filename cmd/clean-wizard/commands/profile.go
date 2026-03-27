@@ -194,14 +194,14 @@ func runProfileCreateCommand(cmd *cobra.Command, args []string, name, descriptio
 			{
 				Name:        "nix-generations",
 				Description: "Clean old Nix generations",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
 			},
 			{
 				Name:        "temp-files",
 				Description: "Clean temporary files",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
 			},

@@ -225,7 +225,7 @@ func NewScanResult(
 func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanResult] {
 	return ToCleanResultWithStrategy(
 		bytesResult,
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 	)
 }
 
@@ -319,7 +319,7 @@ func ToScanResult(
 // CombineCleanResults combines multiple CleanResults into one.
 func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	if len(results) == 0 {
-		return NewCleanResult(domain.CleanStrategyType(domain.StrategyConservativeType), 0, 0)
+		return NewCleanResult(domain.StrategyConservativeType, 0, 0)
 	}
 
 	totalItems := 0
@@ -349,7 +349,7 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	// Otherwise, use conservative as the safest default for mixed operations
 	combinedStrategy := firstStrategy
 	if !allSameStrategy {
-		combinedStrategy = domain.CleanStrategyType(domain.StrategyConservativeType)
+		combinedStrategy = domain.StrategyConservativeType
 	}
 
 	return NewCleanResultWithFailures(
