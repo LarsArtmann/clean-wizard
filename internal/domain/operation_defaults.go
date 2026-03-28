@@ -109,6 +109,8 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 		settings = &OperationSettings{
 			GitHistory: &GitHistorySettings{},
 		}
+	case OperationTypeGolangciLintCache:
+		settings = &OperationSettings{}
 	default:
 		return &OperationSettings{} // Empty settings for custom types
 	}

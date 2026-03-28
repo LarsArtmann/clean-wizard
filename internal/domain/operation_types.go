@@ -153,6 +153,7 @@ const (
 	OperationTypeProjectExecutables           OperationType = "project-executables"
 	OperationTypeCompiledBinaries             OperationType = "compiled-binaries"
 	OperationTypeGitHistory                   OperationType = "git-history"
+	OperationTypeGolangciLintCache            OperationType = "golangci-lint-cache"
 )
 
 // GetOperationType returns the operation type from operation name.
@@ -186,6 +187,8 @@ func GetOperationType(name string) OperationType {
 		return OperationTypeCompiledBinaries
 	case "git-history":
 		return OperationTypeGitHistory
+	case "golangci-lint-cache":
+		return OperationTypeGolangciLintCache
 	default:
 		return OperationType(name) // Fallback for custom types
 	}
@@ -212,7 +215,8 @@ func (ot OperationType) IsValid() bool {
 		OperationTypeProjectsManagementAutomation,
 		OperationTypeProjectExecutables,
 		OperationTypeCompiledBinaries,
-		OperationTypeGitHistory:
+		OperationTypeGitHistory,
+		OperationTypeGolangciLintCache:
 		return true
 	default:
 		return false
@@ -236,5 +240,6 @@ func (OperationType) Values() []OperationType {
 		OperationTypeProjectExecutables,
 		OperationTypeCompiledBinaries,
 		OperationTypeGitHistory,
+		OperationTypeGolangciLintCache,
 	}
 }

@@ -89,12 +89,13 @@ const (
 	ScanTypeHomebrew ScanType = "homebrew"
 	ScanTypeSystem   ScanType = "system"
 	ScanTypeTemp     ScanType = "temp_files"
+	ScanTypeCache    ScanType = "cache"
 )
 
 // IsValid validates ScanType.
 func (st ScanType) IsValid() bool {
 	switch st {
-	case ScanTypeNixStore, ScanTypeHomebrew, ScanTypeSystem, ScanTypeTemp:
+	case ScanTypeNixStore, ScanTypeHomebrew, ScanTypeSystem, ScanTypeTemp, ScanTypeCache:
 		return true
 	default:
 		return false
@@ -113,6 +114,7 @@ func (st ScanType) Values() []ScanType {
 		ScanTypeHomebrew,
 		ScanTypeSystem,
 		ScanTypeTemp,
+		ScanTypeCache,
 	}
 }
 

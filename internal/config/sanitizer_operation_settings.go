@@ -61,7 +61,8 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(
 		domain.OperationTypeProjectsManagementAutomation,
 		domain.OperationTypeProjectExecutables,
 		domain.OperationTypeCompiledBinaries,
-		domain.OperationTypeGitHistory:
+		domain.OperationTypeGitHistory,
+		domain.OperationTypeGolangciLintCache:
 		// These operation types have no specific sanitization logic yet
 		// Fall through to default handling
 

@@ -189,7 +189,8 @@ func (os *OperationSettings) ValidateSettings(
 		OperationTypeProjectsManagementAutomation,
 		OperationTypeProjectExecutables,
 		OperationTypeCompiledBinaries,
-		OperationTypeGitHistory:
+		OperationTypeGitHistory,
+		OperationTypeGolangciLintCache:
 		// No enum validation needed for these operation types
 	}
 
