@@ -72,10 +72,10 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 	status := &cacheStatus{}
 
 	for _, line := range lines {
-		if strings.HasPrefix(line, "Dir:") {
-			status.Dir = strings.TrimSpace(strings.TrimPrefix(line, "Dir:"))
-		} else if strings.HasPrefix(line, "Size:") {
-			sizeStr := strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+		if after, ok := strings.CutPrefix(line, "Dir:"); ok {
+			status.Dir = strings.TrimSpace(after)
+		} else if after, ok := strings.CutPrefix(line, "Size:"); ok {
+			sizeStr := strings.TrimSpace(after)
 			size, err := parseSize(sizeStr)
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse size %q: %w", sizeStr, err)
