@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
-	"regexp"
 	"strings"
 	"time"
 
@@ -72,14 +71,11 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 
 	status := &cacheStatus{}
 
-	dirRegex := regexp.MustCompile(`^Dir:\s*(.+)$`)
-	sizeRegex := regexp.MustCompile(`^Size:\s*(.+)$`)
-
 	for _, line := range lines {
-		if matches := dirRegex.FindStringSubmatch(line); len(matches) > 1 {
-			status.Dir = strings.TrimSpace(matches[1])
-		} else if matches := sizeRegex.FindStringSubmatch(line); len(matches) > 1 {
-			sizeStr := strings.TrimSpace(matches[1])
+		if strings.HasPrefix(line, "Dir:") {
+			status.Dir = strings.TrimSpace(strings.TrimPrefix(line, "Dir:"))
+		} else if strings.HasPrefix(line, "Size:") {
+			sizeStr := strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
 			size, err := parseSize(sizeStr)
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse size %q: %w", sizeStr, err)
@@ -101,7 +97,7 @@ func parseSize(sizeStr string) (int64, error) {
 	sizeStr = strings.TrimSpace(sizeStr)
 
 	if sizeStr == "" {
-		return 0, fmt.Errorf("empty size string")
+		return 0, errors.New("empty size string")
 	}
 
 	var number float64

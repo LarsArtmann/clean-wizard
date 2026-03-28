@@ -148,11 +148,11 @@ func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.Clean
 		return gcc.cleanGoBuildCache(ctx)
 	case GoCacheNone:
 		return result.Err[domain.CleanResult](
-			fmt.Errorf("no cache type specified"),
+			errors.New("no cache type specified"),
 		)
 	case GoCacheLintCache:
 		return result.Err[domain.CleanResult](
-			fmt.Errorf("lint cache cleaning not yet implemented"),
+			errors.New("lint cache cleaning not yet implemented"),
 		)
 	default:
 		return result.Err[domain.CleanResult](
