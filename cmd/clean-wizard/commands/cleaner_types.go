@@ -16,6 +16,7 @@ const (
 	CleanerTypeLangVersionMgr               CleanerType = "langversion"
 	CleanerTypeProjectsManagementAutomation CleanerType = "projects"
 	CleanerTypeCompiledBinaries             CleanerType = "compiled-binaries"
+	CleanerTypeGolangciLintCache            CleanerType = "golangci-lint-cache"
 )
 
 // CleanerAvailability represents the availability status of a cleaner.
@@ -28,16 +29,17 @@ const (
 
 // registryNameToCleanerType maps registry cleaner names to CleanerType.
 var registryNameToCleanerType = map[string]CleanerType{
-	"nix":               CleanerTypeNix,
-	"homebrew":          CleanerTypeHomebrew,
-	"tempfiles":         CleanerTypeTempFiles,
-	"node":              CleanerTypeNodePackages,
-	"go":                CleanerTypeGoPackages,
-	"cargo":             CleanerTypeCargoPackages,
-	"buildcache":        CleanerTypeBuildCache,
-	"docker":            CleanerTypeDocker,
-	"systemcache":       CleanerTypeSystemCache,
-	"langversion":       CleanerTypeLangVersionMgr,
-	"projects":          CleanerTypeProjectsManagementAutomation,
-	"compiled-binaries": CleanerTypeCompiledBinaries,
+	"nix":                 CleanerTypeNix,
+	"homebrew":            CleanerTypeHomebrew,
+	"tempfiles":           CleanerTypeTempFiles,
+	"node":                CleanerTypeNodePackages,
+	"go":                  CleanerTypeGoPackages,
+	"cargo":               CleanerTypeCargoPackages,
+	"buildcache":          CleanerTypeBuildCache,
+	"docker":              CleanerTypeDocker,
+	"systemcache":         CleanerTypeSystemCache,
+	"langversion":         CleanerTypeLangVersionMgr,
+	"projects":            CleanerTypeProjectsManagementAutomation,
+	"compiled-binaries":   CleanerTypeCompiledBinaries,
+	"golangci-lint-cache": CleanerTypeGolangciLintCache,
 }

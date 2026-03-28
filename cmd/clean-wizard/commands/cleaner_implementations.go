@@ -52,6 +52,8 @@ func runCleaner(
 		result, err = runProjectsManagementAutomationCleaner(ctx, dryRun, verbose)
 	case CleanerTypeCompiledBinaries:
 		result, err = runCompiledBinariesCleaner(ctx, dryRun, verbose)
+	case CleanerTypeGolangciLintCache:
+		result, err = runGolangciLintCacheCleaner(ctx, dryRun, verbose)
 	case CleanerTypeLangVersionMgr:
 		return domain.CleanResult{}, errors.New("langversion cleaner is not implemented yet")
 	default:
@@ -334,5 +336,15 @@ func runCompiledBinariesCleaner(
 			nil,
 			[]string{},
 		)
+	})
+}
+
+// runGolangciLintCacheCleaner executes the golangci-lint cache cleaner.
+func runGolangciLintCacheCleaner(
+	ctx context.Context,
+	dryRun, verbose bool,
+) (domain.CleanResult, error) {
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewGolangciLintCacheCleaner(v, d)
 	})
 }

@@ -469,6 +469,8 @@ func getCleanerName(cleanerType CleanerType) string {
 		return "Projects Management Automation"
 	case CleanerTypeCompiledBinaries:
 		return "Compiled Binaries"
+	case CleanerTypeGolangciLintCache:
+		return "golangci-lint Cache"
 	default:
 		return string(cleanerType)
 	}
@@ -501,6 +503,8 @@ func getCleanerDescription(cleanerType CleanerType) string {
 		return "Clear projects-management-automation cache"
 	case CleanerTypeCompiledBinaries:
 		return "Clean compiled binary files in project directories"
+	case CleanerTypeGolangciLintCache:
+		return "Clean golangci-lint cache (uses cache status for accurate sizing)"
 	default:
 		return ""
 	}
@@ -533,6 +537,8 @@ func getCleanerIcon(cleanerType CleanerType) string {
 		return "⚙️"
 	case CleanerTypeCompiledBinaries:
 		return "🔧"
+	case CleanerTypeGolangciLintCache:
+		return "🐹"
 	default:
 		return ""
 	}
@@ -564,6 +570,7 @@ var operationTypeToCleanerType = map[domain.OperationType]CleanerType{
 	domain.OperationTypeProjectsManagementAutomation: CleanerTypeProjectsManagementAutomation,
 	domain.OperationTypeProjectExecutables:           CleanerTypeCompiledBinaries,
 	domain.OperationTypeCompiledBinaries:             CleanerTypeCompiledBinaries,
+	domain.OperationTypeGolangciLintCache:            CleanerTypeGolangciLintCache,
 }
 
 // getProfileCleaners returns the cleaner types for a given profile name.

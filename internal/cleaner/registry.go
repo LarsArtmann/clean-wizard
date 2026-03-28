@@ -23,6 +23,7 @@ const (
 	CleanerProjects         = "projects"
 	CleanerProjectExec      = "project-executables"
 	CleanerCompiledBinaries = "compiled-binaries"
+	CleanerGolangciLint     = "golangci-lint-cache"
 )
 
 // Registry manages all registered cleaners.

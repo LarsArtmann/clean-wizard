@@ -29,6 +29,7 @@ func AvailableCleaners() []CleanerType {
 		CleanerTypeSystemCache,
 		CleanerTypeLangVersionMgr,
 		CleanerTypeProjectsManagementAutomation,
+		CleanerTypeGolangciLintCache,
 	}
 }
 

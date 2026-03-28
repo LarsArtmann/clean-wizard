@@ -112,6 +112,9 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 		verbose, dryRun, DefaultMinSizeMB, DefaultOlderThan, nil, []string{})
 	registry.Register(CleanerCompiledBinaries, compiledBinariesCleaner)
 
+	// golangci-lint cache cleaner (uses `golangci-lint cache status` for accurate sizing)
+	registry.Register(CleanerGolangciLint, NewGolangciLintCacheCleaner(verbose, dryRun))
+
 	return nil
 }
 
