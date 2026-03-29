@@ -200,10 +200,12 @@ func (fb *FlowBuilder[T]) Then(
 ## Improvements (2026-03-28)
 
 ### Package Comments Added
+
 - `internal/result/branch_flow.go` - Added comprehensive package comment
 - `internal/result/flow_builder.go` - Added comprehensive package comment
 
 ### Test Coverage Enhanced
+
 - Added `t.Parallel()` to all test functions for parallel execution
 - Added new tests for `BranchWithValue`, `BranchWithContext` in BranchFlow
 - Added tests for `StepWithRetry` and `Then` in FlowBuilder
@@ -218,6 +220,7 @@ func (fb *FlowBuilder[T]) Then(
   - `TestPickWithValue` - Context selection by value predicate
 
 ### Minor Fixes
+
 - Fixed unused parameter `e` in `TestUnless` (changed to `_`)
 
 ---
@@ -231,6 +234,7 @@ Due to disk space limitations (100% full), the following items are deferred:
 3. Address remaining lint warnings (parallel test markers, type assertions)
 
 Once disk space is freed, these can be completed with:
+
 ```bash
 go test ./internal/result/... -short -v
 go build ./...

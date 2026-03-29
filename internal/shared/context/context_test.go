@@ -356,9 +356,12 @@ func TestBranch(t *testing.T) {
 
 	// Test branch with false condition
 	c2 := NewContext(ctx, TestValidationConfig{FieldA: "test2", FieldB: 43})
-	result2 := c2.Branch(false, func(c *Context[TestValidationConfig]) *Context[TestValidationConfig] {
-		return c.WithMetadata("branched", "true")
-	})
+	result2 := c2.Branch(
+		false,
+		func(c *Context[TestValidationConfig]) *Context[TestValidationConfig] {
+			return c.WithMetadata("branched", "true")
+		},
+	)
 
 	if result2 != c2 {
 		t.Error("Branch should return original context when condition is false")
@@ -415,7 +418,10 @@ func TestFork(t *testing.T) {
 	results := c.Fork(branches)
 
 	if len(results) != 1 {
-		t.Errorf("Fork should return 1 result when only one condition is true, got %d", len(results))
+		t.Errorf(
+			"Fork should return 1 result when only one condition is true, got %d",
+			len(results),
+		)
 	}
 
 	if _, ok := results[0].Metadata["fork1"]; !ok {
