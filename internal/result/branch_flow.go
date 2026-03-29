@@ -1,3 +1,22 @@
+// Package result provides functional programming patterns for error handling and flow control.
+//
+// This package offers comprehensive branching-flow context patterns to enhance the existing
+// Result[T] type with pattern matching, conditional execution, pipeline composition, and
+// parallel execution capabilities.
+//
+// Key types:
+//   - Result[T]: Type-safe wrapper for values that may contain errors
+//   - BranchFlow[T]: Complex conditional branching with fallback support
+//   - FlowBuilder[T]: Sequential pipeline composition
+//   - ParallelFlow[T]: Concurrent execution with result tracking
+//
+// Example usage:
+//
+//	flow := NewBranchFlow[int]().
+//	    Branch(func() bool { return isAdmin }, func() Result[int] { return Ok(42) }).
+//	    Fallback(func() Result[int] { return Ok(1) })
+//
+//	result := flow.Execute()
 package result
 
 import (

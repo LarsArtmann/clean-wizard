@@ -7,7 +7,9 @@ import (
 )
 
 func TestMatch(t *testing.T) {
+	t.Parallel()
 	t.Run("ok result calls ok function", func(t *testing.T) {
+		t.Parallel()
 		result := Ok(42)
 		matched := Match(result,
 			func(v int) string { return "success: " + string(rune(v)) },
@@ -19,6 +21,7 @@ func TestMatch(t *testing.T) {
 	})
 
 	t.Run("error result calls err function", func(t *testing.T) {
+		t.Parallel()
 		testErr := errors.New("test error")
 		result := Err[int](testErr)
 		matched := Match(result,
@@ -32,7 +35,9 @@ func TestMatch(t *testing.T) {
 }
 
 func TestTapErr(t *testing.T) {
+	t.Parallel()
 	t.Run("calls function on error", func(t *testing.T) {
+		t.Parallel()
 		var tappedError error
 		testErr := errors.New("tapped error")
 		result := Err[int](testErr).TapErr(func(e error) {
@@ -48,6 +53,7 @@ func TestTapErr(t *testing.T) {
 	})
 
 	t.Run("does not call function on success", func(t *testing.T) {
+		t.Parallel()
 		called := false
 		result := Ok(42).TapErr(func(e error) {
 			called = true
@@ -63,7 +69,9 @@ func TestTapErr(t *testing.T) {
 }
 
 func TestWhen(t *testing.T) {
+	t.Parallel()
 	t.Run("calls function on success", func(t *testing.T) {
+		t.Parallel()
 		var tappedValue int
 		result := Ok(42).When(func(v int) {
 			tappedValue = v
@@ -78,6 +86,7 @@ func TestWhen(t *testing.T) {
 	})
 
 	t.Run("does not call function on error", func(t *testing.T) {
+		t.Parallel()
 		called := false
 		result := Err[int](errors.New("test")).When(func(v int) {
 			called = true
@@ -93,7 +102,9 @@ func TestWhen(t *testing.T) {
 }
 
 func TestUnless(t *testing.T) {
+	t.Parallel()
 	t.Run("calls function on error", func(t *testing.T) {
+		t.Parallel()
 		var tappedError error
 		testErr := errors.New("test error")
 		result := Err[int](testErr).Unless(func(e error) {
@@ -109,8 +120,9 @@ func TestUnless(t *testing.T) {
 	})
 
 	t.Run("does not call function on success", func(t *testing.T) {
+		t.Parallel()
 		called := false
-		result := Ok(42).Unless(func(e error) {
+		result := Ok(42).Unless(func(_ error) {
 			called = true
 		})
 
@@ -124,7 +136,9 @@ func TestUnless(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
+	t.Parallel()
 	t.Run("passes through on valid predicate", func(t *testing.T) {
+		t.Parallel()
 		result := Ok(42).Filter(func(v int) bool { return v > 0 }, "must be positive")
 		if result.IsErr() {
 			t.Errorf("Filter() should pass through on valid predicate")
@@ -135,6 +149,7 @@ func TestFilter(t *testing.T) {
 	})
 
 	t.Run("returns error on invalid predicate", func(t *testing.T) {
+		t.Parallel()
 		result := Ok(-5).Filter(func(v int) bool { return v > 0 }, "must be positive")
 		if result.IsOk() {
 			t.Errorf("Filter() should return error on invalid predicate")
@@ -145,6 +160,7 @@ func TestFilter(t *testing.T) {
 	})
 
 	t.Run("passes through existing error", func(t *testing.T) {
+		t.Parallel()
 		testErr := errors.New("original error")
 		result := Err[int](testErr).Filter(func(v int) bool { return v > 0 }, "must be positive")
 		if result.IsOk() {
@@ -157,7 +173,9 @@ func TestFilter(t *testing.T) {
 }
 
 func TestFold(t *testing.T) {
+	t.Parallel()
 	t.Run("reduces all results successfully", func(t *testing.T) {
+		t.Parallel()
 		results := []Result[int]{Ok(1), Ok(2), Ok(3)}
 		sum := Fold(results, 0, func(acc, val int) int { return acc + val })
 
@@ -170,6 +188,7 @@ func TestFold(t *testing.T) {
 	})
 
 	t.Run("short-circuits on error", func(t *testing.T) {
+		t.Parallel()
 		testErr := errors.New("fold error")
 		results := []Result[int]{Ok(1), Err[int](testErr), Ok(3)}
 		sum := Fold(results, 0, func(acc, val int) int { return acc + val })
@@ -183,6 +202,7 @@ func TestFold(t *testing.T) {
 	})
 
 	t.Run("handles empty slice", func(t *testing.T) {
+		t.Parallel()
 		results := []Result[int]{}
 		sum := Fold(results, 10, func(acc, val int) int { return acc + val })
 
@@ -196,7 +216,9 @@ func TestFold(t *testing.T) {
 }
 
 func TestFoldAll(t *testing.T) {
+	t.Parallel()
 	t.Run("collects all values", func(t *testing.T) {
+		t.Parallel()
 		results := []Result[int]{Ok(1), Ok(2), Ok(3)}
 		all := FoldAll(results)
 
@@ -210,6 +232,7 @@ func TestFoldAll(t *testing.T) {
 	})
 
 	t.Run("short-circuits on error", func(t *testing.T) {
+		t.Parallel()
 		testErr := errors.New("fold all error")
 		results := []Result[int]{Ok(1), Err[int](testErr), Ok(3)}
 		all := FoldAll(results)
@@ -221,7 +244,9 @@ func TestFoldAll(t *testing.T) {
 }
 
 func TestPartition(t *testing.T) {
+	t.Parallel()
 	t.Run("separates ok and error results", func(t *testing.T) {
+		t.Parallel()
 		err1 := errors.New("error 1")
 		err2 := errors.New("error 2")
 		results := []Result[int]{Ok(1), Err[int](err1), Ok(2), Err[int](err2), Ok(3)}
@@ -236,6 +261,7 @@ func TestPartition(t *testing.T) {
 	})
 
 	t.Run("handles all ok", func(t *testing.T) {
+		t.Parallel()
 		results := []Result[int]{Ok(1), Ok(2), Ok(3)}
 		ok, errs := Partition(results)
 
@@ -249,7 +275,9 @@ func TestPartition(t *testing.T) {
 }
 
 func TestSequence(t *testing.T) {
+	t.Parallel()
 	t.Run("sequences all results", func(t *testing.T) {
+		t.Parallel()
 		results := []Result[int]{Ok(1), Ok(2), Ok(3)}
 		seq := Sequence(results)
 
@@ -264,7 +292,9 @@ func TestSequence(t *testing.T) {
 }
 
 func TestTraverse(t *testing.T) {
+	t.Parallel()
 	t.Run("applies function and sequences results", func(t *testing.T) {
+		t.Parallel()
 		items := []int{1, 2, 3}
 		result := Traverse(items, func(i int) Result[int] {
 			return Ok(i * 2)
@@ -281,7 +311,9 @@ func TestTraverse(t *testing.T) {
 }
 
 func TestBranchFlow(t *testing.T) {
+	t.Parallel()
 	t.Run("executes matching branch", func(t *testing.T) {
+		t.Parallel()
 		flow := NewBranchFlow[int]().
 			Branch(func() bool { return false }, func() Result[int] { return Ok(100) }).
 			Branch(func() bool { return true }, func() Result[int] { return Ok(42) }).
@@ -298,6 +330,7 @@ func TestBranchFlow(t *testing.T) {
 	})
 
 	t.Run("executes fallback when no branch matches", func(t *testing.T) {
+		t.Parallel()
 		flow := NewBranchFlow[int]().
 			Branch(func() bool { return false }, func() Result[int] { return Ok(100) }).
 			Fallback(func() Result[int] { return Ok(999) })
@@ -313,6 +346,7 @@ func TestBranchFlow(t *testing.T) {
 	})
 
 	t.Run("returns error when no branch matches and no fallback", func(t *testing.T) {
+		t.Parallel()
 		flow := NewBranchFlow[int]().
 			Branch(func() bool { return false }, func() Result[int] { return Ok(100) })
 
@@ -324,6 +358,7 @@ func TestBranchFlow(t *testing.T) {
 	})
 
 	t.Run("applies finalizer", func(t *testing.T) {
+		t.Parallel()
 		flow := NewBranchFlow[int]().
 			Branch(func() bool { return true }, func() Result[int] { return Ok(42) }).
 			Finalize(func(r Result[int]) Result[int] {
@@ -339,10 +374,44 @@ func TestBranchFlow(t *testing.T) {
 			t.Errorf("BranchFlow() with finalizer = %v, want 84", result.Value())
 		}
 	})
+
+	t.Run("BranchWithValue executes when predicate matches", func(t *testing.T) {
+		t.Parallel()
+		flow := NewBranchFlow[int]().
+			BranchWithValue(10, func(v int) bool { return v > 5 }, func(v int) Result[int] { return Ok(v * 2) }).
+			FallbackValue(0)
+
+		result := flow.Execute()
+
+		if result.IsErr() {
+			t.Errorf("BranchWithValue() should not error")
+		}
+		if result.Value() != 20 {
+			t.Errorf("BranchWithValue() = %v, want 20", result.Value())
+		}
+	})
+
+	t.Run("BranchWithValue falls back when predicate does not match", func(t *testing.T) {
+		t.Parallel()
+		flow := NewBranchFlow[int]().
+			BranchWithValue(3, func(v int) bool { return v > 5 }, func(v int) Result[int] { return Ok(v * 2) }).
+			FallbackValue(100)
+
+		result := flow.Execute()
+
+		if result.IsErr() {
+			t.Errorf("BranchWithValue() should not error")
+		}
+		if result.Value() != 100 {
+			t.Errorf("BranchWithValue() = %v, want 100 (fallback)", result.Value())
+		}
+	})
 }
 
 func TestSwitchFlow(t *testing.T) {
+	t.Parallel()
 	t.Run("matches first predicate", func(t *testing.T) {
+		t.Parallel()
 		value := 5
 		cases := []Case[int, string]{
 			{
@@ -369,10 +438,31 @@ func TestSwitchFlow(t *testing.T) {
 			t.Errorf("SwitchFlow() = %v, want positive", result.Value())
 		}
 	})
+
+	t.Run("SwitchFlowWithResult handles error result", func(t *testing.T) {
+		t.Parallel()
+		testErr := errors.New("test error")
+		result := Err[int](testErr)
+		cases := []Case[int, string]{
+			{
+				Predicate: func(i int) bool { return i > 0 },
+				Execute:   func() Result[string] { return Ok("positive") },
+			},
+		}
+		defaultCase := func() Result[string] { return Ok("unknown") }
+
+		switchResult := SwitchFlowWithResult(result, cases, defaultCase)
+
+		if switchResult.IsOk() {
+			t.Errorf("SwitchFlowWithResult() should return error for error input")
+		}
+	})
 }
 
 func TestFlowBuilder(t *testing.T) {
+	t.Parallel()
 	t.Run("executes steps in order", func(t *testing.T) {
+		t.Parallel()
 		ctx := context.Background()
 		flow := NewFlowBuilder[int]().
 			Step("step1", func(ctx context.Context) Result[int] { return Ok(1) }).
@@ -390,6 +480,7 @@ func TestFlowBuilder(t *testing.T) {
 	})
 
 	t.Run("stops on error", func(t *testing.T) {
+		t.Parallel()
 		ctx := context.Background()
 		testErr := errors.New("step 2 failed")
 		flow := NewFlowBuilder[int]().
@@ -403,10 +494,55 @@ func TestFlowBuilder(t *testing.T) {
 			t.Errorf("FlowBuilder() should return error")
 		}
 	})
+
+	t.Run("StepWithRetry retries on failure", func(t *testing.T) {
+		t.Parallel()
+		ctx := context.Background()
+		attempts := 0
+		flow := NewFlowBuilder[int]().
+			StepWithRetry("unreliable", 3, func(ctx context.Context) Result[int] {
+				attempts++
+				if attempts < 3 {
+					return Err[int](errors.New("temporary failure"))
+				}
+				return Ok(42)
+			})
+
+		result := flow.Execute(ctx)
+
+		if result.IsErr() {
+			t.Errorf("StepWithRetry() should succeed after retries")
+		}
+		if result.Value() != 42 {
+			t.Errorf("StepWithRetry() = %v, want 42", result.Value())
+		}
+		if attempts != 3 {
+			t.Errorf("StepWithRetry() attempts = %v, want 3", attempts)
+		}
+	})
+
+	t.Run("Then chains steps with previous result", func(t *testing.T) {
+		t.Parallel()
+		ctx := context.Background()
+		flow := NewFlowBuilder[int]().
+			Step("initial", func(ctx context.Context) Result[int] { return Ok(10) }).
+			Then("double", func(ctx context.Context, prev int) Result[int] { return Ok(prev * 2) })
+
+		result := flow.Execute(ctx)
+
+		if result.IsErr() {
+			t.Errorf("Then() should not error")
+		}
+		if result.Value() != 20 {
+			t.Errorf("Then() = %v, want 20", result.Value())
+		}
+	})
 }
 
 func TestParallelFlow(t *testing.T) {
+	t.Parallel()
 	t.Run("executes all steps concurrently", func(t *testing.T) {
+		t.Parallel()
 		ctx := context.Background()
 		parallel := NewParallelFlow[int]().
 			Add("step1", func(ctx context.Context) Result[int] { return Ok(1) }).
@@ -426,6 +562,7 @@ func TestParallelFlow(t *testing.T) {
 	})
 
 	t.Run("separates successful and failed", func(t *testing.T) {
+		t.Parallel()
 		ctx := context.Background()
 		testErr := errors.New("step 2 failed")
 		parallel := NewParallelFlow[int]().
@@ -443,6 +580,17 @@ func TestParallelFlow(t *testing.T) {
 		failed := parallel.Failed()
 		if len(failed) != 1 {
 			t.Errorf("ParallelFlow() failed len = %v, want 1", len(failed))
+		}
+	})
+
+	t.Run("Results returns empty before execution", func(t *testing.T) {
+		t.Parallel()
+		parallel := NewParallelFlow[int]()
+
+		results := parallel.Results()
+
+		if len(results) != 0 {
+			t.Errorf("ParallelFlow() Results() before Execute() should be empty")
 		}
 	})
 }

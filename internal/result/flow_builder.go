@@ -1,3 +1,20 @@
+// Package result provides functional programming patterns for error handling and flow control.
+//
+// FlowBuilder and Pipeline types enable building complex pipelines with sequential execution,
+// branching, parallel execution, and comprehensive error handling.
+//
+// Key types:
+//   - FlowBuilder[T]: Builder for constructing executable pipelines
+//   - Pipeline[T]: Composed pipeline ready for execution
+//   - ParallelFlow[T]: Concurrent executor for parallel operations
+//
+// Example usage:
+//
+//	pipeline := NewFlowBuilder[CleanResult]().
+//	    Step("scan", func(ctx context.Context) Result[CleanResult] { return Scan(ctx) }).
+//	    Step("validate", func(ctx context.Context, r CleanResult) Result[CleanResult] { return Validate(ctx, r) })
+//
+//	result := pipeline.Execute(ctx)
 package result
 
 import (
@@ -66,12 +83,15 @@ func (fb *FlowBuilder[T]) Then(
 	name string,
 	fn func(context.Context, T) Result[T],
 ) *FlowBuilder[T] {
+	// Capture the index of the previous step BEFORE adding the new step
+	prevIdx := len(fb.steps) - 1
+
 	return fb.Step(name, func(ctx context.Context) Result[T] {
-		if len(fb.steps) == 0 {
+		if prevIdx < 0 {
 			return Err[T](ErrNoPreviousStep)
 		}
 
-		lastStep := fb.steps[len(fb.steps)-1]
+		lastStep := fb.steps[prevIdx]
 		prevResult := lastStep.Execute(ctx)
 
 		if prevResult.IsErr() {

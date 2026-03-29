@@ -1,6 +1,7 @@
 # Branching-Flow Context Implementation Complete
 
 **Date:** 2026-03-27  
+**Last Updated:** 2026-03-28
 **Status:** ✅ COMPLETE
 
 ---
@@ -156,3 +157,81 @@ All tests pass:
 - Build: `go build ./...` ✅
 - Tests: `go test ./internal/result/... -short` ✅
 - Context Tests: `go test ./internal/shared/context/... -short` ✅
+
+---
+
+## Bug Fixes (2026-03-28)
+
+### FlowBuilder.Then Infinite Recursion Fix
+
+**File:** `internal/result/flow_builder.go:81-97`
+
+**Problem:** The `Then` method had a closure that captured `fb` by reference. When the closure was executed, it checked `len(fb.steps)` after `fb.Step()` was called, causing the new step to reference itself and creating infinite recursion.
+
+**Solution:** Capture the previous step index before adding the new step:
+
+```go
+func (fb *FlowBuilder[T]) Then(
+	name string,
+	fn func(context.Context, T) Result[T],
+) *FlowBuilder[T] {
+	// Capture the index of the previous step BEFORE adding the new step
+	prevIdx := len(fb.steps) - 1
+
+	return fb.Step(name, func(ctx context.Context) Result[T] {
+		if prevIdx < 0 {
+			return Err[T](ErrNoPreviousStep)
+		}
+
+		lastStep := fb.steps[prevIdx]
+		prevResult := lastStep.Execute(ctx)
+
+		if prevResult.IsErr() {
+			return prevResult
+		}
+
+		return fn(ctx, prevResult.Value())
+	})
+}
+```
+
+---
+
+## Improvements (2026-03-28)
+
+### Package Comments Added
+- `internal/result/branch_flow.go` - Added comprehensive package comment
+- `internal/result/flow_builder.go` - Added comprehensive package comment
+
+### Test Coverage Enhanced
+- Added `t.Parallel()` to all test functions for parallel execution
+- Added new tests for `BranchWithValue`, `BranchWithContext` in BranchFlow
+- Added tests for `StepWithRetry` and `Then` in FlowBuilder
+- Added comprehensive tests for Context[T] branching methods:
+  - `TestBranch` - Conditional context modification
+  - `TestBranchWithValue` - Value-based branching
+  - `TestFork` - Multiple branched contexts
+  - `TestJoin` - Context composition
+  - `TestJoinWithValue` - Value-aware context composition
+  - `TestTransform` - Type transformation
+  - `TestPick` - Context selection by predicate
+  - `TestPickWithValue` - Context selection by value predicate
+
+### Minor Fixes
+- Fixed unused parameter `e` in `TestUnless` (changed to `_`)
+
+---
+
+## Pending Work
+
+Due to disk space limitations (100% full), the following items are deferred:
+
+1. Update `ARCHITECTURE.md` with branching-flow patterns documentation
+2. Add integration tests using branching-flow in real cleaners
+3. Address remaining lint warnings (parallel test markers, type assertions)
+
+Once disk space is freed, these can be completed with:
+```bash
+go test ./internal/result/... -short -v
+go build ./...
+```

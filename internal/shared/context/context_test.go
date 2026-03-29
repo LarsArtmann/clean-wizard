@@ -22,6 +22,7 @@ type TestSanitizationConfig struct {
 }
 
 func TestNewContext(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 
@@ -45,6 +46,7 @@ func TestNewContext(t *testing.T) {
 }
 
 func TestWithMetadata(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 	c := NewContext(ctx, value)
@@ -65,6 +67,7 @@ func TestWithMetadata(t *testing.T) {
 }
 
 func TestWithPermissions(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 	c := NewContext(ctx, value)
@@ -93,6 +96,7 @@ func TestWithPermissions(t *testing.T) {
 }
 
 func TestGetMetadata(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 	c := NewContext(ctx, value)
@@ -112,6 +116,7 @@ func TestGetMetadata(t *testing.T) {
 }
 
 func TestClone(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 	c := NewContext(ctx, value)
@@ -145,6 +150,7 @@ func TestClone(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 
 	// Create first context
@@ -194,6 +200,7 @@ func TestMerge(t *testing.T) {
 }
 
 func TestSetValueType(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value1 := TestValidationConfig{FieldA: "test1", FieldB: 42}
 	c := NewContext(ctx, value1)
@@ -211,6 +218,7 @@ func TestSetValueType(t *testing.T) {
 }
 
 func TestGetContext(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 	c := NewContext(ctx, value)
@@ -227,6 +235,7 @@ func TestGetContext(t *testing.T) {
 }
 
 func TestDifferentTypes(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 
 	// Create different types of contexts
@@ -252,6 +261,7 @@ func TestDifferentTypes(t *testing.T) {
 }
 
 func TestMetadataOperations(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 	c := NewContext(ctx, value)
@@ -286,6 +296,7 @@ func TestMetadataOperations(t *testing.T) {
 }
 
 func TestPermissionsEdgeCases(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	value := TestValidationConfig{FieldA: "test", FieldB: 42}
 	c := NewContext(ctx, value)
@@ -319,5 +330,227 @@ func TestPermissionsEdgeCases(t *testing.T) {
 
 	if !c.HasPermission("") {
 		t.Error("Should allow empty string permissions")
+	}
+}
+
+// Branching method tests
+
+func TestBranch(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	value := TestValidationConfig{FieldA: "test", FieldB: 42}
+	c := NewContext(ctx, value)
+
+	// Test branch with true condition
+	result := c.Branch(true, func(c *Context[TestValidationConfig]) *Context[TestValidationConfig] {
+		return c.WithMetadata("branched", "true")
+	})
+
+	if result == c {
+		t.Error("Branch should return a new context when condition is true")
+	}
+
+	if val, ok := result.Metadata["branched"]; !ok || val != "true" {
+		t.Error("Branch should add metadata when condition is true")
+	}
+
+	// Test branch with false condition
+	c2 := NewContext(ctx, TestValidationConfig{FieldA: "test2", FieldB: 43})
+	result2 := c2.Branch(false, func(c *Context[TestValidationConfig]) *Context[TestValidationConfig] {
+		return c.WithMetadata("branched", "true")
+	})
+
+	if result2 != c2 {
+		t.Error("Branch should return original context when condition is false")
+	}
+}
+
+func TestBranchWithValue(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	value := TestValidationConfig{FieldA: "test", FieldB: 42}
+	c := NewContext(ctx, value)
+
+	// Test when predicate is true
+	result := c.BranchWithValue(
+		func(v TestValidationConfig) bool { return v.FieldB > 10 },
+		func(c *Context[TestValidationConfig]) *Context[TestValidationConfig] {
+			return c.WithMetadata("value_branched", "true")
+		},
+	)
+
+	if result == c {
+		t.Error("BranchWithValue should return new context when predicate is true")
+	}
+
+	// Test when predicate is false
+	c2 := NewContext(ctx, TestValidationConfig{FieldA: "test2", FieldB: 5})
+	result2 := c2.BranchWithValue(
+		func(v TestValidationConfig) bool { return v.FieldB > 10 },
+		func(c *Context[TestValidationConfig]) *Context[TestValidationConfig] {
+			return c.WithMetadata("value_branched", "true")
+		},
+	)
+
+	if result2 == c2 {
+		t.Error("BranchWithValue should return cloned context when predicate is false")
+	}
+}
+
+func TestFork(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	value := TestValidationConfig{FieldA: "test", FieldB: 42}
+	c := NewContext(ctx, value)
+
+	branches := map[bool]func(*Context[TestValidationConfig]) *Context[TestValidationConfig]{
+		true: func(c *Context[TestValidationConfig]) *Context[TestValidationConfig] {
+			return c.WithMetadata("fork1", "value1")
+		},
+		false: func(c *Context[TestValidationConfig]) *Context[TestValidationConfig] {
+			return c.WithMetadata("fork2", "value2")
+		},
+	}
+
+	results := c.Fork(branches)
+
+	if len(results) != 1 {
+		t.Errorf("Fork should return 1 result when only one condition is true, got %d", len(results))
+	}
+
+	if _, ok := results[0].Metadata["fork1"]; !ok {
+		t.Error("Fork should apply true branch transform")
+	}
+}
+
+func TestJoin(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	c1 := NewContext(ctx, TestValidationConfig{FieldA: "test1", FieldB: 42})
+	c1.WithMetadata("key1", "value1")
+
+	c2 := NewContext(ctx, TestValidationConfig{FieldA: "test2", FieldB: 43})
+	c2.WithMetadata("key2", "value2")
+
+	merged := Join(c1, c2)
+
+	if len(merged.Metadata) != 2 {
+		t.Errorf("Join should merge metadata, got %d", len(merged.Metadata))
+	}
+
+	if merged.Metadata["key1"] != "value1" || merged.Metadata["key2"] != "value2" {
+		t.Error("Join should have metadata from both contexts")
+	}
+
+	// Test empty join
+	empty := Join[*Context[TestValidationConfig]]()
+
+	if empty == nil {
+		t.Error("Join should return non-nil for empty input")
+	}
+}
+
+func TestJoinWithValue(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	c1 := NewContext(ctx, 10)
+	c1.WithMetadata("key1", "value1")
+
+	c2 := NewContext(ctx, 20)
+	c2.WithMetadata("key2", "value2")
+
+	merged := JoinWithValue([]*Context[int]{c1, c2}, func(values []int) int {
+		sum := 0
+		for _, v := range values {
+			sum += v
+		}
+		return sum
+	})
+
+	if merged.ValueType != 30 {
+		t.Errorf("JoinWithValue should sum values, got %d", merged.ValueType)
+	}
+
+	if len(merged.Metadata) != 2 {
+		t.Error("JoinWithValue should merge metadata")
+	}
+}
+
+func TestTransform(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	c := NewContext(ctx, TestValidationConfig{FieldA: "test", FieldB: 42})
+	c.WithMetadata("key", "value")
+
+	transformed := Transform(c, func(v TestValidationConfig) string {
+		return v.FieldA
+	})
+
+	if transformed.ValueType != "test" {
+		t.Errorf("Transform should transform value type, got %s", transformed.ValueType)
+	}
+
+	if transformed.Metadata["key"] != "value" {
+		t.Error("Transform should preserve metadata")
+	}
+}
+
+func TestPick(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	c1 := NewContext(ctx, TestValidationConfig{FieldA: "test1", FieldB: 42})
+	c2 := NewContext(ctx, TestValidationConfig{FieldA: "test2", FieldB: 43})
+	c3 := NewContext(ctx, TestValidationConfig{FieldA: "test3", FieldB: 44})
+
+	contexts := []*Context[TestValidationConfig]{c1, c2, c3}
+
+	// Pick by value
+	picked := Pick(contexts, func(c *Context[TestValidationConfig]) bool {
+		return c.ValueType.FieldB == 43
+	})
+
+	if picked == nil {
+		t.Error("Pick should return context when predicate matches")
+	}
+
+	if picked.ValueType.FieldA != "test2" {
+		t.Error("Pick should return matching context")
+	}
+
+	// Pick when no match
+	pickedNone := Pick(contexts, func(c *Context[TestValidationConfig]) bool {
+		return c.ValueType.FieldB == 999
+	})
+
+	if pickedNone != nil {
+		t.Error("Pick should return nil when no match")
+	}
+}
+
+func TestPickWithValue(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	c1 := NewContext(ctx, TestValidationConfig{FieldA: "test1", FieldB: 42})
+	c2 := NewContext(ctx, TestValidationConfig{FieldA: "test2", FieldB: 43})
+	c3 := NewContext(ctx, TestValidationConfig{FieldA: "test3", FieldB: 44})
+
+	contexts := []*Context[TestValidationConfig]{c1, c2, c3}
+
+	// Pick by value
+	picked := PickWithValue(contexts, func(v TestValidationConfig) bool {
+		return v.FieldB == 44
+	})
+
+	if picked == nil {
+		t.Error("PickWithValue should return context when predicate matches")
+	}
+
+	if picked.ValueType.FieldA != "test3" {
+		t.Error("PickWithValue should return matching context")
 	}
 }
