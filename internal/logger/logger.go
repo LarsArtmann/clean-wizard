@@ -1,6 +1,6 @@
 // Package logger provides structured logging for Clean Wizard.
 //
-// This package wraps charmbracelet/log (https://github.com/charmbracelet/log)
+// This package wraps charm.land/log/v2 (https://github.com/charmbracelet/log)
 // to provide beautiful, colorful, structured logging throughout the application.
 // It integrates seamlessly with the existing charmbracelet ecosystem (huh, lipgloss, bubbletea).
 //
@@ -23,7 +23,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/charmbracelet/log"
+	"charm.land/log/v2"
 )
 
 // L is the global logger instance.

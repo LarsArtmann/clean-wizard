@@ -6,7 +6,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/charmbracelet/log"
+	"charm.land/log/v2"
 )
 
 // LoadConfigWithFallback loads configuration with proper error handling and user feedback
