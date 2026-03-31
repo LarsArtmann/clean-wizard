@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 
@@ -314,4 +315,35 @@ func DiskUsageBar(du DiskUsage, width int) string {
 	}
 
 	return fmt.Sprintf("[%s] %.0f%%", bar.String(), du.UsedPercent)
+}
+
+// NewEmptyCleanResult returns a conservative result for when there are no items to clean.
+func NewEmptyCleanResult() result.Result[domain.CleanResult] {
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.StrategyConservativeType,
+		0, int64(0),
+		domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
+	))
+}
+
+// NewDryRunCleanResult returns a dry-run result with the given item count and total bytes.
+func NewDryRunCleanResult(itemCount int, totalBytes int64) result.Result[domain.CleanResult] {
+	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
+		domain.StrategyDryRunType,
+		itemCount, totalBytes,
+		domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
+	))
+}
+
+// NewCleanResultWithMetrics returns a result with the given metrics.
+func NewCleanResultWithMetrics(
+	itemsRemoved, itemsFailed int,
+	bytesFreed int64,
+	duration time.Duration,
+) result.Result[domain.CleanResult] {
+	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
+		domain.StrategyAggressiveType,
+		itemsRemoved, itemsFailed, bytesFreed, duration,
+		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
+	))
 }

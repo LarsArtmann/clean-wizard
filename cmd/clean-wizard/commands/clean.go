@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
-	"charm.land/huh/v2"
 	"github.com/spf13/cobra"
 )
 

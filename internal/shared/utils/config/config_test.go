@@ -5,8 +5,8 @@ import (
 	"io"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"charm.land/log/v2"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/stretchr/testify/assert"
 )
 

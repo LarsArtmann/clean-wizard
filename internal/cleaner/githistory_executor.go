@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	gitfilterrepo "github.com/LarsArtmann/clean-wizard/internal/shared/utils/gitfilterrepo"
 )
 
 const (
@@ -175,12 +176,7 @@ func (e *GitHistoryExecutor) runFilterRepo(
 	args = append(args, "--invert-paths")
 
 	if e.verbose {
-		provider := DetectFilterRepoProvider()
-		if provider == FilterRepoNix {
-			fmt.Printf("Running: nix run nixpkgs#git-filter-repo -- %s\n", strings.Join(args, " "))
-		} else {
-			fmt.Printf("Running: git filter-repo %s\n", strings.Join(args, " "))
-		}
+		gitfilterrepo.LogFilterRepoCommand(e.verbose, args)
 	}
 
 	cmd := BuildFilterRepoCommand(ctx, args)
@@ -374,12 +370,7 @@ func (e *GitHistoryExecutor) StripLargeBlobs(ctx context.Context, sizeMB int) er
 	}
 
 	if e.verbose {
-		provider := DetectFilterRepoProvider()
-		if provider == FilterRepoNix {
-			fmt.Printf("Running: nix run nixpkgs#git-filter-repo -- %s\n", strings.Join(args, " "))
-		} else {
-			fmt.Printf("Running: git filter-repo %s\n", strings.Join(args, " "))
-		}
+		gitfilterrepo.LogFilterRepoCommand(e.verbose, args)
 	}
 
 	cmd := BuildFilterRepoCommand(ctx, args)

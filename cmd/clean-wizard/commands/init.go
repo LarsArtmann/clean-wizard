@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"charm.land/huh/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +32,21 @@ func NewInitCommand() *cobra.Command {
 	return cmd
 }
 
+// newConfirmForm creates a confirmation form with the given parameters.
+// This consolidates the duplicate huh.NewForm + huh.NewConfirm pattern.
+func newConfirmForm(title, description, affirmative, negative string, value *bool) *huh.Form {
+	return huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title(title).
+				Description(description).
+				Affirmative(affirmative).
+				Negative(negative).
+				Value(value),
+		),
+	)
+}
+
 // runInitCommand executes the init command.
 func runInitCommand(force, minimal bool) error {
 	fmt.Println(TitleStyle.Render("🧹 Clean Wizard Setup"))
@@ -52,15 +67,12 @@ func runInitCommand(force, minimal bool) error {
 
 		var overwrite bool
 
-		confirmForm := huh.NewForm(
-			huh.NewGroup(
-				huh.NewConfirm().
-					Title("Overwrite existing configuration?").
-					Description("This will replace your current configuration").
-					Affirmative("Yes, overwrite").
-					Negative("No, cancel").
-					Value(&overwrite),
-			),
+		confirmForm := newConfirmForm(
+			"Overwrite existing configuration?",
+			"This will replace your current configuration",
+			"Yes, overwrite",
+			"No, cancel",
+			&overwrite,
 		)
 
 		err := confirmForm.Run()

@@ -33,6 +33,42 @@ var L *log.Logger
 // StdLogger provides a standard slog.Logger for interoperability.
 var StdLogger *slog.Logger
 
+// levelFromString converts a level string to the corresponding log.Level.
+func levelFromString(levelStr string) log.Level {
+	switch levelStr {
+	case "debug":
+		return log.DebugLevel
+	case "info":
+		return log.InfoLevel
+	case "warn":
+		return log.WarnLevel
+	case "error":
+		return log.ErrorLevel
+	case "fatal":
+		return log.FatalLevel
+	default:
+		return log.InfoLevel
+	}
+}
+
+// setupLogger creates the logger with the given level and development mode.
+func setupLogger(level log.Level, development bool) {
+	formatter := log.JSONFormatter
+	if development {
+		formatter = log.TextFormatter
+	}
+
+	L = log.NewWithOptions(os.Stdout, log.Options{
+		Level:           level,
+		Formatter:       formatter,
+		ReportTimestamp: true,
+		TimeFormat:      time.RFC3339,
+		Prefix:          "clean-wizard",
+	})
+
+	StdLogger = slog.New(L)
+}
+
 // Init initializes the global logger.
 //
 // In development mode, logs are colorful and human-readable.
@@ -48,56 +84,15 @@ func Init(development bool) {
 		level = log.DebugLevel
 	}
 
-	formatter := log.JSONFormatter
-	if development {
-		formatter = log.TextFormatter
-	}
-
-	L = log.NewWithOptions(os.Stdout, log.Options{
-		Level:           level,
-		Formatter:       formatter,
-		ReportTimestamp: true,
-		TimeFormat:      time.RFC3339,
-		Prefix:          "clean-wizard",
-	})
-
-	// Create slog handler from charmbracelet/log
-	StdLogger = slog.New(L)
+	setupLogger(level, development)
 }
 
 // InitWithLevel initializes the logger with a specific level.
 //
 // Valid levels: debug, info, warn, error, fatal.
 func InitWithLevel(levelStr string, development bool) {
-	level := log.InfoLevel
-
-	switch levelStr {
-	case "debug":
-		level = log.DebugLevel
-	case "info":
-		level = log.InfoLevel
-	case "warn":
-		level = log.WarnLevel
-	case "error":
-		level = log.ErrorLevel
-	case "fatal":
-		level = log.FatalLevel
-	}
-
-	formatter := log.JSONFormatter
-	if development {
-		formatter = log.TextFormatter
-	}
-
-	L = log.NewWithOptions(os.Stdout, log.Options{
-		Level:           level,
-		Formatter:       formatter,
-		ReportTimestamp: true,
-		TimeFormat:      time.RFC3339,
-		Prefix:          "clean-wizard",
-	})
-
-	StdLogger = slog.New(L)
+	level := levelFromString(levelStr)
+	setupLogger(level, development)
 }
 
 // Sync flushes any buffered log entries.
@@ -176,18 +171,7 @@ func SetLevel(level string) {
 		return
 	}
 
-	switch level {
-	case "debug":
-		L.SetLevel(log.DebugLevel)
-	case "info":
-		L.SetLevel(log.InfoLevel)
-	case "warn":
-		L.SetLevel(log.WarnLevel)
-	case "error":
-		L.SetLevel(log.ErrorLevel)
-	case "fatal":
-		L.SetLevel(log.FatalLevel)
-	}
+	L.SetLevel(levelFromString(level))
 }
 
 // GetSlogLogger returns the standard slog.Logger for interoperability.

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"charm.land/log/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"charm.land/log/v2"
 )
 
 // LoadConfigWithFallback loads configuration with proper error handling and user feedback

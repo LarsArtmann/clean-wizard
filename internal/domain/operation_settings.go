@@ -227,6 +227,16 @@ const (
 	CacheTypeXdgCache
 	// CacheTypeThumbnails represents Linux thumbnail cache.
 	CacheTypeThumbnails
+	// CacheTypePuppeteer represents Puppeteer browser cache.
+	CacheTypePuppeteer
+	// CacheTypeTerraform represents Terraform plugin cache.
+	CacheTypeTerraform
+	// CacheTypeGradleWrapper represents Gradle wrapper distributions cache.
+	CacheTypeGradleWrapper
+	// CacheTypeKonan represents Kotlin/Native toolchain dependencies.
+	CacheTypeKonan
+	// CacheTypeRustup represents Rust toolchain cache.
+	CacheTypeRustup
 )
 
 // String returns string representation of cache type.
@@ -252,6 +262,16 @@ func (ct CacheType) String() string {
 		return "XDG_CACHE"
 	case CacheTypeThumbnails:
 		return "THUMBNAILS"
+	case CacheTypePuppeteer:
+		return "PUPPETEER"
+	case CacheTypeTerraform:
+		return "TERRAFORM"
+	case CacheTypeGradleWrapper:
+		return "GRADLE_WRAPPER"
+	case CacheTypeKonan:
+		return "KONAN"
+	case CacheTypeRustup:
+		return "RUSTUP"
 	default:
 		return stringUnknown
 	}
@@ -259,7 +279,7 @@ func (ct CacheType) String() string {
 
 // IsValid checks if cache type is valid.
 func (ct CacheType) IsValid() bool {
-	return ct >= CacheTypeSpotlight && ct <= CacheTypeThumbnails
+	return ct >= CacheTypeSpotlight && ct <= CacheTypeRustup
 }
 
 // Values returns all possible cache types.
@@ -275,6 +295,11 @@ func (ct CacheType) Values() []CacheType {
 		CacheTypeCcache,
 		CacheTypeXdgCache,
 		CacheTypeThumbnails,
+		CacheTypePuppeteer,
+		CacheTypeTerraform,
+		CacheTypeGradleWrapper,
+		CacheTypeKonan,
+		CacheTypeRustup,
 	}
 }
 
@@ -286,16 +311,21 @@ func (ct CacheType) MarshalYAML() (any, error) {
 // UnmarshalYAML implements yaml.Unmarshaler interface for CacheType.
 func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 	return UnmarshalYAMLEnum(value, ct, map[string]CacheType{
-		"SPOTLIGHT":  CacheTypeSpotlight,
-		"XCODE":      CacheTypeXcode,
-		"COCOAPODS":  CacheTypeCocoapods,
-		"HOMEBREW":   CacheTypeHomebrew,
-		"PIP":        CacheTypePip,
-		"NPM":        CacheTypeNpm,
-		"YARN":       CacheTypeYarn,
-		"CCACHE":     CacheTypeCcache,
-		"XDG_CACHE":  CacheTypeXdgCache,
-		"THUMBNAILS": CacheTypeThumbnails,
+		"SPOTLIGHT":      CacheTypeSpotlight,
+		"XCODE":          CacheTypeXcode,
+		"COCOAPODS":      CacheTypeCocoapods,
+		"HOMEBREW":       CacheTypeHomebrew,
+		"PIP":            CacheTypePip,
+		"NPM":            CacheTypeNpm,
+		"YARN":           CacheTypeYarn,
+		"CCACHE":         CacheTypeCcache,
+		"XDG_CACHE":      CacheTypeXdgCache,
+		"THUMBNAILS":     CacheTypeThumbnails,
+		"PUPPETEER":      CacheTypePuppeteer,
+		"TERRAFORM":      CacheTypeTerraform,
+		"GRADLE_WRAPPER": CacheTypeGradleWrapper,
+		"KONAN":          CacheTypeKonan,
+		"RUSTUP":         CacheTypeRustup,
 	}, "invalid cache type")
 }
 

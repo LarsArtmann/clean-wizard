@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	fileutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/fileutil"
@@ -329,11 +328,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 	items := scanResult.Value()
 
 	if len(items) == 0 {
-		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.StrategyConservativeType,
-			0, int64(0),
-			domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
-		))
+		return NewEmptyCleanResult()
 	}
 
 	// Calculate total size
@@ -351,11 +346,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 			)
 		}
 
-		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.StrategyDryRunType,
-			len(items), totalBytes,
-			domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
-		))
+		return NewDryRunCleanResult(len(items), totalBytes)
 	}
 
 	// Actual cleaning
@@ -386,11 +377,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 
 	duration := time.Since(startTime)
 
-	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
-		domain.StrategyAggressiveType,
-		itemsRemoved, itemsFailed, bytesFreed, duration,
-		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
-	))
+	return NewCleanResultWithMetrics(itemsRemoved, itemsFailed, bytesFreed, duration)
 }
 
 // GetStoreSize returns the total size of all compiled binaries found.

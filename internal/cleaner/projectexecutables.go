@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	fileutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/fileutil"
@@ -188,11 +187,7 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 	items := scanResult.Value()
 
 	if len(items) == 0 {
-		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.StrategyConservativeType,
-			0, int64(0),
-			domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
-		))
+		return NewEmptyCleanResult()
 	}
 
 	// Calculate total size for dry-run preview
@@ -206,11 +201,7 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 			fmt.Printf("Would trash %d executable file(s) (%d bytes)\n", len(items), totalBytes)
 		}
 
-		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.StrategyDryRunType,
-			len(items), totalBytes,
-			domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
-		))
+		return NewDryRunCleanResult(len(items), totalBytes)
 	}
 
 	// Actual cleaning
@@ -241,11 +232,7 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[dom
 
 	duration := time.Since(startTime)
 
-	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
-		domain.StrategyAggressiveType,
-		itemsRemoved, itemsFailed, bytesFreed, duration,
-		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
-	))
+	return NewCleanResultWithMetrics(itemsRemoved, itemsFailed, bytesFreed, duration)
 }
 
 // GetStoreSize returns the total size of all executable files found.

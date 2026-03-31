@@ -33,6 +33,11 @@ func AvailableSystemCacheTypes() []domain.CacheType {
 			domain.CacheTypeXcode,
 			domain.CacheTypeCocoapods,
 			domain.CacheTypeHomebrew,
+			domain.CacheTypePuppeteer,
+			domain.CacheTypeTerraform,
+			domain.CacheTypeGradleWrapper,
+			domain.CacheTypeKonan,
+			domain.CacheTypeRustup,
 		}
 	case "linux":
 		return []domain.CacheType{
@@ -43,6 +48,11 @@ func AvailableSystemCacheTypes() []domain.CacheType {
 			domain.CacheTypeNpm,
 			domain.CacheTypeYarn,
 			domain.CacheTypeCcache,
+			domain.CacheTypePuppeteer,
+			domain.CacheTypeTerraform,
+			domain.CacheTypeGradleWrapper,
+			domain.CacheTypeKonan,
+			domain.CacheTypeRustup,
 		}
 	default:
 		return []domain.CacheType{}
@@ -214,6 +224,32 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 	domain.CacheTypeCcache: {
 		pathComponents: []string{".cache", "ccache"},
 		displayName:    "Ccache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	// Cross-platform cache types
+	domain.CacheTypePuppeteer: {
+		pathComponents: []string{".cache", "puppeteer"},
+		displayName:    "Puppeteer browser cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeTerraform: {
+		pathComponents: []string{".terraform.d", "plugin-cache"},
+		displayName:    "Terraform plugin cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeGradleWrapper: {
+		pathComponents: []string{".gradle", "wrapper"},
+		displayName:    "Gradle wrapper distributions",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeKonan: {
+		pathComponents: []string{".konan", "dependencies"},
+		displayName:    "Kotlin/Native toolchain dependencies",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeRustup: {
+		pathComponents: []string{".rustup", "toolchains"},
+		displayName:    "Rust toolchain cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 }

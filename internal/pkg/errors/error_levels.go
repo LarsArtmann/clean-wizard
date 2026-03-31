@@ -13,42 +13,33 @@ const (
 	LevelPanic
 )
 
+// errorLevelData provides string representations for each error level.
+var errorLevelData = [...]struct {
+	stringRepr string
+	logRepr    string
+}{
+	LevelDebug: {stringRepr: "DEBUG", logRepr: "debug"},
+	LevelInfo:  {stringRepr: "INFO", logRepr: "info"},
+	LevelWarn:  {stringRepr: "WARN", logRepr: "warning"},
+	LevelError: {stringRepr: "ERROR", logRepr: "error"},
+	LevelFatal: {stringRepr: "FATAL", logRepr: "fatal"},
+	LevelPanic: {stringRepr: "PANIC", logRepr: "panic"},
+}
+
 // String returns string representation of error level.
 func (e ErrorLevel) String() string {
-	switch e {
-	case LevelDebug:
-		return "DEBUG"
-	case LevelInfo:
-		return "INFO"
-	case LevelWarn:
-		return "WARN"
-	case LevelError:
-		return "ERROR"
-	case LevelFatal:
-		return "FATAL"
-	case LevelPanic:
-		return "PANIC"
-	default:
-		return "UNKNOWN_LEVEL"
+	if e >= 0 && e < ErrorLevel(len(errorLevelData)) {
+		return errorLevelData[e].stringRepr
 	}
+
+	return "UNKNOWN_LEVEL"
 }
 
 // LogLevel returns the corresponding logrus level.
 func (e ErrorLevel) LogLevel() string {
-	switch e {
-	case LevelDebug:
-		return "debug"
-	case LevelInfo:
-		return "info"
-	case LevelWarn:
-		return "warning"
-	case LevelError:
-		return "error"
-	case LevelFatal:
-		return "fatal"
-	case LevelPanic:
-		return "panic"
-	default:
-		return "error"
+	if e >= 0 && e < ErrorLevel(len(errorLevelData)) {
+		return errorLevelData[e].logRepr
 	}
+
+	return "error"
 }
