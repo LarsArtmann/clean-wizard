@@ -269,4 +269,3 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 }
 
 // GetVerbose returns the verbose setting.
-

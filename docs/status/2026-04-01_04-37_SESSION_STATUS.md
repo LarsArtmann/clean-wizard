@@ -21,6 +21,7 @@ The `branching-flow dupe .` analysis on the `clean-wizard` Go project identified
 ### What Was Requested
 
 Eliminate all 4 actionable duplicate groups:
+
 - **Group 1:** `LegacyValidationContext` struct (validation_config.go)
 - **Group 2:** Shared `CleanerBase` struct — 15+ cleaners duplicate `verbose bool` + `dryRun bool` fields
 - **Group 3:** `LegacyErrorDetails` + `LegacySanitizationChange` structs (error_config.go)
@@ -28,25 +29,27 @@ Eliminate all 4 actionable duplicate groups:
 
 ### Commit History (All Pushed ✅)
 
-| # | Hash | Description | Files | Lines |
-|---|------|-------------|-------|-------|
-| 1 | `1adadd1` | Remove legacy validation context types | 3 | -45 |
-| 2 | `6fe3980` | Add CleanerBase struct, embed in 15 cleaners | 17 | +68 |
-| 3 | `e4bec04` | Promote GetVerbose/GetDryRun to CleanerBase | 4 | -30 |
-| 4 | `3059800` | Unify GoCleaner: embed CleanerBase, remove GoCacheConfig | 2 | -13 |
-| 5 | `c3b5fc5` | Remove legacy type references from docs | 2 | -6 |
+| #   | Hash      | Description                                              | Files | Lines |
+| --- | --------- | -------------------------------------------------------- | ----- | ----- |
+| 1   | `1adadd1` | Remove legacy validation context types                   | 3     | -45   |
+| 2   | `6fe3980` | Add CleanerBase struct, embed in 15 cleaners             | 17    | +68   |
+| 3   | `e4bec04` | Promote GetVerbose/GetDryRun to CleanerBase              | 4     | -30   |
+| 4   | `3059800` | Unify GoCleaner: embed CleanerBase, remove GoCacheConfig | 2     | -13   |
+| 5   | `c3b5fc5` | Remove legacy type references from docs                  | 2     | -6    |
 
 **Total:** 5 commits, net ~-70 lines of dead code removed.
 
 ### Group-by-Group Status
 
 #### Group 1: `LegacyValidationContext` ✅ FULLY DONE
+
 - **Commit:** `1adadd1`
 - **Removed:** `LegacyValidationContext` struct, `ToLegacyValidationContext()`, `FromLegacyValidationContext()`, `NewLegacyValidationContext()` from `internal/shared/context/validation_config.go`
 - **Tests removed:** `TestLegacyErrorDetailsConversion`, `TestLegacyErrorDetailsNil` from `internal/shared/context/error_config_test.go` (same commit batch)
 - **Documentation:** Removed legacy compatibility section from `ARCHITECTURE.md` line 104 and `docs/historical/PLAN.md` line 9 in commit `c3b5fc5`
 
 #### Group 2: `CleanerBase` struct extraction ✅ FULLY DONE
+
 - **Commit:** `6fe3980` + `e4bec04`
 - **Created:** `CleanerBase` struct in `internal/cleaner/cleaner.go` with `verbose bool`, `dryRun bool` fields
 - **Updated:** 15 cleaner files to embed `CleanerBase`:
@@ -54,11 +57,13 @@ Eliminate all 4 actionable duplicate groups:
 - **Promoted methods:** `GetVerbose()`, `GetDryRun()` moved from 3 individual cleaners (`golangcilint.go`, `buildcache.go`, `systemcache.go`) to `CleanerBase` in commit `e4bec04`
 
 #### Group 3: `LegacyErrorDetails` + `LegacySanitizationChange` ✅ FULLY DONE
+
 - **Commit:** `1adadd1` (same as Group 1)
 - **Removed:** `LegacyErrorDetails` struct + 3 helpers, `LegacySanitizationChange` struct + 3 helpers from `internal/shared/context/error_config.go`
 - **Imports removed:** Unused `"context"` and `"fmt"` imports cleaned up
 
 #### Group 4: `GoCacheConfig` outlier pattern ✅ FULLY DONE
+
 - **Commit:** `3059800`
 - **Changed:** `GoCleaner` from `config GoCacheConfig` (exported fields `Verbose`, `DryRun`, `Caches`) to `CleanerBase` embedding + `caches GoCacheType` (unexported, consistent with all other cleaners)
 - **Removed:** `GoCacheConfig` struct entirely
@@ -72,6 +77,7 @@ Eliminate all 4 actionable duplicate groups:
 The Go toolchain package (`golang.org/toolchain@v0.0.1-go1.26.1.darwin-arm64`) was found to be **corrupted** — the package is installed read-only (owned by root) and had missing/corrupted internal files (`internal/unsafeheader`, `runtime`, `net`, etc. — all reporting "package not in std" errors).
 
 **Workarounds attempted:**
+
 1. `go clean -cache` — partially succeeded but couldn't fully clear directory
 2. `rm -rf ~/Library/Caches/go-build` — corrupted cache removed
 3. `GOTOOLCHAIN=local go build` — local Go 1.26.0 available but project requires Go 1.26.1
@@ -79,11 +85,13 @@ The Go toolchain package (`golang.org/toolchain@v0.0.1-go1.26.1.darwin-arm64`) w
 5. `go install golang.org/dl/go1.26.1@latest` — blocked by security policy
 
 **Verification performed instead:**
+
 - `gofmt -l` on changed files → no output (files are syntactically correct)
 - `git diff` reviewed for both `golang_cleaner.go` and `golang_test.go` → all changes verified correct
 - Manual review of struct embedding: `CleanerBase` with promoted `verbose`, `dryRun` fields + `caches GoCacheType` field
 
 **Changes verified correct:**
+
 - `golang_cleaner.go`: `GoCacheConfig` removed, `CleanerBase` embedded, `config.X` → `gc.X` (6 references)
 - `golang_test.go`: 7 `cleaner.config.X` references → `cleaner.verbose/dryRun/caches`
 
@@ -131,6 +139,7 @@ Untracked:
 The modifications extract shared configuration structs (`outputMixin`, `analysisMixin`) from duplicated fields across CLI command config structs. This is the same "extract shared base" pattern used in the clean-wizard `CleanerBase` work.
 
 **`mixins_config.go` (untracked, new):** Defines two shared mixin structs:
+
 - `outputMixin`: `verbose`, `reportFormat`, `outputPath`, `excludeGenerated`
 - `analysisMixin`: `reportFormat`, `verbose`, `typeStrategyVal`, `showAllLocationsVal`, `minSimilarityVal`, `skipDirsCfg`, `order`, `minOverlapVal`, `includeTestsCfg`
 
@@ -139,6 +148,7 @@ The modifications extract shared configuration structs (`outputMixin`, `analysis
 ### Status: PARTIALLY DONE — NOT COMMitted
 
 The work was done but not committed in this session. It requires:
+
 1. Final review of the mixin extraction
 2. `go build` / `go vet` verification (blocked by same toolchain issue)
 3. Test verification
@@ -265,6 +275,7 @@ The work was done but not committed in this session. It requires:
 ## PART F: WHAT IS PARTIALLY DONE
 
 ### Branching-Flow Mixin Extraction (IN PROGRESS)
+
 - 10 files modified (refactoring to extract shared mixin structs)
 - 1 new file created (`mixins_config.go`)
 - NOT committed — needs review and verification
@@ -289,6 +300,7 @@ The work was done but not committed in this session. It requires:
 ### Go Toolchain Corruption ⚠️
 
 The `golang.org/toolchain@v0.0.1-go1.26.1.darwin-arm64` package is **corrupted** and installed **read-only** (owned by root). This prevents:
+
 - `go build`
 - `go test`
 - `go vet`
@@ -310,6 +322,7 @@ This affects the `clean-wizard` project which requires Go 1.26.1. The local `go 
 The `golang.org/toolchain@v0.0.1-go1.26.1.darwin-arm64` package is installed in `~/go/pkg/mod/` with root-owned files. The toolchain is used automatically when `go.mod` specifies `go >= 1.26.1` and the local Go is `1.26.0`.
 
 **What I've tried:**
+
 1. `go clean -cache` — partial success, directory not fully cleared
 2. `rm -rf ~/Library/Caches/go-build` — cache cleared
 3. `GOTOOLCHAIN=local` — local Go 1.26.0 exists but project requires 1.26.1
@@ -318,6 +331,7 @@ The `golang.org/toolchain@v0.0.1-go1.26.1.darwin-arm64` package is installed in 
 6. Removing toolchain files — permission denied (read-only)
 
 **What might work:**
+
 - Asking system administrator to reinstall the toolchain
 - Creating a `flake.nix` in clean-wizard that pins Go 1.26.1
 - Temporarily changing `go.mod` to require `go 1.26.0` (risky — backwards step)
@@ -348,5 +362,5 @@ a975714 docs(status): comprehensive post-audit status report — all 10 steps co
 
 ---
 
-*Report generated: 2026-04-01 04:37 CEST*
-*Generated by: Crush AI Agent*
+_Report generated: 2026-04-01 04:37 CEST_
+_Generated by: Crush AI Agent_

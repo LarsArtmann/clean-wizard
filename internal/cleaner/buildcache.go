@@ -283,5 +283,3 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(
 
 	return result.Err[domain.CleanResult](fmt.Errorf("unknown build tool type: %s", toolType))
 }
-
-

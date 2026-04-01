@@ -441,5 +441,3 @@ func (scc *SystemCacheCleaner) isMacOS() bool {
 func (scc *SystemCacheCleaner) isLinux() bool {
 	return runtime.GOOS == "linux"
 }
-
-
