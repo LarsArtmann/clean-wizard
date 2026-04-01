@@ -60,6 +60,8 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().StringVar(&mode, "mode", "", "Preset mode: quick, standard, or aggressive")
 	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Use a specific configuration profile")
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
+	cmd.Flags().
+		BoolVar(&skipConfirmation, "yes", false, "Skip confirmation prompt (use with --mode or --profile)")
 
 	return cmd
 }
