@@ -1,8 +1,6 @@
 package context
 
 import (
-	"context"
-	"fmt"
 	"time"
 )
 
@@ -196,123 +194,6 @@ type SanitizationResultV2 struct {
 // NewSanitizationResultV2 creates a new SanitizationResultV2.
 func NewSanitizationResultV2() *SanitizationResultV2 {
 	return &SanitizationResultV2{
-		Timestamp: time.Now(),
-	}
-}
-
-// LegacyErrorDetails provides backward compatibility with the old ErrorDetails type.
-//
-// Deprecated: Use Context[ErrorConfig] for new code. This type will be removed in v2.0.
-type LegacyErrorDetails struct {
-	Field      string
-	Value      string
-	Expected   string
-	Actual     string
-	Operation  string
-	FilePath   string
-	LineNumber int
-	RetryCount int
-	Duration   string
-	Metadata   map[string]string
-}
-
-// ToLegacyErrorDetails converts a Context[ErrorConfig] to the legacy ErrorDetails format.
-func ToLegacyErrorDetails(c *Context[ErrorConfig]) *LegacyErrorDetails {
-	return &LegacyErrorDetails{
-		Field:     c.ValueType.Field,
-		Value:     c.ValueType.Value,
-		Expected:  c.ValueType.Expected,
-		Actual:    c.ValueType.Actual,
-		Operation: c.ValueType.Operation,
-		Metadata:  c.Metadata,
-	}
-}
-
-// FromLegacyErrorDetails creates a Context[ErrorConfig] from the legacy ErrorDetails format.
-func FromLegacyErrorDetails(ctx context.Context, legacy *LegacyErrorDetails) *Context[ErrorConfig] {
-	if legacy == nil {
-		return NewContext(ctx, NewErrorConfig())
-	}
-
-	config := ErrorConfig{
-		Field:     legacy.Field,
-		Value:     legacy.Value,
-		Expected:  legacy.Expected,
-		Actual:    legacy.Actual,
-		Operation: legacy.Operation,
-		Metadata:  legacy.Metadata,
-	}
-
-	newCtx := NewContext(ctx, config)
-	for k, v := range legacy.Metadata {
-		newCtx = newCtx.WithMetadata(k, v)
-	}
-
-	return newCtx
-}
-
-// NewLegacyErrorDetails creates a new LegacyErrorDetails with default values.
-//
-// Deprecated: Use NewContext[ErrorConfig] for new code.
-func NewLegacyErrorDetails() *LegacyErrorDetails {
-	return &LegacyErrorDetails{
-		Metadata: make(map[string]string),
-	}
-}
-
-// LegacySanitizationChange provides backward compatibility with the old SanitizationChange type.
-//
-// Deprecated: Use Context[SanitizationConfig] for new code. This type will be removed in v2.0.
-type LegacySanitizationChange struct {
-	Original  any
-	Sanitized any
-	Reason    string
-	Timestamp time.Time
-}
-
-// ToLegacySanitizationChange converts a Context[SanitizationConfig] to the legacy SanitizationChange format.
-// Note: The original/sanitized values cannot be preserved in Context[SanitizationConfig] since they
-// are stored in Metadata as strings. Use this only for backward compatibility.
-func ToLegacySanitizationChange(
-	original, sanitized any,
-	reason string,
-	timestamp time.Time,
-) *LegacySanitizationChange {
-	return &LegacySanitizationChange{
-		Original:  original,
-		Sanitized: sanitized,
-		Reason:    reason,
-		Timestamp: timestamp,
-	}
-}
-
-// FromLegacySanitizationChange creates a Context[SanitizationConfig] from the legacy SanitizationChange format.
-// Note: Only metadata fields are preserved; original/sanitized values are stored as string representations.
-func FromLegacySanitizationChange(
-	ctx context.Context,
-	legacy *LegacySanitizationChange,
-) *Context[SanitizationConfig] {
-	if legacy == nil {
-		return NewContext(ctx, NewSanitizationConfig())
-	}
-
-	config := SanitizationConfig{
-		Rules: make(map[string]string),
-	}
-
-	newCtx := NewContext(ctx, config)
-	newCtx = newCtx.WithMetadata("original", fmt.Sprintf("%v", legacy.Original))
-	newCtx = newCtx.WithMetadata("sanitized", fmt.Sprintf("%v", legacy.Sanitized))
-	newCtx = newCtx.WithMetadata("reason", legacy.Reason)
-
-	return newCtx
-}
-
-// NewLegacySanitizationChange creates a new LegacySanitizationChange with default values.
-//
-// Deprecated: Use Context[SanitizationConfig] for new code.
-func NewLegacySanitizationChange() *LegacySanitizationChange {
-	return &LegacySanitizationChange{
 		Timestamp: time.Now(),
 	}
 }

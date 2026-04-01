@@ -87,58 +87,6 @@ func TestSanitizationConfigBuilder(t *testing.T) {
 	}
 }
 
-func TestLegacyErrorDetailsConversion(t *testing.T) {
-	ctx := context.Background()
-	legacy := NewLegacyErrorDetails()
-	legacy.Field = "test_field"
-	legacy.Value = "test_value"
-	legacy.Expected = "expected"
-	legacy.Actual = "actual"
-	legacy.Operation = "test_op"
-	legacy.Metadata["key1"] = "value1"
-
-	// Convert from legacy to context
-	convertedCtx := FromLegacyErrorDetails(ctx, legacy)
-
-	if convertedCtx.ValueType.Field != "test_field" {
-		t.Errorf("Expected Field 'test_field', got '%s'", convertedCtx.ValueType.Field)
-	}
-
-	if convertedCtx.ValueType.Value != "test_value" {
-		t.Errorf("Expected Value 'test_value', got '%s'", convertedCtx.ValueType.Value)
-	}
-
-	if convertedCtx.Metadata["key1"] != "value1" {
-		t.Errorf("Expected context metadata key1='value1', got '%s'", convertedCtx.Metadata["key1"])
-	}
-
-	// Convert from context to legacy
-	backToLegacy := ToLegacyErrorDetails(convertedCtx)
-
-	if backToLegacy.Field != "test_field" {
-		t.Errorf("Expected Field 'test_field', got '%s'", backToLegacy.Field)
-	}
-
-	if backToLegacy.Value != "test_value" {
-		t.Errorf("Expected Value 'test_value', got '%s'", backToLegacy.Value)
-	}
-}
-
-func TestLegacyErrorDetailsNil(t *testing.T) {
-	ctx := context.Background()
-
-	// Test nil legacy
-	convertedCtx := FromLegacyErrorDetails(ctx, nil)
-
-	if convertedCtx.ValueType.Field != "" {
-		t.Errorf("Expected empty Field, got '%s'", convertedCtx.ValueType.Field)
-	}
-
-	if convertedCtx.ValueType.Operation != "" {
-		t.Errorf("Expected empty Operation, got '%s'", convertedCtx.ValueType.Operation)
-	}
-}
-
 func TestErrorResultTypes(t *testing.T) {
 	result := NewErrorResult()
 

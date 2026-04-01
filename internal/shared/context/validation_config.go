@@ -1,7 +1,6 @@
 package context
 
 import (
-	"context"
 	"time"
 )
 
@@ -168,78 +167,4 @@ func (c *Context[ValidationConfig]) Execute(validator func() *ValidationResult) 
 	}
 
 	return NewValidationResult()
-}
-
-// LegacyValidationContext provides backward compatibility with the old ValidationContext type.
-//
-// Deprecated: Use Context[ValidationConfig] for new code. This type will be removed in v2.0.
-type LegacyValidationContext struct {
-	ConfigPath      string
-	ValidationLevel string
-	Profile         string
-	Section         string
-	MinValue        any
-	MaxValue        any
-	AllowedValues   []string
-	ReferencedField string
-	Constraints     map[string]string
-	Metadata        map[string]string
-}
-
-// ToLegacyValidationContext converts a Context[ValidationConfig] to the legacy ValidationContext format.
-func ToLegacyValidationContext(c *Context[ValidationConfig]) *LegacyValidationContext {
-	// Directly access the ValueType field to avoid generic type inference issues
-	return &LegacyValidationContext{
-		ConfigPath:      c.ValueType.ConfigPath,
-		ValidationLevel: c.ValueType.ValidationLevel,
-		Profile:         c.ValueType.Profile,
-		Section:         c.ValueType.Section,
-		MinValue:        c.ValueType.MinValue,
-		MaxValue:        c.ValueType.MaxValue,
-		AllowedValues:   c.ValueType.AllowedValues,
-		ReferencedField: c.ValueType.ReferencedField,
-		Constraints:     c.ValueType.Constraints,
-		Metadata:        c.Metadata,
-	}
-}
-
-// FromLegacyValidationContext creates a Context[ValidationConfig] from the legacy ValidationContext format.
-func FromLegacyValidationContext(
-	ctx context.Context,
-	legacy *LegacyValidationContext,
-) *Context[ValidationConfig] {
-	if legacy == nil {
-		return NewContext(ctx, NewValidationConfig())
-	}
-
-	config := ValidationConfig{
-		ConfigPath:      legacy.ConfigPath,
-		ValidationLevel: legacy.ValidationLevel,
-		Profile:         legacy.Profile,
-		Section:         legacy.Section,
-		MinValue:        legacy.MinValue,
-		MaxValue:        legacy.MaxValue,
-		AllowedValues:   legacy.AllowedValues,
-		ReferencedField: legacy.ReferencedField,
-		Constraints:     legacy.Constraints,
-		Metadata:        legacy.Metadata,
-	}
-
-	newCtx := NewContext(ctx, config)
-	for k, v := range legacy.Metadata {
-		newCtx = newCtx.WithMetadata(k, v)
-	}
-
-	return newCtx
-}
-
-// NewLegacyValidationContext creates a new LegacyValidationContext with default values.
-//
-// Deprecated: Use NewContext[ValidationConfig] for new code.
-func NewLegacyValidationContext() *LegacyValidationContext {
-	return &LegacyValidationContext{
-		Constraints:   make(map[string]string),
-		Metadata:      make(map[string]string),
-		AllowedValues: []string{},
-	}
 }
