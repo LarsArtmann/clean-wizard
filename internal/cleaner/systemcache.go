@@ -442,12 +442,4 @@ func (scc *SystemCacheCleaner) isLinux() bool {
 	return runtime.GOOS == "linux"
 }
 
-// GetVerbose returns the verbose setting for testing purposes.
-func (scc *SystemCacheCleaner) GetVerbose() bool {
-	return scc.verbose
-}
 
-// GetDryRun returns the dryRun setting for testing purposes.
-func (scc *SystemCacheCleaner) GetDryRun() bool {
-	return scc.dryRun
-}

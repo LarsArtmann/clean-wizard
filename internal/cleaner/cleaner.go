@@ -19,6 +19,12 @@ func NewCleanerBase(verbose, dryRun bool) CleanerBase {
 	return CleanerBase{verbose: verbose, dryRun: dryRun}
 }
 
+// GetVerbose returns the verbose setting.
+func (cb CleanerBase) GetVerbose() bool { return cb.verbose }
+
+// GetDryRun returns the dryRun setting.
+func (cb CleanerBase) GetDryRun() bool { return cb.dryRun }
+
 // Cleaner defines the interface for all cleaner implementations.
 type Cleaner interface {
 	// Name returns the unique identifier for this cleaner.

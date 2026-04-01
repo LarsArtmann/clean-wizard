@@ -284,12 +284,4 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(
 	return result.Err[domain.CleanResult](fmt.Errorf("unknown build tool type: %s", toolType))
 }
 
-// GetVerbose returns the verbose setting for testing purposes.
-func (bcc *BuildCacheCleaner) GetVerbose() bool {
-	return bcc.verbose
-}
 
-// GetDryRun returns the dryRun setting for testing purposes.
-func (bcc *BuildCacheCleaner) GetDryRun() bool {
-	return bcc.dryRun
-}

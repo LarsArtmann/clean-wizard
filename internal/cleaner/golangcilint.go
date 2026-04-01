@@ -269,11 +269,4 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 }
 
 // GetVerbose returns the verbose setting.
-func (glcc *GolangciLintCacheCleaner) GetVerbose() bool {
-	return glcc.verbose
-}
 
-// GetDryRun returns the dryRun setting.
-func (glcc *GolangciLintCacheCleaner) GetDryRun() bool {
-	return glcc.dryRun
-}
