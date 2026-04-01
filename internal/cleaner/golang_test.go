@@ -96,42 +96,42 @@ func TestNewGoCleaner(t *testing.T) {
 				t.Fatal("NewGoCleaner() returned nil cleaner")
 			}
 
-			if cleaner.config.Verbose != tt.verbose {
-				t.Errorf("verbose = %v, want %v", cleaner.config.Verbose, tt.verbose)
+			if cleaner.verbose != tt.verbose {
+				t.Errorf("verbose = %v, want %v", cleaner.verbose, tt.verbose)
 			}
 
-			if cleaner.config.DryRun != tt.dryRun {
-				t.Errorf("dryRun = %v, want %v", cleaner.config.DryRun, tt.dryRun)
+			if cleaner.dryRun != tt.dryRun {
+				t.Errorf("dryRun = %v, want %v", cleaner.dryRun, tt.dryRun)
 			}
 
-			if cleaner.config.Caches.Has(GoCacheGOCACHE) != tt.cleanCache {
+			if cleaner.caches.Has(GoCacheGOCACHE) != tt.cleanCache {
 				t.Errorf(
 					"cleanCache = %v, want %v",
-					cleaner.config.Caches.Has(GoCacheGOCACHE),
+					cleaner.caches.Has(GoCacheGOCACHE),
 					tt.cleanCache,
 				)
 			}
 
-			if cleaner.config.Caches.Has(GoCacheTestCache) != tt.cleanTestCache {
+			if cleaner.caches.Has(GoCacheTestCache) != tt.cleanTestCache {
 				t.Errorf(
 					"cleanTestCache = %v, want %v",
-					cleaner.config.Caches.Has(GoCacheTestCache),
+					cleaner.caches.Has(GoCacheTestCache),
 					tt.cleanTestCache,
 				)
 			}
 
-			if cleaner.config.Caches.Has(GoCacheModCache) != tt.cleanModCache {
+			if cleaner.caches.Has(GoCacheModCache) != tt.cleanModCache {
 				t.Errorf(
 					"cleanModCache = %v, want %v",
-					cleaner.config.Caches.Has(GoCacheModCache),
+					cleaner.caches.Has(GoCacheModCache),
 					tt.cleanModCache,
 				)
 			}
 
-			if cleaner.config.Caches.Has(GoCacheBuildCache) != tt.cleanBuildCache {
+			if cleaner.caches.Has(GoCacheBuildCache) != tt.cleanBuildCache {
 				t.Errorf(
 					"cleanBuildCache = %v, want %v",
-					cleaner.config.Caches.Has(GoCacheBuildCache),
+					cleaner.caches.Has(GoCacheBuildCache),
 					tt.cleanBuildCache,
 				)
 			}

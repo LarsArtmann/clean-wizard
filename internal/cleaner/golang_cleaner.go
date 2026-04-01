@@ -21,18 +21,12 @@ type CleanStats struct {
 
 // GoCleaner handles Go language cleanup using type-safe cache flags.
 type GoCleaner struct {
-	config   GoCacheConfig
+	CleanerBase
+	caches   GoCacheType
 	scanner  *GoScanner
 	cleaners map[GoCacheType]interface {
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
 	}
-}
-
-// GoCacheConfig holds cleaner configuration.
-type GoCacheConfig struct {
-	Verbose bool
-	DryRun  bool
-	Caches  GoCacheType
 }
 
 // NewGoCleaner creates Go cleaner with type-safe cache configuration.
@@ -47,33 +41,26 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 // NewGoCleanerWithSettings creates Go cleaner with type-safe cache configuration (panics on invalid caches).
 // This is a convenience function for tests and backward compatibility.
 func NewGoCleanerWithSettings(verbose, dryRun bool, caches GoCacheType) *GoCleaner {
-	config := GoCacheConfig{
-		Verbose: verbose,
-		DryRun:  dryRun,
-		Caches:  caches,
-	}
-
 	scanner := NewGoScanner(verbose)
 	cleaners := make(map[GoCacheType]interface {
 		Clean(ctx context.Context) result.Result[domain.CleanResult]
 	})
 
-	// Register built-in Go cache cleaners
 	for _, cacheType := range []GoCacheType{GoCacheGOCACHE, GoCacheTestCache, GoCacheModCache, GoCacheBuildCache} {
 		if caches.Has(cacheType) {
 			cleaners[cacheType] = NewGoCacheCleaner(cacheType, verbose, dryRun)
 		}
 	}
 
-	// Register lint cleaner (new GolangciLintCacheCleaner with dry-run support)
 	if caches.Has(GoCacheLintCache) {
 		cleaners[GoCacheLintCache] = NewGolangciLintCacheCleaner(verbose, dryRun)
 	}
 
 	return &GoCleaner{
-		config:   config,
-		scanner:  scanner,
-		cleaners: cleaners,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		caches:      caches,
+		scanner:     scanner,
+		cleaners:    cleaners,
 	}
 }
 
@@ -101,7 +88,7 @@ func (gc *GoCleaner) ValidateSettings(settings *domain.OperationSettings) error 
 
 // Scan scans for Go caches.
 func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	return gc.scanner.Scan(ctx, gc.config.Caches)
+	return gc.scanner.Scan(ctx, gc.caches)
 }
 
 // Clean removes Go caches.
@@ -110,14 +97,14 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 		return result.Err[domain.CleanResult](errors.New("go not available"))
 	}
 
-	if gc.config.DryRun {
+	if gc.dryRun {
 		return gc.dryRunClean(ctx)
 	}
 
 	startTime := time.Now()
 	stats := CleanStats{}
 
-	for _, cacheType := range gc.config.Caches.EnabledTypes() {
+	for _, cacheType := range gc.caches.EnabledTypes() {
 		cleaner, ok := gc.cleaners[cacheType]
 		if !ok {
 			gc.logWarning("no cleaner for cache type: %v", cacheType)
@@ -137,7 +124,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 // dryRunClean performs dry-run estimation by scanning actual cache sizes.
 func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.CleanResult] {
 	// Scan actual cache directories to get real sizes
-	scanResult := gc.scanner.Scan(ctx, gc.config.Caches)
+	scanResult := gc.scanner.Scan(ctx, gc.caches)
 
 	var (
 		totalBytes   uint64
@@ -153,7 +140,7 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.Clean
 		}
 	} else {
 		// Fallback to counting enabled cache types if scan fails
-		itemsRemoved = gc.config.Caches.Count()
+		itemsRemoved = gc.caches.Count()
 	}
 
 	cleanResult := conversions.NewCleanResult(
@@ -215,7 +202,7 @@ func (gc *GoCleaner) buildCleanResult(
 
 // logWarning logs warning message if verbose.
 func (gc *GoCleaner) logWarning(format string, args ...any) {
-	if gc.config.Verbose {
+	if gc.verbose {
 		fmt.Printf("Warning: "+format+"\n", args...)
 	}
 }
