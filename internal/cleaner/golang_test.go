@@ -361,7 +361,7 @@ func TestGoCleaner_DryRunStrategy(t *testing.T) {
 }
 
 func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {
-	lintCleaner := NewGolangciLintCleaner(true)
+	lintCleaner := NewGolangciLintCacheCleaner(true, false)
 
 	result := lintCleaner.Clean(context.Background())
 	if result.IsErr() {

@@ -65,9 +65,9 @@ func NewGoCleanerWithSettings(verbose, dryRun bool, caches GoCacheType) *GoClean
 		}
 	}
 
-	// Register lint cleaner
+	// Register lint cleaner (new GolangciLintCacheCleaner with dry-run support)
 	if caches.Has(GoCacheLintCache) {
-		cleaners[GoCacheLintCache] = NewGolangciLintCleaner(verbose)
+		cleaners[GoCacheLintCache] = NewGolangciLintCacheCleaner(verbose, dryRun)
 	}
 
 	return &GoCleaner{
