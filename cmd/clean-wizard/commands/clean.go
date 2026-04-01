@@ -27,12 +27,12 @@ const (
 func NewCleanCommand() *cobra.Command {
 	var (
 		dryRun           bool
-		verbose           bool
-		jsonOutput        bool
+		verbose          bool
+		jsonOutput       bool
 		skipConfirmation bool
-		mode              string
-		profile           string
-		configPath        string
+		mode             string
+		profile          string
+		configPath       string
 	)
 
 	cmd := &cobra.Command{
