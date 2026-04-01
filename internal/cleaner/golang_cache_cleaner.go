@@ -21,18 +21,16 @@ const goCommandTimeout = 60 * time.Second
 // GoCacheCleaner handles built-in Go cache cleaning operations.
 type GoCacheCleaner struct {
 	cacheType GoCacheType
-	verbose   bool
-	dryRun    bool
-	helper    *golangHelpers
+	CleanerBase
+	helper *golangHelpers
 }
 
 // NewGoCacheCleaner creates a new GoCacheCleaner.
 func NewGoCacheCleaner(cacheType GoCacheType, verbose, dryRun bool) *GoCacheCleaner {
 	return &GoCacheCleaner{
-		cacheType: cacheType,
-		verbose:   verbose,
-		dryRun:    dryRun,
-		helper:    &golangHelpers{},
+		cacheType:   cacheType,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		helper:      &golangHelpers{},
 	}
 }
 

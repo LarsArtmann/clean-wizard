@@ -30,8 +30,7 @@ func AvailableNodePackageManagers() []domain.PackageManagerType {
 
 // NodePackageManagerCleaner handles Node.js package manager cleanup.
 type NodePackageManagerCleaner struct {
-	verbose         bool
-	dryRun          bool
+	CleanerBase
 	packageManagers []domain.PackageManagerType
 }
 
@@ -40,8 +39,7 @@ func NewNodePackageManagerCleaner(
 	verbose, dryRun bool, packageManagers []domain.PackageManagerType,
 ) *NodePackageManagerCleaner {
 	return &NodePackageManagerCleaner{
-		verbose:         verbose,
-		dryRun:          dryRun,
+		CleanerBase:     NewCleanerBase(verbose, dryRun),
 		packageManagers: packageManagers,
 	}
 }

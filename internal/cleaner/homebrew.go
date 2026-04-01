@@ -24,17 +24,15 @@ const homebrewCommandTimeout = 5 * time.Minute
 
 // HomebrewCleaner handles Homebrew package manager cleanup with proper type safety.
 type HomebrewCleaner struct {
-	verbose    bool
-	dryRun     bool
+	CleanerBase
 	unusedOnly domain.HomebrewMode
 }
 
 // NewHomebrewCleaner creates Homebrew cleaner with proper configuration.
 func NewHomebrewCleaner(verbose, dryRun bool, unusedOnly domain.HomebrewMode) *HomebrewCleaner {
 	return &HomebrewCleaner{
-		verbose:    verbose,
-		dryRun:     dryRun,
-		unusedOnly: unusedOnly,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		unusedOnly:  unusedOnly,
 	}
 }
 

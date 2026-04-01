@@ -24,8 +24,7 @@ const (
 )
 
 type GitHistoryCleaner struct {
-	verbose       bool
-	dryRun        bool
+	CleanerBase
 	repoPath      string
 	minSizeMB     int
 	excludeExts   []string
@@ -33,7 +32,7 @@ type GitHistoryCleaner struct {
 	excludePaths  []string
 	maxFiles      int
 	createBackup  bool
-	selectedFiles []domain.GitHistoryFile // Files selected by user for removal
+	selectedFiles []domain.GitHistoryFile
 
 	scanner       *GitHistoryScanner
 	safetyChecker *GitHistorySafetyChecker

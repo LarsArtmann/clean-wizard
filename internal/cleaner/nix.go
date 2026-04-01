@@ -22,9 +22,8 @@ const (
 
 // NixCleaner handles Nix package manager cleanup with proper type safety.
 type NixCleaner struct {
-	adapter   *adapters.NixAdapter
-	verbose   bool
-	dryRun    bool
+	adapter *adapters.NixAdapter
+	CleanerBase
 	keepCount int
 }
 
@@ -37,10 +36,9 @@ func NewNixCleaner(verbose, dryRun bool, keepCount ...int) *NixCleaner {
 	}
 
 	nc := &NixCleaner{
-		adapter:   adapters.NewNixAdapter(0, 0),
-		verbose:   verbose,
-		dryRun:    dryRun,
-		keepCount: kc,
+		adapter:     adapters.NewNixAdapter(0, 0),
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		keepCount:   kc,
 	}
 	nc.adapter.SetDryRun(dryRun) // Pass dry-run to adapter
 

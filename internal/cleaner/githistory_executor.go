@@ -30,10 +30,9 @@ const (
 
 // GitHistoryExecutor executes git history rewrites using git-filter-repo.
 type GitHistoryExecutor struct {
-	repoPath  string
-	verbose   bool
-	dryRun    bool
-	packRatio float64 // Pack file compression ratio for size estimation
+	repoPath string
+	CleanerBase
+	packRatio float64
 }
 
 // GitHistoryExecutorOption is a functional option for the executor.
@@ -53,10 +52,9 @@ func NewGitHistoryExecutor(
 	opts ...GitHistoryExecutorOption,
 ) *GitHistoryExecutor {
 	e := &GitHistoryExecutor{
-		repoPath:  repoPath,
-		verbose:   verbose,
-		dryRun:    dryRun,
-		packRatio: DefaultPackRatio,
+		repoPath:    repoPath,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		packRatio:   DefaultPackRatio,
 	}
 
 	for _, opt := range opts {

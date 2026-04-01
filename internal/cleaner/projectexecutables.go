@@ -43,8 +43,7 @@ type ProjectInfo struct {
 // ProjectExecutablesCleaner removes executable files (not shell scripts) from project directories.
 // It integrates with projects-management-automation to discover projects and uses trash for safe deletion.
 type ProjectExecutablesCleaner struct {
-	verbose           bool
-	dryRun            bool
+	CleanerBase
 	excludeExtensions []string
 	excludePatterns   []string
 	projectLister     ProjectLister
@@ -79,8 +78,7 @@ func NewProjectExecutablesCleaner(
 	}
 
 	cleaner := &ProjectExecutablesCleaner{
-		verbose:           verbose,
-		dryRun:            dryRun,
+		CleanerBase:       NewCleanerBase(verbose, dryRun),
 		excludeExtensions: excludeExtensions,
 		excludePatterns:   excludePatterns,
 	}

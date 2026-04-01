@@ -29,8 +29,7 @@ const (
 // which is not commonly available. It will be removed in a future version.
 // Use ProjectExecutablesCleaner or CompiledBinariesCleaner instead.
 type ProjectsManagementAutomationCleaner struct {
-	verbose bool
-	dryRun  bool
+	CleanerBase
 }
 
 // NewProjectsManagementAutomationCleaner creates Projects Management Automation cleaner.
@@ -38,8 +37,7 @@ func NewProjectsManagementAutomationCleaner(
 	verbose, dryRun bool,
 ) *ProjectsManagementAutomationCleaner {
 	return &ProjectsManagementAutomationCleaner{
-		verbose: verbose,
-		dryRun:  dryRun,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
 	}
 }
 

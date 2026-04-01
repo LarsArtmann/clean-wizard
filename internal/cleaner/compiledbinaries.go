@@ -92,8 +92,7 @@ type BinaryInfo struct {
 // CompiledBinariesCleaner removes large compiled binary files that can be regenerated.
 // It scans project directories for build outputs, test binaries, and distribution files.
 type CompiledBinariesCleaner struct {
-	verbose           bool
-	dryRun            bool
+	CleanerBase
 	minSizeMB         int
 	olderThan         string
 	basePaths         []string
@@ -159,8 +158,7 @@ func NewCompiledBinariesCleaner(
 	}
 
 	cleaner := &CompiledBinariesCleaner{
-		verbose:         verbose,
-		dryRun:          dryRun,
+		CleanerBase:     NewCleanerBase(verbose, dryRun),
 		minSizeMB:       minSizeMB,
 		olderThan:       olderThan,
 		basePaths:       basePaths,

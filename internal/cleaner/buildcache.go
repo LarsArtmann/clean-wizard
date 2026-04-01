@@ -14,8 +14,7 @@ import (
 
 // BuildCacheCleaner handles build tool cache cleanup.
 type BuildCacheCleaner struct {
-	verbose   bool
-	dryRun    bool
+	CleanerBase
 	olderThan time.Duration
 	toolTypes []JVMBuildToolType
 	basePaths []string
@@ -61,11 +60,10 @@ func NewBuildCacheCleaner(
 	}
 
 	return &BuildCacheCleaner{
-		verbose:   verbose,
-		dryRun:    dryRun,
-		olderThan: duration,
-		toolTypes: toolTypes,
-		basePaths: normalizedPaths,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		olderThan:   duration,
+		toolTypes:   toolTypes,
+		basePaths:   normalizedPaths,
 	}, nil
 }
 

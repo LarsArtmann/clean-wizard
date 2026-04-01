@@ -18,15 +18,13 @@ const golangciLintCommandTimeout = 30 * time.Second
 
 // GolangciLintCacheCleaner handles golangci-lint cache cleanup.
 type GolangciLintCacheCleaner struct {
-	verbose bool
-	dryRun  bool
+	CleanerBase
 }
 
 // NewGolangciLintCacheCleaner creates a new golangci-lint cache cleaner.
 func NewGolangciLintCacheCleaner(verbose, dryRun bool) *GolangciLintCacheCleaner {
 	return &GolangciLintCacheCleaner{
-		verbose: verbose,
-		dryRun:  dryRun,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
 	}
 }
 

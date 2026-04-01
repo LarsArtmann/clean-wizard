@@ -30,17 +30,15 @@ const (
 )
 
 type DockerCleaner struct {
-	verbose   bool
-	dryRun    bool
+	CleanerBase
 	pruneMode domain.DockerPruneMode
 }
 
 // NewDockerCleaner creates Docker cleaner.
 func NewDockerCleaner(verbose, dryRun bool, pruneMode domain.DockerPruneMode) *DockerCleaner {
 	return &DockerCleaner{
-		verbose:   verbose,
-		dryRun:    dryRun,
-		pruneMode: pruneMode,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		pruneMode:   pruneMode,
 	}
 }
 

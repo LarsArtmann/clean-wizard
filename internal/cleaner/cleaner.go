@@ -8,6 +8,17 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// CleanerBase holds the common fields shared by all cleaner implementations.
+type CleanerBase struct {
+	verbose bool
+	dryRun  bool
+}
+
+// NewCleanerBase creates a CleanerBase with the given settings.
+func NewCleanerBase(verbose, dryRun bool) CleanerBase {
+	return CleanerBase{verbose: verbose, dryRun: dryRun}
+}
+
 // Cleaner defines the interface for all cleaner implementations.
 type Cleaner interface {
 	// Name returns the unique identifier for this cleaner.

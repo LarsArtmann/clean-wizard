@@ -17,8 +17,7 @@ import (
 
 // SystemCacheCleaner handles system cache cleanup for macOS and Linux.
 type SystemCacheCleaner struct {
-	verbose    bool
-	dryRun     bool
+	CleanerBase
 	cacheTypes []domain.CacheType
 	olderThan  time.Duration
 }
@@ -75,10 +74,9 @@ func NewSystemCacheCleaner(
 	}
 
 	return &SystemCacheCleaner{
-		verbose:    verbose,
-		dryRun:     dryRun,
-		cacheTypes: cacheTypes,
-		olderThan:  duration,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		cacheTypes:  cacheTypes,
+		olderThan:   duration,
 	}, nil
 }
 

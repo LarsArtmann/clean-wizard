@@ -16,8 +16,7 @@ import (
 
 // TempFilesCleaner handles temporary files cleanup with proper type safety.
 type TempFilesCleaner struct {
-	verbose   bool
-	dryRun    bool
+	CleanerBase
 	olderThan time.Duration
 	excludes  []string
 	basePaths []string
@@ -46,11 +45,10 @@ func NewTempFilesCleaner(
 	}
 
 	return &TempFilesCleaner{
-		verbose:   verbose,
-		dryRun:    dryRun,
-		olderThan: duration,
-		excludes:  normalizedExcludes,
-		basePaths: normalizedPaths,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
+		olderThan:   duration,
+		excludes:    normalizedExcludes,
+		basePaths:   normalizedPaths,
 	}, nil
 }
 

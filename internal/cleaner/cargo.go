@@ -19,15 +19,13 @@ import (
 const cargoCommandTimeout = 5 * time.Minute
 
 type CargoCleaner struct {
-	verbose bool
-	dryRun  bool
+	CleanerBase
 }
 
 // NewCargoCleaner creates Cargo cleaner.
 func NewCargoCleaner(verbose, dryRun bool) *CargoCleaner {
 	return &CargoCleaner{
-		verbose: verbose,
-		dryRun:  dryRun,
+		CleanerBase: NewCleanerBase(verbose, dryRun),
 	}
 }
 
