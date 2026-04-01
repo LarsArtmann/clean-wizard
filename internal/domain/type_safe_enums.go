@@ -502,7 +502,7 @@ func (ses SizeEstimateStatusType) String() string {
 	case SizeEstimateStatusKnown:
 		return "KNOWN"
 	case SizeEstimateStatusUnknown:
-		return "UNKNOWN" //nolint:goconst // valid enum value for unknown status
+		return "UNKNOWN"
 	default:
 		return "INVALID"
 	}
