@@ -26,12 +26,13 @@ const (
 // NewCleanCommand creates a multi-cleaner command with TUI.
 func NewCleanCommand() *cobra.Command {
 	var (
-		dryRun     bool
-		verbose    bool
-		jsonOutput bool
-		mode       string
-		profile    string
-		configPath string
+		dryRun           bool
+		verbose           bool
+		jsonOutput        bool
+		skipConfirmation bool
+		mode              string
+		profile           string
+		configPath        string
 	)
 
 	cmd := &cobra.Command{
@@ -45,6 +46,7 @@ func NewCleanCommand() *cobra.Command {
 				dryRun,
 				verbose,
 				jsonOutput,
+				skipConfirmation,
 				mode,
 				profile,
 				configPath,
@@ -60,8 +62,7 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().StringVar(&mode, "mode", "", "Preset mode: quick, standard, or aggressive")
 	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Use a specific configuration profile")
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
-	cmd.Flags().
-		BoolVar(&skipConfirmation, "yes", false, "Skip confirmation prompt (use with --mode or --profile)")
+	cmd.Flags().BoolVarP(&skipConfirmation, "yes", "y", false, "Skip confirmation prompt")
 
 	return cmd
 }
@@ -70,7 +71,7 @@ func NewCleanCommand() *cobra.Command {
 func runCleanCommand( //nolint:gocyclo,cyclop // CLI command with many options and branches
 	_ *cobra.Command,
 	_ []string,
-	dryRun, verbose, jsonOutput bool,
+	dryRun, verbose, jsonOutput, skipConfirmation bool,
 	mode, profile, configPath string,
 ) error {
 	ctx := context.Background()
@@ -188,7 +189,7 @@ func runCleanCommand( //nolint:gocyclo,cyclop // CLI command with many options a
 	}
 
 	// Confirm before running
-	if !dryRun {
+	if !dryRun && !skipConfirmation {
 		var confirm bool
 
 		confirmForm := huh.NewForm(
