@@ -6,9 +6,8 @@ Generated: 2026-02-10
 
 ### Completed This Session
 
-1. **S1**: Added LegacySanitizationChange conversion to complete generic context system
-2. **S2**: Changed RiskLevel → RiskLevelType in 4 files (config package)
-3. **S3**: Verified Config already has Validate(), Sanitize(), ApplyProfile()
+1. **S2**: Changed RiskLevel → RiskLevelType in 4 files (config package)
+2. **S3**: Verified Config already has Validate(), Sanitize(), ApplyProfile()
 
 ### What Was Forgotten
 

@@ -99,11 +99,6 @@ errCtx := context.NewContext[ErrorConfig](ctx, errorConfig)
 sanCtx := context.NewContext[SanitizationConfig](ctx, sanConfig)
 ```
 
-**Legacy Compatibility:**
-
-- `ToLegacyValidationContext()` / `FromLegacyValidationContext()` for backward compatibility
-- Deprecated types marked for v2.0 removal
-
 ### 4. Result[T] Type
 
 Railway-oriented programming for composable error handling (`internal/result/type.go`):
