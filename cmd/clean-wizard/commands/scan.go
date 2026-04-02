@@ -154,6 +154,7 @@ func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool)
 
 		return result
 	}
+
 	name := getRegistryName(cleanerType)
 
 	c, ok := registry.Get(name)
@@ -197,6 +198,7 @@ func getRegistryName(cleanerType CleanerType) string {
 	if m, ok := cleanerMetadata[cleanerType]; ok {
 		return m.RegistryName
 	}
+
 	return ""
 }
 

@@ -133,6 +133,7 @@ func (pf *ParallelFlow[T]) Execute(ctx context.Context) map[string]Result[T] {
 		pf.mu.Lock()
 		pf.executed = true
 		pf.mu.Unlock()
+
 		return make(map[string]Result[T])
 	}
 
@@ -144,6 +145,7 @@ func (pf *ParallelFlow[T]) Execute(ctx context.Context) map[string]Result[T] {
 	for _, step := range pf.steps {
 		go func(s Step[T]) {
 			defer wg.Done()
+
 			pf.results.Store(s.Name, s.Execute(ctx))
 		}(step)
 	}
@@ -155,6 +157,7 @@ func (pf *ParallelFlow[T]) Execute(ctx context.Context) map[string]Result[T] {
 	results := make(map[string]Result[T], len(pf.steps))
 	pf.results.Range(func(key, value any) bool {
 		results[key.(string)] = value.(Result[T])
+
 		return true
 	})
 
@@ -181,6 +184,7 @@ func (pf *ParallelFlow[T]) Results() map[string]Result[T] {
 	results := make(map[string]Result[T])
 	pf.results.Range(func(key, value any) bool {
 		results[key.(string)] = value.(Result[T])
+
 		return true
 	})
 
@@ -199,6 +203,7 @@ func (pf *ParallelFlow[T]) Successful() map[string]T {
 		if result.IsOk() {
 			successful[key.(string)] = result.Value()
 		}
+
 		return true
 	})
 
@@ -217,6 +222,7 @@ func (pf *ParallelFlow[T]) Failed() map[string]error {
 		if result.IsErr() {
 			failed[key.(string)] = result.Error()
 		}
+
 		return true
 	})
 

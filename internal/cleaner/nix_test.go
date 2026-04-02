@@ -18,6 +18,7 @@ func TestNixCleaner_ListGenerations(t *testing.T) {
 			name: "list generations successfully",
 			test: func(t *testing.T) {
 				t.Helper()
+
 				cleaner := NewNixCleaner(false, false)
 				ctx := context.Background()
 
@@ -38,6 +39,7 @@ func TestNixCleaner_ListGenerations(t *testing.T) {
 			name: "list generations with context canceled",
 			test: func(t *testing.T) {
 				t.Helper()
+
 				cleaner := NewNixCleaner(false, false)
 				ctx, cancel := context.WithCancel(context.Background())
 				cancel() // Cancel immediately

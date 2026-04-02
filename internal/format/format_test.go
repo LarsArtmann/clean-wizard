@@ -12,6 +12,7 @@ func runFormattingTests[T any](t *testing.T, tests []struct {
 }, formatFn func(T) string,
 ) {
 	t.Helper()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := formatFn(tt.input)
@@ -35,6 +36,7 @@ func runDateTimeTests(t *testing.T, tests []struct {
 }, formatFn func(time.Time) string, customCheck func(t *testing.T, result string, tt dateTimeTestStruct),
 ) {
 	t.Helper()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := formatFn(tt.input)
@@ -112,6 +114,7 @@ func TestDateTime(t *testing.T) {
 		DateTime,
 		func(t *testing.T, result string, tt dateTimeTestStruct) {
 			t.Helper()
+
 			if tt.expected == "never" && result != "never" {
 				t.Errorf("DateTime(%v) = %v, want %v", tt.input, result, tt.expected)
 			} else if tt.expected != "never" {

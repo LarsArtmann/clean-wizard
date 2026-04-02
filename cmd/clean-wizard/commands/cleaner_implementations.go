@@ -53,8 +53,6 @@ func runCleaner(
 		result, err = runProjectExecutablesCleaner(ctx, dryRun, verbose)
 	case CleanerTypeGolangciLintCache:
 		result, err = runGolangciLintCacheCleaner(ctx, dryRun, verbose)
-	case CleanerTypeLangVersionMgr:
-		return domain.CleanResult{}, errors.New("langversion cleaner is not implemented yet")
 	default:
 		return domain.CleanResult{}, errors.New("unknown cleaner type: " + string(cleanerType))
 	}

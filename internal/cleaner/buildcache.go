@@ -15,6 +15,7 @@ import (
 // BuildCacheCleaner handles build tool cache cleanup.
 type BuildCacheCleaner struct {
 	CleanerBase
+
 	olderThan time.Duration
 	toolTypes []JVMBuildToolType
 	basePaths []string

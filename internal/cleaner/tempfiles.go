@@ -17,6 +17,7 @@ import (
 // TempFilesCleaner handles temporary files cleanup with proper type safety.
 type TempFilesCleaner struct {
 	CleanerBase
+
 	olderThan time.Duration
 	excludes  []string
 	basePaths []string

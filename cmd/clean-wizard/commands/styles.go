@@ -54,6 +54,7 @@ func newResultsTable(rows ...[]string) *table.Table {
 			if row == 0 {
 				return lipgloss.NewStyle().Foreground(lipgloss.Color("86")).Bold(true)
 			}
+
 			return lipgloss.NewStyle().Foreground(lipgloss.Color("252"))
 		}).
 		Rows(rows...)
@@ -71,6 +72,7 @@ func newParentCommand(
 	for _, subCmd := range subcommands {
 		cmd.AddCommand(subCmd())
 	}
+
 	return cmd
 }
 

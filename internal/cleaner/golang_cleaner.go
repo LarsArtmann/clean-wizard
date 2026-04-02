@@ -22,6 +22,7 @@ type CleanStats struct {
 // GoCleaner handles Go language cleanup using type-safe cache flags.
 type GoCleaner struct {
 	CleanerBase
+
 	caches   GoCacheType
 	scanner  *GoScanner
 	cleaners map[GoCacheType]interface {

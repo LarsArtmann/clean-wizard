@@ -14,7 +14,9 @@ import (
 // Returns an error if any cleaner fails to initialize.
 func DefaultRegistry() (*Registry, error) {
 	registry := NewRegistry()
-	if err := registerAllCleaners(registry, false, false); err != nil {
+
+	err := registerAllCleaners(registry, false, false)
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to create default registry")
 	}
 
@@ -26,7 +28,9 @@ func DefaultRegistry() (*Registry, error) {
 // Returns an error if any cleaner fails to initialize.
 func DefaultRegistryWithConfig(verbose, dryRun bool) (*Registry, error) {
 	registry := NewRegistry()
-	if err := registerAllCleaners(registry, verbose, dryRun); err != nil {
+
+	err := registerAllCleaners(registry, verbose, dryRun)
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to create registry with config")
 	}
 

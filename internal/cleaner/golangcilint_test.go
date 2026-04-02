@@ -32,6 +32,7 @@ func TestGolangciLintCacheCleaner_IsAvailable(t *testing.T) {
 	if t.Failed() {
 		t.Logf("golangci-lint may not be installed, which is acceptable")
 	}
+
 	_ = available
 }
 
@@ -171,6 +172,7 @@ func TestParseCacheStatus(t *testing.T) {
 							tt.wantDir,
 						)
 					}
+
 					if result.Size != tt.wantSize {
 						t.Errorf(
 							"parseCacheStatus(%q).Size = %d, want %d",

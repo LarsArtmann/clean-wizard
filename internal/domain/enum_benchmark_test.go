@@ -94,6 +94,7 @@ func runUnmarshalBenchmark[T any](
 	unmarshal func(T) error,
 ) {
 	b.Helper()
+
 	for _, tc := range testCases {
 		b.Run(labelFunc(tc), func(b *testing.B) {
 			for range b.N {
@@ -122,6 +123,7 @@ type yamlRoundTripper interface {
 // runRoundTripBenchmark runs a benchmark for full marshal→unmarshal round-trip.
 func runRoundTripBenchmark[T yamlRoundTripper](b *testing.B, testCases []T) {
 	b.Helper()
+
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
 			for range b.N {
@@ -151,6 +153,7 @@ func runRoundTripBenchmark[T yamlRoundTripper](b *testing.B, testCases []T) {
 // runMarshalBenchmark runs a benchmark for marshaling enum values to YAML.
 func runMarshalBenchmark[T yamlMarshaler](b *testing.B, testCases []T) {
 	b.Helper()
+
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
 			for range b.N {
@@ -381,6 +384,7 @@ type stringer interface {
 // runStringMethodBenchmark runs a benchmark for the String() method.
 func runStringMethodBenchmark[T stringer](b *testing.B, testCases []T) {
 	b.Helper()
+
 	for _, tc := range testCases {
 		b.Run(tc.String(), func(b *testing.B) {
 			for range b.N {
@@ -411,6 +415,7 @@ type validatable interface {
 // runIsValidBenchmark runs a benchmark for the IsValid() method.
 func runIsValidBenchmark[T validatable](b *testing.B, testCases []T) {
 	b.Helper()
+
 	for _, tc := range testCases {
 		b.Run(fmt.Sprintf("%d", tc), func(b *testing.B) {
 			for range b.N {
@@ -436,6 +441,7 @@ func BenchmarkEnumIsValid_DockerPruneMode(b *testing.B) {
 // benchmarkYAMLDecodeRaw runs a benchmark for raw YAML decoding into type T.
 func benchmarkYAMLDecodeRaw[T any](b *testing.B, data []byte) {
 	b.Helper()
+
 	var result T
 	for b.Loop() {
 		err := yaml.Unmarshal(data, &result)
@@ -458,6 +464,7 @@ func BenchmarkYAMLDecodeRaw_String(b *testing.B) {
 // benchmarkNodeDecode runs a benchmark for yaml.Node.Decode into type T.
 func benchmarkNodeDecode[T any](b *testing.B, yamlData string) {
 	b.Helper()
+
 	node := &yaml.Node{}
 
 	err := yaml.Unmarshal([]byte(yamlData), node)

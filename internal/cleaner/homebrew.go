@@ -25,6 +25,7 @@ const homebrewCommandTimeout = 5 * time.Minute
 // HomebrewCleaner handles Homebrew package manager cleanup with proper type safety.
 type HomebrewCleaner struct {
 	CleanerBase
+
 	unusedOnly domain.HomebrewMode
 }
 

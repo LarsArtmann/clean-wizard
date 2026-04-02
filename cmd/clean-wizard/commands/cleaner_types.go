@@ -13,7 +13,6 @@ const (
 	CleanerTypeBuildCache                   CleanerType = "buildcache"
 	CleanerTypeDocker                       CleanerType = "docker"
 	CleanerTypeSystemCache                  CleanerType = "systemcache"
-	CleanerTypeLangVersionMgr               CleanerType = "langversion"
 	CleanerTypeProjectsManagementAutomation CleanerType = "projects"
 	CleanerTypeCompiledBinaries             CleanerType = "compiled-binaries"
 	CleanerTypeProjectExecutables           CleanerType = "project-executables"
@@ -89,12 +88,6 @@ var cleanerMetadata = map[CleanerType]cleanerMetadataEntry{
 		DisplayName:  "System Cache",
 		Description:  "Clean macOS Spotlight, Xcode, CocoaPods caches",
 		Icon:         "⚙️",
-	},
-	CleanerTypeLangVersionMgr: {
-		RegistryName: "langversion",
-		DisplayName:  "Language Version Managers",
-		Description:  "Clean NVM, Pyenv, and Rbenv versions (WARNING: Destructive)",
-		Icon:         "🗑️",
 	},
 	CleanerTypeProjectsManagementAutomation: {
 		RegistryName: "projects",

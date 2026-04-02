@@ -18,6 +18,7 @@ import (
 // SystemCacheCleaner handles system cache cleanup for macOS and Linux.
 type SystemCacheCleaner struct {
 	CleanerBase
+
 	cacheTypes []domain.CacheType
 	olderThan  time.Duration
 }

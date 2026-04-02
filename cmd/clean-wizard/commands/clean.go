@@ -416,7 +416,6 @@ func isNotAvailableError(errMsg string) bool {
 // potentially destructive or require external services (e.g., Docker daemon).
 var destructiveCleaners = map[CleanerType]bool{
 	CleanerTypeDocker:                       true,
-	CleanerTypeLangVersionMgr:               true,
 	CleanerTypeProjectsManagementAutomation: true,
 }
 
@@ -440,6 +439,7 @@ func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 		return allTypes
 	case "standard":
 		var safeTypes []CleanerType
+
 		for _, cfg := range configs {
 			if !destructiveCleaners[cfg.Type] {
 				safeTypes = append(safeTypes, cfg.Type)
@@ -461,6 +461,7 @@ func getCleanerName(cleanerType CleanerType) string {
 	if m, ok := cleanerMetadata[cleanerType]; ok {
 		return m.DisplayName
 	}
+
 	return string(cleanerType)
 }
 
@@ -468,6 +469,7 @@ func getCleanerDescription(cleanerType CleanerType) string {
 	if m, ok := cleanerMetadata[cleanerType]; ok {
 		return m.Description
 	}
+
 	return ""
 }
 
@@ -475,6 +477,7 @@ func getCleanerIcon(cleanerType CleanerType) string {
 	if m, ok := cleanerMetadata[cleanerType]; ok {
 		return m.Icon
 	}
+
 	return ""
 }
 
@@ -505,6 +508,17 @@ var operationTypeToCleanerType = map[domain.OperationType]CleanerType{
 	domain.OperationTypeProjectExecutables:           CleanerTypeProjectExecutables,
 	domain.OperationTypeCompiledBinaries:             CleanerTypeCompiledBinaries,
 	domain.OperationTypeGolangciLintCache:            CleanerTypeGolangciLintCache,
+}
+
+func init() {
+	for opType, cleanerType := range operationTypeToCleanerType {
+		if _, ok := cleanerMetadata[cleanerType]; !ok {
+			panic(
+				"operationTypeToCleanerType references unknown CleanerType: " +
+					string(cleanerType) + " (for " + string(opType) + ")",
+			)
+		}
+	}
 }
 
 // getProfileCleaners returns the cleaner types for a given profile name.

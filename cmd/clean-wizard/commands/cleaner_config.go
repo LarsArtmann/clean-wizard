@@ -23,6 +23,7 @@ func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
 	if err != nil {
 		return []CleanerConfig{}
 	}
+
 	allNames := registry.Names()
 
 	configs := make([]CleanerConfig, 0, len(allNames))

@@ -74,10 +74,12 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 			status.Dir = strings.TrimSpace(after)
 		} else if after, ok := strings.CutPrefix(line, "Size:"); ok {
 			sizeStr := strings.TrimSpace(after)
+
 			size, err := parseSize(sizeStr)
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse size %q: %w", sizeStr, err)
 			}
+
 			status.Size = size
 		}
 	}
@@ -98,8 +100,10 @@ func parseSize(sizeStr string) (int64, error) {
 		return 0, errors.New("empty size string")
 	}
 
-	var number float64
-	var unit string
+	var (
+		number float64
+		unit   string
+	)
 
 	n, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit)
 	if err != nil || n != 2 {
@@ -146,6 +150,7 @@ func (glcc *GolangciLintCacheCleaner) getCacheStatus(ctx context.Context) (*cach
 				golangciLintCommandTimeout,
 			)
 		}
+
 		return nil, fmt.Errorf(
 			"golangci-lint cache status failed: %w (output: %s)",
 			err, string(output),
@@ -168,6 +173,7 @@ func (glcc *GolangciLintCacheCleaner) Scan(ctx context.Context) result.Result[[]
 		if glcc.verbose {
 			fmt.Printf("Warning: failed to get golangci-lint cache status: %v\n", err)
 		}
+
 		return result.Ok(items)
 	}
 
@@ -210,6 +216,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 		}
 
 		items := itemsResult.Value()
+
 		var totalSize int64
 		for _, item := range items {
 			totalSize += item.Size

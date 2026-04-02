@@ -44,6 +44,7 @@ func getConfigPath() string {
 	if configPath := os.Getenv("CONFIG_PATH"); configPath != "" {
 		return configPath
 	}
+
 	return filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 }
 
@@ -60,6 +61,7 @@ func readConfigFile(ctx context.Context, k *koanf.Koanf) (*domain.Config, error)
 			if os.IsNotExist(err) {
 				return GetDefaultConfig(), nil
 			}
+
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
 
@@ -83,6 +85,7 @@ func unmarshalConfig(k *koanf.Koanf) (*domain.Config, error) {
 		err := k.Unmarshal(profilesKey, &config.Profiles)
 		if err != nil {
 			logger.Error("Failed to unmarshal profiles", "error", err)
+
 			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
 		}
 	}
@@ -188,6 +191,7 @@ func Save(config *domain.Config) error {
 
 	// Build profiles map
 	profilesMap := make(map[string]any)
+
 	for name, profile := range config.Profiles {
 		profileMap := map[string]any{
 			"name":        profile.Name,
@@ -206,11 +210,14 @@ func Save(config *domain.Config) error {
 			if op.Settings != nil {
 				opMap["settings"] = op.Settings
 			}
+
 			operations[i] = opMap
 		}
+
 		profileMap["operations"] = operations
 		profilesMap[name] = profileMap
 	}
+
 	configMap["profiles"] = profilesMap
 
 	// Ensure config directory exists
@@ -252,6 +259,7 @@ func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) doma
 		logger.Warn("No risk level found, defaulting to LOW",
 			"profile", profileName,
 			"operation", operationIndex)
+
 		return domain.RiskLevelLowType
 	}
 
@@ -266,6 +274,7 @@ func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) doma
 		return domain.RiskLevelCriticalType
 	default:
 		logger.Warn("Invalid risk level, defaulting to LOW", "risk_level", riskLevelStr)
+
 		return domain.RiskLevelLowType
 	}
 }
@@ -281,6 +290,7 @@ func unmarshalOperationSettings(
 
 	if !k.Exists(settingsKey) {
 		logger.Debug("No settings map found")
+
 		return
 	}
 
@@ -288,6 +298,7 @@ func unmarshalOperationSettings(
 	nixGenKey := settingsKey + ".nix_generations"
 	if k.Exists(nixGenKey) {
 		nixGenSettings := &domain.NixGenerationsSettings{}
+
 		err := k.Unmarshal(nixGenKey, nixGenSettings)
 		if err == nil {
 			op.Settings = &domain.OperationSettings{}

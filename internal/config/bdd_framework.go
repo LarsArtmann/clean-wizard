@@ -51,6 +51,7 @@ type BDDTestRunner struct {
 // NewBDDTestRunner creates a new BDD test runner.
 func NewBDDTestRunner(t *testing.T, feature BDDFeature) *BDDTestRunner {
 	t.Helper()
+
 	return &BDDTestRunner{
 		t:         t,
 		feature:   feature,

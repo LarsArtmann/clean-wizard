@@ -1,7 +1,31 @@
 # TODO LIST
 
-**Last Updated:** 2026-03-22
-**Status Report:** docs/status/2026-02-24_04-38_git-history-fixes.md
+**Last Updated:** 2026-04-02
+**Status Report:** docs/status/2026-04-02_16-09_TUI-consolidation-architecture-full-status.md
+
+---
+
+## NEW WORK - 2026-04-02
+
+### Completed This Session
+
+| Feature                            | Status  | Notes                                                         |
+| ---------------------------------- | ------- | ------------------------------------------------------------- |
+| Drop stale stashes                 | ✅ DONE | Stashes were based on old commits, contained orphaned work    |
+| Add unit tests for cleanerMetadata | ✅ DONE | `cleaner_types_test.go` - 4 tests passing                     |
+| Add init() validation              | ✅ DONE | Validates operationTypeToCleanerType entries in cleanMetadata |
+| Remove langversion cleaner stub    | ✅ DONE | Removed CleanerTypeLangVersionMgr constant and metadata       |
+
+### Pending (from status report)
+
+| #   | Task                                         | Impact | Effort | Notes                              |
+| --- | -------------------------------------------- | ------ | ------ | ---------------------------------- |
+| 1   | Add tests for getRegistryName reverse lookup | MED    | LOW    | Related to metadata consolidation  |
+| 2   | Add profile command tests                    | MED    | MED    | No test files for commands package |
+| 3   | Add scan command tests                       | MED    | MED    | No test files for commands package |
+| 4   | Add clean command tests                      | MED    | HIGH   | No test files for commands package |
+| 5   | Set up CI pipeline                           | HIGH   | MED    | At minimum: go build + go test     |
+| 6   | Fix pre-commit hook timeout                  | MED    | LOW    | golangci-lint times out            |
 
 ---
 
@@ -147,11 +171,24 @@ The following historical planning documents have been archived to `docs/historic
 
 ---
 
-## 🎉 PROJECT STATUS: COMPLETE
+## 🎉 PROJECT STATUS: IN PROGRESS
 
-**All actionable items from this TODO list have been completed as of 2026-03-22.**
+**New work added 2026-04-02:**
 
-- 21/21 Priority items addressed (19 completed, 2 deferred with justification)
+| Metric                | Value                              |
+| --------------------- | ---------------------------------- |
+| Stashes dropped       | 2 (orphaned, based on old commits) |
+| Tests added           | 1 file, 4 tests                    |
+| Init validation added | 1 function                         |
+| Stubs removed         | 1 (langversion)                    |
+| Cleaners now          | 13 (down from 14)                  |
+
+**Historical:** 21/21 Priority items addressed (19 completed, 2 deferred with justification)
+
+---
+
+**All actionable items from this TODO list have been completed as of 2026-04-02.**
+
 - Build passes without errors
 - All tests compile and pass
 - Static analysis clean

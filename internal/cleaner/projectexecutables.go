@@ -44,6 +44,7 @@ type ProjectInfo struct {
 // It integrates with projects-management-automation to discover projects and uses trash for safe deletion.
 type ProjectExecutablesCleaner struct {
 	CleanerBase
+
 	excludeExtensions []string
 	excludePatterns   []string
 	projectLister     ProjectLister

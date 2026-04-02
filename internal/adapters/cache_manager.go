@@ -61,6 +61,7 @@ func (cm *CacheManager) Get(key string) (any, bool) {
 	// Check if expired
 	if item.isExpired() {
 		cm.cache.Invalidate(key)
+
 		return nil, false
 	}
 
@@ -77,6 +78,7 @@ func (cm *CacheManager) GetWithExpiration(key string) (any, time.Time, bool) {
 	// Check if expired
 	if item.isExpired() {
 		cm.cache.Invalidate(key)
+
 		return nil, time.Time{}, false
 	}
 

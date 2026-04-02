@@ -98,6 +98,7 @@ func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
 //	}
 func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
 	t.Helper()
+
 	for _, tt := range testCases {
 		t.Run(tt.Name, func(t *testing.T) {
 			t.Setenv("HOME", tt.HomeValue)

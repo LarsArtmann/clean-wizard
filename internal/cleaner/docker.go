@@ -31,6 +31,7 @@ const (
 
 type DockerCleaner struct {
 	CleanerBase
+
 	pruneMode domain.DockerPruneMode
 }
 

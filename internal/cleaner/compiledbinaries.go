@@ -93,6 +93,7 @@ type BinaryInfo struct {
 // It scans project directories for build outputs, test binaries, and distribution files.
 type CompiledBinariesCleaner struct {
 	CleanerBase
+
 	minSizeMB         int
 	olderThan         string
 	basePaths         []string

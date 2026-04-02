@@ -31,6 +31,7 @@ func AvailableNodePackageManagers() []domain.PackageManagerType {
 // NodePackageManagerCleaner handles Node.js package manager cleanup.
 type NodePackageManagerCleaner struct {
 	CleanerBase
+
 	packageManagers []domain.PackageManagerType
 }
 
