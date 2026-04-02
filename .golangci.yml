@@ -1,160 +1,203 @@
 version: "2"
 run:
-  timeout: 5m
-  go: 1.26.1
-  build-tags: []
-  modules-download-mode: readonly
-  allow-parallel-runners: true
-  allow-serial-runners: false
-  issues-exit-code: 1
-  tests: true
+    timeout: 5m
+    go: 1.26.1
+    build-tags: []
+    modules-download-mode: readonly
+    allow-parallel-runners: true
+    allow-serial-runners: true
+    issues-exit-code: 1
+    tests: true
 output:
-  formats: {}
+    formats: {}
 linters:
-  enable:
-    - prealloc
-    - copyloopvar
-    - nilnesserr
-    - gocyclo
-    - unused
-    - cyclop
-    - exhaustruct
-    - forcetypeassert
-    - intrange
-    - errorlint
-    - interfacebloat
-    - musttag
-    - nestif
-    - perfsprint
-    - unparam
-    - errname
-    - errcheck
-    - mirror
-    - govet
-    - gochecknoglobals
-    - maintidx
-    - wastedassign
-    - gocritic
-    - dogsled
-    - gochecksumtype
-    - protogetter
-    - recvcheck
-    - sqlclosecheck
-    - staticcheck
-    - dupl
-    - gosec
-    - predeclared
-    - contextcheck
-    - reassign
-    - gocognit
-    - noctx
-    - nolintlint
-    - revive
-    - spancheck
-    - ineffassign
-    - unconvert
-    - misspell
-    - nilnil
-    - nilerr
-    - gosmopolitan
-    - paralleltest
-    - loggercheck
-    - exptostd
-    - usetesting
-    - testifylint
-    - bodyclose
-    - modernize
-    - ginkgolinter
-    - gochecknoinits
-    - wrapcheck
-    - thelper
-    - errchkjson
-    - sloglint
-    - godot
-    - goconst
-    - nakedret
-    - zerologlint
-    - rowserrcheck
-    - exhaustive
-    - durationcheck
-    - funlen
-  settings:
-    cyclop:
-      max-complexity: 20
-    dupl:
-      threshold: 150
-    errcheck:
-      check-blank: false
-      check-type-assertions: false
-    goconst:
-      min-len: 5
-      min-occurrences: 4
-    gocyclo:
-      min-complexity: 20
-    gosec:
-      excludes:
-        - G115
-        - G204
-        - G304
-        - G703
-    staticcheck:
-      checks:
-        - all
-        - -ST1000
-        - -ST1003
-        - -ST1005
-        - -SA9003
-    wrapcheck:
-      ignore-package-globs:
-        - github.com/LarsArtmann/clean-wizard/*
-        - github.com/caarlos0/env/*
-        - github.com/go-resty/resty/*
-        - os/exec.*
-  exclusions:
-    rules:
-      - path: _test\.go
-        linters:
-          - errcheck
-          - staticcheck
-          - wrapcheck
-          - gosec
-          - unconvert
-          - unparam
-          - dupl
-          - gocyclo
-          - goconst
-      - path: _ginkgo_test\.go
-        linters:
-          - errcheck
-          - staticcheck
-          - wrapcheck
-          - gosec
-          - unconvert
-          - unparam
-          - dupl
-          - gocyclo
-          - goconst
-      - path: tests/
-        linters:
-          - errcheck
-          - staticcheck
-          - wrapcheck
-          - gosec
-          - unconvert
-          - unparam
-          - dupl
-          - gocyclo
-          - goconst
-    paths:
-      - tests
-      - test/testdata_etc
-      - vendor
-      - .git
+    enable:
+        - asciicheck
+        - ireturn
+        - unparam
+        - loggercheck
+        - errchkjson
+        - godot
+        - nakedret
+        - goprintffuncname
+        - tparallel
+        - unqueryvet
+        - nilnesserr
+        - unused
+        - intrange
+        - nestif
+        - mirror
+        - gocritic
+        - gocognit
+        - gochecknoinits
+        - interfacebloat
+        - dogsled
+        - nilnil
+        - wrapcheck
+        - durationcheck
+        - depguard
+        - dupword
+        - godoclint
+        - predeclared
+        - nolintlint
+        - spancheck
+        - nilerr
+        - decorder
+        - promlinter
+        - exhaustruct
+        - govet
+        - dupl
+        - gosmopolitan
+        - usetesting
+        - funlen
+        - containedctx
+        - gomoddirectives
+        - sqlclosecheck
+        - gocheckcompilerdirectives
+        - mnd
+        - importas
+        - inamedparam
+        - iotamixing
+        - gosec
+        - arangolint
+        - goheader
+        - nonamedreturns
+        - usestdlibvars
+        - musttag
+        - recvcheck
+        - noctx
+        - testifylint
+        - canonicalheader
+        - fatcontext
+        - err113
+        - grouper
+        - perfsprint
+        - thelper
+        - iface
+        - makezero
+        - noinlineerr
+        - tagalign
+        - wsl_v5
+        - errcheck
+        - contextcheck
+        - ineffassign
+        - gomodguard
+        - nosprintfhostport
+        - testpackage
+        - errname
+        - maintidx
+        - protogetter
+        - staticcheck
+        - exptostd
+        - ginkgolinter
+        - zerologlint
+        - exhaustive
+        - prealloc
+        - forcetypeassert
+        - gochecksumtype
+        - unconvert
+        - sloglint
+        - asasalint
+        - embeddedstructfieldcheck
+        - godox
+        - gochecknoglobals
+        - wastedassign
+        - revive
+        - modernize
+        - nlreturn
+        - testableexamples
+        - whitespace
+        - copyloopvar
+        - gocyclo
+        - cyclop
+        - errorlint
+        - misspell
+        - bidichk
+        - forbidigo
+        - tagliatelle
+        - bodyclose
+        - goconst
+        - rowserrcheck
+        - varnamelen
+        - reassign
+        - paralleltest
+    settings:
+        cyclop:
+            max-complexity: 20
+        dupl:
+            threshold: 150
+        errcheck:
+            check-blank: false
+            check-type-assertions: false
+        goconst:
+            min-len: 5
+            min-occurrences: 4
+        gocyclo:
+            min-complexity: 20
+        gosec:
+            excludes:
+                - G115
+                - G204
+                - G304
+                - G703
+        staticcheck:
+            checks:
+                - all
+                - -ST1000
+                - -ST1003
+                - -ST1005
+                - -SA9003
+        wrapcheck:
+            ignore-package-globs:
+                - github.com/LarsArtmann/clean-wizard/*
+                - github.com/caarlos0/env/*
+                - github.com/go-resty/resty/*
+                - os/exec.*
+    exclusions:
+        rules:
+            - path: _test\.go
+              linters:
+                - errcheck
+                - staticcheck
+                - wrapcheck
+                - gosec
+                - unconvert
+                - unparam
+                - dupl
+                - gocyclo
+                - goconst
+            - path: _ginkgo_test\.go
+              linters:
+                - errcheck
+                - staticcheck
+                - wrapcheck
+                - gosec
+                - unconvert
+                - unparam
+                - dupl
+                - gocyclo
+                - goconst
+            - path: tests/
+              linters:
+                - errcheck
+                - staticcheck
+                - wrapcheck
+                - gosec
+                - unconvert
+                - unparam
+                - dupl
+                - gocyclo
+                - goconst
+        paths:
+            - tests
+            - test/testdata_etc
+            - vendor
+            - .git
 formatters:
-  enable:
-    - goimports
-    - gofmt
-    - golines
+    enable:
+        - goimports
+        - gofmt
+        - golines
 issues:
-  max-issues-per-linter: 50
-  max-same-issues: 10
+    max-issues-per-linter: 50
+    max-same-issues: 10

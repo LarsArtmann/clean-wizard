@@ -116,4 +116,3 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 
 	return nil
 }
-
