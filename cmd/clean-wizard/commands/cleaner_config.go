@@ -15,26 +15,6 @@ type CleanerConfig struct {
 	Available   CleanerAvailability
 }
 
-// AvailableCleaners returns all available cleaner types.
-func AvailableCleaners() []CleanerType {
-	return []CleanerType{
-		CleanerTypeNix,
-		CleanerTypeHomebrew,
-		CleanerTypeTempFiles,
-		CleanerTypeNodePackages,
-		CleanerTypeGoPackages,
-		CleanerTypeCargoPackages,
-		CleanerTypeBuildCache,
-		CleanerTypeDocker,
-		CleanerTypeSystemCache,
-		CleanerTypeLangVersionMgr,
-		CleanerTypeProjectsManagementAutomation,
-		CleanerTypeCompiledBinaries,
-		CleanerTypeProjectExecutables,
-		CleanerTypeGolangciLintCache,
-	}
-}
-
 // GetCleanerConfigs returns all cleaner configurations with availability status.
 // Uses the CleanerRegistry for dynamic discovery and availability checking.
 // Returns an empty slice if the registry cannot be created.

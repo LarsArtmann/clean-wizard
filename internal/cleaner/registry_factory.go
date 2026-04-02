@@ -1,7 +1,6 @@
 package cleaner
 
 import (
-	"context"
 	"path/filepath"
 
 	"github.com/cockroachdb/errors"
@@ -118,24 +117,3 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 	return nil
 }
 
-// AvailableCleaners returns a list of available cleaner names from the default registry.
-// This is a convenience function for quick availability checks.
-// Returns an error if the registry cannot be created.
-func AvailableCleaners(ctx context.Context) ([]string, error) {
-	registry, err := DefaultRegistry()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get available cleaners")
-	}
-	available := registry.Available(ctx)
-	names := make([]string, 0, len(available))
-
-	// Map cleaners back to names
-	allNames := registry.Names()
-	for _, name := range allNames {
-		if cleaner, ok := registry.Get(name); ok && cleaner.IsAvailable(ctx) {
-			names = append(names, name)
-		}
-	}
-
-	return names, nil
-}
