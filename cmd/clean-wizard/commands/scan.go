@@ -193,40 +193,11 @@ func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool)
 	return result
 }
 
-// getRegistryName returns the registry name for a cleaner type.
 func getRegistryName(cleanerType CleanerType) string {
-	switch cleanerType {
-	case CleanerTypeNix:
-		return "nix"
-	case CleanerTypeHomebrew:
-		return "homebrew"
-	case CleanerTypeTempFiles:
-		return "tempfiles"
-	case CleanerTypeNodePackages:
-		return "node"
-	case CleanerTypeGoPackages:
-		return "go"
-	case CleanerTypeCargoPackages:
-		return "cargo"
-	case CleanerTypeBuildCache:
-		return "buildcache"
-	case CleanerTypeDocker:
-		return "docker"
-	case CleanerTypeSystemCache:
-		return "systemcache"
-	case CleanerTypeLangVersionMgr:
-		return "langversion"
-	case CleanerTypeProjectsManagementAutomation:
-		return "projects"
-	case CleanerTypeCompiledBinaries:
-		return "compiled-binaries"
-	case CleanerTypeProjectExecutables:
-		return "project-executables"
-	case CleanerTypeGolangciLintCache:
-		return "golangci-lint-cache"
-	default:
-		return ""
+	if m, ok := cleanerMetadata[cleanerType]; ok {
+		return m.RegistryName
 	}
+	return ""
 }
 
 // printScanTable prints scan results as a formatted table.

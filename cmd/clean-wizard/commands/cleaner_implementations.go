@@ -21,9 +21,6 @@ func runCleaner(
 	cleanerType CleanerType,
 	dryRun, verbose bool,
 ) (domain.CleanResult, error) {
-	name := getCleanerName(cleanerType)
-	_ = name // Avoid unused variable warning
-
 	var (
 		result domain.CleanResult
 		err    error
