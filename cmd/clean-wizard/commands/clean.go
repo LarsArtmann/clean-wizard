@@ -472,6 +472,8 @@ func getCleanerName(cleanerType CleanerType) string {
 		return "Projects Management Automation"
 	case CleanerTypeCompiledBinaries:
 		return "Compiled Binaries"
+	case CleanerTypeProjectExecutables:
+		return "Project Executables"
 	case CleanerTypeGolangciLintCache:
 		return "golangci-lint Cache"
 	default:
@@ -506,6 +508,8 @@ func getCleanerDescription(cleanerType CleanerType) string {
 		return "Clear projects-management-automation cache"
 	case CleanerTypeCompiledBinaries:
 		return "Clean compiled binary files in project directories"
+	case CleanerTypeProjectExecutables:
+		return "Remove executable files (not scripts) from project directories"
 	case CleanerTypeGolangciLintCache:
 		return "Clean golangci-lint cache (uses cache status for accurate sizing)"
 	default:
@@ -540,6 +544,8 @@ func getCleanerIcon(cleanerType CleanerType) string {
 		return "⚙️"
 	case CleanerTypeCompiledBinaries:
 		return "🔧"
+	case CleanerTypeProjectExecutables:
+		return "📁"
 	case CleanerTypeGolangciLintCache:
 		return "🐹"
 	default:
@@ -571,7 +577,7 @@ var operationTypeToCleanerType = map[domain.OperationType]CleanerType{
 	domain.OperationTypeSystemCache:                  CleanerTypeSystemCache,
 	domain.OperationTypeSystemTemp:                   CleanerTypeSystemCache,
 	domain.OperationTypeProjectsManagementAutomation: CleanerTypeProjectsManagementAutomation,
-	domain.OperationTypeProjectExecutables:           CleanerTypeCompiledBinaries,
+	domain.OperationTypeProjectExecutables:           CleanerTypeProjectExecutables,
 	domain.OperationTypeCompiledBinaries:             CleanerTypeCompiledBinaries,
 	domain.OperationTypeGolangciLintCache:            CleanerTypeGolangciLintCache,
 }

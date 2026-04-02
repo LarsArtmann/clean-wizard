@@ -52,6 +52,8 @@ func runCleaner(
 		result, err = runProjectsManagementAutomationCleaner(ctx, dryRun, verbose)
 	case CleanerTypeCompiledBinaries:
 		result, err = runCompiledBinariesCleaner(ctx, dryRun, verbose)
+	case CleanerTypeProjectExecutables:
+		result, err = runProjectExecutablesCleaner(ctx, dryRun, verbose)
 	case CleanerTypeGolangciLintCache:
 		result, err = runGolangciLintCacheCleaner(ctx, dryRun, verbose)
 	case CleanerTypeLangVersionMgr:
@@ -336,6 +338,16 @@ func runCompiledBinariesCleaner(
 			nil,
 			[]string{},
 		)
+	})
+}
+
+// runProjectExecutablesCleaner executes the Project Executables cleaner.
+func runProjectExecutablesCleaner(
+	ctx context.Context,
+	dryRun, verbose bool,
+) (domain.CleanResult, error) {
+	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
+		return cleaner.NewProjectExecutablesCleaner(v, d, []string{".sh"}, []string{})
 	})
 }
 

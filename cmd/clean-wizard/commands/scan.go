@@ -220,6 +220,8 @@ func getRegistryName(cleanerType CleanerType) string {
 		return "projects"
 	case CleanerTypeCompiledBinaries:
 		return "compiled-binaries"
+	case CleanerTypeProjectExecutables:
+		return "project-executables"
 	case CleanerTypeGolangciLintCache:
 		return "golangci-lint-cache"
 	default:

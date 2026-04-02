@@ -16,6 +16,7 @@ const (
 	CleanerTypeLangVersionMgr               CleanerType = "langversion"
 	CleanerTypeProjectsManagementAutomation CleanerType = "projects"
 	CleanerTypeCompiledBinaries             CleanerType = "compiled-binaries"
+	CleanerTypeProjectExecutables           CleanerType = "project-executables"
 	CleanerTypeGolangciLintCache            CleanerType = "golangci-lint-cache"
 )
 
@@ -41,5 +42,6 @@ var registryNameToCleanerType = map[string]CleanerType{
 	"langversion":         CleanerTypeLangVersionMgr,
 	"projects":            CleanerTypeProjectsManagementAutomation,
 	"compiled-binaries":   CleanerTypeCompiledBinaries,
+	"project-executables": CleanerTypeProjectExecutables,
 	"golangci-lint-cache": CleanerTypeGolangciLintCache,
 }
