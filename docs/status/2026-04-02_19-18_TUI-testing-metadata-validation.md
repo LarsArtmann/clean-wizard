@@ -21,12 +21,12 @@
 
 **Purpose:** Lock in the metadata consolidation gains with automated verification.
 
-| Test | Description | Status |
-|------|-------------|--------|
-| `TestCleanerMetadataCompleteness` | Verifies all 14 CleanerTypes have metadata entries | ✅ PASS |
-| `TestCleanerMetadataRegistryNameUniqueness` | Ensures no duplicate RegistryNames | ✅ PASS |
-| `TestRegistryNameToCleanerTypeCompleteness` | Validates reverse lookup map is complete | ✅ PASS |
-| `TestRegistryNameToCleanerTypeRoundTrip` | Confirms RegistryName → CleanerType → RegistryName works | ✅ PASS |
+| Test                                        | Description                                              | Status  |
+| ------------------------------------------- | -------------------------------------------------------- | ------- |
+| `TestCleanerMetadataCompleteness`           | Verifies all 14 CleanerTypes have metadata entries       | ✅ PASS |
+| `TestCleanerMetadataRegistryNameUniqueness` | Ensures no duplicate RegistryNames                       | ✅ PASS |
+| `TestRegistryNameToCleanerTypeCompleteness` | Validates reverse lookup map is complete                 | ✅ PASS |
+| `TestRegistryNameToCleanerTypeRoundTrip`    | Confirms RegistryName → CleanerType → RegistryName works | ✅ PASS |
 
 ### 3. Added init() Validation for Metadata Consistency (`clean.go:509-519`)
 
@@ -53,13 +53,13 @@ func init() {
 
 **Changes:**
 
-| File | Change |
-|------|--------|
-| `cleaner_types.go` | Removed `CleanerTypeLangVersionMgr` constant |
-| `cleaner_types.go` | Removed metadata entry (DisplayName, Description, Icon, RegistryName) |
-| `cleaner_implementations.go` | Removed `case CleanerTypeLangVersionMgr:` from `runCleaner()` |
-| `clean.go` | Removed from `destructiveCleaners` map |
-| `cleaner_types_test.go` | Removed from test array |
+| File                         | Change                                                                |
+| ---------------------------- | --------------------------------------------------------------------- |
+| `cleaner_types.go`           | Removed `CleanerTypeLangVersionMgr` constant                          |
+| `cleaner_types.go`           | Removed metadata entry (DisplayName, Description, Icon, RegistryName) |
+| `cleaner_implementations.go` | Removed `case CleanerTypeLangVersionMgr:` from `runCleaner()`         |
+| `clean.go`                   | Removed from `destructiveCleaners` map                                |
+| `cleaner_types_test.go`      | Removed from test array                                               |
 
 **Impact:** Cleaners reduced from 14 → 13. Eliminates confusion about "what is langversion for?".
 
@@ -76,15 +76,15 @@ func init() {
 
 ### Metadata consolidation — 90% complete
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| `cleanerMetadata` map | ✅ DONE | Single source of truth for all 13 cleaners |
-| `registryNameToCleanerType` reverse lookup | ✅ DONE | Derived via `init()` |
-| `getCleanerName/Description/Icon` | ✅ DONE | Map lookups |
-| `getRegistryName` | ✅ DONE | Map lookup |
-| `operationTypeToCleanerType` | ✅ DONE | Added init() validation |
-| `runCleaner()` switch | ❌ PENDING | Still 13-case switch (could be factory map) |
-| Init-time validation | ✅ DONE | Validates metadata consistency |
+| Component                                  | Status     | Notes                                       |
+| ------------------------------------------ | ---------- | ------------------------------------------- |
+| `cleanerMetadata` map                      | ✅ DONE    | Single source of truth for all 13 cleaners  |
+| `registryNameToCleanerType` reverse lookup | ✅ DONE    | Derived via `init()`                        |
+| `getCleanerName/Description/Icon`          | ✅ DONE    | Map lookups                                 |
+| `getRegistryName`                          | ✅ DONE    | Map lookup                                  |
+| `operationTypeToCleanerType`               | ✅ DONE    | Added init() validation                     |
+| `runCleaner()` switch                      | ❌ PENDING | Still 13-case switch (could be factory map) |
+| Init-time validation                       | ✅ DONE    | Validates metadata consistency              |
 
 ### Dependency Updates (go.mod/go.sum)
 
@@ -128,6 +128,7 @@ Error: go.work requires go >= 1.26.1 (running go 1.26.0)
 ```
 
 **Analysis:**
+
 - `go version` reports: `go1.26.1 darwin/arm64`
 - LSP reports: "running go 1.26.0"
 - The LSP server (gopls) was started before the go.work update to require 1.26.1
@@ -157,6 +158,7 @@ golangci-lint times out every time (>1 minute). Every commit uses `--no-verify` 
 ### 2. CI/CD is Non-Negotiable
 
 No CI pipeline means broken HEAD goes undetected. Add at minimum:
+
 ```yaml
 - go build ./...
 - go test ./... -short
@@ -165,6 +167,7 @@ No CI pipeline means broken HEAD goes undetected. Add at minimum:
 ### 3. Pre-commit Hook Must Work
 
 Fix golangci-lint timeout:
+
 - Reduce linters enabled
 - Increase timeout
 - Or remove slow linters from pre-commit
@@ -176,6 +179,7 @@ The metadata map consolidation is only valuable if we can verify it stays comple
 ### 5. Smaller, More Atomic Commits
 
 This session's changes should be 2-3 separate commits:
+
 1. Dependency updates (go.mod/go.sum)
 2. Langversion removal (dead code)
 3. Tests + validation (quality)
@@ -187,6 +191,7 @@ The `langversion` stub existed for months. Dead stubs create confusion about wha
 ### 7. LSP Health Check
 
 The LSP version mismatch causes 9 project errors. Either:
+
 - Restart LSP server
 - Update all projects to use consistent Go version
 - Ignore diagnostics from projects not currently being worked on
@@ -197,33 +202,33 @@ The LSP version mismatch causes 9 project errors. Either:
 
 Sorted by **impact × effort** (highest ROI first):
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | Add tests for `getCleanerName/Description/Icon` | HIGH | LOW | Testing |
-| 2 | Fix pre-commit hook golangci-lint timeout | MED | LOW | DX |
-| 3 | Set up CI pipeline (go build + go test) | HIGH | MED | CI |
-| 4 | Add profile command tests | MED | MED | Testing |
-| 5 | Add scan command tests | MED | MED | Testing |
-| 6 | Restart LSP server to fix version mismatch | LOW | LOW | DX |
-| 7 | Add clean command tests | MED | HIGH | Testing |
-| 8 | Add `init()` validation for CleanerType ↔ CleanerConfig consistency | MED | LOW | Safety |
-| 9 | Replace `runCleaner()` switch with factory map | MED | MED | Architecture |
-| 10 | Update `FEATURES.md` to reflect current state | LOW | LOW | Docs |
-| 11 | Evaluate `stringer` codegen for `CleanerType` enum | MED | MED | DX |
-| 12 | Consider merging `CleanerType` with registry name strings | HIGH | HIGH | Architecture |
-| 13 | Add TUI form rendering tests | MED | MED | Testing |
-| 14 | Review `OperationType` vs `CleanerType` — are both needed? | MED | HIGH | Architecture |
-| 15 | GitHistory cleaner — unify into TUI or keep separate? | LOW | HIGH | Design |
-| 16 | BDD test performance (322s) — parallelize or optimize | MED | MED | CI |
-| 17 | Review error handling patterns in commands | MED | MED | Quality |
-| 18 | Evaluate Fang DI for cleaner registration | MED | MED | Architecture |
-| 19 | Structured logging instead of `fmt.Println` in commands | MED | MED | Quality |
-| 20 | Add `justfile` improvements for common dev tasks | LOW | LOW | DX |
-| 21 | Fix `~/projects/go.work` (add clean-wizard or document) | MED | LOW | DX |
-| 22 | Add profile validation tests | MED | LOW | Testing |
-| 23 | Add cleaner availability detection tests | MED | MED | Testing |
-| 24 | Document preset modes (quick/standard/aggressive) | LOW | LOW | Docs |
-| 25 | Add auto-approve flag tests | LOW | LOW | Testing |
+| #   | Task                                                                | Impact | Effort | Category     |
+| --- | ------------------------------------------------------------------- | ------ | ------ | ------------ |
+| 1   | Add tests for `getCleanerName/Description/Icon`                     | HIGH   | LOW    | Testing      |
+| 2   | Fix pre-commit hook golangci-lint timeout                           | MED    | LOW    | DX           |
+| 3   | Set up CI pipeline (go build + go test)                             | HIGH   | MED    | CI           |
+| 4   | Add profile command tests                                           | MED    | MED    | Testing      |
+| 5   | Add scan command tests                                              | MED    | MED    | Testing      |
+| 6   | Restart LSP server to fix version mismatch                          | LOW    | LOW    | DX           |
+| 7   | Add clean command tests                                             | MED    | HIGH   | Testing      |
+| 8   | Add `init()` validation for CleanerType ↔ CleanerConfig consistency | MED    | LOW    | Safety       |
+| 9   | Replace `runCleaner()` switch with factory map                      | MED    | MED    | Architecture |
+| 10  | Update `FEATURES.md` to reflect current state                       | LOW    | LOW    | Docs         |
+| 11  | Evaluate `stringer` codegen for `CleanerType` enum                  | MED    | MED    | DX           |
+| 12  | Consider merging `CleanerType` with registry name strings           | HIGH   | HIGH   | Architecture |
+| 13  | Add TUI form rendering tests                                        | MED    | MED    | Testing      |
+| 14  | Review `OperationType` vs `CleanerType` — are both needed?          | MED    | HIGH   | Architecture |
+| 15  | GitHistory cleaner — unify into TUI or keep separate?               | LOW    | HIGH   | Design       |
+| 16  | BDD test performance (322s) — parallelize or optimize               | MED    | MED    | CI           |
+| 17  | Review error handling patterns in commands                          | MED    | MED    | Quality      |
+| 18  | Evaluate Fang DI for cleaner registration                           | MED    | MED    | Architecture |
+| 19  | Structured logging instead of `fmt.Println` in commands             | MED    | MED    | Quality      |
+| 20  | Add `justfile` improvements for common dev tasks                    | LOW    | LOW    | DX           |
+| 21  | Fix `~/projects/go.work` (add clean-wizard or document)             | MED    | LOW    | DX           |
+| 22  | Add profile validation tests                                        | MED    | LOW    | Testing      |
+| 23  | Add cleaner availability detection tests                            | MED    | MED    | Testing      |
+| 24  | Document preset modes (quick/standard/aggressive)                   | LOW    | LOW    | Docs         |
+| 25  | Add auto-approve flag tests                                         | LOW    | LOW    | Testing      |
 
 ---
 
@@ -232,6 +237,7 @@ Sorted by **impact × effort** (highest ROI first):
 **Why does the LSP server report "running go 1.26.0" when `go version` shows "go1.26.1"?**
 
 Current state:
+
 - `go version` → `go version go1.26.1 darwin/arm64`
 - `go env GOWORK` → `/Users/larsartmann/projects/go.work`
 - LSP error → `go: go.work requires go >= 1.26.1 (running go 1.26.0)`
@@ -239,11 +245,13 @@ Current state:
 Hypothesis: The gopls LSP server was started before the go.work file was updated to require `go 1.26.1`. The LSP process cached the old Go version at startup.
 
 Questions:
+
 1. Is restarting gopls sufficient to fix this?
 2. Is there a gopls configuration that needs updating?
 3. Is this a known issue with go.work + gopls interaction?
 
 **I need direction:** Should I:
+
 - A) Restart the LSP server and document the fix
 - B) Ignore the LSP errors (builds work fine)
 - C) Investigate further (might be a deeper issue)
@@ -252,18 +260,18 @@ Questions:
 
 ## Session Metrics
 
-| Metric | Value |
-|--------|-------|
-| Commits this session | 0 (pending) |
-| Files modified | 6 |
-| Files added | 1 |
-| Lines changed | +134 / -91 (net: +43) |
-| Tests added | 4 tests in 1 file |
-| Init() validations added | 1 |
-| Stale stashes dropped | 2 |
-| Cleaners (before → after) | 14 → 13 |
-| Build | ✅ PASS |
-| Tests | ✅ ALL PASS (cmd package) |
+| Metric                    | Value                     |
+| ------------------------- | ------------------------- |
+| Commits this session      | 0 (pending)               |
+| Files modified            | 6                         |
+| Files added               | 1                         |
+| Lines changed             | +134 / -91 (net: +43)     |
+| Tests added               | 4 tests in 1 file         |
+| Init() validations added  | 1                         |
+| Stale stashes dropped     | 2                         |
+| Cleaners (before → after) | 14 → 13                   |
+| Build                     | ✅ PASS                   |
+| Tests                     | ✅ ALL PASS (cmd package) |
 
 ---
 
