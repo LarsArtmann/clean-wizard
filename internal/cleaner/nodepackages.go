@@ -224,7 +224,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 
 // scanHomeDirCache scans a cache directory located under the home directory.
 func (npmc *NodePackageManagerCleaner) scanHomeDirCache(
-	ctx context.Context,
+	_ context.Context,
 	cacheSuffix, pmName string,
 ) result.Result[[]domain.ScanItem] {
 	homeDir, err := GetHomeDir()

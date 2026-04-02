@@ -19,7 +19,7 @@ func NewValidationMiddleware() *ValidationMiddleware {
 
 // ValidateScanRequest validates scan request before processing.
 func (vm *ValidationMiddleware) ValidateScanRequest(
-	ctx context.Context,
+	_ context.Context,
 	req domain.ScanRequest,
 ) result.Result[domain.ScanRequest] {
 	return validation.ValidateAndWrap(req, "scan request")
@@ -27,7 +27,7 @@ func (vm *ValidationMiddleware) ValidateScanRequest(
 
 // ValidateCleanRequest validates clean request before processing.
 func (vm *ValidationMiddleware) ValidateCleanRequest(
-	ctx context.Context,
+	_ context.Context,
 	req domain.CleanRequest,
 ) result.Result[domain.CleanRequest] {
 	return validation.ValidateAndWrap(req, "clean request")
@@ -35,7 +35,7 @@ func (vm *ValidationMiddleware) ValidateCleanRequest(
 
 // ValidateCleanerSettings validates cleaner settings with type safety.
 func (vm *ValidationMiddleware) ValidateCleanerSettings(
-	ctx context.Context,
+	_ context.Context,
 	cleaner domain.OperationHandler,
 	settings *domain.OperationSettings,
 ) result.Result[*domain.OperationSettings] {

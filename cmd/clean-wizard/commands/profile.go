@@ -149,7 +149,7 @@ func NewProfileCreateCommand() *cobra.Command {
 }
 
 // runProfileCreateCommand executes the profile create command.
-func runProfileCreateCommand(cmd *cobra.Command, args []string, name, description string) error {
+func runProfileCreateCommand(_ *cobra.Command, _ []string, name, description string) error {
 	// Interactive prompt for name if not provided
 	if name == "" {
 		fmt.Println("Creating new profile...")
@@ -241,7 +241,7 @@ func NewProfileDeleteCommand() *cobra.Command {
 }
 
 // runProfileDeleteCommand executes the profile delete command.
-func runProfileDeleteCommand(cmd *cobra.Command, args []string, force bool) error {
+func runProfileDeleteCommand(_ *cobra.Command, args []string, force bool) error {
 	profileName := args[0]
 
 	cfg, err := config.Load()

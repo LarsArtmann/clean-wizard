@@ -91,7 +91,7 @@ func (scc *SystemCacheCleaner) Name() string {
 }
 
 // IsAvailable checks if system cache cleaner is available.
-func (scc *SystemCacheCleaner) IsAvailable(ctx context.Context) bool {
+func (scc *SystemCacheCleaner) IsAvailable(_ context.Context) bool {
 	// System cache cleaner is available on macOS and Linux
 	return scc.isMacOS() || scc.isLinux()
 }
@@ -399,7 +399,7 @@ func (scc *SystemCacheCleaner) removeCachePath(
 
 // scanCachePathWithConfig scans a cache directory using configuration and returns scan items.
 func (scc *SystemCacheCleaner) scanCachePathWithConfig(
-	ctx context.Context,
+	_ context.Context,
 	homeDir string,
 	config cacheTypeConfig,
 ) result.Result[[]domain.ScanItem] {
@@ -416,7 +416,7 @@ func (scc *SystemCacheCleaner) scanCachePathWithConfig(
 
 // cleanSystemCache cleans cache for a specific system cache type.
 func (scc *SystemCacheCleaner) cleanSystemCache(
-	ctx context.Context,
+	_ context.Context,
 	cacheType domain.CacheType,
 	homeDir string,
 ) result.Result[domain.CleanResult] {

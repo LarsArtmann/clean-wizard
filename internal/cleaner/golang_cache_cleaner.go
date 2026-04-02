@@ -289,7 +289,7 @@ func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[do
 
 // cleanGoBuildCache removes go-build* folders from all temp locations.
 func (gcc *GoCacheCleaner) cleanGoBuildCache(
-	ctx context.Context,
+	_ context.Context,
 ) result.Result[domain.CleanResult] {
 	buildCachePattern := "go-build*"
 	seen := make(map[string]bool) // Prevent cleaning same path twice

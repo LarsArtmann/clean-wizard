@@ -11,7 +11,7 @@ import (
 
 // applyValidation applies validation at the specified level.
 func (ecl *EnhancedConfigLoader) applyValidation(
-	ctx context.Context,
+	_ context.Context,
 	config *domain.Config,
 	level domain.ValidationLevelType,
 ) *ValidationResult {

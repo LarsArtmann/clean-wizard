@@ -42,7 +42,7 @@ func AvailableBuildTools() []JVMBuildToolType {
 func NewBuildCacheCleaner(
 	verbose, dryRun bool,
 	olderThan string,
-	excludes, basePaths []string,
+	_, basePaths []string,
 ) (*BuildCacheCleaner, error) {
 	// Parse older than duration
 	duration, err := domain.ParseCustomDuration(olderThan)
@@ -78,7 +78,7 @@ func (bcc *BuildCacheCleaner) Name() string {
 }
 
 // IsAvailable checks if build cache cleaner is available.
-func (bcc *BuildCacheCleaner) IsAvailable(ctx context.Context) bool {
+func (bcc *BuildCacheCleaner) IsAvailable(_ context.Context) bool {
 	// Build cache cleaner is always available (uses file system operations)
 	return true
 }
@@ -114,7 +114,7 @@ func getCachePath(toolType JVMBuildToolType, homeDir string) string {
 
 // scanBuildTool scans cache for a specific JVM build tool.
 func (bcc *BuildCacheCleaner) scanBuildTool(
-	ctx context.Context,
+	_ context.Context,
 	toolType JVMBuildToolType,
 	homeDir string,
 ) result.Result[[]domain.ScanItem] {
@@ -196,7 +196,7 @@ func (bcc *BuildCacheCleaner) printVerbose(action, verboseMsg, baseName string) 
 
 // genericClean handles common cleanup logic for both cache directories and partial files.
 func (bcc *BuildCacheCleaner) genericClean(
-	ctx context.Context,
+	_ context.Context,
 	toolName string,
 	baseDir string,
 	pattern string,

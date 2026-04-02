@@ -282,7 +282,7 @@ func (c *GitHistoryCleaner) executeDryRun(totalBytes int64) result.Result[domain
 // executeClean performs the actual history rewrite.
 func (c *GitHistoryCleaner) executeClean(
 	ctx context.Context,
-	totalBytes int64,
+	_ int64,
 ) result.Result[domain.CleanResult] {
 	execResult, err := c.executor.Execute(ctx, ExecuteOptions{
 		FilesToRemove: c.selectedFiles,

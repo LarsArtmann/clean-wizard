@@ -54,7 +54,7 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(
 func (ecl *EnhancedConfigLoader) saveConfigWithRetry(
 	ctx context.Context,
 	config *domain.Config,
-	options *ConfigSaveOptions,
+	_ *ConfigSaveOptions,
 ) error {
 	var lastErr error
 
@@ -88,7 +88,7 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(
 }
 
 // createBackup creates a backup of the current configuration.
-func (ecl *EnhancedConfigLoader) createBackup(ctx context.Context, config *domain.Config) error {
+func (ecl *EnhancedConfigLoader) createBackup(_ context.Context, _ *domain.Config) error {
 	// Read current config file and copy to backup location
 	originalConfigPath := filepath.Join(os.Getenv("HOME"), ".clean-wizard.yaml")
 	backupPath := fmt.Sprintf("%s.backup.%d", originalConfigPath, time.Now().Unix())

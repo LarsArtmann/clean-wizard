@@ -177,7 +177,7 @@ func (cv *ConfigValidator) checkTempFilesConflict(
 }
 
 // checkNixConflict checks for Nix conflicts.
-func (cv *ConfigValidator) checkNixConflict(protected []string, op domain.CleanupOperation) error {
+func (cv *ConfigValidator) checkNixConflict(protected []string, _ domain.CleanupOperation) error {
 	// Nix operations typically affect /nix/store, check if protected paths overlap
 	nixStorePath := "/nix/store"
 	for _, protectedPath := range protected {
