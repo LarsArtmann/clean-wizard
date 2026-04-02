@@ -412,11 +412,18 @@ func isNotAvailableError(errMsg string) bool {
 	return false
 }
 
+// destructiveCleaners are excluded from "standard" mode because they are
+// potentially destructive or require external services (e.g., Docker daemon).
+var destructiveCleaners = map[CleanerType]bool{
+	CleanerTypeDocker:                       true,
+	CleanerTypeLangVersionMgr:               true,
+	CleanerTypeProjectsManagementAutomation: true,
+}
+
 // getPresetSelection returns cleaner selection based on preset mode.
 func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 	switch mode {
 	case "quick":
-		// Quick mode: Homebrew + Node + Go + TempFiles + BuildCache (fast, no Nix/Docker/System changes)
 		return []CleanerType{
 			CleanerTypeHomebrew,
 			CleanerTypeNodePackages,
@@ -425,7 +432,6 @@ func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 			CleanerTypeBuildCache,
 		}
 	case "aggressive":
-		// Aggressive mode: All cleaners including Docker and System Cache
 		var allTypes []CleanerType
 		for _, cfg := range configs {
 			allTypes = append(allTypes, cfg.Type)
@@ -433,9 +439,15 @@ func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 
 		return allTypes
 	case "standard":
-		fallthrough
+		var safeTypes []CleanerType
+		for _, cfg := range configs {
+			if !destructiveCleaners[cfg.Type] {
+				safeTypes = append(safeTypes, cfg.Type)
+			}
+		}
+
+		return safeTypes
 	default:
-		// Standard mode: All available cleaners
 		var allTypes []CleanerType
 		for _, cfg := range configs {
 			allTypes = append(allTypes, cfg.Type)
@@ -445,112 +457,25 @@ func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 	}
 }
 
-// getCleanerName returns the display name for a cleaner type.
 func getCleanerName(cleanerType CleanerType) string {
-	switch cleanerType {
-	case CleanerTypeNix:
-		return "Nix"
-	case CleanerTypeHomebrew:
-		return "Homebrew"
-	case CleanerTypeTempFiles:
-		return "Temp Files"
-	case CleanerTypeNodePackages:
-		return "Node.js Packages"
-	case CleanerTypeGoPackages:
-		return "Go Packages"
-	case CleanerTypeCargoPackages:
-		return "Cargo Packages"
-	case CleanerTypeBuildCache:
-		return "Build Cache"
-	case CleanerTypeDocker:
-		return "Docker"
-	case CleanerTypeSystemCache:
-		return "System Cache"
-	case CleanerTypeLangVersionMgr:
-		return "Language Version Managers"
-	case CleanerTypeProjectsManagementAutomation:
-		return "Projects Management Automation"
-	case CleanerTypeCompiledBinaries:
-		return "Compiled Binaries"
-	case CleanerTypeProjectExecutables:
-		return "Project Executables"
-	case CleanerTypeGolangciLintCache:
-		return "golangci-lint Cache"
-	default:
-		return string(cleanerType)
+	if m, ok := cleanerMetadata[cleanerType]; ok {
+		return m.DisplayName
 	}
+	return string(cleanerType)
 }
 
-// getCleanerDescription returns the description for a cleaner type.
 func getCleanerDescription(cleanerType CleanerType) string {
-	switch cleanerType {
-	case CleanerTypeNix:
-		return "Clean old Nix store generations and optimize store"
-	case CleanerTypeHomebrew:
-		return "Clean Homebrew cache and unused packages"
-	case CleanerTypeTempFiles:
-		return "Clean /tmp files (not dirs) older than 7 days"
-	case CleanerTypeNodePackages:
-		return "Clean npm, pnpm, yarn, bun caches"
-	case CleanerTypeGoPackages:
-		return "Clean Go module, test, and build caches"
-	case CleanerTypeCargoPackages:
-		return "Clean Rust/Cargo registry and source caches"
-	case CleanerTypeBuildCache:
-		return "Clean Gradle, Maven, and SBT caches"
-	case CleanerTypeDocker:
-		return "Clean Docker images, containers, and volumes"
-	case CleanerTypeSystemCache:
-		return "Clean macOS Spotlight, Xcode, CocoaPods caches"
-	case CleanerTypeLangVersionMgr:
-		return "Clean NVM, Pyenv, and Rbenv versions (WARNING: Destructive)"
-	case CleanerTypeProjectsManagementAutomation:
-		return "Clear projects-management-automation cache"
-	case CleanerTypeCompiledBinaries:
-		return "Clean compiled binary files in project directories"
-	case CleanerTypeProjectExecutables:
-		return "Remove executable files (not scripts) from project directories"
-	case CleanerTypeGolangciLintCache:
-		return "Clean golangci-lint cache (uses cache status for accurate sizing)"
-	default:
-		return ""
+	if m, ok := cleanerMetadata[cleanerType]; ok {
+		return m.Description
 	}
+	return ""
 }
 
-// getCleanerIcon returns the icon for a cleaner type.
 func getCleanerIcon(cleanerType CleanerType) string {
-	switch cleanerType {
-	case CleanerTypeNix:
-		return "❄️"
-	case CleanerTypeHomebrew:
-		return "🍺"
-	case CleanerTypeTempFiles:
-		return "🗂️"
-	case CleanerTypeNodePackages:
-		return "📦"
-	case CleanerTypeGoPackages:
-		return "🐹"
-	case CleanerTypeCargoPackages:
-		return "🦀"
-	case CleanerTypeBuildCache:
-		return "🔨"
-	case CleanerTypeDocker:
-		return "🐳"
-	case CleanerTypeSystemCache:
-		return "⚙️"
-	case CleanerTypeLangVersionMgr:
-		return "🗑️"
-	case CleanerTypeProjectsManagementAutomation:
-		return "⚙️"
-	case CleanerTypeCompiledBinaries:
-		return "🔧"
-	case CleanerTypeProjectExecutables:
-		return "📁"
-	case CleanerTypeGolangciLintCache:
-		return "🐹"
-	default:
-		return ""
+	if m, ok := cleanerMetadata[cleanerType]; ok {
+		return m.Icon
 	}
+	return ""
 }
 
 // loadConfigForClean loads configuration from the specified path or returns default config.
