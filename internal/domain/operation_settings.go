@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"gopkg.in/yaml.v3"
-)
+import "gopkg.in/yaml.v3"
 
 // CacheCleanupMode represents cache cleanup behavior as a type-safe enum.
 type CacheCleanupMode int
@@ -14,55 +12,15 @@ const (
 	CacheCleanupEnabled
 )
 
-// String constants for cache cleanup mode representation.
-const (
-	stringDisabled = "DISABLED"
-	stringEnabled  = "ENABLED"
-	stringUnknown  = "UNKNOWN"
-)
+var cacheCleanupModeStrings = []string{"DISABLED", "ENABLED"}
 
-// String returns string representation of cache cleanup mode.
-func (cm CacheCleanupMode) String() string {
-	switch cm {
-	case CacheCleanupDisabled:
-		return stringDisabled
-	case CacheCleanupEnabled:
-		return stringEnabled
-	default:
-		return stringUnknown
-	}
-}
-
-// IsValid checks if cache cleanup mode is valid.
-func (cm CacheCleanupMode) IsValid() bool {
-	return cm >= CacheCleanupDisabled && cm <= CacheCleanupEnabled
-}
-
-// Values returns all possible cache cleanup modes.
-func (cm CacheCleanupMode) Values() []CacheCleanupMode {
-	return []CacheCleanupMode{
-		CacheCleanupDisabled,
-		CacheCleanupEnabled,
-	}
-}
-
-// IsEnabled checks if cache cleanup is enabled.
-func (cm CacheCleanupMode) IsEnabled() bool {
-	return cm == CacheCleanupEnabled
-}
-
-// MarshalYAML implements yaml.Marshaler interface for CacheCleanupMode.
-func (cm CacheCleanupMode) MarshalYAML() (any, error) {
-	return int(cm), nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler interface for CacheCleanupMode.
-// Accepts both string and integer representations.
+func (cm CacheCleanupMode) String() string        { return EnumString(cm, cacheCleanupModeStrings) }
+func (cm CacheCleanupMode) IsValid() bool          { return EnumIsValid(cm, CacheCleanupEnabled) }
+func (cm CacheCleanupMode) Values() []CacheCleanupMode { return EnumValues[CacheCleanupMode](CacheCleanupEnabled) }
+func (cm CacheCleanupMode) IsEnabled() bool         { return cm == CacheCleanupEnabled }
+func (cm CacheCleanupMode) MarshalYAML() (any, error) { return EnumMarshalYAML(cm, cacheCleanupModeStrings) }
 func (cm *CacheCleanupMode) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, cm, map[string]CacheCleanupMode{
-		"DISABLED": CacheCleanupDisabled,
-		"ENABLED":  CacheCleanupEnabled,
-	}, "invalid cache cleanup mode")
+	return EnumUnmarshalYAML(value, (*int)(cm), cacheCleanupModeStrings, "cache cleanup mode")
 }
 
 // DockerPruneMode represents Docker prune behavior as a type-safe enum.
@@ -81,54 +39,14 @@ const (
 	DockerPruneBuilds
 )
 
-// String returns string representation of Docker prune mode.
-func (pm DockerPruneMode) String() string {
-	switch pm {
-	case DockerPruneAll:
-		return "ALL"
-	case DockerPruneImages:
-		return "IMAGES"
-	case DockerPruneContainers:
-		return "CONTAINERS"
-	case DockerPruneVolumes:
-		return "VOLUMES"
-	case DockerPruneBuilds:
-		return "BUILDS"
-	default:
-		return stringUnknown
-	}
-}
+var dockerPruneModeStrings = []string{"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS"}
 
-// IsValid checks if Docker prune mode is valid.
-func (pm DockerPruneMode) IsValid() bool {
-	return pm >= DockerPruneAll && pm <= DockerPruneBuilds
-}
-
-// Values returns all possible Docker prune modes.
-func (pm DockerPruneMode) Values() []DockerPruneMode {
-	return []DockerPruneMode{
-		DockerPruneAll,
-		DockerPruneImages,
-		DockerPruneContainers,
-		DockerPruneVolumes,
-		DockerPruneBuilds,
-	}
-}
-
-// MarshalYAML implements yaml.Marshaler interface for DockerPruneMode.
-func (pm DockerPruneMode) MarshalYAML() (any, error) {
-	return int(pm), nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler interface for DockerPruneMode.
+func (pm DockerPruneMode) String() string        { return EnumString(pm, dockerPruneModeStrings) }
+func (pm DockerPruneMode) IsValid() bool          { return EnumIsValid(pm, DockerPruneBuilds) }
+func (pm DockerPruneMode) Values() []DockerPruneMode { return EnumValues[DockerPruneMode](DockerPruneBuilds) }
+func (pm DockerPruneMode) MarshalYAML() (any, error) { return EnumMarshalYAML(pm, dockerPruneModeStrings) }
 func (pm *DockerPruneMode) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, pm, map[string]DockerPruneMode{
-		"ALL":        DockerPruneAll,
-		"IMAGES":     DockerPruneImages,
-		"CONTAINERS": DockerPruneContainers,
-		"VOLUMES":    DockerPruneVolumes,
-		"BUILDS":     DockerPruneBuilds,
-	}, "invalid docker prune mode")
+	return EnumUnmarshalYAML(value, (*int)(pm), dockerPruneModeStrings, "docker prune mode")
 }
 
 // BuildToolType represents build tool types as a type-safe enum.
@@ -149,58 +67,14 @@ const (
 	BuildToolScala
 )
 
-// String returns string representation of build tool type.
-func (bt BuildToolType) String() string {
-	switch bt {
-	case BuildToolGo:
-		return "GO"
-	case BuildToolRust:
-		return "RUST"
-	case BuildToolNode:
-		return "NODE"
-	case BuildToolPython:
-		return "PYTHON"
-	case BuildToolJava:
-		return "JAVA"
-	case BuildToolScala:
-		return "SCALA"
-	default:
-		return stringUnknown
-	}
-}
+var buildToolTypeStrings = []string{"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA"}
 
-// IsValid checks if build tool type is valid.
-func (bt BuildToolType) IsValid() bool {
-	return bt >= BuildToolGo && bt <= BuildToolScala
-}
-
-// Values returns all possible build tool types.
-func (bt BuildToolType) Values() []BuildToolType {
-	return []BuildToolType{
-		BuildToolGo,
-		BuildToolRust,
-		BuildToolNode,
-		BuildToolPython,
-		BuildToolJava,
-		BuildToolScala,
-	}
-}
-
-// MarshalYAML implements yaml.Marshaler interface for BuildToolType.
-func (bt BuildToolType) MarshalYAML() (any, error) {
-	return int(bt), nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler interface for BuildToolType.
+func (bt BuildToolType) String() string        { return EnumString(bt, buildToolTypeStrings) }
+func (bt BuildToolType) IsValid() bool          { return EnumIsValid(bt, BuildToolScala) }
+func (bt BuildToolType) Values() []BuildToolType { return EnumValues[BuildToolType](BuildToolScala) }
+func (bt BuildToolType) MarshalYAML() (any, error) { return EnumMarshalYAML(bt, buildToolTypeStrings) }
 func (bt *BuildToolType) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, bt, map[string]BuildToolType{
-		"GO":     BuildToolGo,
-		"RUST":   BuildToolRust,
-		"NODE":   BuildToolNode,
-		"PYTHON": BuildToolPython,
-		"JAVA":   BuildToolJava,
-		"SCALA":  BuildToolScala,
-	}, "invalid build tool type")
+	return EnumUnmarshalYAML(value, (*int)(bt), buildToolTypeStrings, "build tool type")
 }
 
 // CacheType represents system cache types as a type-safe enum.
@@ -239,94 +113,18 @@ const (
 	CacheTypeRustup
 )
 
-// String returns string representation of cache type.
-func (ct CacheType) String() string {
-	switch ct {
-	case CacheTypeSpotlight:
-		return "SPOTLIGHT"
-	case CacheTypeXcode:
-		return "XCODE"
-	case CacheTypeCocoapods:
-		return "COCOAPODS"
-	case CacheTypeHomebrew:
-		return "HOMEBREW"
-	case CacheTypePip:
-		return "PIP"
-	case CacheTypeNpm:
-		return "NPM"
-	case CacheTypeYarn:
-		return "YARN"
-	case CacheTypeCcache:
-		return "CCACHE"
-	case CacheTypeXdgCache:
-		return "XDG_CACHE"
-	case CacheTypeThumbnails:
-		return "THUMBNAILS"
-	case CacheTypePuppeteer:
-		return "PUPPETEER"
-	case CacheTypeTerraform:
-		return "TERRAFORM"
-	case CacheTypeGradleWrapper:
-		return "GRADLE_WRAPPER"
-	case CacheTypeKonan:
-		return "KONAN"
-	case CacheTypeRustup:
-		return "RUSTUP"
-	default:
-		return stringUnknown
-	}
+var cacheTypeStrings = []string{
+	"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP",
+	"NPM", "YARN", "CCACHE", "XDG_CACHE", "THUMBNAILS",
+	"PUPPETEER", "TERRAFORM", "GRADLE_WRAPPER", "KONAN", "RUSTUP",
 }
 
-// IsValid checks if cache type is valid.
-func (ct CacheType) IsValid() bool {
-	return ct >= CacheTypeSpotlight && ct <= CacheTypeRustup
-}
-
-// Values returns all possible cache types.
-func (ct CacheType) Values() []CacheType {
-	return []CacheType{
-		CacheTypeSpotlight,
-		CacheTypeXcode,
-		CacheTypeCocoapods,
-		CacheTypeHomebrew,
-		CacheTypePip,
-		CacheTypeNpm,
-		CacheTypeYarn,
-		CacheTypeCcache,
-		CacheTypeXdgCache,
-		CacheTypeThumbnails,
-		CacheTypePuppeteer,
-		CacheTypeTerraform,
-		CacheTypeGradleWrapper,
-		CacheTypeKonan,
-		CacheTypeRustup,
-	}
-}
-
-// MarshalYAML implements yaml.Marshaler interface for CacheType.
-func (ct CacheType) MarshalYAML() (any, error) {
-	return int(ct), nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler interface for CacheType.
+func (ct CacheType) String() string        { return EnumString(ct, cacheTypeStrings) }
+func (ct CacheType) IsValid() bool          { return EnumIsValid(ct, CacheTypeRustup) }
+func (ct CacheType) Values() []CacheType    { return EnumValues[CacheType](CacheTypeRustup) }
+func (ct CacheType) MarshalYAML() (any, error) { return EnumMarshalYAML(ct, cacheTypeStrings) }
 func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, ct, map[string]CacheType{
-		"SPOTLIGHT":      CacheTypeSpotlight,
-		"XCODE":          CacheTypeXcode,
-		"COCOAPODS":      CacheTypeCocoapods,
-		"HOMEBREW":       CacheTypeHomebrew,
-		"PIP":            CacheTypePip,
-		"NPM":            CacheTypeNpm,
-		"YARN":           CacheTypeYarn,
-		"CCACHE":         CacheTypeCcache,
-		"XDG_CACHE":      CacheTypeXdgCache,
-		"THUMBNAILS":     CacheTypeThumbnails,
-		"PUPPETEER":      CacheTypePuppeteer,
-		"TERRAFORM":      CacheTypeTerraform,
-		"GRADLE_WRAPPER": CacheTypeGradleWrapper,
-		"KONAN":          CacheTypeKonan,
-		"RUSTUP":         CacheTypeRustup,
-	}, "invalid cache type")
+	return EnumUnmarshalYAML(value, (*int)(ct), cacheTypeStrings, "cache type")
 }
 
 // PackageManagerType represents Node.js package manager types as a type-safe enum.
@@ -343,48 +141,12 @@ const (
 	PackageManagerBun
 )
 
-// String returns string representation of package manager type.
-func (pm PackageManagerType) String() string {
-	switch pm {
-	case PackageManagerNpm:
-		return "NPM"
-	case PackageManagerPnpm:
-		return "PNPM"
-	case PackageManagerYarn:
-		return "YARN"
-	case PackageManagerBun:
-		return "BUN"
-	default:
-		return stringUnknown
-	}
-}
+var packageManagerTypeStrings = []string{"NPM", "PNPM", "YARN", "BUN"}
 
-// IsValid checks if package manager type is valid.
-func (pm PackageManagerType) IsValid() bool {
-	return pm >= PackageManagerNpm && pm <= PackageManagerBun
-}
-
-// Values returns all possible package manager types.
-func (pm PackageManagerType) Values() []PackageManagerType {
-	return []PackageManagerType{
-		PackageManagerNpm,
-		PackageManagerPnpm,
-		PackageManagerYarn,
-		PackageManagerBun,
-	}
-}
-
-// MarshalYAML implements yaml.Marshaler interface for PackageManagerType.
-func (pm PackageManagerType) MarshalYAML() (any, error) {
-	return int(pm), nil
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler interface for PackageManagerType.
+func (pm PackageManagerType) String() string        { return EnumString(pm, packageManagerTypeStrings) }
+func (pm PackageManagerType) IsValid() bool          { return EnumIsValid(pm, PackageManagerBun) }
+func (pm PackageManagerType) Values() []PackageManagerType { return EnumValues[PackageManagerType](PackageManagerBun) }
+func (pm PackageManagerType) MarshalYAML() (any, error) { return EnumMarshalYAML(pm, packageManagerTypeStrings) }
 func (pm *PackageManagerType) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, pm, map[string]PackageManagerType{
-		"NPM":  PackageManagerNpm,
-		"PNPM": PackageManagerPnpm,
-		"YARN": PackageManagerYarn,
-		"BUN":  PackageManagerBun,
-	}, "invalid package manager type")
+	return EnumUnmarshalYAML(value, (*int)(pm), packageManagerTypeStrings, "package manager type")
 }

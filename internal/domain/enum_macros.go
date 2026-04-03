@@ -9,6 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const stringUnknown = "UNKNOWN"
+
 func EnumString[T ~int](val T, stringsMap []string) string {
 	idx := int(val)
 	if idx < 0 || idx >= len(stringsMap) {
@@ -74,7 +76,8 @@ func EnumUnmarshalYAML[T ~int](
 ) error {
 	var s string
 
-	if err := value.Decode(&s); err == nil {
+	err := value.Decode(&s)
+	if err == nil {
 		if i, atoiErr := strconv.Atoi(s); atoiErr == nil {
 			if i >= 0 && i < len(stringsMap) {
 				*target = T(i)
@@ -82,7 +85,13 @@ func EnumUnmarshalYAML[T ~int](
 				return nil
 			}
 
-			return fmt.Errorf("invalid %s: %d. Valid: 0-%d (%v)", name, i, len(stringsMap)-1, stringsMap)
+			return fmt.Errorf(
+				"invalid %s: %d. Valid: 0-%d (%v)",
+				name,
+				i,
+				len(stringsMap)-1,
+				stringsMap,
+			)
 		}
 
 		upper := strings.ToUpper(s)
@@ -98,14 +107,21 @@ func EnumUnmarshalYAML[T ~int](
 	}
 
 	var i int
-	if err := value.Decode(&i); err == nil {
+	err = value.Decode(&i)
+	if err == nil {
 		if i >= 0 && i < len(stringsMap) {
 			*target = T(i)
 
 			return nil
 		}
 
-		return fmt.Errorf("invalid %s: %d. Valid: 0-%d (%v)", name, i, len(stringsMap)-1, stringsMap)
+		return fmt.Errorf(
+			"invalid %s: %d. Valid: 0-%d (%v)",
+			name,
+			i,
+			len(stringsMap)-1,
+			stringsMap,
+		)
 	}
 
 	return fmt.Errorf("cannot parse %s: expected string or int", name)

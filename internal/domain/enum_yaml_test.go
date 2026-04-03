@@ -17,39 +17,39 @@ func TestEnumYAMLMarshaling(t *testing.T) {
 		expected string
 	}{
 		// CacheCleanupMode
-		{"CacheCleanupMode Disabled", CacheCleanupDisabled, "0\n"},
-		{"CacheCleanupMode Enabled", CacheCleanupEnabled, "1\n"},
+		{"CacheCleanupMode Disabled", CacheCleanupDisabled, "DISABLED\n"},
+		{"CacheCleanupMode Enabled", CacheCleanupEnabled, "ENABLED\n"},
 
 		// DockerPruneMode
-		{"DockerPruneMode All", DockerPruneAll, "0\n"},
-		{"DockerPruneMode Images", DockerPruneImages, "1\n"},
-		{"DockerPruneMode Containers", DockerPruneContainers, "2\n"},
-		{"DockerPruneMode Volumes", DockerPruneVolumes, "3\n"},
-		{"DockerPruneMode Builds", DockerPruneBuilds, "4\n"},
+		{"DockerPruneMode All", DockerPruneAll, "ALL\n"},
+		{"DockerPruneMode Images", DockerPruneImages, "IMAGES\n"},
+		{"DockerPruneMode Containers", DockerPruneContainers, "CONTAINERS\n"},
+		{"DockerPruneMode Volumes", DockerPruneVolumes, "VOLUMES\n"},
+		{"DockerPruneMode Builds", DockerPruneBuilds, "BUILDS\n"},
 
 		// BuildToolType
-		{"BuildToolType Go", BuildToolGo, "0\n"},
-		{"BuildToolType Rust", BuildToolRust, "1\n"},
-		{"BuildToolType Node", BuildToolNode, "2\n"},
-		{"BuildToolType Python", BuildToolPython, "3\n"},
-		{"BuildToolType Java", BuildToolJava, "4\n"},
-		{"BuildToolType Scala", BuildToolScala, "5\n"},
+		{"BuildToolType Go", BuildToolGo, "GO\n"},
+		{"BuildToolType Rust", BuildToolRust, "RUST\n"},
+		{"BuildToolType Node", BuildToolNode, "NODE\n"},
+		{"BuildToolType Python", BuildToolPython, "PYTHON\n"},
+		{"BuildToolType Java", BuildToolJava, "JAVA\n"},
+		{"BuildToolType Scala", BuildToolScala, "SCALA\n"},
 
 		// CacheType
-		{"CacheType Spotlight", CacheTypeSpotlight, "0\n"},
-		{"CacheType Xcode", CacheTypeXcode, "1\n"},
-		{"CacheType Cocoapods", CacheTypeCocoapods, "2\n"},
-		{"CacheType Homebrew", CacheTypeHomebrew, "3\n"},
-		{"CacheType Pip", CacheTypePip, "4\n"},
-		{"CacheType Npm", CacheTypeNpm, "5\n"},
-		{"CacheType Yarn", CacheTypeYarn, "6\n"},
-		{"CacheType Ccache", CacheTypeCcache, "7\n"},
+		{"CacheType Spotlight", CacheTypeSpotlight, "SPOTLIGHT\n"},
+		{"CacheType Xcode", CacheTypeXcode, "XCODE\n"},
+		{"CacheType Cocoapods", CacheTypeCocoapods, "COCOAPODS\n"},
+		{"CacheType Homebrew", CacheTypeHomebrew, "HOMEBREW\n"},
+		{"CacheType Pip", CacheTypePip, "PIP\n"},
+		{"CacheType Npm", CacheTypeNpm, "NPM\n"},
+		{"CacheType Yarn", CacheTypeYarn, "YARN\n"},
+		{"CacheType Ccache", CacheTypeCcache, "CCACHE\n"},
 
 		// PackageManagerType
-		{"PackageManagerType Npm", PackageManagerNpm, "0\n"},
-		{"PackageManagerType Pnpm", PackageManagerPnpm, "1\n"},
-		{"PackageManagerType Yarn", PackageManagerYarn, "2\n"},
-		{"PackageManagerType Bun", PackageManagerBun, "3\n"},
+		{"PackageManagerType Npm", PackageManagerNpm, "NPM\n"},
+		{"PackageManagerType Pnpm", PackageManagerPnpm, "PNPM\n"},
+		{"PackageManagerType Yarn", PackageManagerYarn, "YARN\n"},
+		{"PackageManagerType Bun", PackageManagerBun, "BUN\n"},
 	}
 
 	for _, tt := range tests {
