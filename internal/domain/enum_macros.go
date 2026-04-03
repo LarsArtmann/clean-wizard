@@ -107,6 +107,7 @@ func EnumUnmarshalYAML[T ~int](
 	}
 
 	var i int
+
 	err = value.Decode(&i)
 	if err == nil {
 		if i >= 0 && i < len(stringsMap) {

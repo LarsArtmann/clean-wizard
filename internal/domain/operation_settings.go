@@ -14,11 +14,15 @@ const (
 
 var cacheCleanupModeStrings = []string{"DISABLED", "ENABLED"}
 
-func (cm CacheCleanupMode) String() string        { return EnumString(cm, cacheCleanupModeStrings) }
-func (cm CacheCleanupMode) IsValid() bool          { return EnumIsValid(cm, CacheCleanupEnabled) }
-func (cm CacheCleanupMode) Values() []CacheCleanupMode { return EnumValues[CacheCleanupMode](CacheCleanupEnabled) }
-func (cm CacheCleanupMode) IsEnabled() bool         { return cm == CacheCleanupEnabled }
-func (cm CacheCleanupMode) MarshalYAML() (any, error) { return EnumMarshalYAML(cm, cacheCleanupModeStrings) }
+func (cm CacheCleanupMode) String() string { return EnumString(cm, cacheCleanupModeStrings) }
+func (cm CacheCleanupMode) IsValid() bool  { return EnumIsValid(cm, CacheCleanupEnabled) }
+func (cm CacheCleanupMode) Values() []CacheCleanupMode {
+	return EnumValues[CacheCleanupMode](CacheCleanupEnabled)
+}
+func (cm CacheCleanupMode) IsEnabled() bool { return cm == CacheCleanupEnabled }
+func (cm CacheCleanupMode) MarshalYAML() (any, error) {
+	return EnumMarshalYAML(cm, cacheCleanupModeStrings)
+}
 func (cm *CacheCleanupMode) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(cm), cacheCleanupModeStrings, "cache cleanup mode")
 }
@@ -41,10 +45,14 @@ const (
 
 var dockerPruneModeStrings = []string{"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS"}
 
-func (pm DockerPruneMode) String() string        { return EnumString(pm, dockerPruneModeStrings) }
-func (pm DockerPruneMode) IsValid() bool          { return EnumIsValid(pm, DockerPruneBuilds) }
-func (pm DockerPruneMode) Values() []DockerPruneMode { return EnumValues[DockerPruneMode](DockerPruneBuilds) }
-func (pm DockerPruneMode) MarshalYAML() (any, error) { return EnumMarshalYAML(pm, dockerPruneModeStrings) }
+func (pm DockerPruneMode) String() string { return EnumString(pm, dockerPruneModeStrings) }
+func (pm DockerPruneMode) IsValid() bool  { return EnumIsValid(pm, DockerPruneBuilds) }
+func (pm DockerPruneMode) Values() []DockerPruneMode {
+	return EnumValues[DockerPruneMode](DockerPruneBuilds)
+}
+func (pm DockerPruneMode) MarshalYAML() (any, error) {
+	return EnumMarshalYAML(pm, dockerPruneModeStrings)
+}
 func (pm *DockerPruneMode) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(pm), dockerPruneModeStrings, "docker prune mode")
 }
@@ -69,9 +77,11 @@ const (
 
 var buildToolTypeStrings = []string{"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA"}
 
-func (bt BuildToolType) String() string        { return EnumString(bt, buildToolTypeStrings) }
-func (bt BuildToolType) IsValid() bool          { return EnumIsValid(bt, BuildToolScala) }
+func (bt BuildToolType) String() string { return EnumString(bt, buildToolTypeStrings) }
+func (bt BuildToolType) IsValid() bool  { return EnumIsValid(bt, BuildToolScala) }
+
 func (bt BuildToolType) Values() []BuildToolType { return EnumValues[BuildToolType](BuildToolScala) }
+
 func (bt BuildToolType) MarshalYAML() (any, error) { return EnumMarshalYAML(bt, buildToolTypeStrings) }
 func (bt *BuildToolType) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(bt), buildToolTypeStrings, "build tool type")
@@ -119,9 +129,9 @@ var cacheTypeStrings = []string{
 	"PUPPETEER", "TERRAFORM", "GRADLE_WRAPPER", "KONAN", "RUSTUP",
 }
 
-func (ct CacheType) String() string        { return EnumString(ct, cacheTypeStrings) }
-func (ct CacheType) IsValid() bool          { return EnumIsValid(ct, CacheTypeRustup) }
-func (ct CacheType) Values() []CacheType    { return EnumValues[CacheType](CacheTypeRustup) }
+func (ct CacheType) String() string            { return EnumString(ct, cacheTypeStrings) }
+func (ct CacheType) IsValid() bool             { return EnumIsValid(ct, CacheTypeRustup) }
+func (ct CacheType) Values() []CacheType       { return EnumValues[CacheType](CacheTypeRustup) }
 func (ct CacheType) MarshalYAML() (any, error) { return EnumMarshalYAML(ct, cacheTypeStrings) }
 func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(ct), cacheTypeStrings, "cache type")
@@ -143,10 +153,14 @@ const (
 
 var packageManagerTypeStrings = []string{"NPM", "PNPM", "YARN", "BUN"}
 
-func (pm PackageManagerType) String() string        { return EnumString(pm, packageManagerTypeStrings) }
-func (pm PackageManagerType) IsValid() bool          { return EnumIsValid(pm, PackageManagerBun) }
-func (pm PackageManagerType) Values() []PackageManagerType { return EnumValues[PackageManagerType](PackageManagerBun) }
-func (pm PackageManagerType) MarshalYAML() (any, error) { return EnumMarshalYAML(pm, packageManagerTypeStrings) }
+func (pm PackageManagerType) String() string { return EnumString(pm, packageManagerTypeStrings) }
+func (pm PackageManagerType) IsValid() bool  { return EnumIsValid(pm, PackageManagerBun) }
+func (pm PackageManagerType) Values() []PackageManagerType {
+	return EnumValues[PackageManagerType](PackageManagerBun)
+}
+func (pm PackageManagerType) MarshalYAML() (any, error) {
+	return EnumMarshalYAML(pm, packageManagerTypeStrings)
+}
 func (pm *PackageManagerType) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(pm), packageManagerTypeStrings, "package manager type")
 }

@@ -361,23 +361,23 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% line reduction across 4 files).
 
-| Enum                   | Values                                                        | Status                                 |
-| ---------------------- | ------------------------------------------------------------- | -------------------------------------- |
-| **CacheCleanupMode**   | DISABLED, ENABLED                                             | ✅ Working                             |
-| **DockerPruneMode**    | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS                      | ✅ Working                             |
-| **BuildToolType**      | GO, RUST, NODE, PYTHON, JAVA, SCALA                           | ⚠️ Partial (only JAVA/SCALA used)      |
-| **CacheType**          | SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, CCACHE | ⚠️ Partial (only first 4 used)         |
-| **VersionManagerType** | NVM, PYENV, GVM, RBENV, SDKMAN, JENV                          | ⚠️ Partial (only NVM/PYENV/RBENV used) |
-| **PackageManagerType** | NPM, PNPM, YARN, BUN                                          | ✅ Working                             |
-| **RiskLevel**          | LOW, MEDIUM, HIGH, CRITICAL                                   | ✅ Working                             |
-| **ValidationLevel**    | NONE, BASIC, COMPREHENSIVE, STRICT                            | ✅ Working                             |
-| **CleanStrategy**      | AGGRESSIVE, CONSERVATIVE, DRY_RUN                             | ✅ Working                             |
-| **HomebrewMode**       | UNUSED_ONLY, ALL                                              | ✅ Working                             |
-| **OptimizationMode**   | DISABLED, ENABLED                                             | ✅ Working                             |
-| **ExecutionMode**      | NORMAL, DRY_RUN                                               | ✅ Working                             |
-| **ChangeOperationType** | ADDED, REMOVED, MODIFIED                                     | ✅ Working                             |
-| **SizeEstimateStatusType** | KNOWN, UNKNOWN                                            | ✅ Working                             |
-| **GitHistoryMode**     | ANALYZE, DRY_RUN, EXECUTE                                     | ✅ Working                             |
+| Enum                       | Values                                                        | Status                                 |
+| -------------------------- | ------------------------------------------------------------- | -------------------------------------- |
+| **CacheCleanupMode**       | DISABLED, ENABLED                                             | ✅ Working                             |
+| **DockerPruneMode**        | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS                      | ✅ Working                             |
+| **BuildToolType**          | GO, RUST, NODE, PYTHON, JAVA, SCALA                           | ⚠️ Partial (only JAVA/SCALA used)      |
+| **CacheType**              | SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, CCACHE | ⚠️ Partial (only first 4 used)         |
+| **VersionManagerType**     | NVM, PYENV, GVM, RBENV, SDKMAN, JENV                          | ⚠️ Partial (only NVM/PYENV/RBENV used) |
+| **PackageManagerType**     | NPM, PNPM, YARN, BUN                                          | ✅ Working                             |
+| **RiskLevel**              | LOW, MEDIUM, HIGH, CRITICAL                                   | ✅ Working                             |
+| **ValidationLevel**        | NONE, BASIC, COMPREHENSIVE, STRICT                            | ✅ Working                             |
+| **CleanStrategy**          | AGGRESSIVE, CONSERVATIVE, DRY_RUN                             | ✅ Working                             |
+| **HomebrewMode**           | UNUSED_ONLY, ALL                                              | ✅ Working                             |
+| **OptimizationMode**       | DISABLED, ENABLED                                             | ✅ Working                             |
+| **ExecutionMode**          | NORMAL, DRY_RUN                                               | ✅ Working                             |
+| **ChangeOperationType**    | ADDED, REMOVED, MODIFIED                                      | ✅ Working                             |
+| **SizeEstimateStatusType** | KNOWN, UNKNOWN                                                | ✅ Working                             |
+| **GitHistoryMode**         | ANALYZE, DRY_RUN, EXECUTE                                     | ✅ Working                             |
 
 ---
 

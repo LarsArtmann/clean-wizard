@@ -16,13 +16,13 @@ The **enum consolidation refactor** is **COMPLETE**. All 19 iota-based enum type
 
 ### Before/After Comparison
 
-| File | Before | After | Reduction |
-|------|--------|-------|-----------|
-| `execution_enums.go` | 377 lines | 149 lines | **60%** |
-| `operation_settings.go` | 390 lines | 152 lines | **61%** |
-| `type_safe_enums.go` | 539 lines | 167 lines | **69%** |
-| `githistory_types.go` | — | -43 lines | **28%** |
-| **Total** | **1,349 lines** | **651 lines** | **52%** |
+| File                    | Before          | After         | Reduction |
+| ----------------------- | --------------- | ------------- | --------- |
+| `execution_enums.go`    | 377 lines       | 149 lines     | **60%**   |
+| `operation_settings.go` | 390 lines       | 152 lines     | **61%**   |
+| `type_safe_enums.go`    | 539 lines       | 167 lines     | **69%**   |
+| `githistory_types.go`   | —               | -43 lines     | **28%**   |
+| **Total**               | **1,349 lines** | **651 lines** | **52%**   |
 
 ### Key Technical Changes
 
@@ -65,31 +65,31 @@ All 7 enum consolidation commits are **pushed to origin**.
 
 ### Codebase Size
 
-| Metric | Value |
-|--------|-------|
-| Total Go files | ~50 |
-| Total Go lines | **11,518** |
-| Domain/cleaner/cmd lines | ~20,093 |
-| Production code | ~7,000 lines |
-| Test code | ~4,500 lines |
+| Metric                   | Value        |
+| ------------------------ | ------------ |
+| Total Go files           | ~50          |
+| Total Go lines           | **11,518**   |
+| Domain/cleaner/cmd lines | ~20,093      |
+| Production code          | ~7,000 lines |
+| Test code                | ~4,500 lines |
 
 ### Build & Test Status
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| `go build ./...` | ✅ PASS | No errors |
-| `go test ./... -short` | ✅ PASS | All domain tests pass |
-| `go vet ./...` | ✅ PASS | Clean |
-| `golangci-lint` | ⚠️ TIMEOUT | Pre-existing issues (654+), disk space constraints |
+| Check                  | Status     | Notes                                              |
+| ---------------------- | ---------- | -------------------------------------------------- |
+| `go build ./...`       | ✅ PASS    | No errors                                          |
+| `go test ./... -short` | ✅ PASS    | All domain tests pass                              |
+| `go vet ./...`         | ✅ PASS    | Clean                                              |
+| `golangci-lint`        | ⚠️ TIMEOUT | Pre-existing issues (654+), disk space constraints |
 
 ### Disk Space
 
-| Metric | Value |
-|--------|-------|
-| Total | 229GB |
-| Used | 226GB |
-| Free | **2.7GB** |
-| Capacity | 99% |
+| Metric   | Value     |
+| -------- | --------- |
+| Total    | 229GB     |
+| Used     | 226GB     |
+| Free     | **2.7GB** |
+| Capacity | 99%       |
 
 **⚠️ WARNING:** Disk space is critically low. Use `go clean -cache -testcache` if builds fail.
 
@@ -99,55 +99,55 @@ All 7 enum consolidation commits are **pushed to origin**.
 
 All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers:
 
-| Enum | Values | Status |
-|------|--------|--------|
-| **CacheCleanupMode** | DISABLED, ENABLED | ✅ Working |
-| **DockerPruneMode** | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS | ✅ Working |
-| **BuildToolType** | GO, RUST, NODE, PYTHON, JAVA, SCALA | ⚠️ Partial |
-| **CacheType** | SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, CCACHE | ⚠️ Partial |
-| **VersionManagerType** | NVM, PYENV, GVM, RBENV, SDKMAN, JENV | ⚠️ Partial |
-| **PackageManagerType** | NPM, PNPM, YARN, BUN | ✅ Working |
-| **RiskLevel** | LOW, MEDIUM, HIGH, CRITICAL | ✅ Working |
-| **ValidationLevel** | NONE, BASIC, COMPREHENSIVE, STRICT | ✅ Working |
-| **CleanStrategy** | AGGRESSIVE, CONSERVATIVE, DRY_RUN | ✅ Working |
-| **HomebrewMode** | UNUSED_ONLY, ALL | ✅ Working |
-| **OptimizationMode** | DISABLED, ENABLED | ✅ Working |
-| **ExecutionMode** | NORMAL, DRY_RUN | ✅ Working |
-| **ChangeOperationType** | ADDED, REMOVED, MODIFIED | ✅ Working |
-| **SizeEstimateStatusType** | KNOWN, UNKNOWN | ✅ Working |
-| **GitHistoryMode** | ANALYZE, DRY_RUN, EXECUTE | ✅ Working |
+| Enum                       | Values                                                        | Status     |
+| -------------------------- | ------------------------------------------------------------- | ---------- |
+| **CacheCleanupMode**       | DISABLED, ENABLED                                             | ✅ Working |
+| **DockerPruneMode**        | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS                      | ✅ Working |
+| **BuildToolType**          | GO, RUST, NODE, PYTHON, JAVA, SCALA                           | ⚠️ Partial |
+| **CacheType**              | SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, CCACHE | ⚠️ Partial |
+| **VersionManagerType**     | NVM, PYENV, GVM, RBENV, SDKMAN, JENV                          | ⚠️ Partial |
+| **PackageManagerType**     | NPM, PNPM, YARN, BUN                                          | ✅ Working |
+| **RiskLevel**              | LOW, MEDIUM, HIGH, CRITICAL                                   | ✅ Working |
+| **ValidationLevel**        | NONE, BASIC, COMPREHENSIVE, STRICT                            | ✅ Working |
+| **CleanStrategy**          | AGGRESSIVE, CONSERVATIVE, DRY_RUN                             | ✅ Working |
+| **HomebrewMode**           | UNUSED_ONLY, ALL                                              | ✅ Working |
+| **OptimizationMode**       | DISABLED, ENABLED                                             | ✅ Working |
+| **ExecutionMode**          | NORMAL, DRY_RUN                                               | ✅ Working |
+| **ChangeOperationType**    | ADDED, REMOVED, MODIFIED                                      | ✅ Working |
+| **SizeEstimateStatusType** | KNOWN, UNKNOWN                                                | ✅ Working |
+| **GitHistoryMode**         | ANALYZE, DRY_RUN, EXECUTE                                     | ✅ Working |
 
 ---
 
 ## 4. Core Cleaners (13 Total)
 
-| Cleaner | Available | Scan | Clean | Dry-Run | Size Accurate | Status |
-|---------|-----------|------|-------|---------|---------------|--------|
-| Nix | ✅ | ✅ | ✅ | 🧪 | 🧪 | ✅ Production |
-| Homebrew | ✅ | ✅ | ✅ | 🚧 | 🧪 | ✅ Production |
-| Docker | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ Production |
-| Go | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ Production |
-| Cargo | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ Production |
-| Node Packages | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ Production |
-| Build Cache | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ Limited Tools |
-| System Cache | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ Production |
-| Temp Files | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ Production |
-| Git History | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ Production |
-| Lang Version Mgr | ✅ | ✅ | 📝 | 📝 | N/A | 📝 Not Implemented |
-| Projects Mgmt | 🚧 | 🧪 | 🚧 | 🧪 | 🧪 | 🚧 Non-Functional |
+| Cleaner          | Available | Scan | Clean | Dry-Run | Size Accurate | Status             |
+| ---------------- | --------- | ---- | ----- | ------- | ------------- | ------------------ |
+| Nix              | ✅        | ✅   | ✅    | 🧪      | 🧪            | ✅ Production      |
+| Homebrew         | ✅        | ✅   | ✅    | 🚧      | 🧪            | ✅ Production      |
+| Docker           | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| Go               | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| Cargo            | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| Node Packages    | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| Build Cache      | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools   |
+| System Cache     | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| Temp Files       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| Git History      | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| Lang Version Mgr | ✅        | ✅   | 📝    | 📝      | N/A           | 📝 Not Implemented |
+| Projects Mgmt    | 🚧        | 🧪   | 🚧    | 🧪      | 🧪            | 🚧 Non-Functional  |
 
 ---
 
 ## 5. CLI Commands (6 Total)
 
-| Command | Status | Description |
-|---------|--------|-------------|
-| `clean` | ✅ | Main cleanup with TUI |
-| `scan` | ✅ | Report cleanup opportunities |
-| `init` | ✅ | Interactive setup wizard |
-| `profile` | ✅ | Profile management |
-| `config` | ✅ | Config management |
-| `git-history` | ✅ | Interactive git history cleaner |
+| Command       | Status | Description                     |
+| ------------- | ------ | ------------------------------- |
+| `clean`       | ✅     | Main cleanup with TUI           |
+| `scan`        | ✅     | Report cleanup opportunities    |
+| `init`        | ✅     | Interactive setup wizard        |
+| `profile`     | ✅     | Profile management              |
+| `config`      | ✅     | Config management               |
+| `git-history` | ✅     | Interactive git history cleaner |
 
 ---
 
@@ -155,16 +155,16 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers:
 
 ### Priority 1-8 (21/21 items addressed)
 
-| Category | Items | Status |
-|----------|-------|--------|
-| Generic Context System | 1 | ✅ DONE |
-| Domain Model Enhancement | 1 | ✅ DONE |
-| Enum Refactoring | 2 | ✅ DONE |
-| Complexity Reduction | 3 | ✅ DONE |
-| Test Helper Refactoring | 1 | ✅ DONE |
-| Type Model Improvements | 2 | ✅ DONE |
-| Cleaner Improvements | 5 | ✅ DONE |
-| Documentation | 3 | ✅ DONE |
+| Category                 | Items | Status  |
+| ------------------------ | ----- | ------- |
+| Generic Context System   | 1     | ✅ DONE |
+| Domain Model Enhancement | 1     | ✅ DONE |
+| Enum Refactoring         | 2     | ✅ DONE |
+| Complexity Reduction     | 3     | ✅ DONE |
+| Test Helper Refactoring  | 1     | ✅ DONE |
+| Type Model Improvements  | 2     | ✅ DONE |
+| Cleaner Improvements     | 5     | ✅ DONE |
+| Documentation            | 3     | ✅ DONE |
 
 ### Additional Improvements
 
@@ -186,14 +186,14 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers:
 
 ## 7. Pending Work (From Original Meta-Improvement Request)
 
-| # | Task | Impact | Effort | Notes |
-|---|------|--------|--------|-------|
-| 1 | Add tests for getRegistryName reverse lookup | MED | LOW | Related to metadata consolidation |
-| 2 | Add profile command tests | MED | MED | No test files for commands package |
-| 3 | Add scan command tests | MED | MED | No test files for commands package |
-| 4 | Add clean command tests | MED | HIGH | No test files for commands package |
-| 5 | Set up CI pipeline | HIGH | MED | At minimum: go build + go test |
-| 6 | Fix pre-commit hook timeout | MED | LOW | golangci-lint times out |
+| #   | Task                                         | Impact | Effort | Notes                              |
+| --- | -------------------------------------------- | ------ | ------ | ---------------------------------- |
+| 1   | Add tests for getRegistryName reverse lookup | MED    | LOW    | Related to metadata consolidation  |
+| 2   | Add profile command tests                    | MED    | MED    | No test files for commands package |
+| 3   | Add scan command tests                       | MED    | MED    | No test files for commands package |
+| 4   | Add clean command tests                      | MED    | HIGH   | No test files for commands package |
+| 5   | Set up CI pipeline                           | HIGH   | MED    | At minimum: go build + go test     |
+| 6   | Fix pre-commit hook timeout                  | MED    | LOW    | golangci-lint times out            |
 
 ---
 
@@ -237,6 +237,7 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers:
 **Overall Project Status:** ✅ **PRODUCTION READY**
 
 Clean Wizard has a solid foundation with:
+
 - Excellent architecture and type safety
 - 52% enum code reduction
 - 13 fully functional cleaners (11 production-ready)

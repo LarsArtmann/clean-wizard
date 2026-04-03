@@ -161,10 +161,14 @@ const (
 
 var gitHistoryModeStrings = []string{"analyze", "dry-run", "execute"}
 
-func (m GitHistoryMode) String() string        { return EnumString(m, gitHistoryModeStrings) }
-func (m GitHistoryMode) IsValid() bool          { return EnumIsValid(m, GitHistoryModeExecute) }
-func (m GitHistoryMode) Values() []GitHistoryMode { return EnumValues[GitHistoryMode](GitHistoryModeExecute) }
-func (m GitHistoryMode) MarshalJSON() ([]byte, error) { return EnumMarshalJSON(m, gitHistoryModeStrings) }
+func (m GitHistoryMode) String() string { return EnumString(m, gitHistoryModeStrings) }
+func (m GitHistoryMode) IsValid() bool  { return EnumIsValid(m, GitHistoryModeExecute) }
+func (m GitHistoryMode) Values() []GitHistoryMode {
+	return EnumValues[GitHistoryMode](GitHistoryModeExecute)
+}
+func (m GitHistoryMode) MarshalJSON() ([]byte, error) {
+	return EnumMarshalJSON(m, gitHistoryModeStrings)
+}
 func (m *GitHistoryMode) UnmarshalJSON(data []byte) error {
 	err := EnumUnmarshalJSON(data, (*int)(m), gitHistoryModeStrings, "git history mode")
 	if err != nil {
