@@ -1,6 +1,6 @@
 # Clean Wizard Features
 
-> **Last Updated:** 2026-02-24  
+> **Last Updated:** 2026-04-03
 > **Version:** Based on codebase analysis  
 > **Status:** BRUTALLY HONEST ASSESSMENT
 
@@ -359,6 +359,8 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### Configuration Enums (Type-Safe)
 
+All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% line reduction across 4 files).
+
 | Enum                   | Values                                                        | Status                                 |
 | ---------------------- | ------------------------------------------------------------- | -------------------------------------- |
 | **CacheCleanupMode**   | DISABLED, ENABLED                                             | ✅ Working                             |
@@ -373,6 +375,9 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **HomebrewMode**       | UNUSED_ONLY, ALL                                              | ✅ Working                             |
 | **OptimizationMode**   | DISABLED, ENABLED                                             | ✅ Working                             |
 | **ExecutionMode**      | NORMAL, DRY_RUN                                               | ✅ Working                             |
+| **ChangeOperationType** | ADDED, REMOVED, MODIFIED                                     | ✅ Working                             |
+| **SizeEstimateStatusType** | KNOWN, UNKNOWN                                            | ✅ Working                             |
+| **GitHistoryMode**     | ANALYZE, DRY_RUN, EXECUTE                                     | ✅ Working                             |
 
 ---
 
@@ -435,6 +440,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 6. **Enum/Implementation mismatch** 🔧
    - Several enums have values not used in implementations
    - Dead code in domain layer
+   - Enum system now consolidated onto unified helpers (2026-04-03)
 
 ---
 
@@ -480,6 +486,7 @@ Clean Wizard has a **solid foundation** with excellent architecture and type saf
 
 **Recent Improvements:**
 
+- Enum consolidation refactor (2026-04-03): 52% line reduction across 4 files, unified generic helpers
 - Docker, Go, Cargo, Node cleaners now scan actual cache sizes instead of using hardcoded estimates
 - System Cache cleaner now supports both macOS and Linux
 - Size reporting works correctly for most cleaners

@@ -1,9 +1,30 @@
 # TODO LIST
 
-**Last Updated:** 2026-04-02
-**Status Report:** docs/status/2026-04-02_16-09_TUI-consolidation-architecture-full-status.md
+**Last Updated:** 2026-04-03
+**Status Report:** docs/status/2026-04-03_05-02_enum-consolidation-refactor-status.md
 
 ---
+
+## NEW WORK - 2026-04-03
+
+### Enum Consolidation Refactor ✅ DONE
+
+Consolidated all 19 iota-based enum types across 4 files onto unified `enum_macros.go` helpers.
+
+|| File | Before | After | Reduction |
+|------|--------|--------|----------|
+| `execution_enums.go` | 377 | 149 | 60% |
+| `operation_settings.go` | 390 | 152 | 61% |
+| `type_safe_enums.go` | 539 | 167 | 69% |
+| `githistory_types.go` | 43 lines removed | — | 28% |
+| **Total** | **1,349** | **651** | **52%** |
+
+Key changes:
+- All enums use `EnumString`, `EnumIsValid`, `EnumValues`, `EnumMarshalJSON`, `EnumUnmarshalJSON`, `EnumMarshalYAML`, `EnumUnmarshalYAML` from `enum_macros.go`
+- Removed dead `UnmarshalYAMLEnum`, `UnmarshalJSONEnum`, `UnmarshalYAMLEnumWithDefault` helpers and `TypeSafeEnum` interface
+- YAML marshaling now returns strings instead of ints
+- Error messages simplified to consistent format
+- Fixed latent `:=` vs `=` bug in `enum_macros.go:108`
 
 ## NEW WORK - 2026-04-02
 
@@ -173,6 +194,14 @@ The following historical planning documents have been archived to `docs/historic
 
 ## 🎉 PROJECT STATUS: IN PROGRESS
 
+**New work added 2026-04-03:**
+
+|| Metric | Value |
+|--------|-------|
+| Enum files consolidated | 4 files, 52% line reduction |
+| Dead helpers removed | 3 functions + 1 interface (152 lines) |
+| Bug fixes | 1 (`:=` vs `=` in enum_macros.go) |
+
 **New work added 2026-04-02:**
 
 | Metric                | Value                              |
@@ -187,7 +216,7 @@ The following historical planning documents have been archived to `docs/historic
 
 ---
 
-**All actionable items from this TODO list have been completed as of 2026-04-02.**
+**All actionable items from this TODO list have been completed as of 2026-04-03.**
 
 - Build passes without errors
 - All tests compile and pass
