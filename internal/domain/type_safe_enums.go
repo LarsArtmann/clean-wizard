@@ -11,22 +11,20 @@ import (
 
 // UnmarshalYAMLEnum is a generic helper for unmarshaling YAML node values to enum types.
 // Accepts both string (case-insensitive) and integer representations.
+//
+// Deprecated: Use EnumUnmarshalYAML from enum_macros.go instead.
 func UnmarshalYAMLEnum[T ~int](
 	value *yaml.Node,
 	target *T,
 	valueMap map[string]T,
 	errorMsg string,
 ) error {
-	// Try as string first
 	var s string
 
 	err := value.Decode(&s)
 	if err == nil {
-		// Check if this is actually a numeric string (like "0" or "1")
-		// If so, skip string lookup and try integer parsing instead
 		var i int
 		if _, err := fmt.Sscanf(s, "%d", &i); err == nil {
-			// This is a numeric string, use integer parsing
 			err := value.Decode(&i)
 			if err == nil {
 				for _, enumVal := range valueMap {
@@ -36,7 +34,6 @@ func UnmarshalYAMLEnum[T ~int](
 						return nil
 					}
 				}
-				// Build helpful error message with valid options
 				validStrings := make([]string, 0, len(valueMap))
 
 				validInts := make([]string, 0, len(valueMap))
@@ -56,7 +53,6 @@ func UnmarshalYAMLEnum[T ~int](
 			}
 		}
 
-		// This is a non-numeric string, do case-insensitive lookup
 		upperKey := strings.ToUpper(s)
 		for key, enumVal := range valueMap {
 			if strings.ToUpper(key) == upperKey {
@@ -65,7 +61,6 @@ func UnmarshalYAMLEnum[T ~int](
 				return nil
 			}
 		}
-		// String decode succeeded but didn't match - build helpful error
 		validStrings := make([]string, 0, len(valueMap))
 
 		validInts := make([]string, 0, len(valueMap))
@@ -84,6 +79,8 @@ func UnmarshalYAMLEnum[T ~int](
 }
 
 // UnmarshalYAMLEnumWithDefault is like UnmarshalYAMLEnum but returns a default value for invalid inputs.
+//
+// Deprecated: Unused. Will be removed in a future commit.
 func UnmarshalYAMLEnumWithDefault[T ~int](
 	value *yaml.Node,
 	target *T,
@@ -101,10 +98,8 @@ func UnmarshalYAMLEnumWithDefault[T ~int](
 				return enumVal
 			}
 		}
-		// String decode succeeded but didn't match - try integer as fallback
 	}
 
-	// Try as integer
 	var i int
 
 	err = value.Decode(&i)
@@ -122,6 +117,8 @@ func UnmarshalYAMLEnumWithDefault[T ~int](
 }
 
 // UnmarshalJSONEnum is a generic helper for unmarshaling JSON string values to enum types.
+//
+// Deprecated: Use EnumUnmarshalJSON from enum_macros.go instead. Only kept for githistory_types.go.
 func UnmarshalJSONEnum[T any](
 	data []byte,
 	target *T,
@@ -143,7 +140,6 @@ func UnmarshalJSONEnum[T any](
 			return nil
 		}
 	}
-	// Build helpful error message with valid options
 	validStrings := make([]string, 0, len(valueMap))
 	for key := range valueMap {
 		validStrings = append(validStrings, key)
@@ -174,57 +170,20 @@ const (
 	RiskLevelCriticalType
 )
 
-// String returns the string representation.
-func (rl RiskLevelType) String() string {
-	switch rl {
-	case RiskLevelLowType:
-		return "LOW"
-	case RiskLevelMediumType:
-		return "MEDIUM"
-	case RiskLevelHighType:
-		return "HIGH"
-	case RiskLevelCriticalType:
-		return "CRITICAL"
-	default:
-		return stringUnknown
-	}
-}
+var riskLevelTypeStrings = []string{"LOW", "MEDIUM", "HIGH", "CRITICAL"}
 
-// IsValid checks if risk level is valid.
-func (rl RiskLevelType) IsValid() bool {
-	return rl >= RiskLevelLowType && rl <= RiskLevelCriticalType
-}
-
-// Values returns all possible values.
-func (rl RiskLevelType) Values() []RiskLevelType {
-	return []RiskLevelType{
-		RiskLevelLowType,
-		RiskLevelMediumType,
-		RiskLevelHighType,
-		RiskLevelCriticalType,
-	}
-}
-
-// MarshalJSON implements json.Marshaler.
-func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
-	if !rl.IsValid() {
-		return nil, fmt.Errorf("invalid risk level: %d", rl)
-	}
-
-	return json.Marshal(rl.String())
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
+func (rl RiskLevelType) String() string                          { return EnumString(rl, riskLevelTypeStrings) }
+func (rl RiskLevelType) IsValid() bool                           { return EnumIsValid(rl, RiskLevelCriticalType) }
+func (rl RiskLevelType) Values() []RiskLevelType                 { return EnumValues[RiskLevelType](RiskLevelCriticalType) }
+func (rl RiskLevelType) MarshalJSON() ([]byte, error)            { return EnumMarshalJSON(rl, riskLevelTypeStrings) }
 func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
-	return UnmarshalJSONEnum(data, rl, map[string]RiskLevelType{
-		"LOW":      RiskLevelLowType,
-		"MEDIUM":   RiskLevelMediumType,
-		"HIGH":     RiskLevelHighType,
-		"CRITICAL": RiskLevelCriticalType,
-	}, "invalid risk level")
+	return EnumUnmarshalJSON(data, (*int)(rl), riskLevelTypeStrings, "risk level")
+}
+func (rl RiskLevelType) MarshalYAML() (any, error) { return EnumMarshalYAML(rl, riskLevelTypeStrings) }
+func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
+	return EnumUnmarshalYAML(value, (*int)(rl), riskLevelTypeStrings, "risk level")
 }
 
-// Icon returns emoji for risk level.
 func (rl RiskLevelType) Icon() string {
 	switch rl {
 	case RiskLevelLowType:
@@ -240,17 +199,8 @@ func (rl RiskLevelType) Icon() string {
 	}
 }
 
-// IsHigherThan returns true if this risk level is higher than comparison.
-func (rl RiskLevelType) IsHigherThan(other RiskLevelType) bool {
-	return rl > other
-}
-
-// IsHigherOrEqualThan returns true if this risk level is higher or equal than comparison.
-func (rl RiskLevelType) IsHigherOrEqualThan(other RiskLevelType) bool {
-	return rl >= other
-}
-
-// Convenience constants for backward compatibility are now in types.go
+func (rl RiskLevelType) IsHigherThan(other RiskLevelType) bool        { return rl > other }
+func (rl RiskLevelType) IsHigherOrEqualThan(other RiskLevelType) bool { return rl >= other }
 
 // ValidationLevelType represents validation levels with compile-time safety.
 type ValidationLevelType int
@@ -262,57 +212,17 @@ const (
 	ValidationLevelStrictType
 )
 
-// String returns the string representation.
-func (vl ValidationLevelType) String() string {
-	switch vl {
-	case ValidationLevelNoneType:
-		return "NONE"
-	case ValidationLevelBasicType:
-		return "BASIC"
-	case ValidationLevelComprehensiveType:
-		return "COMPREHENSIVE"
-	case ValidationLevelStrictType:
-		return "STRICT"
-	default:
-		return stringUnknown
-	}
-}
+var validationLevelTypeStrings = []string{"NONE", "BASIC", "COMPREHENSIVE", "STRICT"}
 
-// IsValid checks if validation level is valid.
-func (vl ValidationLevelType) IsValid() bool {
-	return vl >= ValidationLevelNoneType && vl <= ValidationLevelStrictType
-}
-
-// Values returns all possible values.
+func (vl ValidationLevelType) String() string              { return EnumString(vl, validationLevelTypeStrings) }
+func (vl ValidationLevelType) IsValid() bool               { return EnumIsValid(vl, ValidationLevelStrictType) }
 func (vl ValidationLevelType) Values() []ValidationLevelType {
-	return []ValidationLevelType{
-		ValidationLevelNoneType,
-		ValidationLevelBasicType,
-		ValidationLevelComprehensiveType,
-		ValidationLevelStrictType,
-	}
+	return EnumValues[ValidationLevelType](ValidationLevelStrictType)
 }
-
-// MarshalJSON implements json.Marshaler.
-func (vl ValidationLevelType) MarshalJSON() ([]byte, error) {
-	if !vl.IsValid() {
-		return nil, fmt.Errorf("invalid validation level: %d", vl)
-	}
-
-	return json.Marshal(vl.String())
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
+func (vl ValidationLevelType) MarshalJSON() ([]byte, error) { return EnumMarshalJSON(vl, validationLevelTypeStrings) }
 func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
-	return UnmarshalJSONEnum(data, vl, map[string]ValidationLevelType{
-		"NONE":          ValidationLevelNoneType,
-		"BASIC":         ValidationLevelBasicType,
-		"COMPREHENSIVE": ValidationLevelComprehensiveType,
-		"STRICT":        ValidationLevelStrictType,
-	}, "invalid validation level")
+	return EnumUnmarshalJSON(data, (*int)(vl), validationLevelTypeStrings, "validation level")
 }
-
-// Convenience constants for backward compatibility are now in types.go
 
 // ChangeOperationType represents change operations with compile-time safety.
 type ChangeOperationType int
@@ -323,50 +233,16 @@ const (
 	ChangeOperationModifiedType
 )
 
-// String returns the string representation.
-func (co ChangeOperationType) String() string {
-	switch co {
-	case ChangeOperationAddedType:
-		return "ADDED"
-	case ChangeOperationRemovedType:
-		return "REMOVED"
-	case ChangeOperationModifiedType:
-		return "MODIFIED"
-	default:
-		return stringUnknown
-	}
-}
+var changeOperationTypeStrings = []string{"ADDED", "REMOVED", "MODIFIED"}
 
-// IsValid checks if change operation is valid.
-func (co ChangeOperationType) IsValid() bool {
-	return co >= ChangeOperationAddedType && co <= ChangeOperationModifiedType
-}
-
-// Values returns all possible values.
+func (co ChangeOperationType) String() string              { return EnumString(co, changeOperationTypeStrings) }
+func (co ChangeOperationType) IsValid() bool               { return EnumIsValid(co, ChangeOperationModifiedType) }
 func (co ChangeOperationType) Values() []ChangeOperationType {
-	return []ChangeOperationType{
-		ChangeOperationAddedType,
-		ChangeOperationRemovedType,
-		ChangeOperationModifiedType,
-	}
+	return EnumValues[ChangeOperationType](ChangeOperationModifiedType)
 }
-
-// MarshalJSON implements json.Marshaler.
-func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
-	if !co.IsValid() {
-		return nil, fmt.Errorf("invalid change operation: %d", co)
-	}
-
-	return json.Marshal(co.String())
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
+func (co ChangeOperationType) MarshalJSON() ([]byte, error) { return EnumMarshalJSON(co, changeOperationTypeStrings) }
 func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
-	return UnmarshalJSONEnum(data, co, map[string]ChangeOperationType{
-		"ADDED":    ChangeOperationAddedType,
-		"REMOVED":  ChangeOperationRemovedType,
-		"MODIFIED": ChangeOperationModifiedType,
-	}, "invalid change operation")
+	return EnumUnmarshalJSON(data, (*int)(co), changeOperationTypeStrings, "change operation")
 }
 
 // CleanStrategyType represents cleaning strategies with compile-time safety.
@@ -378,54 +254,24 @@ const (
 	StrategyDryRunType
 )
 
-// String returns string representation.
-func (cs CleanStrategyType) String() string {
-	switch cs {
-	case StrategyAggressiveType:
-		return "aggressive"
-	case StrategyConservativeType:
-		return "conservative"
-	case StrategyDryRunType:
-		return "dry-run"
-	default:
-		return "unknown"
-	}
-}
+var cleanStrategyTypeStrings = []string{"aggressive", "conservative", "dry-run"}
 
-// IsValid checks if clean strategy is valid.
-func (cs CleanStrategyType) IsValid() bool {
-	return cs >= StrategyAggressiveType && cs <= StrategyDryRunType
-}
-
-// Values returns all possible values.
-func (cs CleanStrategyType) Values() []CleanStrategyType {
-	return []CleanStrategyType{
-		StrategyAggressiveType,
-		StrategyConservativeType,
-		StrategyDryRunType,
-	}
-}
-
-// MarshalJSON implements json.Marshaler.
-func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
-	if !cs.IsValid() {
-		return nil, fmt.Errorf("invalid clean strategy: %d", cs)
-	}
-
-	return json.Marshal(cs.String())
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
+func (cs CleanStrategyType) String() string              { return EnumString(cs, cleanStrategyTypeStrings) }
+func (cs CleanStrategyType) IsValid() bool               { return EnumIsValid(cs, StrategyDryRunType) }
+func (cs CleanStrategyType) Values() []CleanStrategyType { return EnumValues[CleanStrategyType](StrategyDryRunType) }
+func (cs CleanStrategyType) MarshalJSON() ([]byte, error) { return EnumMarshalJSON(cs, cleanStrategyTypeStrings) }
 func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
-	return UnmarshalJSONEnum(data, cs, map[string]CleanStrategyType{
-		"aggressive":   StrategyAggressiveType,
-		"conservative": StrategyConservativeType,
-		"dry-run":      StrategyDryRunType,
-		"dryrun":       StrategyDryRunType,
-	}, "invalid clean strategy")
+	err := EnumUnmarshalJSON(data, (*int)(cs), cleanStrategyTypeStrings, "clean strategy")
+	if err != nil {
+		var s string
+		if jsonErr := json.Unmarshal(data, &s); jsonErr == nil && strings.EqualFold(s, "dryrun") {
+			*cs = StrategyDryRunType
+			return nil
+		}
+	}
+	return err
 }
 
-// Icon returns emoji for clean strategy.
 func (cs CleanStrategyType) Icon() string {
 	switch cs {
 	case StrategyAggressiveType:
@@ -439,52 +285,6 @@ func (cs CleanStrategyType) Icon() string {
 	}
 }
 
-// Convenience constants for backward compatibility are now in types.go
-
-// UnmarshalYAML implements yaml.Unmarshaler for RiskLevelType.
-func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
-	var s string
-
-	err := value.Decode(&s)
-	if err != nil {
-		// If string unmarshaling fails, try integer
-		var i int
-
-		err := value.Decode(&i)
-		if err == nil {
-			*rl = RiskLevelType(i)
-
-			return nil
-		}
-
-		return err
-	}
-
-	switch strings.ToUpper(s) {
-	case "LOW":
-		*rl = RiskLevelLowType
-	case "MEDIUM":
-		*rl = RiskLevelMediumType
-	case "HIGH":
-		*rl = RiskLevelHighType
-	case "CRITICAL":
-		*rl = RiskLevelCriticalType
-	default:
-		return fmt.Errorf("invalid risk level: %s (must be LOW, MEDIUM, HIGH, or CRITICAL)", s)
-	}
-
-	return nil
-}
-
-// MarshalYAML implements yaml.Marshaler for RiskLevelType.
-func (rl RiskLevelType) MarshalYAML() (any, error) {
-	if !rl.IsValid() {
-		return nil, fmt.Errorf("invalid risk level: %d", rl)
-	}
-
-	return rl.String(), nil
-}
-
 // SizeEstimateStatusType represents the status of a size estimate with type safety.
 // This replaces the boolean Unknown field, making impossible states unrepresentable.
 type SizeEstimateStatusType int
@@ -496,44 +296,24 @@ const (
 	SizeEstimateStatusUnknown
 )
 
-// String returns the string representation of size estimate status.
+var sizeEstimateStatusTypeStrings = []string{"KNOWN", "UNKNOWN"}
+
 func (ses SizeEstimateStatusType) String() string {
-	switch ses {
-	case SizeEstimateStatusKnown:
-		return "KNOWN"
-	case SizeEstimateStatusUnknown:
-		return "UNKNOWN"
-	default:
+	if !ses.IsValid() {
 		return "INVALID"
 	}
+	return sizeEstimateStatusTypeStrings[ses]
 }
-
-// IsValid checks if size estimate status is valid.
-func (ses SizeEstimateStatusType) IsValid() bool {
-	return ses >= SizeEstimateStatusKnown && ses <= SizeEstimateStatusUnknown
-}
-
-// Values returns all possible size estimate status values.
+func (ses SizeEstimateStatusType) IsValid() bool { return EnumIsValid(ses, SizeEstimateStatusUnknown) }
 func (ses SizeEstimateStatusType) Values() []SizeEstimateStatusType {
-	return []SizeEstimateStatusType{
-		SizeEstimateStatusKnown,
-		SizeEstimateStatusUnknown,
-	}
+	return EnumValues[SizeEstimateStatusType](SizeEstimateStatusUnknown)
 }
-
-// MarshalJSON implements json.Marshaler for SizeEstimateStatusType.
 func (ses SizeEstimateStatusType) MarshalJSON() ([]byte, error) {
 	if !ses.IsValid() {
 		return nil, fmt.Errorf("invalid size estimate status: %d", ses)
 	}
-
-	return json.Marshal(ses.String())
+	return EnumMarshalJSON(ses, sizeEstimateStatusTypeStrings)
 }
-
-// UnmarshalJSON implements json.Unmarshaler for SizeEstimateStatusType.
 func (ses *SizeEstimateStatusType) UnmarshalJSON(data []byte) error {
-	return UnmarshalJSONEnum(data, ses, map[string]SizeEstimateStatusType{
-		"KNOWN":   SizeEstimateStatusKnown,
-		"UNKNOWN": SizeEstimateStatusUnknown,
-	}, "invalid size estimate status")
+	return EnumUnmarshalJSON(data, (*int)(ses), sizeEstimateStatusTypeStrings, "size estimate status")
 }
