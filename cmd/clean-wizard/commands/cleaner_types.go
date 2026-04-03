@@ -123,3 +123,27 @@ func init() {
 		registryNameToCleanerType[meta.RegistryName] = ct
 	}
 }
+
+func getCleanerName(cleanerType CleanerType) string {
+	if m, ok := cleanerMetadata[cleanerType]; ok {
+		return m.DisplayName
+	}
+
+	return string(cleanerType)
+}
+
+func getCleanerDescription(cleanerType CleanerType) string {
+	if m, ok := cleanerMetadata[cleanerType]; ok {
+		return m.Description
+	}
+
+	return ""
+}
+
+func getCleanerIcon(cleanerType CleanerType) string {
+	if m, ok := cleanerMetadata[cleanerType]; ok {
+		return m.Icon
+	}
+
+	return ""
+}

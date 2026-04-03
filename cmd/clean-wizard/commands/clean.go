@@ -4,11 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
-	"time"
 
-	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -17,9 +13,7 @@ import (
 )
 
 const (
-	// BytesThresholdGB is the threshold in bytes for displaying GB success message.
 	BytesThresholdGB = 1_000_000_000
-	// BytesThresholdMB is the threshold in bytes for displaying MB success message.
 	BytesThresholdMB = 100_000_000
 )
 
@@ -68,7 +62,7 @@ func NewCleanCommand() *cobra.Command {
 }
 
 // runCleanCommand executes the clean command with multi-cleaner TUI.
-func runCleanCommand( //nolint:gocyclo,cyclop // CLI command with many options and branches
+func runCleanCommand(
 	_ *cobra.Command,
 	_ []string,
 	dryRun, verbose, jsonOutput, skipConfirmation bool,
@@ -76,7 +70,6 @@ func runCleanCommand( //nolint:gocyclo,cyclop // CLI command with many options a
 ) error {
 	ctx := context.Background()
 
-	// Load configuration if specified or use default
 	cfg, err := loadConfigForClean(configPath)
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
@@ -90,131 +83,35 @@ func runCleanCommand( //nolint:gocyclo,cyclop // CLI command with many options a
 		fmt.Println()
 	}
 
-	// Get cleaner configurations with availability status
-	cleanerConfigs := GetCleanerConfigs(ctx)
-
-	// Filter to available cleaners only
-	availableConfigs := make([]CleanerConfig, 0, len(cleanerConfigs))
-	for _, cfg := range cleanerConfigs {
-		if cfg.Available == CleanerAvailabilityAvailable {
-			availableConfigs = append(availableConfigs, cfg)
-		}
-	}
-
+	availableConfigs := getAvailableConfigs(ctx)
 	if len(availableConfigs) == 0 {
 		return errors.New("no cleaners available on this system")
 	}
 
 	fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableConfigs))
 
-	// Determine which cleaners to run
-	var selectedCleaners []CleanerType
-
-	// Priority: profile > mode > interactive
-	switch {
-	case profile != "":
-		// Use profile from configuration
-		selectedCleaners, err = getProfileCleaners(profile, cfg, availableConfigs)
-		if err != nil {
-			return fmt.Errorf("profile error: %w", err)
-		}
-
-		if !jsonOutput {
-			fmt.Printf("📋 Using profile: %s\n", profile)
-			fmt.Println()
-
-			for _, ct := range selectedCleaners {
-				fmt.Printf("  ✓ %s\n", getCleanerName(ct))
-			}
-
-			fmt.Println()
-		}
-	case mode != "":
-		selectedCleaners = getPresetSelection(mode, availableConfigs)
-		if !jsonOutput {
-			fmt.Printf("🎯 Using preset mode: %s\n", mode)
-			fmt.Println()
-
-			for _, ct := range selectedCleaners {
-				fmt.Printf("  ✓ %s\n", getCleanerName(ct))
-			}
-
-			fmt.Println()
-		}
-	case jsonOutput:
-		// In JSON mode without --mode or --profile, use all available cleaners
-		for _, cfg := range availableConfigs {
-			selectedCleaners = append(selectedCleaners, cfg.Type)
-		}
-	default:
-		// Interactive cleaner selection (TUI mode only)
-		fmt.Println(InfoStyle.Render("⌨️  Keyboard Shortcuts:"))
-		fmt.Println("   ↑↓ : Navigate  |  Space : Select  |  Enter : Confirm  |  Esc : Cancel")
-		fmt.Println()
-		// Interactive cleaner selection
-		var selectedTypes []CleanerType
-
-		form := huh.NewForm(
-			huh.NewGroup(
-				huh.NewMultiSelect[CleanerType]().
-					Title("Select cleaners to run").
-					Description("Choose which cleaners to execute (Space to select, Enter to confirm)").
-					Options(
-						func() []huh.Option[CleanerType] {
-							opts := make([]huh.Option[CleanerType], len(availableConfigs))
-							for i, cfg := range availableConfigs {
-								desc := fmt.Sprintf("%s %s", cfg.Description, cfg.Icon)
-								opts[i] = huh.NewOption(desc, cfg.Type)
-							}
-
-							return opts
-						}()...,
-					).
-					Value(&selectedTypes),
-			),
-		)
-
-		err := form.Run()
-		if err != nil {
-			return fmt.Errorf("form error: %w", err)
-		}
-
-		if len(selectedTypes) == 0 {
-			fmt.Println("❌ No cleaners selected. Nothing to clean.")
-
-			return nil
-		}
-
-		selectedCleaners = selectedTypes
+	selectedCleaners, err := selectCleaners(profile, mode, cfg, availableConfigs, jsonOutput)
+	if err != nil {
+		return err
 	}
 
-	// Confirm before running
-	if !dryRun && !skipConfirmation {
-		var confirm bool
+	if selectedCleaners == nil {
+		fmt.Println("❌ No cleaners selected. Nothing to clean.")
 
-		confirmForm := huh.NewForm(
-			huh.NewGroup(
-				huh.NewConfirm().
-					Title("Run selected cleaners?").
-					Affirmative("Yes, run them").
-					Negative("No, cancel").
-					Value(&confirm),
-			),
-		)
-
-		err := confirmForm.Run()
-		if err != nil {
-			return fmt.Errorf("confirmation error: %w", err)
-		}
-
-		if !confirm {
-			fmt.Println("❌ Cancelled. No changes made.")
-
-			return nil
-		}
+		return nil
 	}
 
-	// Run selected cleaners
+	confirmed, err := confirmExecution(skipConfirmation, dryRun)
+	if err != nil {
+		return err
+	}
+
+	if !confirmed {
+		fmt.Println("❌ Cancelled. No changes made.")
+
+		return nil
+	}
+
 	fmt.Println("\n🧹 Starting cleanup...")
 
 	if dryRun {
@@ -223,9 +120,8 @@ func runCleanCommand( //nolint:gocyclo,cyclop // CLI command with many options a
 
 	fmt.Println()
 
-	// Get disk usage before cleanup
-	diskBefore, _ := cleaner.GetDiskUsage("/")
-	if !jsonOutput {
+	diskBefore, diskErr := cleaner.GetDiskUsage("/")
+	if !jsonOutput && diskErr == nil {
 		fmt.Printf(
 			"📊 Disk usage before: %s %s\n",
 			cleaner.DiskUsageBar(diskBefore, 15),
@@ -234,261 +130,53 @@ func runCleanCommand( //nolint:gocyclo,cyclop // CLI command with many options a
 		fmt.Println()
 	}
 
-	startTime := time.Now()
+	cr := executeCleaners(ctx, selectedCleaners, dryRun, verbose)
 
-	// Aggregate results from all cleaners
-	var (
-		totalBytesFreed   uint64
-		totalItemsRemoved uint
-		totalItemsFailed  uint
-		skippedCleaners   []string
-	)
-
-	skippedErrors := make(map[string]error)
-
-	var failedCleaners []struct {
-		name  string
-		error string
-	}
-
-	failedErrors := make(map[string]error)
-	cleanerResults := make(map[string]domain.CleanResult)
-
-	for _, cleanerType := range selectedCleaners {
-		result, err := runCleaner(ctx, cleanerType, dryRun, verbose)
-		name := getCleanerName(cleanerType)
-
-		if err != nil {
-			errMsg := err.Error()
-
-			// Check if this is a "not available" error vs actual failure
-			if isNotAvailableError(errMsg) {
-				skippedCleaners = append(skippedCleaners, name)
-
-				skippedErrors[name] = err
-				if !jsonOutput {
-					fmt.Printf("  ℹ️  Skipped %s: %s\n", name, errMsg)
-				}
-			} else {
-				failedCleaners = append(failedCleaners, struct {
-					name  string
-					error string
-				}{name: name, error: errMsg})
-
-				failedErrors[name] = err
-				if !jsonOutput {
-					fmt.Printf("  ❌ Cleaner %s failed: %s\n", name, errMsg)
-				}
-			}
-
-			continue
-		}
-
-		// Debug: Log individual cleaner contributions
-		if verbose {
-			fmt.Printf(
-				"  [DEBUG] %s: %d bytes (%s), %d items\n",
-				name,
-				result.FreedBytes,
-				format.Bytes(int64(result.FreedBytes)),
-				result.ItemsRemoved,
-			)
-		}
-
-		totalBytesFreed += result.FreedBytes
-		totalItemsRemoved += result.ItemsRemoved
-		totalItemsFailed += result.ItemsFailed
-		cleanerResults[name] = result
-	}
-
-	duration := time.Since(startTime)
-
-	// Output JSON if requested
 	if jsonOutput {
-		jsonBytes, err := format.CleanResultsToJSON(
-			cleanerResults,
-			duration,
-			dryRun,
-			skippedErrors,
-			failedErrors,
-		)
-		if err != nil {
-			return fmt.Errorf("failed to generate JSON output: %w", err)
-		}
-
-		fmt.Println(string(jsonBytes))
-
-		return nil
+		return outputJSON(cr, dryRun)
 	}
 
-	// Show final results (TUI mode)
-	fmt.Println()
-	fmt.Println(TitleStyle.Render("🧹 Cleanup Results"))
-	fmt.Println()
-
-	if dryRun {
-		fmt.Println(WarningStyle.Render("⚠️  DRY RUN: No actual changes were made"))
-		fmt.Println()
+	var diskBeforePtr *cleaner.DiskUsage
+	if diskErr == nil {
+		diskBeforePtr = &diskBefore
 	}
 
-	// Print results table
-	printCleanResultsTable(cleanerResults, totalBytesFreed, totalItemsRemoved, duration)
-
-	// Add encouraging message based on space freed
-	if totalBytesFreed > BytesThresholdGB {
-		fmt.Println(SuccessStyle.Render("🎉 Great job! You freed over 1 GB of space!"))
-	} else if totalBytesFreed > BytesThresholdMB {
-		fmt.Println(SuccessStyle.Render("✅ Nice! You freed some space."))
-	}
-
-	// Show disk usage after cleanup (skip in dry-run and JSON modes)
-	if !dryRun && !jsonOutput {
-		diskAfter, err := cleaner.GetDiskUsage("/")
-		if err == nil {
-			fmt.Println()
-
-			if diskAfter.UsedPercent < diskBefore.UsedPercent {
-				freedPercent := diskBefore.UsedPercent - diskAfter.UsedPercent
-				fmt.Printf(
-					"📊 Disk usage after:  %s %s (-%.1f%%)\n",
-					cleaner.DiskUsageBar(
-						diskAfter,
-						15,
-					),
-					cleaner.FormatDiskUsage(diskAfter),
-					freedPercent,
-				)
-			} else {
-				fmt.Printf("📊 Disk usage after:  %s %s\n",
-					cleaner.DiskUsageBar(diskAfter, 15), cleaner.FormatDiskUsage(diskAfter))
-			}
-		}
-	}
-
-	if dryRun {
-		fmt.Println()
-		fmt.Println(InfoStyle.Render("💡 Tip: Remove --dry-run flag to actually clean:"))
-		fmt.Println("   clean-wizard clean --mode standard")
-	}
-
-	// Show errors and warnings
-	if totalItemsFailed > 0 || len(skippedCleaners) > 0 || len(failedCleaners) > 0 {
-		fmt.Println()
-		fmt.Println(WarningStyle.Render("⚠️  Warnings:"))
-
-		if totalItemsFailed > 0 {
-			fmt.Printf("   • %d item(s) failed to clean\n", totalItemsFailed)
-		}
-
-		if len(skippedCleaners) > 0 {
-			fmt.Printf("   • %d cleaner(s) skipped (not available)\n", len(skippedCleaners))
-		}
-
-		if len(failedCleaners) > 0 {
-			fmt.Printf("   • %d cleaner(s) failed\n", len(failedCleaners))
-		}
-	}
+	displayResults(cr, dryRun, diskBeforePtr)
 
 	return nil
 }
 
-// isNotAvailableError checks if an error indicates a cleaner is not available.
-func isNotAvailableError(errMsg string) bool {
-	lowerMsg := strings.ToLower(errMsg)
-	unavailableKeywords := []string{
-		"not available",
-		"not found",
-		"not installed",
-		"command not found",
-		"no such file or directory",
+func outputJSON(cr cleanResult, dryRun bool) error {
+	jsonBytes, err := format.CleanResultsToJSON(
+		cr.cleanerResults,
+		cr.duration,
+		dryRun,
+		cr.skippedErrors,
+		cr.failedErrors,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to generate JSON output: %w", err)
 	}
 
-	for _, keyword := range unavailableKeywords {
-		if strings.Contains(lowerMsg, keyword) {
-			return true
+	fmt.Println(string(jsonBytes))
+
+	return nil
+}
+
+func getAvailableConfigs(ctx context.Context) []CleanerConfig {
+	cleanerConfigs := GetCleanerConfigs(ctx)
+	available := make([]CleanerConfig, 0, len(cleanerConfigs))
+
+	for _, cfg := range cleanerConfigs {
+		if cfg.Available == CleanerAvailabilityAvailable {
+			available = append(available, cfg)
 		}
 	}
 
-	return false
+	return available
 }
 
-// destructiveCleaners are excluded from "standard" mode because they are
-// potentially destructive or require external services (e.g., Docker daemon).
-var destructiveCleaners = map[CleanerType]bool{
-	CleanerTypeDocker:                       true,
-	CleanerTypeProjectsManagementAutomation: true,
-}
-
-// getPresetSelection returns cleaner selection based on preset mode.
-func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
-	switch mode {
-	case "quick":
-		return []CleanerType{
-			CleanerTypeHomebrew,
-			CleanerTypeNodePackages,
-			CleanerTypeGoPackages,
-			CleanerTypeTempFiles,
-			CleanerTypeBuildCache,
-		}
-	case "aggressive":
-		var allTypes []CleanerType
-		for _, cfg := range configs {
-			allTypes = append(allTypes, cfg.Type)
-		}
-
-		return allTypes
-	case "standard":
-		var safeTypes []CleanerType
-
-		for _, cfg := range configs {
-			if !destructiveCleaners[cfg.Type] {
-				safeTypes = append(safeTypes, cfg.Type)
-			}
-		}
-
-		return safeTypes
-	default:
-		var allTypes []CleanerType
-		for _, cfg := range configs {
-			allTypes = append(allTypes, cfg.Type)
-		}
-
-		return allTypes
-	}
-}
-
-func getCleanerName(cleanerType CleanerType) string {
-	if m, ok := cleanerMetadata[cleanerType]; ok {
-		return m.DisplayName
-	}
-
-	return string(cleanerType)
-}
-
-func getCleanerDescription(cleanerType CleanerType) string {
-	if m, ok := cleanerMetadata[cleanerType]; ok {
-		return m.Description
-	}
-
-	return ""
-}
-
-func getCleanerIcon(cleanerType CleanerType) string {
-	if m, ok := cleanerMetadata[cleanerType]; ok {
-		return m.Icon
-	}
-
-	return ""
-}
-
-// loadConfigForClean loads configuration from the specified path or returns default config.
 func loadConfigForClean(configPath string) (*domain.Config, error) {
-	if configPath != "" {
-		// For custom config path, we'd need to modify config.Load to accept a path
-		// For now, use default loading which respects CONFIG_PATH env var
-		return config.Load()
-	}
-
 	return config.Load()
 }
 
@@ -519,85 +207,4 @@ func init() {
 			)
 		}
 	}
-}
-
-// getProfileCleaners returns the cleaner types for a given profile name.
-func getProfileCleaners(
-	profileName string,
-	cfg *domain.Config,
-	availableConfigs []CleanerConfig,
-) ([]CleanerType, error) {
-	profile, exists := cfg.Profiles[profileName]
-	if !exists {
-		return nil, fmt.Errorf("profile %q not found", profileName)
-	}
-
-	// Create a set of available cleaner types for quick lookup
-	availableSet := make(map[CleanerType]bool)
-	for _, ac := range availableConfigs {
-		availableSet[ac.Type] = true
-	}
-
-	var cleaners []CleanerType
-
-	for _, op := range profile.Operations {
-		if op.Enabled != domain.ProfileStatusEnabled {
-			continue
-		}
-		// Map operation name to OperationType, then to CleanerType
-		opType := domain.GetOperationType(op.Name)
-
-		cleanerType, ok := operationTypeToCleanerType[opType]
-		if !ok {
-			continue // Skip unknown operation types
-		}
-
-		if availableSet[cleanerType] {
-			cleaners = append(cleaners, cleanerType)
-		}
-	}
-
-	if len(cleaners) == 0 {
-		return nil, fmt.Errorf("profile %q has no available cleaners", profileName)
-	}
-
-	return cleaners, nil
-}
-
-// printCleanResultsTable prints clean results as a formatted table.
-func printCleanResultsTable(
-	results map[string]domain.CleanResult,
-	totalBytes uint64,
-	totalItems uint,
-	duration time.Duration,
-) {
-	var rows [][]string
-
-	for name, result := range results {
-		if result.FreedBytes > 0 || result.ItemsRemoved > 0 {
-			rows = append(rows, []string{
-				name,
-				strconv.FormatUint(uint64(result.ItemsRemoved), 10),
-				format.Bytes(int64(result.FreedBytes)),
-			})
-		}
-	}
-
-	if len(rows) == 0 {
-		fmt.Println(InfoStyle.Render("No items were cleaned."))
-
-		return
-	}
-
-	// Add summary row
-	t := newResultsTable(rows...)
-
-	fmt.Println(t)
-	fmt.Println()
-	fmt.Printf(
-		"📊 Total: %s freed, %s items in %s\n",
-		format.Bytes(int64(totalBytes)),
-		strconv.FormatUint(uint64(totalItems), 10),
-		format.Duration(duration),
-	)
 }
