@@ -1,377 +1,149 @@
 package domain
 
-import (
-	"gopkg.in/yaml.v3"
-)
+import "gopkg.in/yaml.v3"
 
-// ExecutionMode represents execution behavior as a type-safe enum.
 type ExecutionMode int
 
 const (
-	// ExecutionModeDryRun represents dry-run execution mode.
 	ExecutionModeDryRun ExecutionMode = iota
-	// ExecutionModeNormal represents normal execution mode.
 	ExecutionModeNormal
-	// ExecutionModeForce represents force execution mode.
 	ExecutionModeForce
 )
 
-// String returns string representation of execution mode.
-func (em ExecutionMode) String() string {
-	switch em {
-	case ExecutionModeDryRun:
-		return "DRY_RUN"
-	case ExecutionModeNormal:
-		return "NORMAL"
-	case ExecutionModeForce:
-		return "FORCE"
-	default:
-		return "UNKNOWN"
-	}
-}
+var executionModeStrings = []string{"DRY_RUN", "NORMAL", "FORCE"}
 
-// IsValid checks if execution mode is valid.
-func (em ExecutionMode) IsValid() bool {
-	return em >= ExecutionModeDryRun && em <= ExecutionModeForce
-}
+func (em ExecutionMode) String() string          { return EnumString(em, executionModeStrings) }
+func (em ExecutionMode) IsValid() bool           { return EnumIsValid(em, ExecutionModeForce) }
+func (em ExecutionMode) Values() []ExecutionMode { return EnumValues(ExecutionModeForce) }
+func (em ExecutionMode) IsDryRun() bool          { return em == ExecutionModeDryRun }
+func (em ExecutionMode) IsForce() bool           { return em == ExecutionModeForce }
 
-// Values returns all possible execution modes.
-func (em ExecutionMode) Values() []ExecutionMode {
-	return []ExecutionMode{
-		ExecutionModeDryRun,
-		ExecutionModeNormal,
-		ExecutionModeForce,
-	}
-}
-
-// IsDryRun checks if mode is dry-run.
-func (em ExecutionMode) IsDryRun() bool {
-	return em == ExecutionModeDryRun
-}
-
-// IsForce checks if mode is force.
-func (em ExecutionMode) IsForce() bool {
-	return em == ExecutionModeForce
-}
-
-// MarshalYAML implements yaml.Marshaler interface for ExecutionMode.
 func (em ExecutionMode) MarshalYAML() (any, error) {
-	return int(em), nil
+	return EnumMarshalYAML(em, executionModeStrings)
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler interface for ExecutionMode.
-// Accepts both string and integer representations.
 func (em *ExecutionMode) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, em, map[string]ExecutionMode{
-		"DRY_RUN": ExecutionModeDryRun,
-		"NORMAL":  ExecutionModeNormal,
-		"FORCE":   ExecutionModeForce,
-	}, "invalid execution mode")
+	return EnumUnmarshalYAML(value, (*int)(em), executionModeStrings, "execution mode")
 }
 
-// SafeMode represents safety level as a type-safe enum.
 type SafeMode int
 
 const (
-	// SafeModeDisabled represents disabled safety.
 	SafeModeDisabled SafeMode = iota
-	// SafeModeEnabled represents enabled safety.
 	SafeModeEnabled
-	// SafeModeStrict represents strict safety mode.
 	SafeModeStrict
 )
 
-// String returns string representation of safe mode.
-func (sm SafeMode) String() string {
-	switch sm {
-	case SafeModeDisabled:
-		return "DISABLED"
-	case SafeModeEnabled:
-		return "ENABLED"
-	case SafeModeStrict:
-		return "STRICT"
-	default:
-		return "UNKNOWN"
-	}
-}
+var safeModeStrings = []string{"DISABLED", "ENABLED", "STRICT"}
 
-// IsValid checks if safe mode is valid.
-func (sm SafeMode) IsValid() bool {
-	return sm >= SafeModeDisabled && sm <= SafeModeStrict
-}
+func (sm SafeMode) String() string     { return EnumString(sm, safeModeStrings) }
+func (sm SafeMode) IsValid() bool      { return EnumIsValid(sm, SafeModeStrict) }
+func (sm SafeMode) Values() []SafeMode { return EnumValues(SafeModeStrict) }
+func (sm SafeMode) IsEnabled() bool    { return sm == SafeModeEnabled || sm == SafeModeStrict }
+func (sm SafeMode) IsStrict() bool     { return sm == SafeModeStrict }
 
-// Values returns all possible safe modes.
-func (sm SafeMode) Values() []SafeMode {
-	return []SafeMode{
-		SafeModeDisabled,
-		SafeModeEnabled,
-		SafeModeStrict,
-	}
-}
-
-// IsEnabled checks if safety is enabled.
-func (sm SafeMode) IsEnabled() bool {
-	return sm == SafeModeEnabled || sm == SafeModeStrict
-}
-
-// IsStrict checks if safety is strict.
-func (sm SafeMode) IsStrict() bool {
-	return sm == SafeModeStrict
-}
-
-// MarshalYAML implements yaml.Marshaler interface for SafeMode.
 func (sm SafeMode) MarshalYAML() (any, error) {
-	return int(sm), nil
+	return EnumMarshalYAML(sm, safeModeStrings)
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler interface for SafeMode.
-// Accepts both string and integer representations.
 func (sm *SafeMode) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, sm, map[string]SafeMode{
-		"DISABLED": SafeModeDisabled,
-		"ENABLED":  SafeModeEnabled,
-		"STRICT":   SafeModeStrict,
-	}, "invalid safe mode")
+	return EnumUnmarshalYAML(value, (*int)(sm), safeModeStrings, "safe mode")
 }
 
-// ProfileStatus represents profile enabled state as type-safe enum.
 type ProfileStatus int
 
 const (
-	// ProfileStatusDisabled represents disabled profile.
 	ProfileStatusDisabled ProfileStatus = iota
-	// ProfileStatusEnabled represents enabled profile.
 	ProfileStatusEnabled
 )
 
-// String returns string representation of profile status.
-func (ps ProfileStatus) String() string {
-	switch ps {
-	case ProfileStatusDisabled:
-		return "DISABLED"
-	case ProfileStatusEnabled:
-		return "ENABLED"
-	default:
-		return "UNKNOWN"
-	}
-}
+var profileStatusStrings = []string{"DISABLED", "ENABLED"}
 
-// IsValid checks if profile status is valid.
-func (ps ProfileStatus) IsValid() bool {
-	return ps >= ProfileStatusDisabled && ps <= ProfileStatusEnabled
-}
+func (ps ProfileStatus) String() string          { return EnumString(ps, profileStatusStrings) }
+func (ps ProfileStatus) IsValid() bool           { return EnumIsValid(ps, ProfileStatusEnabled) }
+func (ps ProfileStatus) Values() []ProfileStatus { return EnumValues(ProfileStatusEnabled) }
+func (ps ProfileStatus) IsEnabled() bool         { return ps == ProfileStatusEnabled }
 
-// Values returns all possible profile statuses.
-func (ps ProfileStatus) Values() []ProfileStatus {
-	return []ProfileStatus{
-		ProfileStatusDisabled,
-		ProfileStatusEnabled,
-	}
-}
-
-// IsEnabled checks if profile is enabled.
-func (ps ProfileStatus) IsEnabled() bool {
-	return ps == ProfileStatusEnabled
-}
-
-// MarshalYAML implements yaml.Marshaler interface for ProfileStatus.
 func (ps ProfileStatus) MarshalYAML() (any, error) {
-	return int(ps), nil
+	return EnumMarshalYAML(ps, profileStatusStrings)
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler interface for ProfileStatus.
-// Accepts both string and integer representations.
 func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, ps, map[string]ProfileStatus{
-		"DISABLED": ProfileStatusDisabled,
-		"ENABLED":  ProfileStatusEnabled,
-	}, "invalid profile status")
+	return EnumUnmarshalYAML(value, (*int)(ps), profileStatusStrings, "profile status")
 }
 
-// OptimizationMode represents optimization preference as type-safe enum.
 type OptimizationMode int
 
 const (
-	// OptimizationModeDisabled represents disabled optimization.
 	OptimizationModeDisabled OptimizationMode = iota
-	// OptimizationModeEnabled represents enabled optimization.
 	OptimizationModeEnabled
 )
 
-// String returns string representation of optimization mode.
-func (om OptimizationMode) String() string {
-	switch om {
-	case OptimizationModeDisabled:
-		return "DISABLED"
-	case OptimizationModeEnabled:
-		return "ENABLED"
-	default:
-		return "UNKNOWN"
-	}
-}
+var optimizationModeStrings = []string{"DISABLED", "ENABLED"}
 
-// IsValid checks if optimization mode is valid.
-func (om OptimizationMode) IsValid() bool {
-	return om >= OptimizationModeDisabled && om <= OptimizationModeEnabled
-}
+func (om OptimizationMode) String() string { return EnumString(om, optimizationModeStrings) }
 
-// Values returns all possible optimization modes.
-func (om OptimizationMode) Values() []OptimizationMode {
-	return []OptimizationMode{
-		OptimizationModeDisabled,
-		OptimizationModeEnabled,
-	}
-}
+func (om OptimizationMode) IsValid() bool { return EnumIsValid(om, OptimizationModeEnabled) }
 
-// IsEnabled checks if optimization is enabled.
-func (om OptimizationMode) IsEnabled() bool {
-	return om == OptimizationModeEnabled
-}
+func (om OptimizationMode) Values() []OptimizationMode { return EnumValues(OptimizationModeEnabled) }
+func (om OptimizationMode) IsEnabled() bool            { return om == OptimizationModeEnabled }
 
-// MarshalYAML implements yaml.Marshaler interface for OptimizationMode.
 func (om OptimizationMode) MarshalYAML() (any, error) {
-	return int(om), nil
+	return EnumMarshalYAML(om, optimizationModeStrings)
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler interface for OptimizationMode.
-// Accepts both string and integer representations.
 func (om *OptimizationMode) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, om, map[string]OptimizationMode{
-		"DISABLED": OptimizationModeDisabled,
-		"ENABLED":  OptimizationModeEnabled,
-	}, "invalid optimization mode")
+	return EnumUnmarshalYAML(value, (*int)(om), optimizationModeStrings, "optimization mode")
 }
 
-// HomebrewMode represents homebrew operation mode as type-safe enum.
 type HomebrewMode int
 
 const (
-	// HomebrewModeAll represents cleaning all packages.
 	HomebrewModeAll HomebrewMode = iota
-	// HomebrewModeUnusedOnly represents cleaning only unused packages.
 	HomebrewModeUnusedOnly
 )
 
-// String returns string representation of homebrew mode.
-func (hm HomebrewMode) String() string {
-	switch hm {
-	case HomebrewModeAll:
-		return "ALL"
-	case HomebrewModeUnusedOnly:
-		return "UNUSED_ONLY"
-	default:
-		return "UNKNOWN"
-	}
-}
+var homebrewModeStrings = []string{"ALL", "UNUSED_ONLY"}
 
-// IsValid checks if homebrew mode is valid.
-func (hm HomebrewMode) IsValid() bool {
-	return hm >= HomebrewModeAll && hm <= HomebrewModeUnusedOnly
-}
+func (hm HomebrewMode) String() string         { return EnumString(hm, homebrewModeStrings) }
+func (hm HomebrewMode) IsValid() bool          { return EnumIsValid(hm, HomebrewModeUnusedOnly) }
+func (hm HomebrewMode) Values() []HomebrewMode { return EnumValues(HomebrewModeUnusedOnly) }
+func (hm HomebrewMode) IsUnusedOnly() bool     { return hm == HomebrewModeUnusedOnly }
 
-// Values returns all possible homebrew modes.
-func (hm HomebrewMode) Values() []HomebrewMode {
-	return []HomebrewMode{
-		HomebrewModeAll,
-		HomebrewModeUnusedOnly,
-	}
-}
-
-// IsUnusedOnly checks if mode is unused-only.
-func (hm HomebrewMode) IsUnusedOnly() bool {
-	return hm == HomebrewModeUnusedOnly
-}
-
-// MarshalYAML implements yaml.Marshaler interface for HomebrewMode.
 func (hm HomebrewMode) MarshalYAML() (any, error) {
-	return int(hm), nil
+	return EnumMarshalYAML(hm, homebrewModeStrings)
 }
 
-// UnmarshalYAML implements yaml.Unmarshaler interface for HomebrewMode.
-// Accepts both string and integer representations.
 func (hm *HomebrewMode) UnmarshalYAML(value *yaml.Node) error {
-	return UnmarshalYAMLEnum(value, hm, map[string]HomebrewMode{
-		"ALL":         HomebrewModeAll,
-		"UNUSED_ONLY": HomebrewModeUnusedOnly,
-	}, "invalid homebrew mode")
+	return EnumUnmarshalYAML(value, (*int)(hm), homebrewModeStrings, "homebrew mode")
 }
 
-// GenerationStatus represents generation status as type-safe enum.
 type GenerationStatus int
 
 const (
-	// GenerationStatusHistorical represents historical generation.
 	GenerationStatusHistorical GenerationStatus = iota
-	// GenerationStatusCurrent represents current generation.
 	GenerationStatusCurrent
 )
 
-// String returns string representation of generation status.
-func (gs GenerationStatus) String() string {
-	switch gs {
-	case GenerationStatusHistorical:
-		return "HISTORICAL"
-	case GenerationStatusCurrent:
-		return "CURRENT"
-	default:
-		return "UNKNOWN"
-	}
-}
+var generationStatusStrings = []string{"HISTORICAL", "CURRENT"}
 
-// IsValid checks if generation status is valid.
-func (gs GenerationStatus) IsValid() bool {
-	return gs >= GenerationStatusHistorical && gs <= GenerationStatusCurrent
-}
+func (gs GenerationStatus) String() string { return EnumString(gs, generationStatusStrings) }
 
-// Values returns all possible generation statuses.
-func (gs GenerationStatus) Values() []GenerationStatus {
-	return []GenerationStatus{
-		GenerationStatusHistorical,
-		GenerationStatusCurrent,
-	}
-}
+func (gs GenerationStatus) IsValid() bool { return EnumIsValid(gs, GenerationStatusCurrent) }
 
-// IsCurrent checks if generation is current.
-func (gs GenerationStatus) IsCurrent() bool {
-	return gs == GenerationStatusCurrent
-}
+func (gs GenerationStatus) Values() []GenerationStatus { return EnumValues(GenerationStatusCurrent) }
+func (gs GenerationStatus) IsCurrent() bool            { return gs == GenerationStatusCurrent }
 
-// ScanMode represents scanning behavior as type-safe enum.
 type ScanMode int
 
 const (
-	// ScanModeNonRecursive represents non-recursive scanning.
 	ScanModeNonRecursive ScanMode = iota
-	// ScanModeRecursive represents recursive scanning.
 	ScanModeRecursive
 )
 
-// String returns string representation of scan mode.
-func (sm ScanMode) String() string {
-	switch sm {
-	case ScanModeNonRecursive:
-		return "NON_RECURSIVE"
-	case ScanModeRecursive:
-		return "RECURSIVE"
-	default:
-		return "UNKNOWN"
-	}
-}
+var scanModeStrings = []string{"NON_RECURSIVE", "RECURSIVE"}
 
-// IsValid checks if scan mode is valid.
-func (sm ScanMode) IsValid() bool {
-	return sm >= ScanModeNonRecursive && sm <= ScanModeRecursive
-}
-
-// Values returns all possible scan modes.
-func (sm ScanMode) Values() []ScanMode {
-	return []ScanMode{
-		ScanModeNonRecursive,
-		ScanModeRecursive,
-	}
-}
-
-// IsRecursive checks if mode is recursive.
-func (sm ScanMode) IsRecursive() bool {
-	return sm == ScanModeRecursive
-}
+func (sm ScanMode) String() string     { return EnumString(sm, scanModeStrings) }
+func (sm ScanMode) IsValid() bool      { return EnumIsValid(sm, ScanModeRecursive) }
+func (sm ScanMode) Values() []ScanMode { return EnumValues(ScanModeRecursive) }
+func (sm ScanMode) IsRecursive() bool  { return sm == ScanModeRecursive }
