@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -158,51 +159,22 @@ const (
 	GitHistoryModeExecute                       // Actually rewrite history
 )
 
-// String returns the string representation.
-func (m GitHistoryMode) String() string {
-	switch m {
-	case GitHistoryModeAnalyze:
-		return "analyze"
-	case GitHistoryModeDryRun:
-		return "dry-run"
-	case GitHistoryModeExecute:
-		return "execute"
-	default:
-		return "unknown"
-	}
-}
+var gitHistoryModeStrings = []string{"analyze", "dry-run", "execute"}
 
-// IsValid checks if the mode is valid.
-func (m GitHistoryMode) IsValid() bool {
-	return m >= GitHistoryModeAnalyze && m <= GitHistoryModeExecute
-}
-
-// Values returns all possible values.
-func (m GitHistoryMode) Values() []GitHistoryMode {
-	return []GitHistoryMode{
-		GitHistoryModeAnalyze,
-		GitHistoryModeDryRun,
-		GitHistoryModeExecute,
-	}
-}
-
-// MarshalJSON implements json.Marshaler.
-func (m GitHistoryMode) MarshalJSON() ([]byte, error) {
-	if !m.IsValid() {
-		return nil, fmt.Errorf("invalid git history mode: %d", m)
-	}
-
-	return json.Marshal(m.String())
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
+func (m GitHistoryMode) String() string        { return EnumString(m, gitHistoryModeStrings) }
+func (m GitHistoryMode) IsValid() bool          { return EnumIsValid(m, GitHistoryModeExecute) }
+func (m GitHistoryMode) Values() []GitHistoryMode { return EnumValues[GitHistoryMode](GitHistoryModeExecute) }
+func (m GitHistoryMode) MarshalJSON() ([]byte, error) { return EnumMarshalJSON(m, gitHistoryModeStrings) }
 func (m *GitHistoryMode) UnmarshalJSON(data []byte) error {
-	return UnmarshalJSONEnum(data, m, map[string]GitHistoryMode{
-		"analyze": GitHistoryModeAnalyze,
-		"dry-run": GitHistoryModeDryRun,
-		"dryrun":  GitHistoryModeDryRun,
-		"execute": GitHistoryModeExecute,
-	}, "invalid git history mode")
+	err := EnumUnmarshalJSON(data, (*int)(m), gitHistoryModeStrings, "git history mode")
+	if err != nil {
+		var s string
+		if jsonErr := json.Unmarshal(data, &s); jsonErr == nil && strings.EqualFold(s, "dryrun") {
+			*m = GitHistoryModeDryRun
+			return nil
+		}
+	}
+	return err
 }
 
 // GitHistorySettings provides type-safe settings for git history cleaning.
