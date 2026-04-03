@@ -1,34 +1,14 @@
-// Package domain provides enum generation macros to reduce boilerplate.
-//
-// Usage example:
-//
-//	//go:generate go run ./cmd/enumgen -type=MyEnum -values=Value1,Value2,Value3
-//	type MyEnum int
-//
-//	const (
-//		MyEnumValue1 MyEnum = iota
-//		MyEnumValue2
-//		MyEnumValue3
-//	)
-//
-//	// Implement using macros
-//	func (m MyEnum) String() string { return EnumString(m, MyEnumStrings) }
-//	func (m MyEnum) IsValid() bool  { return EnumIsValid(m, MyEnumValue3) }
-//	func (m MyEnum) Values() []MyEnum { return EnumValues[MyEnum]() }
-//
-// This reduces 40+ lines per enum to ~10 lines.
 package domain
 
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
-// EnumString is a macro for generating String() method.
-// Pass the enum value and a string slice mapping.
 func EnumString[T ~int](val T, stringsMap []string) string {
 	idx := int(val)
 	if idx < 0 || idx >= len(stringsMap) {
@@ -38,14 +18,10 @@ func EnumString[T ~int](val T, stringsMap []string) string {
 	return stringsMap[idx]
 }
 
-// EnumIsValid is a macro for generating IsValid() method.
-// Pass the enum value and the maximum valid value.
 func EnumIsValid[T ~int](val, maxVal T) bool {
 	return val >= 0 && val <= maxVal
 }
 
-// EnumValues is a macro for generating Values() method.
-// Returns a slice of all enum values from 0 to max.
 func EnumValues[T ~int](maxVal T) []T {
 	maxInt := int(maxVal)
 
@@ -57,12 +33,10 @@ func EnumValues[T ~int](maxVal T) []T {
 	return values
 }
 
-// EnumMarshalJSON is a macro for JSON marshaling.
 func EnumMarshalJSON[T ~int](val T, stringsMap []string) ([]byte, error) {
 	return json.Marshal(EnumString(val, stringsMap))
 }
 
-// EnumUnmarshalJSON is a macro for JSON unmarshaling.
 func EnumUnmarshalJSON[T ~int](
 	data []byte,
 	target *T,
@@ -88,12 +62,10 @@ func EnumUnmarshalJSON[T ~int](
 	return fmt.Errorf("invalid %s: %s. Valid: %v", name, s, stringsMap)
 }
 
-// EnumMarshalYAML is a macro for YAML marshaling.
 func EnumMarshalYAML[T ~int](val T, stringsMap []string) (any, error) {
 	return EnumString(val, stringsMap), nil
 }
 
-// EnumUnmarshalYAML is a macro for YAML unmarshaling.
 func EnumUnmarshalYAML[T ~int](
 	value *yaml.Node,
 	target *T,
@@ -102,53 +74,39 @@ func EnumUnmarshalYAML[T ~int](
 ) error {
 	var s string
 
-	err := value.Decode(&s)
-	if err != nil {
-		return fmt.Errorf("%s must be a string: %w", name, err)
+	if err := value.Decode(&s); err == nil {
+		if i, atoiErr := strconv.Atoi(s); atoiErr == nil {
+			if i >= 0 && i < len(stringsMap) {
+				*target = T(i)
+
+				return nil
+			}
+
+			return fmt.Errorf("invalid %s: %d. Valid: 0-%d (%v)", name, i, len(stringsMap)-1, stringsMap)
+		}
+
+		upper := strings.ToUpper(s)
+		for i, str := range stringsMap {
+			if strings.ToUpper(str) == upper {
+				*target = T(i)
+
+				return nil
+			}
+		}
+
+		return fmt.Errorf("invalid %s: %s. Valid: %v", name, s, stringsMap)
 	}
 
-	upper := strings.ToUpper(s)
-	for i, str := range stringsMap {
-		if strings.ToUpper(str) == upper {
+	var i int
+	if err := value.Decode(&i); err == nil {
+		if i >= 0 && i < len(stringsMap) {
 			*target = T(i)
 
 			return nil
 		}
+
+		return fmt.Errorf("invalid %s: %d. Valid: 0-%d (%v)", name, i, len(stringsMap)-1, stringsMap)
 	}
 
-	return fmt.Errorf("invalid %s: %s. Valid: %v", name, s, stringsMap)
+	return fmt.Errorf("cannot parse %s: expected string or int", name)
 }
-
-// EnumValueMaps holds string mappings for enums.
-// Use these with the macro functions above.
-var (
-	// RiskLevelStrings maps RiskLevelType to strings.
-	RiskLevelStrings = []string{"LOW", "MEDIUM", "HIGH", "CRITICAL"}
-
-	// StrategyTypeStrings maps StrategyType to strings.
-	StrategyTypeStrings = []string{"CONSERVATIVE", "BALANCED", "AGGRESSIVE"}
-
-	// CleanTypeStrings maps CleanType to strings.
-	CleanTypeStrings = []string{"QUICK", "STANDARD", "DEEP"}
-
-	// ScanTypeStrings maps ScanType to strings.
-	ScanTypeStrings = []string{"TEMP", "CACHE", "LOG", "TRASH", "DERIVED", "BINARY"}
-
-	// OperationTypeStrings maps OperationType to strings.
-	OperationTypeStrings = []string{
-		"TEMP_FILES",
-		"DOCKER",
-		"NPM",
-		"CARGO",
-		"GO_PACKAGES",
-		"HOMEBREW",
-		"XCODE",
-		"BASH",
-		"BUILD_CACHE",
-		"SYSTEM_CACHE",
-		"GIT",
-		"PROJECT_EXECUTABLES",
-		"COMPILED_BINARIES",
-		"NIX",
-	}
-)

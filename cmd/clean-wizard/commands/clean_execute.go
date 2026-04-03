@@ -50,6 +50,7 @@ func executeCleaners(
 
 		if err != nil {
 			cr.handleCleanerError(name, err)
+
 			continue
 		}
 

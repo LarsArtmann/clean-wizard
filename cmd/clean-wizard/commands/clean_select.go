@@ -53,7 +53,11 @@ func selectProfileCleaners(
 	return selected, nil
 }
 
-func selectPresetCleaners(mode string, availableConfigs []CleanerConfig, jsonOutput bool) ([]CleanerType, error) {
+func selectPresetCleaners(
+	mode string,
+	availableConfigs []CleanerConfig,
+	jsonOutput bool,
+) ([]CleanerType, error) {
 	selected := getPresetSelection(mode, availableConfigs)
 
 	if !jsonOutput {
@@ -99,12 +103,13 @@ func selectCleanersInteractive(availableConfigs []CleanerConfig) ([]CleanerType,
 		),
 	)
 
-	if err := form.Run(); err != nil {
+	err := form.Run()
+	if err != nil {
 		return nil, fmt.Errorf("form error: %w", err)
 	}
 
 	if len(selectedTypes) == 0 {
-		return nil, nil //nolint:nilnil // No cleaners selected is a valid state
+		return nil, nil
 	}
 
 	return selectedTypes, nil
@@ -127,7 +132,8 @@ func confirmExecution(skipConfirmation, dryRun bool) (bool, error) {
 		),
 	)
 
-	if err := confirmForm.Run(); err != nil {
+	err := confirmForm.Run()
+	if err != nil {
 		return false, fmt.Errorf("confirmation error: %w", err)
 	}
 

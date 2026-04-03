@@ -138,6 +138,18 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 		assert.Equal(t, 1, val)
 	})
 
+	t.Run("valid integer", func(t *testing.T) {
+		t.Parallel()
+
+		node := &yaml.Node{Kind: yaml.ScalarNode, Value: "2"}
+
+		var val int
+
+		err := EnumUnmarshalYAML(node, &val, strings, "test")
+		require.NoError(t, err)
+		assert.Equal(t, 2, val)
+	})
+
 	t.Run("invalid value", func(t *testing.T) {
 		t.Parallel()
 
@@ -148,17 +160,6 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 		err := EnumUnmarshalYAML(node, &val, strings, "test")
 		assert.Error(t, err)
 	})
-}
-
-func TestEnumValueMaps(t *testing.T) {
-	t.Parallel()
-
-	// Verify all string maps are non-empty
-	assert.NotEmpty(t, RiskLevelStrings)
-	assert.NotEmpty(t, StrategyTypeStrings)
-	assert.NotEmpty(t, CleanTypeStrings)
-	assert.NotEmpty(t, ScanTypeStrings)
-	assert.NotEmpty(t, OperationTypeStrings)
 }
 
 // Example of using macros for a custom enum.
@@ -180,7 +181,7 @@ func (e testEnum) MarshalJSON() ([]byte, error) {
 }
 
 func (e *testEnum) UnmarshalJSON(data []byte) error {
-	return EnumUnmarshalJSON(data, (*int)(e), testEnumStrings, "testEnum")
+	return EnumUnmarshalJSON(data, e, testEnumStrings, "testEnum")
 }
 
 func TestCustomEnumWithMacros(t *testing.T) {
