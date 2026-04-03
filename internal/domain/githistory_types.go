@@ -166,9 +166,11 @@ func (m GitHistoryMode) IsValid() bool  { return EnumIsValid(m, GitHistoryModeEx
 func (m GitHistoryMode) Values() []GitHistoryMode {
 	return EnumValues[GitHistoryMode](GitHistoryModeExecute)
 }
+
 func (m GitHistoryMode) MarshalJSON() ([]byte, error) {
 	return EnumMarshalJSON(m, gitHistoryModeStrings)
 }
+
 func (m *GitHistoryMode) UnmarshalJSON(data []byte) error {
 	err := EnumUnmarshalJSON(data, (*int)(m), gitHistoryModeStrings, "git history mode")
 	if err != nil {

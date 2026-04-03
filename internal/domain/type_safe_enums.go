@@ -25,9 +25,11 @@ func (rl RiskLevelType) IsValid() bool  { return EnumIsValid(rl, RiskLevelCritic
 func (rl RiskLevelType) Values() []RiskLevelType {
 	return EnumValues[RiskLevelType](RiskLevelCriticalType)
 }
+
 func (rl RiskLevelType) MarshalJSON() ([]byte, error) {
 	return EnumMarshalJSON(rl, riskLevelTypeStrings)
 }
+
 func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 	return EnumUnmarshalJSON(data, (*int)(rl), riskLevelTypeStrings, "risk level")
 }
@@ -72,9 +74,11 @@ func (vl ValidationLevelType) IsValid() bool  { return EnumIsValid(vl, Validatio
 func (vl ValidationLevelType) Values() []ValidationLevelType {
 	return EnumValues[ValidationLevelType](ValidationLevelStrictType)
 }
+
 func (vl ValidationLevelType) MarshalJSON() ([]byte, error) {
 	return EnumMarshalJSON(vl, validationLevelTypeStrings)
 }
+
 func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
 	return EnumUnmarshalJSON(data, (*int)(vl), validationLevelTypeStrings, "validation level")
 }
@@ -96,9 +100,11 @@ func (co ChangeOperationType) IsValid() bool { return EnumIsValid(co, ChangeOper
 func (co ChangeOperationType) Values() []ChangeOperationType {
 	return EnumValues[ChangeOperationType](ChangeOperationModifiedType)
 }
+
 func (co ChangeOperationType) MarshalJSON() ([]byte, error) {
 	return EnumMarshalJSON(co, changeOperationTypeStrings)
 }
+
 func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
 	return EnumUnmarshalJSON(data, (*int)(co), changeOperationTypeStrings, "change operation")
 }
@@ -119,13 +125,16 @@ func (cs CleanStrategyType) IsValid() bool  { return EnumIsValid(cs, StrategyDry
 func (cs CleanStrategyType) Values() []CleanStrategyType {
 	return EnumValues[CleanStrategyType](StrategyDryRunType)
 }
+
 func (cs CleanStrategyType) MarshalJSON() ([]byte, error) {
 	return EnumMarshalJSON(cs, cleanStrategyTypeStrings)
 }
+
 func (cs *CleanStrategyType) UnmarshalJSON(data []byte) error {
 	err := EnumUnmarshalJSON(data, (*int)(cs), cleanStrategyTypeStrings, "clean strategy")
 	if err != nil {
 		var s string
+
 		jsonErr := json.Unmarshal(data, &s)
 		if jsonErr == nil && strings.EqualFold(s, "dryrun") {
 			*cs = StrategyDryRunType

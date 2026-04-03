@@ -23,6 +23,7 @@ func (cm CacheCleanupMode) IsEnabled() bool { return cm == CacheCleanupEnabled }
 func (cm CacheCleanupMode) MarshalYAML() (any, error) {
 	return EnumMarshalYAML(cm, cacheCleanupModeStrings)
 }
+
 func (cm *CacheCleanupMode) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(cm), cacheCleanupModeStrings, "cache cleanup mode")
 }
@@ -50,9 +51,11 @@ func (pm DockerPruneMode) IsValid() bool  { return EnumIsValid(pm, DockerPruneBu
 func (pm DockerPruneMode) Values() []DockerPruneMode {
 	return EnumValues[DockerPruneMode](DockerPruneBuilds)
 }
+
 func (pm DockerPruneMode) MarshalYAML() (any, error) {
 	return EnumMarshalYAML(pm, dockerPruneModeStrings)
 }
+
 func (pm *DockerPruneMode) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(pm), dockerPruneModeStrings, "docker prune mode")
 }
@@ -158,9 +161,11 @@ func (pm PackageManagerType) IsValid() bool  { return EnumIsValid(pm, PackageMan
 func (pm PackageManagerType) Values() []PackageManagerType {
 	return EnumValues[PackageManagerType](PackageManagerBun)
 }
+
 func (pm PackageManagerType) MarshalYAML() (any, error) {
 	return EnumMarshalYAML(pm, packageManagerTypeStrings)
 }
+
 func (pm *PackageManagerType) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(pm), packageManagerTypeStrings, "package manager type")
 }
