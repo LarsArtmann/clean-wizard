@@ -3,9 +3,8 @@ package cleaner
 import (
 	"path/filepath"
 
-	"github.com/cockroachdb/errors"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/cockroachdb/errors"
 )
 
 // DefaultRegistry creates a new registry with all cleaners registered.

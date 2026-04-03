@@ -13,7 +13,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
-
 	"golang.org/x/sys/unix"
 )
 
