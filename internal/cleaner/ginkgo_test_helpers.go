@@ -227,6 +227,22 @@ func GinkgoValidateEmptySettingsContext(cleaner CleanerWithSettings, itName stri
 	})
 }
 
+// GinkgoValidateNilSettingsTest tests that ValidateSettings returns no error for nil settings.
+// This eliminates duplicate test code across multiple Ginkgo test files.
+//
+// Parameters:
+//   - cleaner: The cleaner instance with ValidateSettings method
+//
+// Usage:
+//
+//	ginkgo.It("should return nil for nil settings", func() {
+//		GinkgoValidateNilSettingsTest(cleaner)
+//	})
+func GinkgoValidateNilSettingsTest(cleaner CleanerWithSettings) {
+	err := cleaner.ValidateSettings(nil)
+	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+}
+
 // StandardTestBinaries returns a slice of BinaryInfo for testing.
 // This eliminates duplicate binary setup code across compiled binaries tests.
 //

@@ -214,6 +214,22 @@ func createHomebrewOperation() domain.CleanupOperation {
 	}
 }
 
+// createNixGenerationsOperation creates a nix-generations cleanup operation with settings.
+func createNixGenerationsOperation() domain.CleanupOperation {
+	return domain.CleanupOperation{
+		Name:        "nix-generations",
+		Description: "Clean Nix generations",
+		RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+		Enabled:     domain.ProfileStatusEnabled,
+		Settings: &domain.OperationSettings{
+			NixGenerations: &domain.NixGenerationsSettings{
+				Generations: 3,
+				Optimize:    domain.OptimizationModeEnabled,
+			},
+		},
+	}
+}
+
 // CreateBenchmarkConfig creates a configuration suitable for benchmarking.
 // This includes a daily profile with multiple operations covering all operation types.
 func CreateBenchmarkConfig() *domain.Config {
@@ -227,18 +243,7 @@ func CreateBenchmarkConfig() *domain.Config {
 				Name:        "Daily Cleanup",
 				Description: "Daily system cleanup",
 				Operations: []domain.CleanupOperation{
-					{
-						Name:        "nix-generations",
-						Description: "Clean Nix generations",
-						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							NixGenerations: &domain.NixGenerationsSettings{
-								Generations: 3,
-								Optimize:    domain.OptimizationModeEnabled,
-							},
-						},
-					},
+					createNixGenerationsOperation(),
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",

@@ -131,10 +131,7 @@ var _ = ginkgo.Describe("GitHistory Integration", func() {
 
 		ginkgo.Context("Scanner", func() {
 			ginkgo.BeforeEach(func() {
-				// Make initial commit
-				_ = os.WriteFile(filepath.Join(tempRepoDir, "README.md"), []byte("# Test"), 0o644)
-				runGitCommand(tempRepoDir, "add", ".")
-				runGitCommand(tempRepoDir, "commit", "-m", "initial")
+				setupInitialGitCommit(tempRepoDir)
 			})
 
 			ginkgo.It("should scan repository with no binary files", func() {
@@ -186,10 +183,7 @@ var _ = ginkgo.Describe("GitHistory Integration", func() {
 
 		ginkgo.Context("Cleaner", func() {
 			ginkgo.BeforeEach(func() {
-				// Make initial commit
-				_ = os.WriteFile(filepath.Join(tempRepoDir, "README.md"), []byte("# Test"), 0o644)
-				runGitCommand(tempRepoDir, "add", ".")
-				runGitCommand(tempRepoDir, "commit", "-m", "initial")
+				setupInitialGitCommit(tempRepoDir)
 			})
 
 			ginkgo.It("should return empty result when no files to clean", func() {
@@ -297,4 +291,12 @@ func runGitCommand(dir string, args ...string) {
 
 	output, err := cmd.CombinedOutput()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred(), "git command failed: %s", string(output))
+}
+
+// setupInitialGitCommit creates an initial git commit with a README file.
+// This eliminates duplicate BeforeEach setup code across integration tests.
+func setupInitialGitCommit(dir string) {
+	_ = os.WriteFile(filepath.Join(dir, "README.md"), []byte("# Test"), 0o644)
+	runGitCommand(dir, "add", ".")
+	runGitCommand(dir, "commit", "-m", "initial")
 }

@@ -71,6 +71,18 @@ func (m *mockFileOperator) GetFileSize(path string) int64 {
 	return 0
 }
 
+func expectExtensionsExcluded(cleaner *ProjectExecutablesCleaner, files ...string) {
+	for _, file := range files {
+		gomega.Expect(cleaner.IsExcludedByExtension(file)).To(gomega.BeTrue())
+	}
+}
+
+func expectPatternsMatched(cleaner *ProjectExecutablesCleaner, patterns ...string) {
+	for _, pattern := range patterns {
+		gomega.Expect(cleaner.IsExcludedByPattern(pattern)).To(gomega.BeTrue())
+	}
+}
+
 var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 	var (
 		ctx          context.Context
@@ -241,8 +253,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("with nil settings", func() {
 			ginkgo.It("should return nil for nil settings", func() {
-				err := cleaner.ValidateSettings(nil)
-				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				GinkgoValidateNilSettingsTest(cleaner)
 			})
 		})
 
@@ -611,8 +622,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 
 		ginkgo.It("should exclude files case-insensitively", func() {
-			gomega.Expect(cleaner.IsExcludedByExtension("SCRIPT.SH")).To(gomega.BeTrue())
-			gomega.Expect(cleaner.IsExcludedByExtension("Script.Sh")).To(gomega.BeTrue())
+			expectExtensionsExcluded(cleaner, "SCRIPT.SH", "Script.Sh")
 		})
 
 		ginkgo.It("should not exclude non-matching extensions", func() {
@@ -621,8 +631,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 
 		ginkgo.It("should match multiple extension patterns", func() {
-			gomega.Expect(cleaner.IsExcludedByExtension("script.sh")).To(gomega.BeTrue())
-			gomega.Expect(cleaner.IsExcludedByExtension("script.bash")).To(gomega.BeTrue())
+			expectExtensionsExcluded(cleaner, "script.sh", "script.bash")
 		})
 
 		ginkgo.It("should match extension exactly at end", func() {
@@ -646,13 +655,11 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 
 		ginkgo.It("should match wildcard patterns", func() {
-			gomega.Expect(cleaner.IsExcludedByPattern("app.config")).To(gomega.BeTrue())
-			gomega.Expect(cleaner.IsExcludedByPattern("database.config")).To(gomega.BeTrue())
+			expectPatternsMatched(cleaner, "app.config", "database.config")
 		})
 
 		ginkgo.It("should match prefix wildcard patterns", func() {
-			gomega.Expect(cleaner.IsExcludedByPattern("test_binary")).To(gomega.BeTrue())
-			gomega.Expect(cleaner.IsExcludedByPattern("test_run")).To(gomega.BeTrue())
+			expectPatternsMatched(cleaner, "test_binary", "test_run")
 		})
 
 		ginkgo.It("should not match non-matching patterns", func() {

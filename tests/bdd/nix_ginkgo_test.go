@@ -64,8 +64,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		})
 
 		ginkgo.It("should list Nix generations when running scan", func() {
-			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 2)
-			gomega.Expect(testCtx.generations.IsOk()).To(gomega.BeTrue())
+			testCtx.generations = getGenerationsAndAssertOk(testCtx.ctx, testCtx.nixCleaner, 2)
 		})
 
 		ginkgo.It("should have valid ID for each generation", func() {
@@ -93,8 +92,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		})
 
 		ginkgo.It("should complete scan command successfully", func() {
-			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 0)
-			gomega.Expect(testCtx.generations.IsOk()).To(gomega.BeTrue())
+			testCtx.generations = getGenerationsAndAssertOk(testCtx.ctx, testCtx.nixCleaner, 0)
 		})
 	})
 

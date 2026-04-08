@@ -262,8 +262,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 		ginkgo.Context("with nil settings", func() {
 			ginkgo.It("should return nil for nil settings", func() {
-				err := cleaner.ValidateSettings(nil)
-				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				GinkgoValidateNilSettingsTest(cleaner)
 			})
 		})
 

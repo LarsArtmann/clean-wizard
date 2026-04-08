@@ -154,6 +154,13 @@ func TestCleanType_IsValid(t *testing.T) {
 }
 
 func TestSafeConfigBuilder_Build(t *testing.T) {
+	validBuilderFunc := func() *SafeConfigBuilder {
+		return NewSafeConfigBuilder().
+			AddProfile("test", "test profile").
+			AddOperation(CleanTypeNixStore, domain.RiskLevelLowType).
+			Done()
+	}
+
 	tests := []struct {
 		name        string
 		builderFunc func() *SafeConfigBuilder
@@ -161,13 +168,8 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 		errorMsg    string
 	}{
 		{
-			name: "build valid config",
-			builderFunc: func() *SafeConfigBuilder {
-				return NewSafeConfigBuilder().
-					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelLowType).
-					Done()
-			},
+			name:        "build valid config",
+			builderFunc: validBuilderFunc,
 			expectError: false,
 		},
 		{
@@ -177,13 +179,8 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			errorMsg:    "config must have at least one profile",
 		},
 		{
-			name: "build config with valid risk level only",
-			builderFunc: func() *SafeConfigBuilder {
-				return NewSafeConfigBuilder().
-					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelLowType).
-					Done()
-			},
+			name:        "build config with valid risk level only",
+			builderFunc: validBuilderFunc,
 			expectError: false,
 		},
 		{

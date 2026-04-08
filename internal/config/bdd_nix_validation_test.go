@@ -192,6 +192,20 @@ func newSecurityErrorValidationThen() []BDDThen {
 	}
 }
 
+// newValidateConfigWhen creates the common When clause for configuration validation scenarios.
+func newValidateConfigWhen() []BDDWhen {
+	return []BDDWhen{
+		{
+			Description: "the configuration is validated",
+			Action: func(cfg *domain.Config) (*ValidationResult, error) {
+				validator := NewConfigValidator()
+
+				return validator.ValidateConfig(cfg), nil
+			},
+		},
+	}
+}
+
 // TestBDD_NixGenerationsValidation provides comprehensive BDD tests for Nix generations.
 func TestBDD_NixGenerationsValidation(t *testing.T) {
 	feature := BDDFeature{
@@ -211,16 +225,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						},
 					},
 				},
-				When: []BDDWhen{
-					{
-						Description: "the configuration is validated",
-						Action: func(cfg *domain.Config) (*ValidationResult, error) {
-							validator := NewConfigValidator()
-
-							return validator.ValidateConfig(cfg), nil
-						},
-					},
-				},
+				When: newValidateConfigWhen(),
 				Then: newValidValidationThen(),
 			},
 			{
@@ -234,16 +239,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						},
 					},
 				},
-				When: []BDDWhen{
-					{
-						Description: "the configuration is validated",
-						Action: func(cfg *domain.Config) (*ValidationResult, error) {
-							validator := NewConfigValidator()
-
-							return validator.ValidateConfig(cfg), nil
-						},
-					},
-				},
+				When: newValidateConfigWhen(),
 				Then: newInvalidValidationThen("generations"),
 			},
 			{
@@ -257,16 +253,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						},
 					},
 				},
-				When: []BDDWhen{
-					{
-						Description: "the configuration is validated",
-						Action: func(cfg *domain.Config) (*ValidationResult, error) {
-							validator := NewConfigValidator()
-
-							return validator.ValidateConfig(cfg), nil
-						},
-					},
-				},
+				When: newValidateConfigWhen(),
 				Then: newInvalidValidationThen("generations"),
 			},
 			{
@@ -283,16 +270,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 						},
 					},
 				},
-				When: []BDDWhen{
-					{
-						Description: "the configuration is validated",
-						Action: func(cfg *domain.Config) (*ValidationResult, error) {
-							validator := NewConfigValidator()
-
-							return validator.ValidateConfig(cfg), nil
-						},
-					},
-				},
+				When: newValidateConfigWhen(),
 				Then: newSecurityErrorValidationThen(),
 			},
 		},

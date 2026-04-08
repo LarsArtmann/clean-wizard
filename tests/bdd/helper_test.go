@@ -8,6 +8,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/onsi/gomega"
 )
 
 // mockGenerations creates mock Nix generations for testing in CI environments.
@@ -36,6 +37,16 @@ func getGenerationsOrMock(
 	if generations.IsErr() {
 		return result.Ok(mockGenerations(mockCount))
 	}
+	return generations
+}
+
+// getGenerationsAndAssertOk gets generations and asserts they are ok.
+// This eliminates duplicate test code for checking generations result.
+func getGenerationsAndAssertOk(
+	ctx context.Context, nixCleaner *cleaner.NixCleaner, mockCount int,
+) result.Result[[]domain.NixGeneration] {
+	generations := getGenerationsOrMock(ctx, nixCleaner, mockCount)
+	gomega.Expect(generations.IsOk()).To(gomega.BeTrue())
 	return generations
 }
 
