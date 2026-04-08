@@ -81,35 +81,30 @@ func TestEnumUnmarshalJSON(t *testing.T) {
 	t.Parallel()
 
 	strings := []string{"LOW", "MEDIUM", "HIGH"}
+	tests := []struct {
+		name     string
+		input    string
+		expected int
+		wantErr  bool
+	}{
+		{"valid lowercase", `"medium"`, 1, false},
+		{"valid uppercase", `"HIGH"`, 2, false},
+		{"invalid value", `"INVALID"`, 0, true},
+	}
 
-	t.Run("valid lowercase", func(t *testing.T) {
-		t.Parallel()
-
-		var val int
-
-		err := EnumUnmarshalJSON([]byte(`"medium"`), &val, strings, "test")
-		require.NoError(t, err)
-		assert.Equal(t, 1, val)
-	})
-
-	t.Run("valid uppercase", func(t *testing.T) {
-		t.Parallel()
-
-		var val int
-
-		err := EnumUnmarshalJSON([]byte(`"HIGH"`), &val, strings, "test")
-		require.NoError(t, err)
-		assert.Equal(t, 2, val)
-	})
-
-	t.Run("invalid value", func(t *testing.T) {
-		t.Parallel()
-
-		var val int
-
-		err := EnumUnmarshalJSON([]byte(`"INVALID"`), &val, strings, "test")
-		assert.Error(t, err)
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			var val int
+			err := EnumUnmarshalJSON([]byte(tt.input), &val, strings, "test")
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tt.expected, val)
+			}
+		})
+	}
 }
 
 func TestEnumMarshalYAML(t *testing.T) {
@@ -125,41 +120,31 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 	t.Parallel()
 
 	strings := []string{"LOW", "MEDIUM", "HIGH"}
+	tests := []struct {
+		name     string
+		input    string
+		expected int
+		wantErr  bool
+	}{
+		{"valid lowercase", "medium", 1, false},
+		{"valid integer", "2", 2, false},
+		{"invalid value", "INVALID", 0, true},
+	}
 
-	t.Run("valid lowercase", func(t *testing.T) {
-		t.Parallel()
-
-		node := &yaml.Node{Kind: yaml.ScalarNode, Value: "medium"}
-
-		var val int
-
-		err := EnumUnmarshalYAML(node, &val, strings, "test")
-		require.NoError(t, err)
-		assert.Equal(t, 1, val)
-	})
-
-	t.Run("valid integer", func(t *testing.T) {
-		t.Parallel()
-
-		node := &yaml.Node{Kind: yaml.ScalarNode, Value: "2"}
-
-		var val int
-
-		err := EnumUnmarshalYAML(node, &val, strings, "test")
-		require.NoError(t, err)
-		assert.Equal(t, 2, val)
-	})
-
-	t.Run("invalid value", func(t *testing.T) {
-		t.Parallel()
-
-		node := &yaml.Node{Kind: yaml.ScalarNode, Value: "INVALID"}
-
-		var val int
-
-		err := EnumUnmarshalYAML(node, &val, strings, "test")
-		assert.Error(t, err)
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			node := &yaml.Node{Kind: yaml.ScalarNode, Value: tt.input}
+			var val int
+			err := EnumUnmarshalYAML(node, &val, strings, "test")
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tt.expected, val)
+			}
+		})
+	}
 }
 
 // Example of using macros for a custom enum.

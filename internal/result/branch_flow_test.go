@@ -6,6 +6,42 @@ import (
 	"testing"
 )
 
+// branchWithValueTestCase holds test data for BranchWithValue tests.
+type branchWithValueTestCase struct {
+	name           string
+	inputValue     int
+	predicate      func(int) bool
+	branchFn       func(int) Result[int]
+	fallbackValue   int
+	expectedValue  int
+}
+
+// runBranchWithValueTests runs a set of BranchWithValue test cases.
+// This eliminates duplicate test code across BranchWithValue test functions.
+func runBranchWithValueTests(t *testing.T, cases []branchWithValueTestCase) {
+	t.Helper()
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			flow := NewBranchFlow[int]().
+				BranchWithValue(tc.inputValue, tc.predicate, tc.branchFn).
+				FallbackValue(tc.fallbackValue)
+
+			result := flow.Execute()
+
+			if result.IsErr() {
+				t.Errorf("BranchWithValue() should not error")
+			}
+
+			if result.Value() != tc.expectedValue {
+				t.Errorf("BranchWithValue() = %v, want %v", result.Value(), tc.expectedValue)
+			}
+		})
+	}
+}
+
 func TestMatch(t *testing.T) {
 	t.Parallel()
 	t.Run("ok result calls ok function", func(t *testing.T) {
@@ -425,40 +461,26 @@ func TestBranchFlow(t *testing.T) {
 		}
 	})
 
-	t.Run("BranchWithValue executes when predicate matches", func(t *testing.T) {
-		t.Parallel()
+	greaterThan5Predicate := func(v int) bool { return v > 5 }
+	doubleBranchFn := func(v int) Result[int] { return Ok(v * 2) }
 
-		flow := NewBranchFlow[int]().
-			BranchWithValue(10, func(v int) bool { return v > 5 }, func(v int) Result[int] { return Ok(v * 2) }).
-			FallbackValue(0)
-
-		result := flow.Execute()
-
-		if result.IsErr() {
-			t.Errorf("BranchWithValue() should not error")
-		}
-
-		if result.Value() != 20 {
-			t.Errorf("BranchWithValue() = %v, want 20", result.Value())
-		}
-	})
-
-	t.Run("BranchWithValue falls back when predicate does not match", func(t *testing.T) {
-		t.Parallel()
-
-		flow := NewBranchFlow[int]().
-			BranchWithValue(3, func(v int) bool { return v > 5 }, func(v int) Result[int] { return Ok(v * 2) }).
-			FallbackValue(100)
-
-		result := flow.Execute()
-
-		if result.IsErr() {
-			t.Errorf("BranchWithValue() should not error")
-		}
-
-		if result.Value() != 100 {
-			t.Errorf("BranchWithValue() = %v, want 100 (fallback)", result.Value())
-		}
+	runBranchWithValueTests(t, []branchWithValueTestCase{
+		{
+			name:          "executes when predicate matches",
+			inputValue:    10,
+			predicate:     greaterThan5Predicate,
+			branchFn:      doubleBranchFn,
+			fallbackValue: 0,
+			expectedValue: 20,
+		},
+		{
+			name:          "falls back when predicate does not match",
+			inputValue:    3,
+			predicate:     greaterThan5Predicate,
+			branchFn:      doubleBranchFn,
+			fallbackValue: 100,
+			expectedValue: 100,
+		},
 	})
 }
 

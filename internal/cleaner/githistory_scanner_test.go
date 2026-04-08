@@ -202,18 +202,14 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 		})
 	})
 
-	ginkgo.Describe("sortBySize", func() {
-		ginkgo.BeforeEach(func() {
-			scanner = NewGitHistoryScanner(tempDir)
-		})
-
+	ginkgo.Describe("SortBySizeDesc", func() {
 		ginkgo.It("should sort files by size in descending order", func() {
 			files := []domain.GitHistoryFile{
 				{Path: "small.exe", SizeBytes: 1 * 1024 * 1024},
 				{Path: "large.exe", SizeBytes: 10 * 1024 * 1024},
 				{Path: "medium.exe", SizeBytes: 5 * 1024 * 1024},
 			}
-			scanner.sortBySize(files)
+			domain.SortBySizeDesc(files)
 			gomega.Expect(files[0].Path).To(gomega.Equal("large.exe"))
 			gomega.Expect(files[1].Path).To(gomega.Equal("medium.exe"))
 			gomega.Expect(files[2].Path).To(gomega.Equal("small.exe"))
@@ -222,14 +218,14 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 		ginkgo.It("should handle empty slice", func() {
 			files := []domain.GitHistoryFile{}
 
-			gomega.Expect(func() { scanner.sortBySize(files) }).NotTo(gomega.Panic())
+			gomega.Expect(func() { domain.SortBySizeDesc(files) }).NotTo(gomega.Panic())
 		})
 
 		ginkgo.It("should handle single element", func() {
 			files := []domain.GitHistoryFile{
 				{Path: "only.exe", SizeBytes: 5 * 1024 * 1024},
 			}
-			scanner.sortBySize(files)
+			domain.SortBySizeDesc(files)
 			gomega.Expect(files).To(gomega.HaveLen(1))
 			gomega.Expect(files[0].Path).To(gomega.Equal("only.exe"))
 		})

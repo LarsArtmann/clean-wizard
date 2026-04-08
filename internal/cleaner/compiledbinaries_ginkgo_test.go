@@ -100,11 +100,6 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 				gomega.Expect(cleaner.minSizeMB).To(gomega.Equal(DefaultMinSizeMB))
 			})
 
-			ginkgo.It("should create cleaner with default older than", func() {
-				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
-				gomega.Expect(cleaner.olderThan).To(gomega.Equal(DefaultOlderThan))
-			})
-
 			ginkgo.It("should create cleaner with default base paths", func() {
 				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
 				gomega.Expect(cleaner.basePaths).NotTo(gomega.BeEmpty())
@@ -118,16 +113,24 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 		})
 
-		ginkgo.Context("with custom configuration", func() {
-			ginkgo.It("should accept custom minimum size", func() {
-				cleaner = NewCompiledBinariesCleaner(false, false, 50, "", nil, nil)
-				gomega.Expect(cleaner.minSizeMB).To(gomega.Equal(50))
-			})
+		ginkgo.It("should accept older than setting", func() {
+			tests := []struct {
+				name      string
+				olderThan string
+				expected  string
+			}{
+				{name: "default older than", olderThan: "", expected: DefaultOlderThan},
+				{name: "custom older than", olderThan: "7d", expected: "7d"},
+			}
+			for _, tt := range tests {
+				ginkgo.By(tt.name, func() {
+					cleaner = NewCompiledBinariesCleaner(false, false, 0, tt.olderThan, nil, nil)
+					gomega.Expect(cleaner.olderThan).To(gomega.Equal(tt.expected))
+				})
+			}
+		})
 
-			ginkgo.It("should accept custom older than", func() {
-				cleaner = NewCompiledBinariesCleaner(false, false, 0, "7d", nil, nil)
-				gomega.Expect(cleaner.olderThan).To(gomega.Equal("7d"))
-			})
+		ginkgo.Context("with custom configuration", func() {
 
 			ginkgo.It("should accept custom base paths", func() {
 				paths := []string{"/custom/path1", "/custom/path2"}
@@ -367,7 +370,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 						ExcludePatterns: []string{"[invalid"},
 					},
 				}
-				GinkgoValidateInvalidExcludePatternTest(cleaner, settings)
+				assertValidationError(cleaner, settings, "invalid exclude pattern")
 			})
 
 			ginkgo.It("should return error for invalid include category", func() {

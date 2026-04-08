@@ -53,33 +53,6 @@ func GinkgoNoItemsToCleanTest(ctx context.Context, cleaner interface {
 	gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyConservative))
 }
 
-// GinkgoValidateInvalidExcludePatternTest tests that ValidateSettings returns an error
-// for an invalid glob pattern in exclude patterns. This eliminates duplicate test code
-// across multiple cleaner test files.
-//
-// Parameters:
-//   - cleaner: The cleaner instance with ValidateSettings method
-//   - settings: The OperationSettings with an invalid exclude pattern configured
-//
-// Usage:
-//
-//	ginkgo.It("should return error for invalid glob pattern", func() {
-//		settings := &domain.OperationSettings{
-//			CompiledBinaries: &domain.CompiledBinariesSettings{
-//				ExcludePatterns: []string{"[invalid"},
-//			},
-//		}
-//		GinkgoValidateInvalidExcludePatternTest(cleaner, settings)
-//	})
-func GinkgoValidateInvalidExcludePatternTest(
-	cleaner CleanerWithSettings,
-	settings *domain.OperationSettings,
-) {
-	err := cleaner.ValidateSettings(settings)
-	gomega.Expect(err).To(gomega.HaveOccurred())
-	gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid exclude pattern"))
-}
-
 // GinkgoValidateValidSettingsTest tests that ValidateSettings returns no error
 // for valid settings. This eliminates duplicate test code across multiple Ginkgo test files.
 //

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 	"time"
 
@@ -360,15 +359,7 @@ func selectFilesToClean(
 	}
 
 	// Sort files by size (already done by scanner, but ensure)
-	slices.SortFunc(files, func(a, b domain.GitHistoryFile) int {
-		if a.SizeBytes > b.SizeBytes {
-			return -1
-		} else if a.SizeBytes < b.SizeBytes {
-			return 1
-		}
-
-		return 0
-	})
+	domain.SortBySizeDesc(files)
 
 	// Build options with size info
 	type fileSelection struct {

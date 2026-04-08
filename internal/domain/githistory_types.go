@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 )
@@ -272,4 +273,17 @@ var ExtensionsToKeep = []string{
 	".mp4",
 	".webm",
 	".webp",
+}
+
+// SortBySizeDesc sorts files by size in descending order.
+func SortBySizeDesc(files []GitHistoryFile) {
+	slices.SortFunc(files, func(a, b GitHistoryFile) int {
+		if a.SizeBytes > b.SizeBytes {
+			return -1
+		} else if a.SizeBytes < b.SizeBytes {
+			return 1
+		}
+
+		return 0
+	})
 }

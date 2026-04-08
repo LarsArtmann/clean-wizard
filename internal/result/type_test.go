@@ -21,6 +21,24 @@ func testPredicateTestCases(okExpected, errExpected bool) []struct {
 	}
 }
 
+// testPanicRecovery tests that a function either panics or doesn't based on wantPanic.
+// This eliminates duplicate panic-recovery test patterns across test functions.
+func testPanicRecovery(t *testing.T, wantPanic bool, fn func()) {
+	t.Helper()
+	defer func() {
+		if r := recover(); r != nil {
+			if !wantPanic {
+				t.Errorf("unexpected panic: %v", r)
+			}
+		} else {
+			if wantPanic {
+				t.Error("expected panic but got none")
+			}
+		}
+	}()
+	fn()
+}
+
 func TestResult_Ok(t *testing.T) {
 	testPredicateCases(
 		t,
@@ -84,22 +102,13 @@ func TestResult_Value(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			defer func() {
-				if r := recover(); r != nil {
-					if !tt.wantPanic {
-						t.Errorf("unexpected panic: %v", r)
-					}
-				} else {
-					if tt.wantPanic {
-						t.Error("expected panic but got none")
-					}
+			t.Parallel()
+			testPanicRecovery(t, tt.wantPanic, func() {
+				value := tt.result.Value()
+				if value != tt.expected {
+					t.Errorf("Value() = %v, want %v", value, tt.expected)
 				}
-			}()
-
-			value := tt.result.Value()
-			if !tt.wantPanic && value != tt.expected {
-				t.Errorf("Value() = %v, want %v", value, tt.expected)
-			}
+			})
 		})
 	}
 }
@@ -117,22 +126,13 @@ func TestResult_Error(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			defer func() {
-				if r := recover(); r != nil {
-					if !tt.wantPanic {
-						t.Errorf("unexpected panic: %v", r)
-					}
-				} else {
-					if tt.wantPanic {
-						t.Error("expected panic but got none")
-					}
+			t.Parallel()
+			testPanicRecovery(t, tt.wantPanic, func() {
+				err := tt.result.Error()
+				if err.Error() != tt.expected {
+					t.Errorf("Error() = %v, want %v", err.Error(), tt.expected)
 				}
-			}()
-
-			err := tt.result.Error()
-			if !tt.wantPanic && err.Error() != tt.expected {
-				t.Errorf("Error() = %v, want %v", err.Error(), tt.expected)
-			}
+			})
 		})
 	}
 }

@@ -117,7 +117,7 @@ func (s *GitHistoryScanner) Scan(ctx context.Context) (*domain.GitHistoryScanRes
 
 	// Filter and sort files
 	files = s.filterFiles(files)
-	s.sortBySize(files)
+	domain.SortBySizeDesc(files)
 
 	// Limit results
 	if len(files) > s.maxFiles {
@@ -396,19 +396,6 @@ func (s *GitHistoryScanner) isLikelyBinary(f domain.GitHistoryFile) bool {
 	}
 
 	return false
-}
-
-// sortBySize sorts files by size in descending order.
-func (s *GitHistoryScanner) sortBySize(files []domain.GitHistoryFile) {
-	slices.SortFunc(files, func(a, b domain.GitHistoryFile) int {
-		if a.SizeBytes > b.SizeBytes {
-			return -1
-		} else if a.SizeBytes < b.SizeBytes {
-			return 1
-		}
-
-		return 0
-	})
 }
 
 // GetRepoSize returns the size of the .git directory.

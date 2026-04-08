@@ -5,6 +5,18 @@ import (
 	"time"
 )
 
+var zeroTime = time.Time{}
+var testDate = time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC)
+
+var commonTimeTests = []struct {
+	name     string
+	input    time.Time
+	expected string
+}{
+	{"zero time", zeroTime, "never"},
+	{"unix epoch", time.Unix(0, 0), ""},
+}
+
 func runFormattingTests[T any](t *testing.T, tests []struct {
 	name     string
 	input    T
@@ -89,9 +101,13 @@ func TestDate(t *testing.T) {
 		input    time.Time
 		expected string
 	}{
-		{"valid date", time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC), "2023-12-25"},
-		{"zero time", time.Time{}, "never"},
-		{"unix epoch", time.Unix(0, 0), "1970-01-01"},
+		{"valid date", testDate, "2023-12-25"},
+	}
+	dateTests = append(dateTests, commonTimeTests...)
+	for i := range dateTests {
+		if dateTests[i].name == "unix epoch" {
+			dateTests[i].expected = "1970-01-01"
+		}
 	}
 
 	runFormattingTests(t, dateTests, Date)
@@ -103,9 +119,13 @@ func TestDateTime(t *testing.T) {
 		input    time.Time
 		expected string
 	}{
-		{"valid datetime", time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC), "2023-12-25 15:30:45"},
-		{"zero time", time.Time{}, "never"},
-		{"unix epoch", time.Unix(0, 0), "1970-01-01 00:00:00"},
+		{"valid datetime", testDate, "2023-12-25 15:30:45"},
+	}
+	dateTimeTests = append(dateTimeTests, commonTimeTests...)
+	for i := range dateTimeTests {
+		if dateTimeTests[i].name == "unix epoch" {
+			dateTimeTests[i].expected = "1970-01-01 00:00:00"
+		}
 	}
 
 	runDateTimeTests(
