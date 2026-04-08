@@ -24,3 +24,7 @@ reports/
 .DS_Store
 # Dependencies
 node_modules/
+# Test coverage
+/coverage
+# Sensitive files
+*.db
