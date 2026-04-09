@@ -9,9 +9,6 @@ import (
 // DefaultTimeout is the default timeout for external commands.
 const DefaultTimeout = 5 * time.Minute
 
-// defaultTimeout is kept for backward compatibility with internal usage.
-const defaultTimeout = DefaultTimeout
-
 // ExecWithTimeout creates a command with the specified timeout.
 // If the context already has a deadline, respects the earlier deadline.
 func ExecWithTimeout(
@@ -26,9 +23,10 @@ func ExecWithTimeout(
 	}
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
-	_ = cancel // will be called by cmd.Wait() or context usage
+	cmd := exec.CommandContext(timeoutCtx, name, args...)
+	cmd.Cancel = cancel
 
-	return exec.CommandContext(timeoutCtx, name, args...)
+	return cmd
 }
 
 // ExecWithDefaultTimeout creates a command with the default 5-minute timeout.
@@ -42,12 +40,12 @@ func ExecWithDefaultTimeout(ctx context.Context, name string, args ...string) *e
 func (n *NixAdapter) execWithTimeout(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	timeout := n.timeout
 	if timeout == 0 {
-		timeout = defaultTimeout
+		timeout = DefaultTimeout
 	}
 
-	// Create timeout context
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
-	_ = cancel // will be called by cmd.Wait() or context usage
+	cmd := exec.CommandContext(timeoutCtx, name, arg...)
+	cmd.Cancel = cancel
 
-	return exec.CommandContext(timeoutCtx, name, arg...)
+	return cmd
 }

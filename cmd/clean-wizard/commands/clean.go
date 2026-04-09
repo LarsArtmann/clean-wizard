@@ -181,6 +181,10 @@ func getAvailableConfigs(ctx context.Context) []CleanerConfig {
 }
 
 func loadConfigForClean(configPath string) (*domain.Config, error) {
+	if configPath != "" {
+		return config.LoadFromPath(configPath)
+	}
+
 	return config.Load()
 }
 

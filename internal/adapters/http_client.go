@@ -63,10 +63,11 @@ func (hc *HTTPClient) WithRetry(count int, waitTime, maxWaitTime time.Duration) 
 
 // WithAuth sets authentication header.
 func (hc *HTTPClient) WithAuth(authType, token string) *HTTPClient {
-	hc.client.SetAuthToken(token)
-
-	if authType == "Bearer" {
-		hc.client.SetAuthToken("Bearer " + token)
+	switch authType {
+	case "Bearer":
+		hc.client.SetAuthToken(token)
+	default:
+		hc.client.SetHeader("Authorization", authType+" "+token)
 	}
 
 	return hc

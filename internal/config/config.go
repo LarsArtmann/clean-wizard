@@ -50,12 +50,15 @@ func getConfigPath() string {
 
 // readConfigFile attempts to read the config file, returning default config if not found.
 func readConfigFile(ctx context.Context, k *koanf.Koanf) (*domain.Config, error) {
+	return readConfigFileFromPath(ctx, k, getConfigPath())
+}
+
+// readConfigFileFromPath attempts to read a config file from the given path.
+func readConfigFileFromPath(ctx context.Context, k *koanf.Koanf, configPath string) (*domain.Config, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	default:
-		configPath := getConfigPath()
-
 		err := k.Load(file.Provider(configPath), yaml.Parser())
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -147,15 +150,23 @@ func Load() (*domain.Config, error) {
 	return LoadWithContext(context.Background())
 }
 
+// LoadFromPath loads configuration from a specific file path.
+func LoadFromPath(configPath string) (*domain.Config, error) {
+	return LoadWithContextFromPath(context.Background(), configPath)
+}
+
 // LoadWithContext loads configuration with context support.
 func LoadWithContext(ctx context.Context) (*domain.Config, error) {
+	return LoadWithContextFromPath(ctx, getConfigPath())
+}
+
+// LoadWithContextFromPath loads configuration from a specific file path with context support.
+func LoadWithContextFromPath(ctx context.Context, configPath string) (*domain.Config, error) {
 	k := setupKoanf()
 
-	// Try to read configuration file
-	config, err := readConfigFile(ctx, k)
+	config, err := readConfigFileFromPath(ctx, k, configPath)
 	if err != nil {
 		if errors.Is(err, ErrConfigShouldUnmarshal) {
-			// File read successfully, unmarshal and process configuration
 			return unmarshalConfig(k)
 		}
 
