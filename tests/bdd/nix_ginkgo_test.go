@@ -118,10 +118,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		ginkgo.It("should show how many generations would be removed", func() {
 			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
 			testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, 3)
-			if testCtx.cleanResult.IsOk() {
-				cleanRes := testCtx.cleanResult.Value()
-				gomega.Expect(cleanRes.ItemsRemoved).To(gomega.BeNumerically(">=", 0))
-			}
+			assertCleanResultItemsRemoved(testCtx.cleanResult)
 		})
 
 		ginkgo.It("should not perform actual cleaning in dry-run mode", func() {
@@ -147,10 +144,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 			generations := testCtx.generations.Value()
 			if len(generations) > keepCount {
 				testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, keepCount)
-				if testCtx.cleanResult.IsOk() {
-					cleanRes := testCtx.cleanResult.Value()
-					gomega.Expect(cleanRes.ItemsRemoved).To(gomega.BeNumerically(">=", 0))
-				}
+				assertCleanResultItemsRemoved(testCtx.cleanResult)
 			}
 		})
 	})
@@ -249,13 +243,8 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 		})
 
 		ginkgo.It("should require confirmation before real deletion", func() {
-			// In dry-run mode, no actual deletion happens
 			nixCtx.cleanResult = nixCtx.nixCleaner.CleanOldGenerations(nixCtx.ctx, 1)
-			if nixCtx.cleanResult.IsOk() {
-				cleanRes := nixCtx.cleanResult.Value()
-				// Dry-run should be indicated in strategy
-				gomega.Expect(cleanRes.Strategy.IsValid()).To(gomega.BeTrue())
-			}
+			assertCleanResultStrategyValid(nixCtx.cleanResult)
 		})
 	})
 
@@ -281,11 +270,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 			nixCtx.dryRun = true
 			nixCtx.nixCleaner = cleaner.NewNixCleaner(true, true)
 			nixCtx.cleanResult = nixCtx.nixCleaner.CleanOldGenerations(nixCtx.ctx, 3)
-			// In dry-run, no bytes should be freed
-			if nixCtx.cleanResult.IsOk() {
-				cleanRes := nixCtx.cleanResult.Value()
-				gomega.Expect(cleanRes.Strategy.IsValid()).To(gomega.BeTrue())
-			}
+			assertCleanResultStrategyValid(nixCtx.cleanResult)
 		})
 
 		ginkgo.It("should not actually delete generations in dry-run", func() {

@@ -68,3 +68,19 @@ func cleanGenerationsAndVerify(
 	cleanResult := nixCleaner.CleanOldGenerations(ctx, keepCount)
 	return cleanResult
 }
+
+// assertCleanResultItemsRemoved verifies that a clean result has ItemsRemoved >= 0.
+// This eliminates duplicate assertion code across BDD test files.
+func assertCleanResultItemsRemoved(cleanResult result.Result[domain.CleanResult]) {
+	gomega.Expect(cleanResult.IsOk()).To(gomega.BeTrue())
+	cleanRes := cleanResult.Value()
+	gomega.Expect(cleanRes.ItemsRemoved).To(gomega.BeNumerically(">=", 0))
+}
+
+// assertCleanResultStrategyValid verifies that a clean result has a valid Strategy.
+// This eliminates duplicate assertion code across BDD test files.
+func assertCleanResultStrategyValid(cleanResult result.Result[domain.CleanResult]) {
+	gomega.Expect(cleanResult.IsOk()).To(gomega.BeTrue())
+	cleanRes := cleanResult.Value()
+	gomega.Expect(cleanRes.Strategy.IsValid()).To(gomega.BeTrue())
+}

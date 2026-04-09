@@ -231,3 +231,21 @@ func StandardTestBinaries() []BinaryInfo {
 func StandardTestBinariesTotalSize() int64 {
 	return 35 * 1024 * 1024
 }
+
+// GinkgoAssertIsAvailableNoPanic asserts that calling IsAvailable does not panic.
+// This eliminates duplicate test code across cleaner test files.
+func GinkgoAssertIsAvailableNoPanic(cleaner interface{ IsAvailable(context.Context) bool }) {
+	gomega.Expect(func() { cleaner.IsAvailable(context.Background()) }).NotTo(gomega.Panic())
+}
+
+// GinkgoAssertIsAvailableWithCancelledContext tests that IsAvailable works with a cancelled context.
+// This eliminates duplicate test code across cleaner test files.
+func GinkgoAssertIsAvailableWithCancelledContext(
+	cleaner interface{ IsAvailable(context.Context) bool },
+) {
+	cancelledCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	result := cleaner.IsAvailable(cancelledCtx)
+	_ = result
+}

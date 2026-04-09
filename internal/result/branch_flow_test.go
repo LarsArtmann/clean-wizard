@@ -8,12 +8,12 @@ import (
 
 // branchWithValueTestCase holds test data for BranchWithValue tests.
 type branchWithValueTestCase struct {
-	name           string
-	inputValue     int
-	predicate      func(int) bool
-	branchFn       func(int) Result[int]
-	fallbackValue   int
-	expectedValue  int
+	name          string
+	inputValue    int
+	predicate     func(int) bool
+	branchFn      func(int) Result[int]
+	fallbackValue int
+	expectedValue int
 }
 
 // runBranchWithValueTests runs a set of BranchWithValue test cases.
@@ -39,6 +39,15 @@ func runBranchWithValueTests(t *testing.T, cases []branchWithValueTestCase) {
 				t.Errorf("BranchWithValue() = %v, want %v", result.Value(), tc.expectedValue)
 			}
 		})
+	}
+}
+
+// makeCase creates a Case struct for SwitchFlow tests.
+// This eliminates duplicate Case struct definitions.
+func makeCase[T any](predicate func(T) bool, result string) Case[T, string] {
+	return Case[T, string]{
+		Predicate: predicate,
+		Execute:   func() Result[string] { return Ok(result) },
 	}
 }
 
@@ -491,18 +500,9 @@ func TestSwitchFlow(t *testing.T) {
 
 		value := 5
 		cases := []Case[int, string]{
-			{
-				Predicate: func(i int) bool { return i < 0 },
-				Execute:   func() Result[string] { return Ok("negative") },
-			},
-			{
-				Predicate: func(i int) bool { return i == 0 },
-				Execute:   func() Result[string] { return Ok("zero") },
-			},
-			{
-				Predicate: func(i int) bool { return i > 0 },
-				Execute:   func() Result[string] { return Ok("positive") },
-			},
+			makeCase(func(i int) bool { return i < 0 }, "negative"),
+			makeCase(func(i int) bool { return i == 0 }, "zero"),
+			makeCase(func(i int) bool { return i > 0 }, "positive"),
 		}
 		defaultCase := func() Result[string] { return Ok("unknown") }
 
@@ -523,10 +523,7 @@ func TestSwitchFlow(t *testing.T) {
 		testErr := errors.New("test error")
 		result := Err[int](testErr)
 		cases := []Case[int, string]{
-			{
-				Predicate: func(i int) bool { return i > 0 },
-				Execute:   func() Result[string] { return Ok("positive") },
-			},
+			makeCase(func(i int) bool { return i > 0 }, "positive"),
 		}
 		defaultCase := func() Result[string] { return Ok("unknown") }
 

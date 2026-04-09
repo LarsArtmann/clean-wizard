@@ -9,6 +9,24 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// enumMacroTestCase holds test data for enum macros (JSON/YAML unmarshal).
+// This consolidates duplicate test case structures.
+type enumMacroTestCase struct {
+	name     string
+	input    string
+	expected int
+	wantErr  bool
+}
+
+// getEnumMacroTestCases returns standard test cases for enum unmarshaling.
+func getEnumMacroTestCases() []enumMacroTestCase {
+	return []enumMacroTestCase{
+		{"valid lowercase", "medium", 1, false},
+		{"valid integer", "2", 2, false},
+		{"invalid value", "INVALID", 0, true},
+	}
+}
+
 func TestEnumString(t *testing.T) {
 	t.Parallel()
 
@@ -95,7 +113,9 @@ func TestEnumUnmarshalJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			var val int
+
 			err := EnumUnmarshalJSON([]byte(tt.input), &val, strings, "test")
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -134,8 +154,11 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			node := &yaml.Node{Kind: yaml.ScalarNode, Value: tt.input}
+
 			var val int
+
 			err := EnumUnmarshalYAML(node, &val, strings, "test")
 			if tt.wantErr {
 				assert.Error(t, err)

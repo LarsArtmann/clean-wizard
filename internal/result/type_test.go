@@ -25,6 +25,7 @@ func testPredicateTestCases(okExpected, errExpected bool) []struct {
 // This eliminates duplicate panic-recovery test patterns across test functions.
 func testPanicRecovery(t *testing.T, wantPanic bool, fn func()) {
 	t.Helper()
+
 	defer func() {
 		if r := recover(); r != nil {
 			if !wantPanic {
@@ -36,6 +37,7 @@ func testPanicRecovery(t *testing.T, wantPanic bool, fn func()) {
 			}
 		}
 	}()
+
 	fn()
 }
 

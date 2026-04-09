@@ -68,6 +68,58 @@ func EnumMarshalYAML[T ~int](val T, stringsMap []string) (any, error) {
 	return EnumString(val, stringsMap), nil
 }
 
+func trySetEnumFromIndex[T ~int](
+	idx int,
+	target *T,
+	stringsMap []string,
+	name string,
+) (bool, error) {
+	if idx >= 0 && idx < len(stringsMap) {
+		*target = T(idx)
+
+		return true, nil
+	}
+
+	return false, fmt.Errorf(
+		"invalid %s: %d. Valid: 0-%d (%v)",
+		name,
+		idx,
+		len(stringsMap)-1,
+		stringsMap,
+	)
+}
+
+func parseEnumFromString[T ~int](
+	s string,
+	target *T,
+	stringsMap []string,
+	name string,
+) (bool, error) {
+	if idx, atoiErr := strconv.Atoi(s); atoiErr == nil {
+		return trySetEnumFromIndex(idx, target, stringsMap, name)
+	}
+
+	upper := strings.ToUpper(s)
+	for idx, str := range stringsMap {
+		if strings.ToUpper(str) == upper {
+			*target = T(idx)
+
+			return true, nil
+		}
+	}
+
+	return false, fmt.Errorf("invalid %s: %s. Valid: %v", name, s, stringsMap)
+}
+
+func parseEnumFromInt[T ~int](
+	i int,
+	target *T,
+	stringsMap []string,
+	name string,
+) (bool, error) {
+	return trySetEnumFromIndex(i, target, stringsMap, name)
+}
+
 func EnumUnmarshalYAML[T ~int](
 	value *yaml.Node,
 	target *T,
@@ -78,51 +130,22 @@ func EnumUnmarshalYAML[T ~int](
 
 	err := value.Decode(&s)
 	if err == nil {
-		if i, atoiErr := strconv.Atoi(s); atoiErr == nil {
-			if i >= 0 && i < len(stringsMap) {
-				*target = T(i)
-
-				return nil
-			}
-
-			return fmt.Errorf(
-				"invalid %s: %d. Valid: 0-%d (%v)",
-				name,
-				i,
-				len(stringsMap)-1,
-				stringsMap,
-			)
+		if ok, parseErr := parseEnumFromString(s, target, stringsMap, name); ok {
+			return parseErr
+		} else if parseErr != nil {
+			return parseErr
 		}
-
-		upper := strings.ToUpper(s)
-		for i, str := range stringsMap {
-			if strings.ToUpper(str) == upper {
-				*target = T(i)
-
-				return nil
-			}
-		}
-
-		return fmt.Errorf("invalid %s: %s. Valid: %v", name, s, stringsMap)
 	}
 
 	var i int
 
 	err = value.Decode(&i)
 	if err == nil {
-		if i >= 0 && i < len(stringsMap) {
-			*target = T(i)
-
-			return nil
+		if ok, parseErr := parseEnumFromInt(i, target, stringsMap, name); ok {
+			return parseErr
+		} else if parseErr != nil {
+			return parseErr
 		}
-
-		return fmt.Errorf(
-			"invalid %s: %d. Valid: 0-%d (%v)",
-			name,
-			i,
-			len(stringsMap)-1,
-			stringsMap,
-		)
 	}
 
 	return fmt.Errorf("cannot parse %s: expected string or int", name)

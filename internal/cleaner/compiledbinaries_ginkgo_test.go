@@ -131,7 +131,6 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		})
 
 		ginkgo.Context("with custom configuration", func() {
-
 			ginkgo.It("should accept custom base paths", func() {
 				paths := []string{"/custom/path1", "/custom/path2"}
 				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", paths, nil)
@@ -238,7 +237,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		})
 
 		ginkgo.It("should not panic when checking availability", func() {
-			gomega.Expect(func() { cleaner.IsAvailable(ctx) }).NotTo(gomega.Panic())
+			GinkgoAssertIsAvailableNoPanic(cleaner)
 		})
 
 		ginkgo.It("should handle context parameter", func() {
@@ -247,11 +246,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		})
 
 		ginkgo.It("should work with cancelled context", func() {
-			cancelledCtx, cancel := context.WithCancel(context.Background())
-			cancel()
-
-			result := cleaner.IsAvailable(cancelledCtx)
-			_ = result
+			GinkgoAssertIsAvailableWithCancelledContext(cleaner)
 		})
 	})
 
@@ -293,22 +288,23 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 				GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
-			ginkgo.It("should return nil for valid older_than with days", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
-						OlderThan: "7d",
-					},
+			ginkgo.It("should return nil for valid older_than with various formats", func() {
+				olderThanFormats := []struct {
+					name  string
+					value string
+				}{
+					{name: "days", value: "7d"},
+					{name: "hours", value: "24h"},
 				}
-				GinkgoValidateValidSettingsTest(cleaner, settings)
-			})
 
-			ginkgo.It("should return nil for valid older_than with hours", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
-						OlderThan: "24h",
-					},
+				for _, format := range olderThanFormats {
+					settings := &domain.OperationSettings{
+						CompiledBinaries: &domain.CompiledBinariesSettings{
+							OlderThan: format.value,
+						},
+					}
+					GinkgoValidateValidSettingsTest(cleaner, settings)
 				}
-				GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid exclude patterns", func() {

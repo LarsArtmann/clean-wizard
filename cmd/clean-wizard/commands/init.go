@@ -194,18 +194,13 @@ func createInteractiveConfig() error {
 
 		// Warn about Docker if selected
 		if includeDocker {
-			warningForm := huh.NewForm(
-				huh.NewGroup(
-					huh.NewConfirm().
-						Title("⚠️  Docker cleaner warning").
-						Description("This will remove unused Docker images and volumes. Continue?").
-						Affirmative("Yes, I understand").
-						Negative("No, skip Docker").
-						Value(&includeDockerWarning),
-				),
-			)
-
-			err := warningForm.Run()
+			err := newConfirmForm(
+				"⚠️  Docker cleaner warning",
+				"This will remove unused Docker images and volumes. Continue?",
+				"Yes, I understand",
+				"No, skip Docker",
+				&includeDockerWarning,
+			).Run()
 			if err != nil {
 				return fmt.Errorf("docker warning error: %w", err)
 			}
@@ -243,18 +238,13 @@ func createInteractiveConfig() error {
 	// Ask about safe mode
 	safeMode := true
 
-	safeModeForm := huh.NewForm(
-		huh.NewGroup(
-			huh.NewConfirm().
-				Title("Enable safe mode?").
-				Description("Safe mode prevents destructive operations and adds confirmation prompts").
-				Affirmative("Yes, enable safe mode (Recommended)").
-				Negative("No, disable safe mode").
-				Value(&safeMode),
-		),
-	)
-
-	if err := safeModeForm.Run(); err != nil {
+	if err := newConfirmForm(
+		"Enable safe mode?",
+		"Safe mode prevents destructive operations and adds confirmation prompts",
+		"Yes, enable safe mode (Recommended)",
+		"No, disable safe mode",
+		&safeMode,
+	).Run(); err != nil {
 		return fmt.Errorf("safe mode selection error: %w", err)
 	}
 

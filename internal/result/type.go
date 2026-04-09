@@ -166,13 +166,6 @@ func Match[T, U any](r Result[T], ok func(T) U, err func(error) U) U {
 	return ok(r.value)
 }
 
-// Switch is an alias for Match for semantic clarity in switch-style branching.
-//
-// Deprecated: Use Match instead for better readability.
-func Switch[T, U any](r Result[T], ok func(T) U, err func(error) U) U {
-	return Match(r, ok, err)
-}
-
 // TapErr applies a side-effect function to the error if present.
 // Returns the original result unchanged, useful for error logging.
 func (r Result[T]) TapErr(fn func(error)) Result[T] {

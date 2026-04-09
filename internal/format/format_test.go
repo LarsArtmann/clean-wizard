@@ -5,8 +5,10 @@ import (
 	"time"
 )
 
-var zeroTime = time.Time{}
-var testDate = time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC)
+var (
+	zeroTime = time.Time{}
+	testDate = time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC)
+)
 
 var commonTimeTests = []struct {
 	name     string
@@ -103,6 +105,7 @@ func TestDate(t *testing.T) {
 	}{
 		{"valid date", testDate, "2023-12-25"},
 	}
+
 	dateTests = append(dateTests, commonTimeTests...)
 	for i := range dateTests {
 		if dateTests[i].name == "unix epoch" {
@@ -121,6 +124,7 @@ func TestDateTime(t *testing.T) {
 	}{
 		{"valid datetime", testDate, "2023-12-25 15:30:45"},
 	}
+
 	dateTimeTests = append(dateTimeTests, commonTimeTests...)
 	for i := range dateTimeTests {
 		if dateTimeTests[i].name == "unix epoch" {

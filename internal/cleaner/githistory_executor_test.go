@@ -155,21 +155,33 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 			executor = NewGitHistoryExecutor(tempDir, false, false)
 		})
 
-		ginkgo.It("should parse commit count from output", func() {
-			output := "Processed 150 commits in 2.3 seconds"
-			count := executor.parseCommitCount(output)
-			gomega.Expect(count).To(gomega.Equal(150))
-		})
+		ginkgo.It("should parse commit count from various outputs", func() {
+			testCases := []struct {
+				name     string
+				output   string
+				expected int
+			}{
+				{
+					name:     "parses valid output",
+					output:   "Processed 150 commits in 2.3 seconds",
+					expected: 150,
+				},
+				{
+					name:     "returns 0 for no match",
+					output:   "No commits processed",
+					expected: 0,
+				},
+				{
+					name:     "handles empty output",
+					output:   "",
+					expected: 0,
+				},
+			}
 
-		ginkgo.It("should return 0 for no match", func() {
-			output := "No commits processed"
-			count := executor.parseCommitCount(output)
-			gomega.Expect(count).To(gomega.Equal(0))
-		})
-
-		ginkgo.It("should handle empty output", func() {
-			count := executor.parseCommitCount("")
-			gomega.Expect(count).To(gomega.Equal(0))
+			for _, tc := range testCases {
+				count := executor.parseCommitCount(tc.output)
+				gomega.Expect(count).To(gomega.Equal(tc.expected), tc.name)
+			}
 		})
 	})
 

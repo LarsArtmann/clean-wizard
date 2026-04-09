@@ -220,7 +220,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 
 		ginkgo.It("should not panic when checking availability", func() {
-			gomega.Expect(func() { cleaner.IsAvailable(ctx) }).NotTo(gomega.Panic())
+			GinkgoAssertIsAvailableNoPanic(cleaner)
 		})
 
 		ginkgo.It("should return a boolean value", func() {
@@ -235,11 +235,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 
 		ginkgo.It("should work with cancelled context", func() {
-			cancelledCtx, cancel := context.WithCancel(context.Background())
-			cancel()
-			// Should still return a result (doesn't depend on context for tool check)
-			result := cleaner.IsAvailable(cancelledCtx)
-			_ = result
+			GinkgoAssertIsAvailableWithCancelledContext(cleaner)
 		})
 	})
 
