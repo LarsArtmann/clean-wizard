@@ -23,30 +23,35 @@ Batch 1 of the comprehensive code quality improvement plan has been **COMPLETED 
 The following critical bug fixes were implemented and committed in `94f4a25`:
 
 #### 1. Context Cancel Leak Fix (`internal/adapters/exec.go`)
+
 - **Problem:** `context.WithTimeout()` creates a cancel function that was being discarded (`_ = cancel`)
 - **Impact:** Resource leak - context timers accumulating
 - **Fix:** Set `cmd.Cancel = cancel` to ensure proper cleanup when command completes
 - **Files Changed:** `ExecWithTimeout()` and `NixAdapter.execWithTimeout()`
 
 #### 2. HTTP Auth Double "Bearer" Fix (`internal/adapters/http_client.go`)
+
 - **Problem:** Code called `SetAuthToken(token)` then `SetAuthToken("Bearer "+token)`
 - **Impact:** Resulted in "Bearer Bearer <token>" - broken authentication
 - **Fix:** Clean switch statement - Bearer uses `SetAuthToken(token)` (resty prepends), others use `SetHeader("Authorization", authType+" "+token)`
 
 #### 3. Duplicate Signal Handling Removal (`cmd/clean-wizard/main.go`)
+
 - **Problem:** `signal.NotifyContext` was redundant with `fang.WithNotifySignal`
 - **Impact:** Double signal handling, unnecessary complexity
 - **Fix:** Removed `os/signal` import, removed ctx/cancel variables, passed `context.Background()` directly to `fang.Execute`
 
 #### 4. Config Path Flag Fix (`cmd/clean-wizard/commands/clean.go` + `internal/config/config.go`)
+
 - **Problem:** `--config` flag was silently ignored - `loadConfigForClean` accepted `configPath` but never used it
 - **Impact:** Users couldn't specify custom config files
-- **Fix:** 
+- **Fix:**
   - Added `LoadFromPath()` and `LoadWithContextFromPath()` public functions
   - Extracted `readConfigFileFromPath()` from `readConfigFile()`
   - Updated `loadConfigForClean` to call `config.LoadFromPath(configPath)` when non-empty
 
 #### 5. Deprecated Alias Removal (`internal/adapters/exec.go`)
+
 - **Problem:** Dead `defaultTimeout` backward-compat alias
 - **Fix:** Removed alias, replaced usage with `DefaultTimeout`
 
@@ -56,13 +61,13 @@ The following critical bug fixes were implemented and committed in `94f4a25`:
 
 ### Code Quality Review Execution
 
-| Phase | Status | Notes |
-|-------|--------|-------|
-| Codebase Audit | ✅ Complete | ~80+ issues identified across all packages |
-| Prioritization | ✅ Complete | Sorted by impact/effort ratio |
-| Batch 1 Implementation | ✅ Complete | 5 bug fixes committed |
-| Batch 1 Verification | 🚧 BLOCKED | Build cache corruption preventing verification |
-| Batch 2 Implementation | 📝 Not Started | Dead code removal + deduplication |
+| Phase                  | Status         | Notes                                          |
+| ---------------------- | -------------- | ---------------------------------------------- |
+| Codebase Audit         | ✅ Complete    | ~80+ issues identified across all packages     |
+| Prioritization         | ✅ Complete    | Sorted by impact/effort ratio                  |
+| Batch 1 Implementation | ✅ Complete    | 5 bug fixes committed                          |
+| Batch 1 Verification   | 🚧 BLOCKED     | Build cache corruption preventing verification |
+| Batch 2 Implementation | 📝 Not Started | Dead code removal + deduplication              |
 
 ### Remaining Batch 1 Items (Steps 6-10)
 
@@ -89,14 +94,14 @@ The following items remain in the backlog:
 
 ### Outstanding TODO_LIST.md Items
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 1 | Add tests for getRegistryName reverse lookup | MED | LOW |
-| 2 | Add profile command tests | MED | MED |
-| 3 | Add scan command tests | MED | MED |
-| 4 | Add clean command tests | MED | HIGH |
-| 5 | Set up CI pipeline | HIGH | MED |
-| 6 | Fix pre-commit hook timeout | MED | LOW |
+| #   | Task                                         | Impact | Effort |
+| --- | -------------------------------------------- | ------ | ------ |
+| 1   | Add tests for getRegistryName reverse lookup | MED    | LOW    |
+| 2   | Add profile command tests                    | MED    | MED    |
+| 3   | Add scan command tests                       | MED    | MED    |
+| 4   | Add clean command tests                      | MED    | HIGH   |
+| 5   | Set up CI pipeline                           | HIGH   | MED    |
+| 6   | Fix pre-commit hook timeout                  | MED    | LOW    |
 
 ---
 
@@ -107,6 +112,7 @@ The following items remain in the backlog:
 **Issue:** Go build cache corruption preventing any builds
 
 **Symptoms:**
+
 ```
 # crypto/internal/fips140/sha3
 ...could not import crypto/internal/fips140deps/byteorder (open ...no such file or directory)
@@ -118,7 +124,8 @@ The following items remain in the backlog:
 
 **Root Cause:** Go build cache at `~/Library/Caches/go-build/` has corrupted/incomplete entries
 
-**Impact:** 
+**Impact:**
+
 - Cannot run `go build ./...`
 - Cannot run `go test ./...`
 - Cannot verify any code changes
@@ -126,11 +133,13 @@ The following items remain in the backlog:
 **Resolution Status:** ❌ NOT RESOLVED
 
 **Actions Taken:**
+
 - Attempted `go clean -cache` → Hung/backgrounded
 - Attempted manual cache deletion → Hung/backgrounded
 - Attempted `GOCACHE=/tmp/go-build-clean go build` → Still downloading, terminated
 
 **Recommended Actions:**
+
 1. Exit current session
 2. Run: `rm -rf ~/Library/Caches/go-build/*` in a fresh terminal
 3. Run: `go clean -cache -modcache`
@@ -214,48 +223,48 @@ The following items remain in the backlog:
 
 ### Critical (Do First)
 
-| # | Task | Category | Impact | Effort |
-|---|------|----------|--------|--------|
-| 1 | **Fix Go build cache** | Infrastructure | CRITICAL | LOW |
-| 2 | **Complete Batch 1 bug fixes** | Bug Fix | HIGH | LOW |
-| 3 | **Verify Batch 1 with tests** | Quality | HIGH | LOW |
-| 4 | **Commit Batch 1 remaining** | Process | HIGH | LOW |
-| 5 | **Extract IsToolAvailable helper** | Refactor | MED | LOW |
+| #   | Task                               | Category       | Impact   | Effort |
+| --- | ---------------------------------- | -------------- | -------- | ------ |
+| 1   | **Fix Go build cache**             | Infrastructure | CRITICAL | LOW    |
+| 2   | **Complete Batch 1 bug fixes**     | Bug Fix        | HIGH     | LOW    |
+| 3   | **Verify Batch 1 with tests**      | Quality        | HIGH     | LOW    |
+| 4   | **Commit Batch 1 remaining**       | Process        | HIGH     | LOW    |
+| 5   | **Extract IsToolAvailable helper** | Refactor       | MED      | LOW    |
 
 ### High Priority
 
-| # | Task | Category | Impact | Effort |
-|---|------|----------|--------|--------|
-| 6 | **Extract ParseSizeString helper** | Refactor | MED | LOW |
-| 7 | **Remove projectsmanagementautomation.go** | Cleanup | MED | LOW |
-| 8 | **Remove scanDockerResources** | Cleanup | LOW | LOW |
-| 9 | **Commit Batch 2** | Process | MED | LOW |
-| 10 | **Add clean command tests** | Testing | HIGH | HIGH |
-| 11 | **Set up CI pipeline** | DevOps | HIGH | MED |
-| 12 | **Fix pre-commit hook timeout** | DevEx | MED | LOW |
-| 13 | **Add profile command tests** | Testing | MED | MED |
-| 14 | **Add scan command tests** | Testing | MED | MED |
-| 15 | **Fix golangci-lint warnings** | Quality | MED | MED |
+| #   | Task                                       | Category | Impact | Effort |
+| --- | ------------------------------------------ | -------- | ------ | ------ |
+| 6   | **Extract ParseSizeString helper**         | Refactor | MED    | LOW    |
+| 7   | **Remove projectsmanagementautomation.go** | Cleanup  | MED    | LOW    |
+| 8   | **Remove scanDockerResources**             | Cleanup  | LOW    | LOW    |
+| 9   | **Commit Batch 2**                         | Process  | MED    | LOW    |
+| 10  | **Add clean command tests**                | Testing  | HIGH   | HIGH   |
+| 11  | **Set up CI pipeline**                     | DevOps   | HIGH   | MED    |
+| 12  | **Fix pre-commit hook timeout**            | DevEx    | MED    | LOW    |
+| 13  | **Add profile command tests**              | Testing  | MED    | MED    |
+| 14  | **Add scan command tests**                 | Testing  | MED    | MED    |
+| 15  | **Fix golangci-lint warnings**             | Quality  | MED    | MED    |
 
 ### Medium Priority
 
-| # | Task | Category | Impact | Effort |
-|---|------|----------|--------|--------|
-| 16 | Implement Go in BuildToolType | Feature | MED | MED |
-| 17 | Implement Node in BuildToolType | Feature | MED | MED |
-| 18 | Implement Python in BuildToolType | Feature | MED | MED |
-| 19 | Implement Rust in BuildToolType | Feature | MED | MED |
-| 20 | Add real size estimation to Nix cleaner | Enhancement | MED | MED |
-| 21 | Add dry-run support to Homebrew cleaner | Enhancement | MED | MED |
+| #   | Task                                    | Category    | Impact | Effort |
+| --- | --------------------------------------- | ----------- | ------ | ------ |
+| 16  | Implement Go in BuildToolType           | Feature     | MED    | MED    |
+| 17  | Implement Node in BuildToolType         | Feature     | MED    | MED    |
+| 18  | Implement Python in BuildToolType       | Feature     | MED    | MED    |
+| 19  | Implement Rust in BuildToolType         | Feature     | MED    | MED    |
+| 20  | Add real size estimation to Nix cleaner | Enhancement | MED    | MED    |
+| 21  | Add dry-run support to Homebrew cleaner | Enhancement | MED    | MED    |
 
 ### Lower Priority / Strategic
 
-| # | Task | Category | Impact | Effort |
-|---|------|----------|--------|--------|
-| 22 | Implement Language Version Manager cleaner | Feature | LOW | HIGH |
-| 23 | Remove Projects Management Automation | Cleanup | LOW | LOW |
-| 24 | Add contributing guidelines | Documentation | LOW | LOW |
-| 25 | Create architecture decision records | Documentation | LOW | LOW |
+| #   | Task                                       | Category      | Impact | Effort |
+| --- | ------------------------------------------ | ------------- | ------ | ------ |
+| 22  | Implement Language Version Manager cleaner | Feature       | LOW    | HIGH   |
+| 23  | Remove Projects Management Automation      | Cleanup       | LOW    | LOW    |
+| 24  | Add contributing guidelines                | Documentation | LOW    | LOW    |
+| 25  | Create architecture decision records       | Documentation | LOW    | LOW    |
 
 ---
 
@@ -264,23 +273,27 @@ The following items remain in the backlog:
 ### Why does the Go build cache keep getting corrupted?
 
 **Context:**
+
 - This is not the first time we've hit cache corruption
 - Previous sessions have also encountered similar issues
 - The corruption appears to happen during active development
 - Standard `go clean -cache` commands hang or fail
 
 **What I've Tried:**
+
 1. `go clean -cache` - hangs/gets backgrounded
 2. Manual `rm -rf ~/Library/Caches/go-build/*` - hangs/gets backgrounded
 3. Setting alternative `GOCACHE` - still encounters issues
 
 **Hypotheses:**
+
 1. Is there a background Go process holding locks on cache files?
 2. Is the macOS filesystem (APFS) causing issues with the sheer number of files?
 3. Is there a Go version compatibility issue with the cache format?
 4. Could the corruption be caused by abrupt session terminations?
 
 **What I Need:**
+
 - Command to diagnose what's holding cache file locks
 - Best practices for preventing cache corruption in long development sessions
 - Whether we should disable caching in development environments
@@ -298,13 +311,14 @@ Author: Lars Artmann <git@lars.software>
 Date:   Thu Apr 9 08:04:57 2026 +0200
 
     feat(core): establish initial application structure
-    
+
     - Add CLI entry point and core command structure
     - Implement adapters for system execution and HTTP
     - Initialize configuration management module
 ```
 
 **Files Changed:**
+
 - `cmd/clean-wizard/commands/clean.go` (+4 lines)
 - `cmd/clean-wizard/main.go` (-7 lines, net)
 - `internal/adapters/exec.go` (-3 lines, net)
@@ -313,14 +327,14 @@ Date:   Thu Apr 9 08:04:57 2026 +0200
 
 ### Project Statistics
 
-| Metric | Value |
-|--------|-------|
-| Total Go Files | 197 |
-| Cleaners Implemented | 13 |
-| Tests | 200+ (all passing previously) |
-| Build Status | 🚧 BLOCKED (cache corruption) |
-| Lint Warnings | 930 (gopls infertypeargs) |
-| TODO Items | 6 pending |
+| Metric               | Value                         |
+| -------------------- | ----------------------------- |
+| Total Go Files       | 197                           |
+| Cleaners Implemented | 13                            |
+| Tests                | 200+ (all passing previously) |
+| Build Status         | 🚧 BLOCKED (cache corruption) |
+| Lint Warnings        | 930 (gopls infertypeargs)     |
+| TODO Items           | 6 pending                     |
 
 ### Key Dependencies
 
@@ -336,16 +350,19 @@ Date:   Thu Apr 9 08:04:57 2026 +0200
 ## Conclusion
 
 **What Went Well:**
+
 - Successfully identified and fixed 5 critical bugs in Batch 1
 - Code changes are clean, minimal, and follow existing patterns
 - Commit message is descriptive and follows conventions
 
 **What Went Wrong:**
+
 - Build environment corruption prevented verification
 - Cannot confirm fixes work without resolving cache issue
 - Session interrupted before completing remaining Batch 1 items
 
 **Next Steps:**
+
 1. **URGENT:** Fix build cache (exit session, clean cache manually)
 2. Verify Batch 1 changes compile and tests pass
 3. Complete remaining Batch 1 items (steps 6-10)
@@ -354,5 +371,5 @@ Date:   Thu Apr 9 08:04:57 2026 +0200
 
 ---
 
-*Report generated: 2026-04-09 08:16:16*  
-*Status: Waiting for build environment resolution*
+_Report generated: 2026-04-09 08:16:16_  
+_Status: Waiting for build environment resolution_

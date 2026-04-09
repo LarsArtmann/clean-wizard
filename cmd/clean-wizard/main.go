@@ -27,7 +27,6 @@ func main() {
 		fang.WithCommit(info.Commit),
 		fang.WithNotifySignal(os.Interrupt, syscall.SIGTERM),
 	)
-
 	if err != nil {
 		os.Exit(1)
 	}
