@@ -170,13 +170,8 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 		return nil, pkgerrors.HandleConfigError("ValidateAndLoadConfig", err)
 	}
 
-	// Perform comprehensive validation
-	validationResult := vm.validator.ValidateConfig(cfg)
-	vm.logger.LogValidation(validationResult)
-
-	if !validationResult.IsValid {
-		return nil, pkgerrors.HandleValidationError("ValidateAndLoadConfig",
-			fmt.Errorf("validation failed: %s", vm.formatValidationErrors(validationResult.Errors)))
+	if err := vm.validateConfig(cfg, "ValidateAndLoadConfig"); err != nil {
+		return nil, err
 	}
 
 	// Configuration is valid
@@ -188,13 +183,8 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(
 	ctx context.Context,
 	cfg *domain.Config,
 ) (*domain.Config, error) {
-	// Perform comprehensive validation first
-	validationResult := vm.validator.ValidateConfig(cfg)
-	vm.logger.LogValidation(validationResult)
-
-	if !validationResult.IsValid {
-		return nil, pkgerrors.HandleValidationError("ValidateAndSaveConfig",
-			fmt.Errorf("validation failed: %s", vm.formatValidationErrors(validationResult.Errors)))
+	if err := vm.validateConfig(cfg, "ValidateAndSaveConfig"); err != nil {
+		return nil, err
 	}
 
 	// Save configuration
@@ -205,6 +195,19 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(
 
 	// Return saved configuration
 	return cfg, nil
+}
+
+// validateConfig performs comprehensive validation on a config and returns an error if invalid.
+func (vm *ValidationMiddleware) validateConfig(cfg *domain.Config, operationName string) error {
+	validationResult := vm.validator.ValidateConfig(cfg)
+	vm.logger.LogValidation(validationResult)
+
+	if !validationResult.IsValid {
+		return pkgerrors.HandleValidationError(operationName,
+			fmt.Errorf("validation failed: %s", vm.formatValidationErrors(validationResult.Errors)))
+	}
+
+	return nil
 }
 
 // ValidateConfigChange validates a specific configuration change.

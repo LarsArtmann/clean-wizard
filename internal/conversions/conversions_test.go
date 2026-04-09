@@ -11,13 +11,58 @@ import (
 )
 
 // assertErrorResult verifies that a CleanResult is an error and matches the expected error.
-func assertErrorResult(t *testing.T, cleanResult result.Result[domain.CleanResult], expectedErr error) {
+func assertErrorResult(
+	t *testing.T,
+	cleanResult result.Result[domain.CleanResult],
+	expectedErr error,
+) {
 	if cleanResult.IsOk() {
 		t.Error("Expected error result, got Ok")
 	}
 
 	if cleanResult.Error().Error() != expectedErr.Error() {
 		t.Errorf("Expected error '%s', got '%s'", expectedErr.Error(), cleanResult.Error().Error())
+	}
+}
+
+// assertStrategyEqual checks that the result's strategy matches the expected strategy.
+func assertStrategyEqual(t *testing.T, value *domain.CleanResult, strategy domain.CleanStrategyType) {
+	if value.Strategy != strategy {
+		t.Errorf("Expected strategy '%s', got '%s'", strategy.String(), value.Strategy.String())
+	}
+}
+
+// assertScanResultFields checks common fields of a ScanResult.
+func assertScanResultFields(
+	t *testing.T,
+	scanResult *domain.ScanResult,
+	totalBytes int64,
+	totalItems int,
+	scannedPaths []string,
+	scanDuration time.Duration,
+) {
+	if scanResult.TotalBytes != totalBytes {
+		t.Errorf("Expected total bytes %d, got %d", totalBytes, scanResult.TotalBytes)
+	}
+
+	if scanResult.TotalItems != totalItems {
+		t.Errorf("Expected total items %d, got %d", totalItems, scanResult.TotalItems)
+	}
+
+	if len(scanResult.ScannedPaths) != len(scannedPaths) {
+		t.Errorf(
+			"Expected %d scanned paths, got %d",
+			len(scannedPaths),
+			len(scanResult.ScannedPaths),
+		)
+	}
+
+	if scanResult.ScanTime != scanDuration {
+		t.Errorf("Expected scan time %v, got %v", scanDuration, scanResult.ScanTime)
+	}
+
+	if scanResult.ScannedAt.IsZero() {
+		t.Error("Expected scanned at to be set, got zero time")
 	}
 }
 
@@ -115,30 +160,7 @@ func TestNewScanResult(t *testing.T) {
 	scanDuration := time.Duration(3) * time.Second
 
 	scanResult := NewScanResult(totalBytes, totalItems, scannedPaths, scanDuration)
-
-	if scanResult.TotalBytes != totalBytes {
-		t.Errorf("Expected total bytes %d, got %d", totalBytes, scanResult.TotalBytes)
-	}
-
-	if scanResult.TotalItems != totalItems {
-		t.Errorf("Expected total items %d, got %d", totalItems, scanResult.TotalItems)
-	}
-
-	if len(scanResult.ScannedPaths) != len(scannedPaths) {
-		t.Errorf(
-			"Expected %d scanned paths, got %d",
-			len(scannedPaths),
-			len(scanResult.ScannedPaths),
-		)
-	}
-
-	if scanResult.ScanTime != scanDuration {
-		t.Errorf("Expected scan time %v, got %v", scanDuration, scanResult.ScanTime)
-	}
-
-	if scanResult.ScannedAt.IsZero() {
-		t.Error("Expected scanned at to be set, got zero time")
-	}
+	assertScanResultFields(t, &scanResult, totalBytes, totalItems, scannedPaths, scanDuration)
 }
 
 func TestToCleanResult(t *testing.T) {
@@ -185,9 +207,7 @@ func TestToCleanResultWithStrategy(t *testing.T) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
 
-	if value.Strategy.String() != strategy.String() {
-		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
-	}
+	assertStrategyEqual(t, &value, strategy)
 }
 
 func TestToCleanResultFromItems(t *testing.T) {
@@ -211,9 +231,7 @@ func TestToCleanResultFromItems(t *testing.T) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
 
-	if value.Strategy.String() != strategy.String() {
-		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
-	}
+	assertStrategyEqual(t, &value, strategy)
 }
 
 func TestToTimedCleanResult(t *testing.T) {
@@ -233,9 +251,7 @@ func TestToTimedCleanResult(t *testing.T) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
 
-	if value.Strategy.String() != strategy.String() {
-		t.Errorf("Expected strategy '%s', got %s", strategy.String(), value.Strategy.String())
-	}
+	assertStrategyEqual(t, &value, strategy)
 
 	if value.CleanTime != cleanTime {
 		t.Errorf("Expected clean time %v, got %v", cleanTime, value.CleanTime)
@@ -249,26 +265,7 @@ func TestToScanResult(t *testing.T) {
 	scanDuration := time.Duration(15) * time.Second
 
 	scanResult := ToScanResult(totalBytes, totalItems, scannedPaths, scanDuration)
-
-	if scanResult.TotalBytes != totalBytes {
-		t.Errorf("Expected total bytes %d, got %d", totalBytes, scanResult.TotalBytes)
-	}
-
-	if scanResult.TotalItems != totalItems {
-		t.Errorf("Expected total items %d, got %d", totalItems, scanResult.TotalItems)
-	}
-
-	if len(scanResult.ScannedPaths) != len(scannedPaths) {
-		t.Errorf(
-			"Expected %d scanned paths, got %d",
-			len(scannedPaths),
-			len(scanResult.ScannedPaths),
-		)
-	}
-
-	if scanResult.ScanTime != scanDuration {
-		t.Errorf("Expected scan time %v, got %v", scanDuration, scanResult.ScanTime)
-	}
+	assertScanResultFields(t, &scanResult, totalBytes, totalItems, scannedPaths, scanDuration)
 }
 
 func TestCombineCleanResults(t *testing.T) {

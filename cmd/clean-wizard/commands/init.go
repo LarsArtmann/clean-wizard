@@ -294,27 +294,21 @@ func createDailyProfile() *domain.Profile {
 		Description: "Quick daily cleanup with safe operations",
 		Enabled:     domain.ProfileStatusEnabled,
 		Operations: []domain.CleanupOperation{
-			{
-				Name:        "temp-files",
-				Description: "Clean temporary files",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
-			},
-			{
-				Name:        "go-packages",
-				Description: "Clean Go module cache",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeGoPackages),
-			},
-			{
-				Name:        "node-packages",
-				Description: "Clean Node.js package caches",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeNodePackages),
-			},
+			createLowRiskOperation(
+				"temp-files",
+				"Clean temporary files",
+				domain.OperationTypeTempFiles,
+			),
+			createLowRiskOperation(
+				"go-packages",
+				"Clean Go module cache",
+				domain.OperationTypeGoPackages,
+			),
+			createLowRiskOperation(
+				"node-packages",
+				"Clean Node.js package caches",
+				domain.OperationTypeNodePackages,
+			),
 		},
 	}
 }
@@ -326,35 +320,55 @@ func createWeeklyProfile() *domain.Profile {
 		Description: "Weekly comprehensive cleanup",
 		Enabled:     domain.ProfileStatusEnabled,
 		Operations: []domain.CleanupOperation{
-			{
-				Name:        "docker",
-				Description: "Clean Docker images, containers, and volumes",
-				RiskLevel:   domain.RiskLevelMediumType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeDocker),
-			},
-			{
-				Name:        "go-packages",
-				Description: "Clean Go build cache",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeGoPackages),
-			},
-			{
-				Name:        "node-packages",
-				Description: "Clean Node.js package caches",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeNodePackages),
-			},
-			{
-				Name:        "homebrew-cleanup",
-				Description: "Clean Homebrew cache",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
-			},
+			createMediumRiskOperation(
+				"docker",
+				"Clean Docker images, containers, and volumes",
+				domain.OperationTypeDocker,
+			),
+			createLowRiskOperation(
+				"go-packages",
+				"Clean Go build cache",
+				domain.OperationTypeGoPackages,
+			),
+			createLowRiskOperation(
+				"node-packages",
+				"Clean Node.js package caches",
+				domain.OperationTypeNodePackages,
+			),
+			createLowRiskOperation(
+				"homebrew-cleanup",
+				"Clean Homebrew cache",
+				domain.OperationTypeHomebrew,
+			),
 		},
+	}
+}
+
+// createLowRiskOperation creates a low risk cleanup operation.
+func createLowRiskOperation(
+	name, description string,
+	operationType domain.OperationType,
+) domain.CleanupOperation {
+	return domain.CleanupOperation{
+		Name:        name,
+		Description: description,
+		RiskLevel:   domain.RiskLevelLowType,
+		Enabled:     domain.ProfileStatusEnabled,
+		Settings:    domain.DefaultSettings(operationType),
+	}
+}
+
+// createMediumRiskOperation creates a medium risk cleanup operation.
+func createMediumRiskOperation(
+	name, description string,
+	operationType domain.OperationType,
+) domain.CleanupOperation {
+	return domain.CleanupOperation{
+		Name:        name,
+		Description: description,
+		RiskLevel:   domain.RiskLevelMediumType,
+		Enabled:     domain.ProfileStatusEnabled,
+		Settings:    domain.DefaultSettings(operationType),
 	}
 }
 

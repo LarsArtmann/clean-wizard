@@ -119,21 +119,18 @@ func (r Result[T]) OrElse(fallback Result[T]) Result[T] {
 // If the predicate returns false, it returns an error with the given message.
 // If the result already has an error, it passes through the error.
 func (r Result[T]) Validate(predicate func(T) bool, errorMsg string) Result[T] {
-	if r.err != nil {
-		return r
-	}
-
-	if !predicate(r.value) {
-		return Err[T](errors.New(errorMsg))
-	}
-
-	return r
+	return r.validateWithError(predicate, errors.New(errorMsg))
 }
 
 // ValidateWithError checks if the value satisfies the predicate.
 // If the predicate returns false, it returns the provided error.
 // If the result already has an error, it passes through the error.
 func (r Result[T]) ValidateWithError(predicate func(T) bool, err error) Result[T] {
+	return r.validateWithError(predicate, err)
+}
+
+// validateWithError is the internal implementation shared by Validate and ValidateWithError.
+func (r Result[T]) validateWithError(predicate func(T) bool, err error) Result[T] {
 	if r.err != nil {
 		return r
 	}
@@ -199,29 +196,13 @@ func (r Result[T]) Unless(fn func(error)) Result[T] {
 // Filter returns the result if predicate is true, otherwise returns an error.
 // If the result already has an error, it passes through the error.
 func (r Result[T]) Filter(predicate func(T) bool, errMsg string) Result[T] {
-	if r.err != nil {
-		return r
-	}
-
-	if !predicate(r.value) {
-		return Err[T](errors.New(errMsg))
-	}
-
-	return r
+	return r.validateWithError(predicate, errors.New(errMsg))
 }
 
 // FilterWithError returns the result if predicate is true, otherwise returns the provided error.
 // If the result already has an error, it passes through the error.
 func (r Result[T]) FilterWithError(predicate func(T) bool, err error) Result[T] {
-	if r.err != nil {
-		return r
-	}
-
-	if !predicate(r.value) {
-		return Err[T](err)
-	}
-
-	return r
+	return r.validateWithError(predicate, err)
 }
 
 // Fold reduces a slice of Results into a single Result by applying fn cumulatively.

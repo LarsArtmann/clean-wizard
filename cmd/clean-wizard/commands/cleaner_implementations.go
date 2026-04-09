@@ -155,16 +155,6 @@ func runCleanerWithConfig[T any](
 	})
 }
 
-// homebrewCleanerFactory creates a Homebrew cleaner with the specified mode.
-func homebrewCleanerFactory(v, d bool, mode domain.HomebrewMode) cleaner.Cleaner {
-	return cleaner.NewHomebrewCleaner(v, d, mode)
-}
-
-// dockerCleanerFactory creates a Docker cleaner with the specified prune mode.
-func dockerCleanerFactory(v, d bool, pruneMode domain.DockerPruneMode) cleaner.Cleaner {
-	return cleaner.NewDockerCleaner(v, d, pruneMode)
-}
-
 // runManagerCleaner executes a cleaner with manager-based configuration.
 // T is the manager type (e.g., cleaner.NodePackageManagerType, cleaner.LangVersionManagerType).
 func runManagerCleaner[T any](
@@ -178,18 +168,28 @@ func runManagerCleaner[T any](
 	})
 }
 
-// runCleanerWithNodeManagers executes the Node package manager cleaner.
-func runCleanerWithNodeManagers(
-	ctx context.Context, verbose, dryRun bool,
-	managers []domain.PackageManagerType,
-) (domain.CleanResult, error) {
-	return runManagerCleaner(ctx, verbose, dryRun, managers, nodeManagerFactory)
+// homebrewCleanerFactory creates a Homebrew cleaner with the specified mode.
+func homebrewCleanerFactory(v, d bool, mode domain.HomebrewMode) cleaner.Cleaner {
+	return cleaner.NewHomebrewCleaner(v, d, mode)
+}
+
+// dockerCleanerFactory creates a Docker cleaner with the specified prune mode.
+func dockerCleanerFactory(v, d bool, pruneMode domain.DockerPruneMode) cleaner.Cleaner {
+	return cleaner.NewDockerCleaner(v, d, pruneMode)
 }
 
 // nodeManagerFactory is a factory function for Node package managers.
 // This adapter bridges the type gap between *NodePackageManagerCleaner and cleaner.Cleaner.
 func nodeManagerFactory(v, d bool, managers []domain.PackageManagerType) cleaner.Cleaner {
 	return cleaner.NewNodePackageManagerCleaner(v, d, managers)
+}
+
+// runCleanerWithNodeManagers executes the Node package manager cleaner.
+func runCleanerWithNodeManagers(
+	ctx context.Context, verbose, dryRun bool,
+	managers []domain.PackageManagerType,
+) (domain.CleanResult, error) {
+	return runManagerCleaner(ctx, verbose, dryRun, managers, nodeManagerFactory)
 }
 
 // runNodePackageManagerCleaner executes the Node package manager cleaner.

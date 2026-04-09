@@ -147,24 +147,39 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]domain.NixGeneration{
 			{
-				ID: mockGenerationIDCurrent, Path: "/nix/var/nix/profiles/default-300-link",
-				Date: time.Now().Add(-mockGenerationAgeCurrent * time.Hour), Current: domain.GenerationStatusCurrent,
+				ID:   mockGenerationIDCurrent,
+				Path: "/nix/var/nix/profiles/default-300-link",
+				Date: time.Now().
+					Add(-mockGenerationAgeCurrent * time.Hour),
+				Current: domain.GenerationStatusCurrent,
 			},
 			{
-				ID: mockGenerationIDRecent1, Path: "/nix/var/nix/profiles/default-299-link",
-				Date: time.Now().Add(-mockGenerationAgeRecent * time.Hour), Current: domain.GenerationStatusHistorical,
+				ID:   mockGenerationIDRecent1,
+				Path: "/nix/var/nix/profiles/default-299-link",
+				Date: time.Now().
+					Add(-mockGenerationAgeRecent * time.Hour),
+				Current: domain.GenerationStatusHistorical,
 			},
 			{
-				ID: mockGenerationIDRecent2, Path: "/nix/var/nix/profiles/default-298-link",
-				Date: time.Now().Add(-mockGenerationAgeOlder * time.Hour), Current: domain.GenerationStatusHistorical,
+				ID:   mockGenerationIDRecent2,
+				Path: "/nix/var/nix/profiles/default-298-link",
+				Date: time.Now().
+					Add(-mockGenerationAgeOlder * time.Hour),
+				Current: domain.GenerationStatusHistorical,
 			},
 			{
-				ID: mockGenerationIDOlder1, Path: "/nix/var/nix/profiles/default-297-link",
-				Date: time.Now().Add(-mockGenerationAgeOld * time.Hour), Current: domain.GenerationStatusHistorical,
+				ID:   mockGenerationIDOlder1,
+				Path: "/nix/var/nix/profiles/default-297-link",
+				Date: time.Now().
+					Add(-mockGenerationAgeOld * time.Hour),
+				Current: domain.GenerationStatusHistorical,
 			},
 			{
-				ID: mockGenerationIDOlder2, Path: "/nix/var/nix/profiles/default-296-link",
-				Date: time.Now().Add(-mockGenerationAgeVeryOld * time.Hour), Current: domain.GenerationStatusHistorical,
+				ID:   mockGenerationIDOlder2,
+				Path: "/nix/var/nix/profiles/default-296-link",
+				Date: time.Now().
+					Add(-mockGenerationAgeVeryOld * time.Hour),
+				Current: domain.GenerationStatusHistorical,
 			},
 		}, "Nix not available - using mock data")
 	}

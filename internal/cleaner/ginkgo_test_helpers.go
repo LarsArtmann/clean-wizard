@@ -235,8 +235,16 @@ func GinkgoValidateNilSettingsTest(cleaner CleanerWithSettings) {
 // Returns two test binaries with sizes 20MB and 15MB respectively.
 func StandardTestBinaries() []BinaryInfo {
 	return []BinaryInfo{
-		{Path: "/path/to/binary1", Size: TestBinarySize1MB * bytesPerMBForTest, Category: CategoryTest},
-		{Path: "/path/to/binary2", Size: TestBinarySize2MB * bytesPerMBForTest, Category: CategoryBin},
+		{
+			Path:     "/path/to/binary1",
+			Size:     TestBinarySize1MB * bytesPerMBForTest,
+			Category: CategoryTest,
+		},
+		{
+			Path:     "/path/to/binary2",
+			Size:     TestBinarySize2MB * bytesPerMBForTest,
+			Category: CategoryBin,
+		},
 	}
 }
 

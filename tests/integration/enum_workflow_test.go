@@ -160,9 +160,15 @@ func TestEnumWorkflow_Integration(t *testing.T) {
 				tt.goCleanCache, tt.goTestCache, tt.goModCache, tt.goBuildCache, tt.goLintCache,
 				tt.systemCacheTypes,
 			)
-			testEnumWorkflow(t, configYAML,
+			testEnumWorkflow(
+				t,
+				configYAML,
 				tt.expectedDockerMode,
-				tt.expectedCleanCache, tt.expectedTestCache, tt.expectedModCache, tt.expectedBuildCache, tt.expectedLintCache,
+				tt.expectedCleanCache,
+				tt.expectedTestCache,
+				tt.expectedModCache,
+				tt.expectedBuildCache,
+				tt.expectedLintCache,
 				tt.expectedSystemCacheEmpty,
 			)
 		})
