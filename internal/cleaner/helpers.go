@@ -172,54 +172,51 @@ var BuildCacheAvailableTypes = []string{
 	domain.BuildToolScala.String(),
 }
 
-// BuildToolTypeToStringSlice converts domain.BuildToolType slice to string slice.
-func BuildToolTypeToStringSlice(types []domain.BuildToolType) []string {
+type stringer interface {
+	String() string
+}
+
+// toStringSlice converts a slice of types implementing Stringer to string slice.
+func toStringSlice[T stringer](types []T) []string {
 	result := make([]string, len(types))
 	for i, t := range types {
 		result[i] = t.String()
 	}
-
 	return result
+}
+
+// toLowerStringSlice converts a slice of types implementing Stringer to lowercase string slice.
+func toLowerStringSlice[T stringer](types []T) []string {
+	result := make([]string, len(types))
+	for i, t := range types {
+		result[i] = strings.ToLower(t.String())
+	}
+	return result
+}
+
+// BuildToolTypeToStringSlice converts domain.BuildToolType slice to string slice.
+func BuildToolTypeToStringSlice(types []domain.BuildToolType) []string {
+	return toStringSlice(types)
 }
 
 // PackageManagerTypeToStringSlice converts domain.PackageManagerType slice to string slice.
 func PackageManagerTypeToStringSlice(types []domain.PackageManagerType) []string {
-	result := make([]string, len(types))
-	for i, t := range types {
-		result[i] = t.String()
-	}
-
-	return result
+	return toStringSlice(types)
 }
 
 // PackageManagerTypeToLowerSlice converts domain.PackageManagerType slice to lowercase string slice.
 func PackageManagerTypeToLowerSlice(types []domain.PackageManagerType) []string {
-	result := make([]string, len(types))
-	for i, t := range types {
-		result[i] = strings.ToLower(t.String())
-	}
-
-	return result
+	return toLowerStringSlice(types)
 }
 
 // CacheTypeToStringSlice converts domain.CacheType slice to string slice.
 func CacheTypeToStringSlice(types []domain.CacheType) []string {
-	result := make([]string, len(types))
-	for i, t := range types {
-		result[i] = t.String()
-	}
-
-	return result
+	return toStringSlice(types)
 }
 
 // CacheTypeToLowerSlice converts domain.CacheType slice to lowercase string slice.
 func CacheTypeToLowerSlice(types []domain.CacheType) []string {
-	result := make([]string, len(types))
-	for i, t := range types {
-		result[i] = strings.ToLower(t.String())
-	}
-
-	return result
+	return toLowerStringSlice(types)
 }
 
 // ValidateBuildCacheSettings validates build cache settings.
