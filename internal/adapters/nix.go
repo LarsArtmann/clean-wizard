@@ -23,6 +23,14 @@ const (
 	NixDryRunGenerationSizeMB = 50
 	// NixDryRunGCSizeMB is the estimated size freed from GC in dry-run mode.
 	NixDryRunGCSizeMB = 100
+
+	// Byte conversion constants.
+	bytesPerKB = 1024
+	bytesPerMB = 1024 * 1024
+	bytesPerGB = 1024 * 1024 * 1024
+
+	// NixGenerationMinFields is the minimum number of fields expected in generation output.
+	NixGenerationMinFields = 3
 )
 
 // boolToGenerationStatus converts boolean to GenerationStatus enum.
@@ -96,7 +104,7 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	// If dry-run, return estimated size without system calls
 	if n.dryRun {
-		return result.Ok(int64(NixDryRunStoreSizeGB * 1024 * 1024 * 1024))
+		return result.Ok(int64(NixDryRunStoreSizeGB * bytesPerGB))
 	}
 
 	// Real system call for production mode
@@ -125,7 +133,7 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
 	// In dry-run mode, return success without actually running GC
 	if n.dryRun {
-		estimatedFreed := int64(NixDryRunGCSizeMB * 1024 * 1024)
+		estimatedFreed := int64(NixDryRunGCSizeMB * bytesPerMB)
 		cleanResult := conversions.NewCleanResultWithTiming(
 			domain.StrategyAggressiveType,
 			1,
@@ -206,7 +214,7 @@ func (n *NixAdapter) RemoveGeneration(
 	// In dry-run mode, return success without actually removing
 	if n.dryRun {
 		// Return a success result with estimated bytes freed
-		estimatedFreed := int64(NixDryRunGenerationSizeMB * 1024 * 1024)
+		estimatedFreed := int64(NixDryRunGenerationSizeMB * bytesPerMB)
 		cleanResult := conversions.NewCleanResultWithTiming(
 			domain.StrategyConservativeType,
 			1,
@@ -265,7 +273,7 @@ func (n *NixAdapter) RemoveGeneration(
 //	"33   2026-01-15 21:14:05   (current)"
 func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) {
 	fields := strings.Fields(line)
-	if len(fields) < 3 {
+	if len(fields) < NixGenerationMinFields {
 		return domain.NixGeneration{}, fmt.Errorf("invalid generation line: %s", line)
 	}
 

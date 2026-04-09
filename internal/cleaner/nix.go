@@ -17,7 +17,21 @@ const (
 	// NixMaxGenerationsToKeep is the maximum allowed generations to keep.
 	NixMaxGenerationsToKeep = 10
 	// NixDryRunBytesPerGeneration is the estimated bytes freed per generation in dry-run mode.
-	NixDryRunBytesPerGeneration = 50 * 1024 * 1024
+	NixDryRunBytesPerGeneration = 50 * bytesPerMB
+
+	// Mock generation IDs for testing when Nix is unavailable.
+	mockGenerationIDCurrent = 300
+	mockGenerationIDRecent1 = 299
+	mockGenerationIDRecent2 = 298
+	mockGenerationIDOlder1  = 297
+	mockGenerationIDOlder2  = 296
+
+	// Mock generation age offsets in hours.
+	mockGenerationAgeCurrent = 24
+	mockGenerationAgeRecent  = 48
+	mockGenerationAgeOlder   = 72
+	mockGenerationAgeOld     = 96
+	mockGenerationAgeVeryOld = 120
 )
 
 // NixCleaner handles Nix package manager cleanup with proper type safety.
@@ -91,7 +105,7 @@ func (nc *NixCleaner) Clean(ctx context.Context) result.Result[domain.CleanResul
 // GetStoreSize gets Nix store size with type safety.
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	if !nc.adapter.IsAvailable(ctx) {
-		return int64(NixMockStoreSizeGB * 1024 * 1024 * 1024)
+		return int64(NixMockStoreSizeGB * bytesPerGB)
 	}
 
 	storeSizeResult := nc.adapter.GetStoreSize(ctx)
@@ -133,24 +147,24 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]domain.NixGeneration{
 			{
-				ID: 300, Path: "/nix/var/nix/profiles/default-300-link",
-				Date: time.Now().Add(-24 * time.Hour), Current: domain.GenerationStatusCurrent,
+				ID: mockGenerationIDCurrent, Path: "/nix/var/nix/profiles/default-300-link",
+				Date: time.Now().Add(-mockGenerationAgeCurrent * time.Hour), Current: domain.GenerationStatusCurrent,
 			},
 			{
-				ID: 299, Path: "/nix/var/nix/profiles/default-299-link",
-				Date: time.Now().Add(-48 * time.Hour), Current: domain.GenerationStatusHistorical,
+				ID: mockGenerationIDRecent1, Path: "/nix/var/nix/profiles/default-299-link",
+				Date: time.Now().Add(-mockGenerationAgeRecent * time.Hour), Current: domain.GenerationStatusHistorical,
 			},
 			{
-				ID: 298, Path: "/nix/var/nix/profiles/default-298-link",
-				Date: time.Now().Add(-72 * time.Hour), Current: domain.GenerationStatusHistorical,
+				ID: mockGenerationIDRecent2, Path: "/nix/var/nix/profiles/default-298-link",
+				Date: time.Now().Add(-mockGenerationAgeOlder * time.Hour), Current: domain.GenerationStatusHistorical,
 			},
 			{
-				ID: 297, Path: "/nix/var/nix/profiles/default-297-link",
-				Date: time.Now().Add(-96 * time.Hour), Current: domain.GenerationStatusHistorical,
+				ID: mockGenerationIDOlder1, Path: "/nix/var/nix/profiles/default-297-link",
+				Date: time.Now().Add(-mockGenerationAgeOld * time.Hour), Current: domain.GenerationStatusHistorical,
 			},
 			{
-				ID: 296, Path: "/nix/var/nix/profiles/default-296-link",
-				Date: time.Now().Add(-120 * time.Hour), Current: domain.GenerationStatusHistorical,
+				ID: mockGenerationIDOlder2, Path: "/nix/var/nix/profiles/default-296-link",
+				Date: time.Now().Add(-mockGenerationAgeVeryOld * time.Hour), Current: domain.GenerationStatusHistorical,
 			},
 		}, "Nix not available - using mock data")
 	}

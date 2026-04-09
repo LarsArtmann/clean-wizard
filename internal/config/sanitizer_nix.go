@@ -4,6 +4,12 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// Nix generations sanitization constants.
+const (
+	nixGenerationsMin = 1
+	nixGenerationsMax = 10
+)
+
 // sanitizeNixGenerationsSettings sanitizes Nix generations settings.
 func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(
 	fieldPrefix string, settings *domain.NixGenerationsSettings, result *SanitizationResult,
@@ -22,7 +28,7 @@ func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(
 			settings.Generations,
 			"clamped to minimum value",
 		)
-	} else if settings.Generations > 10 {
+	} else if settings.Generations > nixGenerationsMax {
 		settings.Generations = 10
 		result.addChange(
 			fieldPrefix+".generations",

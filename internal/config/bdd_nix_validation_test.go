@@ -97,17 +97,22 @@ func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
 	return cfg
 }
 
+// assertInvalidResult is a helper that validates the result should be invalid.
+func assertInvalidResult(result *ValidationResult) error {
+	if result.IsValid {
+		return errors.New("expected invalid configuration")
+	}
+
+	return nil
+}
+
 // newInvalidValidationThen creates validation checks for invalid configurations.
 func newInvalidValidationThen(errorSubstring string) []BDDThen {
 	return []BDDThen{
 		{
 			Description: "validation should fail",
 			Validate: func(result *ValidationResult) error {
-				if result.IsValid {
-					return errors.New("expected invalid configuration")
-				}
-
-				return nil
+				return assertInvalidResult(result)
 			},
 		},
 		{
@@ -167,11 +172,7 @@ func newSecurityErrorValidationThen() []BDDThen {
 		{
 			Description: "validation should fail with security error",
 			Validate: func(result *ValidationResult) error {
-				if result.IsValid {
-					return errors.New("expected invalid configuration")
-				}
-
-				return nil
+				return assertInvalidResult(result)
 			},
 		},
 		{

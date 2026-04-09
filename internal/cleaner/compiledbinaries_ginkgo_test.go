@@ -232,8 +232,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		})
 
 		ginkgo.It("should return a boolean value", func() {
-			result := cleaner.IsAvailable(ctx)
-			gomega.Expect(result).To(gomega.BeAssignableToTypeOf(true))
+			GinkgoAssertIsAvailableReturnsBoolean(cleaner)
 		})
 
 		ginkgo.It("should not panic when checking availability", func() {

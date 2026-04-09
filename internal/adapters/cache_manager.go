@@ -6,6 +6,14 @@ import (
 	"github.com/maypok86/otter/v2"
 )
 
+// Cache configuration constants.
+const (
+	// DefaultCacheMaximumSize is the default maximum number of items in the cache.
+	DefaultCacheMaximumSize = 10_000
+	// DefaultCacheExpiry is the default expiration time for cache entries.
+	DefaultCacheExpiry = 24 * time.Hour
+)
+
 // cacheItem wraps a value with its expiration time.
 type cacheItem struct {
 	value      any
@@ -30,9 +38,9 @@ type CacheManager struct {
 func NewCacheManager(defaultExpiration, cleanupInterval time.Duration) *CacheManager {
 	// Create otter cache - items are stored with expiration metadata
 	cache := otter.Must(&otter.Options[string, *cacheItem]{
-		MaximumSize: 10_000,
+		MaximumSize: DefaultCacheMaximumSize,
 		// Use a long expiry since we manage expiration manually
-		ExpiryCalculator: otter.ExpiryWriting[string, *cacheItem](24 * time.Hour),
+		ExpiryCalculator: otter.ExpiryWriting[string, *cacheItem](DefaultCacheExpiry),
 	})
 
 	return &CacheManager{

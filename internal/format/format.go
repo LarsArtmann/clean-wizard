@@ -7,6 +7,12 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
+// Duration formatting constants.
+const (
+	// NanosecondsPerMillisecond is the number of nanoseconds in a millisecond.
+	NanosecondsPerMillisecond = 1e6
+)
+
 // Size formats bytes for human reading using IEC binary prefixes.
 func Size(bytes int64) string {
 	if bytes < 0 {
@@ -23,7 +29,7 @@ func Duration(d time.Duration) string {
 	}
 
 	if d < time.Second {
-		return fmt.Sprintf("%.1f ms", float64(d.Nanoseconds())/1e6)
+		return fmt.Sprintf("%.1f ms", float64(d.Nanoseconds())/NanosecondsPerMillisecond)
 	}
 
 	if d < time.Minute {

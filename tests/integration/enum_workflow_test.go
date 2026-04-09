@@ -5,6 +5,8 @@ package integration
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -48,6 +50,22 @@ func requireEnumUnmarshal(
 	require.NoError(t, err, "Failed to unmarshal %s", enumName)
 }
 
+// assertDockerCleanerExecution verifies that a docker cleaner can execute without panicking.
+func assertDockerCleanerExecution(t *testing.T, dockerCleaner *cleaner.DockerCleaner) {
+	if dockerCleaner.IsAvailable(ctx) {
+		result := dockerCleaner.Clean(ctx)
+		assert.True(t, result.IsOk() || result.IsErr(), "Clean should complete")
+	}
+}
+
+// assertCleanerExecution verifies that a cleaner can execute without panicking.
+func assertCleanerExecution(t *testing.T, c cleaner.Cleaner) {
+	if c.IsAvailable(ctx) {
+		result := c.Clean(ctx)
+		assert.True(t, result.IsOk() || result.IsErr(), "Clean should complete")
+	}
+}
+
 // createYAMLNode creates a YAML scalar node from a string or int value.
 func createYAMLNode(value interface{}) *yaml.Node {
 	node := &yaml.Node{Kind: yaml.ScalarNode}
@@ -65,65 +83,149 @@ func TestEnumWorkflow_Integration(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	t.Run("integer_enums", func(t *testing.T) {
-		testEnumWorkflow(t, `
-operations:
-  - type: docker
-    docker:
-      prune_mode: 0
-  - type: go-packages
-    go_packages:
-      clean_cache: 1
-      clean_test_cache: 1
-      clean_mod_cache: 0
-      clean_build_cache: 1
-      clean_lint_cache: 0
-  - type: system-cache
-    system_cache:
-      cache_types: [0, 1, 2, 3]
-      older_than: "30d"
-`, domain.DockerPruneAll, true, true, false, false, false, true)
-	})
+	tests := []struct {
+		name                     string
+		dockerPruneMode          interface{}
+		goCleanCache             interface{}
+		goTestCache              interface{}
+		goModCache               interface{}
+		goBuildCache             interface{}
+		goLintCache              interface{}
+		systemCacheTypes         []interface{}
+		expectedDockerMode       domain.DockerPruneMode
+		expectedCleanCache       bool
+		expectedTestCache        bool
+		expectedModCache         bool
+		expectedBuildCache       bool
+		expectedLintCache        bool
+		expectedSystemCacheEmpty bool
+	}{
+		{
+			name:                     "integer_enums",
+			dockerPruneMode:          0,
+			goCleanCache:             1,
+			goTestCache:              1,
+			goModCache:               0,
+			goBuildCache:             1,
+			goLintCache:              0,
+			systemCacheTypes:         []interface{}{0, 1, 2, 3},
+			expectedDockerMode:       domain.DockerPruneAll,
+			expectedCleanCache:       true,
+			expectedTestCache:        true,
+			expectedModCache:         false,
+			expectedBuildCache:       true,
+			expectedLintCache:        false,
+			expectedSystemCacheEmpty: true,
+		},
+		{
+			name:                     "string_enums",
+			dockerPruneMode:          "ALL",
+			goCleanCache:             "ENABLED",
+			goTestCache:              "ENABLED",
+			goModCache:               "DISABLED",
+			goBuildCache:             "ENABLED",
+			goLintCache:              "DISABLED",
+			systemCacheTypes:         []interface{}{"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW"},
+			expectedDockerMode:       domain.DockerPruneAll,
+			expectedCleanCache:       true,
+			expectedTestCache:        true,
+			expectedModCache:         false,
+			expectedBuildCache:       true,
+			expectedLintCache:        false,
+			expectedSystemCacheEmpty: true,
+		},
+		{
+			name:                     "mixed_enums",
+			dockerPruneMode:          2,
+			goCleanCache:             "ENABLED",
+			goTestCache:              1,
+			goModCache:               "DISABLED",
+			goBuildCache:             1,
+			goLintCache:              0,
+			systemCacheTypes:         []interface{}{0, "XCODE", "COCOAPODS", 3},
+			expectedDockerMode:       domain.DockerPruneContainers,
+			expectedCleanCache:       true,
+			expectedTestCache:        true,
+			expectedModCache:         false,
+			expectedBuildCache:       true,
+			expectedLintCache:        false,
+			expectedSystemCacheEmpty: true,
+		},
+	}
 
-	t.Run("string_enums", func(t *testing.T) {
-		testEnumWorkflow(t, `
-operations:
-  - type: docker
-    docker:
-      prune_mode: "ALL"
-  - type: go-packages
-    go_packages:
-      clean_cache: "ENABLED"
-      clean_test_cache: "ENABLED"
-      clean_mod_cache: "DISABLED"
-      clean_build_cache: "ENABLED"
-      clean_lint_cache: "DISABLED"
-  - type: system-cache
-    system_cache:
-      cache_types: ["SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW"]
-      older_than: "30d"
-`, domain.DockerPruneAll, true, true, false, false, false, true)
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			configYAML := buildEnumWorkflowYAML(
+				tt.dockerPruneMode,
+				tt.goCleanCache, tt.goTestCache, tt.goModCache, tt.goBuildCache, tt.goLintCache,
+				tt.systemCacheTypes,
+			)
+			testEnumWorkflow(t, configYAML,
+				tt.expectedDockerMode,
+				tt.expectedCleanCache, tt.expectedTestCache, tt.expectedModCache, tt.expectedBuildCache, tt.expectedLintCache,
+				tt.expectedSystemCacheEmpty,
+			)
+		})
+	}
+}
 
-	t.Run("mixed_enums", func(t *testing.T) {
-		testEnumWorkflow(t, `
+// buildEnumWorkflowYAML constructs a YAML config string from enum test parameters.
+func buildEnumWorkflowYAML(
+	dockerPruneMode interface{},
+	goCleanCache, goTestCache, goModCache, goBuildCache, goLintCache interface{},
+	systemCacheTypes []interface{},
+) string {
+	cacheTypesYAML := "["
+	for i, ct := range systemCacheTypes {
+		if i > 0 {
+			cacheTypesYAML += ", "
+		}
+		switch v := ct.(type) {
+		case string:
+			cacheTypesYAML += fmt.Sprintf("%q", v)
+		case int:
+			cacheTypesYAML += strconv.Itoa(v)
+		}
+	}
+	cacheTypesYAML += "]"
+
+	return fmt.Sprintf(`
 operations:
   - type: docker
     docker:
-      prune_mode: 2
+      prune_mode: %v
   - type: go-packages
     go_packages:
-      clean_cache: "ENABLED"
-      clean_test_cache: 1
-      clean_mod_cache: "DISABLED"
-      clean_build_cache: 1
-      clean_lint_cache: 0
+      clean_cache: %v
+      clean_test_cache: %v
+      clean_mod_cache: %v
+      clean_build_cache: %v
+      clean_lint_cache: %v
   - type: system-cache
     system_cache:
-      cache_types: [0, "XCODE", "COCOAPODS", 3]
+      cache_types: %s
       older_than: "30d"
-`, domain.DockerPruneContainers, true, true, false, false, false, true)
-	})
+`,
+		formatYAMLValue(dockerPruneMode),
+		formatYAMLValue(goCleanCache),
+		formatYAMLValue(goTestCache),
+		formatYAMLValue(goModCache),
+		formatYAMLValue(goBuildCache),
+		formatYAMLValue(goLintCache),
+		cacheTypesYAML,
+	)
+}
+
+// formatYAMLValue formats a value for YAML insertion (handles string quoting).
+func formatYAMLValue(v interface{}) string {
+	switch val := v.(type) {
+	case string:
+		return fmt.Sprintf("%q", val)
+	case int:
+		return strconv.Itoa(val)
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }
 
 // testEnumWorkflow tests the full workflow from YAML config to cleaner execution.
@@ -185,11 +287,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				assert.NotNil(t, dockerCleaner, "Docker cleaner should be created")
 
 				// Test cleaner availability
-				if dockerCleaner.IsAvailable(ctx) {
-					// Execute cleaner in dry-run mode
-					result := dockerCleaner.Clean(ctx)
-					assert.True(t, result.IsOk() || result.IsErr(), "Clean should complete")
-				}
+				assertDockerCleanerExecution(t, dockerCleaner)
 			}
 
 		case "go-packages":
@@ -228,11 +326,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				require.NoError(t, err, "Failed to create Go cleaner")
 
 				// Test cleaner availability
-				if goCleaner.IsAvailable(ctx) {
-					// Execute cleaner in dry-run mode
-					result := goCleaner.Clean(ctx)
-					assert.True(t, result.IsOk() || result.IsErr(), "Clean should complete")
-				}
+				assertCleanerExecution(t, goCleaner)
 			}
 
 		case "system-cache":
@@ -509,11 +603,7 @@ func TestEnumErrorMessages_ThroughWorkflow(t *testing.T) {
 
 	// Test with cleaner
 	dockerCleaner := cleaner.NewDockerCleaner(false, true, validDockerSettings.PruneMode)
-	if dockerCleaner.IsAvailable(ctx) {
-		result := dockerCleaner.Clean(ctx)
-		// Should complete without crashing
-		assert.True(t, result.IsOk() || result.IsErr(), "Clean should complete")
-	}
+	assertDockerCleanerExecution(t, dockerCleaner)
 }
 
 // TestEnumValues_ThroughExecution tests that enum values are used correctly in execution.
@@ -557,10 +647,7 @@ func TestEnumValues_ThroughExecution(t *testing.T) {
 			assert.NoError(t, err, "Settings with %s should be valid", pm.name)
 
 			// Test cleaner availability and execution
-			if dockerCleaner.IsAvailable(ctx) {
-				result := dockerCleaner.Clean(ctx)
-				assert.True(t, result.IsOk() || result.IsErr(), "Clean should complete")
-			}
+			assertDockerCleanerExecution(t, dockerCleaner)
 		})
 	}
 }

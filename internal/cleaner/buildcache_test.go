@@ -332,32 +332,20 @@ func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {
 }
 
 func TestBuildCacheCleaner_ParseDuration(t *testing.T) {
-	tests := []struct {
-		duration  string
-		wantValid bool
-	}{
-		{"1h", true},
-		{"24h", true},
-		{"7d", true},
-		{"30d", true},
-		{"1w", false}, // Not supported
-		{"invalid", false},
-	}
+	for _, tc := range CommonDurationTestCases {
+		t.Run(tc.Duration, func(t *testing.T) {
+			cleaner, err := NewBuildCacheCleaner(false, false, tc.Duration, []string{}, []string{})
 
-	for _, tt := range tests {
-		t.Run(tt.duration, func(t *testing.T) {
-			cleaner, err := NewBuildCacheCleaner(false, false, tt.duration, []string{}, []string{})
-
-			if tt.wantValid && err != nil {
+			if tc.WantValid && err != nil {
 				t.Errorf(
 					"NewBuildCacheCleaner() with duration %s should succeed, got error: %v",
-					tt.duration,
+					tc.Duration,
 					err,
 				)
 			}
 
-			if !tt.wantValid && err == nil {
-				t.Errorf("NewBuildCacheCleaner() with duration %s should fail", tt.duration)
+			if !tc.WantValid && err == nil {
+				t.Errorf("NewBuildCacheCleaner() with duration %s should fail", tc.Duration)
 			}
 
 			if cleaner != nil {

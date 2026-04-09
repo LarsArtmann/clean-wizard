@@ -138,14 +138,14 @@ func displayDiskUsageAfter(cr cleanResult, dryRun bool, diskBefore *cleaner.Disk
 		freedPercent := diskBefore.UsedPercent - diskAfter.UsedPercent
 		fmt.Printf(
 			"📊 Disk usage after:  %s %s (-%.1f%%)\n",
-			cleaner.DiskUsageBar(diskAfter, 15),
+			cleaner.DiskUsageBar(diskAfter, DiskUsageBarWidth),
 			cleaner.FormatDiskUsage(diskAfter),
 			freedPercent,
 		)
 	} else {
 		fmt.Printf(
 			"📊 Disk usage after:  %s %s\n",
-			cleaner.DiskUsageBar(diskAfter, 15),
+			cleaner.DiskUsageBar(diskAfter, DiskUsageBarWidth),
 			cleaner.FormatDiskUsage(diskAfter),
 		)
 	}

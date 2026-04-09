@@ -181,5 +181,5 @@ func (pc *ProjectsManagementAutomationCleaner) estimateCacheSize() int64 {
 		return actualSize
 	}
 	// Fallback estimate: typical cache size
-	return int64(DefaultProjectsAutomationCacheSizeMB * 1024 * 1024)
+	return int64(DefaultProjectsAutomationCacheSizeMB * bytesPerKB * bytesPerKB)
 }

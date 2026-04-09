@@ -16,6 +16,14 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+// Disk usage and formatting constants.
+const (
+	// PercentConversionFactor converts fraction to percentage.
+	PercentConversionFactor = 100
+	// DiskUsageHighThreshold is the threshold for high disk usage warning (in percent).
+	DiskUsageHighThreshold = 90
+)
+
 // GetHomeDir returns user's home directory.
 func GetHomeDir() (string, error) {
 	// Check environment variables first (allows testing and overrides)
@@ -267,7 +275,7 @@ func GetDiskUsage(path string) (DiskUsage, error) {
 
 	usedPercent := 0.0
 	if total > 0 {
-		usedPercent = float64(used) / float64(total) * 100
+		usedPercent = float64(used) / float64(total) * PercentConversionFactor
 	}
 
 	return DiskUsage{
@@ -283,9 +291,9 @@ func GetDiskUsage(path string) (DiskUsage, error) {
 func FormatDiskUsage(du DiskUsage) string {
 	return fmt.Sprintf(
 		"%.0fG %.0fG %.1fG %.0f%%",
-		float64(du.Total)/(1024*1024*1024),
-		float64(du.Used)/(1024*1024*1024),
-		float64(du.Free)/(1024*1024*1024),
+		float64(du.Total)/bytesPerGB,
+		float64(du.Used)/bytesPerGB,
+		float64(du.Free)/bytesPerGB,
 		du.UsedPercent,
 	)
 }
@@ -296,13 +304,13 @@ func DiskUsageBar(du DiskUsage, width int) string {
 		width = 20
 	}
 
-	filled := int(float64(width) * du.UsedPercent / 100)
+	filled := int(float64(width) * du.UsedPercent / PercentConversionFactor)
 	empty := width - filled
 
 	var bar strings.Builder
 
 	for i := 0; i < filled && i < width; i++ {
-		if du.UsedPercent >= 90 {
+		if du.UsedPercent >= DiskUsageHighThreshold {
 			bar.WriteString("█") // Red for high usage
 		} else {
 			bar.WriteString("▓") // Yellow for medium-high or lower

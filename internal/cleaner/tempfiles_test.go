@@ -257,7 +257,19 @@ func TestTempFilesCleaner_isExcluded(t *testing.T) {
 	}
 }
 
+// tempFilesSettings creates an OperationSettings with TempFiles configured.
+func tempFilesSettings(olderThan string, excludes []string) *domain.OperationSettings {
+	return &domain.OperationSettings{
+		TempFiles: &domain.TempFilesSettings{
+			OlderThan: olderThan,
+			Excludes:  excludes,
+		},
+	}
+}
+
 func TestTempFilesCleaner_ValidateSettings(t *testing.T) {
+	defaultExcludes := []string{"/tmp/keep"}
+
 	tests := []struct {
 		name     string
 		settings *domain.OperationSettings
@@ -274,34 +286,19 @@ func TestTempFilesCleaner_ValidateSettings(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "valid settings",
-			settings: &domain.OperationSettings{
-				TempFiles: &domain.TempFilesSettings{
-					OlderThan: "7d",
-					Excludes:  []string{"/tmp/keep"},
-				},
-			},
-			wantErr: false,
+			name:     "valid settings",
+			settings: tempFilesSettings("7d", defaultExcludes),
+			wantErr:  false,
 		},
 		{
-			name: "missing older_than",
-			settings: &domain.OperationSettings{
-				TempFiles: &domain.TempFilesSettings{
-					OlderThan: "",
-					Excludes:  []string{"/tmp/keep"},
-				},
-			},
-			wantErr: true,
+			name:     "missing older_than",
+			settings: tempFilesSettings("", defaultExcludes),
+			wantErr:  true,
 		},
 		{
-			name: "invalid older_than",
-			settings: &domain.OperationSettings{
-				TempFiles: &domain.TempFilesSettings{
-					OlderThan: "invalid",
-					Excludes:  []string{"/tmp/keep"},
-				},
-			},
-			wantErr: true,
+			name:     "invalid older_than",
+			settings: tempFilesSettings("invalid", defaultExcludes),
+			wantErr:  true,
 		},
 	}
 

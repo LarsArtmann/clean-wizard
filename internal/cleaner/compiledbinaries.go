@@ -260,7 +260,7 @@ func (c *CompiledBinariesCleaner) ValidateSettings(settings *domain.OperationSet
 
 // Scan scans for compiled binary files in configured directories.
 func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	minSizeBytes := int64(c.minSizeMB) * 1024 * 1024
+	minSizeBytes := int64(c.minSizeMB) * bytesPerMB
 
 	var allBinaries []BinaryInfo
 
@@ -341,7 +341,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 			fmt.Printf(
 				"Would trash %d compiled binary file(s) (%.2f MB)\n",
 				len(items),
-				float64(totalBytes)/(1024*1024),
+				float64(totalBytes)/bytesPerMB,
 			)
 		}
 
@@ -370,7 +370,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domai
 		bytesFreed += item.Size
 
 		if c.verbose {
-			fmt.Printf("  ✓ Trashed: %s (%.2f MB)\n", item.Path, float64(item.Size)/(1024*1024))
+			fmt.Printf("  ✓ Trashed: %s (%.2f MB)\n", item.Path, float64(item.Size)/bytesPerMB)
 		}
 	}
 

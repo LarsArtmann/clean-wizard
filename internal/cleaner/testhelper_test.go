@@ -145,3 +145,20 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 		})
 	}
 }
+
+// DurationParseTestCase holds test data for duration parsing tests.
+type DurationParseTestCase struct {
+	Duration  string
+	WantValid bool
+}
+
+// CommonDurationTestCases provides shared test cases for duration parsing tests.
+// These are used by both BuildCacheCleaner and SystemCacheCleaner.
+var CommonDurationTestCases = []DurationParseTestCase{
+	{Duration: "1h", WantValid: true},
+	{Duration: "24h", WantValid: true},
+	{Duration: "7d", WantValid: true},
+	{Duration: "30d", WantValid: true},
+	{Duration: "1w", WantValid: false}, // Not supported
+	{Duration: "invalid", WantValid: false},
+}

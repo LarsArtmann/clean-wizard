@@ -117,6 +117,16 @@ func NewParallelFlow[T any]() *ParallelFlow[T] {
 	}
 }
 
+// toMap converts the internal sync.Map results to a regular map.
+func (pf *ParallelFlow[T]) toMap() map[string]Result[T] {
+	results := make(map[string]Result[T])
+	pf.results.Range(func(key, value any) bool {
+		results[key.(string)] = value.(Result[T])
+		return true
+	})
+	return results
+}
+
 // Add adds a step to the parallel flow.
 func (pf *ParallelFlow[T]) Add(name string, fn func(context.Context) Result[T]) *ParallelFlow[T] {
 	pf.steps = append(pf.steps, Step[T]{
@@ -153,13 +163,8 @@ func (pf *ParallelFlow[T]) Execute(ctx context.Context) map[string]Result[T] {
 	// Wait for all goroutines to complete
 	wg.Wait()
 
-	// Convert sync.Map to regular map
-	results := make(map[string]Result[T], len(pf.steps))
-	pf.results.Range(func(key, value any) bool {
-		results[key.(string)] = value.(Result[T])
-
-		return true
-	})
+	// Convert sync.Map to regular map using helper
+	results := pf.toMap()
 
 	pf.mu.Lock()
 	pf.executed = true
@@ -181,14 +186,7 @@ func (pf *ParallelFlow[T]) Results() map[string]Result[T] {
 		return make(map[string]Result[T])
 	}
 
-	results := make(map[string]Result[T])
-	pf.results.Range(func(key, value any) bool {
-		results[key.(string)] = value.(Result[T])
-
-		return true
-	})
-
-	return results
+	return pf.toMap()
 }
 
 // Successful returns only the successful results.

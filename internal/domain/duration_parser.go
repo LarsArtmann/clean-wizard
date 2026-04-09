@@ -9,6 +9,15 @@ import (
 	"time"
 )
 
+// Duration parsing constants.
+const (
+	// HoursPerDay is the number of hours in a day.
+	HoursPerDay = 24
+
+	// DurationRegexSubmatches is the expected number of regex submatches for days duration.
+	DurationRegexSubmatches = 2
+)
+
 // ParseCustomDuration parses human-readable duration formats like "7d", "24h", "30m"
 // and converts them to Go time.Duration.
 func ParseCustomDuration(durationStr string) (time.Duration, error) {
@@ -38,7 +47,7 @@ func parseDaysDuration(durationStr string) (time.Duration, error) {
 	re := regexp.MustCompile(`^(\d+(?:\.\d+)?)d$`)
 
 	matches := re.FindStringSubmatch(durationStr)
-	if len(matches) != 2 {
+	if len(matches) != DurationRegexSubmatches {
 		return 0, fmt.Errorf("invalid days duration format: %s", durationStr)
 	}
 
@@ -48,7 +57,7 @@ func parseDaysDuration(durationStr string) (time.Duration, error) {
 	}
 
 	// Convert days to hours (24 hours per day)
-	hours := days * 24
+	hours := days * HoursPerDay
 	goDurationStr := fmt.Sprintf("%.0fh", hours)
 
 	return time.ParseDuration(goDurationStr)

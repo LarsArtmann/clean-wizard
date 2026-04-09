@@ -18,13 +18,28 @@ type enumMacroTestCase struct {
 	wantErr  bool
 }
 
-// getEnumMacroTestCases returns standard test cases for enum unmarshaling.
-func getEnumMacroTestCases() []enumMacroTestCase {
-	return []enumMacroTestCase{
-		{"valid lowercase", "medium", 1, false},
-		{"valid integer", "2", 2, false},
-		{"invalid value", "INVALID", 0, true},
+// assertEnumUnmarshalResult is a helper that runs assertions on enum unmarshal results.
+func assertEnumUnmarshalResult(t *testing.T, tc enumMacroTestCase, err error, val int) {
+	if tc.wantErr {
+		assert.Error(t, err)
+	} else {
+		require.NoError(t, err)
+		assert.Equal(t, tc.expected, val)
 	}
+}
+
+// jsonEnumTestCases provides test cases specific to JSON unmarshal (with quoted strings).
+var jsonEnumTestCases = []enumMacroTestCase{
+	{"valid lowercase", `"medium"`, 1, false},
+	{"valid uppercase", `"HIGH"`, 2, false},
+	{"invalid value", `"INVALID"`, 0, true},
+}
+
+// yamlEnumTestCases provides test cases specific to YAML unmarshal.
+var yamlEnumTestCases = []enumMacroTestCase{
+	{"valid lowercase", "medium", 1, false},
+	{"valid integer", "2", 2, false},
+	{"invalid value", "INVALID", 0, true},
 }
 
 func TestEnumString(t *testing.T) {
@@ -99,30 +114,14 @@ func TestEnumUnmarshalJSON(t *testing.T) {
 	t.Parallel()
 
 	strings := []string{"LOW", "MEDIUM", "HIGH"}
-	tests := []struct {
-		name     string
-		input    string
-		expected int
-		wantErr  bool
-	}{
-		{"valid lowercase", `"medium"`, 1, false},
-		{"valid uppercase", `"HIGH"`, 2, false},
-		{"invalid value", `"INVALID"`, 0, true},
-	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for _, tc := range jsonEnumTestCases {
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			var val int
-
-			err := EnumUnmarshalJSON([]byte(tt.input), &val, strings, "test")
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, tt.expected, val)
-			}
+			err := EnumUnmarshalJSON([]byte(tc.input), &val, strings, "test")
+			assertEnumUnmarshalResult(t, tc, err, val)
 		})
 	}
 }
@@ -140,32 +139,15 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 	t.Parallel()
 
 	strings := []string{"LOW", "MEDIUM", "HIGH"}
-	tests := []struct {
-		name     string
-		input    string
-		expected int
-		wantErr  bool
-	}{
-		{"valid lowercase", "medium", 1, false},
-		{"valid integer", "2", 2, false},
-		{"invalid value", "INVALID", 0, true},
-	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for _, tc := range yamlEnumTestCases {
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			node := &yaml.Node{Kind: yaml.ScalarNode, Value: tt.input}
-
+			node := &yaml.Node{Kind: yaml.ScalarNode, Value: tc.input}
 			var val int
-
 			err := EnumUnmarshalYAML(node, &val, strings, "test")
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, tt.expected, val)
-			}
+			assertEnumUnmarshalResult(t, tc, err, val)
 		})
 	}
 }

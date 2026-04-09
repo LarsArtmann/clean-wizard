@@ -9,6 +9,19 @@ import (
 	"github.com/onsi/gomega"
 )
 
+// Test binary size constants.
+const (
+	// TestBinarySize1MB is the size of the first test binary in MB.
+	TestBinarySize1MB = 20
+	// TestBinarySize2MB is the size of the second test binary in MB.
+	TestBinarySize2MB = 15
+	// TestBinaryTotalSizeMB is the total size of test binaries in MB.
+	TestBinaryTotalSizeMB = TestBinarySize1MB + TestBinarySize2MB
+
+	// Bytes per MB for size calculations.
+	bytesPerMBForTest = 1024 * 1024
+)
+
 // assertResultOk verifies that a result is OK and panics if not.
 // This eliminates duplicate assertion code across multiple Ginkgo test files.
 //
@@ -222,14 +235,14 @@ func GinkgoValidateNilSettingsTest(cleaner CleanerWithSettings) {
 // Returns two test binaries with sizes 20MB and 15MB respectively.
 func StandardTestBinaries() []BinaryInfo {
 	return []BinaryInfo{
-		{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
-		{Path: "/path/to/binary2", Size: 15 * 1024 * 1024, Category: CategoryBin},
+		{Path: "/path/to/binary1", Size: TestBinarySize1MB * bytesPerMBForTest, Category: CategoryTest},
+		{Path: "/path/to/binary2", Size: TestBinarySize2MB * bytesPerMBForTest, Category: CategoryBin},
 	}
 }
 
 // StandardTestBinariesTotalSize returns the total size of StandardTestBinaries.
 func StandardTestBinariesTotalSize() int64 {
-	return 35 * 1024 * 1024
+	return TestBinaryTotalSizeMB * bytesPerMBForTest
 }
 
 // GinkgoAssertIsAvailableNoPanic asserts that calling IsAvailable does not panic.
@@ -248,4 +261,11 @@ func GinkgoAssertIsAvailableWithCancelledContext(
 
 	result := cleaner.IsAvailable(cancelledCtx)
 	_ = result
+}
+
+// GinkgoAssertIsAvailableReturnsBoolean verifies that IsAvailable returns a boolean value.
+// This eliminates duplicate test code across cleaner test files.
+func GinkgoAssertIsAvailableReturnsBoolean(cleaner interface{ IsAvailable(context.Context) bool }) {
+	result := cleaner.IsAvailable(context.Background())
+	gomega.Expect(result).To(gomega.BeAssignableToTypeOf(true))
 }

@@ -268,32 +268,20 @@ func TestSystemCacheCleaner_DryRunStrategy(t *testing.T) {
 }
 
 func TestSystemCacheCleaner_ParseDuration(t *testing.T) {
-	tests := []struct {
-		duration  string
-		wantValid bool
-	}{
-		{"1h", true},
-		{"24h", true},
-		{"7d", true},
-		{"30d", true},
-		{"1w", false}, // Not supported
-		{"invalid", false},
-	}
+	for _, tc := range CommonDurationTestCases {
+		t.Run(tc.Duration, func(t *testing.T) {
+			cleaner, err := NewSystemCacheCleaner(false, false, tc.Duration, nil)
 
-	for _, tt := range tests {
-		t.Run(tt.duration, func(t *testing.T) {
-			cleaner, err := NewSystemCacheCleaner(false, false, tt.duration, nil)
-
-			if tt.wantValid && err != nil {
+			if tc.WantValid && err != nil {
 				t.Errorf(
 					"NewSystemCacheCleaner() with duration %s should succeed, got error: %v",
-					tt.duration,
+					tc.Duration,
 					err,
 				)
 			}
 
-			if !tt.wantValid && err == nil {
-				t.Errorf("NewSystemCacheCleaner() with duration %s should fail", tt.duration)
+			if !tc.WantValid && err == nil {
+				t.Errorf("NewSystemCacheCleaner() with duration %s should fail", tc.Duration)
 			}
 
 			if cleaner != nil {

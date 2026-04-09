@@ -13,7 +13,11 @@ import (
 )
 
 const (
+	// DiskUsageBarWidth is the width of the disk usage bar in characters.
+	DiskUsageBarWidth = 15
+	// BytesThresholdGB is the threshold for displaying GB freed message.
 	BytesThresholdGB = 1_000_000_000
+	// BytesThresholdMB is the threshold for displaying MB freed message.
 	BytesThresholdMB = 100_000_000
 )
 
@@ -124,7 +128,7 @@ func runCleanCommand(
 	if !jsonOutput && diskErr == nil {
 		fmt.Printf(
 			"📊 Disk usage before: %s %s\n",
-			cleaner.DiskUsageBar(diskBefore, 15),
+			cleaner.DiskUsageBar(diskBefore, DiskUsageBarWidth),
 			cleaner.FormatDiskUsage(diskBefore),
 		)
 		fmt.Println()

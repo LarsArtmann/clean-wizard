@@ -6,6 +6,20 @@ import (
 	"time"
 )
 
+// Size estimation constants for generation size calculations.
+const (
+	// GenerationBaseSizeMB is the base estimated size per generation in MB.
+	GenerationBaseSizeMB = 50
+	// GenerationAgeFactorMB is the additional size per month of age in MB.
+	GenerationAgeFactorMB = 10
+	// DaysPerMonth is the average number of days per month.
+	DaysPerMonth = 30
+
+	// Byte conversion constants.
+	BytesPerKB = 1024
+	BytesPerMB = 1024 * 1024
+)
+
 // Use type-safe constants directly.
 var (
 	RiskLow      = RiskLevelLowType
@@ -74,11 +88,11 @@ func (g NixGeneration) Validate() error {
 func (g NixGeneration) EstimateSize() int64 {
 	// Rough estimate: 50MB per generation as baseline with adjustments
 	// Older generations tend to be larger, newer ones smaller
-	baseSize := int64(50 * 1024 * 1024) // 50MB base
+	baseSize := int64(GenerationBaseSizeMB * BytesPerMB)
 	age := time.Since(g.Date)
-	ageFactor := int64(age.Hours() / 24 / 30) // Age in months
+	ageFactor := int64(age.Hours() / HoursPerDay / DaysPerMonth)
 
-	return baseSize + (ageFactor * 10 * 1024 * 1024) // Add 10MB per month
+	return baseSize + (ageFactor * GenerationAgeFactorMB * BytesPerMB)
 }
 
 // ScanType represents different scanning domains.

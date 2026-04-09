@@ -54,6 +54,12 @@ const (
 	MonitoringOptionEnabled  MonitoringOption = "enabled"
 )
 
+// Config cache expiry constant.
+const (
+	// DefaultConfigCacheExpiry is the default expiration time for config cache entries.
+	DefaultConfigCacheExpiry = 30 * time.Minute
+)
+
 // EnhancedConfigLoader provides comprehensive configuration loading with validation.
 type EnhancedConfigLoader struct {
 	middleware       *ValidationMiddleware
@@ -100,7 +106,7 @@ func NewEnhancedConfigLoader(options ...func(*EnhancedConfigLoader)) *EnhancedCo
 		middleware:       middleware,
 		validator:        validator,
 		sanitizer:        sanitizer,
-		cache:            NewConfigCache(30 * time.Minute),
+		cache:            NewConfigCache(DefaultConfigCacheExpiry),
 		retryPolicy:      getDefaultRetryPolicy(),
 		enableMonitoring: MonitoringOptionDisabled,
 	}

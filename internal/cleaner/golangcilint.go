@@ -16,6 +16,23 @@ import (
 // golangciLintCommandTimeout is the timeout for golangci-lint operations.
 const golangciLintCommandTimeout = 30 * time.Second
 
+// Cache status parsing constants.
+const (
+	cacheStatusMinLines = 2
+
+	// Binary byte conversion constants for size parsing (IEC units).
+	bytesPerKiB = 1024
+	bytesPerMiB = 1024 * 1024
+	bytesPerGiB = 1024 * 1024 * 1024
+	bytesPerTiB = 1024 * 1024 * 1024 * 1024
+
+	// Decimal byte conversion constants (SI units).
+	bytesPerKBDecimal = 1000
+	bytesPerMBDecimal = 1000 * 1000
+	bytesPerGBDecimal = 1000 * 1000 * 1000
+	bytesPerTBDecimal = 1000 * 1000 * 1000 * 1000
+)
+
 // GolangciLintCacheCleaner handles golangci-lint cache cleanup.
 type GolangciLintCacheCleaner struct {
 	CleanerBase
@@ -63,7 +80,7 @@ type cacheStatus struct {
 //	Size: 3.1KiB
 func parseCacheStatus(output string) (*cacheStatus, error) {
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	if len(lines) < 2 {
+	if len(lines) < cacheStatusMinLines {
 		return nil, fmt.Errorf("unexpected output format: %s", output)
 	}
 
@@ -115,21 +132,21 @@ func parseSize(sizeStr string) (int64, error) {
 	case "B", "BYTE", "BYTES":
 		return int64(number), nil
 	case "KIB":
-		return int64(number * 1024), nil
+		return int64(number * bytesPerKiB), nil
 	case "MIB":
-		return int64(number * 1024 * 1024), nil
+		return int64(number * bytesPerMiB), nil
 	case "GIB":
-		return int64(number * 1024 * 1024 * 1024), nil
+		return int64(number * bytesPerGiB), nil
 	case "TIB":
-		return int64(number * 1024 * 1024 * 1024 * 1024), nil
+		return int64(number * bytesPerTiB), nil
 	case "KB":
-		return int64(number * 1000), nil
+		return int64(number * bytesPerKBDecimal), nil
 	case "MB":
-		return int64(number * 1000 * 1000), nil
+		return int64(number * bytesPerMBDecimal), nil
 	case "GB":
-		return int64(number * 1000 * 1000 * 1000), nil
+		return int64(number * bytesPerGBDecimal), nil
 	case "TB":
-		return int64(number * 1000 * 1000 * 1000 * 1000), nil
+		return int64(number * bytesPerTBDecimal), nil
 	default:
 		return 0, fmt.Errorf("unknown size unit: %s", unit)
 	}

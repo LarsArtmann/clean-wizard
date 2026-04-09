@@ -10,6 +10,17 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// assertErrorResult verifies that a CleanResult is an error and matches the expected error.
+func assertErrorResult(t *testing.T, cleanResult result.Result[domain.CleanResult], expectedErr error) {
+	if cleanResult.IsOk() {
+		t.Error("Expected error result, got Ok")
+	}
+
+	if cleanResult.Error().Error() != expectedErr.Error() {
+		t.Errorf("Expected error '%s', got '%s'", expectedErr.Error(), cleanResult.Error().Error())
+	}
+}
+
 func TestNewCleanResult(t *testing.T) {
 	strategy := domain.StrategyDryRunType
 	items := 5
@@ -155,14 +166,7 @@ func TestToCleanResultWithError(t *testing.T) {
 	bytesResult := result.Err[int64](expectedErr)
 
 	cleanResult := ToCleanResult(bytesResult)
-
-	if cleanResult.IsOk() {
-		t.Error("Expected error result, got Ok")
-	}
-
-	if cleanResult.Error().Error() != expectedErr.Error() {
-		t.Errorf("Expected error '%s', got '%s'", expectedErr.Error(), cleanResult.Error().Error())
-	}
+	assertErrorResult(t, cleanResult, expectedErr)
 }
 
 func TestToCleanResultWithStrategy(t *testing.T) {
@@ -397,14 +401,7 @@ func TestToCleanResultFromError(t *testing.T) {
 	expectedErr := errors.New("test error")
 
 	cleanResult := ToCleanResultFromError(expectedErr)
-
-	if cleanResult.IsOk() {
-		t.Error("Expected error result, got Ok")
-	}
-
-	if cleanResult.Error().Error() != expectedErr.Error() {
-		t.Errorf("Expected error '%s', got '%s'", expectedErr.Error(), cleanResult.Error().Error())
-	}
+	assertErrorResult(t, cleanResult, expectedErr)
 }
 
 func TestValidateAndConvertCleanResult(t *testing.T) {
