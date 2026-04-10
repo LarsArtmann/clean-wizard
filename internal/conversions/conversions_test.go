@@ -26,7 +26,11 @@ func assertErrorResult(
 }
 
 // assertStrategyEqual checks that the result's strategy matches the expected strategy.
-func assertStrategyEqual(t *testing.T, value *domain.CleanResult, strategy domain.CleanStrategyType) {
+func assertStrategyEqual(
+	t *testing.T,
+	value *domain.CleanResult,
+	strategy domain.CleanStrategyType,
+) {
 	if value.Strategy != strategy {
 		t.Errorf("Expected strategy '%s', got '%s'", strategy.String(), value.Strategy.String())
 	}

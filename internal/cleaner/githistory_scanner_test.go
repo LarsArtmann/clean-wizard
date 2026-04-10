@@ -180,25 +180,29 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 				gomega.Expect(filtered).To(gomega.HaveLen(expectedCount))
 			}
 
-			ginkgo.It("should include files with known binary extensions", func() {
-				files := createTestFiles([]string{"app.exe", "lib.dll", "archive.zip"})
-				assertFilterCount(files, 3)
-			})
-
-			ginkgo.It("should include extensionless files in binary directories", func() {
-				files := createTestFiles([]string{"bin/myapp", "dist/release", "build/output"})
-				assertFilterCount(files, 3)
-			})
-
-			ginkgo.It("should include .test files", func() {
-				files := createTestFiles([]string{"app.test"})
-				assertFilterCount(files, 1)
-			})
-
-			ginkgo.It("should exclude files with unknown extensions in non-binary dirs", func() {
-				files := createTestFiles([]string{"src/main.go", "lib/util.ts"})
-				assertFilterCount(files, 0)
-			})
+			ginkgo.DescribeTable(
+				"should filter binary files correctly",
+				func(paths []string, expectedCount int) {
+					files := createTestFiles(paths)
+					assertFilterCount(files, expectedCount)
+				},
+				ginkgo.Entry(
+					"includes files with known binary extensions",
+					[]string{"app.exe", "lib.dll", "archive.zip"},
+					3,
+				),
+				ginkgo.Entry(
+					"includes extensionless files in binary directories",
+					[]string{"bin/myapp", "dist/release", "build/output"},
+					3,
+				),
+				ginkgo.Entry("includes .test files", []string{"app.test"}, 1),
+				ginkgo.Entry(
+					"excludes files with unknown extensions in non-binary dirs",
+					[]string{"src/main.go", "lib/util.ts"},
+					0,
+				),
+			)
 		})
 	})
 

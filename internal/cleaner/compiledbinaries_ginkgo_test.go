@@ -635,20 +635,15 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			ginkgo.Entry("years", parseTestCase{input: "1y", expected: 365 * 24 * time.Hour}),
 		)
 
-		ginkgo.It("should return error for invalid format", func() {
-			_, err := parseAgeDuration("invalid")
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
-
-		ginkgo.It("should return error for too short format", func() {
-			_, err := parseAgeDuration("d")
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
-
-		ginkgo.It("should return error for unknown unit", func() {
-			_, err := parseAgeDuration("7x")
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		ginkgo.DescribeTable("should return error for invalid input",
+			func(input string) {
+				_, err := parseAgeDuration(input)
+				gomega.Expect(err).To(gomega.HaveOccurred())
+			},
+			ginkgo.Entry("invalid format", "invalid"),
+			ginkgo.Entry("too short format", "d"),
+			ginkgo.Entry("unknown unit", "7x"),
+		)
 	})
 })
 

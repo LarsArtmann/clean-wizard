@@ -54,7 +54,11 @@ func readConfigFile(ctx context.Context, k *koanf.Koanf) (*domain.Config, error)
 }
 
 // readConfigFileFromPath attempts to read a config file from the given path.
-func readConfigFileFromPath(ctx context.Context, k *koanf.Koanf, configPath string) (*domain.Config, error) {
+func readConfigFileFromPath(
+	ctx context.Context,
+	k *koanf.Koanf,
+	configPath string,
+) (*domain.Config, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()

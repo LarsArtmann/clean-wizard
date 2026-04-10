@@ -153,6 +153,7 @@ func TestMinMax_Range(t *testing.T) {
 }
 
 func TestMinMax_Contains(t *testing.T) {
+	fullRange := MinMax{Min: new(float64(10)), Max: new(float64(90))}
 	tests := []struct {
 		name   string
 		minMax MinMax
@@ -161,31 +162,31 @@ func TestMinMax_Contains(t *testing.T) {
 	}{
 		{
 			name:   "value in range",
-			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
+			minMax: fullRange,
 			value:  50,
 			want:   true,
 		},
 		{
 			name:   "value below min",
-			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
+			minMax: fullRange,
 			value:  5,
 			want:   false,
 		},
 		{
 			name:   "value above max",
-			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
+			minMax: fullRange,
 			value:  95,
 			want:   false,
 		},
 		{
 			name:   "value at min boundary",
-			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
+			minMax: fullRange,
 			value:  10,
 			want:   true,
 		},
 		{
 			name:   "value at max boundary",
-			minMax: MinMax{Min: new(float64(10)), Max: new(float64(90))},
+			minMax: fullRange,
 			value:  90,
 			want:   true,
 		},
