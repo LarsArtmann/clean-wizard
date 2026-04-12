@@ -22,11 +22,9 @@ func ExecWithTimeout(
 		return exec.CommandContext(ctx, name, args...)
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
-	cmd := exec.CommandContext(timeoutCtx, name, args...)
-	cmd.Cancel = cancel
+	timeoutCtx, _ := context.WithTimeout(ctx, timeout)
 
-	return cmd
+	return exec.CommandContext(timeoutCtx, name, args...)
 }
 
 // ExecWithDefaultTimeout creates a command with the default 5-minute timeout.
@@ -43,9 +41,7 @@ func (n *NixAdapter) execWithTimeout(ctx context.Context, name string, arg ...st
 		timeout = DefaultTimeout
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
-	cmd := exec.CommandContext(timeoutCtx, name, arg...)
-	cmd.Cancel = cancel
+	timeoutCtx, _ := context.WithTimeout(ctx, timeout)
 
-	return cmd
+	return exec.CommandContext(timeoutCtx, name, arg...)
 }

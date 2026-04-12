@@ -51,7 +51,6 @@ func (r Result[T]) UnwrapOr(default_ T) T
 // Transformations
 func Map[T, U any](r Result[T], fn func(T) U) Result[U]
 func AndThen[T, U any](r Result[T], fn func(T) Result[U]) Result[U]
-func FlatMap[T, U any](r Result[T], fn func(T) Result[U]) Result[U]
 func (r Result[T]) OrElse(fallback Result[T]) Result[T]
 
 // Validation

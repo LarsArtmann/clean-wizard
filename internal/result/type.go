@@ -101,9 +101,6 @@ func AndThen[T, U any](r Result[T], fn func(T) Result[U]) Result[U] {
 }
 
 // FlatMap is an alias for AndThen for semantic clarity when the function returns a Result.
-func FlatMap[T, U any](r Result[T], fn func(T) Result[U]) Result[U] {
-	return AndThen(r, fn)
-}
 
 // OrElse returns the current result if successful, otherwise returns the fallback result.
 // Useful for providing fallback values when operations fail.

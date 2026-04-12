@@ -182,6 +182,7 @@ func toStringSlice[T stringer](types []T) []string {
 	for i, t := range types {
 		result[i] = t.String()
 	}
+
 	return result
 }
 
@@ -191,6 +192,7 @@ func toLowerStringSlice[T stringer](types []T) []string {
 	for i, t := range types {
 		result[i] = strings.ToLower(t.String())
 	}
+
 	return result
 }
 

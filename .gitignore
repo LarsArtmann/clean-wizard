@@ -28,3 +28,5 @@ node_modules/
 /coverage
 # Sensitive files
 *.db
+Copy/paste detection report
+/report/jscpd-report.json

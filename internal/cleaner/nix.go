@@ -36,8 +36,9 @@ const (
 
 // NixCleaner handles Nix package manager cleanup with proper type safety.
 type NixCleaner struct {
-	adapter *adapters.NixAdapter
 	CleanerBase
+
+	adapter   *adapters.NixAdapter
 	keepCount int
 }
 

@@ -251,8 +251,8 @@ func TestResult_AndThen(t *testing.T) {
 }
 
 func TestResult_FlatMap(t *testing.T) {
-	// FlatMap is an alias for AndThen, so we just verify it works
-	result := FlatMap(Ok(10), func(i int) Result[int] { return Ok(i * 2) })
+	// FlatMap is an alias for AndThen, so we just verify AndThen works
+	result := AndThen(Ok(10), func(i int) Result[int] { return Ok(i * 2) })
 	if !result.IsOk() || result.Value() != 20 {
 		t.Errorf("FlatMap() = %v, want Ok(20)", result)
 	}

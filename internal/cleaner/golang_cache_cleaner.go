@@ -20,9 +20,10 @@ const goCommandTimeout = 60 * time.Second
 
 // GoCacheCleaner handles built-in Go cache cleaning operations.
 type GoCacheCleaner struct {
-	cacheType GoCacheType
 	CleanerBase
-	helper *golangHelpers
+
+	cacheType GoCacheType
+	helper    *golangHelpers
 }
 
 // NewGoCacheCleaner creates a new GoCacheCleaner.

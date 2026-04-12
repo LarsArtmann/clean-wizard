@@ -120,6 +120,7 @@ func TestEnumUnmarshalJSON(t *testing.T) {
 			t.Parallel()
 
 			var val int
+
 			err := EnumUnmarshalJSON([]byte(tc.input), &val, strings, "test")
 			assertEnumUnmarshalResult(t, tc, err, val)
 		})
@@ -145,7 +146,9 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 			t.Parallel()
 
 			node := &yaml.Node{Kind: yaml.ScalarNode, Value: tc.input}
+
 			var val int
+
 			err := EnumUnmarshalYAML(node, &val, strings, "test")
 			assertEnumUnmarshalResult(t, tc, err, val)
 		})

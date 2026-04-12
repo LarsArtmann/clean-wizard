@@ -83,6 +83,15 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 		tempDir, _ = os.MkdirTemp("", "compiled-binaries-test-*")
 	})
 
+	// setupCleanerWithMocks sets up the cleaner with mock scanner and operator.
+	// This eliminates duplicate cleaner setup across Scan, Clean, and GetStoreSize Describe blocks.
+	setupCleanerWithMocks := func() {
+		cleaner = NewCompiledBinariesCleaner(false, false, 10, "", []string{tempDir}, nil,
+			WithBinaryScanner(mockScanner),
+			WithBinaryTrashOperator(mockOperator),
+		)
+	}
+
 	ginkgo.AfterEach(func() {
 		if tempDir != "" {
 			os.RemoveAll(tempDir)
@@ -386,10 +395,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 	// ============================================================================
 	ginkgo.Describe("Scan", func() {
 		ginkgo.BeforeEach(func() {
-			cleaner = NewCompiledBinariesCleaner(false, false, 10, "", []string{tempDir}, nil,
-				WithBinaryScanner(mockScanner),
-				WithBinaryTrashOperator(mockOperator),
-			)
+			setupCleanerWithMocks()
 		})
 
 		ginkgo.Context("when scan succeeds", func() {
@@ -484,10 +490,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 	// ============================================================================
 	ginkgo.Describe("Clean", func() {
 		ginkgo.BeforeEach(func() {
-			cleaner = NewCompiledBinariesCleaner(false, false, 10, "", []string{tempDir}, nil,
-				WithBinaryScanner(mockScanner),
-				WithBinaryTrashOperator(mockOperator),
-			)
+			setupCleanerWithMocks()
 		})
 
 		// Helper function to test that Clean correctly reports freed bytes for two binaries.
@@ -594,10 +597,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 	// ============================================================================
 	ginkgo.Describe("GetStoreSize", func() {
 		ginkgo.BeforeEach(func() {
-			cleaner = NewCompiledBinariesCleaner(false, false, 10, "", []string{tempDir}, nil,
-				WithBinaryScanner(mockScanner),
-				WithBinaryTrashOperator(mockOperator),
-			)
+			setupCleanerWithMocks()
 		})
 
 		ginkgo.It("should return 0 when scan returns empty", func() {
@@ -865,9 +865,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner Integration", func() {
 		}
 
 		scanResult := cleaner.Scan(ctx)
-		if scanResult.IsOk() {
-			gomega.Expect(scanResult.Value()).To(gomega.BeAssignableToTypeOf([]domain.ScanItem{}))
-		}
+		GinkgoAssertScanResultIsOk(scanResult)
 	})
 
 	ginkgo.It("should handle real filesystem operations", func() {

@@ -758,10 +758,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner Integration", func() {
 
 		// Verify Scan works
 		scanResult := cleaner.Scan(ctx)
-		// Either it succeeds or fails with a meaningful error
-		if scanResult.IsOk() {
-			gomega.Expect(scanResult.Value()).To(gomega.BeAssignableToTypeOf([]domain.ScanItem{}))
-		}
+		GinkgoAssertScanResultIsOk(scanResult)
 	})
 
 	ginkgo.It("should handle real filesystem operations", func() {

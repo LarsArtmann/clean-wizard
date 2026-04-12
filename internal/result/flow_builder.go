@@ -122,8 +122,10 @@ func (pf *ParallelFlow[T]) toMap() map[string]Result[T] {
 	results := make(map[string]Result[T])
 	pf.results.Range(func(key, value any) bool {
 		results[key.(string)] = value.(Result[T])
+
 		return true
 	})
+
 	return results
 }
 

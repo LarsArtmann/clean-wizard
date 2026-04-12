@@ -127,6 +127,13 @@ linters:
   settings:
     cyclop:
       max-complexity: 20
+    # depguard:
+    #   packages:
+    #     - github.com/LarsArtmann/clean-wizard/...
+    #   rules:
+    #     main:
+    #       allow:
+    #         - all
     dupl:
       threshold: 150
     errcheck:
@@ -156,41 +163,91 @@ linters:
         - github.com/caarlos0/env/*
         - github.com/go-resty/resty/*
         - os/exec.*
+    testpackage:
+      name: "test"
+      path-patterns:
+        - "**/*_test.go"
+    thelper:
+      test-file-pattern: ".*_test\\.go"
+    tparallel:
+      require-examples: true
   exclusions:
     rules:
-      - path: _test\.go
+      - path: _test\\.go
         linters:
           - errcheck
-          - staticcheck
-          - wrapcheck
+          - errname
+          - errorlint
+          - exhaustive
+          - forbidigo
+          - forcetypeassert
+          - funlen
           - gosec
-          - unconvert
-          - unparam
-          - dupl
-          - gocyclo
-          - goconst
-      - path: _ginkgo_test\.go
+          - inamedparam
+          - ireturn
+          - mnd
+          - nestif
+          - nonamedreturns
+          - noinlineerr
+          - prealloc
+          - revive
+          - gocritic
+          - gomoddirectives
+          - gosec
+          - interfacebloat
+          - musttag
+          - recvcheck
+          - tagliatelle
+      - path: _ginkgo_test\\.go
         linters:
           - errcheck
-          - staticcheck
-          - wrapcheck
+          - errname
+          - errorlint
+          - exhaustive
+          - forbidigo
+          - forcetypeassert
+          - funlen
           - gosec
-          - unconvert
-          - unparam
-          - dupl
-          - gocyclo
-          - goconst
+          - inamedparam
+          - ireturn
+          - mnd
+          - nestif
+          - nonamedreturns
+          - noinlineerr
+          - prealloc
+          - revive
+          - gocritic
+          - gomoddirectives
+          - gosec
+          - interfacebloat
+          - musttag
+          - recvcheck
+          - tagliatelle
       - path: tests/
         linters:
           - errcheck
-          - staticcheck
-          - wrapcheck
+          - errname
+          - errorlint
+          - exhaustive
+          - forbidigo
+          - forcetypeassert
+          - funlen
           - gosec
-          - unconvert
-          - unparam
-          - dupl
-          - gocyclo
-          - goconst
+          - inamedparam
+          - ireturn
+          - mnd
+          - nestif
+          - nonamedreturns
+          - noinlineerr
+          - prealloc
+          - revive
+          - gocritic
+          - gomoddirectives
+          - gosec
+          - interfacebloat
+          - musttag
+          - recvcheck
+          - tagliatelle
     paths:
       - tests
       - test/testdata_etc
@@ -205,3 +262,37 @@ formatters:
 issues:
   max-issues-per-linter: 50
   max-same-issues: 10
+  exclude-rules:
+    - path: _test\\.go
+      linters:
+        - errcheck
+        - staticcheck
+        - wrapcheck
+        - gosec
+        - unconvert
+        - unparam
+        - dupl
+        - gocyclo
+        - goconst
+    - path: _ginkgo_test\\.go
+      linters:
+        - errcheck
+        - staticcheck
+        - wrapcheck
+        - gosec
+        - unconvert
+        - unparam
+        - dupl
+        - gocyclo
+        - goconst
+    - path: tests/
+      linters:
+        - errcheck
+        - staticcheck
+        - wrapcheck
+        - gosec
+        - unconvert
+        - unparam
+        - dupl
+        - gocyclo
+        - goconst

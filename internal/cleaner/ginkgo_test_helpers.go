@@ -277,3 +277,28 @@ func GinkgoAssertIsAvailableReturnsBoolean(cleaner interface{ IsAvailable(contex
 	result := cleaner.IsAvailable(context.Background())
 	gomega.Expect(result).To(gomega.BeAssignableToTypeOf(true))
 }
+
+// GinkgoAssertScanResultIsOk verifies that a scan result is ok and the value is a slice of ScanItems.
+// This eliminates duplicate scan result assertion code across multiple cleaner integration tests.
+func GinkgoAssertScanResultIsOk(scanResult result.Result[[]domain.ScanItem]) {
+	if scanResult.IsOk() {
+		gomega.Expect(scanResult.Value()).To(gomega.BeAssignableToTypeOf([]domain.ScanItem{}))
+	}
+}
+
+// GinkgoAssertNameAndType tests that a cleaner returns the correct name and operation type.
+// This eliminates duplicate name/type assertion code across multiple cleaner test files.
+//
+// Parameters:
+//   - name: Expected cleaner name (e.g., "compiled-binaries")
+//   - expectedType: Expected operation type (e.g., domain.OperationTypeCompiledBinaries)
+//
+// Usage:
+//
+//	ginkgo.It("should return correct name and type", func() {
+//	    GinkgoAssertNameAndType(cleaner, "compiled-binaries", domain.OperationTypeCompiledBinaries)
+//	})
+func GinkgoAssertNameAndType(cleaner Cleaner, name string, expectedType domain.OperationType) {
+	gomega.Expect(cleaner.Name()).To(gomega.Equal(name))
+	gomega.Expect(cleaner.Type()).To(gomega.Equal(expectedType))
+}
