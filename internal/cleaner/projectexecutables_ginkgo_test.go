@@ -196,12 +196,12 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			cleaner = NewProjectExecutablesCleaner(false, false, nil, nil)
 		})
 
-		ginkgo.It("should return correct name", func() {
-			gomega.Expect(cleaner.Name()).To(gomega.Equal("project-executables"))
-		})
-
-		ginkgo.It("should return correct operation type", func() {
-			gomega.Expect(cleaner.Type()).To(gomega.Equal(domain.OperationTypeProjectExecutables))
+		ginkgo.It("should return correct name and type", func() {
+			GinkgoAssertNameAndType(
+				cleaner,
+				"project-executables",
+				domain.OperationTypeProjectExecutables,
+			)
 		})
 	})
 

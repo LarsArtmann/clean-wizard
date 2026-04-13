@@ -142,6 +142,18 @@ func runGenericCleanerWithError(
 	return result.Value(), nil
 }
 
+// runCleanerWithFactory is an internal helper that executes a cleaner using a factory function.
+// This consolidates the common pattern of creating a cleaner and running it.
+func runCleanerWithFactory(
+	ctx context.Context,
+	verbose, dryRun bool,
+	createCleaner func() cleaner.Cleaner,
+) (domain.CleanResult, error) {
+	return runGenericCleaner(ctx, verbose, dryRun, func(bool, bool) cleaner.Cleaner {
+		return createCleaner()
+	})
+}
+
 // runCleanerWithConfig executes a cleaner that requires a single configuration parameter.
 // T is the cleaner configuration type (e.g., domain.HomebrewMode, domain.DockerPruneMode).
 func runCleanerWithConfig[T any](
@@ -150,8 +162,8 @@ func runCleanerWithConfig[T any](
 	factory func(bool, bool, T) cleaner.Cleaner,
 	config T,
 ) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return factory(v, d, config)
+	return runCleanerWithFactory(ctx, verbose, dryRun, func() cleaner.Cleaner {
+		return factory(verbose, dryRun, config)
 	})
 }
 
@@ -163,8 +175,8 @@ func runManagerCleaner[T any](
 	availableManagers []T,
 	factory func(bool, bool, []T) cleaner.Cleaner,
 ) (domain.CleanResult, error) {
-	return runGenericCleaner(ctx, verbose, dryRun, func(v, d bool) cleaner.Cleaner {
-		return factory(v, d, availableManagers)
+	return runCleanerWithFactory(ctx, verbose, dryRun, func() cleaner.Cleaner {
+		return factory(verbose, dryRun, availableManagers)
 	})
 }
 

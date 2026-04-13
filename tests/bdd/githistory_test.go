@@ -134,7 +134,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 				createAndCommitFile(testCtx.repoPath, "README.md", "# Test Repository")
 				testCtx.safetyReport = testCtx.cleaner.GetSafetyReport(testCtx.ctx)
 				gomega.Expect(testCtx.safetyReport.FilterRepoAvailable).To(gomega.BeFalse())
-				gomega.Expect(len(testCtx.safetyReport.Blockers)).To(gomega.BeNumerically(">", 0))
+				gomega.Expect(testCtx.safetyReport.Blockers).ToNot(gomega.BeEmpty())
 			}
 		})
 	})

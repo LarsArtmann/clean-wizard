@@ -223,12 +223,12 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
 		})
 
-		ginkgo.It("should return correct name", func() {
-			gomega.Expect(cleaner.Name()).To(gomega.Equal("compiled-binaries"))
-		})
-
-		ginkgo.It("should return correct operation type", func() {
-			gomega.Expect(cleaner.Type()).To(gomega.Equal(domain.OperationTypeCompiledBinaries))
+		ginkgo.It("should return correct name and type", func() {
+			GinkgoAssertNameAndType(
+				cleaner,
+				"compiled-binaries",
+				domain.OperationTypeCompiledBinaries,
+			)
 		})
 	})
 

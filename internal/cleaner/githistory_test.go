@@ -116,12 +116,8 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 			cleaner = NewGitHistoryCleaner()
 		})
 
-		ginkgo.It("should return correct name", func() {
-			gomega.Expect(cleaner.Name()).To(gomega.Equal("git-history"))
-		})
-
-		ginkgo.It("should return correct operation type", func() {
-			gomega.Expect(cleaner.Type()).To(gomega.Equal(domain.OperationTypeGitHistory))
+		ginkgo.It("should return correct name and type", func() {
+			GinkgoAssertNameAndType(cleaner, "git-history", domain.OperationTypeGitHistory)
 		})
 	})
 
