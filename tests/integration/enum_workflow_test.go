@@ -77,63 +77,93 @@ func createYAMLNode(value interface{}) *yaml.Node {
 	return node
 }
 
+// enumTestCaseExpected holds expected values for enum workflow test cases.
+type enumTestCaseExpected struct {
+	dockerMode       domain.DockerPruneMode
+	cleanCache       bool
+	testCache        bool
+	modCache         bool
+	buildCache       bool
+	lintCache        bool
+	systemCacheEmpty bool
+}
+
+// dockerPruneAllExpected are the expected results for DockerPruneAll test cases.
+var dockerPruneAllExpected = enumTestCaseExpected{
+	dockerMode:       domain.DockerPruneAll,
+	cleanCache:       true,
+	testCache:        true,
+	modCache:         false,
+	buildCache:       true,
+	lintCache:        false,
+	systemCacheEmpty: true,
+}
+
+// enumTestCase represents a single enum workflow test case.
+type enumTestCase struct {
+	name                     string
+	dockerPruneMode          interface{}
+	goCleanCache             interface{}
+	goTestCache              interface{}
+	goModCache               interface{}
+	goBuildCache             interface{}
+	goLintCache              interface{}
+	systemCacheTypes         []interface{}
+	expectedDockerMode       domain.DockerPruneMode
+	expectedCleanCache       bool
+	expectedTestCache        bool
+	expectedModCache         bool
+	expectedBuildCache       bool
+	expectedLintCache        bool
+	expectedSystemCacheEmpty bool
+}
+
+// newEnumTestCase creates a test case with the given inputs and expected values.
+func newEnumTestCase(
+	name string,
+	dockerPruneMode interface{},
+	goCleanCache, goTestCache, goModCache, goBuildCache, goLintCache interface{},
+	systemCacheTypes []interface{},
+	expected enumTestCaseExpected,
+) enumTestCase {
+	return enumTestCase{
+		name:                     name,
+		dockerPruneMode:          dockerPruneMode,
+		goCleanCache:             goCleanCache,
+		goTestCache:              goTestCache,
+		goModCache:               goModCache,
+		goBuildCache:             goBuildCache,
+		goLintCache:              goLintCache,
+		systemCacheTypes:         systemCacheTypes,
+		expectedDockerMode:       expected.dockerMode,
+		expectedCleanCache:       expected.cleanCache,
+		expectedTestCache:        expected.testCache,
+		expectedModCache:         expected.modCache,
+		expectedBuildCache:       expected.buildCache,
+		expectedLintCache:        expected.lintCache,
+		expectedSystemCacheEmpty: expected.systemCacheEmpty,
+	}
+}
+
 // TestEnumWorkflow_Integration tests full workflow from YAML config with enums to execution.
 func TestEnumWorkflow_Integration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	tests := []struct {
-		name                     string
-		dockerPruneMode          interface{}
-		goCleanCache             interface{}
-		goTestCache              interface{}
-		goModCache               interface{}
-		goBuildCache             interface{}
-		goLintCache              interface{}
-		systemCacheTypes         []interface{}
-		expectedDockerMode       domain.DockerPruneMode
-		expectedCleanCache       bool
-		expectedTestCache        bool
-		expectedModCache         bool
-		expectedBuildCache       bool
-		expectedLintCache        bool
-		expectedSystemCacheEmpty bool
-	}{
-		{
-			name:                     "integer_enums",
-			dockerPruneMode:          0,
-			goCleanCache:             1,
-			goTestCache:              1,
-			goModCache:               0,
-			goBuildCache:             1,
-			goLintCache:              0,
-			systemCacheTypes:         []interface{}{0, 1, 2, 3},
-			expectedDockerMode:       domain.DockerPruneAll,
-			expectedCleanCache:       true,
-			expectedTestCache:        true,
-			expectedModCache:         false,
-			expectedBuildCache:       true,
-			expectedLintCache:        false,
-			expectedSystemCacheEmpty: true,
-		},
-		{
-			name:                     "string_enums",
-			dockerPruneMode:          "ALL",
-			goCleanCache:             "ENABLED",
-			goTestCache:              "ENABLED",
-			goModCache:               "DISABLED",
-			goBuildCache:             "ENABLED",
-			goLintCache:              "DISABLED",
-			systemCacheTypes:         []interface{}{"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW"},
-			expectedDockerMode:       domain.DockerPruneAll,
-			expectedCleanCache:       true,
-			expectedTestCache:        true,
-			expectedModCache:         false,
-			expectedBuildCache:       true,
-			expectedLintCache:        false,
-			expectedSystemCacheEmpty: true,
-		},
+	tests := []enumTestCase{
+		newEnumTestCase(
+			"integer_enums",
+			0, 1, 1, 0, 1, 0,
+			[]interface{}{0, 1, 2, 3},
+			dockerPruneAllExpected,
+		),
+		newEnumTestCase(
+			"string_enums",
+			"ALL", "ENABLED", "ENABLED", "DISABLED", "ENABLED", "DISABLED",
+			[]interface{}{"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW"},
+			dockerPruneAllExpected,
+		),
 		{
 			name:                     "mixed_enums",
 			dockerPruneMode:          2,
