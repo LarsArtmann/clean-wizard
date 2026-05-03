@@ -113,7 +113,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 				return &domain.OperationSettings{
 					SystemCache: &domain.SystemCacheSettings{
 						CacheTypes: AvailableSystemCacheTypes(),
-						OlderThan:   "30d",
+						OlderThan:  "30d",
 					},
 				}
 			}(),
@@ -127,14 +127,14 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 					return &domain.OperationSettings{
 						SystemCache: &domain.SystemCacheSettings{
 							CacheTypes: []domain.CacheType{},
-							OlderThan:   "7d",
+							OlderThan:  "7d",
 						},
 					}
 				}
 				return &domain.OperationSettings{
 					SystemCache: &domain.SystemCacheSettings{
 						CacheTypes: []domain.CacheType{caches[0]},
-						OlderThan:   "7d",
+						OlderThan:  "7d",
 					},
 				}
 			}(),

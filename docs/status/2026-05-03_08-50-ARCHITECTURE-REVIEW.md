@@ -42,12 +42,14 @@ cmd/clean-wizard/commands/     CLI Layer (Cobra commands)
 ### Modularity Score: 7/10
 
 **Good:**
+
 - Clean package boundaries
 - Domain types isolated in `internal/domain/`
 - Registry pattern for extensibility
 - Adapter pattern for external deps
 
 **Needs Improvement:**
+
 - `internal/domain/` is a "god package" with 20+ files
 - `internal/cleaner/` is flat — 50+ files in one package
 - Some cleaners reach into OS directly instead of through adapters
@@ -56,6 +58,7 @@ cmd/clean-wizard/commands/     CLI Layer (Cobra commands)
 ### Service Orientation Score: 6/10
 
 **Missing:**
+
 - No formal service layer between CLI commands and domain
 - Commands directly construct and call cleaners
 - No dependency injection — cleaners construct their own dependencies
@@ -64,12 +67,14 @@ cmd/clean-wizard/commands/     CLI Layer (Cobra commands)
 ### Composability Score: 8/10
 
 **Excellent:**
+
 - `result.Result[T]` enables clean function composition
 - `FlowBuilder[T]` and `ParallelFlow[T]` enable pipeline composition
 - `BranchFlow[T]` enables conditional flow composition
 - Generic enum macros work across all enum types
 
 **Weakness:**
+
 - Cleaners don't compose well — each is monolithic
 - No middleware chain for cleaner operations (scan → validate → clean → report)
 - AgeBasedCleaner is the only composable extension point
@@ -77,6 +82,7 @@ cmd/clean-wizard/commands/     CLI Layer (Cobra commands)
 ## Recommendations
 
 ### 1. Split `internal/domain/` into Sub-Packages
+
 ```
 internal/domain/
 ├── enums/           All enum types and macros
@@ -86,6 +92,7 @@ internal/domain/
 ```
 
 ### 2. Split `internal/cleaner/` by Domain
+
 ```
 internal/cleaner/
 ├── registry.go
@@ -99,12 +106,14 @@ internal/cleaner/
 ```
 
 ### 3. Consolidate Error Packages
+
 ```
 internal/errors/  →  Single package with categorized errors
 Remove: pkg/errors/, internal/pkg/errors/ (split brain)
 ```
 
 ### 4. Add Service Layer
+
 ```
 internal/service/
 ├── clean_service.go    Orchestrates scan → clean → report
@@ -113,7 +122,9 @@ internal/service/
 ```
 
 ### 5. Extract Test Infrastructure
+
 ```
 internal/cleaner/test_*.go  →  internal/testutil/cleaner/
 ```
+
 Files: `test_assertions.go`, `test_factories.go`, `test_helpers.go`, `test_interfaces.go`, `testing_helpers.go`, `ginkgo_test_helpers.go` — 6 test utility files in production package.

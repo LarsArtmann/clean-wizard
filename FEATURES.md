@@ -174,22 +174,22 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### 8. System Cache Cleaner ⚙️
 
-| Aspect                   | Status              | Details                                                     |
-| ------------------------ | ------------------- | ----------------------------------------------------------- |
+| Aspect                   | Status                  | Details                                                                  |
+| ------------------------ | ----------------------- | ------------------------------------------------------------------------ |
 | **Overall**              | ⚠️ PARTIALLY_FUNCTIONAL | Test failures on Linux — default settings include macOS-only cache types |
-| **Platform Support**     | ✅ Working          | macOS and Linux supported                                   |
-| **Availability Check**   | ✅ Working          | Runtime OS detection                                        |
-| **Spotlight Cache**      | ✅ Working          | `~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents` |
-| **Xcode DerivedData**    | ✅ Working          | `~/Library/Developer/Xcode/DerivedData`                     |
-| **CocoaPods Cache**      | ✅ Working          | `~/Library/Caches/CocoaPods`                                |
-| **Homebrew Cache**       | ✅ Working          | `~/Library/Caches/Homebrew`                                 |
-| **Linux Pip Cache**      | ✅ Working          | `~/.cache/pip`                                              |
-| **Linux npm Cache**      | ✅ Working          | `~/.cache/npm`                                              |
-| **Linux Yarn Cache**     | ✅ Working          | `~/.cache/yarn`                                             |
-| **Linux ccache**         | ✅ Working          | `~/.cache/ccache`                                           |
-| **Age-Based Filtering**  | ✅ Working          | Configurable `older_than` duration                          |
-| **Dry Run Mode**         | ✅ Working          | Correctly previews actions                                  |
-| **Extended Cache Types** | ✅ Working          | Pip, npm, yarn, ccache implemented for Linux                |
+| **Platform Support**     | ✅ Working              | macOS and Linux supported                                                |
+| **Availability Check**   | ✅ Working              | Runtime OS detection                                                     |
+| **Spotlight Cache**      | ✅ Working              | `~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents`              |
+| **Xcode DerivedData**    | ✅ Working              | `~/Library/Developer/Xcode/DerivedData`                                  |
+| **CocoaPods Cache**      | ✅ Working              | `~/Library/Caches/CocoaPods`                                             |
+| **Homebrew Cache**       | ✅ Working              | `~/Library/Caches/Homebrew`                                              |
+| **Linux Pip Cache**      | ✅ Working              | `~/.cache/pip`                                                           |
+| **Linux npm Cache**      | ✅ Working              | `~/.cache/npm`                                                           |
+| **Linux Yarn Cache**     | ✅ Working              | `~/.cache/yarn`                                                          |
+| **Linux ccache**         | ✅ Working              | `~/.cache/ccache`                                                        |
+| **Age-Based Filtering**  | ✅ Working              | Configurable `older_than` duration                                       |
+| **Dry Run Mode**         | ✅ Working              | Correctly previews actions                                               |
+| **Extended Cache Types** | ✅ Working              | Pip, npm, yarn, ccache implemented for Linux                             |
 
 **Notes:**
 

@@ -1,6 +1,6 @@
 module github.com/LarsArtmann/clean-wizard
 
-go 1.26.1
+go 1.26.2
 
 require (
 	charm.land/huh/v2 v2.0.3
