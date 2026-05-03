@@ -85,22 +85,23 @@ func TestMatch(t *testing.T) {
 
 func TestTapErr(t *testing.T) {
 	t.Parallel()
+
 	t.Run("calls function on error", func(t *testing.T) {
 		t.Parallel()
 
-		var tappedError error
-
 		testErr := errors.New("tapped error")
+		var capturedErr error
+
 		result := Err[int](testErr).TapErr(func(e error) {
-			tappedError = e
+			capturedErr = e
 		})
 
-		if !errors.Is(tappedError, testErr) {
-			t.Errorf("TapErr() did not call function with correct error")
+		if capturedErr == nil || !errors.Is(capturedErr, testErr) {
+			t.Errorf("TapErr() did not capture error correctly")
 		}
 
-		if !errors.Is(result.Error(), testErr) {
-			t.Errorf("TapErr() should return original result")
+		if result.Error() == nil || !errors.Is(result.Error(), testErr) {
+			t.Errorf("TapErr() should return original error result")
 		}
 	})
 
@@ -108,7 +109,7 @@ func TestTapErr(t *testing.T) {
 		t.Parallel()
 
 		called := false
-		result := Ok(42).TapErr(func(e error) {
+		result := Ok(42).TapErr(func(_ error) {
 			called = true
 		})
 
@@ -117,7 +118,7 @@ func TestTapErr(t *testing.T) {
 		}
 
 		if result.Value() != 42 {
-			t.Errorf("TapErr() should return original result")
+			t.Errorf("TapErr() should return original value")
 		}
 	})
 }
@@ -162,39 +163,40 @@ func TestWhen(t *testing.T) {
 
 func TestUnless(t *testing.T) {
 	t.Parallel()
-	t.Run("calls function on error", func(t *testing.T) {
+
+	t.Run("error result triggers callback", func(t *testing.T) {
 		t.Parallel()
 
-		var tappedError error
+		testErr := errors.New("unless error")
+		var callbackErr error
 
-		testErr := errors.New("test error")
-		result := Err[int](testErr).Unless(func(e error) {
-			tappedError = e
+		Err[int](testErr).Unless(func(e error) {
+			callbackErr = e
 		})
 
-		if !errors.Is(tappedError, testErr) {
-			t.Errorf("Unless() did not call function with correct error")
+		if callbackErr == nil {
+			t.Fatal("Unless() should have called the callback on error")
 		}
-
-		if !errors.Is(result.Error(), testErr) {
-			t.Errorf("Unless() should return original result")
+		if !errors.Is(callbackErr, testErr) {
+			t.Errorf("Unless() callback received wrong error")
 		}
 	})
 
-	t.Run("does not call function on success", func(t *testing.T) {
+	t.Run("success result skips callback", func(t *testing.T) {
 		t.Parallel()
 
-		called := false
-		result := Ok(42).Unless(func(_ error) {
-			called = true
+		callbackCalled := false
+		result := Ok(100).Unless(func(_ error) {
+			callbackCalled = true
 		})
 
-		if called {
-			t.Errorf("Unless() should not call function on success")
+		if callbackCalled {
+			t.Error("Unless() should skip callback on success")
 		}
 
-		if result.Value() != 42 {
-			t.Errorf("Unless() should return original result")
+		val := result.Value()
+		if val != 100 {
+			t.Errorf("Unless() returned wrong value: got %d, want 100", val)
 		}
 	})
 }

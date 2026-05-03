@@ -16,6 +16,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Sentinel errors for git history operations.
+var (
+	ErrNoGitRepositoriesFound = errors.New("no git repositories found")
+	ErrGitNotAvailable        = errors.New("not a git repository or git not available")
+	ErrSafetyChecksFailed     = errors.New("safety checks failed")
+	ErrNotAGitRepository      = errors.New("not a git repository")
+)
+
 // NewGitHistoryCommand creates the git-history subcommand.
 func NewGitHistoryCommand() *cobra.Command {
 	var (
@@ -117,7 +125,11 @@ func runGitHistoryWizard(
 		}
 
 		if len(repos) == 0 {
-			return fmt.Errorf("no git repositories found in %s", projectsPath)
+			return fmt.Errorf(
+				"no git repositories found in %s: %w",
+				projectsPath,
+				ErrNoGitRepositoriesFound,
+			)
 		}
 
 		fmt.Printf("✅ Found %d repositories\n\n", len(repos))
@@ -178,6 +190,69 @@ func runGitHistoryWizard(
 	return nil
 }
 
+// displaySafetyWarnings shows safety warnings to the user.
+func displaySafetyWarnings(safetyReport *domain.GitHistorySafetyReport) {
+	for _, warning := range safetyReport.Warnings {
+		fmt.Printf("   ⚠️  %s\n", warning)
+	}
+}
+
+// displaySummary shows the cleanup summary.
+func displaySummary(
+	repoPath string,
+	selectedFiles []domain.GitHistoryFile,
+	selectedSize int64,
+	impact *cleaner.ImpactEstimate,
+) {
+	fmt.Println()
+	fmt.Println(TitleStyle.Render("📊 Summary"))
+	fmt.Printf("   Repository:      %s\n", repoPath)
+	fmt.Printf("   Files to remove: %d\n", len(selectedFiles))
+	fmt.Printf("   Total size:      %s\n", format.Bytes(selectedSize))
+
+	if impact != nil {
+		fmt.Printf("   Current size:    %.1f MB\n", impact.CurrentRepoSizeMB)
+		fmt.Printf("   Estimated new:   %.1f MB\n", impact.EstimatedNewSizeMB)
+		fmt.Printf("   Space saved:     %.1f MB\n", impact.SpaceReclaimedMB)
+	}
+
+	fmt.Println()
+}
+
+// displayCleanupResults shows the final cleanup results.
+func displayCleanupResults(
+	cleanResult domain.CleanResult,
+	dryRun, hasRemote bool,
+	remoteName, currentBranch string,
+) {
+	fmt.Println()
+	fmt.Println(SuccessStyle.Render("✅ Cleanup completed!"))
+	fmt.Printf("   Files processed: %d\n", cleanResult.ItemsRemoved)
+	fmt.Printf("   Space freed:     %s\n", format.Bytes(int64(cleanResult.FreedBytes)))
+
+	if cleanResult.SizeEstimate.Known > 0 {
+		fmt.Printf("   Repository size: %s\n", format.Bytes(int64(cleanResult.SizeEstimate.Known)))
+	}
+
+	if dryRun {
+		fmt.Println()
+		fmt.Println(InfoStyle.Render("💡 Run without --dry-run to actually remove files"))
+	} else {
+		fmt.Println()
+
+		if hasRemote {
+			fmt.Println(WarningStyle.Render("⚠️  Next steps:"))
+			fmt.Println("   1. Verify the repository is in good state")
+			fmt.Printf(
+				"   2. Force push: git push --force-with-lease %s %s\n",
+				remoteName,
+				currentBranch,
+			)
+			fmt.Println("   3. Notify team members to reclone or reset")
+		}
+	}
+}
+
 // processRepository processes a single repository.
 func processRepository(
 	ctx context.Context,
@@ -200,7 +275,7 @@ func processRepository(
 
 	// Check availability
 	if !c.IsAvailable(ctx) {
-		return errors.New("not a git repository or git not available")
+		return ErrGitNotAvailable
 	}
 
 	// Run safety checks
@@ -215,17 +290,11 @@ func processRepository(
 			fmt.Printf("   ❌ %s\n", blocker)
 		}
 
-		return errors.New("safety checks failed")
+		return ErrSafetyChecksFailed
 	}
 
 	fmt.Println(SuccessStyle.Render("PASSED"))
-
-	// Show warnings
-	if len(safetyReport.Warnings) > 0 {
-		for _, warning := range safetyReport.Warnings {
-			fmt.Printf("   ⚠️  %s\n", warning)
-		}
-	}
+	displaySafetyWarnings(safetyReport)
 
 	// Scan for binary files
 	fmt.Print("🔍 Scanning git history for binary files... ")
@@ -275,20 +344,7 @@ func processRepository(
 		fmt.Printf("Warning: could not estimate impact: %v\n", err)
 	}
 
-	// Show summary
-	fmt.Println()
-	fmt.Println(TitleStyle.Render("📊 Summary"))
-	fmt.Printf("   Repository:      %s\n", repoPath)
-	fmt.Printf("   Files to remove: %d\n", len(selectedFiles))
-	fmt.Printf("   Total size:      %s\n", format.Bytes(selectedSize))
-
-	if impact != nil {
-		fmt.Printf("   Current size:    %.1f MB\n", impact.CurrentRepoSizeMB)
-		fmt.Printf("   Estimated new:   %.1f MB\n", impact.EstimatedNewSizeMB)
-		fmt.Printf("   Space saved:     %.1f MB\n", impact.SpaceReclaimedMB)
-	}
-
-	fmt.Println()
+	displaySummary(repoPath, selectedFiles, selectedSize, impact)
 
 	if dryRun {
 		fmt.Println(InfoStyle.Render("🔍 DRY RUN MODE - No changes will be made"))
@@ -315,35 +371,8 @@ func processRepository(
 		return fmt.Errorf("cleanup failed: %w", result.Error())
 	}
 
-	// Show results
 	cleanResult := result.Value()
-
-	fmt.Println()
-	fmt.Println(SuccessStyle.Render("✅ Cleanup completed!"))
-	fmt.Printf("   Files processed: %d\n", cleanResult.ItemsRemoved)
-	fmt.Printf("   Space freed:     %s\n", format.Bytes(int64(cleanResult.FreedBytes)))
-
-	if cleanResult.SizeEstimate.Known > 0 {
-		fmt.Printf("   Repository size: %s\n", format.Bytes(int64(cleanResult.SizeEstimate.Known)))
-	}
-
-	if dryRun {
-		fmt.Println()
-		fmt.Println(InfoStyle.Render("💡 Run without --dry-run to actually remove files"))
-	} else {
-		fmt.Println()
-
-		if safetyReport.HasRemote {
-			fmt.Println(WarningStyle.Render("⚠️  Next steps:"))
-			fmt.Println("   1. Verify the repository is in good state")
-			fmt.Printf(
-				"   2. Force push: git push --force-with-lease %s %s\n",
-				safetyReport.RemoteName,
-				safetyReport.CurrentBranch,
-			)
-			fmt.Println("   3. Notify team members to reclone or reset")
-		}
-	}
+	displayCleanupResults(cleanResult, dryRun, safetyReport.HasRemote, safetyReport.RemoteName, safetyReport.CurrentBranch)
 
 	return nil
 }
@@ -362,11 +391,6 @@ func selectFilesToClean(
 	domain.SortBySizeDesc(files)
 
 	// Build options with size info
-	type fileSelection struct {
-		Index int
-		File  domain.GitHistoryFile
-	}
-
 	var selectedIndices []int
 
 	options := make([]huh.Option[int], len(files))
@@ -485,7 +509,7 @@ func ScanRepoForDisplay(ctx context.Context, repoPath string, minSizeMB int) (*S
 	)
 
 	if !c.IsAvailable(ctx) {
-		return nil, errors.New("not a git repository")
+		return nil, ErrNotAGitRepository
 	}
 
 	scanResult, err := c.GetScanResult(ctx)

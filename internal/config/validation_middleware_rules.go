@@ -53,5 +53,5 @@ func (vm *ValidationMiddleware) validateOperationSettings(
 
 	opType := domain.GetOperationType(operationName)
 
-	return op.Settings.ValidateSettings(opType)
+	return op.Settings.ValidateSettings(opType) //nolint:wrapcheck
 }

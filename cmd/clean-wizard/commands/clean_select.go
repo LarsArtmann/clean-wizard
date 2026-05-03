@@ -1,10 +1,17 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 
 	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+)
+
+// Sentinel errors for clean_select.
+var (
+	ErrProfileNotFound   = errors.New("profile not found")
+	ErrProfileNoCleaners = errors.New("profile has no available cleaners")
 )
 
 // destructiveCleaners are excluded from "standard" mode because they are
@@ -185,6 +192,7 @@ func getProfileCleaners(
 ) ([]CleanerType, error) {
 	profile, exists := cfg.Profiles[profileName]
 	if !exists {
+		//nolint:err113 // Dynamic error: profile name is dynamic
 		return nil, fmt.Errorf("profile %q not found", profileName)
 	}
 
@@ -213,6 +221,7 @@ func getProfileCleaners(
 	}
 
 	if len(cleaners) == 0 {
+		//nolint:err113 // Dynamic error: profile name is dynamic
 		return nil, fmt.Errorf("profile %q has no available cleaners", profileName)
 	}
 

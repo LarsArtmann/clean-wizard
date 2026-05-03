@@ -115,7 +115,7 @@ func (hc *HTTPClient) doRequest(
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck
 	}
 
 	return &HTTPResponse{

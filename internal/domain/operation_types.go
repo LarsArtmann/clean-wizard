@@ -156,42 +156,31 @@ const (
 	OperationTypeGolangciLintCache            OperationType = "golangci-lint-cache"
 )
 
+// nameToOperationType maps operation names to their corresponding OperationType.
+var nameToOperationType = map[string]OperationType{
+	"nix-generations":                OperationTypeNixGenerations,
+	"temp-files":                     OperationTypeTempFiles,
+	"homebrew-cleanup":               OperationTypeHomebrew,
+	"node-packages":                  OperationTypeNodePackages,
+	"go-packages":                    OperationTypeGoPackages,
+	"cargo-packages":                 OperationTypeCargoPackages,
+	"build-cache":                    OperationTypeBuildCache,
+	"docker":                         OperationTypeDocker,
+	"system-cache":                   OperationTypeSystemCache,
+	"system-temp":                    OperationTypeSystemTemp,
+	"projects-management-automation": OperationTypeProjectsManagementAutomation,
+	"project-executables":            OperationTypeProjectExecutables,
+	"compiled-binaries":              OperationTypeCompiledBinaries,
+	"git-history":                    OperationTypeGitHistory,
+	"golangci-lint-cache":            OperationTypeGolangciLintCache,
+}
+
 // GetOperationType returns the operation type from operation name.
 func GetOperationType(name string) OperationType {
-	switch name {
-	case "nix-generations":
-		return OperationTypeNixGenerations
-	case "temp-files":
-		return OperationTypeTempFiles
-	case "homebrew-cleanup":
-		return OperationTypeHomebrew
-	case "node-packages":
-		return OperationTypeNodePackages
-	case "go-packages":
-		return OperationTypeGoPackages
-	case "cargo-packages":
-		return OperationTypeCargoPackages
-	case "build-cache":
-		return OperationTypeBuildCache
-	case "docker":
-		return OperationTypeDocker
-	case "system-cache":
-		return OperationTypeSystemCache
-	case "system-temp":
-		return OperationTypeSystemTemp
-	case "projects-management-automation":
-		return OperationTypeProjectsManagementAutomation
-	case "project-executables":
-		return OperationTypeProjectExecutables
-	case "compiled-binaries":
-		return OperationTypeCompiledBinaries
-	case "git-history":
-		return OperationTypeGitHistory
-	case "golangci-lint-cache":
-		return OperationTypeGolangciLintCache
-	default:
-		return OperationType(name) // Fallback for custom types
+	if opType, ok := nameToOperationType[name]; ok {
+		return opType
 	}
+	return OperationType(name) // Fallback for custom types
 }
 
 // String returns the string representation of the OperationType.

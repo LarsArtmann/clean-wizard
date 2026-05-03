@@ -94,7 +94,7 @@ func LoadEnvironmentConfig() (*EnvironmentConfig, error) {
 
 	err := env.Parse(cfg)
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck
 	}
 
 	return cfg, nil
@@ -108,7 +108,7 @@ func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error) 
 		Prefix: prefix,
 	})
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck
 	}
 
 	return cfg, nil

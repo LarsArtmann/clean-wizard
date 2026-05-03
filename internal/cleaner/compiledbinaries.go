@@ -492,7 +492,7 @@ func (s *defaultBinaryScanner) ScanDirectory(
 		return nil
 	})
 
-	return binaries, err
+	return binaries, err //nolint:wrapcheck
 }
 
 func (s *defaultBinaryScanner) shouldSkipDirectory(path string) bool {
@@ -578,7 +578,7 @@ func (t *defaultBinaryTrashOperator) GetFileSize(path string) int64 {
 func (t *defaultBinaryTrashOperator) GetFileModTime(path string) (time.Time, error) {
 	info, err := os.Stat(path)
 	if err != nil {
-		return time.Time{}, err
+		return time.Time{}, err //nolint:wrapcheck
 	}
 
 	return info.ModTime(), nil

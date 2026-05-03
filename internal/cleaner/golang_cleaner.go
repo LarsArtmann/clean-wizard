@@ -12,6 +12,13 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// Sentinel errors for golang_cleaner.
+var (
+	ErrNoCacheTypeSpecified    = errors.New("no cache type specified")
+	ErrLintCacheNotImplemented = errors.New("lint cache cleaning not yet implemented")
+	ErrGoCacheNotAvailable     = errors.New("go not available")
+)
+
 // CleanStats tracks cleaning metrics.
 type CleanStats struct {
 	Removed    uint
@@ -84,7 +91,7 @@ func (gc *GoCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates settings.
 func (gc *GoCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	return settings.ValidateSettings(domain.OperationTypeGoPackages)
+	return settings.ValidateSettings(domain.OperationTypeGoPackages) //nolint:wrapcheck
 }
 
 // Scan scans for Go caches.

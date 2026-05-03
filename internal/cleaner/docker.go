@@ -439,47 +439,54 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 	return result.Ok(finalResult)
 }
 
-// pruneDocker executes appropriate Docker prune command based on mode.
-func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.CleanResult] {
-	var args []string
-
+// buildPruneArgs returns the docker command arguments for the prune mode.
+func (dc *DockerCleaner) buildPruneArgs() []string {
 	switch dc.pruneMode {
 	case domain.DockerPruneAll:
-		args = []string{"system", "prune", "-af", "--volumes"}
-
 		if dc.verbose {
 			fmt.Println("  Running full prune: docker system prune -af --volumes")
 		}
 
-	case domain.DockerPruneImages:
-		args = []string{"image", "prune", "-af"}
+		return []string{"system", "prune", "-af", "--volumes"}
 
+	case domain.DockerPruneImages:
 		if dc.verbose {
 			fmt.Println("  Running image prune: docker image prune -af")
 		}
 
-	case domain.DockerPruneContainers:
-		args = []string{"container", "prune", "-f"}
+		return []string{"image", "prune", "-af"}
 
+	case domain.DockerPruneContainers:
 		if dc.verbose {
 			fmt.Println("  Running container prune: docker container prune -f")
 		}
 
-	case domain.DockerPruneVolumes:
-		args = []string{"volume", "prune", "-f"}
+		return []string{"container", "prune", "-f"}
 
+	case domain.DockerPruneVolumes:
 		if dc.verbose {
 			fmt.Println("  Running volume prune: docker volume prune -f")
 		}
 
-	case domain.DockerPruneBuilds:
-		args = []string{"builder", "prune", "-af"}
+		return []string{"volume", "prune", "-f"}
 
+	case domain.DockerPruneBuilds:
 		if dc.verbose {
 			fmt.Println("  Running builder prune: docker builder prune -af")
 		}
 
+		return []string{"builder", "prune", "-af"}
+
 	default:
+		return nil
+	}
+}
+
+// pruneDocker executes appropriate Docker prune command based on mode.
+func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.CleanResult] {
+	args := dc.buildPruneArgs()
+
+	if args == nil {
 		return result.Err[domain.CleanResult](
 			fmt.Errorf("unknown Docker prune mode: %s", dc.pruneMode),
 		)

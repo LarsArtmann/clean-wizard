@@ -153,12 +153,33 @@ func (s *GitHistoryScanner) isGitRepo(ctx context.Context) bool {
 
 // findLargeBlobs finds all large blobs in git history.
 func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHistoryFile, error) {
-	// Use git rev-list --objects to get all objects with paths
-	// Then use git cat-file --batch-all-objects to get types and sizes
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
-	// Get all objects with their paths from rev-list
+	objectPaths, err := s.getObjectPaths(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	files, err := s.getLargeBlobsFromObjects(ctx, objectPaths)
+	if err != nil {
+		return nil, err
+	}
+
+	// Enrich with commit information
+	files, err = s.enrichWithCommitInfo(ctx, files)
+	if err != nil && s.verbose {
+		fmt.Printf("Warning: failed to enrich with commit info: %v\n", err)
+	}
+
+	// Check which files still exist in HEAD
+	s.markDeletedFiles(ctx, files)
+
+	return files, nil
+}
+
+// getObjectPaths returns a map of object hash to path from git rev-list.
+func (s *GitHistoryScanner) getObjectPaths(ctx context.Context) (map[string]string, error) {
 	cmd := exec.CommandContext(ctx, "git", "-C", s.repoPath,
 		"rev-list", "--objects", "--all")
 
@@ -167,9 +188,8 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 		return nil, fmt.Errorf("git rev-list failed: %w", err)
 	}
 
-	// Parse object list to build a map of objectHash -> path
-	lines := strings.Split(string(output), "\n")
 	objectPaths := make(map[string]string)
+	lines := strings.Split(string(output), "\n")
 
 	for _, line := range lines {
 		if line == "" {
@@ -187,83 +207,84 @@ func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHis
 		}
 	}
 
-	// Get all objects with their types and sizes using --batch-all-objects
-	cmd = exec.CommandContext(ctx, "git", "-C", s.repoPath,
+	return objectPaths, nil
+}
+
+// getLargeBlobsFromObjects extracts large blobs from git cat-file output.
+func (s *GitHistoryScanner) getLargeBlobsFromObjects(
+	ctx context.Context,
+	objectPaths map[string]string,
+) ([]domain.GitHistoryFile, error) {
+	cmd := exec.CommandContext(ctx, "git", "-C", s.repoPath,
 		"cat-file", "--batch-check", "--batch-all-objects")
 
-	output, err = cmd.Output()
+	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("git cat-file --batch-check failed: %w", err)
 	}
 
 	var files []domain.GitHistoryFile
-
-	seenPaths := make(map[string]bool) // Avoid duplicates
+	seenPaths := make(map[string]bool)
 
 	checkLines := strings.SplitSeq(string(output), "\n")
 	for line := range checkLines {
-		if line == "" {
+		file, ok := s.parseBlobLine(line, objectPaths, seenPaths)
+		if !ok {
 			continue
 		}
 
-		// Format: <hash> <type> <size>
-		parts := strings.Fields(line)
-		if len(parts) < 3 {
-			continue
-		}
-
-		objHash := parts[0]
-		objType := parts[1]
-
-		// Skip non-blob objects (trees, commits, tags) - this is the key fix!
-		if objType != "blob" {
-			continue
-		}
-
-		// Get path for this blob
-		path, hasPath := objectPaths[objHash]
-		if !hasPath || path == "" {
-			continue
-		}
-
-		// Skip if already seen
-		if seenPaths[path] {
-			continue
-		}
-
-		seenPaths[path] = true
-
-		size, err := strconv.ParseInt(parts[2], 10, 64)
-		if err != nil {
-			continue
-		}
-
-		// Skip if below size threshold
-		if size < s.minSizeBytes {
-			continue
-		}
-
-		// Get extension
-		ext := strings.ToLower(filepath.Ext(path))
-
-		files = append(files, domain.GitHistoryFile{
-			Path:      path,
-			SizeBytes: size,
-			BlobHash:  objHash,
-			Extension: ext,
-		})
+		files = append(files, file)
 	}
-
-	// Enrich with commit information
-	files, err = s.enrichWithCommitInfo(ctx, files)
-	if err != nil && s.verbose {
-		fmt.Printf("Warning: failed to enrich with commit info: %v\n", err)
-	}
-
-	// Check which files still exist in HEAD
-	s.markDeletedFiles(ctx, files)
 
 	return files, nil
+}
+
+// parseBlobLine parses a single line from git cat-file output and returns a GitHistoryFile.
+func (s *GitHistoryScanner) parseBlobLine(
+	line string,
+	objectPaths map[string]string,
+	seenPaths map[string]bool,
+) (domain.GitHistoryFile, bool) {
+	if line == "" {
+		return domain.GitHistoryFile{}, false
+	}
+
+	parts := strings.Fields(line)
+	if len(parts) < 3 {
+		return domain.GitHistoryFile{}, false
+	}
+
+	objHash := parts[0]
+	objType := parts[1]
+
+	if objType != "blob" {
+		return domain.GitHistoryFile{}, false
+	}
+
+	path, hasPath := objectPaths[objHash]
+	if !hasPath || path == "" {
+		return domain.GitHistoryFile{}, false
+	}
+
+	if seenPaths[path] {
+		return domain.GitHistoryFile{}, false
+	}
+
+	seenPaths[path] = true
+
+	size, err := strconv.ParseInt(parts[2], 10, 64)
+	if err != nil || size < s.minSizeBytes {
+		return domain.GitHistoryFile{}, false
+	}
+
+	ext := strings.ToLower(filepath.Ext(path))
+
+	return domain.GitHistoryFile{
+		Path:      path,
+		SizeBytes: size,
+		BlobHash:  objHash,
+		Extension: ext,
+	}, true
 }
 
 // enrichWithCommitInfo adds commit hash, date, and author information.

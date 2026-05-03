@@ -27,38 +27,28 @@ const (
 	ErrCleanupRollback
 )
 
+// errorCodeStrings maps ErrorCode values to their string representations.
+var errorCodeStrings = map[ErrorCode]string{
+	ErrUnknown:           "UNKNOWN",
+	ErrInvalidInput:      "INVALID_INPUT",
+	ErrNotFound:          "NOT_FOUND",
+	ErrPermissionDenied:  "PERMISSION_DENIED",
+	ErrTimeout:           "TIMEOUT",
+	ErrConfigLoad:        "CONFIG_LOAD",
+	ErrConfigSave:        "CONFIG_SAVE",
+	ErrConfigValidation:  "CONFIG_VALIDATION",
+	ErrNixNotAvailable:   "NIX_NOT_AVAILABLE",
+	ErrNixCommandFailed:  "NIX_COMMAND_FAILED",
+	ErrNixStoreCorrupted: "NIX_STORE_CORRUPTED",
+	ErrCleaningFailed:    "CLEANING_FAILED",
+	ErrCleaningTimeout:   "CLEANING_TIMEOUT",
+	ErrCleanupRollback:   "CLEANUP_ROLLBACK",
+}
+
 // String returns string representation of error code.
 func (e ErrorCode) String() string {
-	switch e {
-	case ErrUnknown:
-		return "UNKNOWN"
-	case ErrInvalidInput:
-		return "INVALID_INPUT"
-	case ErrNotFound:
-		return "NOT_FOUND"
-	case ErrPermissionDenied:
-		return "PERMISSION_DENIED"
-	case ErrTimeout:
-		return "TIMEOUT"
-	case ErrConfigLoad:
-		return "CONFIG_LOAD"
-	case ErrConfigSave:
-		return "CONFIG_SAVE"
-	case ErrConfigValidation:
-		return "CONFIG_VALIDATION"
-	case ErrNixNotAvailable:
-		return "NIX_NOT_AVAILABLE"
-	case ErrNixCommandFailed:
-		return "NIX_COMMAND_FAILED"
-	case ErrNixStoreCorrupted:
-		return "NIX_STORE_CORRUPTED"
-	case ErrCleaningFailed:
-		return "CLEANING_FAILED"
-	case ErrCleaningTimeout:
-		return "CLEANING_TIMEOUT"
-	case ErrCleanupRollback:
-		return "CLEANUP_ROLLBACK"
-	default:
-		return "UNKNOWN_ERROR_CODE"
+	if str, ok := errorCodeStrings[e]; ok {
+		return str
 	}
+	return "UNKNOWN_ERROR_CODE"
 }

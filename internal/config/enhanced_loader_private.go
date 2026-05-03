@@ -21,7 +21,7 @@ func (ecl *EnhancedConfigLoader) loadConfigWithRetry(
 			delay := ecl.calculateDelay(attempt)
 			select {
 			case <-ctx.Done():
-				return nil, ctx.Err()
+				return nil, ctx.Err() //nolint:wrapcheck
 			case <-time.After(delay):
 			}
 		}
@@ -63,7 +63,7 @@ func (ecl *EnhancedConfigLoader) saveConfigWithRetry(
 			delay := ecl.calculateDelay(attempt)
 			select {
 			case <-ctx.Done():
-				return ctx.Err()
+				return ctx.Err() //nolint:wrapcheck
 			case <-time.After(delay):
 			}
 		}

@@ -11,30 +11,41 @@ func (e *CleanWizardError) WithOperation(operation string) *CleanWizardError {
 	return e
 }
 
+// detailFieldHandler defines a handler for a specific detail field.
+type detailFieldHandler func(details **ErrorDetails, value any)
+
+// detailFieldHandlers maps detail keys to their handlers.
+var detailFieldHandlers = map[string]detailFieldHandler{
+	"field":       setStringFieldStrictHandler,
+	"value":       setStringFieldHandler,
+	"expected":    setStringFieldHandler,
+	"actual":      setStringFieldHandler,
+	"operation":   setStringFieldStrictHandler,
+	"file_path":   setStringFieldStrictHandler,
+	"line_number": setIntFieldHandler,
+	"retry_count": setIntFieldHandler,
+	"duration":    setStringFieldStrictHandler,
+}
+
+func setStringFieldStrictHandler(details **ErrorDetails, value any) {
+	setStringFieldStrict(&(*details).Field, value)
+}
+
+func setStringFieldHandler(details **ErrorDetails, value any) {
+	setStringField(&(*details).Value, value)
+}
+
+func setIntFieldHandler(details **ErrorDetails, value any) {
+	setIntField(&(*details).LineNumber, value)
+}
+
 // WithDetail adds single detail to error.
 func (e *CleanWizardError) WithDetail(key string, value any) *CleanWizardError {
 	ensureDetails(&e.Details)
 
-	switch key {
-	case "field":
-		setStringFieldStrict(&e.Details.Field, value)
-	case "value":
-		setStringField(&e.Details.Value, value)
-	case "expected":
-		setStringField(&e.Details.Expected, value)
-	case "actual":
-		setStringField(&e.Details.Actual, value)
-	case "operation":
-		setStringFieldStrict(&e.Details.Operation, value)
-	case "file_path":
-		setStringFieldStrict(&e.Details.FilePath, value)
-	case "line_number":
-		setIntField(&e.Details.LineNumber, value)
-	case "retry_count":
-		setIntField(&e.Details.RetryCount, value)
-	case "duration":
-		setStringFieldStrict(&e.Details.Duration, value)
-	default:
+	if handler, ok := detailFieldHandlers[key]; ok {
+		handler(&e.Details, value)
+	} else {
 		// Add to metadata for custom keys
 		e.Details.Metadata = addToMetadata(e.Details.Metadata, key, value)
 	}

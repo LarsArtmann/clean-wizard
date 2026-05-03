@@ -2,120 +2,37 @@ package domain
 
 import (
 	"fmt"
+	"runtime"
 )
+
+// settingsFactory maps operation types to their default settings factories.
+var settingsFactory = map[OperationType]func() *OperationSettings{
+	OperationTypeNixGenerations:              defaultNixGenerationsSettings,
+	OperationTypeTempFiles:                   defaultTempFilesSettings,
+	OperationTypeHomebrew:                    defaultHomebrewSettings,
+	OperationTypeNodePackages:                defaultNodePackagesSettings,
+	OperationTypeGoPackages:                  defaultGoPackagesSettings,
+	OperationTypeCargoPackages:               defaultCargoPackagesSettings,
+	OperationTypeBuildCache:                  func() *OperationSettings { return &OperationSettings{BuildCache: defaultBuildCacheSettings()} },
+	OperationTypeDocker:                      defaultDockerSettings,
+	OperationTypeSystemCache:                 defaultSystemCacheSettings,
+	OperationTypeSystemTemp:                 defaultSystemTempSettings,
+	OperationTypeProjectsManagementAutomation: defaultProjectsManagementAutomationSettings,
+	OperationTypeProjectExecutables:         defaultProjectExecutablesSettings,
+	OperationTypeCompiledBinaries:            defaultCompiledBinariesSettings,
+	OperationTypeGitHistory:                 func() *OperationSettings { return &OperationSettings{GitHistory: &GitHistorySettings{}} },
+	OperationTypeGolangciLintCache:          func() *OperationSettings { return &OperationSettings{} },
+}
 
 // DefaultSettings returns default settings for given operation type.
 func DefaultSettings(opType OperationType) *OperationSettings {
-	var settings *OperationSettings
-
-	switch opType {
-	case OperationTypeNixGenerations:
-		settings = &OperationSettings{
-			NixGenerations: &NixGenerationsSettings{
-				Generations: 1,
-				Optimize:    OptimizationModeDisabled,
-				DryRun:      ExecutionModeNormal,
-			},
-		}
-	case OperationTypeTempFiles:
-		settings = &OperationSettings{
-			TempFiles: &TempFilesSettings{
-				OlderThan: "7d",
-				Excludes:  []string{"/tmp/keep"},
-			},
-		}
-	case OperationTypeHomebrew:
-		settings = &OperationSettings{
-			Homebrew: &HomebrewSettings{
-				UnusedOnly: HomebrewModeUnusedOnly,
-			},
-		}
-	case OperationTypeNodePackages:
-		settings = &OperationSettings{
-			NodePackages: &NodePackagesSettings{
-				PackageManagers: []PackageManagerType{
-					PackageManagerNpm,
-					PackageManagerPnpm,
-					PackageManagerYarn,
-					PackageManagerBun,
-				},
-			},
-		}
-	case OperationTypeGoPackages:
-		settings = &OperationSettings{
-			GoPackages: &GoPackagesSettings{
-				CleanCache:      CacheCleanupEnabled,
-				CleanTestCache:  CacheCleanupEnabled,
-				CleanModCache:   CacheCleanupDisabled,
-				CleanBuildCache: CacheCleanupEnabled,
-				CleanLintCache:  CacheCleanupDisabled,
-			},
-		}
-	case OperationTypeCargoPackages:
-		settings = &OperationSettings{
-			CargoPackages: &CargoPackagesSettings{
-				Autoclean: CacheCleanupEnabled,
-			},
-		}
-	case OperationTypeBuildCache:
-		settings = &OperationSettings{
-			BuildCache: defaultBuildCacheSettings(),
-		}
-	case OperationTypeDocker:
-		settings = &OperationSettings{
-			Docker: &DockerSettings{
-				PruneMode: DockerPruneAll,
-			},
-		}
-	case OperationTypeSystemCache:
-		settings = &OperationSettings{
-			SystemCache: &SystemCacheSettings{
-				CacheTypes: []CacheType{
-					CacheTypeSpotlight,
-					CacheTypeXcode,
-					CacheTypeCocoapods,
-					CacheTypeHomebrew,
-				},
-				OlderThan: "30d",
-			},
-		}
-	case OperationTypeSystemTemp:
-		settings = &OperationSettings{
-			SystemTemp: &SystemTempSettings{
-				Paths:     []string{"/tmp", "/var/tmp"},
-				OlderThan: "30d",
-			},
-		}
-	case OperationTypeProjectsManagementAutomation:
-		settings = &OperationSettings{
-			ProjectsManagementAutomation: &ProjectsManagementAutomationSettings{
-				ClearCache: CacheCleanupEnabled,
-			},
-		}
-	case OperationTypeProjectExecutables:
-		settings = &OperationSettings{
-			ProjectExecutables: &ProjectExecutablesSettings{
-				ExcludeExtensions: []string{".sh"},
-			},
-		}
-	case OperationTypeCompiledBinaries:
-		settings = &OperationSettings{
-			CompiledBinaries: &CompiledBinariesSettings{
-				MinSizeMB: 10,
-				OlderThan: "0",
-			},
-		}
-	case OperationTypeGitHistory:
-		settings = &OperationSettings{
-			GitHistory: &GitHistorySettings{},
-		}
-	case OperationTypeGolangciLintCache:
-		settings = &OperationSettings{}
-	default:
-		return &OperationSettings{} // Empty settings for custom types
+	factory, ok := settingsFactory[opType]
+	if !ok {
+		return &OperationSettings{}
 	}
 
-	// Validate all enum defaults
+	settings := factory()
+
 	err := validateEnumDefaults(settings, opType)
 	if err != nil {
 		panic(fmt.Sprintf("DefaultSettings validation failed for %s: %v", opType, err))
@@ -124,131 +41,258 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 	return settings
 }
 
+func defaultNixGenerationsSettings() *OperationSettings {
+	return &OperationSettings{
+		NixGenerations: &NixGenerationsSettings{
+			Generations: 1,
+			Optimize:    OptimizationModeDisabled,
+			DryRun:      ExecutionModeNormal,
+		},
+	}
+}
+
+func defaultTempFilesSettings() *OperationSettings {
+	return &OperationSettings{
+		TempFiles: &TempFilesSettings{
+			OlderThan: "7d",
+			Excludes:  []string{"/tmp/keep"},
+		},
+	}
+}
+
+func defaultHomebrewSettings() *OperationSettings {
+	return &OperationSettings{
+		Homebrew: &HomebrewSettings{
+			UnusedOnly: HomebrewModeUnusedOnly,
+		},
+	}
+}
+
+func defaultNodePackagesSettings() *OperationSettings {
+	return &OperationSettings{
+		NodePackages: &NodePackagesSettings{
+			PackageManagers: []PackageManagerType{
+				PackageManagerNpm,
+				PackageManagerPnpm,
+				PackageManagerYarn,
+				PackageManagerBun,
+			},
+		},
+	}
+}
+
+func defaultGoPackagesSettings() *OperationSettings {
+	return &OperationSettings{
+		GoPackages: &GoPackagesSettings{
+			CleanCache:      CacheCleanupEnabled,
+			CleanTestCache:  CacheCleanupEnabled,
+			CleanModCache:   CacheCleanupDisabled,
+			CleanBuildCache: CacheCleanupEnabled,
+			CleanLintCache:  CacheCleanupDisabled,
+		},
+	}
+}
+
+func defaultCargoPackagesSettings() *OperationSettings {
+	return &OperationSettings{
+		CargoPackages: &CargoPackagesSettings{
+			Autoclean: CacheCleanupEnabled,
+		},
+	}
+}
+
+func defaultDockerSettings() *OperationSettings {
+	return &OperationSettings{
+		Docker: &DockerSettings{
+			PruneMode: DockerPruneAll,
+		},
+	}
+}
+
+func defaultSystemCacheSettings() *OperationSettings {
+	return &OperationSettings{
+		SystemCache: &SystemCacheSettings{
+			CacheTypes: getDefaultSystemCacheTypes(),
+			OlderThan:  "30d",
+		},
+	}
+}
+
+func defaultSystemTempSettings() *OperationSettings {
+	return &OperationSettings{
+		SystemTemp: &SystemTempSettings{
+			Paths:     []string{"/tmp", "/var/tmp"},
+			OlderThan: "30d",
+		},
+	}
+}
+
+func defaultProjectsManagementAutomationSettings() *OperationSettings {
+	return &OperationSettings{
+		ProjectsManagementAutomation: &ProjectsManagementAutomationSettings{
+			ClearCache: CacheCleanupEnabled,
+		},
+	}
+}
+
+func defaultProjectExecutablesSettings() *OperationSettings {
+	return &OperationSettings{
+		ProjectExecutables: &ProjectExecutablesSettings{
+			ExcludeExtensions: []string{".sh"},
+		},
+	}
+}
+
+func defaultCompiledBinariesSettings() *OperationSettings {
+	return &OperationSettings{
+		CompiledBinaries: &CompiledBinariesSettings{
+			MinSizeMB: 10,
+			OlderThan: "0",
+		},
+	}
+}
+
 // validateEnumDefaults validates all enum values in default settings.
-// This is called from DefaultSettings to ensure defaults are valid.
-func validateEnumDefaults(
-	settings *OperationSettings,
-	opType OperationType,
-) error {
+func validateEnumDefaults(settings *OperationSettings, opType OperationType) error {
 	if settings == nil {
 		return fmt.Errorf("nil settings for operation type: %s", opType)
 	}
 
-	// Validate NixGenerations
-	if settings.NixGenerations != nil {
-		if !settings.NixGenerations.Optimize.IsValid() {
-			return fmt.Errorf(
-				"invalid default OptimizationMode in NixGenerations: %d",
-				settings.NixGenerations.Optimize,
-			)
-		}
+	if err := validateNixGenerationsDefaults(settings.NixGenerations); err != nil {
+		return err
+	}
+	if err := validateHomebrewDefaults(settings.Homebrew); err != nil {
+		return err
+	}
+	if err := validateNodePackagesDefaults(settings.NodePackages); err != nil {
+		return err
+	}
+	if err := validateGoPackagesDefaults(settings.GoPackages); err != nil {
+		return err
+	}
+	if err := validateCargoPackagesDefaults(settings.CargoPackages); err != nil {
+		return err
+	}
+	if err := validateBuildCacheDefaults(settings.BuildCache); err != nil {
+		return err
+	}
+	if err := validateDockerDefaults(settings.Docker); err != nil {
+		return err
+	}
+	if err := validateSystemCacheDefaults(settings.SystemCache); err != nil {
+		return err
+	}
+	return validateProjectsAutomationDefaults(settings.ProjectsManagementAutomation)
+}
 
-		if !settings.NixGenerations.DryRun.IsValid() {
-			return fmt.Errorf(
-				"invalid default ExecutionMode in NixGenerations: %d",
-				settings.NixGenerations.DryRun,
-			)
+func validateNixGenerationsDefaults(s *NixGenerationsSettings) error {
+	if s == nil {
+		return nil
+	}
+	if !s.Optimize.IsValid() {
+		return fmt.Errorf("invalid default OptimizationMode in NixGenerations: %d", s.Optimize)
+	}
+	if !s.DryRun.IsValid() {
+		return fmt.Errorf("invalid default ExecutionMode in NixGenerations: %d", s.DryRun)
+	}
+	return nil
+}
+
+func validateHomebrewDefaults(s *HomebrewSettings) error {
+	if s == nil {
+		return nil
+	}
+	if !s.UnusedOnly.IsValid() {
+		return fmt.Errorf("invalid default HomebrewMode: %d", s.UnusedOnly)
+	}
+	return nil
+}
+
+func validateNodePackagesDefaults(s *NodePackagesSettings) error {
+	if s == nil {
+		return nil
+	}
+	for i, pm := range s.PackageManagers {
+		if !pm.IsValid() {
+			return fmt.Errorf("invalid default PackageManagerType at index %d: %d", i, pm)
 		}
 	}
+	return nil
+}
 
-	// Validate Homebrew
-	if settings.Homebrew != nil {
-		if !settings.Homebrew.UnusedOnly.IsValid() {
-			return fmt.Errorf("invalid default HomebrewMode: %d", settings.Homebrew.UnusedOnly)
+func validateGoPackagesDefaults(s *GoPackagesSettings) error {
+	if s == nil {
+		return nil
+	}
+	if !s.CleanCache.IsValid() {
+		return fmt.Errorf("invalid default CacheCleanupMode for CleanCache: %d", s.CleanCache)
+	}
+	if !s.CleanTestCache.IsValid() {
+		return fmt.Errorf("invalid default CacheCleanupMode for CleanTestCache: %d", s.CleanTestCache)
+	}
+	if !s.CleanModCache.IsValid() {
+		return fmt.Errorf("invalid default CacheCleanupMode for CleanModCache: %d", s.CleanModCache)
+	}
+	if !s.CleanBuildCache.IsValid() {
+		return fmt.Errorf("invalid default CacheCleanupMode for CleanBuildCache: %d", s.CleanBuildCache)
+	}
+	if !s.CleanLintCache.IsValid() {
+		return fmt.Errorf("invalid default CacheCleanupMode for CleanLintCache: %d", s.CleanLintCache)
+	}
+	return nil
+}
+
+func validateCargoPackagesDefaults(s *CargoPackagesSettings) error {
+	if s == nil {
+		return nil
+	}
+	if !s.Autoclean.IsValid() {
+		return fmt.Errorf("invalid default CacheCleanupMode in CargoPackages: %d", s.Autoclean)
+	}
+	return nil
+}
+
+func validateBuildCacheDefaults(s *BuildCacheSettings) error {
+	if s == nil {
+		return nil
+	}
+	for i, tt := range s.ToolTypes {
+		if !tt.IsValid() {
+			return fmt.Errorf("invalid default BuildToolType at index %d: %d", i, tt)
 		}
 	}
+	return nil
+}
 
-	// Validate NodePackages
-	if settings.NodePackages != nil {
-		for i, pm := range settings.NodePackages.PackageManagers {
-			if !pm.IsValid() {
-				return fmt.Errorf("invalid default PackageManagerType at index %d: %d", i, pm)
-			}
+func validateDockerDefaults(s *DockerSettings) error {
+	if s == nil {
+		return nil
+	}
+	if !s.PruneMode.IsValid() {
+		return fmt.Errorf("invalid default DockerPruneMode: %d", s.PruneMode)
+	}
+	return nil
+}
+
+func validateSystemCacheDefaults(s *SystemCacheSettings) error {
+	if s == nil {
+		return nil
+	}
+	for i, ct := range s.CacheTypes {
+		if !ct.IsValid() {
+			return fmt.Errorf("invalid default CacheType at index %d: %d", i, ct)
 		}
 	}
+	return nil
+}
 
-	// Validate GoPackages
-	if settings.GoPackages != nil {
-		if !settings.GoPackages.CleanCache.IsValid() {
-			return fmt.Errorf(
-				"invalid default CacheCleanupMode for CleanCache: %d",
-				settings.GoPackages.CleanCache,
-			)
-		}
-
-		if !settings.GoPackages.CleanTestCache.IsValid() {
-			return fmt.Errorf(
-				"invalid default CacheCleanupMode for CleanTestCache: %d",
-				settings.GoPackages.CleanTestCache,
-			)
-		}
-
-		if !settings.GoPackages.CleanModCache.IsValid() {
-			return fmt.Errorf(
-				"invalid default CacheCleanupMode for CleanModCache: %d",
-				settings.GoPackages.CleanModCache,
-			)
-		}
-
-		if !settings.GoPackages.CleanBuildCache.IsValid() {
-			return fmt.Errorf(
-				"invalid default CacheCleanupMode for CleanBuildCache: %d",
-				settings.GoPackages.CleanBuildCache,
-			)
-		}
-
-		if !settings.GoPackages.CleanLintCache.IsValid() {
-			return fmt.Errorf(
-				"invalid default CacheCleanupMode for CleanLintCache: %d",
-				settings.GoPackages.CleanLintCache,
-			)
-		}
+func validateProjectsAutomationDefaults(s *ProjectsManagementAutomationSettings) error {
+	if s == nil {
+		return nil
 	}
-
-	// Validate CargoPackages
-	if settings.CargoPackages != nil {
-		if !settings.CargoPackages.Autoclean.IsValid() {
-			return fmt.Errorf(
-				"invalid default CacheCleanupMode in CargoPackages: %d",
-				settings.CargoPackages.Autoclean,
-			)
-		}
+	if !s.ClearCache.IsValid() {
+		return fmt.Errorf("invalid default CacheCleanupMode in ProjectsManagementAutomation: %d", s.ClearCache)
 	}
-
-	// Validate BuildCache
-	if settings.BuildCache != nil {
-		for i, tt := range settings.BuildCache.ToolTypes {
-			if !tt.IsValid() {
-				return fmt.Errorf("invalid default BuildToolType at index %d: %d", i, tt)
-			}
-		}
-	}
-
-	// Validate Docker
-	if settings.Docker != nil {
-		if !settings.Docker.PruneMode.IsValid() {
-			return fmt.Errorf("invalid default DockerPruneMode: %d", settings.Docker.PruneMode)
-		}
-	}
-
-	// Validate SystemCache
-	if settings.SystemCache != nil {
-		for i, ct := range settings.SystemCache.CacheTypes {
-			if !ct.IsValid() {
-				return fmt.Errorf("invalid default CacheType at index %d: %d", i, ct)
-			}
-		}
-	}
-
-	// Validate ProjectsManagementAutomation
-	if settings.ProjectsManagementAutomation != nil {
-		if !settings.ProjectsManagementAutomation.ClearCache.IsValid() {
-			return fmt.Errorf(
-				"invalid default CacheCleanupMode in ProjectsManagementAutomation: %d",
-				settings.ProjectsManagementAutomation.ClearCache)
-		}
-	}
-
 	return nil
 }
 
@@ -264,5 +308,28 @@ func defaultBuildCacheSettings() *BuildCacheSettings {
 			BuildToolScala,
 		},
 		OlderThan: "30d",
+	}
+}
+
+// getDefaultSystemCacheTypes returns platform-appropriate default cache types.
+func getDefaultSystemCacheTypes() []CacheType {
+	switch runtime.GOOS {
+	case "darwin":
+		return []CacheType{
+			CacheTypeSpotlight,
+			CacheTypeXcode,
+			CacheTypeCocoapods,
+			CacheTypeHomebrew,
+		}
+	case "linux":
+		return []CacheType{
+			CacheTypeXdgCache,
+			CacheTypeThumbnails,
+			CacheTypeHomebrew,
+		}
+	default:
+		return []CacheType{
+			CacheTypeHomebrew,
+		}
 	}
 }

@@ -21,6 +21,12 @@ const (
 	BytesThresholdMB = 100_000_000
 )
 
+// Sentinel errors for clean command.
+var (
+	ErrNoCleanersAvailable  = errors.New("no cleaners available on this system")
+	ErrNoConfigPathProvided = errors.New("no config path provided")
+)
+
 // NewCleanCommand creates a multi-cleaner command with TUI.
 func NewCleanCommand() *cobra.Command {
 	var (
@@ -65,6 +71,41 @@ func NewCleanCommand() *cobra.Command {
 	return cmd
 }
 
+// printDiskUsage prints disk usage before cleanup if available.
+func printDiskUsage(diskUsage *cleaner.DiskUsage, jsonOutput bool) {
+	if jsonOutput || diskUsage == nil {
+		return
+	}
+	fmt.Printf(
+		"📊 Disk usage before: %s %s\n",
+		cleaner.DiskUsageBar(*diskUsage, DiskUsageBarWidth),
+		cleaner.FormatDiskUsage(*diskUsage),
+	)
+	fmt.Println()
+}
+
+// printDryRunHeader prints the header and dry-run warning.
+func printDryRunHeader(dryRun bool) {
+	fmt.Println(TitleStyle.Render("🧹 Clean Wizard"))
+	fmt.Println()
+
+	if dryRun {
+		fmt.Println(WarningStyle.Render("⚠️  DRY RUN MODE: No actual changes will be made"))
+		fmt.Println()
+	}
+}
+
+// printCleanStart prints the start of cleanup.
+func printCleanStart(dryRun bool) {
+	fmt.Println("\n🧹 Starting cleanup...")
+
+	if dryRun {
+		fmt.Println("   (DRY RUN: Simulated only)")
+	}
+
+	fmt.Println()
+}
+
 // runCleanCommand executes the clean command with multi-cleaner TUI.
 func runCleanCommand(
 	_ *cobra.Command,
@@ -79,17 +120,11 @@ func runCleanCommand(
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
 
-	fmt.Println(TitleStyle.Render("🧹 Clean Wizard"))
-	fmt.Println()
-
-	if dryRun {
-		fmt.Println(WarningStyle.Render("⚠️  DRY RUN MODE: No actual changes will be made"))
-		fmt.Println()
-	}
+	printDryRunHeader(dryRun)
 
 	availableConfigs := getAvailableConfigs(ctx)
 	if len(availableConfigs) == 0 {
-		return errors.New("no cleaners available on this system")
+		return ErrNoCleanersAvailable
 	}
 
 	fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableConfigs))
@@ -116,33 +151,20 @@ func runCleanCommand(
 		return nil
 	}
 
-	fmt.Println("\n🧹 Starting cleanup...")
-
-	if dryRun {
-		fmt.Println("   (DRY RUN: Simulated only)")
-	}
-
-	fmt.Println()
+	printCleanStart(dryRun)
 
 	diskBefore, diskErr := cleaner.GetDiskUsage("/")
-	if !jsonOutput && diskErr == nil {
-		fmt.Printf(
-			"📊 Disk usage before: %s %s\n",
-			cleaner.DiskUsageBar(diskBefore, DiskUsageBarWidth),
-			cleaner.FormatDiskUsage(diskBefore),
-		)
-		fmt.Println()
+	var diskBeforePtr *cleaner.DiskUsage
+	if diskErr == nil {
+		diskBeforePtr = &diskBefore
 	}
+
+	printDiskUsage(diskBeforePtr, jsonOutput)
 
 	cr := executeCleaners(ctx, selectedCleaners, dryRun, verbose)
 
 	if jsonOutput {
 		return outputJSON(cr, dryRun)
-	}
-
-	var diskBeforePtr *cleaner.DiskUsage
-	if diskErr == nil {
-		diskBeforePtr = &diskBefore
 	}
 
 	displayResults(cr, dryRun, diskBeforePtr)
@@ -182,10 +204,18 @@ func getAvailableConfigs(ctx context.Context) []CleanerConfig {
 
 func loadConfigForClean(configPath string) (*domain.Config, error) {
 	if configPath != "" {
-		return config.LoadFromPath(configPath)
+		cfg, err := config.LoadFromPath(configPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load config from %s: %w", configPath, err)
+		}
+		return cfg, nil
 	}
 
-	return config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load config: %w", err)
+	}
+	return cfg, nil
 }
 
 // operationTypeToCleanerType maps domain OperationType to CleanerType.

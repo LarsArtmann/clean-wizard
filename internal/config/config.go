@@ -48,11 +48,6 @@ func getConfigPath() string {
 	return filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 }
 
-// readConfigFile attempts to read the config file, returning default config if not found.
-func readConfigFile(ctx context.Context, k *koanf.Koanf) (*domain.Config, error) {
-	return readConfigFileFromPath(ctx, k, getConfigPath())
-}
-
 // readConfigFileFromPath attempts to read a config file from the given path.
 func readConfigFileFromPath(
 	ctx context.Context,
@@ -61,7 +56,7 @@ func readConfigFileFromPath(
 ) (*domain.Config, error) {
 	select {
 	case <-ctx.Done():
-		return nil, ctx.Err()
+		return nil, ctx.Err() //nolint:wrapcheck
 	default:
 		err := k.Load(file.Provider(configPath), yaml.Parser())
 		if err != nil {

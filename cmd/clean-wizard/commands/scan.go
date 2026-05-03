@@ -35,6 +35,29 @@ func NewScanCommand() *cobra.Command {
 	return cmd
 }
 
+// printNixStoreSize prints the Nix store size if available.
+func printNixStoreSize(ctx context.Context) {
+	nixRegistry, err := cleaner.DefaultRegistry()
+	if err != nil {
+		return
+	}
+
+	nixCleaner, ok := nixRegistry.Get("nix")
+	if !ok || !nixCleaner.IsAvailable(ctx) {
+		return
+	}
+
+	nixSizer, ok := nixCleaner.(cleaner.NixStoreSizer)
+	if !ok {
+		return
+	}
+
+	storeSize := nixSizer.GetStoreSize(ctx)
+	if storeSize > 0 {
+		fmt.Printf("❄️  Nix store size: %s\n", format.Bytes(storeSize))
+	}
+}
+
 // runScanCommand executes the scan command.
 func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	ctx := context.Background()
@@ -106,17 +129,7 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	)
 
 	// Show Nix store size if available
-	nixRegistry, err := cleaner.DefaultRegistry()
-	if err == nil {
-		if nixCleaner, ok := nixRegistry.Get("nix"); ok && nixCleaner.IsAvailable(ctx) {
-			if nixSizer, ok := nixCleaner.(cleaner.NixStoreSizer); ok {
-				storeSize := nixSizer.GetStoreSize(ctx)
-				if storeSize > 0 {
-					fmt.Printf("❄️  Nix store size: %s\n", format.Bytes(storeSize))
-				}
-			}
-		}
-	}
+	printNixStoreSize(ctx)
 
 	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 

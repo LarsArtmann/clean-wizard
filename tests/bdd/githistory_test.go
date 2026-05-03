@@ -19,7 +19,6 @@ type GitHistoryTestContext struct {
 	repoPath         string
 	cleaner          *cleaner.GitHistoryCleaner
 	safetyReport     *domain.GitHistorySafetyReport
-	scanResult       *domain.GitHistoryScanResult
 	hasGitFilterRepo bool
 }
 

@@ -25,7 +25,6 @@ const (
 	NixDryRunGCSizeMB = 100
 
 	// Byte conversion constants.
-	bytesPerKB = 1024
 	bytesPerMB = 1024 * 1024
 	bytesPerGB = 1024 * 1024 * 1024
 
@@ -194,7 +193,7 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("failed to get store size: %w", err)
 	}
 
 	fields := strings.Fields(string(output))
@@ -202,7 +201,11 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 		return 0, fmt.Errorf("invalid du output: %s", string(output))
 	}
 
-	return strconv.ParseInt(fields[0], 10, 64)
+	size, err := strconv.ParseInt(fields[0], 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse store size: %w", err)
+	}
+	return size, nil
 }
 
 // RemoveGeneration removes specific Nix generation.

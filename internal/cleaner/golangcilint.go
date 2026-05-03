@@ -108,6 +108,21 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 	return status, nil
 }
 
+// golangciLintSizeMultiplier converts size unit strings to byte multipliers.
+var golangciLintSizeMultiplier = map[string]int64{
+	"B":     1,
+	"BYTE":  1,
+	"BYTES": 1,
+	"KIB":   bytesPerKiB,
+	"MIB":   bytesPerMiB,
+	"GIB":   bytesPerGiB,
+	"TIB":   bytesPerTiB,
+	"KB":    bytesPerKBDecimal,
+	"MB":    bytesPerMBDecimal,
+	"GB":    bytesPerGBDecimal,
+	"TB":    bytesPerTBDecimal,
+}
+
 // parseSize parses a size string like "3.1KiB" or "1.5MiB" into bytes.
 // Supports units: B, KiB, MiB, GiB, TiB, KB, MB, GB, TB (binary units take precedence).
 func parseSize(sizeStr string) (int64, error) {
@@ -122,34 +137,16 @@ func parseSize(sizeStr string) (int64, error) {
 		unit   string
 	)
 
-	n, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit)
-	if err != nil || n != 2 {
+	if _, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit); err != nil {
 		return 0, fmt.Errorf("invalid size format: %s", sizeStr)
 	}
 
 	// Binary units (powers of 1024)
-	switch strings.ToUpper(unit) {
-	case "B", "BYTE", "BYTES":
-		return int64(number), nil
-	case "KIB":
-		return int64(number * bytesPerKiB), nil
-	case "MIB":
-		return int64(number * bytesPerMiB), nil
-	case "GIB":
-		return int64(number * bytesPerGiB), nil
-	case "TIB":
-		return int64(number * bytesPerTiB), nil
-	case "KB":
-		return int64(number * bytesPerKBDecimal), nil
-	case "MB":
-		return int64(number * bytesPerMBDecimal), nil
-	case "GB":
-		return int64(number * bytesPerGBDecimal), nil
-	case "TB":
-		return int64(number * bytesPerTBDecimal), nil
-	default:
+	multiplier, ok := golangciLintSizeMultiplier[strings.ToUpper(unit)]
+	if !ok {
 		return 0, fmt.Errorf("unknown size unit: %s", unit)
 	}
+	return int64(number * float64(multiplier)), nil
 }
 
 // getCacheStatus returns the cache status by running "golangci-lint cache status".

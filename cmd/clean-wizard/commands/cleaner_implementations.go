@@ -15,53 +15,44 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
+// Sentinel errors for cleaner_implementations.
+var (
+	ErrUnknownCleanerType = errors.New("unknown cleaner type")
+	ErrNixNotAvailable    = errors.New("nix not available on this system")
+	ErrGoProcessesRunning = errors.New("other Go processes detected")
+)
+
+// cleanerRunner executes a specific cleaner.
+type cleanerRunner func(context.Context, bool, bool) (domain.CleanResult, error)
+
+var cleanerRegistry = map[CleanerType]cleanerRunner{
+	CleanerTypeNix:                           runNixCleaner,
+	CleanerTypeHomebrew:                      runHomebrewCleaner,
+	CleanerTypeTempFiles:                     runTempFilesCleaner,
+	CleanerTypeNodePackages:                  runNodePackageManagerCleaner,
+	CleanerTypeGoPackages:                    runGoCleaner,
+	CleanerTypeCargoPackages:                 runCargoCleaner,
+	CleanerTypeBuildCache:                    runBuildCacheCleaner,
+	CleanerTypeDocker:                        runDockerCleaner,
+	CleanerTypeSystemCache:                   runSystemCacheCleaner,
+	CleanerTypeProjectsManagementAutomation:   runProjectsManagementAutomationCleaner,
+	CleanerTypeCompiledBinaries:              runCompiledBinariesCleaner,
+	CleanerTypeProjectExecutables:            runProjectExecutablesCleaner,
+	CleanerTypeGolangciLintCache:             runGolangciLintCacheCleaner,
+}
+
 // runCleaner runs a specific cleaner and returns the result.
 func runCleaner(
 	ctx context.Context,
 	cleanerType CleanerType,
 	dryRun, verbose bool,
 ) (domain.CleanResult, error) {
-	var (
-		result domain.CleanResult
-		err    error
-	)
-
-	switch cleanerType {
-	case CleanerTypeNix:
-		result, err = runNixCleaner(ctx, dryRun, verbose)
-	case CleanerTypeHomebrew:
-		result, err = runHomebrewCleaner(ctx, dryRun, verbose)
-	case CleanerTypeTempFiles:
-		result, err = runTempFilesCleaner(ctx, dryRun, verbose)
-	case CleanerTypeNodePackages:
-		result, err = runNodePackageManagerCleaner(ctx, dryRun, verbose)
-	case CleanerTypeGoPackages:
-		result, err = runGoCleaner(ctx, dryRun, verbose)
-	case CleanerTypeCargoPackages:
-		result, err = runCargoCleaner(ctx, dryRun, verbose)
-	case CleanerTypeBuildCache:
-		result, err = runBuildCacheCleaner(ctx, dryRun, verbose)
-	case CleanerTypeDocker:
-		result, err = runDockerCleaner(ctx, dryRun, verbose)
-	case CleanerTypeSystemCache:
-		result, err = runSystemCacheCleaner(ctx, dryRun, verbose)
-	case CleanerTypeProjectsManagementAutomation:
-		result, err = runProjectsManagementAutomationCleaner(ctx, dryRun, verbose)
-	case CleanerTypeCompiledBinaries:
-		result, err = runCompiledBinariesCleaner(ctx, dryRun, verbose)
-	case CleanerTypeProjectExecutables:
-		result, err = runProjectExecutablesCleaner(ctx, dryRun, verbose)
-	case CleanerTypeGolangciLintCache:
-		result, err = runGolangciLintCacheCleaner(ctx, dryRun, verbose)
-	default:
-		return domain.CleanResult{}, errors.New("unknown cleaner type: " + string(cleanerType))
+	runner, ok := cleanerRegistry[cleanerType]
+	if !ok {
+		return domain.CleanResult{}, fmt.Errorf("unknown cleaner type: %s", cleanerType)
 	}
 
-	if err != nil {
-		return domain.CleanResult{}, err
-	}
-
-	return result, nil
+	return runner(ctx, dryRun, verbose)
 }
 
 // runNixCleaner executes the Nix cleaner.
@@ -69,7 +60,7 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 	nixAdapter := cleaner.NewNixCleaner(verbose, dryRun)
 
 	if !nixAdapter.IsAvailable(ctx) {
-		return domain.CleanResult{}, errors.New("nix not available on this system")
+		return domain.CleanResult{}, ErrNixNotAvailable
 	}
 
 	keepCount := 5
@@ -216,11 +207,7 @@ func runNodePackageManagerCleaner(
 // Skips cleaning if other Go processes are running to avoid cache corruption.
 func runGoCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResult, error) {
 	if hasOtherGoProcesses() {
-		return domain.CleanResult{}, errors.New(
-			"other Go processes detected (e.g., running tests, builds, or IDE operations). " +
-				"Skipping Go cache cleaning to avoid cache corruption. " +
-				"Please wait for other Go operations to complete and try again.",
-		)
+		return domain.CleanResult{}, ErrGoProcessesRunning
 	}
 
 	return runGenericCleanerWithError(

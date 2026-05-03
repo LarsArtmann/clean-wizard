@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -30,60 +31,50 @@ type CleanWizardError struct {
 	Stack     string
 }
 
-// Error implements error interface.
-func (e *CleanWizardError) Error() string {
-	if e.Details == nil {
-		return fmt.Sprintf("[%s] %s: %s", e.Level.String(), e.Code.String(), e.Message)
+// formatErrorDetails formats the error details as a string.
+func formatErrorDetails(details *ErrorDetails) string {
+	if details == nil {
+		return ""
 	}
 
-	var details []string
-	if e.Details.Field != "" {
-		details = append(details, "field="+e.Details.Field)
+	var parts []string
+
+	addDetail := func(name, value string) {
+		if value != "" {
+			parts = append(parts, name+"="+value)
+		}
 	}
 
-	if e.Details.Value != "" {
-		details = append(details, "value="+e.Details.Value)
-	}
+	addDetail("field", details.Field)
+	addDetail("value", details.Value)
+	addDetail("expected", details.Expected)
+	addDetail("actual", details.Actual)
+	addDetail("operation", details.Operation)
+	addDetail("file", details.FilePath)
 
-	if e.Details.Expected != "" {
-		details = append(details, "expected="+e.Details.Expected)
+	if details.LineNumber > 0 {
+		parts = append(parts, fmt.Sprintf("line=%d", details.LineNumber))
 	}
-
-	if e.Details.Actual != "" {
-		details = append(details, "actual="+e.Details.Actual)
+	if details.RetryCount > 0 {
+		parts = append(parts, fmt.Sprintf("retry=%d", details.RetryCount))
 	}
-
-	if e.Details.Operation != "" {
-		details = append(details, "operation="+e.Details.Operation)
-	}
-
-	if e.Details.FilePath != "" {
-		details = append(details, "file="+e.Details.FilePath)
-	}
-
-	if e.Details.LineNumber > 0 {
-		details = append(details, fmt.Sprintf("line=%d", e.Details.LineNumber))
-	}
-
-	if e.Details.RetryCount > 0 {
-		details = append(details, fmt.Sprintf("retry=%d", e.Details.RetryCount))
-	}
-
-	if e.Details.Duration != "" {
-		details = append(details, "duration="+e.Details.Duration)
-	}
+	addDetail("duration", details.Duration)
 
 	// Add metadata
-	for key, value := range e.Details.Metadata {
-		details = append(details, fmt.Sprintf("%s=%s", key, value))
+	for key, value := range details.Metadata {
+		parts = append(parts, fmt.Sprintf("%s=%s", key, value))
 	}
 
-	detailStr := ""
-	if len(details) > 0 {
-		detailStr = fmt.Sprintf(" (%s)", fmt.Sprintf("%s", details))
+	if len(parts) == 0 {
+		return ""
 	}
+	return fmt.Sprintf(" (%s)", strings.Join(parts, " "))
+}
 
-	return fmt.Sprintf("[%s] %s: %s%s", e.Level.String(), e.Code.String(), e.Message, detailStr)
+// Error implements error interface.
+func (e *CleanWizardError) Error() string {
+	base := fmt.Sprintf("[%s] %s: %s", e.Level.String(), e.Code.String(), e.Message)
+	return base + formatErrorDetails(e.Details)
 }
 
 // Unwrap returns the underlying error for compatibility with Go 1.13+ error wrapping.

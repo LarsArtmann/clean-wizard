@@ -33,10 +33,18 @@ func ParseDockerReclaimedSpace(output string) (int64, error) {
 	return 0, nil // No space found (0 is valid)
 }
 
+// sizeMultiplier converts Docker size unit strings to byte multipliers.
+var sizeMultiplier = map[string]int64{
+	"b":  1,
+	"kb": bytesPerKB,
+	"mb": bytesPerMB,
+	"gb": bytesPerGB,
+	"tb": bytesPerTB,
+}
+
 // ParseDockerSize converts Docker size string to bytes.
 // Supports units: B, kB, MB, GB, TB (case-insensitive).
 func ParseDockerSize(sizeStr string) (int64, error) {
-	// Remove any whitespace
 	sizeStr = strings.TrimSpace(sizeStr)
 
 	// Handle "0B" case or empty string
@@ -50,24 +58,14 @@ func ParseDockerSize(sizeStr string) (int64, error) {
 		unit   string
 	)
 
-	n, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit)
-	if err != nil || n != 2 {
+	if _, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit); err != nil {
 		return 0, fmt.Errorf("invalid size format: %s", sizeStr)
 	}
 
 	// Convert to bytes based on unit
-	switch strings.ToLower(unit) {
-	case "b":
-		return int64(number), nil
-	case "kb":
-		return int64(number * bytesPerKB), nil
-	case "mb":
-		return int64(number * bytesPerMB), nil
-	case "gb":
-		return int64(number * bytesPerGB), nil
-	case "tb":
-		return int64(number * bytesPerTB), nil
-	default:
+	multiplier, ok := sizeMultiplier[strings.ToLower(unit)]
+	if !ok {
 		return 0, fmt.Errorf("unknown size unit: %s", unit)
 	}
+	return int64(number * float64(multiplier)), nil
 }

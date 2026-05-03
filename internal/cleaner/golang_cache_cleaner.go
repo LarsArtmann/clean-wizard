@@ -153,14 +153,11 @@ func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.Clean
 	case GoCacheBuildCache:
 		return gcc.cleanGoBuildCache(ctx)
 	case GoCacheNone:
-		return result.Err[domain.CleanResult](
-			errors.New("no cache type specified"),
-		)
+		return result.Err[domain.CleanResult](ErrNoCacheTypeSpecified)
 	case GoCacheLintCache:
-		return result.Err[domain.CleanResult](
-			errors.New("lint cache cleaning not yet implemented"),
-		)
+		return result.Err[domain.CleanResult](ErrLintCacheNotImplemented)
 	default:
+		//nolint:err113 // Dynamic: cacheType is included for debugging
 		return result.Err[domain.CleanResult](
 			fmt.Errorf("unsupported cache type: %v", gcc.cacheType),
 		)
@@ -204,7 +201,7 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 		domain.StrategyConservativeType,
 		1, int64(sizeEstimate),
-		domain.SizeEstimate{Known: sizeEstimate},
+		domain.SizeEstimate{Known: sizeEstimate, Status: domain.SizeEstimateStatusKnown},
 	))
 }
 

@@ -76,6 +76,8 @@ func TestBuildFilterRepoCommand(t *testing.T) {
 	// The command path should be either "nix" or "git" depending on provider
 	provider := DetectFilterRepoProvider()
 	switch provider {
+	case FilterRepoNone:
+		t.Skip("No filter-repo provider available")
 	case FilterRepoNix:
 		if cmd.Path != "nix" && cmd.Args[0] != "nix" {
 			t.Errorf("Expected nix command for Nix provider, got: %s", cmd.Path)

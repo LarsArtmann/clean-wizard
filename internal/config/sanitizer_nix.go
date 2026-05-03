@@ -6,7 +6,6 @@ import (
 
 // Nix generations sanitization constants.
 const (
-	nixGenerationsMin = 1
 	nixGenerationsMax = 10
 )
 

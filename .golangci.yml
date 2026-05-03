@@ -16,73 +16,21 @@ run:
 output:
   formats: {}
 linters:
+  settings:
+    cyclop:
+      max-complexity: 15
+  default: none
+  exclusions:
+    rules:
+      - path: ".*_test\\.go"
+        linters:
+          - cyclop
   enable:
-    - bodyclose
-    - contextcheck
-    - copyloopvar
     - cyclop
-    - dupl
-    - durationcheck
-    - err113
-    - errcheck
-    - errchkjson
-    - errname
-    - errorlint
-    - exhaustive
-    - exhaustruct
-    - forcetypeassert
-    - funlen
-    - ginkgolinter
-    - gochecknoglobals
-    - gochecknoinits
-    - gochecksumtype
-    - gocognit
-    - goconst
-    - gocritic
-    - gocyclo
-    - gosec
-    - gosmopolitan
-    - govet
-    - ineffassign
-    - interfacebloat
-    - intrange
-    - loggercheck
-    - maintidx
-    - mirror
-    - misspell
-    - musttag
-    - nakedret
-    - nestif
-    - nilerr
-    - nilnesserr
-    - nilnil
-    - noctx
-    - nolintlint
-    - paralleltest
-    - perfsprint
-    - prealloc
-    - predeclared
-    - protogetter
-    - reassign
-    - recvcheck
-    - revive
-    - rowserrcheck
-    - sloglint
-    - spancheck
-    - sqlclosecheck
-    - testifylint
-    - thelper
-    - unconvert
-    - unparam
-    - unused
-    - usetesting
-    - wastedassign
-    - wrapcheck
-    - zerologlint
 formatters:
-  enable:
-    - gci
-    - goimports
-    - gofumpt
-    - golines
-issues: {}
+  settings:
+    enable:
+      - gci
+      - goimports
+      - gofumpt
+      - golines

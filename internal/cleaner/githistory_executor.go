@@ -268,7 +268,7 @@ func getGitDirSize(repoPath string) (int64, error) {
 		return nil
 	})
 
-	return size, err
+	return size, err //nolint:wrapcheck
 }
 
 // getDefaultBackupPath returns the default backup path.

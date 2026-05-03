@@ -50,15 +50,6 @@ func getGenerationsAndAssertOk(
 	return generations
 }
 
-// newTestContext creates a NixTestContext with sensible defaults for testing.
-func newTestContext() *NixTestContext {
-	return &NixTestContext{
-		ctx:    context.Background(),
-		output: nil,
-		dryRun: true,
-	}
-}
-
 // cleanGenerationsAndVerify gets mock generations and runs CleanOldGenerations,
 // then verifies the result is OK. Returns the clean result for additional assertions.
 func cleanGenerationsAndVerify(

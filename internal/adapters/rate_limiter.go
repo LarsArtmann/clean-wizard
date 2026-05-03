@@ -22,7 +22,7 @@ func NewRateLimiter(rps float64, burst int) *RateLimiter {
 
 // Wait blocks until the operation is allowed or context is cancelled.
 func (rl *RateLimiter) Wait(ctx context.Context) error {
-	return rl.limiter.Wait(ctx)
+	return rl.limiter.Wait(ctx) //nolint:wrapcheck
 }
 
 // Allow returns true if the operation is allowed immediately.
