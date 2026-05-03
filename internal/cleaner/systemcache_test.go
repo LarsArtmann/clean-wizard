@@ -108,26 +108,36 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "valid settings with all caches",
-			settings: &domain.OperationSettings{
-				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []domain.CacheType{
-						domain.CacheTypeSpotlight, domain.CacheTypeXcode,
-						domain.CacheTypeCocoapods, domain.CacheTypeHomebrew,
+			name: "valid settings with all platform caches",
+			settings: func() *domain.OperationSettings {
+				return &domain.OperationSettings{
+					SystemCache: &domain.SystemCacheSettings{
+						CacheTypes: AvailableSystemCacheTypes(),
+						OlderThan:   "30d",
 					},
-					OlderThan: "30d",
-				},
-			},
+				}
+			}(),
 			wantErr: false,
 		},
 		{
-			name: "valid settings with single cache",
-			settings: &domain.OperationSettings{
-				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []domain.CacheType{domain.CacheTypeSpotlight},
-					OlderThan:  "7d",
-				},
-			},
+			name: "valid settings with single platform cache",
+			settings: func() *domain.OperationSettings {
+				caches := AvailableSystemCacheTypes()
+				if len(caches) == 0 {
+					return &domain.OperationSettings{
+						SystemCache: &domain.SystemCacheSettings{
+							CacheTypes: []domain.CacheType{},
+							OlderThan:   "7d",
+						},
+					}
+				}
+				return &domain.OperationSettings{
+					SystemCache: &domain.SystemCacheSettings{
+						CacheTypes: []domain.CacheType{caches[0]},
+						OlderThan:   "7d",
+					},
+				}
+			}(),
 			wantErr: false,
 		},
 		{

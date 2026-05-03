@@ -1,7 +1,7 @@
 # Clean Wizard Features
 
-> **Last Updated:** 2026-04-03
-> **Version:** Based on codebase analysis  
+> **Last Updated:** 2026-05-03
+> **Version:** Based on codebase analysis
 > **Status:** BRUTALLY HONEST ASSESSMENT
 
 ---
@@ -176,7 +176,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 | Aspect                   | Status              | Details                                                     |
 | ------------------------ | ------------------- | ----------------------------------------------------------- |
-| **Overall**              | ✅ FULLY_FUNCTIONAL | macOS and Linux support                                     |
+| **Overall**              | ⚠️ PARTIALLY_FUNCTIONAL | Test failures on Linux — default settings include macOS-only cache types |
 | **Platform Support**     | ✅ Working          | macOS and Linux supported                                   |
 | **Availability Check**   | ✅ Working          | Runtime OS detection                                        |
 | **Spotlight Cache**      | ✅ Working          | `~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents` |
@@ -455,7 +455,7 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 | Cargo            | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Node Packages    | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Build Cache      | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools    |
-| System Cache     | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| System Cache     | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Test Failures    |
 | Temp Files       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Git History      | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Lang Version Mgr | ✅        | ✅   | 📝    | 📝      | N/A           | 📝 Not Implemented  |

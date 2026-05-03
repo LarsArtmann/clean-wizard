@@ -89,14 +89,21 @@ func (gcc *GoCacheCleaner) scanGoEnvCache(ctx context.Context, envVar string) []
 // getGoBuildCacheLocations returns all potential go-build cache locations.
 // This ensures comprehensive coverage across different platforms and configurations.
 func (gcc *GoCacheCleaner) getGoBuildCacheLocations() []string {
-	locations := []string{
-		os.TempDir(), // Platform-specific temp (e.g., /private/var/folders/... on macOS)
-		"/tmp",       // Standard Unix temp
+	seen := make(map[string]bool)
+	locations := []string{}
+
+	addUnique := func(path string) {
+		if !seen[path] {
+			seen[path] = true
+			locations = append(locations, path)
+		}
 	}
 
-	// Add macOS-specific Library/Caches location
+	addUnique(os.TempDir())
+	addUnique("/tmp")
+
 	if homeDir := gcc.helper.getHomeDir(); homeDir != "" {
-		locations = append(locations, filepath.Join(homeDir, "Library", "Caches"))
+		addUnique(filepath.Join(homeDir, "Library", "Caches"))
 	}
 
 	return locations

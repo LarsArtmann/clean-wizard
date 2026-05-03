@@ -1,0 +1,102 @@
+direction: down
+
+CLI: {
+  shape: rectangle
+  style.fill: "#4A90D9"
+  "cmd/clean-wizard/commands": {
+    shape: rectangle
+    "Thin CLI layer"
+    "Delegates to services"
+  }
+}
+
+Services: {
+  shape: rectangle
+  style.fill: "#50C878"
+  "internal/service": {
+    shape: rectangle
+    CleanService: {
+      shape: diamond
+      "orchestrates scan → validate → clean → report"
+    }
+    ScanService: {
+      shape: diamond
+      "multi-cleaner scanning with aggregation"
+    }
+    ConfigService: {
+      shape: diamond
+      "configuration management"
+    }
+  }
+}
+
+Domain: {
+  shape: rectangle
+  style.fill: "#7BC67E"
+  "internal/domain": {
+    shape: rectangle
+    enums: {
+      shape: cylinder
+      "Separated sub-package"
+    }
+    operations: {
+      shape: cylinder
+      "OperationType, Settings, Defaults"
+    }
+    types: {
+      shape: cylinder
+      "Core domain types"
+    }
+    interfaces: {
+      shape: diamond
+      "Clean interfaces"
+    }
+  }
+}
+
+Cleaners: {
+  shape: rectangle
+  style.fill: "#F5A623"
+  "internal/cleaner": {
+    shape: rectangle
+    Registry: {
+      shape: queue
+      "Thread-safe cleaner registry"
+    }
+    "Per-domain sub-packages": {
+      shape: cylinder
+      "cleaner/nix/"
+      "cleaner/docker/"
+      "cleaner/golang/"
+      "cleaner/githistory/"
+      "cleaner/homebrew/"
+    }
+  }
+}
+
+Infrastructure: {
+  shape: rectangle
+  style.fill: "#BD10E0"
+  "internal/result": "Result[T], FlowBuilder[T]"
+  "internal/config": "koanf/yaml"
+  "internal/adapters": "Nix, Exec, HTTP, Cache"
+  "internal/errors": "Unified error package"
+}
+
+Testing: {
+  shape: rectangle
+  style.fill: "#FF6B6B"
+  "internal/testutil": {
+    shape: cylinder
+    "Test factories"
+    "Test assertions"
+    "Mock adapters"
+  }
+}
+
+CLI -> Services: "delegates to"
+Services -> Domain: "uses types & interfaces"
+Services -> Cleaners: "orchestrates via registry"
+Cleaners -> Domain: "implements interfaces"
+Cleaners -> Infrastructure: "uses adapters"
+Cleaners -> Testing: "uses test utilities"

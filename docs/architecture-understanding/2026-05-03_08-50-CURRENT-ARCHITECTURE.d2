@@ -1,0 +1,113 @@
+direction: down
+
+CLI: {
+  shape: rectangle
+  style.fill: "#4A90D9"
+  cmd/clean-wizard/commands: {
+    shape: rectangle
+    clean.go
+    scan.go
+    init.go
+    config.go
+    profile.go
+    githistory.go
+    root.go
+  }
+}
+
+Domain: {
+  shape: rectangle
+  style.fill: "#7BC67E"
+  internal/domain: {
+    shape: rectangle
+    types: {
+      shape: cylinder
+      CleanResult
+      ScanResult
+      SizeEstimate
+      NixGeneration
+    }
+    enums: {
+      shape: cylinder
+      "19 type-safe enums"
+      "EnumString/IsValid/Values macros"
+    }
+    settings: {
+      shape: cylinder
+      "12 OperationSettings structs"
+    }
+    interfaces: {
+      shape: diamond
+      OperationHandler
+      GenerationCleaner
+      PackageCleaner
+      Scanner
+    }
+  }
+}
+
+Cleaners: {
+  shape: rectangle
+  style.fill: "#F5A623"
+  internal/cleaner: {
+    shape: rectangle
+    Registry: {
+      shape: queue
+      "Thread-safe map[string]Cleaner"
+    }
+    Cleaner Interface: {
+      shape: diamond
+      Name()
+      Type()
+      Clean()
+      IsAvailable()
+      Scan()
+    }
+    "13 Cleaners": {
+      shape: cylinder
+      Nix
+      Homebrew
+      Docker
+      Go
+      Cargo
+      Node
+      BuildCache
+      SystemCache
+      TempFiles
+      GitHistory
+      CompiledBinaries
+      ProjectExecutables
+      GolangciLint
+    }
+  }
+}
+
+Infrastructure: {
+  shape: rectangle
+  style.fill: "#BD10E0"
+  result: {
+    shape: cylinder
+    "Result[T]"
+    "FlowBuilder[T]"
+    "ParallelFlow[T]"
+    "BranchFlow[T]"
+  }
+  config: {
+    shape: cylinder
+    "koanf/yaml loader"
+    "validation middleware"
+  }
+  adapters: {
+    shape: cylinder
+    Nix
+    Exec
+    HTTP
+    Cache
+    RateLimiter
+  }
+}
+
+CLI -> Domain: "uses types & interfaces"
+CLI -> Cleaners: "creates registry, calls Clean/Scan"
+Cleaners -> Domain: "implements interfaces, uses types"
+Cleaners -> Infrastructure: "uses adapters, returns Result[T]"
