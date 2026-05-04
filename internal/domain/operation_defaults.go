@@ -7,21 +7,21 @@ import (
 
 // settingsFactory maps operation types to their default settings factories.
 var settingsFactory = map[OperationType]func() *OperationSettings{
-	OperationTypeNixGenerations:              defaultNixGenerationsSettings,
-	OperationTypeTempFiles:                   defaultTempFilesSettings,
-	OperationTypeHomebrew:                    defaultHomebrewSettings,
-	OperationTypeNodePackages:                defaultNodePackagesSettings,
-	OperationTypeGoPackages:                  defaultGoPackagesSettings,
-	OperationTypeCargoPackages:               defaultCargoPackagesSettings,
-	OperationTypeBuildCache:                  func() *OperationSettings { return &OperationSettings{BuildCache: defaultBuildCacheSettings()} },
-	OperationTypeDocker:                      defaultDockerSettings,
-	OperationTypeSystemCache:                 defaultSystemCacheSettings,
-	OperationTypeSystemTemp:                 defaultSystemTempSettings,
+	OperationTypeNixGenerations:               defaultNixGenerationsSettings,
+	OperationTypeTempFiles:                    defaultTempFilesSettings,
+	OperationTypeHomebrew:                     defaultHomebrewSettings,
+	OperationTypeNodePackages:                 defaultNodePackagesSettings,
+	OperationTypeGoPackages:                   defaultGoPackagesSettings,
+	OperationTypeCargoPackages:                defaultCargoPackagesSettings,
+	OperationTypeBuildCache:                   func() *OperationSettings { return &OperationSettings{BuildCache: defaultBuildCacheSettings()} },
+	OperationTypeDocker:                       defaultDockerSettings,
+	OperationTypeSystemCache:                  defaultSystemCacheSettings,
+	OperationTypeSystemTemp:                   defaultSystemTempSettings,
 	OperationTypeProjectsManagementAutomation: defaultProjectsManagementAutomationSettings,
-	OperationTypeProjectExecutables:         defaultProjectExecutablesSettings,
-	OperationTypeCompiledBinaries:            defaultCompiledBinariesSettings,
-	OperationTypeGitHistory:                 func() *OperationSettings { return &OperationSettings{GitHistory: &GitHistorySettings{}} },
-	OperationTypeGolangciLintCache:          func() *OperationSettings { return &OperationSettings{} },
+	OperationTypeProjectExecutables:           defaultProjectExecutablesSettings,
+	OperationTypeCompiledBinaries:             defaultCompiledBinariesSettings,
+	OperationTypeGitHistory:                   func() *OperationSettings { return &OperationSettings{GitHistory: &GitHistorySettings{}} },
+	OperationTypeGolangciLintCache:            func() *OperationSettings { return &OperationSettings{} },
 }
 
 // DefaultSettings returns default settings for given operation type.
@@ -228,16 +228,25 @@ func validateGoPackagesDefaults(s *GoPackagesSettings) error {
 		return fmt.Errorf("invalid default CacheCleanupMode for CleanCache: %d", s.CleanCache)
 	}
 	if !s.CleanTestCache.IsValid() {
-		return fmt.Errorf("invalid default CacheCleanupMode for CleanTestCache: %d", s.CleanTestCache)
+		return fmt.Errorf(
+			"invalid default CacheCleanupMode for CleanTestCache: %d",
+			s.CleanTestCache,
+		)
 	}
 	if !s.CleanModCache.IsValid() {
 		return fmt.Errorf("invalid default CacheCleanupMode for CleanModCache: %d", s.CleanModCache)
 	}
 	if !s.CleanBuildCache.IsValid() {
-		return fmt.Errorf("invalid default CacheCleanupMode for CleanBuildCache: %d", s.CleanBuildCache)
+		return fmt.Errorf(
+			"invalid default CacheCleanupMode for CleanBuildCache: %d",
+			s.CleanBuildCache,
+		)
 	}
 	if !s.CleanLintCache.IsValid() {
-		return fmt.Errorf("invalid default CacheCleanupMode for CleanLintCache: %d", s.CleanLintCache)
+		return fmt.Errorf(
+			"invalid default CacheCleanupMode for CleanLintCache: %d",
+			s.CleanLintCache,
+		)
 	}
 	return nil
 }
@@ -291,7 +300,10 @@ func validateProjectsAutomationDefaults(s *ProjectsManagementAutomationSettings)
 		return nil
 	}
 	if !s.ClearCache.IsValid() {
-		return fmt.Errorf("invalid default CacheCleanupMode in ProjectsManagementAutomation: %d", s.ClearCache)
+		return fmt.Errorf(
+			"invalid default CacheCleanupMode in ProjectsManagementAutomation: %d",
+			s.ClearCache,
+		)
 	}
 	return nil
 }

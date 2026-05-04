@@ -189,9 +189,9 @@ func (s *GitHistoryScanner) getObjectPaths(ctx context.Context) (map[string]stri
 	}
 
 	objectPaths := make(map[string]string)
-	lines := strings.Split(string(output), "\n")
+	lines := strings.SplitSeq(string(output), "\n")
 
-	for _, line := range lines {
+	for line := range lines {
 		if line == "" {
 			continue
 		}

@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 10m
-  go: 1.26.1
+  go: 1.26.2
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -16,21 +16,97 @@ run:
 output:
   formats: {}
 linters:
+  enable:
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - dupl
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - gosmopolitan
+    - govet
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - loggercheck
+    - maintidx
+    - mirror
+    - misspell
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - noctx
+    - nolintlint
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - testifylint
+    - thelper
+    - unconvert
+    - unparam
+    - unused
+    - usetesting
+    - wastedassign
+    - wrapcheck
+    - zerologlint
+  default: none
   settings:
     cyclop:
       max-complexity: 15
-  default: none
+    exhaustruct:
+      exclude:
+        - os/exec.Cmd
+    gocritic:
+      disabled-checks:
+        - dupImport
+        - ifElseChain
+        - octalLiteral
+        - whyNoLint
   exclusions:
     rules:
-      - path: ".*_test\\.go"
+      - path: .*_test\.go
         linters:
           - cyclop
-  enable:
-    - cyclop
 formatters:
+  enable:
+    - gci
+    - goimports
+    - gofumpt
+    - golines
   settings:
     enable:
       - gci
       - goimports
       - gofumpt
       - golines
+issues: {}

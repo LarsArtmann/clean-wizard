@@ -26,19 +26,19 @@ var (
 type cleanerRunner func(context.Context, bool, bool) (domain.CleanResult, error)
 
 var cleanerRegistry = map[CleanerType]cleanerRunner{
-	CleanerTypeNix:                           runNixCleaner,
-	CleanerTypeHomebrew:                      runHomebrewCleaner,
-	CleanerTypeTempFiles:                     runTempFilesCleaner,
-	CleanerTypeNodePackages:                  runNodePackageManagerCleaner,
-	CleanerTypeGoPackages:                    runGoCleaner,
-	CleanerTypeCargoPackages:                 runCargoCleaner,
-	CleanerTypeBuildCache:                    runBuildCacheCleaner,
-	CleanerTypeDocker:                        runDockerCleaner,
-	CleanerTypeSystemCache:                   runSystemCacheCleaner,
-	CleanerTypeProjectsManagementAutomation:   runProjectsManagementAutomationCleaner,
-	CleanerTypeCompiledBinaries:              runCompiledBinariesCleaner,
-	CleanerTypeProjectExecutables:            runProjectExecutablesCleaner,
-	CleanerTypeGolangciLintCache:             runGolangciLintCacheCleaner,
+	CleanerTypeNix:                          runNixCleaner,
+	CleanerTypeHomebrew:                     runHomebrewCleaner,
+	CleanerTypeTempFiles:                    runTempFilesCleaner,
+	CleanerTypeNodePackages:                 runNodePackageManagerCleaner,
+	CleanerTypeGoPackages:                   runGoCleaner,
+	CleanerTypeCargoPackages:                runCargoCleaner,
+	CleanerTypeBuildCache:                   runBuildCacheCleaner,
+	CleanerTypeDocker:                       runDockerCleaner,
+	CleanerTypeSystemCache:                  runSystemCacheCleaner,
+	CleanerTypeProjectsManagementAutomation: runProjectsManagementAutomationCleaner,
+	CleanerTypeCompiledBinaries:             runCompiledBinariesCleaner,
+	CleanerTypeProjectExecutables:           runProjectExecutablesCleaner,
+	CleanerTypeGolangciLintCache:            runGolangciLintCacheCleaner,
 }
 
 // runCleaner runs a specific cleaner and returns the result.

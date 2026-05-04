@@ -372,7 +372,13 @@ func processRepository(
 	}
 
 	cleanResult := result.Value()
-	displayCleanupResults(cleanResult, dryRun, safetyReport.HasRemote, safetyReport.RemoteName, safetyReport.CurrentBranch)
+	displayCleanupResults(
+		cleanResult,
+		dryRun,
+		safetyReport.HasRemote,
+		safetyReport.RemoteName,
+		safetyReport.CurrentBranch,
+	)
 
 	return nil
 }
