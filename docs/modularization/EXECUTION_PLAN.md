@@ -12,7 +12,7 @@
 
 ## Phase A: Pre-Modularization Cleanup (1% → 51% impact)
 
-These tasks fix structural problems that would complicate the module split. They are the highest-impact items because they eliminate coupling *before* boundaries are drawn.
+These tasks fix structural problems that would complicate the module split. They are the highest-impact items because they eliminate coupling _before_ boundaries are drawn.
 
 ---
 
@@ -23,6 +23,7 @@ These tasks fix structural problems that would complicate the module split. They
 `internal/api/` (3 files, ~650 lines) is never imported by any file. Delete it.
 
 **Steps:**
+
 1. `trash internal/api/`
 2. `go build ./...`
 3. `go test ./...`
@@ -38,11 +39,13 @@ These tasks fix structural problems that would complicate the module split. They
 **Impact:** 1% → 51% | **Effort:** 30 min | **Depends on:** None
 
 Three overlapping error packages:
+
 - `internal/errors` — 7 simple constructors
 - `internal/pkg/errors` — structured `CleanWizardError` with builder
 - `pkg/errors` — minimal `BaseError` + `New()`
 
 **Steps:**
+
 1. Choose `internal/pkg/errors` as the canonical package (most complete)
 2. Move useful constructors from `internal/errors` into `internal/pkg/errors`
 3. Move `BaseError` from `pkg/errors` into `internal/pkg/errors` (or delete if unused)
@@ -62,16 +65,17 @@ Three overlapping error packages:
 
 Move non-`_test.go` test helper files out of the production package:
 
-| File | Lines | Destination |
-|---|---|---|
-| `test_interfaces.go` | ~120 | `internal/cleaner/testhelpers/` |
-| `test_factories.go` | 94 | `internal/cleaner/testhelpers/` |
-| `test_helpers.go` | 213 | `internal/cleaner/testhelpers/` |
-| `test_assertions.go` | 323 | `internal/cleaner/testhelpers/` |
-| `testing_helpers.go` | 88 | `internal/cleaner/testhelpers/` |
-| `ginkgo_test_helpers.go` | 304 | `internal/cleaner/testhelpers/` |
+| File                     | Lines | Destination                     |
+| ------------------------ | ----- | ------------------------------- |
+| `test_interfaces.go`     | ~120  | `internal/cleaner/testhelpers/` |
+| `test_factories.go`      | 94    | `internal/cleaner/testhelpers/` |
+| `test_helpers.go`        | 213   | `internal/cleaner/testhelpers/` |
+| `test_assertions.go`     | 323   | `internal/cleaner/testhelpers/` |
+| `testing_helpers.go`     | 88    | `internal/cleaner/testhelpers/` |
+| `ginkgo_test_helpers.go` | 304   | `internal/cleaner/testhelpers/` |
 
 **Steps:**
+
 1. Create `internal/cleaner/testhelpers/` package
 2. Move files, update package declaration from `cleaner` to `testhelpers`
 3. Export any symbols that test files reference (they're in the same package currently)
@@ -93,6 +97,7 @@ Move non-`_test.go` test helper files out of the production package:
 `internal/domain` imports `stretchr/testify` in non-test files (test helpers).
 
 **Steps:**
+
 1. Identify non-`_test.go` files in `internal/domain/` that import `testify`
 2. Either move the helpers to a `testhelpers` sub-package, or convert to `testing.T` + manual assertions
 3. `go build ./...` && `go test ./...`
@@ -114,6 +119,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 10 min | **Depends on:** A2, A4
 
 **Steps:**
+
 1. Create `core/` directory
 2. Create `core/go.mod`:
    ```
@@ -141,6 +147,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 20 min | **Depends on:** B1
 
 **Steps:**
+
 1. `mkdir -p core/domain`
 2. Move all files from `internal/domain/` to `core/domain/`
 3. Update package declarations (already `domain`, no change needed)
@@ -160,6 +167,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 10 min | **Depends on:** B1
 
 **Steps:**
+
 1. `mkdir -p core/result`
 2. Move files from `internal/result/` to `core/result/`
 3. Find-and-replace import paths
@@ -177,6 +185,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 15 min | **Depends on:** B1, A2
 
 **Steps:**
+
 1. Move `internal/pkg/errors/` to `core/errors/`
 2. Update package declaration from `errors` to `errors` (same name, no change)
 3. Find-and-replace import paths:
@@ -195,6 +204,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 10 min | **Depends on:** B1
 
 **Steps:**
+
 1. Move `internal/format/` to `core/format/`
 2. Update import paths
 3. Add `github.com/dustin/go-humanize` to `core/go.mod`
@@ -212,6 +222,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 10 min | **Depends on:** B3
 
 **Steps:**
+
 1. Move `internal/shared/utils/validation/` to `core/validation/`
 2. Update import paths
 3. `go mod tidy`
@@ -228,6 +239,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 10 min | **Depends on:** B1
 
 **Steps:**
+
 1. Move `internal/testing/` to `core/testing/`
 2. Update import paths
 3. `go mod tidy`
@@ -244,6 +256,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 10 min | **Depends on:** B1-B7
 
 **Steps:**
+
 1. Verify `go.work` includes both `.` and `./core`
 2. `go work sync`
 3. `go build ./...` at root — all packages compile
@@ -253,6 +266,7 @@ This is the foundational extraction. Everything depends on core.
 7. Verify `core/go.mod` has no internal dependencies (only external deps)
 
 **Verification:**
+
 - `grep 'github.com/LarsArtmann' core/go.mod` returns nothing (no replace/require of self)
 - Root builds with workspace
 - Core builds in isolation
@@ -270,6 +284,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 20 min | **Depends on:** B8
 
 **Steps:**
+
 1. Create `adapters/` directory and `adapters/go.mod`:
    ```
    module github.com/LarsArtmann/clean-wizard/adapters
@@ -308,6 +323,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 15 min | **Depends on:** None (can run in parallel)
 
 **Steps:**
+
 1. In `internal/config/config.go`, replace `logger.Info(...)` / `logger.Error(...)` with `slog.Info(...)` / `slog.Error(...)`
 2. Remove `internal/logger` import from config files
 3. Add `log/slog` import
@@ -324,6 +340,7 @@ This is the foundational extraction. Everything depends on core.
 **Impact:** 4% → 64% | **Effort:** 25 min | **Depends on:** B8, D1
 
 **Steps:**
+
 1. Create `config/` directory and `config/go.mod`:
    ```
    module github.com/LarsArtmann/clean-wizard/config
@@ -363,6 +380,7 @@ This is the foundational extraction. Everything depends on core.
 `internal/conversions` is primarily used by cleaners (16 files). Move it into the cleaners module.
 
 **Steps:**
+
 1. Note: conversions also imported by `internal/adapters/nix.go` and `internal/middleware/validation.go`
 2. Decision: Move conversions to `cleaners/conversions/` sub-package
 3. For adapters and middleware, they use `ToCleanResult()` and similar — these should be inlined or the callers updated
@@ -384,6 +402,7 @@ This is the foundational extraction. Everything depends on core.
 This is the largest single task — moving ~40 files.
 
 **Steps:**
+
 1. Create `cleaners/` directory and `cleaners/go.mod`:
    ```
    module github.com/LarsArtmann/clean-wizard/cleaners
@@ -413,6 +432,7 @@ This is the largest single task — moving ~40 files.
 8. `go build ./...` && `go test ./...`
 
 **Verification:**
+
 - Cleaners build independently: `cd cleaners && go build ./...`
 - Cleaner tests pass independently: `cd cleaners && go test ./...`
 - Root builds with workspace
@@ -431,6 +451,7 @@ This is the largest single task — moving ~40 files.
 **Impact:** 20% → 80% | **Effort:** 20 min | **Depends on:** E2
 
 **Steps:**
+
 1. Update root `go.mod` — remove direct dependencies now in sub-modules
 2. Add sub-module dependencies to root `go.mod`:
    ```
@@ -465,6 +486,7 @@ This is the largest single task — moving ~40 files.
 **Impact:** 20% → 80% | **Effort:** 5 min | **Depends on:** F1
 
 **Steps:**
+
 1. Remove empty directories left after migration:
    - `internal/cleaner/` (if empty)
    - `internal/domain/` (if empty)
@@ -488,6 +510,7 @@ This is the largest single task — moving ~40 files.
 **Impact:** 20% → 80% | **Effort:** 10 min | **Depends on:** F2
 
 **Steps:**
+
 1. `cd core && go build ./... && go test ./... && go vet ./... && go mod tidy`
 2. `cd adapters && go build ./... && go test ./... && go vet ./... && go mod tidy`
 3. `cd config && go build ./... && go test ./... && go vet ./... && go mod tidy`
@@ -508,6 +531,7 @@ This is the largest single task — moving ~40 files.
 **Impact:** 20% → 80% | **Effort:** 20 min | **Depends on:** F3
 
 **Steps:**
+
 1. Update `flake.nix` build to use `go.work`
 2. Add per-module test targets:
    - `nix run .#test-core`
@@ -529,6 +553,7 @@ This is the largest single task — moving ~40 files.
 **Impact:** 20% → 80% | **Effort:** 15 min | **Depends on:** F3
 
 **Steps:**
+
 1. Update `AGENTS.md` — new module structure, build/test commands per module
 2. Update `README.md` — if it references internal structure
 3. Update `TODO_LIST.md` — mark modularization items as done
@@ -569,24 +594,24 @@ A4 ──┘    │   B3 ──┤
 
 ## Pareto Impact Summary
 
-| Phase | Tasks | Impact | Effort |
-|---|---|---|---|
-| A: Pre-cleanup | A1-A4 | 1% → 51% | ~80 min |
-| B: Core module | B1-B8 | 4% → 64% | ~95 min |
-| C: Adapters | C1 | 4% → 64% | ~20 min |
-| D: Config | D1-D2 | 4% → 64% | ~40 min |
-| E: Cleaners | E1-E2 | 4% → 64% | ~60 min |
-| F: Finalize | F1-F5 | 20% → 80% | ~70 min |
-| **Total** | **20 tasks** | **0% → 80%** | **~365 min** |
+| Phase          | Tasks        | Impact       | Effort       |
+| -------------- | ------------ | ------------ | ------------ |
+| A: Pre-cleanup | A1-A4        | 1% → 51%     | ~80 min      |
+| B: Core module | B1-B8        | 4% → 64%     | ~95 min      |
+| C: Adapters    | C1           | 4% → 64%     | ~20 min      |
+| D: Config      | D1-D2        | 4% → 64%     | ~40 min      |
+| E: Cleaners    | E1-E2        | 4% → 64%     | ~60 min      |
+| F: Finalize    | F1-F5        | 20% → 80%    | ~70 min      |
+| **Total**      | **20 tasks** | **0% → 80%** | **~365 min** |
 
 ---
 
 ## Risk Mitigation Per Task
 
-| Risk | Tasks Affected | Mitigation |
-|---|---|---|
-| Import path typos | All move tasks | Use `sed` + `gofmt` for find-replace; verify with `go build` |
-| Missed imports | E2, F1 | `grep -r 'internal/cleaner\|internal/domain' .` after each task |
-| Test failures from moved helpers | A3, E2 | Move helpers first; run full test suite |
-| go.work sync issues | B8, C1, D2, E2 | `go work sync` after every module creation |
-| Circular dependency | C1, D2, E2 | `go vet ./...` catches cycles; DAG pre-verified |
+| Risk                             | Tasks Affected | Mitigation                                                      |
+| -------------------------------- | -------------- | --------------------------------------------------------------- |
+| Import path typos                | All move tasks | Use `sed` + `gofmt` for find-replace; verify with `go build`    |
+| Missed imports                   | E2, F1         | `grep -r 'internal/cleaner\|internal/domain' .` after each task |
+| Test failures from moved helpers | A3, E2         | Move helpers first; run full test suite                         |
+| go.work sync issues              | B8, C1, D2, E2 | `go work sync` after every module creation                      |
+| Circular dependency              | C1, D2, E2     | `go vet ./...` catches cycles; DAG pre-verified                 |

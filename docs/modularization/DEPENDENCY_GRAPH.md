@@ -102,18 +102,18 @@ test                          → internal/testhelper
 
 ## External Dependency Map Per Package
 
-| Package | Key External Dependencies |
-|---|---|
-| `cmd/clean-wizard` | `charmbracelet/fang` |
-| `cmd/clean-wizard/commands` | `charm.land/huh/v2`, `charm.land/lipgloss/v2`, `spf13/cobra` |
-| `internal/cleaner` | `cockroachdb/errors`, `golang.org/x/sys/unix`, `onsi/ginkgo`, `onsi/gomega`, `stretchr/testify` |
-| `internal/config` | `knadh/koanf/v2`, `knadh/koanf/parsers/yaml`, `knadh/koanf/providers/file` |
-| `internal/domain` | `gopkg.in/yaml.v3` |
-| `internal/adapters` | `caarlos0/env/v6`, `go-resty/resty/v2`, `maypok86/otter/v2`, `golang.org/x/time/rate`, `stretchr/testify` |
-| `internal/format` | `dustin/go-humanize` |
-| `internal/logger` | `charm.land/log/v2` |
-| `internal/shared/utils/config` | `charm.land/log/v2` |
-| `tests/bdd` | `onsi/ginkgo/v2`, `onsi/gomega` |
+| Package                        | Key External Dependencies                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `cmd/clean-wizard`             | `charmbracelet/fang`                                                                                      |
+| `cmd/clean-wizard/commands`    | `charm.land/huh/v2`, `charm.land/lipgloss/v2`, `spf13/cobra`                                              |
+| `internal/cleaner`             | `cockroachdb/errors`, `golang.org/x/sys/unix`, `onsi/ginkgo`, `onsi/gomega`, `stretchr/testify`           |
+| `internal/config`              | `knadh/koanf/v2`, `knadh/koanf/parsers/yaml`, `knadh/koanf/providers/file`                                |
+| `internal/domain`              | `gopkg.in/yaml.v3`                                                                                        |
+| `internal/adapters`            | `caarlos0/env/v6`, `go-resty/resty/v2`, `maypok86/otter/v2`, `golang.org/x/time/rate`, `stretchr/testify` |
+| `internal/format`              | `dustin/go-humanize`                                                                                      |
+| `internal/logger`              | `charm.land/log/v2`                                                                                       |
+| `internal/shared/utils/config` | `charm.land/log/v2`                                                                                       |
+| `tests/bdd`                    | `onsi/ginkgo/v2`, `onsi/gomega`                                                                           |
 
 ---
 
@@ -122,6 +122,7 @@ test                          → internal/testhelper
 ### 1. `internal/domain` — God Package (22 non-test files, 2,442 lines)
 
 Every other internal package imports `domain`. It contains:
+
 - 19 type-safe enums (iota-based)
 - Core domain types: `CleanResult`, `ScanResult`, `ScanItem`, `CleanRequest`, `ScanRequest`
 - Nix-specific types: `NixGeneration`, `NixGenerationsSettings`
@@ -143,11 +144,11 @@ Contains 14 concrete cleaner implementations, shared infrastructure, and test he
 
 ### 3. Three Error Packages (Split Brain)
 
-| Package | Purpose |
-|---|---|
-| `internal/errors` | 7 error constructors (`CleanOperationError`, `ConfigLoadError`, etc.) |
+| Package               | Purpose                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| `internal/errors`     | 7 error constructors (`CleanOperationError`, `ConfigLoadError`, etc.)                      |
 | `internal/pkg/errors` | Structured error types with `CleanWizardError`, `ErrorCode`, `ErrorLevel`, builder pattern |
-| `pkg/errors` | Minimal `BaseError` with `New()` constructor |
+| `pkg/errors`          | Minimal `BaseError` with `New()` constructor                                               |
 
 **Problem:** Overlapping responsibilities. No clear ownership. Consumers use different packages for similar needs.
 
@@ -198,14 +199,14 @@ The graph is a valid DAG — no circular dependencies detected.
 
 ## Package Size Distribution
 
-| Package | Files (non-test) | Lines (non-test) | Status |
-|---|---|---|---|
-| `internal/cleaner` | 37 | ~16,000 | CRITICAL — god package |
-| `internal/domain` | 15 | ~2,442 | WARNING — mixed concerns |
-| `internal/config` | 25 | ~3,400 | WARNING — large |
-| `internal/adapters` | 7 | ~1,046 | OK |
-| `internal/conversions` | 1 | ~400 | OK |
-| `internal/api` | 2 | ~351 | OK |
-| `internal/result` | ~3 | ~500 | OK |
-| `internal/shared/utils/*` | 6 | ~305 | OK |
-| All others | ~10 | ~300 | OK |
+| Package                   | Files (non-test) | Lines (non-test) | Status                   |
+| ------------------------- | ---------------- | ---------------- | ------------------------ |
+| `internal/cleaner`        | 37               | ~16,000          | CRITICAL — god package   |
+| `internal/domain`         | 15               | ~2,442           | WARNING — mixed concerns |
+| `internal/config`         | 25               | ~3,400           | WARNING — large          |
+| `internal/adapters`       | 7                | ~1,046           | OK                       |
+| `internal/conversions`    | 1                | ~400             | OK                       |
+| `internal/api`            | 2                | ~351             | OK                       |
+| `internal/result`         | ~3               | ~500             | OK                       |
+| `internal/shared/utils/*` | 6                | ~305             | OK                       |
+| All others                | ~10              | ~300             | OK                       |

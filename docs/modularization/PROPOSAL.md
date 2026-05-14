@@ -28,14 +28,14 @@ This proposal splits the monolith into **5 sub-modules** coordinated via `go.wor
 
 ### Starting State: Monolith
 
-| Metric | Value |
-|---|---|
-| `go.mod` files | 1 |
-| `go.work` | None |
-| Packages | 29 |
-| Non-test lines | ~31,000 |
-| External deps (direct) | 24 |
-| Circular dependencies | None (valid DAG) |
+| Metric                 | Value            |
+| ---------------------- | ---------------- |
+| `go.mod` files         | 1                |
+| `go.work`              | None             |
+| Packages               | 29               |
+| Non-test lines         | ~31,000          |
+| External deps (direct) | 24               |
+| Circular dependencies  | None (valid DAG) |
 
 ### Current Dependency Layers
 
@@ -65,13 +65,13 @@ See [DEPENDENCY_GRAPH.md](./DEPENDENCY_GRAPH.md) for full analysis.
 
 ### Module Map
 
-| Module | Path | Purpose | External Deps |
-|---|---|---|---|
-| **core** | `/core` | Domain types, interfaces, enums, result type, shared utilities | `gopkg.in/yaml.v3` only |
-| **cleaners** | `/cleaners` | All 14 cleaner implementations, registry, factory, metrics | `cockroachdb/errors`, `golang.org/x/sys` |
-| **adapters** | `/adapters` | External tool wrappers (Nix, Exec, HTTP, Cache, Environment) | `caarlos0/env`, `go-resty`, `maypok86/otter`, `golang.org/x/time` |
-| **config** | `/config` | Configuration loading, validation, sanitization, profiles | `knadh/koanf/v2`, `knadh/koanf/parsers/yaml` |
-| **app** | `/app` (root module) | CLI commands, TUI forms, formatting, wiring | `charm.land/*`, `spf13/cobra` |
+| Module       | Path                 | Purpose                                                        | External Deps                                                     |
+| ------------ | -------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **core**     | `/core`              | Domain types, interfaces, enums, result type, shared utilities | `gopkg.in/yaml.v3` only                                           |
+| **cleaners** | `/cleaners`          | All 14 cleaner implementations, registry, factory, metrics     | `cockroachdb/errors`, `golang.org/x/sys`                          |
+| **adapters** | `/adapters`          | External tool wrappers (Nix, Exec, HTTP, Cache, Environment)   | `caarlos0/env`, `go-resty`, `maypok86/otter`, `golang.org/x/time` |
+| **config**   | `/config`            | Configuration loading, validation, sanitization, profiles      | `knadh/koanf/v2`, `knadh/koanf/parsers/yaml`                      |
+| **app**      | `/app` (root module) | CLI commands, TUI forms, formatting, wiring                    | `charm.land/*`, `spf13/cobra`                                     |
 
 ### Module Dependency DAG
 
@@ -95,12 +95,12 @@ app  ──→  config
 
 **Module path:** `github.com/LarsArtmann/clean-wizard/core`
 
-| Field | Content |
-|---|---|
-| Purpose | Domain types, interfaces, enums, Result[T], shared utilities |
-| Dependencies (prod) | None (zero internal deps) |
-| Dependencies (test) | `stretchr/testify` (for enum/type tests) |
-| External deps | `gopkg.in/yaml.v3` |
+| Field               | Content                                                      |
+| ------------------- | ------------------------------------------------------------ |
+| Purpose             | Domain types, interfaces, enums, Result[T], shared utilities |
+| Dependencies (prod) | None (zero internal deps)                                    |
+| Dependencies (test) | `stretchr/testify` (for enum/type tests)                     |
+| External deps       | `gopkg.in/yaml.v3`                                           |
 
 **Package structure:**
 
@@ -141,12 +141,12 @@ core/
 
 **Module path:** `github.com/LarsArtmann/clean-wizard/cleaners`
 
-| Field | Content |
-|---|---|
-| Purpose | All cleaner implementations, registry, factory, parallel execution, metrics |
-| Dependencies (prod) | `core`, `adapters` |
-| Dependencies (test) | `core` (via test helpers) |
-| External deps | `cockroachdb/errors`, `golang.org/x/sys/unix` |
+| Field               | Content                                                                     |
+| ------------------- | --------------------------------------------------------------------------- |
+| Purpose             | All cleaner implementations, registry, factory, parallel execution, metrics |
+| Dependencies (prod) | `core`, `adapters`                                                          |
+| Dependencies (test) | `core` (via test helpers)                                                   |
+| External deps       | `cockroachdb/errors`, `golang.org/x/sys/unix`                               |
 
 **Package structure:**
 
@@ -204,12 +204,12 @@ cleaners/
 
 **Module path:** `github.com/LarsArtmann/clean-wizard/adapters`
 
-| Field | Content |
-|---|---|
-| Purpose | External tool wrappers (Nix, Exec, HTTP, Cache, Environment config) |
-| Dependencies (prod) | `core` |
-| Dependencies (test) | `core` |
-| External deps | `caarlos0/env/v6`, `go-resty/resty/v2`, `maypok86/otter/v2`, `golang.org/x/time/rate` |
+| Field               | Content                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| Purpose             | External tool wrappers (Nix, Exec, HTTP, Cache, Environment config)                   |
+| Dependencies (prod) | `core`                                                                                |
+| Dependencies (test) | `core`                                                                                |
+| External deps       | `caarlos0/env/v6`, `go-resty/resty/v2`, `maypok86/otter/v2`, `golang.org/x/time/rate` |
 
 **Package structure:**
 
@@ -233,12 +233,12 @@ adapters/
 
 **Module path:** `github.com/LarsArtmann/clean-wizard/config`
 
-| Field | Content |
-|---|---|
-| Purpose | YAML config loading, validation, sanitization, profile management, middleware |
-| Dependencies (prod) | `core` |
-| Dependencies (test) | `core` |
-| External deps | `knadh/koanf/v2`, `knadh/koanf/parsers/yaml`, `knadh/koanf/providers/file` |
+| Field               | Content                                                                       |
+| ------------------- | ----------------------------------------------------------------------------- |
+| Purpose             | YAML config loading, validation, sanitization, profile management, middleware |
+| Dependencies (prod) | `core`                                                                        |
+| Dependencies (test) | `core`                                                                        |
+| External deps       | `knadh/koanf/v2`, `knadh/koanf/parsers/yaml`, `knadh/koanf/providers/file`    |
 
 **Package structure:**
 
@@ -272,12 +272,12 @@ config/
 
 **Module path:** `github.com/LarsArtmann/clean-wizard` (root)
 
-| Field | Content |
-|---|---|
-| Purpose | CLI entry point, Cobra commands, TUI forms, output formatting, wiring |
-| Dependencies (prod) | `core`, `cleaners`, `adapters`, `config` |
-| Dependencies (test) | All sub-modules |
-| External deps | `charm.land/huh/v2`, `charm.land/lipgloss/v2`, `charm.land/log/v2`, `github.com/charmbracelet/fang`, `spf13/cobra` |
+| Field               | Content                                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Purpose             | CLI entry point, Cobra commands, TUI forms, output formatting, wiring                                              |
+| Dependencies (prod) | `core`, `cleaners`, `adapters`, `config`                                                                           |
+| Dependencies (test) | All sub-modules                                                                                                    |
+| External deps       | `charm.land/huh/v2`, `charm.land/lipgloss/v2`, `charm.land/log/v2`, `github.com/charmbracelet/fang`, `spf13/cobra` |
 
 **Package structure:**
 
@@ -360,13 +360,13 @@ use (
 
 ## 7. Test Dependency Isolation
 
-| Module | Production Deps | Test-Only Deps |
-|---|---|---|
-| core | `gopkg.in/yaml.v3` | `stretchr/testify` |
-| adapters | core + `caarlos0/env`, `go-resty`, `otter`, `golang.org/x/time` | `stretchr/testify` |
-| config | core + `knadh/koanf/v2` | `stretchr/testify` |
-| cleaners | core, adapters + `cockroachdb/errors`, `golang.org/x/sys` | `onsi/ginkgo/v2`, `onsi/gomega`, `stretchr/testify` |
-| app | all modules + `charm.land/*`, `spf13/cobra` | all test frameworks |
+| Module   | Production Deps                                                 | Test-Only Deps                                      |
+| -------- | --------------------------------------------------------------- | --------------------------------------------------- |
+| core     | `gopkg.in/yaml.v3`                                              | `stretchr/testify`                                  |
+| adapters | core + `caarlos0/env`, `go-resty`, `otter`, `golang.org/x/time` | `stretchr/testify`                                  |
+| config   | core + `knadh/koanf/v2`                                         | `stretchr/testify`                                  |
+| cleaners | core, adapters + `cockroachdb/errors`, `golang.org/x/sys`       | `onsi/ginkgo/v2`, `onsi/gomega`, `stretchr/testify` |
+| app      | all modules + `charm.land/*`, `spf13/cobra`                     | all test frameworks                                 |
 
 **Critical fix:** Move all test helper files from `internal/cleaner/test_*.go` into `cleaners/testhelpers/` sub-package. This eliminates `testify`, `ginkgo`, and `gomega` from the cleaners production `go.mod`.
 
@@ -400,11 +400,11 @@ The `Cleaner` interface lives in the cleaners module because it's specific to th
 
 **Recommendation: Shared version (single git tag).**
 
-| Strategy | Chosen? | Rationale |
-|---|---|---|
-| Shared version | ✅ Yes | Single CLI tool, no external consumers of sub-modules |
-| Independent semver | ❌ No | Overhead without benefit — no external consumers |
-| Root-only versioning | ❌ No | Subset of shared version |
+| Strategy             | Chosen? | Rationale                                             |
+| -------------------- | ------- | ----------------------------------------------------- |
+| Shared version       | ✅ Yes  | Single CLI tool, no external consumers of sub-modules |
+| Independent semver   | ❌ No   | Overhead without benefit — no external consumers      |
+| Root-only versioning | ❌ No   | Subset of shared version                              |
 
 All modules bump together under a single `vX.Y.Z` tag. The sub-modules are internal implementation detail — no one imports them independently.
 
@@ -456,14 +456,14 @@ Ordered steps, each independently executable. See [EXECUTION_PLAN.md](./EXECUTIO
 
 ## 11. Risk Assessment
 
-| Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| Import path breakage during migration | High | High | Automate with `sed`/`gofmt`; verify build after each step |
-| Test failures from moved test helpers | Medium | Medium | Move test helpers first, verify all tests pass before proceeding |
-| Circular dependency discovery | Low | High | DAG verified in proposal; `go vet` catches cycles at compile time |
-| `go.work` confusion in CI | Low | Medium | Add `GOWORK=off` flag to CI release builds |
-| Increased repo complexity | Medium | Low | Clear README documenting module structure |
-| `gopkg.in/yaml.v3` in core module | Low | Low | Single dependency; acceptable for domain types with YAML tags |
+| Risk                                  | Likelihood | Impact | Mitigation                                                        |
+| ------------------------------------- | ---------- | ------ | ----------------------------------------------------------------- |
+| Import path breakage during migration | High       | High   | Automate with `sed`/`gofmt`; verify build after each step         |
+| Test failures from moved test helpers | Medium     | Medium | Move test helpers first, verify all tests pass before proceeding  |
+| Circular dependency discovery         | Low        | High   | DAG verified in proposal; `go vet` catches cycles at compile time |
+| `go.work` confusion in CI             | Low        | Medium | Add `GOWORK=off` flag to CI release builds                        |
+| Increased repo complexity             | Medium     | Low    | Clear README documenting module structure                         |
+| `gopkg.in/yaml.v3` in core module     | Low        | Low    | Single dependency; acceptable for domain types with YAML tags     |
 
 ---
 
@@ -486,9 +486,9 @@ Ordered steps, each independently executable. See [EXECUTION_PLAN.md](./EXECUTIO
 
 ## Appendix: Dead Code Identified
 
-| Package | Files | Lines | Recommendation |
-|---|---|---|---|
-| `internal/api` | 3 (mapper.go, types.go, mapper_test.go) | ~650 | **DELETE** — not imported anywhere |
+| Package        | Files                                   | Lines | Recommendation                     |
+| -------------- | --------------------------------------- | ----- | ---------------------------------- |
+| `internal/api` | 3 (mapper.go, types.go, mapper_test.go) | ~650  | **DELETE** — not imported anywhere |
 
 ## Appendix: Self-Review Findings
 
@@ -512,14 +512,14 @@ Ordered steps, each independently executable. See [EXECUTION_PLAN.md](./EXECUTIO
 
 Based on findings:
 
-| Package | Proposed Module | Revised Module | Reason |
-|---|---|---|---|
-| `internal/api` | app | **DELETE** | Dead code |
-| `internal/conversions` | core | **cleaners** | 16 cleaner files depend on it; it's a cleaner concern |
-| `internal/shared/utils/config` | core | **app** | Depends on `config` module; can't be in core |
-| `internal/testhelper` | app | **app** | Only used by integration tests; stays in root |
-| `internal/format` | core | **core** | Confirmed: small, shared by cleaners and CLI |
-| `internal/logger` | app | **app** | Wraps charm.land/log; TUI concern |
+| Package                        | Proposed Module | Revised Module | Reason                                                |
+| ------------------------------ | --------------- | -------------- | ----------------------------------------------------- |
+| `internal/api`                 | app             | **DELETE**     | Dead code                                             |
+| `internal/conversions`         | core            | **cleaners**   | 16 cleaner files depend on it; it's a cleaner concern |
+| `internal/shared/utils/config` | core            | **app**        | Depends on `config` module; can't be in core          |
+| `internal/testhelper`          | app             | **app**        | Only used by integration tests; stays in root         |
+| `internal/format`              | core            | **core**       | Confirmed: small, shared by cleaners and CLI          |
+| `internal/logger`              | app             | **app**        | Wraps charm.land/log; TUI concern                     |
 
 ### Updated Module Dependencies
 
@@ -533,17 +533,17 @@ app (root)  → core, cleaners, adapters, config ✅
 
 Per `how-to-golang` policy:
 
-| Current Dependency | Status | Action |
-|---|---|---|
-| `stretchr/testify` | BANNED | Keep for existing tests; migrate to `ginkgo/gomega` over time |
-| `gopkg.in/yaml.v3` | BANNED | Replace with `go-faster/yaml` (defer to separate task) |
-| `charm.land/huh/v2` | OK (v2) | No action |
-| `charm.land/lipgloss/v2` | OK (v2) | No action |
-| `charm.land/log/v2` | OK (v2) | No action |
-| `cockroachdb/errors` | OK | No action |
-| `knadh/koanf/v2` | OK | No action |
-| `spf13/cobra` | OK | No action |
-| `maypok86/otter/v2` | OK (recommended) | No action |
-| `dustin/go-humanize` | OK | No action |
+| Current Dependency       | Status           | Action                                                        |
+| ------------------------ | ---------------- | ------------------------------------------------------------- |
+| `stretchr/testify`       | BANNED           | Keep for existing tests; migrate to `ginkgo/gomega` over time |
+| `gopkg.in/yaml.v3`       | BANNED           | Replace with `go-faster/yaml` (defer to separate task)        |
+| `charm.land/huh/v2`      | OK (v2)          | No action                                                     |
+| `charm.land/lipgloss/v2` | OK (v2)          | No action                                                     |
+| `charm.land/log/v2`      | OK (v2)          | No action                                                     |
+| `cockroachdb/errors`     | OK               | No action                                                     |
+| `knadh/koanf/v2`         | OK               | No action                                                     |
+| `spf13/cobra`            | OK               | No action                                                     |
+| `maypok86/otter/v2`      | OK (recommended) | No action                                                     |
+| `dustin/go-humanize`     | OK               | No action                                                     |
 
 **IMPORTANT:** `internal/api` is dead code — not imported by any file (production or test). It should be deleted, not migrated. Removing it eliminates 2 packages and ~650 lines.
