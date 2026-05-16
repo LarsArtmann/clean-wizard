@@ -31,10 +31,9 @@ func (m *MockSanitizationResult) AddChange(path string, original, newValue any, 
 	})
 }
 
-func newTrimmableField(name, path, value string) TrimmableField {
+func newTrimmableField(value string) TrimmableField {
 	return TrimmableField{
-		Name: name,
-		Path: path,
+		Path: "test.path",
 		Value: func() *string {
 			s := value
 
@@ -53,28 +52,28 @@ func TestTrimWhitespaceField(t *testing.T) {
 	}{
 		{
 			name:          "trims leading and trailing whitespace",
-			field:         newTrimmableField("test", "test.path", "  hello world  "),
+			field:         newTrimmableField("  hello world  "),
 			changes:       &MockSanitizationResult{},
 			expectChange:  true,
 			expectedValue: "hello world",
 		},
 		{
 			name:          "does not change already trimmed string",
-			field:         newTrimmableField("test", "test.path", "hello world"),
+			field:         newTrimmableField("hello world"),
 			changes:       &MockSanitizationResult{},
 			expectChange:  false,
 			expectedValue: "hello world",
 		},
 		{
 			name:          "handles empty string",
-			field:         newTrimmableField("test", "test.path", ""),
+			field:         newTrimmableField(""),
 			changes:       &MockSanitizationResult{},
 			expectChange:  false,
 			expectedValue: "",
 		},
 		{
 			name:          "handles string with only whitespace",
-			field:         newTrimmableField("test", "test.path", "   \t\n   "),
+			field:         newTrimmableField("   \t\n   "),
 			changes:       &MockSanitizationResult{},
 			expectChange:  true,
 			expectedValue: "",
@@ -124,14 +123,14 @@ func TestTrimIfEnabled(t *testing.T) {
 		{
 			name:         "trims when enabled",
 			trimEnabled:  true,
-			field:        newTrimmableField("test", "test.path", "  hello  "),
+			field:        newTrimmableField("  hello  "),
 			changes:      &MockSanitizationResult{},
 			expectChange: true,
 		},
 		{
 			name:         "does not trim when disabled",
 			trimEnabled:  false,
-			field:        newTrimmableField("test", "test.path", "  hello  "),
+			field:        newTrimmableField("  hello  "),
 			changes:      &MockSanitizationResult{},
 			expectChange: false,
 		},

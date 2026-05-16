@@ -96,46 +96,57 @@ func TestNewGoCleaner(t *testing.T) {
 				t.Fatal("NewGoCleaner() returned nil cleaner")
 			}
 
-			if cleaner.verbose != tt.verbose {
-				t.Errorf("verbose = %v, want %v", cleaner.verbose, tt.verbose)
-			}
-
-			if cleaner.dryRun != tt.dryRun {
-				t.Errorf("dryRun = %v, want %v", cleaner.dryRun, tt.dryRun)
-			}
-
-			if cleaner.caches.Has(GoCacheGOCACHE) != tt.cleanCache {
-				t.Errorf(
-					"cleanCache = %v, want %v",
-					cleaner.caches.Has(GoCacheGOCACHE),
-					tt.cleanCache,
-				)
-			}
-
-			if cleaner.caches.Has(GoCacheTestCache) != tt.cleanTestCache {
-				t.Errorf(
-					"cleanTestCache = %v, want %v",
-					cleaner.caches.Has(GoCacheTestCache),
-					tt.cleanTestCache,
-				)
-			}
-
-			if cleaner.caches.Has(GoCacheModCache) != tt.cleanModCache {
-				t.Errorf(
-					"cleanModCache = %v, want %v",
-					cleaner.caches.Has(GoCacheModCache),
-					tt.cleanModCache,
-				)
-			}
-
-			if cleaner.caches.Has(GoCacheBuildCache) != tt.cleanBuildCache {
-				t.Errorf(
-					"cleanBuildCache = %v, want %v",
-					cleaner.caches.Has(GoCacheBuildCache),
-					tt.cleanBuildCache,
-				)
-			}
+			assertGoCleanerFields(
+				t,
+				cleaner,
+				tt.verbose,
+				tt.dryRun,
+				tt.cleanCache,
+				tt.cleanTestCache,
+				tt.cleanModCache,
+				tt.cleanBuildCache,
+			)
 		})
+	}
+}
+
+func assertGoCleanerFields(
+	t *testing.T,
+	cleaner *GoCleaner,
+	verbose, dryRun, cleanCache, cleanTestCache, cleanModCache, cleanBuildCache bool,
+) {
+	t.Helper()
+
+	if cleaner.verbose != verbose {
+		t.Errorf("verbose = %v, want %v", cleaner.verbose, verbose)
+	}
+
+	if cleaner.dryRun != dryRun {
+		t.Errorf("dryRun = %v, want %v", cleaner.dryRun, dryRun)
+	}
+
+	if cleaner.caches.Has(GoCacheGOCACHE) != cleanCache {
+		t.Errorf("cleanCache = %v, want %v", cleaner.caches.Has(GoCacheGOCACHE), cleanCache)
+	}
+
+	if cleaner.caches.Has(GoCacheTestCache) != cleanTestCache {
+		t.Errorf(
+			"cleanTestCache = %v, want %v",
+			cleaner.caches.Has(GoCacheTestCache),
+			cleanTestCache,
+		)
+	}
+
+	if cleaner.caches.Has(GoCacheModCache) != cleanModCache {
+		t.Errorf("cleanModCache = %v, want %v", cleaner.caches.Has(GoCacheModCache), cleanModCache)
+	}
+
+	if cleaner.caches.Has(GoCacheBuildCache) != cleanBuildCache {
+		t.Errorf(
+			"cleanBuildCache = %v, want %v",
+			cleaner.caches.Has(GoCacheBuildCache),
+			cleanBuildCache,
+		)
 	}
 }
 

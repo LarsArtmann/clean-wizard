@@ -122,7 +122,7 @@ func printEncouragement(totalBytes uint64) {
 	}
 }
 
-func displayDiskUsageAfter(cr cleanResult, dryRun bool, diskBefore *cleaner.DiskUsage) {
+func displayDiskUsageAfter(_ cleanResult, dryRun bool, diskBefore *cleaner.DiskUsage) {
 	if dryRun || diskBefore == nil {
 		return
 	}

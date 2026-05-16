@@ -7,144 +7,59 @@ import (
 
 // TestParseCustomDuration provides comprehensive testing for custom duration parsing.
 func TestParseCustomDuration(t *testing.T) {
+	t.Run("valid durations", testValidDurations)
+	t.Run("invalid durations", testInvalidDurations)
+}
+
+func testValidDurations(t *testing.T) {
 	tests := []struct {
-		name        string
-		input       string
-		expectValid bool
-		expected    time.Duration
-		expectError bool
+		name     string
+		input    string
+		expected time.Duration
 	}{
-		{
-			name:        "Valid Go duration - seconds",
-			input:       "30s",
-			expectValid: true,
-			expected:    30 * time.Second,
-			expectError: false,
-		},
-		{
-			name:        "Valid Go duration - minutes",
-			input:       "15m",
-			expectValid: true,
-			expected:    15 * time.Minute,
-			expectError: false,
-		},
-		{
-			name:        "Valid Go duration - hours",
-			input:       "2h",
-			expectValid: true,
-			expected:    2 * time.Hour,
-			expectError: false,
-		},
-		{
-			name:        "Valid Go duration - complex",
-			input:       "1h30m",
-			expectValid: true,
-			expected:    1*time.Hour + 30*time.Minute,
-			expectError: false,
-		},
-		{
-			name:        "Valid custom duration - single day",
-			input:       "1d",
-			expectValid: true,
-			expected:    24 * time.Hour,
-			expectError: false,
-		},
-		{
-			name:        "Valid custom duration - multiple days",
-			input:       "7d",
-			expectValid: true,
-			expected:    7 * 24 * time.Hour,
-			expectError: false,
-		},
-		{
-			name:        "Valid custom duration - fractional days",
-			input:       "1.5d",
-			expectValid: true,
-			expected:    36 * time.Hour,
-			expectError: false,
-		},
-		{
-			name:        "Valid custom duration - many days",
-			input:       "30d",
-			expectValid: true,
-			expected:    30 * 24 * time.Hour,
-			expectError: false,
-		},
-		{
-			name:        "Invalid duration - empty string",
-			input:       "",
-			expectValid: false,
-			expected:    0,
-			expectError: true,
-		},
-		{
-			name:        "Invalid duration - unsupported unit",
-			input:       "1w", // weeks not supported
-			expectValid: false,
-			expected:    0,
-			expectError: true,
-		},
-		{
-			name:        "Invalid duration - malformed days",
-			input:       "1.xd",
-			expectValid: false,
-			expected:    0,
-			expectError: true,
-		},
-		{
-			name:        "Invalid duration - negative days",
-			input:       "-1d",
-			expectValid: false,
-			expected:    0,
-			expectError: true,
-		},
-		{
-			name:        "Invalid duration - just unit",
-			input:       "d",
-			expectValid: false,
-			expected:    0,
-			expectError: true,
-		},
-		{
-			name:        "Whitespace handling - valid with spaces",
-			input:       " 7d ",
-			expectValid: true,
-			expected:    7 * 24 * time.Hour,
-			expectError: false,
-		},
+		{"Go duration - seconds", "30s", 30 * time.Second},
+		{"Go duration - minutes", "15m", 15 * time.Minute},
+		{"Go duration - hours", "2h", 2 * time.Hour},
+		{"Go duration - complex", "1h30m", 1*time.Hour + 30*time.Minute},
+		{"custom - single day", "1d", 24 * time.Hour},
+		{"custom - multiple days", "7d", 7 * 24 * time.Hour},
+		{"custom - fractional days", "1.5d", 36 * time.Hour},
+		{"custom - many days", "30d", 30 * 24 * time.Hour},
+		{"whitespace handling", " 7d ", 7 * 24 * time.Hour},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := ParseCustomDuration(tt.input)
+			if err != nil {
+				t.Errorf("Unexpected error for input '%s': %v", tt.input, err)
+				return
+			}
 
-			if tt.expectError {
-				if err == nil {
-					t.Errorf("Expected error for input '%s', but got none", tt.input)
+			if result != tt.expected {
+				t.Errorf("Expected %v for '%s', got %v", tt.expected, tt.input, result)
+			}
+		})
+	}
+}
 
-					return
-				}
+func testInvalidDurations(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+	}{
+		{"empty string", ""},
+		{"unsupported unit", "1w"},
+		{"malformed days", "1.xd"},
+		{"negative days", "-1d"},
+		{"just unit", "d"},
+	}
 
-				t.Logf("✓ Expected error for input '%s': %v", tt.input, err)
-			} else {
-				if err != nil {
-					t.Errorf("Unexpected error for input '%s': %v", tt.input, err)
-
-					return
-				}
-
-				if result != tt.expected {
-					t.Errorf(
-						"Expected duration %v for input '%s', but got %v",
-						tt.expected,
-						tt.input,
-						result,
-					)
-
-					return
-				}
-
-				t.Logf("✓ Parsed '%s' to %v", tt.input, result)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := ParseCustomDuration(tt.input)
+			if err == nil {
+				t.Errorf("Expected error for input '%s', but got none", tt.input)
 			}
 		})
 	}

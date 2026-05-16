@@ -313,7 +313,7 @@ func BenchmarkRoundTrip_CacheCleanupMode(b *testing.B) {
 // BenchmarkFullConfigMarshal benchmarks marshaling a complete configuration with enums.
 func BenchmarkFullConfigMarshal(b *testing.B) {
 	for b.Loop() {
-		_, err := yaml.Marshal(benchmarkTestConfig)
+		_, err := yaml.Marshal(benchmarkTestConfig) //nolint:musttag
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -354,7 +354,7 @@ profiles:
 	for b.Loop() {
 		var config Config
 
-		err := yaml.Unmarshal([]byte(yamlConfig), &config)
+		err := yaml.Unmarshal([]byte(yamlConfig), &config) //nolint:musttag
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -364,13 +364,13 @@ profiles:
 // BenchmarkFullConfigRoundTrip benchmarks marshal→unmarshal round-trip for complete configuration.
 func BenchmarkFullConfigRoundTrip(b *testing.B) {
 	for b.Loop() {
-		yamlBytes, err := yaml.Marshal(benchmarkTestConfig)
+		yamlBytes, err := yaml.Marshal(benchmarkTestConfig) //nolint:musttag
 		if err != nil {
 			b.Fatal(err)
 		}
 
 		var result Config
-		if err := yaml.Unmarshal(yamlBytes, &result); err != nil {
+		if err := yaml.Unmarshal(yamlBytes, &result); err != nil { //nolint:musttag
 			b.Fatal(err)
 		}
 	}
@@ -510,7 +510,7 @@ func BenchmarkBufferWrite_Config(b *testing.B) {
 	for b.Loop() {
 		var buf bytes.Buffer
 
-		err := yaml.NewEncoder(&buf).Encode(benchmarkTestConfig)
+		err := yaml.NewEncoder(&buf).Encode(benchmarkTestConfig) //nolint:musttag
 		if err != nil {
 			b.Fatal(err)
 		}

@@ -11,6 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const goosDarwin = "darwin"
+
 func TestGoCacheCleaner_getGoBuildCacheLocations(t *testing.T) {
 	t.Parallel()
 
@@ -49,7 +51,7 @@ func TestGoCacheCleaner_getGoBuildCacheLocations(t *testing.T) {
 			assert.Contains(t, locations, "/tmp", "should include /tmp")
 
 			// On macOS, verify Library/Caches is included
-			if runtime.GOOS == "darwin" {
+			if runtime.GOOS == goosDarwin {
 				homeDir := cleaner.helper.getHomeDir()
 				if homeDir != "" {
 					macosCache := filepath.Join(homeDir, "Library", "Caches")
@@ -89,7 +91,7 @@ func TestGoCacheCleaner_getGoBuildCacheLocations_MacOSDetection(t *testing.T) {
 
 	// On macOS, os.TempDir() returns something like /var/folders/xx/yyyyyy/T
 	// which is where go-build caches are actually stored
-	if runtime.GOOS == "darwin" {
+	if runtime.GOOS == goosDarwin {
 		tempDir := os.TempDir()
 		assert.Contains(t, locations, tempDir,
 			"on macOS, os.TempDir() should be included for go-build cache detection")

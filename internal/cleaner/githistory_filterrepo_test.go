@@ -79,7 +79,7 @@ func TestBuildFilterRepoCommand(t *testing.T) {
 	case FilterRepoNone:
 		t.Skip("No filter-repo provider available")
 	case FilterRepoNix:
-		if cmd.Path != "nix" && cmd.Args[0] != "nix" {
+		if cmd.Path != CleanerNix && cmd.Args[0] != CleanerNix {
 			t.Errorf("Expected nix command for Nix provider, got: %s", cmd.Path)
 		}
 	case FilterRepoSystem:

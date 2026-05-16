@@ -456,14 +456,14 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 	}
 
 	// Marshal to YAML
-	data, err := yaml.Marshal(settings)
+	data, err := yaml.Marshal(settings) //nolint:musttag
 	if err != nil {
 		t.Fatalf("Marshal() error = %v", err)
 	}
 
 	// Unmarshal from YAML
 	var unmarshaled OperationSettings
-	if err := yaml.Unmarshal(data, &unmarshaled); err != nil {
+	if err := yaml.Unmarshal(data, &unmarshaled); err != nil { //nolint:musttag
 		t.Fatalf("Unmarshal() error = %v", err)
 	}
 

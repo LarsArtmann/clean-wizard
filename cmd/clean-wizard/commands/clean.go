@@ -29,6 +29,8 @@ var (
 
 // NewCleanCommand creates a multi-cleaner command with TUI.
 func NewCleanCommand() *cobra.Command {
+	validateOperationTypeMapping()
+
 	var (
 		dryRun           bool
 		verbose          bool
@@ -236,7 +238,9 @@ var operationTypeToCleanerType = map[domain.OperationType]CleanerType{
 	domain.OperationTypeGolangciLintCache:            CleanerTypeGolangciLintCache,
 }
 
-func init() {
+// validateOperationTypeMapping panics at package init if operationTypeToCleanerType
+// references a CleanerType not present in cleanerMetadata.
+func validateOperationTypeMapping() {
 	for opType, cleanerType := range operationTypeToCleanerType {
 		if _, ok := cleanerMetadata[cleanerType]; !ok {
 			panic(

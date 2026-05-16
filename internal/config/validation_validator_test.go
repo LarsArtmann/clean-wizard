@@ -7,48 +7,7 @@ import (
 )
 
 func TestConfigValidator_ValidateConfig(t *testing.T) {
-	// Use less strict rules for testing
-	testRules := &ConfigValidationRules{
-		MaxDiskUsage: &ValidationRule[int]{
-			Required: true,
-			Min: func() *int {
-				i := 10
-
-				return &i
-			}(),
-			Max: func() *int {
-				i := 95
-
-				return &i
-			}(),
-			Message: "Max disk usage must be between 10% and 95%",
-		},
-		MinProtectedPaths: &ValidationRule[int]{
-			Required: true,
-			Min: func() *int {
-				i := 1
-
-				return &i
-			}(),
-			Message: "At least one protected path is required",
-		},
-		ProfileNamePattern: &ValidationRule[string]{
-			Required: true,
-			Pattern:  "^[a-zA-Z0-9_-]+$",
-			Message:  "Profile names must be alphanumeric with underscores and hyphens",
-		},
-		UniquePaths:    true,
-		UniqueProfiles: true,
-		ProtectedSystemPaths: []string{ // Reduced for tests
-			"/",
-			"/System",
-			"/Library",
-		},
-		RequireSafeMode: true,
-		MaxRiskLevel:    domain.RiskLevelHighType,
-		BackupRequired:  domain.RiskLevelMediumType,
-	}
-	validator := NewConfigValidatorWithRules(testRules)
+	validator := newTestValidator()
 
 	tests := []struct {
 		name        string
@@ -56,11 +15,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 		expectValid bool
 		expectError string
 	}{
-		{
-			name:        "valid config",
-			config:      CreateTestConfig(),
-			expectValid: true,
-		},
+		{name: "valid config", config: CreateTestConfig(), expectValid: true},
 		{
 			name:        "invalid max disk usage",
 			config:      CreateTestConfig(WithMaxDiskUsage(150)),
@@ -90,33 +45,84 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := validator.ValidateConfig(tt.config)
-
-			if result.IsValid != tt.expectValid {
-				t.Errorf("Expected validity: %v, got: %v", tt.expectValid, result.IsValid)
-
-				if !result.IsValid {
-					for _, err := range result.Errors {
-						t.Logf("Error: %s - %s", err.Field, err.Message)
-					}
-				}
-			}
-
-			if !tt.expectValid && tt.expectError != "" {
-				found := false
-
-				for _, err := range result.Errors {
-					if err.Field == tt.expectError {
-						found = true
-
-						break
-					}
-				}
-
-				if !found {
-					t.Errorf("Expected error in field: %s", tt.expectError)
-				}
-			}
+			assertValidationResult(t, result, tt.expectValid, tt.expectError)
 		})
+	}
+}
+
+func newTestValidator() *ConfigValidator {
+	testRules := &ConfigValidationRules{
+		MaxDiskUsage: &ValidationRule[int]{
+			Required: true,
+			Min: func() *int {
+				i := 10
+				return &i
+			}(),
+			Max: func() *int {
+				i := 95
+				return &i
+			}(),
+			Message: "Max disk usage must be between 10% and 95%",
+		},
+		MinProtectedPaths: &ValidationRule[int]{
+			Required: true,
+			Min: func() *int {
+				i := 1
+				return &i
+			}(),
+			Message: "At least one protected path is required",
+		},
+		ProfileNamePattern: &ValidationRule[string]{
+			Required: true,
+			Pattern:  "^[a-zA-Z0-9_-]+$",
+			Message:  "Profile names must be alphanumeric with underscores and hyphens",
+		},
+		UniquePaths:    true,
+		UniqueProfiles: true,
+		ProtectedSystemPaths: []string{
+			"/",
+			"/System",
+			"/Library",
+		},
+		RequireSafeMode: true,
+		MaxRiskLevel:    domain.RiskLevelHighType,
+		BackupRequired:  domain.RiskLevelMediumType,
+	}
+
+	return NewConfigValidatorWithRules(testRules)
+}
+
+func assertValidationResult(
+	t *testing.T,
+	result *ValidationResult,
+	expectValid bool,
+	expectError string,
+) {
+	t.Helper()
+
+	if result.IsValid != expectValid {
+		t.Errorf("Expected validity: %v, got: %v", expectValid, result.IsValid)
+
+		if !result.IsValid {
+			for _, err := range result.Errors {
+				t.Logf("Error: %s - %s", err.Field, err.Message)
+			}
+		}
+	}
+
+	if !expectValid && expectError != "" {
+		found := false
+
+		for _, err := range result.Errors {
+			if err.Field == expectError {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			t.Errorf("Expected error in field: %s", expectError)
+		}
 	}
 }
 

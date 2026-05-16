@@ -96,14 +96,14 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 
 		ginkgo.It("should detect clean working directory", func() {
 			// Make initial commit
-			createAndCommitFile(testCtx.repoPath, "README.md", "# Test Repository")
+			createAndCommitFile(testCtx.repoPath, "# Test Repository")
 			testCtx.safetyReport = testCtx.cleaner.GetSafetyReport(testCtx.ctx)
 			gomega.Expect(testCtx.safetyReport.HasUncommittedChanges).To(gomega.BeFalse())
 		})
 
 		ginkgo.It("should detect uncommitted changes", func() {
 			// Make initial commit
-			createAndCommitFile(testCtx.repoPath, "README.md", "# Test Repository")
+			createAndCommitFile(testCtx.repoPath, "# Test Repository")
 			// Create uncommitted file
 			_ = os.WriteFile(
 				filepath.Join(testCtx.repoPath, "uncommitted.txt"),
@@ -115,13 +115,13 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 		})
 
 		ginkgo.It("should detect protected branch (master/main)", func() {
-			createAndCommitFile(testCtx.repoPath, "README.md", "# Test Repository")
+			createAndCommitFile(testCtx.repoPath, "# Test Repository")
 			testCtx.safetyReport = testCtx.cleaner.GetSafetyReport(testCtx.ctx)
 			gomega.Expect(testCtx.safetyReport.IsProtectedBranch).To(gomega.BeTrue())
 		})
 
 		ginkgo.It("should check git-filter-repo availability", func() {
-			createAndCommitFile(testCtx.repoPath, "README.md", "# Test Repository")
+			createAndCommitFile(testCtx.repoPath, "# Test Repository")
 			testCtx.safetyReport = testCtx.cleaner.GetSafetyReport(testCtx.ctx)
 			// FilterRepoAvailable should match our detection
 			gomega.Expect(testCtx.safetyReport.FilterRepoAvailable).
@@ -130,7 +130,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 
 		ginkgo.It("should provide helpful install hint when git-filter-repo not available", func() {
 			if !testCtx.hasGitFilterRepo {
-				createAndCommitFile(testCtx.repoPath, "README.md", "# Test Repository")
+				createAndCommitFile(testCtx.repoPath, "# Test Repository")
 				testCtx.safetyReport = testCtx.cleaner.GetSafetyReport(testCtx.ctx)
 				gomega.Expect(testCtx.safetyReport.FilterRepoAvailable).To(gomega.BeFalse())
 				gomega.Expect(testCtx.safetyReport.Blockers).ToNot(gomega.BeEmpty())
@@ -148,7 +148,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 		})
 
 		ginkgo.It("should find no binary files in empty repository", func() {
-			createAndCommitFile(testCtx.repoPath, "README.md", "# Empty Repo")
+			createAndCommitFile(testCtx.repoPath, "# Empty Repo")
 			scanResult, err := testCtx.cleaner.GetScanResult(testCtx.ctx)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			gomega.Expect(scanResult.Files).To(gomega.BeEmpty())
@@ -343,10 +343,10 @@ func initGitRepo(path string) {
 	_ = cmd.Run()
 }
 
-func createAndCommitFile(repoPath, filename, content string) {
-	filePath := filepath.Join(repoPath, filename)
+func createAndCommitFile(repoPath, content string) {
+	filePath := filepath.Join(repoPath, "README.md")
 	_ = os.WriteFile(filePath, []byte(content), 0o644)
-	commitFile(repoPath, filename, "Add "+filename)
+	commitFile(repoPath, "README.md", "Add README.md")
 }
 
 func commitFile(repoPath, filename, message string) {

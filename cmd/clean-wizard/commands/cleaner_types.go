@@ -115,14 +115,14 @@ var cleanerMetadata = map[CleanerType]cleanerMetadataEntry{
 	},
 }
 
-var registryNameToCleanerType map[string]CleanerType
-
-func init() {
-	registryNameToCleanerType = make(map[string]CleanerType, len(cleanerMetadata))
+var registryNameToCleanerType = func() map[string]CleanerType {
+	m := make(map[string]CleanerType, len(cleanerMetadata))
 	for ct, meta := range cleanerMetadata {
-		registryNameToCleanerType[meta.RegistryName] = ct
+		m[meta.RegistryName] = ct
 	}
-}
+
+	return m
+}()
 
 func getCleanerName(cleanerType CleanerType) string {
 	if m, ok := cleanerMetadata[cleanerType]; ok {

@@ -238,117 +238,114 @@ func TestEnsureDetails(t *testing.T) {
 }
 
 func TestErrorDetailsBuilder(t *testing.T) {
-	t.Run("basic construction", func(t *testing.T) {
-		builder := NewErrorDetails()
-		if builder == nil {
-			t.Fatal("NewErrorDetails returned nil")
-		}
+	t.Run("basic construction", testBasicConstruction)
+	t.Run("WithField", testWithField)
+	t.Run("WithValue", testWithValue)
+	t.Run("WithExpected", testWithExpected)
+	t.Run("WithActual", testWithActual)
+	t.Run("WithOperation", testWithOperation)
+	t.Run("WithFilePath", testWithFilePath)
+	t.Run("WithLineNumber", testWithLineNumber)
+	t.Run("WithRetryCount", testWithRetryCount)
+	t.Run("WithDuration", testWithDuration)
+	t.Run("WithMetadata", testWithMetadata)
+	t.Run("fluent chaining", testFluentChaining)
+	t.Run("metadata initialized once", testMetadataInitializedOnce)
+}
 
-		details := builder.Build()
-		if details == nil {
-			t.Fatal("Build returned nil")
-		}
+func testBasicConstruction(t *testing.T) {
+	builder := NewErrorDetails()
+	if builder == nil {
+		t.Fatal("NewErrorDetails returned nil")
+	}
 
-		if details.Metadata == nil {
-			t.Error("Metadata should be initialized")
-		}
-	})
+	details := builder.Build()
+	if details == nil {
+		t.Fatal("Build returned nil")
+	}
 
-	t.Run("WithField", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithField("maxRisk").
-			Build()
-		if details.Field != "maxRisk" {
-			t.Errorf("Field = %q, want %q", details.Field, "maxRisk")
-		}
-	})
+	if details.Metadata == nil {
+		t.Error("Metadata should be initialized")
+	}
+}
 
-	t.Run("WithValue", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithValue("high").
-			Build()
-		if details.Value != "high" {
-			t.Errorf("Value = %q, want %q", details.Value, "high")
-		}
-	})
+func testWithField(t *testing.T) {
+	details := NewErrorDetails().WithField("maxRisk").Build()
+	if details.Field != "maxRisk" {
+		t.Errorf("Field = %q, want %q", details.Field, "maxRisk")
+	}
+}
 
-	t.Run("WithExpected", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithExpected("low").
-			Build()
-		if details.Expected != "low" {
-			t.Errorf("Expected = %q, want %q", details.Expected, "low")
-		}
-	})
+func testWithValue(t *testing.T) {
+	details := NewErrorDetails().WithValue("high").Build()
+	if details.Value != "high" {
+		t.Errorf("Value = %q, want %q", details.Value, "high")
+	}
+}
 
-	t.Run("WithActual", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithActual("medium").
-			Build()
-		if details.Actual != "medium" {
-			t.Errorf("Actual = %q, want %q", details.Actual, "medium")
-		}
-	})
+func testWithExpected(t *testing.T) {
+	details := NewErrorDetails().WithExpected("low").Build()
+	if details.Expected != "low" {
+		t.Errorf("Expected = %q, want %q", details.Expected, "low")
+	}
+}
 
-	t.Run("WithOperation", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithOperation("config_validation").
-			Build()
-		if details.Operation != "config_validation" {
-			t.Errorf("Operation = %q, want %q", details.Operation, "config_validation")
-		}
-	})
+func testWithActual(t *testing.T) {
+	details := NewErrorDetails().WithActual("medium").Build()
+	if details.Actual != "medium" {
+		t.Errorf("Actual = %q, want %q", details.Actual, "medium")
+	}
+}
 
-	t.Run("WithFilePath", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithFilePath("/etc/clean-wizard/config.yaml").
-			Build()
-		if details.FilePath != "/etc/clean-wizard/config.yaml" {
-			t.Errorf("FilePath = %q, want %q", details.FilePath, "/etc/clean-wizard/config.yaml")
-		}
-	})
+func testWithOperation(t *testing.T) {
+	details := NewErrorDetails().WithOperation("config_validation").Build()
+	if details.Operation != "config_validation" {
+		t.Errorf("Operation = %q, want %q", details.Operation, "config_validation")
+	}
+}
 
-	t.Run("WithLineNumber", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithLineNumber(42).
-			Build()
-		if details.LineNumber != 42 {
-			t.Errorf("LineNumber = %d, want %d", details.LineNumber, 42)
-		}
-	})
+func testWithFilePath(t *testing.T) {
+	details := NewErrorDetails().WithFilePath("/etc/clean-wizard/config.yaml").Build()
+	if details.FilePath != "/etc/clean-wizard/config.yaml" {
+		t.Errorf("FilePath = %q, want %q", details.FilePath, "/etc/clean-wizard/config.yaml")
+	}
+}
 
-	t.Run("WithRetryCount", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithRetryCount(3).
-			Build()
-		if details.RetryCount != 3 {
-			t.Errorf("RetryCount = %d, want %d", details.RetryCount, 3)
-		}
-	})
+func testWithLineNumber(t *testing.T) {
+	details := NewErrorDetails().WithLineNumber(42).Build()
+	if details.LineNumber != 42 {
+		t.Errorf("LineNumber = %d, want %d", details.LineNumber, 42)
+	}
+}
 
-	t.Run("WithDuration", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithDuration("500ms").
-			Build()
-		if details.Duration != "500ms" {
-			t.Errorf("Duration = %q, want %q", details.Duration, "500ms")
-		}
-	})
+func testWithRetryCount(t *testing.T) {
+	details := NewErrorDetails().WithRetryCount(3).Build()
+	if details.RetryCount != 3 {
+		t.Errorf("RetryCount = %d, want %d", details.RetryCount, 3)
+	}
+}
 
-	t.Run("WithMetadata", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithMetadata("key1", "value1").
-			WithMetadata("key2", "value2").
-			Build()
-		if details.Metadata["key1"] != "value1" {
-			t.Errorf("Metadata[key1] = %q, want %q", details.Metadata["key1"], "value1")
-		}
+func testWithDuration(t *testing.T) {
+	details := NewErrorDetails().WithDuration("500ms").Build()
+	if details.Duration != "500ms" {
+		t.Errorf("Duration = %q, want %q", details.Duration, "500ms")
+	}
+}
 
-		if details.Metadata["key2"] != "value2" {
-			t.Errorf("Metadata[key2] = %q, want %q", details.Metadata["key2"], "value2")
-		}
-	})
+func testWithMetadata(t *testing.T) {
+	details := NewErrorDetails().
+		WithMetadata("key1", "value1").
+		WithMetadata("key2", "value2").
+		Build()
+	if details.Metadata["key1"] != "value1" {
+		t.Errorf("Metadata[key1] = %q, want %q", details.Metadata["key1"], "value1")
+	}
+	if details.Metadata["key2"] != "value2" {
+		t.Errorf("Metadata[key2] = %q, want %q", details.Metadata["key2"], "value2")
+	}
+}
 
+func testFluentChaining(t *testing.T) {
 	fluentTests := []struct {
 		name          string
 		field         string
@@ -367,41 +364,22 @@ func TestErrorDetailsBuilder(t *testing.T) {
 		metadataCount int
 	}{
 		{
-			name:          "test values",
-			field:         "testField",
-			value:         "testValue",
-			expected:      "testExpected",
-			actual:        "testActual",
-			operation:     "testOp",
-			filePath:      "/test/path",
-			lineNumber:    100,
-			retryCount:    5,
-			duration:      "1s",
-			metadataKey1:  "mk",
-			metadataVal1:  "mv",
-			metadataCount: 1,
+			name: "test values", field: "testField", value: "testValue",
+			expected: "testExpected", actual: "testActual", operation: "testOp",
+			filePath: "/test/path", lineNumber: 100, retryCount: 5,
+			duration: "1s", metadataKey1: "mk", metadataVal1: "mv", metadataCount: 1,
 		},
 		{
-			name:          "config values",
-			field:         "config.path",
-			value:         "/invalid/path",
-			expected:      "valid/path",
-			actual:        "/invalid/path",
-			operation:     "config_validation",
-			filePath:      "/path/to/config.go",
-			lineNumber:    42,
-			retryCount:    3,
-			duration:      "500ms",
-			metadataKey1:  "env",
-			metadataVal1:  "production",
-			metadataKey2:  "user",
-			metadataVal2:  "admin",
-			metadataCount: 2,
+			name: "config values", field: "config.path", value: "/invalid/path",
+			expected: "valid/path", actual: "/invalid/path", operation: "config_validation",
+			filePath: "/path/to/config.go", lineNumber: 42, retryCount: 3,
+			duration: "500ms", metadataKey1: "env", metadataVal1: "production",
+			metadataKey2: "user", metadataVal2: "admin", metadataCount: 2,
 		},
 	}
 
 	for _, tt := range fluentTests {
-		t.Run("fluent chaining "+tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			builder := NewErrorDetails().
 				WithField(tt.field).
 				WithValue(tt.value).
@@ -420,29 +398,12 @@ func TestErrorDetailsBuilder(t *testing.T) {
 
 			details := builder.Build()
 
-			if details.Field != tt.field {
-				t.Errorf("Field = %q, want %q", details.Field, tt.field)
-			}
-
-			if details.Value != tt.value {
-				t.Errorf("Value = %q, want %q", details.Value, tt.value)
-			}
-
-			if details.Expected != tt.expected {
-				t.Errorf("Expected = %q, want %q", details.Expected, tt.expected)
-			}
-
-			if details.Actual != tt.actual {
-				t.Errorf("Actual = %q, want %q", details.Actual, tt.actual)
-			}
-
-			if details.Operation != tt.operation {
-				t.Errorf("Operation = %q, want %q", details.Operation, tt.operation)
-			}
-
-			if details.FilePath != tt.filePath {
-				t.Errorf("FilePath = %q, want %q", details.FilePath, tt.filePath)
-			}
+			assertField(t, "Field", details.Field, tt.field)
+			assertField(t, "Value", details.Value, tt.value)
+			assertField(t, "Expected", details.Expected, tt.expected)
+			assertField(t, "Actual", details.Actual, tt.actual)
+			assertField(t, "Operation", details.Operation, tt.operation)
+			assertField(t, "FilePath", details.FilePath, tt.filePath)
 
 			if details.LineNumber != tt.lineNumber {
 				t.Errorf("LineNumber = %d, want %d", details.LineNumber, tt.lineNumber)
@@ -452,9 +413,7 @@ func TestErrorDetailsBuilder(t *testing.T) {
 				t.Errorf("RetryCount = %d, want %d", details.RetryCount, tt.retryCount)
 			}
 
-			if details.Duration != tt.duration {
-				t.Errorf("Duration = %q, want %q", details.Duration, tt.duration)
-			}
+			assertField(t, "Duration", details.Duration, tt.duration)
 
 			if len(details.Metadata) != tt.metadataCount {
 				t.Errorf("Metadata length = %d, want %d", len(details.Metadata), tt.metadataCount)
@@ -463,35 +422,35 @@ func TestErrorDetailsBuilder(t *testing.T) {
 			if details.Metadata[tt.metadataKey1] != tt.metadataVal1 {
 				t.Errorf(
 					"Metadata[%s] = %q, want %q",
-					tt.metadataKey1,
-					details.Metadata[tt.metadataKey1],
-					tt.metadataVal1,
+					tt.metadataKey1, details.Metadata[tt.metadataKey1], tt.metadataVal1,
 				)
 			}
 
 			if tt.metadataKey2 != "" && details.Metadata[tt.metadataKey2] != tt.metadataVal2 {
 				t.Errorf(
 					"Metadata[%s] = %q, want %q",
-					tt.metadataKey2,
-					details.Metadata[tt.metadataKey2],
-					tt.metadataVal2,
+					tt.metadataKey2, details.Metadata[tt.metadataKey2], tt.metadataVal2,
 				)
 			}
 		})
 	}
+}
 
-	t.Run("metadata initialized once", func(t *testing.T) {
-		details := NewErrorDetails().
-			WithMetadata("key", "value").
-			Build()
-		if details.Metadata == nil {
-			t.Error("Metadata should not be nil")
-		}
+func testMetadataInitializedOnce(t *testing.T) {
+	details := NewErrorDetails().WithMetadata("key", "value").Build()
+	if details.Metadata == nil {
+		t.Error("Metadata should not be nil")
+	}
+	if len(details.Metadata) != 1 {
+		t.Errorf("Metadata length = %d, want %d", len(details.Metadata), 1)
+	}
+}
 
-		if len(details.Metadata) != 1 {
-			t.Errorf("Metadata length = %d, want %d", len(details.Metadata), 1)
-		}
-	})
+func assertField(t *testing.T, fieldName, got, want string) {
+	t.Helper()
+	if got != want {
+		t.Errorf("%s = %q, want %q", fieldName, got, want)
+	}
 }
 
 func requireCleanWizardError(t *testing.T, err error) *CleanWizardError {

@@ -263,8 +263,37 @@ func processRepository(
 ) error {
 	fmt.Println(InfoStyle.Render("\n📂 Repository: " + repoPath))
 
-	// Create cleaner
-	c := cleaner.NewGitHistoryCleaner(
+	c := newGitHistoryCleaner(repoPath, minSizeMB, maxFiles, verbose, dryRun, createBackup)
+
+	if !c.IsAvailable(ctx) {
+		return ErrGitNotAvailable
+	}
+
+	if err := runSafetyChecks(ctx, c); err != nil {
+		return err
+	}
+
+	selectedFiles, selectedSize, err := scanAndSelectFiles(ctx, c, force)
+	if err != nil {
+		return err
+	}
+
+	if len(selectedFiles) == 0 {
+		return nil
+	}
+
+	return confirmAndExecuteCleanup(
+		ctx, c, repoPath, selectedFiles, selectedSize,
+		dryRun, force,
+	)
+}
+
+func newGitHistoryCleaner(
+	repoPath string,
+	minSizeMB, maxFiles int,
+	verbose, dryRun, createBackup bool,
+) *cleaner.GitHistoryCleaner {
+	return cleaner.NewGitHistoryCleaner(
 		cleaner.WithGitHistoryRepoPath(repoPath),
 		cleaner.WithGitHistoryMinSizeMB(minSizeMB),
 		cleaner.WithGitHistoryMaxFiles(maxFiles),
@@ -272,13 +301,9 @@ func processRepository(
 		cleaner.WithGitHistoryDryRun(dryRun),
 		cleaner.WithGitHistoryCreateBackup(createBackup),
 	)
+}
 
-	// Check availability
-	if !c.IsAvailable(ctx) {
-		return ErrGitNotAvailable
-	}
-
-	// Run safety checks
+func runSafetyChecks(ctx context.Context, c *cleaner.GitHistoryCleaner) error {
 	fmt.Print("🔒 Running safety checks... ")
 
 	safetyReport := c.GetSafetyReport(ctx)
@@ -296,18 +321,25 @@ func processRepository(
 	fmt.Println(SuccessStyle.Render("PASSED"))
 	displaySafetyWarnings(safetyReport)
 
-	// Scan for binary files
+	return nil
+}
+
+func scanAndSelectFiles(
+	ctx context.Context,
+	c *cleaner.GitHistoryCleaner,
+	force bool,
+) ([]domain.GitHistoryFile, int64, error) {
 	fmt.Print("🔍 Scanning git history for binary files... ")
 
 	scanResult, err := c.GetScanResult(ctx)
 	if err != nil {
-		return fmt.Errorf("scan failed: %w", err)
+		return nil, 0, fmt.Errorf("scan failed: %w", err)
 	}
 
 	if len(scanResult.Files) == 0 {
 		fmt.Println(SuccessStyle.Render("No large binaries found!"))
 
-		return nil
+		return nil, 0, nil
 	}
 
 	fmt.Println(
@@ -320,25 +352,33 @@ func processRepository(
 		),
 	)
 
-	// Step 2: Show found files and let user select
 	selectedFiles, err := selectFilesToClean(scanResult.Files, force)
 	if err != nil {
-		return fmt.Errorf("selection error: %w", err)
+		return nil, 0, fmt.Errorf("selection error: %w", err)
 	}
 
 	if len(selectedFiles) == 0 {
 		fmt.Println("❌ No files selected. Nothing to do.")
 
-		return nil
+		return nil, 0, nil
 	}
 
-	// Calculate selected size
 	var selectedSize int64
 	for _, f := range selectedFiles {
 		selectedSize += f.SizeBytes
 	}
 
-	// Step 3: Show impact and get final confirmation
+	return selectedFiles, selectedSize, nil
+}
+
+func confirmAndExecuteCleanup(
+	ctx context.Context,
+	c *cleaner.GitHistoryCleaner,
+	repoPath string,
+	selectedFiles []domain.GitHistoryFile,
+	selectedSize int64,
+	dryRun, force bool,
+) error {
 	impact, err := c.EstimateImpact(ctx)
 	if err != nil {
 		fmt.Printf("Warning: could not estimate impact: %v\n", err)
@@ -351,8 +391,8 @@ func processRepository(
 		fmt.Println()
 	}
 
-	// Final confirmation
 	if !force && !dryRun {
+		safetyReport := c.GetSafetyReport(ctx)
 		if !confirmAction(repoPath, len(selectedFiles), selectedSize, safetyReport) {
 			fmt.Println("❌ Cancelled. No changes made.")
 
@@ -360,7 +400,6 @@ func processRepository(
 		}
 	}
 
-	// Step 4: Execute
 	c.SetSelectedFiles(selectedFiles)
 
 	fmt.Println("\n🧹 Starting cleanup...")
@@ -372,6 +411,7 @@ func processRepository(
 	}
 
 	cleanResult := result.Value()
+	safetyReport := c.GetSafetyReport(ctx)
 	displayCleanupResults(
 		cleanResult,
 		dryRun,

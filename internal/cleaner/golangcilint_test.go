@@ -156,32 +156,22 @@ func TestParseCacheStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := parseCacheStatus(tt.output)
-			if tt.hasError {
-				if err == nil {
-					t.Errorf("parseCacheStatus(%q) = %+v, want error", tt.output, result)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("parseCacheStatus(%q) returned error: %v", tt.output, err)
-				} else {
-					if result.Dir != tt.wantDir {
-						t.Errorf(
-							"parseCacheStatus(%q).Dir = %q, want %q",
-							tt.output,
-							result.Dir,
-							tt.wantDir,
-						)
-					}
 
-					if result.Size != tt.wantSize {
-						t.Errorf(
-							"parseCacheStatus(%q).Size = %d, want %d",
-							tt.output,
-							result.Size,
-							tt.wantSize,
-						)
-					}
-				}
+			switch {
+			case tt.hasError && err == nil:
+				t.Errorf("parseCacheStatus(%q) = %+v, want error", tt.output, result)
+			case !tt.hasError && err != nil:
+				t.Errorf("parseCacheStatus(%q) returned error: %v", tt.output, err)
+			case !tt.hasError && result.Dir != tt.wantDir:
+				t.Errorf(
+					"parseCacheStatus(%q).Dir = %q, want %q",
+					tt.output, result.Dir, tt.wantDir,
+				)
+			case !tt.hasError && result.Size != tt.wantSize:
+				t.Errorf(
+					"parseCacheStatus(%q).Size = %d, want %d",
+					tt.output, result.Size, tt.wantSize,
+				)
 			}
 		})
 	}

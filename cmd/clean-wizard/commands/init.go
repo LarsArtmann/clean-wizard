@@ -123,6 +123,8 @@ func createMinimalConfig() error {
 	return nil
 }
 
+const setupModeCustom = "custom"
+
 // createInteractiveConfig creates a configuration interactively using huh forms.
 func createInteractiveConfig() error {
 	fmt.Println(
@@ -130,25 +132,49 @@ func createInteractiveConfig() error {
 	)
 	fmt.Println()
 
-	// Interactive form for configuration options
-	var (
-		setupMode            string
-		includeNix           bool
-		includeHomebrew      bool
-		includeDocker        bool
-		includeNode          bool
-		includeGo            bool
-		includeDockerWarning bool
-	)
+	setupMode, err := selectSetupMode()
+	if err != nil {
+		return err
+	}
 
-	// Select setup mode
+	customOpts, err := maybeSelectCustomCleaners(setupMode)
+	if err != nil {
+		return err
+	}
+
+	cfg := buildConfigFromSetupMode(setupMode, customOpts)
+
+	if err := configureSafeMode(cfg); err != nil {
+		return err
+	}
+
+	if err := config.Save(cfg); err != nil {
+		return fmt.Errorf("failed to save configuration: %w", err)
+	}
+
+	printConfigSuccess(cfg)
+
+	return nil
+}
+
+type customCleanerOptions struct {
+	includeNix      bool
+	includeHomebrew bool
+	includeDocker   bool
+	includeNode     bool
+	includeGo       bool
+}
+
+func selectSetupMode() (string, error) {
+	var setupMode string
+
 	modeForm := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Title("How would you like to configure Clean Wizard?").
 				Options(
 					huh.NewOption("🎯 Quick Setup (Recommended)", "quick"),
-					huh.NewOption("⚙️  Custom Setup (Choose cleaners)", "custom"),
+					huh.NewOption("⚙️  Custom Setup (Choose cleaners)", setupModeCustom),
 					huh.NewOption("📦 Full Setup (All profiles)", "full"),
 				).
 				Value(&setupMode),
@@ -156,77 +182,85 @@ func createInteractiveConfig() error {
 	)
 
 	if err := modeForm.Run(); err != nil {
-		return fmt.Errorf("setup mode selection error: %w", err)
+		return "", fmt.Errorf("setup mode selection error: %w", err)
 	}
 
-	// If custom mode, let user select cleaners
-	if setupMode == "custom" {
-		cleanerForm := huh.NewForm(
-			huh.NewGroup(
-				huh.NewConfirm().
-					Title("Include Nix cleaner?").
-					Description("Clean old Nix store generations").
-					Value(&includeNix),
-				huh.NewConfirm().
-					Title("Include Homebrew cleaner?").
-					Description("Clean Homebrew cache and unused packages").
-					Value(&includeHomebrew),
-				huh.NewConfirm().
-					Title("Include Docker cleaner?").
-					Description("Clean Docker images, containers, and volumes").
-					Value(&includeDocker),
-				huh.NewConfirm().
-					Title("Include Node.js cleaner?").
-					Description("Clean npm, pnpm, yarn, bun caches").
-					Value(&includeNode),
-				huh.NewConfirm().
-					Title("Include Go cleaner?").
-					Description("Clean Go module and build caches").
-					Value(&includeGo),
-			),
-		)
+	return setupMode, nil
+}
 
-		err := cleanerForm.Run()
+func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) {
+	if setupMode != setupModeCustom {
+		return &customCleanerOptions{}, nil
+	}
+
+	var opts customCleanerOptions
+
+	cleanerForm := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title("Include Nix cleaner?").
+				Description("Clean old Nix store generations").
+				Value(&opts.includeNix),
+			huh.NewConfirm().
+				Title("Include Homebrew cleaner?").
+				Description("Clean Homebrew cache and unused packages").
+				Value(&opts.includeHomebrew),
+			huh.NewConfirm().
+				Title("Include Docker cleaner?").
+				Description("Clean Docker images, containers, and volumes").
+				Value(&opts.includeDocker),
+			huh.NewConfirm().
+				Title("Include Node.js cleaner?").
+				Description("Clean npm, pnpm, yarn, bun caches").
+				Value(&opts.includeNode),
+			huh.NewConfirm().
+				Title("Include Go cleaner?").
+				Description("Clean Go module and build caches").
+				Value(&opts.includeGo),
+		),
+	)
+
+	if err := cleanerForm.Run(); err != nil {
+		return nil, fmt.Errorf("cleaner selection error: %w", err)
+	}
+
+	if opts.includeDocker {
+		var includeDockerWarning bool
+
+		err := newConfirmForm(
+			"⚠️  Docker cleaner warning",
+			"This will remove unused Docker images and volumes. Continue?",
+			"Yes, I understand",
+			"No, skip Docker",
+			&includeDockerWarning,
+		).Run()
 		if err != nil {
-			return fmt.Errorf("cleaner selection error: %w", err)
+			return nil, fmt.Errorf("docker warning error: %w", err)
 		}
 
-		// Warn about Docker if selected
-		if includeDocker {
-			err := newConfirmForm(
-				"⚠️  Docker cleaner warning",
-				"This will remove unused Docker images and volumes. Continue?",
-				"Yes, I understand",
-				"No, skip Docker",
-				&includeDockerWarning,
-			).Run()
-			if err != nil {
-				return fmt.Errorf("docker warning error: %w", err)
-			}
-
-			includeDocker = includeDockerWarning
-		}
+		opts.includeDocker = includeDockerWarning
 	}
 
-	// Create configuration based on selections
+	return &opts, nil
+}
+
+func buildConfigFromSetupMode(setupMode string, customOpts *customCleanerOptions) *domain.Config {
 	cfg := config.GetDefaultConfig()
 
 	switch setupMode {
 	case "quick":
-		// Quick setup: daily profile only with safe cleaners
 		cfg.Profiles = map[string]*domain.Profile{
 			"daily": createDailyProfile(),
 		}
-	case "custom":
+	case setupModeCustom:
 		cfg.Profiles = createCustomProfile(
-			includeNix,
-			includeHomebrew,
-			includeDocker,
-			includeNode,
-			includeGo,
+			customOpts.includeNix,
+			customOpts.includeHomebrew,
+			customOpts.includeDocker,
+			customOpts.includeNode,
+			customOpts.includeGo,
 		)
 	case "full":
-		// Full setup: all profiles
 		cfg.Profiles = map[string]*domain.Profile{
 			"daily":      createDailyProfile(),
 			"weekly":     createWeeklyProfile(),
@@ -234,7 +268,10 @@ func createInteractiveConfig() error {
 		}
 	}
 
-	// Ask about safe mode
+	return cfg
+}
+
+func configureSafeMode(cfg *domain.Config) error {
 	safeMode := true
 
 	if err := newConfirmForm(
@@ -252,13 +289,10 @@ func createInteractiveConfig() error {
 		cfg.SafeMode = domain.SafeModeDisabled
 	}
 
-	// Save configuration
-	err := config.Save(cfg)
-	if err != nil {
-		return fmt.Errorf("failed to save configuration: %w", err)
-	}
+	return nil
+}
 
-	// Show success message
+func printConfigSuccess(cfg *domain.Config) {
 	fmt.Println()
 	fmt.Println(SuccessStyle.Render("✅ Configuration created successfully!"))
 	fmt.Println()
@@ -282,8 +316,6 @@ func createInteractiveConfig() error {
 	fmt.Println("   clean-wizard scan               - Scan for cleanable items")
 	fmt.Println("   clean-wizard profile list       - List available profiles")
 	fmt.Println("   clean-wizard config show        - View current configuration")
-
-	return nil
 }
 
 // createDailyProfile creates the daily cleanup profile.
@@ -469,8 +501,8 @@ func createCustomProfile(
 	})
 
 	return map[string]*domain.Profile{
-		"custom": {
-			Name:        "custom",
+		setupModeCustom: {
+			Name:        setupModeCustom,
 			Description: "Custom cleanup profile",
 			Enabled:     domain.ProfileStatusEnabled,
 			Operations:  operations,

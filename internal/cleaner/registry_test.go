@@ -72,7 +72,7 @@ func TestRegistry_RegisterAndGet(t *testing.T) {
 }
 
 // setupRegistryWithTwoCleaners creates a registry with two mock cleaners registered.
-func setupRegistryWithTwoCleaners() (*Registry, *mockCleaner, *mockCleaner) {
+func setupRegistryWithTwoCleaners() *Registry {
 	registry := NewRegistry()
 	cleaner1 := &mockCleaner{name: "test1", available: true}
 	cleaner2 := &mockCleaner{name: "test2", available: false}
@@ -80,11 +80,11 @@ func setupRegistryWithTwoCleaners() (*Registry, *mockCleaner, *mockCleaner) {
 	registry.Register("test1", cleaner1)
 	registry.Register("test2", cleaner2)
 
-	return registry, cleaner1, cleaner2
+	return registry
 }
 
 func TestRegistry_List(t *testing.T) {
-	registry, _, _ := setupRegistryWithTwoCleaners()
+	registry := setupRegistryWithTwoCleaners()
 
 	list := registry.List()
 	assert.Len(t, list, 2)
@@ -92,7 +92,7 @@ func TestRegistry_List(t *testing.T) {
 }
 
 func TestRegistry_Names(t *testing.T) {
-	registry, _, _ := setupRegistryWithTwoCleaners()
+	registry := setupRegistryWithTwoCleaners()
 
 	names := registry.Names()
 	assert.Len(t, names, 2)
