@@ -67,7 +67,7 @@ func runNixCleaner(ctx context.Context, dryRun, verbose bool) (domain.CleanResul
 	result := nixAdapter.CleanOldGenerations(ctx, keepCount)
 
 	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
+		return domain.CleanResult{}, fmt.Errorf("cleaner failed: %w", result.Error())
 	}
 
 	return result.Value(), nil
@@ -108,7 +108,7 @@ func runGenericCleaner(
 
 	result := cleanerInstance.Clean(ctx)
 	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
+		return domain.CleanResult{}, fmt.Errorf("cleaner failed: %w", result.Error())
 	}
 
 	return result.Value(), nil
@@ -127,7 +127,7 @@ func runGenericCleanerWithError(
 
 	result := cleanerInstance.Clean(ctx)
 	if result.IsErr() {
-		return domain.CleanResult{}, result.Error()
+		return domain.CleanResult{}, fmt.Errorf("cleaner failed: %w", result.Error())
 	}
 
 	return result.Value(), nil
@@ -238,7 +238,7 @@ func hasOtherGoProcesses() bool {
 func isProcessRunning(name string) bool {
 	// Use pgrep on Unix systems to check for processes
 	// Exclude the current clean-wizard process itself
-	cmd := exec.Command("pgrep", "-x", name)
+	cmd := exec.CommandContext(context.Background(), "pgrep", "-x", name)
 
 	output, err := cmd.Output()
 	if err != nil {

@@ -1,6 +1,7 @@
 package version
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -75,7 +76,7 @@ func generateVersion() string {
 
 // getGitCommit returns the current git commit hash.
 func getGitCommit() string {
-	cmd := exec.Command("git", "rev-parse", "--short", "HEAD")
+	cmd := exec.CommandContext(context.Background(), "git", "rev-parse", "--short", "HEAD")
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -87,7 +88,7 @@ func getGitCommit() string {
 
 // getGitTag returns the current git tag if available.
 func getGitTag() string {
-	cmd := exec.Command("git", "describe", "--tags", "--exact-match", "HEAD")
+	cmd := exec.CommandContext(context.Background(), "git", "describe", "--tags", "--exact-match", "HEAD")
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -99,7 +100,7 @@ func getGitTag() string {
 
 // isGitDirty returns true if there are uncommitted changes.
 func isGitDirty() bool {
-	cmd := exec.Command("git", "status", "--porcelain")
+	cmd := exec.CommandContext(context.Background(), "git", "status", "--porcelain")
 
 	output, err := cmd.Output()
 	if err != nil {

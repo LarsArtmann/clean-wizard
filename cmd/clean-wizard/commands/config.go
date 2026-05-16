@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"context"
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -144,7 +145,7 @@ func runConfigEditCommand(_ *cobra.Command, _ []string) error {
 	fmt.Println()
 
 	// Open editor
-	editCmd := exec.Command(editor, configPath)
+	editCmd := exec.CommandContext(context.Background(), editor, configPath)
 	editCmd.Stdout = os.Stdout
 	editCmd.Stderr = os.Stderr
 	editCmd.Stdin = os.Stdin

@@ -22,7 +22,8 @@ func ExecWithTimeout(
 		return exec.CommandContext(ctx, name, args...)
 	}
 
-	timeoutCtx, _ := context.WithTimeout(ctx, timeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
 	return exec.CommandContext(timeoutCtx, name, args...)
 }
@@ -41,7 +42,8 @@ func (n *NixAdapter) execWithTimeout(ctx context.Context, name string, arg ...st
 		timeout = DefaultTimeout
 	}
 
-	timeoutCtx, _ := context.WithTimeout(ctx, timeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
 	return exec.CommandContext(timeoutCtx, name, arg...)
 }
