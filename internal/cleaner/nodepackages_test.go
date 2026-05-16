@@ -299,7 +299,5 @@ func TestGetHomeDir(t *testing.T) {
 	_, err = GetHomeDir()
 	// On systems where user.Current() succeeds, this won't error
 	// This test only validates that error handling exists
-	if err != nil {
-		// Good - error handling works
-	}
+	_ = err
 }

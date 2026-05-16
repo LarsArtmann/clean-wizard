@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const neverStr = "never"
+
 var (
 	zeroTime = time.Time{}
 	testDate = time.Date(2023, 12, 25, 10, 30, 45, 0, time.UTC)
@@ -15,7 +17,7 @@ var commonTimeTests = []struct {
 	input    time.Time
 	expected string
 }{
-	{"zero time", zeroTime, "never"},
+	{"zero time", zeroTime, neverStr},
 	{"unix epoch", time.Unix(0, 0), ""},
 }
 
@@ -145,9 +147,9 @@ func TestDateTime(t *testing.T) {
 		func(t *testing.T, result string, tt dateTimeTestStruct) {
 			t.Helper()
 
-			if tt.expected == "never" && result != "never" {
+			if tt.expected == neverStr && result != neverStr {
 				t.Errorf("DateTime(%v) = %v, want %v", tt.input, result, tt.expected)
-			} else if tt.expected != "never" {
+			} else if tt.expected != neverStr {
 				if len(result) < 19 {
 					t.Errorf("DateTime(%v) = %v, expected at least 19 characters", tt.input, result)
 				}

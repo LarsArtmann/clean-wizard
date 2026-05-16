@@ -7,6 +7,8 @@ import (
 )
 
 // analyzeConfigChanges analyzes differences between current and proposed configuration.
+const protectedField = "protected"
+
 func (vm *ValidationMiddleware) analyzeConfigChanges(
 	current, proposed *domain.Config,
 ) []ConfigChange {
@@ -16,7 +18,7 @@ func (vm *ValidationMiddleware) analyzeConfigChanges(
 	changes = append(changes, vm.analyzeSimpleFieldChanges(current, proposed)...)
 
 	// Analyze protected paths
-	pathsChanges := vm.analyzePathChanges("protected", current.Protected, proposed.Protected)
+	pathsChanges := vm.analyzePathChanges(protectedField, current.Protected, proposed.Protected)
 	changes = append(changes, pathsChanges...)
 
 	// Analyze profiles
@@ -27,6 +29,7 @@ func (vm *ValidationMiddleware) analyzeConfigChanges(
 }
 
 // analyzePathChanges analyzes path array changes.
+
 func (vm *ValidationMiddleware) analyzePathChanges(
 	field string,
 	current, proposed []string,
@@ -61,6 +64,7 @@ func (vm *ValidationMiddleware) analyzePathChanges(
 
 // collectPathChanges collects path changes based on operation type.
 // isAdded determines the OldValue/NewValue ordering: true = added (nil→path), false = removed (path→nil).
+
 func (vm *ValidationMiddleware) collectPathChanges(
 	paths []string,
 	existingSet map[string]bool,
@@ -92,6 +96,7 @@ func (vm *ValidationMiddleware) collectPathChanges(
 }
 
 // analyzeProfileChanges analyzes profile map changes.
+
 func (vm *ValidationMiddleware) analyzeProfileChanges(
 	current, proposed map[string]*domain.Profile,
 ) []ConfigChange {
@@ -191,7 +196,7 @@ func (vm *ValidationMiddleware) assessChangeRisk(
 		}
 
 		return domain.RiskLevelLowType
-	case "protected":
+	case protectedField:
 		if newVal == nil {
 			return domain.RiskLevelCriticalType
 		}
@@ -224,6 +229,7 @@ func (vm *ValidationMiddleware) makeStringSet(slice []string) map[string]bool {
 }
 
 // analyzeSimpleFieldChanges analyzes changes for simple comparable fields.
+
 func (vm *ValidationMiddleware) analyzeSimpleFieldChanges(
 	current, proposed *domain.Config,
 ) []ConfigChange {
@@ -251,6 +257,7 @@ func (vm *ValidationMiddleware) analyzeSimpleFieldChanges(
 }
 
 // createFieldChange creates a ConfigChange for a field comparison.
+
 func (vm *ValidationMiddleware) createFieldChange(
 	field string,
 	oldValue, newValue any,

@@ -88,7 +88,14 @@ func getGitCommit() string {
 
 // getGitTag returns the current git tag if available.
 func getGitTag() string {
-	cmd := exec.CommandContext(context.Background(), "git", "describe", "--tags", "--exact-match", "HEAD")
+	cmd := exec.CommandContext(
+		context.Background(),
+		"git",
+		"describe",
+		"--tags",
+		"--exact-match",
+		"HEAD",
+	)
 
 	output, err := cmd.Output()
 	if err != nil {

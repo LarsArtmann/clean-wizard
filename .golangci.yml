@@ -109,8 +109,6 @@ linters:
           disabled: true
         - name: package-comments
           disabled: true
-        - name: stutter
-          disabled: true
     wrapcheck:
       ignorePackageGlobs:
         - github.com/LarsArtmann/clean-wizard/internal/*

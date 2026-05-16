@@ -85,10 +85,10 @@ func WithExcludePaths(paths []string) GitHistoryScannerOption {
 }
 
 // WithMaxFiles sets the maximum number of files to return.
-func WithMaxFiles(max int) GitHistoryScannerOption {
+func WithMaxFiles(maxFiles int) GitHistoryScannerOption {
 	return func(s *GitHistoryScanner) {
-		if max > 0 {
-			s.maxFiles = max
+		if maxFiles > 0 {
+			s.maxFiles = maxFiles
 		}
 	}
 }

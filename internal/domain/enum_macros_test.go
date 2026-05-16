@@ -20,6 +20,7 @@ type enumMacroTestCase struct {
 
 // assertEnumUnmarshalResult is a helper that runs assertions on enum unmarshal results.
 func assertEnumUnmarshalResult(t *testing.T, tc enumMacroTestCase, err error, val int) {
+	t.Helper()
 	if tc.wantErr {
 		assert.Error(t, err)
 	} else {

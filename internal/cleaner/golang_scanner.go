@@ -16,6 +16,9 @@ type GoScanner struct {
 }
 
 // NewGoScanner creates a new GoScanner.
+
+const goBuildCachePattern = "go-build*"
+
 func NewGoScanner(verbose bool) *GoScanner {
 	return &GoScanner{
 		verbose: verbose,
@@ -24,6 +27,7 @@ func NewGoScanner(verbose bool) *GoScanner {
 }
 
 // Scan scans for all enabled cache types.
+
 func (gs *GoScanner) Scan(
 	ctx context.Context,
 	caches GoCacheType,
@@ -54,16 +58,19 @@ func (gs *GoScanner) Scan(
 }
 
 // scanGoCache scans GOCACHE.
+
 func (gs *GoScanner) scanGoCache(ctx context.Context) []domain.ScanItem {
 	return gs.scanGoEnvCache(ctx, "GOCACHE", "Go cache")
 }
 
 // scanGoModCache scans GOMODCACHE.
+
 func (gs *GoScanner) scanGoModCache(ctx context.Context) []domain.ScanItem {
 	return gs.scanGoEnvCache(ctx, "GOMODCACHE", "Go module cache")
 }
 
 // addScanItem creates a scan item for a cache directory and appends it to items.
+
 func (gs *GoScanner) addScanItem(
 	items []domain.ScanItem,
 	path, cacheName string,
@@ -83,6 +90,7 @@ func (gs *GoScanner) addScanItem(
 }
 
 // scanGoEnvCache scans a Go environment variable cache path.
+
 func (gs *GoScanner) scanGoEnvCache(
 	ctx context.Context,
 	envVar, cacheName string,
@@ -98,9 +106,10 @@ func (gs *GoScanner) scanGoEnvCache(
 }
 
 // scanGoBuildCache scans go-build* folders.
+
 func (gs *GoScanner) scanGoBuildCache() []domain.ScanItem {
 	items := make([]domain.ScanItem, 0)
-	buildCachePattern := "go-build*"
+	buildCachePattern := goBuildCachePattern
 
 	tempDir := filepath.Join("/", "tmp", "build")
 	if homeDir := gs.helper.getHomeDir(); homeDir != "" {
@@ -118,6 +127,7 @@ func (gs *GoScanner) scanGoBuildCache() []domain.ScanItem {
 }
 
 // scanLintCache scans for golangci-lint cache.
+
 func (gs *GoScanner) scanLintCache() []domain.ScanItem {
 	items := make([]domain.ScanItem, 0)
 
@@ -130,6 +140,7 @@ func (gs *GoScanner) scanLintCache() []domain.ScanItem {
 }
 
 // detectLintCacheDir finds golangci-lint cache directory.
+
 func (gs *GoScanner) detectLintCacheDir() string {
 	// Try XDG_CACHE_HOME first
 	if xdgCache := gs.helper.getEnv("XDG_CACHE_HOME"); xdgCache != "" {

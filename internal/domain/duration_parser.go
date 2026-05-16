@@ -60,7 +60,12 @@ func parseDaysDuration(durationStr string) (time.Duration, error) {
 	hours := days * HoursPerDay
 	goDurationStr := fmt.Sprintf("%.0fh", hours)
 
-	return time.ParseDuration(goDurationStr)
+	dur, err := time.ParseDuration(goDurationStr)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse duration %q: %w", goDurationStr, err)
+	}
+
+	return dur, nil
 }
 
 // parseComplexDuration parses combined durations like "7d12h".

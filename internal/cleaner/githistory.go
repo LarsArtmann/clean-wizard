@@ -107,9 +107,9 @@ func WithGitHistoryExcludePaths(paths []string) GitHistoryCleanerOption {
 }
 
 // WithGitHistoryMaxFiles sets the maximum number of files to show.
-func WithGitHistoryMaxFiles(max int) GitHistoryCleanerOption {
+func WithGitHistoryMaxFiles(maxFiles int) GitHistoryCleanerOption {
 	return func(c *GitHistoryCleaner) {
-		c.maxFiles = max
+		c.maxFiles = maxFiles
 	}
 }
 
@@ -249,7 +249,7 @@ func (c *GitHistoryCleaner) ensureSelectedFiles(ctx context.Context) error {
 // emptyResult returns a result for when there are no files to clean.
 func (c *GitHistoryCleaner) emptyResult() result.Result[domain.CleanResult] {
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.CleanStrategyType(domain.StrategyConservativeType),
+		domain.StrategyConservativeType,
 		0, 0,
 		domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
 	))
@@ -273,7 +273,7 @@ func (c *GitHistoryCleaner) executeDryRun(totalBytes int64) result.Result[domain
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.CleanStrategyType(domain.StrategyDryRunType),
+		domain.StrategyDryRunType,
 		len(c.selectedFiles), totalBytes,
 		domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
 	))
@@ -302,7 +302,7 @@ func (c *GitHistoryCleaner) executeClean(
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.CleanStrategyType(domain.StrategyAggressiveType),
+		domain.StrategyAggressiveType,
 		len(execResult.FilesRemoved),
 		execResult.BytesRemoved,
 		domain.SizeEstimate{
@@ -383,7 +383,7 @@ func FindGitRepositories(basePath string, maxDepth int) ([]string, error) {
 
 	entries, err := os.ReadDir(basePath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read directory %s: %w", basePath, err)
 	}
 
 	for _, entry := range entries {

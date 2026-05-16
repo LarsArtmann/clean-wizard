@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+const unknownStr = "unknown"
+
 func TestGet(t *testing.T) {
 	info := Get()
 
@@ -45,12 +47,12 @@ func TestGenerateVersion(t *testing.T) {
 func TestGetGitCommit(t *testing.T) {
 	commit := getGitCommit()
 
-	// Should return "unknown" or a valid commit hash
+	// Should return unknownStr or a valid commit hash
 	if commit == "" {
 		t.Error("Commit should not be empty")
 	}
 
-	if commit != "unknown" && len(commit) < 4 {
+	if commit != unknownStr && len(commit) < 4 {
 		t.Errorf("Commit hash too short: %s", commit)
 	}
 }

@@ -91,5 +91,10 @@ func CleanResultsToJSON(
 	// Set human-readable freed space
 	output.FreedHuman = Bytes(int64(output.FreedBytes))
 
-	return json.MarshalIndent(output, "", "  ")
+	data, err := json.MarshalIndent(output, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal JSON output: %w", err)
+	}
+
+	return data, nil
 }

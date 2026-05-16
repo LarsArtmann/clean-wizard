@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
 	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
@@ -483,14 +482,4 @@ func createCustomProfile(
 // This is a wrapper around config.GetDefaultConfig for use in commands.
 func GetDefaultConfig() *domain.Config {
 	return config.GetDefaultConfig()
-}
-
-// init ensures we check for terminal support.
-func init() {
-	// Check if we're in an interactive terminal
-	if fi, err := os.Stdin.Stat(); err == nil {
-		if (fi.Mode() & os.ModeCharDevice) == 0 {
-			// Non-interactive mode, use minimal config by default
-		}
-	}
 }

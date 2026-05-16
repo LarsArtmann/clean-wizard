@@ -33,7 +33,7 @@ func loadConfig(
 		logger.Warn("Could not load configuration, using defaults", "error", err)
 
 		if propagateErrors {
-			return nil, err
+			return nil, fmt.Errorf("failed to load configuration: %w", err)
 		}
 
 		// Graceful degradation: return default config

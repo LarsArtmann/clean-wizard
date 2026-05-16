@@ -424,7 +424,7 @@ func selectFilesToClean(
 
 	err := form.Run()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("file selection form failed: %w", err)
 	}
 
 	// Collect selected files
@@ -520,7 +520,7 @@ func ScanRepoForDisplay(ctx context.Context, repoPath string, minSizeMB int) (*S
 
 	scanResult, err := c.GetScanResult(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan failed: %w", err)
 	}
 
 	repoSize := c.GetStoreSize(ctx)

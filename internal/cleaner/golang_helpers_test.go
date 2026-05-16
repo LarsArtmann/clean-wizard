@@ -32,9 +32,7 @@ func TestGolangHelpers_getHomeDir(t *testing.T) {
 	home = helper.getHomeDir()
 	// On systems where user.Current() succeeds, this will return the real home
 	// The function handles errors by returning empty string
-	if home != "" {
-		// Good - system user fallback works
-	}
+	_ = home
 }
 
 func TestGolangHelpers_getDirSize(t *testing.T) {

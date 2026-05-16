@@ -174,7 +174,7 @@ func CreateWeeklyProfile() *domain.Profile {
 			{
 				Name:        "nix-generations",
 				Description: "Deep Nix cleanup",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+				RiskLevel:   domain.RiskLevelMediumType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings: &domain.OperationSettings{
 					NixGenerations: &domain.NixGenerationsSettings{
@@ -247,7 +247,7 @@ func CreateBenchmarkConfig() *domain.Config {
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+						RiskLevel:   domain.RiskLevelMediumType,
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							TempFiles: &domain.TempFilesSettings{
@@ -260,7 +260,7 @@ func CreateBenchmarkConfig() *domain.Config {
 					{
 						Name:        "system-temp",
 						Description: "Clean system temp",
-						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+						RiskLevel:   domain.RiskLevelMediumType,
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							SystemTemp: &domain.SystemTempSettings{
@@ -305,7 +305,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+						RiskLevel:   domain.RiskLevelMediumType,
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							TempFiles: &domain.TempFilesSettings{
@@ -329,7 +329,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "system-temp",
 						Description: "Clean system temp",
-						RiskLevel:   domain.RiskLevelType(domain.RiskLevelMediumType),
+						RiskLevel:   domain.RiskLevelMediumType,
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							SystemTemp: &domain.SystemTempSettings{
