@@ -233,9 +233,16 @@ func (pf *ParallelFlow[T]) Failed() map[string]error {
 	failed := make(map[string]error)
 
 	pf.results.Range(func(key, value any) bool {
-		result := value.(Result[T])
+		result, ok := value.(Result[T])
+		if !ok {
+			return true
+		}
+		keyStr, ok := key.(string)
+		if !ok {
+			return true
+		}
 		if result.IsErr() {
-			failed[key.(string)] = result.Error()
+			failed[keyStr] = result.Error()
 		}
 
 		return true
