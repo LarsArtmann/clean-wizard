@@ -152,7 +152,7 @@ docker_manifests:
 nfpms:
   - id: default
     package_name: clean-wizard
-    file_name_template: "{"{"} .ConventionalFileName {"}"}"
+    file_name_template: "{{ .ConventionalFileName }}
     homepage: https://github.com/LarsArtmann/clean-wizard
     description: "Comprehensive CLI/TUI tool for system cleanup"
     license: MIT
