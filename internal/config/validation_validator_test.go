@@ -45,8 +45,8 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 			"/Library",
 		},
 		RequireSafeMode: true,
-		MaxRiskLevel:    domain.RiskLevelType(domain.RiskLevelHighType),
-		BackupRequired:  domain.RiskLevelType(domain.RiskLevelMediumType),
+		MaxRiskLevel:    domain.RiskLevelHighType,
+		BackupRequired:  domain.RiskLevelMediumType,
 	}
 	validator := NewConfigValidatorWithRules(testRules)
 

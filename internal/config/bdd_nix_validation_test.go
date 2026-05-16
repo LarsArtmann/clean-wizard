@@ -111,9 +111,7 @@ func newInvalidValidationThen(errorSubstring string) []BDDThen {
 	return []BDDThen{
 		{
 			Description: "validation should fail",
-			Validate: func(result *ValidationResult) error {
-				return assertInvalidResult(result)
-			},
+			Validate:    assertInvalidResult,
 		},
 		{
 			Description: "validation errors should be present",
@@ -171,9 +169,7 @@ func newSecurityErrorValidationThen() []BDDThen {
 	return []BDDThen{
 		{
 			Description: "validation should fail with security error",
-			Validate: func(result *ValidationResult) error {
-				return assertInvalidResult(result)
-			},
+			Validate:    assertInvalidResult,
 		},
 		{
 			Description: "security validation error should be present",

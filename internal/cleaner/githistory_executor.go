@@ -161,9 +161,8 @@ func (e *GitHistoryExecutor) runFilterRepo(
 	defer cancel()
 
 	// Build arguments for git-filter-repo
-	args := []string{
-		"--force", // Required for non-fresh clones
-	}
+	args := make([]string, 0, 1+2*len(files)+1)
+	args = append(args, "--force")
 
 	// Add paths to remove
 	for _, file := range files {

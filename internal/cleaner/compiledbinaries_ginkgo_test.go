@@ -94,7 +94,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 	ginkgo.AfterEach(func() {
 		if tempDir != "" {
-			os.RemoveAll(tempDir)
+			_ = os.RemoveAll(tempDir)
 		}
 	})
 
@@ -673,7 +673,7 @@ var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 
 	ginkgo.AfterEach(func() {
 		if tempDir != "" {
-			os.RemoveAll(tempDir)
+			_ = os.RemoveAll(tempDir)
 		}
 	})
 
@@ -879,7 +879,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner Integration", func() {
 		tmpDir, err := os.MkdirTemp("", "integration-test-*")
 		gomega.Expect(err).ToNot(gomega.HaveOccurred())
 
-		defer os.RemoveAll(tmpDir)
+		defer func() { _ = os.RemoveAll(tmpDir) }()
 
 		execFile := filepath.Join(tmpDir, "test-binary")
 		err = os.WriteFile(execFile, make([]byte, 15*1024*1024), 0o755)

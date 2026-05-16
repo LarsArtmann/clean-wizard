@@ -24,7 +24,7 @@ var _ = ginkgo.Describe("GitHistorySafetyChecker", func() {
 
 	ginkgo.AfterEach(func() {
 		if tempDir != "" {
-			os.RemoveAll(tempDir)
+			_ = os.RemoveAll(tempDir)
 		}
 	})
 

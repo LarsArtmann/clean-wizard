@@ -45,20 +45,14 @@ var sizeMultiplier = map[string]int64{
 // ParseDockerSize converts Docker size string to bytes.
 // Supports units: B, kB, MB, GB, TB (case-insensitive).
 func ParseDockerSize(sizeStr string) (int64, error) {
-	sizeStr = strings.TrimSpace(sizeStr)
-
 	// Handle "0B" case or empty string
 	if sizeStr == "0B" || sizeStr == "0" || sizeStr == "" {
 		return 0, nil
 	}
 
-	// Parse number and unit
-	var (
-		number float64
-		unit   string
-	)
-
-	if _, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit); err != nil {
+	// Parse number and unit using shared helper
+	number, unit, err := ParseNumberAndUnit(sizeStr)
+	if err != nil {
 		return 0, fmt.Errorf("invalid size format: %s", sizeStr)
 	}
 

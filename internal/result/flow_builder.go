@@ -121,7 +121,15 @@ func NewParallelFlow[T any]() *ParallelFlow[T] {
 func (pf *ParallelFlow[T]) toMap() map[string]Result[T] {
 	results := make(map[string]Result[T])
 	pf.results.Range(func(key, value any) bool {
-		results[key.(string)] = value.(Result[T])
+		k, ok := key.(string)
+		if !ok {
+			return true
+		}
+		v, ok := value.(Result[T])
+		if !ok {
+			return true
+		}
+		results[k] = v
 
 		return true
 	})
@@ -199,9 +207,16 @@ func (pf *ParallelFlow[T]) Successful() map[string]T {
 	successful := make(map[string]T)
 
 	pf.results.Range(func(key, value any) bool {
-		result := value.(Result[T])
+		result, ok := value.(Result[T])
+		if !ok {
+			return true
+		}
 		if result.IsOk() {
-			successful[key.(string)] = result.Value()
+			k, ok := key.(string)
+			if !ok {
+				return true
+			}
+			successful[k] = result.Value()
 		}
 
 		return true

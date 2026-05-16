@@ -163,13 +163,7 @@ func SwitchFlow[T, U any](
 	cases []Case[T, U],
 	defaultCase func() Result[U],
 ) Result[U] {
-	for _, c := range cases {
-		if c.Predicate(value) {
-			return c.Execute()
-		}
-	}
-
-	return defaultCase()
+	return executeSwitchFlow(value, cases, defaultCase)
 }
 
 // SwitchFlowWithResult is similar to SwitchFlow but the predicates operate on Result values.
@@ -182,8 +176,15 @@ func SwitchFlowWithResult[T, U any](
 		return Err[U](result.Error())
 	}
 
-	value := result.Value()
+	return executeSwitchFlow(result.Value(), cases, defaultCase)
+}
 
+// executeSwitchFlow is the internal helper that executes the switch logic.
+func executeSwitchFlow[T, U any](
+	value T,
+	cases []Case[T, U],
+	defaultCase func() Result[U],
+) Result[U] {
 	for _, c := range cases {
 		if c.Predicate(value) {
 			return c.Execute()

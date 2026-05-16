@@ -40,10 +40,7 @@ func NewTempFilesCleaner(
 	}
 
 	// Normalize base paths
-	normalizedPaths := make([]string, 0, len(basePaths))
-	for _, path := range basePaths {
-		normalizedPaths = append(normalizedPaths, filepath.Clean(path))
-	}
+	normalizedPaths := NormalizePaths(basePaths)
 
 	return &TempFilesCleaner{
 		CleanerBase: NewCleanerBase(verbose, dryRun),

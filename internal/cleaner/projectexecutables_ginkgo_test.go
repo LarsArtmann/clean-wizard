@@ -773,7 +773,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner Integration", func() {
 		tmpDir, err := os.MkdirTemp("", "cleaner-test-*")
 		gomega.Expect(err).ToNot(gomega.HaveOccurred())
 
-		defer os.RemoveAll(tmpDir)
+		defer func() { _ = os.RemoveAll(tmpDir) }()
 
 		execFile := filepath.Join(tmpDir, "test-executable")
 		err = os.WriteFile(execFile, []byte("#!/bin/sh\necho test"), 0o755)

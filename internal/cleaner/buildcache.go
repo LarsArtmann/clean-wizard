@@ -55,10 +55,7 @@ func NewBuildCacheCleaner(
 	toolTypes := AvailableBuildTools()
 
 	// Normalize base paths
-	normalizedPaths := make([]string, 0, len(basePaths))
-	for _, path := range basePaths {
-		normalizedPaths = append(normalizedPaths, filepath.Clean(path))
-	}
+	normalizedPaths := NormalizePaths(basePaths)
 
 	return &BuildCacheCleaner{
 		CleanerBase: NewCleanerBase(verbose, dryRun),

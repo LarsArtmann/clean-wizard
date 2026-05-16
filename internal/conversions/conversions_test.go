@@ -16,6 +16,7 @@ func assertErrorResult(
 	cleanResult result.Result[domain.CleanResult],
 	expectedErr error,
 ) {
+	t.Helper()
 	if cleanResult.IsOk() {
 		t.Error("Expected error result, got Ok")
 	}
@@ -31,6 +32,7 @@ func assertStrategyEqual(
 	value *domain.CleanResult,
 	strategy domain.CleanStrategyType,
 ) {
+	t.Helper()
 	if value.Strategy != strategy {
 		t.Errorf("Expected strategy '%s', got '%s'", strategy.String(), value.Strategy.String())
 	}
@@ -45,6 +47,7 @@ func assertScanResultFields(
 	scannedPaths []string,
 	scanDuration time.Duration,
 ) {
+	t.Helper()
 	if scanResult.TotalBytes != totalBytes {
 		t.Errorf("Expected total bytes %d, got %d", totalBytes, scanResult.TotalBytes)
 	}

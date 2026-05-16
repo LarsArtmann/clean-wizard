@@ -188,7 +188,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelType(domain.RiskLevelCriticalType)).
+					AddOperation(CleanTypeNixStore, domain.RiskLevelCriticalType).
 					Done()
 			},
 			expectError: true,

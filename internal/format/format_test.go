@@ -98,13 +98,16 @@ func TestDuration(t *testing.T) {
 }
 
 func TestDate(t *testing.T) {
-	dateTests := []struct {
+	dateTests := make([]struct {
 		name     string
 		input    time.Time
 		expected string
-	}{
-		{"valid date", testDate, "2023-12-25"},
-	}
+	}, 0, 1+len(commonTimeTests))
+	dateTests = append(dateTests, struct {
+		name     string
+		input    time.Time
+		expected string
+	}{"valid date", testDate, "2023-12-25"})
 
 	dateTests = append(dateTests, commonTimeTests...)
 	for i := range dateTests {
@@ -117,13 +120,16 @@ func TestDate(t *testing.T) {
 }
 
 func TestDateTime(t *testing.T) {
-	dateTimeTests := []struct {
+	dateTimeTests := make([]struct {
 		name     string
 		input    time.Time
 		expected string
-	}{
-		{"valid datetime", testDate, "2023-12-25 15:30:45"},
-	}
+	}, 0, 1+len(commonTimeTests))
+	dateTimeTests = append(dateTimeTests, struct {
+		name     string
+		input    time.Time
+		expected string
+	}{"valid datetime", testDate, "2023-12-25 15:30:45"})
 
 	dateTimeTests = append(dateTimeTests, commonTimeTests...)
 	for i := range dateTimeTests {

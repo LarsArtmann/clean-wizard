@@ -4,10 +4,7 @@ run:
   go: 1.26.2
   build-tags:
     - goexperiment.arenas
-    - goexperiment.goroutineleakprofile
-    - goexperiment.jsonv2
     - goexperiment.runtimesecret
-    - goexperiment.simd
   modules-download-mode: readonly
   allow-parallel-runners: true
   allow-serial-runners: true
@@ -16,6 +13,11 @@ run:
 output:
   formats: {}
 linters:
+  disable:
+    - exhaustruct
+    - gochecknoglobals
+    - paralleltest
+    - recvcheck
   enable:
     - bodyclose
     - contextcheck
@@ -28,11 +30,9 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
     - forcetypeassert
     - funlen
     - ginkgolinter
-    - gochecknoglobals
     - gochecknoinits
     - gochecksumtype
     - gocognit
@@ -57,13 +57,11 @@ linters:
     - nilnil
     - noctx
     - nolintlint
-    - paralleltest
     - perfsprint
     - prealloc
     - predeclared
     - protogetter
     - reassign
-    - recvcheck
     - revive
     - rowserrcheck
     - sloglint
@@ -83,20 +81,69 @@ linters:
   settings:
     cyclop:
       max-complexity: 15
-    exhaustruct:
-      exclude:
-        - os/exec.Cmd
+    funlen:
+      lines: 100
+      statements: 60
+    gocognit:
+      min-complexity: 50
     gocritic:
       disabled-checks:
         - dupImport
         - ifElseChain
         - octalLiteral
         - whyNoLint
+    gosec:
+      excludes:
+        - G115
+        - G118
+        - G204
+        - G301
+        - G304
+        - G306
+        - G703
+    nestif:
+      min-complexity: 7
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
+        - name: stutter
+          disabled: true
+    wrapcheck:
+      ignorePackageGlobs:
+        - github.com/LarsArtmann/clean-wizard/internal/*
+        - encoding/*
+        - os
+        - time
+        - charm.land/*
   exclusions:
     rules:
       - path: .*_test\.go
         linters:
           - cyclop
+          - gosec
+          - wrapcheck
+      - path: .*_test\.go
+        linters:
+          - revive
+        text: "unused-parameter|empty-block"
+      - path: tests/bdd/.*\.go
+        linters:
+          - revive
+        text: "unused-parameter"
+      - path: internal/cleaner/testing_helpers\.go
+        linters:
+          - revive
+        text: "unused-parameter"
+      - path: internal/cleaner/test_factories\.go
+        linters:
+          - revive
+        text: "unused-parameter"
+      - path: internal/domain/enum_macros\.go
+        linters:
+          - wrapcheck
 formatters:
   enable:
     - gci

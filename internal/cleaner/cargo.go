@@ -61,13 +61,7 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 	items := make([]domain.ScanItem, 0)
 
 	// Get CARGO_HOME environment variable
-	cargoHome := os.Getenv("CARGO_HOME")
-	if cargoHome == "" {
-		// Fallback to default ~/.cargo
-		if homeDir, err := GetHomeDir(); err == nil && homeDir != "" {
-			cargoHome = homeDir + "/.cargo"
-		}
-	}
+	cargoHome := cc.getCargoCacheDir()
 
 	if cargoHome != "" {
 		// Add registry cache location
@@ -112,12 +106,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 		itemsRemoved := 0
 
 		// Get CARGO_HOME
-		cargoHome := os.Getenv("CARGO_HOME")
-		if cargoHome == "" {
-			if homeDir, err := GetHomeDir(); err == nil && homeDir != "" {
-				cargoHome = homeDir + "/.cargo"
-			}
-		}
+		cargoHome := cc.getCargoCacheDir()
 
 		if cargoHome != "" {
 			registryCache := cargoHome + "/registry"

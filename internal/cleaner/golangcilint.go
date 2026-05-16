@@ -126,18 +126,13 @@ var golangciLintSizeMultiplier = map[string]int64{
 // parseSize parses a size string like "3.1KiB" or "1.5MiB" into bytes.
 // Supports units: B, KiB, MiB, GiB, TiB, KB, MB, GB, TB (binary units take precedence).
 func parseSize(sizeStr string) (int64, error) {
-	sizeStr = strings.TrimSpace(sizeStr)
-
 	if sizeStr == "" {
 		return 0, errors.New("empty size string")
 	}
 
-	var (
-		number float64
-		unit   string
-	)
-
-	if _, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit); err != nil {
+	// Parse number and unit using shared helper
+	number, unit, err := ParseNumberAndUnit(sizeStr)
+	if err != nil {
 		return 0, fmt.Errorf("invalid size format: %s", sizeStr)
 	}
 

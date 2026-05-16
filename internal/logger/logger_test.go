@@ -306,7 +306,7 @@ func TestLogMessageContent(t *testing.T) {
 	messages := []string{
 		"simple message",
 		"message with special chars: !@#$%^&*()",
-		"message with unicode: 你好世界 🌍",
+		"message with unicode: 你好世界 🌍", //nolint:gosmopolitan // test: intentionally testing unicode logging
 		"very long message " + strings.Repeat("x", 1000),
 	}
 

@@ -23,7 +23,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 
 	ginkgo.AfterEach(func() {
 		if tempDir != "" {
-			os.RemoveAll(tempDir)
+			_ = os.RemoveAll(tempDir)
 		}
 	})
 

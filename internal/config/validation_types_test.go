@@ -151,7 +151,7 @@ func CreateDailyProfile(opts ...DailyProfileOption) *domain.Profile {
 			{
 				Name:        "nix-generations",
 				Description: "Clean Nix generations",
-				RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 			},
 		},
@@ -203,7 +203,7 @@ func createHomebrewOperation() domain.CleanupOperation {
 	return domain.CleanupOperation{
 		Name:        "homebrew-cleanup",
 		Description: "Clean Homebrew",
-		RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+		RiskLevel:   domain.RiskLevelLowType,
 		Enabled:     domain.ProfileStatusEnabled,
 		Settings: &domain.OperationSettings{
 			Homebrew: &domain.HomebrewSettings{
@@ -219,7 +219,7 @@ func createNixGenerationsOperation() domain.CleanupOperation {
 	return domain.CleanupOperation{
 		Name:        "nix-generations",
 		Description: "Clean Nix generations",
-		RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+		RiskLevel:   domain.RiskLevelLowType,
 		Enabled:     domain.ProfileStatusEnabled,
 		Settings: &domain.OperationSettings{
 			NixGenerations: &domain.NixGenerationsSettings{
@@ -293,7 +293,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "nix-generations",
 						Description: " Clean Nix generations ",
-						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+						RiskLevel:   domain.RiskLevelLowType,
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							NixGenerations: &domain.NixGenerationsSettings{
@@ -317,7 +317,7 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean Homebrew",
-						RiskLevel:   domain.RiskLevelType(domain.RiskLevelLowType),
+						RiskLevel:   domain.RiskLevelLowType,
 						Enabled:     domain.ProfileStatusEnabled,
 						Settings: &domain.OperationSettings{
 							Homebrew: &domain.HomebrewSettings{
