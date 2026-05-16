@@ -148,6 +148,27 @@ docker_manifests:
       - "ghcr.io/larsartmann/clean-wizard:{{ .Tag }}-amd64"
       - "ghcr.io/larsartmann/clean-wizard:{{ .Tag }}-arm64"
 
+
+nfpms:
+  - id: default
+    package_name: clean-wizard
+    file_name_template: "{"{"} .ConventionalFileName {"}"}"
+    homepage: https://github.com/LarsArtmann/clean-wizard
+    description: "Comprehensive CLI/TUI tool for system cleanup"
+    license: MIT
+    maintainer: "Lars Artmann <lars@larsartmann.com>"
+    formats:
+      - deb
+      - rpm
+      - apk
+    contents:
+      - src: LICENSE
+        dst: /usr/share/doc/clean-wizard/LICENSE
+      - src: README.md
+        dst: /usr/share/doc/clean-wizard/README.md
+    deb:
+      fields:
+        Bugs: https://github.com/LarsArtmann/clean-wizard/issues
 nix:
   - name: clean-wizard
     repository:
@@ -156,10 +177,25 @@ nix:
     homepage: https://github.com/LarsArtmann/clean-wizard
     description: "Comprehensive CLI/TUI tool for system cleanup"
     license: mit
+    formatter: nixfmt
     path: pkgs/clean-wizard/default.nix
     install: |
       mkdir -p $out/bin
       cp -vr ./{binary} $out/bin/clean-wizard
+
+
+scoops:
+  - name: clean-wizard
+    repository:
+      owner: LarsArtmann
+      name: homebrew-tap
+    folder: Scoop
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@larsartmann.com
+    homepage: "https://github.com/LarsArtmann/clean-wizard"
+    description: "Comprehensive CLI/TUI tool for system cleanup"
+    license: MIT
 
 release:
   github:
