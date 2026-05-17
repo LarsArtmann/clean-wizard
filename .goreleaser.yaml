@@ -149,7 +149,6 @@ docker_manifests:
       - "ghcr.io/larsartmann/clean-wizard:{{ .Tag }}-amd64"
       - "ghcr.io/larsartmann/clean-wizard:{{ .Tag }}-arm64"
 
-
 nfpms:
   - id: default
     package_name: clean-wizard
@@ -184,7 +183,6 @@ nix:
     install: |
       mkdir -p $out/bin
       cp -vr ./{binary} $out/bin/clean-wizard
-
 
 scoops:
   - name: clean-wizard
