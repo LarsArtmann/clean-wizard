@@ -269,8 +269,8 @@ func GetDiskUsage(path string) (DiskUsage, error) {
 		return DiskUsage{}, fmt.Errorf("failed to get disk usage for %s: %w", path, err)
 	}
 
-	total := int64(stat.Blocks) * stat.Bsize
-	free := int64(stat.Bfree) * stat.Bsize
+	total := int64(stat.Blocks) * int64(stat.Bsize)
+	free := int64(stat.Bfree) * int64(stat.Bsize)
 	used := total - free
 
 	usedPercent := 0.0
