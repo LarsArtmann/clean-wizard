@@ -89,6 +89,7 @@ sboms:
 
 brews:
   - name: clean-wizard
+    skip_upload: auto
     homepage: https://github.com/LarsArtmann/clean-wizard
     description: "Comprehensive CLI/TUI tool for system cleanup"
     license: MIT
@@ -171,6 +172,7 @@ nfpms:
         Bugs: https://github.com/LarsArtmann/clean-wizard/issues
 nix:
   - name: clean-wizard
+    skip_upload: auto
     repository:
       owner: LarsArtmann
       name: nur-packages
@@ -186,6 +188,7 @@ nix:
 
 scoops:
   - name: clean-wizard
+    skip_upload: auto
     repository:
       owner: LarsArtmann
       name: homebrew-tap
