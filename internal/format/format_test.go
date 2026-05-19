@@ -5,7 +5,11 @@ import (
 	"time"
 )
 
-const neverStr = "never"
+const (
+	neverStr     = "never"
+	unixEpochStr = "unix epoch"
+	zeroStr      = "zero"
+)
 
 var (
 	zeroTime = time.Time{}
@@ -18,7 +22,7 @@ var commonTimeTests = []struct {
 	expected string
 }{
 	{"zero time", zeroTime, neverStr},
-	{"unix epoch", time.Unix(0, 0), ""},
+	{unixEpochStr, time.Unix(0, 0), ""},
 }
 
 func runFormattingTests[T any](t *testing.T, tests []struct {
@@ -74,8 +78,8 @@ func TestSize(t *testing.T) {
 		{"terabytes", int64(1649267441664), "1.5 TiB"},
 		{"petabytes", int64(1688849860263936), "1.5 PiB"},
 		{"exabytes", int64(1729382256910270464), "1.5 EiB"},
-		{"zero", int64(0), "0 B"},
-		{"negative", int64(-1024), "0 B"},
+		{zeroStr, int64(0), zeroBytes},
+		{"negative", int64(-1024), zeroBytes},
 	}
 
 	runFormattingTests(t, tests, Size)

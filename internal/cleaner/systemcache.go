@@ -15,6 +15,13 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+const (
+	// pathComponentLibrary is the Library directory component for macOS paths.
+	pathComponentLibrary = "Library"
+	// pathComponentDotCache is the .cache directory component for Linux paths.
+	pathComponentDotCache = ".cache"
+)
+
 // SystemCacheCleaner handles system cache cleanup for macOS and Linux.
 type SystemCacheCleaner struct {
 	CleanerBase
@@ -171,7 +178,7 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 	// macOS-specific cache types
 	domain.CacheTypeSpotlight: {
 		pathComponents: []string{
-			"Library",
+			pathComponentLibrary,
 			"Metadata",
 			"CoreSpotlight",
 			"SpotlightKnowledgeEvents",
@@ -180,54 +187,54 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 		scanType:    domain.ScanTypeTemp,
 	},
 	domain.CacheTypeXcode: {
-		pathComponents: []string{"Library", "Developer", "Xcode", "DerivedData"},
+		pathComponents: []string{pathComponentLibrary, "Developer", "Xcode", "DerivedData"},
 		displayName:    "Xcode DerivedData",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeCocoapods: {
-		pathComponents: []string{"Library", "Caches", "CocoaPods"},
+		pathComponents: []string{pathComponentLibrary, "Caches", "CocoaPods"},
 		displayName:    "CocoaPods cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeHomebrew: {
-		pathComponents: []string{"Library", "Caches", "Homebrew"},
+		pathComponents: []string{pathComponentLibrary, "Caches", "Homebrew"},
 		displayName:    "Homebrew cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	// Linux-specific cache types
 	domain.CacheTypeXdgCache: {
-		pathComponents: []string{".cache"},
+		pathComponents: []string{pathComponentDotCache},
 		displayName:    "XDG cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeThumbnails: {
-		pathComponents: []string{".cache", "thumbnails"},
+		pathComponents: []string{pathComponentDotCache, "thumbnails"},
 		displayName:    "Thumbnail cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypePip: {
-		pathComponents: []string{".cache", "pip"},
+		pathComponents: []string{pathComponentDotCache, "pip"},
 		displayName:    "Pip cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeNpm: {
-		pathComponents: []string{".cache", "npm"},
+		pathComponents: []string{pathComponentDotCache, "npm"},
 		displayName:    "NPM cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeYarn: {
-		pathComponents: []string{".cache", "yarn"},
+		pathComponents: []string{pathComponentDotCache, "yarn"},
 		displayName:    "Yarn cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeCcache: {
-		pathComponents: []string{".cache", "ccache"},
+		pathComponents: []string{pathComponentDotCache, "ccache"},
 		displayName:    "Ccache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	// Cross-platform cache types
 	domain.CacheTypePuppeteer: {
-		pathComponents: []string{".cache", "puppeteer"},
+		pathComponents: []string{pathComponentDotCache, "puppeteer"},
 		displayName:    "Puppeteer browser cache",
 		scanType:       domain.ScanTypeTemp,
 	},

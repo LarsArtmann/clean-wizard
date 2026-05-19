@@ -11,12 +11,14 @@ import (
 const (
 	// NanosecondsPerMillisecond is the number of nanoseconds in a millisecond.
 	NanosecondsPerMillisecond = 1e6
+	// zeroBytes is the formatted representation of zero bytes.
+	zeroBytes = "0 B"
 )
 
 // Size formats bytes for human reading using IEC binary prefixes.
 func Size(bytes int64) string {
 	if bytes < 0 {
-		return "0 B"
+		return zeroBytes
 	}
 
 	return humanize.IBytes(uint64(bytes))

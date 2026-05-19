@@ -33,18 +33,27 @@ var L *log.Logger
 // StdLogger provides a standard slog.Logger for interoperability.
 var StdLogger *slog.Logger
 
+// Level strings for configuration parsing.
+const (
+	levelStringDebug = "debug"
+	levelStringInfo  = "info"
+	levelStringWarn  = "warn"
+	levelStringError = "error"
+	levelStringFatal = "fatal"
+)
+
 // levelFromString converts a level string to the corresponding log.Level.
 func levelFromString(levelStr string) log.Level {
 	switch levelStr {
-	case "debug":
+	case levelStringDebug:
 		return log.DebugLevel
-	case "info":
+	case levelStringInfo:
 		return log.InfoLevel
-	case "warn":
+	case levelStringWarn:
 		return log.WarnLevel
-	case "error":
+	case levelStringError:
 		return log.ErrorLevel
-	case "fatal":
+	case levelStringFatal:
 		return log.FatalLevel
 	default:
 		return log.InfoLevel
