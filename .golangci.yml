@@ -28,9 +28,11 @@ linters:
         - errname
         - errorlint
         - exhaustive
+        - exhaustruct
         - forcetypeassert
         - funlen
         - ginkgolinter
+        - gochecknoglobals
         - gochecknoinits
         - gochecksumtype
         - gocognit
@@ -55,11 +57,13 @@ linters:
         - nilnil
         - noctx
         - nolintlint
+        - paralleltest
         - perfsprint
         - prealloc
         - predeclared
         - protogetter
         - reassign
+        - recvcheck
         - revive
         - rowserrcheck
         - sloglint
@@ -79,6 +83,9 @@ linters:
     settings:
         cyclop:
             max-complexity: 15
+        exhaustruct:
+            exclude:
+                - os/exec.Cmd
         funlen:
             lines: 100
             statements: 60
