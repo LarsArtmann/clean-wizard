@@ -100,7 +100,7 @@ func (e *GitHistoryExecutor) Execute(
 
 		err := e.createBackup(ctx, backupPath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create backup: %w", err)
+			return nil, fmt.Errorf("failed to create backup at backupPath=%v: %w", backupPath, err)
 		}
 
 		backupCreated = true
@@ -235,7 +235,7 @@ func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) err
 	if _, err := os.Stat(backupPath); err == nil {
 		err := os.RemoveAll(backupPath)
 		if err != nil {
-			return fmt.Errorf("failed to remove existing backup: %w", err)
+			return fmt.Errorf("failed to remove existing backup at repoPath=%v, backupPath=%v: %w", repoPath, backupPath, err)
 		}
 	}
 
@@ -243,7 +243,7 @@ func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) err
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("backup failed: %w\nOutput: %s", err, string(output))
+		return fmt.Errorf("backup failed for repoPath=%v, backupPath=%v: %w\nOutput: %s", repoPath, backupPath, err, string(output))
 	}
 
 	return nil

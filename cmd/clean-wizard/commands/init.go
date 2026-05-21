@@ -182,7 +182,7 @@ func selectSetupMode() (string, error) {
 	)
 
 	if err := modeForm.Run(); err != nil {
-		return "", fmt.Errorf("setup mode selection error: %w", err)
+		return "", fmt.Errorf("setup mode selection error for setupMode=%v: %w", setupMode, err)
 	}
 
 	return setupMode, nil

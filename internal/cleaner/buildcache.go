@@ -48,7 +48,7 @@ func NewBuildCacheCleaner(
 	// Parse older than duration
 	duration, err := domain.ParseCustomDuration(olderThan)
 	if err != nil {
-		return nil, fmt.Errorf("invalid older_than duration: %w", err)
+		return nil, fmt.Errorf("invalid older_than duration %v: %w", olderThan, err)
 	}
 
 	// Default tool types to all available
@@ -203,7 +203,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 ) result.Result[domain.CleanResult] {
 	matches, err := filepath.Glob(filepath.Join(baseDir, pattern))
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to find %s: %w", toolName, err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to find %s at baseDir=%v, pattern=%v: %w", toolName, baseDir, pattern, err))
 	}
 
 	itemsRemoved := 0

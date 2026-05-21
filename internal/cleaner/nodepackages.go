@@ -154,7 +154,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return result.Err[[]domain.ScanItem](
-				fmt.Errorf("failed to get npm cache location: %w", err),
+				fmt.Errorf("failed to get npm cache location for pm=%v: %w", pm, err),
 			)
 		}
 
@@ -185,7 +185,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return result.Err[[]domain.ScanItem](
-				fmt.Errorf("failed to get pnpm store location: %w", err),
+				fmt.Errorf("failed to get pnpm store location for pm=%v: %w", pm, err),
 			)
 		}
 
@@ -230,7 +230,7 @@ func (npmc *NodePackageManagerCleaner) scanHomeDirCache(
 ) result.Result[[]domain.ScanItem] {
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
+		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory for cacheSuffix=%v, pmName=%v: %w", cacheSuffix, pmName, err))
 	}
 
 	cachePath := fmt.Sprintf("%s/%s", homeDir, cacheSuffix)

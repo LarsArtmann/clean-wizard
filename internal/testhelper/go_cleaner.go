@@ -17,7 +17,7 @@ func GoCleanerTest(ctx context.Context, title string) error {
 	// Test 1: Check Go is available
 	goCleaner, err := cleaner.NewGoCleaner(true, false, GoCacheFlags)
 	if err != nil {
-		return fmt.Errorf("failed to create Go cleaner: %w", err)
+		return fmt.Errorf("failed to create Go cleaner for title=%v: %w", title, err)
 	}
 
 	if !goCleaner.IsAvailable(ctx) {
@@ -53,7 +53,7 @@ func GoCleanerTest(ctx context.Context, title string) error {
 
 	dryRunCleaner, err := cleaner.NewGoCleaner(true, true, GoCacheFlags)
 	if err != nil {
-		return fmt.Errorf("failed to create Go cleaner: %w", err)
+		return fmt.Errorf("failed to create Go cleaner for title=%v: %w", title, err)
 	}
 
 	cleanResult := dryRunCleaner.Clean(ctx)

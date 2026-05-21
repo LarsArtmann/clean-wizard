@@ -121,7 +121,7 @@ func runGitHistoryWizard(
 
 		repos, err = cleaner.FindGitRepositories(projectsPath, 3)
 		if err != nil {
-			return fmt.Errorf("failed to find repositories: %w", err)
+			return fmt.Errorf("failed to find repositories at basePath=%v, minSizeMB=%v, maxFiles=%v: %w", projectsPath, minSizeMB, maxFiles, err)
 		}
 
 		if len(repos) == 0 {
@@ -270,12 +270,12 @@ func processRepository(
 	}
 
 	if err := runSafetyChecks(ctx, c); err != nil {
-		return err
+		return fmt.Errorf("repoPath=%v, minSizeMB=%v, maxFiles=%v: %w", repoPath, minSizeMB, maxFiles, err)
 	}
 
 	selectedFiles, selectedSize, err := scanAndSelectFiles(ctx, c, force)
 	if err != nil {
-		return err
+		return fmt.Errorf("repoPath=%v, minSizeMB=%v, maxFiles=%v: %w", repoPath, minSizeMB, maxFiles, err)
 	}
 
 	if len(selectedFiles) == 0 {
@@ -407,7 +407,7 @@ func confirmAndExecuteCleanup(
 	result := c.Clean(ctx)
 
 	if result.IsErr() {
-		return fmt.Errorf("cleanup failed: %w", result.Error())
+		return fmt.Errorf("cleanup failed for repoPath=%v, selectedSize=%v: %w", repoPath, selectedSize, result.Error())
 	}
 
 	cleanResult := result.Value()

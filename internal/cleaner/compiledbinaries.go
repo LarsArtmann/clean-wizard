@@ -492,7 +492,10 @@ func (s *defaultBinaryScanner) ScanDirectory(
 		return nil
 	})
 
-	return binaries, err //nolint:wrapcheck
+	if err != nil {
+		return binaries, fmt.Errorf("dir=%v, minSize=%v: %w", dir, minSize, err)
+	}
+	return binaries, nil
 }
 
 func (s *defaultBinaryScanner) shouldSkipDirectory(path string) bool {

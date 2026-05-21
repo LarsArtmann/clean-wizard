@@ -119,7 +119,7 @@ func runCleanCommand(
 
 	cfg, err := loadConfigForClean(configPath)
 	if err != nil {
-		return fmt.Errorf("failed to load configuration: %w", err)
+		return fmt.Errorf("failed to load configuration for mode=%v, profile=%v: %w", mode, profile, err)
 	}
 
 	printDryRunHeader(dryRun)
@@ -133,7 +133,7 @@ func runCleanCommand(
 
 	selectedCleaners, err := selectCleaners(profile, mode, cfg, availableConfigs, jsonOutput)
 	if err != nil {
-		return err
+		return fmt.Errorf("mode=%v, profile=%v: %w", mode, profile, err)
 	}
 
 	if selectedCleaners == nil {
@@ -144,7 +144,7 @@ func runCleanCommand(
 
 	confirmed, err := confirmExecution(skipConfirmation, dryRun)
 	if err != nil {
-		return err
+		return fmt.Errorf("mode=%v, profile=%v: %w", mode, profile, err)
 	}
 
 	if !confirmed {

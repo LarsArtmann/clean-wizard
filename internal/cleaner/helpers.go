@@ -72,7 +72,7 @@ func cleanWithIterator[T any](
 
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get home directory: %w", err))
+		return result.Err[domain.CleanResult](fmt.Errorf("failed to get home directory for %s: %w", cleanerName, err))
 	}
 
 	for _, item := range items {
