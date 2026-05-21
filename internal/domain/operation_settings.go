@@ -86,6 +86,7 @@ func (bt BuildToolType) IsValid() bool  { return EnumIsValid(bt, BuildToolScala)
 func (bt BuildToolType) Values() []BuildToolType { return EnumValues[BuildToolType](BuildToolScala) }
 
 func (bt BuildToolType) MarshalYAML() (any, error) { return EnumMarshalYAML(bt, buildToolTypeStrings) }
+
 func (bt *BuildToolType) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(bt), buildToolTypeStrings, "build tool type")
 }

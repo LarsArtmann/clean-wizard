@@ -225,7 +225,8 @@ func buildEnumWorkflowYAML(
 	}
 	cacheTypesYAML += "]"
 
-	return fmt.Sprintf(`
+	return fmt.Sprintf(
+		`
 operations:
   - type: docker
     docker:

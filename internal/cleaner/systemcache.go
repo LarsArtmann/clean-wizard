@@ -417,7 +417,8 @@ func (scc *SystemCacheCleaner) scanCachePathWithConfig(
 		config.displayName,
 		scc.verbose,
 		"",
-		config.pathComponents...)
+		config.pathComponents...,
+	)
 
 	return result.Ok(scanResult.Items)
 }

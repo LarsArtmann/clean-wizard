@@ -101,7 +101,8 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(
 					Field: fmt.Sprintf("profiles.%s.operations", name),
 					Message: fmt.Sprintf(
 						"Profile '%s' has %d operations, exceeding recommended limit (%d)",
-						name, len(profile.Operations), *cv.rules.MaxOperations.Max),
+						name, len(profile.Operations), *cv.rules.MaxOperations.Max,
+					),
 					Suggestion: "Consider splitting operations into multiple profiles",
 					Context: &ValidationContext{
 						Metadata: map[string]string{

@@ -405,7 +405,8 @@ func (npmc *NodePackageManagerCleaner) execPackageManagerCommand(
 		ctx,
 		DefaultNodePackageManagerTimeout,
 		commandArgs[0],
-		commandArgs[1:]...)
+		commandArgs[1:]...,
+	)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {

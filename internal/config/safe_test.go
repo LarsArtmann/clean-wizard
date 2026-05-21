@@ -113,7 +113,8 @@ func TestRiskLevel_String(t *testing.T) {
 }
 
 func TestRiskLevel_Icon(t *testing.T) {
-	testRiskLevelMethod(t, "Icon", func(level domain.RiskLevelType) string { return level.Icon() },
+	testRiskLevelMethod(
+		t, "Icon", func(level domain.RiskLevelType) string { return level.Icon() },
 		riskLevelEmojiValues,
 	)
 }

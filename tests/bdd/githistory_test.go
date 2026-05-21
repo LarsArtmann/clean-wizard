@@ -359,7 +359,8 @@ func commitFile(repoPath, filename, message string) {
 
 	cmd = exec.CommandContext(ctx, "git", "commit", "-m", message)
 	cmd.Dir = repoPath
-	cmd.Env = append(os.Environ(),
+	cmd.Env = append(
+		os.Environ(),
 		"GIT_AUTHOR_DATE=2024-01-01T00:00:00",
 		"GIT_COMMITTER_DATE=2024-01-01T00:00:00",
 	)
@@ -376,7 +377,8 @@ func commitAll(repoPath, message string) {
 
 	cmd = exec.CommandContext(ctx, "git", "commit", "-m", message)
 	cmd.Dir = repoPath
-	cmd.Env = append(os.Environ(),
+	cmd.Env = append(
+		os.Environ(),
 		"GIT_AUTHOR_DATE=2024-01-01T00:00:00",
 		"GIT_COMMITTER_DATE=2024-01-01T00:00:00",
 	)

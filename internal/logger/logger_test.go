@@ -172,7 +172,8 @@ func TestLoggingWithMultipleFields(t *testing.T) {
 
 	// Test logging with various field types
 	assert.NotPanics(t, func() {
-		Info("complex log",
+		Info(
+			"complex log",
 			"string", "value",
 			"int", 42,
 			"bool", true,
@@ -212,7 +213,8 @@ func BenchmarkLogging(b *testing.B) {
 
 	b.Run("info_with_fields", func(b *testing.B) {
 		for i := range b.N {
-			Info("benchmark message",
+			Info(
+				"benchmark message",
 				"iteration", i,
 				"cleaner", "docker",
 				"bytes_freed", 1024*1024,

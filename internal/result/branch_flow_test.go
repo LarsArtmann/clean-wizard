@@ -58,7 +58,8 @@ func TestMatch(t *testing.T) {
 
 		result := Ok(42)
 
-		matched := Match(result,
+		matched := Match(
+			result,
 			func(v int) string { return "success: " + string(rune(v)) },
 			func(e error) string { return "error: " + e.Error() },
 		)
@@ -73,7 +74,8 @@ func TestMatch(t *testing.T) {
 		testErr := errors.New("test error")
 		result := Err[int](testErr)
 
-		matched := Match(result,
+		matched := Match(
+			result,
 			func(v int) string { return "success" },
 			func(e error) string { return "error: " + e.Error() },
 		)

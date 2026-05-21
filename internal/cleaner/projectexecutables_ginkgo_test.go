@@ -319,7 +319,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 	// setupDefaultCleaner initializes the cleaner with default test configuration.
 	setupDefaultCleaner := func(mockLister *mockProjectLister, mockOperator *mockFileOperator) {
-		cleaner = NewProjectExecutablesCleaner(false, false, []string{".sh"}, nil,
+		cleaner = NewProjectExecutablesCleaner(
+			false, false, []string{".sh"}, nil,
 			WithProjectLister(mockLister),
 			WithFileOperator(mockOperator),
 		)
@@ -437,7 +438,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("with verbose mode", func() {
 			ginkgo.It("should not panic with verbose mode enabled", func() {
-				cleaner = NewProjectExecutablesCleaner(true, false, []string{".sh"}, nil,
+				cleaner = NewProjectExecutablesCleaner(
+					true, false, []string{".sh"}, nil,
 					WithProjectLister(mockLister),
 					WithFileOperator(mockOperator),
 				)
@@ -476,7 +478,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("in dry-run mode", func() {
 			ginkgo.BeforeEach(func() {
-				cleaner = NewProjectExecutablesCleaner(false, true, []string{".sh"}, nil,
+				cleaner = NewProjectExecutablesCleaner(
+					false, true, []string{".sh"}, nil,
 					WithProjectLister(mockLister),
 					WithFileOperator(mockOperator),
 				)

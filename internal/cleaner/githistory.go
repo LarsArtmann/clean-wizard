@@ -56,7 +56,8 @@ func NewGitHistoryCleaner(opts ...GitHistoryCleanerOption) *GitHistoryCleaner {
 	}
 
 	// Initialize components
-	c.scanner = NewGitHistoryScanner(c.repoPath,
+	c.scanner = NewGitHistoryScanner(
+		c.repoPath,
 		WithMinSizeMB(c.minSizeMB),
 		WithExcludeExtensions(c.excludeExts),
 		WithIncludeExtensions(c.includeExts),

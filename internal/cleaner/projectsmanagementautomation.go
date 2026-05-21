@@ -133,7 +133,8 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 	if err != nil {
 		return result.Err[domain.CleanResult](
 			fmt.Errorf("projects-management-automation --clear-cache failed: %w (output: %s)",
-				err, string(output)))
+				err, string(output)),
+		)
 	}
 
 	itemsRemoved++

@@ -35,6 +35,7 @@ func (rl *RiskLevelType) UnmarshalJSON(data []byte) error {
 }
 
 func (rl RiskLevelType) MarshalYAML() (any, error) { return EnumMarshalYAML(rl, riskLevelTypeStrings) }
+
 func (rl *RiskLevelType) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(rl), riskLevelTypeStrings, "risk level")
 }
@@ -181,6 +182,7 @@ func (ses SizeEstimateStatusType) String() string {
 }
 
 func (ses SizeEstimateStatusType) IsValid() bool { return EnumIsValid(ses, SizeEstimateStatusUnknown) }
+
 func (ses SizeEstimateStatusType) Values() []SizeEstimateStatusType {
 	return EnumValues[SizeEstimateStatusType](SizeEstimateStatusUnknown)
 }

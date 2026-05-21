@@ -86,7 +86,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 	// setupCleanerWithMocks sets up the cleaner with mock scanner and operator.
 	// This eliminates duplicate cleaner setup across Scan, Clean, and GetStoreSize Describe blocks.
 	setupCleanerWithMocks := func() {
-		cleaner = NewCompiledBinariesCleaner(false, false, 10, "", []string{tempDir}, nil,
+		cleaner = NewCompiledBinariesCleaner(
+			false, false, 10, "", []string{tempDir}, nil,
 			WithBinaryScanner(mockScanner),
 			WithBinaryTrashOperator(mockOperator),
 		)
@@ -165,14 +166,16 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 		ginkgo.Context("with functional options", func() {
 			ginkgo.It("should accept custom BinaryScanner via option", func() {
-				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil,
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 0, "", nil, nil,
 					WithBinaryScanner(mockScanner),
 				)
 				gomega.Expect(cleaner.scanner).To(gomega.Equal(mockScanner))
 			})
 
 			ginkgo.It("should accept custom BinaryTrashOperator via option", func() {
-				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil,
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 0, "", nil, nil,
 					WithBinaryTrashOperator(mockOperator),
 				)
 				gomega.Expect(cleaner.trashOperator).To(gomega.Equal(mockOperator))
@@ -180,7 +183,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 			ginkgo.It("should accept custom base paths via option", func() {
 				paths := []string{"/option/path"}
-				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil,
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 0, "", nil, nil,
 					WithBasePaths(paths),
 				)
 				gomega.Expect(cleaner.basePaths).To(gomega.Equal(paths))
@@ -188,7 +192,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 			ginkgo.It("should accept custom categories via option", func() {
 				categories := []BinaryCategory{CategoryTest, CategoryBin}
-				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil,
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 0, "", nil, nil,
 					WithIncludeCategories(categories),
 				)
 				gomega.Expect(cleaner.includeCategories).To(gomega.Equal(categories))
@@ -472,7 +477,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					},
 				}
 
-				cleaner = NewCompiledBinariesCleaner(false, false, 10, "7d", []string{tempDir}, nil,
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 10, "7d", []string{tempDir}, nil,
 					WithBinaryScanner(mockScanner),
 				)
 
@@ -512,7 +518,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 		ginkgo.Context("in dry-run mode", func() {
 			ginkgo.BeforeEach(func() {
-				cleaner = NewCompiledBinariesCleaner(false, true, 10, "", []string{tempDir}, nil,
+				cleaner = NewCompiledBinariesCleaner(
+					false, true, 10, "", []string{tempDir}, nil,
 					WithBinaryScanner(mockScanner),
 					WithBinaryTrashOperator(mockOperator),
 				)
@@ -622,7 +629,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			expected time.Duration
 		}
 
-		ginkgo.DescribeTable("should parse valid durations correctly",
+		ginkgo.DescribeTable(
+			"should parse valid durations correctly",
 			func(tc parseTestCase) {
 				d, err := parseAgeDuration(tc.input)
 				gomega.Expect(err).ToNot(gomega.HaveOccurred())
@@ -635,7 +643,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			ginkgo.Entry("years", parseTestCase{input: "1y", expected: 365 * 24 * time.Hour}),
 		)
 
-		ginkgo.DescribeTable("should return error for invalid input",
+		ginkgo.DescribeTable(
+			"should return error for invalid input",
 			func(input string) {
 				_, err := parseAgeDuration(input)
 				gomega.Expect(err).To(gomega.HaveOccurred())

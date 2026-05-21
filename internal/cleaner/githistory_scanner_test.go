@@ -86,7 +86,8 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 			})
 
 			ginkgo.It("should accept multiple options", func() {
-				scanner = NewGitHistoryScanner(tempDir,
+				scanner = NewGitHistoryScanner(
+					tempDir,
 					WithMinSizeMB(5),
 					WithMaxFiles(25),
 					WithVerbose(true),

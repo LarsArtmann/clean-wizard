@@ -515,7 +515,8 @@ func confirmAction(
 		huh.NewOption("Yes, proceed", true),
 		huh.NewOption("No, cancel", false),
 	}
-	confirms = append(confirms,
+	confirms = append(
+		confirms,
 		huh.NewSelect[bool]().
 			Title("Confirm destructive operation?").
 			Options(confirmOpts...).
@@ -529,7 +530,8 @@ func confirmAction(
 	)
 
 	if report.HasRemote {
-		confirms = append(confirms,
+		confirms = append(
+			confirms,
 			huh.NewConfirm().
 				Title("I have coordinated with my team").
 				Value(&coordinated),

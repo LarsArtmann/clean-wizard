@@ -22,7 +22,8 @@ func main() {
 
 	info := version.Get()
 
-	err := fang.Execute(context.Background(), rootCmd,
+	err := fang.Execute(
+		context.Background(), rootCmd,
 		fang.WithVersion(info.Version),
 		fang.WithCommit(info.Commit),
 		fang.WithNotifySignal(os.Interrupt, syscall.SIGTERM),

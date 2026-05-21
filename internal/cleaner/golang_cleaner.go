@@ -43,7 +43,7 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 		return nil, errors.New("at least one cache type must be specified")
 	}
 
-	return NewGoCleanerWithSettings(verbose, dryRun, caches), (error)(nil)
+	return NewGoCleanerWithSettings(verbose, dryRun, caches), error(nil)
 }
 
 // NewGoCleanerWithSettings creates Go cleaner with type-safe cache configuration (panics on invalid caches).

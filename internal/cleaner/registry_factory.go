@@ -111,7 +111,8 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 
 	// Compiled binaries cleaner (default: 10MB, any age, ~/projects)
 	compiledBinariesCleaner := NewCompiledBinariesCleaner(
-		verbose, dryRun, DefaultMinSizeMB, DefaultOlderThan, nil, []string{})
+		verbose, dryRun, DefaultMinSizeMB, DefaultOlderThan, nil, []string{},
+	)
 	registry.Register(CleanerCompiledBinaries, compiledBinariesCleaner)
 
 	// golangci-lint cache cleaner (uses `golangci-lint cache status` for accurate sizing)
