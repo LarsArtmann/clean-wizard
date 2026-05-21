@@ -119,7 +119,12 @@ func runCleanCommand(
 
 	cfg, err := loadConfigForClean(configPath)
 	if err != nil {
-		return fmt.Errorf("failed to load configuration for mode=%v, profile=%v: %w", mode, profile, err)
+		return fmt.Errorf(
+			"failed to load configuration for mode=%v, profile=%v: %w",
+			mode,
+			profile,
+			err,
+		)
 	}
 
 	printDryRunHeader(dryRun)

@@ -230,7 +230,14 @@ func (npmc *NodePackageManagerCleaner) scanHomeDirCache(
 ) result.Result[[]domain.ScanItem] {
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory for cacheSuffix=%v, pmName=%v: %w", cacheSuffix, pmName, err))
+		return result.Err[[]domain.ScanItem](
+			fmt.Errorf(
+				"failed to get home directory for cacheSuffix=%v, pmName=%v: %w",
+				cacheSuffix,
+				pmName,
+				err,
+			),
+		)
 	}
 
 	cachePath := fmt.Sprintf("%s/%s", homeDir, cacheSuffix)

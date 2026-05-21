@@ -491,7 +491,6 @@ func (s *defaultBinaryScanner) ScanDirectory(
 
 		return nil
 	})
-
 	if err != nil {
 		return binaries, fmt.Errorf("dir=%v, minSize=%v: %w", dir, minSize, err)
 	}

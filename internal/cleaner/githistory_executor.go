@@ -235,7 +235,12 @@ func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) err
 	if _, err := os.Stat(backupPath); err == nil {
 		err := os.RemoveAll(backupPath)
 		if err != nil {
-			return fmt.Errorf("failed to remove existing backup at repoPath=%v, backupPath=%v: %w", repoPath, backupPath, err)
+			return fmt.Errorf(
+				"failed to remove existing backup at repoPath=%v, backupPath=%v: %w",
+				repoPath,
+				backupPath,
+				err,
+			)
 		}
 	}
 
@@ -243,7 +248,13 @@ func createGitMirrorBackup(ctx context.Context, repoPath, backupPath string) err
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("backup failed for repoPath=%v, backupPath=%v: %w\nOutput: %s", repoPath, backupPath, err, string(output))
+		return fmt.Errorf(
+			"backup failed for repoPath=%v, backupPath=%v: %w\nOutput: %s",
+			repoPath,
+			backupPath,
+			err,
+			string(output),
+		)
 	}
 
 	return nil

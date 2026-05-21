@@ -158,7 +158,12 @@ func ScanVersionDirectory(
 	matches, err := filepath.Glob(filepath.Join(versionsDir, "*"))
 	if err != nil {
 		return result.Err[[]domain.ScanItem](
-			fmt.Errorf("failed to find %s versions at versionsDir=%v: %w", managerName, versionsDir, err),
+			fmt.Errorf(
+				"failed to find %s versions at versionsDir=%v: %w",
+				managerName,
+				versionsDir,
+				err,
+			),
 		)
 	}
 
