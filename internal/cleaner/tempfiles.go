@@ -30,7 +30,7 @@ func NewTempFilesCleaner(
 	// Parse older than duration using custom duration parser (supports "7d", "24h", etc.)
 	duration, err := domain.ParseCustomDuration(olderThan)
 	if err != nil {
-		return nil, fmt.Errorf("invalid older_than duration: %w", err)
+		return nil, fmt.Errorf("invalid older_than duration for olderThan=%v: %w", olderThan, err)
 	}
 
 	// Normalize excludes

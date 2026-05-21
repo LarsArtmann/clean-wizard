@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -108,7 +109,7 @@ func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error) 
 		Prefix: prefix,
 	})
 	if err != nil {
-		return nil, err //nolint:wrapcheck
+		return nil, fmt.Errorf("prefix=%v: %w", prefix, err)
 	}
 
 	return cfg, nil

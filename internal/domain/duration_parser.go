@@ -25,7 +25,7 @@ func ParseCustomDuration(durationStr string) (time.Duration, error) {
 	durationStr = strings.TrimSpace(durationStr)
 
 	if durationStr == "" {
-		return 0, errors.New("empty duration string")
+		return 0, fmt.Errorf("empty duration string for durationStr=%v", durationStr)
 	}
 
 	// Check if it's already a valid Go duration
@@ -85,6 +85,9 @@ func ValidateCustomDuration(durationStr string) error {
 	}
 
 	_, err := ParseCustomDuration(durationStr)
+	if err != nil {
+		return fmt.Errorf("durationStr=%v: %w", durationStr, err)
+	}
 
-	return err
+	return nil
 }

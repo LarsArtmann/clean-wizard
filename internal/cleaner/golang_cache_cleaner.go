@@ -183,9 +183,11 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 		if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
 			return result.Err[domain.CleanResult](
 				fmt.Errorf(
-					"go clean -%s timed out after %v (command may be hanging)",
+					"go clean -%s timed out after %v for successMessage=%v, sizeEstimate=%v (command may be hanging)",
 					cleanFlag,
 					goCommandTimeout,
+					successMessage,
+					sizeEstimate,
 				),
 			)
 		}
@@ -253,7 +255,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 		}, gcc.verbose, "Cache")
 
 		if cleanupErr != nil {
-			return result.Err[domain.CleanResult](cleanupErr)
+			return result.Err[domain.CleanResult](fmt.Errorf("envVar=%v, successMessage=%v, bytesFreed=%v: %w", envVar, successMessage, bytesFreed, cleanupErr))
 		}
 
 		if gcc.verbose {

@@ -221,7 +221,7 @@ func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) 
 	)
 
 	if err := cleanerForm.Run(); err != nil {
-		return nil, fmt.Errorf("cleaner selection error: %w", err)
+		return nil, fmt.Errorf("cleaner selection error for setupMode=%v: %w", setupMode, err)
 	}
 
 	if opts.includeDocker {
@@ -235,7 +235,7 @@ func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) 
 			&includeDockerWarning,
 		).Run()
 		if err != nil {
-			return nil, fmt.Errorf("docker warning error: %w", err)
+			return nil, fmt.Errorf("docker warning error for includeDockerWarning=%v: %w", includeDockerWarning, err)
 		}
 
 		opts.includeDocker = includeDockerWarning

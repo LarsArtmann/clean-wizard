@@ -49,7 +49,7 @@ func selectProfileCleaners(
 ) ([]CleanerType, error) {
 	selected, err := getProfileCleaners(profileName, cfg, availableConfigs)
 	if err != nil {
-		return nil, fmt.Errorf("profile error: %w", err)
+		return nil, fmt.Errorf("profile error for profileName=%v: %w", profileName, err)
 	}
 
 	if !jsonOutput {

@@ -259,8 +259,9 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 		if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
 			return result.Err[domain.CleanResult](
 				fmt.Errorf(
-					"golangci-lint cache clean timed out after %v",
+					"golangci-lint cache clean timed out after %v for bytesFreed=%v",
 					golangciLintCommandTimeout,
+					bytesFreed,
 				),
 			)
 		}

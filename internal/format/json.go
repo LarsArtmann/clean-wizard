@@ -93,7 +93,7 @@ func CleanResultsToJSON(
 
 	data, err := json.MarshalIndent(output, "", "  ")
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal JSON output: %w", err)
+		return nil, fmt.Errorf("failed to marshal JSON output (duration=%v): %w", duration, err)
 	}
 
 	return data, nil

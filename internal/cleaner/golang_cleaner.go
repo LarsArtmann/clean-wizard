@@ -40,10 +40,10 @@ type GoCleaner struct {
 // NewGoCleaner creates Go cleaner with type-safe cache configuration.
 func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) {
 	if !caches.IsValid() {
-		return nil, errors.New("at least one cache type must be specified")
+		return nil, fmt.Errorf("at least one cache type must be specified for caches=%v", caches)
 	}
 
-	return NewGoCleanerWithSettings(verbose, dryRun, caches), error(nil)
+	return NewGoCleanerWithSettings(verbose, dryRun, caches), nil
 }
 
 // NewGoCleanerWithSettings creates Go cleaner with type-safe cache configuration (panics on invalid caches).

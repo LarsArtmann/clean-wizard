@@ -111,11 +111,11 @@ func (hc *HTTPClient) doRequest(
 	case "DELETE":
 		resp, err = req.Delete(url)
 	default:
-		return nil, fmt.Errorf("unsupported HTTP method: %s", method)
+		return nil, fmt.Errorf("unsupported HTTP method: %s for url=%v", method, url)
 	}
 
 	if err != nil {
-		return nil, err //nolint:wrapcheck
+		return nil, fmt.Errorf("url=%v: %w", url, err)
 	}
 
 	return &HTTPResponse{

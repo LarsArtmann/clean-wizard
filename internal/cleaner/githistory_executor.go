@@ -208,7 +208,7 @@ func (e *GitHistoryExecutor) runGC(ctx context.Context) error {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("%w\nOutput: %s", err, string(output))
+		return fmt.Errorf("repoPath=%v: %w\nOutput: %s", e.repoPath, err, string(output))
 	}
 
 	return nil
@@ -278,7 +278,10 @@ func getGitDirSize(repoPath string) (int64, error) {
 		return nil
 	})
 
-	return size, err //nolint:wrapcheck
+	if err != nil {
+		return size, fmt.Errorf("repoPath=%v, size=%v: %w", repoPath, size, err)
+	}
+	return size, nil
 }
 
 // getDefaultBackupPath returns the default backup path.
@@ -386,7 +389,7 @@ func (e *GitHistoryExecutor) StripLargeBlobs(ctx context.Context, sizeMB int) er
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("%w\nOutput: %s", err, string(output))
+		return fmt.Errorf("sizeMB=%v: %w\nOutput: %s", sizeMB, err, string(output))
 	}
 
 	// Run GC after stripping

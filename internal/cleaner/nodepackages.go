@@ -437,7 +437,7 @@ func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
 		// Cache directory not found, execute command anyway
 		err := npmc.execPackageManagerCommand(ctx, commandArgs, commandName)
 		if err != nil {
-			return result.Err[domain.CleanResult](err)
+			return result.Err[domain.CleanResult](fmt.Errorf("cacheDirErr=%v, cacheDir=%v, commandName=%v, cacheLabel=%v: %w", cacheDirErr, cacheDir, commandName, cacheLabel, err))
 		}
 
 		if npmc.verbose {
