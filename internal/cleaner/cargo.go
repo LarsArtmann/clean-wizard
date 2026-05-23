@@ -233,7 +233,13 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 
 			output, err := cmd.CombinedOutput()
 			if err != nil {
-				return fmt.Errorf("cmdName=%v, bytesFreed=%v: "+errorFormat, cmdName, bytesFreed, err, string(output))
+				return fmt.Errorf(
+					"cmdName=%v, bytesFreed=%v: "+errorFormat,
+					cmdName,
+					bytesFreed,
+					err,
+					string(output),
+				)
 			}
 
 			return nil
@@ -248,7 +254,15 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("cmdName=%v, bytesFreed=%v: "+errorFormat, cmdName, bytesFreed, err, string(output)))
+			return result.Err[domain.CleanResult](
+				fmt.Errorf(
+					"cmdName=%v, bytesFreed=%v: "+errorFormat,
+					cmdName,
+					bytesFreed,
+					err,
+					string(output),
+				),
+			)
 		}
 
 		if cc.verbose {

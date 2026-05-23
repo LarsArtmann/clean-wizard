@@ -369,7 +369,12 @@ func ParseNumberAndUnit(sizeStr string) (float64, string, error) {
 	var unit string
 
 	if _, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit); err != nil {
-		return 0, "", fmt.Errorf("invalid size format: %s for unit=%v, number=%v", sizeStr, unit, number)
+		return 0, "", fmt.Errorf(
+			"invalid size format: %s for unit=%v, number=%v",
+			sizeStr,
+			unit,
+			number,
+		)
 	}
 
 	return number, unit, nil

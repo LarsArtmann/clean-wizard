@@ -269,7 +269,12 @@ func (scc *SystemCacheCleaner) scanSystemCache(
 	config, exists := systemCacheConfigs[cacheType]
 	if !exists {
 		return result.Err[[]domain.ScanItem](
-			fmt.Errorf("unknown system cache type %s for homeDir=%v: %w", cacheType.String(), homeDir, errors.New("cache type not found")),
+			fmt.Errorf(
+				"unknown system cache type %s for homeDir=%v: %w",
+				cacheType.String(),
+				homeDir,
+				errors.New("cache type not found"),
+			),
 		)
 	}
 
@@ -327,7 +332,9 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	// Get home directory
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to get home directory (itemsFailed=%v): %w", itemsFailed, err))
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("failed to get home directory (itemsFailed=%v): %w", itemsFailed, err),
+		)
 	}
 
 	// Clean for each cache type
@@ -391,7 +398,9 @@ func (scc *SystemCacheCleaner) removeCachePath(
 
 	err := os.RemoveAll(path)
 	if err != nil && !os.IsNotExist(err) {
-		return result.Err[domain.CleanResult](fmt.Errorf("failed to remove %s (successMessage=%v): %w", path, successMessage, err))
+		return result.Err[domain.CleanResult](
+			fmt.Errorf("failed to remove %s (successMessage=%v): %w", path, successMessage, err),
+		)
 	}
 
 	if scc.verbose {

@@ -255,7 +255,15 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 		}, gcc.verbose, "Cache")
 
 		if cleanupErr != nil {
-			return result.Err[domain.CleanResult](fmt.Errorf("envVar=%v, successMessage=%v, bytesFreed=%v: %w", envVar, successMessage, bytesFreed, cleanupErr))
+			return result.Err[domain.CleanResult](
+				fmt.Errorf(
+					"envVar=%v, successMessage=%v, bytesFreed=%v: %w",
+					envVar,
+					successMessage,
+					bytesFreed,
+					cleanupErr,
+				),
+			)
 		}
 
 		if gcc.verbose {

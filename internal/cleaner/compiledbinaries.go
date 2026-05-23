@@ -411,7 +411,12 @@ func parseAgeDuration(s string) (time.Duration, error) {
 
 	var value int
 	if _, err := fmt.Sscanf(s[:len(s)-1], "%d", &value); err != nil {
-		return 0, fmt.Errorf("invalid duration value: %s for value=%v, multiplier=%v", s, value, multiplier)
+		return 0, fmt.Errorf(
+			"invalid duration value: %s for value=%v, multiplier=%v",
+			s,
+			value,
+			multiplier,
+		)
 	}
 
 	return time.Duration(value) * multiplier, nil

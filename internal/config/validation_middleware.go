@@ -203,8 +203,14 @@ func (vm *ValidationMiddleware) validateConfig(cfg *domain.Config, operationName
 	vm.logger.LogValidation(validationResult)
 
 	if !validationResult.IsValid {
-		return pkgerrors.HandleValidationError(operationName,
-			fmt.Errorf("validation failed for operationName=%v: %s", operationName, vm.formatValidationErrors(validationResult.Errors)))
+		return pkgerrors.HandleValidationError(
+			operationName,
+			fmt.Errorf(
+				"validation failed for operationName=%v: %s",
+				operationName,
+				vm.formatValidationErrors(validationResult.Errors),
+			),
+		)
 	}
 
 	return nil

@@ -235,7 +235,11 @@ func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) 
 			&includeDockerWarning,
 		).Run()
 		if err != nil {
-			return nil, fmt.Errorf("docker warning error for includeDockerWarning=%v: %w", includeDockerWarning, err)
+			return nil, fmt.Errorf(
+				"docker warning error for includeDockerWarning=%v: %w",
+				includeDockerWarning,
+				err,
+			)
 		}
 
 		opts.includeDocker = includeDockerWarning

@@ -163,7 +163,13 @@ func runGitHistoryWizard(
 
 			err := form.Run()
 			if err != nil {
-				return fmt.Errorf("repos=%v, minSizeMB=%v, maxFiles=%v: selection error: %w", repos, minSizeMB, maxFiles, err)
+				return fmt.Errorf(
+					"repos=%v, minSizeMB=%v, maxFiles=%v: selection error: %w",
+					repos,
+					minSizeMB,
+					maxFiles,
+					err,
+				)
 			}
 
 			repos = selectedRepos

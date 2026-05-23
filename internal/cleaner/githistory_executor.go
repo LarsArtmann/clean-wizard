@@ -277,7 +277,6 @@ func getGitDirSize(repoPath string) (int64, error) {
 
 		return nil
 	})
-
 	if err != nil {
 		return size, fmt.Errorf("repoPath=%v, size=%v: %w", repoPath, size, err)
 	}
