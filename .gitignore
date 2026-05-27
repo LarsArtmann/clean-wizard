@@ -20,6 +20,11 @@ reports/
 .vscode/
 *.swp
 
+# Nix
+result
+result-*
+.direnv/
+
 # OS
 .DS_Store
 # Dependencies
