@@ -93,10 +93,7 @@ linters:
       min-complexity: 50
     gocritic:
       disabled-checks:
-        - dupImport
         - ifElseChain
-        - octalLiteral
-        - whyNoLint
     gosec:
       excludes:
         - G115

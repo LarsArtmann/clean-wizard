@@ -43,6 +43,7 @@ The documentation suggests using cron for scheduled cleanups, but the tool itsel
 ### 8. No `clean-wizard doctor` / Health Check
 
 There is no diagnostic command that tells a user:
+
 - Is my config valid?
 - Which cleaners are available?
 - Which tools are missing?
@@ -86,6 +87,7 @@ The README shows demo output (`✓ Homebrew: Freed 245 MB`) that does not match 
 ### 16. No Troubleshooting Guide for Common Issues
 
 The `HOW_TO_USE.md` has a small troubleshooting section, but it does not cover:
+
 - "Docker daemon is not running" (the most common Docker cleaner failure)
 - "Permission denied on /tmp" on Linux
 - "No cleanable items found" when the user expects items
@@ -114,6 +116,7 @@ Users cannot export the dry-run results to a file for review or sharing. The `--
 ### 20. No Pre-Built Binaries on GitHub Releases
 
 The GoReleaser config exists, but the `brews` section has `skip_upload: true`, the Nix section has `skip_upload: auto`, and the Scoop section has `skip_upload: true`. This means:
+
 - `brew install clean-wizard` does not work
 - `nix run github:LarsArtmann/nur-packages#clean-wizard` does not work
 - `scoop install clean-wizard` does not work
@@ -168,15 +171,15 @@ The `clean --profile daily` flag exists, but the profile system defines operatio
 
 ## Summary
 
-| Category                | Count | Impact                                                                                     |
-|-------------------------|-------|--------------------------------------------------------------------------------------------|
-| Critical Gaps           | 5     | Users literally cannot do expected things (version, completions, undo)                     |
-| Significant Gaps        | 7     | User experience friction (no history, no scheduling, no on-the-fly config)                 |
-| Documentation Gaps      | 4     | Users can't learn or troubleshoot effectively                                              |
-| Trust & Safety Gaps     | 3     | Privacy-conscious or security-minded users won't adopt                                     |
-| Distribution Gaps       | 3     | Most users can't install the tool without Go                                               |
-| Polish Gaps             | 8     | Competing tools have these; their absence makes the tool feel unfinished                   |
-| **Total**               | **30** |                                                                                            |
+| Category            | Count  | Impact                                                                     |
+| ------------------- | ------ | -------------------------------------------------------------------------- |
+| Critical Gaps       | 5      | Users literally cannot do expected things (version, completions, undo)     |
+| Significant Gaps    | 7      | User experience friction (no history, no scheduling, no on-the-fly config) |
+| Documentation Gaps  | 4      | Users can't learn or troubleshoot effectively                              |
+| Trust & Safety Gaps | 3      | Privacy-conscious or security-minded users won't adopt                     |
+| Distribution Gaps   | 3      | Most users can't install the tool without Go                               |
+| Polish Gaps         | 8      | Competing tools have these; their absence makes the tool feel unfinished   |
+| **Total**           | **30** |                                                                            |
 
 ### Top 5 Recommendations (Highest Consumer Impact)
 
