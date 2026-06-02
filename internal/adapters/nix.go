@@ -127,10 +127,10 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 	return result.Ok(size)
 }
 
-// CollectGarbage removes old Nix generations.
+// CollectGarbage runs garbage collection on the Nix store.
+// Uses the modern "nix store gc" command (Nix 2.4+).
 // In dry-run mode, returns a success result without actually running garbage collection.
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
-	// In dry-run mode, return success without actually running GC
 	if n.dryRun {
 		estimatedFreed := int64(NixDryRunGCSizeMB * bytesPerMB)
 		cleanResult := conversions.NewCleanResultWithTiming(
@@ -145,7 +145,6 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 
 	startTime := time.Now()
 
-	// Get store size before garbage collection
 	beforeSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
 		return conversions.ToCleanResultFromError(
@@ -153,18 +152,15 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		)
 	}
 
-	// Run actual nix-collect-garbage command
-	cmd := n.execWithTimeout(ctx, "nix-collect-garbage", "-d")
+	cmd := n.execWithTimeout(ctx, "nix", "store", "gc")
 
 	err = cmd.Run()
 	if err != nil {
-		return conversions.ToCleanResultFromError(fmt.Errorf("failed to collect garbage: %w", err))
+		return conversions.ToCleanResultFromError(fmt.Errorf("failed to run nix store gc: %w", err))
 	}
 
-	// Small delay to ensure async GC operations complete before measuring
 	time.Sleep(NixGCPostDelay)
 
-	// Get store size after garbage collection
 	afterSize, err := n.getActualStoreSize(ctx)
 	if err != nil {
 		return conversions.ToCleanResultFromError(
@@ -172,11 +168,8 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 		)
 	}
 
-	bytesFreed := max(beforeSize-afterSize,
-		// Shouldn't happen but guard against it
-		0)
+	bytesFreed := max(beforeSize-afterSize, 0)
 
-	// Use centralized conversion with proper timing
 	cleanResult := conversions.NewCleanResultWithTiming(
 		domain.StrategyAggressiveType,
 		1,
