@@ -440,7 +440,7 @@
           "type": "array",
           "items": {
             "type": "integer",
-            "enum": [0, 1, 2, 3, 4, 5, 6, 7],
+            "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
             "oneOf": [
               {
                 "const": 0,
@@ -473,6 +473,82 @@
               {
                 "const": 7,
                 "description": "CCACHE"
+              },
+              {
+                "const": 8,
+                "description": "XDG_CACHE"
+              },
+              {
+                "const": 9,
+                "description": "THUMBNAILS"
+              },
+              {
+                "const": 10,
+                "description": "PUPPETEER"
+              },
+              {
+                "const": 11,
+                "description": "TERRAFORM"
+              },
+              {
+                "const": 12,
+                "description": "GRADLE_WRAPPER"
+              },
+              {
+                "const": 13,
+                "description": "KONAN"
+              },
+              {
+                "const": 14,
+                "description": "RUSTUP"
+              },
+              {
+                "const": 15,
+                "description": "GOPLS"
+              },
+              {
+                "const": 16,
+                "description": "GOIMPORTS"
+              },
+              {
+                "const": 17,
+                "description": "JETBRAINS"
+              },
+              {
+                "const": 18,
+                "description": "BUN_CACHE"
+              },
+              {
+                "const": 19,
+                "description": "PLAYWRIGHT"
+              },
+              {
+                "const": 20,
+                "description": "MOZILLA"
+              },
+              {
+                "const": 21,
+                "description": "NIX_CACHE"
+              },
+              {
+                "const": 22,
+                "description": "ZIG"
+              },
+              {
+                "const": 23,
+                "description": "UV"
+              },
+              {
+                "const": 24,
+                "description": "TINYGO"
+              },
+              {
+                "const": 25,
+                "description": "MESA_SHADER"
+              },
+              {
+                "const": 26,
+                "description": "COMGR"
               }
             ]
           }
