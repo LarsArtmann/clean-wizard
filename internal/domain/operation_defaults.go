@@ -337,7 +337,10 @@ func getDefaultSystemCacheTypes() []CacheType {
 		return []CacheType{
 			CacheTypeXdgCache,
 			CacheTypeThumbnails,
-			CacheTypeHomebrew,
+			CacheTypePip,
+			CacheTypeNpm,
+			CacheTypeYarn,
+			CacheTypeCcache,
 		}
 	default:
 		return []CacheType{

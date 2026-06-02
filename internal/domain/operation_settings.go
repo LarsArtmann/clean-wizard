@@ -125,17 +125,44 @@ const (
 	CacheTypeKonan
 	// CacheTypeRustup represents Rust toolchain cache.
 	CacheTypeRustup
+	// CacheTypeGopls represents gopls Go language server cache.
+	CacheTypeGopls
+	// CacheTypeGoimports represents goimports cache.
+	CacheTypeGoimports
+	// CacheTypeJetBrains represents JetBrains IDE cache.
+	CacheTypeJetBrains
+	// CacheTypeBunCache represents Bun package manager cache.
+	CacheTypeBunCache
+	// CacheTypePlaywright represents Playwright browser cache.
+	CacheTypePlaywright
+	// CacheTypeMozilla represents Mozilla/Firefox cache.
+	CacheTypeMozilla
+	// CacheTypeNixCache represents Nix evaluator/substituter cache.
+	CacheTypeNixCache
+	// CacheTypeZig represents Zig compiler cache.
+	CacheTypeZig
+	// CacheTypeUv represents uv Python package manager cache.
+	CacheTypeUv
+	// CacheTypeTinygo represents TinyGo compiler cache.
+	CacheTypeTinygo
+	// CacheTypeMesaShader represents Mesa shader cache.
+	CacheTypeMesaShader
+	// CacheTypeComgr represents AMD GPU compiler cache.
+	CacheTypeComgr
 )
 
 var cacheTypeStrings = []string{
 	"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP",
 	"NPM", "YARN", "CCACHE", "XDG_CACHE", "THUMBNAILS",
 	"PUPPETEER", "TERRAFORM", "GRADLE_WRAPPER", "KONAN", "RUSTUP",
+	"GOPLS", "GOIMPORTS", "JETBRAINS", "BUN_CACHE", "PLAYWRIGHT",
+	"MOZILLA", "NIX_CACHE", "ZIG", "UV", "TINYGO",
+	"MESA_SHADER", "COMGR",
 }
 
 func (ct CacheType) String() string            { return EnumString(ct, cacheTypeStrings) }
-func (ct CacheType) IsValid() bool             { return EnumIsValid(ct, CacheTypeRustup) }
-func (ct CacheType) Values() []CacheType       { return EnumValues[CacheType](CacheTypeRustup) }
+func (ct CacheType) IsValid() bool             { return EnumIsValid(ct, CacheTypeComgr) }
+func (ct CacheType) Values() []CacheType       { return EnumValues[CacheType](CacheTypeComgr) }
 func (ct CacheType) MarshalYAML() (any, error) { return EnumMarshalYAML(ct, cacheTypeStrings) }
 func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(ct), cacheTypeStrings, "cache type")
