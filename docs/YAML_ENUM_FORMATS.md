@@ -169,18 +169,37 @@ enabled: "ENABLED" # String
 | JAVA   | 4       | "JAVA"   | Java build tools (Maven, Gradle) |
 | SCALA  | 5       | "SCALA"  | Scala build tools (SBT)          |
 
-### CacheType (0-7)
+### CacheType (0-26)
 
-| Value     | Integer | String      | Description              |
-| --------- | ------- | ----------- | ------------------------ |
-| SPOTLIGHT | 0       | "SPOTLIGHT" | macOS Spotlight cache    |
-| XCODE     | 1       | "XCODE"     | Xcode derived data cache |
-| COCOAPODS | 2       | "COCOAPODS" | CocoaPods cache          |
-| HOMEBREW  | 3       | "HOMEBREW"  | Homebrew cache           |
-| PIP       | 4       | "PIP"       | Python pip cache         |
-| NPM       | 5       | "NPM"       | Node.js npm cache        |
-| YARN      | 6       | "YARN"      | Yarn cache               |
-| CCACHE    | 7       | "CCACHE"    | ccache compiler cache    |
+| Value          | Integer | String           | Description                          | Platform    |
+| -------------- | ------- | ---------------- | ------------------------------------ | ----------- |
+| SPOTLIGHT      | 0       | "SPOTLIGHT"      | macOS Spotlight cache                | macOS       |
+| XCODE          | 1       | "XCODE"          | Xcode derived data cache             | macOS       |
+| COCOAPODS      | 2       | "COCOAPODS"      | CocoaPods cache                      | macOS       |
+| HOMEBREW       | 3       | "HOMEBREW"       | Homebrew cache                       | macOS/Linux |
+| PIP            | 4       | "PIP"            | Python pip cache                     | Linux       |
+| NPM            | 5       | "NPM"            | Node.js npm cache                    | Linux       |
+| YARN           | 6       | "YARN"           | Yarn cache                           | Linux       |
+| CCACHE         | 7       | "CCACHE"         | ccache compiler cache                | Linux       |
+| XDG_CACHE      | 8       | "XDG_CACHE"      | XDG cache directory (~/.cache)       | Linux       |
+| THUMBNAILS     | 9       | "THUMBNAILS"     | Thumbnail cache                      | Linux       |
+| PUPPETEER      | 10      | "PUPPETEER"      | Puppeteer browser cache              | Cross       |
+| TERRAFORM      | 11      | "TERRAFORM"      | Terraform plugin cache               | Cross       |
+| GRADLE_WRAPPER | 12      | "GRADLE_WRAPPER" | Gradle wrapper distributions         | Cross       |
+| KONAN          | 13      | "KONAN"          | Kotlin/Native toolchain dependencies | Cross       |
+| RUSTUP         | 14      | "RUSTUP"         | Rust toolchain cache                 | Cross       |
+| GOPLS          | 15      | "GOPLS"          | gopls language server cache          | Cross       |
+| GOIMPORTS      | 16      | "GOIMPORTS"      | goimports cache                      | Cross       |
+| JETBRAINS      | 17      | "JETBRAINS"      | JetBrains IDE cache                  | Cross       |
+| BUN_CACHE      | 18      | "BUN_CACHE"      | Bun package manager cache            | Cross       |
+| PLAYWRIGHT     | 19      | "PLAYWRIGHT"     | Playwright browser cache             | Cross       |
+| MOZILLA        | 20      | "MOZILLA"        | Mozilla/Firefox cache                | Cross       |
+| NIX_CACHE      | 21      | "NIX_CACHE"      | Nix evaluator/substituter cache      | Linux       |
+| ZIG            | 22      | "ZIG"            | Zig compiler cache                   | Cross       |
+| UV             | 23      | "UV"             | uv Python package manager cache      | Cross       |
+| TINYGO         | 24      | "TINYGO"         | TinyGo compiler cache                | Cross       |
+| MESA_SHADER    | 25      | "MESA_SHADER"    | Mesa shader cache                    | Linux       |
+| COMGR          | 26      | "COMGR"          | AMD GPU compiler cache               | Linux       |
 
 ### VersionManagerType (0-5)
 

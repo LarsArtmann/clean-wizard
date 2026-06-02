@@ -1,6 +1,6 @@
 # Clean Wizard - Project Instructions
 
-**Updated:** 2026-05-03
+**Updated:** 2026-06-02
 
 ## Build & Test
 
@@ -9,11 +9,18 @@ go build ./...
 go test ./... -short
 ```
 
+## Target Machines
+
+- **evo-x2**: NixOS Linux x86_64, Nix 2.34.7, Go 1.26.3, Docker, pnpm, bun, golangci-lint
+  - No: cargo, brew, npm, yarn, pip/pip3
+  - Major caches: go-build (25GB), goimports (8.2GB), pip (6.5GB), nix (3.1GB), gopls (2.1GB), puppeteer (1.2GB), JetBrains (845MB), pnpm (717MB)
+- **macOS**: Primary historical target (Spotlight, Xcode, CocoaPods, Homebrew)
+
 ## Project Structure
 
 - `cmd/clean-wizard/` - CLI entry point and commands (Cobra)
 - `internal/cleaner/` - 13+ cleaner implementations, registry, factory
-- `internal/domain/` - Domain types, 19 type-safe enums, interfaces, settings
+- `internal/domain/` - Domain types, 27 CacheType enums, interfaces, settings
 - `internal/config/` - Configuration loading (koanf/yaml), validation
 - `internal/result/` - Result[T], FlowBuilder[T], ParallelFlow[T], BranchFlow[T]
 - `internal/adapters/` - External tool adapters (Nix, Exec, HTTP, Cache)
@@ -36,9 +43,10 @@ go test ./... -short
 
 - **Registry Pattern** - `cleaner.Registry` for thread-safe cleaner management
 - **Result Type** - `result.Result[T]` for functional error handling
-- **Type-Safe Enums** - 19 iota-based enums with generic helpers in `enum_macros.go`
+- **Type-Safe Enums** - 27 CacheType enums with generic helpers in `enum_macros.go`
 - **Adapter Pattern** - External tools wrapped in `internal/adapters/`
 - **Flow Composition** - `FlowBuilder[T]`, `ParallelFlow[T]`, `BranchFlow[T]`
+- **Platform-Aware Defaults** - `DefaultProtectedPaths()`, `getDefaultSystemCacheTypes()` use `runtime.GOOS`
 
 ## Dependencies
 
@@ -56,7 +64,6 @@ go test ./... -short
 - 4 error packages with overlapping responsibilities (split brain)
 - `internal/domain/` is a god package (20+ files)
 - `internal/cleaner/` has 50+ files flat (no sub-packages)
-- `DefaultSettings(OperationTypeSystemCache)` returns macOS-only cache types
 - ~40 `err113` lint violations (dynamic errors via fmt.Errorf)
 - 15 source files over 350 lines
 

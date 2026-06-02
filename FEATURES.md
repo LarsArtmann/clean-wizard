@@ -193,8 +193,8 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 **Notes:**
 
-- Domain enum has 8 cache types
-- All cache types now implemented (4 macOS + 4 Linux)
+- Domain enum has 27 cache types (15 original + 12 new for Linux/NixOS)
+- All cache types now implemented (4 macOS + 11 Linux original + 12 cross-platform/Linux new)
 - Platform detection uses runtime.GOOS
 
 ---
@@ -366,7 +366,7 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 | **CacheCleanupMode**       | DISABLED, ENABLED                                             | ✅ Working                             |
 | **DockerPruneMode**        | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS                      | ✅ Working                             |
 | **BuildToolType**          | GO, RUST, NODE, PYTHON, JAVA, SCALA                           | ⚠️ Partial (only JAVA/SCALA used)      |
-| **CacheType**              | SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, CCACHE | ⚠️ Partial (only first 4 used)         |
+| **CacheType**              | 27 types: SPOTLIGHT..COMGR (macOS, Linux, cross-platform) | ✅ Working (all implemented)            |
 | **VersionManagerType**     | NVM, PYENV, GVM, RBENV, SDKMAN, JENV                          | ⚠️ Partial (only NVM/PYENV/RBENV used) |
 | **PackageManagerType**     | NPM, PNPM, YARN, BUN                                          | ✅ Working                             |
 | **RiskLevel**              | LOW, MEDIUM, HIGH, CRITICAL                                   | ✅ Working                             |
