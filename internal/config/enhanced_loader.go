@@ -81,7 +81,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(
 	if len(requiredPaths) == 0 {
 		requiredPaths = ecl.validator.rules.DefaultProtectedPaths
 		if len(requiredPaths) == 0 {
-			requiredPaths = []string{domain.PathSystem, domain.PathLibrary} // Final fallback
+			requiredPaths = domain.DefaultProtectedPaths() // Final fallback
 		}
 	}
 

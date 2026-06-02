@@ -34,7 +34,7 @@ func setupKoanf() *koanf.Koanf {
 	_ = k.Set("version", "1.0.0")
 	_ = k.Set("safe_mode", true)
 	_ = k.Set("max_disk_usage_percent", DefaultMaxDiskUsage)
-	_ = k.Set("protected", []string{domain.PathSystem, domain.PathLibrary})
+	_ = k.Set("protected", domain.DefaultProtectedPaths())
 
 	return k
 }

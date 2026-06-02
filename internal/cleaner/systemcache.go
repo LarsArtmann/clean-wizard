@@ -45,12 +45,21 @@ func AvailableSystemCacheTypes() []domain.CacheType {
 			domain.CacheTypeGradleWrapper,
 			domain.CacheTypeKonan,
 			domain.CacheTypeRustup,
+			domain.CacheTypeGopls,
+			domain.CacheTypeGoimports,
+			domain.CacheTypeJetBrains,
+			domain.CacheTypeBunCache,
+			domain.CacheTypePlaywright,
+			domain.CacheTypeMozilla,
+			domain.CacheTypeNixCache,
+			domain.CacheTypeZig,
+			domain.CacheTypeUv,
+			domain.CacheTypeTinygo,
 		}
 	case "linux":
 		return []domain.CacheType{
 			domain.CacheTypeXdgCache,
 			domain.CacheTypeThumbnails,
-			domain.CacheTypeHomebrew, // Homebrew works on Linux too
 			domain.CacheTypePip,
 			domain.CacheTypeNpm,
 			domain.CacheTypeYarn,
@@ -60,6 +69,18 @@ func AvailableSystemCacheTypes() []domain.CacheType {
 			domain.CacheTypeGradleWrapper,
 			domain.CacheTypeKonan,
 			domain.CacheTypeRustup,
+			domain.CacheTypeGopls,
+			domain.CacheTypeGoimports,
+			domain.CacheTypeJetBrains,
+			domain.CacheTypeBunCache,
+			domain.CacheTypePlaywright,
+			domain.CacheTypeMozilla,
+			domain.CacheTypeNixCache,
+			domain.CacheTypeZig,
+			domain.CacheTypeUv,
+			domain.CacheTypeTinygo,
+			domain.CacheTypeMesaShader,
+			domain.CacheTypeComgr,
 		}
 	default:
 		return []domain.CacheType{}
@@ -256,6 +277,66 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 	domain.CacheTypeRustup: {
 		pathComponents: []string{".rustup", "toolchains"},
 		displayName:    "Rust toolchain cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeGopls: {
+		pathComponents: []string{pathComponentDotCache, "gopls"},
+		displayName:    "gopls language server cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeGoimports: {
+		pathComponents: []string{pathComponentDotCache, "goimports"},
+		displayName:    "goimports cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeJetBrains: {
+		pathComponents: []string{pathComponentDotCache, "JetBrains"},
+		displayName:    "JetBrains IDE cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeBunCache: {
+		pathComponents: []string{pathComponentDotCache, "bun"},
+		displayName:    "Bun cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypePlaywright: {
+		pathComponents: []string{pathComponentDotCache, "ms-playwright"},
+		displayName:    "Playwright browser cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeMozilla: {
+		pathComponents: []string{pathComponentDotCache, "mozilla"},
+		displayName:    "Mozilla/Firefox cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeNixCache: {
+		pathComponents: []string{pathComponentDotCache, "nix"},
+		displayName:    "Nix evaluator/substituter cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeZig: {
+		pathComponents: []string{pathComponentDotCache, "zig"},
+		displayName:    "Zig compiler cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeUv: {
+		pathComponents: []string{pathComponentDotCache, "uv"},
+		displayName:    "uv Python package manager cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeTinygo: {
+		pathComponents: []string{pathComponentDotCache, "tinygo"},
+		displayName:    "TinyGo compiler cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeMesaShader: {
+		pathComponents: []string{pathComponentDotCache, "mesa_shader_cache"},
+		displayName:    "Mesa shader cache",
+		scanType:       domain.ScanTypeTemp,
+	},
+	domain.CacheTypeComgr: {
+		pathComponents: []string{pathComponentDotCache, "comgr"},
+		displayName:    "AMD GPU compiler cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 }
