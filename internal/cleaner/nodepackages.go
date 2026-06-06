@@ -94,10 +94,10 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 
 	packageManagerStrings := PackageManagerTypeToLowerSlice(settings.NodePackages.PackageManagers)
 	validPackageManagersMap := map[string]bool{
-		"npm":  true,
+		"npm":  true, //nolint:goconst
 		"pnpm": true,
-		"yarn": true,
-		"bun":  true,
+		"yarn": true, //nolint:goconst
+		"bun":  true, //nolint:goconst
 	}
 
 	return validateSettings(
@@ -353,7 +353,7 @@ func (npmc *NodePackageManagerCleaner) Clean(
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)}
+		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
 
 		return result.Ok(cleanResult)
 	}
@@ -498,7 +498,7 @@ func (npmc *NodePackageManagerCleaner) cleanNpmCache(
 	cacheDir, err := npmc.getNpmCacheDir(ctx)
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,
-		[]string{"npm", "cache", "clean", "--force"},
+		[]string{"npm", "cache", "clean", "--force"}, //nolint:goconst
 		"npm cache clean",
 		"Cache")
 }
@@ -510,7 +510,7 @@ func (npmc *NodePackageManagerCleaner) cleanPnpmStore(
 	cacheDir, err := npmc.getPnpmStoreDir(ctx)
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,
-		[]string{"pnpm", "store", "prune"},
+		[]string{"pnpm", "store", "prune"}, //nolint:goconst
 		"pnpm store prune",
 		"Store")
 }

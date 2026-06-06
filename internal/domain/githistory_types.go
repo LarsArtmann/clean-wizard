@@ -152,6 +152,8 @@ func (r GitHistorySafetyReport) CanProceed() bool {
 }
 
 // GitHistoryMode represents the mode of operation for git history cleaning.
+//
+//nolint:recvcheck
 type GitHistoryMode int
 
 const (
@@ -160,7 +162,7 @@ const (
 	GitHistoryModeExecute                       // Actually rewrite history
 )
 
-var gitHistoryModeStrings = []string{"analyze", "dry-run", "execute"}
+var gitHistoryModeStrings = []string{"analyze", "dry-run", "execute"} //nolint:gochecknoglobals
 
 func (m GitHistoryMode) String() string { return EnumString(m, gitHistoryModeStrings) }
 func (m GitHistoryMode) IsValid() bool  { return EnumIsValid(m, GitHistoryModeExecute) }
@@ -204,7 +206,7 @@ type GitHistorySettings struct {
 
 // DefaultGitHistorySettings returns the default settings.
 func DefaultGitHistorySettings() GitHistorySettings {
-	return GitHistorySettings{
+	return GitHistorySettings{ //nolint:exhaustruct
 		MinSizeMB:         1,
 		MaxFiles:          100,
 		CreateBackup:      true,
@@ -214,7 +216,7 @@ func DefaultGitHistorySettings() GitHistorySettings {
 }
 
 // DefaultBinaryExtensions are binary extensions commonly found in git history that should be cleaned.
-var DefaultBinaryExtensions = []string{
+var DefaultBinaryExtensions = []string{ //nolint:gochecknoglobals
 	// Go build outputs (often extensionless)
 	"", // Extensionless binaries
 	".exe",
@@ -257,7 +259,7 @@ var DefaultBinaryExtensions = []string{
 }
 
 // ExtensionsToKeep are binary extensions that should typically NOT be removed.
-var ExtensionsToKeep = []string{
+var ExtensionsToKeep = []string{ //nolint:gochecknoglobals
 	".pdf",
 	".png",
 	".jpg",

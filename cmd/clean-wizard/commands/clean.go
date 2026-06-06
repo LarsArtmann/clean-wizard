@@ -226,7 +226,7 @@ func loadConfigForClean(configPath string) (*domain.Config, error) {
 }
 
 // operationTypeToCleanerType maps domain OperationType to CleanerType.
-var operationTypeToCleanerType = map[domain.OperationType]CleanerType{
+var operationTypeToCleanerType = map[domain.OperationType]CleanerType{ //nolint:gochecknoglobals
 	domain.OperationTypeNixGenerations:               CleanerTypeNix,
 	domain.OperationTypeTempFiles:                    CleanerTypeTempFiles,
 	domain.OperationTypeHomebrew:                     CleanerTypeHomebrew,

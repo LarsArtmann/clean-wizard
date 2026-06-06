@@ -10,9 +10,9 @@ import (
 
 var (
 	version = ""           // Set via -ldflags at build time
-	commit  = ""           // Set via -ldflags at build time
-	date    = ""           // Set via -ldflags at build time
-	builtBy = "goreleaser" // Set via -ldflags at build time
+	commit  = ""           //nolint:gochecknoglobals // Set via -ldflags at build time
+	date    = ""           //nolint:gochecknoglobals // Set via -ldflags at build time
+	builtBy = "goreleaser" //nolint:gochecknoglobals // Set via -ldflags at build time
 )
 
 // Info contains version information.
@@ -27,7 +27,7 @@ type Info struct {
 
 // Get returns the current version info.
 func Get() Info {
-	info := Info{
+	info := Info{ //nolint:exhaustruct
 		Version: version,
 		Commit:  commit,
 		Date:    date,

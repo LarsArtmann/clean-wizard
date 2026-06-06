@@ -447,7 +447,7 @@ func (dc *DockerCleaner) buildPruneArgs() []string {
 			fmt.Println("  Running full prune: docker system prune -af --volumes")
 		}
 
-		return []string{"system", "prune", "-af", "--volumes"}
+		return []string{"system", "prune", "-af", "--volumes"} //nolint:goconst
 
 	case domain.DockerPruneImages:
 		if dc.verbose {

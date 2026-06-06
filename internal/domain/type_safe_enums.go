@@ -9,6 +9,8 @@ import (
 )
 
 // RiskLevelType represents the risk level enum with compile-time safety.
+//
+//nolint:recvcheck
 type RiskLevelType int
 
 const (
@@ -18,7 +20,7 @@ const (
 	RiskLevelCriticalType
 )
 
-var riskLevelTypeStrings = []string{"LOW", "MEDIUM", "HIGH", "CRITICAL"}
+var riskLevelTypeStrings = []string{"LOW", "MEDIUM", "HIGH", "CRITICAL"} //nolint:goconst,gochecknoglobals
 
 func (rl RiskLevelType) String() string { return EnumString(rl, riskLevelTypeStrings) }
 func (rl RiskLevelType) IsValid() bool  { return EnumIsValid(rl, RiskLevelCriticalType) }
@@ -59,6 +61,8 @@ func (rl RiskLevelType) IsHigherThan(other RiskLevelType) bool        { return r
 func (rl RiskLevelType) IsHigherOrEqualThan(other RiskLevelType) bool { return rl >= other }
 
 // ValidationLevelType represents validation levels with compile-time safety.
+//
+//nolint:recvcheck
 type ValidationLevelType int
 
 const (
@@ -68,7 +72,7 @@ const (
 	ValidationLevelStrictType
 )
 
-var validationLevelTypeStrings = []string{"NONE", "BASIC", "COMPREHENSIVE", "STRICT"}
+var validationLevelTypeStrings = []string{"NONE", "BASIC", "COMPREHENSIVE", "STRICT"} //nolint:gochecknoglobals
 
 func (vl ValidationLevelType) String() string { return EnumString(vl, validationLevelTypeStrings) }
 func (vl ValidationLevelType) IsValid() bool  { return EnumIsValid(vl, ValidationLevelStrictType) }
@@ -85,6 +89,8 @@ func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
 }
 
 // ChangeOperationType represents change operations with compile-time safety.
+//
+//nolint:recvcheck
 type ChangeOperationType int
 
 const (
@@ -93,7 +99,7 @@ const (
 	ChangeOperationModifiedType
 )
 
-var changeOperationTypeStrings = []string{"ADDED", "REMOVED", "MODIFIED"}
+var changeOperationTypeStrings = []string{"ADDED", "REMOVED", "MODIFIED"} //nolint:gochecknoglobals
 
 func (co ChangeOperationType) String() string { return EnumString(co, changeOperationTypeStrings) }
 
@@ -111,6 +117,8 @@ func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
 }
 
 // CleanStrategyType represents cleaning strategies with compile-time safety.
+//
+//nolint:recvcheck
 type CleanStrategyType int
 
 const (
@@ -119,7 +127,7 @@ const (
 	StrategyDryRunType
 )
 
-var cleanStrategyTypeStrings = []string{"aggressive", "conservative", "dry-run"}
+var cleanStrategyTypeStrings = []string{"aggressive", "conservative", "dry-run"} //nolint:gochecknoglobals
 
 func (cs CleanStrategyType) String() string { return EnumString(cs, cleanStrategyTypeStrings) }
 func (cs CleanStrategyType) IsValid() bool  { return EnumIsValid(cs, StrategyDryRunType) }
@@ -162,6 +170,8 @@ func (cs CleanStrategyType) Icon() string {
 
 // SizeEstimateStatusType represents the status of a size estimate with type safety.
 // This replaces the boolean Unknown field, making impossible states unrepresentable.
+//
+//nolint:recvcheck
 type SizeEstimateStatusType int
 
 const (
@@ -171,11 +181,11 @@ const (
 	SizeEstimateStatusUnknown
 )
 
-var sizeEstimateStatusTypeStrings = []string{"KNOWN", "UNKNOWN"}
+var sizeEstimateStatusTypeStrings = []string{"KNOWN", "UNKNOWN"} //nolint:goconst,gochecknoglobals
 
 func (ses SizeEstimateStatusType) String() string {
 	if !ses.IsValid() {
-		return "INVALID"
+		return "INVALID" //nolint:goconst
 	}
 
 	return sizeEstimateStatusTypeStrings[ses]

@@ -47,12 +47,14 @@ func (m *mockCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem]
 }
 
 func TestNewRegistry(t *testing.T) {
+	t.Parallel()
 	registry := NewRegistry()
 	require.NotNil(t, registry)
 	assert.Equal(t, 0, registry.Count())
 }
 
 func TestRegistry_RegisterAndGet(t *testing.T) {
+	t.Parallel()
 	registry := NewRegistry()
 	cleaner := &mockCleaner{name: "test", available: true}
 
@@ -84,6 +86,7 @@ func setupRegistryWithTwoCleaners() *Registry {
 }
 
 func TestRegistry_List(t *testing.T) {
+	t.Parallel()
 	registry := setupRegistryWithTwoCleaners()
 
 	list := registry.List()
@@ -92,6 +95,7 @@ func TestRegistry_List(t *testing.T) {
 }
 
 func TestRegistry_Names(t *testing.T) {
+	t.Parallel()
 	registry := setupRegistryWithTwoCleaners()
 
 	names := registry.Names()
@@ -100,6 +104,7 @@ func TestRegistry_Names(t *testing.T) {
 }
 
 func TestRegistry_Count(t *testing.T) {
+	t.Parallel()
 	registry := NewRegistry()
 	assert.Equal(t, 0, registry.Count())
 
@@ -111,6 +116,7 @@ func TestRegistry_Count(t *testing.T) {
 }
 
 func TestRegistry_Available(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	registry := NewRegistry()
 
@@ -126,6 +132,7 @@ func TestRegistry_Available(t *testing.T) {
 }
 
 func TestRegistry_Unregister(t *testing.T) {
+	t.Parallel()
 	registry := NewRegistry()
 	cleaner := &mockCleaner{name: "test", available: true}
 
@@ -140,6 +147,7 @@ func TestRegistry_Unregister(t *testing.T) {
 }
 
 func TestRegistry_Clear(t *testing.T) {
+	t.Parallel()
 	registry := NewRegistry()
 
 	registry.Register("test1", &mockCleaner{name: "test1"})
@@ -154,6 +162,7 @@ func TestRegistry_Clear(t *testing.T) {
 }
 
 func TestRegistry_CleanAll(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	registry := NewRegistry()
 
@@ -175,6 +184,7 @@ func TestRegistry_CleanAll(t *testing.T) {
 }
 
 func TestRegistry_RegisterOverwrite(t *testing.T) {
+	t.Parallel()
 	registry := NewRegistry()
 	cleaner1 := &mockCleaner{name: "test1"}
 	cleaner2 := &mockCleaner{name: "test2"}
@@ -189,6 +199,7 @@ func TestRegistry_RegisterOverwrite(t *testing.T) {
 }
 
 func TestRegistry_ConcurrentAccess(t *testing.T) {
+	t.Parallel()
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -226,6 +237,7 @@ func TestRegistry_ConcurrentAccess(t *testing.T) {
 }
 
 func TestRegistry_EmptyOperations(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	registry := NewRegistry()
 

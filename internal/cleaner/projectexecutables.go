@@ -75,10 +75,10 @@ func NewProjectExecutablesCleaner(
 ) *ProjectExecutablesCleaner {
 	// Default to excluding .sh files if not specified
 	if len(excludeExtensions) == 0 {
-		excludeExtensions = []string{".sh"}
+		excludeExtensions = []string{".sh"} //nolint:goconst
 	}
 
-	cleaner := &ProjectExecutablesCleaner{
+	cleaner := &ProjectExecutablesCleaner{ //nolint:exhaustruct
 		CleanerBase:       NewCleanerBase(verbose, dryRun),
 		excludeExtensions: excludeExtensions,
 		excludePatterns:   excludePatterns,

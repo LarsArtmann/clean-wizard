@@ -25,11 +25,11 @@ func (p FilterRepoProvider) String() string {
 	case FilterRepoNone:
 		return "none"
 	case FilterRepoSystem:
-		return "system"
+		return "system" //nolint:goconst
 	case FilterRepoNix:
-		return "nix"
+		return "nix" //nolint:goconst
 	default:
-		return "unknown"
+		return "unknown" //nolint:goconst
 	}
 }
 
@@ -39,7 +39,7 @@ type filterRepoDetector struct {
 	provider FilterRepoProvider
 }
 
-var detector filterRepoDetector
+var detector filterRepoDetector //nolint:gochecknoglobals
 
 // DetectFilterRepoProvider detects how git-filter-repo can be run.
 // Priority: system install > nix > none.
@@ -53,7 +53,7 @@ func DetectFilterRepoProvider() FilterRepoProvider {
 
 // ResetDetector resets the cached detector (for testing).
 func ResetDetector() {
-	detector = filterRepoDetector{}
+	detector = filterRepoDetector{} //nolint:exhaustruct
 }
 
 func detectProvider() FilterRepoProvider {
@@ -107,7 +107,7 @@ func BuildFilterRepoCommand(ctx context.Context, args []string) *exec.Cmd {
 		return exec.CommandContext(ctx, "nix", nixArgs...)
 	case FilterRepoSystem:
 		// System install: git filter-repo <args>
-		gitArgs := append([]string{"filter-repo"}, args...)
+		gitArgs := append([]string{"filter-repo"}, args...) //nolint:goconst
 
 		return exec.CommandContext(ctx, "git", gitArgs...)
 	case FilterRepoNone:

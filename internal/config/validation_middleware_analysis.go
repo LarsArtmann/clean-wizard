@@ -176,13 +176,13 @@ func (vm *ValidationMiddleware) assessChangeRisk(
 	field string, old, newVal any,
 ) domain.RiskLevelType {
 	switch field {
-	case "safe_mode":
+	case "safe_mode": //nolint:goconst
 		if old == true && newVal == false {
 			return domain.RiskLevelHighType
 		}
 
 		return domain.RiskLevelLowType
-	case "max_disk_usage":
+	case "max_disk_usage": //nolint:goconst
 		// Safe type assertions
 		oldVal, oldOk := old.(int)
 

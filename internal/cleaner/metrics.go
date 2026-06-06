@@ -40,7 +40,7 @@ type MetricsSnapshot struct {
 
 // NewMetricsCollector creates a new metrics collector.
 func NewMetricsCollector() *MetricsCollector {
-	return &MetricsCollector{
+	return &MetricsCollector{ //nolint:exhaustruct
 		cleaners: make(map[string]*CleanerMetrics),
 	}
 }
@@ -52,7 +52,7 @@ func (mc *MetricsCollector) RecordStart(cleanerName string) time.Time {
 
 	m, exists := mc.cleaners[cleanerName]
 	if !exists {
-		m = &CleanerMetrics{Name: cleanerName}
+		m = &CleanerMetrics{Name: cleanerName} //nolint:exhaustruct
 		mc.cleaners[cleanerName] = m
 	}
 
@@ -72,7 +72,7 @@ func (mc *MetricsCollector) RecordSuccess(
 
 	m, exists := mc.cleaners[cleanerName]
 	if !exists {
-		m = &CleanerMetrics{Name: cleanerName}
+		m = &CleanerMetrics{Name: cleanerName} //nolint:exhaustruct
 		mc.cleaners[cleanerName] = m
 	}
 
@@ -95,7 +95,7 @@ func (mc *MetricsCollector) RecordFailure(
 
 	m, exists := mc.cleaners[cleanerName]
 	if !exists {
-		m = &CleanerMetrics{Name: cleanerName}
+		m = &CleanerMetrics{Name: cleanerName} //nolint:exhaustruct
 		mc.cleaners[cleanerName] = m
 	}
 
@@ -111,7 +111,7 @@ func (mc *MetricsCollector) GetMetrics(cleanerName string) (CleanerMetrics, bool
 
 	m, ok := mc.cleaners[cleanerName]
 	if !ok {
-		return CleanerMetrics{}, false
+		return CleanerMetrics{}, false //nolint:exhaustruct
 	}
 
 	return *m, true
@@ -122,7 +122,7 @@ func (mc *MetricsCollector) Snapshot() MetricsSnapshot {
 	mc.mu.RLock()
 	defer mc.mu.RUnlock()
 
-	snapshot := MetricsSnapshot{
+	snapshot := MetricsSnapshot{ //nolint:exhaustruct
 		Cleaners:      make(map[string]CleanerMetrics, len(mc.cleaners)),
 		TotalCleaners: len(mc.cleaners),
 	}

@@ -6,29 +6,29 @@ import (
 )
 
 // settingsFactory maps operation types to their default settings factories.
-var settingsFactory = map[OperationType]func() *OperationSettings{
+var settingsFactory = map[OperationType]func() *OperationSettings{ //nolint:gochecknoglobals
 	OperationTypeNixGenerations:               defaultNixGenerationsSettings,
 	OperationTypeTempFiles:                    defaultTempFilesSettings,
 	OperationTypeHomebrew:                     defaultHomebrewSettings,
 	OperationTypeNodePackages:                 defaultNodePackagesSettings,
 	OperationTypeGoPackages:                   defaultGoPackagesSettings,
 	OperationTypeCargoPackages:                defaultCargoPackagesSettings,
-	OperationTypeBuildCache:                   func() *OperationSettings { return &OperationSettings{BuildCache: defaultBuildCacheSettings()} },
+	OperationTypeBuildCache:                   func() *OperationSettings { return &OperationSettings{BuildCache: defaultBuildCacheSettings()} }, //nolint:exhaustruct
 	OperationTypeDocker:                       defaultDockerSettings,
 	OperationTypeSystemCache:                  defaultSystemCacheSettings,
 	OperationTypeSystemTemp:                   defaultSystemTempSettings,
 	OperationTypeProjectsManagementAutomation: defaultProjectsManagementAutomationSettings,
 	OperationTypeProjectExecutables:           defaultProjectExecutablesSettings,
 	OperationTypeCompiledBinaries:             defaultCompiledBinariesSettings,
-	OperationTypeGitHistory:                   func() *OperationSettings { return &OperationSettings{GitHistory: &GitHistorySettings{}} },
-	OperationTypeGolangciLintCache:            func() *OperationSettings { return &OperationSettings{} },
+	OperationTypeGitHistory:                   func() *OperationSettings { return &OperationSettings{GitHistory: &GitHistorySettings{}} }, //nolint:exhaustruct
+	OperationTypeGolangciLintCache:            func() *OperationSettings { return &OperationSettings{} },                                  //nolint:exhaustruct
 }
 
 // DefaultSettings returns default settings for given operation type.
 func DefaultSettings(opType OperationType) *OperationSettings {
 	factory, ok := settingsFactory[opType]
 	if !ok {
-		return &OperationSettings{}
+		return &OperationSettings{} //nolint:exhaustruct
 	}
 
 	settings := factory()
@@ -42,7 +42,7 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 }
 
 func defaultNixGenerationsSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		NixGenerations: &NixGenerationsSettings{
 			Generations: 1,
 			Optimize:    OptimizationModeDisabled,
@@ -52,7 +52,7 @@ func defaultNixGenerationsSettings() *OperationSettings {
 }
 
 func defaultTempFilesSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		TempFiles: &TempFilesSettings{
 			OlderThan: "7d",
 			Excludes:  []string{"/tmp/keep"},
@@ -61,15 +61,15 @@ func defaultTempFilesSettings() *OperationSettings {
 }
 
 func defaultHomebrewSettings() *OperationSettings {
-	return &OperationSettings{
-		Homebrew: &HomebrewSettings{
+	return &OperationSettings{ //nolint:exhaustruct
+		Homebrew: &HomebrewSettings{ //nolint:exhaustruct
 			UnusedOnly: HomebrewModeUnusedOnly,
 		},
 	}
 }
 
 func defaultNodePackagesSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		NodePackages: &NodePackagesSettings{
 			PackageManagers: []PackageManagerType{
 				PackageManagerNpm,
@@ -82,7 +82,7 @@ func defaultNodePackagesSettings() *OperationSettings {
 }
 
 func defaultGoPackagesSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		GoPackages: &GoPackagesSettings{
 			CleanCache:      CacheCleanupEnabled,
 			CleanTestCache:  CacheCleanupEnabled,
@@ -94,7 +94,7 @@ func defaultGoPackagesSettings() *OperationSettings {
 }
 
 func defaultCargoPackagesSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		CargoPackages: &CargoPackagesSettings{
 			Autoclean: CacheCleanupEnabled,
 		},
@@ -102,7 +102,7 @@ func defaultCargoPackagesSettings() *OperationSettings {
 }
 
 func defaultDockerSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		Docker: &DockerSettings{
 			PruneMode: DockerPruneAll,
 		},
@@ -110,16 +110,16 @@ func defaultDockerSettings() *OperationSettings {
 }
 
 func defaultSystemCacheSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		SystemCache: &SystemCacheSettings{
 			CacheTypes: getDefaultSystemCacheTypes(),
-			OlderThan:  "30d",
+			OlderThan:  "30d", //nolint:goconst
 		},
 	}
 }
 
 func defaultSystemTempSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		SystemTemp: &SystemTempSettings{
 			Paths:     []string{"/tmp", "/var/tmp"},
 			OlderThan: "30d",
@@ -128,7 +128,7 @@ func defaultSystemTempSettings() *OperationSettings {
 }
 
 func defaultProjectsManagementAutomationSettings() *OperationSettings {
-	return &OperationSettings{
+	return &OperationSettings{ //nolint:exhaustruct
 		ProjectsManagementAutomation: &ProjectsManagementAutomationSettings{
 			ClearCache: CacheCleanupEnabled,
 		},
@@ -136,16 +136,16 @@ func defaultProjectsManagementAutomationSettings() *OperationSettings {
 }
 
 func defaultProjectExecutablesSettings() *OperationSettings {
-	return &OperationSettings{
-		ProjectExecutables: &ProjectExecutablesSettings{
+	return &OperationSettings{ //nolint:exhaustruct
+		ProjectExecutables: &ProjectExecutablesSettings{ //nolint:exhaustruct
 			ExcludeExtensions: []string{".sh"},
 		},
 	}
 }
 
 func defaultCompiledBinariesSettings() *OperationSettings {
-	return &OperationSettings{
-		CompiledBinaries: &CompiledBinariesSettings{
+	return &OperationSettings{ //nolint:exhaustruct
+		CompiledBinaries: &CompiledBinariesSettings{ //nolint:exhaustruct
 			MinSizeMB: 10,
 			OlderThan: "0",
 		},
@@ -326,14 +326,14 @@ func defaultBuildCacheSettings() *BuildCacheSettings {
 // getDefaultSystemCacheTypes returns platform-appropriate default cache types.
 func getDefaultSystemCacheTypes() []CacheType {
 	switch runtime.GOOS {
-	case "darwin":
+	case "darwin": //nolint:goconst
 		return []CacheType{
 			CacheTypeSpotlight,
 			CacheTypeXcode,
 			CacheTypeCocoapods,
 			CacheTypeHomebrew,
 		}
-	case "linux":
+	case "linux": //nolint:goconst
 		return []CacheType{
 			CacheTypeXdgCache,
 			CacheTypeThumbnails,

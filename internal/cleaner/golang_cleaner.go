@@ -110,7 +110,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 	}
 
 	startTime := time.Now()
-	stats := CleanStats{}
+	stats := CleanStats{} //nolint:exhaustruct
 
 	for _, cacheType := range gc.caches.EnabledTypes() {
 		cleaner, ok := gc.cleaners[cacheType]
@@ -156,7 +156,7 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.Clean
 		itemsRemoved,
 		int64(totalBytes),
 	)
-	cleanResult.SizeEstimate = domain.SizeEstimate{Known: totalBytes}
+	cleanResult.SizeEstimate = domain.SizeEstimate{Known: totalBytes} //nolint:exhaustruct
 
 	return result.Ok(cleanResult)
 }

@@ -8,6 +8,7 @@ import (
 )
 
 func TestGolangciLintCacheCleaner_Name(t *testing.T) {
+	t.Parallel()
 	cleaner := NewGolangciLintCacheCleaner(false, false)
 
 	if cleaner.Name() != "golangci-lint-cache" {
@@ -16,6 +17,7 @@ func TestGolangciLintCacheCleaner_Name(t *testing.T) {
 }
 
 func TestGolangciLintCacheCleaner_Type(t *testing.T) {
+	t.Parallel()
 	cleaner := NewGolangciLintCacheCleaner(false, false)
 
 	if cleaner.Type() != domain.OperationTypeGolangciLintCache {
@@ -24,6 +26,7 @@ func TestGolangciLintCacheCleaner_Type(t *testing.T) {
 }
 
 func TestGolangciLintCacheCleaner_IsAvailable(t *testing.T) {
+	t.Parallel()
 	cleaner := NewGolangciLintCacheCleaner(false, false)
 	ctx := context.Background()
 
@@ -37,6 +40,7 @@ func TestGolangciLintCacheCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestGolangciLintCacheCleaner_GetVerbose(t *testing.T) {
+	t.Parallel()
 	cleaner := NewGolangciLintCacheCleaner(true, false)
 
 	if !cleaner.GetVerbose() {
@@ -45,6 +49,7 @@ func TestGolangciLintCacheCleaner_GetVerbose(t *testing.T) {
 }
 
 func TestGolangciLintCacheCleaner_GetDryRun(t *testing.T) {
+	t.Parallel()
 	cleaner := NewGolangciLintCacheCleaner(false, true)
 
 	if !cleaner.GetDryRun() {
@@ -53,6 +58,7 @@ func TestGolangciLintCacheCleaner_GetDryRun(t *testing.T) {
 }
 
 func TestGolangciLintCacheCleaner_Scan(t *testing.T) {
+	t.Parallel()
 	cleaner := NewGolangciLintCacheCleaner(false, false)
 	ctx := context.Background()
 
@@ -64,6 +70,7 @@ func TestGolangciLintCacheCleaner_Scan(t *testing.T) {
 }
 
 func TestGolangciLintCacheCleaner_Clean(t *testing.T) {
+	t.Parallel()
 	cleaner := NewGolangciLintCacheCleaner(true, false)
 	ctx := context.Background()
 
@@ -78,6 +85,7 @@ func TestGolangciLintCacheCleaner_Clean(t *testing.T) {
 }
 
 func TestParseSize(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		input    string
 		expected int64
@@ -99,6 +107,7 @@ func TestParseSize(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
 			result, err := parseSize(tt.input)
 			if tt.hasError {
 				if err == nil {
@@ -116,6 +125,7 @@ func TestParseSize(t *testing.T) {
 }
 
 func TestParseCacheStatus(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		output   string
@@ -155,6 +165,7 @@ func TestParseCacheStatus(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result, err := parseCacheStatus(tt.output)
 
 			switch {

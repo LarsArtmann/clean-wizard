@@ -101,7 +101,7 @@ func createMinimalConfig() error {
 	// Keep only the daily profile for minimal config
 	daily := cfg.Profiles["daily"]
 	cfg.Profiles = map[string]*domain.Profile{
-		"daily": daily,
+		"daily": daily, //nolint:goconst
 	}
 
 	err := config.Save(cfg)
@@ -190,7 +190,7 @@ func selectSetupMode() (string, error) {
 
 func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) {
 	if setupMode != setupModeCustom {
-		return &customCleanerOptions{}, nil
+		return &customCleanerOptions{}, nil //nolint:exhaustruct
 	}
 
 	var opts customCleanerOptions
@@ -268,7 +268,7 @@ func buildConfigFromSetupMode(setupMode string, customOpts *customCleanerOptions
 		cfg.Profiles = map[string]*domain.Profile{
 			"daily":      createDailyProfile(),
 			"weekly":     createWeeklyProfile(),
-			"aggressive": createAggressiveProfile(),
+			"aggressive": createAggressiveProfile(), //nolint:goconst
 		}
 	}
 
@@ -415,8 +415,8 @@ func createAggressiveProfile() *domain.Profile {
 		Enabled:     domain.ProfileStatusDisabled,
 		Operations: []domain.CleanupOperation{
 			{
-				Name:        "nix-generations",
-				Description: "Clean old Nix generations",
+				Name:        "nix-generations",           //nolint:goconst
+				Description: "Clean old Nix generations", //nolint:goconst
 				RiskLevel:   domain.RiskLevelHighType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
@@ -429,7 +429,7 @@ func createAggressiveProfile() *domain.Profile {
 				Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
 			},
 			{
-				Name:        "docker",
+				Name:        "docker", //nolint:goconst
 				Description: "Clean all unused Docker resources",
 				RiskLevel:   domain.RiskLevelHighType,
 				Enabled:     domain.ProfileStatusEnabled,

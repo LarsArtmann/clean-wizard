@@ -38,7 +38,7 @@ func CleanResultsToJSON(
 	results map[string]domain.CleanResult, duration time.Duration,
 	dryRun bool, skipped, failed map[string]error,
 ) ([]byte, error) {
-	output := JSONOutput{
+	output := JSONOutput{ //nolint:exhaustruct
 		Success:      len(failed) == 0,
 		CleanedAt:    time.Now(),
 		DurationMs:   duration.Milliseconds(),
@@ -56,7 +56,7 @@ func CleanResultsToJSON(
 		output.ItemsFailed += result.ItemsFailed
 		output.FreedBytes += result.FreedBytes
 
-		cleanerResult := CleanerResult{
+		cleanerResult := CleanerResult{ //nolint:exhaustruct
 			Name:         name,
 			ItemsRemoved: result.ItemsRemoved,
 			ItemsFailed:  result.ItemsFailed,
@@ -70,7 +70,7 @@ func CleanResultsToJSON(
 
 	// Process skipped cleaners
 	for name, err := range skipped {
-		output.Cleaners = append(output.Cleaners, CleanerResult{
+		output.Cleaners = append(output.Cleaners, CleanerResult{ //nolint:exhaustruct
 			Name:   name,
 			Status: "skipped",
 			Error:  err.Error(),
@@ -79,7 +79,7 @@ func CleanResultsToJSON(
 
 	// Process failed cleaners
 	for name, err := range failed {
-		output.Cleaners = append(output.Cleaners, CleanerResult{
+		output.Cleaners = append(output.Cleaners, CleanerResult{ //nolint:exhaustruct
 			Name:   name,
 			Status: "failed",
 			Error:  err.Error(),

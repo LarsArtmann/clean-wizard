@@ -8,7 +8,9 @@ import (
 
 // TestIntegration_ValidationSanitizationPipeline tests complete validation and sanitization workflow.
 func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
+	t.Parallel()
 	t.Run("Complete pipeline with complex configuration", func(t *testing.T) {
+		t.Parallel()
 		cfg := CreateIntegrationTestConfig()
 
 		validationResult, _, sanitizationResult := runValidationPipeline(t, cfg)

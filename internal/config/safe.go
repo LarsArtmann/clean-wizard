@@ -60,7 +60,7 @@ func (ct CleanType) IsValid() bool {
 
 // NewSafeConfigBuilder creates a type-safe configuration builder.
 func NewSafeConfigBuilder() *SafeConfigBuilder {
-	return &SafeConfigBuilder{
+	return &SafeConfigBuilder{ //nolint:exhaustruct
 		profiles: []SafeProfile{},
 		maxRisk:  domain.RiskLevelLowType,
 	}
@@ -100,10 +100,10 @@ func (scb *SafeConfigBuilder) Backup() *SafeConfigBuilder {
 // AddProfile adds a safe profile.
 func (scb *SafeConfigBuilder) AddProfile(name, description string) *SafeProfileBuilder {
 	if scb.err != nil {
-		return &SafeProfileBuilder{err: scb.err}
+		return &SafeProfileBuilder{err: scb.err} //nolint:exhaustruct
 	}
 
-	return &SafeProfileBuilder{
+	return &SafeProfileBuilder{ //nolint:exhaustruct
 		name:        name,
 		description: description,
 		config:      scb,

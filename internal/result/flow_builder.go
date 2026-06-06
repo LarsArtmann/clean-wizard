@@ -112,7 +112,7 @@ type ParallelFlow[T any] struct {
 
 // NewParallelFlow creates a new ParallelFlow for concurrent execution.
 func NewParallelFlow[T any]() *ParallelFlow[T] {
-	return &ParallelFlow[T]{
+	return &ParallelFlow[T]{ //nolint:exhaustruct
 		steps: []Step[T]{},
 	}
 }

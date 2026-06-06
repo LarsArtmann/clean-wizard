@@ -11,7 +11,9 @@ import (
 
 // TestNixCleaningBDD tests Nix cleaning operations.
 func TestNixCleaningBDD(t *testing.T) {
+	t.Parallel()
 	t.Run("Scenario: List available Nix generations", func(t *testing.T) {
+		t.Parallel()
 		// Given I have Nix installed
 		t.Log("✅ Given I have Nix installed")
 
@@ -39,6 +41,7 @@ func TestNixCleaningBDD(t *testing.T) {
 	})
 
 	t.Run("Scenario: Clean old Nix generations safely", func(t *testing.T) {
+		t.Parallel()
 		// Given I have multiple Nix generations
 		t.Log("✅ Given I have multiple Nix generations")
 

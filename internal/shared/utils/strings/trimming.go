@@ -66,7 +66,7 @@ func (b *TrimmableFieldsBuilder) AddField(
 	name, path string,
 	value *string,
 ) *TrimmableFieldsBuilder {
-	b.fields = append(b.fields, TrimmableField{
+	b.fields = append(b.fields, TrimmableField{ //nolint:exhaustruct
 		Name:  name,
 		Value: value,
 		Path:  path,

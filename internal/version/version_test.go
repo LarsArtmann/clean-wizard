@@ -8,6 +8,7 @@ import (
 const unknownStr = "unknown"
 
 func TestGet(t *testing.T) {
+	t.Parallel()
 	info := Get()
 
 	// Version should never be empty
@@ -32,6 +33,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestGenerateVersion(t *testing.T) {
+	t.Parallel()
 	v := generateVersion()
 
 	// Should be in format YYYY.MM.DD
@@ -45,6 +47,7 @@ func TestGenerateVersion(t *testing.T) {
 }
 
 func TestGetGitCommit(t *testing.T) {
+	t.Parallel()
 	commit := getGitCommit()
 
 	// Should return unknownStr or a valid commit hash
@@ -58,11 +61,13 @@ func TestGetGitCommit(t *testing.T) {
 }
 
 func TestIsGitDirty(t *testing.T) {
+	t.Parallel()
 	// This test just verifies the function doesn't panic
 	_ = isGitDirty()
 }
 
 func TestInfoString(t *testing.T) {
+	t.Parallel()
 	info := Info{
 		Version: "2026.02.16",
 		Commit:  "abc1234",
@@ -82,6 +87,7 @@ func TestInfoString(t *testing.T) {
 }
 
 func TestInfoShort(t *testing.T) {
+	t.Parallel()
 	info := Info{
 		Version: "2026.02.16-dirty",
 	}
@@ -92,6 +98,7 @@ func TestInfoShort(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
+	t.Parallel()
 	v := Version()
 	if v == "" {
 		t.Error("Version() should not return empty string")
@@ -99,6 +106,7 @@ func TestVersion(t *testing.T) {
 }
 
 func TestCommit(t *testing.T) {
+	t.Parallel()
 	c := Commit()
 	if c == "" {
 		t.Error("Commit() should not return empty string")
@@ -106,6 +114,7 @@ func TestCommit(t *testing.T) {
 }
 
 func TestGetWithDirtyRepo(t *testing.T) {
+	t.Parallel()
 	// If repo is dirty, version should end with -dirty
 	info := Get()
 
@@ -119,6 +128,7 @@ func TestGetWithDirtyRepo(t *testing.T) {
 }
 
 func TestInfoStringWithoutCommit(t *testing.T) {
+	t.Parallel()
 	info := Info{
 		Version: "2026.02.16",
 		Date:    "2026-02-16",

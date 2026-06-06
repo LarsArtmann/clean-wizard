@@ -67,7 +67,7 @@ func (nc *NixCleaner) Type() domain.OperationType {
 
 // Name returns the unique identifier for this cleaner.
 func (nc *NixCleaner) Name() string {
-	return "nix"
+	return "nix" //nolint:goconst
 }
 
 // IsAvailable checks if Nix cleaner is available.

@@ -11,6 +11,7 @@ import (
 )
 
 func TestNewTempFilesCleaner(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		olderThan string
@@ -36,6 +37,7 @@ func TestNewTempFilesCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner, err := NewTempFilesCleaner(
 				false,
 				false,
@@ -57,6 +59,7 @@ func TestNewTempFilesCleaner(t *testing.T) {
 }
 
 func TestTempFilesCleaner_IsAvailable(t *testing.T) {
+	t.Parallel()
 	cleaner, err := NewTempFilesCleaner(false, false, "24h", []string{}, []string{"/tmp"})
 	if err != nil {
 		t.Fatalf("NewTempFilesCleaner() error = %v", err)
@@ -68,6 +71,7 @@ func TestTempFilesCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestTempFilesCleaner_Scan(t *testing.T) {
+	t.Parallel()
 	// Create temporary directory for testing
 	tmpDir := t.TempDir()
 
@@ -120,6 +124,7 @@ func TestTempFilesCleaner_Scan(t *testing.T) {
 }
 
 func TestTempFilesCleaner_Clean_DryRun(t *testing.T) {
+	t.Parallel()
 	// Create temporary directory for testing
 	tmpDir := t.TempDir()
 
@@ -165,6 +170,7 @@ func TestTempFilesCleaner_Clean_DryRun(t *testing.T) {
 }
 
 func TestTempFilesCleaner_Clean_Real(t *testing.T) {
+	t.Parallel()
 	// Create temporary directory for testing
 	tmpDir := t.TempDir()
 
@@ -210,6 +216,7 @@ func TestTempFilesCleaner_Clean_Real(t *testing.T) {
 }
 
 func TestTempFilesCleaner_isExcluded(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		path     string
@@ -244,6 +251,7 @@ func TestTempFilesCleaner_isExcluded(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner, err := NewTempFilesCleaner(false, false, "24h", tt.excludes, []string{"/tmp"})
 			if err != nil {
 				t.Fatalf("NewTempFilesCleaner() error = %v", err)
@@ -268,6 +276,7 @@ func tempFilesSettings(olderThan string, excludes []string) *domain.OperationSet
 }
 
 func TestTempFilesCleaner_ValidateSettings(t *testing.T) {
+	t.Parallel()
 	defaultExcludes := []string{"/tmp/keep"}
 
 	tests := []struct {
@@ -304,6 +313,7 @@ func TestTempFilesCleaner_ValidateSettings(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner, err := NewTempFilesCleaner(false, false, "24h", []string{}, []string{"/tmp"})
 			if err != nil {
 				t.Fatalf("NewTempFilesCleaner() error = %v", err)

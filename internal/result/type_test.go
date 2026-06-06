@@ -42,6 +42,7 @@ func testPanicRecovery(t *testing.T, wantPanic bool, fn func()) {
 }
 
 func TestResult_Ok(t *testing.T) {
+	t.Parallel()
 	testPredicateCases(
 		t,
 		"IsOk",
@@ -51,6 +52,7 @@ func TestResult_Ok(t *testing.T) {
 }
 
 func TestResult_IsErr(t *testing.T) {
+	t.Parallel()
 	testPredicateCases(
 		t,
 		"IsErr",
@@ -84,6 +86,7 @@ func testPredicateCases(
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if predicate(tt.result) != tt.expected {
 				t.Errorf("%s() = %v, want %v", methodName, predicate(tt.result), tt.expected)
 			}
@@ -92,6 +95,7 @@ func testPredicateCases(
 }
 
 func TestResult_Value(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		result    Result[int]
@@ -116,6 +120,7 @@ func TestResult_Value(t *testing.T) {
 }
 
 func TestResult_Error(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		result    Result[int]
@@ -140,6 +145,7 @@ func TestResult_Error(t *testing.T) {
 }
 
 func TestResult_UnwrapOr(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		result   Result[int]
@@ -152,6 +158,7 @@ func TestResult_UnwrapOr(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			value := tt.result.UnwrapOr(tt.default_)
 			if value != tt.expected {
 				t.Errorf("UnwrapOr(%v) = %v, want %v", tt.default_, value, tt.expected)
@@ -187,6 +194,7 @@ func assertResultEquals[T comparable](t *testing.T, opName string, got, want Res
 }
 
 func TestResult_Map(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		result   Result[int]
@@ -209,6 +217,7 @@ func TestResult_Map(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mapped := Map(tt.result, tt.fn)
 			assertResultEquals(t, "Map", mapped, tt.expected)
 		})
@@ -216,6 +225,7 @@ func TestResult_Map(t *testing.T) {
 }
 
 func TestResult_AndThen(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		result   Result[int]
@@ -244,6 +254,7 @@ func TestResult_AndThen(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := AndThen(tt.result, tt.fn)
 			assertResultEquals(t, "AndThen", result, tt.expected)
 		})
@@ -251,6 +262,7 @@ func TestResult_AndThen(t *testing.T) {
 }
 
 func TestResult_FlatMap(t *testing.T) {
+	t.Parallel()
 	// FlatMap is an alias for AndThen, so we just verify AndThen works
 	result := AndThen(Ok(10), func(i int) Result[int] { return Ok(i * 2) })
 	if !result.IsOk() || result.Value() != 20 {
@@ -259,6 +271,7 @@ func TestResult_FlatMap(t *testing.T) {
 }
 
 func TestResult_OrElse(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		result        Result[int]
@@ -282,6 +295,7 @@ func TestResult_OrElse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := tt.result.OrElse(tt.fallback)
 
 			if result.IsOk() != tt.expectedOk {
@@ -296,6 +310,7 @@ func TestResult_OrElse(t *testing.T) {
 }
 
 func TestResult_Validate(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		result        Result[int]
@@ -323,6 +338,7 @@ func TestResult_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := tt.result.Validate(tt.predicate, tt.errorMsg)
 
 			if result.IsOk() != tt.expectedOk {
@@ -343,6 +359,7 @@ func TestResult_Validate(t *testing.T) {
 }
 
 func TestResult_ValidateWithError(t *testing.T) {
+	t.Parallel()
 	customErr := errors.New("custom validation error")
 	result := Ok(10).ValidateWithError(func(i int) bool { return i > 100 }, customErr)
 
@@ -360,6 +377,7 @@ func TestResult_ValidateWithError(t *testing.T) {
 }
 
 func TestResult_Tap(t *testing.T) {
+	t.Parallel()
 	var tappedValue *int
 
 	okResult := Ok(42).Tap(func(v int) { tappedValue = &v })

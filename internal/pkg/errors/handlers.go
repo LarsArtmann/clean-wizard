@@ -22,7 +22,7 @@ func HandleCommandError(cmd *exec.Cmd, err error) *CleanWizardError {
 		WithDetail("path", cmd.Path)
 
 	// Add specific error details based on error type
-	exitErr := &exec.ExitError{}
+	exitErr := &exec.ExitError{} //nolint:exhaustruct
 	if errors.As(err, &exitErr) {
 		baseErr = baseErr.
 			WithDetail("exit_code", exitErr.ExitCode).
@@ -85,7 +85,7 @@ func WrapError(err error, code ErrorCode, operation string) *CleanWizardError {
 	cleanErr = cleanErr.WithDetail("wrapped_error", err.Error())
 
 	// If it's already a CleanWizardError, preserve details
-	wizardErr := &CleanWizardError{}
+	wizardErr := &CleanWizardError{} //nolint:exhaustruct
 	if errors.As(err, &wizardErr) {
 		cleanErr.Details = wizardErr.Details
 		cleanErr.Stack = wizardErr.Stack

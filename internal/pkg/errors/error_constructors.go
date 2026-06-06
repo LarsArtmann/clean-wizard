@@ -6,7 +6,7 @@ import (
 
 // NewError creates new CleanWizardError.
 func NewError(code ErrorCode, message string) *CleanWizardError {
-	return &CleanWizardError{
+	return &CleanWizardError{ //nolint:exhaustruct
 		Code:      code,
 		Level:     LevelError,
 		Message:   message,
@@ -18,7 +18,7 @@ func NewError(code ErrorCode, message string) *CleanWizardError {
 
 // NewErrorWithLevel creates new CleanWizardError with custom level.
 func NewErrorWithLevel(code ErrorCode, level ErrorLevel, message string) *CleanWizardError {
-	return &CleanWizardError{
+	return &CleanWizardError{ //nolint:exhaustruct
 		Code:      code,
 		Level:     level,
 		Message:   message,
@@ -30,7 +30,7 @@ func NewErrorWithLevel(code ErrorCode, level ErrorLevel, message string) *CleanW
 
 // NewErrorWithDetails creates new CleanWizardError with context details.
 func NewErrorWithDetails(code ErrorCode, message string, details *ErrorDetails) *CleanWizardError {
-	err := &CleanWizardError{
+	err := &CleanWizardError{ //nolint:exhaustruct
 		Code:      code,
 		Level:     LevelError,
 		Message:   message,

@@ -7,6 +7,7 @@ import (
 )
 
 func TestConfigValidator_ValidateConfig(t *testing.T) {
+	t.Parallel()
 	validator := newTestValidator()
 
 	tests := []struct {
@@ -44,6 +45,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := validator.ValidateConfig(tt.config)
 			assertValidationResult(t, result, tt.expectValid, tt.expectError)
 		})
@@ -127,6 +129,7 @@ func assertValidationResult(
 }
 
 func TestConfigValidator_ValidateField(t *testing.T) {
+	t.Parallel()
 	validator := NewConfigValidator()
 
 	tests := []struct {
@@ -181,6 +184,7 @@ func TestConfigValidator_ValidateField(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			err := validator.ValidateField(tt.field, tt.value)
 
 			if tt.expectError && err == nil {

@@ -90,6 +90,7 @@ type BooleanSettingsCleanerTestCase struct {
 // TestBooleanSettingsCleaners runs boolean settings tests for all applicable cleaners.
 // This consolidates duplicate test functions across cleaner test files.
 func TestBooleanSettingsCleaners(t *testing.T) {
+	t.Parallel()
 	testCases := []BooleanSettingsCleanerTestCase{
 		{
 			Name: "Cargo",
@@ -141,6 +142,7 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 			CreateBooleanSettingsTest(t, tc.Config)
 		})
 	}

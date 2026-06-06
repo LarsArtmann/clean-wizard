@@ -107,7 +107,7 @@ func (e *GitHistoryExecutor) Execute(
 	}
 
 	if e.dryRun {
-		return &domain.GitHistoryRewriteResult{
+		return &domain.GitHistoryRewriteResult{ //nolint:exhaustruct
 			FilesRemoved:    opts.FilesToRemove,
 			BytesRemoved:    e.calculateTotalSize(opts.FilesToRemove),
 			CommitsAffected: 0,
@@ -358,10 +358,10 @@ type ImpactEstimate struct {
 func (e *GitHistoryExecutor) RemoveFilesFromHistory(ctx context.Context, paths []string) error {
 	files := make([]domain.GitHistoryFile, len(paths))
 	for i, path := range paths {
-		files[i] = domain.GitHistoryFile{Path: path}
+		files[i] = domain.GitHistoryFile{Path: path} //nolint:exhaustruct
 	}
 
-	_, err := e.Execute(ctx, ExecuteOptions{
+	_, err := e.Execute(ctx, ExecuteOptions{ //nolint:exhaustruct
 		FilesToRemove: files,
 		CreateBackup:  true,
 	})

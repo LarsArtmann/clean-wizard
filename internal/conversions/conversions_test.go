@@ -74,6 +74,7 @@ func assertScanResultFields(
 }
 
 func TestNewCleanResult(t *testing.T) {
+	t.Parallel()
 	strategy := domain.StrategyDryRunType
 	items := 5
 	bytes := int64(1024)
@@ -106,6 +107,7 @@ func TestNewCleanResult(t *testing.T) {
 }
 
 func TestNewCleanResultWithTiming(t *testing.T) {
+	t.Parallel()
 	strategy := domain.StrategyDryRunType
 	items := 3
 	bytes := int64(2048)
@@ -131,6 +133,7 @@ func TestNewCleanResultWithTiming(t *testing.T) {
 }
 
 func TestNewCleanResultWithFailures(t *testing.T) {
+	t.Parallel()
 	strategy := domain.StrategyDryRunType
 	itemsRemoved := 8
 	itemsFailed := 2
@@ -161,6 +164,7 @@ func TestNewCleanResultWithFailures(t *testing.T) {
 }
 
 func TestNewScanResult(t *testing.T) {
+	t.Parallel()
 	totalBytes := int64(8192)
 	totalItems := 12
 	scannedPaths := []string{"/path1", "/path2"}
@@ -171,6 +175,7 @@ func TestNewScanResult(t *testing.T) {
 }
 
 func TestToCleanResult(t *testing.T) {
+	t.Parallel()
 	bytes := int64(1024)
 	bytesResult := result.Ok(bytes)
 
@@ -191,6 +196,7 @@ func TestToCleanResult(t *testing.T) {
 }
 
 func TestToCleanResultWithError(t *testing.T) {
+	t.Parallel()
 	expectedErr := errors.New("test error")
 	bytesResult := result.Err[int64](expectedErr)
 
@@ -199,6 +205,7 @@ func TestToCleanResultWithError(t *testing.T) {
 }
 
 func TestToCleanResultWithStrategy(t *testing.T) {
+	t.Parallel()
 	bytes := int64(2048)
 	strategy := domain.StrategyDryRunType
 	bytesResult := result.Ok(bytes)
@@ -218,6 +225,7 @@ func TestToCleanResultWithStrategy(t *testing.T) {
 }
 
 func TestToCleanResultFromItems(t *testing.T) {
+	t.Parallel()
 	itemsRemoved := 5
 	bytes := int64(4096)
 	strategy := domain.StrategyDryRunType
@@ -242,6 +250,7 @@ func TestToCleanResultFromItems(t *testing.T) {
 }
 
 func TestToTimedCleanResult(t *testing.T) {
+	t.Parallel()
 	bytes := int64(8192)
 	strategy := domain.StrategyDryRunType
 	cleanTime := time.Duration(7) * time.Second
@@ -266,6 +275,7 @@ func TestToTimedCleanResult(t *testing.T) {
 }
 
 func TestToScanResult(t *testing.T) {
+	t.Parallel()
 	totalBytes := int64(16384)
 	totalItems := 20
 	scannedPaths := []string{"/path1", "/path2", "/path3"}
@@ -276,6 +286,7 @@ func TestToScanResult(t *testing.T) {
 }
 
 func TestCombineCleanResults(t *testing.T) {
+	t.Parallel()
 	result1 := NewCleanResult(
 		domain.StrategyAggressiveType,
 		3,
@@ -312,6 +323,7 @@ func TestCombineCleanResults(t *testing.T) {
 }
 
 func TestCombineCleanResultsWithFailures(t *testing.T) {
+	t.Parallel()
 	result1 := NewCleanResultWithFailures(
 		domain.StrategyAggressiveType,
 		3,
@@ -349,6 +361,7 @@ func TestCombineCleanResultsWithFailures(t *testing.T) {
 }
 
 func TestCombineCleanResultsEmpty(t *testing.T) {
+	t.Parallel()
 	results := []domain.CleanResult{}
 
 	combined := CombineCleanResults(results)
@@ -370,6 +383,7 @@ func TestCombineCleanResultsEmpty(t *testing.T) {
 }
 
 func TestExtractBytesFromCleanResult(t *testing.T) {
+	t.Parallel()
 	bytes := int64(4096)
 	cleanResult := result.Ok(
 		NewCleanResult(domain.StrategyConservativeType, 1, bytes),
@@ -387,6 +401,7 @@ func TestExtractBytesFromCleanResult(t *testing.T) {
 }
 
 func TestExtractBytesFromCleanResultWithError(t *testing.T) {
+	t.Parallel()
 	expectedErr := errors.New("test error")
 	cleanResult := result.Err[domain.CleanResult](expectedErr)
 
@@ -402,6 +417,7 @@ func TestExtractBytesFromCleanResultWithError(t *testing.T) {
 }
 
 func TestToCleanResultFromError(t *testing.T) {
+	t.Parallel()
 	expectedErr := errors.New("test error")
 
 	cleanResult := ToCleanResultFromError(expectedErr)
@@ -409,6 +425,7 @@ func TestToCleanResultFromError(t *testing.T) {
 }
 
 func TestValidateAndConvertCleanResult(t *testing.T) {
+	t.Parallel()
 	validResult := NewCleanResult(
 		domain.StrategyConservativeType,
 		1,
@@ -423,6 +440,7 @@ func TestValidateAndConvertCleanResult(t *testing.T) {
 }
 
 func TestValidateAndConvertCleanResultInvalid(t *testing.T) {
+	t.Parallel()
 	invalidResult := domain.CleanResult{
 		SizeEstimate: domain.SizeEstimate{
 			Known:  0,

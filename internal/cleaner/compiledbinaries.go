@@ -46,7 +46,7 @@ const (
 )
 
 // DefaultExcludeDirectories are directories that should never be scanned.
-var DefaultExcludeDirectories = []string{
+var DefaultExcludeDirectories = []string{ //nolint:gochecknoglobals
 	"node_modules",
 	"venv",
 	".venv",
@@ -58,7 +58,7 @@ var DefaultExcludeDirectories = []string{
 }
 
 // DefaultExcludeBinaries are specific binaries that should not be cleaned (required by tools).
-var DefaultExcludeBinaries = []string{
+var DefaultExcludeBinaries = []string{ //nolint:gochecknoglobals
 	"chromedriver",
 	"geckodriver",
 	"edgedriver",
@@ -158,7 +158,7 @@ func NewCompiledBinariesCleaner(
 		}
 	}
 
-	cleaner := &CompiledBinariesCleaner{
+	cleaner := &CompiledBinariesCleaner{ //nolint:exhaustruct
 		CleanerBase:     NewCleanerBase(verbose, dryRun),
 		minSizeMB:       minSizeMB,
 		olderThan:       olderThan,
@@ -533,7 +533,7 @@ func (s *defaultBinaryScanner) categorizeBinary(path, baseDir string) BinaryCate
 
 	for _, part := range parts {
 		switch part {
-		case "tmp":
+		case "tmp": //nolint:goconst
 			return CategoryTmp
 		case "bin":
 			return CategoryBin

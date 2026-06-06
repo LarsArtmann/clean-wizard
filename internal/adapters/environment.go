@@ -91,7 +91,7 @@ type EnvironmentConfig struct {
 
 // LoadEnvironmentConfig loads configuration from environment variables.
 func LoadEnvironmentConfig() (*EnvironmentConfig, error) {
-	cfg := &EnvironmentConfig{}
+	cfg := &EnvironmentConfig{} //nolint:exhaustruct
 
 	err := env.Parse(cfg)
 	if err != nil {
@@ -103,7 +103,7 @@ func LoadEnvironmentConfig() (*EnvironmentConfig, error) {
 
 // LoadEnvironmentConfigWithPrefix loads configuration with custom prefix.
 func LoadEnvironmentConfigWithPrefix(prefix string) (*EnvironmentConfig, error) {
-	cfg := &EnvironmentConfig{}
+	cfg := &EnvironmentConfig{} //nolint:exhaustruct
 
 	err := env.Parse(cfg, env.Options{
 		Prefix: prefix,

@@ -84,7 +84,7 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 		return nil, fmt.Errorf("unexpected output format: %s", output)
 	}
 
-	status := &cacheStatus{}
+	status := &cacheStatus{} //nolint:exhaustruct
 
 	for _, line := range lines {
 		if after, ok := strings.CutPrefix(line, "Dir:"); ok {
@@ -109,7 +109,7 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 }
 
 // golangciLintSizeMultiplier converts size unit strings to byte multipliers.
-var golangciLintSizeMultiplier = map[string]int64{
+var golangciLintSizeMultiplier = map[string]int64{ //nolint:gochecknoglobals
 	"B":     1,
 	"BYTE":  1,
 	"BYTES": 1,
@@ -214,7 +214,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			domain.StrategyConservativeType,
 			0, int64(0),
-			domain.SizeEstimate{Status: domain.SizeEstimateStatusUnknown},
+			domain.SizeEstimate{Status: domain.SizeEstimateStatusUnknown}, //nolint:exhaustruct
 		))
 	}
 
@@ -234,7 +234,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			domain.StrategyDryRunType,
 			len(items), totalSize,
-			domain.SizeEstimate{Known: uint64(totalSize)},
+			domain.SizeEstimate{Known: uint64(totalSize)}, //nolint:exhaustruct
 		))
 	}
 
@@ -281,7 +281,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 		domain.StrategyConservativeType,
 		1, bytesFreed,
-		domain.SizeEstimate{Known: uint64(bytesFreed)},
+		domain.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
 	))
 }
 

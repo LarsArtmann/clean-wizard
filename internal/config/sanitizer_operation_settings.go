@@ -18,16 +18,16 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(
 	err := settings.ValidateSettings(opType)
 	if err != nil {
 		// Convert validation errors to warnings since the result type doesn't have an Errors field
-		validationErr := &domain.ValidationError{}
+		validationErr := &domain.ValidationError{} //nolint:exhaustruct
 		if errors.As(err, &validationErr) {
-			result.Warnings = append(result.Warnings, SanitizationWarning{
+			result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct
 				Field:     fieldPrefix + "." + validationErr.Field,
 				Original:  validationErr.Value,
 				Sanitized: validationErr.Value,
 				Reason:    validationErr.Message,
 			})
 		} else {
-			result.Warnings = append(result.Warnings, SanitizationWarning{
+			result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct
 				Field:     fieldPrefix,
 				Original:  "settings validation",
 				Sanitized: "settings validation",
@@ -68,7 +68,7 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(
 
 	default:
 		// For custom operation types, just record that they were processed
-		result.Warnings = append(result.Warnings, SanitizationWarning{
+		result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct
 			Field:     fieldPrefix,
 			Original:  "custom operation settings",
 			Sanitized: "custom operation settings",

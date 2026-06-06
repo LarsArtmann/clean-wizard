@@ -157,7 +157,7 @@ const (
 )
 
 // nameToOperationType maps operation names to their corresponding OperationType.
-var nameToOperationType = map[string]OperationType{
+var nameToOperationType = map[string]OperationType{ //nolint:gochecknoglobals
 	"nix-generations":                OperationTypeNixGenerations,
 	"temp-files":                     OperationTypeTempFiles,
 	"homebrew-cleanup":               OperationTypeHomebrew,

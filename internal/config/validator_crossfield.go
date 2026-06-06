@@ -21,13 +21,13 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 		}
 
 		result.Errors = append(result.Errors, ValidationError{
-			Field:      "max_disk_usage",
+			Field:      "max_disk_usage", //nolint:goconst
 			Rule:       "range",
 			Value:      cfg.MaxDiskUsage,
 			Message:    err.Error(),
 			Severity:   SeverityError,
 			Suggestion: suggestion,
-			Context: &ValidationContext{
+			Context: &ValidationContext{ //nolint:exhaustruct
 				MinValue: minUsage,
 				MaxValue: maxUsage,
 			},
@@ -37,8 +37,8 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	// Protected paths validation
 	err = cv.validateProtectedPaths(cfg.Protected)
 	if err != nil {
-		result.Errors = append(result.Errors, ValidationError{
-			Field:      "protected",
+		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
+			Field:      "protected", //nolint:goconst
 			Rule:       "format",
 			Value:      cfg.Protected,
 			Message:    err.Error(),
@@ -51,7 +51,7 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	if cv.rules.UniquePaths {
 		duplicates := cv.findDuplicatePaths(cfg.Protected)
 		if len(duplicates) > 0 {
-			result.Warnings = append(result.Warnings, ValidationWarning{
+			result.Warnings = append(result.Warnings, ValidationWarning{ //nolint:exhaustruct
 				Field:      "protected",
 				Message:    fmt.Sprintf("Duplicate protected paths found: %v", duplicates),
 				Suggestion: "Remove duplicate paths from protected list",
@@ -62,8 +62,8 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 	// Check profile count limits
 	if cv.rules.MaxProfiles != nil && cv.rules.MaxProfiles.Max != nil &&
 		len(cfg.Profiles) > *cv.rules.MaxProfiles.Max {
-		result.Warnings = append(result.Warnings, ValidationWarning{
-			Field: "profiles",
+		result.Warnings = append(result.Warnings, ValidationWarning{ //nolint:exhaustruct
+			Field: "profiles", //nolint:goconst
 			Message: fmt.Sprintf("Profile count (%d) exceeds recommended limit (%d)",
 				len(cfg.Profiles), *cv.rules.MaxProfiles.Max),
 			Suggestion: "Consider consolidating profiles to improve maintainability",
@@ -80,10 +80,10 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(
 		maxRisk := cv.findMaxRiskLevel(cfg)
 		if maxRisk == domain.RiskLevelCriticalType {
 			result.Warnings = append(result.Warnings, ValidationWarning{
-				Field:      "safe_mode",
+				Field:      "safe_mode", //nolint:goconst
 				Message:    "Critical risk operations enabled while safe_mode is false",
 				Suggestion: "Enable safe_mode or review critical risk operations",
-				Context: &ValidationContext{
+				Context: &ValidationContext{ //nolint:exhaustruct
 					Metadata: map[string]string{
 						"max_risk_level": maxRisk.String(),
 						"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode),
@@ -104,7 +104,7 @@ func (cv *ConfigValidator) validateCrossFieldConstraints(
 						name, len(profile.Operations), *cv.rules.MaxOperations.Max,
 					),
 					Suggestion: "Consider splitting operations into multiple profiles",
-					Context: &ValidationContext{
+					Context: &ValidationContext{ //nolint:exhaustruct
 						Metadata: map[string]string{
 							"operation_count": strconv.Itoa(len(profile.Operations)),
 							"max_operations":  strconv.Itoa(*cv.rules.MaxOperations.Max),

@@ -205,6 +205,7 @@ func newValidateConfigWhen() []BDDWhen {
 
 // TestBDD_NixGenerationsValidation provides comprehensive BDD tests for Nix generations.
 func TestBDD_NixGenerationsValidation(t *testing.T) {
+	t.Parallel()
 	feature := BDDFeature{
 		Name: "Nix Generations Configuration Validation",
 		Description: "As a system administrator, I want to configure Nix generations cleanup " +

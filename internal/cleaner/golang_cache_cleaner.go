@@ -273,7 +273,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			domain.StrategyConservativeType,
 			1, bytesFreed,
-			domain.SizeEstimate{Known: uint64(bytesFreed)},
+			domain.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
 		))
 	}
 
@@ -283,7 +283,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 		domain.StrategyConservativeType,
 		1, bytesFreed,
-		domain.SizeEstimate{Known: uint64(bytesFreed)},
+		domain.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
 	))
 }
 
@@ -328,7 +328,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(
 
 			// Calculate size before removal (always, for accurate dry-run estimates)
 			bytesFreed := GetDirSize(match)
-			totalSizeEstimate = domain.SizeEstimate{
+			totalSizeEstimate = domain.SizeEstimate{ //nolint:exhaustruct
 				Known: totalSizeEstimate.Known + uint64(bytesFreed),
 			}
 

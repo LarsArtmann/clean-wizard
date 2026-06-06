@@ -3,6 +3,8 @@ package domain
 import "gopkg.in/yaml.v3"
 
 // CacheCleanupMode represents cache cleanup behavior as a type-safe enum.
+//
+//nolint:recvcheck
 type CacheCleanupMode int
 
 const (
@@ -12,7 +14,7 @@ const (
 	CacheCleanupEnabled
 )
 
-var cacheCleanupModeStrings = []string{"DISABLED", "ENABLED"}
+var cacheCleanupModeStrings = []string{"DISABLED", "ENABLED"} //nolint:goconst,gochecknoglobals
 
 func (cm CacheCleanupMode) String() string { return EnumString(cm, cacheCleanupModeStrings) }
 func (cm CacheCleanupMode) IsValid() bool  { return EnumIsValid(cm, CacheCleanupEnabled) }
@@ -29,6 +31,8 @@ func (cm *CacheCleanupMode) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // DockerPruneMode represents Docker prune behavior as a type-safe enum.
+//
+//nolint:recvcheck
 type DockerPruneMode int
 
 const (
@@ -44,7 +48,13 @@ const (
 	DockerPruneBuilds
 )
 
-var dockerPruneModeStrings = []string{"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS"}
+var dockerPruneModeStrings = []string{ //nolint:gochecknoglobals
+	"ALL",        //nolint:goconst
+	"IMAGES",     //nolint:goconst
+	"CONTAINERS", //nolint:goconst
+	"VOLUMES",    //nolint:goconst
+	"BUILDS",     //nolint:goconst
+}
 
 func (pm DockerPruneMode) String() string { return EnumString(pm, dockerPruneModeStrings) }
 func (pm DockerPruneMode) IsValid() bool  { return EnumIsValid(pm, DockerPruneBuilds) }
@@ -61,6 +71,8 @@ func (pm *DockerPruneMode) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // BuildToolType represents build tool types as a type-safe enum.
+//
+//nolint:recvcheck
 type BuildToolType int
 
 const (
@@ -78,7 +90,7 @@ const (
 	BuildToolScala
 )
 
-var buildToolTypeStrings = []string{"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA"}
+var buildToolTypeStrings = []string{"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA"} //nolint:goconst,gochecknoglobals
 
 func (bt BuildToolType) String() string { return EnumString(bt, buildToolTypeStrings) }
 func (bt BuildToolType) IsValid() bool  { return EnumIsValid(bt, BuildToolScala) }
@@ -92,6 +104,8 @@ func (bt *BuildToolType) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // CacheType represents system cache types as a type-safe enum.
+//
+//nolint:recvcheck
 type CacheType int
 
 const (
@@ -151,9 +165,9 @@ const (
 	CacheTypeComgr
 )
 
-var cacheTypeStrings = []string{
-	"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP",
-	"NPM", "YARN", "CCACHE", "XDG_CACHE", "THUMBNAILS",
+var cacheTypeStrings = []string{ //nolint:gochecknoglobals
+	"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP", //nolint:goconst
+	"NPM", "YARN", "CCACHE", "XDG_CACHE", "THUMBNAILS", //nolint:goconst
 	"PUPPETEER", "TERRAFORM", "GRADLE_WRAPPER", "KONAN", "RUSTUP",
 	"GOPLS", "GOIMPORTS", "JETBRAINS", "BUN_CACHE", "PLAYWRIGHT",
 	"MOZILLA", "NIX_CACHE", "ZIG", "UV", "TINYGO",
@@ -169,6 +183,8 @@ func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // PackageManagerType represents Node.js package manager types as a type-safe enum.
+//
+//nolint:recvcheck
 type PackageManagerType int
 
 const (
@@ -182,7 +198,7 @@ const (
 	PackageManagerBun
 )
 
-var packageManagerTypeStrings = []string{"NPM", "PNPM", "YARN", "BUN"}
+var packageManagerTypeStrings = []string{"NPM", "PNPM", "YARN", "BUN"} //nolint:goconst,gochecknoglobals
 
 func (pm PackageManagerType) String() string { return EnumString(pm, packageManagerTypeStrings) }
 func (pm PackageManagerType) IsValid() bool  { return EnumIsValid(pm, PackageManagerBun) }

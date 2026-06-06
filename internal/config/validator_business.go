@@ -12,7 +12,7 @@ func (cv *ConfigValidator) addCriticalRiskError(
 	result *ValidationResult, profileName string, op domain.CleanupOperation,
 	rule, message, suggestion string,
 ) {
-	result.Errors = append(result.Errors, ValidationError{
+	result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
 		Field:      fmt.Sprintf("profiles.%s.operations.%s.risk_level", profileName, op.Name),
 		Rule:       rule,
 		Value:      op.RiskLevel,
@@ -27,7 +27,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 	for name, profile := range cfg.Profiles {
 		// Validate profile business logic
 		if len(profile.Operations) == 0 {
-			result.Errors = append(result.Errors, ValidationError{
+			result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
 				Field:      fmt.Sprintf("profiles.%s.operations", name),
 				Rule:       "business_logic",
 				Value:      len(profile.Operations),
@@ -53,7 +53,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 
 				err := op.Settings.ValidateSettings(opType)
 				if err != nil {
-					result.Errors = append(result.Errors, ValidationError{
+					result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
 						Field: fmt.Sprintf(
 							"profiles.%s.operations.%s.settings",
 							name,
@@ -79,7 +79,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 		for _, op := range profile.Operations {
 			err := cv.validateProtectedPathsConflict(cfg.Protected, op)
 			if err != nil {
-				result.Warnings = append(result.Warnings, ValidationWarning{
+				result.Warnings = append(result.Warnings, ValidationWarning{ //nolint:exhaustruct
 					Field:      fmt.Sprintf("profiles.%s.operations.%s", profile.Name, op.Name),
 					Message:    fmt.Sprintf("Operation may affect protected paths: %v", err),
 					Suggestion: "Review operation scope and protected paths configuration",
@@ -98,10 +98,10 @@ func (cv *ConfigValidator) validateSecurityConstraints(
 	for _, path := range cfg.Protected {
 		if path == "/" {
 			result.Warnings = append(result.Warnings, ValidationWarning{
-				Field:      "protected",
+				Field:      "protected", //nolint:goconst
 				Message:    "Protecting root directory '/' may prevent system operations",
 				Suggestion: "Consider protecting specific system directories instead",
-				Context: &ValidationContext{
+				Context: &ValidationContext{ //nolint:exhaustruct
 					Metadata: map[string]string{
 						"protected_path": path,
 					},
@@ -111,7 +111,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(
 
 		// Check for suspicious path patterns
 		if strings.Contains(path, "..") {
-			result.Errors = append(result.Errors, ValidationError{
+			result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
 				Field:      "protected",
 				Rule:       "security",
 				Value:      path,
@@ -141,10 +141,10 @@ func (cv *ConfigValidator) validateProtectedPathsConflict(
 	op domain.CleanupOperation,
 ) error {
 	switch op.Name {
-	case "temp-files":
+	case "temp-files": //nolint:goconst
 		// Check if temp files cleanup might affect protected paths
 		return cv.checkTempFilesConflict(protected, op)
-	case "nix-generations":
+	case "nix-generations": //nolint:goconst
 		// Check if nix cleanup might affect protected paths
 		return cv.checkNixConflict(protected, op)
 	default:

@@ -16,7 +16,7 @@ var (
 
 // destructiveCleaners are excluded from "standard" mode because they are
 // potentially destructive or require external services (e.g., Docker daemon).
-var destructiveCleaners = map[CleanerType]bool{
+var destructiveCleaners = map[CleanerType]bool{ //nolint:gochecknoglobals
 	CleanerTypeDocker:                       true,
 	CleanerTypeProjectsManagementAutomation: true,
 }
@@ -158,7 +158,7 @@ func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 			CleanerTypeTempFiles,
 			CleanerTypeBuildCache,
 		}
-	case "aggressive":
+	case "aggressive": //nolint:goconst
 		return allAvailableTypes(configs)
 	case "standard":
 		var safeTypes []CleanerType

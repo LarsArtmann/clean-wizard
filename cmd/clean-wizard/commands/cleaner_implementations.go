@@ -25,7 +25,7 @@ var (
 // cleanerRunner executes a specific cleaner.
 type cleanerRunner func(context.Context, bool, bool) (domain.CleanResult, error)
 
-var cleanerRegistry = map[CleanerType]cleanerRunner{
+var cleanerRegistry = map[CleanerType]cleanerRunner{ //nolint:gochecknoglobals
 	CleanerTypeNix:                          runNixCleaner,
 	CleanerTypeHomebrew:                     runHomebrewCleaner,
 	CleanerTypeTempFiles:                    runTempFilesCleaner,

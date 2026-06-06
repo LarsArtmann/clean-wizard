@@ -17,6 +17,7 @@ import (
 
 // Test entry point for Ginkgo.
 func TestNixBDDSuite(t *testing.T) {
+	t.Parallel()
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "Nix BDD Suite")
 }

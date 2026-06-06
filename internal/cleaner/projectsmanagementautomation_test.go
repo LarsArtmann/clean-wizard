@@ -8,6 +8,7 @@ import (
 )
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
+	t.Parallel()
 	TestNewCleanerConstructor(
 		t,
 		NewProjectsManagementAutomationCleaner,
@@ -16,6 +17,7 @@ func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
+	t.Parallel()
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	if cleaner.Type() != domain.OperationTypeProjectsManagementAutomation {
@@ -28,10 +30,12 @@ func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
+	t.Parallel()
 	TestIsAvailable(t, NewProjectsManagementAutomationCleaner)
 }
 
 func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
+	t.Parallel()
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	size := cleaner.estimateCacheSize()
@@ -43,6 +47,7 @@ func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
+	t.Parallel()
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	result := cleaner.Scan(context.Background())
@@ -85,6 +90,7 @@ func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_Scan_NotAvailable(t *testing.T) {
+	t.Parallel()
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	// If tool is not available, should return empty items
@@ -104,6 +110,7 @@ func TestProjectsManagementAutomationCleaner_Scan_NotAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
+	t.Parallel()
 	// This test would fail if projects-management-automation is installed
 	// We just verify error handling logic exists
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
@@ -114,6 +121,7 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestProjectsManagementAutomationCleaner_StandardTests(t *testing.T) {
+	t.Parallel()
 	TestStandardCleaner(t,
 		NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
 		"projects-management-automation")

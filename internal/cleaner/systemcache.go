@@ -195,7 +195,7 @@ type cacheTypeConfig struct {
 }
 
 // systemCacheConfigs maps cache types to their configuration.
-var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
+var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{ //nolint:gochecknoglobals
 	// macOS-specific cache types
 	domain.CacheTypeSpotlight: {
 		pathComponents: []string{
@@ -239,12 +239,12 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeNpm: {
-		pathComponents: []string{pathComponentDotCache, "npm"},
+		pathComponents: []string{pathComponentDotCache, "npm"}, //nolint:goconst
 		displayName:    "NPM cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeYarn: {
-		pathComponents: []string{pathComponentDotCache, "yarn"},
+		pathComponents: []string{pathComponentDotCache, "yarn"}, //nolint:goconst
 		displayName:    "Yarn cache",
 		scanType:       domain.ScanTypeTemp,
 	},
@@ -295,7 +295,7 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeBunCache: {
-		pathComponents: []string{pathComponentDotCache, "bun"},
+		pathComponents: []string{pathComponentDotCache, "bun"}, //nolint:goconst
 		displayName:    "Bun cache",
 		scanType:       domain.ScanTypeTemp,
 	},
@@ -310,7 +310,7 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeNixCache: {
-		pathComponents: []string{pathComponentDotCache, "nix"},
+		pathComponents: []string{pathComponentDotCache, "nix"}, //nolint:goconst
 		displayName:    "Nix evaluator/substituter cache",
 		scanType:       domain.ScanTypeTemp,
 	},

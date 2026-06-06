@@ -15,9 +15,9 @@ func (e *CleanWizardError) WithOperation(operation string) *CleanWizardError {
 type detailFieldHandler func(details **ErrorDetails, value any)
 
 // detailFieldHandlers maps detail keys to their handlers.
-var detailFieldHandlers = map[string]detailFieldHandler{
+var detailFieldHandlers = map[string]detailFieldHandler{ //nolint:gochecknoglobals
 	"field":       setStringFieldStrictHandler,
-	"value":       setStringFieldHandler,
+	"value":       setStringFieldHandler, //nolint:goconst
 	"expected":    setStringFieldHandler,
 	"actual":      setStringFieldHandler,
 	"operation":   setStringFieldStrictHandler,
@@ -122,7 +122,7 @@ func (e *CleanWizardError) Log() {
 		e.infoLog()
 	case "warning":
 		e.warnLog()
-	case "error":
+	case "error": //nolint:goconst
 		e.errorLog()
 	case "fatal":
 		e.fatalLog()

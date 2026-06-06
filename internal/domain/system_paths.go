@@ -20,9 +20,9 @@ const (
 // DefaultProtectedPaths returns platform-appropriate protected system paths.
 func DefaultProtectedPaths() []string {
 	switch runtime.GOOS {
-	case "darwin":
+	case "darwin": //nolint:goconst
 		return []string{PathSystem, PathApplications, PathLibrary}
-	case "linux":
+	case "linux": //nolint:goconst
 		return []string{PathNixStore, PathNixVar}
 	default:
 		return []string{}

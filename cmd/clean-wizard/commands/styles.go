@@ -9,33 +9,33 @@ import (
 )
 
 var (
-	TitleStyle = lipgloss.NewStyle().
+	TitleStyle = lipgloss.NewStyle(). //nolint:gochecknoglobals
 			Bold(true).
 			Foreground(lipgloss.Color("86")).
 			Padding(1, 0)
 
-	WarningStyle = lipgloss.NewStyle().
+	WarningStyle = lipgloss.NewStyle(). //nolint:gochecknoglobals
 			Foreground(lipgloss.Color("214")).
 			Padding(0, 1)
 
-	InfoStyle = lipgloss.NewStyle().
+	InfoStyle = lipgloss.NewStyle(). //nolint:gochecknoglobals
 			Foreground(lipgloss.Color("117")).
 			Padding(0, 1)
 
-	SuccessStyle = lipgloss.NewStyle().
+	SuccessStyle = lipgloss.NewStyle(). //nolint:gochecknoglobals
 			Foreground(lipgloss.Color("82")).
 			Padding(0, 1)
 
-	ErrorStyle = lipgloss.NewStyle().
+	ErrorStyle = lipgloss.NewStyle(). //nolint:gochecknoglobals
 			Foreground(lipgloss.Color("196")).
 			Padding(0, 1)
 
-	HeaderStyle = lipgloss.NewStyle().
+	HeaderStyle = lipgloss.NewStyle(). //nolint:gochecknoglobals
 			Bold(true).
 			Foreground(lipgloss.Color("81")).
 			Padding(0, 1)
 
-	MutedStyle = lipgloss.NewStyle().
+	MutedStyle = lipgloss.NewStyle(). //nolint:gochecknoglobals
 			Foreground(lipgloss.Color("241")).
 			Padding(0, 1)
 )

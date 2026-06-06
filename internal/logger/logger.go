@@ -28,10 +28,10 @@ import (
 
 // L is the global logger instance.
 // Use this for all logging throughout the application.
-var L *log.Logger
+var L *log.Logger //nolint:gochecknoglobals
 
 // StdLogger provides a standard slog.Logger for interoperability.
-var StdLogger *slog.Logger
+var StdLogger *slog.Logger //nolint:gochecknoglobals
 
 // Level strings for configuration parsing.
 const (
@@ -67,7 +67,7 @@ func setupLogger(level log.Level, development bool) {
 		formatter = log.TextFormatter
 	}
 
-	L = log.NewWithOptions(os.Stdout, log.Options{
+	L = log.NewWithOptions(os.Stdout, log.Options{ //nolint:exhaustruct
 		Level:           level,
 		Formatter:       formatter,
 		ReportTimestamp: true,

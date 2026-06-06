@@ -29,7 +29,7 @@ func NewCleanResult(
 	itemsRemoved int,
 	freedBytes int64,
 ) domain.CleanResult {
-	return domain.CleanResult{
+	return domain.CleanResult{ //nolint:exhaustruct
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  0,
@@ -63,7 +63,7 @@ func NewCleanResult(
 func NewCleanResultWithTiming(
 	strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64, cleanTime time.Duration,
 ) domain.CleanResult {
-	return domain.CleanResult{
+	return domain.CleanResult{ //nolint:exhaustruct
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  0,
@@ -97,7 +97,7 @@ func NewCleanResultWithFailures(
 	strategy domain.CleanStrategyType, itemsRemoved, itemsFailed int, freedBytes int64,
 	cleanTime time.Duration,
 ) domain.CleanResult {
-	return domain.CleanResult{
+	return domain.CleanResult{ //nolint:exhaustruct
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  uint(itemsFailed),

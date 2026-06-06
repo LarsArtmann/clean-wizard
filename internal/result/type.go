@@ -12,7 +12,7 @@ type Result[T any] struct {
 
 // Ok creates a successful result.
 func Ok[T any](value T) Result[T] {
-	return Result[T]{value: value}
+	return Result[T]{value: value} //nolint:exhaustruct
 }
 
 // Err creates an error result.

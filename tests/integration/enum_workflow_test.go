@@ -147,6 +147,7 @@ func newEnumTestCase(
 
 // TestEnumWorkflow_Integration tests full workflow from YAML config with enums to execution.
 func TestEnumWorkflow_Integration(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -185,6 +186,7 @@ func TestEnumWorkflow_Integration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			configYAML := buildEnumWorkflowYAML(
 				tt.dockerPruneMode,
 				tt.goCleanCache, tt.goTestCache, tt.goModCache, tt.goBuildCache, tt.goLintCache,
@@ -405,6 +407,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 
 // TestEnumWorkflow_InvalidEnums tests that invalid enum values are caught.
 func TestEnumWorkflow_InvalidEnums(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -484,6 +487,7 @@ operations:
 
 // TestDefaultSettings_WithEnums tests that DefaultSettings returns valid enum values.
 func TestDefaultSettings_WithEnums(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -504,6 +508,7 @@ func TestDefaultSettings_WithEnums(t *testing.T) {
 
 	for _, opType := range testCases {
 		t.Run(string(opType), func(t *testing.T) {
+			t.Parallel()
 			// Get default settings
 			settings := domain.DefaultSettings(opType)
 			require.NotNil(t, settings, "DefaultSettings should not return nil")
@@ -540,6 +545,7 @@ func TestDefaultSettings_WithEnums(t *testing.T) {
 
 // TestEnumRoundtrip_ThroughConfig tests roundtrip of enum values through config.
 func TestEnumRoundtrip_ThroughConfig(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -618,6 +624,7 @@ func TestEnumRoundtrip_ThroughConfig(t *testing.T) {
 
 // TestEnumErrorMessages_ThroughWorkflow tests that enum errors are helpful.
 func TestEnumErrorMessages_ThroughWorkflow(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -645,6 +652,7 @@ func TestEnumErrorMessages_ThroughWorkflow(t *testing.T) {
 
 // TestEnumValues_ThroughExecution tests that enum values are used correctly in execution.
 func TestEnumValues_ThroughExecution(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -663,6 +671,7 @@ func TestEnumValues_ThroughExecution(t *testing.T) {
 
 	for _, pm := range pruneModes {
 		t.Run(pm.name, func(t *testing.T) {
+			t.Parallel()
 			// Verify enum is valid
 			assert.True(t, pm.mode.IsValid(), "%s should be valid", pm.name)
 

@@ -9,6 +9,7 @@ import (
 )
 
 func TestNewNodePackageManagerCleaner(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name             string
 		verbose          bool
@@ -45,6 +46,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner := NewNodePackageManagerCleaner(tt.verbose, tt.dryRun, tt.packageManagers)
 
 			if cleaner == nil {
@@ -65,6 +67,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_Type(t *testing.T) {
+	t.Parallel()
 	cleaner := NewNodePackageManagerCleaner(false, false, AvailableNodePackageManagers())
 
 	if cleaner.Type() != domain.OperationTypeNodePackages {
@@ -73,6 +76,7 @@ func TestNodePackageManagerCleaner_Type(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name              string
 		packageManagers   []domain.PackageManagerType
@@ -92,6 +96,7 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner := NewNodePackageManagerCleaner(false, false, tt.packageManagers)
 			available := cleaner.IsAvailable(context.Background())
 
@@ -103,6 +108,7 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
+	t.Parallel()
 	factory := NewCleanerConstructorWithSettings(
 		NewNodePackageManagerCleaner,
 		AvailableNodePackageManagers,
@@ -174,6 +180,7 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name            string
 		packageManagers []domain.PackageManagerType
@@ -196,6 +203,7 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner := NewNodePackageManagerCleaner(false, true, tt.packageManagers)
 
 			// Skip test if no PMs are available
@@ -240,6 +248,7 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_Clean_NoAvailableManagers(t *testing.T) {
+	t.Parallel()
 	cleaner := NewNodePackageManagerCleaner(false, false, []domain.PackageManagerType{})
 
 	result := cleaner.Clean(context.Background())
@@ -249,6 +258,7 @@ func TestNodePackageManagerCleaner_Clean_NoAvailableManagers(t *testing.T) {
 }
 
 func TestNodePackageManagerCleaner_AvailableNodePackageManagers(t *testing.T) {
+	t.Parallel()
 	expectedPMs := []domain.PackageManagerType{
 		domain.PackageManagerNpm,
 		domain.PackageManagerPnpm,

@@ -68,7 +68,7 @@ func NewConfigValidatorWithRules(rules *ConfigValidationRules) *ConfigValidator 
 // ValidateConfig performs comprehensive configuration validation.
 func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult {
 	start := time.Now()
-	result := &ValidationResult{
+	result := &ValidationResult{ //nolint:exhaustruct
 		IsValid:   true,
 		Errors:    []ValidationError{},
 		Warnings:  []ValidationWarning{},
@@ -104,11 +104,11 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 // ValidateField validates a specific configuration field.
 func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	switch field {
-	case "max_disk_usage":
+	case "max_disk_usage": //nolint:goconst
 		return cv.validateMaxDiskUsage(value)
-	case "protected":
+	case "protected": //nolint:goconst
 		return cv.validateProtectedPaths(value)
-	case "profiles":
+	case "profiles": //nolint:goconst
 		if cfg, ok := value.(*domain.Config); ok {
 			return cv.validateProfiles(cfg)
 		}

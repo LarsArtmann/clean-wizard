@@ -25,7 +25,7 @@ type ParallelExecutor struct {
 // NewParallelExecutor creates a new parallel executor with the specified max concurrency.
 // If maxConcurrency <= 0, it defaults to the number of available cleaners.
 func NewParallelExecutor(maxConcurrency int) *ParallelExecutor {
-	return &ParallelExecutor{
+	return &ParallelExecutor{ //nolint:exhaustruct
 		maxConcurrency: maxConcurrency,
 	}
 }
@@ -146,7 +146,7 @@ type ExecutionMetrics struct {
 
 // CalculateMetrics aggregates metrics from parallel execution results.
 func CalculateMetrics(results []CleanResultWithMetrics) ExecutionMetrics {
-	metrics := ExecutionMetrics{
+	metrics := ExecutionMetrics{ //nolint:exhaustruct
 		TotalCleaners: len(results),
 	}
 

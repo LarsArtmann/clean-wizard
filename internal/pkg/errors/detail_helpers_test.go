@@ -8,6 +8,7 @@ import (
 )
 
 func TestSetStringField(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		inputValue  any
@@ -42,6 +43,7 @@ func TestSetStringField(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			var target string
 
 			wasExact := setStringField(&target, tt.inputValue)
@@ -53,6 +55,7 @@ func TestSetStringField(t *testing.T) {
 }
 
 func TestSetStringFieldStrict(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name            string
 		inputValue      any
@@ -84,6 +87,7 @@ func TestSetStringFieldStrict(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			var target string
 
 			wasSet := setStringFieldStrict(&target, tt.inputValue)
@@ -100,6 +104,7 @@ func TestSetStringFieldStrict(t *testing.T) {
 }
 
 func TestSetIntField(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name            string
 		inputValue      any
@@ -138,6 +143,7 @@ func TestSetIntField(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			var target int
 
 			wasSet := setIntField(&target, tt.inputValue)
@@ -154,6 +160,7 @@ func TestSetIntField(t *testing.T) {
 }
 
 func TestAddToMetadata(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		metadata   map[string]string
@@ -186,6 +193,7 @@ func TestAddToMetadata(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := addToMetadata(tt.metadata, tt.key, tt.inputValue)
 
 			assert.NotNil(t, result)
@@ -201,6 +209,7 @@ func TestAddToMetadata(t *testing.T) {
 }
 
 func TestEnsureDetails(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name         string
 		inputDetails **ErrorDetails
@@ -228,6 +237,7 @@ func TestEnsureDetails(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			ensureDetails(tt.inputDetails)
 
 			assert.NotNil(t, *tt.inputDetails)
@@ -238,19 +248,20 @@ func TestEnsureDetails(t *testing.T) {
 }
 
 func TestErrorDetailsBuilder(t *testing.T) {
-	t.Run("basic construction", testBasicConstruction)
-	t.Run("WithField", testWithField)
-	t.Run("WithValue", testWithValue)
-	t.Run("WithExpected", testWithExpected)
-	t.Run("WithActual", testWithActual)
-	t.Run("WithOperation", testWithOperation)
-	t.Run("WithFilePath", testWithFilePath)
-	t.Run("WithLineNumber", testWithLineNumber)
-	t.Run("WithRetryCount", testWithRetryCount)
-	t.Run("WithDuration", testWithDuration)
-	t.Run("WithMetadata", testWithMetadata)
+	t.Parallel()
+	t.Run("basic construction", testBasicConstruction) //nolint:paralleltest
+	t.Run("WithField", testWithField)                  //nolint:paralleltest
+	t.Run("WithValue", testWithValue)                  //nolint:paralleltest
+	t.Run("WithExpected", testWithExpected)            //nolint:paralleltest
+	t.Run("WithActual", testWithActual)                //nolint:paralleltest
+	t.Run("WithOperation", testWithOperation)          //nolint:paralleltest
+	t.Run("WithFilePath", testWithFilePath)            //nolint:paralleltest
+	t.Run("WithLineNumber", testWithLineNumber)        //nolint:paralleltest
+	t.Run("WithRetryCount", testWithRetryCount)        //nolint:paralleltest
+	t.Run("WithDuration", testWithDuration)            //nolint:paralleltest
+	t.Run("WithMetadata", testWithMetadata)            //nolint:paralleltest
 	t.Run("fluent chaining", testFluentChaining)
-	t.Run("metadata initialized once", testMetadataInitializedOnce)
+	t.Run("metadata initialized once", testMetadataInitializedOnce) //nolint:paralleltest
 }
 
 func testBasicConstruction(t *testing.T) {
@@ -380,6 +391,7 @@ func testFluentChaining(t *testing.T) {
 
 	for _, tt := range fluentTests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			builder := NewErrorDetails().
 				WithField(tt.field).
 				WithValue(tt.value).
@@ -475,8 +487,10 @@ func requireErrorDetails(t *testing.T, err *CleanWizardError) *ErrorDetails {
 }
 
 func TestErrorDetailsBuilderIntegration(t *testing.T) {
+	t.Parallel()
 	// Integration test: Verify ErrorDetailsBuilder works with error constructors
 	t.Run("config validation error", func(t *testing.T) {
+		t.Parallel()
 		err := ValidationError("test_field", "invalid_value", "expected_value")
 
 		cleanErr := requireCleanWizardError(t, err)
@@ -513,6 +527,7 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			err := tt.createErr("test error message")
 
 			cleanErr := requireCleanWizardError(t, err)
@@ -525,6 +540,7 @@ func TestErrorDetailsBuilderIntegration(t *testing.T) {
 	}
 
 	t.Run("handler validation error with details", func(t *testing.T) {
+		t.Parallel()
 		err := HandleValidationErrorWithDetails(
 			"test_operation",
 			"test_field",

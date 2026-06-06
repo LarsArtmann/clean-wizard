@@ -10,6 +10,7 @@ import (
 )
 
 func TestNixCleaner_ListGenerations(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		test func(t *testing.T)
@@ -52,12 +53,13 @@ func TestNixCleaner_ListGenerations(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, tt.test)
 	}
 }
 
 func TestNixCleaner_CleanOldGenerations(t *testing.T) {
+	t.Parallel()
 	cleaner := NewNixCleaner(true, true) // dry run
 	ctx := context.Background()
 
@@ -76,6 +78,7 @@ func TestNixCleaner_CleanOldGenerations(t *testing.T) {
 }
 
 func TestNixCleaner_GetStoreSize(t *testing.T) {
+	t.Parallel()
 	cleaner := NewNixCleaner(false, true) // dry run to avoid expensive system call
 	ctx := context.Background()
 
@@ -84,6 +87,7 @@ func TestNixCleaner_GetStoreSize(t *testing.T) {
 }
 
 func TestNixCleaner_ParseGeneration(t *testing.T) {
+	t.Parallel()
 	adapter := adapters.NewNixAdapter(0, 0)
 
 	// Test parsing valid generation line
@@ -104,6 +108,7 @@ func TestNixCleaner_ParseGeneration(t *testing.T) {
 }
 
 func TestNixCleaner_IsNixNotAvailable(t *testing.T) {
+	t.Parallel()
 	// Test basic functionality
 	err := errors.New("nix-env: command not found")
 	isNotAvailable := strings.Contains(err.Error(), "command not found")

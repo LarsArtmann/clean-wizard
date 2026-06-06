@@ -16,6 +16,7 @@ import (
 
 // TestNixCleaner_Integration tests Nix cleaner with real Nix environment.
 func TestNixCleaner_Integration(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -52,6 +53,7 @@ func TestNixCleaner_Integration(t *testing.T) {
 
 // TestGoCleaner_Integration tests Go cleaner integration.
 func TestGoCleaner_Integration(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -80,6 +82,7 @@ func TestGoCleaner_Integration(t *testing.T) {
 
 // TestHomebrewCleaner_Integration tests Homebrew cleaner integration.
 func TestHomebrewCleaner_Integration(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -103,6 +106,7 @@ func TestHomebrewCleaner_Integration(t *testing.T) {
 
 // TestMultiCleaner_Integration tests multiple cleaners running together.
 func TestMultiCleaner_Integration(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -133,6 +137,7 @@ func TestMultiCleaner_Integration(t *testing.T) {
 
 	for _, tc := range cleaners {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			// Just check availability - don't actually clean in integration tests
 			available := tc.cleaner.IsAvailable(ctx)
 			t.Logf("%s cleaner available: %v", tc.name, available)
@@ -142,6 +147,7 @@ func TestMultiCleaner_Integration(t *testing.T) {
 
 // TestCleanerTimeout_Integration tests that cleaners respect timeouts.
 func TestCleanerTimeout_Integration(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}

@@ -36,6 +36,7 @@ func TestGolangHelpers_getHomeDir(t *testing.T) {
 }
 
 func TestGolangHelpers_getDirSize(t *testing.T) {
+	t.Parallel()
 	testDir := t.TempDir()
 
 	// Should return 0 for empty directory
@@ -61,6 +62,7 @@ func TestGolangHelpers_getDirSize(t *testing.T) {
 }
 
 func TestGolangHelpers_getDirModTime(t *testing.T) {
+	t.Parallel()
 	testDir := t.TempDir()
 
 	// Create a test file

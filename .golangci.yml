@@ -86,6 +86,9 @@ linters:
     exhaustruct:
       exclude:
         - os/exec.Cmd
+        - github.com/spf13/cobra.Command
+        - github.com/maypok86/otter/v2.Options
+        - github.com/caarlos0/env/v6.Options
     funlen:
       lines: 100
       statements: 60
@@ -142,6 +145,14 @@ linters:
         text: unused-parameter
         linters:
           - revive
+      - path: internal/cleaner/ginkgo_test_helpers\.go
+        linters:
+          - exhaustruct
+          - goconst
+      - path: internal/cleaner/test_assertions\.go
+        linters:
+          - exhaustruct
+          - goconst
       - path: internal/domain/enum_macros\.go
         linters:
           - wrapcheck

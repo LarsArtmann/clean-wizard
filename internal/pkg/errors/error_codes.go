@@ -28,7 +28,7 @@ const (
 )
 
 // errorCodeStrings maps ErrorCode values to their string representations.
-var errorCodeStrings = map[ErrorCode]string{
+var errorCodeStrings = map[ErrorCode]string{ //nolint:gochecknoglobals
 	ErrUnknown:           "UNKNOWN",
 	ErrInvalidInput:      "INVALID_INPUT",
 	ErrNotFound:          "NOT_FOUND",

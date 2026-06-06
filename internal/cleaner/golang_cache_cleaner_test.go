@@ -32,6 +32,7 @@ func TestGoCacheCleaner_getGoBuildCacheLocations(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner := tt.setup()
 			locations := cleaner.getGoBuildCacheLocations()
 
@@ -145,6 +146,7 @@ func TestGoCacheCleaner_NewGoCacheCleaner(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner := NewGoCacheCleaner(tt.cacheType, tt.verbose, tt.dryRun)
 
 			require.NotNil(t, cleaner)
@@ -174,6 +176,7 @@ func TestGoCacheCleaner_Name(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			cleaner := NewGoCacheCleaner(tt.cacheType, false, false)
 			assert.Equal(t, "golang", cleaner.Name())
 		})

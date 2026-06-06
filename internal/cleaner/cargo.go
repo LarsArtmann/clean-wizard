@@ -127,7 +127,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)}
+		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
 
 		return result.Ok(cleanResult)
 	}
@@ -197,7 +197,7 @@ func (cc *CargoCleaner) cleanWithCargoCacheTool(
 func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[domain.CleanResult] {
 	return cc.executeCargoCleanCommand(
 		ctx,
-		"cargo", []string{"clean"},
+		"cargo", []string{"clean"}, //nolint:goconst
 		"cargo clean failed: %w (output: %s)",
 		"  ✓ Cargo cache cleaned",
 	)

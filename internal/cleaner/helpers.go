@@ -165,7 +165,7 @@ func ValidateOptionalSettingsWithTypes[F any](
 }
 
 // BuildCacheAvailableTypes defines all valid build cache tool types.
-var BuildCacheAvailableTypes = []string{
+var BuildCacheAvailableTypes = []string{ //nolint:gochecknoglobals
 	domain.BuildToolGo.String(),
 	domain.BuildToolRust.String(),
 	domain.BuildToolNode.String(),

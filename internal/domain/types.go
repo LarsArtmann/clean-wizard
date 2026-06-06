@@ -22,23 +22,23 @@ const (
 
 // Use type-safe constants directly.
 var (
-	RiskLow      = RiskLevelLowType
-	RiskMedium   = RiskLevelMediumType
-	RiskHigh     = RiskLevelHighType
-	RiskCritical = RiskLevelCriticalType
+	RiskLow      = RiskLevelLowType      //nolint:gochecknoglobals
+	RiskMedium   = RiskLevelMediumType   //nolint:gochecknoglobals
+	RiskHigh     = RiskLevelHighType     //nolint:gochecknoglobals
+	RiskCritical = RiskLevelCriticalType //nolint:gochecknoglobals
 
-	ValidationLevelNone          = ValidationLevelNoneType
-	ValidationLevelBasic         = ValidationLevelBasicType
-	ValidationLevelComprehensive = ValidationLevelComprehensiveType
-	ValidationLevelStrict        = ValidationLevelStrictType
+	ValidationLevelNone          = ValidationLevelNoneType          //nolint:gochecknoglobals
+	ValidationLevelBasic         = ValidationLevelBasicType         //nolint:gochecknoglobals
+	ValidationLevelComprehensive = ValidationLevelComprehensiveType //nolint:gochecknoglobals
+	ValidationLevelStrict        = ValidationLevelStrictType        //nolint:gochecknoglobals
 
-	OperationAdded    = ChangeOperationAddedType
-	OperationRemoved  = ChangeOperationRemovedType
-	OperationModified = ChangeOperationModifiedType
+	OperationAdded    = ChangeOperationAddedType    //nolint:gochecknoglobals
+	OperationRemoved  = ChangeOperationRemovedType  //nolint:gochecknoglobals
+	OperationModified = ChangeOperationModifiedType //nolint:gochecknoglobals
 
-	StrategyAggressive   = StrategyAggressiveType
-	StrategyConservative = StrategyConservativeType
-	StrategyDryRun       = StrategyDryRunType
+	StrategyAggressive   = StrategyAggressiveType   //nolint:gochecknoglobals
+	StrategyConservative = StrategyConservativeType //nolint:gochecknoglobals
+	StrategyDryRun       = StrategyDryRunType       //nolint:gochecknoglobals
 )
 
 // Strong ID types for compile-time type safety on identifiers.

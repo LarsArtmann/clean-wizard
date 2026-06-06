@@ -10,6 +10,7 @@ import (
 )
 
 func TestInit(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		development bool
@@ -26,6 +27,7 @@ func TestInit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			Init(tt.development)
 			require.NotNil(t, L, "logger should be initialized")
 			require.NotNil(t, StdLogger, "slog logger should be initialized")
@@ -34,6 +36,7 @@ func TestInit(t *testing.T) {
 }
 
 func TestInitWithLevel(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		level       string
@@ -63,6 +66,7 @@ func TestInitWithLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			InitWithLevel(tt.level, tt.development)
 			require.NotNil(t, L, "logger should be initialized")
 		})
@@ -70,6 +74,7 @@ func TestInitWithLevel(t *testing.T) {
 }
 
 func TestLoggingFunctions(t *testing.T) {
+	t.Parallel()
 	Init(true) // Development mode for testability
 
 	tests := []struct {
@@ -96,6 +101,7 @@ func TestLoggingFunctions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Should not panic
 			assert.NotPanics(t, tt.fn)
 		})
@@ -103,6 +109,7 @@ func TestLoggingFunctions(t *testing.T) {
 }
 
 func TestWith(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	childLogger := With("request_id", "123", "user_id", "456")
@@ -110,6 +117,7 @@ func TestWith(t *testing.T) {
 }
 
 func TestWithPrefix(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	prefixedLogger := WithPrefix("test-component")
@@ -117,6 +125,7 @@ func TestWithPrefix(t *testing.T) {
 }
 
 func TestCleanerLogger(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	cleanerLog := CleanerLogger("docker")
@@ -124,6 +133,7 @@ func TestCleanerLogger(t *testing.T) {
 }
 
 func TestSetLevel(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	tests := []struct {
@@ -139,6 +149,7 @@ func TestSetLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Should not panic
 			assert.NotPanics(t, func() { SetLevel(tt.level) })
 		})
@@ -146,6 +157,7 @@ func TestSetLevel(t *testing.T) {
 }
 
 func TestSetLevel_Uninitialized(t *testing.T) {
+	t.Parallel()
 	// Reset logger to nil
 	L = nil
 
@@ -154,6 +166,7 @@ func TestSetLevel_Uninitialized(t *testing.T) {
 }
 
 func TestSync(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	// Should not panic
@@ -161,6 +174,7 @@ func TestSync(t *testing.T) {
 }
 
 func TestGetSlogLogger(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	slogLogger := GetSlogLogger()
@@ -168,6 +182,7 @@ func TestGetSlogLogger(t *testing.T) {
 }
 
 func TestLoggingWithMultipleFields(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	// Test logging with various field types
@@ -183,12 +198,14 @@ func TestLoggingWithMultipleFields(t *testing.T) {
 }
 
 func TestCleanerLoggerIntegration(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	cleaners := []string{"docker", "nix", "homebrew", "go", "cargo"}
 
 	for _, name := range cleaners {
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			logger := CleanerLogger(name)
 			require.NotNil(t, logger)
 
@@ -225,6 +242,7 @@ func BenchmarkLogging(b *testing.B) {
 
 // TestLoggingOutput verifies that logs are written.
 func TestLoggingOutput(t *testing.T) {
+	t.Parallel()
 	// This is a basic smoke test to ensure logging doesn't panic
 	// In a real scenario, you'd capture stdout and verify output
 	Init(true)
@@ -240,6 +258,7 @@ func TestLoggingOutput(t *testing.T) {
 
 // TestPrefix verifies prefix functionality.
 func TestPrefix(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	// Test that prefix methods work
@@ -254,6 +273,7 @@ func TestPrefix(t *testing.T) {
 
 // TestLevelValidation tests that invalid levels are handled gracefully.
 func TestLevelValidation(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	// Invalid level should default to info
@@ -267,6 +287,7 @@ func TestLevelValidation(t *testing.T) {
 
 // TestNilLoggerSafety tests that functions handle nil logger gracefully.
 func TestNilLoggerSafety(t *testing.T) {
+	t.Parallel()
 	// Save original logger
 	originalL := L
 
@@ -287,13 +308,16 @@ func TestNilLoggerSafety(t *testing.T) {
 
 // TestDevelopmentVsProduction tests different modes.
 func TestDevelopmentVsProduction(t *testing.T) {
+	t.Parallel()
 	t.Run("development", func(t *testing.T) {
+		t.Parallel()
 		Init(true)
 		assert.NotNil(t, L)
 		assert.NotNil(t, StdLogger)
 	})
 
 	t.Run("production", func(t *testing.T) {
+		t.Parallel()
 		Init(false)
 		assert.NotNil(t, L)
 		assert.NotNil(t, StdLogger)
@@ -302,6 +326,7 @@ func TestDevelopmentVsProduction(t *testing.T) {
 
 // TestLogMessageContent verifies log message content.
 func TestLogMessageContent(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	// Test that we can create logs with various content
@@ -314,6 +339,7 @@ func TestLogMessageContent(t *testing.T) {
 
 	for _, msg := range messages {
 		t.Run(msg[:min(len(msg), 20)], func(t *testing.T) {
+			t.Parallel()
 			assert.NotPanics(t, func() {
 				Info(msg)
 			})
@@ -323,6 +349,7 @@ func TestLogMessageContent(t *testing.T) {
 
 // TestCharmbraceletIntegration verifies integration with charmbracelet/log.
 func TestCharmbraceletIntegration(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	// Test that we can use charmbracelet/log specific features
@@ -338,6 +365,7 @@ func TestCharmbraceletIntegration(t *testing.T) {
 
 // TestSlogIntegration verifies slog integration.
 func TestSlogIntegration(t *testing.T) {
+	t.Parallel()
 	Init(true)
 
 	// Test that slog logger works

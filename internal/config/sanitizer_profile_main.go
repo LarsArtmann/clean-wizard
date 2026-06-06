@@ -61,7 +61,7 @@ func (cs *ConfigSanitizer) sanitizeOperations(
 func (cs *ConfigSanitizer) applyDefaults(cfg *domain.Config, result *SanitizationResult) {
 	// Set default version if empty
 	if cfg.Version == "" {
-		cfg.Version = "1.0.0"
+		cfg.Version = "1.0.0" //nolint:goconst
 		result.addChange("version", "", cfg.Version, "applied default version")
 	}
 

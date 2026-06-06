@@ -24,6 +24,7 @@ func TestDefaultSettingsValidation(t *testing.T) {
 
 	for _, opType := range testCases {
 		t.Run(string(opType), func(t *testing.T) {
+			t.Parallel()
 			// This should not panic for valid defaults
 			settings := DefaultSettings(opType)
 			if settings == nil {

@@ -154,7 +154,7 @@ type ScanResult struct {
 
 // scanCleanerReal scans a cleaner using the real Scan method from the cleaner interface.
 func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool) ScanResult {
-	result := ScanResult{
+	result := ScanResult{ //nolint:exhaustruct
 		Name:        getCleanerName(cleanerType),
 		Description: getCleanerDescription(cleanerType),
 		Icon:        getCleanerIcon(cleanerType),

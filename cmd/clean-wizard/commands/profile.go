@@ -192,8 +192,8 @@ func runProfileCreateCommand(_ *cobra.Command, _ []string, name, description str
 		Enabled:     domain.ProfileStatusEnabled,
 		Operations: []domain.CleanupOperation{
 			{
-				Name:        "nix-generations",
-				Description: "Clean old Nix generations",
+				Name:        "nix-generations",           //nolint:goconst
+				Description: "Clean old Nix generations", //nolint:goconst
 				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),

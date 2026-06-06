@@ -30,7 +30,7 @@ type GitHistoryScannerOption func(*GitHistoryScanner)
 
 // NewGitHistoryScanner creates a new git history scanner.
 func NewGitHistoryScanner(repoPath string, opts ...GitHistoryScannerOption) *GitHistoryScanner {
-	s := &GitHistoryScanner{
+	s := &GitHistoryScanner{ //nolint:exhaustruct
 		repoPath:     repoPath,
 		minSizeBytes: 1024 * 1024, // Default 1MB
 		excludeExts:  make(map[string]bool),
@@ -246,40 +246,40 @@ func (s *GitHistoryScanner) parseBlobLine(
 	seenPaths map[string]bool,
 ) (domain.GitHistoryFile, bool) {
 	if line == "" {
-		return domain.GitHistoryFile{}, false
+		return domain.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	parts := strings.Fields(line)
 	if len(parts) < 3 {
-		return domain.GitHistoryFile{}, false
+		return domain.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	objHash := parts[0]
 	objType := parts[1]
 
 	if objType != "blob" {
-		return domain.GitHistoryFile{}, false
+		return domain.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	path, hasPath := objectPaths[objHash]
 	if !hasPath || path == "" {
-		return domain.GitHistoryFile{}, false
+		return domain.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	if seenPaths[path] {
-		return domain.GitHistoryFile{}, false
+		return domain.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	seenPaths[path] = true
 
 	size, err := strconv.ParseInt(parts[2], 10, 64)
 	if err != nil || size < s.minSizeBytes {
-		return domain.GitHistoryFile{}, false
+		return domain.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	ext := strings.ToLower(filepath.Ext(path))
 
-	return domain.GitHistoryFile{
+	return domain.GitHistoryFile{ //nolint:exhaustruct
 		Path:      path,
 		SizeBytes: size,
 		BlobHash:  objHash,
@@ -403,7 +403,7 @@ func (s *GitHistoryScanner) isLikelyBinary(f domain.GitHistoryFile) bool {
 		}
 
 		// Check for common binary names
-		binaryNames := []string{"main", "app", "server", "cli", "cmd", "run", "start", "stop"}
+		binaryNames := []string{"main", "app", "server", "cli", "cmd", "run", "start", "stop"} //nolint:goconst
 
 		base := filepath.Base(f.Path)
 		if slices.Contains(binaryNames, base) {

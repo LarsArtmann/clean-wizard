@@ -11,6 +11,7 @@ import (
 
 // TestEnumYAMLMarshaling tests that all enum types can be properly marshaled to YAML.
 func TestEnumYAMLMarshaling(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		value    any
@@ -54,6 +55,7 @@ func TestEnumYAMLMarshaling(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			data, err := yaml.Marshal(tt.value)
 			if err != nil {
 				t.Fatalf("Marshal() error = %v", err)
@@ -277,6 +279,7 @@ func runEnumMethodTests[T comparable](
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			actual := extract(tt.value)
 			if actual != tt.expected {
 				t.Errorf("%s = %v, want %v", methodName, actual, tt.expected)
@@ -359,16 +362,19 @@ func runEnumYAMLUnmarshalingTests(t *testing.T, tests []enumUnmarshalTestCase) {
 
 // TestEnumYAMLUnmarshalingFromString tests that all enum types can be unmarshaled from YAML strings.
 func TestEnumYAMLUnmarshalingFromString(t *testing.T) {
+	t.Parallel()
 	runEnumYAMLUnmarshalingTests(t, enumStringTestCases)
 }
 
 // TestEnumYAMLUnmarshalingFromInt tests that all enum types can be unmarshaled from YAML integers.
 func TestEnumYAMLUnmarshalingFromInt(t *testing.T) {
+	t.Parallel()
 	runEnumYAMLUnmarshalingTests(t, enumIntTestCases)
 }
 
 // TestEnumStringMethod tests that all enum types implement String() correctly.
 func TestEnumStringMethod(t *testing.T) {
+	t.Parallel()
 	tests := []enumValueTestCase[string]{
 		// CacheCleanupMode
 		{"CacheCleanupMode Disabled", CacheCleanupDisabled, "DISABLED"},
@@ -416,6 +422,7 @@ func TestEnumStringMethod(t *testing.T) {
 
 // TestEnumIsValidMethod tests that all enum types implement IsValid() correctly.
 func TestEnumIsValidMethod(t *testing.T) {
+	t.Parallel()
 	tests := []enumValueTestCase[bool]{
 		// CacheCleanupMode
 		{"CacheCleanupMode Disabled", CacheCleanupDisabled, true},
@@ -481,6 +488,7 @@ func testSystemCacheSettings() *SystemCacheSettings {
 
 // TestOperationSettingsWithEnums tests that OperationSettings can be marshaled/unmarshaled with enums.
 func TestOperationSettingsWithEnums(t *testing.T) {
+	t.Parallel()
 	settings := &OperationSettings{
 		NodePackages: &NodePackagesSettings{
 			PackageManagers: []PackageManagerType{
@@ -555,6 +563,7 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 
 // TestEnumErrorMessages tests that invalid enum values produce helpful error messages.
 func TestEnumErrorMessages(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		input       string
@@ -600,6 +609,7 @@ func TestEnumErrorMessages(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			var (
 				dockerMode    DockerPruneMode
 				buildTool     BuildToolType

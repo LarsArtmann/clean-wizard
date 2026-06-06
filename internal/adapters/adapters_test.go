@@ -11,6 +11,7 @@ import (
 )
 
 func TestNewRateLimiter(t *testing.T) {
+	t.Parallel()
 	rl := adapters.NewRateLimiter(10, 5)
 	require.NotNil(t, rl)
 
@@ -21,6 +22,7 @@ func TestNewRateLimiter(t *testing.T) {
 }
 
 func TestRateLimiter_Allow(t *testing.T) {
+	t.Parallel()
 	rl := adapters.NewRateLimiter(100, 10) // High limit for testing
 	require.NotNil(t, rl)
 
@@ -32,6 +34,7 @@ func TestRateLimiter_Allow(t *testing.T) {
 }
 
 func TestRateLimiter_Wait(t *testing.T) {
+	t.Parallel()
 	rl := adapters.NewRateLimiter(100, 10) // High limit for testing
 	require.NotNil(t, rl)
 
@@ -43,6 +46,7 @@ func TestRateLimiter_Wait(t *testing.T) {
 }
 
 func TestCacheManager(t *testing.T) {
+	t.Parallel()
 	cm := adapters.NewCacheManager(5*time.Minute, 10*time.Minute)
 	require.NotNil(t, cm)
 
@@ -68,6 +72,7 @@ func TestCacheManager(t *testing.T) {
 }
 
 func TestCacheManager_Expiration(t *testing.T) {
+	t.Parallel()
 	cm := adapters.NewCacheManager(100*time.Millisecond, 1*time.Minute)
 	require.NotNil(t, cm)
 
@@ -87,6 +92,7 @@ func TestCacheManager_Expiration(t *testing.T) {
 }
 
 func TestCacheManager_Clear(t *testing.T) {
+	t.Parallel()
 	cm := adapters.NewCacheManager(5*time.Minute, 10*time.Minute)
 	require.NotNil(t, cm)
 
@@ -103,6 +109,7 @@ func TestCacheManager_Clear(t *testing.T) {
 }
 
 func TestHTTPClient(t *testing.T) {
+	t.Parallel()
 	client := adapters.NewHTTPClient()
 	require.NotNil(t, client)
 
@@ -124,6 +131,7 @@ func TestHTTPClient(t *testing.T) {
 }
 
 func TestEnvironmentConfig(t *testing.T) {
+	t.Parallel()
 	cfg, err := adapters.LoadEnvironmentConfig()
 	require.NoError(t, err)
 	require.NotNil(t, cfg)
@@ -140,6 +148,7 @@ func TestEnvironmentConfig(t *testing.T) {
 }
 
 func TestEnvironmentConfig_Validate(t *testing.T) {
+	t.Parallel()
 	cfg, err := adapters.LoadEnvironmentConfig()
 	require.NoError(t, err)
 
@@ -149,6 +158,7 @@ func TestEnvironmentConfig_Validate(t *testing.T) {
 }
 
 func TestEnvironmentConfig_Getters(t *testing.T) {
+	t.Parallel()
 	// Test GetEnvWithDefault
 	value := adapters.GetEnvWithDefault("NON_EXISTENT_ENV", "default")
 	assert.Equal(t, "default", value)
@@ -167,6 +177,7 @@ func TestEnvironmentConfig_Getters(t *testing.T) {
 }
 
 func TestErrorConstructors(t *testing.T) {
+	t.Parallel()
 	// Test ErrInvalidConfig
 	err := adapters.ErrInvalidConfig("test error")
 	require.Error(t, err)

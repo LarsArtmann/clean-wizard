@@ -11,7 +11,7 @@ import (
 func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChange) error {
 	for _, change := range changes {
 		// Rule: Cannot remove critical protected paths
-		if change.Field == "protected" &&
+		if change.Field == "protected" && //nolint:goconst
 			change.Operation == domain.ChangeOperationRemovedType {
 			criticalPaths := domain.CriticalSystemPaths()
 			for _, critical := range criticalPaths {
@@ -22,7 +22,7 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 		}
 
 		// Rule: Cannot disable safe mode without explicit confirmation
-		if change.Field == "safe_mode" && change.OldValue == true && change.NewValue == false {
+		if change.Field == "safe_mode" && change.OldValue == true && change.NewValue == false { //nolint:goconst
 			// Check if safe mode confirmation is required
 			if vm.options != nil && vm.options.RequireSafeModeConfirmation {
 				return errors.New(

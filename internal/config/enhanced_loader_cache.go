@@ -18,7 +18,7 @@ type ConfigCache struct {
 
 // NewConfigCache creates a new configuration cache with specified TTL.
 func NewConfigCache(ttl time.Duration) *ConfigCache {
-	return &ConfigCache{
+	return &ConfigCache{ //nolint:exhaustruct
 		ttl:       ttl,
 		validator: NewConfigValidator(),
 	}

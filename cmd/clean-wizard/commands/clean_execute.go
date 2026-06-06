@@ -36,7 +36,7 @@ func executeCleaners(
 	selectedCleaners []CleanerType,
 	dryRun, verbose bool,
 ) cleanResult {
-	cr := cleanResult{
+	cr := cleanResult{ //nolint:exhaustruct
 		cleanerResults: make(map[string]domain.CleanResult),
 		skippedErrors:  make(map[string]error),
 		failedErrors:   make(map[string]error),

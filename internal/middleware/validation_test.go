@@ -11,10 +11,12 @@ import (
 )
 
 func TestValidationMiddleware(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	validator := NewValidationMiddleware()
 
 	t.Run("ValidScanRequest", func(t *testing.T) {
+		t.Parallel()
 		req := domain.ScanRequest{
 			Type:      domain.ScanTypeNixStore,
 			Recursive: domain.ScanModeRecursive,
@@ -26,6 +28,7 @@ func TestValidationMiddleware(t *testing.T) {
 	})
 
 	t.Run("InvalidScanRequest", func(t *testing.T) {
+		t.Parallel()
 		req := domain.ScanRequest{
 			Type:      "invalid",
 			Recursive: domain.ScanModeRecursive,
@@ -38,6 +41,7 @@ func TestValidationMiddleware(t *testing.T) {
 	})
 
 	t.Run("ValidCleanRequest", func(t *testing.T) {
+		t.Parallel()
 		req := domain.CleanRequest{
 			Items: []domain.ScanItem{
 				{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: domain.ScanTypeTemp},
@@ -50,6 +54,7 @@ func TestValidationMiddleware(t *testing.T) {
 	})
 
 	t.Run("InvalidCleanRequest", func(t *testing.T) {
+		t.Parallel()
 		req := domain.CleanRequest{
 			Items:    []domain.ScanItem{},
 			Strategy: domain.CleanStrategyType(999), // Invalid strategy value
@@ -61,6 +66,7 @@ func TestValidationMiddleware(t *testing.T) {
 	})
 
 	t.Run("ValidCleanerSettings", func(t *testing.T) {
+		t.Parallel()
 		cleaner := &mockCleaner{}
 		settings := &domain.OperationSettings{
 			NixGenerations: &domain.NixGenerationsSettings{Generations: 3},
@@ -71,6 +77,7 @@ func TestValidationMiddleware(t *testing.T) {
 	})
 
 	t.Run("InvalidCleanerSettings", func(t *testing.T) {
+		t.Parallel()
 		cleaner := &mockCleaner{}
 		settings := &domain.OperationSettings{
 			NixGenerations: &domain.NixGenerationsSettings{Generations: -1},

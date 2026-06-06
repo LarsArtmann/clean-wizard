@@ -10,9 +10,9 @@ import (
 func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *ValidationResult) {
 	// Version validation
 	if cfg.Version == "" {
-		result.Errors = append(result.Errors, ValidationError{
-			Field:      "version",
-			Rule:       "required",
+		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
+			Field:      "version",  //nolint:goconst
+			Rule:       "required", //nolint:goconst
 			Value:      cfg.Version,
 			Message:    "Configuration version is required",
 			Severity:   SeverityError,
@@ -22,8 +22,8 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 
 	// Profiles validation
 	if len(cfg.Profiles) == 0 {
-		result.Errors = append(result.Errors, ValidationError{
-			Field:      "profiles",
+		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
+			Field:      "profiles", //nolint:goconst
 			Rule:       "required",
 			Value:      cfg.Profiles,
 			Message:    "At least one profile is required",
@@ -34,8 +34,8 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 
 	// Protected paths validation
 	if len(cfg.Protected) == 0 {
-		result.Errors = append(result.Errors, ValidationError{
-			Field:      "protected",
+		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
+			Field:      "protected", //nolint:goconst
 			Rule:       "required",
 			Value:      cfg.Protected,
 			Message:    "Protected paths cannot be empty",

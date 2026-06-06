@@ -24,6 +24,7 @@ func makeTestCleanResult(
 
 // TestCleanResultValidation tests the enhanced CleanResult validation.
 func TestCleanResultValidation(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		result      CleanResult
@@ -103,6 +104,7 @@ func TestCleanResultValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// Test IsValid method
 			isValid := tt.result.IsValid()
 			if isValid != tt.shouldValid {

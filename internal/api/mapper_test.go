@@ -11,6 +11,7 @@ import (
 // Validates conversion between public API types and internal domain models
 
 func TestMapConfigToDomain_ValidConfig(t *testing.T) {
+	t.Parallel()
 	// Create public config
 	publicConfig := &PublicConfig{
 		Version:        "1.0.0",
@@ -96,6 +97,7 @@ func TestMapConfigToDomain_ValidConfig(t *testing.T) {
 }
 
 func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
+	t.Parallel()
 	// Create domain config
 	domainConfig := &domain.Config{
 		Version:  "1.0.0",
@@ -156,6 +158,7 @@ func TestMapConfigToPublic_ValidDomainConfig(t *testing.T) {
 }
 
 func TestMapCleanResultToPublic_ValidResult(t *testing.T) {
+	t.Parallel()
 	// Create domain clean result
 	now := time.Now()
 	domainResult := domain.CleanResult{
@@ -210,6 +213,7 @@ func TestMapCleanResultToPublic_ValidResult(t *testing.T) {
 }
 
 func TestMapRiskLevel_Conversions(t *testing.T) {
+	t.Parallel()
 	// Test all risk level conversions
 	testCases := []struct {
 		public PublicRiskLevel
@@ -223,6 +227,7 @@ func TestMapRiskLevel_Conversions(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(string(tc.public), func(t *testing.T) {
+			t.Parallel()
 			// Test public to domain
 			domainLevel, err := MapRiskLevelToDomain(tc.public)
 			if err != nil {

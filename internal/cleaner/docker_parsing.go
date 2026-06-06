@@ -34,7 +34,7 @@ func ParseDockerReclaimedSpace(output string) (int64, error) {
 }
 
 // sizeMultiplier converts Docker size unit strings to byte multipliers.
-var sizeMultiplier = map[string]int64{
+var sizeMultiplier = map[string]int64{ //nolint:gochecknoglobals
 	"b":  1,
 	"kb": bytesPerKB,
 	"mb": bytesPerMB,

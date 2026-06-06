@@ -14,14 +14,14 @@ const (
 )
 
 // errorLevelData provides string representations for each error level.
-var errorLevelData = [...]struct {
+var errorLevelData = [...]struct { //nolint:gochecknoglobals
 	stringRepr string
 	logRepr    string
 }{
 	LevelDebug: {stringRepr: "DEBUG", logRepr: "debug"},
 	LevelInfo:  {stringRepr: "INFO", logRepr: "info"},
 	LevelWarn:  {stringRepr: "WARN", logRepr: "warning"},
-	LevelError: {stringRepr: "ERROR", logRepr: "error"},
+	LevelError: {stringRepr: "ERROR", logRepr: "error"}, //nolint:goconst
 	LevelFatal: {stringRepr: "FATAL", logRepr: "fatal"},
 	LevelPanic: {stringRepr: "PANIC", logRepr: "panic"},
 }

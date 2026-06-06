@@ -10,7 +10,7 @@ type ErrorDetailsBuilder struct {
 // NewErrorDetails creates a new builder with an initialized metadata map.
 func NewErrorDetails() *ErrorDetailsBuilder {
 	return &ErrorDetailsBuilder{
-		details: ErrorDetails{
+		details: ErrorDetails{ //nolint:exhaustruct
 			Metadata: make(map[string]string),
 		},
 	}
@@ -148,7 +148,7 @@ func addToMetadata(metadata map[string]string, key string, value any) map[string
 // ensureDetails initializes ErrorDetails if nil and ensures Metadata is initialized.
 func ensureDetails(e **ErrorDetails) {
 	if *e == nil {
-		*e = &ErrorDetails{
+		*e = &ErrorDetails{ //nolint:exhaustruct
 			Metadata: make(map[string]string),
 		}
 	} else if (*e).Metadata == nil {

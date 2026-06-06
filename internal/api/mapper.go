@@ -63,7 +63,7 @@ func MapConfigToDomain(publicConfig *PublicConfig) result.Result[*domain.Config]
 	}
 
 	// Create domain config
-	config := &domain.Config{
+	config := &domain.Config{ //nolint:exhaustruct
 		Version:      publicConfig.Version,
 		SafeMode:     boolToSafeMode(publicConfig.SafeMode),
 		MaxDiskUsage: int(publicConfig.MaxDiskUsage),
@@ -251,7 +251,7 @@ func MapCleanResultToPublic(domainResult domain.CleanResult) result.Result[*Publ
 	// Map strategy
 	strategy := MapStrategyToPublic(domainResult.Strategy)
 
-	publicResult := &PublicCleanResult{
+	publicResult := &PublicCleanResult{ //nolint:exhaustruct
 		Success:      domainResult.IsValid(),
 		FreedBytes:   domainResult.FreedBytes,
 		ItemsRemoved: uint32(domainResult.ItemsRemoved),

@@ -5,6 +5,7 @@ import (
 )
 
 func TestCleanerMetadataCompleteness(t *testing.T) {
+	t.Parallel()
 	allCleanerTypes := []CleanerType{
 		CleanerTypeNix,
 		CleanerTypeHomebrew,
@@ -23,6 +24,7 @@ func TestCleanerMetadataCompleteness(t *testing.T) {
 
 	for _, ct := range allCleanerTypes {
 		t.Run(string(ct), func(t *testing.T) {
+			t.Parallel()
 			entry, ok := cleanerMetadata[ct]
 			if !ok {
 				t.Errorf("CleanerType %q has no entry in cleanerMetadata", ct)
@@ -50,6 +52,7 @@ func TestCleanerMetadataCompleteness(t *testing.T) {
 }
 
 func TestCleanerMetadataRegistryNameUniqueness(t *testing.T) {
+	t.Parallel()
 	seen := make(map[string]CleanerType, len(cleanerMetadata))
 
 	for ct, entry := range cleanerMetadata {
@@ -67,6 +70,7 @@ func TestCleanerMetadataRegistryNameUniqueness(t *testing.T) {
 }
 
 func TestRegistryNameToCleanerTypeCompleteness(t *testing.T) {
+	t.Parallel()
 	for ct, entry := range cleanerMetadata {
 		found, ok := registryNameToCleanerType[entry.RegistryName]
 		if !ok {
@@ -87,6 +91,7 @@ func TestRegistryNameToCleanerTypeCompleteness(t *testing.T) {
 }
 
 func TestRegistryNameToCleanerTypeRoundTrip(t *testing.T) {
+	t.Parallel()
 	for _, entry := range cleanerMetadata {
 		ct, ok := registryNameToCleanerType[entry.RegistryName]
 		if !ok {

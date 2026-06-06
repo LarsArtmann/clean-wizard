@@ -35,6 +35,7 @@ func runFormattingTests[T any](t *testing.T, tests []struct {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := formatFn(tt.input)
 			if result != tt.expected {
 				t.Errorf("result = %v, want %v", result, tt.expected)
@@ -59,6 +60,7 @@ func runDateTimeTests(t *testing.T, tests []struct {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := formatFn(tt.input)
 			customCheck(t, result, tt)
 		})
@@ -66,6 +68,7 @@ func runDateTimeTests(t *testing.T, tests []struct {
 }
 
 func TestSize(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		input    int64
@@ -86,6 +89,7 @@ func TestSize(t *testing.T) {
 }
 
 func TestDuration(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		input    time.Duration
@@ -104,6 +108,7 @@ func TestDuration(t *testing.T) {
 }
 
 func TestDate(t *testing.T) {
+	t.Parallel()
 	dateTests := make([]struct {
 		name     string
 		input    time.Time
@@ -126,6 +131,7 @@ func TestDate(t *testing.T) {
 }
 
 func TestDateTime(t *testing.T) {
+	t.Parallel()
 	dateTimeTests := make([]struct {
 		name     string
 		input    time.Time
@@ -163,6 +169,7 @@ func TestDateTime(t *testing.T) {
 }
 
 func TestNumber(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		input    int64

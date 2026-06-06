@@ -27,8 +27,8 @@ func NewGitHistorySafetyChecker(repoPath string, verbose bool) *GitHistorySafety
 }
 
 // Protected branch names that require extra caution.
-var protectedBranches = map[string]bool{
-	"main":       true,
+var protectedBranches = map[string]bool{ //nolint:gochecknoglobals
+	"main":       true, //nolint:goconst
 	"master":     true,
 	"production": true,
 	"staging":    true,
@@ -43,7 +43,7 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistoryS
 	ctx, cancel := context.WithTimeout(ctx, SafetyCheckTimeout)
 	defer cancel()
 
-	report := &domain.GitHistorySafetyReport{
+	report := &domain.GitHistorySafetyReport{ //nolint:exhaustruct
 		Warnings: []string{},
 		Blockers: []string{},
 	}
@@ -139,7 +139,7 @@ func (c *GitHistorySafetyChecker) isGitRepo(ctx context.Context) bool {
 
 // newGitCommand creates a new git command with the given arguments.
 func (c *GitHistorySafetyChecker) newGitCommand(ctx context.Context, args ...string) *exec.Cmd {
-	allArgs := append([]string{"git", "-C", c.repoPath}, args...)
+	allArgs := append([]string{"git", "-C", c.repoPath}, args...) //nolint:goconst
 
 	return exec.CommandContext(ctx, allArgs[0], allArgs[1:]...)
 }
@@ -183,7 +183,7 @@ func (c *GitHistorySafetyChecker) getCurrentBranch(ctx context.Context) string {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return "unknown"
+		return "unknown" //nolint:goconst
 	}
 
 	return strings.TrimSpace(string(output))

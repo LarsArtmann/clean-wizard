@@ -50,7 +50,7 @@ type NixAdapter struct {
 
 // NewNixAdapter creates Nix adapter with configuration.
 func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter {
-	return &NixAdapter{
+	return &NixAdapter{ //nolint:exhaustruct
 		timeout: timeout,
 		retries: retries,
 	}

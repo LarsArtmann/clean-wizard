@@ -9,10 +9,12 @@ import (
 )
 
 func TestNewCargoCleaner(t *testing.T) {
+	t.Parallel()
 	TestNewCleanerConstructor(t, NewCargoCleaner, "NewCargoCleaner")
 }
 
 func TestCargoCleaner_Type(t *testing.T) {
+	t.Parallel()
 	cleaner := NewCargoCleaner(false, false)
 
 	if cleaner.Type() != domain.OperationTypeCargoPackages {
@@ -21,10 +23,11 @@ func TestCargoCleaner_Type(t *testing.T) {
 }
 
 func TestCargoCleaner_IsAvailable(t *testing.T) {
+	t.Parallel()
 	TestIsAvailable(t, NewCargoCleaner)
 }
 
-func TestCargoCleaner_GetHomeDir(t *testing.T) {
+func TestCargoCleaner_GetHomeDir(t *testing.T) { //nolint:paralleltest
 	testCases := []GetHomeDirTestCase{
 		{
 			Name:      "HOME set",
@@ -45,6 +48,7 @@ func TestCargoCleaner_GetHomeDir(t *testing.T) {
 }
 
 func TestCargoCleaner_GetDirSize(t *testing.T) {
+	t.Parallel()
 	// Test with non-existent path
 	size := GetDirSize("/non/existent/path/12345")
 	// Should return 0 for non-existent path
@@ -62,6 +66,7 @@ func TestCargoCleaner_GetDirSize(t *testing.T) {
 }
 
 func TestCargoCleaner_GetDirModTime(t *testing.T) {
+	t.Parallel()
 	// Test with non-existent path
 	modTime := GetDirModTime("/non/existent/path/12345")
 	if !modTime.IsZero() {
@@ -83,6 +88,7 @@ func TestCargoCleaner_GetDirModTime(t *testing.T) {
 }
 
 func TestCargoCleaner_HasCargoCacheTool(t *testing.T) {
+	t.Parallel()
 	cleaner := NewCargoCleaner(false, false)
 
 	// Just verify it returns a boolean without crashing
@@ -93,6 +99,7 @@ func TestCargoCleaner_HasCargoCacheTool(t *testing.T) {
 }
 
 func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
+	t.Parallel()
 	// This test would fail if Cargo is installed
 	// We just verify the error handling logic exists
 	cleaner := NewCargoCleaner(false, false)
@@ -103,6 +110,7 @@ func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
 }
 
 func TestCargoCleaner_StandardTests(t *testing.T) {
+	t.Parallel()
 	TestStandardCleaner(t, NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner), "Cargo")
 }
 

@@ -34,7 +34,7 @@ type cleanerMetadataEntry struct {
 	Icon         string
 }
 
-var cleanerMetadata = map[CleanerType]cleanerMetadataEntry{
+var cleanerMetadata = map[CleanerType]cleanerMetadataEntry{ //nolint:gochecknoglobals
 	CleanerTypeNix: {
 		RegistryName: "nix",
 		DisplayName:  "Nix",
@@ -78,7 +78,7 @@ var cleanerMetadata = map[CleanerType]cleanerMetadataEntry{
 		Icon:         "🔨",
 	},
 	CleanerTypeDocker: {
-		RegistryName: "docker",
+		RegistryName: "docker", //nolint:goconst
 		DisplayName:  "Docker",
 		Description:  "Clean Docker images, containers, and volumes",
 		Icon:         "🐳",
@@ -115,7 +115,7 @@ var cleanerMetadata = map[CleanerType]cleanerMetadataEntry{
 	},
 }
 
-var registryNameToCleanerType = func() map[string]CleanerType {
+var registryNameToCleanerType = func() map[string]CleanerType { //nolint:gochecknoglobals
 	m := make(map[string]CleanerType, len(cleanerMetadata))
 	for ct, meta := range cleanerMetadata {
 		m[meta.RegistryName] = ct

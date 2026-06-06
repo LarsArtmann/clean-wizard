@@ -11,6 +11,7 @@ import (
 )
 
 func TestPrintConfigSuccess(t *testing.T) {
+	t.Parallel()
 	cfg := &domain.Config{
 		SafeMode: domain.SafeModeEnabled,
 		Profiles: map[string]*domain.Profile{
@@ -26,6 +27,7 @@ func TestPrintConfigSuccess(t *testing.T) {
 }
 
 func TestLoadConfigOrContinue_ContextCancel(t *testing.T) {
+	t.Parallel()
 	// Test with cancelled context
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel() // Cancel immediately
