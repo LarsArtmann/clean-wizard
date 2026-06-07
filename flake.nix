@@ -24,6 +24,9 @@
 
       imports = [ inputs.treefmt-nix.flakeModule ];
 
+
+      checks.format = config.treefmt.build.check self;
+      checks.build = config.packages.default;
       perSystem =
         {
           config,
@@ -132,7 +135,6 @@
                 gotools
                 gofumpt
                 govulncheck
-                just
                 jq
                 goreleaser
                 cosign
