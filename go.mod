@@ -33,7 +33,7 @@ require (
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260601155805-6cf7526a1b3f // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260602025833-85a30b5e440a // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260607010151-cd19a2bba55f // indirect
 	github.com/charmbracelet/x/exp/golden v0.0.0-20251106172358-54469c29c2bc // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
