@@ -37,6 +37,7 @@
           version = self.rev or self.dirtyRev or "dev";
 
           vendorHash = "sha256-g0ab36H36/UTl2WfIblDG+RE7KcTIdrA8Eh5HLg34yM=";
+          proxyVendor = true;
 
           ldflags = [
             "-s"
