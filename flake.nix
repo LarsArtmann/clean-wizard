@@ -25,8 +25,6 @@
       imports = [ inputs.treefmt-nix.flakeModule ];
 
 
-      checks.format = config.treefmt.build.check self;
-      checks.build = config.packages.default;
       perSystem =
         {
           config,
@@ -96,6 +94,7 @@
           };
 
           checks = {
+            format = config.treefmt.build.check self;
             build = clean-wizard;
 
             test = clean-wizard.overrideAttrs (old: {
