@@ -8,7 +8,7 @@ require (
 	charm.land/log/v2 v2.0.0
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/charmbracelet/fang v1.0.0
-	github.com/cockroachdb/errors v1.13.0
+	github.com/cockroachdb/errors v1.14.0
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/knadh/koanf/parsers/yaml v1.1.0
