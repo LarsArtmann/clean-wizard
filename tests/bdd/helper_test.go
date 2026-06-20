@@ -29,6 +29,11 @@ func mockGenerations(count int) []domain.NixGeneration {
 	return gens
 }
 
+// The two helpers below share their parameter list and return type by design:
+// both are Gomega-aware wrappers over the same Result type. Their bodies diverge
+// (one falls back to mocks, the other asserts IsOk), so a shared signature alias
+// would not eliminate duplication — it would only rename it.
+
 // getGenerationsOrMock attempts to list real Nix generations, falling back to mocks on error.
 func getGenerationsOrMock(
 	ctx context.Context, nixCleaner *cleaner.NixCleaner, mockCount int,

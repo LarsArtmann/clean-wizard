@@ -158,6 +158,11 @@ type Case[T any, U any] struct {
 
 // SwitchFlow is a simpler alternative to BranchFlow for simple value-based switching.
 // It takes a value and a slice of cases, plus a default.
+//
+// NOTE: SwitchFlow and executeSwitchFlow share an identical signature by design.
+// SwitchFlow is the public facade; executeSwitchFlow is the shared implementation
+// also used by SwitchFlowWithResult. Extracting the signature into a type alias
+// would obscure the API without removing real duplication.
 func SwitchFlow[T, U any](
 	value T,
 	cases []Case[T, U],

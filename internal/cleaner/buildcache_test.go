@@ -18,6 +18,9 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 		basePaths []string
 		wantErr   bool
 	}{
+		// Test cases below share the same struct shape by design — Go's table-driven
+		// testing idiom. Each row carries distinct values and a distinct expectation;
+		// collapsing the rows into a helper would obscure the per-case intent.
 		{
 			name:      "valid configuration",
 			verbose:   false,

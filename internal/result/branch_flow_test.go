@@ -404,6 +404,9 @@ func TestTraverse(t *testing.T) {
 
 func TestBranchFlow(t *testing.T) {
 	t.Parallel()
+	// Subtests below share the NewBranchFlow[int]() builder pattern intentionally;
+	// each scenario uses a distinct branch/fallback configuration and assertions,
+	// so an abstraction would hide intent without removing real duplication.
 	t.Run("executes matching branch", func(t *testing.T) {
 		t.Parallel()
 
@@ -541,6 +544,9 @@ func TestSwitchFlow(t *testing.T) {
 
 func TestFlowBuilder(t *testing.T) {
 	t.Parallel()
+	// Each subtest uses a distinct step chain and assertion; sharing only the
+	// builder entry point. Table-driving would obscure the per-scenario step names
+	// and is not worth the indirection here.
 	t.Run("executes steps in order", func(t *testing.T) {
 		t.Parallel()
 
@@ -630,6 +636,9 @@ func TestFlowBuilder(t *testing.T) {
 
 func TestParallelFlow(t *testing.T) {
 	t.Parallel()
+	// Subtests share only the NewParallelFlow[int]() entry; each scenario has a
+	// unique step configuration and assertion. Boilerplate extraction would hide
+	// intent without removing real duplication.
 	t.Run("executes all steps concurrently", func(t *testing.T) {
 		t.Parallel()
 
