@@ -838,10 +838,10 @@
         <!-- =================== SUMMARY =================== -->
         <h2 id="summary"><span class="num">00</span>Health Dashboard</h2>
         <p>
-          The project compiles, builds via Nix, and every test package passes. That's the good
-          news. The architecture carries significant structural debt that compounds with every
-          feature added: a god package, a split-brain error system, and a flat cleaner directory
-          with 37 files.
+          The project compiles, builds via Nix, and every test package passes. That's the good news.
+          The architecture carries significant structural debt that compounds with every feature
+          added: a god package, a split-brain error system, and a flat cleaner directory with 37
+          files.
         </p>
 
         <div class="stat-grid">
@@ -933,8 +933,8 @@
               <strong>13 core cleaners implemented &amp; functional</strong>
               <span
                 >Nix, Homebrew, Docker, Go cache, Compiled Binaries, Node Packages, Git History,
-                System Cache, Project Executables, and more. Each has availability detection,
-                scan, clean, and dry-run modes where applicable.</span
+                System Cache, Project Executables, and more. Each has availability detection, scan,
+                clean, and dry-run modes where applicable.</span
               >
             </div>
           </div>
@@ -964,8 +964,8 @@
             <div class="text">
               <strong>Full Nix flake build system</strong>
               <span
-                ><code>flake.nix</code> with buildGoModule, proxyVendor for deterministic builds,
-                5 flake checks (build, test, go-vet, format, treefmt), devShells, and overlay. No
+                ><code>flake.nix</code> with buildGoModule, proxyVendor for deterministic builds, 5
+                flake checks (build, test, go-vet, format, treefmt), devShells, and overlay. No
                 Makefile dependency.</span
               >
             </div>
@@ -975,9 +975,9 @@
             <div class="text">
               <strong>Platform-aware architecture</strong>
               <span
-                ><code>DefaultProtectedPaths()</code> and <code>getDefaultSystemCacheTypes()</code>
-                use <code>runtime.GOOS</code> to behave correctly on both macOS and NixOS
-                Linux.</span
+                ><code>DefaultProtectedPaths()</code> and
+                <code>getDefaultSystemCacheTypes()</code> use <code>runtime.GOOS</code> to behave
+                correctly on both macOS and NixOS Linux.</span
               >
             </div>
           </div>
@@ -1054,8 +1054,8 @@
           <div class="card card-warning">
             <h4>Nix Size Estimation: Mocked</h4>
             <p>
-              The Nix cleaner uses a hardcoded <strong>50MB per generation</strong> estimate
-              rather than measuring actual size. Functional but inaccurate — dry-run estimates are
+              The Nix cleaner uses a hardcoded <strong>50MB per generation</strong> estimate rather
+              than measuring actual size. Functional but inaccurate — dry-run estimates are
               misleading.
             </p>
             <div class="callout callout-warning">
@@ -1072,17 +1072,17 @@
               of running it.
             </p>
             <div class="callout callout-warning">
-              <strong>Gap</strong> Could shell out to <code>brew cleanup -n</code> and parse
-              output, or document the limitation more prominently.
+              <strong>Gap</strong> Could shell out to <code>brew cleanup -n</code> and parse output,
+              or document the limitation more prominently.
             </div>
           </div>
 
           <div class="card card-warning">
             <h4>Lint Compliance: ~40 err113 violations</h4>
             <p>
-              ~40 <code>fmt.Errorf</code> calls should use sentinel errors per the err113 lint
-              rule. Plus mixed receiver warnings (10 enum types), goconst violations, and
-              infertypeargs warnings. Build passes but lint is not green.
+              ~40 <code>fmt.Errorf</code> calls should use sentinel errors per the err113 lint rule.
+              Plus mixed receiver warnings (10 enum types), goconst violations, and infertypeargs
+              warnings. Build passes but lint is not green.
             </p>
             <div class="callout callout-warning">
               <strong>Gap</strong> Pre-commit hook reportedly times out on golangci-lint.
@@ -1093,12 +1093,13 @@
             <h4>Documentation: Present but aging</h4>
             <p>
               TODO_LIST.md (last updated 2026-05-03), FEATURES.md, BDD_TESTS_REVIEW.md, and 10
-              status reports exist. Architecture diagrams in <code>docs/architecture-understanding/</code>.
-              But docs are 7 weeks stale relative to recent commits.
+              status reports exist. Architecture diagrams in
+              <code>docs/architecture-understanding/</code>. But docs are 7 weeks stale relative to
+              recent commits.
             </p>
             <div class="callout callout-warning">
-              <strong>Gap</strong> FEATURES.md and TODO_LIST.md need freshness verification
-              against current code.
+              <strong>Gap</strong> FEATURES.md and TODO_LIST.md need freshness verification against
+              current code.
             </div>
           </div>
 
@@ -1106,8 +1107,9 @@
             <h4>Test Suite: 47 test functions across 55 files</h4>
             <p>
               All 25 packages pass, but coverage is unit-heavy with limited integration and E2E
-              tests. No CLI command tests at all. Benchmark tests exist but are empty
-              (<code>[no tests to run]</code>).
+              tests. No CLI command tests at all. Benchmark tests exist but are empty (<code
+                >[no tests to run]</code
+              >).
             </p>
             <div class="callout callout-warning">
               <strong>Gap</strong> Integration tests for the CLI commands (scan, clean, profile,
@@ -1151,8 +1153,8 @@
           <div class="card">
             <h4>Language Version Manager Cleaner</h4>
             <p>
-              Placeholder/NO-OP exists but no implementation. Would clean up nvm, pyenv, rbenv,
-              asdf version caches.
+              Placeholder/NO-OP exists but no implementation. Would clean up nvm, pyenv, rbenv, asdf
+              version caches.
             </p>
           </div>
 
@@ -1175,24 +1177,26 @@
 
         <!-- =================== TOTALLY FUCKED UP =================== -->
         <h2 id="fucked"><span class="num">04</span>Totally Fucked Up</h2>
-        <p>Structural problems that actively harm the codebase. These compound with every change.</p>
+        <p>
+          Structural problems that actively harm the codebase. These compound with every change.
+        </p>
 
         <div class="issue issue-critical">
           <span class="severity severity-critical">Split Brain</span>
           <h3>4 Error Packages With Overlapping Responsibilities</h3>
           <div class="where">
-            internal/errors/ &middot; internal/pkg/errors/ &middot;
-            internal/adapters/errors.go &middot; pkg/errors/
+            internal/errors/ &middot; internal/pkg/errors/ &middot; internal/adapters/errors.go
+            &middot; pkg/errors/
           </div>
           <p>
             Four separate error packages compete for the same responsibility. Developers must guess
             which to import. This is a classic split brain — the type system can't enforce
-            consistency because there's no single source of truth for error handling. Every new
-            file imports a different one, creating an inconsistent patchwork.
+            consistency because there's no single source of truth for error handling. Every new file
+            imports a different one, creating an inconsistent patchwork.
           </p>
           <div class="callout callout-solution">
-            <strong>Fix</strong> Consolidate into ONE error package. Delete the other three. This
-            is the single highest-impact architectural fix.
+            <strong>Fix</strong> Consolidate into ONE error package. Delete the other three. This is
+            the single highest-impact architectural fix.
           </div>
         </div>
 
@@ -1203,8 +1207,8 @@
           <p>
             The domain package contains interfaces, 27 CacheType enums, types, settings, defaults,
             and macros — all in one package. This violates the single responsibility principle at
-            the package level. Everything depends on it, so it can't evolve independently. It
-            should be split into <code>enums/</code>, <code>operations/</code>, and
+            the package level. Everything depends on it, so it can't evolve independently. It should
+            be split into <code>enums/</code>, <code>operations/</code>, and
             <code>types/</code> sub-packages.
           </p>
           <div class="callout callout-solution">
@@ -1224,9 +1228,9 @@
             Each cleaner's logic, scanner, executor, and test helpers are interleaved.
           </p>
           <div class="callout callout-solution">
-            <strong>Fix</strong> Split into per-domain sub-packages:
-            <code>cleaner/nix/</code>, <code>cleaner/docker/</code>,
-            <code>cleaner/golang/</code>, etc. Keep the registry at the top level.
+            <strong>Fix</strong> Split into per-domain sub-packages: <code>cleaner/nix/</code>,
+            <code>cleaner/docker/</code>, <code>cleaner/golang/</code>, etc. Keep the registry at
+            the top level.
           </div>
         </div>
 
@@ -1251,8 +1255,8 @@
           <h3>Platform-Aware Defaults Bug</h3>
           <div class="where">DefaultSettings(OperationTypeSystemCache)</div>
           <p>
-            <code>DefaultSettings(OperationTypeSystemCache)</code> returns macOS-only cache types
-            on Linux. The platform-aware pattern exists elsewhere but this function was missed. On
+            <code>DefaultSettings(OperationTypeSystemCache)</code> returns macOS-only cache types on
+            Linux. The platform-aware pattern exists elsewhere but this function was missed. On
             evo-x2 (NixOS), system cache cleaning targets the wrong paths.
           </p>
           <div class="callout callout-solution">
@@ -1265,9 +1269,8 @@
           <span class="severity severity-important">Dead Code</span>
           <h3>Unused Functions and Constants</h3>
           <div class="where">
-            config.go:52 (readConfigFile) &middot; sanitizer_nix.go:9 (nixGenerationsMin)
-            &middot; adapters/nix.go:28 (bytesPerKB) &middot; golang_cache_cleaner.go (go-build*
-            string)
+            config.go:52 (readConfigFile) &middot; sanitizer_nix.go:9 (nixGenerationsMin) &middot;
+            adapters/nix.go:28 (bytesPerKB) &middot; golang_cache_cleaner.go (go-build* string)
           </div>
           <p>
             Multiple unused functions, constants, and string literals flagged by linters. Dead code
@@ -1402,7 +1405,9 @@
             </tr>
             <tr>
               <td>5</td>
-              <td><strong>Remove dead code</strong> (readConfigFile, nixGenerationsMin, bytesPerKB)</td>
+              <td>
+                <strong>Remove dead code</strong> (readConfigFile, nixGenerationsMin, bytesPerKB)
+              </td>
               <td><span class="badge badge-low">Low</span></td>
               <td><span class="badge badge-low">Low</span></td>
               <td>Cleanup</td>
@@ -1573,15 +1578,20 @@
             packages to import correctly). It's a chicken-and-egg problem:
           </p>
           <ul style="margin: 0 0 1rem 1.5rem">
-            <li><strong>Tests first:</strong> Safer refactors, but tests are harder to write against the current tangled structure.</li>
-            <li><strong>Refactor first:</strong> Cleaner targets for tests, but refactoring untested code risks silent regressions.</li>
+            <li>
+              <strong>Tests first:</strong> Safer refactors, but tests are harder to write against
+              the current tangled structure.
+            </li>
+            <li>
+              <strong>Refactor first:</strong> Cleaner targets for tests, but refactoring untested
+              code risks silent regressions.
+            </li>
           </ul>
           <p>
             My recommendation: <strong>set up CI first (task #3)</strong>, then
-            <strong>add CLI integration tests (task #4)</strong> against the current structure,
-            THEN refactor with the safety net in place. But I can't decide this for the project —
-            it depends on your risk tolerance and whether you've been running the tool in
-            production.
+            <strong>add CLI integration tests (task #4)</strong> against the current structure, THEN
+            refactor with the safety net in place. But I can't decide this for the project — it
+            depends on your risk tolerance and whether you've been running the tool in production.
           </p>
         </div>
 
