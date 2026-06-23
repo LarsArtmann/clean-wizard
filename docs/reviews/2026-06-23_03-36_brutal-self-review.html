@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brutal Self-Review — Clean Wizard 2026-06-23</title>
+    <style>
+      :root {
+        --color-graphite: #0e0e10;
+        --color-graphite-2: #18181d;
+        --color-graphite-3: #16161a;
+        --color-bone: #f4f4f0;
+        --color-red: #ff6b6b;
+        --color-blue: #6eb5ff;
+        --color-yellow: #f4d35e;
+        --color-amber: #ffb347;
+        --color-hairline: rgba(244, 244, 240, 0.12);
+        --color-hairline-strong: rgba(244, 244, 240, 0.25);
+        --surface: var(--color-graphite);
+        --surface-raised: var(--color-graphite-2);
+        --surface-sunken: var(--color-graphite-3);
+        --text: var(--color-bone);
+        --text-muted: rgba(244, 244, 240, 0.72);
+        --text-faint: rgba(244, 244, 240, 0.45);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-amber);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+        --radius: 0px;
+        --font-heading: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas, monospace;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
+      section[id], [id] { scroll-margin-top: 60px; }
+      body { background: var(--surface); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+      .top-bar { background: var(--text); color: var(--surface); padding: 0.6rem 2rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+      .layout { display: flex; gap: 2.5rem; padding: 2rem; }
+      .sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 1rem; align-self: flex-start; height: calc(100vh - 2rem); overflow-y: auto; display: none; }
+      .sidebar nav { display: flex; flex-direction: column; gap: 0; }
+      .sidebar .label { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border-strong); }
+      .sidebar a { font-size: 0.85rem; color: var(--text-muted); text-decoration: none; padding: 0.45rem 0.75rem; border-left: 2px solid transparent; transition: all 0.15s ease; font-weight: 500; }
+      .sidebar a:hover, .sidebar a.active { color: var(--accent); border-left-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+      .main { flex: 1; min-width: 0; }
+      h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -0.02em; }
+      h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.1; margin: 0 0 0.6rem; }
+      h2 { font-size: 1.4rem; margin: 2.5rem 0 1rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border-strong); display: flex; align-items: baseline; gap: 0.6rem; }
+      h2 .num { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); font-weight: 700; }
+      h3 { font-size: 1.1rem; margin: 0 0 0.4rem; font-weight: 700; }
+      h4 { font-size: 0.98rem; margin: 0 0 0.3rem; font-weight: 700; }
+      p { margin: 0 0 1rem; }
+      .hero { padding: 1.5rem 0 1.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-strong); }
+      .hero-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--surface); background: var(--accent); padding: 0.3rem 0.7rem; margin-bottom: 0.9rem; }
+      .hero-subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 70ch; margin: 0; }
+      .card { background: var(--surface-raised); border: 1px solid var(--border); padding: 1.1rem 1.3rem; margin-bottom: 1rem; border-left: 4px solid var(--border-strong); }
+      .card-problem { border-left-color: var(--problem); background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised)); }
+      .card-solution { border-left-color: var(--solution); background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised)); }
+      .card-warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised)); }
+      .issue { background: var(--surface-raised); border: 1px solid var(--border); padding: 1.1rem 1.3rem; margin-bottom: 1rem; border-left: 4px solid var(--border-strong); }
+      .issue-critical { border-left-color: var(--problem); background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised)); }
+      .issue-important { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised)); }
+      .issue-nice { border-left-color: var(--solution); background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised)); }
+      .issue .where { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-faint); margin: 0.2rem 0 0.6rem; }
+      .severity { display: inline-block; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.55rem; margin-bottom: 0.6rem; color: var(--surface); }
+      .severity-critical { background: var(--problem); }
+      .severity-important { background: var(--warning); }
+      .severity-nice { background: var(--solution); }
+      .badge { display: inline-block; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.18rem 0.5rem; border: 1px solid var(--border-strong); color: var(--text-muted); }
+      .badge-critical { color: var(--problem); border-color: var(--problem); }
+      .badge-high { color: var(--warning); border-color: var(--warning); }
+      .badge-medium { color: var(--accent); border-color: var(--accent); }
+      .badge-fixed { color: var(--solution); border-color: var(--solution); }
+      .callout { margin: 0.8rem 0 0; padding: 0.7rem 0.9rem; border-left: 3px solid var(--border-strong); background: color-mix(in srgb, var(--text) 5%, transparent); font-size: 0.9rem; }
+      .callout strong { display: inline-block; margin-right: 0.4rem; }
+      .callout-solution { border-left-color: var(--solution); background: color-mix(in srgb, var(--solution) 10%, transparent); }
+      .callout-warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 10%, transparent); }
+      .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin: 1rem 0 1.5rem; }
+      .stat-card { background: var(--surface-raised); border: 1px solid var(--border); padding: 1.1rem 1rem; position: relative; }
+      .stat-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border-strong); }
+      .stat-bad::before { background: var(--problem); }
+      .stat-good::before { background: var(--solution); }
+      .stat-warn::before { background: var(--warning); }
+      .stat-value { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--text); }
+      .stat-bad .stat-value { color: var(--problem); }
+      .stat-good .stat-value { color: var(--solution); }
+      .stat-warn .stat-value { color: var(--warning); }
+      .stat-label { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); margin-top: 0.5rem; }
+      .strengths { display: grid; gap: 0.5rem; margin: 1rem 0 1.5rem; }
+      .strength { display: grid; grid-template-columns: auto 1fr; gap: 0.8rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .strength .check { font-family: var(--font-mono); font-weight: 700; color: var(--solution); font-size: 1.1rem; }
+      .strength .text strong { display: block; margin-bottom: 0.15rem; }
+      .strength .text span { color: var(--text-muted); font-size: 0.9rem; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.9rem; }
+      th { text-align: left; padding: 0.6rem 0.9rem; background: var(--surface-raised); color: var(--text-faint); font-family: var(--font-mono); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid var(--border-strong); }
+      td { padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--border); }
+      tr:hover td { background: var(--surface-raised); }
+      .migration-step { display: grid; grid-template-columns: 48px 1fr; gap: 1rem; margin: 1rem 0; padding: 1rem; background: var(--surface-raised); border: 1px solid var(--border); border-left: 3px solid var(--accent); }
+      .migration-num { font-family: var(--font-mono); font-weight: 800; font-size: 1.5rem; color: var(--accent); line-height: 1; }
+      .migration-content p { margin-bottom: 0; color: var(--text-muted); font-size: 0.92rem; }
+      .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-faint); font-family: var(--font-mono); }
+      .toc { background: var(--surface-raised); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 1rem 1.3rem; margin: 1rem 0 1.5rem; }
+      .toc ul { list-style: none; padding: 0; }
+      .toc li { margin: 0.25rem 0; }
+      .toc a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
+      .toc a:hover { color: var(--accent); }
+      @media (min-width: 1024px) { .sidebar { display: block; } }
+      @media (max-width: 768px) { .layout { flex-direction: column; padding: 1rem; } .top-bar { padding: 0.6rem 1rem; flex-wrap: wrap; gap: 0.3rem; } .stat-grid { grid-template-columns: repeat(2, 1fr); } .migration-step { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <span>BRUTAL SELF-REVIEW</span>
+      <span>2026-06-23</span>
+      <span>CLEAN WIZARD</span>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#questions">Self-Review Answers</a>
+          <a href="#ghosts">Ghost Systems</a>
+          <a href="#splitbrains">Split Brains</a>
+          <a href="#arch">Architectural Debt</a>
+          <a href="#tests">Testing Gaps</a>
+          <a href="#types">Type Model Issues</a>
+          <a href="#libs">Library Debt</a>
+          <a href="#plan">Action Plan</a>
+          <a href="#question">Top Question</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="hero">
+          <div class="hero-badge">Brutal Self-Review</div>
+          <h1>What Did We Forget? What Is Stupid?</h1>
+          <p class="hero-subtitle">A brutally honest audit of the Clean Wizard codebase: ghost systems, split brains, dead code, architectural debt, and what to do about it. Every claim verified against source code on 2026-06-23.</p>
+        </div>
+
+        <nav class="toc">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#questions">11 Self-Review Questions Answered</a></li>
+            <li><a href="#ghosts">Ghost Systems Found (Now Removed)</a></li>
+            <li><a href="#splitbrains">Split Brains</a></li>
+            <li><a href="#arch">Architectural Debt</a></li>
+            <li><a href="#tests">Testing Gaps</a></li>
+            <li><a href="#types">Type Model Issues</a></li>
+            <li><a href="#libs">Library Debt</a></li>
+            <li><a href="#plan">Prioritized Action Plan</a></li>
+            <li><a href="#question">Top Question I Cannot Answer</a></li>
+          </ul>
+        </nav>
+
+        <h2 id="questions"><span class="num">01</span>Self-Review Answers</h2>
+
+        <div class="stat-grid">
+          <div class="stat-card stat-bad">
+            <div class="stat-value">4</div>
+            <div class="stat-label">Ghosts Removed</div>
+          </div>
+          <div class="stat-card stat-bad">
+            <div class="stat-value">2</div>
+            <div class="stat-label">Split Brains</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">950+</div>
+            <div class="stat-label">Lines Dead Code Removed</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">22</div>
+            <div class="stat-label">Packages Passing</div>
+          </div>
+        </div>
+
+        <div class="card card-problem">
+          <h4>1. What did you forget?</h4>
+          <p>We forgot to verify that the "platform-aware defaults" bug and "missing Status field" reported in the prior status report were <strong>already fixed</strong>. The prior summary listed them as open issues — they are not. <code>getDefaultSystemCacheTypes()</code> at <code>internal/domain/operation_defaults.go:327</code> already has a <code>runtime.GOOS</code> switch, and <code>golang_cache_cleaner.go:200</code> already populates the <code>Status</code> field. The status report was shipping misinformation.</p>
+        </div>
+
+        <div class="card card-problem">
+          <h4>2. What is something stupid that we do anyway?</h4>
+          <p>We had <strong>4 separate error packages</strong> with overlapping responsibilities. Two of them (<code>pkg/errors/</code> and <code>internal/errors/</code>) had <strong>zero imports</strong> — pure dead weight. A third (<code>internal/adapters/errors.go</code>) had 11 error constructors of which 10 were <strong>only called from their own test</strong>. This is a split brain that fooled every reviewer into thinking there was a real error strategy. There wasn't.</p>
+        </div>
+
+        <div class="card card-problem">
+          <h4>3. What could you have done better?</h4>
+          <p>The prior status report was not verified against code before publishing. It listed already-fixed bugs as open, inflating the perceived problem count. Every claim in a status report should be grep-verified against the source before writing it down.</p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>4. What could you still improve?</h4>
+          <p>The <code>internal/domain/</code> god package (23 files) and <code>internal/cleaner/</code> flat directory (37 files) are structural debt. The testify usage in adapter tests violates the project's own Go policy. CI now runs tests but there are zero CLI command tests and 5 cleaner support files with no tests.</p>
+        </div>
+
+        <div class="card card-solution">
+          <h4>5. Did you lie to me?</h4>
+          <p><strong>Yes, by omission.</strong> The prior status report stated "<code>DefaultSettings(OperationTypeSystemCache)</code> returns macOS types on Linux" as a bug. This is false — the code at <code>operation_defaults.go:327</code> already branches on <code>runtime.GOOS</code>. I reported a bug that was already fixed without checking the code. That is a lie.</p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>6. How can we be less stupid?</h4>
+          <p>Always grep before claiming something is broken. Never trust summaries from prior sessions — verify against source. Delete dead code immediately when found, don't leave it "in case we need it later."</p>
+        </div>
+
+        <div class="card card-solution">
+          <h4>7. Ghost systems?</h4>
+          <p><strong>Yes — 4 found and removed this session:</strong></p>
+          <ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">
+            <li><code>internal/api/</code> — 601 lines of HTTP API types and mappers. Zero imports. Complete ghost.</li>
+            <li><code>pkg/errors/</code> — BaseError type, never imported by anyone.</li>
+            <li><code>internal/errors/</code> — 8 error constructors, zero imports.</li>
+            <li><code>internal/shared/utils/config/</code> + <code>testutil/</code> — ghost utility packages, zero non-test imports.</li>
+          </ul>
+          <p>All removed. Build and tests still pass.</p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>8. Scope creep trap?</h4>
+          <p>The <code>internal/adapters/</code> package defines RateLimiter, CacheManager, HTTPClient with auth, retry, and header builders. For a CLI tool that runs <code>nix-collect-garbage</code> and <code>docker system prune</code>, this is massive over-engineering. The HTTPClient is never used to make HTTP calls. The RateLimiter is never used to rate-limit anything. These are ghost infrastructure.</p>
+        </div>
+
+        <div class="card card-solution">
+          <h4>9. Did we remove something useful?</h4>
+          <p>No. Every deleted file/package was verified to have zero non-test imports before deletion. The <code>AssertCleanerFields</code> stub in <code>testutil/</code> was a no-op with a TODO that was never implemented — removing it made tests more honest, not less covered.</p>
+        </div>
+
+        <div class="card card-problem">
+          <h4>10. Split brains?</h4>
+          <p><strong>Yes, two active:</strong></p>
+          <ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">
+            <li><strong>Error handling:</strong> <code>internal/pkg/errors/</code> (rich error system with codes, levels, handlers) vs <code>fmt.Errorf</code> scattered across ~40 call sites. Two philosophies, never reconciled.</li>
+            <li><strong>Test framework:</strong> Ginkgo/Gomega (correct, per policy) in BDD tests vs testify in adapter tests. Banned library coexisting with the sanctioned one.</li>
+          </ul>
+        </div>
+
+        <div class="card card-warning">
+          <h4>11. How are we doing on tests?</h4>
+          <p><strong>Decent but blind-spotted:</strong></p>
+          <ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">
+            <li>22 packages pass, 43 BDD specs run and pass</li>
+            <li>CLI commands — only metadata-map tested, zero behavioral tests</li>
+            <li><code>homebrew.go</code> — no unit test (only integration)</li>
+            <li><code>parallel.go</code>, <code>metrics.go</code>, <code>validate.go</code> — no tests</li>
+            <li>CI now runs <code>go build</code> + <code>go test -race</code> (fixed this session)</li>
+          </ul>
+        </div>
+
+        <h2 id="ghosts"><span class="num">02</span>Ghost Systems Removed This Session</h2>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Removed</span>
+          <h3>internal/api/ — 601 lines of HTTP API ghost</h3>
+          <div class="where">internal/api/{doc,types,mapper,mapper_test}.go</div>
+          <p>Defined <code>APICleanResult</code>, <code>APIScanResult</code>, and a mapper converting domain types to/from API DTOs. Never imported by any other package. This is a CLI/TUI tool — there is no HTTP server. Pure speculative scaffolding.</p>
+        </div>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Removed</span>
+          <h3>pkg/errors/ + internal/errors/ — Dead error packages</h3>
+          <div class="where">pkg/errors/errors.go, internal/errors/{doc,errors}.go</div>
+          <p>Both had zero imports. <code>pkg/errors</code> defined a <code>BaseError</code> struct that nobody used. <code>internal/errors</code> defined 8 constructors (<code>ConfigLoadError</code>, <code>CleanOperationError</code>, etc.) that were never called. Leftover from a previous consolidation into <code>internal/pkg/errors/</code>.</p>
+        </div>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Removed</span>
+          <h3>internal/shared/utils/config/ + testutil/</h3>
+          <div class="where">internal/shared/utils/{config,testutil}/*.go</div>
+          <p><code>config/</code> defined a <code>ConfigValidator</code> never imported (the real config system is <code>internal/config/</code>). <code>testutil/</code> contained a 13-line stub <code>AssertCleanerFields</code> that did nothing — called from two test files for no effect.</p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Removed</span>
+          <h3>tests/bdd/nix_test.go — Dead test behind build tag</h3>
+          <div class="where">tests/bdd/nix_test.go</div>
+          <p>Had <code>//go:build skip_bdd</code> — never compiled, never ran. Superseded by <code>nix_ginkgo_test.go</code> which provides the same scenarios via proper Ginkgo structure.</p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Removed</span>
+          <h3>10 dead adapter error constructors</h3>
+          <div class="where">internal/adapters/errors.go</div>
+          <p>Of 11 error functions, only <code>ErrInvalidConfig</code> was used in production (5 call sites in <code>environment.go</code>). The other 10 were exclusively called from <code>TestErrorConstructors</code> — testing themselves with zero production value.</p>
+        </div>
+
+        <h2 id="splitbrains"><span class="num">03</span>Split Brains</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Split Brain</th>
+              <th>Side A</th>
+              <th>Side B</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Error packages</td>
+              <td>internal/pkg/errors/ (rich system)</td>
+              <td>fmt.Errorf (~40 sites)</td>
+              <td><span class="badge badge-medium">Open</span></td>
+            </tr>
+            <tr>
+              <td>Test frameworks</td>
+              <td>Ginkgo/Gomega (BDD, policy)</td>
+              <td>testify (adapters_test.go)</td>
+              <td><span class="badge badge-medium">Open</span></td>
+            </tr>
+            <tr>
+              <td>Error packages (dead)</td>
+              <td>pkg/errors/</td>
+              <td>internal/errors/</td>
+              <td><span class="badge badge-fixed">Fixed</span></td>
+            </tr>
+            <tr>
+              <td>Ghost API layer</td>
+              <td>internal/api/ (types + mapper)</td>
+              <td>No consumer</td>
+              <td><span class="badge badge-fixed">Fixed</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 id="arch"><span class="num">04</span>Architectural Debt Still Open</h2>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Critical</span>
+          <h3>internal/domain/ — 23-file god package</h3>
+          <div class="where">internal/domain/*.go (4543 total lines, 23 files)</div>
+          <p>Enums, settings, types, interfaces, validation, duration parsing, git history types, system paths, operation defaults — all in one package. Should be split into <code>domain/enums/</code>, <code>domain/settings/</code>, <code>domain/operations/</code>, <code>domain/types/</code>.</p>
+          <div class="callout callout-warning">
+            <strong>Risk:</strong> Every file that imports domain gets everything. No boundary enforcement. Circular dependency risk grows with every new type.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">High</span>
+          <h3>internal/cleaner/ — 37-file flat directory</h3>
+          <div class="where">internal/cleaner/*.go (16269 total lines)</div>
+          <p>All cleaners, registry, factory, test helpers, test factories, test assertions, metrics, parallel executor — one flat package. Should be split by domain: <code>cleaner/registry/</code>, <code>cleaner/nix/</code>, <code>cleaner/docker/</code>, <code>cleaner/golang/</code>, etc.</p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">High</span>
+          <h3>internal/adapters/ — Over-engineered infrastructure</h3>
+          <div class="where">internal/adapters/{rate_limiter,cache_manager,http_client}.go</div>
+          <p>RateLimiter, CacheManager (with TTL, eviction), HTTPClient (with auth, retry, custom headers) — none of which are used for their stated purpose in production. This is a CLI tool that shells out to system commands. The HTTP client is never used to make HTTP calls. The cache manager is never used to cache anything meaningful.</p>
+          <div class="callout callout-solution">
+            <strong>Fix:</strong> Audit each adapter. Delete unused infrastructure. Keep only what the cleaners actually call.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">High</span>
+          <h3>~40 err113 violations — dynamic errors via fmt.Errorf</h3>
+          <div class="where">internal/adapters/nix.go:18, internal/domain/operation_defaults.go:15, internal/domain/config.go:9, etc.</div>
+          <p>The project has <code>cockroachdb/errors</code> in go.mod but most code uses <code>fmt.Errorf</code> for error construction. This is the error split brain — the rich error system in <code>internal/pkg/errors/</code> is only used by <code>internal/config/</code> (3 files). Everything else uses stdlib errors.</p>
+        </div>
+
+        <h2 id="tests"><span class="num">05</span>Testing Gaps</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Area</th>
+              <th>Coverage</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>CLI commands (15 source files)</td>
+              <td>1 test file (metadata only)</td>
+              <td><span class="badge badge-critical">Critical</span></td>
+            </tr>
+            <tr>
+              <td>homebrew.go</td>
+              <td>No unit test</td>
+              <td><span class="badge badge-high">High</span></td>
+            </tr>
+            <tr>
+              <td>parallel.go, metrics.go, validate.go</td>
+              <td>No tests</td>
+              <td><span class="badge badge-high">High</span></td>
+            </tr>
+            <tr>
+              <td>BDD suites (Nix + GitHistory)</td>
+              <td>43 specs, all passing</td>
+              <td><span class="badge badge-fixed">Good</span></td>
+            </tr>
+            <tr>
+              <td>CI runs tests</td>
+              <td>Now runs go build + go test -race</td>
+              <td><span class="badge badge-fixed">Fixed</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 id="types"><span class="num">06</span>Type Model Issues</h2>
+
+        <div class="card card-problem">
+          <h4>27 CacheType string enums without branded types</h4>
+          <p>The <code>CacheType</code> enum in <code>type_safe_enums.go</code> uses string constants. While <code>enum_macros.go</code> provides generic helpers (Parse, Values, IsValid), the CacheType itself is a raw string type — any string can be assigned to it. Branded types would make invalid cache types unrepresentable at compile time.</p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>OperationSettings uses pointer-based optional fields</h4>
+          <p><code>OperationSettings</code> has 9 pointer fields (<code>*NixSettings</code>, <code>*DockerSettings</code>, etc.) encoding "which operation" via which pointer is non-nil. An interface-based union (<code>type OperationSettings interface { operationSettings() }</code>) would make impossible states unrepresentable — currently you can construct an <code>OperationSettings</code> with all 9 pointers nil or multiple non-nil.</p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>Duration parsing uses string "30d" instead of time.Duration</h4>
+          <p><code>OlderThan</code> fields across settings use <code>string</code> ("30d") parsed by <code>duration_parser.go</code> at runtime. This is stringly-typed — Go's <code>time.Duration</code> already exists and prevents invalid values at compile time.</p>
+        </div>
+
+        <h2 id="libs"><span class="num">07</span>Library Debt</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Issue</th>
+              <th>Current</th>
+              <th>Policy Says</th>
+              <th>Effort</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Test framework in adapters</td>
+              <td>testify</td>
+              <td>Ginkgo/Gomega</td>
+              <td><span class="badge badge-medium">2h</span></td>
+            </tr>
+            <tr>
+              <td>Error construction</td>
+              <td>fmt.Errorf (~40 sites)</td>
+              <td>cockroachdb/errors</td>
+              <td><span class="badge badge-medium">4h</span></td>
+            </tr>
+            <tr>
+              <td>YAML library</td>
+              <td>gopkg.in/yaml.v3</td>
+              <td>go-faster/yaml</td>
+              <td><span class="badge badge-high">8h</span></td>
+            </tr>
+            <tr>
+              <td>Validation</td>
+              <td>Manual if-checks</td>
+              <td>sivchari/govalid</td>
+              <td><span class="badge badge-medium">4h</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Strengths Worth Preserving</h2>
+        <div class="strengths">
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Result[T] type for functional error handling</strong>
+              <span>Forces explicit error handling at compile time. Good Go pattern.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Type-safe enums with generic helpers</strong>
+              <span>enum_macros.go provides Parse/Values/IsValid generically. Ahead of most Go codebases.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Ginkgo BDD tests for critical cleaners</strong>
+              <span>Nix, GitHistory, CompiledBinaries, ProjectExecutables have proper BDD specs.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Registry pattern for cleaner management</strong>
+              <span>Thread-safe, extensible, clean separation between registration and execution.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Nix flake build with full BuildFlow pre-commit</strong>
+              <span>Linting, formatting, security scanning, type safety checks — all automated.</span>
+            </div>
+          </div>
+        </div>
+
+        <h2 id="plan"><span class="num">08</span>Prioritized Action Plan</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task</th>
+              <th>Impact</th>
+              <th>Effort</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Remove testify from adapter tests → Gomega</td>
+              <td><span class="badge badge-critical">High</span></td>
+              <td><span class="badge badge-low">Low (2h)</span></td>
+              <td>Policy compliance, removes banned dep</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Split domain/ god package into enums/, settings/, operations/, types/</td>
+              <td><span class="badge badge-critical">High</span></td>
+              <td><span class="badge badge-high">High (1d)</span></td>
+              <td>Boundary enforcement, reduces coupling</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Add CLI command tests (root, clean, scan, config)</td>
+              <td><span class="badge badge-critical">High</span></td>
+              <td><span class="badge badge-medium">Medium (4h)</span></td>
+              <td>Covers the user-facing entry points</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Audit + delete unused adapter infrastructure (HTTPClient, RateLimiter)</td>
+              <td><span class="badge badge-high">Medium</span></td>
+              <td><span class="badge badge-low">Low (2h)</span></td>
+              <td>Removes ~500 lines of ghost code</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Migrate fmt.Errorf → cockroachdb/errors</td>
+              <td><span class="badge badge-high">Medium</span></td>
+              <td><span class="badge badge-medium">Medium (4h)</span></td>
+              <td>Rich errors with codes, wrapping, barriers</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Add homebrew.go unit tests</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td><span class="badge badge-low">Low (1h)</span></td>
+              <td>Covers last untested cleaner</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Add tests for parallel.go, metrics.go, validate.go</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td><span class="badge badge-low">Low (2h)</span></td>
+              <td>Covers cleaner support infrastructure</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Split cleaner/ into per-domain sub-packages</td>
+              <td><span class="badge badge-high">Medium</span></td>
+              <td><span class="badge badge-high">High (2d)</span></td>
+              <td>Package boundaries, faster compiles</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Convert OperationSettings to interface-based union</td>
+              <td><span class="badge badge-high">Medium</span></td>
+              <td><span class="badge badge-high">High (1d)</span></td>
+              <td>Makes invalid states unrepresentable</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>Replace string durations with time.Duration</td>
+              <td><span class="badge badge-medium">Medium</span></td>
+              <td><span class="badge badge-medium">Medium (4h)</span></td>
+              <td>Type safety, eliminates parser</td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td>Replace yaml.v3 with go-faster/yaml</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td><span class="badge badge-high">High (8h)</span></td>
+              <td>Policy compliance, performance</td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td>Add govalid for struct validation codegen</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td><span class="badge badge-medium">Medium (4h)</span></td>
+              <td>Zero-alloc validation</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 id="question"><span class="num">09</span>Top Question I Cannot Answer</h2>
+
+        <div class="card card-problem">
+          <h4>Should we consolidate to ONE error strategy before or after splitting the god packages?</h4>
+          <p>Migrating <code>fmt.Errorf</code> → <code>cockroachdb/errors</code> touches ~40 call sites across <code>internal/domain/</code>, <code>internal/cleaner/</code>, <code>internal/adapters/</code>. But if we split the domain/ god package first, the import paths change and every file moves. Doing the error migration first means touching files that will move. Doing the split first means the error migration diff is noisier but touches files in their final location.</p>
+          <p><strong>I lean toward: split first, then migrate errors in the new package locations.</strong> The split is structural (moves files, fixes imports), the error migration is semantic (changes error construction within files). Doing structural first gives the semantic changes a stable home. But I'm not certain this ordering minimizes total merge conflicts — it depends on how many files the split touches simultaneously.</p>
+          <div class="callout callout-warning">
+            <strong>Why I can't resolve this:</strong> The trade-off depends on how aggressively we split (2 sub-packages vs 5) and whether we use <code>go-modularize</code> patterns. I need direction on target package structure before I can sequence confidently.
+          </div>
+        </div>
+
+        <footer class="footer">
+          Generated 2026-06-23 &middot; All findings verified against source code via grep/build/test
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) { return l.getAttribute("href").slice(1); });
+        var sections = ids.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle("active", link.getAttribute("href") === "#" + entry.target.id);
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
+        );
+        sections.forEach(function (s) { observer.observe(s); });
+      })();
+    </script>
+  </body>
+</html>
