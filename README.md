@@ -1,8 +1,8 @@
 # Clean Wizard
 
-**A comprehensive system cleanup tool for macOS that safely removes old caches, temporary files, and unused data across 12 different cleanup targets — from Nix generations to Homebrew, Docker containers to Go build caches.**
+**A comprehensive system cleanup tool for macOS and Linux that safely removes old caches, temporary files, and unused data across 12 different cleanup targets — from Nix generations to Homebrew, Docker containers to Go build caches.**
 
-[![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/go-1.26+-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-200%2B-green.svg)](https://github.com/LarsArtmann/clean-wizard/actions)
 
