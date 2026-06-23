@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	testutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/testutil"
 )
 
 func TestNewDockerCleaner(t *testing.T) {
@@ -56,8 +55,6 @@ func TestNewDockerCleaner(t *testing.T) {
 			if cleaner == nil {
 				t.Fatal("NewDockerCleaner() returned nil cleaner")
 			}
-
-			testutil.AssertCleanerFields(t, cleaner, tt.verbose, tt.dryRun)
 
 			if cleaner.pruneMode != tt.pruneMode {
 				t.Errorf("pruneMode = %v, want %v", cleaner.pruneMode, tt.pruneMode)

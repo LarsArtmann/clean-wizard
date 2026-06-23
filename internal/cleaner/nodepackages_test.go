@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	testutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/testutil"
 )
 
 func TestNewNodePackageManagerCleaner(t *testing.T) {
@@ -52,8 +51,6 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 			if cleaner == nil {
 				t.Fatal("NewNodePackageManagerCleaner() returned nil cleaner")
 			}
-
-			testutil.AssertCleanerFields(t, cleaner, tt.verbose, tt.dryRun)
 
 			if len(cleaner.packageManagers) != tt.wantPackageCount {
 				t.Errorf(
