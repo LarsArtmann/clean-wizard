@@ -35,7 +35,7 @@
         let
           version = self.rev or self.dirtyRev or "dev";
 
-          vendorHash = "sha256-g0ab36H36/UTl2WfIblDG+RE7KcTIdrA8Eh5HLg34yM=";
+          vendorHash = "sha256-g17cVEsjDmBDiDHObW2Pp/X1y6Xrr4Qu7emWbVSm3mo=";
           proxyVendor = true;
 
           ldflags = [
