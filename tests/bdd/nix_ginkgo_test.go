@@ -15,11 +15,12 @@ import (
 	"github.com/onsi/gomega"
 )
 
-// Test entry point for Ginkgo.
-func TestNixBDDSuite(t *testing.T) {
+// Test entry point for Ginkgo — runs all specs in the bdd package
+// (Nix, GitHistory, and future cleaner BDD tests).
+func TestCleanWizardBDDSuite(t *testing.T) {
 	t.Parallel()
 	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "Nix BDD Suite")
+	ginkgo.RunSpecs(t, "Clean Wizard BDD Suite")
 }
 
 // NixTestContext holds test state across scenarios.
