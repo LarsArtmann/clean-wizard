@@ -359,10 +359,7 @@ func (npmc *NodePackageManagerCleaner) Clean(
 	}
 
 	// Real cleaning implementation
-	startTime := time.Now()
-	itemsRemoved := 0
-	itemsFailed := 0
-	bytesFreed := int64(0)
+	counters := NewCleanCounters()
 
 	for _, pm := range npmc.packageManagers {
 		if !npmc.isPackageManagerAvailable(pm) {
@@ -371,25 +368,18 @@ func (npmc *NodePackageManagerCleaner) Clean(
 
 		result := npmc.cleanPackageManager(ctx, pm)
 		if result.IsErr() {
-			itemsFailed++
-
-			if npmc.verbose {
-				fmt.Printf("Warning: failed to clean %s: %v\n", pm, result.Error())
-			}
+			counters.RecordFailure(npmc.verbose, pm, result.Error())
 
 			continue
 		}
 
 		cleanResult := result.Value()
-		itemsRemoved++
-		bytesFreed += int64(cleanResult.FreedBytes)
+		counters.RecordSuccess(int64(cleanResult.FreedBytes))
 	}
-
-	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
 		domain.StrategyConservativeType,
-		itemsRemoved, itemsFailed, bytesFreed, duration,
+		counters.ItemsRemoved, counters.ItemsFailed, counters.BytesFreed, counters.Duration(),
 	))
 }
 

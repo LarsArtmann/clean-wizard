@@ -178,60 +178,19 @@ func (p *ProjectExecutablesCleaner) Scan(ctx context.Context) result.Result[[]do
 
 // Clean removes executable files from project directories using trash.
 func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
-	scanResult := p.Scan(ctx)
-	if scanResult.IsErr() {
-		return result.Err[domain.CleanResult](scanResult.Error())
-	}
-
-	items := scanResult.Value()
-
-	if len(items) == 0 {
-		return NewEmptyCleanResult()
-	}
-
-	// Calculate total size for dry-run preview
-	var totalBytes int64
-	for _, item := range items {
-		totalBytes += item.Size
-	}
-
-	if p.dryRun {
-		if p.verbose {
-			fmt.Printf("Would trash %d executable file(s) (%d bytes)\n", len(items), totalBytes)
-		}
-
-		return NewDryRunCleanResult(len(items), totalBytes)
-	}
-
-	// Actual cleaning
-	startTime := time.Now()
-	itemsRemoved := 0
-	itemsFailed := 0
-	bytesFreed := int64(0)
-
-	for _, item := range items {
-		err := p.fileOperator.TrashFile(ctx, item.Path)
-		if err != nil {
-			itemsFailed++
-
-			if p.verbose {
-				fmt.Printf("Warning: %v\n", err)
-			}
-
-			continue
-		}
-
-		itemsRemoved++
-		bytesFreed += item.Size
-
-		if p.verbose {
+	return ExecuteTrashPipeline(
+		ctx,
+		p.Scan(ctx),
+		p.dryRun,
+		p.verbose,
+		"executable file(s)",
+		func(cleanCtx context.Context, item domain.ScanItem) error {
+			return p.fileOperator.TrashFile(cleanCtx, item.Path)
+		},
+		func(item domain.ScanItem) {
 			fmt.Printf("  ✓ Trashed: %s\n", item.Path)
-		}
-	}
-
-	duration := time.Since(startTime)
-
-	return NewCleanResultWithMetrics(itemsRemoved, itemsFailed, bytesFreed, duration)
+		},
+	)
 }
 
 // GetStoreSize returns the total size of all executable files found.

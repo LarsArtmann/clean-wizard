@@ -405,16 +405,13 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	}
 
 	// Real cleaning implementation
-	startTime := time.Now()
-	itemsRemoved := 0
-	itemsFailed := 0
-	bytesFreed := int64(0)
+	counters := NewCleanCounters()
 
 	// Get home directory
 	homeDir, err := GetHomeDir()
 	if err != nil {
 		return result.Err[domain.CleanResult](
-			fmt.Errorf("failed to get home directory (itemsFailed=%v): %w", itemsFailed, err),
+			fmt.Errorf("failed to get home directory (itemsFailed=%v): %w", counters.ItemsFailed, err),
 		)
 	}
 
@@ -422,33 +419,26 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	for _, cacheType := range scc.cacheTypes {
 		result := scc.cleanSystemCache(ctx, cacheType, homeDir)
 		if result.IsErr() {
-			itemsFailed++
-
-			if scc.verbose {
-				fmt.Printf("Warning: failed to clean %s: %v\n", cacheType, result.Error())
-			}
+			counters.RecordFailure(scc.verbose, cacheType, result.Error())
 
 			continue
 		}
 
 		cleanResult := result.Value()
-		itemsRemoved++
-		bytesFreed += int64(cleanResult.FreedBytes)
+		counters.RecordSuccess(int64(cleanResult.FreedBytes))
 	}
 
 	var status domain.SizeEstimateStatusType
-	if bytesFreed > 0 {
+	if counters.BytesFreed > 0 {
 		status = domain.SizeEstimateStatusKnown
 	} else {
 		status = domain.SizeEstimateStatusUnknown
 	}
 
-	duration := time.Since(startTime)
-
 	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
 		domain.StrategyConservativeType,
-		itemsRemoved, itemsFailed, bytesFreed, duration,
-		domain.SizeEstimate{Known: uint64(bytesFreed), Status: status},
+		counters.ItemsRemoved, counters.ItemsFailed, counters.BytesFreed, counters.Duration(),
+		domain.SizeEstimate{Known: uint64(counters.BytesFreed), Status: status},
 	))
 }
 

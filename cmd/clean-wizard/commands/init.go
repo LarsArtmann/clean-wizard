@@ -111,14 +111,9 @@ func createMinimalConfig() error {
 
 	fmt.Println()
 	fmt.Println(SuccessStyle.Render("✅ Minimal configuration created successfully!"))
-	fmt.Println()
-	fmt.Println(InfoStyle.Render("📁 Configuration saved to: ~/.clean-wizard.yaml"))
-	fmt.Println()
-	fmt.Println("💡 To get started:")
-	fmt.Println("   clean-wizard clean              - Run daily cleanup")
-	fmt.Println("   clean-wizard scan               - Scan for cleanable items")
-	fmt.Println("   clean-wizard profile list       - List available profiles")
-	fmt.Println("   clean-wizard config show        - View current configuration")
+	printConfigSavedNotice()
+
+	printGettingStartedHints()
 
 	return nil
 }
@@ -299,8 +294,7 @@ func configureSafeMode(cfg *domain.Config) error {
 func printConfigSuccess(cfg *domain.Config) {
 	fmt.Println()
 	fmt.Println(SuccessStyle.Render("✅ Configuration created successfully!"))
-	fmt.Println()
-	fmt.Println(InfoStyle.Render("📁 Configuration saved to: ~/.clean-wizard.yaml"))
+	printConfigSavedNotice()
 	fmt.Println()
 	fmt.Println("📋 Available profiles:")
 
@@ -314,6 +308,18 @@ func printConfigSuccess(cfg *domain.Config) {
 		fmt.Printf("     %s\n", profile.Description)
 	}
 
+	printGettingStartedHints()
+}
+
+// printConfigSavedNotice prints the standard "Configuration saved to: ~/.clean-wizard.yaml"
+// notice with surrounding blank lines.
+func printConfigSavedNotice() {
+	fmt.Println()
+	fmt.Println(InfoStyle.Render("📁 Configuration saved to: ~/.clean-wizard.yaml"))
+}
+
+// printGettingStartedHints prints the standard post-setup usage hints.
+func printGettingStartedHints() {
 	fmt.Println()
 	fmt.Println("💡 To get started:")
 	fmt.Println("   clean-wizard clean              - Run daily cleanup")

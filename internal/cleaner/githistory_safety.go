@@ -137,6 +137,19 @@ func (c *GitHistorySafetyChecker) isGitRepo(ctx context.Context) bool {
 	return cmd.Run() == nil
 }
 
+// gitOutputHasContent runs a git command and returns whether its trimmed stdout is non-empty.
+// Returns false if the command fails or produces only whitespace.
+func (c *GitHistorySafetyChecker) gitOutputHasContent(ctx context.Context, args ...string) bool {
+	cmd := c.newGitCommand(ctx, args...)
+
+	output, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+
+	return len(strings.TrimSpace(string(output))) > 0
+}
+
 // newGitCommand creates a new git command with the given arguments.
 func (c *GitHistorySafetyChecker) newGitCommand(ctx context.Context, args ...string) *exec.Cmd {
 	allArgs := append([]string{"git", "-C", c.repoPath}, args...) //nolint:goconst
@@ -153,28 +166,14 @@ func (c *GitHistorySafetyChecker) hasUncommittedChanges(ctx context.Context) boo
 	}
 
 	// Check for unstaged changes
-	cmd = exec.CommandContext(ctx, "git", "-C", c.repoPath, "diff", "--quiet")
+	cmd = c.newGitCommand(ctx, "diff", "--quiet")
 	if cmd.Run() != nil {
 		return true
 	}
 
 	// Check for untracked files
-	cmd = exec.CommandContext(
-		ctx,
-		"git",
-		"-C",
-		c.repoPath,
-		"ls-files",
-		"--others",
-		"--exclude-standard",
-	)
-
-	output, err := cmd.Output()
-	if err != nil {
-		return false // If we can't check, assume clean
-	}
-
-	return len(strings.TrimSpace(string(output))) > 0
+	// If we can't check, assume clean.
+	return c.gitOutputHasContent(ctx, "ls-files", "--others", "--exclude-standard")
 }
 
 // getCurrentBranch returns the current branch name.
@@ -236,16 +235,9 @@ func (c *GitHistorySafetyChecker) checkRemote(
 }
 
 // hasUnpushedCommits checks if there are unpushed commits.
+// Returns false if no upstream is configured.
 func (c *GitHistorySafetyChecker) hasUnpushedCommits(ctx context.Context) bool {
-	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath,
-		"log", "@{u}..HEAD", "--oneline")
-
-	output, err := cmd.Output()
-	if err != nil {
-		return false // No upstream configured
-	}
-
-	return len(strings.TrimSpace(string(output))) > 0
+	return c.gitOutputHasContent(ctx, "log", "@{u}..HEAD", "--oneline")
 }
 
 // isFilterRepoAvailable checks if git-filter-repo is installed (system or via nix).

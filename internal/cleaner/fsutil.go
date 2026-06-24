@@ -8,6 +8,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
@@ -358,6 +359,123 @@ func NewCleanResultWithMetrics(
 		itemsRemoved, itemsFailed, bytesFreed, duration,
 		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
 	))
+}
+
+// CleanItemTrashFn trashes a single scan item and returns an error if it fails.
+type CleanItemTrashFn func(ctx context.Context, item domain.ScanItem) error
+
+// CleanItemLogFn logs a successfully trashed item (typically verbose mode).
+// Pass nil to disable per-item logging.
+type CleanItemLogFn func(item domain.ScanItem)
+
+// LockedMapLookup reads mu.RLock, fetches the value for key from m, and returns it.
+// Centralizes the idiomatic "RWMutex + map lookup" pattern used by every registry-style
+// container in this package (Registry.Get, MetricsCollector.GetMetrics, etc.).
+func LockedMapLookup[K comparable, V any](mu *sync.RWMutex, m map[K]V, key K) (V, bool) {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	v, ok := m[key]
+
+	return v, ok
+}
+
+// ExecuteTrashPipeline runs the common trash flow shared by item-based cleaners:
+// scan-result short-circuit, dry-run preview, counter init, per-item trash loop,
+// and metrics aggregation. Callers supply the per-item trash operation and an
+// optional verbose per-item log callback.
+func ExecuteTrashPipeline(
+	ctx context.Context,
+	scanResult result.Result[[]domain.ScanItem],
+	dryRun, verbose bool,
+	dryRunLabel string,
+	trash CleanItemTrashFn,
+	logItem CleanItemLogFn,
+) result.Result[domain.CleanResult] {
+	if scanResult.IsErr() {
+		return result.Err[domain.CleanResult](scanResult.Error())
+	}
+
+	items := scanResult.Value()
+
+	if len(items) == 0 {
+		return NewEmptyCleanResult()
+	}
+
+	var totalBytes int64
+	for _, item := range items {
+		totalBytes += item.Size
+	}
+
+	if dryRun {
+		if verbose {
+			fmt.Printf("Would trash %d %s (%.2f MB)\n", len(items), dryRunLabel, float64(totalBytes)/bytesPerMB)
+		}
+
+		return NewDryRunCleanResult(len(items), totalBytes)
+	}
+
+	counters := NewCleanCounters()
+
+	for _, item := range items {
+		if err := trash(ctx, item); err != nil {
+			counters.RecordFailure(verbose, item.Path, err)
+
+			continue
+		}
+
+		counters.RecordSuccess(item.Size)
+
+		if verbose && logItem != nil {
+			logItem(item)
+		}
+	}
+
+	return NewCleanResultWithMetrics(
+		counters.ItemsRemoved,
+		counters.ItemsFailed,
+		counters.BytesFreed,
+		counters.Duration(),
+	)
+}
+
+// CleanCounters aggregates the running totals tracked during a Clean pipeline.
+// Callers update it inline as each item is processed, then read the public fields
+// to build the result. Centralizing the counter set eliminates the repeated
+// `startTime/itemsRemoved/itemsFailed/bytesFreed` boilerplate shared by all
+// item-based cleaners.
+type CleanCounters struct {
+	startTime time.Time
+
+	ItemsRemoved int
+	ItemsFailed  int
+	BytesFreed   int64
+}
+
+// NewCleanCounters returns counters with startTime set to time.Now().
+// Counters are populated incrementally by Record* methods.
+func NewCleanCounters() CleanCounters {
+	return CleanCounters{startTime: time.Now()} //nolint:exhaustruct
+}
+
+// Duration returns the elapsed time since the counters were created.
+func (c *CleanCounters) Duration() time.Duration {
+	return time.Since(c.startTime)
+}
+
+// RecordSuccess adds the freed bytes to the success total and increments ItemsRemoved.
+func (c *CleanCounters) RecordSuccess(freedBytes int64) {
+	c.ItemsRemoved++
+	c.BytesFreed += freedBytes
+}
+
+// RecordFailure increments the failure counter and prints a verbose warning.
+func (c *CleanCounters) RecordFailure(verbose bool, label any, err error) {
+	c.ItemsFailed++
+
+	if verbose {
+		fmt.Printf("Warning: failed to clean %v: %v\n", label, err)
+	}
 }
 
 // ParseNumberAndUnit parses a size string like "2.5GB" into a number and unit.

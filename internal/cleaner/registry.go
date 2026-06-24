@@ -53,12 +53,7 @@ func (r *Registry) Register(name string, c Cleaner) {
 // Get retrieves a cleaner by name.
 // Returns the cleaner and true if found, nil and false otherwise.
 func (r *Registry) Get(name string) (Cleaner, bool) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	c, ok := r.cleaners[name]
-
-	return c, ok
+	return LockedMapLookup(&r.mu, r.cleaners, name)
 }
 
 // List returns all registered cleaners.

@@ -61,55 +61,60 @@ func (mc *MetricsCollector) RecordStart(cleanerName string) time.Time {
 	return time.Now()
 }
 
+// getOrCreateMetrics returns the metrics entry for cleanerName, creating it if absent.
+// The caller must already hold the write lock on mc.mu.
+func (mc *MetricsCollector) getOrCreateMetrics(cleanerName string) *CleanerMetrics {
+	m, exists := mc.cleaners[cleanerName]
+	if !exists {
+		m = &CleanerMetrics{Name: cleanerName} //nolint:exhaustruct
+		mc.cleaners[cleanerName] = m
+	}
+
+	return m
+}
+
+// withMetrics acquires the write lock, hands the metrics entry for cleanerName to fn,
+// then releases the lock. Centralizes the lock + get-or-create pattern shared by
+// every mutating MetricsCollector method.
+func (mc *MetricsCollector) withMetrics(cleanerName string, fn func(m *CleanerMetrics)) {
+	mc.mu.Lock()
+	defer mc.mu.Unlock()
+
+	fn(mc.getOrCreateMetrics(cleanerName))
+}
+
 // RecordSuccess records a successful cleaner operation.
 func (mc *MetricsCollector) RecordSuccess(
 	cleanerName string,
 	startTime time.Time,
 	res domain.CleanResult,
 ) {
-	mc.mu.Lock()
-	defer mc.mu.Unlock()
+	mc.withMetrics(cleanerName, func(m *CleanerMetrics) {
+		duration := time.Since(startTime)
 
-	m, exists := mc.cleaners[cleanerName]
-	if !exists {
-		m = &CleanerMetrics{Name: cleanerName} //nolint:exhaustruct
-		mc.cleaners[cleanerName] = m
-	}
-
-	duration := time.Since(startTime)
-
-	m.SuccessCount++
-	m.TotalDuration += duration
-	m.TotalBytesFreed += res.FreedBytes
-	m.LastRunAt = time.Now()
+		m.SuccessCount++
+		m.TotalDuration += duration
+		m.TotalBytesFreed += res.FreedBytes
+		m.LastRunAt = time.Now()
+	})
 }
 
 // RecordFailure records a failed cleaner operation.
 func (mc *MetricsCollector) RecordFailure(
 	cleanerName string,
-	startTime time.Time,
+	_ time.Time,
 	err error,
 ) {
-	mc.mu.Lock()
-	defer mc.mu.Unlock()
-
-	m, exists := mc.cleaners[cleanerName]
-	if !exists {
-		m = &CleanerMetrics{Name: cleanerName} //nolint:exhaustruct
-		mc.cleaners[cleanerName] = m
-	}
-
-	m.FailureCount++
-	m.LastError = err
-	m.LastRunAt = time.Now()
+	mc.withMetrics(cleanerName, func(m *CleanerMetrics) {
+		m.FailureCount++
+		m.LastError = err
+		m.LastRunAt = time.Now()
+	})
 }
 
 // GetMetrics returns metrics for a specific cleaner.
 func (mc *MetricsCollector) GetMetrics(cleanerName string) (CleanerMetrics, bool) {
-	mc.mu.RLock()
-	defer mc.mu.RUnlock()
-
-	m, ok := mc.cleaners[cleanerName]
+	m, ok := LockedMapLookup(&mc.mu, mc.cleaners, cleanerName)
 	if !ok {
 		return CleanerMetrics{}, false //nolint:exhaustruct
 	}

@@ -319,64 +319,19 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]doma
 
 // Clean removes compiled binary files using trash.
 func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
-	scanResult := c.Scan(ctx)
-	if scanResult.IsErr() {
-		return result.Err[domain.CleanResult](scanResult.Error())
-	}
-
-	items := scanResult.Value()
-
-	if len(items) == 0 {
-		return NewEmptyCleanResult()
-	}
-
-	// Calculate total size
-	var totalBytes int64
-	for _, item := range items {
-		totalBytes += item.Size
-	}
-
-	if c.dryRun {
-		if c.verbose {
-			fmt.Printf(
-				"Would trash %d compiled binary file(s) (%.2f MB)\n",
-				len(items),
-				float64(totalBytes)/bytesPerMB,
-			)
-		}
-
-		return NewDryRunCleanResult(len(items), totalBytes)
-	}
-
-	// Actual cleaning
-	startTime := time.Now()
-	itemsRemoved := 0
-	itemsFailed := 0
-	bytesFreed := int64(0)
-
-	for _, item := range items {
-		err := c.trashOperator.TrashBinary(ctx, item.Path)
-		if err != nil {
-			itemsFailed++
-
-			if c.verbose {
-				fmt.Printf("Warning: %v\n", err)
-			}
-
-			continue
-		}
-
-		itemsRemoved++
-		bytesFreed += item.Size
-
-		if c.verbose {
+	return ExecuteTrashPipeline(
+		ctx,
+		c.Scan(ctx),
+		c.dryRun,
+		c.verbose,
+		"compiled binary file(s)",
+		func(cleanCtx context.Context, item domain.ScanItem) error {
+			return c.trashOperator.TrashBinary(cleanCtx, item.Path)
+		},
+		func(item domain.ScanItem) {
 			fmt.Printf("  ✓ Trashed: %s (%.2f MB)\n", item.Path, float64(item.Size)/bytesPerMB)
-		}
-	}
-
-	duration := time.Since(startTime)
-
-	return NewCleanResultWithMetrics(itemsRemoved, itemsFailed, bytesFreed, duration)
+		},
+	)
 }
 
 // GetStoreSize returns the total size of all compiled binaries found.
