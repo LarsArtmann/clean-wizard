@@ -1,193 +1,202 @@
 version: "2"
 run:
-  timeout: 10m
-  go: 1.26.3
-  build-tags:
-    - goexperiment.arenas
-    - goexperiment.goroutineleakprofile
-    - goexperiment.jsonv2
-    - goexperiment.runtimesecret
-    - goexperiment.simd
-  modules-download-mode: readonly
-  allow-parallel-runners: true
-  allow-serial-runners: true
-  issues-exit-code: 1
-  tests: true
+    timeout: 10m
+    go: 1.26.3
+    build-tags:
+        - goexperiment.arenas
+        - goexperiment.goroutineleakprofile
+        - goexperiment.jsonv2
+        - goexperiment.runtimesecret
+        - goexperiment.simd
+    modules-download-mode: readonly
+    allow-parallel-runners: true
+    allow-serial-runners: true
+    issues-exit-code: 1
+    tests: true
 output:
-  formats: {}
+    formats: {}
 linters:
-  enable:
-    - bodyclose
-    - contextcheck
-    - copyloopvar
-    - cyclop
-    - dupl
-    - durationcheck
-    - errcheck
-    - errchkjson
-    - errname
-    - errorlint
-    - exhaustive
-    - exhaustruct
-    - forcetypeassert
-    - funlen
-    - ginkgolinter
-    - gochecknoglobals
-    - gochecknoinits
-    - gochecksumtype
-    - gocognit
-    - goconst
-    - gocritic
-    - gocyclo
-    - gosec
-    - gosmopolitan
-    - govet
-    - ineffassign
-    - interfacebloat
-    - intrange
-    - loggercheck
-    - maintidx
-    - mirror
-    - misspell
-    - musttag
-    - nakedret
-    - nestif
-    - nilerr
-    - nilnesserr
-    - nilnil
-    - noctx
-    - nolintlint
-    - paralleltest
-    - perfsprint
-    - prealloc
-    - predeclared
-    - protogetter
-    - reassign
-    - recvcheck
-    - revive
-    - rowserrcheck
-    - sloglint
-    - spancheck
-    - sqlclosecheck
-    - staticcheck
-    - testifylint
-    - thelper
-    - unconvert
-    - unparam
-    - unused
-    - usetesting
-    - wastedassign
-    - wrapcheck
-    - zerologlint
-  default: none
-  settings:
-    cyclop:
-      max-complexity: 15
-    exhaustruct:
-      exclude:
-        - os/exec.Cmd
-        - github.com/spf13/cobra.Command
-        - github.com/maypok86/otter/v2.Options
-        - github.com/caarlos0/env/v6.Options
-    funlen:
-      lines: 100
-      statements: 60
-    gocognit:
-      min-complexity: 50
-    gocritic:
-      disabled-checks:
-        - ifElseChain
-    gosec:
-      excludes:
-        - G115
-        - G118
-        - G204
-        - G301
-        - G304
-        - G306
-        - G703
-    nestif:
-      min-complexity: 7
-    revive:
-      rules:
-        - disabled: true
-          name: exported
-        - disabled: true
-          name: package-comments
-    wrapcheck:
-      ignorePackageGlobs:
-        - github.com/LarsArtmann/clean-wizard/internal/*
-        - encoding/*
-        - os
-        - time
-        - charm.land/*
-  exclusions:
-    generated: lax
-    rules:
-      - path: .*_test\.go
-        linters:
-          - cyclop
-          - gosec
-          - wrapcheck
-      - path: .*_test\.go
-        text: unused-parameter|empty-block
-        linters:
-          - revive
-      - path: tests/bdd/.*\.go
-        text: unused-parameter
-        linters:
-          - revive
-      - path: internal/cleaner/testing_helpers\.go
-        text: unused-parameter
-        linters:
-          - revive
-      - path: internal/cleaner/test_factories\.go
-        text: unused-parameter
-        linters:
-          - revive
-      - path: internal/cleaner/ginkgo_test_helpers\.go
-        linters:
-          - exhaustruct
-          - goconst
-      - path: internal/cleaner/test_assertions\.go
-        linters:
-          - exhaustruct
-          - goconst
-      - path: internal/domain/enum_macros\.go
-        linters:
-          - wrapcheck
-      - path: _test\.go
-        linters:
-          - exhaustruct
-          - testpackage
-          - gochecknoglobals
-          - funlen
-          - cyclop
-          - goconst
-      - path: _test\.go
-        text: unused
-        linters:
-          - unused
-    paths:
-      - \.gen\.go$
-      - _templ\.go$
-      - vendor/
-formatters:
-  enable:
-    - gci
-    - goimports
-    - gofumpt
-    - golines
-  settings:
     enable:
-      - gci
-      - goimports
-      - gofumpt
-      - golines
-    golines:
-      max-len: 120
-  exclusions:
-    generated: lax
-    paths:
-      - _templ\.go$
-issues: {}
+        - bodyclose
+        - contextcheck
+        - copyloopvar
+        - cyclop
+        - dupl
+        - durationcheck
+        - errcheck
+        - errchkjson
+        - errname
+        - errorlint
+        - exhaustive
+        - exhaustruct
+        - forcetypeassert
+        - funlen
+        - ginkgolinter
+        - gochecknoglobals
+        - gochecknoinits
+        - gochecksumtype
+        - gocognit
+        - goconst
+        - gocritic
+        - gocyclo
+        - gosec
+        - gosmopolitan
+        - govet
+        - ineffassign
+        - interfacebloat
+        - intrange
+        - loggercheck
+        - maintidx
+        - mirror
+        - misspell
+        - musttag
+        - nakedret
+        - nestif
+        - nilerr
+        - nilnesserr
+        - nilnil
+        - noctx
+        - nolintlint
+        - paralleltest
+        - perfsprint
+        - prealloc
+        - predeclared
+        - protogetter
+        - reassign
+        - recvcheck
+        - revive
+        - rowserrcheck
+        - sloglint
+        - spancheck
+        - sqlclosecheck
+        - staticcheck
+        - testifylint
+        - thelper
+        - unconvert
+        - unparam
+        - unused
+        - usetesting
+        - wastedassign
+        - wrapcheck
+        - zerologlint
+    default: none
+    settings:
+        cyclop:
+            max-complexity: 15
+        exhaustruct:
+            exclude:
+                - os/exec.Cmd
+                - github.com/spf13/cobra.Command
+                - github.com/maypok86/otter/v2.Options
+                - github.com/caarlos0/env/v6.Options
+        funlen:
+            lines: 100
+            statements: 60
+        ginkgolinter:
+            forbid-focus-container: true
+            forbid-spec-pollution: true
+        gocognit:
+            min-complexity: 50
+        gocritic:
+            disabled-checks:
+                - ifElseChain
+        gosec:
+            excludes:
+                - G115
+                - G118
+                - G204
+                - G301
+                - G304
+                - G306
+                - G703
+        nestif:
+            min-complexity: 7
+        revive:
+            rules:
+                - disabled: true
+                  name: exported
+                - disabled: true
+                  name: package-comments
+        testifylint:
+            disable:
+                - go-require
+            enable-all: true
+        wrapcheck:
+            ignorePackageGlobs:
+                - github.com/LarsArtmann/clean-wizard/internal/*
+                - encoding/*
+                - os
+                - time
+                - charm.land/*
+    exclusions:
+        generated: lax
+        rules:
+            - path: .*_test\.go
+              linters:
+                - cyclop
+                - gosec
+                - wrapcheck
+            - path: .*_test\.go
+              text: unused-parameter|empty-block
+              linters:
+                - revive
+            - path: tests/bdd/.*\.go
+              text: unused-parameter
+              linters:
+                - revive
+            - path: internal/cleaner/testing_helpers\.go
+              text: unused-parameter
+              linters:
+                - revive
+            - path: internal/cleaner/test_factories\.go
+              text: unused-parameter
+              linters:
+                - revive
+            - path: internal/cleaner/ginkgo_test_helpers\.go
+              linters:
+                - exhaustruct
+                - goconst
+            - path: internal/cleaner/test_assertions\.go
+              linters:
+                - exhaustruct
+                - goconst
+            - path: internal/domain/enum_macros\.go
+              linters:
+                - wrapcheck
+            - path: _test\.go
+              linters:
+                - exhaustruct
+                - testpackage
+                - gochecknoglobals
+                - funlen
+                - cyclop
+                - goconst
+            - path: _test\.go
+              text: unused
+              linters:
+                - unused
+        paths:
+            - \.gen\.go$
+            - _templ\.go$
+            - vendor/
+formatters:
+    enable:
+        - gci
+        - goimports
+        - gofumpt
+        - golines
+    settings:
+        enable:
+            - gci
+            - goimports
+            - gofumpt
+            - golines
+        golines:
+            max-len: 120
+    exclusions:
+        generated: lax
+        paths:
+            - _templ\.go$
+issues:
+    max-issues-per-linter: 50
+    max-same-issues: 10
