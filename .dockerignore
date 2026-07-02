@@ -1,42 +1,4 @@
-# Build outputs
-bin/
-dist/
-tmp/
-/clean-wizard
-
-# Go test binaries
-*.test
-
-# Coverage artifacts
-*.out
-coverage.html
-.coverage/
-
-# Generated reports
-reports/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-
-# Nix
-result
-result-*
-.direnv/
-
-# OS
-.DS_Store
-# Dependencies
-node_modules/
-# Test coverage
-/coverage
-# Sensitive files
-*.db
-Copy/paste detection report
-/report/jscpd-report.json
-
-# >>> buildflow-managed (.gitignore) >>>
+# >>> buildflow-managed (.dockerignore) >>>
 # Auto-managed by buildflow. Edit outside these markers; this block is regenerated on `buildflow --fix`.
 
 ## Secrets and environment
@@ -46,11 +8,17 @@ Copy/paste detection report
 *.pem
 *.key
 
-## Databases
-*.db-shm
-*.db-wal
+## Version control
+.git
+.gitignore
+.gitattributes
+
+## Ci cd
+.github/
+.gitlab-ci.yml
 
 ## Operating systems
+.DS_Store
 ._*
 .Spotlight-V100
 .Trashes
@@ -58,8 +26,15 @@ Thumbs.db
 ehthumbs.db
 
 ## Editors and ides
+.idea/
+.vscode/
+*.swp
 *.swo
 *~
+
+## Documentation
+docs/
+*.md
 
 ## Logs and temporaries
 *.log
@@ -71,19 +46,33 @@ audit-log.*
 workflow-audit-log.*
 .buildflow-workflow-baseline.json
 
+## Test artifacts
+*.test
+*.out
+coverage.out
+*.html
+
 ## Go
 *.exe
 *.dll
 *.so
 *.dylib
+*.test
+*.out
 vendor/
 go.work
 go.work.sum
+/clean-wizard
 
 ## Nix
+result
+result-*
 .envrc
+.direnv/
 
 ## Javascript and typescript
+node_modules/
+dist/
 build/
 *.tsbuildinfo
 .next/
@@ -96,4 +85,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-# <<< buildflow-managed (.gitignore) <<<
+# <<< buildflow-managed (.dockerignore) <<<
