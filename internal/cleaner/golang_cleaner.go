@@ -4,7 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"slices"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
@@ -17,6 +21,9 @@ var (
 	ErrNoCacheTypeSpecified    = errors.New("no cache type specified")
 	ErrLintCacheNotImplemented = errors.New("lint cache cleaning not yet implemented")
 	ErrGoCacheNotAvailable     = errors.New("go not available")
+	ErrGoProcessesRunning      = errors.New(
+		"other Go processes detected (go, gopls, golangci-lint, dlv) — skipping to avoid cache corruption",
+	)
 )
 
 // CleanStats tracks cleaning metrics.
@@ -100,9 +107,14 @@ func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] 
 }
 
 // Clean removes Go caches.
+// It checks for other running Go processes first to avoid cache corruption.
 func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !gc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("go not available"))
+		return result.Err[domain.CleanResult](ErrGoCacheNotAvailable)
+	}
+
+	if !gc.dryRun && hasOtherGoProcesses() {
+		return result.Err[domain.CleanResult](ErrGoProcessesRunning)
 	}
 
 	if gc.dryRun {
@@ -213,4 +225,49 @@ func (gc *GoCleaner) logWarning(format string, args ...any) {
 	if gc.verbose {
 		fmt.Printf("Warning: "+format+"\n", args...)
 	}
+}
+
+// goProcessNames lists Go-related processes whose presence indicates
+// the Go cache may be in active use.
+var goProcessNames = []string{"go", "gopls", "golangci-lint", "dlv"}
+
+// hasOtherGoProcesses checks if there are other Go processes running
+// that might be using the Go cache, which could cause cache corruption
+// if the cache is cleaned concurrently.
+// If pgrep is unavailable, this returns true (fail-closed) to protect
+// against cache corruption in minimal environments.
+func hasOtherGoProcesses() bool {
+	// On systems without pgrep, fail closed to prevent cache corruption
+	if _, err := exec.LookPath("pgrep"); err != nil {
+		return true
+	}
+
+	return slices.ContainsFunc(goProcessNames, isProcessRunning)
+}
+
+// isProcessRunning checks if a process with the given name is currently running,
+// excluding the current clean-wizard process itself.
+func isProcessRunning(name string) bool {
+	cmd := exec.CommandContext(context.Background(), "pgrep", "-x", name)
+
+	output, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+
+	pids := strings.Fields(string(output))
+	currentPID := os.Getpid()
+
+	for _, pidStr := range pids {
+		pid, err := strconv.Atoi(pidStr)
+		if err != nil {
+			continue
+		}
+
+		if pid != currentPID {
+			return true
+		}
+	}
+
+	return false
 }

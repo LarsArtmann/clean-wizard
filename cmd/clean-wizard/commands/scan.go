@@ -7,6 +7,8 @@ import (
 	"strconv"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/config"
+	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/spf13/cobra"
 )
@@ -36,13 +38,8 @@ func NewScanCommand() *cobra.Command {
 }
 
 // printNixStoreSize prints the Nix store size if available.
-func printNixStoreSize(ctx context.Context) {
-	nixRegistry, err := cleaner.DefaultRegistry()
-	if err != nil {
-		return
-	}
-
-	nixCleaner, ok := nixRegistry.Get("nix")
+func printNixStoreSize(ctx context.Context, registry *cleaner.Registry) {
+	nixCleaner, ok := registry.Get("nix")
 	if !ok || !nixCleaner.IsAvailable(ctx) {
 		return
 	}
@@ -62,20 +59,38 @@ func printNixStoreSize(ctx context.Context) {
 func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	ctx := context.Background()
 
+	cfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	container, cleanup := di.New()
+	defer cleanup()
+
+	settings := di.RunSettings{Verbose: verbose, DryRun: false}
+	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
+		return fmt.Errorf("failed to register DI services: %w", err)
+	}
+
+	registry, err := di.CleanerRegistry(container.Injector())
+	if err != nil {
+		return fmt.Errorf("failed to resolve cleaner registry from DI: %w", err)
+	}
+
 	if !jsonOutput {
 		fmt.Println(TitleStyle.Render("🔍 Scanning system for cleanable items..."))
 		fmt.Println()
 	}
 
 	// Get cleaner configurations
-	cleanerConfigs := GetCleanerConfigs(ctx)
+	cleanerConfigs := GetCleanerConfigs(ctx, registry)
 
 	// Filter to available cleaners only
 	var availableCleaners []CleanerConfig
 
-	for _, cfg := range cleanerConfigs {
-		if cfg.Available == CleanerAvailabilityAvailable {
-			availableCleaners = append(availableCleaners, cfg)
+	for _, c := range cleanerConfigs {
+		if c.Available == CleanerAvailabilityAvailable {
+			availableCleaners = append(availableCleaners, c)
 		}
 	}
 
@@ -99,8 +114,8 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 		scanResults    []ScanResult
 	)
 
-	for _, cfg := range availableCleaners {
-		result := scanCleanerReal(ctx, cfg.Type, verbose)
+	for _, c := range availableCleaners {
+		result := scanCleanerReal(ctx, registry, c.Type, verbose)
 
 		scanResults = append(scanResults, result)
 		if result.BytesCleanable > 0 {
@@ -129,7 +144,7 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	)
 
 	// Show Nix store size if available
-	printNixStoreSize(ctx)
+	printNixStoreSize(ctx, registry)
 
 	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 
@@ -153,19 +168,16 @@ type ScanResult struct {
 }
 
 // scanCleanerReal scans a cleaner using the real Scan method from the cleaner interface.
-func scanCleanerReal(ctx context.Context, cleanerType CleanerType, verbose bool) ScanResult {
+func scanCleanerReal(
+	ctx context.Context,
+	registry *cleaner.Registry,
+	cleanerType CleanerType,
+	verbose bool,
+) ScanResult {
 	result := ScanResult{ //nolint:exhaustruct
 		Name:        getCleanerName(cleanerType),
 		Description: getCleanerDescription(cleanerType),
 		Icon:        getCleanerIcon(cleanerType),
-	}
-
-	// Get cleaner from registry
-	registry, err := cleaner.DefaultRegistry()
-	if err != nil {
-		result.Available = CleanerAvailabilityUnavailable
-
-		return result
 	}
 
 	name := getRegistryName(cleanerType)

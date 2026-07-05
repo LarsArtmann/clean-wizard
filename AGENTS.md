@@ -1,6 +1,6 @@
 # Clean Wizard - Project Instructions
 
-**Updated:** 2026-06-02
+**Updated:** 2026-07-05
 
 ## Build & Test
 
@@ -19,6 +19,8 @@ go test ./... -short
 ## Project Structure
 
 - `cmd/clean-wizard/` - CLI entry point and commands (Cobra)
+- `internal/di/` - Dependency injection container (samber/do v2)
+- `internal/execution/` - Workflow orchestration engine (Azure/go-workflow)
 - `internal/cleaner/` - 13+ cleaner implementations, registry, factory
 - `internal/domain/` - Domain types, 27 CacheType enums, interfaces, settings
 - `internal/config/` - Configuration loading (koanf/yaml), validation
@@ -41,12 +43,26 @@ go test ./... -short
 
 ## Architecture Patterns
 
-- **Registry Pattern** - `cleaner.Registry` for thread-safe cleaner management
-- **Result Type** - `result.Result[T]` for functional error handling
+- **Dependency Injection** - `internal/di/` using samber/do v2; `RegisterAllServices` wires all services into a single container; typed accessors wrap `do.Invoke[T]`
+- **Workflow Orchestration** - `internal/execution/` using Azure/go-workflow; `RunCleaners`/`RunScans` compile cleaners into a DAG of `flow.FuncIO` steps with `BeforeStep`/`AfterStep` hooks
+- **Registry Pattern** - `cleaner.Registry` for thread-safe cleaner management, resolved from DI container
+- **Result Type** - `result.Result[T]` for functional error handling in cleaner methods
 - **Type-Safe Enums** - 27 CacheType enums with generic helpers in `enum_macros.go`
 - **Adapter Pattern** - External tools wrapped in `internal/adapters/`
-- **Flow Composition** - `FlowBuilder[T]`, `ParallelFlow[T]`, `BranchFlow[T]`
 - **Platform-Aware Defaults** - `DefaultProtectedPaths()`, `getDefaultSystemCacheTypes()` use `runtime.GOOS`
+
+## DI + Workflow Architecture
+
+The application follows the same pattern as BuildFlow:
+
+1. **CLI parses flags** → loads config → creates DI container per command invocation
+2. **`di.RegisterAllServices(injector, cfg, settings)`** registers config, run settings, and cleaner registry as lazy singletons
+3. **Command resolves services** from DI via typed accessors (`di.CleanerRegistry(i)`)
+4. **`execution.RunCleaners(ctx, registry, names, opts...)`** compiles cleaners into a go-workflow DAG and executes it
+5. **Workflow steps** wrap each cleaner's `Clean(ctx)` method, collecting results in a thread-safe `resultCollector`
+6. **`WorkflowResult`** aggregates per-step outcomes with succeeded/skipped/failed classification
+
+Key design principle: the execution layer is **DI-agnostic** — it receives `*cleaner.Registry` and cleaner names as plain parameters. The DI container provides the service graph; the CLI extracts services and hands them to the workflow engine.
 
 ## Dependencies
 
@@ -56,6 +72,8 @@ go test ./... -short
 - `github.com/cockroachdb/errors` - Error wrapping
 - `github.com/onsi/ginkgo/v2` + `github.com/onsi/gomega` - BDD testing
 - `github.com/knadh/koanf/v2` - Configuration
+- `github.com/samber/do/v2` - Dependency injection
+- `github.com/Azure/go-workflow` - Workflow orchestration engine
 - `github.com/spf13/cobra` - CLI framework
 - `gopkg.in/yaml.v3` - YAML handling
 
@@ -66,10 +84,13 @@ go test ./... -short
 - `internal/cleaner/` has 50+ files flat (no sub-packages)
 - ~40 `err113` lint violations (dynamic errors via fmt.Errorf)
 - 15 source files over 350 lines
+- `result.FlowBuilder`/`BranchFlow`/`ParallelFlow` are dormant (replaced by go-workflow but not yet removed)
 
 ## Test Facts
 
-- 298 test functions across 63 test files
+- 298+ test functions across 63+ test files
+- DI package tests: `internal/di/di_test.go`
+- Execution package tests: `internal/execution/execution_test.go`
 - Ginkgo BDD tests exist for: GitHistory, Nix, CompiledBinaries, ProjectExecutables
 - 9 of 13 cleaners have NO BDD tests
 - CLI command tests are missing entirely

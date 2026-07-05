@@ -1,100 +1,19 @@
 package commands
 
 import (
-	"context"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 )
 
-// cleanResult holds aggregated results from executing multiple cleaners.
-type cleanResult struct {
-	totalBytesFreed   uint64
-	totalItemsRemoved uint
-	totalItemsFailed  uint
-	cleanerResults    map[string]domain.CleanResult
-	skippedCleaners   []string
-	failedCleaners    []cleanerFailure
-	skippedErrors     map[string]error
-	failedErrors      map[string]error
-	duration          time.Duration
-}
-
-type cleanerFailure struct {
-	name  string
-	error string
-}
-
-// executeCleaners runs all selected cleaners and aggregates their results.
-func executeCleaners(
-	ctx context.Context,
-	selectedCleaners []CleanerType,
-	dryRun, verbose bool,
-) cleanResult {
-	cr := cleanResult{ //nolint:exhaustruct
-		cleanerResults: make(map[string]domain.CleanResult),
-		skippedErrors:  make(map[string]error),
-		failedErrors:   make(map[string]error),
-	}
-
-	startTime := time.Now()
-
-	for _, cleanerType := range selectedCleaners {
-		result, err := runCleaner(ctx, cleanerType, dryRun, verbose)
-		name := getCleanerName(cleanerType)
-
-		if err != nil {
-			cr.handleCleanerError(name, err)
-
-			continue
-		}
-
-		if verbose {
-			fmt.Printf(
-				"  [DEBUG] %s: %d bytes (%s), %d items\n",
-				name,
-				result.FreedBytes,
-				format.Bytes(int64(result.FreedBytes)),
-				result.ItemsRemoved,
-			)
-		}
-
-		cr.totalBytesFreed += result.FreedBytes
-		cr.totalItemsRemoved += result.ItemsRemoved
-		cr.totalItemsFailed += result.ItemsFailed
-		cr.cleanerResults[name] = result
-	}
-
-	cr.duration = time.Since(startTime)
-
-	return cr
-}
-
-func (cr *cleanResult) handleCleanerError(name string, err error) {
-	errMsg := err.Error()
-
-	if isNotAvailableError(errMsg) {
-		cr.skippedCleaners = append(cr.skippedCleaners, name)
-		cr.skippedErrors[name] = err
-		fmt.Printf("  ℹ️  Skipped %s: %s\n", name, errMsg)
-	} else {
-		cr.failedCleaners = append(cr.failedCleaners, cleanerFailure{
-			name:  name,
-			error: errMsg,
-		})
-		cr.failedErrors[name] = err
-		fmt.Printf("  ❌ Cleaner %s failed: %s\n", name, errMsg)
-	}
-}
-
 // displayResults renders the final cleanup results to the terminal.
 func displayResults(
-	cr cleanResult,
+	wr *execution.WorkflowResult,
 	dryRun bool,
 	diskBefore *cleaner.DiskUsage,
 ) {
@@ -107,11 +26,11 @@ func displayResults(
 		fmt.Println()
 	}
 
-	printCleanResultsTable(cr.cleanerResults, cr.totalBytesFreed, cr.totalItemsRemoved, cr.duration)
-	printEncouragement(cr.totalBytesFreed)
-	displayDiskUsageAfter(cr, dryRun, diskBefore)
+	printCleanResultsTable(wr.CleanResultsMap(), wr.TotalBytesFreed, wr.TotalItemsRemoved, wr.Duration)
+	printEncouragement(wr.TotalBytesFreed)
+	displayDiskUsageAfter(dryRun, diskBefore)
 	displayDryRunTip(dryRun)
-	displayWarnings(cr)
+	displayWarnings(wr)
 }
 
 func printEncouragement(totalBytes uint64) {
@@ -122,7 +41,7 @@ func printEncouragement(totalBytes uint64) {
 	}
 }
 
-func displayDiskUsageAfter(_ cleanResult, dryRun bool, diskBefore *cleaner.DiskUsage) {
+func displayDiskUsageAfter(dryRun bool, diskBefore *cleaner.DiskUsage) {
 	if dryRun || diskBefore == nil {
 		return
 	}
@@ -161,24 +80,33 @@ func displayDryRunTip(dryRun bool) {
 	fmt.Println("   clean-wizard clean --mode standard")
 }
 
-func displayWarnings(cr cleanResult) {
-	if cr.totalItemsFailed == 0 && len(cr.skippedCleaners) == 0 && len(cr.failedCleaners) == 0 {
+func displayWarnings(wr *execution.WorkflowResult) {
+	skipped := wr.Skipped()
+	failed := wr.Failed()
+
+	if wr.TotalItemsFailed == 0 && len(skipped) == 0 && len(failed) == 0 {
 		return
 	}
 
 	fmt.Println()
 	fmt.Println(WarningStyle.Render("⚠️  Warnings:"))
 
-	if cr.totalItemsFailed > 0 {
-		fmt.Printf("   • %d item(s) failed to clean\n", cr.totalItemsFailed)
+	if wr.TotalItemsFailed > 0 {
+		fmt.Printf("   • %d item(s) failed to clean\n", wr.TotalItemsFailed)
 	}
 
-	if len(cr.skippedCleaners) > 0 {
-		fmt.Printf("   • %d cleaner(s) skipped (not available)\n", len(cr.skippedCleaners))
+	if len(skipped) > 0 {
+		fmt.Printf("   • %d cleaner(s) skipped (not available)\n", len(skipped))
+		for _, s := range skipped {
+			fmt.Printf("     ℹ️  Skipped %s: %s\n", s.Name, s.Err.Error())
+		}
 	}
 
-	if len(cr.failedCleaners) > 0 {
-		fmt.Printf("   • %d cleaner(s) failed\n", len(cr.failedCleaners))
+	if len(failed) > 0 {
+		fmt.Printf("   • %d cleaner(s) failed\n", len(failed))
+		for _, f := range failed {
+			fmt.Printf("     ❌ %s failed: %s\n", f.Name, f.Err.Error())
+		}
 	}
 }
 
@@ -217,24 +145,4 @@ func printCleanResultsTable(
 		strconv.FormatUint(uint64(totalItems), 10),
 		format.Duration(duration),
 	)
-}
-
-// isNotAvailableError checks if an error indicates a cleaner is not available.
-func isNotAvailableError(errMsg string) bool {
-	lowerMsg := strings.ToLower(errMsg)
-	unavailableKeywords := []string{
-		"not available",
-		"not found",
-		"not installed",
-		"command not found",
-		"no such file or directory",
-	}
-
-	for _, keyword := range unavailableKeywords {
-		if strings.Contains(lowerMsg, keyword) {
-			return true
-		}
-	}
-
-	return false
 }

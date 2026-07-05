@@ -35,7 +35,7 @@
         let
           version = self.rev or self.dirtyRev or "dev";
 
-          vendorHash = "sha256-g17cVEsjDmBDiDHObW2Pp/X1y6Xrr4Qu7emWbVSm3mo=";
+          vendorHash = "sha256-F1o9yOTg3RiUApVGlJSRsYcpi/Y3J4GCPrCQ9vyorLs=";
           proxyVendor = true;
 
           ldflags = [
@@ -54,7 +54,6 @@
               ./go.sum
               ./cmd
               ./internal
-              ./pkg
             ];
           };
 

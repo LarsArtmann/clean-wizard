@@ -4,8 +4,9 @@ go 1.26.4
 
 require (
 	charm.land/huh/v2 v2.0.3
-	charm.land/lipgloss/v2 v2.0.4
+	charm.land/lipgloss/v2 v2.0.5
 	charm.land/log/v2 v2.0.0
+	github.com/Azure/go-workflow v0.1.13
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/charmbracelet/fang v1.0.0
 	github.com/cockroachdb/errors v1.14.0
@@ -17,6 +18,7 @@ require (
 	github.com/maypok86/otter/v2 v2.3.0
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.42.1
+	github.com/samber/do/v2 v2.0.0
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/sys v0.46.0
@@ -25,15 +27,17 @@ require (
 )
 
 require (
-	charm.land/bubbles/v2 v2.1.0 // indirect
-	charm.land/bubbletea/v2 v2.0.7 // indirect
+	charm.land/bubbles/v2 v2.1.1 // indirect
+	charm.land/bubbletea/v2 v2.0.8 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
+	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
+	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
-	github.com/charmbracelet/ultraviolet v0.0.0-20260622092850-f39628c8a989 // indirect
+	github.com/charmbracelet/ultraviolet v0.0.0-20260703014108-f5a850f9c2b7 // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260629091435-9c70f75e26a4 // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260705004817-2cc9a8fe1146 // indirect
 	github.com/charmbracelet/x/exp/golden v0.0.0-20251106172358-54469c29c2bc // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
@@ -74,6 +78,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.15.0 // indirect
+	github.com/samber/go-type-to-string v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect

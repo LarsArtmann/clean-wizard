@@ -7,7 +7,9 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
+	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/spf13/cobra"
 )
@@ -127,9 +129,22 @@ func runCleanCommand(
 		)
 	}
 
+	container, cleanup := di.New()
+	defer cleanup()
+
+	settings := di.RunSettings{Verbose: verbose, DryRun: dryRun}
+	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
+		return fmt.Errorf("failed to register DI services: %w", err)
+	}
+
+	registry, err := di.CleanerRegistry(container.Injector())
+	if err != nil {
+		return fmt.Errorf("failed to resolve cleaner registry from DI: %w", err)
+	}
+
 	printDryRunHeader(dryRun)
 
-	availableConfigs := getAvailableConfigs(ctx)
+	availableConfigs := getAvailableConfigs(ctx, registry)
 	if len(availableConfigs) == 0 {
 		return ErrNoCleanersAvailable
 	}
@@ -168,24 +183,39 @@ func runCleanCommand(
 
 	printDiskUsage(diskBeforePtr, jsonOutput)
 
-	cr := executeCleaners(ctx, selectedCleaners, dryRun, verbose)
+	selectedNames := cleanerTypesToNames(selectedCleaners)
 
-	if jsonOutput {
-		return outputJSON(cr, dryRun)
+	wr, err := execution.RunCleaners(ctx, registry, selectedNames, execution.WithVerbose(verbose))
+	if err != nil {
+		return fmt.Errorf("clean workflow execution failed: %w", err)
 	}
 
-	displayResults(cr, dryRun, diskBeforePtr)
+	if jsonOutput {
+		return outputJSON(wr, dryRun)
+	}
+
+	displayResults(wr, dryRun, diskBeforePtr)
 
 	return nil
 }
 
-func outputJSON(cr cleanResult, dryRun bool) error {
+func outputJSON(wr *execution.WorkflowResult, dryRun bool) error {
+	skipped := make(map[string]error)
+	for _, s := range wr.Skipped() {
+		skipped[s.Name] = s.Err
+	}
+
+	failed := make(map[string]error)
+	for _, s := range wr.Failed() {
+		failed[s.Name] = s.Err
+	}
+
 	jsonBytes, err := format.CleanResultsToJSON(
-		cr.cleanerResults,
-		cr.duration,
+		wr.CleanResultsMap(),
+		wr.Duration,
 		dryRun,
-		cr.skippedErrors,
-		cr.failedErrors,
+		skipped,
+		failed,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to generate JSON output: %w", err)
@@ -196,8 +226,8 @@ func outputJSON(cr cleanResult, dryRun bool) error {
 	return nil
 }
 
-func getAvailableConfigs(ctx context.Context) []CleanerConfig {
-	cleanerConfigs := GetCleanerConfigs(ctx)
+func getAvailableConfigs(ctx context.Context, registry *cleaner.Registry) []CleanerConfig {
+	cleanerConfigs := GetCleanerConfigs(ctx, registry)
 	available := make([]CleanerConfig, 0, len(cleanerConfigs))
 
 	for _, cfg := range cleanerConfigs {
@@ -223,6 +253,16 @@ func loadConfigForClean(configPath string) (*domain.Config, error) {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
 	return cfg, nil
+}
+
+// cleanerTypesToNames converts a slice of CleanerType to a slice of string
+// for the execution layer, which works with cleaner names.
+func cleanerTypesToNames(types []CleanerType) []string {
+	names := make([]string, len(types))
+	for i, t := range types {
+		names[i] = string(t)
+	}
+	return names
 }
 
 // operationTypeToCleanerType maps domain OperationType to CleanerType.

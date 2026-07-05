@@ -16,14 +16,8 @@ type CleanerConfig struct {
 }
 
 // GetCleanerConfigs returns all cleaner configurations with availability status.
-// Uses the CleanerRegistry for dynamic discovery and availability checking.
-// Returns an empty slice if the registry cannot be created.
-func GetCleanerConfigs(ctx context.Context) []CleanerConfig {
-	registry, err := cleaner.DefaultRegistry()
-	if err != nil {
-		return []CleanerConfig{}
-	}
-
+// Uses the provided registry for dynamic discovery and availability checking.
+func GetCleanerConfigs(ctx context.Context, registry *cleaner.Registry) []CleanerConfig {
 	allNames := registry.Names()
 
 	configs := make([]CleanerConfig, 0, len(allNames))
