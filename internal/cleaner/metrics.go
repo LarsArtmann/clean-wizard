@@ -216,28 +216,3 @@ func (r *MetricsEnabledRegistry) CleanAllWithMetrics(
 
 	return results
 }
-
-// CleanAllParallelWithMetrics runs all cleaners in parallel with metrics.
-func (r *MetricsEnabledRegistry) CleanAllParallelWithMetrics(
-	ctx context.Context,
-	maxConcurrency int,
-) map[string]CleanResultWithMetrics {
-	available := r.Available(ctx)
-	executor := NewParallelExecutor(maxConcurrency)
-
-	// Wrap cleaners with tracking
-	trackedCleaners := make([]Cleaner, len(available))
-	for i, c := range available {
-		trackedCleaners[i] = NewTrackedCleaner(c, r.collector)
-	}
-
-	results := executor.Execute(ctx, trackedCleaners)
-
-	// Convert to map
-	resultMap := make(map[string]CleanResultWithMetrics, len(results))
-	for _, res := range results {
-		resultMap[res.Cleaner] = res
-	}
-
-	return resultMap
-}

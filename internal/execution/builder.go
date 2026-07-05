@@ -22,11 +22,18 @@ type CompiledWorkflow struct {
 // as plain parameters, matching BuildFlow's execution package design.
 type Builder struct {
 	verbose bool
+	retry   *RetryConfig
 }
 
 // NewBuilder creates a Builder with the given options.
 func NewBuilder(verbose bool) *Builder {
 	return &Builder{verbose: verbose}
+}
+
+// WithRetryConfig enables per-step retry on the builder.
+func (b *Builder) WithRetryConfig(cfg *RetryConfig) *Builder {
+	b.retry = cfg
+	return b
 }
 
 // BuildClean compiles a clean workflow from the given registry and selected cleaner names.
@@ -53,9 +60,17 @@ func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*Co
 			makeCleanStepFunc(name, c, collector),
 		)
 
-		wf.Add(flow.Step(step).
+		stepBuilder := flow.Step(step).
 			BeforeStep(before).
-			AfterStep(after))
+			AfterStep(after)
+
+		if b.retry != nil {
+			if opts := retryOptions(*b.retry); len(opts) > 0 {
+				stepBuilder = stepBuilder.Retry(opts...)
+			}
+		}
+
+		wf.Add(stepBuilder)
 	}
 
 	return &CompiledWorkflow{

@@ -9,6 +9,8 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
+	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/spf13/cobra"
 )
@@ -16,9 +18,10 @@ import (
 // NewScanCommand creates a command that scans for cleanable items.
 func NewScanCommand() *cobra.Command {
 	var (
-		verbose bool
-		profile string
-		jsonOut bool
+		verbose    bool
+		profile    string
+		jsonOut    bool
+		configPath string
 	)
 
 	cmd := &cobra.Command{
@@ -26,13 +29,14 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(verbose, profile, jsonOut)
+			return runScanCommand(verbose, profile, jsonOut, configPath)
 		},
 	}
 
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Show detailed scan information")
 	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Filter results by profile")
 	cmd.Flags().BoolVarP(&jsonOut, "json", "j", false, "Output in JSON format")
+	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 
 	return cmd
 }
@@ -56,10 +60,10 @@ func printNixStoreSize(ctx context.Context, registry *cleaner.Registry) {
 }
 
 // runScanCommand executes the scan command.
-func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
+func runScanCommand(verbose bool, _ string, jsonOutput bool, configPath string) error {
 	ctx := context.Background()
 
-	cfg, err := config.Load()
+	cfg, err := loadConfigForScan(configPath)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
@@ -107,20 +111,28 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 		fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableCleaners))
 	}
 
-	// Scan each cleaner and collect results using real Scan method
+	// Run scans via the workflow engine for parallel execution
+	selectedNames := make([]string, len(availableCleaners))
+	for i, c := range availableCleaners {
+		selectedNames[i] = getRegistryName(c.Type)
+	}
+
+	wr, err := execution.RunScans(ctx, registry, selectedNames, execution.WithVerbose(verbose))
+	if err != nil {
+		return fmt.Errorf("scan workflow execution failed: %w", err)
+	}
+
+	// Build display results from the workflow result
+	scanResults := buildScanResults(wr, availableCleaners)
+
 	var (
 		totalCleanable uint64
 		totalItems     uint
-		scanResults    []ScanResult
 	)
-
-	for _, c := range availableCleaners {
-		result := scanCleanerReal(ctx, registry, c.Type, verbose)
-
-		scanResults = append(scanResults, result)
-		if result.BytesCleanable > 0 {
-			totalCleanable += result.BytesCleanable
-			totalItems += result.ItemsCount
+	for _, r := range scanResults {
+		if r.BytesCleanable > 0 {
+			totalCleanable += r.BytesCleanable
+			totalItems += r.ItemsCount
 		}
 	}
 
@@ -155,6 +167,51 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool) error {
 	}
 
 	return nil
+}
+
+// buildScanResults converts a WorkflowResult into display-ready ScanResult structs.
+func buildScanResults(wr *execution.WorkflowResult, available []CleanerConfig) []ScanResult {
+	stepByName := make(map[string]execution.StepResult, len(wr.Steps))
+	for _, s := range wr.Steps {
+		stepByName[s.Name] = s
+	}
+
+	results := make([]ScanResult, 0, len(available))
+	for _, cfg := range available {
+		sr := ScanResult{ //nolint:exhaustruct
+			Name:        cfg.Name,
+			Description: cfg.Description,
+			Icon:        cfg.Icon,
+			Available:   cfg.Available,
+		}
+
+		regName := getRegistryName(cfg.Type)
+		if step, ok := stepByName[regName]; ok && step.Err == nil {
+			sr.ItemsCount = step.Clean.ItemsRemoved
+			sr.BytesCleanable = step.Clean.FreedBytes
+		}
+
+		results = append(results, sr)
+	}
+
+	return results
+}
+
+// loadConfigForScan loads config from path or default.
+func loadConfigForScan(configPath string) (*domain.Config, error) {
+	if configPath != "" {
+		cfg, err := config.LoadFromPath(configPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load config from %s: %w", configPath, err)
+		}
+		return cfg, nil
+	}
+
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load config: %w", err)
+	}
+	return cfg, nil
 }
 
 // ScanResult holds the scan result for a cleaner.

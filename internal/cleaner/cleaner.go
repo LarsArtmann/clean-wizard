@@ -2,6 +2,8 @@ package cleaner
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
@@ -67,4 +69,53 @@ type AgeBasedCleaner interface {
 
 	// SupportsAgeFiltering returns true if this cleaner supports age-based filtering.
 	SupportsAgeFiltering() bool
+}
+
+// NotAvailableError marks errors that indicate a cleaner's prerequisite (e.g. a
+// package manager binary) is not present on the system. The execution layer uses
+// this to classify a step as "skipped" rather than "failed".
+type NotAvailableError struct {
+	CleanerName string
+	Reason      string
+}
+
+func (e *NotAvailableError) Error() string {
+	if e.Reason != "" {
+		return e.CleanerName + " not available: " + e.Reason
+	}
+	return e.CleanerName + " not available"
+}
+
+// IsNotAvailableError reports whether err represents a cleaner that is not
+// installed or not applicable on the current system. It checks for the typed
+// *NotAvailableError first, then falls back to keyword matching for errors
+// that originate from exec.LookPath or the OS.
+func IsNotAvailableError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	// Fast path: typed sentinel
+	var nae *NotAvailableError
+	if errors.As(err, &nae) {
+		return true
+	}
+
+	// Fallback: keyword match for ad-hoc errors from exec/OS
+	msg := strings.ToLower(err.Error())
+	for _, keyword := range notAvailableKeywords {
+		if strings.Contains(msg, keyword) {
+			return true
+		}
+	}
+
+	return false
+}
+
+var notAvailableKeywords = []string{
+	"not available",
+	"not found",
+	"not installed",
+	"command not found",
+	"no such file or directory",
 }

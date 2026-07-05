@@ -7,23 +7,9 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
-// DefaultRegistry creates a new registry with all cleaners registered.
-// Cleaners are created with default settings (verbose=false, dryRun=false).
-// This is useful for availability checks and discovery.
-// Returns an error if any cleaner fails to initialize.
-func DefaultRegistry() (*Registry, error) {
-	registry := NewRegistry()
-
-	err := registerAllCleaners(registry, false, false)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create default registry")
-	}
-
-	return registry, nil
-}
-
-// DefaultRegistryWithConfig creates a registry with cleaners configured for actual cleaning.
-// This should be used when performing clean operations.
+// DefaultRegistryWithConfig creates a registry with cleaners configured for the
+// given verbosity and dry-run settings. This is the single factory used by the
+// DI container to create the cleaner registry.
 // Returns an error if any cleaner fails to initialize.
 func DefaultRegistryWithConfig(verbose, dryRun bool) (*Registry, error) {
 	registry := NewRegistry()

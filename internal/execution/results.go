@@ -2,10 +2,10 @@ package execution
 
 import (
 	"sort"
-	"strings"
 	"sync"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -29,7 +29,7 @@ const (
 // Status returns the classification for this step result.
 func (s StepResult) Status() StepStatus {
 	if s.Err != nil {
-		if isNotAvailableError(s.Err.Error()) {
+		if cleaner.IsNotAvailableError(s.Err) {
 			return StepStatusSkipped
 		}
 		return StepStatusFailed
@@ -136,25 +136,4 @@ func (rc *resultCollector) sortedByRegistration() []StepResult {
 		return ci < cj
 	})
 	return sorted
-}
-
-// isNotAvailableError checks if an error indicates a cleaner is not available,
-// preserving the classification logic from the former command layer.
-func isNotAvailableError(errMsg string) bool {
-	lowerMsg := strings.ToLower(errMsg)
-	unavailableKeywords := []string{
-		"not available",
-		"not found",
-		"not installed",
-		"command not found",
-		"no such file or directory",
-	}
-
-	for _, keyword := range unavailableKeywords {
-		if strings.Contains(lowerMsg, keyword) {
-			return true
-		}
-	}
-
-	return false
 }

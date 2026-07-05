@@ -1,6 +1,6 @@
 # Clean Wizard - Project Instructions
 
-**Updated:** 2026-07-05
+**Updated:** 2026-07-06
 
 ## Build & Test
 
@@ -24,21 +24,19 @@ go test ./... -short
 - `internal/cleaner/` - 13+ cleaner implementations, registry, factory
 - `internal/domain/` - Domain types, 27 CacheType enums, interfaces, settings
 - `internal/config/` - Configuration loading (koanf/yaml), validation
-- `internal/result/` - Result[T], FlowBuilder[T], ParallelFlow[T], BranchFlow[T]
+- `internal/result/` - Result[T] type for functional error handling
 - `internal/adapters/` - External tool adapters (Nix, Exec, HTTP, Cache)
 - `internal/middleware/` - Validation middleware
 - `internal/conversions/` - Unit conversions
-- `internal/format/` - Byte formatting
+- `internal/format/` - Byte formatting, JSON output
 - `tests/bdd/` - Ginkgo-based BDD tests
 - `docs/` - Documentation
 
 ## Key Files
 
-- `TODO_LIST.md` - Current source of truth for pending work (30 items)
+- `TODO_LIST.md` - Current source of truth for pending work
 - `FEATURES.md` - Feature status documentation
-- `BDD_TESTS_REVIEW.md` - BDD test coverage analysis
-- `docs/status/2026-05-03_08-50-CODE-QUALITY-SCAN.md` - Latest quality scan
-- `docs/status/2026-05-03_08-50-ARCHITECTURE-REVIEW.md` - Latest architecture review
+- `docs/status/` - Status reports
 - `docs/architecture-understanding/` - D2 architecture diagrams
 
 ## Architecture Patterns
@@ -50,6 +48,7 @@ go test ./... -short
 - **Type-Safe Enums** - 27 CacheType enums with generic helpers in `enum_macros.go`
 - **Adapter Pattern** - External tools wrapped in `internal/adapters/`
 - **Platform-Aware Defaults** - `DefaultProtectedPaths()`, `getDefaultSystemCacheTypes()` use `runtime.GOOS`
+- **Typed Error Classification** - `cleaner.NotAvailableError` + `cleaner.IsNotAvailableError()` replaces fragile string matching
 
 ## DI + Workflow Architecture
 
@@ -59,10 +58,22 @@ The application follows the same pattern as BuildFlow:
 2. **`di.RegisterAllServices(injector, cfg, settings)`** registers config, run settings, and cleaner registry as lazy singletons
 3. **Command resolves services** from DI via typed accessors (`di.CleanerRegistry(i)`)
 4. **`execution.RunCleaners(ctx, registry, names, opts...)`** compiles cleaners into a go-workflow DAG and executes it
-5. **Workflow steps** wrap each cleaner's `Clean(ctx)` method, collecting results in a thread-safe `resultCollector`
-6. **`WorkflowResult`** aggregates per-step outcomes with succeeded/skipped/failed classification
+5. **Workflow steps** wrap each cleaner's `Clean(ctx)` method with panic recovery, collecting results in a thread-safe `resultCollector`
+6. **`WorkflowResult`** aggregates per-step outcomes with succeeded/skipped/failed classification; results sorted by registration order for deterministic output
 
-Key design principle: the execution layer is **DI-agnostic** — it receives `*cleaner.Registry` and cleaner names as plain parameters. The DI container provides the service graph; the CLI extracts services and hands them to the workflow engine.
+Key design principles:
+
+- The execution layer is **DI-agnostic** — it receives `*cleaner.Registry` and cleaner names as plain parameters
+- Workflow errors are preserved — panics are recovered and recorded as failed steps
+- Step results are **deterministically ordered** by registration order regardless of parallel completion
+
+## Execution Layer Capabilities
+
+- **Parallel execution** via go-workflow DAG (`MaxConcurrency` configurable via `RunSettings`)
+- **Panic recovery** — `DontPanic: true` + `recover()` in step functions
+- **Retry support** — `flow.Retry` with exponential backoff (`cenkalti/backoff/v4`)
+- **Step hooks** — `BeforeStep` for timing/logging, `AfterStep` for verbose output
+- **Error classification** — `cleaner.IsNotAvailableError()` with typed + string fallback
 
 ## Dependencies
 
@@ -74,6 +85,7 @@ Key design principle: the execution layer is **DI-agnostic** — it receives `*c
 - `github.com/knadh/koanf/v2` - Configuration
 - `github.com/samber/do/v2` - Dependency injection
 - `github.com/Azure/go-workflow` - Workflow orchestration engine
+- `github.com/cenkalti/backoff/v4` - Exponential backoff for retries
 - `github.com/spf13/cobra` - CLI framework
 - `gopkg.in/yaml.v3` - YAML handling
 
@@ -83,14 +95,13 @@ Key design principle: the execution layer is **DI-agnostic** — it receives `*c
 - `internal/domain/` is a god package (20+ files)
 - `internal/cleaner/` has 50+ files flat (no sub-packages)
 - ~40 `err113` lint violations (dynamic errors via fmt.Errorf)
-- 15 source files over 350 lines
-- `result.FlowBuilder`/`BranchFlow`/`ParallelFlow` are dormant (replaced by go-workflow but not yet removed)
+- Cleaners still use hardcoded defaults instead of user profile config
 
 ## Test Facts
 
-- 298+ test functions across 63+ test files
-- DI package tests: `internal/di/di_test.go`
-- Execution package tests: `internal/execution/execution_test.go`
+- 300+ test functions across 63+ test files
+- DI package tests: `internal/di/di_test.go` (8 tests)
+- Execution package tests: `internal/execution/execution_test.go` + `integration_test.go` (16 tests)
 - Ginkgo BDD tests exist for: GitHistory, Nix, CompiledBinaries, ProjectExecutables
 - 9 of 13 cleaners have NO BDD tests
 - CLI command tests are missing entirely

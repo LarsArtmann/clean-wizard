@@ -24,6 +24,9 @@ func RunCleaners(
 	cfg := resolveRunOptions(opts)
 
 	builder := NewBuilder(cfg.verbose)
+	if cfg.retry != nil {
+		builder.WithRetryConfig(cfg.retry)
+	}
 	compiled, err := builder.BuildClean(registry, selected)
 	if err != nil {
 		return nil, err
