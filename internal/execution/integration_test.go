@@ -150,7 +150,7 @@ func TestRunCleaners_SmartRetry_NotAvailable(t *testing.T) {
 	naCleaner := &countingMockCleaner{
 		name:  "not-installed",
 		avail: true,
-		err:   &cleaner.NotAvailableError{CleanerName: "not-installed"},
+		err:   cleaner.NewNotAvailableError("not-installed", ""),
 	}
 	registry.Register("not-installed", naCleaner)
 

@@ -8,7 +8,7 @@ import (
 	flow "github.com/Azure/go-workflow"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/cockroachdb/errors"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // CompiledWorkflow holds a ready-to-execute workflow and its result collector.
@@ -50,7 +50,10 @@ func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*Co
 	for i, name := range selected {
 		c, ok := registry.Get(name)
 		if !ok {
-			return nil, errors.Newf("cleaner %q not found in registry", name)
+			return nil, errorfamily.NewRejection(
+				"cleaner.not_found",
+				fmt.Sprintf("cleaner %q not found in registry", name),
+			)
 		}
 
 		collector.register(name, i)
@@ -90,7 +93,10 @@ func (b *Builder) BuildScan(registry *cleaner.Registry, selected []string) (*Com
 	for i, name := range selected {
 		c, ok := registry.Get(name)
 		if !ok {
-			return nil, errors.Newf("cleaner %q not found in registry", name)
+			return nil, errorfamily.NewRejection(
+				"cleaner.not_found",
+				fmt.Sprintf("cleaner %q not found in registry", name),
+			)
 		}
 
 		collector.register(name, i)

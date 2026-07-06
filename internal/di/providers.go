@@ -3,7 +3,7 @@ package di
 import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/cockroachdb/errors"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/samber/do/v2"
 )
 
@@ -37,12 +37,16 @@ func registerCleanerRegistry(injector do.Injector) {
 	do.Provide(injector, func(i do.Injector) (*cleaner.Registry, error) {
 		settings, err := do.Invoke[RunSettings](i)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to resolve RunSettings for cleaner registry")
+			return nil, errorfamily.WrapRejection(
+				err,
+				"di.resolve_settings_for_registry",
+				"failed to resolve RunSettings for cleaner registry",
+			)
 		}
 
 		registry, err := cleaner.DefaultRegistryWithConfig(settings.Verbose, settings.DryRun)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to create cleaner registry")
+			return nil, errorfamily.WrapRejection(err, "di.create_registry", "failed to create cleaner registry")
 		}
 
 		return registry, nil

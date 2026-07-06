@@ -1,6 +1,6 @@
 # Clean Wizard - Project Instructions
 
-**Updated:** 2026-07-06 (go-error-family adoption)
+**Updated:** 2026-07-06 (go-error-family hardening: per-cleaner codes, CLI exit codes, RetryProfile, PathError classifier)
 
 ## Build & Test
 
@@ -51,7 +51,7 @@ go test ./... -short
 - **ValidateOptionalSettings helper** - Generic helper in `internal/cleaner/helpers.go` that consolidates the `if settings == nil || settings.X == nil { return nil }` boilerplate shared by every cleaner's `ValidateSettings` method
 - **CleanerConstructor[T] generic** - `internal/cleaner/test_interfaces.go` defines `type CleanerConstructor[T any] func(verbose, dryRun bool) T` used as alias for `CleanerConstructorWithSettings` and `SimpleCleanerConstructor`
 - **CleanerCore base interface** - Minimum cleaner interface (`IsAvailable` + `Clean`) shared by `CleanerWithSettings` and `SimpleCleaner` to avoid duplicate interface declarations
-- **Error Classification** — `go-error-family` (`github.com/larsartmann/go-error-family`) classifies all errors into 5 families (Rejection, Conflict, Transient, Corruption, Infrastructure). `NotAvailableError` implements `Classified` + `Coded` interfaces → `Infrastructure` (not retryable, skipped). `errorfamily.IsRetryable()` drives retry decisions; `errorfamily.Classify()` drives skip/failed classification. No keyword matching.
+- **Error Classification** — `go-error-family` (`github.com/larsartmann/go-error-family`) is the sole error library (cockroachdb/errors fully removed). All errors classify into 5 families (Rejection, Conflict, Transient, Corruption, Infrastructure). `NotAvailableError` implements `Classified` + `Coded` with per-cleaner codes (`cleaner.<name>.not_available`) via the `NewNotAvailableError` factory. `domain.ValidationError` implements `Classified` (→ Rejection). `errorfamily.IsRetryable()` drives retry decisions; `errorfamily.Classify()` drives skip/failed classification; `errorfamily.ExitCode()` drives sysexits exit codes at the CLI boundary.
 
 ## DI + Workflow Architecture
 
@@ -78,6 +78,8 @@ Key design principles:
 - **Step hooks** — `BeforeStep` for timing/logging, `AfterStep` for verbose output
 - **Error classification** — `errorfamily.Classify(err)` returns `Infrastructure` for unavailable cleaners (skipped), `Transient` for retryable failures (retried with backoff), `Rejection`/`Conflict`/`Corruption` for permanent failures. No keyword matching.
 - **Retry by default** — `--retries 3` on both clean and scan commands; `errorfamily.IsRetryable()` returns false for non-Transient errors → `backoff.Stop` (zero delay); `--retries 0` disables
+- **RetryProfile presets** — `--retry-profile` flag (default/aggressive/conservative/none) on both clean and scan; overrides `--retries` with pre-tuned backoff/attempt combinations
+- **CLI exit codes** — `errorfamily.ExitCode(err)` in `main.go` maps error families to BSD sysexits codes (Rejection=1, Transient=75, Infrastructure=69, Corruption=65); `errorfamily.LogError` adds structured slog output with family/code/retryable fields
 
 ## Dependencies
 
@@ -107,11 +109,13 @@ All errors use `github.com/larsartmann/go-error-family` for behavioral classific
 
 Key files:
 
-- `internal/cleaner/cleaner.go` — `NotAvailableError` implements `Classified` + `Coded` (Infrastructure)
-- `internal/cleaner/error_classification.go` — `init()` registers `exec.ErrNotFound`, stdlib defaults, cleaner sentinels
-- `internal/execution/retry.go` — `NextBackOff` hook uses `errorfamily.IsRetryable()` to stop non-retryable errors
+- `internal/cleaner/cleaner.go` — `NotAvailableError` implements `Classified` + `Coded` (Infrastructure); `NewNotAvailableError(name, reason)` factory derives per-cleaner error codes
+- `internal/cleaner/error_classification.go` — `init()` registers `exec.ErrNotFound`, stdlib defaults, cleaner sentinels, `*exec.ExitError`→Transient, `*os.PathError` permanent errno→Rejection (ENOSPC/EROFS/ELOOP), and user-facing message templates
+- `internal/domain/operation_validation.go` — `ValidationError` implements `Classified` (Rejection) + `Coded` (`validation.rejected`)
+- `internal/execution/retry.go` — `RetryConfig`, `RetryConfigFromAttempts(n)`, `RetryProfile` type (Default/Aggressive/Conservative/None); `NextBackOff` hook uses `errorfamily.IsRetryable()`
 - `internal/execution/results.go` — `StepResult.Status()` uses `errorfamily.Classify()` → Infrastructure=skipped, else=failed
-- `internal/execution/retry.go` — `RetryConfigFromAttempts(n)` shared builder (used by both clean and scan commands)
+- `internal/format/json.go` — JSON output includes `family`/`code`/`retryable` fields for skipped/failed cleaners; cleaners sorted by name for deterministic output
+- `cmd/clean-wizard/main.go` — `errorfamily.ExitCode(err)` + `errorfamily.LogError(err, slog.Default())` at CLI boundary
 
 **Bridge not adopted**: `go-error-family/bridge` connects `samber/oops` to `go-error-family`. Clean-wizard doesn't use oops; core `errorfamily` provides `.WithContext()` for structured context. BuildFlow also implements `Classified` directly without the bridge.
 
@@ -124,9 +128,12 @@ Key files:
 
 ## Test Facts
 
-- 300+ test functions across 63+ test files
+- 300+ test functions across 65+ test files
 - DI package tests: `internal/di/di_test.go` (9 tests)
-- Execution package tests: `internal/execution/execution_test.go` + `integration_test.go` (16 tests, including smart retry tests for NotAvailableError and Transient)
+- Execution package tests: `execution_test.go` + `integration_test.go` + `retry_profile_test.go` (19 tests, including smart retry tests, RetryProfile tests, errorfamilytest.AssertFamily assertions)
+- Cleaner classification tests: `internal/cleaner/error_classification_test.go` (PathError classification matrix, NotAvailableError per-cleaner codes, exec.ErrNotFound)
+- Domain classification test: `internal/domain/operation_validation_test.go` (ValidationError → Rejection)
+- JSON output tests: `internal/format/json_test.go` (family/code fields, deterministic ordering)
 - CLI integration test: `cmd/clean-wizard/commands/clean_integration_test.go` (dry-run JSON pipeline)
 - Integration tests use `testing.Short()` skip guards for real-system tests
 - Ginkgo BDD tests exist for: GitHistory, Nix, CompiledBinaries, ProjectExecutables

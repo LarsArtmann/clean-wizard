@@ -39,6 +39,58 @@ func RetryConfigFromAttempts(maxAttempts int) *RetryConfig {
 	return &cfg
 }
 
+// RetryProfile is a named preset for retry behavior. It provides a simpler
+// alternative to --retries for common retry strategies.
+type RetryProfile string
+
+const (
+	// RetryProfileDefault is the standard retry strategy: 3 attempts,
+	// 2s initial backoff, 30s max backoff.
+	RetryProfileDefault RetryProfile = "default"
+	// RetryProfileAggressive retries more with faster backoff:
+	// 5 attempts, 1s initial backoff, 60s max backoff.
+	RetryProfileAggressive RetryProfile = "aggressive"
+	// RetryProfileConservative retries less with slower backoff:
+	// 2 attempts, 5s initial backoff, 30s max backoff.
+	RetryProfileConservative RetryProfile = "conservative"
+	// RetryProfileNone disables retries entirely.
+	RetryProfileNone RetryProfile = "none"
+)
+
+// IsValid reports whether p is a recognised RetryProfile.
+func (p RetryProfile) IsValid() bool {
+	switch p {
+	case RetryProfileDefault, RetryProfileAggressive, RetryProfileConservative, RetryProfileNone:
+		return true
+	default:
+		return false
+	}
+}
+
+// Apply converts the profile into a *RetryConfig. Returns nil for None
+// (retries disabled). An empty profile defaults to RetryProfileDefault.
+func (p RetryProfile) Apply() *RetryConfig {
+	switch p {
+	case RetryProfileAggressive:
+		return &RetryConfig{
+			MaxAttempts:    5,
+			InitialBackoff: 1 * time.Second,
+			MaxBackoff:     60 * time.Second,
+		}
+	case RetryProfileConservative:
+		return &RetryConfig{
+			MaxAttempts:    2,
+			InitialBackoff: 5 * time.Second,
+			MaxBackoff:     30 * time.Second,
+		}
+	case RetryProfileNone:
+		return nil
+	default: // RetryProfileDefault or empty
+		cfg := DefaultRetryConfig()
+		return &cfg
+	}
+}
+
 // retryOptions converts a RetryConfig into go-workflow retry option funcs.
 // The NextBackOff hook stops retrying immediately when the error is
 // non-retryable (Infrastructure, Rejection, Conflict, Corruption) —

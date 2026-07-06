@@ -371,7 +371,7 @@ func (scc *SystemCacheCleaner) scanSystemCache(
 func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !scc.IsAvailable(ctx) {
 		return result.Err[domain.CleanResult](
-			&NotAvailableError{CleanerName: "systemcache", Reason: "requires macOS or Linux"},
+			NewNotAvailableError("systemcache", "requires macOS or Linux"),
 		)
 	}
 

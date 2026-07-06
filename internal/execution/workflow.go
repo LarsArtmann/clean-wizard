@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/cockroachdb/errors"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // RunCleaners builds and executes a clean workflow for the given selected cleaners.
@@ -81,7 +81,11 @@ func executeWorkflow(ctx context.Context, compiled *CompiledWorkflow, cfg runCon
 	}
 
 	if runErr != nil && len(result.Steps) == 0 {
-		return nil, errors.Wrap(runErr, "workflow execution failed with no collected steps")
+		return nil, errorfamily.WrapTransient(
+			runErr,
+			"execution.workflow_failed",
+			"workflow execution failed with no collected steps",
+		)
 	}
 
 	return result, nil

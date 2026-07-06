@@ -102,7 +102,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 ) result.Result[domain.CleanResult] {
 	if !pc.IsAvailable(ctx) {
 		return result.Err[domain.CleanResult](
-			&NotAvailableError{CleanerName: "projects-management-automation"},
+			NewNotAvailableError("projects-management-automation", ""),
 		)
 	}
 

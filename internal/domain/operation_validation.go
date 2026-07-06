@@ -2,6 +2,8 @@ package domain
 
 import (
 	"fmt"
+
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // ValidationSeverity represents error severity levels.
@@ -40,6 +42,16 @@ type ValidationError struct {
 
 func (e *ValidationError) Error() string {
 	return e.Message
+}
+
+// ErrorCode returns the machine-readable code for this validation error.
+func (e *ValidationError) ErrorCode() string { return "validation.rejected" }
+
+// ErrorFamily classifies validation errors as Rejection — the input or
+// configuration is invalid as given and won't succeed on retry without
+// changing the input.
+func (e *ValidationError) ErrorFamily() errorfamily.Family {
+	return errorfamily.Rejection
 }
 
 // ValidateSettings validates settings for the given operation type.

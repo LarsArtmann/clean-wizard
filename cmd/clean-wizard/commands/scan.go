@@ -10,18 +10,20 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
 
 // NewScanCommand creates a command that scans for cleanable items.
 func NewScanCommand() *cobra.Command {
 	var (
-		verbose     bool
-		profile     string
-		jsonOut     bool
-		configPath  string
-		retries     int
-		concurrency int
+		verbose      bool
+		profile      string
+		jsonOut      bool
+		configPath   string
+		retries      int
+		retryProfile string
+		concurrency  int
 	)
 
 	cmd := &cobra.Command{
@@ -29,7 +31,7 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(verbose, profile, jsonOut, configPath, retries, concurrency)
+			return runScanCommand(verbose, profile, jsonOut, configPath, retries, retryProfile, concurrency)
 		},
 	}
 
@@ -38,6 +40,8 @@ func NewScanCommand() *cobra.Command {
 	cmd.Flags().BoolVarP(&jsonOut, "json", "j", false, "Output in JSON format")
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 	cmd.Flags().IntVar(&retries, "retries", 3, "Number of retry attempts per scanner (0=disabled)")
+	cmd.Flags().
+		StringVar(&retryProfile, "retry-profile", "", "Retry strategy preset: default, aggressive, conservative, or none (overrides --retries)")
 	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max scanners running concurrently (0=unlimited)")
 
 	return cmd
@@ -62,7 +66,15 @@ func printNixStoreSize(ctx context.Context, registry *cleaner.Registry) {
 }
 
 // runScanCommand executes the scan command.
-func runScanCommand(verbose bool, profile string, jsonOutput bool, configPath string, retries, concurrency int) error {
+func runScanCommand(
+	verbose bool,
+	profile string,
+	jsonOutput bool,
+	configPath string,
+	retries int,
+	retryProfile string,
+	concurrency int,
+) error {
 	ctx := context.Background()
 
 	if profile != "" {
@@ -71,7 +83,7 @@ func runScanCommand(verbose bool, profile string, jsonOutput bool, configPath st
 
 	cfg, err := loadConfigFromPath(configPath)
 	if err != nil {
-		return fmt.Errorf("failed to load config: %w", err)
+		return errorfamily.WrapRejection(err, "scan.config_load", "failed to load config")
 	}
 
 	container, cleanup := di.New()
@@ -79,12 +91,12 @@ func runScanCommand(verbose bool, profile string, jsonOutput bool, configPath st
 
 	settings := di.RunSettings{Verbose: verbose, DryRun: false, MaxConcurrency: concurrency}
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
-		return fmt.Errorf("failed to register DI services: %w", err)
+		return errorfamily.WrapRejection(err, "scan.di_register", "failed to register DI services")
 	}
 
 	registry, err := di.CleanerRegistry(container.Injector())
 	if err != nil {
-		return fmt.Errorf("failed to resolve cleaner registry from DI: %w", err)
+		return errorfamily.WrapRejection(err, "scan.di_resolve", "failed to resolve cleaner registry from DI")
 	}
 
 	if !jsonOutput {
@@ -130,7 +142,14 @@ func runScanCommand(verbose bool, profile string, jsonOutput bool, configPath st
 	if concurrency > 0 {
 		runOpts = append(runOpts, execution.WithMaxConcurrency(concurrency))
 	}
-	if retries > 0 {
+	if retryProfile != "" {
+		rp := execution.RetryProfile(retryProfile)
+		if !rp.IsValid() {
+			return errorfamily.NewRejection("scan.invalid_retry_profile",
+				"invalid --retry-profile: "+retryProfile)
+		}
+		runOpts = append(runOpts, execution.WithRetry(rp.Apply()))
+	} else if retries > 0 {
 		runOpts = append(runOpts, execution.WithRetry(execution.RetryConfigFromAttempts(retries)))
 	}
 

@@ -23,6 +23,7 @@ func TestRunCleanCommand_DryRun_JSON(t *testing.T) {
 		"",    // profile
 		"",    // configPath
 		0,     // retries
+		"",    // retryProfile
 		0,     // concurrency
 	)
 

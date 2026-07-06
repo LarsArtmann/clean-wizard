@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	"github.com/cockroachdb/errors"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // DefaultRegistryWithConfig creates a registry with cleaners configured for the
@@ -16,7 +16,7 @@ func DefaultRegistryWithConfig(verbose, dryRun bool) (*Registry, error) {
 
 	err := registerAllCleaners(registry, verbose, dryRun)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create registry with config")
+		return nil, errorfamily.WrapRejection(err, "cleaner.registry_create", "failed to create registry with config")
 	}
 
 	return registry, nil
@@ -45,7 +45,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 		GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache,
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to create Go cleaner")
+		return errorfamily.WrapRejection(err, "cleaner.go_create", "failed to create Go cleaner")
 	}
 
 	registry.Register(CleanerGo, goCleaner)
@@ -59,7 +59,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 	// Build cache cleaner (default: 30d, all tools)
 	buildCacheCleaner, err := NewBuildCacheCleaner(verbose, dryRun, "30d", []string{}, []string{})
 	if err != nil {
-		return errors.Wrap(err, "failed to create BuildCache cleaner")
+		return errorfamily.WrapRejection(err, "cleaner.buildcache_create", "failed to create BuildCache cleaner")
 	}
 
 	registry.Register(CleanerBuildCache, buildCacheCleaner)
@@ -67,7 +67,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 	// System cache cleaner (default: 30d, all cache types)
 	systemCacheCleaner, err := NewSystemCacheCleaner(verbose, dryRun, "30d", nil)
 	if err != nil {
-		return errors.Wrap(err, "failed to create SystemCache cleaner")
+		return errorfamily.WrapRejection(err, "cleaner.systemcache_create", "failed to create SystemCache cleaner")
 	}
 
 	registry.Register(CleanerSystemCache, systemCacheCleaner)
@@ -81,7 +81,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 		[]string{filepath.Join("/", "tmp")},
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to create TempFiles cleaner")
+		return errorfamily.WrapRejection(err, "cleaner.tempfiles_create", "failed to create TempFiles cleaner")
 	}
 
 	registry.Register(CleanerTempFiles, tempFilesCleaner)

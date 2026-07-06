@@ -80,6 +80,7 @@ type AgeBasedCleaner interface {
 type NotAvailableError struct {
 	CleanerName string
 	Reason      string
+	Code        string
 }
 
 func (e *NotAvailableError) Error() string {
@@ -90,12 +91,30 @@ func (e *NotAvailableError) Error() string {
 }
 
 // ErrorCode returns the machine-readable code for this error type.
-func (e *NotAvailableError) ErrorCode() string { return "cleaner.not_available" }
+// If Code is set (e.g. "cleaner.cargo.not_installed"), it takes precedence;
+// otherwise the generic "cleaner.not_available" is returned.
+func (e *NotAvailableError) ErrorCode() string {
+	if e.Code != "" {
+		return e.Code
+	}
+	return "cleaner.not_available"
+}
 
 // ErrorFamily classifies this as Infrastructure — the system cannot serve
 // because a prerequisite is missing. Infrastructure is not retryable.
 func (e *NotAvailableError) ErrorFamily() errorfamily.Family {
 	return errorfamily.Infrastructure
+}
+
+// NewNotAvailableError constructs a NotAvailableError with a per-cleaner
+// diagnostic code (e.g. "cleaner.cargo.not_available"). Using this factory
+// ensures code consistency across all cleaner call sites.
+func NewNotAvailableError(cleanerName, reason string) *NotAvailableError {
+	return &NotAvailableError{
+		CleanerName: cleanerName,
+		Reason:      reason,
+		Code:        "cleaner." + cleanerName + ".not_available",
+	}
 }
 
 // IsNotAvailableError reports whether err represents a cleaner that is not

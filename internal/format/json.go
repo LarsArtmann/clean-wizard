@@ -3,9 +3,11 @@ package format
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // JSONOutput represents the JSON structure for clean command output.
@@ -31,6 +33,9 @@ type CleanerResult struct {
 	FreedHuman   string `json:"freed_human"`
 	Status       string `json:"status"` // "success", "skipped", "failed"
 	Error        string `json:"error,omitempty"`
+	Family       string `json:"family,omitempty"` // errorfamily classification (e.g. "infrastructure", "transient")
+	Code         string `json:"code,omitempty"`   // machine-readable error code (e.g. "cleaner.cargo.not_available")
+	Retryable    bool   `json:"retryable,omitempty"`
 }
 
 // CleanResultsToJSON converts clean results to JSON output format.
@@ -70,23 +75,37 @@ func CleanResultsToJSON(
 
 	// Process skipped cleaners
 	for name, err := range skipped {
+		family := errorfamily.Classify(err)
 		output.Cleaners = append(output.Cleaners, CleanerResult{ //nolint:exhaustruct
-			Name:   name,
-			Status: "skipped",
-			Error:  err.Error(),
+			Name:      name,
+			Status:    "skipped",
+			Error:     err.Error(),
+			Family:    family.String(),
+			Code:      errorfamily.Code(err),
+			Retryable: family == errorfamily.Transient,
 		})
 	}
 
 	// Process failed cleaners
 	for name, err := range failed {
+		family := errorfamily.Classify(err)
 		output.Cleaners = append(output.Cleaners, CleanerResult{ //nolint:exhaustruct
-			Name:   name,
-			Status: "failed",
-			Error:  err.Error(),
+			Name:      name,
+			Status:    "failed",
+			Error:     err.Error(),
+			Family:    family.String(),
+			Code:      errorfamily.Code(err),
+			Retryable: family == errorfamily.Transient,
 		})
 		output.Errors = append(output.Errors, fmt.Sprintf("%s: %v", name, err))
 		output.Success = false
 	}
+
+	// Sort cleaners by name for deterministic output regardless of map
+	// iteration order.
+	sort.Slice(output.Cleaners, func(i, j int) bool {
+		return output.Cleaners[i].Name < output.Cleaners[j].Name
+	})
 
 	// Set human-readable freed space
 	output.FreedHuman = Bytes(int64(output.FreedBytes))

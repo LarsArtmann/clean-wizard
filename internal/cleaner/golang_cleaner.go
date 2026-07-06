@@ -110,7 +110,7 @@ func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] 
 func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !gc.IsAvailable(ctx) {
 		return result.Err[domain.CleanResult](
-			&NotAvailableError{CleanerName: "go"},
+			NewNotAvailableError("go", ""),
 		)
 	}
 

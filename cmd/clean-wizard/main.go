@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"syscall"
 
 	"github.com/LarsArtmann/clean-wizard/cmd/clean-wizard/commands"
 	"github.com/LarsArtmann/clean-wizard/internal/version"
 	"github.com/charmbracelet/fang"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 func main() {
@@ -29,6 +31,7 @@ func main() {
 		fang.WithNotifySignal(os.Interrupt, syscall.SIGTERM),
 	)
 	if err != nil {
-		os.Exit(1)
+		errorfamily.LogError(err, slog.Default())
+		os.Exit(errorfamily.ExitCode(err))
 	}
 }

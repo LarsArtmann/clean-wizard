@@ -8,6 +8,8 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	errorfamily "github.com/larsartmann/go-error-family"
+	"github.com/larsartmann/go-error-family/errorfamilytest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -64,7 +66,7 @@ func TestRunCleaners_MixedResults(t *testing.T) {
 	registry.Register("skipped", &mockCleaner{
 		name:     "skipped",
 		avail:    true,
-		cleanRes: result.Err[domain.CleanResult](&cleaner.NotAvailableError{CleanerName: "some-tool"}),
+		cleanRes: result.Err[domain.CleanResult](cleaner.NewNotAvailableError("some-tool", "")),
 	})
 
 	wr, err := RunCleaners(context.Background(), registry, []string{"success", "failed", "skipped"})
@@ -75,6 +77,11 @@ func TestRunCleaners_MixedResults(t *testing.T) {
 	assert.Len(t, wr.Failed(), 1)
 	assert.Len(t, wr.Skipped(), 1)
 	assert.Equal(t, uint64(500), wr.TotalBytesFreed)
+
+	// The skipped cleaner's error should classify as Infrastructure.
+	skipped := wr.Skipped()
+	require.Len(t, skipped, 1)
+	errorfamilytest.AssertFamily(t, skipped[0].Err, errorfamily.Infrastructure)
 }
 
 func TestRunCleaners_EmptySelection(t *testing.T) {
@@ -92,6 +99,8 @@ func TestRunCleaners_UnknownCleanerReturnsError(t *testing.T) {
 	_, err := RunCleaners(context.Background(), registry, []string{"nonexistent"})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "not found in registry")
+	errorfamilytest.AssertFamily(t, err, errorfamily.Rejection)
+	errorfamilytest.AssertCode(t, err, "cleaner.not_found")
 }
 
 func TestRunScans_SuccessfulSteps(t *testing.T) {
@@ -150,7 +159,7 @@ func TestStepResult_StatusClassification(t *testing.T) {
 		},
 		{
 			name:     "skipped with NotAvailableError",
-			step:     StepResult{Err: &cleaner.NotAvailableError{CleanerName: "some-tool"}},
+			step:     StepResult{Err: cleaner.NewNotAvailableError("some-tool", "")},
 			expected: StepStatusSkipped,
 		},
 		{

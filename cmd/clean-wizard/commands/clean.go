@@ -41,6 +41,7 @@ func NewCleanCommand() *cobra.Command {
 		profile          string
 		configPath       string
 		retries          int
+		retryProfile     string
 		concurrency      int
 	)
 
@@ -60,6 +61,7 @@ func NewCleanCommand() *cobra.Command {
 				profile,
 				configPath,
 				retries,
+				retryProfile,
 				concurrency,
 			)
 		},
@@ -75,6 +77,8 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 	cmd.Flags().BoolVarP(&skipConfirmation, "yes", "y", false, "Skip confirmation prompt")
 	cmd.Flags().IntVar(&retries, "retries", 3, "Number of retry attempts per cleaner (0=disabled)")
+	cmd.Flags().
+		StringVar(&retryProfile, "retry-profile", "", "Retry strategy preset: default, aggressive, conservative, or none (overrides --retries)")
 	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max cleaners running concurrently (0=unlimited)")
 
 	return cmd
@@ -121,17 +125,16 @@ func runCleanCommand(
 	_ []string,
 	dryRun, verbose, jsonOutput, skipConfirmation bool,
 	mode, profile, configPath string,
-	retries, concurrency int,
+	retries int, retryProfile string,
+	concurrency int,
 ) error {
 	ctx := context.Background()
 
 	cfg, err := loadConfigFromPath(configPath)
 	if err != nil {
-		return fmt.Errorf(
-			"failed to load configuration for mode=%v, profile=%v: %w",
-			mode,
-			profile,
-			err,
+		return errorfamily.WrapRejectionf(
+			err, "clean.config_load",
+			"failed to load configuration for mode=%v, profile=%v", mode, profile,
 		)
 	}
 
@@ -140,12 +143,12 @@ func runCleanCommand(
 
 	settings := di.RunSettings{Verbose: verbose, DryRun: dryRun, MaxConcurrency: concurrency}
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
-		return fmt.Errorf("failed to register DI services: %w", err)
+		return errorfamily.WrapRejection(err, "clean.di_register", "failed to register DI services")
 	}
 
 	registry, err := di.CleanerRegistry(container.Injector())
 	if err != nil {
-		return fmt.Errorf("failed to resolve cleaner registry from DI: %w", err)
+		return errorfamily.WrapRejection(err, "clean.di_resolve", "failed to resolve cleaner registry from DI")
 	}
 
 	printDryRunHeader(dryRun)
@@ -159,7 +162,7 @@ func runCleanCommand(
 
 	selectedCleaners, err := selectCleaners(profile, mode, cfg, availableConfigs, jsonOutput)
 	if err != nil {
-		return fmt.Errorf("mode=%v, profile=%v: %w", mode, profile, err)
+		return errorfamily.WrapRejectionf(err, "clean.select_cleaners", "mode=%v, profile=%v", mode, profile)
 	}
 
 	if selectedCleaners == nil {
@@ -170,7 +173,7 @@ func runCleanCommand(
 
 	confirmed, err := confirmExecution(skipConfirmation, dryRun)
 	if err != nil {
-		return fmt.Errorf("mode=%v, profile=%v: %w", mode, profile, err)
+		return errorfamily.WrapRejectionf(err, "clean.confirm", "mode=%v, profile=%v", mode, profile)
 	}
 
 	if !confirmed {
@@ -198,7 +201,19 @@ func runCleanCommand(
 	if concurrency > 0 {
 		runOpts = append(runOpts, execution.WithMaxConcurrency(concurrency))
 	}
-	if retries > 0 {
+	if retryProfile != "" {
+		rp := execution.RetryProfile(retryProfile)
+		if !rp.IsValid() {
+			return errorfamily.NewRejection(
+				"clean.invalid_retry_profile",
+				fmt.Sprintf(
+					"invalid --retry-profile %q: must be default, aggressive, conservative, or none",
+					retryProfile,
+				),
+			)
+		}
+		runOpts = append(runOpts, execution.WithRetry(rp.Apply()))
+	} else if retries > 0 {
 		runOpts = append(runOpts, execution.WithRetry(execution.RetryConfigFromAttempts(retries)))
 	}
 
@@ -235,7 +250,7 @@ func outputJSON(wr *execution.WorkflowResult, dryRun bool) error {
 		failed,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to generate JSON output: %w", err)
+		return errorfamily.WrapCorruption(err, "clean.json_output", "failed to generate JSON output")
 	}
 
 	fmt.Println(string(jsonBytes))

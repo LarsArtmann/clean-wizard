@@ -96,7 +96,7 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 // Clean removes Cargo caches.
 func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !cc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](&NotAvailableError{CleanerName: "cargo"})
+		return result.Err[domain.CleanResult](NewNotAvailableError("cargo", ""))
 	}
 
 	if cc.dryRun {
