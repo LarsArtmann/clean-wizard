@@ -2,7 +2,6 @@ package cleaner
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -103,7 +102,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 ) result.Result[domain.CleanResult] {
 	if !pc.IsAvailable(ctx) {
 		return result.Err[domain.CleanResult](
-			errors.New("projects-management-automation not available"),
+			&NotAvailableError{CleanerName: "projects-management-automation"},
 		)
 	}
 

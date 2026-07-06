@@ -20,7 +20,6 @@ import (
 var (
 	ErrNoCacheTypeSpecified    = errors.New("no cache type specified")
 	ErrLintCacheNotImplemented = errors.New("lint cache cleaning not yet implemented")
-	ErrGoCacheNotAvailable     = &NotAvailableError{CleanerName: "go"}
 	ErrGoProcessesRunning      = errors.New(
 		"other Go processes detected (go, gopls, golangci-lint, dlv) — skipping to avoid cache corruption",
 	)
@@ -110,7 +109,9 @@ func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] 
 // It checks for other running Go processes first to avoid cache corruption.
 func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !gc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](ErrGoCacheNotAvailable)
+		return result.Err[domain.CleanResult](
+			&NotAvailableError{CleanerName: "go"},
+		)
 	}
 
 	if !gc.dryRun && hasOtherGoProcesses() {
