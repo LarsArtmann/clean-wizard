@@ -1,9 +1,11 @@
 package execution
 
 import (
+	"context"
 	"time"
 
 	flow "github.com/Azure/go-workflow"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/cenkalti/backoff/v4"
 )
 
@@ -26,8 +28,9 @@ func DefaultRetryConfig() RetryConfig {
 }
 
 // retryOptions converts a RetryConfig into go-workflow retry option funcs.
-// The NextBackOff hook stops retrying on nil errors (shouldn't happen, but defensive)
-// and respects the configured exponential backoff.
+// The NextBackOff hook stops retrying immediately when the error indicates
+// the cleaner is not available (e.g. "cargo not installed") — retrying would
+// be a waste of time since the binary won't appear mid-run.
 func retryOptions(cfg RetryConfig) []func(*flow.RetryOption) {
 	if cfg.MaxAttempts <= 0 {
 		return nil
@@ -52,6 +55,14 @@ func retryOptions(cfg RetryConfig) []func(*flow.RetryOption) {
 				backoff.WithMaxInterval(maxInterval),
 			)
 			opt.Backoff = expBackoff
+
+			opt.NextBackOff = func(_ context.Context, re flow.RetryEvent, _ time.Duration) time.Duration {
+				if cleaner.IsNotAvailableError(re.Error) {
+					return backoff.Stop
+				}
+
+				return expBackoff.NextBackOff()
+			}
 		},
 	}
 }

@@ -112,6 +112,11 @@ func (b *Builder) BuildScan(registry *cleaner.Registry, selected []string) (*Com
 // makeCleanStepFunc creates a step function that wraps a cleaner's Clean method,
 // recording the result in the collector. Panics are recovered and recorded as
 // errors so that a panicking cleaner doesn't silently disappear from results.
+//
+// IMPORTANT: The collector.record() call is in the defer block, NOT in the
+// function body. This ensures only the FINAL outcome is recorded — when
+// go-workflow retries, only the last attempt's result is kept, preventing
+// duplicate entries in the WorkflowResult.
 func makeCleanStepFunc(
 	name string,
 	c cleaner.Cleaner,
@@ -119,33 +124,35 @@ func makeCleanStepFunc(
 ) func(context.Context, struct{}) (domain.CleanResult, error) {
 	return func(ctx context.Context, _ struct{}) (result domain.CleanResult, err error) {
 		startTime := time.Now()
+
 		defer func() {
 			duration := time.Since(startTime)
 			if r := recover(); r != nil {
 				panicErr := fmt.Errorf("cleaner %s panicked: %v", name, r)
-				collector.record(name, domain.CleanResult{}, panicErr, duration)
+				collector.recordFinal(name, domain.CleanResult{}, panicErr, duration)
 				err = panicErr
 				return
 			}
+			if err != nil {
+				collector.recordFinal(name, domain.CleanResult{}, err, duration)
+				return
+			}
+			collector.recordFinal(name, result, nil, duration)
 		}()
 
 		res := c.Clean(ctx)
-		duration := time.Since(startTime)
-
 		if res.IsErr() {
-			collector.record(name, domain.CleanResult{}, res.Error(), duration)
 			return domain.CleanResult{}, res.Error()
 		}
 
 		result = res.Value()
-		collector.record(name, result, nil, duration)
-
 		return result, nil
 	}
 }
 
 // makeScanStepFunc creates a step function that wraps a cleaner's Scan method,
 // recording the result in the collector as a CleanResult-equivalent.
+// Uses recordFinal to prevent duplicate entries on retry.
 func makeScanStepFunc(
 	name string,
 	c cleaner.Cleaner,
@@ -153,34 +160,35 @@ func makeScanStepFunc(
 ) func(context.Context, struct{}) ([]domain.ScanItem, error) {
 	return func(ctx context.Context, _ struct{}) (items []domain.ScanItem, err error) {
 		startTime := time.Now()
+
 		defer func() {
 			duration := time.Since(startTime)
 			if r := recover(); r != nil {
 				panicErr := fmt.Errorf("scanner %s panicked: %v", name, r)
-				collector.record(name, domain.CleanResult{}, panicErr, duration)
+				collector.recordFinal(name, domain.CleanResult{}, panicErr, duration)
 				err = panicErr
 				return
 			}
+			if err != nil {
+				collector.recordFinal(name, domain.CleanResult{}, err, duration)
+				return
+			}
+			var totalSize uint64
+			for _, item := range items {
+				totalSize += uint64(item.Size)
+			}
+			collector.recordFinal(name, domain.CleanResult{
+				FreedBytes:   totalSize,
+				ItemsRemoved: uint(len(items)),
+			}, nil, duration)
 		}()
 
 		res := c.Scan(ctx)
-		duration := time.Since(startTime)
-
 		if res.IsErr() {
-			collector.record(name, domain.CleanResult{}, res.Error(), duration)
 			return nil, res.Error()
 		}
 
 		items = res.Value()
-		var totalSize uint64
-		for _, item := range items {
-			totalSize += uint64(item.Size)
-		}
-		collector.record(name, domain.CleanResult{
-			FreedBytes:   totalSize,
-			ItemsRemoved: uint(len(items)),
-		}, nil, duration)
-
 		return items, nil
 	}
 }

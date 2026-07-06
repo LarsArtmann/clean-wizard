@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
@@ -40,6 +41,8 @@ func NewCleanCommand() *cobra.Command {
 		mode             string
 		profile          string
 		configPath       string
+		retries          int
+		concurrency      int
 	)
 
 	cmd := &cobra.Command{
@@ -57,6 +60,8 @@ func NewCleanCommand() *cobra.Command {
 				mode,
 				profile,
 				configPath,
+				retries,
+				concurrency,
 			)
 		},
 	}
@@ -70,6 +75,8 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Use a specific configuration profile")
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 	cmd.Flags().BoolVarP(&skipConfirmation, "yes", "y", false, "Skip confirmation prompt")
+	cmd.Flags().IntVar(&retries, "retries", 0, "Number of retry attempts per cleaner (0=disabled)")
+	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max cleaners running concurrently (0=unlimited)")
 
 	return cmd
 }
@@ -115,6 +122,7 @@ func runCleanCommand(
 	_ []string,
 	dryRun, verbose, jsonOutput, skipConfirmation bool,
 	mode, profile, configPath string,
+	retries, concurrency int,
 ) error {
 	ctx := context.Background()
 
@@ -131,7 +139,7 @@ func runCleanCommand(
 	container, cleanup := di.New()
 	defer cleanup()
 
-	settings := di.RunSettings{Verbose: verbose, DryRun: dryRun}
+	settings := di.RunSettings{Verbose: verbose, DryRun: dryRun, MaxConcurrency: concurrency}
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
 		return fmt.Errorf("failed to register DI services: %w", err)
 	}
@@ -184,7 +192,22 @@ func runCleanCommand(
 
 	selectedNames := cleanerTypesToNames(selectedCleaners)
 
-	wr, err := execution.RunCleaners(ctx, registry, selectedNames, execution.WithVerbose(verbose))
+	var runOpts []execution.RunOption
+	if verbose {
+		runOpts = append(runOpts, execution.WithVerbose(true))
+	}
+	if concurrency > 0 {
+		runOpts = append(runOpts, execution.WithMaxConcurrency(concurrency))
+	}
+	if retries > 0 {
+		runOpts = append(runOpts, execution.WithRetry(&execution.RetryConfig{
+			MaxAttempts:    retries,
+			InitialBackoff: 2 * time.Second,
+			MaxBackoff:     30 * time.Second,
+		}))
+	}
+
+	wr, err := execution.RunCleaners(ctx, registry, selectedNames, runOpts...)
 	if err != nil {
 		return fmt.Errorf("clean workflow execution failed: %w", err)
 	}

@@ -42,7 +42,7 @@ func cleanWithIterator[T any](
 	sizeEstimator SizeEstimatorFunc[T],
 ) result.Result[domain.CleanResult] {
 	if !availableCheck(ctx) {
-		return result.Err[domain.CleanResult](fmt.Errorf("%s not available", cleanerName))
+		return result.Err[domain.CleanResult](&NotAvailableError{CleanerName: cleanerName})
 	}
 
 	if dryRun {

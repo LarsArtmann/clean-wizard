@@ -2,7 +2,6 @@ package cleaner
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -406,7 +405,7 @@ func (dc *DockerCleaner) parseVolumeJSONOutput(output string) []domain.ScanItem 
 // Clean removes Docker resources based on prune mode.
 func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !dc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("docker not available"))
+		return result.Err[domain.CleanResult](&NotAvailableError{CleanerName: "docker"})
 	}
 
 	if dc.dryRun {

@@ -2,7 +2,6 @@ package cleaner
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -97,7 +96,7 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 // Clean removes Cargo caches.
 func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !cc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("cargo not available"))
+		return result.Err[domain.CleanResult](&NotAvailableError{CleanerName: "cargo"})
 	}
 
 	if cc.dryRun {

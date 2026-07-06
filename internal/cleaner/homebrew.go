@@ -74,7 +74,7 @@ func (hbc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings)
 // Scan scans for Homebrew packages that can be cleaned.
 func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
 	if !hbc.IsAvailable(ctx) {
-		return result.Err[[]domain.ScanItem](errors.New("homebrew not available"))
+		return result.Err[[]domain.ScanItem](&NotAvailableError{CleanerName: "homebrew"})
 	}
 
 	items := make([]domain.ScanItem, 0)
@@ -125,7 +125,7 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 // Clean removes old Homebrew packages with proper type safety.
 func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	if !hbc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("homebrew not available"))
+		return result.Err[domain.CleanResult](&NotAvailableError{CleanerName: "homebrew"})
 	}
 
 	if hbc.dryRun {

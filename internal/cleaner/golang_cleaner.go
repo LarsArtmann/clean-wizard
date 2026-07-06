@@ -20,7 +20,7 @@ import (
 var (
 	ErrNoCacheTypeSpecified    = errors.New("no cache type specified")
 	ErrLintCacheNotImplemented = errors.New("lint cache cleaning not yet implemented")
-	ErrGoCacheNotAvailable     = errors.New("go not available")
+	ErrGoCacheNotAvailable     = &NotAvailableError{CleanerName: "go"}
 	ErrGoProcessesRunning      = errors.New(
 		"other Go processes detected (go, gopls, golangci-lint, dlv) — skipping to avoid cache corruption",
 	)

@@ -205,58 +205,6 @@ type ScanResult struct {
 	Icon           string
 }
 
-// scanCleanerReal scans a cleaner using the real Scan method from the cleaner interface.
-func scanCleanerReal(
-	ctx context.Context,
-	registry *cleaner.Registry,
-	cleanerType CleanerType,
-	verbose bool,
-) ScanResult {
-	result := ScanResult{ //nolint:exhaustruct
-		Name:        getCleanerName(cleanerType),
-		Description: getCleanerDescription(cleanerType),
-		Icon:        getCleanerIcon(cleanerType),
-	}
-
-	name := getRegistryName(cleanerType)
-
-	c, ok := registry.Get(name)
-	if !ok {
-		result.Available = CleanerAvailabilityUnavailable
-
-		return result
-	}
-
-	result.Available = toCleanerAvailability(c.IsAvailable(ctx))
-
-	if result.Available != CleanerAvailabilityAvailable {
-		return result
-	}
-
-	// Use the real Scan method
-	scanRes := c.Scan(ctx)
-
-	items, err := scanRes.Unwrap()
-	if err != nil {
-		if verbose {
-			fmt.Printf("  ⚠️  Scan error for %s: %v\n", result.Name, err)
-		}
-
-		return result
-	}
-
-	result.ItemsCount = uint(len(items))
-
-	var totalSize int64
-	for _, item := range items {
-		totalSize += item.Size
-	}
-
-	result.BytesCleanable = uint64(totalSize)
-
-	return result
-}
-
 func getRegistryName(cleanerType CleanerType) string {
 	if m, ok := cleanerMetadata[cleanerType]; ok {
 		return m.RegistryName

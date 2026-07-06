@@ -122,6 +122,25 @@ func (rc *resultCollector) record(name string, clean domain.CleanResult, err err
 	})
 }
 
+// recordFinal stores the result of a step, replacing any previous entry for
+// the same step name. This prevents duplicate entries when go-workflow retries
+// a step — only the final outcome is kept.
+func (rc *resultCollector) recordFinal(name string, clean domain.CleanResult, err error, duration time.Duration) {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
+	for i := len(rc.results) - 1; i >= 0; i-- {
+		if rc.results[i].Name == name {
+			rc.results[i] = StepResult{
+				Name: name, Clean: clean, Err: err, Duration: duration,
+			}
+			return
+		}
+	}
+	rc.results = append(rc.results, StepResult{
+		Name: name, Clean: clean, Err: err, Duration: duration,
+	})
+}
+
 // sortedByRegistration returns results ordered by their original registration
 // index, ensuring deterministic output regardless of parallel completion order.
 func (rc *resultCollector) sortedByRegistration() []StepResult {
