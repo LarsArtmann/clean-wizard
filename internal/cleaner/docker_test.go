@@ -221,7 +221,7 @@ func TestDockerCleaner_DryRunStrategy(t *testing.T) {
 	t.Parallel()
 	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
 
-	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "docker")
+	TestDryRun(t, SimpleCleanerConstructorFromInstance(cleaner), "docker", -1)
 }
 
 func TestDockerCleaner_PruneModes(t *testing.T) {

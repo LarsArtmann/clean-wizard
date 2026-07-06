@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
@@ -119,7 +118,7 @@ func runCleanCommand(
 ) error {
 	ctx := context.Background()
 
-	cfg, err := loadConfigForClean(configPath)
+	cfg, err := loadConfigFromPath(configPath)
 	if err != nil {
 		return fmt.Errorf(
 			"failed to load configuration for mode=%v, profile=%v: %w",
@@ -237,22 +236,6 @@ func getAvailableConfigs(ctx context.Context, registry *cleaner.Registry) []Clea
 	}
 
 	return available
-}
-
-func loadConfigForClean(configPath string) (*domain.Config, error) {
-	if configPath != "" {
-		cfg, err := config.LoadFromPath(configPath)
-		if err != nil {
-			return nil, fmt.Errorf("failed to load config from %s: %w", configPath, err)
-		}
-		return cfg, nil
-	}
-
-	cfg, err := config.Load()
-	if err != nil {
-		return nil, fmt.Errorf("failed to load config: %w", err)
-	}
-	return cfg, nil
 }
 
 // cleanerTypesToNames converts a slice of CleanerType to a slice of string

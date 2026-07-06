@@ -63,7 +63,8 @@ func (glcc *GolangciLintCacheCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // ValidateSettings validates settings.
-func (glcc *GolangciLintCacheCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+// golangci-lint has no configurable settings, so this is always a no-op.
+func (glcc *GolangciLintCacheCleaner) ValidateSettings(_ *domain.OperationSettings) error {
 	return nil
 }
 

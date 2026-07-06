@@ -59,15 +59,17 @@ func (pc *ProjectsManagementAutomationCleaner) IsAvailable(ctx context.Context) 
 }
 
 // ValidateSettings validates Projects Management Automation cleaner settings.
+// All settings are valid by default; the field is optional.
 func (pc *ProjectsManagementAutomationCleaner) ValidateSettings(
 	settings *domain.OperationSettings,
 ) error {
-	if settings == nil || settings.ProjectsManagementAutomation == nil {
-		return nil // Settings are optional
-	}
-
-	// All settings are valid by default
-	return nil
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.ProjectsManagementAutomationSettings {
+			return s.ProjectsManagementAutomation
+		},
+		func(*domain.ProjectsManagementAutomationSettings) error { return nil },
+	)
 }
 
 // Scan scans for Projects Management Automation cache.

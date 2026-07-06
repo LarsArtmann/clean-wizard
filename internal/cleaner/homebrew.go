@@ -57,17 +57,18 @@ func (hbc *HomebrewCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates Homebrew cleaner settings with type safety.
 func (hbc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.Homebrew == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.HomebrewSettings { return s.Homebrew },
+		func(h *domain.HomebrewSettings) error {
+			if h.UnusedOnly != domain.HomebrewModeUnusedOnly &&
+				h.UnusedOnly != domain.HomebrewModeAll {
+				return errors.New("invalid unused_only mode: must be either 'unused_only' or 'all'")
+			}
 
-	// Validate unused_only mode
-	if settings.Homebrew.UnusedOnly != domain.HomebrewModeUnusedOnly &&
-		settings.Homebrew.UnusedOnly != domain.HomebrewModeAll {
-		return errors.New("invalid unused_only mode: must be either 'unused_only' or 'all'")
-	}
-
-	return nil
+			return nil
+		},
+	)
 }
 
 // Scan scans for Homebrew packages that can be cleaned.

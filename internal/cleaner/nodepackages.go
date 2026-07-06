@@ -88,23 +88,25 @@ func (npmc *NodePackageManagerCleaner) isPackageManagerAvailable(
 
 // ValidateSettings validates Node package manager cleaner settings.
 func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.NodePackages == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.NodePackagesSettings { return s.NodePackages },
+		func(np *domain.NodePackagesSettings) error {
+			packageManagerStrings := PackageManagerTypeToLowerSlice(np.PackageManagers)
+			validPackageManagersMap := map[string]bool{
+				"npm":  true, //nolint:goconst
+				"pnpm": true,
+				"yarn": true, //nolint:goconst
+				"bun":  true, //nolint:goconst
+			}
 
-	packageManagerStrings := PackageManagerTypeToLowerSlice(settings.NodePackages.PackageManagers)
-	validPackageManagersMap := map[string]bool{
-		"npm":  true, //nolint:goconst
-		"pnpm": true,
-		"yarn": true, //nolint:goconst
-		"bun":  true, //nolint:goconst
-	}
-
-	return validateSettings(
-		packageManagerStrings,
-		validPackageManagersMap,
-		"package manager",
-		"npm, pnpm, yarn, or bun",
+			return validateSettings(
+				packageManagerStrings,
+				validPackageManagersMap,
+				"package manager",
+				"npm, pnpm, yarn, or bun",
+			)
+		},
 	)
 }
 

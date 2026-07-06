@@ -142,6 +142,27 @@ func ValidateSettingsWithTypes[S any](
 	return ValidateToolTypes(slice, availableTypes, typeName)
 }
 
+// ValidateOptionalSettings validates the typed subfield of OperationSettings
+// when both settings and the subfield are non-nil, otherwise returns nil.
+// This eliminates the repeated `if settings == nil || settings.X == nil { return nil }`
+// boilerplate across every cleaner's ValidateSettings method.
+func ValidateOptionalSettings[T any](
+	settings *domain.OperationSettings,
+	getField func(*domain.OperationSettings) *T,
+	validate func(*T) error,
+) error {
+	if settings == nil {
+		return nil
+	}
+
+	field := getField(settings)
+	if field == nil {
+		return nil
+	}
+
+	return validate(field)
+}
+
 // ValidateOptionalSettingsWithTypes validates optional settings with type validation.
 // It handles the common pattern of checking if a field is nil, and if not,
 // validating its types against available types.

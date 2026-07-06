@@ -15,9 +15,7 @@ type ValidateSettingsTestCase struct {
 }
 
 // IsAvailableConstructor is a function type for creating cleaners in tests that need IsAvailable.
-type IsAvailableConstructor func() interface {
-	IsAvailable(ctx context.Context) bool
-}
+type IsAvailableConstructor func() CleanerCore
 
 // IsAvailableTestCase represents a test case for IsAvailable tests.
 type IsAvailableTestCase struct {
@@ -25,25 +23,32 @@ type IsAvailableTestCase struct {
 	Constructor IsAvailableConstructor
 }
 
+// CleanerCore is the minimum cleaner interface used in test helpers.
+// CleanerWithSettings and SimpleCleaner both build on this.
+type CleanerCore interface {
+	IsAvailable(ctx context.Context) bool
+	Clean(ctx context.Context) result.Result[domain.CleanResult]
+}
+
+// CleanerConstructor is the standard constructor signature for test cleaners:
+// they take verbose and dryRun flags and return a value of type T.
+type CleanerConstructor[T any] func(verbose, dryRun bool) T
+
 // CleanerWithSettings represents a cleaner interface with settings validation
 // This eliminates duplicate interface declarations in test helper functions.
 type CleanerWithSettings interface {
-	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) result.Result[domain.CleanResult]
+	CleanerCore
 	ValidateSettings(*domain.OperationSettings) error
 }
 
 // CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings.
-type CleanerConstructorWithSettings func(verbose, dryRun bool) CleanerWithSettings
+type CleanerConstructorWithSettings = CleanerConstructor[CleanerWithSettings]
 
 // SimpleCleanerConstructor is a function type for creating cleaners in tests that only need Clean and IsAvailable.
-type SimpleCleanerConstructor func(verbose, dryRun bool) SimpleCleaner
+type SimpleCleanerConstructor = CleanerConstructor[CleanerCore]
 
 // SimpleCleaner represents a cleaner interface without settings validation.
-type SimpleCleaner interface {
-	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) result.Result[domain.CleanResult]
-}
+type SimpleCleaner = CleanerCore
 
 // GetHomeDirTestCase represents a test case for GetHomeDir tests.
 type GetHomeDirTestCase struct {

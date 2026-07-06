@@ -127,10 +127,15 @@ func (scc *SystemCacheCleaner) IsAvailable(_ context.Context) bool {
 
 // ValidateSettings validates system cache cleaner settings.
 func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.SystemCache == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.SystemCacheSettings { return s.SystemCache },
+		validateSystemCacheSettings,
+	)
+}
 
+// validateSystemCacheSettings validates a non-nil SystemCacheSettings struct.
+func validateSystemCacheSettings(sc *domain.SystemCacheSettings) error {
 	// Create valid cache types map
 	validCacheTypes := make(map[domain.CacheType]bool)
 	for _, ct := range AvailableSystemCacheTypes() {
@@ -138,7 +143,7 @@ func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettin
 	}
 
 	// Validate each CacheType in settings
-	for i, ct := range settings.SystemCache.CacheTypes {
+	for i, ct := range sc.CacheTypes {
 		if !ct.IsValid() {
 			return fmt.Errorf("invalid CacheType at index %d: %d is not a valid cache type", i, ct)
 		}

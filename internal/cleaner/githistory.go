@@ -167,21 +167,21 @@ func (c *GitHistoryCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates the cleaner settings.
 func (c *GitHistoryCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.GitHistory == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.GitHistorySettings { return s.GitHistory },
+		func(s *domain.GitHistorySettings) error {
+			if s.MinSizeMB < 0 {
+				return fmt.Errorf("min_size_mb must be >= 0, got %d", s.MinSizeMB)
+			}
 
-	s := settings.GitHistory
+			if s.MaxFiles < 0 {
+				return fmt.Errorf("max_files must be >= 0, got %d", s.MaxFiles)
+			}
 
-	if s.MinSizeMB < 0 {
-		return fmt.Errorf("min_size_mb must be >= 0, got %d", s.MinSizeMB)
-	}
-
-	if s.MaxFiles < 0 {
-		return fmt.Errorf("max_files must be >= 0, got %d", s.MaxFiles)
-	}
-
-	return nil
+			return nil
+		},
+	)
 }
 
 // Scan scans git history for large binary files.

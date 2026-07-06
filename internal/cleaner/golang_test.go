@@ -378,7 +378,7 @@ func TestGoCleaner_DryRunStrategy(t *testing.T) {
 		cacheTypeFromBools(true, true, true, true, true),
 	)
 
-	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "go")
+	TestDryRun(t, SimpleCleanerConstructorFromInstance(cleaner), "go", -1)
 }
 
 func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {

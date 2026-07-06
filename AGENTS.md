@@ -48,6 +48,9 @@ go test ./... -short
 - **Type-Safe Enums** - 27 CacheType enums with generic helpers in `enum_macros.go`
 - **Adapter Pattern** - External tools wrapped in `internal/adapters/`
 - **Platform-Aware Defaults** - `DefaultProtectedPaths()`, `getDefaultSystemCacheTypes()` use `runtime.GOOS`
+- **ValidateOptionalSettings helper** - Generic helper in `internal/cleaner/helpers.go` that consolidates the `if settings == nil || settings.X == nil { return nil }` boilerplate shared by every cleaner's `ValidateSettings` method
+- **CleanerConstructor[T] generic** - `internal/cleaner/test_interfaces.go` defines `type CleanerConstructor[T any] func(verbose, dryRun bool) T` used as alias for `CleanerConstructorWithSettings` and `SimpleCleanerConstructor`
+- **CleanerCore base interface** - Minimum cleaner interface (`IsAvailable` + `Clean`) shared by `CleanerWithSettings` and `SimpleCleaner` to avoid duplicate interface declarations
 - **Typed Error Classification** - `cleaner.NotAvailableError` + `cleaner.IsNotAvailableError()` replaces fragile string matching
 
 ## DI + Workflow Architecture

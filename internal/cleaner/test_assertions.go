@@ -43,15 +43,11 @@ func TestIsAvailableGeneric(t *testing.T, testCases []IsAvailableTestCase) {
 // Parameters:
 //   - t: The testing.T object
 //   - newCleanerFunc: Function that creates a new cleaner instance with verbose and dryRun parameters
-func TestIsAvailable[T interface {
-	IsAvailable(ctx context.Context) bool
-}](t *testing.T, newCleanerFunc func(bool, bool) T) {
+func TestIsAvailable[T CleanerCore](t *testing.T, newCleanerFunc CleanerConstructor[T]) {
 	testCases := []IsAvailableTestCase{
 		{
 			Name: "default configuration",
-			Constructor: func() interface {
-				IsAvailable(ctx context.Context) bool
-			} {
+			Constructor: func() CleanerCore {
 				return NewTestCleaner(newCleanerFunc)()
 			},
 		},
@@ -77,10 +73,12 @@ func TestValidateSettings(
 	}
 }
 
-// TestCleanDryRun runs a standard clean dry-run test suite.
-func TestCleanDryRun(
+// TestDryRun runs a standard dry-run test suite for cleaners.
+// If expectedItemsRemoved is provided (>= 0), it asserts the exact item count;
+// otherwise only strategy and failure invariants are checked.
+func TestDryRun(
 	t *testing.T, newCleanerFunc SimpleCleanerConstructor,
-	toolName string, expectedItemsRemoved uint,
+	toolName string, expectedItemsRemoved int,
 ) {
 	cleaner := newCleanerFunc(false, true)
 
@@ -97,7 +95,15 @@ func TestCleanDryRun(
 
 	cleanResult := result.Value()
 
-	if cleanResult.ItemsRemoved != expectedItemsRemoved {
+	if cleanResult.Strategy != domain.StrategyDryRunType {
+		t.Errorf(
+			"Clean() strategy = %v, want %v",
+			cleanResult.Strategy,
+			domain.StrategyDryRunType,
+		)
+	}
+
+	if expectedItemsRemoved >= 0 && cleanResult.ItemsRemoved != uint(expectedItemsRemoved) {
 		t.Errorf(
 			"Clean() removed %d items, want %d",
 			cleanResult.ItemsRemoved,
@@ -105,45 +111,11 @@ func TestCleanDryRun(
 		)
 	}
 
-	if cleanResult.Strategy != domain.StrategyDryRunType {
-		t.Errorf(
-			"Clean() strategy = %v, want %v",
-			cleanResult.Strategy,
-			domain.StrategyDryRunType,
-		)
-	}
-
-	if cleanResult.FreedBytes == 0 {
+	if expectedItemsRemoved >= 0 && cleanResult.FreedBytes == 0 {
 		t.Errorf("Clean() freed %d bytes, want > 0", cleanResult.FreedBytes)
 	}
-}
 
-// TestDryRunStrategy runs a standard dry-run strategy test suite.
-func TestDryRunStrategy(t *testing.T, newCleanerFunc SimpleCleanerConstructor, toolName string) {
-	cleaner := newCleanerFunc(false, true)
-
-	if !cleaner.IsAvailable(context.Background()) {
-		t.Skipf("Skipping test: %s not available", toolName)
-
-		return
-	}
-
-	result := cleaner.Clean(context.Background())
-	if result.IsErr() {
-		t.Fatalf("Clean() error = %v", result.Error())
-	}
-
-	cleanResult := result.Value()
-
-	if cleanResult.Strategy != domain.StrategyDryRunType {
-		t.Errorf(
-			"Clean() strategy = %v, want %v",
-			cleanResult.Strategy,
-			domain.StrategyDryRunType,
-		)
-	}
-
-	if cleanResult.ItemsFailed != 0 {
+	if expectedItemsRemoved < 0 && cleanResult.ItemsFailed != 0 {
 		t.Errorf("Clean() failed %d items, want 0", cleanResult.ItemsFailed)
 	}
 }
@@ -286,7 +258,7 @@ func TestBooleanSettingsCleanerCleanDryRun(
 	constructor CleanerConstructorWithSettings,
 ) {
 	simpleConstructor := ToSimpleCleanerConstructor(constructor)
-	TestCleanDryRun(t, simpleConstructor, config.ToolName, config.ExpectedItems)
+	TestDryRun(t, simpleConstructor, config.ToolName, int(config.ExpectedItems))
 }
 
 // TestDryRunStrategyWithConstructor is a helper that creates a DryRunStrategy test.
@@ -295,7 +267,7 @@ func TestDryRunStrategyWithConstructor(
 	constructor CleanerConstructorWithSettings,
 	toolName string,
 ) {
-	TestDryRunStrategy(t, ToSimpleCleanerConstructor(constructor), toolName)
+	TestDryRun(t, ToSimpleCleanerConstructor(constructor), toolName, -1)
 }
 
 // TestCleanTimingWithConstructor is a helper that creates a Clean_Timing test.

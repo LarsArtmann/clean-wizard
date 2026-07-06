@@ -23,7 +23,7 @@ func SimpleCleanerConstructorFromInstance[T SimpleCleaner](cleaner T) SimpleClea
 
 // cleanerConstructorWithSettingsAdapter wraps a constructor into CleanerConstructorWithSettings.
 func cleanerConstructorWithSettingsAdapter[T CleanerWithSettings](
-	constructor func(verbose, dryRun bool) T,
+	constructor CleanerConstructor[T],
 ) CleanerConstructorWithSettings {
 	return func(verbose, dryRun bool) CleanerWithSettings {
 		return constructor(verbose, dryRun)
@@ -44,7 +44,7 @@ func NewCleanerConstructorWithSettings[T CleanerWithSettings, M any](
 // NewBooleanSettingsCleanerTestConstructor is a helper that creates a CleanerConstructorWithSettings
 // from a cleaner constructor function.
 func NewBooleanSettingsCleanerTestConstructor[T CleanerWithSettings](
-	constructor func(verbose, dryRun bool) T,
+	constructor CleanerConstructor[T],
 ) CleanerConstructorWithSettings {
 	return cleanerConstructorWithSettingsAdapter(constructor)
 }
@@ -55,7 +55,7 @@ func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 	toolName string,
 	settingsFieldName string,
 	expectedItems uint,
-	newCleanerFunc func(verbose, dryRun bool) T,
+	newCleanerFunc CleanerConstructor[T],
 	createSettings func(bool) *domain.OperationSettings,
 ) BooleanSettingsCleanerTestConfig {
 	return BooleanSettingsCleanerTestConfig{
@@ -73,7 +73,7 @@ func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](
 	testName, toolName, settingsFieldName string,
 	expectedItems uint,
-	constructor func(verbose, dryRun bool) T,
+	constructor CleanerConstructor[T],
 	createSettings func(bool) *domain.OperationSettings,
 ) BooleanSettingsCleanerTestConfig {
 	return BooleanSettingsCleanerTestConfig{
@@ -87,7 +87,7 @@ func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](
 }
 
 // NewTestCleaner creates a cleaner with default test settings (verbose=false, dryRun=false).
-func NewTestCleaner[T any](constructor func(verbose, dryRun bool) T) func() T {
+func NewTestCleaner[T any](constructor CleanerConstructor[T]) func() T {
 	return func() T {
 		return constructor(false, false)
 	}

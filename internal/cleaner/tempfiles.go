@@ -68,17 +68,21 @@ func (tfc *TempFilesCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates temp files cleaner settings with type safety.
 func (tfc *TempFilesCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.TempFiles == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.TempFilesSettings { return s.TempFiles },
+		validateTempFilesSettings,
+	)
+}
 
-	if settings.TempFiles.OlderThan == "" {
+// validateTempFilesSettings validates a non-nil TempFilesSettings struct.
+func validateTempFilesSettings(tf *domain.TempFilesSettings) error {
+	if tf.OlderThan == "" {
 		return errors.New("older_than must be specified")
 	}
 
 	// Parse older than to validate it's a valid duration using custom parser
-	_, err := domain.ParseCustomDuration(settings.TempFiles.OlderThan)
-	if err != nil {
+	if _, err := domain.ParseCustomDuration(tf.OlderThan); err != nil {
 		return fmt.Errorf("invalid older_than duration: %w", err)
 	}
 

@@ -8,6 +8,7 @@ require (
 	charm.land/log/v2 v2.0.0
 	github.com/Azure/go-workflow v0.1.13
 	github.com/caarlos0/env/v6 v6.10.1
+	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/charmbracelet/fang v1.0.0
 	github.com/cockroachdb/errors v1.14.0
 	github.com/dustin/go-humanize v1.0.1
@@ -33,7 +34,6 @@ require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
-	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260703014108-f5a850f9c2b7 // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect

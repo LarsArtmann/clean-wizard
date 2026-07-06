@@ -28,11 +28,6 @@ const (
 	DefaultLoadTimeout = 30 * time.Second // Default timeout for configuration loading
 )
 
-// Cache constants.
-const (
-	DefaultCacheDuration = 30 * time.Minute // Default cache duration
-)
-
 // Nix generation constants.
 const (
 	DefaultNixMaxGenerations = 10 // Default maximum generations to keep

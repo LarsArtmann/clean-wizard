@@ -62,16 +62,17 @@ func (dc *DockerCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates Docker cleaner settings.
 func (dc *DockerCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.Docker == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.DockerSettings { return s.Docker },
+		func(d *domain.DockerSettings) error {
+			if !d.PruneMode.IsValid() {
+				return fmt.Errorf("invalid DockerPruneMode: %d", d.PruneMode)
+			}
 
-	// Validate prune mode using domain enum validation
-	if !settings.Docker.PruneMode.IsValid() {
-		return fmt.Errorf("invalid DockerPruneMode: %d", settings.Docker.PruneMode)
-	}
-
-	return nil
+			return nil
+		},
+	)
 }
 
 // Scan scans for Docker resources.

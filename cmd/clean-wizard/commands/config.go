@@ -257,6 +257,24 @@ func runConfigResetCommand(_ *cobra.Command, _ []string, force bool) error {
 	return nil
 }
 
+// loadConfigFromPath loads configuration from an explicit path, falling back
+// to the default discovery path when configPath is empty.
+func loadConfigFromPath(configPath string) (*domain.Config, error) {
+	if configPath != "" {
+		cfg, err := config.LoadFromPath(configPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load config from %s: %w", configPath, err)
+		}
+		return cfg, nil
+	}
+
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load config: %w", err)
+	}
+	return cfg, nil
+}
+
 // promptForConfirmation prompts the user to confirm an action by typing 'yes'.
 // Returns true if confirmed, false if cancelled.
 func promptForConfirmation(promptMsg, cancelMsg string) bool {

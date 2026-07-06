@@ -213,12 +213,15 @@ func (c *CompiledBinariesCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates Compiled Binaries cleaner settings.
 func (c *CompiledBinariesCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.CompiledBinaries == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.CompiledBinariesSettings { return s.CompiledBinaries },
+		validateCompiledBinariesSettings,
+	)
+}
 
-	s := settings.CompiledBinaries
-
+// validateCompiledBinariesSettings validates a non-nil CompiledBinariesSettings struct.
+func validateCompiledBinariesSettings(s *domain.CompiledBinariesSettings) error {
 	// Validate MinSizeMB
 	if s.MinSizeMB < 0 {
 		return fmt.Errorf("min_size_mb must be >= 0, got %d", s.MinSizeMB)

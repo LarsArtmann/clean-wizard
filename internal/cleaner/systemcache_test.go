@@ -284,7 +284,7 @@ func TestSystemCacheCleaner_DryRunStrategy(t *testing.T) {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
 	}
 
-	TestDryRunStrategy(t, SimpleCleanerConstructorFromInstance(cleaner), "system-cache")
+	TestDryRun(t, SimpleCleanerConstructorFromInstance(cleaner), "system-cache", -1)
 }
 
 func TestSystemCacheCleaner_ParseDuration(t *testing.T) {

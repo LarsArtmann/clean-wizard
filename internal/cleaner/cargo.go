@@ -47,13 +47,13 @@ func (cc *CargoCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // ValidateSettings validates Cargo cleaner settings.
+// All Cargo settings are valid by default; the field is optional.
 func (cc *CargoCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.CargoPackages == nil {
-		return nil // Settings are optional
-	}
-
-	// All Cargo settings are valid by default
-	return nil
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.CargoPackagesSettings { return s.CargoPackages },
+		func(*domain.CargoPackagesSettings) error { return nil },
+	)
 }
 
 // Scan scans for Cargo caches.

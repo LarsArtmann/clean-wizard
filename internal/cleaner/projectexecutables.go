@@ -125,19 +125,20 @@ func (p *ProjectExecutablesCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates Project Executables cleaner settings.
 func (p *ProjectExecutablesCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.ProjectExecutables == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.ProjectExecutablesSettings { return s.ProjectExecutables },
+		func(pe *domain.ProjectExecutablesSettings) error {
+			// Validate exclude patterns are valid globs
+			for _, pattern := range pe.ExcludePatterns {
+				if _, err := filepath.Match(pattern, "test"); err != nil {
+					return fmt.Errorf("invalid exclude pattern %q: %w", pattern, err)
+				}
+			}
 
-	// Validate exclude patterns are valid globs
-	for _, pattern := range settings.ProjectExecutables.ExcludePatterns {
-		_, err := filepath.Match(pattern, "test")
-		if err != nil {
-			return fmt.Errorf("invalid exclude pattern %q: %w", pattern, err)
-		}
-	}
-
-	return nil
+			return nil
+		},
+	)
 }
 
 // Scan scans for executable files in project directories.

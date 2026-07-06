@@ -119,26 +119,28 @@ func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 
 // ValidateSettings validates Nix cleaner settings with type safety.
 func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	if settings == nil || settings.NixGenerations == nil {
-		return nil // Settings are optional
-	}
+	return ValidateOptionalSettings(
+		settings,
+		func(s *domain.OperationSettings) *domain.NixGenerationsSettings { return s.NixGenerations },
+		func(n *domain.NixGenerationsSettings) error {
+			if n.Generations < 1 {
+				return fmt.Errorf(
+					"generations to keep must be at least 1, got: %d",
+					n.Generations,
+				)
+			}
 
-	if settings.NixGenerations.Generations < 1 {
-		return fmt.Errorf(
-			"generations to keep must be at least 1, got: %d",
-			settings.NixGenerations.Generations,
-		)
-	}
+			if n.Generations > NixMaxGenerationsToKeep {
+				return fmt.Errorf(
+					"generations to keep must not exceed %d, got: %d",
+					NixMaxGenerationsToKeep,
+					n.Generations,
+				)
+			}
 
-	if settings.NixGenerations.Generations > NixMaxGenerationsToKeep {
-		return fmt.Errorf(
-			"generations to keep must not exceed %d, got: %d",
-			NixMaxGenerationsToKeep,
-			settings.NixGenerations.Generations,
-		)
-	}
-
-	return nil
+			return nil
+		},
+	)
 }
 
 // ListGenerations lists Nix generations with proper type safety.
