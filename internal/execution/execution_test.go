@@ -2,6 +2,7 @@ package execution
 
 import (
 	"context"
+	osexec "os/exec"
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -63,7 +64,7 @@ func TestRunCleaners_MixedResults(t *testing.T) {
 	registry.Register("skipped", &mockCleaner{
 		name:     "skipped",
 		avail:    true,
-		cleanRes: result.Err[domain.CleanResult](assertError("command not found: some-tool")),
+		cleanRes: result.Err[domain.CleanResult](&cleaner.NotAvailableError{CleanerName: "some-tool"}),
 	})
 
 	wr, err := RunCleaners(context.Background(), registry, []string{"success", "failed", "skipped"})
@@ -148,13 +149,13 @@ func TestStepResult_StatusClassification(t *testing.T) {
 			expected: StepStatusFailed,
 		},
 		{
-			name:     "skipped with not-available error",
-			step:     StepResult{Err: assertError("command not found")},
+			name:     "skipped with NotAvailableError",
+			step:     StepResult{Err: &cleaner.NotAvailableError{CleanerName: "some-tool"}},
 			expected: StepStatusSkipped,
 		},
 		{
-			name:     "skipped with not-installed error",
-			step:     StepResult{Err: assertError("not installed")},
+			name:     "skipped with exec.ErrNotFound",
+			step:     StepResult{Err: osexec.ErrNotFound},
 			expected: StepStatusSkipped,
 		},
 	}

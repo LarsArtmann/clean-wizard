@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // ValidationMiddleware provides comprehensive validation for configuration operations.
@@ -167,7 +167,7 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 	// Load configuration using existing loader
 	cfg, err := LoadWithContext(ctx)
 	if err != nil {
-		return nil, pkgerrors.HandleConfigError("ValidateAndLoadConfig", err)
+		return nil, errorfamily.WrapRejection(err, "config.load", "ValidateAndLoadConfig: failed to load config")
 	}
 
 	if err := vm.validateConfig(cfg, "ValidateAndLoadConfig"); err != nil {
@@ -190,7 +190,7 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(
 	// Save configuration
 	err := Save(cfg)
 	if err != nil {
-		return nil, pkgerrors.HandleConfigError("ValidateAndSaveConfig", err)
+		return nil, errorfamily.WrapRejection(err, "config.save", "ValidateAndSaveConfig: failed to save config")
 	}
 
 	// Return saved configuration
@@ -203,13 +203,14 @@ func (vm *ValidationMiddleware) validateConfig(cfg *domain.Config, operationName
 	vm.logger.LogValidation(validationResult)
 
 	if !validationResult.IsValid {
-		return pkgerrors.HandleValidationError(
-			operationName,
+		return errorfamily.WrapRejection(
 			fmt.Errorf(
 				"validation failed for operationName=%v: %s",
 				operationName,
 				vm.formatValidationErrors(validationResult.Errors),
 			),
+			"config.validation",
+			operationName+": configuration validation failed",
 		)
 	}
 

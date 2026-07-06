@@ -2,12 +2,11 @@ package cleaner
 
 import (
 	"context"
-	"errors"
-	"strings"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // CleanerBase holds the common fields shared by all cleaner implementations.
@@ -74,6 +73,10 @@ type AgeBasedCleaner interface {
 // NotAvailableError marks errors that indicate a cleaner's prerequisite (e.g. a
 // package manager binary) is not present on the system. The execution layer uses
 // this to classify a step as "skipped" rather than "failed".
+//
+// Implements errorfamily.Classified (Infrastructure) and errorfamily.Coded so
+// that errorfamily.Classify and errorfamily.IsRetryable work without any
+// keyword matching or registration.
 type NotAvailableError struct {
 	CleanerName string
 	Reason      string
@@ -86,36 +89,22 @@ func (e *NotAvailableError) Error() string {
 	return e.CleanerName + " not available"
 }
 
+// ErrorCode returns the machine-readable code for this error type.
+func (e *NotAvailableError) ErrorCode() string { return "cleaner.not_available" }
+
+// ErrorFamily classifies this as Infrastructure — the system cannot serve
+// because a prerequisite is missing. Infrastructure is not retryable.
+func (e *NotAvailableError) ErrorFamily() errorfamily.Family {
+	return errorfamily.Infrastructure
+}
+
 // IsNotAvailableError reports whether err represents a cleaner that is not
-// installed or not applicable on the current system. It checks for the typed
-// *NotAvailableError first, then falls back to keyword matching for errors
-// that originate from exec.LookPath or the OS.
+// installed or not applicable on the current system. Uses errorfamily.Classify
+// so that both typed *NotAvailableError and registered sentinels (e.g.
+// exec.ErrNotFound) are detected without keyword matching.
 func IsNotAvailableError(err error) bool {
 	if err == nil {
 		return false
 	}
-
-	// Fast path: typed sentinel
-	var nae *NotAvailableError
-	if errors.As(err, &nae) {
-		return true
-	}
-
-	// Fallback: keyword match for ad-hoc errors from exec/OS
-	msg := strings.ToLower(err.Error())
-	for _, keyword := range notAvailableKeywords {
-		if strings.Contains(msg, keyword) {
-			return true
-		}
-	}
-
-	return false
-}
-
-var notAvailableKeywords = []string{
-	"not available",
-	"not found",
-	"not installed",
-	"command not found",
-	"no such file or directory",
+	return errorfamily.Classify(err) == errorfamily.Infrastructure
 }

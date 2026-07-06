@@ -5,8 +5,8 @@ import (
 	"time"
 
 	flow "github.com/Azure/go-workflow"
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/cenkalti/backoff/v4"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // RetryConfig controls per-step retry behavior for the workflow.
@@ -27,10 +27,23 @@ func DefaultRetryConfig() RetryConfig {
 	}
 }
 
+// RetryConfigFromAttempts returns a RetryConfig with the given max attempts
+// and default backoff settings. This is the shared builder used by both
+// clean and scan commands to avoid duplicating inline RetryConfig literals.
+func RetryConfigFromAttempts(maxAttempts int) *RetryConfig {
+	if maxAttempts <= 0 {
+		return nil
+	}
+	cfg := DefaultRetryConfig()
+	cfg.MaxAttempts = maxAttempts
+	return &cfg
+}
+
 // retryOptions converts a RetryConfig into go-workflow retry option funcs.
-// The NextBackOff hook stops retrying immediately when the error indicates
-// the cleaner is not available (e.g. "cargo not installed") — retrying would
-// be a waste of time since the binary won't appear mid-run.
+// The NextBackOff hook stops retrying immediately when the error is
+// non-retryable (Infrastructure, Rejection, Conflict, Corruption) —
+// retrying a permanent condition wastes time. Only Transient errors
+// (timeouts, transient I/O, exec failures) proceed with backoff.
 func retryOptions(cfg RetryConfig) []func(*flow.RetryOption) {
 	if cfg.MaxAttempts <= 0 {
 		return nil
@@ -57,7 +70,7 @@ func retryOptions(cfg RetryConfig) []func(*flow.RetryOption) {
 			opt.Backoff = expBackoff
 
 			opt.NextBackOff = func(_ context.Context, re flow.RetryEvent, _ time.Duration) time.Duration {
-				if cleaner.IsNotAvailableError(re.Error) {
+				if !errorfamily.IsRetryable(re.Error) {
 					return backoff.Stop
 				}
 

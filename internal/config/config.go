@@ -11,10 +11,10 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/logger"
-	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // ErrConfigShouldUnmarshal is returned when the config file was read successfully
@@ -64,7 +64,7 @@ func readConfigFileFromPath(
 				return GetDefaultConfig(), nil
 			}
 
-			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+			return nil, errorfamily.WrapRejection(err, "config.load", "failed to load configuration from "+configPath)
 		}
 
 		return nil, ErrConfigShouldUnmarshal
@@ -88,7 +88,7 @@ func unmarshalConfig(k *koanf.Koanf) (*domain.Config, error) {
 		if err != nil {
 			logger.Error("Failed to unmarshal profiles", "error", err)
 
-			return nil, pkgerrors.HandleConfigError("LoadWithContext", err)
+			return nil, errorfamily.WrapRejection(err, "config.load", "failed to unmarshal profiles")
 		}
 	}
 
@@ -119,7 +119,7 @@ func fixProfileSettings(k *koanf.Koanf, config *domain.Config) {
 func validateLoadedConfig(config *domain.Config) error {
 	err := config.Validate()
 	if err != nil {
-		return pkgerrors.HandleConfigError("LoadWithContext", err)
+		return errorfamily.WrapRejection(err, "config.load", "configuration validation failed")
 	}
 
 	validator := NewConfigValidator()
@@ -235,19 +235,19 @@ func Save(config *domain.Config) error {
 
 	err := os.MkdirAll(configDir, ConfigDirPermission)
 	if err != nil {
-		return pkgerrors.HandleConfigError("Save", err)
+		return errorfamily.WrapRejection(err, "config.save", "failed to create config directory: "+configDir)
 	}
 
 	// Marshal to YAML
 	yamlData, err := yaml.Parser().Marshal(configMap)
 	if err != nil {
-		return pkgerrors.HandleConfigError("Save", err)
+		return errorfamily.WrapRejection(err, "config.save", "failed to marshal config to YAML")
 	}
 
 	// Write configuration file
 	err = os.WriteFile(configPath, yamlData, ConfigFilePermission)
 	if err != nil {
-		return pkgerrors.HandleConfigError("Save", err)
+		return errorfamily.WrapRejection(err, "config.save", "failed to write config file: "+configPath)
 	}
 
 	logger.Info("Configuration saved successfully", "config_path", configPath)

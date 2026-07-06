@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
-	pkgerrors "github.com/LarsArtmann/clean-wizard/internal/pkg/errors"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // LoadConfig loads configuration with comprehensive validation and caching.
@@ -36,12 +36,10 @@ func (ecl *EnhancedConfigLoader) LoadConfig(
 	// Apply validation based on level
 	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
 	if !validationResult.IsValid {
-		return nil, pkgerrors.HandleValidationError(
-			"LoadConfig",
-			fmt.Errorf(
-				"validation failed: %s",
-				ecl.formatValidationErrors(validationResult.Errors),
-			),
+		return nil, errorfamily.WrapRejection(
+			fmt.Errorf("validation failed: %s", ecl.formatValidationErrors(validationResult.Errors)),
+			"config.load",
+			"LoadConfig: validation failed",
 		)
 	}
 

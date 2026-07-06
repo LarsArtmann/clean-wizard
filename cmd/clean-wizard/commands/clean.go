@@ -2,15 +2,14 @@ package commands
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
 
@@ -23,10 +22,10 @@ const (
 	BytesThresholdMB = 100_000_000
 )
 
-// Sentinel errors for clean command.
+// Classified errors for clean command.
 var (
-	ErrNoCleanersAvailable  = errors.New("no cleaners available on this system")
-	ErrNoConfigPathProvided = errors.New("no config path provided")
+	ErrNoCleanersAvailable  = errorfamily.NewRejection("clean.no_cleaners", "no cleaners available on this system")
+	ErrNoConfigPathProvided = errorfamily.NewRejection("clean.no_config_path", "no config path provided")
 )
 
 // NewCleanCommand creates a multi-cleaner command with TUI.
@@ -200,11 +199,7 @@ func runCleanCommand(
 		runOpts = append(runOpts, execution.WithMaxConcurrency(concurrency))
 	}
 	if retries > 0 {
-		runOpts = append(runOpts, execution.WithRetry(&execution.RetryConfig{
-			MaxAttempts:    retries,
-			InitialBackoff: 2 * time.Second,
-			MaxBackoff:     30 * time.Second,
-		}))
+		runOpts = append(runOpts, execution.WithRetry(execution.RetryConfigFromAttempts(retries)))
 	}
 
 	wr, err := execution.RunCleaners(ctx, registry, selectedNames, runOpts...)

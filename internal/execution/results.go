@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // StepResult holds the outcome of a single cleaner step within the workflow.
@@ -27,9 +27,12 @@ const (
 )
 
 // Status returns the classification for this step result.
+// Infrastructure errors (binary not installed, system can't serve) are
+// classified as Skipped. All other error families — Transient (after
+// retries exhausted), Rejection, Conflict, Corruption — are Failures.
 func (s StepResult) Status() StepStatus {
 	if s.Err != nil {
-		if cleaner.IsNotAvailableError(s.Err) {
+		if errorfamily.Classify(s.Err) == errorfamily.Infrastructure {
 			return StepStatusSkipped
 		}
 		return StepStatusFailed

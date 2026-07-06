@@ -1,6 +1,6 @@
 # Clean Wizard - Project Instructions
 
-**Updated:** 2026-07-06 (hardening pass)
+**Updated:** 2026-07-06 (go-error-family adoption)
 
 ## Build & Test
 
@@ -51,7 +51,7 @@ go test ./... -short
 - **ValidateOptionalSettings helper** - Generic helper in `internal/cleaner/helpers.go` that consolidates the `if settings == nil || settings.X == nil { return nil }` boilerplate shared by every cleaner's `ValidateSettings` method
 - **CleanerConstructor[T] generic** - `internal/cleaner/test_interfaces.go` defines `type CleanerConstructor[T any] func(verbose, dryRun bool) T` used as alias for `CleanerConstructorWithSettings` and `SimpleCleanerConstructor`
 - **CleanerCore base interface** - Minimum cleaner interface (`IsAvailable` + `Clean`) shared by `CleanerWithSettings` and `SimpleCleaner` to avoid duplicate interface declarations
-- **Typed Error Classification** - `cleaner.NotAvailableError` + `cleaner.IsNotAvailableError()` — all cleaners return `*NotAvailableError` for unavailable conditions; keyword fallback is a safety net for OS-level errors
+- **Error Classification** — `go-error-family` (`github.com/larsartmann/go-error-family`) classifies all errors into 5 families (Rejection, Conflict, Transient, Corruption, Infrastructure). `NotAvailableError` implements `Classified` + `Coded` interfaces → `Infrastructure` (not retryable, skipped). `errorfamily.IsRetryable()` drives retry decisions; `errorfamily.Classify()` drives skip/failed classification. No keyword matching.
 
 ## DI + Workflow Architecture
 
@@ -76,15 +76,15 @@ Key design principles:
 - **Panic recovery** — `DontPanic: true` + `recover()` in step functions
 - **Retry support** — `flow.Retry` with exponential backoff (`cenkalti/backoff/v4`)
 - **Step hooks** — `BeforeStep` for timing/logging, `AfterStep` for verbose output
-- **Error classification** — `cleaner.IsNotAvailableError()` with typed `*NotAvailableError` (all cleaners migrated); keyword fallback as safety net for OS-level errors
-- **Retry by default** — `--retries 3` on both clean and scan commands; `IsNotAvailableError` stops retry immediately for non-retryable errors (zero delay); `--retries 0` disables
+- **Error classification** — `errorfamily.Classify(err)` returns `Infrastructure` for unavailable cleaners (skipped), `Transient` for retryable failures (retried with backoff), `Rejection`/`Conflict`/`Corruption` for permanent failures. No keyword matching.
+- **Retry by default** — `--retries 3` on both clean and scan commands; `errorfamily.IsRetryable()` returns false for non-Transient errors → `backoff.Stop` (zero delay); `--retries 0` disables
 
 ## Dependencies
 
 - `charm.land/huh/v2` - TUI forms
 - `charm.land/lipgloss/v2` - Terminal styling
 - `github.com/charmbracelet/fang` - Help command generation
-- `github.com/cockroachdb/errors` - Error wrapping
+- `github.com/larsartmann/go-error-family` - Error classification (5 families: Rejection, Conflict, Transient, Corruption, Infrastructure)
 - `github.com/onsi/ginkgo/v2` + `github.com/onsi/gomega` - BDD testing
 - `github.com/knadh/koanf/v2` - Configuration
 - `github.com/samber/do/v2` - Dependency injection
@@ -93,9 +93,30 @@ Key design principles:
 - `github.com/spf13/cobra` - CLI framework
 - `gopkg.in/yaml.v3` - YAML handling
 
+## Error Handling Architecture
+
+All errors use `github.com/larsartmann/go-error-family` for behavioral classification:
+
+| Family             | Retryable | Usage in clean-wizard                                          | Exit Code |
+| ------------------ | --------- | -------------------------------------------------------------- | --------- |
+| **Infrastructure** | no        | `NotAvailableError` (binary not installed), `exec.ErrNotFound` | 69        |
+| **Transient**      | yes       | Exec failures, timeouts, I/O errors (default for unknown)      | 75        |
+| **Rejection**      | no        | Bad config, invalid input, missing cache type                  | 1         |
+| **Conflict**       | no        | `ErrGoProcessesRunning` (state conflict)                       | 1         |
+| **Corruption**     | no        | Nix store corruption (not yet wired)                           | 65        |
+
+Key files:
+
+- `internal/cleaner/cleaner.go` — `NotAvailableError` implements `Classified` + `Coded` (Infrastructure)
+- `internal/cleaner/error_classification.go` — `init()` registers `exec.ErrNotFound`, stdlib defaults, cleaner sentinels
+- `internal/execution/retry.go` — `NextBackOff` hook uses `errorfamily.IsRetryable()` to stop non-retryable errors
+- `internal/execution/results.go` — `StepResult.Status()` uses `errorfamily.Classify()` → Infrastructure=skipped, else=failed
+- `internal/execution/retry.go` — `RetryConfigFromAttempts(n)` shared builder (used by both clean and scan commands)
+
+**Bridge not adopted**: `go-error-family/bridge` connects `samber/oops` to `go-error-family`. Clean-wizard doesn't use oops; core `errorfamily` provides `.WithContext()` for structured context. BuildFlow also implements `Classified` directly without the bridge.
+
 ## Known Issues
 
-- 4 error packages with overlapping responsibilities (split brain): `internal/pkg/errors/`, `cleaner.NotAvailableError`, `domain.ValidationError`, scattered sentinel `var Err...`
 - `internal/domain/` is a god package (23 files)
 - `internal/cleaner/` has 50+ files flat (no sub-packages)
 - Cleaners still use hardcoded defaults instead of user profile config
@@ -105,7 +126,7 @@ Key design principles:
 
 - 300+ test functions across 63+ test files
 - DI package tests: `internal/di/di_test.go` (9 tests)
-- Execution package tests: `internal/execution/execution_test.go` + `integration_test.go` (14 tests)
+- Execution package tests: `internal/execution/execution_test.go` + `integration_test.go` (16 tests, including smart retry tests for NotAvailableError and Transient)
 - CLI integration test: `cmd/clean-wizard/commands/clean_integration_test.go` (dry-run JSON pipeline)
 - Integration tests use `testing.Short()` skip guards for real-system tests
 - Ginkgo BDD tests exist for: GitHistory, Nix, CompiledBinaries, ProjectExecutables

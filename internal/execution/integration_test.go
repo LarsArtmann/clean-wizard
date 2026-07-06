@@ -10,6 +10,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -139,6 +140,83 @@ func TestRunScans_RealRegistry_DryRun(t *testing.T) {
 	require.NotNil(t, wr)
 }
 
+// TestRunCleaners_SmartRetry_NotAvailable verifies that a cleaner returning
+// NotAvailableError (classified as Infrastructure by go-error-family) is NOT
+// retried — the NextBackOff hook returns backoff.Stop immediately. The cleaner
+// must be called exactly once, not MaxAttempts times.
+func TestRunCleaners_SmartRetry_NotAvailable(t *testing.T) {
+	registry := cleaner.NewRegistry()
+
+	naCleaner := &countingMockCleaner{
+		name:  "not-installed",
+		avail: true,
+		err:   &cleaner.NotAvailableError{CleanerName: "not-installed"},
+	}
+	registry.Register("not-installed", naCleaner)
+
+	retryCfg := &RetryConfig{
+		MaxAttempts:    5,
+		InitialBackoff: 1 * time.Millisecond,
+		MaxBackoff:     10 * time.Millisecond,
+	}
+
+	start := time.Now()
+	wr, err := RunCleaners(context.Background(), registry, []string{"not-installed"},
+		WithRetry(retryCfg),
+	)
+	elapsed := time.Since(start)
+
+	require.NoError(t, err)
+	require.NotNil(t, wr)
+	require.Len(t, wr.Steps, 1)
+
+	// Infrastructure error → Skipped, not Failed
+	assert.Equal(t, StepStatusSkipped, wr.Steps[0].Status())
+
+	// Must be called exactly once — no retries for non-retryable errors
+	assert.Equal(t, int32(1), atomic.LoadInt32(&naCleaner.attempts),
+		"Infrastructure error must not be retried")
+
+	// Should complete near-instantly (no backoff delay)
+	assert.Less(t, elapsed, 100*time.Millisecond,
+		"non-retryable error should not wait for backoff")
+}
+
+// TestRunCleaners_SmartRetry_Transient verifies that a cleaner returning a
+// Transient error IS retried up to MaxAttempts. Uses errorfamily.NewTransient
+// to classify the error as retryable.
+func TestRunCleaners_SmartRetry_Transient(t *testing.T) {
+	registry := cleaner.NewRegistry()
+
+	transientCleaner := &countingMockCleaner{
+		name:      "transient-fail",
+		avail:     true,
+		err:       errorfamily.NewTransient("test.transient", "transient failure"),
+		failCount: 3, // fail 3 times, then the retry budget is exhausted
+	}
+	registry.Register("transient-fail", transientCleaner)
+
+	retryCfg := &RetryConfig{
+		MaxAttempts:    3,
+		InitialBackoff: 1 * time.Millisecond,
+		MaxBackoff:     10 * time.Millisecond,
+	}
+
+	wr, err := RunCleaners(context.Background(), registry, []string{"transient-fail"},
+		WithRetry(retryCfg),
+	)
+	require.NoError(t, err)
+	require.NotNil(t, wr)
+	require.Len(t, wr.Steps, 1)
+
+	// Transient error after retries exhausted → Failed (not Skipped)
+	assert.Equal(t, StepStatusFailed, wr.Steps[0].Status())
+
+	// Must be called exactly MaxAttempts times (3)
+	assert.Equal(t, int32(3), atomic.LoadInt32(&transientCleaner.attempts),
+		"Transient error must be retried up to MaxAttempts")
+}
+
 // --- Test Helpers ---
 
 type panicCleaner struct {
@@ -190,5 +268,33 @@ func (r *retryableMockCleaner) Clean(_ context.Context) result.Result[domain.Cle
 }
 func (r *retryableMockCleaner) IsAvailable(_ context.Context) bool { return r.avail }
 func (r *retryableMockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
+	return result.Ok([]domain.ScanItem{})
+}
+
+// countingMockCleaner returns a fixed error until failCount is reached,
+// then returns success. Tracks total call count for retry verification.
+type countingMockCleaner struct {
+	name      string
+	avail     bool
+	err       error // error to return (if non-nil, always fails with this)
+	failCount int32 // number of times to fail before succeeding
+	attempts  int32
+}
+
+func (c *countingMockCleaner) Name() string               { return c.name }
+func (c *countingMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+func (c *countingMockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {
+	attempt := atomic.AddInt32(&c.attempts, 1)
+	if c.err != nil {
+		// Always return the same error (for NotAvailable / Transient tests)
+		return result.Err[domain.CleanResult](c.err)
+	}
+	if attempt <= c.failCount {
+		return result.Err[domain.CleanResult](fmt.Errorf("failure attempt %d", attempt))
+	}
+	return result.Ok(domain.CleanResult{FreedBytes: 42})
+}
+func (c *countingMockCleaner) IsAvailable(_ context.Context) bool { return c.avail }
+func (c *countingMockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
 	return result.Ok([]domain.ScanItem{})
 }

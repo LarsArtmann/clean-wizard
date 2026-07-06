@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
@@ -132,11 +131,7 @@ func runScanCommand(verbose bool, profile string, jsonOutput bool, configPath st
 		runOpts = append(runOpts, execution.WithMaxConcurrency(concurrency))
 	}
 	if retries > 0 {
-		runOpts = append(runOpts, execution.WithRetry(&execution.RetryConfig{
-			MaxAttempts:    retries,
-			InitialBackoff: 2 * time.Second,
-			MaxBackoff:     30 * time.Second,
-		}))
+		runOpts = append(runOpts, execution.WithRetry(execution.RetryConfigFromAttempts(retries)))
 	}
 
 	wr, err := execution.RunScans(ctx, registry, selectedNames, runOpts...)
