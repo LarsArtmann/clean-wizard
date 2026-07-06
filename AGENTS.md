@@ -1,6 +1,6 @@
 # Clean Wizard - Project Instructions
 
-**Updated:** 2026-07-06
+**Updated:** 2026-07-06 (hardening pass)
 
 ## Build & Test
 
@@ -51,7 +51,7 @@ go test ./... -short
 - **ValidateOptionalSettings helper** - Generic helper in `internal/cleaner/helpers.go` that consolidates the `if settings == nil || settings.X == nil { return nil }` boilerplate shared by every cleaner's `ValidateSettings` method
 - **CleanerConstructor[T] generic** - `internal/cleaner/test_interfaces.go` defines `type CleanerConstructor[T any] func(verbose, dryRun bool) T` used as alias for `CleanerConstructorWithSettings` and `SimpleCleanerConstructor`
 - **CleanerCore base interface** - Minimum cleaner interface (`IsAvailable` + `Clean`) shared by `CleanerWithSettings` and `SimpleCleaner` to avoid duplicate interface declarations
-- **Typed Error Classification** - `cleaner.NotAvailableError` + `cleaner.IsNotAvailableError()` replaces fragile string matching
+- **Typed Error Classification** - `cleaner.NotAvailableError` + `cleaner.IsNotAvailableError()` — all cleaners return `*NotAvailableError` for unavailable conditions; keyword fallback is a safety net for OS-level errors
 
 ## DI + Workflow Architecture
 
@@ -76,7 +76,8 @@ Key design principles:
 - **Panic recovery** — `DontPanic: true` + `recover()` in step functions
 - **Retry support** — `flow.Retry` with exponential backoff (`cenkalti/backoff/v4`)
 - **Step hooks** — `BeforeStep` for timing/logging, `AfterStep` for verbose output
-- **Error classification** — `cleaner.IsNotAvailableError()` with typed + string fallback
+- **Error classification** — `cleaner.IsNotAvailableError()` with typed `*NotAvailableError` (all cleaners migrated); keyword fallback as safety net for OS-level errors
+- **Retry by default** — `--retries 3` on both clean and scan commands; `IsNotAvailableError` stops retry immediately for non-retryable errors (zero delay); `--retries 0` disables
 
 ## Dependencies
 
@@ -94,17 +95,18 @@ Key design principles:
 
 ## Known Issues
 
-- 4 error packages with overlapping responsibilities (split brain)
-- `internal/domain/` is a god package (20+ files)
+- 4 error packages with overlapping responsibilities (split brain): `internal/pkg/errors/`, `cleaner.NotAvailableError`, `domain.ValidationError`, scattered sentinel `var Err...`
+- `internal/domain/` is a god package (23 files)
 - `internal/cleaner/` has 50+ files flat (no sub-packages)
-- ~40 `err113` lint violations (dynamic errors via fmt.Errorf)
 - Cleaners still use hardcoded defaults instead of user profile config
+- Logger uses mutable package-level globals (`L`, `StdLogger`) — causes test race conditions
 
 ## Test Facts
 
 - 300+ test functions across 63+ test files
-- DI package tests: `internal/di/di_test.go` (8 tests)
-- Execution package tests: `internal/execution/execution_test.go` + `integration_test.go` (16 tests)
+- DI package tests: `internal/di/di_test.go` (9 tests)
+- Execution package tests: `internal/execution/execution_test.go` + `integration_test.go` (14 tests)
+- CLI integration test: `cmd/clean-wizard/commands/clean_integration_test.go` (dry-run JSON pipeline)
+- Integration tests use `testing.Short()` skip guards for real-system tests
 - Ginkgo BDD tests exist for: GitHistory, Nix, CompiledBinaries, ProjectExecutables
 - 9 of 13 cleaners have NO BDD tests
-- CLI command tests are missing entirely
