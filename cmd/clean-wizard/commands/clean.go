@@ -75,7 +75,7 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Use a specific configuration profile")
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 	cmd.Flags().BoolVarP(&skipConfirmation, "yes", "y", false, "Skip confirmation prompt")
-	cmd.Flags().IntVar(&retries, "retries", 0, "Number of retry attempts per cleaner (0=disabled)")
+	cmd.Flags().IntVar(&retries, "retries", 3, "Number of retry attempts per cleaner (0=disabled)")
 	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max cleaners running concurrently (0=unlimited)")
 
 	return cmd

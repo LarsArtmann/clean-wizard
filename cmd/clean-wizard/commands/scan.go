@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
@@ -16,10 +17,12 @@ import (
 // NewScanCommand creates a command that scans for cleanable items.
 func NewScanCommand() *cobra.Command {
 	var (
-		verbose    bool
-		profile    string
-		jsonOut    bool
-		configPath string
+		verbose     bool
+		profile     string
+		jsonOut     bool
+		configPath  string
+		retries     int
+		concurrency int
 	)
 
 	cmd := &cobra.Command{
@@ -27,7 +30,7 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(verbose, profile, jsonOut, configPath)
+			return runScanCommand(verbose, profile, jsonOut, configPath, retries, concurrency)
 		},
 	}
 
@@ -35,6 +38,8 @@ func NewScanCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Filter results by profile")
 	cmd.Flags().BoolVarP(&jsonOut, "json", "j", false, "Output in JSON format")
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
+	cmd.Flags().IntVar(&retries, "retries", 3, "Number of retry attempts per scanner (0=disabled)")
+	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max scanners running concurrently (0=unlimited)")
 
 	return cmd
 }
@@ -58,8 +63,12 @@ func printNixStoreSize(ctx context.Context, registry *cleaner.Registry) {
 }
 
 // runScanCommand executes the scan command.
-func runScanCommand(verbose bool, _ string, jsonOutput bool, configPath string) error {
+func runScanCommand(verbose bool, profile string, jsonOutput bool, configPath string, retries, concurrency int) error {
 	ctx := context.Background()
+
+	if profile != "" {
+		fmt.Printf("⚠️  Warning: --profile %q is not yet supported for scan; showing all available cleaners\n", profile)
+	}
 
 	cfg, err := loadConfigFromPath(configPath)
 	if err != nil {
@@ -69,7 +78,7 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool, configPath string) 
 	container, cleanup := di.New()
 	defer cleanup()
 
-	settings := di.RunSettings{Verbose: verbose, DryRun: false}
+	settings := di.RunSettings{Verbose: verbose, DryRun: false, MaxConcurrency: concurrency}
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
 		return fmt.Errorf("failed to register DI services: %w", err)
 	}
@@ -115,7 +124,22 @@ func runScanCommand(verbose bool, _ string, jsonOutput bool, configPath string) 
 		selectedNames[i] = getRegistryName(c.Type)
 	}
 
-	wr, err := execution.RunScans(ctx, registry, selectedNames, execution.WithVerbose(verbose))
+	var runOpts []execution.RunOption
+	if verbose {
+		runOpts = append(runOpts, execution.WithVerbose(true))
+	}
+	if concurrency > 0 {
+		runOpts = append(runOpts, execution.WithMaxConcurrency(concurrency))
+	}
+	if retries > 0 {
+		runOpts = append(runOpts, execution.WithRetry(&execution.RetryConfig{
+			MaxAttempts:    retries,
+			InitialBackoff: 2 * time.Second,
+			MaxBackoff:     30 * time.Second,
+		}))
+	}
+
+	wr, err := execution.RunScans(ctx, registry, selectedNames, runOpts...)
 	if err != nil {
 		return fmt.Errorf("scan workflow execution failed: %w", err)
 	}
