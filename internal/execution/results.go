@@ -111,17 +111,6 @@ func (rc *resultCollector) register(name string, index int) {
 	rc.orderIndex[name] = index
 }
 
-func (rc *resultCollector) record(name string, clean domain.CleanResult, err error, duration time.Duration) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
-	rc.results = append(rc.results, StepResult{
-		Name:     name,
-		Clean:    clean,
-		Err:      err,
-		Duration: duration,
-	})
-}
-
 // recordFinal stores the result of a step, replacing any previous entry for
 // the same step name. This prevents duplicate entries when go-workflow retries
 // a step — only the final outcome is kept.

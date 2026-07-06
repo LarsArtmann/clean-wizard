@@ -18,6 +18,9 @@ import (
 // cleaner registry and runs a dry-run clean workflow through the go-workflow engine.
 // It verifies the end-to-end path: DI registry → builder → workflow.Do → result aggregation.
 func TestRunCleaners_RealRegistry_DryRun(t *testing.T) {
+	if testing.Short() {
+		t.Skip("integration test: uses real system cleaners (slow)")
+	}
 	registry, err := cleaner.DefaultRegistryWithConfig(false, true) // dryRun=true
 	require.NoError(t, err)
 	require.NotNil(t, registry)
@@ -111,10 +114,23 @@ func TestRunCleaners_Retry(t *testing.T) {
 	)
 	require.NoError(t, err)
 	require.NotNil(t, wr)
+
+	// CRITICAL: despite 3 total attempts (2 failures + 1 success), there must be
+	// exactly ONE step entry — recordFinal replaces, not appends.
+	require.Len(t, wr.Steps, 1, "retried step must produce exactly 1 entry, not one per attempt")
+	assert.Equal(t, "retry-me", wr.Steps[0].Name)
+	assert.Equal(t, StepStatusSucceeded, wr.Steps[0].Status())
+	assert.Equal(t, uint64(42), wr.Steps[0].Clean.FreedBytes)
+
+	// Verify retries actually happened (2 failures before success)
+	assert.Equal(t, int32(3), atomic.LoadInt32(&failingThenSucceeding.attempts))
 }
 
 // TestRunScans_RealRegistry_DryRun is an integration test for the scan workflow path.
 func TestRunScans_RealRegistry_DryRun(t *testing.T) {
+	if testing.Short() {
+		t.Skip("integration test: uses real system cleaners (slow)")
+	}
 	registry, err := cleaner.DefaultRegistryWithConfig(false, true)
 	require.NoError(t, err)
 
