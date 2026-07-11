@@ -82,7 +82,12 @@
               homepage = "https://github.com/LarsArtmann/clean-wizard";
               license = lib.licenses.mit;
               mainProgram = "clean-wizard";
-              maintainers = [ lib.maintainers.larsartmann ];
+              maintainers = [
+                {
+                  name = "Lars Artmann";
+                  github = "LarsArtmann";
+                }
+              ];
               platforms = lib.platforms.unix;
             };
           };
