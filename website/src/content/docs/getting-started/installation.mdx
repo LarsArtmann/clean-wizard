@@ -1,0 +1,54 @@
+---
+title: Installation
+description: Install Clean Wizard on macOS or Linux.
+---
+
+## Requirements
+
+- Go 1.26 or later
+- macOS or Linux
+
+## Install from Source
+
+```bash
+go install github.com/LarsArtmann/clean-wizard@latest
+```
+
+The binary is placed in `$GOPATH/bin` (typically `~/go/bin`).
+
+## Build from Source
+
+```bash
+git clone https://github.com/LarsArtmann/clean-wizard.git
+cd clean-wizard
+go build -o clean-wizard ./cmd/clean-wizard/
+```
+
+> **Note:** Clean Wizard uses `encoding/json/v2`. If building outside the Nix devShell, set `GOEXPERIMENT=jsonv2`:
+>
+> ```bash
+> GOEXPERIMENT=jsonv2 go build -o clean-wizard ./cmd/clean-wizard/
+> ```
+
+## Nix
+
+If using Nix flakes, enter the devShell which sets `GOEXPERIMENT` automatically:
+
+```bash
+nix develop
+go build -o clean-wizard ./cmd/clean-wizard/
+```
+
+## Verify Installation
+
+```bash
+clean-wizard --help
+```
+
+You should see the CLI help with `clean` and `scan` commands.
+
+## Next Steps
+
+- Follow the [Quick Start](/getting-started/quick-start/) for usage examples
+- Learn about [Preset Modes](/guides/preset-modes/) for quick, standard, and aggressive cleanup
+- See the [CLI Reference](/cli-reference/) for all flags

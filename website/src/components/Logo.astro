@@ -1,0 +1,19 @@
+---
+export interface Props {
+  width?: number;
+  height?: number;
+  class?: string;
+}
+
+const { width = 28, height = 28, class: className } = Astro.props;
+---
+
+<svg class={className} width={width} height={height} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Clean Wizard logo">
+  <rect width="28" height="28" rx="6" class="fill-[var(--color-accent)]" />
+  <path d="M8 19c0-3 2-5 6-5s6 2 6 5" class="stroke-[var(--color-bg-primary)]" stroke-width="2" stroke-linecap="round" fill="none" />
+  <path d="M14 4v8" class="stroke-[var(--color-bg-primary)]" stroke-width="2" stroke-linecap="round" />
+  <path d="M11 8l3-4 3 4" class="stroke-[var(--color-bg-primary)]" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <circle cx="10" cy="22" r="1" class="fill-[var(--color-bg-primary)]" />
+  <circle cx="14" cy="23" r="1" class="fill-[var(--color-bg-primary)]" />
+  <circle cx="18" cy="22" r="1" class="fill-[var(--color-bg-primary)]" />
+</svg>

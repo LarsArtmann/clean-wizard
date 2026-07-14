@@ -1,0 +1,44 @@
+---
+title: Related Tools
+description: Tools that complement Clean Wizard.
+---
+
+## SystemNix
+
+[SystemNix](https://github.com/LarsArtmann/SystemNix) is the predecessor to Clean Wizard. It is a POSIX shell script that performs similar cleanup operations.
+
+Clean Wizard was built to address SystemNix's limitations: no type safety, no dry-run, no TUI, no JSON output, no retry support.
+
+| Feature     | SystemNix | Clean Wizard |
+| ----------- | --------- | ------------ |
+| Language    | Shell     | Type-safe Go |
+| Dry-run     | No        | Yes          |
+| TUI         | No        | Yes          |
+| JSON output | No        | Yes          |
+| Retry       | No        | Yes          |
+
+## go-error-family
+
+[go-error-family](https://github.com/LarsArtmann/go-error-family) provides behavioral error classification used by Clean Wizard to drive retry decisions, skip/failed classification, and exit codes.
+
+All Clean Wizard errors classify into 5 families: Rejection, Conflict, Transient, Corruption, Infrastructure.
+
+## Nix
+
+[Nix](https://nixos.org/) is the package manager that Clean Wizard's Nix cleaner targets. The cleaner removes old generations and runs garbage collection while always protecting the current generation.
+
+## Docker
+
+[Docker](https://www.docker.com/) is targeted by the Docker cleaner, which removes stopped containers, dangling images, unused volumes, and build cache.
+
+## Charm Bracelet
+
+Clean Wizard's TUI is built with:
+
+- [Huh](https://github.com/charmbracelet/huh) — Interactive forms
+- [Lipgloss](https://github.com/charmbracelet/lipgloss) — Terminal styling
+- [Fang](https://github.com/charmbracelet/fang) — Help command generation
+
+## Azure go-workflow
+
+[Azure/go-workflow](https://github.com/Azure/go-workflow) powers Clean Wizard's parallel execution engine. Cleaners are compiled into a DAG of steps with retry support and panic recovery.

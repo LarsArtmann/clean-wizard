@@ -1,0 +1,108 @@
+---
+title: CLI Reference
+description: All commands and flags for Clean Wizard.
+---
+
+## Commands
+
+### `clean-wizard clean`
+
+The main cleanup command.
+
+```bash
+clean-wizard clean [flags]
+```
+
+#### Flags
+
+| Flag              | Short | Description                                             | Default                              |
+| ----------------- | ----- | ------------------------------------------------------- | ------------------------------------ |
+| `--mode`          | `-m`  | Preset mode: `quick`, `standard`, `aggressive`          | `standard`                           |
+| `--config`        | `-c`  | Path to config file                                     | `~/.config/clean-wizard/config.yaml` |
+| `--profile`       | `-p`  | Configuration profile                                   | `""`                                 |
+| `--dry-run`       |       | Preview without making changes                          | `false`                              |
+| `--json`          |       | Machine-readable JSON output                            | `false`                              |
+| `--verbose`       |       | Detailed logging                                        | `false`                              |
+| `--yes`           | `-y`  | Skip confirmation prompts                               | `false`                              |
+| `--retries`       |       | Retry attempts per cleaner (0=disabled)                 | `3`                                  |
+| `--retry-profile` |       | Preset: `default`, `aggressive`, `conservative`, `none` | `""`                                 |
+| `--concurrency`   | `-C`  | Max concurrent cleaners (0=unlimited)                   | `0`                                  |
+
+#### Examples
+
+```bash
+# Interactive TUI
+clean-wizard clean
+
+# Quick daily cleanup
+clean-wizard clean --mode quick
+
+# Aggressive cleanup with preview first
+clean-wizard clean --mode aggressive --dry-run
+clean-wizard clean --mode aggressive --yes
+
+# JSON output for automation
+clean-wizard clean --json --yes
+
+# With custom config and profile
+clean-wizard clean --config ./my-config.yaml --profile weekly
+
+# High concurrency with no retries
+clean-wizard clean --concurrency 8 --retries 0
+```
+
+### `clean-wizard scan`
+
+Scans for reclaimable space without cleaning.
+
+```bash
+clean-wizard scan [flags]
+```
+
+#### Flags
+
+| Flag              | Short | Description                                             | Default |
+| ----------------- | ----- | ------------------------------------------------------- | ------- |
+| `--json`          |       | Machine-readable JSON output                            | `false` |
+| `--verbose`       |       | Detailed breakdown per cleaner                          | `false` |
+| `--retries`       |       | Retry attempts per scanner (0=disabled)                 | `3`     |
+| `--retry-profile` |       | Preset: `default`, `aggressive`, `conservative`, `none` | `""`    |
+
+#### Examples
+
+```bash
+# Interactive scan
+clean-wizard scan
+
+# JSON output
+clean-wizard scan --json
+
+# Verbose per-cleaner breakdown
+clean-wizard scan --verbose
+```
+
+### `clean-wizard config`
+
+Initialize or validate configuration files.
+
+```bash
+clean-wizard config init    # Create default config file
+clean-wizard config validate # Validate existing config
+```
+
+## Global Flags
+
+| Flag              | Description               |
+| ----------------- | ------------------------- |
+| `--help`, `-h`    | Show help for any command |
+| `--version`, `-v` | Print version information |
+
+## Exit Codes
+
+| Code | Meaning                                                    |
+| ---- | ---------------------------------------------------------- |
+| `0`  | Success                                                    |
+| `1`  | Configuration error or state conflict (Rejection/Conflict) |
+| `65` | Data corruption (Corruption)                               |
+| `69` | Required tool not installed (Infrastructure)               |
+| `75` | Transient failure after retries (Transient)                |

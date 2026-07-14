@@ -1,0 +1,128 @@
+---
+title: Automation & CI
+description: Integrate Clean Wizard into scripts, cron jobs, and CI/CD pipelines.
+---
+
+## JSON Output
+
+The `--json` flag produces machine-readable output:
+
+```bash
+clean-wizard clean --mode quick --json --yes
+```
+
+```json
+{
+  "success": true,
+  "freed_bytes": 2947483648,
+  "duration_ms": 3100,
+  "cleaners": {
+    "homebrew": {
+      "freed_bytes": 245000000,
+      "success": true,
+      "family": null,
+      "code": null,
+      "retryable": false
+    },
+    "go": {
+      "freed_bytes": 1204000000,
+      "success": true,
+      "family": null,
+      "code": null,
+      "retryable": false
+    },
+    "node": {
+      "freed_bytes": 380000000,
+      "success": true,
+      "family": null,
+      "code": null,
+      "retryable": false
+    }
+  }
+}
+```
+
+Failed or skipped cleaners include error classification fields (`family`, `code`, `retryable`).
+
+## Skip Confirmation
+
+Use `--yes` (or `-y`) to skip the interactive confirmation:
+
+```bash
+clean-wizard clean --mode quick --yes
+```
+
+## Retry Configuration
+
+Transient failures (exec timeouts, I/O errors) are automatically retried:
+
+```bash
+# Default: 3 retries with exponential backoff
+clean-wizard clean --mode standard
+
+# Disable retries
+clean-wizard clean --retries 0
+
+# Use a retry profile preset
+clean-wizard clean --retry-profile aggressive
+```
+
+| Profile        | Attempts | Backoff           |
+| -------------- | -------- | ----------------- |
+| `default`      | 3        | Exponential       |
+| `aggressive`   | 5        | Short exponential |
+| `conservative` | 2        | Long exponential  |
+| `none`         | 0        | Disabled          |
+
+## Exit Codes
+
+Clean Wizard uses BSD sysexits codes for error classification:
+
+| Code | Family               | Meaning                                   |
+| ---- | -------------------- | ----------------------------------------- |
+| 0    | —                    | Success                                   |
+| 1    | Rejection / Conflict | Bad config, invalid input, state conflict |
+| 65   | Corruption           | Nix store corruption                      |
+| 69   | Infrastructure       | Tool not installed (cleaner skipped)      |
+| 75   | Transient            | Exec failure, timeout (retryable)         |
+
+## GitHub Actions Example
+
+```yaml
+name: Cleanup
+on:
+  schedule:
+    - cron: "0 3 * * 0" # Weekly Sunday at 3 AM
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+
+      - name: Install Clean Wizard
+        run: go install github.com/LarsArtmann/clean-wizard@latest
+
+      - name: Clean
+        run: clean-wizard clean --mode quick --json --yes
+```
+
+## Cron Job
+
+```bash
+# Daily quick cleanup at 3 AM
+0 3 * * * /home/user/go/bin/clean-wizard clean --mode quick --yes >> /var/log/clean-wizard.log 2>&1
+```
+
+## Parsing Results with jq
+
+```bash
+# Total freed bytes
+clean-wizard clean --json --yes | jq '.freed_bytes'
+
+# Per-cleaner breakdown
+clean-wizard clean --json --yes | jq '.cleaners | to_entries[] | {cleaner: .key, freed: .value.freed_bytes}'
+```

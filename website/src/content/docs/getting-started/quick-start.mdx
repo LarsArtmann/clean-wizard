@@ -1,0 +1,84 @@
+---
+title: Quick Start
+description: Start cleaning disk space in under a minute.
+---
+
+## Interactive Mode
+
+The simplest way to use Clean Wizard:
+
+```bash
+clean-wizard clean
+```
+
+This opens an interactive TUI where you select which cleaners to run. Clean Wizard auto-detects which tools are installed and only shows available cleaners.
+
+## Preset Modes
+
+Skip the TUI with preset modes:
+
+```bash
+# Quick — safe daily cleanup (Homebrew, Go, Node, TempFiles, BuildCache)
+clean-wizard clean --mode quick
+
+# Standard — all available cleaners
+clean-wizard clean --mode standard
+
+# Aggressive — everything including system caches and full Docker volumes
+clean-wizard clean --mode aggressive
+```
+
+## Dry-Run Preview
+
+Always preview before cleaning:
+
+```bash
+clean-wizard clean --mode quick --dry-run
+```
+
+Output shows what would be cleaned and estimated space freed. No files are touched.
+
+## JSON Output
+
+For scripts and CI/CD:
+
+```bash
+clean-wizard clean --json --yes
+```
+
+Returns machine-readable JSON with per-cleaner results:
+
+```json
+{
+  "success": true,
+  "freed_bytes": 2947483648,
+  "duration_ms": 3100,
+  "cleaners": {
+    "homebrew": { "freed_bytes": 245000000, "success": true },
+    "go": { "freed_bytes": 1204000000, "success": true }
+  }
+}
+```
+
+## Scan (Without Cleaning)
+
+Check what can be cleaned without running anything:
+
+```bash
+clean-wizard scan
+clean-wizard scan --json
+```
+
+## Skip Confirmation
+
+For automation where you have already previewed:
+
+```bash
+clean-wizard clean --mode quick --yes
+```
+
+## Next Steps
+
+- [Cleaners](/guides/cleaners/) — detailed breakdown of all 13 cleaners
+- [Configuration](/guides/configuration/) — YAML profiles and per-cleaner settings
+- [Automation & CI](/guides/automation/) — integrate with CI/CD pipelines

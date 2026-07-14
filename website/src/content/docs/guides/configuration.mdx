@@ -1,0 +1,106 @@
+---
+title: Configuration
+description: YAML configuration file, profiles, and per-cleaner settings.
+---
+
+## Config File Location
+
+```bash
+~/.config/clean-wizard/config.yaml
+```
+
+Override with the `--config` flag or `CLEAN_WIZARD_CONFIG` environment variable.
+
+## Full Example
+
+```yaml
+# Preset definitions
+presets:
+  quick:
+    cleaners: [homebrew, go, node, tempfiles, buildcache]
+
+  standard:
+    cleaners: [homebrew, go, node, cargo, tempfiles, buildcache, systemcache, docker, nix]
+
+  aggressive:
+    cleaners: [all]
+    include_dangerous: true
+
+# Per-cleaner settings
+nix:
+  keep_generations: 5
+
+docker:
+  timeout: 2m
+  include_volumes: true
+
+tempfiles:
+  older_than: 7d
+  exclude_paths:
+    - /tmp/important-*
+
+# Output settings
+output:
+  json: false
+  verbose: false
+```
+
+## Environment Variables
+
+| Variable               | Description          |
+| ---------------------- | -------------------- |
+| `CLEAN_WIZARD_CONFIG`  | Path to config file  |
+| `CLEAN_WIZARD_DRY_RUN` | Default dry-run mode |
+| `CLEAN_WIZARD_VERBOSE` | Default verbose mode |
+
+## Per-Cleaner Settings
+
+### Nix
+
+```yaml
+nix:
+  keep_generations: 5 # Generations to keep (besides current)
+```
+
+### Docker
+
+```yaml
+docker:
+  timeout: 2m # Operation timeout
+  include_volumes: true # Remove unused volumes
+```
+
+### TempFiles
+
+```yaml
+tempfiles:
+  older_than: 7d # Age threshold
+  exclude_paths: # Glob patterns to skip
+    - /tmp/important-*
+    - /var/tmp/myapp-*
+```
+
+### BuildCache
+
+```yaml
+buildcache:
+  older_than: 30d # Only clean caches older than this
+```
+
+## Profiles
+
+Profiles let you override settings for specific use cases:
+
+```yaml
+presets:
+  ci-cleanup:
+    cleaners: [go, node, tempfiles]
+    include_dangerous: false
+
+nix:
+  keep_generations: 3
+```
+
+```bash
+clean-wizard clean --profile ci-cleanup
+```

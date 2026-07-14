@@ -1,0 +1,70 @@
+---
+title: Changelog
+description: All notable changes to Clean Wizard.
+---
+
+## Error Classification Integration
+
+### Added
+
+- **`go-error-family` integration** — All errors now classify into 5 families: Rejection, Conflict, Transient, Corruption, Infrastructure
+- **Per-cleaner error codes** — `NotAvailableError` derives codes like `cleaner.nix.not_available`, `cleaner.docker.not_available`
+- **`RetryProfile` presets** — `--retry-profile` flag (default/aggressive/conservative/none) on both clean and scan commands
+- **CLI exit codes** — `errorfamily.ExitCode()` maps families to BSD sysexits codes (Rejection=1, Transient=75, Infrastructure=69, Corruption=65)
+- **Structured error logging** — `errorfamily.LogError()` adds slog output with family/code/retryable fields
+- **Smart retry** — `errorfamily.IsRetryable()` returns false for non-Transient errors, preventing wasteful retries
+
+### Changed
+
+- `NotAvailableError` implements `Classified` + `Coded` via `NewNotAvailableError(name, reason)` factory
+- `ValidationError` implements `Classified` (Rejection) with code `validation.rejected`
+- `*exec.ExitError` classified as Transient (retryable)
+- `*os.PathError` with permanent errno (ENOSPC/EROFS/ELOOP) classified as Rejection
+- JSON output includes `family`/`code`/`retryable` fields for skipped/failed cleaners
+- Cleaners sorted by name in JSON output for deterministic results
+
+## Workflow & Execution
+
+### Added
+
+- **Parallel execution** via go-workflow DAG with configurable `MaxConcurrency`
+- **Panic recovery** in step functions — panics recorded as failed steps
+- **Deterministic ordering** — step results sorted by registration order regardless of parallel completion
+- **`--concurrency` flag** on clean command (0=unlimited)
+
+## Cleaners
+
+### Added
+
+- **Golangci-lint cleaner** — Cleans `~/.cache/golangci-lint` cache directory
+- **Linux system cache types** — pip, npm, yarn, ccache cache cleaning for Linux/NixOS
+- **27 type-safe CacheType enums** — Compile-time constants for all cache types
+
+### Improved
+
+- Docker cleaner — refactored with proper prune modes (ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS)
+- Go cleaner — bit-flag based cache type selection
+- Node cleaner — multi-PM support (npm, pnpm, yarn, bun) with graceful degradation
+
+## Architecture
+
+### Changed
+
+- **DI container** — `samber/do v2` with `RegisterAllServices` and typed accessors
+- **`encoding/json/v2`** — Migrated from `encoding/json` to v2 (requires `GOEXPERIMENT=jsonv2`)
+- **`Result[T]` type** — Functional error handling in cleaner methods
+
+### Known Issues
+
+- `internal/domain/` is a god package (23 files)
+- `internal/cleaner/` has 50+ files flat (no sub-packages)
+- Cleaners use hardcoded defaults instead of user profile config
+- Logger uses mutable package-level globals (causes test race conditions)
+
+## Testing
+
+- 300+ test functions across 65+ test files
+- Ginkgo BDD tests for: GitHistory, Nix, CompiledBinaries, ProjectExecutables
+- Error classification tests: PathError matrix, NotAvailableError codes, exec.ErrNotFound
+- CLI integration test: dry-run JSON pipeline
+- Integration tests use `testing.Short()` skip guards for real-system tests

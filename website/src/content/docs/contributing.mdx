@@ -1,0 +1,103 @@
+---
+title: Contributing
+description: How to contribute to Clean Wizard.
+---
+
+## Development Setup
+
+**Requirements:** Go 1.26+, `GOEXPERIMENT=jsonv2`
+
+```bash
+git clone https://github.com/LarsArtmann/clean-wizard.git
+cd clean-wizard
+nix develop  # Sets GOEXPERIMENT automatically
+```
+
+If not using Nix:
+
+```bash
+export GOEXPERIMENT=jsonv2
+go mod download
+```
+
+## Building
+
+```bash
+go build -o clean-wizard ./cmd/clean-wizard/
+```
+
+## Testing
+
+```bash
+# Run all tests
+go test ./...
+
+# With race detector
+go test -race ./...
+
+# Short tests only (skip real-system tests)
+go test ./... -short
+
+# BDD scenarios
+go test ./tests/bdd/...
+
+# Coverage report
+go test -cover ./...
+
+# Benchmarks
+go test -bench=. ./...
+```
+
+## Linting
+
+```bash
+golangci-lint run ./...
+```
+
+## Adding a New Cleaner
+
+1. **Implement the interface** in `internal/cleaner/`:
+
+```go
+type MyCleaner struct {
+    verbose bool
+    dryRun  bool
+}
+
+func (c *MyCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+    // Implementation
+}
+
+func (c *MyCleaner) IsAvailable(ctx context.Context) bool {
+    // Check if tool is installed
+}
+```
+
+2. **Register in the factory** (`internal/cleaner/registry_factory.go`):
+
+```go
+registry.Register("mycleaner", NewMyCleaner(verbose, dryRun))
+```
+
+3. **Add domain enums** if needed (`internal/domain/`)
+
+4. **Write tests** — unit tests, and ideally a Ginkgo BDD test in `tests/bdd/`
+
+5. **Update configuration schema** if the cleaner has settings
+
+## Pull Requests
+
+1. Fork and clone the repository
+2. Create a feature branch (`git switch -c feature/new-cleaner`)
+3. Run tests (`go test -race ./...`)
+4. Ensure linting passes (`golangci-lint run ./...`)
+5. Open a pull request with a clear description
+
+## Code Style
+
+- Strong types over runtime checks
+- Early returns over nested conditionals
+- `Result[T]` for error handling in cleaner methods
+- `t.Parallel()` on most tests
+- `t.TempDir()` for filesystem isolation in tests
+- Full words for variable names (no abbreviations)

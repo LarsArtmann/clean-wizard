@@ -1,0 +1,81 @@
+---
+title: Preset Modes
+description: Quick, standard, and aggressive cleanup presets.
+---
+
+Clean Wizard ships with three preset modes that select which cleaners run. Each mode is designed for a different use case.
+
+## Quick Mode
+
+```bash
+clean-wizard clean --mode quick
+```
+
+Safe daily cleanup. Excludes system-critical paths and operations that require elevated privileges.
+
+**Cleaners:**
+
+- Homebrew
+- Go
+- Node
+- TempFiles
+- BuildCache
+
+**Best for:** Daily or weekly developer workstation cleanup.
+
+## Standard Mode
+
+```bash
+clean-wizard clean --mode standard
+```
+
+Full cleanup with all available cleaners. This is the default.
+
+**Cleaners:** Everything from quick mode, plus:
+
+- Nix (generation cleanup + garbage collection)
+- Docker (system prune)
+- Cargo
+- SystemCache
+- ProjectExec
+- CompiledBinaries
+- GitHistory
+- Golangci-lint
+
+**Best for:** Periodic deep cleanup (monthly).
+
+## Aggressive Mode
+
+```bash
+clean-wizard clean --mode aggressive
+```
+
+Nuclear cleanup including destructive operations.
+
+**Additional behavior:**
+
+- Full Docker with volumes (no keep count)
+- All Nix generations (except current)
+- All system caches
+
+> **Warning:** Aggressive mode includes destructive operations. Always use `--dry-run` first.
+
+**Best for:** CI/CD cleanup steps, fresh installs, or when you need maximum space reclamation.
+
+## Custom Presets
+
+Define your own presets in the config file:
+
+```yaml
+presets:
+  my-weekly:
+    cleaners: [go, node, docker, nix]
+```
+
+Then run:
+
+```bash
+clean-wizard clean --profile my-weekly
+```
+
+See [Configuration](/guides/configuration/) for details.

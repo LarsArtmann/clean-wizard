@@ -1,0 +1,147 @@
+---
+title: Cleaners
+description: All 13 specialized cleaners and what they target.
+---
+
+Clean Wizard includes 13 cleaners, each targeting a specific source of disk waste. Each cleaner auto-detects whether its target tool is installed and available. Unavailable cleaners are silently skipped.
+
+## Nix
+
+Cleans old Nix generations and runs garbage collection.
+
+| Setting            | Default | Description                                     |
+| ------------------ | ------- | ----------------------------------------------- |
+| `keep_generations` | 5       | Number of generations to keep (besides current) |
+
+- Current generation is always protected
+- Runs `nix-collect-garbage` after generation cleanup
+- Platform: Linux
+
+## Homebrew
+
+Cleans Homebrew cache downloads, dead symlinks, and runs autoremove.
+
+- `brew cleanup` — removes cached downloads
+- `brew prune` — removes dead symlinks
+- `brew autoremove` — removes unused dependencies
+- Platform: macOS
+
+## Docker
+
+Removes stopped containers, dangling images, unused volumes, and build cache.
+
+| Setting           | Default | Description           |
+| ----------------- | ------- | --------------------- |
+| `timeout`         | 2m      | Operation timeout     |
+| `include_volumes` | true    | Remove unused volumes |
+
+- Runs `docker system prune` with appropriate flags
+- Docker daemon must be running (not just installed)
+- Platform: Both
+
+## Cargo
+
+Cleans Rust Cargo registry and git cache.
+
+- Runs `cargo clean` for local projects
+- Uses `cargo-cache --autoclean` if available
+- Falls back to manual cache directory cleaning
+- Platform: Both
+
+## Go
+
+Cleans Go build cache, test cache, module cache, and lint cache.
+
+| Cache Type   | Flag          | Cleaned With                     |
+| ------------ | ------------- | -------------------------------- |
+| Build cache  | `GOCACHE`     | `go clean -cache`                |
+| Test cache   | `GOTESTCACHE` | `go clean -testcache`            |
+| Module cache | `GOMODCACHE`  | `go clean -modcache`             |
+| Lint cache   | golangci-lint | Removes `~/.cache/golangci-lint` |
+
+- Type-safe bit-flag selection for selective cleaning
+- Platform: Both
+
+## Node
+
+Cleans package manager caches for npm, pnpm, yarn, and bun.
+
+- `npm cache clean --force`
+- `pnpm store prune`
+- `yarn cache clean`
+- `bun pm cache rm`
+- Discovers cache locations dynamically
+- Platform: Both
+
+## BuildCache
+
+Cleans JVM build tool caches.
+
+| Tool   | Path                         |
+| ------ | ---------------------------- |
+| Gradle | `~/.gradle/caches`           |
+| Maven  | `~/.m2/repository/**/*.part` |
+| SBT    | `~/.ivy2/cache`              |
+
+- Age-based filtering with configurable `older_than`
+- Platform: Both
+
+## SystemCache
+
+Cleans OS-specific caches.
+
+**macOS:**
+
+- Spotlight metadata
+- Xcode DerivedData
+- CocoaPods cache
+- Homebrew cache
+
+**Linux:**
+
+- pip cache
+- npm cache
+- yarn cache
+- ccache
+
+- Platform-aware via `runtime.GOOS`
+- Age-based filtering
+
+## TempFiles
+
+Removes temporary files older than a configurable age.
+
+| Setting         | Default | Description              |
+| --------------- | ------- | ------------------------ |
+| `older_than`    | 7d      | Age threshold            |
+| `exclude_paths` | `[]`    | Glob patterns to exclude |
+
+- Platform: Both
+
+## ProjectExec
+
+Removes old compiled shell scripts and executables from `~/projects`.
+
+- Scans for stale binary files
+- Platform: Both
+
+## CompiledBinaries
+
+Finds and removes large stale compiled binaries.
+
+- Configurable size threshold
+- Platform: Both
+
+## GitHistory
+
+Identifies large blobs bloating git repository history.
+
+- Scans for oversized objects
+- Reports potential savings
+- Platform: Both
+
+## Golangci-lint
+
+Cleans the golangci-lint cache directory (`~/.cache/golangci-lint`).
+
+- Platform: Both

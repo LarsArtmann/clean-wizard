@@ -1,0 +1,52 @@
+{
+  "name": "clean-wizard-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website and documentation for Clean Wizard — reclaim disk space across macOS and Linux",
+  "keywords": [
+    "astro",
+    "cleanup",
+    "cli",
+    "disk-space",
+    "docker",
+    "go",
+    "golang",
+    "homebrew",
+    "nix",
+    "starlight",
+    "tui"
+  ],
+  "homepage": "https://cleanwizard.lars.software",
+  "bugs": "https://github.com/LarsArtmann/clean-wizard/issues",
+  "license": "MIT",
+  "author": "LarsArtmann <lars@larsartmann.com> (https://larsartmann.com/)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LarsArtmann/clean-wizard.git",
+    "directory": "website"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "clean": "rm -rf dist .astro node_modules/.cache",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/starlight": "^0.41.1",
+    "@tailwindcss/vite": "^4.3.1",
+    "astro": "^7.0.3",
+    "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "html-validate": "^11.5.3",
+    "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "brace-expansion": "5.0.6"
+  }
+}
