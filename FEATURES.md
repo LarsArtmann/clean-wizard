@@ -1,6 +1,6 @@
 # Clean Wizard Features
 
-> **Last Updated:** 2026-06-23
+> **Last Updated:** 2026-07-13
 > **Version:** Based on codebase analysis
 > **Status:** BRUTALLY HONEST ASSESSMENT
 
@@ -26,7 +26,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ---
 
-## Core Cleaners (13 Total)
+## Core Cleaners (13 Registered)
 
 ### 1. Nix Cleaner ❄️
 
@@ -256,25 +256,19 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ---
 
-### 11. Language Version Manager Cleaner 🗑️
+### 11. Golangci-lint Cache Cleaner 🔍
 
-| Aspect              | Status             | Details                                             |
-| ------------------- | ------------------ | --------------------------------------------------- |
-| **Overall**         | 📝 NOT_IMPLEMENTED | Placeholder only                                    |
-| **Availability**    | ✅ Working         | Always available (file-based)                       |
-| **Scanning**        | ✅ Working         | Scans NVM, Pyenv, Rbenv directories                 |
-| **NVM Support**     | 📝 NOT_IMPLEMENTED | Scans only, does NOT clean                          |
-| **Pyenv Support**   | 📝 NOT_IMPLEMENTED | Scans only, does NOT clean                          |
-| **Rbenv Support**   | 📝 NOT_IMPLEMENTED | Scans only, does NOT clean                          |
-| **Clean Operation** | 📝 NOT_IMPLEMENTED | NO-OP - prints warning only                         |
-| **Domain Enum**     | 📝 PLANNED         | GVM, SDKMAN, Jenv exist in enum but NOT implemented |
+| Aspect                     | Status              | Details                              |
+| -------------------------- | ------------------- | ------------------------------------ |
+| **Overall**                | ✅ FULLY_FUNCTIONAL | Cleans golangci-lint cache directory |
+| **Availability Detection** | ✅ Working          | Always available (file-based)        |
+| **Cache Cleaning**         | ✅ Working          | Removes `~/.cache/golangci-lint`     |
+| **Dry Run Mode**           | ✅ Working          | Scans actual cache size              |
 
 **Notes:**
 
-- **IMPORTANT:** Cleaner is a placeholder - does not perform actual cleaning
-- Scanning works, but clean operation intentionally does nothing
-- Reason: Cleaning version managers is destructive and requires careful implementation
-- Future: Consider implementing with user confirmation for specific versions
+- Registered as 13th cleaner in the registry
+- Always available since it operates on a file path
 
 ---
 
@@ -383,32 +377,36 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 
 ## Testing & Quality
 
-| Aspect                   | Status       | Details                        |
-| ------------------------ | ------------ | ------------------------------ |
-| **Unit Tests**           | ✅ EXTENSIVE | 200+ tests across packages     |
-| **BDD Tests**            | ✅ WORKING   | Godog-based BDD scenarios      |
-| **Integration Tests**    | ✅ WORKING   | Real cleaner integration tests |
-| **Fuzz Tests**           | ✅ WORKING   | Multiple fuzzing targets       |
-| **Benchmark Tests**      | ✅ WORKING   | Performance benchmarks         |
-| **Test Coverage**        | ⚠️ MODERATE  | Good but not comprehensive     |
-| **Mock Implementations** | ✅ WORKING   | Mock data for CI environments  |
+| Aspect                   | Status       | Details                         |
+| ------------------------ | ------------ | ------------------------------- |
+| **Unit Tests**           | ✅ EXTENSIVE | ~300 tests across 66 test files |
+| **BDD Tests**            | ✅ WORKING   | Ginkgo-based BDD scenarios      |
+| **Integration Tests**    | ✅ WORKING   | Real cleaner integration tests  |
+| **Fuzz Tests**           | ✅ WORKING   | Multiple fuzzing targets        |
+| **Benchmark Tests**      | ✅ WORKING   | Performance benchmarks          |
+| **Test Coverage**        | ⚠️ MODERATE  | Good but not comprehensive      |
+| **Mock Implementations** | ✅ WORKING   | Mock data for CI environments   |
 
 ---
 
 ## Architecture Highlights
 
-| Pattern                  | Status               | Details                                    |
-| ------------------------ | -------------------- | ------------------------------------------ |
-| **Registry Pattern**     | ✅ FULLY_FUNCTIONAL  | Clean registry for all cleaners            |
-| **Factory Functions**    | ✅ FULLY_FUNCTIONAL  | DefaultRegistry, DefaultRegistryWithConfig |
-| **Result Type**          | ✅ FULLY_FUNCTIONAL  | Generic result.Result[T] type              |
-| **Adapter Pattern**      | ✅ FULLY_FUNCTIONAL  | External tool adapters (Nix, etc.)         |
-| **Middleware**           | ✅ FULLY_FUNCTIONAL  | Validation middleware                      |
-| **Type-Safe Enums**      | ✅ FULLY_FUNCTIONAL  | Compile-time enum safety                   |
-| **Dependency Injection** | 🔧 NEEDS_IMPROVEMENT | Some hardcoded dependencies                |
-| **AgeBasedCleaner**      | ✅ FULLY_FUNCTIONAL  | Interface for age-based filtering          |
-| **Parallel Execution**   | ✅ FULLY_FUNCTIONAL  | Concurrent cleaner execution               |
-| **Metrics Collection**   | ✅ FULLY_FUNCTIONAL  | Observability and performance tracking     |
+| Pattern                    | Status              | Details                                                  |
+| -------------------------- | ------------------- | -------------------------------------------------------- |
+| **Registry Pattern**       | ✅ FULLY_FUNCTIONAL | Thread-safe cleaner registry                             |
+| **Factory Functions**      | ✅ FULLY_FUNCTIONAL | `DefaultRegistryWithConfig(verbose, dryRun)`             |
+| **Result Type**            | ✅ FULLY_FUNCTIONAL | Generic `result.Result[T]` type                          |
+| **Adapter Pattern**        | ✅ FULLY_FUNCTIONAL | External tool adapters (Nix, Exec, HTTP, Cache)          |
+| **Middleware**             | ✅ FULLY_FUNCTIONAL | Validation middleware                                    |
+| **Type-Safe Enums**        | ✅ FULLY_FUNCTIONAL | Compile-time enum safety (19 enums, 27 CacheType values) |
+| **Dependency Injection**   | ✅ FULLY_FUNCTIONAL | `samber/do v2` DI container with typed accessors         |
+| **Workflow Orchestration** | ✅ FULLY_FUNCTIONAL | `Azure/go-workflow` DAG engine with parallel execution   |
+| **Error Classification**   | ✅ FULLY_FUNCTIONAL | `go-error-family` 5-family behavioral classification     |
+| **Retry Support**          | ✅ FULLY_FUNCTIONAL | Exponential backoff with `RetryProfile` presets          |
+| **CLI Exit Codes**         | ✅ FULLY_FUNCTIONAL | BSD sysexits via `errorfamily.ExitCode()`                |
+| **AgeBasedCleaner**        | ✅ FULLY_FUNCTIONAL | Interface for age-based filtering                        |
+| **Parallel Execution**     | ✅ FULLY_FUNCTIONAL | Concurrent cleaner execution via workflow DAG            |
+| **Metrics Collection**     | ✅ FULLY_FUNCTIONAL | Observability and performance tracking                   |
 
 ---
 
@@ -416,16 +414,13 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 
 ### Critical Issues
 
-1. **Language Version Manager Cleaner is not implemented** 📝
-   - Scans but never cleans
-   - Intentionally placeholder to avoid destructive behavior
-
-2. **Projects Management Automation requires external tool** 🚧
+1. **Projects Management Automation requires external tool** 🚧
    - Depends on tool most users won't have
    - Effectively non-functional
 
-3. ~~**Most CLI commands not implemented**~~ ✅ FIXED
-   - All 6 commands fully implemented: `clean`, `scan`, `init`, `profile`, `config`, `git-history`
+2. **Cleaners use hardcoded defaults instead of config profiles** ⚠️
+   - User YAML settings don't reach individual cleaner constructors
+   - Pre-existing issue; DI container wraps the factory rather than per-cleaner providers
 
 ### Minor Issues
 
@@ -438,28 +433,37 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
    - Suggests manual `brew cleanup -n` for preview
 
 6. **Enum/Implementation mismatch** 🔧
-   - Several enums have values not used in implementations
-   - Dead code in domain layer
-   - Enum system now consolidated onto unified helpers (2026-04-03)
+   - Several enums have values not used in implementations (BuildToolType, VersionManagerType)
+   - Enum system consolidated onto unified helpers (2026-04-03)
+
+7. **Logger uses mutable package-level globals** ⚠️
+   - `L`, `StdLogger` cause test race conditions
+   - `t.Parallel()` removed from logger tests as workaround
+
+8. **`internal/domain/` is a god package** ⚠️
+   - 23 files in one flat package
+   - Should be split into `enums/`, `operations/`, `types/`
 
 ---
 
 ## Feature Matrix Summary
 
-| Cleaner          | Available | Scan | Clean | Dry-Run | Size Accurate | Status              |
-| ---------------- | --------- | ---- | ----- | ------- | ------------- | ------------------- |
-| Nix              | ✅        | ✅   | ✅    | 🧪      | 🧪            | ✅ Production Ready |
-| Homebrew         | ✅        | ✅   | ✅    | 🚧      | 🧪            | ✅ Production Ready |
-| Docker           | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Go               | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Cargo            | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Node Packages    | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Build Cache      | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools    |
-| System Cache     | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Test Failures    |
-| Temp Files       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Git History      | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Lang Version Mgr | ✅        | ✅   | 📝    | 📝      | N/A           | 📝 Not Implemented  |
-| Projects Mgmt    | 🚧        | 🧪   | 🚧    | 🧪      | 🧪            | 🚧 Non-Functional   |
+| Cleaner             | Available | Scan | Clean | Dry-Run | Size Accurate | Status              |
+| ------------------- | --------- | ---- | ----- | ------- | ------------- | ------------------- |
+| Nix                 | ✅        | ✅   | ✅    | 🧪      | 🧪            | ✅ Production Ready |
+| Homebrew            | ✅        | ✅   | ✅    | 🚧      | 🧪            | ✅ Production Ready |
+| Docker              | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Go                  | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Golangci-lint       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Cargo               | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Node Packages       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Build Cache         | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools    |
+| System Cache        | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Temp Files          | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Git History         | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Project Executables | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Compiled Binaries   | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
+| Projects Mgmt       | 🚧        | 🧪   | 🚧    | 🧪      | 🧪            | 🚧 Non-Functional   |
 
 ---
 
@@ -469,13 +473,13 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 
 1. **Use with confidence:** Nix, Homebrew, Docker, Go, Cargo, Node, System Cache, Temp Files, Git History cleaners
 2. **Use with caution:** Build Cache (limited tool support), Git History (rewrites history - requires force-push)
-3. **Don't rely on:** Language Version Manager (not implemented), Projects Management Automation (requires external tool)
+3. **Don't rely on:** Projects Management Automation (requires external tool)
 
 ### For Contributors
 
 1. **Priority 1:** Improve size estimation for Nix cleaner (currently uses hardcoded estimate)
 2. **Priority 2:** Add dry-run support for Homebrew cleaner
-3. **Priority 3:** Implement remaining enum values (BuildToolType, VersionManagerType)
+3. **Priority 3:** Implement remaining enum values (BuildToolType — Go, Rust, Node, Python)
 4. **Priority 4:** Enhance Projects Management Automation (currently requires external tools)
 
 ---
@@ -486,16 +490,20 @@ Clean Wizard has a **solid foundation** with excellent architecture and type saf
 
 **Recent Improvements:**
 
+- DI container + workflow orchestration engine (2026-07-06): `samber/do v2` + `Azure/go-workflow`
+- `go-error-family` error classification (2026-07-06): 5-family behavioral classification with CLI exit codes
+- Retry support with `RetryProfile` presets (2026-07-06): default/aggressive/conservative/none
 - Enum consolidation refactor (2026-04-03): 52% line reduction across 4 files, unified generic helpers
 - Docker, Go, Cargo, Node cleaners now scan actual cache sizes instead of using hardcoded estimates
 - System Cache cleaner now supports both macOS and Linux
-- Size reporting works correctly for most cleaners
 
 **Remaining Gaps:**
 
-- ~18% of cleaners are non-functional or placeholders (Projects Management Automation requires external tools)
+- Projects Management Automation requires external tools (non-functional for most users)
 - Nix cleaner still uses hardcoded size estimation
 - Homebrew cleaner lacks dry-run support
+- Cleaners use hardcoded defaults instead of user config profiles
+- `internal/domain/` god package (23 files) needs splitting
 
 **Overall Project Status:** ✅ **PRODUCTION READY** - Core cleaners work well with accurate size reporting and dry-run support.
 

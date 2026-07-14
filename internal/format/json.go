@@ -1,7 +1,8 @@
 package format
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"sort"
 	"time"
@@ -110,7 +111,7 @@ func CleanResultsToJSON(
 	// Set human-readable freed space
 	output.FreedHuman = Bytes(int64(output.FreedBytes))
 
-	data, err := json.MarshalIndent(output, "", "  ")
+	data, err := json.Marshal(output, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal JSON output (duration=%v): %w", duration, err)
 	}

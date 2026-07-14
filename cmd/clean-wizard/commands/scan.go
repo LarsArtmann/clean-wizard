@@ -2,7 +2,8 @@ package commands
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"strconv"
 
@@ -322,7 +323,7 @@ func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
 		},
 	}
 
-	jsonBytes, err := json.MarshalIndent(output, "", "  ")
+	jsonBytes, err := json.Marshal(output, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	if err != nil {
 		fmt.Printf("{\"error\": %q}\n", err.Error())
 

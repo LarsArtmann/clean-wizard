@@ -146,53 +146,25 @@ value := result.UnwrapOr(defaultValue)
 - `Sequence()` / `Traverse()` — Convert slice of Results
 - `OrElse()` — Provide fallback results
 
-### 5. BranchFlow Type
+### 5. Workflow Orchestration (Azure/go-workflow)
 
-Complex conditional branching flows (`internal/result/branch_flow.go`):
-
-```go
-// Conditional branching with fallback
-flow := NewBranchFlow[int]().
-    Branch(func() bool { return isAdmin }, func() Result[int] { return Ok(42) }).
-    Branch(func() bool { return isUser }, func() Result[int] { return Ok(10) }).
-    Fallback(func() Result[int] { return Ok(1) })
-
-result := flow.Execute()
-
-// Value-based branching
-cases := []Case[int, string]{
-    {Predicate: func(i int) bool { return i < 0 }, Execute: func() Result[string] { return Ok("negative") }},
-    {Predicate: func(i int) bool { return i == 0 }, Execute: func() Result[string] { return Ok("zero") }},
-    {Predicate: func(i int) bool { return i > 0 }, Execute: func() Result[string] { return Ok("positive") }},
-}
-result := SwitchFlow(value, cases, func() Result[string] { return Ok("unknown") })
-```
-
-### 6. FlowBuilder & Pipeline
-
-Pipeline composition (`internal/result/flow_builder.go`):
+DAG-based parallel execution (`internal/execution/`):
 
 ```go
-// Sequential pipeline
-pipeline := NewFlowBuilder[CleanResult]().
-    Step("scan", func(ctx context.Context) Result[CleanResult] { return Scan(ctx) }).
-    Step("validate", func(ctx context.Context, r CleanResult) Result[CleanResult] { return Validate(ctx, r) }).
-    Step("clean", func(ctx context.Context, r CleanResult) Result[CleanResult] { return Clean(ctx, r) })
+// Cleaners compiled into a workflow DAG
+result := RunCleaners(ctx, registry, cleanerNames,
+    WithRetry(retryConfig),
+    WithMaxConcurrency(n),
+    WithVerbose(verbose),
+)
 
-result := pipeline.Execute(ctx)
-
-// Parallel execution
-parallel := NewParallelFlow[CleanResult]().
-    Add("docker", func(ctx context.Context) Result[CleanResult] { return CleanDocker(ctx) }).
-    Add("go", func(ctx context.Context) Result[CleanResult] { return CleanGo(ctx) }).
-    Add("cargo", func(ctx context.Context) Result[CleanResult] { return CleanCargo(ctx) })
-
-results := parallel.Execute(ctx)
-successful := parallel.Successful()
-failed := parallel.Failed()
+// Result: succeeded/skipped/failed classification with deterministic ordering
+result.Succeeded() // []StepResult
+result.Skipped()   // []StepResult (Infrastructure errors)
+result.Failed()    // []StepResult (Transient/Rejection/Conflict/Corruption)
 ```
 
-### 7. Context[T] Branching
+### 6. Context[T] Branching
 
 Context composition and branching (`internal/shared/context/context.go`):
 
@@ -293,7 +265,7 @@ risk_level: 2         # Integer form (equivalent to HIGH)
 
 ## Configuration
 
-Configuration is loaded via Viper from:
+Configuration is loaded via Koanf from:
 
 1. `./clean-wizard.yaml` (project-local)
 2. `~/.config/clean-wizard/config.yaml` (user-level)
@@ -317,12 +289,13 @@ go test ./...
 
 ## Future Considerations
 
-| Topic                | Status        | Notes                                  |
-| -------------------- | ------------- | -------------------------------------- |
-| Dependency Injection | Investigating | Consider `samber/do/v2`                |
-| Plugin Architecture  | Deferred      | Interface already supports plugins     |
-| Linux Support        | Partial       | SystemCache needs Linux paths          |
-| Complexity Reduction | In Progress   | 21 functions >10 cyclomatic complexity |
+| Topic                | Status      | Notes                                     |
+| -------------------- | ----------- | ----------------------------------------- |
+| Dependency Injection | ✅ Adopted  | `samber/do v2` DI container               |
+| Workflow Engine      | ✅ Adopted  | `Azure/go-workflow` DAG-based execution   |
+| Error Classification | ✅ Adopted  | `go-error-family` 5-family classification |
+| Plugin Architecture  | Deferred    | Interface already supports plugins        |
+| Complexity Reduction | In Progress | 21 functions >10 cyclomatic complexity    |
 
 ---
 
@@ -336,7 +309,8 @@ go test ./...
 | `internal/domain/operation_settings.go`        | Operation-specific enums                   |
 | `internal/domain/types.go`                     | Domain types (CleanResult, ScanItem, etc.) |
 | `internal/result/type.go`                      | Result[T] railway type                     |
-| `internal/result/branch_flow.go`               | BranchFlow and SwitchFlow                  |
-| `internal/result/flow_builder.go`              | FlowBuilder and Pipeline                   |
+| `internal/di/container.go`                     | DI container (samber/do v2)                |
+| `internal/execution/workflow.go`               | Workflow orchestration (Azure/go-workflow) |
+| `internal/cleaner/error_classification.go`     | go-error-family registration               |
 | `internal/shared/context/context.go`           | Generic Context[T] with branching          |
 | `internal/shared/context/validation_config.go` | Validation context types                   |

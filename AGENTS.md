@@ -1,13 +1,17 @@
 # Clean Wizard - Project Instructions
 
-**Updated:** 2026-07-06 (go-error-family hardening: per-cleaner codes, CLI exit codes, RetryProfile, PathError classifier)
+**Updated:** 2026-07-13 (encoding/json/v2 migration: GOEXPERIMENT=jsonv2 required)
 
 ## Build & Test
 
+**Requires `GOEXPERIMENT=jsonv2`** (set in flake.nix devShell/build or `export GOEXPERIMENT=jsonv2` for standalone):
+
 ```bash
-go build ./...
-go test ./... -short
+GOEXPERIMENT=jsonv2 go build ./...
+GOEXPERIMENT=jsonv2 go test ./... -short
 ```
+
+Or use the Nix devShell (`nix develop`) which sets it automatically.
 
 ## Target Machines
 
@@ -94,6 +98,7 @@ Key design principles:
 - `github.com/cenkalti/backoff/v4` - Exponential backoff for retries
 - `github.com/spf13/cobra` - CLI framework
 - `gopkg.in/yaml.v3` - YAML handling
+- `encoding/json/v2` + `encoding/json/jsontext` - JSON marshaling (requires `GOEXPERIMENT=jsonv2`)
 
 ## Error Handling Architecture
 

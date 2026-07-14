@@ -141,7 +141,7 @@ clean-wizard/
 │   └── middleware/             # Middleware patterns
 ├── tests/
 │   ├── integration/            # Integration tests
-│   └── bdd/                    # BDD tests (Godog)
+│   └── bdd/                    # BDD tests (Ginkgo)
 └── schemas/
     └── config.schema.json      # JSON Schema for config
 ```
@@ -491,9 +491,9 @@ func (mc *MyCleaner) IsAvailable(ctx context.Context) bool {
 2. **Register in registry_factory.go**:
 
 ```go
-func DefaultRegistry() *Registry {
+func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
     registry := NewRegistry()
-    registry.Register("mycleaner", NewMyCleaner(false, false))
+    registry.Register("mycleaner", NewMyCleaner(verbose, dryRun))
     return registry
 }
 ```

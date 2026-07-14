@@ -35,7 +35,7 @@
         let
           version = self.rev or self.dirtyRev or "dev";
 
-          vendorHash = "sha256-PjErY8LkNNLm9KeQv/5ITTxD3quqrYxmX1WrSsEC9kw=";
+          vendorHash = "sha256-rs1zRWLacox7lLrcAfUS1UZHlLxPEnLrjEvqW6lsEro=";
           proxyVendor = true;
 
           ldflags = [
@@ -69,6 +69,7 @@
             subPackages = [ "cmd/clean-wizard" ];
 
             env.CGO_ENABLED = 0;
+            env.GOEXPERIMENT = "jsonv2";
 
             tags = [
               "netgo"
@@ -144,6 +145,7 @@
               ];
 
               GOWORK = "off";
+              GOEXPERIMENT = "jsonv2";
 
               shellHook = ''
                 echo "🧙 clean-wizard development environment"
@@ -158,6 +160,8 @@
                 golangci-lint
                 jq
               ];
+
+              GOEXPERIMENT = "jsonv2";
             };
           };
 

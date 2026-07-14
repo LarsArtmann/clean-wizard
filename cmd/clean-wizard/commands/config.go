@@ -2,7 +2,8 @@ package commands
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"os"
 	"os/exec"
@@ -87,7 +88,7 @@ func runConfigShowCommand(_ *cobra.Command, _ []string, jsonOutput bool) error {
 // showConfigJSON outputs config in JSON format.
 func showConfigJSON(cfg *domain.Config) error {
 	// Use proper JSON marshaling for complete output
-	jsonBytes, err := json.MarshalIndent(cfg, "", "  ")
+	jsonBytes, err := json.Marshal(cfg, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	if err != nil {
 		return fmt.Errorf("failed to marshal configuration to JSON: %w", err)
 	}

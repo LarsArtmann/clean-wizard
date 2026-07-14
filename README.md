@@ -1,22 +1,23 @@
 # Clean Wizard
 
-**A comprehensive system cleanup tool for macOS and Linux that safely removes old caches, temporary files, and unused data across 12 different cleanup targets — from Nix generations to Homebrew, Docker containers to Go build caches.**
+**A comprehensive system cleanup tool for macOS and Linux that safely removes old caches, temporary files, and unused data across 13 different cleanup targets — from Nix generations to Homebrew, Docker containers to Go build caches.**
 
 [![Go Version](https://img.shields.io/badge/go-1.26+-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-200%2B-green.svg)](https://github.com/LarsArtmann/clean-wizard/actions)
+[![Tests](https://img.shields.io/badge/tests-300%2B-green.svg)](https://github.com/LarsArtmann/clean-wizard/actions)
 
 ### Key Features
 
 - **Interactive TUI** — Beautiful multi-select interface powered by Charm Bracelet
-- **12 Specialized Cleaners** — Nix, Homebrew, Docker, Cargo, Go, Node, Build Caches, System Caches, Temp Files, Project Automation, Executables, Compiled Binaries
+- **13 Specialized Cleaners** — Nix, Homebrew, Docker, Cargo, Go, Golangci-lint, Node, Build Caches, System Caches, Temp Files, Project Executables, Compiled Binaries, Git History
 - **Dry-Run Mode** — Preview what would be cleaned before making any changes
 - **Type-Safe Architecture** — Compile-time safety with Go enums and interfaces
+- **Workflow Engine** — DAG-based parallel execution with retry support
 - **Safety First** — Confirmation dialogs, protected generations, availability detection
 
 ## ✨ Features
 
-### 12 Specialized Cleaners
+### 13 Specialized Cleaners
 
 | Cleaner              | Target                              | Status              |
 | -------------------- | ----------------------------------- | ------------------- |
@@ -25,13 +26,14 @@
 | **Docker**           | Containers, images, volumes, builds | ✅ Production Ready |
 | **Cargo**            | Rust Cargo cache and registries     | ✅ Production Ready |
 | **Go**               | Go module, test, and build cache    | ✅ Production Ready |
+| **Golangci-lint**    | golangci-lint cache directory       | ✅ Production Ready |
 | **Node**             | npm, pnpm, yarn, bun package caches | ✅ Production Ready |
 | **BuildCache**       | Gradle, Maven, SBT build caches     | ✅ Production Ready |
 | **SystemCache**      | macOS Spotlight, Xcode, CocoaPods   | ✅ Production Ready |
 | **TempFiles**        | Age-based temporary files           | ✅ Production Ready |
-| **Projects**         | Project automation                  | ⚠️ Deprecated       |
 | **ProjectExec**      | Old shell scripts in ~/projects     | ✅ Production Ready |
 | **CompiledBinaries** | Large compiled binaries             | ✅ Production Ready |
+| **GitHistory**       | Large files in git history          | ✅ Production Ready |
 
 ### Preset Modes
 
@@ -39,7 +41,7 @@
 | -------------- | --------------- | ----------------------------------------------- |
 | **Quick**      | Daily cleanup   | Homebrew, Go, Node, TempFiles, BuildCache       |
 | **Standard**   | Full cleanup    | All available cleaners including Nix and Docker |
-| **Aggressive** | Nuclear cleanup | All cleaners including language versions        |
+| **Aggressive** | Nuclear cleanup | All cleaners including system caches            |
 
 ### Interactive TUI
 
@@ -57,12 +59,15 @@
 
 ### Output Options
 
-| Flag        | Output                       |
-| ----------- | ---------------------------- |
-| _(default)_ | Interactive TUI with forms   |
-| `--json`    | Machine-readable JSON output |
-| `--dry-run` | Preview mode (no changes)    |
-| `--verbose` | Detailed logging             |
+| Flag              | Output                                              |
+| ----------------- | --------------------------------------------------- |
+| _(default)_       | Interactive TUI with forms                          |
+| `--json`          | Machine-readable JSON output                        |
+| `--dry-run`       | Preview mode (no changes)                           |
+| `--verbose`       | Detailed logging                                    |
+| `--retries N`     | Retry attempts (default: 3)                         |
+| `--retry-profile` | Retry preset (default/aggressive/conservative/none) |
+| `--concurrency`   | Max concurrent cleaners (0=unlimited)               |
 
 ## 🎬 Quick Start
 
@@ -175,14 +180,18 @@ clean-wizard clean [flags]
 
 **Flags:**
 
-| Flag           | Description                              | Default                            |
-| -------------- | ---------------------------------------- | ---------------------------------- |
-| `--mode, -m`   | Preset mode: quick, standard, aggressive | standard                           |
-| `--config, -c` | Path to config file                      | ~/.config/clean-wizard/config.yaml |
-| `--dry-run`    | Preview without making changes           | false                              |
-| `--json`       | Output as JSON                           | false                              |
-| `--verbose`    | Enable verbose logging                   | false                              |
-| `--dry-run`    | Simulate deletion                        | false                              |
+| Flag                  | Description                                        | Default                            |
+| --------------------- | -------------------------------------------------- | ---------------------------------- |
+| `--mode`, `-m`        | Preset mode: quick, standard, aggressive           | standard                           |
+| `--config`, `-c`      | Path to config file                                | ~/.config/clean-wizard/config.yaml |
+| `--profile`, `-p`     | Configuration profile                              | ""                                 |
+| `--dry-run`           | Preview without making changes                     | false                              |
+| `--json`              | Output as JSON                                     | false                              |
+| `--verbose`           | Enable verbose logging                             | false                              |
+| `--yes`, `-y`         | Skip confirmation                                  | false                              |
+| `--retries`           | Retry attempts per cleaner (0=disabled)            | 3                                  |
+| `--retry-profile`     | Retry preset: default/aggressive/conservative/none | ""                                 |
+| `--concurrency`, `-C` | Max concurrent cleaners (0=unlimited)              | 0                                  |
 
 **Examples:**
 
@@ -262,10 +271,8 @@ clean-wizard clean --mode aggressive
 
 # Additional cleaners in aggressive mode:
 # - All from standard mode
-# - Language Version Managers (NVM, Pyenv, Rbenv)
-# - All Nix generations (no keep count)
-# - iOS Simulators (xcrun simctl delete all)
 # - Full Docker with volumes
+# - All Nix generations (no keep count)
 ```
 
 **⚠️ Warning:** Aggressive mode includes destructive operations. Always use `--dry-run` first to preview.
@@ -301,19 +308,19 @@ clean-wizard clean --dry-run
 
 ### What Each Cleaner Cleans
 
-| Cleaner         | Target                                         | Risk Level             |
-| --------------- | ---------------------------------------------- | ---------------------- |
-| Nix             | `/nix/store/*-generation`                      | Low                    |
-| Homebrew        | `~/Library/Caches/Homebrew`                    | Low                    |
-| Docker          | Containers, images, volumes                    | Medium                 |
-| Cargo           | `~/.cargo/registry`, `~/.cargo/git`            | Low                    |
-| Go              | `go build cache`, `go mod cache`               | Low                    |
-| Node            | `~/.npm`, `~/.pnpm`, `~/.cache/yarn`, `~/.bun` | Low                    |
-| BuildCache      | `~/.gradle`, `~/.m2`, `~/.sbt`                 | Low                    |
-| SystemCache     | `~/Library/Caches/*`, Xcode DerivedData        | Medium                 |
-| TempFiles       | `/tmp/*` (age-based)                           | Low                    |
-| ~~LangVersion~~ | ~~`~/.nvm/versions`, `~/.pyenv/versions`~~     | ~~**High**~~ (Removed) |
-| Projects        | Project-specific cleanup                       | Medium                 |
+| Cleaner       | Target                                         | Risk Level |
+| ------------- | ---------------------------------------------- | ---------- |
+| Nix           | `/nix/store/*-generation`                      | Low        |
+| Homebrew      | `~/Library/Caches/Homebrew`                    | Low        |
+| Docker        | Containers, images, volumes                    | Medium     |
+| Cargo         | `~/.cargo/registry`, `~/.cargo/git`            | Low        |
+| Go            | `go build cache`, `go mod cache`               | Low        |
+| Golangci-lint | `~/.cache/golangci-lint`                       | Low        |
+| Node          | `~/.npm`, `~/.pnpm`, `~/.cache/yarn`, `~/.bun` | Low        |
+| BuildCache    | `~/.gradle`, `~/.m2`, `~/.sbt`                 | Low        |
+| SystemCache   | `~/Library/Caches/*`, Xcode DerivedData        | Medium     |
+| TempFiles     | `/tmp/*` (age-based)                           | Low        |
+| GitHistory    | Large blobs in git history                     | High       |
 
 ---
 
@@ -392,33 +399,33 @@ Clean Wizard is built with a focus on type safety and extensibility:
 clean-wizard/
 ├── cmd/
 │   └── clean-wizard/          # CLI entry point
+│       └── commands/          # Cobra commands (clean, scan, init, profile, config, githistory)
 ├── internal/
-│   ├── cleaner/               # Cleaner implementations
-│   │   ├── registry.go         # Thread-safe cleaner registry
-│   │   ├── registry_factory.go # Default cleaner setup
-│   │   ├── nix.go             # Nix store cleanup
-│   │   ├── homebrew.go        # Homebrew cleanup
-│   │   ├── docker.go          # Docker cleanup
-│   │   ├── golang_*.go        # Go cache cleanup
-│   │   ├── node_*.go          # Node package managers
-│   │   └── ...
-│   ├── domain/                # Type-safe enums and constants
-│   ├── config/                # YAML configuration
-│   └── adapters/             # External tool adapters
-├── api/                        # REST API layer
+│   ├── cleaner/               # 13 cleaner implementations + registry
+│   ├── di/                    # Dependency injection container (samber/do v2)
+│   ├── execution/             # Workflow orchestration engine (Azure/go-workflow)
+│   ├── domain/                # Type-safe enums, settings, interfaces
+│   ├── config/                # YAML configuration loading + validation
+│   ├── adapters/              # External tool adapters (Nix, Exec, HTTP, Cache)
+│   ├── result/                # Result[T] type for functional error handling
+│   ├── format/                # Byte formatting, JSON output
+│   └── logger/                # Structured logging
+├── api/                        # TypeSpec API definitions
 ├── schemas/                    # JSON schemas
 └── tests/
-    ├── unit/                  # Unit tests (200+)
-    └── integration/           # BDD tests with Godog
+    ├── bdd/                   # Ginkgo BDD tests
+    └── integration/           # Integration tests
 ```
 
 ### Key Design Principles
 
 1. **Type-Safe Enums** - Compile-time safety for all constants
 2. **Registry Pattern** - Centralized cleaner management with thread-safety
-3. **Result Types** - Explicit success/failure with error handling
-4. **Interface-Based** - All cleaners implement common `Cleaner` interface
-5. **Testable** - 200+ tests with BDD scenarios
+3. **Dependency Injection** - `samber/do v2` container with typed accessors
+4. **Workflow Orchestration** - `Azure/go-workflow` DAG engine with retry support
+5. **Result Types** - Explicit success/failure with functional error handling
+6. **Error Classification** - `go-error-family` behavioral classification driving retries and exit codes
+7. **Testable** - ~300 tests with Ginkgo BDD scenarios
 
 ### Domain Enums
 
@@ -464,23 +471,24 @@ go test -v ./...
 go test -bench=. ./...
 
 # BDD tests
-go test -tags=bdd ./tests/integration/...
+go test ./tests/bdd/...
 ```
 
 ### Test Coverage
 
 | Test Type         | Count | Status         |
 | ----------------- | ----- | -------------- |
-| Unit Tests        | 200+  | ✅ All Passing |
+| Unit Tests        | ~300  | ✅ All Passing |
 | Integration Tests | 10+   | ✅ Passing     |
-| BDD Tests (Godog) | 5     | ✅ Passing     |
-| Benchmark Tests   | 15    | ✅ Passing     |
+| BDD Tests         | 4     | ✅ Passing     |
+| Benchmark Tests   | 5+    | ✅ Passing     |
+| Fuzz Tests        | 6     | ✅ Passing     |
 
 ### Test Categories
 
 - **Unit Tests** - Individual cleaner functionality
 - **Integration Tests** - Clean command and registry
-- **BDD Tests** - User scenarios with Godog
+- **BDD Tests** - User scenarios with Ginkgo
 - **Benchmark Tests** - Performance measurement
 
 ---
@@ -536,9 +544,9 @@ func (mc *MyCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // 2. Register in registry_factory.go
-func DefaultRegistry() *Registry {
+func DefaultRegistryWithConfig(verbose, dryRun bool) *Registry {
     registry := NewRegistry()
-    registry.Register("mycleaner", NewMyCleaner(false, false))
+    registry.Register("mycleaner", NewMyCleaner(verbose, dryRun))
     // ...
     return registry
 }
@@ -562,7 +570,7 @@ Clean Wizard and [SystemNix](https://github.com/LarsArtmann/SystemNix) serve sim
 | Interactive TUI  | ❌ CLI only          | ✅ Beautiful forms      |
 | JSON Output      | ❌ Not available     | ✅ Machine-readable     |
 | Registry Pattern | ❌ Manual            | ✅ Thread-safe registry |
-| Test Coverage    | ❌ Manual            | ✅ 200+ tests           |
+| Test Coverage    | ❌ Manual            | ✅ ~300 tests           |
 | Configuration    | ❌ Hardcoded         | ✅ YAML profiles        |
 
 ### Feature Parity
@@ -575,7 +583,6 @@ Clean Wizard and [SystemNix](https://github.com/LarsArtmann/SystemNix) serve sim
 
 ### Missing in Clean Wizard
 
-- ~~Language Version Manager~~ (removed - too risky for users)
 - Docker light prune (quick mode)
 - Nix store optimization
 - Nix profile management
@@ -588,13 +595,12 @@ Clean Wizard and [SystemNix](https://github.com/LarsArtmann/SystemNix) serve sim
 
 ### Ways to Contribute
 
-1. ~~**Language Version Manager**~~ - Removed (too risky for users)
-2. **Implement Docker light prune** - For quick mode parity
-3. **Add Nix store optimization** - `nix-store --optimize`
-4. **Implement iOS simulator cleanup** - `xcrun simctl delete`
-5. **Write BDD tests** - Expand test coverage
-6. **Improve documentation** - README, examples, guides
-7. **Report issues** - Bug reports and feature requests
+1. **Implement Docker light prune** - For quick mode parity
+2. **Add Nix store optimization** - `nix-store --optimize`
+3. **Implement iOS simulator cleanup** - `xcrun simctl delete`
+4. **Write BDD tests** - Expand test coverage to all 13 cleaners
+5. **Improve documentation** - README, examples, guides
+6. **Report issues** - Bug reports and feature requests
 
 ### Development Workflow
 
@@ -625,28 +631,14 @@ git push origin feature/new-cleaner
 
 ## 📝 Roadmap
 
-### Immediate (This Week)
+See [TODO_LIST.md](TODO_LIST.md) for actionable tasks and [ROADMAP.md](ROADMAP.md) for long-term vision.
 
-- [ ] Update README documentation
-- [ ] Fix Go build cache location gap
-- [ ] Implement Docker light prune
-- [ ] Add Nix temp files cleanup
+Key areas of active development:
 
-### Short-Term (This Month)
-
-- [x] ~~Language Version Manager~~ (removed - too risky, see docs/status/2026-02-12_06-41_LANGUAGE_VERSION_MANAGER_RISK_ANALYSIS.md)
-- [ ] Implement Nix store optimization
-- [ ] Implement Nix profile management
-- [ ] Add iOS simulator cleanup
-- [ ] Complete quick mode parity
-
-### Long-Term (This Quarter)
-
-- [ ] Complete standard mode parity
-- [ ] Complete aggressive mode parity
-- [ ] Write comprehensive BDD tests
-- [ ] Create complete documentation
-- [ ] Add performance benchmarks
+- Wire `OperationSettings` from YAML config to cleaner constructors
+- Expand BDD test coverage to all 13 cleaners
+- Split `internal/domain/` god package into sub-packages
+- Implement `scan --profile` filtering
 
 ---
 
@@ -660,10 +652,12 @@ git push origin feature/new-cleaner
 ### Dependencies
 
 - **CLI Framework:** [Cobra](https://github.com/spf13/cobra)
-- **TUI Library:** [Huh](https://github.com/charmbracelet/huh)
-- **TUI Framework:** [BubbleTea](https://github.com/charmbracelet/bubbletea)
-- **Testing:** [Testify](https://github.com/stretchr/testify), [Godog](https://github.com/cucumber/godog)
-- **Configuration:** [Viper](https://github.com/spf13/viper)
+- **TUI Library:** [Huh](https://github.com/charmbracelet/huh) + [Lipgloss](https://github.com/charmbracelet/lipgloss)
+- **DI Container:** [samber/do](https://github.com/samber/do)
+- **Workflow Engine:** [Azure/go-workflow](https://github.com/Azure/go-workflow)
+- **Error Classification:** [go-error-family](https://github.com/larsartmann/go-error-family)
+- **Testing:** [Testify](https://github.com/stretchr/testify), [Ginkgo](https://github.com/onsi/ginkgo)
+- **Configuration:** [Koanf](https://github.com/knadh/koanf)
 
 ---
 
@@ -681,6 +675,4 @@ This project originated from: [Setup-Mac](https://github.com/LarsArtmann/Setup-M
 
 ---
 
-**Built with ❤️ for a cleaner macOS experience**
-
-_The ultimate tool for keeping your MacBook clean and fast_
+**Built with ❤️ for a cleaner system**

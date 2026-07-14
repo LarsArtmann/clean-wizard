@@ -1,39 +1,53 @@
 # ROADMAP
 
-**Last Updated:** 2026-04-05
-**Focus:** Aspirational items - no timeline commitment
+**Last Updated:** 2026-07-13
+**Focus:** Long-term direction and raw ideas — no timeline commitment
 
 ---
 
-## Future Enhancements
+## Themes
 
-### Potential Improvements
+### 1. Configuration-Driven Cleaning
 
-| Category             | Item                          | Notes                                                                                  |
-| -------------------- | ----------------------------- | -------------------------------------------------------------------------------------- |
-| Dependency Injection | Consider samber/do/v2         | Evaluated: Current simple constructor pattern sufficient, DI would be over-engineering |
-| Plugin Architecture  | Plugin system for cleaners    | Future enhancement, not required for v1                                                |
-| RiskLevelType        | Auto mapstructure decode hook | Investigated: Works correctly, would need decode hook for auto-conversion              |
+Today cleaners use hardcoded defaults. The vision: every cleaner reads its settings from
+YAML profiles, letting users define per-cleaner behavior (cache types, age thresholds,
+keep counts) declaratively. This requires registering individual cleaners as DI providers
+and wiring `OperationSettings` through to constructors.
 
----
+### 2. Extensibility
 
-## Deferred Decisions
+A plugin system would allow third-party cleaners without modifying the core registry.
+The current `Cleaner` interface and registry pattern provide the foundation, but the
+loading and discovery mechanism does not exist yet.
 
-These items were evaluated and deferred, but may be revisited in future versions:
+### 3. Observability
 
-1. **Plugin Architecture for Cleaners** - Would allow third-party cleaners, but not needed for v1 scope
-2. **Advanced DI Container** - Current dependency injection via constructors is sufficient
-3. **Automated RiskLevel Configuration** - Manual mapstructure processing works; auto-conversion needs additional hooks
-
----
-
-## Long-term Vision
-
-- Expand cleaner ecosystem with community-contributed plugins
-- Web UI for configuration and monitoring
-- Remote execution capabilities
-- Integration with cloud storage providers
+Live progress TUI during workflow execution (per-cleaner status, real-time freed space).
+Structured audit log of DI registrations. Resume/checkpoint support for interrupted runs.
 
 ---
 
-**Note:** Items here are aspirational. No timeline commitments.
+## Raw Ideas
+
+| Category             | Idea                              | Notes                                                                      |
+| -------------------- | --------------------------------- | -------------------------------------------------------------------------- |
+| Plugin Architecture  | Plugin system for cleaners        | Third-party cleaners loaded dynamically; not required for v1               |
+| Progress TUI         | Live per-cleaner status display   | Like BuildFlow's ProgressBridge; requires workflow engine hooks            |
+| Resume Support       | Checkpoint interrupted clean runs | `flow.Workflow` state persistence; low priority                            |
+| RiskLevel Automation | Auto mapstructure decode hook     | Investigated: manual mapstructure processing works; auto needs extra hooks |
+| Web UI               | Configuration and monitoring UI   | Long-term; CLI-first for now                                               |
+| Cloud Integration    | Remote execution / cloud storage  | Very long-term; no current use case                                        |
+
+---
+
+## Explicitly NOT Pursuing (Non-Goals)
+
+1. **Application-global DI bootstrap** — per-command DI containers are sufficient for a CLI tool
+2. **`do.ExplainInjector` debug output** — YAGNI; debug flags add complexity for minimal value
+3. **`do.ShutdownerWithError` on adapters** — no adapters currently hold resources requiring cleanup
+4. **Consolidating `cleaner.Cleaner` vs `domain.OperationHandler`** — risky refactor, low value
+
+---
+
+**Note:** Items here are aspirational. No timeline commitments. Refined ideas become
+actionable tasks in `TODO_LIST.md`.
