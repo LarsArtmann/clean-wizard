@@ -1,11 +1,16 @@
-# Clean Wizard
+<h1 align="center">Clean Wizard</h1>
 
-**Reclaim disk space across macOS and Linux. One command, 13 specialized cleaners, zero guesswork.**
+<p align="center"><strong>Reclaim disk space across macOS and Linux. One command, 13 specialized cleaners, zero guesswork.</strong></p>
 
-[![Go Version](https://img.shields.io/badge/go-1.26+-00ADD8?logo=go&logoColor=white)](https://golang.org)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-300%2B-brightgreen.svg)](https://github.com/LarsArtmann/clean-wizard/actions)
-[![Website](https://img.shields.io/badge/website-cleanwizard.lars.software-8b5cf6)](https://cleanwizard.lars.software)
+<p align="center">
+<a href="https://github.com/LarsArtmann/clean-wizard/actions/workflows/type-safety.yml"><img src="https://github.com/LarsArtmann/clean-wizard/actions/workflows/type-safety.yml/badge.svg" alt="CI"></a>
+<a href="https://github.com/LarsArtmann/clean-wizard/actions/workflows/website.yml"><img src="https://github.com/LarsArtmann/clean-wizard/actions/workflows/website.yml/badge.svg" alt="Website"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+</p>
+
+<p align="center">
+<a href="https://cleanwizard.lars.software">Documentation</a> · <a href="CHANGELOG.md">Changelog</a>
+</p>
 
 ---
 
@@ -21,8 +26,10 @@ Clean Wizard finds and removes all of it — safely, with dry-run previews, conf
 
 ### Install
 
+> **Note:** Clean Wizard uses `encoding/json/v2`. Set `GOEXPERIMENT=jsonv2` before building.
+
 ```bash
-go install github.com/LarsArtmann/clean-wizard@latest
+GOEXPERIMENT=jsonv2 go install github.com/LarsArtmann/clean-wizard@latest
 ```
 
 Or build from source:
@@ -30,6 +37,13 @@ Or build from source:
 ```bash
 git clone https://github.com/LarsArtmann/clean-wizard.git
 cd clean-wizard
+GOEXPERIMENT=jsonv2 go build -o clean-wizard ./cmd/clean-wizard/
+```
+
+Or use the Nix devShell (sets `GOEXPERIMENT` automatically):
+
+```bash
+nix develop
 go build -o clean-wizard ./cmd/clean-wizard/
 ```
 
@@ -175,23 +189,25 @@ tempfiles:
 
 ```bash
 # All tests
-go test ./...
+GOEXPERIMENT=jsonv2 go test ./... -short
 
 # With race detector
-go test -race ./...
+GOEXPERIMENT=jsonv2 go test -race ./...
 
 # BDD scenarios
-go test ./tests/bdd/...
+GOEXPERIMENT=jsonv2 go test ./tests/bdd/...
 
 # Coverage report
-go test -cover ./...
+GOEXPERIMENT=jsonv2 go test -cover ./...
 ```
+
+Or use `nix develop` which sets `GOEXPERIMENT=jsonv2` automatically.
 
 ## Development
 
 ```bash
 # Build
-go build -o clean-wizard ./cmd/clean-wizard/
+GOEXPERIMENT=jsonv2 go build -o clean-wizard ./cmd/clean-wizard/
 
 # Lint
 golangci-lint run ./...

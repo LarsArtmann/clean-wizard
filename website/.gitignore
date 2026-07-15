@@ -24,3 +24,9 @@ pnpm-debug.log*
 
 # nix
 /result
+
+# firebase
+.firebase/
+
+# bun (if used locally)
+bun.lock
