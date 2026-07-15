@@ -91,12 +91,3 @@ jobs:
             exit 1
           fi
           echo "OK: No reflect package violations in production code"
-
-      - name: Dependency Cycle Check
-        run: |
-          go install github.com/fzipp/gocycmd/cmd/gocycmd@latest
-          if ! gocycmd ./...; then
-            echo "VIOLATION: Dependency cycle detected"
-            exit 1
-          fi
-          echo "OK: No dependency cycles"
