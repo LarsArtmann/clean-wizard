@@ -15,7 +15,7 @@ export interface StepCard {
   code?: string;
 }
 
-export type ComparisonVariant = "Manual Cleanup" | "SystemNix" | "Clean Wizard";
+export type ComparisonVariant = "Manual Commands" | "Generic Cleaners" | "Clean Wizard";
 
 export interface ComparisonItem {
   variant: ComparisonVariant;
@@ -24,7 +24,7 @@ export interface ComparisonItem {
   accent: boolean;
 }
 
-export type MatrixValue = "yes" | "no" | string;
+export type MatrixValue = "yes" | "no" | "partial" | string;
 
 export interface MatrixRow {
   feature: string;
@@ -43,6 +43,12 @@ export interface UseCase {
   title: string;
   desc: string;
   icon: UseCaseIcon;
+}
+
+export interface PainPoint {
+  tool: string;
+  detail: string;
+  size: string;
 }
 
 export const uiIconKeys = [

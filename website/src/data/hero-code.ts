@@ -1,24 +1,40 @@
-export const heroCode = `$ clean-wizard clean --mode quick --dry-run
+export const heroCode = `$ clean-wizard scan
 
-Scanning for available cleaners...
-  Found 7 available cleaners
+Scanning system for cleanable items...
 
-Would clean:
-  Homebrew      cache + autoremove     ~245 MB
-  Go            build + mod + test     ~1.2 GB
-  Node          npm + pnpm + yarn      ~380 MB
-  BuildCache    Gradle + Maven         ~890 MB
-  TempFiles     older than 7 days      ~156 MB
+Found 11 available cleaner(s)
 
-Estimated total: ~2.9 GB
+  System Cache          9 items    20 GiB
+  Compiled Binaries     162 items   5.1 GiB
+  Go Packages           2 items    11 GiB
+  Cargo Packages        2 items     1.6 GiB
+  golangci-lint Cache   1 item      2.2 MiB
+  Project Executables   1 item      100 MiB
+
+Total cleanable: 38 GiB (177 items)
+
+$ clean-wizard clean --mode quick --dry-run
+
+Found 11 available cleaner(s)
+Using preset mode: quick
+  Homebrew
+  Node.js Packages
+  Go Packages
+  Temp Files
+  Build Cache
+
+Starting cleanup... (DRY RUN)
+
+  buildcache    3 items    900 MiB
+  go            2 items    11 GiB
+
+Total: 12 GiB freed, 6 items in 1.1s
 
 $ clean-wizard clean --mode quick
 
-Running 5 cleaners in parallel...
-  Homebrew      245 MB
-  Go          1,204 MB
-  Node          380 MB
-  BuildCache    890 MB
-  TempFiles     156 MB
+Cleanup Results
 
-Freed 2.9 GB in 3.1s`;
+  buildcache    3 items    900 MiB
+  go            2 items    11 GiB
+
+Total: 12 GiB freed in 1.1s`;

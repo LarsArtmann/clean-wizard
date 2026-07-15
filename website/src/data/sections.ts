@@ -1,102 +1,110 @@
-import type { StepCard, ComparisonItem, UseCase, ComparisonMatrix } from "./types";
+import type { StepCard, ComparisonItem, UseCase, ComparisonMatrix, PainPoint } from "./types";
+
+export const painPoints: PainPoint[] = [
+  { tool: "Go", detail: "Build cache + module cache + test cache", size: "11 GiB" },
+  { tool: "Docker", detail: "Stopped containers, dangling images, volumes", size: "5+ GiB" },
+  { tool: "Nix", detail: "Old generations from every system update", size: "10+ GiB" },
+  { tool: "Homebrew", detail: "Download cache, dead symlinks, old casks", size: "1+ GiB" },
+  { tool: "Node", detail: "npm, pnpm, yarn, bun caches combined", size: "2+ GiB" },
+  { tool: "Cargo", detail: "Registry cache + git cache + old artifacts", size: "1.6 GiB" },
+];
 
 export const steps: StepCard[] = [
   {
     step: "1",
     stepColor: "accent",
     title: "Scan",
-    desc: "Detects all available cleaners based on installed tools and system platform.",
+    desc: "Detects all available cleaners based on what is installed on your system. Nothing runs yet, just discovery.",
     code: "$ clean-wizard scan",
   },
   {
     step: "2",
     stepColor: "accent",
     title: "Select",
-    desc: "Interactive TUI or preset mode (quick, standard, aggressive) to choose what to clean.",
+    desc: "Pick cleaners interactively or use a preset mode: quick, standard, or aggressive. Each shows its estimated size.",
     code: "$ clean-wizard clean --mode quick",
   },
   {
     step: "3",
     stepColor: "amber",
     title: "Confirm",
-    desc: "Dry-run preview shows what will be removed. Explicit yes/no before any deletion.",
+    desc: "Dry-run shows exactly what gets removed and how much space comes back. Nothing is deleted without your explicit yes.",
     code: "$ clean-wizard clean --dry-run",
   },
   {
     step: "4",
     stepColor: "amber",
     title: "Clean",
-    desc: "Parallel execution with retry support. Results reported per-cleaner with freed bytes.",
-    code: "// Freed 5.2 GB in 3.1s",
+    desc: "All selected cleaners run in parallel. Results reported per-cleaner with freed bytes. Failed cleaners retry automatically.",
+    code: "Freed 12 GiB in 1.1s",
   },
 ];
 
 export const comparisons: ComparisonItem[] = [
   {
-    variant: "Manual Cleanup",
+    variant: "Manual Commands",
     accent: false,
-    pros: ["No installation needed"],
+    pros: ["No installation needed", "Full control over every command"],
     cons: [
-      "Remember every cache location",
-      "No dry-run or preview",
+      "Must remember 13+ different cleanup commands",
+      "No dry-run or preview before deleting",
       "Easy to delete something important",
-      "No parallel execution",
+      "Sequential, no parallel execution",
+    ],
+  },
+  {
+    variant: "Generic Cleaners",
+    accent: false,
+    pros: ["Broad system coverage", "GUI available", "Well-established tools"],
+    cons: [
+      "Not developer-focused",
+      "Misses dev-specific caches like Nix generations",
+      "Limited JSON output for automation",
+      "No retry or error classification",
     ],
   },
   {
     variant: "Clean Wizard",
     accent: true,
     pros: [
-      "13 cleaners in one command",
+      "13 dev caches in one command",
       "Dry-run previews before any change",
       "Protected generations and paths",
-      "Parallel execution with retries",
-      "JSON output for CI/CD",
+      "Parallel execution with auto-retry",
+      "JSON output for CI/CD pipelines",
     ],
     cons: [],
-  },
-  {
-    variant: "SystemNix",
-    accent: false,
-    pros: ["Simple shell script"],
-    cons: [
-      "No dry-run mode",
-      "No TUI or interactive selection",
-      "No JSON output",
-      "Hardcoded configuration",
-      "No retry on failure",
-    ],
   },
 ];
 
 export const comparisonMatrix: ComparisonMatrix = {
-  columns: ["Manual Cleanup", "SystemNix", "Clean Wizard"],
+  columns: ["Manual Commands", "Generic Cleaners", "Clean Wizard"],
   rows: [
-    { feature: "Dry-run preview", values: ["no", "no", "yes"] },
-    { feature: "Interactive TUI", values: ["no", "no", "yes"] },
-    { feature: "JSON output", values: ["no", "no", "yes"] },
-    { feature: "Parallel execution", values: ["no", "no", "yes"] },
-    { feature: "Retry on failure", values: ["no", "no", "yes"] },
-    { feature: "Error classification", values: ["no", "no", "yes"] },
-    { feature: "Configuration profiles", values: ["no", "no", "yes"] },
-    { feature: "Cleaners", values: ["manual", "8", "13"] },
+    { feature: "Dev-cache aware", values: ["no", "partial", "yes"] },
+    { feature: "Dry-run preview", values: ["partial", "partial", "yes"] },
+    { feature: "Interactive TUI", values: ["no", "partial", "yes"] },
+    { feature: "JSON for CI/CD", values: ["no", "no", "yes"] },
+    { feature: "Parallel execution", values: ["no", "partial", "yes"] },
+    { feature: "Auto-retry on failure", values: ["no", "no", "yes"] },
+    { feature: "Nix generation protection", values: ["no", "no", "yes"] },
+    { feature: "Safe by default", values: ["no", "partial", "yes"] },
   ],
 };
 
 export const useCases: UseCase[] = [
   {
     title: "Developer Workstations",
-    desc: "Daily cleanup of Go, Node, Docker, and Homebrew caches",
+    desc: "Reclaim 5-20 GB from Go, Node, Docker, and Homebrew caches in one daily command",
     icon: "dev",
   },
   {
     title: "NixOS Servers",
-    desc: "Old generation cleanup with protected current generation",
+    desc: "Clean old generations safely without touching the current one",
     icon: "server",
   },
   {
     title: "CI/CD Pipelines",
-    desc: "JSON output and dry-run for safe automation",
+    desc: "JSON output and dry-run mode make it safe to automate in any pipeline",
     icon: "ci",
   },
 ];

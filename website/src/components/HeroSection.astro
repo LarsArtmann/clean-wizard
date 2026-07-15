@@ -19,38 +19,55 @@ async function getGitHubStars(): Promise<number | null> {
 }
 
 const stars = await getGitHubStars();
-const starsText = stars !== null ? `${stars} Stars` : 'Star on GitHub';
+const showStars = stars !== null && stars >= 10;
+const starsText = showStars ? `${stars} Stars` : 'View on GitHub';
 
-const highlightedCode = `<span class="text-text-muted">$</span> clean-wizard clean <span class="text-accent">--mode</span> quick <span class="text-accent">--dry-run</span>
+const highlightedCode = `<span class="text-text-muted">$</span> clean-wizard scan
 
-<span class="text-text-secondary">Scanning for available cleaners...</span>
-  <span class="text-success">Found</span> 7 available cleaners
+<span class="text-text-secondary">Scanning system for cleanable items...</span>
 
-<span class="text-text-secondary">Would clean:</span>
-  <span class="text-text-primary">Homebrew</span>      cache + autoremove     <span class="text-amber">~245 MB</span>
-  <span class="text-text-primary">Go</span>            build + mod + test     <span class="text-amber">~1.2 GB</span>
-  <span class="text-text-primary">Node</span>          npm + pnpm + yarn      <span class="text-amber">~380 MB</span>
-  <span class="text-text-primary">BuildCache</span>    Gradle + Maven         <span class="text-amber">~890 MB</span>
-  <span class="text-text-primary">TempFiles</span>     older than 7 days      <span class="text-amber">~156 MB</span>
+<span class="text-success">Found</span> 11 available cleaner(s)
 
-<span class="text-accent">Estimated total: ~2.9 GB</span>
+  <span class="text-text-primary">System Cache</span>          9 items    <span class="text-amber">20 GiB</span>
+  <span class="text-text-primary">Compiled Binaries</span>     162 items   <span class="text-amber">5.1 GiB</span>
+  <span class="text-text-primary">Go Packages</span>           2 items    <span class="text-amber">11 GiB</span>
+  <span class="text-text-primary">Cargo Packages</span>        2 items     <span class="text-amber">1.6 GiB</span>
+  <span class="text-text-primary">golangci-lint Cache</span>   1 item      <span class="text-amber">2.2 MiB</span>
+  <span class="text-text-primary">Project Executables</span>   1 item      <span class="text-amber">100 MiB</span>
+
+<span class="text-accent">Total cleanable: 38 GiB (177 items)</span>
+
+<span class="text-text-muted">$</span> clean-wizard clean <span class="text-accent">--mode</span> quick <span class="text-accent">--dry-run</span>
+
+<span class="text-text-secondary">Found 11 available cleaner(s)</span>
+<span class="text-text-secondary">Using preset mode: quick</span>
+  Homebrew
+  Node.js Packages
+  Go Packages
+  Temp Files
+  Build Cache
+
+<span class="text-text-secondary">Starting cleanup... (DRY RUN)</span>
+
+  <span class="text-text-primary">buildcache</span>    3 items    <span class="text-amber">900 MiB</span>
+  <span class="text-text-primary">go</span>            2 items    <span class="text-amber">11 GiB</span>
+
+<span class="text-accent">Total: 12 GiB freed, 6 items in 1.1s</span>
 
 <span class="text-text-muted">$</span> clean-wizard clean <span class="text-accent">--mode</span> quick
 
-<span class="text-text-secondary">Running 5 cleaners in parallel...</span>
-  <span class="text-text-primary">Homebrew</span>      <span class="text-success">245 MB</span>
-  <span class="text-text-primary">Go</span>          <span class="text-success">1,204 MB</span>
-  <span class="text-text-primary">Node</span>          <span class="text-success">380 MB</span>
-  <span class="text-text-primary">BuildCache</span>    <span class="text-success">890 MB</span>
-  <span class="text-text-primary">TempFiles</span>     <span class="text-success">156 MB</span>
+<span class="text-text-secondary">Cleanup Results</span>
 
-<span class="text-accent">Freed 2.9 GB in 3.1s</span>`;
+  <span class="text-text-primary">buildcache</span>    3 items    <span class="text-success">900 MiB</span>
+  <span class="text-text-primary">go</span>            2 items    <span class="text-success">11 GiB</span>
+
+<span class="text-accent">Total: 12 GiB freed in 1.1s</span>`;
 
 const metrics = [
-  { value: '13', label: 'Cleaners' },
+  { value: '13', label: 'Caches covered' },
   { value: '2', label: 'Platforms' },
-  { value: '300+', label: 'Tests' },
-  { value: 'MIT', label: 'License' },
+  { value: '1', label: 'Command for all' },
+  { value: '0', label: 'Files lost' },
 ];
 ---
 
@@ -62,20 +79,20 @@ const metrics = [
         <span class="animate-pulse-dot absolute inline-flex w-full h-full rounded-full bg-accent"></span>
         <span class="relative inline-flex rounded-full w-2 h-2 bg-accent"></span>
       </span>
-      Disk space reclaimer for macOS and Linux
+      Open source disk cleaner for developers
     </div>
 
     <h1 class="text-[clamp(2.75rem,8vw,4.5rem)] font-bold tracking-tighter leading-[1.05] mb-6 text-text-primary">
-      Reclaim <span class="text-accent">gigabytes</span> in seconds.
+      One command to clean <span class="text-accent">every dev cache</span> on your machine.
     </h1>
 
     <p class="text-[clamp(1.0625rem,2.5vw,1.25rem)] text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
-      13 specialized cleaners for Nix, Docker, Go, Homebrew, Cargo, Node, and more. Dry-run previews, interactive TUI, and JSON output for automation.
+      Go build caches, Docker images, Nix generations, Homebrew downloads, node_modules, Cargo registries, and 7 more. Preview before deleting, automate with JSON, never lose what matters.
     </p>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
-      <a href="/getting-started/installation/" data-astro-prefetch class="px-6 py-3 bg-accent text-bg-primary font-semibold rounded-lg text-sm hover:bg-accent-hover transition-all duration-200 inline-flex items-center gap-2 border-none cursor-pointer shadow-lg shadow-accent/20 hover:shadow-accent/30 hover:-translate-y-0.5">
-        Get Started
+      <a href="/getting-started/quick-start/" data-astro-prefetch class="px-6 py-3 bg-accent text-bg-primary font-semibold rounded-lg text-sm hover:bg-accent-hover transition-all duration-200 inline-flex items-center gap-2 border-none cursor-pointer shadow-lg shadow-accent/20 hover:shadow-accent/30 hover:-translate-y-0.5">
+        Quick Start Guide
         <Icon name="arrow-right" size={16} />
       </a>
       <a href={siteConfig.github} target="_blank" rel="noopener noreferrer" class="px-6 py-3 border border-border text-text-secondary font-medium rounded-lg text-sm hover:border-border-hover hover:text-text-primary transition-all duration-200 inline-flex items-center gap-2 no-underline hover:-translate-y-0.5">

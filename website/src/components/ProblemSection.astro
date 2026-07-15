@@ -1,0 +1,32 @@
+---
+import { painPoints } from '../data/sections';
+import SectionHeader from './SectionHeader.astro';
+---
+
+<SectionHeader eyebrow="The Problem" title="Your dev machine is hiding gigabytes of cache." subtitle="Every tool you use leaves caches behind. They grow silently. And each one has a different cleanup command nobody remembers." />
+
+<div class="max-w-2xl mx-auto">
+  <div class="rounded-xl border border-border bg-bg-card backdrop-blur-sm overflow-hidden">
+    {painPoints.map((point, index) => (
+      <div class={`flex items-center justify-between px-5 py-4 ${index < painPoints.length - 1 ? 'border-b border-border/50' : ''}`}>
+        <div class="flex items-center gap-4">
+          <span class="text-sm font-mono font-semibold text-text-primary min-w-[80px]">{point.tool}</span>
+          <span class="text-xs text-text-muted">{point.detail}</span>
+        </div>
+        <span class="text-sm font-mono font-bold text-amber whitespace-nowrap">{point.size}</span>
+      </div>
+    ))}
+    <div class="flex items-center justify-between px-5 py-4 border-t-2 border-border bg-bg-card-solid/50">
+      <span class="text-sm font-semibold text-text-primary">Total on a typical dev machine</span>
+      <span class="text-lg font-mono font-bold text-accent">30+ GiB</span>
+    </div>
+  </div>
+  <p class="text-center text-sm text-text-muted mt-6 leading-relaxed">
+    Who remembers <code class="text-accent/80 font-mono text-xs">go clean -cache</code>,
+    <code class="text-accent/80 font-mono text-xs">docker system prune</code>,
+    <code class="text-accent/80 font-mono text-xs">nix-collect-garbage -d</code>,
+    <code class="text-accent/80 font-mono text-xs">brew cleanup</code>,
+    <code class="text-accent/80 font-mono text-xs">cargo cache -a</code>,
+    and 8 more?
+  </p>
+</div>

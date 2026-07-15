@@ -3,32 +3,32 @@ import type { Feature } from "./types";
 export const features: Feature[] = [
   {
     icon: "broom",
-    title: "13 Specialized Cleaners",
-    desc: "Nix, Docker, Go, Homebrew, Cargo, Node, Gradle, Maven, Xcode, and more. Each auto-detects whether its target is installed.",
+    title: "13 Dev Caches, One Command",
+    desc: "Go build caches, Docker images, Nix generations, Homebrew downloads, node_modules, Cargo registries, Gradle artifacts, and 7 more. Each is detected automatically based on what you have installed.",
   },
   {
     icon: "eye",
     title: "Dry-Run Previews",
-    desc: "See exactly what would be cleaned and how much space would be freed before a single byte is touched.",
+    desc: "See exactly what gets cleaned and how much space comes back before a single byte is touched. Run --dry-run on any command, always.",
   },
   {
     icon: "terminal",
-    title: "Interactive TUI",
-    desc: "Beautiful multi-select forms powered by Charm Bracelet. Pick cleaners, see sizes, confirm in one flow.",
+    title: "Interactive Terminal UI",
+    desc: "Pick what to clean from a beautiful interactive menu. See sizes, toggle cleaners on and off, and confirm, all without leaving your terminal.",
   },
   {
     icon: "bolt",
-    title: "Parallel Execution",
-    desc: "DAG-based workflow engine runs cleaners concurrently with configurable max concurrency and retry support.",
+    title: "All Cleaners at Once",
+    desc: "Every cleaner runs in parallel, not one by one. Set how many run at the same time, and failed cleaners retry automatically with exponential backoff.",
   },
   {
     icon: "shield",
-    title: "Safety First",
-    desc: "Confirmation dialogs, protected Nix generations, availability detection. Unavailable tools are skipped, not crashed.",
+    title: "Nothing Deleted Without Consent",
+    desc: "Confirmation required before any deletion. Current Nix generation is always protected. Tools that are not installed are skipped, never crash your run.",
   },
   {
     icon: "code",
-    title: "Type-Safe Core",
-    desc: "27 cache types as compile-time enums. Registry pattern, DI container, Result[T] error handling. 300+ tests.",
+    title: "Built for Automation",
+    desc: "Pipe results to jq, integrate with CI, schedule with cron. JSON output on every command makes Clean Wizard scriptable, predictable, and machine-readable.",
   },
 ];
