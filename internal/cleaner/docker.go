@@ -49,7 +49,7 @@ func (dc *DockerCleaner) Type() domain.OperationType {
 
 // Name returns the unique identifier for this cleaner.
 func (dc *DockerCleaner) Name() string {
-	return "docker"
+	return CleanerDocker
 }
 
 // IsAvailable checks if Docker is available.

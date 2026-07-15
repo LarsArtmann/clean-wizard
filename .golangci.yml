@@ -89,6 +89,10 @@ linters:
         - github.com/spf13/cobra.Command
         - github.com/maypok86/otter/v2.Options
         - github.com/caarlos0/env/v6.Options
+        - github.com/Azure/go-workflow.Workflow
+        - github.com/LarsArtmann/clean-wizard/internal/domain.CleanResult
+        - github.com/LarsArtmann/clean-wizard/internal/execution.WorkflowResult
+        - github.com/LarsArtmann/clean-wizard/internal/execution.resultCollector
     funlen:
       lines: 100
       statements: 60

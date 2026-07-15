@@ -25,7 +25,7 @@ func RegisterAllServices(injector do.Injector, cfg *domain.Config, settings RunS
 // CleanerPackage groups all cleaner-related provider registrations.
 // Using do.Package keeps the registration organized and composable,
 // matching BuildFlow's InfrastructurePackage / ApplicationPackage pattern.
-var CleanerPackage = do.Package(
+var CleanerPackage = do.Package( //nolint:gochecknoglobals
 	registerCleanerRegistry,
 )
 

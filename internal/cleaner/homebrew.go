@@ -44,7 +44,7 @@ func (hbc *HomebrewCleaner) Type() domain.OperationType {
 
 // Name returns the unique identifier for this cleaner.
 func (hbc *HomebrewCleaner) Name() string {
-	return "homebrew"
+	return CleanerHomebrew
 }
 
 // IsAvailable checks if Homebrew cleaner is available.

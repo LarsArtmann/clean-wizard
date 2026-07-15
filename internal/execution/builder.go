@@ -27,7 +27,7 @@ type Builder struct {
 
 // NewBuilder creates a Builder with the given options.
 func NewBuilder(verbose bool) *Builder {
-	return &Builder{verbose: verbose}
+	return &Builder{verbose: verbose, retry: nil}
 }
 
 // WithRetryConfig enables per-step retry on the builder.

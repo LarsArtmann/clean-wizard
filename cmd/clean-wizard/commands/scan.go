@@ -105,17 +105,7 @@ func runScanCommand(
 		fmt.Println()
 	}
 
-	// Get cleaner configurations
-	cleanerConfigs := GetCleanerConfigs(ctx, registry)
-
-	// Filter to available cleaners only
-	var availableCleaners []CleanerConfig
-
-	for _, c := range cleanerConfigs {
-		if c.Available == CleanerAvailabilityAvailable {
-			availableCleaners = append(availableCleaners, c)
-		}
-	}
+	availableCleaners := getAvailableConfigs(ctx, registry)
 
 	if len(availableCleaners) == 0 {
 		fmt.Println("ℹ️  No cleanable items found on this system.")
@@ -130,28 +120,11 @@ func runScanCommand(
 		fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableCleaners))
 	}
 
-	// Run scans via the workflow engine for parallel execution
-	selectedNames := make([]string, len(availableCleaners))
-	for i, c := range availableCleaners {
-		selectedNames[i] = getRegistryName(c.Type)
-	}
+	selectedNames := cleanerConfigsToNames(availableCleaners)
 
-	var runOpts []execution.RunOption
-	if verbose {
-		runOpts = append(runOpts, execution.WithVerbose(true))
-	}
-	if concurrency > 0 {
-		runOpts = append(runOpts, execution.WithMaxConcurrency(concurrency))
-	}
-	if retryProfile != "" {
-		rp := execution.RetryProfile(retryProfile)
-		if !rp.IsValid() {
-			return errorfamily.NewRejection("scan.invalid_retry_profile",
-				"invalid --retry-profile: "+retryProfile)
-		}
-		runOpts = append(runOpts, execution.WithRetry(rp.Apply()))
-	} else if retries > 0 {
-		runOpts = append(runOpts, execution.WithRetry(execution.RetryConfigFromAttempts(retries)))
+	runOpts, err := buildRunOptions(verbose, concurrency, retries, retryProfile)
+	if err != nil {
+		return errorfamily.WrapRejection(err, "scan.invalid_options", "invalid run options")
 	}
 
 	wr, err := execution.RunScans(ctx, registry, selectedNames, runOpts...)
@@ -159,31 +132,35 @@ func runScanCommand(
 		return fmt.Errorf("scan workflow execution failed: %w", err)
 	}
 
-	// Build display results from the workflow result
 	scanResults := buildScanResults(wr, availableCleaners)
 
-	var (
-		totalCleanable uint64
-		totalItems     uint
-	)
-	for _, r := range scanResults {
-		if r.BytesCleanable > 0 {
-			totalCleanable += r.BytesCleanable
-			totalItems += r.ItemsCount
-		}
-	}
-
-	// Output JSON if requested
 	if jsonOutput {
+		totalCleanable, totalItems := computeScanTotals(scanResults)
 		outputScanJSON(scanResults, totalCleanable, totalItems)
 
 		return nil
 	}
 
-	// Print table output
-	printScanTable(scanResults, verbose)
+	printScanSummary(ctx, registry, scanResults)
 
-	// Print summary
+	return nil
+}
+
+func computeScanTotals(results []ScanResult) (totalCleanable uint64, totalItems uint) {
+	for _, r := range results {
+		if r.BytesCleanable > 0 {
+			totalCleanable += r.BytesCleanable
+			totalItems += r.ItemsCount
+		}
+	}
+	return totalCleanable, totalItems
+}
+
+func printScanSummary(ctx context.Context, registry *cleaner.Registry, scanResults []ScanResult) {
+	printScanTable(scanResults, false)
+
+	totalCleanable, totalItems := computeScanTotals(scanResults)
+
 	fmt.Println()
 	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 	fmt.Printf(
@@ -192,7 +169,6 @@ func runScanCommand(
 		totalItems,
 	)
 
-	// Show Nix store size if available
 	printNixStoreSize(ctx, registry)
 
 	fmt.Println(HeaderStyle.Render("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
@@ -202,8 +178,14 @@ func runScanCommand(
 		fmt.Println("💡 Tip: Run 'clean-wizard clean' to remove these items")
 		fmt.Println("   Or use 'clean-wizard clean --dry-run' to preview first")
 	}
+}
 
-	return nil
+func cleanerConfigsToNames(configs []CleanerConfig) []string {
+	names := make([]string, len(configs))
+	for i, c := range configs {
+		names[i] = getRegistryName(c.Type)
+	}
+	return names
 }
 
 // buildScanResults converts a WorkflowResult into display-ready ScanResult structs.

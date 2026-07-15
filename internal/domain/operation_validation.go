@@ -15,6 +15,8 @@ const (
 	SeverityInfo    ValidationSeverity = "info"
 )
 
+const tempFilesOlderThanField = "temp_files.older_than"
+
 // ValidationContext provides strongly-typed validation context information.
 type ValidationContext struct {
 	ConfigPath      string            `json:"config_path,omitempty"`
@@ -112,7 +114,7 @@ func (os *OperationSettings) validateTempFilesSettings() error {
 
 	if os.TempFiles.OlderThan == "" {
 		return &ValidationError{ //nolint:exhaustruct
-			Field:   "temp_files.older_than",
+			Field:   tempFilesOlderThanField,
 			Message: "older_than is required",
 			Value:   os.TempFiles.OlderThan,
 		}
@@ -120,7 +122,7 @@ func (os *OperationSettings) validateTempFilesSettings() error {
 
 	if _, err := ParseCustomDuration(os.TempFiles.OlderThan); err != nil {
 		return &ValidationError{ //nolint:exhaustruct
-			Field:   "temp_files.older_than",
+			Field:   tempFilesOlderThanField,
 			Message: "older_than must be a valid duration (e.g., '7d', '24h')",
 			Value:   os.TempFiles.OlderThan,
 		}

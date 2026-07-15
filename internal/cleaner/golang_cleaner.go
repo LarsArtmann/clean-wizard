@@ -97,7 +97,7 @@ func (gc *GoCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates settings.
 func (gc *GoCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	return settings.ValidateSettings(domain.OperationTypeGoPackages) //nolint:wrapcheck
+	return settings.ValidateSettings(domain.OperationTypeGoPackages)
 }
 
 // Scan scans for Go caches.
@@ -230,7 +230,7 @@ func (gc *GoCleaner) logWarning(format string, args ...any) {
 
 // goProcessNames lists Go-related processes whose presence indicates
 // the Go cache may be in active use.
-var goProcessNames = []string{"go", "gopls", "golangci-lint", "dlv"}
+var goProcessNames = []string{"go", "gopls", "golangci-lint", "dlv"} //nolint:gochecknoglobals
 
 // hasOtherGoProcesses checks if there are other Go processes running
 // that might be using the Go cache, which could cause cache corruption

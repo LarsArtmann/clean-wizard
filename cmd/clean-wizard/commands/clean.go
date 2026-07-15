@@ -194,27 +194,9 @@ func runCleanCommand(
 
 	selectedNames := cleanerTypesToNames(selectedCleaners)
 
-	var runOpts []execution.RunOption
-	if verbose {
-		runOpts = append(runOpts, execution.WithVerbose(true))
-	}
-	if concurrency > 0 {
-		runOpts = append(runOpts, execution.WithMaxConcurrency(concurrency))
-	}
-	if retryProfile != "" {
-		rp := execution.RetryProfile(retryProfile)
-		if !rp.IsValid() {
-			return errorfamily.NewRejection(
-				"clean.invalid_retry_profile",
-				fmt.Sprintf(
-					"invalid --retry-profile %q: must be default, aggressive, conservative, or none",
-					retryProfile,
-				),
-			)
-		}
-		runOpts = append(runOpts, execution.WithRetry(rp.Apply()))
-	} else if retries > 0 {
-		runOpts = append(runOpts, execution.WithRetry(execution.RetryConfigFromAttempts(retries)))
+	runOpts, err := buildRunOptions(verbose, concurrency, retries, retryProfile)
+	if err != nil {
+		return errorfamily.WrapRejectionf(err, "clean.invalid_options", "mode=%v, profile=%v", mode, profile)
 	}
 
 	wr, err := execution.RunCleaners(ctx, registry, selectedNames, runOpts...)

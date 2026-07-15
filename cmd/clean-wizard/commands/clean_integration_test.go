@@ -9,6 +9,7 @@ import (
 // TestRunCleanCommand_DryRun_JSON verifies the full clean command pipeline:
 // flag parsing → config loading → DI container → registry → workflow → JSON output.
 func TestRunCleanCommand_DryRun_JSON(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("integration test: uses real system cleaners (slow)")
 	}

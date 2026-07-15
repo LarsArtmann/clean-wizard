@@ -35,7 +35,7 @@ func (cc *CargoCleaner) Type() domain.OperationType {
 
 // Name returns the cleaner name for result tracking.
 func (cc *CargoCleaner) Name() string {
-	return "cargo"
+	return CleanerCargo
 }
 
 // IsAvailable checks if Cargo is available.

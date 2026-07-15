@@ -116,7 +116,7 @@ func (scc *SystemCacheCleaner) Type() domain.OperationType {
 
 // Name returns the cleaner name for result tracking.
 func (scc *SystemCacheCleaner) Name() string {
-	return "systemcache"
+	return CleanerSystemCache
 }
 
 // IsAvailable checks if system cache cleaner is available.

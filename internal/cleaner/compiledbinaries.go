@@ -543,7 +543,7 @@ func (t *defaultBinaryTrashOperator) GetFileSize(path string) int64 {
 func (t *defaultBinaryTrashOperator) GetFileModTime(path string) (time.Time, error) {
 	info, err := os.Stat(path)
 	if err != nil {
-		return time.Time{}, err //nolint:wrapcheck
+		return time.Time{}, err
 	}
 
 	return info.ModTime(), nil

@@ -191,7 +191,7 @@ func runConfigValidateCommand(_ *cobra.Command, _ []string, _ string) error {
 		fmt.Println("💡 To create a valid configuration:")
 		fmt.Println("   clean-wizard init --minimal")
 
-		return err //nolint:wrapcheck
+		return err
 	}
 
 	fmt.Println("✅ Configuration is valid!")

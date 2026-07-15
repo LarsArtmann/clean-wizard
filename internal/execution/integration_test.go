@@ -19,6 +19,7 @@ import (
 // cleaner registry and runs a dry-run clean workflow through the go-workflow engine.
 // It verifies the end-to-end path: DI registry → builder → workflow.Do → result aggregation.
 func TestRunCleaners_RealRegistry_DryRun(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("integration test: uses real system cleaners (slow)")
 	}
@@ -43,6 +44,7 @@ func TestRunCleaners_RealRegistry_DryRun(t *testing.T) {
 // TestRunCleaners_PanicRecovery verifies that a panicking cleaner is recorded
 // as a failed step rather than silently swallowed.
 func TestRunCleaners_PanicRecovery(t *testing.T) {
+	t.Parallel()
 	registry := cleaner.NewRegistry()
 
 	registry.Register("panic-cleaner", &mockCleaner{
@@ -67,6 +69,7 @@ func TestRunCleaners_PanicRecovery(t *testing.T) {
 // TestRunCleaners_DeterministicOrdering verifies that results are returned in
 // registration order even when steps complete out of order due to parallelism.
 func TestRunCleaners_DeterministicOrdering(t *testing.T) {
+	t.Parallel()
 	registry := cleaner.NewRegistry()
 
 	registry.Register("slow", &delayedMockCleaner{
@@ -95,6 +98,7 @@ func TestRunCleaners_DeterministicOrdering(t *testing.T) {
 // TestRunCleaners_Retry verifies that retry options are wired correctly.
 // A cleaner that fails twice then succeeds should ultimately show as succeeded.
 func TestRunCleaners_Retry(t *testing.T) {
+	t.Parallel()
 	registry := cleaner.NewRegistry()
 
 	failingThenSucceeding := &retryableMockCleaner{
@@ -129,6 +133,7 @@ func TestRunCleaners_Retry(t *testing.T) {
 
 // TestRunScans_RealRegistry_DryRun is an integration test for the scan workflow path.
 func TestRunScans_RealRegistry_DryRun(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("integration test: uses real system cleaners (slow)")
 	}
@@ -145,6 +150,7 @@ func TestRunScans_RealRegistry_DryRun(t *testing.T) {
 // retried — the NextBackOff hook returns backoff.Stop immediately. The cleaner
 // must be called exactly once, not MaxAttempts times.
 func TestRunCleaners_SmartRetry_NotAvailable(t *testing.T) {
+	t.Parallel()
 	registry := cleaner.NewRegistry()
 
 	naCleaner := &countingMockCleaner{
@@ -186,6 +192,7 @@ func TestRunCleaners_SmartRetry_NotAvailable(t *testing.T) {
 // Transient error IS retried up to MaxAttempts. Uses errorfamily.NewTransient
 // to classify the error as retryable.
 func TestRunCleaners_SmartRetry_Transient(t *testing.T) {
+	t.Parallel()
 	registry := cleaner.NewRegistry()
 
 	transientCleaner := &countingMockCleaner{
