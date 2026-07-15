@@ -123,12 +123,13 @@ Clean Wizard Architecture
 - `CacheType` (Spotlight, Xcode, CocoaPods, Homebrew, Pip, Npm, Yarn, Ccache)
 
 **Enum Usage Status:**
-| Enum | Values Defined | Values Used | Gap |
-|------|---------------|-------------|-----|
-| BuildToolType | 6 | 2 (JAVA, SCALA) | 4 unused |
-| CacheType | 8 | 4 (first 4) | 4 unused |
-| VersionManagerType | 6 | 3 (NVM, PYENV, RBENV) | 3 unused, 1 NO-OP |
-| DockerPruneMode | 5 | 1 (ALL) | 4 unused |
+
+| Enum               | Values Defined | Values Used           | Gap               |
+| ------------------ | -------------- | --------------------- | ----------------- |
+| BuildToolType      | 6              | 2 (JAVA, SCALA)       | 4 unused          |
+| CacheType          | 8              | 4 (first 4)           | 4 unused          |
+| VersionManagerType | 6              | 3 (NVM, PYENV, RBENV) | 3 unused, 1 NO-OP |
+| DockerPruneMode    | 5              | 1 (ALL)               | 4 unused          |
 
 ### 2.3 Registry Pattern
 
@@ -242,16 +243,17 @@ return []CleanerType{
 ```
 
 **vs SystemNix `clean-quick`:**
-| Feature | SystemNix | Clean Wizard | Status |
-|---------|-----------|--------------|--------|
-| Homebrew | ✅ | ✅ | ✅ Matching |
-| npm | ✅ | ✅ | ✅ Matching |
-| pnpm | ✅ | ✅ | ✅ Matching |
-| Go | ✅ | ✅ | ✅ Matching |
-| Temp Files | ✅ | ✅ | ✅ Matching |
-| Build Cache | ❌ | ✅ | ✅ Clean Wizard |
-| Docker Light | ✅ | ❌ | 🔴 Missing |
-| Nix Temp Files | ✅ | ❌ | 🔴 Missing |
+
+| Feature        | SystemNix | Clean Wizard | Status          |
+| -------------- | --------- | ------------ | --------------- |
+| Homebrew       | ✅        | ✅           | ✅ Matching     |
+| npm            | ✅        | ✅           | ✅ Matching     |
+| pnpm           | ✅        | ✅           | ✅ Matching     |
+| Go             | ✅        | ✅           | ✅ Matching     |
+| Temp Files     | ✅        | ✅           | ✅ Matching     |
+| Build Cache    | ❌        | ✅           | ✅ Clean Wizard |
+| Docker Light   | ✅        | ❌           | 🔴 Missing      |
+| Nix Temp Files | ✅        | ❌           | 🔴 Missing      |
 
 **Gap: 2 missing features**
 
@@ -265,16 +267,17 @@ return allRegisteredCleaners()
 ```
 
 **vs SystemNix `clean`:**
-| Feature | SystemNix | Clean Wizard | Status |
-|---------|-----------|--------------|--------|
-| Nix GC | ✅ | ✅ | ✅ Matching |
-| Docker Full | ✅ | ✅ | ✅ Matching |
-| Xcode | ✅ | ✅ | ✅ Matching |
-| Nix Optimization | ✅ | ❌ | 🔴 Missing |
-| Nix Profiles | ✅ | ❌ | 🔴 Missing |
-| iOS Simulators | ✅ | ❌ | 🔴 Missing |
-| Size Before/After | ✅ | ❌ | 🔴 Missing |
-| Disk Space Display | ✅ | ❌ | 🔴 Missing |
+
+| Feature            | SystemNix | Clean Wizard | Status      |
+| ------------------ | --------- | ------------ | ----------- |
+| Nix GC             | ✅        | ✅           | ✅ Matching |
+| Docker Full        | ✅        | ✅           | ✅ Matching |
+| Xcode              | ✅        | ✅           | ✅ Matching |
+| Nix Optimization   | ✅        | ❌           | 🔴 Missing  |
+| Nix Profiles       | ✅        | ❌           | 🔴 Missing  |
+| iOS Simulators     | ✅        | ❌           | 🔴 Missing  |
+| Size Before/After  | ✅        | ❌           | 🔴 Missing  |
+| Disk Space Display | ✅        | ❌           | 🔴 Missing  |
 
 **Gap: 5 missing features**
 
@@ -288,14 +291,15 @@ return allRegisteredCleanersWithDangerous()
 ```
 
 **vs SystemNix `clean-aggressive`:**
-| Feature | SystemNix | Clean Wizard | Status |
-|---------|-----------|--------------|--------|
-| All Standard | ✅ | ✅ | ✅ Matching |
-| Language Versions | ✅ | ❌ NO-OP | 🔴 Broken |
-| iOS ALL Delete | ✅ | ❌ | 🔴 Missing |
-| Nix All Generations | ✅ | ⚠️ Count-based | 🟡 Different |
-| Nix All Profiles | ✅ | ❌ | 🔴 Missing |
-| Full Confirmation | ⚠️ | ⚠️ | 🟡 Different |
+
+| Feature             | SystemNix | Clean Wizard   | Status       |
+| ------------------- | --------- | -------------- | ------------ |
+| All Standard        | ✅        | ✅             | ✅ Matching  |
+| Language Versions   | ✅        | ❌ NO-OP       | 🔴 Broken    |
+| iOS ALL Delete      | ✅        | ❌             | 🔴 Missing   |
+| Nix All Generations | ✅        | ⚠️ Count-based | 🟡 Different |
+| Nix All Profiles    | ✅        | ❌             | 🔴 Missing   |
+| Full Confirmation   | ⚠️        | ⚠️             | 🟡 Different |
 
 **Gap: 8 missing/broken features**
 

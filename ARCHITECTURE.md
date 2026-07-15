@@ -216,8 +216,8 @@ type TypeSafeEnum[T any] interface {
 All enums support both string and integer representations:
 
 ```yaml
-risk_level: HIGH      # String form
-risk_level: 2         # Integer form (equivalent to HIGH)
+risk_level: HIGH # String form
+risk_level: 2 # Integer form (equivalent to HIGH)
 ```
 
 ---

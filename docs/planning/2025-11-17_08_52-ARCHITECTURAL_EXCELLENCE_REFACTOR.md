@@ -199,7 +199,7 @@ These changes transform good code into excellent code:
     - **Effort:** 25 minutes
     - **Impact:** Code cleanliness
 
-26. **Standardize naming (Config* vs *Config)**
+26. _*Standardize naming (Config* vs *Config)*_
     - **Value:** 0.3%
     - **Effort:** 30 minutes
     - **Impact:** Consistency

@@ -83,13 +83,14 @@
 - Committed and pushed: `5e94e2a`
 
 **Command Mapping**:
-| Domain Enum | Docker Command | Purpose |
-|-------------|---------------|---------|
-| `DockerPruneAll` | `docker system prune -af --volumes` | Clean everything |
-| `DockerPruneImages` | `docker image prune -af` | Clean images only |
-| `DockerPruneContainers` | `docker container prune -f` | Clean containers only |
-| `DockerPruneVolumes` | `docker volume prune -f` | Clean volumes only |
-| `DockerPruneBuilds` | `docker builder prune -af` | Clean build cache |
+
+| Domain Enum             | Docker Command                      | Purpose               |
+| ----------------------- | ----------------------------------- | --------------------- |
+| `DockerPruneAll`        | `docker system prune -af --volumes` | Clean everything      |
+| `DockerPruneImages`     | `docker image prune -af`            | Clean images only     |
+| `DockerPruneContainers` | `docker container prune -f`         | Clean containers only |
+| `DockerPruneVolumes`    | `docker volume prune -f`            | Clean volumes only    |
+| `DockerPruneBuilds`     | `docker builder prune -af`          | Clean build cache     |
 
 **Files Modified**:
 

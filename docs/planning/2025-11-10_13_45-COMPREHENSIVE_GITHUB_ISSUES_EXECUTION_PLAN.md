@@ -580,7 +580,7 @@ profiles:
     operations:
       - name: "nix-generations"
         description: "Clean old Nix package generations"
-        risk_level: "LOW"  # NEW: Standardized risk_level field
+        risk_level: "LOW" # NEW: Standardized risk_level field
         enabled: true
         settings:
           keep_count: 3

@@ -11,11 +11,12 @@
 Clean Wizard currently has the **architectural foundation** to replace SystemNix but is missing **critical features** that would make it your "ultimate MacBook storage cleanup tool."
 
 **Gap Summary:**
-| SystemNix Command | Clean Wizard Equivalent | Feature Parity | Critical Gaps |
-|-------------------|------------------------|----------------|---------------|
-| `clean-quick` | `clean --mode quick` | ~85% | Docker light, Nix temp files |
-| `clean` | `clean --mode standard` | ~75% | Nix optimization, Nix profiles, iOS |
-| `clean-aggressive` | `clean --mode aggressive` | ~60% | Language managers (NO-OP), full Xcode |
+
+| SystemNix Command  | Clean Wizard Equivalent   | Feature Parity | Critical Gaps                         |
+| ------------------ | ------------------------- | -------------- | ------------------------------------- |
+| `clean-quick`      | `clean --mode quick`      | ~85%           | Docker light, Nix temp files          |
+| `clean`            | `clean --mode standard`   | ~75%           | Nix optimization, Nix profiles, iOS   |
+| `clean-aggressive` | `clean --mode aggressive` | ~60%           | Language managers (NO-OP), full Xcode |
 
 ---
 

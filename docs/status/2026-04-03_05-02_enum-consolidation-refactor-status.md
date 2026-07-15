@@ -52,11 +52,12 @@
 - Updated error message test expectations to match new `EnumUnmarshalYAML` format
 
 **Uncommitted files:**
-| File | Change |
-|------|--------|
-| `internal/domain/enum_macros.go` | +3 lines (added `stringUnknown` const, fixed `:=` → `=`) |
-| `internal/domain/operation_settings.go` | 390→152 lines (full rewrite) |
-| `internal/domain/enum_yaml_test.go` | Updated marshaling + error expectations |
+
+| File                                    | Change                                                   |
+| --------------------------------------- | -------------------------------------------------------- |
+| `internal/domain/enum_macros.go`        | +3 lines (added `stringUnknown` const, fixed `:=` → `=`) |
+| `internal/domain/operation_settings.go` | 390→152 lines (full rewrite)                             |
+| `internal/domain/enum_yaml_test.go`     | Updated marshaling + error expectations                  |
 
 ---
 

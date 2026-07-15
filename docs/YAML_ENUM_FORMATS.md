@@ -281,10 +281,10 @@ profiles:
 String format is case-insensitive, so all these are valid:
 
 ```yaml
-prune_mode: "ALL"      # ✅ Uppercase (preferred)
-prune_mode: "all"      # ✅ Lowercase (valid)
-prune_mode: "All"      # ✅ Mixed case (valid)
-prune_mode: "aLl"      # ✅ Valid but ugly (don't do this)
+prune_mode: "ALL" # ✅ Uppercase (preferred)
+prune_mode: "all" # ✅ Lowercase (valid)
+prune_mode: "All" # ✅ Mixed case (valid)
+prune_mode: "aLl" # ✅ Valid but ugly (don't do this)
 ```
 
 **Recommendation:** Use uppercase strings for consistency with enum definitions.
