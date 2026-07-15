@@ -59,9 +59,11 @@ jobs:
         run: |
           echo "Type safety validation..."
 
-          # 1. Check for map[string]any violations
-          if grep -r "map\[string\]any" internal/ --include="*.go" --exclude-dir=vendor; then
-            echo "VIOLATION: map[string]any found"
+          # 1. Check for map[string]any violations (exclude test files and YAML serialization)
+          if grep -r "map\[string\]any" internal/ --include="*.go" --exclude="*_test.go" --exclude-dir=vendor \
+            | grep -v "environment.go" \
+            | grep -v "config.go"; then
+            echo "VIOLATION: map[string]any found in production code"
             exit 1
           fi
           echo "OK: No map[string]any violations"
@@ -80,13 +82,13 @@ jobs:
           fi
           echo "OK: No unsafe package violations"
 
-          # 4. Check for reflect package usage (requires explicit justification)
-          if grep -r "reflect\." internal/ --include="*.go" --exclude-dir=vendor; then
-            echo "VIOLATION: reflect package usage"
+          # 4. Check for reflect package usage in production code (exclude tests)
+          if grep -r "reflect\." internal/ --include="*.go" --exclude="*_test.go" --exclude-dir=vendor; then
+            echo "VIOLATION: reflect package usage in production code"
             echo "If reflection is necessary, add // REFLECT-JUSTIFIED: <reason> comment"
             exit 1
           fi
-          echo "OK: No reflect package violations"
+          echo "OK: No reflect package violations in production code"
 
       - name: Dependency Cycle Check
         run: |

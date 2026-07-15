@@ -127,14 +127,14 @@ func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
 	}
 }
 
-// TestNewCleanerConstructor tests a cleaner constructor function with different
+// VerifyNewCleanerConstructor tests a cleaner constructor function with different
 // combinations of verbose and dryRun parameters.
 // This eliminates duplicate test code across multiple cleaner test files.
 //
 // Usage:
 //
 //	func TestNewXxxCleaner(t *testing.T) {
-//	    TestNewCleanerConstructor(t, NewXxxCleaner, "NewXxxCleaner")
+//	    VerifyNewCleanerConstructor(t, NewXxxCleaner, "NewXxxCleaner")
 //	}
 //
 // Type Parameters:
@@ -144,11 +144,12 @@ func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
 //   - t: The testing.T object
 //   - constructor: Function that creates a cleaner with given verbose and dryRun flags
 //   - cleanerName: Name of the cleaner for error messages
-func TestNewCleanerConstructor[T any](
+func VerifyNewCleanerConstructor[T any](
 	t *testing.T,
 	constructor func(bool, bool) T,
 	cleanerName string,
 ) {
+	t.Helper()
 	tests := []struct {
 		name    string
 		verbose bool

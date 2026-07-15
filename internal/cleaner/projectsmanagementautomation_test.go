@@ -9,7 +9,7 @@ import (
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
 	t.Parallel()
-	TestNewCleanerConstructor(
+	VerifyNewCleanerConstructor(
 		t,
 		NewProjectsManagementAutomationCleaner,
 		"NewProjectsManagementAutomationCleaner",

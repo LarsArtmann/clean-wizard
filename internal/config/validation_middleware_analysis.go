@@ -1,8 +1,6 @@
 package config
 
 import (
-	"reflect"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
@@ -143,7 +141,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 			// Deep comparison instead of just checking length
 			if currentProfile.Name != proposedProfile.Name ||
 				currentProfile.Description != proposedProfile.Description ||
-				!reflect.DeepEqual(currentProfile.Operations, proposedProfile.Operations) {
+				!operationsEqual(currentProfile.Operations, proposedProfile.Operations) {
 				changes = append(changes, ConfigChange{
 					Field:     "profiles." + name,
 					OldValue:  currentProfile.Name,
@@ -156,6 +154,29 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 	}
 
 	return changes
+}
+
+// operationsEqual compares two slices of CleanupOperation for deep equality
+// without using reflect.DeepEqual.
+func operationsEqual(a, b []domain.CleanupOperation) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Name != b[i].Name ||
+			a[i].Description != b[i].Description ||
+			a[i].RiskLevel != b[i].RiskLevel ||
+			a[i].Enabled != b[i].Enabled {
+			return false
+		}
+		if (a[i].Settings == nil) != (b[i].Settings == nil) {
+			return false
+		}
+		if a[i].Settings != nil && *a[i].Settings != *b[i].Settings {
+			return false
+		}
+	}
+	return true
 }
 
 // Helper methods for change analysis

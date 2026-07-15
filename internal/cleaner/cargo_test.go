@@ -10,7 +10,7 @@ import (
 
 func TestNewCargoCleaner(t *testing.T) {
 	t.Parallel()
-	TestNewCleanerConstructor(t, NewCargoCleaner, "NewCargoCleaner")
+	VerifyNewCleanerConstructor(t, NewCargoCleaner, "NewCargoCleaner")
 }
 
 func TestCargoCleaner_Type(t *testing.T) {
