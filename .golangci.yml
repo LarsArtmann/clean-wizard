@@ -122,7 +122,7 @@ linters:
         - go-require
       enable-all: true
     wrapcheck:
-      ignorePackageGlobs:
+      ignore-pkg-globs:
         - github.com/LarsArtmann/clean-wizard/internal/*
         - encoding/*
         - os
@@ -186,11 +186,6 @@ formatters:
     - gofumpt
     - golines
   settings:
-    enable:
-      - gci
-      - goimports
-      - gofumpt
-      - golines
     golines:
       max-len: 120
   exclusions:
