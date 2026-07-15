@@ -54,7 +54,6 @@ jobs:
         uses: golangci/golangci-lint-action@v7
         with:
           version: latest
-          install-mode: goinstall
 
       - name: Type Safety Linting
         run: |
