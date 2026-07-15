@@ -59,8 +59,9 @@ jobs:
         run: |
           echo "Type safety validation..."
 
-          # 1. Check for map[string]any violations (exclude test files and YAML serialization)
+          # 1. Check for map[string]any violations (exclude tests, comments, YAML serialization)
           if grep -r "map\[string\]any" internal/ --include="*.go" --exclude="*_test.go" --exclude-dir=vendor \
+            | grep -v "//" \
             | grep -v "environment.go" \
             | grep -v "config.go"; then
             echo "VIOLATION: map[string]any found in production code"
@@ -82,8 +83,9 @@ jobs:
           fi
           echo "OK: No unsafe package violations"
 
-          # 4. Check for reflect package usage in production code (exclude tests)
-          if grep -r "reflect\." internal/ --include="*.go" --exclude="*_test.go" --exclude-dir=vendor; then
+          # 4. Check for reflect package usage in production code (exclude tests and comments)
+          if grep -r "reflect\." internal/ --include="*.go" --exclude="*_test.go" --exclude-dir=vendor \
+            | grep -v "//"; then
             echo "VIOLATION: reflect package usage in production code"
             echo "If reflection is necessary, add // REFLECT-JUSTIFIED: <reason> comment"
             exit 1
