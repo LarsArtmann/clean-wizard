@@ -27,7 +27,7 @@ jobs:
         run: go build ./...
 
       - name: Test
-        run: go test ./... -short -race -coverprofile=coverage.out
+        run: go test ./... -short -race -v -coverprofile=coverage.out
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
