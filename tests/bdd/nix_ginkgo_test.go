@@ -19,6 +19,9 @@ import (
 // (Nix, GitHistory, and future cleaner BDD tests).
 func TestCleanWizardBDDSuite(t *testing.T) {
 	t.Parallel()
+	if testing.Short() {
+		t.Skip("BDD tests require Nix — skipped in short mode")
+	}
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "Clean Wizard BDD Suite")
 }
