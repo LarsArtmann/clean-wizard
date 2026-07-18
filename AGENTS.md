@@ -1,7 +1,5 @@
 # Clean Wizard - Project Instructions
 
-**Updated:** 2026-07-13 (encoding/json/v2 migration: GOEXPERIMENT=jsonv2 required)
-
 ## Build & Test
 
 **Requires `GOEXPERIMENT=jsonv2`** (set in flake.nix devShell/build or `export GOEXPERIMENT=jsonv2` for standalone):
