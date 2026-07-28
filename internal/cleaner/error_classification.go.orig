@@ -37,7 +37,8 @@ func init() {
 	// (e.g. "nix store gc" fails). These are Transient: retrying may succeed
 	// if the failure was caused by a lock contention or temporary I/O issue.
 	errorfamily.RegisterClassifier(func(err error) (errorfamily.Family, bool) {
-		if _, ok := errors.AsType[*exec.ExitError](err); ok {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
 			return errorfamily.Transient, true
 		}
 		return errorfamily.Transient, false
@@ -51,8 +52,8 @@ func init() {
 	// that won't resolve on retry: a full disk (ENOSPC), a read-only filesystem
 	// (EROFS), or a loop in the filesystem (ELOOP).
 	errorfamily.RegisterClassifier(func(err error) (errorfamily.Family, bool) {
-		pathErr, ok := errors.AsType[*os.PathError](err)
-		if !ok {
+		var pathErr *os.PathError
+		if !errors.As(err, &pathErr) {
 			return errorfamily.Transient, false
 		}
 
