@@ -90,10 +90,10 @@ var GoCacheFlags = cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.G
 
 ```json
 {
-  "name": "Go Packages",
-  "items_removed": 4,
-  "freed_bytes": 209715200,
-  "status": "success"
+	"name": "Go Packages",
+	"items_removed": 4,
+	"freed_bytes": 209715200,
+	"status": "success"
 }
 ```
 

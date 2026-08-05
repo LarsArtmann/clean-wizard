@@ -261,9 +261,9 @@ JSON serialization uses string representation only:
 
 ```json
 {
-  "risk_level": "HIGH",
-  "validation_level": "COMPREHENSIVE",
-  "strategy": "conservative"
+	"risk_level": "HIGH",
+	"validation_level": "COMPREHENSIVE",
+	"strategy": "conservative"
 }
 ```
 

@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 10m
-  go: 1.26.4
+  go: 1.26.5
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -17,21 +17,35 @@ output:
   formats: {}
 linters:
   enable:
+    - asasalint
+    - asciicheck
+    - bidichk
     - bodyclose
+    - canonicalheader
+    - containedctx
     - contextcheck
     - copyloopvar
     - cyclop
+    - decorder
+    - dogsled
     - dupl
+    - dupword
     - durationcheck
+    - embeddedstructfieldcheck
+    - err113
     - errcheck
     - errchkjson
     - errname
     - errorlint
     - exhaustive
     - exhaustruct
+    - exptostd
+    - fatcontext
+    - forbidigo
     - forcetypeassert
     - funlen
     - ginkgolinter
+    - gocheckcompilerdirectives
     - gochecknoglobals
     - gochecknoinits
     - gochecksumtype
@@ -39,28 +53,48 @@ linters:
     - goconst
     - gocritic
     - gocyclo
+    - godoclint
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard_v2
+    - goprintffuncname
     - gosec
     - gosmopolitan
     - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
     - ineffassign
     - interfacebloat
     - intrange
+    - iotamixing
+    - ireturn
     - loggercheck
     - maintidx
+    - makezero
     - mirror
     - misspell
+    - mnd
+    - modernize
     - musttag
     - nakedret
     - nestif
     - nilerr
     - nilnesserr
     - nilnil
+    - nlreturn
     - noctx
     - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
     - paralleltest
     - perfsprint
     - prealloc
     - predeclared
+    - promlinter
     - protogetter
     - reassign
     - recvcheck
@@ -70,19 +104,47 @@ linters:
     - spancheck
     - sqlclosecheck
     - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
     - testifylint
+    - testpackage
     - thelper
+    - tparallel
     - unconvert
     - unparam
+    - unqueryvet
     - unused
+    - usestdlibvars
     - usetesting
+    - varnamelen
     - wastedassign
+    - whitespace
     - wrapcheck
+    - wsl_v5
     - zerologlint
   default: none
   settings:
     cyclop:
       max-complexity: 15
+    errcheck:
+      exclude-functions:
+        - (*os.File).Close
+        - (io.Closer).Close
+        - (*sql.DB).Close
+        - (*sql.Rows).Close
+        - (*sql.Stmt).Close
+        - (net.Conn).Close
+        - (*net.TCPConn).Close
+        - (*net.UDPConn).Close
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Print
+        - fmt.Printf
+        - fmt.Println
+        - (*strings.Builder).WriteString
+        - (*bytes.Buffer).WriteString
     exhaustruct:
       exclude:
         - os/exec.Cmd
@@ -104,6 +166,8 @@ linters:
     gocritic:
       disabled-checks:
         - ifElseChain
+    gomoddirectives:
+      replace-local: true
     gosec:
       excludes:
         - G115
@@ -113,6 +177,21 @@ linters:
         - G304
         - G306
         - G703
+    ireturn:
+      allow:
+        - error
+        - empty
+        - anon
+        - stdlib
+        - generic
+    makezero:
+      always: true
+    mnd:
+      ignored-numbers:
+        - "0"
+        - "1"
+        - "2"
+        - "100"
     nestif:
       min-complexity: 7
     revive:
@@ -125,6 +204,21 @@ linters:
       disable:
         - go-require
       enable-all: true
+    varnamelen:
+      ignore-map-index-ok: true
+      ignore-names:
+        - err
+        - ok
+        - tt
+        - fn
+        - t
+        - i
+        - m
+        - g
+        - a
+        - b
+        - v
+      ignore-type-assert-ok: true
     wrapcheck:
       ignore-package-globs:
         - github.com/LarsArtmann/clean-wizard/internal/*

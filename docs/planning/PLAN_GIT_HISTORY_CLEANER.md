@@ -788,48 +788,48 @@ Feature: Git History Binary Removal
 
 ```json
 {
-  "gitHistory": {
-    "type": "object",
-    "description": "Git history cleaning configuration",
-    "properties": {
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "maxFileSizeMB": {
-        "type": "integer",
-        "description": "Files larger than this are candidates for removal",
-        "default": 10,
-        "minimum": 1
-      },
-      "minBlobSizeKB": {
-        "type": "integer",
-        "description": "Minimum blob size to consider",
-        "default": 50,
-        "minimum": 1
-      },
-      "autoDetectBinaries": {
-        "type": "boolean",
-        "description": "Use heuristics to detect binary content",
-        "default": true
-      },
-      "targetPaths": {
-        "type": "array",
-        "items": { "type": "string" },
-        "description": "Specific paths to scan (empty = all)"
-      },
-      "excludePaths": {
-        "type": "array",
-        "items": { "type": "string" },
-        "description": "Paths to ignore"
-      },
-      "binaryExtensions": {
-        "type": "array",
-        "items": { "type": "string" },
-        "description": "File extensions considered binary"
-      }
-    }
-  }
+	"gitHistory": {
+		"type": "object",
+		"description": "Git history cleaning configuration",
+		"properties": {
+			"enabled": {
+				"type": "boolean",
+				"default": true
+			},
+			"maxFileSizeMB": {
+				"type": "integer",
+				"description": "Files larger than this are candidates for removal",
+				"default": 10,
+				"minimum": 1
+			},
+			"minBlobSizeKB": {
+				"type": "integer",
+				"description": "Minimum blob size to consider",
+				"default": 50,
+				"minimum": 1
+			},
+			"autoDetectBinaries": {
+				"type": "boolean",
+				"description": "Use heuristics to detect binary content",
+				"default": true
+			},
+			"targetPaths": {
+				"type": "array",
+				"items": { "type": "string" },
+				"description": "Specific paths to scan (empty = all)"
+			},
+			"excludePaths": {
+				"type": "array",
+				"items": { "type": "string" },
+				"description": "Paths to ignore"
+			},
+			"binaryExtensions": {
+				"type": "array",
+				"items": { "type": "string" },
+				"description": "File extensions considered binary"
+			}
+		}
+	}
 }
 ```
 

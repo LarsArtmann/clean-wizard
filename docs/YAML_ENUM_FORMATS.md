@@ -369,10 +369,10 @@ Add to `.vscode/settings.json`:
 
 ```json
 {
-  "yaml.validate": true,
-  "yaml.schemas": {
-    "./schemas/config.schema.json": ["*.yaml", "*.yml"]
-  }
+	"yaml.validate": true,
+	"yaml.schemas": {
+		"./schemas/config.schema.json": ["*.yaml", "*.yml"]
+	}
 }
 ```
 

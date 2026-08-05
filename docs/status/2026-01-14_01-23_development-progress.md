@@ -31,15 +31,15 @@ Successfully implemented core cleaning operations, JSON output for scripting, te
 
 ```json
 {
-  "status": "success",
-  "items_removed": 2,
-  "items_failed": 0,
-  "freed_bytes": 104857600,
-  "freed_bytes_human": "100.0 MB",
-  "duration_ms": 678,
-  "strategy": "dry-run",
-  "dry_run": true,
-  "cleaned_at": "2026-01-14T00:39:25.792348+01:00"
+	"status": "success",
+	"items_removed": 2,
+	"items_failed": 0,
+	"freed_bytes": 104857600,
+	"freed_bytes_human": "100.0 MB",
+	"duration_ms": 678,
+	"strategy": "dry-run",
+	"dry_run": true,
+	"cleaned_at": "2026-01-14T00:39:25.792348+01:00"
 }
 ```
 
