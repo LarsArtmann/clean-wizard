@@ -34,8 +34,10 @@ func RetryConfigFromAttempts(maxAttempts int) *RetryConfig {
 	if maxAttempts <= 0 {
 		return nil
 	}
+
 	cfg := DefaultRetryConfig()
 	cfg.MaxAttempts = maxAttempts
+
 	return &cfg
 }
 
@@ -73,6 +75,7 @@ func (p RetryProfile) Apply() *RetryConfig {
 	switch p {
 	case RetryProfileDefault:
 		cfg := DefaultRetryConfig()
+
 		return &cfg
 	case RetryProfileAggressive:
 		return &RetryConfig{
@@ -90,6 +93,7 @@ func (p RetryProfile) Apply() *RetryConfig {
 		return nil
 	default: // empty string — treat as default
 		cfg := DefaultRetryConfig()
+
 		return &cfg
 	}
 }

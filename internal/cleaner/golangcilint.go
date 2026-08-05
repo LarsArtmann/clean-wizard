@@ -8,11 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dustin/go-humanize"
-
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	"github.com/dustin/go-humanize"
 )
 
 // golangciLintCommandTimeout is the timeout for golangci-lint operations.
@@ -104,6 +103,7 @@ func parseSize(sizeStr string) (int64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("invalid size format: %q: %w", sizeStr, err)
 	}
+
 	return int64(bytes), nil
 }
 

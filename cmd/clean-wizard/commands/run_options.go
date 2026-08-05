@@ -28,6 +28,7 @@ func buildRunOptions(verbose bool, concurrency int, retries int, retryProfile st
 				retryProfile,
 			)
 		}
+
 		opts = append(opts, execution.WithRetry(rp.Apply()))
 	} else if retries > 0 {
 		opts = append(opts, execution.WithRetry(execution.RetryConfigFromAttempts(retries)))

@@ -70,6 +70,7 @@ func testRiskLevelMethod(
 	for _, tc := range riskLevelTestCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := method(tc.level)
 
 			expect := expected[tc.level]
@@ -97,6 +98,7 @@ func testIsValid[T validatable](t *testing.T, tests []struct {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := tt.value.IsValid()
 			if result != tt.expected {
 				t.Errorf("IsValid() = %v, want %v", result, tt.expected)
@@ -125,6 +127,7 @@ func TestRiskLevel_Icon(t *testing.T) {
 
 func TestRiskLevel_IsValid(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		value    domain.RiskLevelType
@@ -144,6 +147,7 @@ func TestRiskLevel_IsValid(t *testing.T) {
 
 func TestCleanType_IsValid(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		value    CleanType
@@ -162,6 +166,7 @@ func TestCleanType_IsValid(t *testing.T) {
 
 func TestSafeConfigBuilder_Build(t *testing.T) {
 	t.Parallel()
+
 	validBuilderFunc := func() *SafeConfigBuilder {
 		return NewSafeConfigBuilder().
 			AddProfile("test", "test profile").
@@ -207,6 +212,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			config, err := tt.builderFunc().Build()
 
 			if tt.expectError {
@@ -238,6 +244,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 
 func TestSafeProfileBuilder_Build(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name        string
 		builderFunc func() *SafeProfileBuilder

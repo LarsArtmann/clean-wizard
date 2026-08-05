@@ -19,9 +19,11 @@ import (
 // (Nix, GitHistory, and future cleaner BDD tests).
 func TestCleanWizardBDDSuite(t *testing.T) {
 	t.Parallel()
+
 	if testing.Short() {
 		t.Skip("BDD tests require Nix — skipped in short mode")
 	}
+
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "Clean Wizard BDD Suite")
 }
@@ -74,6 +76,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 		ginkgo.It("should have valid ID for each generation", func() {
 			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
+
 			generations := testCtx.generations.Value()
 			for _, gen := range generations {
 				gomega.Expect(gen.ID).To(gomega.BeNumerically(">", 0))
@@ -82,6 +85,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 		ginkgo.It("should have creation date for each generation", func() {
 			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
+
 			generations := testCtx.generations.Value()
 			for _, gen := range generations {
 				gomega.Expect(gen.Date).NotTo(gomega.BeZero())
@@ -113,6 +117,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 		ginkgo.It("should estimate space to be freed", func() {
 			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
+
 			testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, 3)
 			if testCtx.cleanResult.IsOk() {
 				cleanRes := testCtx.cleanResult.Value()
@@ -146,6 +151,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		ginkgo.It("should keep specified number of generations", func() {
 			keepCount := 3
 			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 4)
+
 			generations := testCtx.generations.Value()
 			if len(generations) > keepCount {
 				testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, keepCount)
@@ -201,6 +207,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			generations := nixCtx.generations.Value()
 			gomega.Expect(generations).ToNot(gomega.BeEmpty())
+
 			for _, gen := range generations {
 				gomega.Expect(gen.ID).To(gomega.BeNumerically(">", 0))
 				gomega.Expect(gen.Date).NotTo(gomega.BeZero())
@@ -211,6 +218,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 2)
 			generations := nixCtx.generations.Value()
 			currentCount := 0
+
 			for _, gen := range generations {
 				if gen.Current.IsCurrent() {
 					currentCount++
@@ -236,12 +244,15 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 			generations := nixCtx.generations.Value()
 			// Find current generation
 			var currentGen *domain.NixGeneration
+
 			for i := range generations {
 				if generations[i].Current.IsCurrent() {
 					currentGen = &generations[i]
+
 					break
 				}
 			}
+
 			if currentGen != nil {
 				gomega.Expect(currentGen.Current.IsCurrent()).To(gomega.BeTrue())
 			}
@@ -257,13 +268,17 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 		ginkgo.It("should keep current generation after cleaning", func() {
 			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			generations := nixCtx.generations.Value()
+
 			var currentGenID int64
+
 			for _, gen := range generations {
 				if gen.Current.IsCurrent() {
 					currentGenID = int64(gen.ID)
+
 					break
 				}
 			}
+
 			if currentGenID > 0 {
 				gomega.Expect(currentGenID).To(gomega.BeNumerically(">", 0))
 			}

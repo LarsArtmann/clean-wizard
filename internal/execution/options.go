@@ -31,5 +31,6 @@ func resolveRunOptions(opts []RunOption) runConfig {
 	for _, opt := range opts {
 		opt(&c)
 	}
+
 	return c
 }

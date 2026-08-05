@@ -266,6 +266,7 @@ func loadConfigFromPath(configPath string) (*domain.Config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to load config from %s: %w", configPath, err)
 		}
+
 		return cfg, nil
 	}
 
@@ -273,6 +274,7 @@ func loadConfigFromPath(configPath string) (*domain.Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
+
 	return cfg, nil
 }
 

@@ -1,6 +1,7 @@
 package execution
 
 import (
+	"slices"
 	"sort"
 	"sync"
 	"time"
@@ -35,8 +36,10 @@ func (s StepResult) Status() StepStatus {
 		if errorfamily.Classify(s.Err) == errorfamily.Infrastructure {
 			return StepStatusSkipped
 		}
+
 		return StepStatusFailed
 	}
+
 	return StepStatusSucceeded
 }
 
@@ -52,33 +55,39 @@ type WorkflowResult struct {
 // Succeeded returns only steps that completed successfully.
 func (wr *WorkflowResult) Succeeded() []StepResult {
 	var out []StepResult
+
 	for _, s := range wr.Steps {
 		if s.Status() == StepStatusSucceeded {
 			out = append(out, s)
 		}
 	}
+
 	return out
 }
 
 // Skipped returns only steps that were skipped (cleaner not available).
 func (wr *WorkflowResult) Skipped() []StepResult {
 	var out []StepResult
+
 	for _, s := range wr.Steps {
 		if s.Status() == StepStatusSkipped {
 			out = append(out, s)
 		}
 	}
+
 	return out
 }
 
 // Failed returns only steps that failed with a non-availability error.
 func (wr *WorkflowResult) Failed() []StepResult {
 	var out []StepResult
+
 	for _, s := range wr.Steps {
 		if s.Status() == StepStatusFailed {
 			out = append(out, s)
 		}
 	}
+
 	return out
 }
 
@@ -86,11 +95,13 @@ func (wr *WorkflowResult) Failed() []StepResult {
 // matching the shape expected by the existing display functions.
 func (wr *WorkflowResult) CleanResultsMap() map[string]domain.CleanResult {
 	m := make(map[string]domain.CleanResult)
+
 	for _, s := range wr.Steps {
 		if s.Status() == StepStatusSucceeded {
 			m[s.Name] = s.Clean
 		}
 	}
+
 	return m
 }
 
@@ -111,6 +122,7 @@ func newResultCollector() *resultCollector {
 func (rc *resultCollector) register(name string, index int) {
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
+
 	rc.orderIndex[name] = index
 }
 
@@ -120,14 +132,17 @@ func (rc *resultCollector) register(name string, index int) {
 func (rc *resultCollector) recordFinal(name string, clean domain.CleanResult, err error, duration time.Duration) {
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
-	for i := len(rc.results) - 1; i >= 0; i-- {
-		if rc.results[i].Name == name {
-			rc.results[i] = StepResult{
+
+	for _, v := range slices.Backward(rc.results) {
+		if v.Name == name {
+			v = StepResult{
 				Name: name, Clean: clean, Err: err, Duration: duration,
 			}
+
 			return
 		}
 	}
+
 	rc.results = append(rc.results, StepResult{
 		Name: name, Clean: clean, Err: err, Duration: duration,
 	})
@@ -140,11 +155,14 @@ func (rc *resultCollector) sortedByRegistration() []StepResult {
 	copy(sorted, rc.results)
 	sort.SliceStable(sorted, func(i, j int) bool {
 		ci, oki := rc.orderIndex[sorted[i].Name]
+
 		cj, okj := rc.orderIndex[sorted[j].Name]
 		if !oki || !okj {
 			return sorted[i].Name < sorted[j].Name
 		}
+
 		return ci < cj
 	})
+
 	return sorted
 }

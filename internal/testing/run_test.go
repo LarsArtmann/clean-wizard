@@ -4,6 +4,7 @@ import "testing"
 
 func TestRunTestCases(t *testing.T) {
 	t.Parallel()
+
 	tests := []TestCase[int, string]{
 		{"one", 1, "1"},
 		{"two", 2, "2"},
@@ -17,6 +18,7 @@ func TestRunTestCases(t *testing.T) {
 
 func TestRunTestCasesDifferentTypes(t *testing.T) {
 	t.Parallel()
+
 	tests := []TestCase[bool, int]{
 		{"true is 1", true, 1},
 		{"false is 0", false, 0},
@@ -33,6 +35,7 @@ func TestRunTestCasesDifferentTypes(t *testing.T) {
 
 func TestRunValueTestCases(t *testing.T) {
 	t.Parallel()
+
 	tests := []ValueTestCase[int, string]{
 		{1, "one"},
 		{2, "two"},

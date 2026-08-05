@@ -33,6 +33,7 @@ func NewBuilder(verbose bool) *Builder {
 // WithRetryConfig enables per-step retry on the builder.
 func (b *Builder) WithRetryConfig(cfg *RetryConfig) *Builder {
 	b.retry = cfg
+
 	return b
 }
 
@@ -133,16 +134,21 @@ func makeCleanStepFunc(
 
 		defer func() {
 			duration := time.Since(startTime)
+
 			if r := recover(); r != nil {
 				panicErr := fmt.Errorf("cleaner %s panicked: %v", name, r)
 				collector.recordFinal(name, domain.CleanResult{}, panicErr, duration)
 				err = panicErr
+
 				return
 			}
+
 			if err != nil {
 				collector.recordFinal(name, domain.CleanResult{}, err, duration)
+
 				return
 			}
+
 			collector.recordFinal(name, result, nil, duration)
 		}()
 
@@ -152,6 +158,7 @@ func makeCleanStepFunc(
 		}
 
 		result = res.Value()
+
 		return result, nil
 	}
 }
@@ -169,20 +176,26 @@ func makeScanStepFunc(
 
 		defer func() {
 			duration := time.Since(startTime)
+
 			if r := recover(); r != nil {
 				panicErr := fmt.Errorf("scanner %s panicked: %v", name, r)
 				collector.recordFinal(name, domain.CleanResult{}, panicErr, duration)
 				err = panicErr
+
 				return
 			}
+
 			if err != nil {
 				collector.recordFinal(name, domain.CleanResult{}, err, duration)
+
 				return
 			}
+
 			var totalSize uint64
 			for _, item := range items {
 				totalSize += uint64(item.Size)
 			}
+
 			collector.recordFinal(name, domain.CleanResult{
 				FreedBytes:   totalSize,
 				ItemsRemoved: uint(len(items)),
@@ -195,6 +208,7 @@ func makeScanStepFunc(
 		}
 
 		items = res.Value()
+
 		return items, nil
 	}
 }

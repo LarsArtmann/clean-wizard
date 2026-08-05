@@ -483,8 +483,10 @@ func (c *CleanCounters) RecordFailure(verbose bool, label any, err error) {
 func ParseNumberAndUnit(sizeStr string) (float64, string, error) {
 	sizeStr = strings.TrimSpace(sizeStr)
 
-	var number float64
-	var unit string
+	var (
+		number float64
+		unit   string
+	)
 
 	if _, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit); err != nil {
 		return 0, "", fmt.Errorf(
@@ -505,5 +507,6 @@ func NormalizePaths(paths []string) []string {
 	for _, path := range paths {
 		normalized = append(normalized, filepath.Clean(path))
 	}
+
 	return normalized
 }

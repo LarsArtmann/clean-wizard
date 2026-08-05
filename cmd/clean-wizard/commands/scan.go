@@ -153,6 +153,7 @@ func computeScanTotals(results []ScanResult) (totalCleanable uint64, totalItems 
 			totalItems += r.ItemsCount
 		}
 	}
+
 	return totalCleanable, totalItems
 }
 
@@ -185,6 +186,7 @@ func cleanerConfigsToNames(configs []CleanerConfig) []string {
 	for i, c := range configs {
 		names[i] = getRegistryName(c.Type)
 	}
+
 	return names
 }
 

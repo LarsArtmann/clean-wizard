@@ -9,6 +9,7 @@ import (
 
 func TestNewDockerCleaner(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name      string
 		verbose   bool
@@ -50,6 +51,7 @@ func TestNewDockerCleaner(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner := NewDockerCleaner(tt.verbose, tt.dryRun, tt.pruneMode)
 
 			if cleaner == nil {
@@ -65,6 +67,7 @@ func TestNewDockerCleaner(t *testing.T) {
 
 func TestDockerCleaner_Type(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 	if cleaner.Type() != domain.OperationTypeDocker {
@@ -74,6 +77,7 @@ func TestDockerCleaner_Type(t *testing.T) {
 
 func TestDockerCleaner_IsAvailable(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 	available := cleaner.IsAvailable(context.Background())
 
@@ -85,6 +89,7 @@ func TestDockerCleaner_IsAvailable(t *testing.T) {
 
 func TestDockerCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		settings *domain.OperationSettings
@@ -141,6 +146,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 			err := cleaner.ValidateSettings(tt.settings)
@@ -153,6 +159,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 
 func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
 
 	// Skip test if Docker is not available
@@ -191,6 +198,7 @@ func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 
 func TestDockerCleaner_Clean_NoAvailable(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 	// Can't easily test "Docker not available" case without mocking
@@ -200,6 +208,7 @@ func TestDockerCleaner_Clean_NoAvailable(t *testing.T) {
 
 func TestDockerCleaner_Scan(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
 
 	result := cleaner.Scan(context.Background())
@@ -219,6 +228,7 @@ func TestDockerCleaner_Scan(t *testing.T) {
 
 func TestDockerCleaner_DryRunStrategy(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
 
 	TestDryRun(t, SimpleCleanerConstructorFromInstance(cleaner), "docker", -1)
@@ -226,6 +236,7 @@ func TestDockerCleaner_DryRunStrategy(t *testing.T) {
 
 func TestDockerCleaner_PruneModes(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name      string
 		pruneMode domain.DockerPruneMode
@@ -240,6 +251,7 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner := NewDockerCleaner(false, false, tt.pruneMode)
 
 			if cleaner.pruneMode != tt.pruneMode {
@@ -251,6 +263,7 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 
 func TestDockerCleaner_Clean_Verbose(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewDockerCleaner(true, false, domain.DockerPruneAll)
 
 	// Skip if Docker is not available
@@ -268,6 +281,7 @@ func TestDockerCleaner_Clean_Verbose(t *testing.T) {
 
 func TestDockerCleaner_Clean_Aggressive(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
 
 	// Skip if Docker is not available
@@ -296,6 +310,7 @@ func TestDockerCleaner_Clean_Aggressive(t *testing.T) {
 // TestParseDockerReclaimedSpace tests parsing of docker prune output.
 func TestParseDockerReclaimedSpace(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		output   string
@@ -349,6 +364,7 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result, err := ParseDockerReclaimedSpace(tt.output)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseDockerReclaimedSpace() error = %v, wantErr %v", err, tt.wantErr)
@@ -366,6 +382,7 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 // TestParseDockerSize tests conversion of Docker size strings to bytes.
 func TestParseDockerSize(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		sizeStr  string
@@ -440,6 +457,7 @@ func TestParseDockerSize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result, err := ParseDockerSize(tt.sizeStr)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseDockerSize() error = %v, wantErr %v", err, tt.wantErr)

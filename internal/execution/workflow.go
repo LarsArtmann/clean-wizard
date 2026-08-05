@@ -27,6 +27,7 @@ func RunCleaners(
 	if cfg.retry != nil {
 		builder.WithRetryConfig(cfg.retry)
 	}
+
 	compiled, err := builder.BuildClean(registry, selected)
 	if err != nil {
 		return nil, err
@@ -46,6 +47,7 @@ func RunScans(
 	cfg := resolveRunOptions(opts)
 
 	builder := NewBuilder(cfg.verbose)
+
 	compiled, err := builder.BuildScan(registry, selected)
 	if err != nil {
 		return nil, err
@@ -77,6 +79,7 @@ func executeWorkflow(ctx context.Context, compiled *CompiledWorkflow, cfg runCon
 			result.TotalBytesFreed += step.Clean.FreedBytes
 			result.TotalItemsRemoved += step.Clean.ItemsRemoved
 		}
+
 		result.TotalItemsFailed += step.Clean.ItemsFailed
 	}
 

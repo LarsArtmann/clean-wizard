@@ -19,6 +19,7 @@ func mockGenerations(count int) []domain.NixGeneration {
 		if i == 0 {
 			status = domain.GenerationStatusCurrent
 		}
+
 		gens[i] = domain.NixGeneration{
 			ID:      domain.NixGenerationID(300 - i),
 			Path:    fmt.Sprintf("/nix/var/nix/profiles/default-%d-link", 300-i),
@@ -26,6 +27,7 @@ func mockGenerations(count int) []domain.NixGeneration {
 			Current: status,
 		}
 	}
+
 	return gens
 }
 
@@ -42,6 +44,7 @@ func getGenerationsOrMock(
 	if generations.IsErr() {
 		return result.Ok(mockGenerations(mockCount))
 	}
+
 	return generations
 }
 
@@ -52,6 +55,7 @@ func getGenerationsAndAssertOk(
 ) result.Result[[]domain.NixGeneration] {
 	generations := getGenerationsOrMock(ctx, nixCleaner, mockCount)
 	gomega.Expect(generations.IsOk()).To(gomega.BeTrue())
+
 	return generations
 }
 
@@ -62,6 +66,7 @@ func cleanGenerationsAndVerify(
 ) result.Result[domain.CleanResult] {
 	_ = getGenerationsOrMock(ctx, nixCleaner, minCount)
 	cleanResult := nixCleaner.CleanOldGenerations(ctx, keepCount)
+
 	return cleanResult
 }
 

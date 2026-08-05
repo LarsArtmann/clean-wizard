@@ -198,6 +198,7 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("failed to parse store size: %w", err)
 	}
+
 	return size, nil
 }
 

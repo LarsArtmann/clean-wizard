@@ -32,9 +32,11 @@ func testValidDurations(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result, err := ParseCustomDuration(tt.input)
 			if err != nil {
 				t.Errorf("Unexpected error for input '%s': %v", tt.input, err)
+
 				return
 			}
 
@@ -60,6 +62,7 @@ func testInvalidDurations(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			_, err := ParseCustomDuration(tt.input)
 			if err == nil {
 				t.Errorf("Expected error for input '%s', but got none", tt.input)
@@ -71,6 +74,7 @@ func testInvalidDurations(t *testing.T) {
 // TestValidateCustomDuration tests the validation function.
 func TestValidateCustomDuration(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name        string
 		input       string
@@ -101,6 +105,7 @@ func TestValidateCustomDuration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			err := ValidateCustomDuration(tt.input)
 
 			if tt.expectError && err == nil {

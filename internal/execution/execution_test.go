@@ -31,6 +31,7 @@ func (m *mockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem]  
 
 func TestRunCleaners_SuccessfulSteps(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	successCleaner := &mockCleaner{
@@ -53,6 +54,7 @@ func TestRunCleaners_SuccessfulSteps(t *testing.T) {
 
 func TestRunCleaners_MixedResults(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	registry.Register("success", &mockCleaner{
@@ -88,6 +90,7 @@ func TestRunCleaners_MixedResults(t *testing.T) {
 
 func TestRunCleaners_EmptySelection(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	wr, err := RunCleaners(context.Background(), registry, []string{})
@@ -98,6 +101,7 @@ func TestRunCleaners_EmptySelection(t *testing.T) {
 
 func TestRunCleaners_UnknownCleanerReturnsError(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	_, err := RunCleaners(context.Background(), registry, []string{"nonexistent"})
@@ -109,6 +113,7 @@ func TestRunCleaners_UnknownCleanerReturnsError(t *testing.T) {
 
 func TestRunScans_SuccessfulSteps(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	registry.Register("scanner", &mockCleaner{
@@ -132,6 +137,7 @@ func TestRunScans_SuccessfulSteps(t *testing.T) {
 
 func TestWorkflowResult_CleanResultsMap(t *testing.T) {
 	t.Parallel()
+
 	wr := &WorkflowResult{
 		Steps: []StepResult{
 			{Name: "ok1", Clean: domain.CleanResult{FreedBytes: 100}, Err: nil},
@@ -149,6 +155,7 @@ func TestWorkflowResult_CleanResultsMap(t *testing.T) {
 
 func TestStepResult_StatusClassification(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		step     StepResult
@@ -186,12 +193,14 @@ func TestStepResult_StatusClassification(t *testing.T) {
 
 func TestWithMaxConcurrency(t *testing.T) {
 	t.Parallel()
+
 	cfg := resolveRunOptions([]RunOption{WithMaxConcurrency(5)})
 	assert.Equal(t, 5, cfg.maxConcurrency)
 }
 
 func TestWithVerbose(t *testing.T) {
 	t.Parallel()
+
 	cfg := resolveRunOptions([]RunOption{WithVerbose(true)})
 	assert.True(t, cfg.verbose)
 

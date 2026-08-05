@@ -61,5 +61,6 @@ func ParseDockerSize(sizeStr string) (int64, error) {
 	if !ok {
 		return 0, fmt.Errorf("unknown size unit: %s", unit)
 	}
+
 	return int64(number * float64(multiplier)), nil
 }

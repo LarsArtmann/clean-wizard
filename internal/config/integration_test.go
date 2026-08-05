@@ -11,6 +11,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 	t.Parallel()
 	t.Run("Complete pipeline with complex configuration", func(t *testing.T) {
 		t.Parallel()
+
 		cfg := CreateIntegrationTestConfig()
 
 		validationResult, _, sanitizationResult := runValidationPipeline(t, cfg)
@@ -58,6 +59,7 @@ func verifySanitizationEffects(t *testing.T, cfg *domain.Config, result *Validat
 	}
 
 	protectedPathCount := 0
+
 	for _, path := range cfg.Protected {
 		if path == "/System" {
 			protectedPathCount++

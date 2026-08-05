@@ -33,6 +33,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 		// Create a temporary directory for test repos
 		tempDir, err := os.MkdirTemp("", "githistory-bdd-test-*")
 		gomega.Expect(err).NotTo(gomega.HaveOccurred())
+
 		testCtx.repoPath = tempDir
 
 		// Check if git-filter-repo is available
@@ -160,12 +161,15 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 			for i := range binaryData {
 				binaryData[i] = byte(i % 256)
 			}
+
 			binaryPath := filepath.Join(testCtx.repoPath, "large.bin")
 			_ = os.WriteFile(binaryPath, binaryData, 0o644)
+
 			commitFile(testCtx.repoPath, "large.bin", "Add large binary")
 
 			// Remove the file but keep it in history
 			_ = os.Remove(binaryPath)
+
 			commitAll(testCtx.repoPath, "Remove large binary")
 
 			// Scan should find it
@@ -175,14 +179,18 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 
 			// Find the binary file
 			found := false
+
 			for _, f := range scanResult.Files {
 				if f.Path == "large.bin" {
 					found = true
+
 					gomega.Expect(f.SizeBytes).To(gomega.BeNumerically(">=", int64(2*1024*1024)))
 					gomega.Expect(f.IsDeleted).To(gomega.BeTrue())
+
 					break
 				}
 			}
+
 			gomega.Expect(found).To(gomega.BeTrue(), "large.bin should be found in scan results")
 		})
 
@@ -194,6 +202,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 				binaryPath := filepath.Join(testCtx.repoPath, "binary"+string(rune('0'+i))+".bin")
 				_ = os.WriteFile(binaryPath, binaryData, 0o644)
 			}
+
 			commitAll(testCtx.repoPath, "Add multiple binaries")
 
 			scanResult, err := testCtx.cleaner.GetScanResult(testCtx.ctx)
@@ -223,6 +232,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 			binaryData := make([]byte, 2*1024*1024)
 			binaryPath := filepath.Join(testCtx.repoPath, "test.bin")
 			_ = os.WriteFile(binaryPath, binaryData, 0o644)
+
 			commitFile(testCtx.repoPath, "test.bin", "Add binary")
 
 			// Get repo size before
@@ -241,6 +251,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 			binaryData := make([]byte, 2*1024*1024)
 			binaryPath := filepath.Join(testCtx.repoPath, "test.bin")
 			_ = os.WriteFile(binaryPath, binaryData, 0o644)
+
 			commitFile(testCtx.repoPath, "test.bin", "Add binary")
 
 			result := testCtx.cleaner.Clean(testCtx.ctx)
@@ -316,6 +327,7 @@ func isGitFilterRepoAvailable() bool {
 	// Check nix
 	if _, err := exec.LookPath("nix"); err == nil {
 		cmd = exec.CommandContext(ctx, "nix", "eval", "--raw", "nixpkgs#git-filter-repo.name")
+
 		return cmd.Run() == nil
 	}
 
@@ -346,6 +358,7 @@ func initGitRepo(path string) {
 func createAndCommitFile(repoPath, content string) {
 	filePath := filepath.Join(repoPath, "README.md")
 	_ = os.WriteFile(filePath, []byte(content), 0o644)
+
 	commitFile(repoPath, "README.md", "Add README.md")
 }
 
@@ -359,6 +372,7 @@ func commitFile(repoPath, filename, message string) {
 
 	cmd = exec.CommandContext(ctx, "git", "commit", "-m", message)
 	cmd.Dir = repoPath
+
 	cmd.Env = append(
 		os.Environ(),
 		"GIT_AUTHOR_DATE=2024-01-01T00:00:00",
@@ -377,6 +391,7 @@ func commitAll(repoPath, message string) {
 
 	cmd = exec.CommandContext(ctx, "git", "commit", "-m", message)
 	cmd.Dir = repoPath
+
 	cmd.Env = append(
 		os.Environ(),
 		"GIT_AUTHOR_DATE=2024-01-01T00:00:00",

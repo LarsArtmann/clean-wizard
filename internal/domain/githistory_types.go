@@ -180,28 +180,30 @@ func (m *GitHistoryMode) UnmarshalJSON(data []byte) error {
 		var s string
 		if jsonErr := json.Unmarshal(data, &s); jsonErr == nil && strings.EqualFold(s, "dryrun") {
 			*m = GitHistoryModeDryRun
+
 			return nil
 		}
 	}
+
 	return err
 }
 
 // GitHistorySettings provides type-safe settings for git history cleaning.
 type GitHistorySettings struct {
 	// MinSizeMB is the minimum file size in MB to consider (default: 1)
-	MinSizeMB int `json:"min_size_mb,omitempty"        yaml:"min_size_mb,omitempty"`
+	MinSizeMB int `json:"min_size_mb,omitempty" yaml:"min_size_mb,omitempty"`
 	// MaxFiles limits the number of files to show (0 = unlimited)
-	MaxFiles int `json:"max_files,omitempty"          yaml:"max_files,omitempty"`
+	MaxFiles int `json:"max_files,omitempty" yaml:"max_files,omitempty"`
 	// ExcludeExtensions are file extensions to exclude
 	ExcludeExtensions []string `json:"exclude_extensions,omitempty" yaml:"exclude_extensions,omitempty"`
 	// IncludeExtensions are file extensions to include (empty = all)
 	IncludeExtensions []string `json:"include_extensions,omitempty" yaml:"include_extensions,omitempty"`
 	// ExcludePaths are path patterns to exclude
-	ExcludePaths []string `json:"exclude_paths,omitempty"      yaml:"exclude_paths,omitempty"`
+	ExcludePaths []string `json:"exclude_paths,omitempty" yaml:"exclude_paths,omitempty"`
 	// CreateBackup indicates if a backup should be created before rewrite
-	CreateBackup bool `json:"create_backup,omitempty"      yaml:"create_backup,omitempty"`
+	CreateBackup bool `json:"create_backup,omitempty" yaml:"create_backup,omitempty"`
 	// SkipConfirmation skips the interactive confirmation (dangerous)
-	SkipConfirmation bool `json:"skip_confirmation,omitempty"  yaml:"skip_confirmation,omitempty"`
+	SkipConfirmation bool `json:"skip_confirmation,omitempty" yaml:"skip_confirmation,omitempty"`
 }
 
 // DefaultGitHistorySettings returns the default settings.

@@ -28,6 +28,7 @@ func (tv TestValidator) Validate() error {
 
 func TestValidateAndWrap(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		item     TestValidator
@@ -57,6 +58,7 @@ func TestValidateAndWrap(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := ValidateAndWrap(tt.item, tt.itemType)
 
 			if tt.wantErr {
@@ -74,11 +76,13 @@ func TestValidateAndWrap(t *testing.T) {
 
 func TestValidateWithCustomError(t *testing.T) {
 	t.Parallel()
+
 	validItem := TestValidator{Name: "test", Valid: true}
 	invalidItem := TestValidator{Name: "test", Valid: false}
 
 	t.Run("valid item", func(t *testing.T) {
 		t.Parallel()
+
 		result := ValidateWithCustomError(validItem, "Custom validation failed")
 		assert.True(t, result.IsOk())
 		assert.Equal(t, validItem, result.Value())
@@ -86,6 +90,7 @@ func TestValidateWithCustomError(t *testing.T) {
 
 	t.Run("invalid item", func(t *testing.T) {
 		t.Parallel()
+
 		result := ValidateWithCustomError(invalidItem, "Custom validation failed")
 		assert.True(t, result.IsErr())
 		err := result.Error()
@@ -95,6 +100,7 @@ func TestValidateWithCustomError(t *testing.T) {
 
 func TestValidateAndConvert(t *testing.T) {
 	t.Parallel()
+
 	type ConvertedType struct {
 		UppercaseName string
 	}
@@ -108,6 +114,7 @@ func TestValidateAndConvert(t *testing.T) {
 
 	t.Run("valid conversion", func(t *testing.T) {
 		t.Parallel()
+
 		result := ValidateAndConvert(validItem, converter, "TestValidator")
 		require.True(t, result.IsOk())
 		converted := result.Value()
@@ -116,6 +123,7 @@ func TestValidateAndConvert(t *testing.T) {
 
 	t.Run("invalid conversion", func(t *testing.T) {
 		t.Parallel()
+
 		result := ValidateAndConvert(invalidItem, converter, "TestValidator")
 		assert.True(t, result.IsErr())
 		assert.Contains(t, result.Error().Error(), "invalid TestValidator")

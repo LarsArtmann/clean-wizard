@@ -12,6 +12,7 @@ import (
 // BenchmarkResult_Ok benchmarks creating successful results.
 func BenchmarkResult_Ok(b *testing.B) {
 	b.ReportAllocs()
+
 	for b.Loop() {
 		_ = result.Ok[int](42)
 	}
@@ -20,6 +21,7 @@ func BenchmarkResult_Ok(b *testing.B) {
 // BenchmarkResult_Err benchmarks creating error results.
 func BenchmarkResult_Err(b *testing.B) {
 	b.ReportAllocs()
+
 	err := errors.New("test error")
 	for b.Loop() {
 		_ = result.Err[int](err)
@@ -29,6 +31,7 @@ func BenchmarkResult_Err(b *testing.B) {
 // BenchmarkResult_IsOk benchmarks checking if result is OK.
 func BenchmarkResult_IsOk(b *testing.B) {
 	r := result.Ok[int](42)
+
 	b.ReportAllocs()
 
 	for b.Loop() {
@@ -39,6 +42,7 @@ func BenchmarkResult_IsOk(b *testing.B) {
 // BenchmarkResult_Value benchmarks getting value from result.
 func BenchmarkResult_Value(b *testing.B) {
 	r := result.Ok[int](42)
+
 	b.ReportAllocs()
 
 	for b.Loop() {
@@ -56,6 +60,7 @@ func BenchmarkCleanResult_Validate(b *testing.B) {
 		CleanedAt:    testTime,
 		Strategy:     domain.StrategyAggressiveType,
 	}
+
 	b.ReportAllocs()
 
 	for b.Loop() {

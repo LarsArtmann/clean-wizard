@@ -9,6 +9,7 @@ import (
 
 func TestNewBuildCacheCleaner(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name      string
 		verbose   bool
@@ -62,6 +63,7 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner, err := NewBuildCacheCleaner(
 				tt.verbose,
 				tt.dryRun,
@@ -89,6 +91,7 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 
 func TestBuildCacheCleaner_Type(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -101,6 +104,7 @@ func TestBuildCacheCleaner_Type(t *testing.T) {
 
 func TestBuildCacheCleaner_IsAvailable(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -116,6 +120,7 @@ func TestBuildCacheCleaner_IsAvailable(t *testing.T) {
 
 func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		settings *domain.OperationSettings
@@ -186,6 +191,7 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 			if err != nil {
 				t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -201,6 +207,7 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 
 func TestBuildCacheCleaner_Clean_DryRun(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewBuildCacheCleaner(false, true, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -233,6 +240,7 @@ func TestBuildCacheCleaner_Clean_DryRun(t *testing.T) {
 
 func TestBuildCacheCleaner_Scan(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -256,6 +264,7 @@ func TestBuildCacheCleaner_Scan(t *testing.T) {
 
 func TestBuildCacheCleaner_GetHomeDir(t *testing.T) {
 	t.Parallel()
+
 	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -276,6 +285,7 @@ func TestBuildCacheCleaner_GetHomeDir(t *testing.T) {
 
 func TestBuildCacheCleaner_GetDirSize(t *testing.T) {
 	t.Parallel()
+
 	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -299,6 +309,7 @@ func TestBuildCacheCleaner_GetDirSize(t *testing.T) {
 
 func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
 	t.Parallel()
+
 	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -321,6 +332,7 @@ func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
 
 func TestAvailableBuildTools(t *testing.T) {
 	t.Parallel()
+
 	expectedTools := []JVMBuildToolType{
 		JVMBuildToolGradle,
 		JVMBuildToolMaven,
@@ -340,6 +352,7 @@ func TestBuildToolType_String(t *testing.T) {
 
 func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewBuildCacheCleaner(false, true, "30d", []string{}, []string{})
 	if err != nil {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
@@ -350,9 +363,11 @@ func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {
 
 func TestBuildCacheCleaner_ParseDuration(t *testing.T) {
 	t.Parallel()
+
 	for _, tc := range CommonDurationTestCases {
 		t.Run(tc.Duration, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner, err := NewBuildCacheCleaner(false, false, tc.Duration, []string{}, []string{})
 
 			if tc.WantValid && err != nil {

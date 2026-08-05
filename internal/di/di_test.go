@@ -12,6 +12,7 @@ import (
 
 func TestNew_CreatesContainerWithInjector(t *testing.T) {
 	t.Parallel()
+
 	container, cleanup := New()
 	defer cleanup()
 
@@ -21,6 +22,7 @@ func TestNew_CreatesContainerWithInjector(t *testing.T) {
 
 func TestNew_CleanupCallsShutdown(t *testing.T) {
 	t.Parallel()
+
 	container, cleanup := New()
 	_ = container
 
@@ -35,6 +37,7 @@ func TestNew_CleanupCallsShutdown(t *testing.T) {
 
 func TestRegisterAllServices_RegistersConfig(t *testing.T) {
 	t.Parallel()
+
 	container, cleanup := New()
 	defer cleanup()
 
@@ -51,6 +54,7 @@ func TestRegisterAllServices_RegistersConfig(t *testing.T) {
 
 func TestRegisterAllServices_RegistersSettings(t *testing.T) {
 	t.Parallel()
+
 	container, cleanup := New()
 	defer cleanup()
 
@@ -67,6 +71,7 @@ func TestRegisterAllServices_RegistersSettings(t *testing.T) {
 
 func TestRegisterAllServices_RegistersCleanerRegistry(t *testing.T) {
 	t.Parallel()
+
 	container, cleanup := New()
 	defer cleanup()
 
@@ -92,6 +97,7 @@ func TestRegisterAllServices_RegistersCleanerRegistry(t *testing.T) {
 
 func TestOverrideRegistry_ReplacesRegistry(t *testing.T) {
 	t.Parallel()
+
 	container, cleanup := New()
 	defer cleanup()
 
@@ -114,6 +120,7 @@ func TestOverrideRegistry_ReplacesRegistry(t *testing.T) {
 
 func TestOverrideSettings_ReplacesSettings(t *testing.T) {
 	t.Parallel()
+
 	container, cleanup := New()
 	defer cleanup()
 
@@ -133,6 +140,7 @@ func TestOverrideSettings_ReplacesSettings(t *testing.T) {
 
 func TestConfig_ReturnsErrorWhenNotRegistered(t *testing.T) {
 	t.Parallel()
+
 	injector := do.New()
 
 	_, err := Config(injector)
@@ -141,6 +149,7 @@ func TestConfig_ReturnsErrorWhenNotRegistered(t *testing.T) {
 
 func TestCleanerRegistry_ReturnsErrorWhenNotRegistered(t *testing.T) {
 	t.Parallel()
+
 	injector := do.New()
 
 	_, err := CleanerRegistry(injector)

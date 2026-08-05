@@ -18,6 +18,7 @@ func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
 
 func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	if cleaner.Type() != domain.OperationTypeProjectsManagementAutomation {
@@ -36,6 +37,7 @@ func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
 
 func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	size := cleaner.estimateCacheSize()
@@ -48,6 +50,7 @@ func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
 
 func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	result := cleaner.Scan(context.Background())
@@ -91,6 +94,7 @@ func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
 
 func TestProjectsManagementAutomationCleaner_Scan_NotAvailable(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	// If tool is not available, should return empty items

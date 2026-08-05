@@ -224,6 +224,7 @@ func (s *GitHistoryScanner) getLargeBlobsFromObjects(
 	}
 
 	var files []domain.GitHistoryFile
+
 	seenPaths := make(map[string]bool)
 
 	checkLines := strings.SplitSeq(string(output), "\n")

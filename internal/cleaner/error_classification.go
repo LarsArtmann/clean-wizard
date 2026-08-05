@@ -40,6 +40,7 @@ func init() {
 		if _, ok := errors.AsType[*exec.ExitError](err); ok {
 			return errorfamily.Transient, true
 		}
+
 		return errorfamily.Transient, false
 	})
 

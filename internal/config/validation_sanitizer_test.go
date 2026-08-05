@@ -6,6 +6,7 @@ import (
 
 func TestConfigSanitizer_SanitizeConfig(t *testing.T) {
 	t.Parallel()
+
 	sanitizer := NewConfigSanitizer()
 
 	tests := GetSanitizationTestCases()

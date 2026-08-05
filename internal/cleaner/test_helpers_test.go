@@ -150,6 +150,7 @@ func VerifyNewCleanerConstructor[T any](
 	cleanerName string,
 ) {
 	t.Helper()
+
 	tests := []struct {
 		name    string
 		verbose bool

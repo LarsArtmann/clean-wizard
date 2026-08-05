@@ -25,6 +25,7 @@ func makeTestCleanResult(
 // TestCleanResultValidation tests the enhanced CleanResult validation.
 func TestCleanResultValidation(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name        string
 		result      CleanResult

@@ -23,6 +23,7 @@ func TestRetryProfile_IsValid(t *testing.T) {
 		if p == "" {
 			continue // empty string is treated as Default by Apply, but IsValid returns false
 		}
+
 		assert.False(t, p.IsValid(), "%q should be invalid", p)
 	}
 }

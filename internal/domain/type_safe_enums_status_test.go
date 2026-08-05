@@ -10,6 +10,7 @@ import (
 
 func TestSizeEstimateStatusType_String(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		status   SizeEstimateStatusType
@@ -42,6 +43,7 @@ func TestSizeEstimateStatusType_String(t *testing.T) {
 
 func TestSizeEstimateStatusType_IsValid(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		status   SizeEstimateStatusType
@@ -79,6 +81,7 @@ func TestSizeEstimateStatusType_IsValid(t *testing.T) {
 
 func TestSizeEstimateStatusType_Values(t *testing.T) {
 	t.Parallel()
+
 	values := SizeEstimateStatusKnown.Values()
 
 	assert.Len(t, values, 2)
@@ -88,6 +91,7 @@ func TestSizeEstimateStatusType_Values(t *testing.T) {
 
 func TestSizeEstimateStatusType_MarshalJSON(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		status   SizeEstimateStatusType
@@ -116,6 +120,7 @@ func TestSizeEstimateStatusType_MarshalJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			data, err := json.Marshal(tt.status)
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -131,6 +136,7 @@ func TestSizeEstimateStatusType_MarshalJSON(t *testing.T) {
 
 func TestSizeEstimateStatusType_UnmarshalJSON(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name      string
 		jsonInput string
@@ -170,6 +176,7 @@ func TestSizeEstimateStatusType_UnmarshalJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			var status SizeEstimateStatusType
 
 			err := json.Unmarshal([]byte(tt.jsonInput), &status)
@@ -187,6 +194,7 @@ func TestSizeEstimateStatusType_UnmarshalJSON(t *testing.T) {
 
 func TestSizeEstimateStatusType_JSONRoundTrip(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name   string
 		status SizeEstimateStatusType

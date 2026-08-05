@@ -9,6 +9,7 @@ import (
 
 func TestNewSystemCacheCleaner(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name      string
 		verbose   bool
@@ -49,6 +50,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner, err := NewSystemCacheCleaner(tt.verbose, tt.dryRun, tt.olderThan, nil)
 
 			if (err != nil) != tt.wantErr {
@@ -70,6 +72,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 
 func TestSystemCacheCleaner_Type(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewSystemCacheCleaner(false, false, "30d", nil)
 	if err != nil {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
@@ -82,6 +85,7 @@ func TestSystemCacheCleaner_Type(t *testing.T) {
 
 func TestSystemCacheCleaner_IsAvailable(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewSystemCacheCleaner(false, false, "30d", nil)
 	if err != nil {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
@@ -97,6 +101,7 @@ func TestSystemCacheCleaner_IsAvailable(t *testing.T) {
 
 func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		settings *domain.OperationSettings
@@ -136,6 +141,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 						},
 					}
 				}
+
 				return &domain.OperationSettings{
 					SystemCache: &domain.SystemCacheSettings{
 						CacheTypes: []domain.CacheType{caches[0]},
@@ -183,6 +189,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner, err := NewSystemCacheCleaner(false, false, "30d", nil)
 			if err != nil {
 				t.Fatalf("NewSystemCacheCleaner() error = %v", err)
@@ -198,6 +205,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 
 func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewSystemCacheCleaner(false, true, "30d", nil)
 	if err != nil {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
@@ -237,6 +245,7 @@ func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 
 func TestSystemCacheCleaner_Scan(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewSystemCacheCleaner(false, false, "30d", nil)
 	if err != nil {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
@@ -259,6 +268,7 @@ func TestSystemCacheCleaner_Scan(t *testing.T) {
 
 func TestSystemCacheCleaner_GetHomeDir(t *testing.T) {
 	t.Parallel()
+
 	_, err := NewSystemCacheCleaner(false, false, "30d", nil)
 	if err != nil {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
@@ -279,6 +289,7 @@ func TestSystemCacheCleaner_GetHomeDir(t *testing.T) {
 
 func TestSystemCacheCleaner_DryRunStrategy(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewSystemCacheCleaner(false, true, "30d", nil)
 	if err != nil {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
@@ -289,9 +300,11 @@ func TestSystemCacheCleaner_DryRunStrategy(t *testing.T) {
 
 func TestSystemCacheCleaner_ParseDuration(t *testing.T) {
 	t.Parallel()
+
 	for _, tc := range CommonDurationTestCases {
 		t.Run(tc.Duration, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner, err := NewSystemCacheCleaner(false, false, tc.Duration, nil)
 
 			if tc.WantValid && err != nil {
@@ -318,6 +331,7 @@ func TestSystemCacheCleaner_ParseDuration(t *testing.T) {
 
 func TestSystemCacheCleaner_IsMacOS(t *testing.T) {
 	t.Parallel()
+
 	cleaner, err := NewSystemCacheCleaner(false, false, "30d", nil)
 	if err != nil {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)

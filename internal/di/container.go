@@ -22,6 +22,7 @@ type Container struct {
 // implementing do.ShutdownerWithError are gracefully stopped.
 func New() (*Container, func()) {
 	injector := do.New()
+
 	return &Container{injector: injector}, func() {
 		_ = injector.Shutdown()
 	}

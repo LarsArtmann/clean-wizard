@@ -87,6 +87,7 @@ func (e *NotAvailableError) Error() string {
 	if e.Reason != "" {
 		return e.CleanerName + " not available: " + e.Reason
 	}
+
 	return e.CleanerName + " not available"
 }
 
@@ -97,6 +98,7 @@ func (e *NotAvailableError) ErrorCode() string {
 	if e.Code != "" {
 		return e.Code
 	}
+
 	return "cleaner.not_available"
 }
 
@@ -125,5 +127,6 @@ func IsNotAvailableError(err error) bool {
 	if err == nil {
 		return false
 	}
+
 	return errorfamily.Classify(err) == errorfamily.Infrastructure
 }

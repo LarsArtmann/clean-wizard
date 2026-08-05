@@ -44,6 +44,7 @@ func newTrimmableField(value string) TrimmableField {
 
 func TestTrimWhitespaceField(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name          string
 		field         TrimmableField
@@ -84,6 +85,7 @@ func TestTrimWhitespaceField(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			changed := TrimWhitespaceField(tt.field, tt.changes)
 
 			assert.Equal(t, tt.expectChange, changed)
@@ -102,6 +104,7 @@ func TestTrimWhitespaceField(t *testing.T) {
 
 func TestTrimWhitespaceField_NilValue(t *testing.T) {
 	t.Parallel()
+
 	field := TrimmableField{
 		Name:  "test",
 		Path:  "test.path",
@@ -117,6 +120,7 @@ func TestTrimWhitespaceField_NilValue(t *testing.T) {
 
 func TestTrimIfEnabled(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name         string
 		trimEnabled  bool
@@ -143,6 +147,7 @@ func TestTrimIfEnabled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			changed := TrimIfEnabled(tt.trimEnabled, tt.field, tt.changes)
 
 			assert.Equal(t, tt.expectChange, changed)
@@ -160,6 +165,7 @@ func TestTrimIfEnabled(t *testing.T) {
 
 func TestTrimmableFieldsBuilder(t *testing.T) {
 	t.Parallel()
+
 	builder := NewTrimmableFieldsBuilder()
 
 	value1 := "  test1  "
@@ -181,6 +187,7 @@ func TestTrimmableFieldsBuilder(t *testing.T) {
 
 func TestTrimMultipleFields(t *testing.T) {
 	t.Parallel()
+
 	value1 := "  test1  "
 	value2 := "  test2  "
 	value3 := "test3" // Already trimmed

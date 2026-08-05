@@ -25,6 +25,7 @@ const (
 
 type GitHistoryCleaner struct {
 	CleanerBase
+
 	repoPath      string
 	minSizeMB     int
 	excludeExts   []string

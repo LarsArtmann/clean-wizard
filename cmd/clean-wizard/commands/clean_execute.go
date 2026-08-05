@@ -97,6 +97,7 @@ func displayWarnings(wr *execution.WorkflowResult) {
 
 	if len(skipped) > 0 {
 		fmt.Printf("   • %d cleaner(s) skipped (not available)\n", len(skipped))
+
 		for _, s := range skipped {
 			fmt.Printf("     ℹ️  Skipped %s: %s\n", s.Name, s.Err.Error())
 		}
@@ -104,6 +105,7 @@ func displayWarnings(wr *execution.WorkflowResult) {
 
 	if len(failed) > 0 {
 		fmt.Printf("   • %d cleaner(s) failed\n", len(failed))
+
 		for _, f := range failed {
 			fmt.Printf("     ❌ %s failed: %s\n", f.Name, f.Err.Error())
 		}

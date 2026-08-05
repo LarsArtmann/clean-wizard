@@ -18,9 +18,11 @@ type stepStartKey struct{}
 func makeBeforeHook(verbose bool) flow.BeforeStep {
 	return func(ctx context.Context, step flow.Steper) (context.Context, error) {
 		ctx = context.WithValue(ctx, stepStartKey{}, time.Now())
+
 		if verbose {
 			fmt.Printf("  [DEBUG] Running cleaner: %s\n", flow.String(step))
 		}
+
 		return ctx, nil
 	}
 }
@@ -30,10 +32,12 @@ func makeBeforeHook(verbose bool) flow.BeforeStep {
 func makeAfterHook(verbose bool) flow.AfterStep {
 	return func(ctx context.Context, step flow.Steper, runErr error) error {
 		name := flow.String(step)
+
 		start, ok := ctx.Value(stepStartKey{}).(time.Time)
 		if !ok {
 			start = time.Now()
 		}
+
 		duration := time.Since(start)
 
 		if verbose && runErr == nil {

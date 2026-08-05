@@ -162,6 +162,7 @@ func operationsEqual(a, b []domain.CleanupOperation) bool {
 	if len(a) != len(b) {
 		return false
 	}
+
 	for i := range a {
 		if a[i].Name != b[i].Name ||
 			a[i].Description != b[i].Description ||
@@ -169,13 +170,16 @@ func operationsEqual(a, b []domain.CleanupOperation) bool {
 			a[i].Enabled != b[i].Enabled {
 			return false
 		}
+
 		if (a[i].Settings == nil) != (b[i].Settings == nil) {
 			return false
 		}
+
 		if a[i].Settings != nil && *a[i].Settings != *b[i].Settings {
 			return false
 		}
 	}
+
 	return true
 }
 

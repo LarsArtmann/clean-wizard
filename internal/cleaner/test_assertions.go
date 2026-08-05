@@ -107,6 +107,7 @@ func TestDryRun(
 		if cleanResult.ItemsRemoved == 0 {
 			t.Skipf("%s installed but cache empty — nothing to clean", toolName)
 		}
+
 		t.Errorf(
 			"Clean() removed %d items, want %d",
 			cleanResult.ItemsRemoved,

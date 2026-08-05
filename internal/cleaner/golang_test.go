@@ -37,6 +37,7 @@ func cacheTypeFromBools(
 
 func TestNewGoCleaner(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name            string
 		verbose         bool
@@ -82,6 +83,7 @@ func TestNewGoCleaner(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner := NewGoCleanerWithSettings(
 				tt.verbose,
 				tt.dryRun,
@@ -154,6 +156,7 @@ func assertGoCleanerFields(
 
 func TestGoCleaner_Type(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewGoCleanerWithSettings(
 		false,
 		false,
@@ -167,6 +170,7 @@ func TestGoCleaner_Type(t *testing.T) {
 
 func TestGoCleaner_IsAvailable(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewGoCleanerWithSettings(
 		false,
 		false,
@@ -183,6 +187,7 @@ func TestGoCleaner_IsAvailable(t *testing.T) {
 
 func TestGoCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		settings *domain.OperationSettings
@@ -239,6 +244,7 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner := NewGoCleanerWithSettings(
 				false,
 				false,
@@ -255,6 +261,7 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 
 func TestGoCleaner_Clean_DryRun(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name            string
 		cleanCache      bool
@@ -301,6 +308,7 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			cleaner := NewGoCleanerWithSettings(
 				false,
 				true,
@@ -372,6 +380,7 @@ func TestGoCleaner_Clean_NoAvailable(t *testing.T) {
 
 func TestGoCleaner_DryRunStrategy(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewGoCleanerWithSettings(
 		false,
 		true,
@@ -383,11 +392,13 @@ func TestGoCleaner_DryRunStrategy(t *testing.T) {
 
 func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {
 	t.Parallel()
+
 	lintCleaner := NewGolangciLintCacheCleaner(true, false)
 
 	result := lintCleaner.Clean(context.Background())
 	if result.IsErr() {
 		t.Logf("lintCleaner.Clean() returned error: %v", result.Error())
+
 		return
 	}
 

@@ -91,6 +91,7 @@ type BooleanSettingsCleanerTestCase struct {
 // This consolidates duplicate test functions across cleaner test files.
 func TestBooleanSettingsCleaners(t *testing.T) {
 	t.Parallel()
+
 	testCases := []BooleanSettingsCleanerTestCase{
 		{
 			Name: "Cargo",

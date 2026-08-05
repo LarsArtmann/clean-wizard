@@ -20,9 +20,11 @@ import (
 // It verifies the end-to-end path: DI registry → builder → workflow.Do → result aggregation.
 func TestRunCleaners_RealRegistry_DryRun(t *testing.T) {
 	t.Parallel()
+
 	if testing.Short() {
 		t.Skip("integration test: uses real system cleaners (slow)")
 	}
+
 	registry, err := cleaner.DefaultRegistryWithConfig(false, true) // dryRun=true
 	require.NoError(t, err)
 	require.NotNil(t, registry)
@@ -45,6 +47,7 @@ func TestRunCleaners_RealRegistry_DryRun(t *testing.T) {
 // as a failed step rather than silently swallowed.
 func TestRunCleaners_PanicRecovery(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	registry.Register("panic-cleaner", &mockCleaner{
@@ -70,6 +73,7 @@ func TestRunCleaners_PanicRecovery(t *testing.T) {
 // registration order even when steps complete out of order due to parallelism.
 func TestRunCleaners_DeterministicOrdering(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	registry.Register("slow", &delayedMockCleaner{
@@ -99,6 +103,7 @@ func TestRunCleaners_DeterministicOrdering(t *testing.T) {
 // A cleaner that fails twice then succeeds should ultimately show as succeeded.
 func TestRunCleaners_Retry(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	failingThenSucceeding := &retryableMockCleaner{
@@ -128,15 +133,17 @@ func TestRunCleaners_Retry(t *testing.T) {
 	assert.Equal(t, uint64(42), wr.Steps[0].Clean.FreedBytes)
 
 	// Verify retries actually happened (2 failures before success)
-	assert.Equal(t, int32(3), atomic.LoadInt32(&failingThenSucceeding.attempts))
+	assert.Equal(t, int32(3), failingThenSucceeding.attempts.Load())
 }
 
 // TestRunScans_RealRegistry_DryRun is an integration test for the scan workflow path.
 func TestRunScans_RealRegistry_DryRun(t *testing.T) {
 	t.Parallel()
+
 	if testing.Short() {
 		t.Skip("integration test: uses real system cleaners (slow)")
 	}
+
 	registry, err := cleaner.DefaultRegistryWithConfig(false, true)
 	require.NoError(t, err)
 
@@ -151,6 +158,7 @@ func TestRunScans_RealRegistry_DryRun(t *testing.T) {
 // must be called exactly once, not MaxAttempts times.
 func TestRunCleaners_SmartRetry_NotAvailable(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	naCleaner := &countingMockCleaner{
@@ -180,7 +188,7 @@ func TestRunCleaners_SmartRetry_NotAvailable(t *testing.T) {
 	assert.Equal(t, StepStatusSkipped, wr.Steps[0].Status())
 
 	// Must be called exactly once — no retries for non-retryable errors
-	assert.Equal(t, int32(1), atomic.LoadInt32(&naCleaner.attempts),
+	assert.Equal(t, int32(1), naCleaner.attempts.Load(),
 		"Infrastructure error must not be retried")
 
 	// Should complete near-instantly (no backoff delay)
@@ -193,6 +201,7 @@ func TestRunCleaners_SmartRetry_NotAvailable(t *testing.T) {
 // to classify the error as retryable.
 func TestRunCleaners_SmartRetry_Transient(t *testing.T) {
 	t.Parallel()
+
 	registry := cleaner.NewRegistry()
 
 	transientCleaner := &countingMockCleaner{
@@ -220,7 +229,7 @@ func TestRunCleaners_SmartRetry_Transient(t *testing.T) {
 	assert.Equal(t, StepStatusFailed, wr.Steps[0].Status())
 
 	// Must be called exactly MaxAttempts times (3)
-	assert.Equal(t, int32(3), atomic.LoadInt32(&transientCleaner.attempts),
+	assert.Equal(t, int32(3), transientCleaner.attempts.Load(),
 		"Transient error must be retried up to MaxAttempts")
 }
 
@@ -250,6 +259,7 @@ func (d *delayedMockCleaner) Name() string               { return d.name }
 func (d *delayedMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
 func (d *delayedMockCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	time.Sleep(d.delay)
+
 	return d.cleanRes
 }
 func (d *delayedMockCleaner) IsAvailable(_ context.Context) bool { return d.avail }
@@ -261,16 +271,17 @@ type retryableMockCleaner struct {
 	name      string
 	avail     bool
 	failCount int32
-	attempts  int32
+	attempts  atomic.Int32
 }
 
 func (r *retryableMockCleaner) Name() string               { return r.name }
 func (r *retryableMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
 func (r *retryableMockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {
-	attempt := atomic.AddInt32(&r.attempts, 1)
+	attempt := r.attempts.Add(1)
 	if attempt <= r.failCount {
 		return result.Err[domain.CleanResult](fmt.Errorf("transient failure attempt %d", attempt))
 	}
+
 	return result.Ok(domain.CleanResult{FreedBytes: 42})
 }
 func (r *retryableMockCleaner) IsAvailable(_ context.Context) bool { return r.avail }
@@ -285,20 +296,22 @@ type countingMockCleaner struct {
 	avail     bool
 	err       error // error to return (if non-nil, always fails with this)
 	failCount int32 // number of times to fail before succeeding
-	attempts  int32
+	attempts  atomic.Int32
 }
 
 func (c *countingMockCleaner) Name() string               { return c.name }
 func (c *countingMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
 func (c *countingMockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {
-	attempt := atomic.AddInt32(&c.attempts, 1)
+	attempt := c.attempts.Add(1)
 	if c.err != nil {
 		// Always return the same error (for NotAvailable / Transient tests)
 		return result.Err[domain.CleanResult](c.err)
 	}
+
 	if attempt <= c.failCount {
 		return result.Err[domain.CleanResult](fmt.Errorf("failure attempt %d", attempt))
 	}
+
 	return result.Ok(domain.CleanResult{FreedBytes: 42})
 }
 func (c *countingMockCleaner) IsAvailable(_ context.Context) bool { return c.avail }

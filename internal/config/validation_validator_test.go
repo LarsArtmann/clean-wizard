@@ -8,6 +8,7 @@ import (
 
 func TestConfigValidator_ValidateConfig(t *testing.T) {
 	t.Parallel()
+
 	validator := newTestValidator()
 
 	tests := []struct {
@@ -46,6 +47,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := validator.ValidateConfig(tt.config)
 			assertValidationResult(t, result, tt.expectValid, tt.expectError)
 		})
@@ -58,10 +60,12 @@ func newTestValidator() *ConfigValidator {
 			Required: true,
 			Min: func() *int {
 				i := 10
+
 				return &i
 			}(),
 			Max: func() *int {
 				i := 95
+
 				return &i
 			}(),
 			Message: "Max disk usage must be between 10% and 95%",
@@ -70,6 +74,7 @@ func newTestValidator() *ConfigValidator {
 			Required: true,
 			Min: func() *int {
 				i := 1
+
 				return &i
 			}(),
 			Message: "At least one protected path is required",
@@ -118,6 +123,7 @@ func assertValidationResult(
 		for _, err := range result.Errors {
 			if err.Field == expectError {
 				found = true
+
 				break
 			}
 		}
@@ -130,6 +136,7 @@ func assertValidationResult(
 
 func TestConfigValidator_ValidateField(t *testing.T) {
 	t.Parallel()
+
 	validator := NewConfigValidator()
 
 	tests := []struct {
@@ -185,6 +192,7 @@ func TestConfigValidator_ValidateField(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			err := validator.ValidateField(tt.field, tt.value)
 
 			if tt.expectError && err == nil {

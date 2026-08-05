@@ -89,6 +89,7 @@ func printDiskUsage(diskUsage *cleaner.DiskUsage, jsonOutput bool) {
 	if jsonOutput || diskUsage == nil {
 		return
 	}
+
 	fmt.Printf(
 		"📊 Disk usage before: %s %s\n",
 		cleaner.DiskUsageBar(*diskUsage, DiskUsageBarWidth),
@@ -185,6 +186,7 @@ func runCleanCommand(
 	printCleanStart(dryRun)
 
 	diskBefore, diskErr := cleaner.GetDiskUsage("/")
+
 	var diskBeforePtr *cleaner.DiskUsage
 	if diskErr == nil {
 		diskBeforePtr = &diskBefore
@@ -260,6 +262,7 @@ func cleanerTypesToNames(types []CleanerType) []string {
 	for i, t := range types {
 		names[i] = string(t)
 	}
+
 	return names
 }
 

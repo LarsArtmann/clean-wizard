@@ -15,6 +15,7 @@ func TestNewCargoCleaner(t *testing.T) {
 
 func TestCargoCleaner_Type(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewCargoCleaner(false, false)
 
 	if cleaner.Type() != domain.OperationTypeCargoPackages {
@@ -89,6 +90,7 @@ func TestCargoCleaner_GetDirModTime(t *testing.T) {
 
 func TestCargoCleaner_HasCargoCacheTool(t *testing.T) {
 	t.Parallel()
+
 	cleaner := NewCargoCleaner(false, false)
 
 	// Just verify it returns a boolean without crashing

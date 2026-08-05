@@ -19,6 +19,7 @@ func assertFloat64PtrEqual(t *testing.T, name string, got, want *float64) {
 
 func TestExtractMinMax(t *testing.T) {
 	t.Parallel()
+
 	minVal := 10
 	maxVal := 95
 
@@ -72,6 +73,7 @@ func TestExtractMinMax(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := ExtractMinMax(tt.min, tt.max, tt.minFallback, tt.maxFallback)
 
 			assertFloat64PtrEqual(t, "Min", result.Min, tt.wantMin)
@@ -82,6 +84,7 @@ func TestExtractMinMax(t *testing.T) {
 
 func TestMinMax_IsEmpty(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name      string
 		minMax    MinMax
@@ -112,6 +115,7 @@ func TestMinMax_IsEmpty(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			if got := tt.minMax.IsEmpty(); got != tt.wantEmpty {
 				t.Errorf("IsEmpty() = %v, want %v", got, tt.wantEmpty)
 			}
@@ -121,6 +125,7 @@ func TestMinMax_IsEmpty(t *testing.T) {
 
 func TestMinMax_Range(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name   string
 		minMax MinMax
@@ -146,6 +151,7 @@ func TestMinMax_Range(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			got := tt.minMax.Range()
 			if math.IsNaN(tt.want) {
 				if !math.IsNaN(got) {
@@ -160,6 +166,7 @@ func TestMinMax_Range(t *testing.T) {
 
 func TestMinMax_Contains(t *testing.T) {
 	t.Parallel()
+
 	fullRange := MinMax{Min: new(float64(10)), Max: new(float64(90))}
 	tests := []struct {
 		name   string
@@ -232,6 +239,7 @@ func TestMinMax_Contains(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			if got := tt.minMax.Contains(tt.value); got != tt.want {
 				t.Errorf("Contains(%v) = %v, want %v", tt.value, got, tt.want)
 			}
@@ -241,6 +249,7 @@ func TestMinMax_Contains(t *testing.T) {
 
 func TestToFloat64(t *testing.T) {
 	t.Parallel()
+
 	val := 42
 	tests := []struct {
 		name  string
@@ -262,6 +271,7 @@ func TestToFloat64(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			got := ToFloat64(tt.input)
 			assertFloat64PtrEqual(t, "ToFloat64()", got, tt.want)
 		})
@@ -270,6 +280,7 @@ func TestToFloat64(t *testing.T) {
 
 func TestGetConstraint(t *testing.T) {
 	t.Parallel()
+
 	val := float64(50)
 	tests := []struct {
 		name     string
@@ -294,6 +305,7 @@ func TestGetConstraint(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			got := GetConstraint(tt.input, tt.fallback)
 			if got != tt.want {
 				t.Errorf("GetConstraint() = %v, want %v", got, tt.want)

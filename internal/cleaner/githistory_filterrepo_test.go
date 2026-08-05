@@ -7,7 +7,6 @@ import (
 )
 
 func TestDetectFilterRepoProvider(t *testing.T) { //nolint:paralleltest
-
 	// Reset detector for clean test
 	ResetDetector()
 
@@ -43,6 +42,7 @@ func TestDetectFilterRepoProvider(t *testing.T) { //nolint:paralleltest
 
 func TestFilterRepoProvider_String(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		provider FilterRepoProvider
 		want     string
@@ -56,6 +56,7 @@ func TestFilterRepoProvider_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			t.Parallel()
+
 			if got := tt.provider.String(); got != tt.want {
 				t.Errorf("String() = %q, want %q", got, tt.want)
 			}

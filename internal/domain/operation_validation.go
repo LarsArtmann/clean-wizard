@@ -104,6 +104,7 @@ func (os *OperationSettings) validateNixGenerationsSettings() error {
 			Value:   os.NixGenerations.Generations,
 		}
 	}
+
 	return nil
 }
 
@@ -127,6 +128,7 @@ func (os *OperationSettings) validateTempFilesSettings() error {
 			Value:   os.TempFiles.OlderThan,
 		}
 	}
+
 	return nil
 }
 
@@ -142,6 +144,7 @@ func (os *OperationSettings) validateSystemTempSettings() error {
 			Value:   os.SystemTemp.Paths,
 		}
 	}
+
 	return nil
 }
 
@@ -158,6 +161,7 @@ func (os *OperationSettings) validateDockerSettings() error {
 			Value: os.Docker.PruneMode.String(),
 		}
 	}
+
 	return nil
 }
 
@@ -205,6 +209,7 @@ func (os *OperationSettings) validateGoPackagesSettings() error {
 			Value:   os.GoPackages.CleanLintCache.String(),
 		}
 	}
+
 	return nil
 }
 
@@ -223,6 +228,7 @@ func (os *OperationSettings) validateSystemCacheSettings() error {
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -240,5 +246,6 @@ func (os *OperationSettings) validateBuildCacheSettings() error {
 			}
 		}
 	}
+
 	return nil
 }

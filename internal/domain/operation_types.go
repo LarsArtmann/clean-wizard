@@ -117,18 +117,18 @@ type ProjectExecutablesSettings struct {
 	// ExcludeExtensions specifies file extensions to exclude from cleanup (default: ".sh")
 	ExcludeExtensions []string `json:"exclude_extensions,omitempty" yaml:"exclude_extensions,omitempty"`
 	// ExcludePatterns specifies glob patterns to exclude from cleanup
-	ExcludePatterns []string `json:"exclude_patterns,omitempty"   yaml:"exclude_patterns,omitempty"`
+	ExcludePatterns []string `json:"exclude_patterns,omitempty" yaml:"exclude_patterns,omitempty"`
 }
 
 // CompiledBinariesSettings provides type-safe settings for compiled binaries cleanup.
 // This cleaner removes large executable files that can be regenerated (build outputs, test binaries).
 type CompiledBinariesSettings struct {
 	// MinSizeMB minimum file size in MB to consider (default: 10)
-	MinSizeMB int `json:"min_size_mb,omitempty"      yaml:"min_size_mb,omitempty"`
+	MinSizeMB int `json:"min_size_mb,omitempty" yaml:"min_size_mb,omitempty"`
 	// OlderThan age filter for files (default: "0" = any age)
-	OlderThan string `json:"older_than,omitempty"       yaml:"older_than,omitempty"`
+	OlderThan string `json:"older_than,omitempty" yaml:"older_than,omitempty"`
 	// BasePaths directories to scan (default: ~/projects or user home)
-	BasePaths []string `json:"base_paths,omitempty"       yaml:"base_paths,omitempty"`
+	BasePaths []string `json:"base_paths,omitempty" yaml:"base_paths,omitempty"`
 	// ExcludePatterns glob patterns to exclude
 	ExcludePatterns []string `json:"exclude_patterns,omitempty" yaml:"exclude_patterns,omitempty"`
 	// IncludePatterns categories to include: tmp, test, bin, dist, root
@@ -180,6 +180,7 @@ func GetOperationType(name string) OperationType {
 	if opType, ok := nameToOperationType[name]; ok {
 		return opType
 	}
+
 	return OperationType(name) // Fallback for custom types
 }
 
