@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dustin/go-humanize"
+
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -17,21 +19,7 @@ import (
 const golangciLintCommandTimeout = 30 * time.Second
 
 // Cache status parsing constants.
-const (
-	cacheStatusMinLines = 2
-
-	// Binary byte conversion constants for size parsing (IEC units).
-	bytesPerKiB = 1024
-	bytesPerMiB = 1024 * 1024
-	bytesPerGiB = 1024 * 1024 * 1024
-	bytesPerTiB = 1024 * 1024 * 1024 * 1024
-
-	// Decimal byte conversion constants (SI units).
-	bytesPerKBDecimal = 1000
-	bytesPerMBDecimal = 1000 * 1000
-	bytesPerGBDecimal = 1000 * 1000 * 1000
-	bytesPerTBDecimal = 1000 * 1000 * 1000 * 1000
-)
+const cacheStatusMinLines = 2
 
 // GolangciLintCacheCleaner handles golangci-lint cache cleanup.
 type GolangciLintCacheCleaner struct {
@@ -109,40 +97,14 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 	return status, nil
 }
 
-// golangciLintSizeMultiplier converts size unit strings to byte multipliers.
-var golangciLintSizeMultiplier = map[string]int64{ //nolint:gochecknoglobals
-	"B":     1,
-	"BYTE":  1,
-	"BYTES": 1,
-	"KIB":   bytesPerKiB,
-	"MIB":   bytesPerMiB,
-	"GIB":   bytesPerGiB,
-	"TIB":   bytesPerTiB,
-	"KB":    bytesPerKBDecimal,
-	"MB":    bytesPerMBDecimal,
-	"GB":    bytesPerGBDecimal,
-	"TB":    bytesPerTBDecimal,
-}
-
 // parseSize parses a size string like "3.1KiB" or "1.5MiB" into bytes.
-// Supports units: B, KiB, MiB, GiB, TiB, KB, MB, GB, TB (binary units take precedence).
+// Delegates to humanize.ParseBytes which handles all SI and IEC suffixes.
 func parseSize(sizeStr string) (int64, error) {
-	if sizeStr == "" {
-		return 0, errors.New("empty size string")
-	}
-
-	// Parse number and unit using shared helper
-	number, unit, err := ParseNumberAndUnit(sizeStr)
+	bytes, err := humanize.ParseBytes(sizeStr)
 	if err != nil {
-		return 0, fmt.Errorf("invalid size format: %s", sizeStr)
+		return 0, fmt.Errorf("invalid size format: %q: %w", sizeStr, err)
 	}
-
-	// Binary units (powers of 1024)
-	multiplier, ok := golangciLintSizeMultiplier[strings.ToUpper(unit)]
-	if !ok {
-		return 0, fmt.Errorf("unknown size unit: %s", unit)
-	}
-	return int64(number * float64(multiplier)), nil
+	return int64(bytes), nil
 }
 
 // getCacheStatus returns the cache status by running "golangci-lint cache status".
