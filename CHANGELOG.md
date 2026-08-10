@@ -8,6 +8,11 @@
 
 ### Added
 
+#### 2026-08-10 (continued)
+
+- **Cargo test expectation aligned** (`internal/cleaner/testhelper_test.go`) — `TestBooleanSettingsCleaners/Cargo` now expects 2 items (registry + git cache subdirs) instead of 1, matching the actual `CargoCleaner.Clean` dry-run contract. Closes TODO #24.
+- **TODO_LIST.md refresh** — TODO #24 marked DONE; test count updated to 23/23 packages PASS
+
 #### 2026-08-10
 
 - **Retry test regression fixed** (`internal/execution/integration_test.go`) — `TestRunCleaners_Retry` now uses `SizeEstimate.Value()` instead of deprecated `FreedBytes` field; assertion matches actual cleaner contract

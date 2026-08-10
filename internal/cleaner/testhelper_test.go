@@ -99,7 +99,7 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				TestName:          "Cargo",
 				ToolName:          "Cargo",
 				SettingsFieldName: "cargo packages",
-				ExpectedItems:     1,
+				ExpectedItems:     2,
 				Constructor:       NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner),
 				CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
 					cleanupMode := domain.CacheCleanupDisabled

@@ -48,7 +48,7 @@
 | 21  | Standardize BDD test naming (`*_ginkgo_test.go` → consistent pattern)            | LOW    | LOW    | BDD testing      |
 | 22  | Add `--dry-run` to scan command (parity with clean)                              | LOW    | LOW    | Pre-existing     |
 | 23  | Add `--keep-generations` flag for Nix cleaner                                    | LOW    | LOW    | Pre-existing     |
-| 24  | Fix `TestBooleanSettingsCleaners/Cargo` flake — counts 2 items (registry + git) but test expects 1 | LOW    | LOW    | 2026-08-05 linter |
+| 24  | ~~Fix `TestBooleanSettingsCleaners/Cargo` flake — counts 2 items (registry + git) but test expects 1~~ DONE 2026-08-10 | LOW    | LOW    | 2026-08-05 linter |
 | 25  | `ParseNumberAndUnit` in `fsutil.go:483` is a single-callsite helper after b7692ff — inline or delete | LOW    | LOW    | 2026-08-05 linter |
 | 26  | Add regression test that `parseSize("garbage")` produces a wrapped error chain (errorfamily.Classify → Rejection) | LOW    | LOW    | 2026-08-05 linter |
 
@@ -66,4 +66,4 @@
 **Status:** 26 actionable items (5 Critical, 4 High, 9 Medium, 8 Low, 4 Long-term)
 
 **Build:** `GOEXPERIMENT=jsonv2 go build ./...` ✅ PASS
-**Tests:** `GOEXPERIMENT=jsonv2 go test ./... -short` — 22/22 packages PASS except `internal/cleaner` which has the pre-existing Cargo flake (TODO #24)
+**Tests:** `GOEXPERIMENT=jsonv2 go test ./... -short` — 23/23 packages PASS
