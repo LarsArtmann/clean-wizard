@@ -1,12 +1,37 @@
 # CHANGELOG
 
-**Last Updated:** 2026-07-13
+**Last Updated:** 2026-08-10
 
 ---
 
 ## [Unreleased]
 
 ### Added
+
+#### 2026-08-10
+
+- **Retry test regression fixed** (`internal/execution/integration_test.go`) — `TestRunCleaners_Retry` now uses `SizeEstimate.Value()` instead of deprecated `FreedBytes` field; assertion matches actual cleaner contract
+- **`recordFinal` in-place mutation fix** (`internal/execution/results.go`) — `for _, v := range slices.Backward(rc.results)` mutated a copy and silently dropped the assignment; replaced with index-based assignment so retry outcomes correctly overwrite previous attempts (without this, retry-succeeded steps were reported as failed because the original error remained)
+- **TODO list refresh** (`TODO_LIST.md`) — verified items against code, added new items harvested from 2026-07-06 → 2026-08-05 sessions
+- **FEATURES.md status correction** — Projects Management Automation cleaner now correctly described as `FULLY_FUNCTIONAL` (uses typed `*NotAvailableError` for missing-tool signaling); `docker_parsing.go` H007 violation added as known issue
+
+#### 2026-08-05
+
+- **`go-humanize` adopted for size parsing** (`internal/cleaner/golangcilint.go`) — replaced 11-entry `golangciLintSizeMultiplier` map and 8 byte-conversion constants with `humanize.ParseBytes` (commit `b7692ff`)
+- **TestParseSize passes 10/10 cases** — binary (3.1KiB, 1.5MiB, 500B, 1GiB, 1TiB), decimal (1KB, 1MB, 1GB, 1TB), invalid
+- **Full cleaner suite passes 243/243 Ginkgo specs** — `go test ./internal/cleaner/ -short` clean
+
+#### 2026-07-15
+
+- **Public website launched** (`https://cleanwizard.lars.software`) — Astro 7 + Starlight + Tailwind v4, deployed to Firebase hosting with SSL cert (Let's Encrypt), CI/CD workflow (`.github/workflows/website.yml`), 13 GitHub topics set
+- **Landing page copywriting overhaul** — replaced fabricated hero output with real captured `clean-wizard scan`/`clean --dry-run` output (38 GiB scan, 12 GiB freed); rewrote all 6 feature cards in user-facing language; added ProblemSection with real pain-point data; replaced strawman "SystemNix" comparison with honest "Generic Cleaners"
+
+#### 2026-07-14
+
+- **`encoding/json/v2` migration** — all 7 production source files migrated to `encoding/json/v2` + `encoding/json/jsontext` (`MarshalIndent` → `Marshal` + `jsontext.WithIndent`)
+- **`go-error-family` bumped v0.6.1 → v0.7.0** — transitively imports `encoding/json/v2`
+- **`GOEXPERIMENT=jsonv2`** set in flake.nix `buildGoModule.env`, both `default` and `ci` devShells
+- **GitHub description, homepage URL, 13 topics** set for `LarsArtmann/clean-wizard`
 
 #### 2026-07-06
 
@@ -60,6 +85,8 @@
 ### Fixed
 
 - Retry duplicate recording — `recordFinal()` replaces `record()` so retried steps produce exactly 1 entry
+- **2026-08-10**: `recordFinal` copy-in-loop bug — was iterating with `for _, v := range` (mutated copy, dropped assignment); now index-based `rc.results[i] = ...`
+- **2026-08-10**: `TestRunCleaners_Retry` regression assertion — was asserting deprecated `FreedBytes`; now asserts `SizeEstimate.Value()`
 - Workflow errors no longer silently dropped when steps exist
 - Panics in cleaners now recovered and recorded as failed steps
 - `isProcessRunning` fails closed when `pgrep` is unavailable (was failing open)

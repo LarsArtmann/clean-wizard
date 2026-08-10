@@ -1,5 +1,7 @@
 # Clean Wizard - Project Instructions
 
+**Last Reviewed:** 2026-08-10 (docs-health audit)
+
 ## Build & Test
 
 **Requires `GOEXPERIMENT=jsonv2`** (set in flake.nix devShell/build or `export GOEXPERIMENT=jsonv2` for standalone):

@@ -52,44 +52,28 @@
 
 ## b) PARTIALLY DONE
 
-### 1. Scan Command Missing `--retries` and `--concurrency` Flags
-
-Only `clean` got the new flags. `scan` still calls `execution.RunScans` with only `WithVerbose(verbose)` — no retry or concurrency control. The execution layer supports it (`RunScans` accepts the same `RunOption` variadic), but the scan command doesn't expose it.
-
-### 2. Two Cleaners Still Use Ad-Hoc String Errors
-
-- `projectsmanagementautomation.go:106` — `errors.New("projects-management-automation not available")`
-- `systemcache.go:374` — `errors.New("not available on this platform (requires macOS or Linux)")`
-
-These haven't been migrated to `*NotAvailableError`. The keyword fallback in `IsNotAvailableError()` handles them, but they're not using the typed path.
-
-### 3. `record()` Method on `resultCollector` Is Now Dead Code
-
-After the retry fix, all callers use `recordFinal()`. The old `record()` method still exists in `results.go` with zero callers. Should be removed.
-
-### 4. Nix Cleaner Not Migrated to `*NotAvailableError`
-
-Nix cleaner returns mock data when unavailable rather than a `*NotAvailableError`. This is intentional (for dry-run estimation), but means the typed error path isn't used for Nix.
-
----
+1. ~~Scan Command Missing `--retries` and `--concurrency` Flags~~ done at `1b96d06` — both flags now wired to `scan` command with parity to `clean`
+2. ~~Two Cleaners Still Use Ad-Hoc String Errors~~ done at `c102e0f` — `projectsmanagementautomation` and `systemcache` now return `*NotAvailableError` via `NewNotAvailableError`
+3. ~~`record()` Method on `resultCollector` Is Now Dead Code~~ done at `6a539e7` — `record()` removed; only `recordFinal()` remains
+4. ~~Nix Cleaner Not Migrated to `*NotAvailableError`~~ Won't implement — Nix intentionally returns mock data when unavailable for dry-run estimation; not an error condition
 
 ## c) NOT STARTED
 
-1. **`--retries` / `--concurrency` flags on scan command** — execution layer supports it, command doesn't expose it
-2. **Migrate remaining 2 cleaners** (`projectsmanagementautomation`, `systemcache`) to `*NotAvailableError`
-3. **Remove dead `record()` method** from `resultCollector`
-4. **`githistory` command DI migration** — skipped as low value
-5. **Per-cleaner timeout** via `flow.Timeout` — skipped as complexity > value
-6. **Profile-based filtering for `scan --profile`** — flag accepted but discarded
-7. **Register individual cleaners as DI providers** — large refactor, deferred
-8. **Pass `OperationSettings` from config to cleaner constructors** — not wired
-9. **Make adapters interface-backed** — deferred
-10. **`do.ShutdownerWithError`** on resource-holding adapters — deferred
-11. **Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`** — deferred
-12. **BDD tests for execution layer** (Ginkgo) — not started
-13. **`--keep-generations` flag** for Nix — not started
-14. **Progress TUI** — not started
-15. **Stale status report cleanup** — `docs/status/2026-07-06_00-35_DI-WORKFLOW-MIGRATION.md` references deleted `FlowBuilder`/`BranchFlow`
+1. ~~`--retries` / `--concurrency` flags on scan command~~ done at `1b96d06`
+2. ~~Migrate remaining 2 cleaners~~ done at `c102e0f`
+3. ~~Remove dead `record()` method~~ done at `6a539e7`
+4. ~~`githistory` command DI migration~~ NOT-DO — explicitly deferred in 2026-07-06_03-42 Pareto pass
+5. ~~Per-cleaner timeout via `flow.Timeout`~~ NOT-DO — complexity > value
+6. Implement profile-based filtering for `scan --profile` — still open; tracked as TODO #10
+7. Register individual cleaners as DI providers — still open; tracked as TODO #29
+8. Pass `OperationSettings` from config to cleaner constructors — still open; tracked as TODO #6
+9. Make adapters interface-backed — still open; tracked as TODO #30
+10. `do.ShutdownerWithError` on resource-holding adapters — NOT-DO
+11. Consolidate `cleaner.Cleaner` vs `domain.OperationHandler` — NOT-DO (ROADMAP non-goal #4)
+12. Add BDD tests for execution layer (Ginkgo) — still open; tracked as TODO #7
+13. `--keep-generations` flag for Nix — still open; tracked as TODO #23
+14. Progress TUI — aspirational (ROADMAP Theme #3)
+15. ~~Stale status report cleanup — references to deleted `FlowBuilder`/`BranchFlow`~~ done at 2026-07-13 + 2026-08-10 docs-health audits
 
 ---
 
