@@ -1,7 +1,6 @@
 package execution
 
 import (
-	"slices"
 	"sort"
 	"sync"
 	"time"
@@ -133,9 +132,9 @@ func (rc *resultCollector) recordFinal(name string, clean domain.CleanResult, er
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
 
-	for _, v := range slices.Backward(rc.results) {
-		if v.Name == name {
-			v = StepResult{
+	for i := len(rc.results) - 1; i >= 0; i-- {
+		if rc.results[i].Name == name {
+			rc.results[i] = StepResult{
 				Name: name, Clean: clean, Err: err, Duration: duration,
 			}
 
