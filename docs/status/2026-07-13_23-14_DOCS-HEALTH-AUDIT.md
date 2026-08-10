@@ -6,6 +6,16 @@
 **Test Status:** ALL 24 packages pass in short mode (290+ tests), 0 failures
 **Build Status:** `go build ./...` clean
 
+**Resolution (2026-08-10):** The audit's 20 findings from 2026-07-13 were all applied. A second docs-health pass on 2026-08-10 verified:
+- TODO_LIST.md rebuilt (28 → 26 items after harvest)
+- ROADMAP.md rebuilt (DI contradiction resolved; themes + non-goals)
+- FEATURES.md refreshed (Projects Mgmt Automation status corrected to `FULLY_FUNCTIONAL`; new improvements added)
+- CHANGELOG.md extended (2026-07-14, 2026-07-15, 2026-08-05, 2026-08-10 entries)
+- Test failure fixed: `TestRunCleaners_Retry` regression (deprecated `FreedBytes` → `SizeEstimate.Value()`)
+- `recordFinal` in-place mutation bug fixed (index-based assignment)
+
+**Stale references in this report:** Section "g) Top 2 Questions" — both questions remain partially unresolved. Modularization work is still deferred; documentation surface area is still large. These are conscious choices (ROADMAP non-goals; "no threshold" memory rule).
+
 ---
 
 ## Executive Summary

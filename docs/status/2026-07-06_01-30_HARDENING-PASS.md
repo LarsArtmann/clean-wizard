@@ -3,6 +3,8 @@
 **Date:** 2026-07-06
 **Session Scope:** Bug fixes, dead code removal, retry support, test hardening
 
+**Resolution (2026-08-10):** All 13 numbered items in "Completed Work" shipped in commit `65290ce`. The retry test (item #1) had a latent regression that resurfaced in 2026-08-10 (`recordFinal` index-based assignment fix + assertion migration to `SizeEstimate.Value()`). All other items stable.
+
 ---
 
 ## Executive Summary

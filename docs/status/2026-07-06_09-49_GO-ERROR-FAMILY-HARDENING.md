@@ -1,7 +1,9 @@
 # go-error-family Hardening — Status Report
 
 **Date:** 2026-07-06 09:49
-**Session goal:** Complete the "Ready" items from the previous go-error-family adoption report — eliminate cockroachdb/errors, add per-cleaner error codes, wire CLI exit codes, enrich JSON output, add RetryProfile, and migrate all command-layer error wrapping to classified errors.
+**Session goal:** Complete the "Ready" items from the previous go-error-family adoption report.
+
+**Resolution (2026-08-10):** This report produced commit `132f5f6` (`feat: harden go-error-family integration`). All 10 "FULLY DONE" items shipped. Items in PARTIALLY DONE (#1-#5) remain partially open and are tracked in `TODO_LIST.md` (#1, #2, #3, #4, #5). Section f) "25 Things to Get Done Next" maps 1:1 to `TODO_LIST.md`.
 
 ---
 

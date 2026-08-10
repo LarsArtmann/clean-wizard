@@ -3,6 +3,10 @@
 **Date:** 2026-07-06 00:35
 **Session Scope:** Migrating clean-wizard to the BuildFlow DI + workflow pattern
 
+**Resolution (2026-08-10):** This report described the initial migration which shipped across `e6d6933`/`43df609` and `65290ce`. Items in section b) (PARTIALLY DONE) were resolved at `de105b0`, `c102e0f`, `1b96d06`. Items in section c) (NOT STARTED) were mostly completed in subsequent sessions; remaining open items are tracked in `TODO_LIST.md` and `ROADMAP.md`.
+
+**Stale references:** Section a) item 6 "Moved Go Process Safety Check" still references `hasOtherGoProcesses`/`isProcessRunning` correctly — these moved to `golang_cleaner.go`. Section b) "Cleaner Registry is Still Default-Configured" is still true today and tracked as TODO #6 (OperationSettings wiring) and TODO #29 (per-cleaner DI providers).
+
 ---
 
 ## Executive Summary

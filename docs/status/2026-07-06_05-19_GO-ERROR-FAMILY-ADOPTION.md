@@ -1,7 +1,9 @@
 # go-error-family Adoption — Status Report
 
 **Date:** 2026-07-06 05:19
-**Session goal:** Properly adopt `go-error-family` (and evaluate `go-error-family/bridge`) to replace hand-rolled error classification throughout clean-wizard.
+**Session goal:** Properly adopt `github.com/larsartmann/go-error-family v0.6.1` to replace hand-rolled error classification throughout clean-wizard.
+
+**Resolution (2026-08-10):** This report was the foundation for commit `edaff33` (`feat: adopt go-error-family for behavioral error classification`). Items 1-7 in "Immediate" were completed at `132f5f6` (`feat: harden go-error-family integration`). Remaining open items are tracked in `TODO_LIST.md` (TODOs #1, #3, #5, #6, #10, #11, #27, #28, #29, #30) and `ROADMAP.md`. Bridge subpackage deliberately not adopted — see "Bridge evaluation" section below.
 
 ---
 
