@@ -79,102 +79,70 @@
 
 ## d) TOTALLY FUCKED UP / RISKS
 
-### 1. No Test for the Retry Duplicate Recording Fix
-
-The fix adds `recordFinal()` and moves recording to `defer`, but **no test verifies that a retried step produces exactly 1 entry** in `WorkflowResult.Steps`. The existing `TestRunCleaners_Retry` test verifies the workflow succeeds after retries, but doesn't assert step count. A regression could silently reintroduce duplicates.
-
-### 2. `--retries` Default of 0 Means Production Has No Retries
-
-The `--retries` flag defaults to 0 (disabled). This means production clean runs get zero retries — a transient Nix store lock or Docker daemon hiccup causes immediate failure. The `DefaultRetryConfig()` exists with sensible defaults (3 attempts, 2s initial backoff) but is never used as a default. Should the default be 3?
-
-### 3. `ErrGoCacheNotAvailable` Changed Type but Sentinel Comparison May Break
-
-`ErrGoCacheNotAvailable` was changed from `errors.New(...)` (value) to `&NotAvailableError{...}` (pointer). Any code doing `errors.Is(err, ErrGoCacheNotAvailable)` will now do pointer comparison against a specific `*NotAvailableError` instance. If a test creates its own `&NotAvailableError{CleanerName: "go"}`, it won't match the sentinel even though it represents the same condition. The `IsNotAvailableError()` function handles this correctly via `errors.As`, but direct sentinel comparisons could break.
-
-### 4. Integration Test Takes 15 Seconds
-
-`TestRunCleanCommand_DryRun_JSON` runs the actual clean pipeline with real cleaners in dry-run mode. On the evo-x2 machine, this takes 15.3 seconds because it actually scans system caches (Go cache, system cache, compiled binaries, etc.). This is too slow for a unit test suite — it should be tagged as integration or use a mock registry.
-
-### 5. `--profile` Flag Silently Ignored in Scan Command
-
-The flag is defined, parsed by cobra, but `runScanCommand` receives it as `_ string`. Users running `scan --profile daily` get ALL cleaners with no warning. Pre-existing issue, not fixed in this session.
-
----
+1. ~~No Test for the Retry Duplicate Recording Fix~~ done at `6a539e7` — `TestRunCleaners_Retry` now asserts `len(Steps) == 1` after 3 attempts. **2026-08-10:** assertion migrated from deprecated `FreedBytes` to `SizeEstimate.Value()`; in-place mutation bug in `recordFinal` fixed.
+2. `--retries` Default of 0 Means Production Has No Retries — **resolved at `1b96d06`** — default raised to 3 with smart retry via `errorfamily.IsRetryable()`
+3. `ErrGoCacheNotAvailable` Changed Type but Sentinel Comparison May Break — **resolved at `c102e0f`** — sentinel removed entirely; comparison goes through `IsNotAvailableError()` → `errors.As`
+4. Integration Test Takes 15 Seconds — **partial fix at `6a539e7`** — `testing.Short()` skip guard added; test still takes 15s when run explicitly
+5. `--profile` Flag Silently Ignored in Scan Command — **partially resolved at `1b96d06`** — flag now prints warning; full filtering still tracked as TODO #10
 
 ## e) WHAT WE SHOULD IMPROVE
 
 ### Immediate (Low Effort, High Confidence)
 
-1. **Add test asserting step count after retry** — verify `recordFinal` produces exactly 1 entry per step
-2. **Remove dead `record()` method** from `resultCollector`
-3. **Migrate remaining 2 cleaners** to `*NotAvailableError`
-4. **Add `--retries` and `--concurrency` to scan command** — symmetric with clean
-5. **Tag integration test** with `//go:build integration` or use `testing.Short()` skip
+1. ~~Add test asserting step count after retry~~ done at `6a539e7` + 2026-08-10
+2. ~~Remove dead `record()` method~~ done at `6a539e7`
+3. ~~Migrate remaining 2 cleaners to `*NotAvailableError`~~ done at `c102e0f`
+4. ~~Add `--retries` and `--concurrency` to scan command~~ done at `1b96d06`
+5. ~~Tag integration test with `//go:build integration` or use `testing.Short()` skip~~ done at `6a539e7`
 
 ### Near-Term (Medium Effort, Real Value)
 
-6. **Set `--retries` default to 3** — production cleaners should retry transient failures
-7. **Wire `OperationSettings` from config profiles** through to cleaner constructors
-8. **Implement `scan --profile` filtering** — or remove the flag if not planned
-9. **Add `--timeout` flag** — per-cleaner timeout via `flow.Timeout`
-10. **Consolidate error packages** — 4 packages with overlapping responsibilities
+6. ~~Set `--retries` default to 3 (or 2) for production resilience~~ done at `1b96d06`
+7. Wire `OperationSettings` from config profiles — still open; tracked as TODO #6
+8. Implement `scan --profile` filtering — still open; tracked as TODO #10
+9. Add `--timeout` flag — NOT-DO — complexity > value
+10. Consolidate 4 error packages into one coherent design — done at `edaff33` (`go-error-family` adoption); `internal/pkg/errors/` ghost package removed
 
 ### Strategic (Higher Effort, Architectural)
 
-11. **Register individual cleaners as DI providers** — enable per-cleaner config
-12. **Make adapters interface-backed** with `do.As` aliasing
-13. **Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`**
-14. **Add BDD tests** for execution layer (Ginkgo)
-15. **Add progress TUI** — live per-cleaner status during workflow execution
-
----
+11. Register individual cleaners as DI providers — still open; tracked as TODO #29
+12. Make adapters interface-backed with `do.As` aliasing — still open; tracked as TODO #30
+13. Consolidate `cleaner.Cleaner` vs `domain.OperationHandler` — NOT-DO (ROADMAP non-goal #4)
+14. Add BDD tests for execution layer (Ginkgo) — still open; tracked as TODO #7
+15. Add progress TUI — aspirational (ROADMAP Theme #3)
 
 ## f) Top 25 Things to Do Next
 
-| #   | Task                                                                               | Impact   | Effort |
-| --- | ---------------------------------------------------------------------------------- | -------- | ------ |
-| 1   | **Add test: assert step count = 1 after retry**                                    | CRITICAL | S      |
-| 2   | **Remove dead `record()` method** from resultCollector                             | HIGH     | S      |
-| 3   | **Migrate `projectsmanagementautomation` + `systemcache` to `*NotAvailableError`** | MEDIUM   | S      |
-| 4   | **Add `--retries` and `--concurrency` to scan command**                            | MEDIUM   | S      |
-| 5   | **Tag/skip integration test for short mode**                                       | HIGH     | S      |
-| 6   | **Set `--retries` default to 3** (or 2) for production resilience                  | HIGH     | S      |
-| 7   | **Wire `OperationSettings` from config to cleaner constructors**                   | HIGH     | L      |
-| 8   | **Implement `scan --profile` filtering** or remove the flag                        | MEDIUM   | M      |
-| 9   | **Add `--timeout` per-cleaner flag** wired to `flow.Timeout`                       | MEDIUM   | M      |
-| 10  | **Consolidate 4 error packages** into one coherent design                          | MEDIUM   | L      |
-| 11  | **Clean up stale status reports** (reference deleted types)                        | LOW      | S      |
-| 12  | **Add `--keep-generations` flag** for Nix cleaner                                  | LOW      | S      |
-| 13  | **Register individual cleaners as separate DI providers**                          | HIGH     | L      |
-| 14  | **Make adapters interface-backed with `do.As`**                                    | HIGH     | L      |
-| 15  | **Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`**                     | MEDIUM   | L      |
-| 16  | **Implement `do.ShutdownerWithError`** on adapters with resources                  | LOW      | S      |
-| 17  | **Add BDD tests for execution layer** (Ginkgo)                                     | MEDIUM   | M      |
-| 18  | **Add progress TUI** (live per-cleaner status)                                     | LOW      | L      |
-| 19  | **Add `do.ExplainInjector` debug output** behind `--di-debug`                      | LOW      | S      |
-| 20  | **Create application-global DI bootstrap** shared by all commands                  | MEDIUM   | M      |
-| 21  | **Migrate `githistory` command to DI**                                             | LOW      | S      |
-| 22  | **Add `flow.If` conditional for Docker** (daemon running check)                    | LOW      | S      |
-| 23  | **Add audit log of DI registrations**                                              | LOW      | S      |
-| 24  | **Fix `ErrGoCacheNotAvailable` sentinel** — make it a value, not pointer           | MEDIUM   | S      |
-| 25  | **Profile-guided cleaner selection** — read config profiles in DI provider         | HIGH     | L      |
-
----
+| #   | Task                                                                               | Resolution |
+| --- | ---------------------------------------------------------------------------------- | ---------- |
+| 1   | ~~**Add test: assert step count = 1 after retry**~~                               | done at `6a539e7` + 2026-08-10 |
+| 2   | ~~**Remove dead `record()` method** from resultCollector~~                       | done at `6a539e7` |
+| 3   | ~~**Migrate `projectsmanagementautomation` + `systemcache` to `*NotAvailableError`**~~ | done at `c102e0f` |
+| 4   | ~~**Add `--retries` and `--concurrency` to scan command**~~                        | done at `1b96d06` |
+| 5   | ~~**Tag/skip integration test for short mode**~~                                  | done at `6a539e7` |
+| 6   | ~~**Set `--retries` default to 3** (or 2) for production resilience~~              | done at `1b96d06` |
+| 7   | Wire `OperationSettings` from config to cleaner constructors                       | still open — TODO #6 |
+| 8   | Implement `scan --profile` filtering or remove the flag                            | still open — TODO #10 |
+| 9   | Add `--timeout` per-cleaner flag                                                    | NOT-DO |
+| 10  | ~~**Consolidate 4 error packages into one coherent design**~~                     | done at `edaff33` |
+| 11  | ~~Clean up stale status reports (reference deleted types)~~                       | done at 2026-07-13 + 2026-08-10 audits |
+| 12  | Add `--keep-generations` flag for Nix cleaner                                      | still open — TODO #23 |
+| 13  | Register individual cleaners as separate DI providers                              | still open — TODO #29 |
+| 14  | Make adapters interface-backed with `do.As`                                        | still open — TODO #30 |
+| 15  | Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`                         | NOT-DO |
+| 16  | Implement `do.ShutdownerWithError` on adapters with resources                      | NOT-DO |
+| 17  | Add BDD tests for execution layer (Ginkgo)                                         | still open — TODO #7 |
+| 18  | Add progress TUI                                                                   | aspirational |
+| 19  | Add `do.ExplainInjector` debug output behind `--di-debug`                          | NOT-DO |
+| 20  | Create application-global DI bootstrap shared by all commands                      | NOT-DO |
+| 21  | Migrate `githistory` command to DI                                                 | NOT-DO |
+| 22  | Add `flow.If` conditional for Docker                                               | NOT-DO |
+| 23  | Add audit log of DI registrations                                                  | NOT-DO |
+| 24  | ~~Fix `ErrGoCacheNotAvailable` sentinel — make it a value, not pointer~~           | done at `c102e0f` (sentinel removed entirely) |
+| 25  | Profile-guided cleaner selection                                                   | still open — TODO #6 (subsumed) |
 
 ## g) Top #1 Question I Cannot Answer Myself
 
 **Should `--retries` default to 0 (disabled, current) or 3 (enabled with `DefaultRetryConfig`)?**
 
-Arguments for default 0:
-
-- Predictability — users get immediate failure feedback, no surprising delays
-- Backward compatibility — matches the pre-workflow behavior (no retries)
-- Safer — a hung Docker daemon won't cause 30s delays on every clean run
-
-Arguments for default 3:
-
-- Production resilience — transient failures (Nix store locks, Docker daemon hiccups) are common
-- The `IsNotAvailableError` smart retry already prevents wasting time on non-retryable errors
-- The `DefaultRetryConfig()` function exists specifically because 3 attempts with 2s backoff was deemed sensible
-
-I cannot determine the user's preference for default-fail-fast vs default-resilience. This is a UX decision that affects every `clean-wizard clean` invocation.
+> **Resolved at `1b96d06`:** default is **3**. Smart retry via `errorfamily.IsRetryable()` prevents wasting budget on non-retryable errors. `--retries 0` remains available as escape hatch.
