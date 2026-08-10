@@ -130,7 +130,7 @@ func TestRunCleaners_Retry(t *testing.T) {
 	require.Len(t, wr.Steps, 1, "retried step must produce exactly 1 entry, not one per attempt")
 	assert.Equal(t, "retry-me", wr.Steps[0].Name)
 	assert.Equal(t, StepStatusSucceeded, wr.Steps[0].Status())
-	assert.Equal(t, uint64(42), wr.Steps[0].Clean.FreedBytes)
+	assert.Equal(t, uint64(42), wr.Steps[0].Clean.SizeEstimate.Value())
 
 	// Verify retries actually happened (2 failures before success)
 	assert.Equal(t, int32(3), failingThenSucceeding.attempts.Load())
