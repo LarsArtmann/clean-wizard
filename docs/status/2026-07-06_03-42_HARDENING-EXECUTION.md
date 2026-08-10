@@ -63,75 +63,43 @@ BuildFlow pre-commit        → 27/27 green (every commit)
 
 ## b) PARTIALLY DONE
 
-### 1. `IsNotAvailableError` Keyword Fallback Still Exists
-
-The keyword-based fallback in `IsNotAvailableError()` (checking for "not available", "not installed" substrings) still exists in `cleaner/cleaner.go`. All 13 internal cleaners now return typed `*NotAvailableError`, so the fallback is technically dead code for internal use. However, OS-level errors from `exec.LookPath`, `os.Stat`, etc. may still contain "not available" strings, so the fallback serves as a safety net for those cases.
-
-**Status:** Functional but carrying dead weight for internal cleaners. Could be tightened to only check `errors.As` once we're confident no OS errors need keyword matching.
-
-### 2. `RetryConfig` Hardcoded in Command Layer
-
-Both `clean.go` and `scan.go` construct `RetryConfig{MaxAttempts: 3, InitialBackoff: 2s, MaxBackoff: 30s}` inline from the `--retries` flag value. The `DefaultRetryConfig()` function exists in `execution/retry.go` but is not used. The backoff/MaxBackoff values are duplicated across both commands.
-
-**Status:** Works correctly but is a minor DRY violation. A shared helper or config-driven approach would be cleaner.
-
-### 3. Stale Status Reports Not Cleaned Up
-
-`docs/status/2026-07-06_00-35_DI-WORKFLOW-MIGRATION.md` still references deleted `FlowBuilder`/`BranchFlow` as "dormant" — they've been deleted. Multiple status reports from the migration session are now partially stale.
-
-**Status:** Pre-existing issue. Not blocking but creates confusion for anyone reading the history.
+1. `IsNotAvailableError` Keyword Fallback Still Exists — **partial** — keyword fallback still in `cleaner.go`; retained as safety net for OS errors (`exec.LookPath`, etc.). Acceptable.
+2. `RetryConfig` Hardcoded in Command Layer — **resolved at `edaff33`** — `RetryConfigFromAttempts(n)` shared builder extracted; commands now use it
+3. Stale Status Reports Not Cleaned Up — **resolved at 2026-07-13 + 2026-08-10 audits**
 
 ---
 
 ## c) NOT STARTED
 
-1. **Consolidate 4 error packages** — `internal/pkg/errors/` (ghost, used only by config), `cleaner.NotAvailableError`, `domain.ValidationError`, scattered sentinel `var Err...` across commands
-2. **Adopt `go-error-family`** — BuildFlow uses `errorfamily.Transient` for retry classification; cleaner than hand-rolled `IsNotAvailableError`
-3. **Add `RetryProfile` type** — Default/Aggressive/Conservative/None profiles matching BuildFlow's pattern
-4. **Wire `OperationSettings` from YAML config** — user profile settings don't reach cleaner constructors; hardcoded defaults used instead
-5. **Register individual cleaners as DI providers** — large refactor; enables per-cleaner config from YAML
-6. **`flow.If` for Docker daemon check** — BuildFlow conditional pattern
-7. **Migrate `githistory` command to DI** — still uses direct constructor calls
-8. **Migrate `init`, `profile`, `config` commands to DI** — not using container
-9. **Make adapters interface-backed** with `do.As` aliasing
-10. **Implement `do.ShutdownerWithError`** on resource-holding adapters
-11. **Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`** — impedance mismatch
-12. **Add BDD tests for execution layer** (Ginkgo)
-13. **Logger globals → DI-injected logger** — root cause of test races (we patched symptoms by removing `t.Parallel()`)
-14. **Re-enable `t.Parallel()` on logger tests** — after logger globals fix
-15. **Add `--keep-generations` flag** for Nix cleaner
-16. **Add progress TUI** — live per-cleaner status during workflow execution
-17. **Per-cleaner timeout** via `flow.Timeout`
-18. **Profile-based filtering for `scan --profile`** — flag now warns but doesn't filter
-19. **Clean up stale status reports** — references to deleted types
-20. **Split `internal/domain/` god package** — 23 files in one package
-21. **Split `internal/cleaner/` flat structure** — 50+ files, no sub-packages
+1. Consolidate 4 error packages — **done at `edaff33`** — `go-error-family` fully adopted; `internal/pkg/errors/` deleted (1283 lines)
+2. ~~Adopt `go-error-family`~~ done at `edaff33`
+3. Add `RetryProfile` type — **done at `132f5f6`**
+4. Wire `OperationSettings` from YAML config — still open; tracked as TODO #6
+5. Register individual cleaners as DI providers — still open; tracked as TODO #29
+6. `flow.If` for Docker daemon check — NOT-DO; handled by `IsAvailable`
+7. Migrate `githistory` command to DI — NOT-DO; explicitly deferred
+8. Migrate `init`, `profile`, `config` commands to DI — NOT-DO; explicitly deferred
+9. Make adapters interface-backed — still open; tracked as TODO #30
+10. Implement `do.ShutdownerWithError` — NOT-DO
+11. Consolidate `cleaner.Cleaner` vs `domain.OperationHandler` — NOT-DO (ROADMAP non-goal #4)
+12. Add BDD tests for execution layer (Ginkgo) — still open; tracked as TODO #7
+13. Logger globals → DI-injected logger — still open; tracked as TODO #11
+14. Re-enable `t.Parallel()` on logger tests — still open; blocked by #13
+15. Add `--keep-generations` flag — still open; tracked as TODO #23
+16. Add progress TUI — aspirational (ROADMAP Theme #3)
+17. Per-cleaner timeout via `flow.Timeout` — NOT-DO
+18. Profile-based filtering for `scan --profile` — still open; tracked as TODO #10
+19. ~~Clean up stale status reports~~ done at 2026-07-13 + 2026-08-10 audits
+20. Split `internal/domain/` god package — still open; tracked as TODO #27
+21. Split `internal/cleaner/` flat structure — still open; tracked as TODO #28
 
----
+## d) TOTALLY FUCKED UP
 
-## d) TOTALLY FUCKED UP / RISKS
-
-### 1. `--retries 3` Default May Surprise Users
-
-Changing the default from 0 (disabled) to 3 (enabled) means every `clean-wizard clean` invocation now retries transient failures with 2s→4s→8s backoff. A hung Docker daemon or unresponsive Nix store will cause up to ~14s of delay per cleaner before failing. The `IsNotAvailableError` smart retry prevents delay for non-retryable errors, but genuinely transient-but-stuck errors (daemon starting up) will still cause delays.
-
-**Risk:** Users running `clean` interactively may experience unexpected pauses. The `--retries 0` escape hatch exists but isn't obvious.
-
-### 2. RetryConfig Values Duplicated Across Commands
-
-`clean.go` and `scan.go` both hardcode `InitialBackoff: 2 * time.Second, MaxBackoff: 30 * time.Second`. If someone changes one, they might forget the other. `DefaultRetryConfig()` exists but isn't used.
-
-### 3. Scan `--profile` Warning Is a Band-Aid
-
-The warning tells users the flag isn't supported, but `scan --profile daily` still runs ALL cleaners. A user who doesn't read warnings (most users) will assume filtering happened. This is better than silent ignoring, but still a UX lie.
-
-### 4. `paralleltest` Lint Warnings on Integration Tests
-
-The linter flags all integration tests in `execution/integration_test.go` for missing `t.Parallel()`. These tests can't run in parallel (they share the workflow engine and may interfere). The warnings are noise but indicate the tests aren't parallelized.
-
-### 5. No Test for Smart Retry (NotAvailableError → backoff.Stop)
-
-The `NextBackOff` hook in `retry.go` calls `cleaner.IsNotAvailableError(re.Error)` and returns `backoff.Stop`. This was verified manually but has **no automated test**. A regression could cause the retry engine to waste time retrying "cargo not installed" errors.
+1. `--retries 3` Default May Surprise Users — **partially mitigated at `1b96d06`** — `--retries 0` escape hatch documented; smart retry via `errorfamily.IsRetryable()` reduces wasted budget
+2. RetryConfig Values Duplicated Across Commands — **resolved at `edaff33`** — `RetryConfigFromAttempts(n)` shared builder
+3. Scan `--profile` Warning Is a Band-Aid — **partially resolved** at `1b96d06`; full filtering still tracked as TODO #10
+4. `paralleltest` Lint Warnings on Integration Tests — NOT-DO; tests legitimately cannot run in parallel
+5. No Test for Smart Retry (NotAvailableError → backoff.Stop) — **resolved at `edaff33`**
 
 ---
 
@@ -139,63 +107,63 @@ The `NextBackOff` hook in `retry.go` calls `cleaner.IsNotAvailableError(re.Error
 
 ### Immediate (Low Effort, High Confidence)
 
-1. **Add test for smart retry** — verify `NotAvailableError` + retries enabled → only 1 attempt (no backoff)
-2. **Extract shared retry config builder** — DRY the `RetryConfig` construction between clean and scan
-3. **Use `DefaultRetryConfig()`** in commands instead of inline hardcoded values
-4. **Tighten `IsNotAvailableError`** — log a warning when keyword fallback fires, so we know if it's still needed
+1. ~~Add test for smart retry~~ done at `edaff33`
+2. ~~Extract shared retry config builder~~ done at `edaff33`
+3. ~~Use `DefaultRetryConfig()` in commands instead of inline hardcoded values~~ done at `edaff33`
+4. Tighten `IsNotAvailableError` — NOT-DO; safety net for OS errors is correct
 
 ### Near-Term (Medium Effort, Real Value)
 
-5. **Wire `OperationSettings` from config profiles** through to cleaner constructors
-6. **Implement `scan --profile` filtering** — or remove the flag entirely
-7. **Adopt `go-error-family`** for retry classification — replaces hand-rolled keyword matching
-8. **Add `RetryProfile` type** — flexible retry presets
-9. **Logger globals → DI** — fix root cause of test races
-10. **Consolidate error packages** into one coherent design
+5. Wire `OperationSettings` from config profiles — still open; tracked as TODO #6
+6. Implement `scan --profile` filtering — still open; tracked as TODO #10
+7. ~~Adopt `go-error-family`~~ done at `edaff33`
+8. ~~Add `RetryProfile` type~~ done at `132f5f6`
+9. Logger globals → DI — still open; tracked as TODO #11
+10. ~~Consolidate error packages~~ done at `edaff33`
 
 ### Strategic (Higher Effort, Architectural)
 
-11. **Register individual cleaners as DI providers** — enable per-cleaner config
-12. **Make adapters interface-backed** with `do.As` aliasing
-13. **Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`**
-14. **Add BDD tests** for execution layer (Ginkgo)
-15. **Split `internal/domain/` god package** into sub-packages
+11. Register individual cleaners as DI providers — still open; tracked as TODO #29
+12. Make adapters interface-backed — still open; tracked as TODO #30
+13. Consolidate `cleaner.Cleaner` vs `domain.OperationHandler` — NOT-DO (ROADMAP non-goal #4)
+14. Add BDD tests — still open; tracked as TODO #7
+15. Split `internal/domain/` god package — still open; tracked as TODO #27
 
 ---
 
 ## f) Top 25 Things to Do Next
 
-| #   | Task                                                                 | Impact   | Effort |
-| --- | -------------------------------------------------------------------- | -------- | ------ |
-| 1   | **Add test: smart retry stops on NotAvailableError**                 | CRITICAL | S      |
-| 2   | **Extract shared retry config builder** (DRY clean/scan)             | HIGH     | S      |
-| 3   | **Use `DefaultRetryConfig()`** in commands instead of inline         | HIGH     | S      |
-| 4   | **Log warning when keyword fallback in `IsNotAvailableError` fires** | MEDIUM   | S      |
-| 5   | **Clean up stale status reports** (references to deleted types)      | LOW      | S      |
-| 6   | **Add `--timeout` per-cleaner flag** wired to `flow.Timeout`         | MEDIUM   | M      |
-| 7   | **Wire `OperationSettings` from config to cleaner constructors**     | HIGH     | L      |
-| 8   | **Implement `scan --profile` filtering** or remove the flag          | MEDIUM   | M      |
-| 9   | **Adopt `go-error-family`** for retry classification                 | HIGH     | M      |
-| 10  | **Add `RetryProfile` type** (Default/Aggressive/Conservative/None)   | MEDIUM   | M      |
-| 11  | **Logger globals → DI-injected logger**                              | MEDIUM   | M      |
-| 12  | **Re-enable `t.Parallel()` on logger tests**                         | LOW      | S      |
-| 13  | **Consolidate 4 error packages** into one coherent design            | HIGH     | L      |
-| 14  | **Register individual cleaners as separate DI providers**            | HIGH     | L      |
-| 15  | **Make adapters interface-backed with `do.As`**                      | MEDIUM   | L      |
-| 16  | **Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`**       | MEDIUM   | L      |
-| 17  | **Add BDD tests for execution layer** (Ginkgo)                       | MEDIUM   | M      |
-| 18  | **Migrate `githistory` command to DI**                               | LOW      | S      |
-| 19  | **Add `flow.If` for Docker daemon check**                            | MEDIUM   | S      |
-| 20  | **Implement `do.ShutdownerWithError`** on resource holders           | LOW      | S      |
-| 21  | **Split `internal/domain/` god package** (23 files)                  | MEDIUM   | L      |
-| 22  | **Split `internal/cleaner/` flat structure** (50+ files)             | MEDIUM   | L      |
-| 23  | **Add progress TUI** (live per-cleaner status)                       | LOW      | L      |
-| 24  | **Add `--keep-generations` flag** for Nix cleaner                    | LOW      | S      |
-| 25  | **Add `--dry-run` to scan command** (parity with clean)              | LOW      | S      |
-
----
+| #   | Task                                                                 | Resolution |
+| --- | -------------------------------------------------------------------- | ---------- |
+| 1   | ~~**Add test: smart retry stops on NotAvailableError**~~             | done at `edaff33` |
+| 2   | ~~**Extract shared retry config builder**~~                          | done at `edaff33` |
+| 3   | ~~**Use `DefaultRetryConfig()`** in commands~~                       | done at `edaff33` |
+| 4   | Log warning when keyword fallback in `IsNotAvailableError` fires     | NOT-DO |
+| 5   | ~~Clean up stale status reports~~                                   | done at 2026-07-13 + 2026-08-10 audits |
+| 6   | Add `--timeout` per-cleaner flag                                     | NOT-DO |
+| 7   | Wire `OperationSettings` from config to cleaner constructors         | still open — TODO #6 |
+| 8   | Implement `scan --profile` filtering or remove the flag              | still open — TODO #10 |
+| 9   | ~~Adopt `go-error-family`~~                                         | done at `edaff33` |
+| 10  | ~~Add `RetryProfile` type~~                                          | done at `132f5f6` |
+| 11  | Logger globals → DI-injected logger                                  | still open — TODO #11 |
+| 12  | Re-enable `t.Parallel()` on logger tests                             | blocked by #11 |
+| 13  | ~~Consolidate 4 error packages~~                                    | done at `edaff33` |
+| 14  | Register individual cleaners as separate DI providers                | still open — TODO #29 |
+| 15  | Make adapters interface-backed with `do.As`                          | still open — TODO #30 |
+| 16  | Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`           | NOT-DO |
+| 17  | Add BDD tests for execution layer (Ginkgo)                           | still open — TODO #7 |
+| 18  | Migrate `githistory` command to DI                                   | NOT-DO |
+| 19  | Add `flow.If` for Docker daemon check                                | NOT-DO |
+| 20  | Implement `do.ShutdownerWithError` on resource holders               | NOT-DO |
+| 21  | Split `internal/domain/` god package (23 files)                      | still open — TODO #27 |
+| 22  | Split `internal/cleaner/` flat structure (50+ files)                 | still open — TODO #28 |
+| 23  | Add progress TUI                                                     | aspirational |
+| 24  | Add `--keep-generations` flag for Nix cleaner                        | still open — TODO #23 |
+| 25  | Add `--dry-run` to scan command (parity with clean)                  | still open — TODO #22 |
 
 ## g) Top #1 Question I Cannot Answer Myself
+
+> **Resolved at `edaff33`:** Yes — `go-error-family` was adopted. `bridge` subpackage deliberately **not adopted** (clean-wizard doesn't use `samber/oops`). See the 2026-07-06 go-error-family adoption report for full rationale.
 
 **Should we adopt `go-error-family` (`github.com/larsartmann/go-error-family`) to replace the hand-rolled `IsNotAvailableError` + keyword fallback?**
 
