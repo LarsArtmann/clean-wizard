@@ -282,7 +282,10 @@ func (r *retryableMockCleaner) Clean(_ context.Context) result.Result[domain.Cle
 		return result.Err[domain.CleanResult](fmt.Errorf("transient failure attempt %d", attempt))
 	}
 
-	return result.Ok(domain.CleanResult{FreedBytes: 42})
+	return result.Ok(domain.CleanResult{
+		SizeEstimate: domain.SizeEstimate{Known: 42, Status: domain.SizeEstimateStatusKnown},
+		ItemsRemoved: 1,
+	})
 }
 func (r *retryableMockCleaner) IsAvailable(_ context.Context) bool { return r.avail }
 func (r *retryableMockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {

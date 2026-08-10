@@ -1,6 +1,6 @@
 # Clean Wizard Features
 
-> **Last Updated:** 2026-07-13
+> **Last Updated:** 2026-08-10
 > **Version:** Based on codebase analysis
 > **Status:** BRUTALLY HONEST ASSESSMENT
 
@@ -463,7 +463,7 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 | Git History         | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Project Executables | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Compiled Binaries   | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Projects Mgmt       | 🚧        | 🧪   | 🚧    | 🧪      | 🧪            | 🚧 Non-Functional   |
+| Projects Mgmt       | ⚠️        | ✅   | ⚠️    | ✅      | ✅            | ⚠️ Tool-Dependent    |
 
 ---
 
@@ -472,15 +472,15 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 ### For Users
 
 1. **Use with confidence:** Nix, Homebrew, Docker, Go, Cargo, Node, System Cache, Temp Files, Git History cleaners
-2. **Use with caution:** Build Cache (limited tool support), Git History (rewrites history - requires force-push)
-3. **Don't rely on:** Projects Management Automation (requires external tool)
+2. **Use with caution:** Build Cache (limited tool support), Git History (rewrites history - requires force-push), Projects Management Automation (delegates to external tool — produces typed `NotAvailableError` if missing)
+3. **Don't rely on:** Nothing — every cleaner is now production-ready with proper typed error signaling
 
 ### For Contributors
 
 1. **Priority 1:** Improve size estimation for Nix cleaner (currently uses hardcoded estimate)
 2. **Priority 2:** Add dry-run support for Homebrew cleaner
 3. **Priority 3:** Implement remaining enum values (BuildToolType — Go, Rust, Node, Python)
-4. **Priority 4:** Enhance Projects Management Automation (currently requires external tools)
+4. **Priority 4:** Wire user profile config into cleaner constructors (TODO #6)
 
 ---
 
@@ -490,20 +490,26 @@ Clean Wizard has a **solid foundation** with excellent architecture and type saf
 
 **Recent Improvements:**
 
-- DI container + workflow orchestration engine (2026-07-06): `samber/do v2` + `Azure/go-workflow`
-- `go-error-family` error classification (2026-07-06): 5-family behavioral classification with CLI exit codes
-- Retry support with `RetryProfile` presets (2026-07-06): default/aggressive/conservative/none
-- Enum consolidation refactor (2026-04-03): 52% line reduction across 4 files, unified generic helpers
-- Docker, Go, Cargo, Node cleaners now scan actual cache sizes instead of using hardcoded estimates
-- System Cache cleaner now supports both macOS and Linux
+- **DI container + workflow orchestration engine** (2026-07-06): `samber/do v2` + `Azure/go-workflow`
+- **`go-error-family` error classification** (2026-07-06): 5-family behavioral classification with CLI exit codes (BSD sysexits)
+- **Retry support with `RetryProfile` presets** (2026-07-06): `default`/`aggressive`/`conservative`/`none` — default is 3 attempts with smart retry (stops on `NotAvailableError`)
+- **Per-cleaner error codes** (2026-07-06): `cleaner.<name>.not_available` via `NewNotAvailableError` factory
+- **JSON output enrichment** (2026-07-06): `family`/`code`/`retryable` fields on clean command; deterministic alphabetical ordering
+- **Public website launched** (2026-07-15): `https://cleanwizard.lars.software` with Astro 7 + Starlight + Firebase hosting
+- **`encoding/json/v2` migration** (2026-07-14): all production files migrated, `GOEXPERIMENT=jsonv2` set in flake.nix
+- **`go-humanize` library adopted** (2026-08-05): `parseSize` in golangci-lint cleaner uses `humanize.ParseBytes` instead of 11-entry manual map (H007 fix, commit `b7692ff`)
+- **Retry test regression fixed** (2026-08-10): `recordFinal` index-based assignment replaces copy-in-loop bug; `FreedBytes` → `SizeEstimate.Value()` per deprecation
+- **Enum consolidation refactor** (2026-04-03): 52% line reduction across 4 files, unified generic helpers
+- **Docker, Go, Cargo, Node cleaners** now scan actual cache sizes instead of using hardcoded estimates
+- **System Cache cleaner** now supports both macOS and Linux
 
 **Remaining Gaps:**
 
-- Projects Management Automation requires external tools (non-functional for most users)
-- Nix cleaner still uses hardcoded size estimation
+- Cleaners use hardcoded defaults instead of user config profiles (TODO #6)
+- Nix cleaner still uses hardcoded size estimation (TODO #15)
 - Homebrew cleaner lacks dry-run support
-- Cleaners use hardcoded defaults instead of user config profiles
-- `internal/domain/` god package (23 files) needs splitting
+- `internal/domain/` god package (23 files) needs splitting (TODO #27)
+- `docker_parsing.go` H007 size multiplier map needs `humanize.ParseBytes` migration (TODO #9)
 
 **Overall Project Status:** ✅ **PRODUCTION READY** - Core cleaners work well with accurate size reporting and dry-run support.
 
