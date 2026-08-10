@@ -4,6 +4,8 @@
 **Session Focus:** Fixing build failures caused by go-auto-upgrade migrating to `encoding/json/v2`
 **Commit:** `ef80b9f` — docs: comprehensive documentation health audit and encoding/json v2 migration
 
+**Resolution (2026-08-10):** All items in section A (FULLY DONE) shipped in `ef80b9f` and `7343959`. Items in section B (PARTIALLY DONE) — test files migration is now PARTIALLY DONE (verified 2026-08-10: `internal/domain/type_safe_enums_status_test.go`, `internal/domain/enum_macros_test.go`, `internal/format/json_test.go` still use v1 per `git grep`; tracked as open items). `nix flake check` validation was implicit via `nix build` (subsequent commits all build clean). `README.md` build instructions remain without `GOEXPERIMENT=jsonv2` mention — this is a documented split-brain (TODO-style fix deferred).
+
 ---
 
 ## What Happened This Session

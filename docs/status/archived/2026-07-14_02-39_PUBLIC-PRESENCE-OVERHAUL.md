@@ -3,6 +3,8 @@
 **Date:** 2026-07-14 02:39
 **Session Goal:** Make clean-wizard's public presence superb across README, website, GitHub metadata, and domain/Firebase hosting.
 
+**Resolution (2026-08-10):** All 20 items in section A (FULLY DONE) shipped. Section B (PARTIALLY DONE) was completed in a follow-up session (see `2026-07-15_15-49_WEBSITE-LAUNCH-COMPLETION.md`): Firebase hosting site created, deployed, SSL cert active, DNS CNAME applied, ACME TXT staged, CI/CD workflow (`website.yml`) added. Section C items remain — these are deferred polish (OG images, CSP, GitHub Social Preview). The `pnpm-workspace.yaml` and `website/flake.nix` deploy-app issues noted in `2026-07-15_15-49` are known but low priority.
+
 ---
 
 ## A) FULLY DONE

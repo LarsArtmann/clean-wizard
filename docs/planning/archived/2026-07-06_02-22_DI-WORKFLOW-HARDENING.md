@@ -4,6 +4,8 @@
 **Status:** Planning
 **Goal:** Fix bugs, wire dead infra, add tests, deliver user value — without over-engineering
 
+**Resolution (2026-08-10):** Items 1-7 in the Pareto breakdown all shipped in commits `de105b0`, `c102e0f`, `1b96d06`. Items 8-12 in "20%/80%" — items 8, 9, 11 were deferred as NOT-DO (ROADMAP non-goals); items 10, 12 shipped. All "Explicitly NOT doing" items remain not-done (correctly). The Pareto execution graph in section "Mermaid Execution Graph" can be removed if desired — superseded by the actual commit history.
+
 ---
 
 ## Pareto Breakdown

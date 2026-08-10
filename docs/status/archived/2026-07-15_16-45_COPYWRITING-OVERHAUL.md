@@ -5,6 +5,10 @@
 **Skill:** copywriting
 **Prior session commits:** `a90d1b1` (website launch completion), `68e28ac` (initial website)
 
+**Resolution (2026-08-10):** All 22 items in section a) (FULLY DONE) shipped. The fabricated hero code was replaced with real `clean-wizard scan`/`clean --dry-run` output (38 GiB scan, 12 GiB freed). All 6 feature cards rewritten in user-facing language. The ProblemSection was added with real pain-point data. The "SystemNix" strawman was replaced with honest "Generic Cleaners" comparison. The 8 docs pages were NOT reviewed (item #3 in section c) — deferred to a future copywriting pass.
+
+**Stale items:** Section d) item #7 (hero code is too long, 38 lines) — still too long; section e) item #1 still open. Section e) item #11 (pnpm-workspace.yaml) and item #12 (website/flake.nix deploy app) still not addressed.
+
 ---
 
 ## Context

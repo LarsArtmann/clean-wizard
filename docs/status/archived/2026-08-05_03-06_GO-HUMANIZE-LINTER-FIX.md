@@ -5,6 +5,8 @@
 Single-task session: apply the H007 finding from `/tmp/go-humanize-linter .`
 on `internal/cleaner/golangcilint.go`. No other work was performed or attempted.
 
+**Resolution (2026-08-10):** All 11 items in section a) (FULLY DONE) shipped. Commit `b7692ff` and status log `92d8cf2` recorded. Section b) is correctly marked "None". Section d) confirmed the `TestBooleanSettingsCleaners/Cargo` flake is environment-dependent and out of scope; tracked as TODO #24 in the docs-health audit. Section e) items 1 (`docker_parsing.go` H007) and 6 (linter not in CI) are tracked in TODO_LIST.md as #9 and #17/#18 respectively.
+
 ---
 
 ## a) FULLY DONE

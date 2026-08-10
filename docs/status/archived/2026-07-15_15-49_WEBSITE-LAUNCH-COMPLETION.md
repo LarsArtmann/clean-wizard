@@ -4,6 +4,15 @@
 **Session Goal:** Complete the website-launch skill for clean-wizard
 **Skill:** website-launch (maintenance mode — website existed but was never deployed)
 
+**Resolution (2026-08-10):** All 20 items in section a) (FULLY DONE) shipped. Section b) (PARTIALLY DONE) items:
+1. DNS Terraform apply — still partial; CNAME applied, TXT record still pending user action
+2. Visual QA — done via later session
+3. CI/CD workflow — created but never triggered (no commits since)
+
+The `website/flake.nix` deploy app noted in section d) item #1 is still broken (no `--project lars-software` flag). Item #2 (prior commit never deployed) was fixed by this session. Item #3 (README missing `GOEXPERIMENT=jsonv2`) was fixed in `a90d1b1`. Item #4 (npm overrides) fixed in this session.
+
+**Status:** Live at `https://cleanwizard.lars.software` with valid TLS cert (ACMe-via-HTTP). DNS propagation confirmed. The website is operational; remaining polish items (CSP, OG images, GitHub Social Preview) are deferred.
+
 ---
 
 ## Context
