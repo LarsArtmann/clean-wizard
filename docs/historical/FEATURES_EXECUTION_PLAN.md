@@ -110,7 +110,7 @@
 #### 3.1.6 Node Package Manager Cleaner [Priority: HIGH | Effort: 1min]
 
 - [ ] Overall status: FULLY_FUNCTIONAL
-- [ ] Package managers: All 4 working (npm, pnpm, yarn, bun)
+- [ ] Package managers: All 4 working (pnpm, pnpm, yarn, bun)
 
 #### 3.1.7 Build Cache Cleaner [Priority: MEDIUM | Effort: 2min]
 

@@ -31,7 +31,7 @@ nix profile wipe-history
 
 # Package Managers
 brew autoremove + brew cleanup --prune=all -s
-npm cache clean --force
+pnpm cache clean --force
 pnpm store prune
 go clean -cache -testcache -modcache
 cargo cache --autoclean
@@ -54,7 +54,7 @@ docker system prune -af
 ```bash
 # NO Nix store changes
 brew autoremove + brew cleanup
-npm cache clean --force
+pnpm cache clean --force
 pnpm store prune
 go clean -cache
 rm /tmp/nix-build-*, /tmp/nix-shell-*
@@ -89,7 +89,7 @@ xcrun simctl delete all
 
 **Cleaners Needed:**
 
-1. **NodePackageManagerCleaner** - npm, pnpm, yarn, bun caches
+1. **NodePackageManagerCleaner** - pnpm, pnpm, yarn, bun caches
 2. **GoCleaner** - Go module cache, test cache, build cache folders
 3. **CargoCleaner** - Rust/Cargo registry cache and source cache
 4. **BuildCacheCleaner** - gradle, maven, etc.
@@ -134,7 +134,7 @@ xcrun simctl delete all
 
 | #   | Task                                                 | Est. Time | Impact | Notes                                    |
 | --- | ---------------------------------------------------- | --------- | ------ | ---------------------------------------- |
-| 4   | **Implement NodePackageManagerCleaner**              | 120min    | 6%     | npm/pnpm/bun caches (very common)        |
+| 4   | **Implement NodePackageManagerCleaner**              | 120min    | 6%     | pnpm/pnpm/bun caches (very common)        |
 | 5   | **Implement GoCleaner**                              | 90min     | 4%     | Go caches are huge and fast to clean     |
 | 6   | **Implement CargoCleaner**                           | 75min     | 2%     | Rust is less common but caches are large |
 | 7   | **Add Node/Go/Cargo to TUI multi-cleaner selection** | 45min     | 1%     | Simple addition to existing form         |
@@ -143,7 +143,7 @@ xcrun simctl delete all
 
 **Why This Is The 4%:**
 
-- npm/pnpm/bun are top 3 most used package managers
+- pnpm/pnpm/bun are top 3 most used package managers
 - Go is top 10 most popular language
 - Cargo caches grow large over time
 - All follow same pattern as HomebrewCleaner
@@ -238,7 +238,7 @@ graph TD
 
 | ID  | Task                                             | Time   | Dependencies  | Status                                             | Description |
 | --- | ------------------------------------------------ | ------ | ------------- | -------------------------------------------------- | ----------- |
-| M04 | Implement NodePackageManagerCleaner              | 120min | None          | 🟡 Create cleaner for npm/pnpm/bun/yarn caches     |
+| M04 | Implement NodePackageManagerCleaner              | 120min | None          | 🟡 Create cleaner for pnpm/pnpm/bun/yarn caches     |
 | M05 | Implement GoCleaner                              | 90min  | None          | 🟡 Create cleaner for Go module/test/build caches  |
 | M06 | Implement CargoCleaner                           | 75min  | None          | 🟡 Create cleaner for Cargo registry/source caches |
 | M07 | Add Node/Go/Cargo to TUI multi-cleaner selection | 45min  | M04, M05, M06 | 🟡 Update TUI form with new cleaners               |
@@ -338,24 +338,24 @@ graph TD
 
 | ID  | Task                                    | Time  | Status                             | Description |
 | --- | --------------------------------------- | ----- | ---------------------------------- | ----------- |
-| U35 | Research npm cache locations            | 10min | 🟡 Understand npm cache structure  |
+| U35 | Research pnpm cache locations            | 10min | 🟡 Understand pnpm cache structure  |
 | U36 | Research pnpm store locations           | 10min | 🟡 Understand pnpm store structure |
 | U37 | Research yarn cache locations           | 10min | 🟡 Understand yarn cache structure |
 | U38 | Research bun cache locations            | 10min | 🟡 Understand bun cache structure  |
 | U39 | Design NodePackageManagerCleaner struct | 15min | 🟡 Domain model for node cleaners  |
-| U40 | Implement npm cache clean method        | 15min | 🟡 Execute npm cache clean         |
+| U40 | Implement pnpm cache clean method        | 15min | 🟡 Execute pnpm cache clean         |
 | U41 | Implement pnpm store prune method       | 15min | 🟡 Execute pnpm store prune        |
 | U42 | Implement yarn cache clean method       | 15min | 🟡 Execute yarn cache clean        |
 | U43 | Implement bun cache clean method        | 15min | 🟡 Execute bun pm cache rm         |
-| U44 | Add availability detection for npm      | 5min  | 🟡 Check if npm installed          |
+| U44 | Add availability detection for pnpm      | 5min  | 🟡 Check if pnpm installed          |
 | U45 | Add availability detection for pnpm     | 5min  | 🟡 Check if pnpm installed         |
 | U46 | Add availability detection for yarn     | 5min  | 🟡 Check if yarn installed         |
 | U47 | Add availability detection for bun      | 5min  | 🟡 Check if bun installed          |
-| U48 | Implement dry-run for npm               | 5min  | 🟡 Simulate npm clean              |
+| U48 | Implement dry-run for pnpm               | 5min  | 🟡 Simulate pnpm clean              |
 | U49 | Implement dry-run for pnpm              | 5min  | 🟡 Simulate pnpm prune             |
 | U50 | Implement dry-run for yarn              | 5min  | 🟡 Simulate yarn clean             |
 | U51 | Implement dry-run for bun               | 5min  | 🟡 Simulate bun clean              |
-| U52 | Write unit tests for npm cleaner        | 10min | 🟡 Test npm cache clean            |
+| U52 | Write unit tests for pnpm cleaner        | 10min | 🟡 Test pnpm cache clean            |
 | U53 | Write unit tests for pnpm cleaner       | 10min | 🟡 Test pnpm store prune           |
 | U54 | Write unit tests for yarn cleaner       | 10min | 🟡 Test yarn cache clean           |
 | U55 | Write unit tests for bun cleaner        | 10min | 🟡 Test bun cache clean            |
@@ -398,7 +398,7 @@ graph TD
 
 | ID  | Task                                         | Time  | Status                            | Description |
 | --- | -------------------------------------------- | ----- | --------------------------------- | ----------- |
-| U80 | Create cleaner options for npm/pnpm/yarn/bun | 10min | 🟡 Add checkboxes to TUI          |
+| U80 | Create cleaner options for pnpm/pnpm/yarn/bun | 10min | 🟡 Add checkboxes to TUI          |
 | U81 | Create cleaner option for Go                 | 5min  | 🟡 Add checkbox to TUI            |
 | U82 | Create cleaner option for Cargo              | 5min  | 🟡 Add checkbox to TUI            |
 | U83 | Wire Node cleaner execution                  | 10min | 🟡 Call NodePackageManagerCleaner |

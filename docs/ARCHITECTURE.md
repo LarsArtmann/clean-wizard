@@ -79,7 +79,7 @@ Each cleaner handles exactly one domain:
 - `DockerCleaner` - Docker containers, images, volumes
 - `CargoCleaner` - Rust Cargo cache
 - `GoCleaner` - Go module, test, and build cache
-- `NodeCleaner` - npm, pnpm, yarn, bun caches
+- `NodeCleaner` - pnpm, pnpm, yarn, bun caches
 - `BuildCacheCleaner` - Gradle, Maven, SBT caches
 - `SystemCacheCleaner` - OS-specific caches (macOS/Linux)
 - `TempFilesCleaner` - Age-based temporary files

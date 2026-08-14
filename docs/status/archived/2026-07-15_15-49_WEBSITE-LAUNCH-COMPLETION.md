@@ -9,7 +9,7 @@
 2. Visual QA — done via later session
 3. CI/CD workflow — created but never triggered (no commits since)
 
-The `website/flake.nix` deploy app noted in section d) item #1 is still broken (no `--project lars-software` flag). Item #2 (prior commit never deployed) was fixed by this session. Item #3 (README missing `GOEXPERIMENT=jsonv2`) was fixed in `a90d1b1`. Item #4 (npm overrides) fixed in this session.
+The `website/flake.nix` deploy app noted in section d) item #1 is still broken (no `--project lars-software` flag). Item #2 (prior commit never deployed) was fixed by this session. Item #3 (README missing `GOEXPERIMENT=jsonv2`) was fixed in `a90d1b1`. Item #4 (pnpm overrides) fixed in this session.
 
 **Status:** Live at `https://cleanwizard.lars.software` with valid TLS cert (ACMe-via-HTTP). DNS propagation confirmed. The website is operational; remaining polish items (CSP, OG images, GitHub Social Preview) are deferred.
 
@@ -42,10 +42,10 @@ of the website-launch skill.
 | 7   | **Terraform validate passes**           | `terraform fmt` + `terraform validate` both succeed                                                                                                |
 | 8   | **CI/CD workflow created**              | `.github/workflows/website.yml` — two-job pattern (build → deploy on master push)                                                                  |
 | 9   | **GitHub secret set**                   | `FIREBASE_SERVICE_ACCOUNT` created from `firebase-adminsdk-dwv0a@lars-software` key                                                                |
-| 10  | **npm install succeeds**                | Fixed missing `devalue` + `yaml` overrides in `package.json` per dependency reference                                                              |
+| 10  | **pnpm add succeeds**                | Fixed missing `devalue` + `yaml` overrides in `package.json` per dependency reference                                                              |
 | 11  | **Build verification passes**           | `astro build` = 12 pages, 0 errors; `astro check` = 0 errors, 0 warnings, 0 hints                                                                  |
 | 12  | **HTML validation passes**              | `html-validate "dist/**/*.html"` = clean                                                                                                           |
-| 13  | **package-lock.json generated**         | Needed for CI `npm ci` cache                                                                                                                       |
+| 13  | **package-lock.json generated**         | Needed for CI `pnpm install --frozen-lockfile` cache                                                                                                                       |
 | 14  | **flake.lock generated**                | Needed for reproducible Nix builds                                                                                                                 |
 | 15  | **.gitignore updated**                  | Added `.firebase/` and `bun.lock` entries                                                                                                          |
 | 16  | **README updated**                      | Centered header, CI + Website badges, documentation link bar, `GOEXPERIMENT=jsonv2` in all build/test/install commands                             |
@@ -75,7 +75,7 @@ of the website-launch skill.
 | 3   | **CI workflow validation**        | Can't validate until it runs on GitHub. Should trigger on first push to master.                                                                                                                                                                                |
 | 4   | **CSP hardening**                 | The site has security headers (HSTS, X-Frame-Options, etc.) in `firebase.json` but NO Content-Security-Policy. Gogenfilter has `fix-csp.mjs` for CSP hash injection. Clean-wizard doesn't. This is optional per the skill but would be a security improvement. |
 | 5   | **OG images**                     | No `astro-og-canvas` integration. Social media shares will have no preview image. Gogenfilter has this; clean-wizard doesn't.                                                                                                                                  |
-| 6   | **`pnpm-workspace.yaml` cleanup** | This file exists in `website/` but the project uses npm, not pnpm. It only has `allowBuilds: { esbuild: true }`. Could be replaced with `.npmrc` for the same effect in a more standard way.                                                                   |
+| 6   | **`pnpm-workspace.yaml` cleanup** | This file exists in `website/` but the project uses pnpm, not pnpm. It only has `allowBuilds: { esbuild: true }`. Could be replaced with `.npmrc` for the same effect in a more standard way.                                                                   |
 | 7   | **Website flake.nix deploy app**  | The `deploy` app in `website/flake.nix` runs `firebase deploy --only hosting` without the `--project lars-software` flag or the `cleanwizard` target name. It would fail if used.                                                                              |
 
 ---
@@ -87,8 +87,8 @@ of the website-launch skill.
 | 1   | **`website/flake.nix` deploy app is broken**               | The `deploy` app runs `firebase deploy --only hosting` without `--project lars-software` or the `:cleanwizard` target. Anyone running `nix run .#deploy` would get an error or deploy to the wrong place.                                                                                                   | Yes — fix the deploy script string in `flake.nix`                                               |
 | 2   | **Prior session committed website without ever deploying** | Commit `68e28ac` says "launch public website" but the Firebase site didn't exist and `cleanwizard.web.app` returned 404. The README linked to `cleanwizard.lars.software` which had a TLS cert mismatch. Anyone visiting the documented URL before this session would have seen a browser security warning. | Fixed this session — site is now live.                                                          |
 | 3   | **README build commands lacked `GOEXPERIMENT=jsonv2`**     | The prior README's Quick Start, Testing, and Development sections used plain `go build` / `go test` without the required environment variable. Users following the README would get compilation errors.                                                                                                     | Fixed this session — all commands now include `GOEXPERIMENT=jsonv2` or reference `nix develop`. |
-| 4   | **npm overrides were incomplete**                          | `package.json` had only `brace-expansion` in overrides, missing `devalue` and `yaml` per the verified dependency matrix. This caused `npm install` to fail with `ERESOLVE` on TypeScript 6 peer deps. The prior session may have used `--legacy-peer-deps` silently.                                        | Fixed this session — overrides now match the reference.                                         |
-| 5   | **`pnpm-workspace.yaml` but no `.npmrc`**                  | The project uses npm (not pnpm) but has a `pnpm-workspace.yaml` for `allowBuilds`. This is confusing — the npm equivalent is `.npmrc` with `allow-scripts` or just running `npm approve-scripts`. Not broken, just inconsistent.                                                                            | Low priority — works but misleading.                                                            |
+| 4   | **pnpm overrides were incomplete**                          | `package.json` had only `brace-expansion` in overrides, missing `devalue` and `yaml` per the verified dependency matrix. This caused `pnpm install` to fail with `ERESOLVE` on TypeScript 6 peer deps. The prior session may have used `--legacy-peer-deps` silently.                                        | Fixed this session — overrides now match the reference.                                         |
+| 5   | **`pnpm-workspace.yaml` but no `.npmrc`**                  | The project uses pnpm (not pnpm) but has a `pnpm-workspace.yaml` for `allowBuilds`. This is confusing — the pnpm equivalent is `.npmrc` with `allow-scripts` or just running `pnpm approve-scripts`. Not broken, just inconsistent.                                                                            | Low priority — works but misleading.                                                            |
 
 ---
 
@@ -112,7 +112,7 @@ of the website-launch skill.
 
 7. **Fix `website/flake.nix` deploy app** — Add `--project lars-software` and `:cleanwizard` target to the deploy script.
 
-8. **Replace `pnpm-workspace.yaml` with `.npmrc`** — The project uses npm, not pnpm. Using pnpm config for npm is confusing.
+8. **Replace `pnpm-workspace.yaml` with `.npmrc`** — The project uses pnpm, not pnpm. Using pnpm config for pnpm is confusing.
 
 9. **The hero code is fabricated** — The terminal output in the hero section (`clean-wizard clean --mode quick --dry-run` showing "~2.9 GB freed") is illustrative, not real output. The skill explicitly warns about this (pitfall #15). It should either be real captured output or clearly labeled as illustrative.
 
@@ -173,7 +173,7 @@ of the website-launch skill.
 ### Code Quality
 
 37. **Remove `pnpm-workspace.yaml`** — Replace with `.npmrc` if needed
-38. **Add `.npmrc` with explicit settings** — Document the npm configuration
+38. **Add `.npmrc` with explicit settings** — Document the pnpm configuration
 39. **Pin Node.js version in `.node-version`** — Verify it matches CI (`24`)
 40. **Add `engines` field to `package.json`** — Enforce Node.js version
 41. **Consider adding `jscpd` for duplicate code detection** — In website components

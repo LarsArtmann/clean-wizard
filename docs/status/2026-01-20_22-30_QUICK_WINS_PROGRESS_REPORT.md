@@ -376,7 +376,7 @@ Select cleaners to run
   Clean old Nix store generations and optimize store
 
 📦 Node.js Packages
-  Clean npm, pnpm, yarn, bun caches
+  Clean pnpm, pnpm, yarn, bun caches
 
 🐹 Go Packages
   Clean Go module, test, and build caches

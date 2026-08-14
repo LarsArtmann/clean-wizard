@@ -16,7 +16,7 @@
 
 ## Why Clean Wizard?
 
-Your dev machine accumulates gigabytes of stale data: old Nix generations, Go build caches, Docker images, Homebrew downloads, npm/pnpm/yarn/bun caches, Gradle/Maven artifacts, Xcode DerivedData, temp files, and more.
+Your dev machine accumulates gigabytes of stale data: old Nix generations, Go build caches, Docker images, Homebrew downloads, pnpm/pnpm/yarn/bun caches, Gradle/Maven artifacts, Xcode DerivedData, temp files, and more.
 
 Clean Wizard finds and removes all of it — safely, with dry-run previews, confirmation dialogs, and protected generations.
 
@@ -72,7 +72,7 @@ clean-wizard clean --json
 | **Docker**           | Stopped containers, dangling images, volumes, builds | Both      |
 | **Cargo**            | Rust registry and git cache                          | Both      |
 | **Go**               | Build cache, test cache, module cache, lint cache    | Both      |
-| **Node**             | npm, pnpm, yarn, bun caches                          | Both      |
+| **Node**             | pnpm, pnpm, yarn, bun caches                          | Both      |
 | **BuildCache**       | Gradle, Maven, SBT artifacts                         | Both      |
 | **SystemCache**      | Spotlight, Xcode DerivedData, CocoaPods, pip, ccache | Both      |
 | **TempFiles**        | Age-based temporary file removal                     | Both      |

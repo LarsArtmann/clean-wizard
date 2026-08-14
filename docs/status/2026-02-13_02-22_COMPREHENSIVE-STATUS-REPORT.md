@@ -210,7 +210,7 @@ clean-wizard/
 ### This Month
 
 5. **Add Linux Support to SystemCache** (4h)
-   - Add Linux cache paths (pip, npm, yarn, ccache)
+   - Add Linux cache paths (pip, pnpm, yarn, ccache)
    - Update availability detection
 
 6. **Refactor NodePackages Enum** (4h)

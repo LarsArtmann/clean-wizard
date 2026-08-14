@@ -31,7 +31,7 @@ Adds a cleaner to the registry. If a cleaner with the same name exists, it will 
 
 ```go
 registry.Register("docker", dockerCleaner)
-registry.Register("npm", npmCleaner)
+registry.Register("pnpm", npmCleaner)
 ```
 
 ### Get
@@ -62,7 +62,7 @@ Returns all registered cleaner names.
 
 ```go
 names := registry.Names()
-// ["docker", "npm", "gradle", ...]
+// ["docker", "pnpm", "gradle", ...]
 ```
 
 ### Count
@@ -163,7 +163,7 @@ func main() {
 
     // Register cleaners
     registry.Register("docker", NewDockerCleaner())
-    registry.Register("npm", NewNpmCleaner())
+    registry.Register("pnpm", NewNpmCleaner())
     registry.Register("gradle", NewGradleCleaner())
 
     // Show available cleaners

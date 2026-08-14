@@ -105,7 +105,7 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 **Adapter Pattern:**
 
 - ✅ System-specific adapters (Nix, macOS, Linux)
-- ✅ Package manager adapters (npm, yarn, pnpm, bun, cargo)
+- ✅ Package manager adapters (pnpm, yarn, pnpm, bun, cargo)
 - ✅ Container runtime adapters (Docker, OrbStack)
 - ✅ Build tool adapters (Gradle, Maven, SBT)
 - ✅ Clean interfaces for adapter implementation
@@ -217,12 +217,12 @@ clean-wizard is a production-ready multi-cleaner CLI tool for system cache and p
 
 **Node.js Packages Cleaner (100%):**
 
-- ✅ npm cache detection and cleanup
+- ✅ pnpm cache detection and cleanup
 - ✅ pnpm cache detection and cleanup
 - ✅ yarn cache detection and cleanup
 - ✅ bun cache detection and cleanup
 - ✅ Package manager availability detection
-- ✅ Cache path detection (npm, pnpm, yarn, bun)
+- ✅ Cache path detection (pnpm, pnpm, yarn, bun)
 - ✅ Autoclean mode support (--autoclean flag)
 - ✅ Dry-run mode with safe simulation
 - ✅ Verbose mode with detailed logging
@@ -3159,7 +3159,7 @@ func FuzzGetDirSize(f *testing.F) {
 func FuzzParsePath(f *testing.F) {
     // Add corpus seeds
     f.Add("/home/user/.cache/npm")
-    f.Add("C:\Users\user\AppData\Local\npm")
+    f.Add("C:\Users\user\AppData\Local\pnpm")
     f.Add("~/.cache/cargo")
 
     // Fuzz test function

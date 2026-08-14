@@ -430,7 +430,7 @@ func (si ScanItem) Validate() error
 // NodePackages: Uses local string enum
 func (pm PackageManagerType) String() string {
     switch pm {
-    case 0: return "npm"
+    case 0: return "pnpm"
     case 1: return "pnpm"
     // ...
     }

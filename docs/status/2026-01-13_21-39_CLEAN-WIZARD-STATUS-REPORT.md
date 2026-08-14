@@ -82,7 +82,7 @@ Clean Wizard is now **production-ready for Nix store management** with a solid, 
 | Manager  | Config Exists | Implementation Needed        |
 | -------- | ------------- | ---------------------------- |
 | Homebrew | ✅ Yes        | Cleaner + dry-run simulation |
-| npm/pnpm | ❌ No         | Config + Cleaner + Adapter   |
+| pnpm/pnpm | ❌ No         | Config + Cleaner + Adapter   |
 | Go       | ❌ No         | Config + Cleaner + Adapter   |
 | Cargo    | ❌ No         | Config + Cleaner + Adapter   |
 | Python   | ❌ No         | Config + Cleaner + Adapter   |

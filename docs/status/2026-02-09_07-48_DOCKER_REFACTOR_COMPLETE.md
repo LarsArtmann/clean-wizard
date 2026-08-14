@@ -170,7 +170,7 @@ type Cleaner interface {
 **Impact**: MEDIUM  
 **Issue**: Type mismatch - local string enum vs domain integer enum
 
-- Local enum: String type ("npm", "pnpm", "yarn", "bun")
+- Local enum: String type ("pnpm", "pnpm", "yarn", "bun")
 - Domain enum: Integer type with same string values
 
 **Files**: `internal/cleaner/nodepackages.go`

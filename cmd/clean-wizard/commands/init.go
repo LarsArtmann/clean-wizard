@@ -206,7 +206,7 @@ func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) 
 				Value(&opts.includeDocker),
 			huh.NewConfirm().
 				Title("Include Node.js cleaner?").
-				Description("Clean npm, pnpm, yarn, bun caches").
+				Description("Clean pnpm, pnpm, yarn, bun caches").
 				Value(&opts.includeNode),
 			huh.NewConfirm().
 				Title("Include Go cleaner?").

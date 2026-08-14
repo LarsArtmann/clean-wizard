@@ -234,11 +234,11 @@ Parse `go clean -cache` output or calculate directory size before/after.
 
 ## Phase 5: Node Packages Size Reporting Fix (1 hour)
 
-### Task 5.1: Parse npm Cache Clean Output (20 min)
+### Task 5.1: Parse pnpm Cache Clean Output (20 min)
 
 **File:** `internal/cleaner/nodepackages.go`
 
-Calculate npm cache directory size before/after clean.
+Calculate pnpm cache directory size before/after clean.
 
 ### Task 5.2: Parse yarn Cache Clean Output (20 min)
 
@@ -293,7 +293,7 @@ Calculate pnpm cache directory size before/after clean.
 
 ### Phase 5: Node
 
-- [ ] Calculate npm cache size
+- [ ] Calculate pnpm cache size
 - [ ] Calculate yarn cache size
 - [ ] Calculate pnpm cache size
 - [ ] Add tests

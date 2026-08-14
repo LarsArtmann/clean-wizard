@@ -395,7 +395,7 @@ profiles:
         enabled: true
         settings:
           package_caches:
-            npm: true
+            pnpm: true
             cargo: true
             go: true
 ```

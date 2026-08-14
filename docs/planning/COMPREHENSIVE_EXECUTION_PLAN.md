@@ -48,9 +48,9 @@ The following tasks deliver 51% of value with minimal effort:
 | --------------------------------- | ---- | ------------------------- | -------- |
 | `cargo.go`                        | 164  | `cargo-cache --autoclean` | CRITICAL |
 | `cargo.go`                        | 186  | `cargo clean`             | CRITICAL |
-| `nodepackages.go`                 | 137  | `npm config get cache`    | HIGH     |
+| `nodepackages.go`                 | 137  | `pnpm config get cache`    | HIGH     |
 | `nodepackages.go`                 | 159  | `pnpm store path`         | HIGH     |
-| `nodepackages.go`                 | 279  | `npm cache clean --force` | CRITICAL |
+| `nodepackages.go`                 | 279  | `pnpm cache clean --force` | CRITICAL |
 | `nodepackages.go`                 | 290  | `pnpm store prune`        | CRITICAL |
 | `nodepackages.go`                 | 301  | `yarn cache clean`        | HIGH     |
 | `nodepackages.go`                 | 312  | `bun pm cache rm`         | HIGH     |

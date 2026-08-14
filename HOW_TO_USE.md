@@ -119,7 +119,7 @@ When you run `clean-wizard scan`, you'll see output like:
 
 - **Nix Store**: Old Nix package generations
 - **Homebrew**: Homebrew cache and old versions
-- **Package Caches**: npm, cargo, go module caches
+- **Package Caches**: pnpm, cargo, go module caches
 - **Total**: Estimated space you can recover
 
 ## 🎨 Using Profiles

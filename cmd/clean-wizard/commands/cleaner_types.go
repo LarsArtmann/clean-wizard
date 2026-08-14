@@ -56,7 +56,7 @@ var cleanerMetadata = map[CleanerType]cleanerMetadataEntry{ //nolint:gochecknogl
 	CleanerTypeNodePackages: {
 		RegistryName: "node",
 		DisplayName:  "Node.js Packages",
-		Description:  "Clean npm, pnpm, yarn, bun caches",
+		Description:  "Clean pnpm, pnpm, yarn, bun caches",
 		Icon:         "📦",
 	},
 	CleanerTypeGoPackages: {

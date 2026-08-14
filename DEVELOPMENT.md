@@ -181,7 +181,7 @@ protected:
 - Nix
 - Docker
 - Homebrew
-- Node.js (npm, pnpm, yarn, bun)
+- Node.js (pnpm, pnpm, yarn, bun)
 - Rust/Cargo
 - Go toolchain
 

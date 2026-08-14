@@ -27,7 +27,7 @@ Clean Wizard currently has the **architectural foundation** to replace SystemNix
 | Feature            | SystemNix                                 | Clean Wizard                              | Status          |
 | ------------------ | ----------------------------------------- | ----------------------------------------- | --------------- |
 | **Homebrew**       | ✅ `brew autoremove && brew cleanup`      | ✅ `brew cleanup`                         | ✅ Matching     |
-| **npm**            | ✅ `npm cache clean --force`              | ✅ `npm cache clean --force`              | ✅ Matching     |
+| **pnpm**            | ✅ `pnpm cache clean --force`              | ✅ `pnpm cache clean --force`              | ✅ Matching     |
 | **pnpm**           | ✅ `pnpm store prune`                     | ✅ `pnpm store prune`                     | ✅ Matching     |
 | **Go**             | ✅ `go clean -cache`                      | ✅ `go clean -cache -testcache -modcache` | ✅ Better       |
 | **Temp Files**     | ✅ `/tmp/nix-build-*`                     | ✅ Configurable age-based                 | ⚠️ Partial      |
@@ -430,7 +430,7 @@ xcrun simctl delete all 2>/dev/null || true
 case "quick":
     return []CleanerType{
         CleanerTypeHomebrew,           // brew autoremove + cleanup
-        CleanerTypeNodePackages,        // npm, pnpm, yarn, bun caches
+        CleanerTypeNodePackages,        // pnpm, pnpm, yarn, bun caches
         CleanerTypeGoPackages,          // go clean -cache -testcache -modcache
         CleanerTypeTempFiles,           // Including /tmp/nix-build-* /tmp/nix-shell-*
         CleanerTypeBuildCache,          // Gradle, Maven, SBT caches

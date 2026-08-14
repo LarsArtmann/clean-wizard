@@ -48,7 +48,7 @@ Clean Wizard is now a comprehensive system cleanup tool that manages:
 | DockerCleaner                       | Docker containers, images, volumes | ✅ Production Ready     |
 | CargoCleaner                        | Rust Cargo cache                   | ✅ Production Ready     |
 | GoCleaner                           | Go module, test, and build cache   | ✅ Production Ready     |
-| NodePackageManagerCleaner           | npm, pnpm, yarn, bun caches        | ✅ Production Ready     |
+| NodePackageManagerCleaner           | pnpm, pnpm, yarn, bun caches        | ✅ Production Ready     |
 | BuildCacheCleaner                   | Gradle, Maven, SBT caches          | ⚠️ Basic Implementation |
 | SystemCacheCleaner                  | macOS Spotlight, Xcode, CocoaPods  | ⚠️ macOS Only           |
 | TempFilesCleaner                    | Age-based temporary file cleanup   | ✅ Production Ready     |
@@ -247,7 +247,7 @@ return []CleanerType{
 | Feature        | SystemNix | Clean Wizard | Status          |
 | -------------- | --------- | ------------ | --------------- |
 | Homebrew       | ✅        | ✅           | ✅ Matching     |
-| npm            | ✅        | ✅           | ✅ Matching     |
+| pnpm            | ✅        | ✅           | ✅ Matching     |
 | pnpm           | ✅        | ✅           | ✅ Matching     |
 | Go             | ✅        | ✅           | ✅ Matching     |
 | Temp Files     | ✅        | ✅           | ✅ Matching     |

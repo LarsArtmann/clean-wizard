@@ -66,7 +66,7 @@ func (npmc *NodePackageManagerCleaner) isPackageManagerAvailable(
 ) bool {
 	switch pm {
 	case domain.PackageManagerNpm:
-		_, err := exec.LookPath("npm")
+		_, err := exec.LookPath("pnpm")
 
 		return err == nil
 	case domain.PackageManagerPnpm:
@@ -94,7 +94,7 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 		func(np *domain.NodePackagesSettings) error {
 			packageManagerStrings := PackageManagerTypeToLowerSlice(np.PackageManagers)
 			validPackageManagersMap := map[string]bool{
-				"npm":  true, //nolint:goconst
+				"pnpm":  true, //nolint:goconst
 				"pnpm": true,
 				"yarn": true, //nolint:goconst
 				"bun":  true, //nolint:goconst
@@ -104,7 +104,7 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 				packageManagerStrings,
 				validPackageManagersMap,
 				"package manager",
-				"npm, pnpm, yarn, or bun",
+				"pnpm, pnpm, yarn, or bun",
 			)
 		},
 	)
@@ -143,11 +143,11 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 
 	switch pm {
 	case domain.PackageManagerNpm:
-		// Get npm cache location
+		// Get pnpm cache location
 		cmd := adapters.ExecWithTimeout(
 			ctx,
 			DefaultNodePackageManagerTimeout,
-			"npm",
+			"pnpm",
 			"config",
 			"get",
 			"cache",
@@ -156,7 +156,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return result.Err[[]domain.ScanItem](
-				fmt.Errorf("failed to get npm cache location for pm=%v: %w", pm, err),
+				fmt.Errorf("failed to get pnpm cache location for pm=%v: %w", pm, err),
 			)
 		}
 
@@ -170,7 +170,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 			})
 
 			if npmc.verbose {
-				fmt.Printf("Found npm cache: %s\n", cachePath)
+				fmt.Printf("Found pnpm cache: %s\n", cachePath)
 			}
 		}
 
@@ -259,12 +259,12 @@ func (npmc *NodePackageManagerCleaner) scanHomeDirCache(
 	return result.Ok(items)
 }
 
-// getNpmCacheDir returns the npm cache directory path.
+// getNpmCacheDir returns the pnpm cache directory path.
 func (npmc *NodePackageManagerCleaner) getNpmCacheDir(ctx context.Context) (string, error) {
 	cmd := adapters.ExecWithTimeout(
 		ctx,
 		DefaultNodePackageManagerTimeout,
-		"npm",
+		"pnpm",
 		"config",
 		"get",
 		"cache",
@@ -272,12 +272,12 @@ func (npmc *NodePackageManagerCleaner) getNpmCacheDir(ctx context.Context) (stri
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", fmt.Errorf("failed to get npm cache location: %w", err)
+		return "", fmt.Errorf("failed to get pnpm cache location: %w", err)
 	}
 
 	cachePath := strings.TrimSpace(string(output))
 	if cachePath == "" {
-		return "", errors.New("npm cache path is empty")
+		return "", errors.New("pnpm cache path is empty")
 	}
 
 	return cachePath, nil
@@ -483,7 +483,7 @@ func (npmc *NodePackageManagerCleaner) cleanPackageManager(
 	return result.Ok(npmc.createDefaultCleanResult())
 }
 
-// cleanNpmCache cleans the npm cache and returns bytes freed.
+// cleanNpmCache cleans the pnpm cache and returns bytes freed.
 func (npmc *NodePackageManagerCleaner) cleanNpmCache(
 	ctx context.Context,
 ) result.Result[domain.CleanResult] {

@@ -29,7 +29,7 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | ------------------ | --------------------------------------- | ------------------------------------------ |
 | **Target**         | Daily cache cleanup                     | Fast cleanup without system changes        |
 | **Homebrew**       | ✅ `brew autoremove && brew cleanup`    | ✅ Homebrew                                |
-| **npm**            | ✅ `npm cache clean --force`            | ✅ Node Packages                           |
+| **pnpm**            | ✅ `pnpm cache clean --force`            | ✅ Node Packages                           |
 | **pnpm**           | ✅ `pnpm store prune`                   | ✅ Node Packages                           |
 | **Go**             | ✅ `go clean -cache`                    | ✅ Go Packages                             |
 | **Temp Files**     | ✅ `/tmp/nix-*`                         | ✅ TempFiles                               |
@@ -75,7 +75,7 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 
 | Feature            | SystemNix                        | Clean Wizard                  |
 | ------------------ | -------------------------------- | ----------------------------- |
-| **npm**            | ✅ `npm cache clean --force`     | ✅ `npm cache clean --force`  |
+| **pnpm**            | ✅ `pnpm cache clean --force`     | ✅ `pnpm cache clean --force`  |
 | **pnpm**           | ✅ `pnpm store prune`            | ✅ `pnpm store prune`         |
 | **yarn**           | ✅ `yarn cache clean`            | ✅ `yarn cache clean`         |
 | **bun**            | ✅ `rm -rf ~/.bun/install/cache` | ✅ `bun pm cache rm`          |
@@ -283,7 +283,7 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | **Nix GC**            | ✅ Matching commands        |
 | **Homebrew cleanup**  | ✅ Matching commands        |
 | **Docker prune**      | ✅ Matching commands        |
-| **npm/pnpm/yarn/bun** | ✅ Matching commands        |
+| **pnpm/pnpm/yarn/bun** | ✅ Matching commands        |
 | **Go cache clean**    | ✅ SystemNix has more paths |
 | **Cargo clean**       | ✅ Matching commands        |
 | **Spotlight cleanup** | ✅ Matching paths           |

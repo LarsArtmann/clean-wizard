@@ -137,7 +137,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **Overall**                | ✅ FULLY_FUNCTIONAL | Multi-PM support            |
 | **Package Managers**       | ✅ Working          | npm, pnpm, yarn, bun        |
 | **Availability Detection** | ✅ Working          | Checks each PM individually |
-| **npm Cache Clean**        | ✅ Working          | `npm cache clean --force`   |
+| **npm Cache Clean**         | ✅ Working          | `npm cache clean --force`   |
 | **pnpm Store Prune**       | ✅ Working          | `pnpm store prune`          |
 | **Yarn Cache Clean**       | ✅ Working          | `yarn cache clean`          |
 | **Bun Cache Clean**        | ✅ Working          | `bun pm cache rm`           |
@@ -184,12 +184,12 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **CocoaPods Cache**      | ✅ Working              | `~/Library/Caches/CocoaPods`                                             |
 | **Homebrew Cache**       | ✅ Working              | `~/Library/Caches/Homebrew`                                              |
 | **Linux Pip Cache**      | ✅ Working              | `~/.cache/pip`                                                           |
-| **Linux npm Cache**      | ✅ Working              | `~/.cache/npm`                                                           |
+| **Linux pnpm Cache**      | ✅ Working              | `~/.cache/npm`                                                           |
 | **Linux Yarn Cache**     | ✅ Working              | `~/.cache/yarn`                                                          |
 | **Linux ccache**         | ✅ Working              | `~/.cache/ccache`                                                        |
 | **Age-Based Filtering**  | ✅ Working              | Configurable `older_than` duration                                       |
 | **Dry Run Mode**         | ✅ Working              | Correctly previews actions                                               |
-| **Extended Cache Types** | ✅ Working              | Pip, npm, yarn, ccache implemented for Linux                             |
+| **Extended Cache Types** | ✅ Working              | Pip, pnpm, yarn, ccache implemented for Linux                             |
 
 **Notes:**
 

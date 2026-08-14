@@ -258,7 +258,7 @@ The user did not say "commit". All changes (renamed + content-modified historica
 45. Add CSP headers to website (copy `fix-csp.mjs` from gogenfilter)
 46. Add OG images to website (`astro-og-canvas`)
 47. Fix `website/flake.nix` deploy app (`--project lars-software` flag)
-48. Replace `pnpm-workspace.yaml` with `.npmrc` for npm project
+48. Replace `pnpm-workspace.yaml` with `.npmrc` for pnpm project
 49. Add `engines.node` to website `package.json`
 50. Document the 13th cleaner (Golangci-lint) in `docs/cleaner.md` (FEATURES.md was updated but `docs/cleaner.md` was not audited this session)
 

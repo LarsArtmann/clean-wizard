@@ -24,7 +24,7 @@ const (
     CacheTypeCocoapods                    // CocoaPods cache
     CacheTypeHomebrew                     // Homebrew cache
     CacheTypePip                          // Python pip cache
-    CacheTypeNpm                          // Node.js npm cache
+    CacheTypeNpm                          // Node.js pnpm cache
     CacheTypeYarn                         // Yarn cache
     CacheTypeCcache                       // ccache
 )
@@ -53,7 +53,7 @@ const (
 )
 ```
 
-**Purpose**: Local enum for `SystemCacheCleaner` which only handles **macOS system caches**. Does NOT handle language-specific caches (pip, npm, yarn, ccache).
+**Purpose**: Local enum for `SystemCacheCleaner` which only handles **macOS system caches**. Does NOT handle language-specific caches (pip, pnpm, yarn, ccache).
 
 ## Design Intent
 
@@ -64,8 +64,8 @@ const (
    - `SystemCacheType` - Implementation layer for macOS system cache cleaner
 
 2. **Different Responsibilities**:
-   - Language-specific caches (pip, npm, yarn, ccache) are handled by other cleaners:
-     - `NodePackageManagerCleaner` - handles npm/yarn
+   - Language-specific caches (pip, pnpm, yarn, ccache) are handled by other cleaners:
+     - `NodePackageManagerCleaner` - handles pnpm/yarn
      - `LanguageVersionManagerCleaner` - handles pyenv (pip)
      - `BuildCacheCleaner` - handles ccache
    - `SystemCacheCleaner` only handles macOS-specific system caches

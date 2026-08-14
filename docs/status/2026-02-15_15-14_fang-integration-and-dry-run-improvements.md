@@ -29,7 +29,7 @@ The clean-wizard project is in **GOOD** overall health with recent improvements 
 - ✅ Go cleaner: Actual cache size calculation
 - ✅ Cargo cleaner: Registry and git cache scanning
 - ✅ Node packages cleaner: Real cache directory sizes
-- ✅ System cache: Linux support added (pip, npm, yarn, ccache)
+- ✅ System cache: Linux support added (pip, pnpm, yarn, ccache)
 
 ### 3. CleanResult Refactoring
 

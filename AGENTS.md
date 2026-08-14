@@ -16,7 +16,7 @@ Or use the Nix devShell (`nix develop`) which sets it automatically.
 ## Target Machines
 
 - **evo-x2**: NixOS Linux x86_64, Nix 2.34.7, Go 1.26.3, Docker, pnpm, bun, golangci-lint
-  - No: cargo, brew, npm, yarn, pip/pip3
+  - No: cargo, brew, pnpm, yarn, pip/pip3
   - Major caches: go-build (25GB), goimports (8.2GB), pip (6.5GB), nix (3.1GB), gopls (2.1GB), puppeteer (1.2GB), JetBrains (845MB), pnpm (717MB)
 - **macOS**: Primary historical target (Spotlight, Xcode, CocoaPods, Homebrew)
 

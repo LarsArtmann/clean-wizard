@@ -233,7 +233,7 @@ func (r *Registry) Available(ctx context.Context) []Cleaner {
 
 **Details**:
 
-- Local enum: string type ("npm", "pnpm", "yarn", "bun")
+- Local enum: string type ("pnpm", "pnpm", "yarn", "bun")
 - Domain enum: integer type
 - Solution: Use domain enum directly
 

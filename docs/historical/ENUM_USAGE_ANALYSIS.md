@@ -21,7 +21,7 @@ Analysis of enum usage across all cleaner implementations revealed significant d
 | homebrew.go                     | YES          | Correctly uses `domain.HomebrewModeUnusedOnly` and `domain.HomebrewModeAll`                                                                                                             |
 | langversionmanager.go           | NO           | Local `LangVersionManagerType` ("nvm", "pyenv", "rbenv") is subset of domain `VersionManagerType` ("NVM", "PYENV", "GVM", "RBENV", "SDKMAN", "JENV")                                    |
 | nix.go                          | YES          | Correctly uses `domain.GenerationStatusCurrent` and `domain.GenerationStatusHistorical`                                                                                                 |
-| nodepackages.go                 | **ISSUE**    | Local `NodePackageManagerType` ("npm", "pnpm", "yarn", "bun") conflicts with domain `PackageManagerType` (integer enum with same string values)                                         |
+| nodepackages.go                 | **ISSUE**    | Local `NodePackageManagerType` ("pnpm", "pnpm", "yarn", "bun") conflicts with domain `PackageManagerType` (integer enum with same string values)                                         |
 | projectsmanagementautomation.go | NO           | None - no enums used                                                                                                                                                                    |
 | systemcache.go                  | **ISSUE**    | Local `SystemCacheType` ("spotlight", "xcode", "cocoapods", "homebrew") is subset of domain `CacheType` ("SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP", "NPM", "YARN", "CCACHE") |
 | tempfiles.go                    | NO           | None - no enums used                                                                                                                                                                    |
@@ -99,7 +99,7 @@ Either:
 
 **Problem:**
 
-- **Local enum:** String type ("npm", "pnpm", "yarn", "bun")
+- **Local enum:** String type ("pnpm", "pnpm", "yarn", "bun")
 - **Domain enum:** Integer type with same string values
 
 **Impact:**

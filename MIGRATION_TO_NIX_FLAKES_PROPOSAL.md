@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-clean-wizard currently manages its development environment through an ad-hoc combination of `go.mod` tool directives, `just` recipes that auto-install tools via `go install`, Homebrew (`brew install trivy`), npm (`bun install -g jscpd`), and pip (`pip install jsonschema pyyaml`). This creates several problems:
+clean-wizard currently manages its development environment through an ad-hoc combination of `go.mod` tool directives, `just` recipes that auto-install tools via `go install`, Homebrew (`brew install trivy`), pnpm (`bun install -g jscpd`), and pip (`pip install jsonschema pyyaml`). This creates several problems:
 
 1. **No reproducibility** — developers get different tool versions depending on when they first ran `just bootstrap`
 2. **No declarative lock** — there is no single file that pins every tool to an exact version
@@ -77,7 +77,7 @@ The following external tools are required across the project, extracted from `Ju
 | `jscpd`      | `bun install -g jscpd` | Multi-language duplicate detection |
 | `jq`         | System package         | JSON processing in scripts         |
 | `bc`         | System package         | Arithmetic in coverage scripts     |
-| `node`/`npm` | System / nvm           | TypeSpec API compilation           |
+| `node`/`pnpm` | System / nvm           | TypeSpec API compilation           |
 
 #### System Tools Invoked at Runtime (by cleaners)
 
@@ -87,7 +87,7 @@ The following external tools are required across the project, extracted from `Ju
 | `docker`                  | `DockerCleaner`       | Container/image cleanup    |
 | `brew`                    | `HomebrewCleaner`     | Homebrew cache cleanup     |
 | `cargo`                   | `CargoCleaner`        | Rust cache cleanup         |
-| `npm`/`yarn`/`pnpm`/`bun` | `NodePackagesCleaner` | Node cache cleanup         |
+| `pnpm`/`yarn`/`pnpm`/`bun` | `NodePackagesCleaner` | Node cache cleanup         |
 | `git`                     | `GitHistoryCleaner`   | Git history operations     |
 | `git-filter-repo`         | `GitHistoryCleaner`   | History rewriting          |
 | `trash`                   | `TempFilesCleaner`    | Safe file deletion (macOS) |
@@ -243,7 +243,7 @@ These tools are not available in nixpkgs or are more specialized:
 | `templ`                | Not in nixpkgs                     | Build from source via `buildGoModule` |
 | `air`                  | Not in nixpkgs                     | Build from source via `buildGoModule` |
 | `gocycmd`              | Not in nixpkgs                     | Build from source via `buildGoModule` |
-| `jscpd`                | npm package                        | `pkgs.nodePackages.jscpd` or skip     |
+| `jscpd`                | pnpm package                        | `pkgs.nodePackages.jscpd` or skip     |
 | `benchcmp`             | Deprecated in favor of `benchstat` | Use `pkgs.benchstat`                  |
 
 ### Step-by-Step Actions

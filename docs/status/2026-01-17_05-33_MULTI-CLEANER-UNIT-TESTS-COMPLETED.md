@@ -64,7 +64,7 @@ go build ./cmd/clean-wizard
 
 - ✅ Constructor with all configuration options
 - ✅ Type() method returns correct operation type
-- ✅ IsAvailable() checks for package managers (npm, pnpm, yarn, bun)
+- ✅ IsAvailable() checks for package managers (pnpm, pnpm, yarn, bun)
 - ✅ ValidateSettings() handles nil, valid, and invalid settings
 - ✅ Clean() dry-run mode with estimation
 - ✅ Package manager type constants

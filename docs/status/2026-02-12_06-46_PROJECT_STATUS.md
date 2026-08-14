@@ -170,7 +170,7 @@ Should we implement actual Language Version Manager cleaning, or remove it entir
 ```
 eef80f5 refactor(cleaners): extract shared CalculateBytesFreed utility - deduplication
 39b24f5 style: apply code formatting and whitespace cleanup
-67ed165 feat(nodepackages): add accurate size reporting for npm/yarn/pnpm/bun
+67ed165 feat(nodepackages): add accurate size reporting for pnpm/yarn/pnpm/bun
 d85e083 feat(golang): add accurate size reporting for Go cache cleaning
 696ae0b feat(nix): use real store size for dry-run estimates
 ```

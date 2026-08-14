@@ -10,9 +10,9 @@ These commands can hang forever. They use raw `exec.CommandContext(ctx, ...)` in
 | -------------------------------------------------- | ---- | ---------------------------------------------- | ------------ |
 | `internal/cleaner/cargo.go`                        | 164  | `cargo-cache --autoclean`                      | **CRITICAL** |
 | `internal/cleaner/cargo.go`                        | 186  | `cargo clean`                                  | **CRITICAL** |
-| `internal/cleaner/nodepackages.go`                 | 137  | `npm config get cache`                         | **HIGH**     |
+| `internal/cleaner/nodepackages.go`                 | 137  | `pnpm config get cache`                         | **HIGH**     |
 | `internal/cleaner/nodepackages.go`                 | 159  | `pnpm store path`                              | **HIGH**     |
-| `internal/cleaner/nodepackages.go`                 | 279  | `npm cache clean --force`                      | **CRITICAL** |
+| `internal/cleaner/nodepackages.go`                 | 279  | `pnpm cache clean --force`                      | **CRITICAL** |
 | `internal/cleaner/nodepackages.go`                 | 290  | `pnpm store prune`                             | **CRITICAL** |
 | `internal/cleaner/nodepackages.go`                 | 301  | `yarn cache clean`                             | **HIGH**     |
 | `internal/cleaner/nodepackages.go`                 | 312  | `bun pm cache rm`                              | **HIGH**     |

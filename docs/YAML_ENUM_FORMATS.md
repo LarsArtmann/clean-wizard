@@ -143,7 +143,7 @@ enabled: "ENABLED" # String
 
 | Value | Integer | String | Description          |
 | ----- | ------- | ------ | -------------------- |
-| NPM   | 0       | "NPM"  | npm package manager  |
+| NPM   | 0       | "NPM"  | pnpm package manager  |
 | PNPM  | 1       | "PNPM" | pnpm package manager |
 | YARN  | 2       | "YARN" | Yarn package manager |
 | BUN   | 3       | "BUN"  | Bun package manager  |
@@ -178,7 +178,7 @@ enabled: "ENABLED" # String
 | COCOAPODS      | 2       | "COCOAPODS"      | CocoaPods cache                      | macOS       |
 | HOMEBREW       | 3       | "HOMEBREW"       | Homebrew cache                       | macOS/Linux |
 | PIP            | 4       | "PIP"            | Python pip cache                     | Linux       |
-| NPM            | 5       | "NPM"            | Node.js npm cache                    | Linux       |
+| NPM            | 5       | "NPM"            | Node.js pnpm cache                    | Linux       |
 | YARN           | 6       | "YARN"           | Yarn cache                           | Linux       |
 | CCACHE         | 7       | "CCACHE"         | ccache compiler cache                | Linux       |
 | XDG_CACHE      | 8       | "XDG_CACHE"      | XDG cache directory (~/.cache)       | Linux       |

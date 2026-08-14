@@ -46,7 +46,7 @@ This is NOT like deleting cache files.
 
 ```
 Delete: ~/.npm/_cacache
-Impact: npm just re-downloads packages
+Impact: pnpm just re-downloads packages
 Recovery: Automatic, painless
 Time: <1 minute
 User Acceptance: High (expected behavior)
@@ -89,7 +89,7 @@ Deletion Executed:
 
 Next Day:
   User: $ cd project-b
-  User: $ npm start
+  User: $ pnpm start
   Error: /bin/sh: node: command not found
 
   User: "WTF?! It worked yesterday!"
@@ -227,7 +227,7 @@ Delete 4 versions? [y/N]
 ```bash
 # Step 1: User discovers broken project
 $ cd ~/project-b
-$ npm start
+$ pnpm start
 node: command not found
 
 # Step 2: User figures out which version they need
@@ -239,17 +239,17 @@ $ nvm install 16.20.0
 Downloading and installing node v16.20.0...
 Downloading https://nodejs.org/dist/v16.20.0/node-v16.20.0-darwin-x64.tar.xz...
 ######################################################################## 100.0%
-Now using node v16.20.0 (npm v8.19.4)
+Now using node v16.20.0 (pnpm v8.19.4)
 
 # Step 4: Re-install global packages for that version
-$ npm install -g yarn typescript pm2 eslint prettier...
+$ pnpm add -g yarn typescript pm2 eslint prettier...
 Adding yarn...
 Adding typescript...
 [packages being installed...]
 # Time: 2-5 minutes additional
 
 # Step 5: Hope everything still works
-$ npm start
+$ pnpm start
 # Might have issues if:
 #   - Package versions not compatible with v16
 #   - Node modules need to be re-installed
@@ -382,7 +382,7 @@ Day 31:
 
 Day 32 (Morning):
   User: $ cd ~/important-legacy-project
-  User: $ npm start
+  User: $ pnpm start
   Error: node: command not found
   User: "What? It worked yesterday!"
   User: Checks .nvmrc: v16.20.0
@@ -391,7 +391,7 @@ Day 32 (Morning):
 Day 32 (Afternoon):
   User: Installs v16.20.0 again (5 minutes)
   User: Installs global packages (3 minutes)
-  User: npm start works again
+  User: pnpm start works again
   User: BUT: Lost time, frustrated, lost trust
 
 Day 33:
@@ -427,7 +427,7 @@ Operation: Delete ~/.npm/_cacache
 
 Rollback:
   $ cd ~/any-npm-project
-  $ npm install
+  $ pnpm install
   Result: Cache automatically regenerated
   Time: <1 minute
   Effort: Zero
@@ -444,7 +444,7 @@ Rollback:
   Step 2: Download Node.js v16.20.0 binary (1-5 minutes)
   Step 3: Install via nvm/pyenv/rbenv (1-3 minutes)
   Step 4: Re-install global packages (2-5 minutes)
-  Step 5: Re-install project dependencies (npm install, etc.)
+  Step 5: Re-install project dependencies (pnpm install, etc.)
   Step 6: Hope everything works (testing required)
 
   Total Time: 5-15 minutes

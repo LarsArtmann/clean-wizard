@@ -213,7 +213,7 @@ System cache types for cleanup.
 | 2     | `COCOAPODS`  | macOS    | CocoaPods cache       |
 | 3     | `HOMEBREW`   | macOS    | Homebrew cache        |
 | 4     | `PIP`        | All      | Python pip cache      |
-| 5     | `NPM`        | All      | Node.js npm cache     |
+| 5     | `NPM`        | All      | Node.js pnpm cache     |
 | 6     | `YARN`       | All      | Yarn cache            |
 | 7     | `CCACHE`     | All      | Compiler cache        |
 | 8     | `XDG_CACHE`  | Linux    | XDG cache directory   |
@@ -229,7 +229,7 @@ Node.js package managers.
 
 | Value | String | Description          |
 | ----- | ------ | -------------------- |
-| 0     | `NPM`  | npm registry         |
+| 0     | `NPM`  | pnpm registry         |
 | 1     | `PNPM` | pnpm (efficient)     |
 | 2     | `YARN` | Yarn package manager |
 | 3     | `BUN`  | Bun runtime          |

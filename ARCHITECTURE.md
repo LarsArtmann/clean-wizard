@@ -232,7 +232,7 @@ risk_level: 2 # Integer form (equivalent to HIGH)
 | `GolangCleaner`                       | Go module cache, test cache            | macOS, Linux |
 | `HomebrewCleaner`                     | Homebrew cache and old versions        | macOS        |
 | `NixCleaner`                          | Nix store generations                  | macOS, Linux |
-| `NodePackagesCleaner`                 | npm/yarn/pnpm caches                   | macOS, Linux |
+| `NodePackagesCleaner`                 | pnpm/yarn/pnpm caches                   | macOS, Linux |
 | `ProjectExecutablesCleaner`           | Compiled binaries in projects          | macOS, Linux |
 | `ProjectsManagementAutomationCleaner` | Project automation files (deprecated)  | macOS, Linux |
 | `SystemCacheCleaner`                  | System caches (Spotlight, Xcode, etc.) | macOS        |

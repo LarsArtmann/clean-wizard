@@ -86,7 +86,7 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 		{
 			name:              "all package managers",
 			packageManagers:   AvailableNodePackageManagers(),
-			shouldBeAvailable: true, // At least npm should be available
+			shouldBeAvailable: true, // At least pnpm should be available
 		},
 		{
 			name:              "empty package managers",
@@ -200,8 +200,8 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 		{
 			name:            "dry-run with single PM",
 			packageManagers: []domain.PackageManagerType{domain.PackageManagerNpm},
-			wantMinItems:    1,     // npm should be available
-			shouldTest:      false, // Skip if npm not installed
+			wantMinItems:    1,     // pnpm should be available
+			shouldTest:      false, // Skip if pnpm not installed
 		},
 	}
 

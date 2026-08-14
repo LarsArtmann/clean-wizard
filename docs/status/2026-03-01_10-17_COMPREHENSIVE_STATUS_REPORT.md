@@ -46,10 +46,10 @@
 1. ✅ Homebrew - Package cleanup
 2. ✅ Docker - Image/container/prune
 3. ✅ Go - Module cache, build cache
-4. ✅ Node (npm/yarn/pnpm) - node_modules, cache
+4. ✅ Node (pnpm/yarn/pnpm) - node_modules, cache
 5. ✅ Cargo (Rust) - target dir, registry
 6. ✅ BuildCache (Gradle/Maven) - JVM build caches
-7. ✅ SystemCache - XDG cache, thumbnails, pip, npm, yarn, ccache
+7. ✅ SystemCache - XDG cache, thumbnails, pip, pnpm, yarn, ccache
 8. ✅ TempFiles - OS temp directories
 9. ✅ CompiledBinaries - User binaries scanning
 10. ✅ GitHistory - BFG/filter-repo integration

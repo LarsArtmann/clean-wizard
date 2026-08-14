@@ -555,8 +555,8 @@ Flags:
     - Clean brew cache
     - Separate command or integrated
 
-17. **npm cache cleanup** - Clean npm cache
-    - Run `npm cache clean --force`
+17. **pnpm cache cleanup** - Clean pnpm cache
+    - Run `pnpm cache clean --force`
     - Calculate space freed
     - Optional module
 

@@ -104,7 +104,7 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
    - Timeout: via `execWithTimeout()`
 
 2. ✅ `nodepackages.go:146` - Uses `execWithTimeout()`
-   - Command: `npm config get cache`
+   - Command: `pnpm config get cache`
    - Timeout: Via DefaultNodePackageManagerTimeout (2 minutes)
 
 3. ✅ `nodepackages.go:168` - Uses `execWithTimeout()`
@@ -112,7 +112,7 @@ go test ./tests/integration/cleaner_integration_test.go -tags=integration -run "
    - Timeout: Via DefaultNodePackageManagerTimeout (2 minutes)
 
 4. ✅ `nodepackages.go:287-292` - Uses context.WithTimeout()
-   - Commands: `npm cache clean --force`, `pnpm store prune`, `yarn cache clean`, `bun pm cache rm`
+   - Commands: `pnpm cache clean --force`, `pnpm store prune`, `yarn cache clean`, `bun pm cache rm`
    - Timeout: DefaultNodePackageManagerTimeout (2 minutes)
 
 5. ✅ `projectsmanagementautomation.go:118` - Uses `execWithTimeout()`

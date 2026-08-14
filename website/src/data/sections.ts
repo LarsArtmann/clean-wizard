@@ -5,7 +5,7 @@ export const painPoints: PainPoint[] = [
   { tool: "Docker", detail: "Stopped containers, dangling images, volumes", size: "5+ GiB" },
   { tool: "Nix", detail: "Old generations from every system update", size: "10+ GiB" },
   { tool: "Homebrew", detail: "Download cache, dead symlinks, old casks", size: "1+ GiB" },
-  { tool: "Node", detail: "npm, pnpm, yarn, bun caches combined", size: "2+ GiB" },
+  { tool: "Node", detail: "pnpm, pnpm, yarn, bun caches combined", size: "2+ GiB" },
   { tool: "Cargo", detail: "Registry cache + git cache + old artifacts", size: "1.6 GiB" },
 ];
 

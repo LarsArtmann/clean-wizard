@@ -38,7 +38,7 @@
 | H1-5    | **Add configuration validation tests**                 | #5           | 20         | High   | H1-4         |
 | H1-6    | **Complete Homebrew adapter implementation**           | #2           | 30         | High   | None         |
 | H1-7    | **Add Homebrew cleaning operations**                   | #2           | 30         | High   | H1-6         |
-| H1-8    | **Implement package cache cleaners (npm, cargo, go)**  | #2           | 30         | High   | H1-7         |
+| H1-8    | **Implement package cache cleaners (pnpm, cargo, go)**  | #2           | 30         | High   | H1-7         |
 | H1-9    | **Add BDD scenarios for other operations**             | #3           | 25         | High   | G1-10        |
 | H1-10   | **Implement performance test framework**               | #3           | 30         | High   | H1-9         |
 

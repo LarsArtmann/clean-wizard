@@ -117,7 +117,7 @@ specificity over vagueness, and honest over sensational.
 
 ### Technical
 
-11. **The `pnpm-workspace.yaml` issue persists** — Still using pnpm config for an npm project (noted in prior status report, not addressed).
+11. **The `pnpm-workspace.yaml` issue persists** — Still using pnpm config for an pnpm project (noted in prior status report, not addressed).
 
 12. **`website/flake.nix` deploy app still broken** — Still missing `--project lars-software` and `:cleanwizard` target (noted in prior report, not addressed).
 
@@ -177,7 +177,7 @@ specificity over vagueness, and honest over sensational.
 ### Technical debt
 
 33. **Fix `website/flake.nix` deploy app** — Add `--project lars-software` and `:cleanwizard` target
-34. **Remove `pnpm-workspace.yaml`** — Replace with `.npmrc` for npm
+34. **Remove `pnpm-workspace.yaml`** — Replace with `.npmrc` for pnpm
 35. **Add CSP hardening** — Copy `fix-csp.mjs` from gogenfilter
 36. **Add `.node-version` check** — Verify it matches CI Node.js version (24)
 37. **Add `engines` field to `package.json`** — Enforce Node.js version

@@ -39,7 +39,7 @@ Comprehensive schema for validating clean-wizard YAML configurations with full s
 #### Using `ajv` (Node.js)
 
 ```bash
-npm install -g ajv-cli
+pnpm add -g ajv-cli
 ajv validate -s schemas/config.schema.json -d path/to/config.yaml
 ```
 
@@ -158,7 +158,7 @@ When adding new enum types or configuration fields:
 Validate the schema itself:
 
 ```bash
-npm install -g ajv-cli
+pnpm add -g ajv-cli
 ajv compile -s schemas/config.schema.json -r draft-07
 ```
 
