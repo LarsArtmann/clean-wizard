@@ -119,7 +119,7 @@ const (
 	CacheTypeHomebrew
 	// CacheTypePip represents Python pip cache.
 	CacheTypePip
-	// CacheTypeNpm represents Node.js pnpm cache.
+	// CacheTypeNpm represents Node.js npm cache.
 	CacheTypeNpm
 	// CacheTypeYarn represents Yarn cache.
 	CacheTypeYarn
@@ -188,7 +188,7 @@ func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 type PackageManagerType int
 
 const (
-	// PackageManagerNpm represents pnpm.
+	// PackageManagerNpm represents npm.
 	PackageManagerNpm PackageManagerType = iota
 	// PackageManagerPnpm represents pnpm.
 	PackageManagerPnpm
