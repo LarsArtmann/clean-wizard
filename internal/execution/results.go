@@ -133,9 +133,9 @@ func (rc *resultCollector) recordFinal(name string, clean domain.CleanResult, er
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
 
-	for _, v := range slices.Backward(rc.results) {
+	for i, v := range slices.Backward(rc.results) {
 		if v.Name == name {
-			v = StepResult{
+			rc.results[i] = StepResult{
 				Name: name, Clean: clean, Err: err, Duration: duration,
 			}
 

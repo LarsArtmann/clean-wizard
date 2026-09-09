@@ -94,7 +94,7 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 		func(np *domain.NodePackagesSettings) error {
 			packageManagerStrings := PackageManagerTypeToLowerSlice(np.PackageManagers)
 			validPackageManagersMap := map[string]bool{
-				"npm":  true,  //nolint:goconst
+				"npm":  true, //nolint:goconst
 				"pnpm": true, //nolint:goconst
 				"yarn": true, //nolint:goconst
 				"bun":  true, //nolint:goconst
