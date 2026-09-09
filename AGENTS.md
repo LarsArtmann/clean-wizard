@@ -13,6 +13,8 @@ GOEXPERIMENT=jsonv2 go test ./... -short
 
 Or use the Nix devShell (`nix develop`) which sets it automatically.
 
+**Website CI gotcha:** pnpm 11.20 enforces a default 24h `minimumReleaseAge` supply-chain check in `pnpm install`. Dependency bumps whose regenerated lockfile pulls freshly-published transitive deps (e.g. rolldown for astro) fail CI with `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` — not a bug; re-run the jobs ~24h later.
+
 ## Target Machines
 
 - **evo-x2**: NixOS Linux x86_64, Nix 2.34.7, Go 1.26.3, Docker, pnpm, bun, golangci-lint
