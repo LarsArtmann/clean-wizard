@@ -24,7 +24,7 @@ const (
     CacheTypeCocoapods                    // CocoaPods cache
     CacheTypeHomebrew                     // Homebrew cache
     CacheTypePip                          // Python pip cache
-    CacheTypeNpm                          // Node.js pnpm cache
+    CacheTypeNpm                          // Node.js npm cache
     CacheTypeYarn                         // Yarn cache
     CacheTypeCcache                       // ccache
 )
