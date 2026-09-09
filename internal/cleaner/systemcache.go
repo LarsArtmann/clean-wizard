@@ -244,7 +244,7 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{ //nolint:gocheckn
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeNpm: {
-		pathComponents: []string{pathComponentDotCache, "pnpm"}, //nolint:goconst
+		pathComponents: []string{pathComponentDotCache, "npm"}, //nolint:goconst
 		displayName:    "NPM cache",
 		scanType:       domain.ScanTypeTemp,
 	},

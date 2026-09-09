@@ -184,12 +184,12 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **CocoaPods Cache**      | ✅ Working              | `~/Library/Caches/CocoaPods`                                             |
 | **Homebrew Cache**       | ✅ Working              | `~/Library/Caches/Homebrew`                                              |
 | **Linux Pip Cache**      | ✅ Working              | `~/.cache/pip`                                                           |
-| **Linux pnpm Cache**      | ✅ Working              | `~/.cache/npm`                                                           |
+| **Linux npm Cache**      | ✅ Working              | `~/.cache/npm`                                                           |
 | **Linux Yarn Cache**     | ✅ Working              | `~/.cache/yarn`                                                          |
 | **Linux ccache**         | ✅ Working              | `~/.cache/ccache`                                                        |
 | **Age-Based Filtering**  | ✅ Working              | Configurable `older_than` duration                                       |
 | **Dry Run Mode**         | ✅ Working              | Correctly previews actions                                               |
-| **Extended Cache Types** | ✅ Working              | Pip, pnpm, yarn, ccache implemented for Linux                             |
+| **Extended Cache Types** | ✅ Working              | Pip, npm, yarn, ccache implemented for Linux                             |
 
 **Notes:**
 
