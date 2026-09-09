@@ -24,7 +24,8 @@ type mockCleaner struct {
 
 func (m *mockCleaner) Name() string { return m.name }
 
-func (m *mockCleaner) Type() domain.OperationType                                { return domain.OperationTypeCargoPackages }
+func (m *mockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+
 func (m *mockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] { return m.cleanRes }
 func (m *mockCleaner) IsAvailable(_ context.Context) bool                        { return m.avail }
 func (m *mockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem]   { return m.scanRes }

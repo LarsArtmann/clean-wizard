@@ -101,7 +101,7 @@ Cleaning strategy modes.
 | Value | String         | Icon | Description               |
 | ----- | -------------- | ---- | ------------------------- |
 | 0     | `aggressive`   | 🔥   | Delete aggressively       |
-| 1     | `conservative` | 🛡️   | Delete conservatively     |
+| 1     | `conservative` | 🛡️    | Delete conservatively     |
 | 2     | `dry-run`      | 🔍   | Preview only, no deletion |
 
 **Usage:**
@@ -261,9 +261,9 @@ JSON serialization uses string representation only:
 
 ```json
 {
-	"risk_level": "HIGH",
-	"validation_level": "COMPREHENSIVE",
-	"strategy": "conservative"
+  "risk_level": "HIGH",
+  "validation_level": "COMPREHENSIVE",
+  "strategy": "conservative"
 }
 ```
 

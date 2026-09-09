@@ -155,48 +155,48 @@ The `CompiledBinariesCleaner` has been **FULLY IMPLEMENTED** with comprehensive 
 
 ### Immediate (This Session)
 
-| #   | Task                                                   | Priority    | Effort |
-| --- | ------------------------------------------------------ | ----------- | ------ |
-| 1   | **Fix compiled-binaries not appearing in scan output** | 🔴 Critical | 30m    |
-| 2   | Add CLI flags for CompiledBinaries settings            | 🟡 High     | 1h     |
-| 3   | Test cleaner on real ~/projects directory              | 🟡 High     | 15m    |
-| 4   | Add compiled-binaries to documentation                 | 🟢 Medium   | 30m    |
+| # | Task                                                   | Priority    | Effort |
+| - | ------------------------------------------------------ | ----------- | ------ |
+| 1 | **Fix compiled-binaries not appearing in scan output** | 🔴 Critical | 30m    |
+| 2 | Add CLI flags for CompiledBinaries settings            | 🟡 High     | 1h     |
+| 3 | Test cleaner on real ~/projects directory              | 🟡 High     | 15m    |
+| 4 | Add compiled-binaries to documentation                 | 🟢 Medium   | 30m    |
 
 ### Short Term (Next Session)
 
-| #   | Task                                                | Priority    | Effort |
-| --- | --------------------------------------------------- | ----------- | ------ |
-| 5   | Fix Language Version Manager NO-OP bug              | 🔴 Critical | 1h     |
-| 6   | Fix Docker size reporting (returns 0)               | 🔴 Critical | 30m    |
-| 7   | Fix Cargo size reporting                            | 🟡 High     | 30m    |
-| 8   | Improve dry-run estimates (remove hardcoded values) | 🟡 High     | 1h     |
-| 9   | Add Linux support for SystemCache cleaner           | 🟡 High     | 2h     |
-| 10  | Generic Context System unification                  | 🟡 High     | 4h     |
+| #  | Task                                                | Priority    | Effort |
+| -- | --------------------------------------------------- | ----------- | ------ |
+| 5  | Fix Language Version Manager NO-OP bug              | 🔴 Critical | 1h     |
+| 6  | Fix Docker size reporting (returns 0)               | 🔴 Critical | 30m    |
+| 7  | Fix Cargo size reporting                            | 🟡 High     | 30m    |
+| 8  | Improve dry-run estimates (remove hardcoded values) | 🟡 High     | 1h     |
+| 9  | Add Linux support for SystemCache cleaner           | 🟡 High     | 2h     |
+| 10 | Generic Context System unification                  | 🟡 High     | 4h     |
 
 ### Medium Term
 
-| #   | Task                                           | Priority  | Effort |
-| --- | ---------------------------------------------- | --------- | ------ |
-| 11  | Reduce LoadWithContext complexity (20→<10)     | 🟢 Medium | 2h     |
-| 12  | Reduce validateProfileName complexity (16→<10) | 🟢 Medium | 1h     |
-| 13  | Refactor BDD test helpers (8+ files)           | 🟢 Medium | 4h     |
-| 14  | Add IsValid(), Values(), String() to all enums | 🟢 Medium | 2h     |
-| 15  | Create ARCHITECTURE.md documentation           | 🟢 Medium | 2h     |
-| 16  | Document CleanerRegistry usage                 | 🟢 Medium | 1h     |
-| 17  | Create ENUM_QUICK_REFERENCE.md                 | 🟢 Medium | 1h     |
+| #  | Task                                           | Priority  | Effort |
+| -- | ---------------------------------------------- | --------- | ------ |
+| 11 | Reduce LoadWithContext complexity (20→<10)     | 🟢 Medium | 2h     |
+| 12 | Reduce validateProfileName complexity (16→<10) | 🟢 Medium | 1h     |
+| 13 | Refactor BDD test helpers (8+ files)           | 🟢 Medium | 4h     |
+| 14 | Add IsValid(), Values(), String() to all enums | 🟢 Medium | 2h     |
+| 15 | Create ARCHITECTURE.md documentation           | 🟢 Medium | 2h     |
+| 16 | Document CleanerRegistry usage                 | 🟢 Medium | 1h     |
+| 17 | Create ENUM_QUICK_REFERENCE.md                 | 🟢 Medium | 1h     |
 
 ### Future Considerations
 
-| #   | Task                                                        | Priority    | Effort |
-| --- | ----------------------------------------------------------- | ----------- | ------ |
-| 18  | NodePackages enum refactor to domain                        | 🟢 Low      | 2h     |
-| 19  | BuildCache tools vs languages decision                      | 🟢 Low      | 1h     |
-| 20  | Result type enhancement for validation chaining             | 🟢 Low      | 2h     |
-| 21  | Investigate RiskLevelType manual Viper processing           | 🟢 Low      | 2h     |
-| 22  | Add samber/do/v2 dependency injection                       | 🟢 Low      | 4h     |
-| 23  | Plugin architecture for cleaners                            | 🔵 Deferred | 8h+    |
-| 24  | Domain Model Enhancement (Validate, Sanitize, ApplyProfile) | 🟢 Medium   | 4h     |
-| 25  | Add progress indicators for long operations                 | 🟢 Low      | 2h     |
+| #  | Task                                                        | Priority    | Effort |
+| -- | ----------------------------------------------------------- | ----------- | ------ |
+| 18 | NodePackages enum refactor to domain                        | 🟢 Low      | 2h     |
+| 19 | BuildCache tools vs languages decision                      | 🟢 Low      | 1h     |
+| 20 | Result type enhancement for validation chaining             | 🟢 Low      | 2h     |
+| 21 | Investigate RiskLevelType manual Viper processing           | 🟢 Low      | 2h     |
+| 22 | Add samber/do/v2 dependency injection                       | 🟢 Low      | 4h     |
+| 23 | Plugin architecture for cleaners                            | 🔵 Deferred | 8h+    |
+| 24 | Domain Model Enhancement (Validate, Sanitize, ApplyProfile) | 🟢 Medium   | 4h     |
+| 25 | Add progress indicators for long operations                 | 🟢 Low      | 2h     |
 
 ---
 

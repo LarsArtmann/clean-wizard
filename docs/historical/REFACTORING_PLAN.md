@@ -65,7 +65,7 @@ func ValidateAndWrap[T Validator](item T, itemType string) result.Result[T] {
 #### 1.2 Create Config Loading Utility ⚡
 
 **Files**: `internal/shared/utils/config/`
-**Impact**: Eliminates 2 config loading duplicates  
+**Impact**: Eliminates 2 config loading duplicates\
 **Work**: 1 hour
 
 ```go

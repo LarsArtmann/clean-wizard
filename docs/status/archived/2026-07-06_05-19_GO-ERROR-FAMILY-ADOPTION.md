@@ -210,33 +210,33 @@ One thing to watch: the `init()` in `error_classification.go` registers a classi
 
 ## f) 25 Things We Should Get Done Next
 
-| #   | Task                                                                                    | Priority | Effort | Status        |
-| --- | --------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
-| 1   | Migrate `builder.go` `errors.Newf` → `errorfamily.NewRejection`                         | HIGH     | 5 min  | Ready         |
-| 2   | Add `ErrorFamily()` to `domain.ValidationError` → Rejection                             | HIGH     | 10 min | Ready         |
-| 3   | Use `errorfamily.ExitCode(err)` at CLI boundary (`main.go`)                             | HIGH     | 15 min | Ready         |
-| 4   | Add `errorfamily.LogError` at CLI boundary                                              | MEDIUM   | 15 min | Ready         |
-| 5   | Add `Code` field to `NotAvailableError` for per-cleaner codes                           | MEDIUM   | 30 min | Ready         |
-| 6   | Add `RetryProfile` type (Default/Aggressive/Conservative/None)                          | HIGH     | 1h     | Ready         |
-| 7   | Add `RetryBudget` for system-wide retry pressure                                        | MEDIUM   | 2h     | Ready         |
-| 8   | Register `*os.PathError` classifier for file operations                                 | MEDIUM   | 30 min | Ready         |
-| 9   | Wire `OperationSettings` from YAML config → cleaner constructors                        | HIGH     | 4h     | Not started   |
-| 10  | Implement `scan --profile` filtering                                                    | MEDIUM   | 2h     | Not started   |
-| 11  | Logger globals → DI-injected (root cause of test races)                                 | HIGH     | 4h     | Not started   |
-| 12  | Split `internal/domain/` god package (23 files)                                         | MEDIUM   | 8h     | Not started   |
-| 13  | Split `internal/cleaner/` flat structure (50+ files)                                    | MEDIUM   | 8h     | Not started   |
-| 14  | Register individual cleaners as DI providers (`do.Provide`)                             | MEDIUM   | 4h     | Not started   |
-| 15  | Make adapters interface-backed with `do.As`                                             | LOW      | 4h     | Not started   |
-| 16  | Add BDD tests for execution layer (Ginkgo)                                              | MEDIUM   | 4h     | Not started   |
-| 17  | Add BDD tests for remaining 9 cleaners without BDD coverage                             | MEDIUM   | 8h     | Not started   |
-| 18  | Add `errorfamily.RegisterTemplate` for user-facing messages                             | LOW      | 1h     | Ready         |
-| 19  | Consolidate `context.DeadlineExceeded` checks to use `errorfamily.Classify`             | LOW      | 30 min | Ready         |
-| 20  | Migrate remaining `fmt.Errorf("...: %w", err)` in commands to `errorfamily.Wrap*`       | LOW      | 1h     | Ready         |
-| 21  | Add `errorfamilytest.AssertFamily` assertions to execution tests                        | LOW      | 30 min | Ready         |
-| 22  | Wire `errorfamily.Family` into JSON output (`--json` flag)                              | LOW      | 1h     | Ready         |
-| 23  | Add `--retry-profile` flag (aggressive/conservative/none) to clean and scan             | MEDIUM   | 1h     | Depends on #6 |
-| 24  | Explore `errorfamily.HandleError` for structured CLI error output (What/Why/Fix/WayOut) | MEDIUM   | 2h     | Ready         |
-| 25  | Full code review of error handling consistency across all packages                      | LOW      | 2h     | Ready         |
+| #  | Task                                                                                    | Priority | Effort | Status        |
+| -- | --------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
+| 1  | Migrate `builder.go` `errors.Newf` → `errorfamily.NewRejection`                         | HIGH     | 5 min  | Ready         |
+| 2  | Add `ErrorFamily()` to `domain.ValidationError` → Rejection                             | HIGH     | 10 min | Ready         |
+| 3  | Use `errorfamily.ExitCode(err)` at CLI boundary (`main.go`)                             | HIGH     | 15 min | Ready         |
+| 4  | Add `errorfamily.LogError` at CLI boundary                                              | MEDIUM   | 15 min | Ready         |
+| 5  | Add `Code` field to `NotAvailableError` for per-cleaner codes                           | MEDIUM   | 30 min | Ready         |
+| 6  | Add `RetryProfile` type (Default/Aggressive/Conservative/None)                          | HIGH     | 1h     | Ready         |
+| 7  | Add `RetryBudget` for system-wide retry pressure                                        | MEDIUM   | 2h     | Ready         |
+| 8  | Register `*os.PathError` classifier for file operations                                 | MEDIUM   | 30 min | Ready         |
+| 9  | Wire `OperationSettings` from YAML config → cleaner constructors                        | HIGH     | 4h     | Not started   |
+| 10 | Implement `scan --profile` filtering                                                    | MEDIUM   | 2h     | Not started   |
+| 11 | Logger globals → DI-injected (root cause of test races)                                 | HIGH     | 4h     | Not started   |
+| 12 | Split `internal/domain/` god package (23 files)                                         | MEDIUM   | 8h     | Not started   |
+| 13 | Split `internal/cleaner/` flat structure (50+ files)                                    | MEDIUM   | 8h     | Not started   |
+| 14 | Register individual cleaners as DI providers (`do.Provide`)                             | MEDIUM   | 4h     | Not started   |
+| 15 | Make adapters interface-backed with `do.As`                                             | LOW      | 4h     | Not started   |
+| 16 | Add BDD tests for execution layer (Ginkgo)                                              | MEDIUM   | 4h     | Not started   |
+| 17 | Add BDD tests for remaining 9 cleaners without BDD coverage                             | MEDIUM   | 8h     | Not started   |
+| 18 | Add `errorfamily.RegisterTemplate` for user-facing messages                             | LOW      | 1h     | Ready         |
+| 19 | Consolidate `context.DeadlineExceeded` checks to use `errorfamily.Classify`             | LOW      | 30 min | Ready         |
+| 20 | Migrate remaining `fmt.Errorf("...: %w", err)` in commands to `errorfamily.Wrap*`       | LOW      | 1h     | Ready         |
+| 21 | Add `errorfamilytest.AssertFamily` assertions to execution tests                        | LOW      | 30 min | Ready         |
+| 22 | Wire `errorfamily.Family` into JSON output (`--json` flag)                              | LOW      | 1h     | Ready         |
+| 23 | Add `--retry-profile` flag (aggressive/conservative/none) to clean and scan             | MEDIUM   | 1h     | Depends on #6 |
+| 24 | Explore `errorfamily.HandleError` for structured CLI error output (What/Why/Fix/WayOut) | MEDIUM   | 2h     | Ready         |
+| 25 | Full code review of error handling consistency across all packages                      | LOW      | 2h     | Ready         |
 
 ---
 

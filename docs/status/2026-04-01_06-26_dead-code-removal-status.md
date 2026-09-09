@@ -1,7 +1,7 @@
 # Comprehensive Status Report — Branching-Flow Mixins Remediation
 
-**Date:** 2026-04-01 06:26  
-**Session:** Continuation of branching-flow analysis and dead code removal  
+**Date:** 2026-04-01 06:26\
+**Session:** Continuation of branching-flow analysis and dead code removal\
 **Origin:** User requested branching-flow mixins analysis, reflection on architecture, and multi-step execution plan
 
 ---
@@ -10,15 +10,15 @@
 
 ### Commits (7 ahead of origin/master)
 
-| #   | Commit    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                 | Lines |
-| --- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| 1   | `c275712` | **fix(lint)**: `.golangci.yml` wrapcheck config key `ignore-sig-globs` → `ignore-package-globs` (invalid key in v2.10.1)                                                                                                                                                                                                                                                                                                                    | ~2    |
-| 2   | `fc3575d` | **fix(git)**: `.gitignore` `clean-wizard` → `/clean-wizard` (was gitignoring `cmd/clean-wizard/commands/styles.go`). Added styles.go to tracking.                                                                                                                                                                                                                                                                                           | ~2    |
-| 3   | `bcf6a78` | **docs**: Branching-flow mixins analysis report (20 findings, 185 structs, score 99/100)                                                                                                                                                                                                                                                                                                                                                    | +180  |
-| 4   | `e017166` | **refactor(config)**: Deleted `type_safe_validation_rules.go` — `TypeSafeValidationRules`, `NumericValidationRule`, `StringValidationRule` all dead code with zero external references. Resolves findings #8, #9.                                                                                                                                                                                                                           | -158  |
-| 5   | `24f6d23` | **refactor(context)**: Removed `ValidationResult`, `ValidationError`, `ValidationWarning` + methods from `shared/context/validation_config.go`. Zero external consumers. Resolves findings #3, #4, #14–#18, #20.                                                                                                                                                                                                                            | -71   |
-| 6   | `f5ee3e9` | **refactor(domain)**: Deleted entire `config_methods.go` — `Sanitize`, `ApplyProfile`, `EstimateImpact` + their `*WithContext` variants, `SanitizeConfigResult`, `ApplyProfileResult`, `EstimateImpactResult`, `OperationImpactDetail`, `sanitizeString`, `sanitizePath`, `trimAllWhitespace` — ALL dead code (zero external consumers). Preserved `SanitizationWarning` in new `sanitization_types.go` (aliased by `config/sanitizer.go`). | -473  |
-| 7   | `fd113be` | **refactor(shared)**: Deleted entire `shared/context/` package (5 files) — `Context[T]`, `ErrorConfig`, `ValidationConfig`, all builders and tests. Zero imports remaining after step 6.                                                                                                                                                                                                                                                    | -1339 |
+| # | Commit    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                 | Lines |
+| - | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 1 | `c275712` | **fix(lint)**: `.golangci.yml` wrapcheck config key `ignore-sig-globs` → `ignore-package-globs` (invalid key in v2.10.1)                                                                                                                                                                                                                                                                                                                    | ~2    |
+| 2 | `fc3575d` | **fix(git)**: `.gitignore` `clean-wizard` → `/clean-wizard` (was gitignoring `cmd/clean-wizard/commands/styles.go`). Added styles.go to tracking.                                                                                                                                                                                                                                                                                           | ~2    |
+| 3 | `bcf6a78` | **docs**: Branching-flow mixins analysis report (20 findings, 185 structs, score 99/100)                                                                                                                                                                                                                                                                                                                                                    | +180  |
+| 4 | `e017166` | **refactor(config)**: Deleted `type_safe_validation_rules.go` — `TypeSafeValidationRules`, `NumericValidationRule`, `StringValidationRule` all dead code with zero external references. Resolves findings #8, #9.                                                                                                                                                                                                                           | -158  |
+| 5 | `24f6d23` | **refactor(context)**: Removed `ValidationResult`, `ValidationError`, `ValidationWarning` + methods from `shared/context/validation_config.go`. Zero external consumers. Resolves findings #3, #4, #14–#18, #20.                                                                                                                                                                                                                            | -71   |
+| 6 | `f5ee3e9` | **refactor(domain)**: Deleted entire `config_methods.go` — `Sanitize`, `ApplyProfile`, `EstimateImpact` + their `*WithContext` variants, `SanitizeConfigResult`, `ApplyProfileResult`, `EstimateImpactResult`, `OperationImpactDetail`, `sanitizeString`, `sanitizePath`, `trimAllWhitespace` — ALL dead code (zero external consumers). Preserved `SanitizationWarning` in new `sanitization_types.go` (aliased by `config/sanitizer.go`). | -473  |
+| 7 | `fd113be` | **refactor(shared)**: Deleted entire `shared/context/` package (5 files) — `Context[T]`, `ErrorConfig`, `ValidationConfig`, all builders and tests. Zero imports remaining after step 6.                                                                                                                                                                                                                                                    | -1339 |
 
 ### Aggregate Stats
 
@@ -101,53 +101,53 @@ Golangci-lint takes ~60s and the pre-commit hook has a 1m timeout. Multiple comm
 
 ### HIGH IMPACT, LOW EFFORT
 
-| #   | Task                                                                                                       | Why                      | Est.  |
-| --- | ---------------------------------------------------------------------------------------------------------- | ------------------------ | ----- |
-| 1   | Push these 7 commits to origin                                                                             | Uncommitted work at risk | 1min  |
-| 2   | Fix pre-commit hook golangci-lint timeout                                                                  | Blocks clean workflow    | 10min |
-| 3   | Run `branching-flow mixins .` again to verify improved score                                               | Validate our work        | 2min  |
-| 4   | Delete stale `docs/status/2026-04-01_05-30_COMPREHENSIVE_STATUS_REPORT.md` if it was from previous session | Cleanup                  | 1min  |
-| 5   | Remove dead `context` import alias across codebase (`stdctx "context"` → `"context"` where applicable)     | Code hygiene             | 5min  |
-| 6   | Add `//go:build ignore` or remove unused `docs/status/` drafts from previous sessions                      | Repo hygiene             | 5min  |
+| # | Task                                                                                                       | Why                      | Est.  |
+| - | ---------------------------------------------------------------------------------------------------------- | ------------------------ | ----- |
+| 1 | Push these 7 commits to origin                                                                             | Uncommitted work at risk | 1min  |
+| 2 | Fix pre-commit hook golangci-lint timeout                                                                  | Blocks clean workflow    | 10min |
+| 3 | Run `branching-flow mixins .` again to verify improved score                                               | Validate our work        | 2min  |
+| 4 | Delete stale `docs/status/2026-04-01_05-30_COMPREHENSIVE_STATUS_REPORT.md` if it was from previous session | Cleanup                  | 1min  |
+| 5 | Remove dead `context` import alias across codebase (`stdctx "context"` → `"context"` where applicable)     | Code hygiene             | 5min  |
+| 6 | Add `//go:build ignore` or remove unused `docs/status/` drafts from previous sessions                      | Repo hygiene             | 5min  |
 
 ### HIGH IMPACT, MEDIUM EFFORT
 
-| #   | Task                                                                                     | Why                             | Est.  |
-| --- | ---------------------------------------------------------------------------------------- | ------------------------------- | ----- |
-| 7   | File size reduction: 32 files exceed 350-line limit (flagged by BuildFlow)               | BuildFlow warns on every commit | 2hr   |
-| 8   | Refactor `cmd/clean-wizard/commands/clean.go` (658 lines, 88% over limit)                | Largest violation               | 30min |
-| 9   | Refactor `internal/cleaner/compiledbinaries_ginkgo_test.go` (902 lines, 158% over limit) | Worst offender                  | 30min |
-| 10  | Refactor `internal/cleaner/projectexecutables_ginkgo_test.go` (787 lines)                | Second worst                    | 30min |
-| 11  | Add integration tests that exercise cmd/ → config → domain flow                          | Prevents dead code recurrence   | 1hr   |
-| 12  | Fix gopls diagnostics: unused params in `profile.go`, `slices.Contains` in `mixins.go`   | Linter noise                    | 15min |
-| 13  | Fix `result/flow_builder.go` warnings: `exhaustruct`, `forcetypeassert`                  | Code quality                    | 15min |
+| #  | Task                                                                                     | Why                             | Est.  |
+| -- | ---------------------------------------------------------------------------------------- | ------------------------------- | ----- |
+| 7  | File size reduction: 32 files exceed 350-line limit (flagged by BuildFlow)               | BuildFlow warns on every commit | 2hr   |
+| 8  | Refactor `cmd/clean-wizard/commands/clean.go` (658 lines, 88% over limit)                | Largest violation               | 30min |
+| 9  | Refactor `internal/cleaner/compiledbinaries_ginkgo_test.go` (902 lines, 158% over limit) | Worst offender                  | 30min |
+| 10 | Refactor `internal/cleaner/projectexecutables_ginkgo_test.go` (787 lines)                | Second worst                    | 30min |
+| 11 | Add integration tests that exercise cmd/ → config → domain flow                          | Prevents dead code recurrence   | 1hr   |
+| 12 | Fix gopls diagnostics: unused params in `profile.go`, `slices.Contains` in `mixins.go`   | Linter noise                    | 15min |
+| 13 | Fix `result/flow_builder.go` warnings: `exhaustruct`, `forcetypeassert`                  | Code quality                    | 15min |
 
 ### MEDIUM IMPACT, LOW EFFORT
 
-| #   | Task                                                                                             | Why                     | Est.  |
-| --- | ------------------------------------------------------------------------------------------------ | ----------------------- | ----- |
-| 14  | Consolidate `config.ValidationWarning` into `domain` (extend alias pattern)                      | Finding #13 partial fix | 20min |
-| 15  | Extract `ResultBase` struct for `ConfigChangeResult`/`ValidationResult` shared fields            | Finding #10             | 20min |
-| 16  | Review `ErrorDetails` in `pkg/errors` vs `domain` — ensure single canonical location             | Defensive               | 15min |
-| 17  | Check if `SanitizationResult` in `config/sanitizer.go` can be simplified after dead code removal | Reduce surface area     | 15min |
-| 18  | Add `// Deprecated` comments or remove backward-compat aliases in `config/sanitizer.go`          | Code clarity            | 5min  |
+| #  | Task                                                                                             | Why                     | Est.  |
+| -- | ------------------------------------------------------------------------------------------------ | ----------------------- | ----- |
+| 14 | Consolidate `config.ValidationWarning` into `domain` (extend alias pattern)                      | Finding #13 partial fix | 20min |
+| 15 | Extract `ResultBase` struct for `ConfigChangeResult`/`ValidationResult` shared fields            | Finding #10             | 20min |
+| 16 | Review `ErrorDetails` in `pkg/errors` vs `domain` — ensure single canonical location             | Defensive               | 15min |
+| 17 | Check if `SanitizationResult` in `config/sanitizer.go` can be simplified after dead code removal | Reduce surface area     | 15min |
+| 18 | Add `// Deprecated` comments or remove backward-compat aliases in `config/sanitizer.go`          | Code clarity            | 5min  |
 
 ### MEDIUM IMPACT, MEDIUM EFFORT
 
-| #   | Task                                                                               | Why               | Est.  |
-| --- | ---------------------------------------------------------------------------------- | ----------------- | ----- |
-| 19  | Extract test config mixins (Finding #1) — only if test files grow                  | Test dedup        | 30min |
-| 20  | Review `PublicCleanResult` / `JSONOutput` — consider shared `OutputBase`           | Finding #6        | 20min |
-| 21  | Review `ScanDisplay` / `GitHistoryScanResult` overlap                              | Finding #11       | 20min |
-| 22  | Add golangci-lint `unparam` linter to catch unused params like those in profile.go | Prevention        | 10min |
-| 23  | Investigate `govalid` adoption (suggested by BuildFlow)                            | Struct validation | 30min |
+| #  | Task                                                                               | Why               | Est.  |
+| -- | ---------------------------------------------------------------------------------- | ----------------- | ----- |
+| 19 | Extract test config mixins (Finding #1) — only if test files grow                  | Test dedup        | 30min |
+| 20 | Review `PublicCleanResult` / `JSONOutput` — consider shared `OutputBase`           | Finding #6        | 20min |
+| 21 | Review `ScanDisplay` / `GitHistoryScanResult` overlap                              | Finding #11       | 20min |
+| 22 | Add golangci-lint `unparam` linter to catch unused params like those in profile.go | Prevention        | 10min |
+| 23 | Investigate `govalid` adoption (suggested by BuildFlow)                            | Struct validation | 30min |
 
 ### STRATEGIC
 
-| #   | Task                                                                              | Why                         | Est.  |
-| --- | --------------------------------------------------------------------------------- | --------------------------- | ----- |
-| 24  | Create architecture decision record (ADR) for validation type canonical locations | Prevents future duplication | 30min |
-| 25  | Set up CI pipeline with `branching-flow` as a quality gate                        | Automated detection         | 1hr   |
+| #  | Task                                                                              | Why                         | Est.  |
+| -- | --------------------------------------------------------------------------------- | --------------------------- | ----- |
+| 24 | Create architecture decision record (ADR) for validation type canonical locations | Prevents future duplication | 30min |
+| 25 | Set up CI pipeline with `branching-flow` as a quality gate                        | Automated detection         | 1hr   |
 
 ---
 

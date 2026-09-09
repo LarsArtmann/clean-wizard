@@ -1,8 +1,8 @@
 # Clean Wizard — Comprehensive Multi-Session Status Report
 
-**Date:** 2026-04-02 09:25  
-**Author:** Parakletos (Crush AI Agent)  
-**Context:** Meta-improvement task spanning 3+ interrupted sessions (2026-03-28 → 2026-04-02)  
+**Date:** 2026-04-02 09:25\
+**Author:** Parakletos (Crush AI Agent)\
+**Context:** Meta-improvement task spanning 3+ interrupted sessions (2026-03-28 → 2026-04-02)\
 **Original Request:** 6-part meta-improvement: reflect, plan, prioritize, reuse, improve types, leverage libs.
 
 ---
@@ -213,33 +213,33 @@ Over 29 commits across multiple sessions, significant architectural improvements
 
 ## F) TOP 25 THINGS TO DO NEXT (Priority Order)
 
-| #   | Task                                                                         | Impact  | Effort | File(s)                                                       |
-| --- | ---------------------------------------------------------------------------- | ------- | ------ | ------------------------------------------------------------- |
-| 1   | Fix BDD test timeout (mock NixAdapter)                                       | HIGH    | M      | `tests/bdd/nix_ginkgo_test.go`                                |
-| 2   | Fix `standard` vs `aggressive` mode                                          | HIGH    | S      | `clean.go:435-445`                                            |
-| 3   | Refactor `clean.go` under 350 lines                                          | HIGH    | L      | `cmd/clean-wizard/commands/clean.go`                          |
-| 4   | Investigate pre-commit hook not catching 350-line violations                 | HIGH    | S      | `.pre-commit-config.yaml` or `justfile`                       |
-| 5   | Complete CleanerBase migration (Docker, Node, Cargo, etc.)                   | MED     | M      | `internal/cleaner/*.go`                                       |
-| 6   | Consolidate enum methods using `enum_macros.go` generics                     | MED     | M      | `internal/domain/operation_settings.go`, `type_safe_enums.go` |
-| 7   | Fix 30 LSP unused parameter warnings                                         | MED     | S      | Various files                                                 |
-| 8   | Fix receiver consistency in `operation_settings.go`                          | MED     | S      | `internal/domain/operation_settings.go`                       |
-| 9   | Add `--yes` flag unit test                                                   | MED     | S      | New: `cmd/clean-wizard/commands/clean_test.go`                |
-| 10  | Update FEATURES.md with recent changes                                       | MED     | S      | `FEATURES.md`                                                 |
-| 11  | Adopt `samber/lo` for slice utilities                                        | LOW-MED | S      | Multiple files                                                |
-| 12  | Split `compiledbinaries.go` (584 lines) under 350                            | MED     | M      | `internal/cleaner/compiledbinaries.go`                        |
-| 13  | Split `type_safe_enums.go` (539 lines) under 350                             | MED     | M      | `internal/domain/type_safe_enums.go`                          |
-| 14  | Split `githistory.go` (525 lines) under 350                                  | MED     | M      | `internal/cleaner/githistory.go`                              |
-| 15  | Split `docker.go` (523 lines) under 350                                      | MED     | M      | `internal/cleaner/docker.go`                                  |
-| 16  | Split `nodepackages.go` (522 lines) under 350                                | MED     | M      | `internal/cleaner/nodepackages.go`                            |
-| 17  | Split `init.go` (492 lines) under 350                                        | LOW     | M      | `cmd/clean-wizard/commands/init.go`                           |
-| 18  | Split `systemcache.go` (443 lines) under 350                                 | LOW     | M      | `internal/cleaner/systemcache.go`                             |
-| 19  | Split `config.go` (400 lines) under 350                                      | LOW     | M      | `internal/config/config.go`                                   |
-| 20  | Split `conversions.go` (399 lines) under 350                                 | LOW     | M      | `internal/conversions/conversions.go`                         |
-| 21  | Implement actual scan/clean for new cache types (Puppeteer, Terraform, etc.) | MED     | L      | `internal/cleaner/systemcache.go`                             |
-| 22  | Consider `go:generate` for enum codegen                                      | LOW     | M      | Build system                                                  |
-| 23  | Remove dead `ProjectsManagementAutomation` cleaner (non-functional)          | LOW     | S      | `internal/cleaner/projectsmanagementautomation.go`            |
-| 24  | Push all commits to remote                                                   | LOW     | S      | `git push`                                                    |
-| 25  | Archive old status reports in `docs/status/` (100+ files)                    | LOW     | S      | `docs/status/`                                                |
+| #  | Task                                                                         | Impact  | Effort | File(s)                                                       |
+| -- | ---------------------------------------------------------------------------- | ------- | ------ | ------------------------------------------------------------- |
+| 1  | Fix BDD test timeout (mock NixAdapter)                                       | HIGH    | M      | `tests/bdd/nix_ginkgo_test.go`                                |
+| 2  | Fix `standard` vs `aggressive` mode                                          | HIGH    | S      | `clean.go:435-445`                                            |
+| 3  | Refactor `clean.go` under 350 lines                                          | HIGH    | L      | `cmd/clean-wizard/commands/clean.go`                          |
+| 4  | Investigate pre-commit hook not catching 350-line violations                 | HIGH    | S      | `.pre-commit-config.yaml` or `justfile`                       |
+| 5  | Complete CleanerBase migration (Docker, Node, Cargo, etc.)                   | MED     | M      | `internal/cleaner/*.go`                                       |
+| 6  | Consolidate enum methods using `enum_macros.go` generics                     | MED     | M      | `internal/domain/operation_settings.go`, `type_safe_enums.go` |
+| 7  | Fix 30 LSP unused parameter warnings                                         | MED     | S      | Various files                                                 |
+| 8  | Fix receiver consistency in `operation_settings.go`                          | MED     | S      | `internal/domain/operation_settings.go`                       |
+| 9  | Add `--yes` flag unit test                                                   | MED     | S      | New: `cmd/clean-wizard/commands/clean_test.go`                |
+| 10 | Update FEATURES.md with recent changes                                       | MED     | S      | `FEATURES.md`                                                 |
+| 11 | Adopt `samber/lo` for slice utilities                                        | LOW-MED | S      | Multiple files                                                |
+| 12 | Split `compiledbinaries.go` (584 lines) under 350                            | MED     | M      | `internal/cleaner/compiledbinaries.go`                        |
+| 13 | Split `type_safe_enums.go` (539 lines) under 350                             | MED     | M      | `internal/domain/type_safe_enums.go`                          |
+| 14 | Split `githistory.go` (525 lines) under 350                                  | MED     | M      | `internal/cleaner/githistory.go`                              |
+| 15 | Split `docker.go` (523 lines) under 350                                      | MED     | M      | `internal/cleaner/docker.go`                                  |
+| 16 | Split `nodepackages.go` (522 lines) under 350                                | MED     | M      | `internal/cleaner/nodepackages.go`                            |
+| 17 | Split `init.go` (492 lines) under 350                                        | LOW     | M      | `cmd/clean-wizard/commands/init.go`                           |
+| 18 | Split `systemcache.go` (443 lines) under 350                                 | LOW     | M      | `internal/cleaner/systemcache.go`                             |
+| 19 | Split `config.go` (400 lines) under 350                                      | LOW     | M      | `internal/config/config.go`                                   |
+| 20 | Split `conversions.go` (399 lines) under 350                                 | LOW     | M      | `internal/conversions/conversions.go`                         |
+| 21 | Implement actual scan/clean for new cache types (Puppeteer, Terraform, etc.) | MED     | L      | `internal/cleaner/systemcache.go`                             |
+| 22 | Consider `go:generate` for enum codegen                                      | LOW     | M      | Build system                                                  |
+| 23 | Remove dead `ProjectsManagementAutomation` cleaner (non-functional)          | LOW     | S      | `internal/cleaner/projectsmanagementautomation.go`            |
+| 24 | Push all commits to remote                                                   | LOW     | S      | `git push`                                                    |
+| 25 | Archive old status reports in `docs/status/` (100+ files)                    | LOW     | S      | `docs/status/`                                                |
 
 ---
 

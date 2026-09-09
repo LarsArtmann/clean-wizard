@@ -12,16 +12,16 @@ Clean Wizard is a **well-structured, functional application** that follows many 
 
 **Overall Compliance Score: 65/100**
 
-| Category           | Score | Status                          |
-| ------------------ | ----- | ------------------------------- |
-| Required Libraries | 40%   | ❌ Critical Gaps                |
-| Banned Libraries   | 33%   | ❌ Violations Found             |
+| Category           | Score | Status                         |
+| ------------------ | ----- | ------------------------------ |
+| Required Libraries | 40%   | ❌ Critical Gaps               |
+| Banned Libraries   | 33%   | ❌ Violations Found            |
 | File Size Limits   | 50%   | ⚠️ Multiple Violations          |
 | Type Safety        | 70%   | ⚠️ `any` Usage Present          |
 | Error Handling     | 50%   | ⚠️ Missing Recommended Patterns |
-| Architecture       | 85%   | ✅ Good                         |
-| Testing            | 80%   | ✅ Good                         |
-| CLI/Logging        | 95%   | ✅ Excellent                    |
+| Architecture       | 85%   | ✅ Good                        |
+| Testing            | 80%   | ✅ Good                        |
+| CLI/Logging        | 95%   | ✅ Excellent                   |
 
 ---
 
@@ -282,48 +282,48 @@ panic(fmt.Sprintf("failed to create TempFiles cleaner: %v", err))
 
 ### Immediate (Critical - Do Today)
 
-| #   | Task                                         | Impact   | Effort |
-| --- | -------------------------------------------- | -------- | ------ |
-| 1   | Replace viper with koanf                     | Critical | 4h     |
-| 2   | Replace go-cache with otter/v2               | Critical | 2h     |
-| 3   | Replace gopkg.in/yaml.v3 with go-faster/yaml | Critical | 2h     |
-| 4   | Fix panics in registry_factory.go            | Critical | 1h     |
+| # | Task                                         | Impact   | Effort |
+| - | -------------------------------------------- | -------- | ------ |
+| 1 | Replace viper with koanf                     | Critical | 4h     |
+| 2 | Replace go-cache with otter/v2               | Critical | 2h     |
+| 3 | Replace gopkg.in/yaml.v3 with go-faster/yaml | Critical | 2h     |
+| 4 | Fix panics in registry_factory.go            | Critical | 1h     |
 
 ### This Week (High Priority)
 
-| #   | Task                                     | Impact | Effort |
-| --- | ---------------------------------------- | ------ | ------ |
-| 5   | Split compiledbinaries.go (599 → ~200)   | High   | 3h     |
-| 6   | Split type_safe_enums.go (539 → ~200)    | High   | 2h     |
-| 7   | Split nodepackages.go (524 → ~200)       | High   | 2h     |
-| 8   | Split docker.go (524 → ~200)             | High   | 2h     |
-| 9   | Add cockroachdb/errors                   | High   | 2h     |
-| 10  | Migrate encoding/json → encoding/json/v2 | High   | 2h     |
+| #  | Task                                     | Impact | Effort |
+| -- | ---------------------------------------- | ------ | ------ |
+| 5  | Split compiledbinaries.go (599 → ~200)   | High   | 3h     |
+| 6  | Split type_safe_enums.go (539 → ~200)    | High   | 2h     |
+| 7  | Split nodepackages.go (524 → ~200)       | High   | 2h     |
+| 8  | Split docker.go (524 → ~200)             | High   | 2h     |
+| 9  | Add cockroachdb/errors                   | High   | 2h     |
+| 10 | Migrate encoding/json → encoding/json/v2 | High   | 2h     |
 
 ### This Month (Medium Priority)
 
-| #   | Task                                     | Impact | Effort |
-| --- | ---------------------------------------- | ------ | ------ |
-| 11  | Add go-composable-business-types         | High   | 4h     |
-| 12  | Implement branded IDs for all entity IDs | High   | 4h     |
-| 13  | Split remaining large files (6 files)    | Medium | 4h     |
-| 14  | Reduce `any` usage in validation code    | Medium | 3h     |
-| 15  | Add `just dogfood` command               | Medium | 2h     |
-| 16  | Add retry logic to external commands     | Medium | 3h     |
-| 17  | Add circuit breaker for Docker API       | Medium | 2h     |
-| 18  | Document error handling patterns         | Medium | 1h     |
-| 19  | Add OpenTelemetry spans                  | Medium | 4h     |
-| 20  | Create migration guide for deps          | Medium | 1h     |
+| #  | Task                                     | Impact | Effort |
+| -- | ---------------------------------------- | ------ | ------ |
+| 11 | Add go-composable-business-types         | High   | 4h     |
+| 12 | Implement branded IDs for all entity IDs | High   | 4h     |
+| 13 | Split remaining large files (6 files)    | Medium | 4h     |
+| 14 | Reduce `any` usage in validation code    | Medium | 3h     |
+| 15 | Add `just dogfood` command               | Medium | 2h     |
+| 16 | Add retry logic to external commands     | Medium | 3h     |
+| 17 | Add circuit breaker for Docker API       | Medium | 2h     |
+| 18 | Document error handling patterns         | Medium | 1h     |
+| 19 | Add OpenTelemetry spans                  | Medium | 4h     |
+| 20 | Create migration guide for deps          | Medium | 1h     |
 
 ### Backlog (Low Priority)
 
-| #   | Task                                 | Impact | Effort |
-| --- | ------------------------------------ | ------ | ------ |
-| 21  | Consider uniflow for pipelines       | Low    | 4h     |
-| 22  | Add rate limiting for concurrent ops | Low    | 2h     |
-| 23  | Implement hot-reload for config      | Low    | 3h     |
-| 24  | Add API documentation with Huma      | Low    | 4h     |
-| 25  | Add snapshot testing with cupaloy    | Low    | 2h     |
+| #  | Task                                 | Impact | Effort |
+| -- | ------------------------------------ | ------ | ------ |
+| 21 | Consider uniflow for pipelines       | Low    | 4h     |
+| 22 | Add rate limiting for concurrent ops | Low    | 2h     |
+| 23 | Implement hot-reload for config      | Low    | 3h     |
+| 24 | Add API documentation with Huma      | Low    | 4h     |
+| 25 | Add snapshot testing with cupaloy    | Low    | 2h     |
 
 ---
 

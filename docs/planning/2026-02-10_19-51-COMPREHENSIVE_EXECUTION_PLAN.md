@@ -1,8 +1,8 @@
 # Comprehensive Execution Plan for Clean-Wizard
 
-**Created:** 2026-02-10 19:51  
-**Version:** 1.0  
-**Author:** Crush (AI Engineering Partner)  
+**Created:** 2026-02-10 19:51\
+**Version:** 1.0\
+**Author:** Crush (AI Engineering Partner)\
 **Priority:** Pareto Analysis → Comprehensive Plan → Detailed Execution
 
 ---
@@ -115,55 +115,55 @@ The remaining tasks deliver the final 20% of value.
 
 ### Phase 1: Quick Wins (Tasks 1-5)
 
-| #   | Task                                                    | Max Time | Priority | Dependencies               |
-| --- | ------------------------------------------------------- | -------- | -------- | -------------------------- |
-| 1   | Fix test warnings: error_config_test.go:25,63           | 5 min    | CRITICAL | None                       |
-| 2   | Update error_constructors.go to use ErrorDetailsBuilder | 15 min   | CRITICAL | ErrorDetailsBuilder exists |
-| 3   | Add integration test for ErrorDetailsBuilder            | 20 min   | HIGH     | Task 2 complete            |
-| 4   | Convert CleanerConfig.Available bool → enum             | 15 min   | HIGH     | None                       |
-| 5   | Convert ConfigLoadOptions bool fields → enum            | 20 min   | HIGH     | None                       |
+| # | Task                                                    | Max Time | Priority | Dependencies               |
+| - | ------------------------------------------------------- | -------- | -------- | -------------------------- |
+| 1 | Fix test warnings: error_config_test.go:25,63           | 5 min    | CRITICAL | None                       |
+| 2 | Update error_constructors.go to use ErrorDetailsBuilder | 15 min   | CRITICAL | ErrorDetailsBuilder exists |
+| 3 | Add integration test for ErrorDetailsBuilder            | 20 min   | HIGH     | Task 2 complete            |
+| 4 | Convert CleanerConfig.Available bool → enum             | 15 min   | HIGH     | None                       |
+| 5 | Convert ConfigLoadOptions bool fields → enum            | 20 min   | HIGH     | None                       |
 
 ### Phase 2: Type Safety (Tasks 6-12)
 
-| #   | Task                                         | Max Time | Priority | Dependencies |
-| --- | -------------------------------------------- | -------- | -------- | ------------ |
-| 6   | Convert remaining boolean fields to enums    | 30 min   | HIGH     | Tasks 4-5    |
-| 7   | Add uint validation for counter fields       | 20 min   | MEDIUM   | None         |
-| 8   | Split clean.go (713→350 lines)               | 30 min   | CRITICAL | None         |
-| 9   | Split type_safe_enums.go (496→350 lines)     | 25 min   | HIGH     | None         |
-| 10  | Split config_methods.go (447→350 lines)      | 25 min   | HIGH     | None         |
-| 11  | Split enum_yaml_test.go (591→350 lines)      | 25 min   | MEDIUM   | None         |
-| 12  | Split enum_benchmark_test.go (642→350 lines) | 25 min   | MEDIUM   | None         |
+| #  | Task                                         | Max Time | Priority | Dependencies |
+| -- | -------------------------------------------- | -------- | -------- | ------------ |
+| 6  | Convert remaining boolean fields to enums    | 30 min   | HIGH     | Tasks 4-5    |
+| 7  | Add uint validation for counter fields       | 20 min   | MEDIUM   | None         |
+| 8  | Split clean.go (713→350 lines)               | 30 min   | CRITICAL | None         |
+| 9  | Split type_safe_enums.go (496→350 lines)     | 25 min   | HIGH     | None         |
+| 10 | Split config_methods.go (447→350 lines)      | 25 min   | HIGH     | None         |
+| 11 | Split enum_yaml_test.go (591→350 lines)      | 25 min   | MEDIUM   | None         |
+| 12 | Split enum_benchmark_test.go (642→350 lines) | 25 min   | MEDIUM   | None         |
 
 ### Phase 3: Error Handling (Tasks 13-18)
 
-| #   | Task                                      | Max Time | Priority | Dependencies |
-| --- | ----------------------------------------- | -------- | -------- | ------------ |
-| 13  | Document error handling strategy          | 15 min   | MEDIUM   | None         |
-| 14  | Create comprehensive error classification | 30 min   | MEDIUM   | None         |
-| 15  | Add error metrics collection              | 25 min   | MEDIUM   | None         |
-| 16  | Implement advanced error patterns         | 30 min   | MEDIUM   | Tasks 13-15  |
-| 17  | Consolidate error handling utilities      | 30 min   | HIGH     | Tasks 13-16  |
-| 18  | Review CacheType enum for consistency     | 15 min   | MEDIUM   | None         |
+| #  | Task                                      | Max Time | Priority | Dependencies |
+| -- | ----------------------------------------- | -------- | -------- | ------------ |
+| 13 | Document error handling strategy          | 15 min   | MEDIUM   | None         |
+| 14 | Create comprehensive error classification | 30 min   | MEDIUM   | None         |
+| 15 | Add error metrics collection              | 25 min   | MEDIUM   | None         |
+| 16 | Implement advanced error patterns         | 30 min   | MEDIUM   | Tasks 13-15  |
+| 17 | Consolidate error handling utilities      | 30 min   | HIGH     | Tasks 13-16  |
+| 18 | Review CacheType enum for consistency     | 15 min   | MEDIUM   | None         |
 
 ### Phase 4: Testing & Quality (Tasks 19-23)
 
-| #   | Task                                   | Max Time | Priority | Dependencies |
-| --- | -------------------------------------- | -------- | -------- | ------------ |
-| 19  | Consolidate BDD test helpers           | 25 min   | MEDIUM   | None         |
-| 20  | Add comprehensive BDD assertions       | 25 min   | MEDIUM   | None         |
-| 21  | Create validation middleware patterns  | 25 min   | MEDIUM   | None         |
-| 22  | Add edge case tests for error handling | 20 min   | MEDIUM   | None         |
-| 23  | Final test verification                | 30 min   | CRITICAL | All tasks    |
+| #  | Task                                   | Max Time | Priority | Dependencies |
+| -- | -------------------------------------- | -------- | -------- | ------------ |
+| 19 | Consolidate BDD test helpers           | 25 min   | MEDIUM   | None         |
+| 20 | Add comprehensive BDD assertions       | 25 min   | MEDIUM   | None         |
+| 21 | Create validation middleware patterns  | 25 min   | MEDIUM   | None         |
+| 22 | Add edge case tests for error handling | 20 min   | MEDIUM   | None         |
+| 23 | Final test verification                | 30 min   | CRITICAL | All tasks    |
 
 ### Phase 5: Documentation & Cleanup (Tasks 24-27)
 
-| #   | Task                                            | Max Time | Priority | Dependencies       |
-| --- | ----------------------------------------------- | -------- | -------- | ------------------ |
-| 24  | Update PLAN.md with completed items             | 10 min   | LOW      | All tasks          |
-| 25  | Update all planning documentation               | 20 min   | LOW      | Task 24            |
-| 26  | Create comprehensive architecture documentation | 30 min   | MEDIUM   | All tasks          |
-| 27  | Final git cleanup and push                      | 15 min   | CRITICAL | All tasks complete |
+| #  | Task                                            | Max Time | Priority | Dependencies       |
+| -- | ----------------------------------------------- | -------- | -------- | ------------------ |
+| 24 | Update PLAN.md with completed items             | 10 min   | LOW      | All tasks          |
+| 25 | Update all planning documentation               | 20 min   | LOW      | Task 24            |
+| 26 | Create comprehensive architecture documentation | 30 min   | MEDIUM   | All tasks          |
+| 27 | Final git cleanup and push                      | 15 min   | CRITICAL | All tasks complete |
 
 ---
 
@@ -173,137 +173,137 @@ The remaining tasks deliver the final 20% of value.
 
 #### A1: Boolean to Enum Conversions (Tasks 1-15)
 
-| #   | File                        | Field              | Current Type | Target Type         | Effort | Status  |
-| --- | --------------------------- | ------------------ | ------------ | ------------------- | ------ | ------- |
-| 1   | clean.go:73                 | Available          | bool         | CleanerAvailability | 5 min  | PENDING |
-| 2   | enhanced_loader_types.go:21 | ForceRefresh       | bool         | RefreshOption       | 5 min  | PENDING |
-| 3   | enhanced_loader_types.go:22 | EnableCache        | bool         | CacheOption         | 5 min  | PENDING |
-| 4   | enhanced_loader_types.go:34 | ForceSave          | bool         | SaveOption          | 5 min  | PENDING |
-| 5   | enhanced_loader_types.go:30 | EnableSanitization | bool         | SanitizeOption      | 5 min  | PENDING |
-| 6   | error_config.go:97          | ClampValues        | bool         | ClampOption         | 5 min  | PENDING |
-| 7   | error_config.go:95          | TrimWhitespace     | bool         | TrimOption          | 5 min  | PENDING |
-| 8   | error_config.go:96          | NormalizeCase      | bool         | CaseOption          | 5 min  | PENDING |
-| 9   | validator_rules.go:38       | Required           | bool         | RequiredOption      | 5 min  | PENDING |
-| 10  | validator_rules.go:29       | RequireSafeMode    | bool         | SafeModeOption      | 5 min  | PENDING |
-| 11  | sanitizer.go:22             | ValidateExists     | bool         | ValidateOption      | 5 min  | PENDING |
-| 12  | sanitizer.go:21             | ExpandHomeDir      | bool         | ExpandOption        | 5 min  | PENDING |
-| 13  | golang_cleaner.go:33        | Verbose            | bool         | VerboseOption       | 5 min  | PENDING |
-| 14  | golang_cleaner.go:34        | DryRun             | bool         | DryRunOption        | 5 min  | PENDING |
-| 15  | fsutil.go:78                | Found              | bool         | FoundOption         | 5 min  | PENDING |
+| #  | File                        | Field              | Current Type | Target Type         | Effort | Status  |
+| -- | --------------------------- | ------------------ | ------------ | ------------------- | ------ | ------- |
+| 1  | clean.go:73                 | Available          | bool         | CleanerAvailability | 5 min  | PENDING |
+| 2  | enhanced_loader_types.go:21 | ForceRefresh       | bool         | RefreshOption       | 5 min  | PENDING |
+| 3  | enhanced_loader_types.go:22 | EnableCache        | bool         | CacheOption         | 5 min  | PENDING |
+| 4  | enhanced_loader_types.go:34 | ForceSave          | bool         | SaveOption          | 5 min  | PENDING |
+| 5  | enhanced_loader_types.go:30 | EnableSanitization | bool         | SanitizeOption      | 5 min  | PENDING |
+| 6  | error_config.go:97          | ClampValues        | bool         | ClampOption         | 5 min  | PENDING |
+| 7  | error_config.go:95          | TrimWhitespace     | bool         | TrimOption          | 5 min  | PENDING |
+| 8  | error_config.go:96          | NormalizeCase      | bool         | CaseOption          | 5 min  | PENDING |
+| 9  | validator_rules.go:38       | Required           | bool         | RequiredOption      | 5 min  | PENDING |
+| 10 | validator_rules.go:29       | RequireSafeMode    | bool         | SafeModeOption      | 5 min  | PENDING |
+| 11 | sanitizer.go:22             | ValidateExists     | bool         | ValidateOption      | 5 min  | PENDING |
+| 12 | sanitizer.go:21             | ExpandHomeDir      | bool         | ExpandOption        | 5 min  | PENDING |
+| 13 | golang_cleaner.go:33        | Verbose            | bool         | VerboseOption       | 5 min  | PENDING |
+| 14 | golang_cleaner.go:34        | DryRun             | bool         | DryRunOption        | 5 min  | PENDING |
+| 15 | fsutil.go:78                | Found              | bool         | FoundOption         | 5 min  | PENDING |
 
 #### A2: Uint Validation (Tasks 16-25)
 
-| #   | File            | Field        | Location     | Validation Needed  | Effort | Status  |
-| --- | --------------- | ------------ | ------------ | ------------------ | ------ | ------- |
-| 16  | clean.go        | ItemsRemoved | CleanResult  | Min(0), Max bounds | 5 min  | PENDING |
-| 17  | clean.go        | ItemsFailed  | CleanResult  | Min(0), Max bounds | 5 min  | PENDING |
-| 18  | scan.go         | ItemsFound   | ScanResult   | Min(0), Max bounds | 5 min  | PENDING |
-| 19  | api/types.go    | ItemsRemoved | CleanResult  | Min(0), Max bounds | 5 min  | PENDING |
-| 20  | api/types.go    | ItemsFailed  | CleanResult  | Min(0), Max bounds | 5 min  | PENDING |
-| 21  | format/json.go  | BytesFreed   | SizeResult   | Min(0), Max bounds | 5 min  | PENDING |
-| 22  | format/json.go  | ItemsRemoved | CountResult  | Min(0), Max bounds | 5 min  | PENDING |
-| 23  | nodepackages.go | CacheSize    | PackageCache | Min(0), Max bounds | 5 min  | PENDING |
-| 24  | systemcache.go  | CacheSize    | SystemCache  | Min(0), Max bounds | 5 min  | PENDING |
-| 25  | buildcache.go   | BuildSize    | BuildCache   | Min(0), Max bounds | 5 min  | PENDING |
+| #  | File            | Field        | Location     | Validation Needed  | Effort | Status  |
+| -- | --------------- | ------------ | ------------ | ------------------ | ------ | ------- |
+| 16 | clean.go        | ItemsRemoved | CleanResult  | Min(0), Max bounds | 5 min  | PENDING |
+| 17 | clean.go        | ItemsFailed  | CleanResult  | Min(0), Max bounds | 5 min  | PENDING |
+| 18 | scan.go         | ItemsFound   | ScanResult   | Min(0), Max bounds | 5 min  | PENDING |
+| 19 | api/types.go    | ItemsRemoved | CleanResult  | Min(0), Max bounds | 5 min  | PENDING |
+| 20 | api/types.go    | ItemsFailed  | CleanResult  | Min(0), Max bounds | 5 min  | PENDING |
+| 21 | format/json.go  | BytesFreed   | SizeResult   | Min(0), Max bounds | 5 min  | PENDING |
+| 22 | format/json.go  | ItemsRemoved | CountResult  | Min(0), Max bounds | 5 min  | PENDING |
+| 23 | nodepackages.go | CacheSize    | PackageCache | Min(0), Max bounds | 5 min  | PENDING |
+| 24 | systemcache.go  | CacheSize    | SystemCache  | Min(0), Max bounds | 5 min  | PENDING |
+| 25 | buildcache.go   | BuildSize    | BuildCache   | Min(0), Max bounds | 5 min  | PENDING |
 
 #### A3: File Size Refactoring (Tasks 26-40)
 
-| #   | File                               | Current Lines | Target Lines | Split Strategy                                | Effort | Status  |
-| --- | ---------------------------------- | ------------- | ------------ | --------------------------------------------- | ------ | ------- |
-| 26  | clean.go                           | 713           | 350          | Extract: command logic, validation, execution | 30 min | PENDING |
-| 27  | enum_benchmark_test.go             | 642           | 350          | Extract: specific benchmark categories        | 25 min | PENDING |
-| 28  | enum_yaml_test.go                  | 591           | 350          | Extract: format tests by enum type            | 25 min | PENDING |
-| 29  | type_safe_enums.go                 | 496           | 350          | Extract: methods to interfaces.go             | 25 min | PENDING |
-| 30  | config_methods.go                  | 447           | 350          | Extract: to domain/operations/                | 25 min | PENDING |
-| 31  | operation_settings.go              | 413           | 350          | Extract: validation to separate file          | 20 min | PENDING |
-| 32  | detail_helpers_test.go             | 395           | 350          | Extract: builder tests to separate file       | 20 min | PENDING |
-| 33  | nix_bdd_test.go                    | 393           | 350          | Extract: helper functions                     | 20 min | PENDING |
-| 34  | configuration_workflow_bdd_test.go | 383           | 350          | Extract: step definitions                     | 20 min | PENDING |
-| 35  | execution_enums.go                 | 377           | 350          | Extract: execution logic                      | 15 min | PENDING |
-| 36  | conversions_test.go                | 370           | 350          | Extract: conversion categories                | 15 min | PENDING |
-| 37  | validation_types_test.go           | 365           | 350          | Extract: validation scenarios                 | 15 min | PENDING |
-| 38  | buildcache_test.go                 | 361           | 350          | Extract: test utilities                       | 15 min | PENDING |
-| 39  | nodepackages.go                    | 329           | <350         | Minimal changes needed                        | 10 min | PENDING |
-| 40  | systemcache.go                     | 323           | <350         | Minimal changes needed                        | 10 min | PENDING |
+| #  | File                               | Current Lines | Target Lines | Split Strategy                                | Effort | Status  |
+| -- | ---------------------------------- | ------------- | ------------ | --------------------------------------------- | ------ | ------- |
+| 26 | clean.go                           | 713           | 350          | Extract: command logic, validation, execution | 30 min | PENDING |
+| 27 | enum_benchmark_test.go             | 642           | 350          | Extract: specific benchmark categories        | 25 min | PENDING |
+| 28 | enum_yaml_test.go                  | 591           | 350          | Extract: format tests by enum type            | 25 min | PENDING |
+| 29 | type_safe_enums.go                 | 496           | 350          | Extract: methods to interfaces.go             | 25 min | PENDING |
+| 30 | config_methods.go                  | 447           | 350          | Extract: to domain/operations/                | 25 min | PENDING |
+| 31 | operation_settings.go              | 413           | 350          | Extract: validation to separate file          | 20 min | PENDING |
+| 32 | detail_helpers_test.go             | 395           | 350          | Extract: builder tests to separate file       | 20 min | PENDING |
+| 33 | nix_bdd_test.go                    | 393           | 350          | Extract: helper functions                     | 20 min | PENDING |
+| 34 | configuration_workflow_bdd_test.go | 383           | 350          | Extract: step definitions                     | 20 min | PENDING |
+| 35 | execution_enums.go                 | 377           | 350          | Extract: execution logic                      | 15 min | PENDING |
+| 36 | conversions_test.go                | 370           | 350          | Extract: conversion categories                | 15 min | PENDING |
+| 37 | validation_types_test.go           | 365           | 350          | Extract: validation scenarios                 | 15 min | PENDING |
+| 38 | buildcache_test.go                 | 361           | 350          | Extract: test utilities                       | 15 min | PENDING |
+| 39 | nodepackages.go                    | 329           | <350         | Minimal changes needed                        | 10 min | PENDING |
+| 40 | systemcache.go                     | 323           | <350         | Minimal changes needed                        | 10 min | PENDING |
 
 ### Section B: Error Handling (Tasks 41-80)
 
 #### B1: Error Constructor Updates (Tasks 41-50)
 
-| #   | File                  | Function            | Update Needed           | Effort | Status  |
-| --- | --------------------- | ------------------- | ----------------------- | ------ | ------- |
-| 41  | error_constructors.go | NewCleanWizardError | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 42  | error_constructors.go | NewValidationError  | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 43  | error_constructors.go | NewConfigError      | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 44  | error_constructors.go | NewExecutionError   | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 45  | error_constructors.go | NewTimeoutError     | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 46  | error_constructors.go | NewPermissionError  | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 47  | error_constructors.go | NewNotFoundError    | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 48  | error_constructors.go | NewConflictError    | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 49  | error_constructors.go | NewInternalError    | Use ErrorDetailsBuilder | 10 min | PENDING |
-| 50  | error_constructors.go | WrapError           | Use ErrorDetailsBuilder | 10 min | PENDING |
+| #  | File                  | Function            | Update Needed           | Effort | Status  |
+| -- | --------------------- | ------------------- | ----------------------- | ------ | ------- |
+| 41 | error_constructors.go | NewCleanWizardError | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 42 | error_constructors.go | NewValidationError  | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 43 | error_constructors.go | NewConfigError      | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 44 | error_constructors.go | NewExecutionError   | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 45 | error_constructors.go | NewTimeoutError     | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 46 | error_constructors.go | NewPermissionError  | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 47 | error_constructors.go | NewNotFoundError    | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 48 | error_constructors.go | NewConflictError    | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 49 | error_constructors.go | NewInternalError    | Use ErrorDetailsBuilder | 10 min | PENDING |
+| 50 | error_constructors.go | WrapError           | Use ErrorDetailsBuilder | 10 min | PENDING |
 
 #### B2: Error Classification (Tasks 51-60)
 
-| #   | Task                           | Description                           | Effort | Status  |
-| --- | ------------------------------ | ------------------------------------- | ------ | ------- |
-| 51  | Categorize all errors          | Create hierarchical error code system | 15 min | PENDING |
-| 52  | Document error codes           | Add comprehensive godoc               | 15 min | PENDING |
-| 53  | Add error severity levels      | Implement severity enum               | 15 min | PENDING |
-| 54  | Create error recovery patterns | Add recovery suggestions              | 15 min | PENDING |
-| 55  | Add error metrics collection   | Track error frequency                 | 15 min | PENDING |
-| 56  | Implement error chaining       | Proper error wrapping                 | 15 min | PENDING |
-| 57  | Add error context preservation | Maintain context through calls        | 15 min | PENDING |
-| 58  | Create error logging patterns  | Structured logging                    | 15 min | PENDING |
-| 59  | Add error translation          | User-friendly messages                | 15 min | PENDING |
-| 60  | Implement error auditing       | Track error resolution                | 15 min | PENDING |
+| #  | Task                           | Description                           | Effort | Status  |
+| -- | ------------------------------ | ------------------------------------- | ------ | ------- |
+| 51 | Categorize all errors          | Create hierarchical error code system | 15 min | PENDING |
+| 52 | Document error codes           | Add comprehensive godoc               | 15 min | PENDING |
+| 53 | Add error severity levels      | Implement severity enum               | 15 min | PENDING |
+| 54 | Create error recovery patterns | Add recovery suggestions              | 15 min | PENDING |
+| 55 | Add error metrics collection   | Track error frequency                 | 15 min | PENDING |
+| 56 | Implement error chaining       | Proper error wrapping                 | 15 min | PENDING |
+| 57 | Add error context preservation | Maintain context through calls        | 15 min | PENDING |
+| 58 | Create error logging patterns  | Structured logging                    | 15 min | PENDING |
+| 59 | Add error translation          | User-friendly messages                | 15 min | PENDING |
+| 60 | Implement error auditing       | Track error resolution                | 15 min | PENDING |
 
 #### B3: Error Strategy Documentation (Tasks 61-70)
 
-| #   | Task                              | Description                                    | Effort | Status  |
-| --- | --------------------------------- | ---------------------------------------------- | ------ | ------- |
-| 61  | Document error strategy           | When to use CleanWizardError vs standard error | 10 min | PENDING |
-| 62  | Document Result type usage        | When to use Result[T,E]                        | 10 min | PENDING |
-| 63  | Create error patterns guide       | Best practices for error handling              | 15 min | PENDING |
-| 64  | Add error examples                | Common error scenarios                         | 15 min | PENDING |
-| 65  | Document error testing            | How to test error paths                        | 15 min | PENDING |
-| 66  | Create error migration guide      | Converting existing errors                     | 15 min | PENDING |
-| 67  | Add error monitoring integration  | Metrics and alerts                             | 15 min | PENDING |
-| 68  | Implement error rollback patterns | Automatic recovery                             | 15 min | PENDING |
-| 69  | Add error retry logic             | Exponential backoff                            | 15 min | PENDING |
-| 70  | Document error performance        | Performance implications                       | 10 min | PENDING |
+| #  | Task                              | Description                                    | Effort | Status  |
+| -- | --------------------------------- | ---------------------------------------------- | ------ | ------- |
+| 61 | Document error strategy           | When to use CleanWizardError vs standard error | 10 min | PENDING |
+| 62 | Document Result type usage        | When to use Result[T,E]                        | 10 min | PENDING |
+| 63 | Create error patterns guide       | Best practices for error handling              | 15 min | PENDING |
+| 64 | Add error examples                | Common error scenarios                         | 15 min | PENDING |
+| 65 | Document error testing            | How to test error paths                        | 15 min | PENDING |
+| 66 | Create error migration guide      | Converting existing errors                     | 15 min | PENDING |
+| 67 | Add error monitoring integration  | Metrics and alerts                             | 15 min | PENDING |
+| 68 | Implement error rollback patterns | Automatic recovery                             | 15 min | PENDING |
+| 69 | Add error retry logic             | Exponential backoff                            | 15 min | PENDING |
+| 70 | Document error performance        | Performance implications                       | 10 min | PENDING |
 
 #### B4: Error Testing (Tasks 71-80)
 
-| #   | Task                        | Description                | Effort | Status  |
-| --- | --------------------------- | -------------------------- | ------ | ------- |
-| 71  | Add error constructor tests | Verify all error types     | 15 min | PENDING |
-| 72  | Add error builder tests     | Test ErrorDetailsBuilder   | 15 min | PENDING |
-| 73  | Add error wrapping tests    | Verify error chaining      | 15 min | PENDING |
-| 74  | Add error context tests     | Test context preservation  | 15 min | PENDING |
-| 75  | Add error metrics tests     | Verify metrics collection  | 15 min | PENDING |
-| 76  | Add error recovery tests    | Test recovery patterns     | 15 min | PENDING |
-| 77  | Add error retry tests       | Verify retry logic         | 15 min | PENDING |
-| 78  | Add error edge case tests   | Boundary conditions        | 15 min | PENDING |
-| 79  | Add error performance tests | Benchmark error handling   | 15 min | PENDING |
-| 80  | Add integration error tests | End-to-end error scenarios | 15 min | PENDING |
+| #  | Task                        | Description                | Effort | Status  |
+| -- | --------------------------- | -------------------------- | ------ | ------- |
+| 71 | Add error constructor tests | Verify all error types     | 15 min | PENDING |
+| 72 | Add error builder tests     | Test ErrorDetailsBuilder   | 15 min | PENDING |
+| 73 | Add error wrapping tests    | Verify error chaining      | 15 min | PENDING |
+| 74 | Add error context tests     | Test context preservation  | 15 min | PENDING |
+| 75 | Add error metrics tests     | Verify metrics collection  | 15 min | PENDING |
+| 76 | Add error recovery tests    | Test recovery patterns     | 15 min | PENDING |
+| 77 | Add error retry tests       | Verify retry logic         | 15 min | PENDING |
+| 78 | Add error edge case tests   | Boundary conditions        | 15 min | PENDING |
+| 79 | Add error performance tests | Benchmark error handling   | 15 min | PENDING |
+| 80 | Add integration error tests | End-to-end error scenarios | 15 min | PENDING |
 
 ### Section C: Testing & Quality (Tasks 81-120)
 
 #### C1: BDD Test Improvements (Tasks 81-90)
 
-| #   | Task                        | Description                                | Effort | Status  |
-| --- | --------------------------- | ------------------------------------------ | ------ | ------- |
-| 81  | Consolidate BDD helpers     | Extract common helpers to internal/testing | 20 min | PENDING |
-| 82  | Add BDD assertion library   | Create nix assertions                      | 20 min | PENDING |
-| 83  | Add BDD step definitions    | Standardize steps                          | 20 min | PENDING |
-| 84  | Add BDD test templates      | Reusable test patterns                     | 15 min | PENDING |
-| 85  | Document BDD patterns       | How to write BDD tests                     | 15 min | PENDING |
-| 86  | Add BDD test examples       | Sample scenarios                           | 15 min | PENDING |
-| 87  | Implement BDD coverage      | Track scenario coverage                    | 15 min | PENDING |
-| 88  | Add BDD reporting           | Structured output                          | 15 min | PENDING |
-| 89  | Create BDD CI integration   | Automated BDD runs                         | 15 min | PENDING |
-| 90  | Document BDD best practices | Style guide                                | 15 min | PENDING |
+| #  | Task                        | Description                                | Effort | Status  |
+| -- | --------------------------- | ------------------------------------------ | ------ | ------- |
+| 81 | Consolidate BDD helpers     | Extract common helpers to internal/testing | 20 min | PENDING |
+| 82 | Add BDD assertion library   | Create nix assertions                      | 20 min | PENDING |
+| 83 | Add BDD step definitions    | Standardize steps                          | 20 min | PENDING |
+| 84 | Add BDD test templates      | Reusable test patterns                     | 15 min | PENDING |
+| 85 | Document BDD patterns       | How to write BDD tests                     | 15 min | PENDING |
+| 86 | Add BDD test examples       | Sample scenarios                           | 15 min | PENDING |
+| 87 | Implement BDD coverage      | Track scenario coverage                    | 15 min | PENDING |
+| 88 | Add BDD reporting           | Structured output                          | 15 min | PENDING |
+| 89 | Create BDD CI integration   | Automated BDD runs                         | 15 min | PENDING |
+| 90 | Document BDD best practices | Style guide                                | 15 min | PENDING |
 
 #### C2: Unit Test Improvements (Tasks 91-100)
 
@@ -570,11 +570,11 @@ graph TD
 
 ---
 
-**Total Estimated Time:** ~7 hours  
-**Total Tasks:** 27 (comprehensive) / 150 (detailed)  
+**Total Estimated Time:** ~7 hours\
+**Total Tasks:** 27 (comprehensive) / 150 (detailed)\
 **Status:** Ready for execution
 
 ---
 
-_Generated with Crush - AI Engineering Partner_  
+_Generated with Crush - AI Engineering Partner_\
 _Assisted-by: MiniMax M2.1 via Crush <crush@charm.land>_

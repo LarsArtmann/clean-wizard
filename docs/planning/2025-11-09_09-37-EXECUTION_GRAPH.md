@@ -1,7 +1,7 @@
 # 🚀 EXECUTION GRAPH - Clean Wizard Comprehensive Plan
 
-**Date:** 2025-11-09  
-**Session:** MERMAID EXECUTION GRAPH  
+**Date:** 2025-11-09\
+**Session:** MERMAID EXECUTION GRAPH\
 **Scope:** All GitHub Issues + Internal TODOs
 
 ---

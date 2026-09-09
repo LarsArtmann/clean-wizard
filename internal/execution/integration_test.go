@@ -257,6 +257,7 @@ type delayedMockCleaner struct {
 
 func (d *delayedMockCleaner) Name() string               { return d.name }
 func (d *delayedMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+
 func (d *delayedMockCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	time.Sleep(d.delay)
 
@@ -276,6 +277,7 @@ type retryableMockCleaner struct {
 
 func (r *retryableMockCleaner) Name() string               { return r.name }
 func (r *retryableMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+
 func (r *retryableMockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {
 	attempt := r.attempts.Add(1)
 	if attempt <= r.failCount {
@@ -304,6 +306,7 @@ type countingMockCleaner struct {
 
 func (c *countingMockCleaner) Name() string               { return c.name }
 func (c *countingMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+
 func (c *countingMockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {
 	attempt := c.attempts.Add(1)
 	if c.err != nil {

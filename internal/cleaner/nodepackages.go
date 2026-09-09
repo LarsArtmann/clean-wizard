@@ -95,7 +95,7 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 			packageManagerStrings := PackageManagerTypeToLowerSlice(np.PackageManagers)
 			validPackageManagersMap := map[string]bool{
 				"npm":  true, //nolint:goconst
-				"pnpm": true, //nolint:goconst
+				"pnpm": true,
 				"yarn": true, //nolint:goconst
 				"bun":  true, //nolint:goconst
 			}

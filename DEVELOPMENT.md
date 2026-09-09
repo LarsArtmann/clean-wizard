@@ -164,9 +164,9 @@ Default config location: `~/.clean-wizard.yaml`
 ```yaml
 version: "1.0.0"
 safe_mode: truemax_disk_usage_percent: 50
-protected:
-  - /System
-  - /Library
+  protected:
+    - /System
+    - /Library
 ```
 
 ## Dependencies

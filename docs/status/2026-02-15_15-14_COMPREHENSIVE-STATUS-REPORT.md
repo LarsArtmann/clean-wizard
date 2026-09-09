@@ -1,8 +1,8 @@
 # Clean-Wizard: Comprehensive Status Report
 
-**Generated:** 2026-02-15 15:14:52 CET  
-**Git Branch:** master (1 commit ahead of origin)  
-**Build Status:** ❌ BROKEN  
+**Generated:** 2026-02-15 15:14:52 CET\
+**Git Branch:** master (1 commit ahead of origin)\
+**Build Status:** ❌ BROKEN\
 **Go Files:** 168 | **Cleaner LOC:** 10,542
 
 ---
@@ -158,48 +158,48 @@ internal/cleaner/nodepackages.go:538:1: syntax error: non-declaration statement 
 
 ### Immediate (Do First!)
 
-| #   | Task                                                       | Blocker? | Effort |
-| --- | ---------------------------------------------------------- | -------- | ------ |
-| 1   | **FIX nodepackages.go syntax errors** (remove 5 extra `}`) | YES      | 2 min  |
-| 2   | Run `go build ./...` to verify fix                         | YES      | 1 min  |
-| 3   | Commit conversions changes                                 | NO       | 2 min  |
-| 4   | Push to origin                                             | NO       | 1 min  |
+| # | Task                                                       | Blocker? | Effort |
+| - | ---------------------------------------------------------- | -------- | ------ |
+| 1 | **FIX nodepackages.go syntax errors** (remove 5 extra `}`) | YES      | 2 min  |
+| 2 | Run `go build ./...` to verify fix                         | YES      | 1 min  |
+| 3 | Commit conversions changes                                 | NO       | 2 min  |
+| 4 | Push to origin                                             | NO       | 1 min  |
 
 ### High Priority (This Session)
 
-| #   | Task                                                     | Impact | Effort |
-| --- | -------------------------------------------------------- | ------ | ------ |
-| 5   | Convert remaining 7 cleaner files to conversions helpers | High   | 30 min |
-| 6   | Add tests for conversions helpers                        | Medium | 20 min |
-| 7   | Create centralized `execWithTimeout` helper              | High   | 30 min |
-| 8   | Fix Docker size reporting                                | High   | 15 min |
+| # | Task                                                     | Impact | Effort |
+| - | -------------------------------------------------------- | ------ | ------ |
+| 5 | Convert remaining 7 cleaner files to conversions helpers | High   | 30 min |
+| 6 | Add tests for conversions helpers                        | Medium | 20 min |
+| 7 | Create centralized `execWithTimeout` helper              | High   | 30 min |
+| 8 | Fix Docker size reporting                                | High   | 15 min |
 
 ### Medium Priority (Next Session)
 
-| #   | Task                                                     | Impact | Effort |
-| --- | -------------------------------------------------------- | ------ | ------ |
-| 9   | Add `Scan()` to Cleaner interface                        | Medium | 1 hr   |
-| 10  | Standardize error handling with `ToCleanResultFromError` | Medium | 30 min |
-| 11  | Fix Cargo size reporting                                 | Medium | 15 min |
-| 12  | Improve dry-run estimates with actual scanning           | Medium | 1 hr   |
-| 13  | Add `IsValid()`, `Values()`, `String()` to all enums     | Medium | 1 hr   |
+| #  | Task                                                     | Impact | Effort |
+| -- | -------------------------------------------------------- | ------ | ------ |
+| 9  | Add `Scan()` to Cleaner interface                        | Medium | 1 hr   |
+| 10 | Standardize error handling with `ToCleanResultFromError` | Medium | 30 min |
+| 11 | Fix Cargo size reporting                                 | Medium | 15 min |
+| 12 | Improve dry-run estimates with actual scanning           | Medium | 1 hr   |
+| 13 | Add `IsValid()`, `Values()`, `String()` to all enums     | Medium | 1 hr   |
 
 ### Lower Priority (Future)
 
-| #   | Task                                       | Impact | Effort |
-| --- | ------------------------------------------ | ------ | ------ |
-| 14  | Generic Context System                     | High   | 4 hr   |
-| 15  | Domain Model Enhancement                   | Medium | 2 hr   |
-| 16  | Reduce LoadWithContext complexity          | Low    | 1 hr   |
-| 17  | Refactor BDD test helpers                  | Low    | 2 hr   |
-| 18  | Fix Language Version Manager NO-OP         | Low    | 1 hr   |
-| 19  | Add Linux support for SystemCache          | Low    | 2 hr   |
-| 20  | Create ARCHITECTURE.md                     | Low    | 1 hr   |
-| 21  | Document CleanerRegistry usage             | Low    | 30 min |
-| 22  | Create ENUM_QUICK_REFERENCE.md             | Low    | 30 min |
-| 23  | Investigate samber/do/v2 DI                | Low    | 2 hr   |
-| 24  | Plugin architecture for cleaners           | Low    | 8 hr   |
-| 25  | Investigate RiskLevelType Viper processing | Low    | 1 hr   |
+| #  | Task                                       | Impact | Effort |
+| -- | ------------------------------------------ | ------ | ------ |
+| 14 | Generic Context System                     | High   | 4 hr   |
+| 15 | Domain Model Enhancement                   | Medium | 2 hr   |
+| 16 | Reduce LoadWithContext complexity          | Low    | 1 hr   |
+| 17 | Refactor BDD test helpers                  | Low    | 2 hr   |
+| 18 | Fix Language Version Manager NO-OP         | Low    | 1 hr   |
+| 19 | Add Linux support for SystemCache          | Low    | 2 hr   |
+| 20 | Create ARCHITECTURE.md                     | Low    | 1 hr   |
+| 21 | Document CleanerRegistry usage             | Low    | 30 min |
+| 22 | Create ENUM_QUICK_REFERENCE.md             | Low    | 30 min |
+| 23 | Investigate samber/do/v2 DI                | Low    | 2 hr   |
+| 24 | Plugin architecture for cleaners           | Low    | 8 hr   |
+| 25 | Investigate RiskLevelType Viper processing | Low    | 1 hr   |
 
 ---
 

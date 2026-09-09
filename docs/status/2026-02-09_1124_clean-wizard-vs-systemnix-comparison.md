@@ -1,8 +1,8 @@
 # Clean Wizard vs SystemNix: Feature Comparison Report
 
-**Generated:** 2026-02-09 11:24  
-**Project:** Clean Wizard (clean-wizard)  
-**Comparison Target:** SystemNix (justfile)  
+**Generated:** 2026-02-09 11:24\
+**Project:** Clean Wizard (clean-wizard)\
+**Comparison Target:** SystemNix (justfile)\
 **Purpose:** Comprehensive feature gap analysis
 
 ---
@@ -29,7 +29,7 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | ------------------ | --------------------------------------- | ------------------------------------------ |
 | **Target**         | Daily cache cleanup                     | Fast cleanup without system changes        |
 | **Homebrew**       | ✅ `brew autoremove && brew cleanup`    | ✅ Homebrew                                |
-| **pnpm**            | ✅ `pnpm cache clean --force`            | ✅ Node Packages                           |
+| **pnpm**           | ✅ `pnpm cache clean --force`           | ✅ Node Packages                           |
 | **pnpm**           | ✅ `pnpm store prune`                   | ✅ Node Packages                           |
 | **Go**             | ✅ `go clean -cache`                    | ✅ Go Packages                             |
 | **Temp Files**     | ✅ `/tmp/nix-*`                         | ✅ TempFiles                               |
@@ -52,20 +52,20 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | **Cargo**                  | ✅ `cargo cache --autoclean`                       | ✅ `cargo clean`                         |
 | **Go**                     | ✅ `go clean -cache -testcache -modcache`          | ✅ + lint cache                          |
 | **Temp Files**             | ✅ `/tmp/nix-build-*`                              | ✅ Age-based configurable                |
-| **Language Managers**      | ❌ Not included                                    | ⚠️ Scans only (NO-OP)                    |
+| **Language Managers**      | ❌ Not included                                    | ⚠️ Scans only (NO-OP)                     |
 
 ### Aggressive/Nuclear Mode
 
-| Aspect                | SystemNix                              | Clean Wizard                     |
-| --------------------- | -------------------------------------- | -------------------------------- |
-| **Confirmation**      | ⚠️ Interactive pause                   | ⚠️ Default prompt (not explicit) |
-| **Nix**               | ✅ ALL generations (no time threshold) | ✅ All available                 |
-| **Nix Profiles**      | ✅ All wiped                           | ❌ Not implemented               |
+| Aspect                | SystemNix                              | Clean Wizard                    |
+| --------------------- | -------------------------------------- | ------------------------------- |
+| **Confirmation**      | ⚠️ Interactive pause                    | ⚠️ Default prompt (not explicit) |
+| **Nix**               | ✅ ALL generations (no time threshold) | ✅ All available                |
+| **Nix Profiles**      | ✅ All wiped                           | ❌ Not implemented              |
 | **Language Versions** | ✅ NVM, Pyenv, Rbenv all deleted       | ⚠️ NO-OP (prints warning)        |
-| **Build Caches**      | ✅ Full `~/.cache` wipe                | ✅ Via BuildCache cleaner        |
-| **Xcode**             | ✅ Full DerivedData wipe               | ✅ Via SystemCache cleaner       |
-| **Docker**            | ✅ With volumes `--volumes`            | ✅ With volumes                  |
-| **iOS Simulators**    | ✅ `xcrun simctl delete all`           | ❌ Not implemented               |
+| **Build Caches**      | ✅ Full `~/.cache` wipe                | ✅ Via BuildCache cleaner       |
+| **Xcode**             | ✅ Full DerivedData wipe               | ✅ Via SystemCache cleaner      |
+| **Docker**            | ✅ With volumes `--volumes`            | ✅ With volumes                 |
+| **iOS Simulators**    | ✅ `xcrun simctl delete all`           | ❌ Not implemented              |
 
 ---
 
@@ -75,12 +75,12 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 
 | Feature            | SystemNix                        | Clean Wizard                  |
 | ------------------ | -------------------------------- | ----------------------------- |
-| **pnpm**            | ✅ `pnpm cache clean --force`     | ✅ `pnpm cache clean --force`  |
+| **pnpm**           | ✅ `pnpm cache clean --force`    | ✅ `pnpm cache clean --force` |
 | **pnpm**           | ✅ `pnpm store prune`            | ✅ `pnpm store prune`         |
 | **yarn**           | ✅ `yarn cache clean`            | ✅ `yarn cache clean`         |
 | **bun**            | ✅ `rm -rf ~/.bun/install/cache` | ✅ `bun pm cache rm`          |
 | **Detection**      | Assumes installed                | ✅ Dynamic availability check |
-| **Error Handling** | ⚠️ Silent continue               | ✅ Graceful degradation       |
+| **Error Handling** | ⚠️ Silent continue                | ✅ Graceful degradation       |
 
 ### Go and Rust
 
@@ -116,17 +116,17 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | **Xcode DerivedData** | ✅ `rm -rf ~/Library/Developer/Xcode/DerivedData` | ✅ `rm -rf ~/Library/Developer/Xcode/DerivedData` | ✅ Matching          |
 | **CocoaPods**         | ❌ Not included                                   | ✅ `rm -rf ~/Library/Caches/CocoaPods`            | ✅ Clean Wizard only |
 | **Homebrew Cache**    | ✅ `rm -rf ~/Library/Caches/Homebrew`             | ✅ `rm -rf ~/Library/Caches/Homebrew`             | ✅ Matching          |
-| **iOS Simulators**    | ✅ `xcrun simctl delete unavailable`              | ❌ Not implemented                                | ⚠️ SystemNix only    |
-| **Lima Cache**        | ✅ `rm -rf ~/Library/Caches/lima`                 | ❌ Not implemented                                | ⚠️ SystemNix only    |
+| **iOS Simulators**    | ✅ `xcrun simctl delete unavailable`              | ❌ Not implemented                                | ⚠️ SystemNix only     |
+| **Lima Cache**        | ✅ `rm -rf ~/Library/Caches/lima`                 | ❌ Not implemented                                | ⚠️ SystemNix only     |
 
 ### Platform Detection
 
 | Aspect               | SystemNix                          | Clean Wizard                |
 | -------------------- | ---------------------------------- | --------------------------- |
 | **macOS Support**    | ✅ Always                          | ✅ Works                    |
-| **Linux Support**    | ⚠️ Assumes paths exist             | ⚠️ Broken (env vars only)   |
+| **Linux Support**    | ⚠️ Assumes paths exist              | ⚠️ Broken (env vars only)    |
 | **Detection Method** | ✅ `uname` check                   | ❌ `GOOS`/`OSTYPE` env vars |
-| **Safety**           | ❌ Silent failure if paths missing | ⚠️ Fragile detection        |
+| **Safety**           | ❌ Silent failure if paths missing | ⚠️ Fragile detection         |
 
 ---
 
@@ -149,8 +149,8 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 
 ## 5. Language Version Manager Handling
 
-| Manager            | SystemNix                           | Clean Wizard                |
-| ------------------ | ----------------------------------- | --------------------------- |
+| Manager            | SystemNix                           | Clean Wizard               |
+| ------------------ | ----------------------------------- | -------------------------- |
 | **NVM (Node)**     | ✅ Deletes `~/.nvm/versions/node/*` | ⚠️ Scans only, NO-OP        |
 | **Pyenv (Python)** | ✅ Deletes `~/.pyenv/versions/*`    | ⚠️ Scans only, NO-OP        |
 | **Rbenv (Ruby)**   | ✅ Deletes `~/.rbenv/versions/*`    | ⚠️ Scans only, NO-OP        |
@@ -186,7 +186,7 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | **Dry-Run Support**    | ❌ Not available              | ✅ Estimates 50MB/generation |
 | **Safety**             | Current generation protected  | Current generation protected |
 | **Mock Data**          | ❌ Real commands only         | ✅ Mock in CI/testing        |
-| **Size Calculation**   | ✅ `du -sh /nix/store`        | ⚠️ Hardcoded estimates       |
+| **Size Calculation**   | ✅ `du -sh /nix/store`        | ⚠️ Hardcoded estimates        |
 
 ---
 
@@ -198,8 +198,8 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | **Nix Shell Temp**         | ✅ `/tmp/nix-shell-*` | ❌ Not implemented             |
 | **General Temp**           | ❌ Not included       | ✅ Age-based, configurable     |
 | **Exclusion Patterns**     | ❌ Not configurable   | ✅ Prefix-based exclusions     |
-| **Directory Preservation** | ⚠️ Risk of deletion   | ✅ Files only, dirs preserved  |
-| **Safety Mechanism**       | ⚠️ Minimal            | ✅ Multiple safety checks      |
+| **Directory Preservation** | ⚠️ Risk of deletion    | ✅ Files only, dirs preserved  |
+| **Safety Mechanism**       | ⚠️ Minimal             | ✅ Multiple safety checks      |
 | **Custom Paths**           | ❌ Hardcoded          | ✅ Custom base paths supported |
 
 ---
@@ -213,8 +213,8 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | **JSON Output**            | ❌ Not available          | ✅ `--json` flag            |
 | **Interactive TUI**        | ❌ Command line only      | ✅ Charm Huh forms          |
 | **Multi-Select**           | ❌ All-or-nothing         | ✅ Select multiple cleaners |
-| **Confirmation Prompt**    | ⚠️ Only aggressive        | ✅ Yes/No before execution  |
-| **Size Reporting**         | ✅ Before/after with `du` | ⚠️ Hardcoded estimates      |
+| **Confirmation Prompt**    | ⚠️ Only aggressive         | ✅ Yes/No before execution  |
+| **Size Reporting**         | ✅ Before/after with `du` | ⚠️ Hardcoded estimates       |
 | **Progress Display**       | ❌ Linear output          | ✅ Per-cleaner progress     |
 | **Result Aggregation**     | ❌ Manual calculation     | ✅ Totals across cleaners   |
 | **Error Handling**         | ❌ Silent continue        | ✅ Graceful degradation     |
@@ -232,7 +232,7 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | **Registry Pattern**      | ❌ Manual                | ✅ Cleaner registry                |
 | **Configuration**         | ❌ Hardcoded             | ✅ YAML config (partially wired)   |
 | **Testing**               | ❌ Manual                | ✅ 200+ unit tests, BDD            |
-| **Cross-Platform**        | ✅ POSIX shell           | ⚠️ macOS only (Linux broken)       |
+| **Cross-Platform**        | ✅ POSIX shell           | ⚠️ macOS only (Linux broken)        |
 | **Dependency Management** | Nix flake                | Go modules                         |
 | **Binary Size**           | N/A (justfile)           | ~10MB+                             |
 
@@ -273,22 +273,22 @@ This report provides a detailed comparison between **Clean Wizard** (a Go-based 
 | **Lima VM Cache**           | ✅ `~/Library/Caches/lima`    | ❌           |
 | **Puppeteer Cache**         | ✅ `~/.cache/puppeteer`       | ❌           |
 | **NuGet Packages**          | ✅ `~/.nuget/packages`        | ❌           |
-| **Aggressive Confirmation** | ✅ Explicit pause             | ⚠️           |
-| **Size Before/After**       | ✅ `du -sh`                   | ⚠️ Estimates |
+| **Aggressive Confirmation** | ✅ Explicit pause             | ⚠️            |
+| **Size Before/After**       | ✅ `du -sh`                   | ⚠️ Estimates  |
 
 ### Both have (matching implementations)
 
-| Feature               | Status                      |
-| --------------------- | --------------------------- |
-| **Nix GC**            | ✅ Matching commands        |
-| **Homebrew cleanup**  | ✅ Matching commands        |
-| **Docker prune**      | ✅ Matching commands        |
+| Feature                | Status                      |
+| ---------------------- | --------------------------- |
+| **Nix GC**             | ✅ Matching commands        |
+| **Homebrew cleanup**   | ✅ Matching commands        |
+| **Docker prune**       | ✅ Matching commands        |
 | **pnpm/pnpm/yarn/bun** | ✅ Matching commands        |
-| **Go cache clean**    | ✅ SystemNix has more paths |
-| **Cargo clean**       | ✅ Matching commands        |
-| **Spotlight cleanup** | ✅ Matching paths           |
-| **Xcode DerivedData** | ✅ Matching paths           |
-| **Homebrew cache**    | ✅ Matching paths           |
+| **Go cache clean**     | ✅ SystemNix has more paths |
+| **Cargo clean**        | ✅ Matching commands        |
+| **Spotlight cleanup**  | ✅ Matching paths           |
+| **Xcode DerivedData**  | ✅ Matching paths           |
+| **Homebrew cache**     | ✅ Matching paths           |
 
 ---
 
@@ -400,8 +400,8 @@ Both tools have distinct strengths and target different use cases:
 
 ---
 
-_Report generated on 2026-02-09 11:24_  
-_Clean Wizard version: Based on codebase analysis_  
+_Report generated on 2026-02-09 11:24_\
+_Clean Wizard version: Based on codebase analysis_\
 _SystemNix version: Justfile (latest)_
 
 ---

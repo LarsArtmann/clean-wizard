@@ -14,15 +14,15 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ## Feature Status Legend
 
-| Status                      | Meaning                                                     |
-| --------------------------- | ----------------------------------------------------------- |
-| ✅ **FULLY_FUNCTIONAL**     | Feature is complete, tested, and works as intended          |
+| Status                     | Meaning                                                     |
+| -------------------------- | ----------------------------------------------------------- |
+| ✅ **FULLY_FUNCTIONAL**    | Feature is complete, tested, and works as intended          |
 | ⚠️ **PARTIALLY_FUNCTIONAL** | Feature works but has limitations or known issues           |
-| 🔧 **NEEDS_IMPROVEMENT**    | Feature exists but needs refinement or has technical debt   |
-| 🚧 **BROKEN**               | Feature does not work correctly or is incomplete            |
-| 📝 **PLANNED**              | Feature is planned but not yet implemented                  |
-| 🧪 **MOCKED**               | Feature returns mock/simulated data instead of real results |
-| 📝 **NOT_IMPLEMENTED**      | Feature exists as placeholder, intentionally not functional |
+| 🔧 **NEEDS_IMPROVEMENT**   | Feature exists but needs refinement or has technical debt   |
+| 🚧 **BROKEN**              | Feature does not work correctly or is incomplete            |
+| 📝 **PLANNED**             | Feature is planned but not yet implemented                  |
+| 🧪 **MOCKED**              | Feature returns mock/simulated data instead of real results |
+| 📝 **NOT_IMPLEMENTED**     | Feature exists as placeholder, intentionally not functional |
 
 ---
 
@@ -30,16 +30,16 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### 1. Nix Cleaner ❄️
 
-| Aspect                     | Status                  | Details                                                          |
-| -------------------------- | ----------------------- | ---------------------------------------------------------------- |
-| **Overall**                | ✅ FULLY_FUNCTIONAL     | Core feature, well-tested                                        |
-| **Availability Detection** | ✅ Working              | Checks for `nix` command                                         |
+| Aspect                     | Status                 | Details                                                          |
+| -------------------------- | ---------------------- | ---------------------------------------------------------------- |
+| **Overall**                | ✅ FULLY_FUNCTIONAL    | Core feature, well-tested                                        |
+| **Availability Detection** | ✅ Working             | Checks for `nix` command                                         |
 | **Generation Listing**     | ⚠️ PARTIALLY_FUNCTIONAL | Returns mock data when Nix unavailable; real data when available |
-| **Generation Cleanup**     | ✅ Working              | Removes old generations, keeps current + N others                |
-| **Garbage Collection**     | ✅ Working              | Runs `nix-collect-garbage` after cleanup                         |
-| **Dry Run Mode**           | ✅ Working              | Estimates 50MB per generation                                    |
-| **Size Estimation**        | 🧪 MOCKED               | Uses hardcoded 50MB estimate per generation                      |
-| **Configurability**        | ✅ Working              | Configurable keep count (default: 5)                             |
+| **Generation Cleanup**     | ✅ Working             | Removes old generations, keeps current + N others                |
+| **Garbage Collection**     | ✅ Working             | Runs `nix-collect-garbage` after cleanup                         |
+| **Dry Run Mode**           | ✅ Working             | Estimates 50MB per generation                                    |
+| **Size Estimation**        | 🧪 MOCKED              | Uses hardcoded 50MB estimate per generation                      |
+| **Configurability**        | ✅ Working             | Configurable keep count (default: 5)                             |
 
 **Notes:**
 
@@ -137,7 +137,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **Overall**                | ✅ FULLY_FUNCTIONAL | Multi-PM support            |
 | **Package Managers**       | ✅ Working          | npm, pnpm, yarn, bun        |
 | **Availability Detection** | ✅ Working          | Checks each PM individually |
-| **npm Cache Clean**         | ✅ Working          | `npm cache clean --force`   |
+| **npm Cache Clean**        | ✅ Working          | `npm cache clean --force`   |
 | **pnpm Store Prune**       | ✅ Working          | `pnpm store prune`          |
 | **Yarn Cache Clean**       | ✅ Working          | `yarn cache clean`          |
 | **Bun Cache Clean**        | ✅ Working          | `bun pm cache rm`           |
@@ -153,16 +153,16 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### 7. Build Cache Cleaner 🔨
 
-| Aspect                  | Status                  | Details                                                  |
-| ----------------------- | ----------------------- | -------------------------------------------------------- |
+| Aspect                  | Status                 | Details                                                  |
+| ----------------------- | ---------------------- | -------------------------------------------------------- |
 | **Overall**             | ⚠️ PARTIALLY_FUNCTIONAL | Limited tool coverage                                    |
-| **Availability**        | ✅ Working              | Always available (file-based)                            |
-| **Gradle Support**      | ✅ Working              | Cleans `~/.gradle/caches`                                |
-| **Maven Support**       | ✅ Working              | Removes `~/.m2/repository/**/*.part` files               |
-| **SBT Support**         | ✅ Working              | Cleans `~/.ivy2/cache`                                   |
-| **Age-Based Filtering** | ✅ Working              | Configurable `older_than` duration                       |
-| **Dry Run Mode**        | ✅ Working              | Correctly previews actions                               |
-| **Other Build Tools**   | 📝 PLANNED              | Go, Rust, Node, Python exist in enum but NOT implemented |
+| **Availability**        | ✅ Working             | Always available (file-based)                            |
+| **Gradle Support**      | ✅ Working             | Cleans `~/.gradle/caches`                                |
+| **Maven Support**       | ✅ Working             | Removes `~/.m2/repository/**/*.part` files               |
+| **SBT Support**         | ✅ Working             | Cleans `~/.ivy2/cache`                                   |
+| **Age-Based Filtering** | ✅ Working             | Configurable `older_than` duration                       |
+| **Dry Run Mode**        | ✅ Working             | Correctly previews actions                               |
+| **Other Build Tools**   | 📝 PLANNED             | Go, Rust, Node, Python exist in enum but NOT implemented |
 
 **Notes:**
 
@@ -174,22 +174,22 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### 8. System Cache Cleaner ⚙️
 
-| Aspect                   | Status                  | Details                                                                  |
-| ------------------------ | ----------------------- | ------------------------------------------------------------------------ |
+| Aspect                   | Status                 | Details                                                                  |
+| ------------------------ | ---------------------- | ------------------------------------------------------------------------ |
 | **Overall**              | ⚠️ PARTIALLY_FUNCTIONAL | Test failures on Linux — default settings include macOS-only cache types |
-| **Platform Support**     | ✅ Working              | macOS and Linux supported                                                |
-| **Availability Check**   | ✅ Working              | Runtime OS detection                                                     |
-| **Spotlight Cache**      | ✅ Working              | `~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents`              |
-| **Xcode DerivedData**    | ✅ Working              | `~/Library/Developer/Xcode/DerivedData`                                  |
-| **CocoaPods Cache**      | ✅ Working              | `~/Library/Caches/CocoaPods`                                             |
-| **Homebrew Cache**       | ✅ Working              | `~/Library/Caches/Homebrew`                                              |
-| **Linux Pip Cache**      | ✅ Working              | `~/.cache/pip`                                                           |
-| **Linux npm Cache**      | ✅ Working              | `~/.cache/npm`                                                           |
-| **Linux Yarn Cache**     | ✅ Working              | `~/.cache/yarn`                                                          |
-| **Linux ccache**         | ✅ Working              | `~/.cache/ccache`                                                        |
-| **Age-Based Filtering**  | ✅ Working              | Configurable `older_than` duration                                       |
-| **Dry Run Mode**         | ✅ Working              | Correctly previews actions                                               |
-| **Extended Cache Types** | ✅ Working              | Pip, npm, yarn, ccache implemented for Linux                             |
+| **Platform Support**     | ✅ Working             | macOS and Linux supported                                                |
+| **Availability Check**   | ✅ Working             | Runtime OS detection                                                     |
+| **Spotlight Cache**      | ✅ Working             | `~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents`              |
+| **Xcode DerivedData**    | ✅ Working             | `~/Library/Developer/Xcode/DerivedData`                                  |
+| **CocoaPods Cache**      | ✅ Working             | `~/Library/Caches/CocoaPods`                                             |
+| **Homebrew Cache**       | ✅ Working             | `~/Library/Caches/Homebrew`                                              |
+| **Linux Pip Cache**      | ✅ Working             | `~/.cache/pip`                                                           |
+| **Linux npm Cache**      | ✅ Working             | `~/.cache/npm`                                                           |
+| **Linux Yarn Cache**     | ✅ Working             | `~/.cache/yarn`                                                          |
+| **Linux ccache**         | ✅ Working             | `~/.cache/ccache`                                                        |
+| **Age-Based Filtering**  | ✅ Working             | Configurable `older_than` duration                                       |
+| **Dry Run Mode**         | ✅ Working             | Correctly previews actions                                               |
+| **Extended Cache Types** | ✅ Working             | Pip, npm, yarn, ccache implemented for Linux                             |
 
 **Notes:**
 
@@ -355,23 +355,23 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% line reduction across 4 files).
 
-| Enum                       | Values                                                    | Status                                 |
-| -------------------------- | --------------------------------------------------------- | -------------------------------------- |
-| **CacheCleanupMode**       | DISABLED, ENABLED                                         | ✅ Working                             |
-| **DockerPruneMode**        | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS                  | ✅ Working                             |
+| Enum                       | Values                                                    | Status                                |
+| -------------------------- | --------------------------------------------------------- | ------------------------------------- |
+| **CacheCleanupMode**       | DISABLED, ENABLED                                         | ✅ Working                            |
+| **DockerPruneMode**        | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS                  | ✅ Working                            |
 | **BuildToolType**          | GO, RUST, NODE, PYTHON, JAVA, SCALA                       | ⚠️ Partial (only JAVA/SCALA used)      |
-| **CacheType**              | 27 types: SPOTLIGHT..COMGR (macOS, Linux, cross-platform) | ✅ Working (all implemented)           |
+| **CacheType**              | 27 types: SPOTLIGHT..COMGR (macOS, Linux, cross-platform) | ✅ Working (all implemented)          |
 | **VersionManagerType**     | NVM, PYENV, GVM, RBENV, SDKMAN, JENV                      | ⚠️ Partial (only NVM/PYENV/RBENV used) |
-| **PackageManagerType**     | NPM, PNPM, YARN, BUN                                      | ✅ Working                             |
-| **RiskLevel**              | LOW, MEDIUM, HIGH, CRITICAL                               | ✅ Working                             |
-| **ValidationLevel**        | NONE, BASIC, COMPREHENSIVE, STRICT                        | ✅ Working                             |
-| **CleanStrategy**          | AGGRESSIVE, CONSERVATIVE, DRY_RUN                         | ✅ Working                             |
-| **HomebrewMode**           | UNUSED_ONLY, ALL                                          | ✅ Working                             |
-| **OptimizationMode**       | DISABLED, ENABLED                                         | ✅ Working                             |
-| **ExecutionMode**          | NORMAL, DRY_RUN                                           | ✅ Working                             |
-| **ChangeOperationType**    | ADDED, REMOVED, MODIFIED                                  | ✅ Working                             |
-| **SizeEstimateStatusType** | KNOWN, UNKNOWN                                            | ✅ Working                             |
-| **GitHistoryMode**         | ANALYZE, DRY_RUN, EXECUTE                                 | ✅ Working                             |
+| **PackageManagerType**     | NPM, PNPM, YARN, BUN                                      | ✅ Working                            |
+| **RiskLevel**              | LOW, MEDIUM, HIGH, CRITICAL                               | ✅ Working                            |
+| **ValidationLevel**        | NONE, BASIC, COMPREHENSIVE, STRICT                        | ✅ Working                            |
+| **CleanStrategy**          | AGGRESSIVE, CONSERVATIVE, DRY_RUN                         | ✅ Working                            |
+| **HomebrewMode**           | UNUSED_ONLY, ALL                                          | ✅ Working                            |
+| **OptimizationMode**       | DISABLED, ENABLED                                         | ✅ Working                            |
+| **ExecutionMode**          | NORMAL, DRY_RUN                                           | ✅ Working                            |
+| **ChangeOperationType**    | ADDED, REMOVED, MODIFIED                                  | ✅ Working                            |
+| **SizeEstimateStatusType** | KNOWN, UNKNOWN                                            | ✅ Working                            |
+| **GitHistoryMode**         | ANALYZE, DRY_RUN, EXECUTE                                 | ✅ Working                            |
 
 ---
 
@@ -384,7 +384,7 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 | **Integration Tests**    | ✅ WORKING   | Real cleaner integration tests  |
 | **Fuzz Tests**           | ✅ WORKING   | Multiple fuzzing targets        |
 | **Benchmark Tests**      | ✅ WORKING   | Performance benchmarks          |
-| **Test Coverage**        | ⚠️ MODERATE  | Good but not comprehensive      |
+| **Test Coverage**        | ⚠️ MODERATE   | Good but not comprehensive      |
 | **Mock Implementations** | ✅ WORKING   | Mock data for CI environments   |
 
 ---
@@ -457,13 +457,13 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 | Golangci-lint       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Cargo               | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Node Packages       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Build Cache         | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools    |
+| Build Cache         | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools     |
 | System Cache        | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Temp Files          | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Git History         | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Project Executables | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
 | Compiled Binaries   | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production Ready |
-| Projects Mgmt       | ⚠️        | ✅   | ⚠️    | ✅      | ✅            | ⚠️ Tool-Dependent    |
+| Projects Mgmt       | ⚠️         | ✅   | ⚠️     | ✅      | ✅            | ⚠️ Tool-Dependent    |
 
 ---
 

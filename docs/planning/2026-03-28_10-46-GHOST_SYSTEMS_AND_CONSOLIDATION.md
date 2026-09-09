@@ -1,6 +1,6 @@
 # Comprehensive Execution Plan - Clean Wizard
 
-**Generated:** 2026-03-28 10:46 CET  
+**Generated:** 2026-03-28 10:46 CET\
 **Author:** AI Assistant (Brutally Honest Assessment)
 
 ---
@@ -83,7 +83,7 @@ This plan addresses architectural issues, technical debt, and quality improvemen
 | `monitoring/`     | EMPTY    |
 | `errorrecovery/`  | EMPTY    |
 
-**Value:** ZERO - Not used anywhere  
+**Value:** ZERO - Not used anywhere\
 **Decision:** DELETE ENTIRE DIRECTORY
 
 #### Ghost System #2: `internal/infrastructure/`
@@ -94,7 +94,7 @@ This plan addresses architectural issues, technical debt, and quality improvemen
 | `config/`   | EMPTY    |
 | `cleaners/` | EMPTY    |
 
-**Value:** ZERO - Not used anywhere  
+**Value:** ZERO - Not used anywhere\
 **Decision:** DELETE ENTIRE DIRECTORY
 
 ### H) Scope Creep Trap
@@ -151,7 +151,7 @@ This plan addresses architectural issues, technical debt, and quality improvemen
 
 ### Task 1.1: Delete Ghost Directories
 
-**Effort:** 5 minutes  
+**Effort:** 5 minutes\
 **Impact:** Medium (removes confusion)
 
 ```
@@ -169,7 +169,7 @@ find internal/infrastructure -name "*.go" | wc -l  # Should be 0
 
 ### Task 1.2: Remove Old GolangciLintCleaner
 
-**Effort:** 30 minutes  
+**Effort:** 30 minutes\
 **Impact:** High (eliminates split-brain)
 
 1. Delete `internal/cleaner/golang_lint_adapter.go`
@@ -185,7 +185,7 @@ find internal/infrastructure -name "*.go" | wc -l  # Should be 0
 
 ### Task 1.3: Fix Unused Parameters
 
-**Effort:** 60 minutes  
+**Effort:** 60 minutes\
 **Impact:** Medium (code cleanliness)
 
 Files with unused parameters:
@@ -202,7 +202,7 @@ Files with unused parameters:
 
 ### Task 1.4: Remove Deprecated Aliases
 
-**Effort:** 30 minutes  
+**Effort:** 30 minutes\
 **Impact:** Low (technical debt reduction)
 
 In `domain/types.go`, remove:
@@ -223,7 +223,7 @@ Update all references to use the type-safe versions.
 
 ### Task 2.1: Add samber/lo Dependency
 
-**Effort:** 120 minutes  
+**Effort:** 120 minutes\
 **Impact:** Medium (developer experience)
 
 **Benefits:**
@@ -248,7 +248,7 @@ func AvailableCleaners(ctx context.Context) []Cleaner {
 
 ### Task 2.2: Add samber/mo for Result Types
 
-**Effort:** 60 minutes  
+**Effort:** 60 minutes\
 **Impact:** Medium (improves functional patterns)
 
 **Benefits:**
@@ -261,7 +261,7 @@ func AvailableCleaners(ctx context.Context) []Cleaner {
 
 ### Task 2.3: Reduce Function Complexity
 
-**Effort:** 240 minutes  
+**Effort:** 240 minutes\
 **Impact:** Medium (testability)
 
 | Function                  | Current | Target | Strategy                |
@@ -277,7 +277,7 @@ func AvailableCleaners(ctx context.Context) []Cleaner {
 
 ### Task 3.1: Integration Test Coverage
 
-**Effort:** 480 minutes  
+**Effort:** 480 minutes\
 **Impact:** High (regression prevention)
 
 Add integration tests for:
@@ -288,7 +288,7 @@ Add integration tests for:
 
 ### Task 3.2: Fuzz Testing
 
-**Effort:** 240 minutes  
+**Effort:** 240 minutes\
 **Impact:** Medium (bug prevention)
 
 Add fuzz tests for:
@@ -299,7 +299,7 @@ Add fuzz tests for:
 
 ### Task 3.3: CLI Flag Integration
 
-**Effort:** 120 minutes  
+**Effort:** 120 minutes\
 **Impact:** Medium (user experience)
 
 Complete the CLI flag integration for:

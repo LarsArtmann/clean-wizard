@@ -141,53 +141,53 @@ The clean-wizard project is in **GOOD** overall health with recent improvements 
 
 ### HIGH IMPACT + LOW EFFORT (Do First)
 
-| #   | Task                            | Impact | Effort | Status  |
-| --- | ------------------------------- | ------ | ------ | ------- |
-| 1   | Commit current changes          | HIGH   | LOW    | Pending |
-| 2   | Add fang.WithVersion/WithCommit | MEDIUM | LOW    | Pending |
-| 3   | Push to remote                  | HIGH   | LOW    | Pending |
-| 4   | Verify tests pass               | HIGH   | LOW    | Running |
+| # | Task                            | Impact | Effort | Status  |
+| - | ------------------------------- | ------ | ------ | ------- |
+| 1 | Commit current changes          | HIGH   | LOW    | Pending |
+| 2 | Add fang.WithVersion/WithCommit | MEDIUM | LOW    | Pending |
+| 3 | Push to remote                  | HIGH   | LOW    | Pending |
+| 4 | Verify tests pass               | HIGH   | LOW    | Running |
 
 ### MEDIUM IMPACT + LOW EFFORT (Do Soon)
 
-| #   | Task                                           | Impact | Effort | Status  |
-| --- | ---------------------------------------------- | ------ | ------ | ------- |
-| 5   | Add signal handling with fang.WithNotifySignal | MEDIUM | LOW    | Pending |
-| 6   | Add version variables with ldflags support     | MEDIUM | LOW    | Pending |
-| 7   | Update godoc for new conversion helpers        | LOW    | LOW    | Pending |
-| 8   | Add pre-commit hook for syntax check           | MEDIUM | LOW    | Pending |
+| # | Task                                           | Impact | Effort | Status  |
+| - | ---------------------------------------------- | ------ | ------ | ------- |
+| 5 | Add signal handling with fang.WithNotifySignal | MEDIUM | LOW    | Pending |
+| 6 | Add version variables with ldflags support     | MEDIUM | LOW    | Pending |
+| 7 | Update godoc for new conversion helpers        | LOW    | LOW    | Pending |
+| 8 | Add pre-commit hook for syntax check           | MEDIUM | LOW    | Pending |
 
 ### HIGH IMPACT + MEDIUM EFFORT (Plan)
 
-| #   | Task                                        | Impact | Effort | Status  |
-| --- | ------------------------------------------- | ------ | ------ | ------- |
-| 9   | Implement Language Version Manager cleaning | HIGH   | MEDIUM | Planned |
-| 10  | Add integration tests for all cleaners      | HIGH   | MEDIUM | Planned |
-| 11  | Add Nix size estimation from actual store   | HIGH   | MEDIUM | Planned |
-| 12  | Create release automation with ldflags      | MEDIUM | MEDIUM | Planned |
+| #  | Task                                        | Impact | Effort | Status  |
+| -- | ------------------------------------------- | ------ | ------ | ------- |
+| 9  | Implement Language Version Manager cleaning | HIGH   | MEDIUM | Planned |
+| 10 | Add integration tests for all cleaners      | HIGH   | MEDIUM | Planned |
+| 11 | Add Nix size estimation from actual store   | HIGH   | MEDIUM | Planned |
+| 12 | Create release automation with ldflags      | MEDIUM | MEDIUM | Planned |
 
 ### MEDIUM IMPACT + MEDIUM EFFORT (Consider)
 
-| #   | Task                                       | Impact | Effort | Status  |
-| --- | ------------------------------------------ | ------ | ------ | ------- |
-| 13  | Add Homebrew dry-run support (if possible) | MEDIUM | MEDIUM | Backlog |
-| 14  | Improve Projects Management Automation     | LOW    | MEDIUM | Backlog |
-| 15  | Add Windows support                        | MEDIUM | HIGH   | Backlog |
-| 16  | Create comprehensive API documentation     | MEDIUM | MEDIUM | Backlog |
-| 17  | Add performance benchmarks                 | LOW    | MEDIUM | Backlog |
-| 18  | Implement config file hot-reload           | LOW    | MEDIUM | Backlog |
+| #  | Task                                       | Impact | Effort | Status  |
+| -- | ------------------------------------------ | ------ | ------ | ------- |
+| 13 | Add Homebrew dry-run support (if possible) | MEDIUM | MEDIUM | Backlog |
+| 14 | Improve Projects Management Automation     | LOW    | MEDIUM | Backlog |
+| 15 | Add Windows support                        | MEDIUM | HIGH   | Backlog |
+| 16 | Create comprehensive API documentation     | MEDIUM | MEDIUM | Backlog |
+| 17 | Add performance benchmarks                 | LOW    | MEDIUM | Backlog |
+| 18 | Implement config file hot-reload           | LOW    | MEDIUM | Backlog |
 
 ### LOW PRIORITY (Nice to Have)
 
-| #   | Task                              | Impact | Effort | Status  |
-| --- | --------------------------------- | ------ | ------ | ------- |
-| 19  | Add shell completion improvements | LOW    | LOW    | Backlog |
-| 20  | Create homebrew formula           | LOW    | LOW    | Backlog |
-| 21  | Add telemetry (opt-in)            | LOW    | MEDIUM | Backlog |
-| 22  | Create GUI wrapper                | LOW    | HIGH   | Backlog |
-| 23  | Add plugin system                 | LOW    | HIGH   | Backlog |
-| 24  | Internationalization (i18n)       | LOW    | HIGH   | Backlog |
-| 25  | Create VS Code extension          | LOW    | HIGH   | Backlog |
+| #  | Task                              | Impact | Effort | Status  |
+| -- | --------------------------------- | ------ | ------ | ------- |
+| 19 | Add shell completion improvements | LOW    | LOW    | Backlog |
+| 20 | Create homebrew formula           | LOW    | LOW    | Backlog |
+| 21 | Add telemetry (opt-in)            | LOW    | MEDIUM | Backlog |
+| 22 | Create GUI wrapper                | LOW    | HIGH   | Backlog |
+| 23 | Add plugin system                 | LOW    | HIGH   | Backlog |
+| 24 | Internationalization (i18n)       | LOW    | HIGH   | Backlog |
+| 25 | Create VS Code extension          | LOW    | HIGH   | Backlog |
 
 ---
 

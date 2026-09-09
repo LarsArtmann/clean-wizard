@@ -29,13 +29,13 @@ Eliminate all 4 actionable duplicate groups:
 
 ### Commit History (All Pushed ✅)
 
-| #   | Hash      | Description                                              | Files | Lines |
-| --- | --------- | -------------------------------------------------------- | ----- | ----- |
-| 1   | `1adadd1` | Remove legacy validation context types                   | 3     | -45   |
-| 2   | `6fe3980` | Add CleanerBase struct, embed in 15 cleaners             | 17    | +68   |
-| 3   | `e4bec04` | Promote GetVerbose/GetDryRun to CleanerBase              | 4     | -30   |
-| 4   | `3059800` | Unify GoCleaner: embed CleanerBase, remove GoCacheConfig | 2     | -13   |
-| 5   | `c3b5fc5` | Remove legacy type references from docs                  | 2     | -6    |
+| # | Hash      | Description                                              | Files | Lines |
+| - | --------- | -------------------------------------------------------- | ----- | ----- |
+| 1 | `1adadd1` | Remove legacy validation context types                   | 3     | -45   |
+| 2 | `6fe3980` | Add CleanerBase struct, embed in 15 cleaners             | 17    | +68   |
+| 3 | `e4bec04` | Promote GetVerbose/GetDryRun to CleanerBase              | 4     | -30   |
+| 4 | `3059800` | Unify GoCleaner: embed CleanerBase, remove GoCacheConfig | 2     | -13   |
+| 5 | `c3b5fc5` | Remove legacy type references from docs                  | 2     | -6    |
 
 **Total:** 5 commits, net ~-70 lines of dead code removed.
 

@@ -7,6 +7,7 @@
 **Build Status:** `go build ./...` clean
 
 **Resolution (2026-08-10):** The audit's 20 findings from 2026-07-13 were all applied. A second docs-health pass on 2026-08-10 verified:
+
 - TODO_LIST.md rebuilt (28 → 26 items after harvest)
 - ROADMAP.md rebuilt (DI contradiction resolved; themes + non-goals)
 - FEATURES.md refreshed (Projects Mgmt Automation status corrected to `FULLY_FUNCTIONAL`; new improvements added)
@@ -237,58 +238,58 @@ I read all 9 files (as instructed), but I started fixing docs without first crea
 
 ## f) Up to 50 Things to Get Done Next
 
-| #   | Task                                                                                | Impact | Effort | Category       |
-| --- | ----------------------------------------------------------------------------------- | ------ | ------ | -------------- |
-| 1   | Bump AGENTS.md date to 2026-07-13                                                   | LOW    | S      | Doc fix        |
-| 2   | Fix docs/modularization/PROPOSAL.md (14→13 cleaners, remove cockroachdb/pkg/errors) | MED    | S      | Doc fix        |
-| 3   | Fix docs/modularization/EXECUTION_PLAN.md (9 stale refs to deleted code)            | MED    | S      | Doc fix        |
-| 4   | Fix docs/modularization/DEPENDENCY_GRAPH.md (5 stale refs)                          | LOW    | S      | Doc fix        |
-| 5   | Audit DEVELOPMENT.md for stale content                                              | LOW    | S      | Doc audit      |
-| 6   | Audit USAGE.md for stale content                                                    | LOW    | S      | Doc audit      |
-| 7   | Audit HOW_TO_USE.md for stale content                                               | LOW    | S      | Doc audit      |
-| 8   | Audit CONTRIBUTING.md for stale content                                             | LOW    | S      | Doc audit      |
-| 9   | Audit PARTS.md for stale content                                                    | LOW    | S      | Doc audit      |
-| 10  | Audit BDD_TESTS_REVIEW.md for stale content                                         | LOW    | S      | Doc audit      |
-| 11  | Audit CONSUMER_PERSPECTIVE.md for stale content                                     | LOW    | S      | Doc audit      |
-| 12  | Check for duplicate content between README.md, USAGE.md, HOW_TO_USE.md              | MED    | M      | Consolidation  |
-| 13  | Check for duplicate content between ARCHITECTURE.md and docs/ARCHITECTURE.md        | MED    | M      | Consolidation  |
-| 14  | Delete or archive `Justfile` (deprecated per global AGENTS.md)                      | LOW    | S      | Cleanup        |
-| 15  | Add "stale reference" pre-commit hook for known-deleted symbols                     | HIGH   | S      | Prevention     |
-| 16  | Verify schemas/config.schema.json against Go config struct                          | MED    | M      | Schema audit   |
-| 17  | Verify test config YAML files against documented format                             | LOW    | S      | Config audit   |
-| 18  | Migrate 5 command files to classified errors (from TODO_LIST #1)                    | HIGH   | M      | Error handling |
-| 19  | Classify ErrGitNotAvailable as Infrastructure (from TODO_LIST #2)                   | MED    | S      | Error handling |
-| 20  | Enrich scan JSON with family/code/retryable (from TODO_LIST #3)                     | MED    | S      | Error handling |
-| 21  | Fix scan JSON swallowing marshal errors (from TODO_LIST #4)                         | MED    | S      | Error handling |
-| 22  | Wire HandleError or remove dead message templates (from TODO_LIST #5)               | LOW    | S      | Error handling |
-| 23  | Wire OperationSettings from YAML config to cleaner constructors                     | HIGH   | L      | Architecture   |
-| 24  | Add BDD tests for execution layer (Ginkgo)                                          | HIGH   | M      | Testing        |
-| 25  | Add BDD tests for Docker, Homebrew, Go cleaners                                     | HIGH   | H      | Testing        |
-| 26  | Implement scan --profile filtering or remove the flag                               | MED    | M      | UX             |
-| 27  | Logger globals → DI-injected logger                                                 | MED    | M      | Architecture   |
-| 28  | Split files over 350 lines (compiledbinaries.go, docker.go, nodepackages.go)        | MED    | M      | Code quality   |
-| 29  | Add CLI command tests: profile, config, scan, init                                  | MED    | H      | Testing        |
-| 30  | Split internal/domain/ god package into sub-packages                                | HIGH   | H      | Architecture   |
-| 31  | Split internal/cleaner/ flat structure into sub-packages                            | HIGH   | H      | Architecture   |
-| 32  | Register individual cleaners as DI providers                                        | HIGH   | H      | Architecture   |
-| 33  | Improve Nix size estimation (hardcoded 50MB/generation)                             | MED    | M      | Feature        |
-| 34  | Add tests for getRegistryName reverse lookup                                        | MED    | S      | Testing        |
-| 35  | Remove infertypeargs warnings (8 places)                                            | LOW    | S      | Lint           |
-| 36  | Add Gherkin .feature files for top 3 cleaners                                       | MED    | M      | Testing        |
-| 37  | Fix nix_test.go BDD tests (remove go:build skip_bdd tag)                            | LOW    | S      | Testing        |
-| 38  | Standardize BDD test naming (\*\_ginkgo_test.go pattern)                            | LOW    | S      | Testing        |
-| 39  | Fix pre-commit hook timeout (golangci-lint)                                         | MED    | S      | Tooling        |
-| 40  | Add --dry-run to scan command (parity with clean)                                   | LOW    | S      | Feature        |
-| 41  | Add --keep-generations flag for Nix cleaner                                         | LOW    | S      | Feature        |
-| 42  | Reduce GetOperationType complexity (17 → <10)                                       | LOW    | S      | Lint           |
-| 43  | Extract "go-build\*" string constant                                                | LOW    | S      | Lint           |
-| 44  | Fix mixed receiver warnings (10 enum types)                                         | LOW    | S      | Lint           |
-| 45  | Make adapters interface-backed with do.As aliasing                                  | MED    | L      | Architecture   |
-| 46  | Add doc freshness check script to CI                                                | MED    | M      | Prevention     |
-| 47  | Archive or delete old planning docs (docs/planning/2025-_ and 2026-01/02/03-_)      | LOW    | M      | Cleanup        |
-| 48  | Consolidate duplicate ARCHITECTURE.md files (root vs docs/)                         | MED    | M      | Consolidation  |
-| 49  | Add structured logging for --profile warning in scan                                | LOW    | S      | UX             |
-| 50  | Document the 13th cleaner (Golangci-lint) in docs/cleaner.md                        | LOW    | S      | Doc fix        |
+| #  | Task                                                                                | Impact | Effort | Category       |
+| -- | ----------------------------------------------------------------------------------- | ------ | ------ | -------------- |
+| 1  | Bump AGENTS.md date to 2026-07-13                                                   | LOW    | S      | Doc fix        |
+| 2  | Fix docs/modularization/PROPOSAL.md (14→13 cleaners, remove cockroachdb/pkg/errors) | MED    | S      | Doc fix        |
+| 3  | Fix docs/modularization/EXECUTION_PLAN.md (9 stale refs to deleted code)            | MED    | S      | Doc fix        |
+| 4  | Fix docs/modularization/DEPENDENCY_GRAPH.md (5 stale refs)                          | LOW    | S      | Doc fix        |
+| 5  | Audit DEVELOPMENT.md for stale content                                              | LOW    | S      | Doc audit      |
+| 6  | Audit USAGE.md for stale content                                                    | LOW    | S      | Doc audit      |
+| 7  | Audit HOW_TO_USE.md for stale content                                               | LOW    | S      | Doc audit      |
+| 8  | Audit CONTRIBUTING.md for stale content                                             | LOW    | S      | Doc audit      |
+| 9  | Audit PARTS.md for stale content                                                    | LOW    | S      | Doc audit      |
+| 10 | Audit BDD_TESTS_REVIEW.md for stale content                                         | LOW    | S      | Doc audit      |
+| 11 | Audit CONSUMER_PERSPECTIVE.md for stale content                                     | LOW    | S      | Doc audit      |
+| 12 | Check for duplicate content between README.md, USAGE.md, HOW_TO_USE.md              | MED    | M      | Consolidation  |
+| 13 | Check for duplicate content between ARCHITECTURE.md and docs/ARCHITECTURE.md        | MED    | M      | Consolidation  |
+| 14 | Delete or archive `Justfile` (deprecated per global AGENTS.md)                      | LOW    | S      | Cleanup        |
+| 15 | Add "stale reference" pre-commit hook for known-deleted symbols                     | HIGH   | S      | Prevention     |
+| 16 | Verify schemas/config.schema.json against Go config struct                          | MED    | M      | Schema audit   |
+| 17 | Verify test config YAML files against documented format                             | LOW    | S      | Config audit   |
+| 18 | Migrate 5 command files to classified errors (from TODO_LIST #1)                    | HIGH   | M      | Error handling |
+| 19 | Classify ErrGitNotAvailable as Infrastructure (from TODO_LIST #2)                   | MED    | S      | Error handling |
+| 20 | Enrich scan JSON with family/code/retryable (from TODO_LIST #3)                     | MED    | S      | Error handling |
+| 21 | Fix scan JSON swallowing marshal errors (from TODO_LIST #4)                         | MED    | S      | Error handling |
+| 22 | Wire HandleError or remove dead message templates (from TODO_LIST #5)               | LOW    | S      | Error handling |
+| 23 | Wire OperationSettings from YAML config to cleaner constructors                     | HIGH   | L      | Architecture   |
+| 24 | Add BDD tests for execution layer (Ginkgo)                                          | HIGH   | M      | Testing        |
+| 25 | Add BDD tests for Docker, Homebrew, Go cleaners                                     | HIGH   | H      | Testing        |
+| 26 | Implement scan --profile filtering or remove the flag                               | MED    | M      | UX             |
+| 27 | Logger globals → DI-injected logger                                                 | MED    | M      | Architecture   |
+| 28 | Split files over 350 lines (compiledbinaries.go, docker.go, nodepackages.go)        | MED    | M      | Code quality   |
+| 29 | Add CLI command tests: profile, config, scan, init                                  | MED    | H      | Testing        |
+| 30 | Split internal/domain/ god package into sub-packages                                | HIGH   | H      | Architecture   |
+| 31 | Split internal/cleaner/ flat structure into sub-packages                            | HIGH   | H      | Architecture   |
+| 32 | Register individual cleaners as DI providers                                        | HIGH   | H      | Architecture   |
+| 33 | Improve Nix size estimation (hardcoded 50MB/generation)                             | MED    | M      | Feature        |
+| 34 | Add tests for getRegistryName reverse lookup                                        | MED    | S      | Testing        |
+| 35 | Remove infertypeargs warnings (8 places)                                            | LOW    | S      | Lint           |
+| 36 | Add Gherkin .feature files for top 3 cleaners                                       | MED    | M      | Testing        |
+| 37 | Fix nix_test.go BDD tests (remove go:build skip_bdd tag)                            | LOW    | S      | Testing        |
+| 38 | Standardize BDD test naming (\*\_ginkgo_test.go pattern)                            | LOW    | S      | Testing        |
+| 39 | Fix pre-commit hook timeout (golangci-lint)                                         | MED    | S      | Tooling        |
+| 40 | Add --dry-run to scan command (parity with clean)                                   | LOW    | S      | Feature        |
+| 41 | Add --keep-generations flag for Nix cleaner                                         | LOW    | S      | Feature        |
+| 42 | Reduce GetOperationType complexity (17 → <10)                                       | LOW    | S      | Lint           |
+| 43 | Extract "go-build\*" string constant                                                | LOW    | S      | Lint           |
+| 44 | Fix mixed receiver warnings (10 enum types)                                         | LOW    | S      | Lint           |
+| 45 | Make adapters interface-backed with do.As aliasing                                  | MED    | L      | Architecture   |
+| 46 | Add doc freshness check script to CI                                                | MED    | M      | Prevention     |
+| 47 | Archive or delete old planning docs (docs/planning/2025-_ and 2026-01/02/03-_)      | LOW    | M      | Cleanup        |
+| 48 | Consolidate duplicate ARCHITECTURE.md files (root vs docs/)                         | MED    | M      | Consolidation  |
+| 49 | Add structured logging for --profile warning in scan                                | LOW    | S      | UX             |
+| 50 | Document the 13th cleaner (Golangci-lint) in docs/cleaner.md                        | LOW    | S      | Doc fix        |
 
 ---
 

@@ -2,7 +2,6 @@ package domain
 
 import "gopkg.in/yaml.v3"
 
-//nolint:recvcheck
 type ExecutionMode int
 
 const (
@@ -27,7 +26,6 @@ func (em *ExecutionMode) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(em), executionModeStrings, "execution mode")
 }
 
-//nolint:recvcheck
 type SafeMode int
 
 const (
@@ -52,7 +50,6 @@ func (sm *SafeMode) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(sm), safeModeStrings, "safe mode")
 }
 
-//nolint:recvcheck
 type ProfileStatus int
 
 const (
@@ -75,7 +72,6 @@ func (ps *ProfileStatus) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(ps), profileStatusStrings, "profile status")
 }
 
-//nolint:recvcheck
 type OptimizationMode int
 
 const (
@@ -100,7 +96,6 @@ func (om *OptimizationMode) UnmarshalYAML(value *yaml.Node) error {
 	return EnumUnmarshalYAML(value, (*int)(om), optimizationModeStrings, "optimization mode")
 }
 
-//nolint:recvcheck
 type HomebrewMode int
 
 const (

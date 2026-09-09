@@ -79,28 +79,28 @@
 
 ## c) NOT STARTED 📝
 
-| #   | Task                                                                        | Impact | Effort |
-| --- | --------------------------------------------------------------------------- | ------ | ------ |
-| 1   | `nix profile` per-user generation management                                | HIGH   | MED    |
-| 2   | `nix store optimise` hard-link deduplication                                | MED    | LOW    |
-| 3   | Consolidate 4 error packages into 1                                         | HIGH   | MED    |
-| 4   | BDD tests for Docker, Homebrew, Go cleaners                                 | HIGH   | HIGH   |
-| 5   | Fix ~40 `err113` lint violations                                            | MED    | MED    |
-| 6   | CI pipeline (`go build` + `go test`)                                        | HIGH   | MED    |
-| 7   | Split `internal/domain/` into sub-packages                                  | HIGH   | HIGH   |
-| 8   | Add `platform` field to `cacheTypeConfig`                                   | MED    | LOW    |
-| 9   | Centralize `runtime.GOOS` into platform detector                            | MED    | MED    |
-| 10  | Split files >350 lines (compiledbinaries 592, docker 540, nodepackages 540) | MED    | MED    |
-| 11  | CLI command tests (scan, clean, profile, config)                            | MED    | HIGH   |
-| 12  | Fix mixed receiver warnings (10 enum types)                                 | LOW    | LOW    |
-| 13  | Reduce `GetOperationType` complexity (17→<10)                               | LOW    | LOW    |
-| 14  | Investigate `net.imput.helium` cache (2.4GB)                                | MED    | LOW    |
-| 15  | Investigate Go `~/.cache/go` dir overlap with GoCacheCleaner                | MED    | LOW    |
-| 16  | Improve Nix size estimation (hardcoded 50MB/gen)                            | MED    | MED    |
-| 17  | Extract test utilities from `internal/cleaner/test_*.go`                    | MED    | MED    |
-| 18  | Add service layer `internal/service/` between CLI and domain                | MED    | HIGH   |
-| 19  | Split `internal/cleaner/` into per-domain sub-packages                      | HIGH   | HIGH   |
-| 20  | Homebrew dry-run support or documented limitation                           | LOW    | MED    |
+| #  | Task                                                                        | Impact | Effort |
+| -- | --------------------------------------------------------------------------- | ------ | ------ |
+| 1  | `nix profile` per-user generation management                                | HIGH   | MED    |
+| 2  | `nix store optimise` hard-link deduplication                                | MED    | LOW    |
+| 3  | Consolidate 4 error packages into 1                                         | HIGH   | MED    |
+| 4  | BDD tests for Docker, Homebrew, Go cleaners                                 | HIGH   | HIGH   |
+| 5  | Fix ~40 `err113` lint violations                                            | MED    | MED    |
+| 6  | CI pipeline (`go build` + `go test`)                                        | HIGH   | MED    |
+| 7  | Split `internal/domain/` into sub-packages                                  | HIGH   | HIGH   |
+| 8  | Add `platform` field to `cacheTypeConfig`                                   | MED    | LOW    |
+| 9  | Centralize `runtime.GOOS` into platform detector                            | MED    | MED    |
+| 10 | Split files >350 lines (compiledbinaries 592, docker 540, nodepackages 540) | MED    | MED    |
+| 11 | CLI command tests (scan, clean, profile, config)                            | MED    | HIGH   |
+| 12 | Fix mixed receiver warnings (10 enum types)                                 | LOW    | LOW    |
+| 13 | Reduce `GetOperationType` complexity (17→<10)                               | LOW    | LOW    |
+| 14 | Investigate `net.imput.helium` cache (2.4GB)                                | MED    | LOW    |
+| 15 | Investigate Go `~/.cache/go` dir overlap with GoCacheCleaner                | MED    | LOW    |
+| 16 | Improve Nix size estimation (hardcoded 50MB/gen)                            | MED    | MED    |
+| 17 | Extract test utilities from `internal/cleaner/test_*.go`                    | MED    | MED    |
+| 18 | Add service layer `internal/service/` between CLI and domain                | MED    | HIGH   |
+| 19 | Split `internal/cleaner/` into per-domain sub-packages                      | HIGH   | HIGH   |
+| 20 | Homebrew dry-run support or documented limitation                           | LOW    | MED    |
 
 ---
 
@@ -137,33 +137,33 @@
 
 ## f) Top 25 Next Actions (sorted by impact/effort)
 
-| #   | Task                                                      | Impact | Effort | Category      |
-| --- | --------------------------------------------------------- | ------ | ------ | ------------- |
-| 1   | Add `nix store optimise` to NixCleaner                    | HIGH   | LOW    | Feature       |
-| 2   | Add marshaling tests for all 27 CacheType values          | MED    | LOW    | Testing       |
-| 3   | Fix systemcache_test.go mixed test (uses macOS-only type) | LOW    | LOW    | Testing       |
-| 4   | Fix mixed receiver warnings (10 enum types)               | LOW    | LOW    | Lint          |
-| 5   | Reduce `GetOperationType` complexity (17→<10)             | LOW    | LOW    | Lint          |
-| 6   | Add `platform` field to `cacheTypeConfig`                 | MED    | LOW    | Type Model    |
-| 7   | Investigate `net.imput.helium` cache (2.4GB)              | MED    | LOW    | Investigation |
-| 8   | Investigate `~/.cache/go` overlap with GoCacheCleaner     | MED    | LOW    | Investigation |
-| 9   | Add `nix profile` per-user generation management          | HIGH   | MED    | Feature       |
-| 10  | Consolidate 4 error packages into 1                       | HIGH   | MED    | Architecture  |
-| 11  | Set up CI pipeline                                        | HIGH   | MED    | Infra         |
-| 12  | Split files >350 lines                                    | MED    | MED    | Code Quality  |
-| 13  | Fix ~40 `err113` lint violations                          | MED    | MED    | Lint          |
-| 14  | Centralize `runtime.GOOS` into platform detector          | MED    | MED    | Architecture  |
-| 15  | Improve Nix size estimation (hardcoded 50MB/gen)          | MED    | MED    | Feature       |
-| 16  | Extract test utilities from cleaner/test\_\*.go           | MED    | MED    | Architecture  |
-| 17  | Add profile command tests                                 | MED    | MED    | Testing       |
-| 18  | BDD tests for Docker, Homebrew, Go cleaners               | HIGH   | HIGH   | Testing       |
-| 19  | CLI command tests (scan, clean, profile, config)          | MED    | HIGH   | Testing       |
-| 20  | Split `internal/domain/` into sub-packages                | HIGH   | HIGH   | Architecture  |
-| 21  | Add service layer `internal/service/`                     | MED    | HIGH   | Architecture  |
-| 22  | Split `internal/cleaner/` into per-domain sub-packages    | HIGH   | HIGH   | Architecture  |
-| 23  | Make NixAdapter discover profile paths dynamically        | MED    | MED    | Architecture  |
-| 24  | Homebrew dry-run support or documented limitation         | LOW    | MED    | Feature       |
-| 25  | Language Version Manager cleaner (currently NO-OP)        | MED    | MED    | Feature       |
+| #  | Task                                                      | Impact | Effort | Category      |
+| -- | --------------------------------------------------------- | ------ | ------ | ------------- |
+| 1  | Add `nix store optimise` to NixCleaner                    | HIGH   | LOW    | Feature       |
+| 2  | Add marshaling tests for all 27 CacheType values          | MED    | LOW    | Testing       |
+| 3  | Fix systemcache_test.go mixed test (uses macOS-only type) | LOW    | LOW    | Testing       |
+| 4  | Fix mixed receiver warnings (10 enum types)               | LOW    | LOW    | Lint          |
+| 5  | Reduce `GetOperationType` complexity (17→<10)             | LOW    | LOW    | Lint          |
+| 6  | Add `platform` field to `cacheTypeConfig`                 | MED    | LOW    | Type Model    |
+| 7  | Investigate `net.imput.helium` cache (2.4GB)              | MED    | LOW    | Investigation |
+| 8  | Investigate `~/.cache/go` overlap with GoCacheCleaner     | MED    | LOW    | Investigation |
+| 9  | Add `nix profile` per-user generation management          | HIGH   | MED    | Feature       |
+| 10 | Consolidate 4 error packages into 1                       | HIGH   | MED    | Architecture  |
+| 11 | Set up CI pipeline                                        | HIGH   | MED    | Infra         |
+| 12 | Split files >350 lines                                    | MED    | MED    | Code Quality  |
+| 13 | Fix ~40 `err113` lint violations                          | MED    | MED    | Lint          |
+| 14 | Centralize `runtime.GOOS` into platform detector          | MED    | MED    | Architecture  |
+| 15 | Improve Nix size estimation (hardcoded 50MB/gen)          | MED    | MED    | Feature       |
+| 16 | Extract test utilities from cleaner/test\_\*.go           | MED    | MED    | Architecture  |
+| 17 | Add profile command tests                                 | MED    | MED    | Testing       |
+| 18 | BDD tests for Docker, Homebrew, Go cleaners               | HIGH   | HIGH   | Testing       |
+| 19 | CLI command tests (scan, clean, profile, config)          | MED    | HIGH   | Testing       |
+| 20 | Split `internal/domain/` into sub-packages                | HIGH   | HIGH   | Architecture  |
+| 21 | Add service layer `internal/service/`                     | MED    | HIGH   | Architecture  |
+| 22 | Split `internal/cleaner/` into per-domain sub-packages    | HIGH   | HIGH   | Architecture  |
+| 23 | Make NixAdapter discover profile paths dynamically        | MED    | MED    | Architecture  |
+| 24 | Homebrew dry-run support or documented limitation         | LOW    | MED    | Feature       |
+| 25 | Language Version Manager cleaner (currently NO-OP)        | MED    | MED    | Feature       |
 
 ---
 

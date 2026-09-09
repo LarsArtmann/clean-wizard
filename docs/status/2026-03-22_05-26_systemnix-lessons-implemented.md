@@ -1,7 +1,7 @@
 # Clean Wizard - SystemNix Lessons Implementation Status
 
-**Date:** 2026-03-22  
-**Author:** Lars Artmann  
+**Date:** 2026-03-22\
+**Author:** Lars Artmann\
 **Branch:** master (up to date with origin)
 
 ---

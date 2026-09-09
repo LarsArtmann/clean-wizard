@@ -380,9 +380,9 @@ $ go vet ./...
 | -------------------- | ---------- | ----------------------- | ----------- |
 | Per-cleaner details  | ❌ Generic | ✅ Specific metrics     | 100%        |
 | Error context        | ❌ Vague   | ✅ Clear categorization | 100%        |
-| Summary completeness | ⚠️ Partial | ✅ Comprehensive        | 100%        |
+| Summary completeness | ⚠️ Partial  | ✅ Comprehensive        | 100%        |
 | Platform detection   | ❌ Runtime | ✅ Config-time          | 100%        |
-| User trust           | ⚠️ Medium  | ✅ High                 | 80%         |
+| User trust           | ⚠️ Medium   | ✅ High                 | 80%         |
 
 ---
 

@@ -17,16 +17,16 @@ VERSION_NUM=$(echo "$GO_VERSION" | sed 's/^go//' | cut -d'.' -f1-2)
 
 # Check if fuzzing is supported
 if [[ "$VERSION_NUM" < "1.18" ]]; then
-    echo "❌ Go version $GO_VERSION does not support native fuzzing"
-    echo "   Required: Go 1.18+"
-    echo "   Current: $GO_VERSION"
-    exit 1
+	echo "❌ Go version $GO_VERSION does not support native fuzzing"
+	echo "   Required: Go 1.18+"
+	echo "   Current: $GO_VERSION"
+	exit 1
 fi
 
 echo "✅ Go version supports native fuzzing"
 
 # Run fuzz tests with coverage
-FUZZ_TIME=${1:-"30s"}  # Default 30 seconds per fuzz test
+FUZZ_TIME=${1:-"30s"} # Default 30 seconds per fuzz test
 COVERAGE_DIR="fuzz_coverage"
 mkdir -p "$COVERAGE_DIR"
 
@@ -103,16 +103,16 @@ echo "==============================="
 
 # Generate coverage report
 echo "Generating combined coverage report..."
-go tool covmerge "$COVERAGE_DIR"/*.cover > "$COVERAGE_DIR/combined.cover" 2>/dev/null || echo "No coverage files to merge"
+go tool covmerge "$COVERAGE_DIR"/*.cover >"$COVERAGE_DIR/combined.cover" 2>/dev/null || echo "No coverage files to merge"
 
 # Create coverage summary
 if [ -f "$COVERAGE_DIR/combined.cover" ]; then
-    echo "Combined coverage:"
-    go tool cover -func="$COVERAGE_DIR/combined.cover" | head -20
-    
-    # Generate HTML report
-    go tool cover -html="$COVERAGE_DIR/combined.cover" -o "$COVERAGE_DIR/fuzz_coverage.html"
-    echo "HTML coverage report: $COVERAGE_DIR/fuzz_coverage.html"
+	echo "Combined coverage:"
+	go tool cover -func="$COVERAGE_DIR/combined.cover" | head -20
+
+	# Generate HTML report
+	go tool cover -html="$COVERAGE_DIR/combined.cover" -o "$COVERAGE_DIR/fuzz_coverage.html"
+	echo "HTML coverage report: $COVERAGE_DIR/fuzz_coverage.html"
 fi
 
 echo ""
@@ -125,7 +125,7 @@ echo "✅ Coverage reports generated"
 echo "✅ No panics or crashes detected"
 
 if [ -f "$COVERAGE_DIR/fuzz_coverage.html" ]; then
-    echo "📈 Detailed coverage report: $COVERAGE_DIR/fuzz_coverage.html"
+	echo "📈 Detailed coverage report: $COVERAGE_DIR/fuzz_coverage.html"
 fi
 
 echo ""

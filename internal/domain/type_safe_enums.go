@@ -10,7 +10,7 @@ import (
 
 // RiskLevelType represents the risk level enum with compile-time safety.
 //
-//nolint:recvcheck
+
 type RiskLevelType int
 
 const (
@@ -62,7 +62,7 @@ func (rl RiskLevelType) IsHigherOrEqualThan(other RiskLevelType) bool { return r
 
 // ValidationLevelType represents validation levels with compile-time safety.
 //
-//nolint:recvcheck
+
 type ValidationLevelType int
 
 const (
@@ -90,7 +90,7 @@ func (vl *ValidationLevelType) UnmarshalJSON(data []byte) error {
 
 // ChangeOperationType represents change operations with compile-time safety.
 //
-//nolint:recvcheck
+
 type ChangeOperationType int
 
 const (
@@ -118,7 +118,7 @@ func (co *ChangeOperationType) UnmarshalJSON(data []byte) error {
 
 // CleanStrategyType represents cleaning strategies with compile-time safety.
 //
-//nolint:recvcheck
+
 type CleanStrategyType int
 
 const (
@@ -171,7 +171,7 @@ func (cs CleanStrategyType) Icon() string {
 // SizeEstimateStatusType represents the status of a size estimate with type safety.
 // This replaces the boolean Unknown field, making impossible states unrepresentable.
 //
-//nolint:recvcheck
+
 type SizeEstimateStatusType int
 
 const (
@@ -185,7 +185,7 @@ var sizeEstimateStatusTypeStrings = []string{"KNOWN", "UNKNOWN"} //nolint:gocons
 
 func (ses SizeEstimateStatusType) String() string {
 	if !ses.IsValid() {
-		return "INVALID" //nolint:goconst
+		return "INVALID"
 	}
 
 	return sizeEstimateStatusTypeStrings[ses]

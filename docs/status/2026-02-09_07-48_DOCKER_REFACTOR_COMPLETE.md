@@ -1,9 +1,9 @@
 # Clean Wizard: Comprehensive Status Report
 
-**Date**: February 9, 2026, 07:48 UTC  
-**Status**: Docker Cleaner Refactoring COMPLETE - Ready for Next Phase  
-**Quality Score**: 90.1/100 (World-Class)  
-**Branch**: master  
+**Date**: February 9, 2026, 07:48 UTC\
+**Status**: Docker Cleaner Refactoring COMPLETE - Ready for Next Phase\
+**Quality Score**: 90.1/100 (World-Class)\
+**Branch**: master\
 **Commit**: 5e94e2a (refactor(docker): migrate from local enum to domain enum)
 
 ---
@@ -12,7 +12,7 @@
 
 ### 1. Cleaner Interface Implementation ✅
 
-**Status**: 100% Complete  
+**Status**: 100% Complete\
 **Details**: All 13 cleaners now implement both `Clean()` and `IsAvailable()` methods consistently
 
 - Nix Cleaner
@@ -29,7 +29,7 @@
 
 ### 2. Context Propagation Fix ✅
 
-**Status**: 100% Complete  
+**Status**: 100% Complete\
 **Details**: Error messages in `internal/cleaner/validate.go` now include:
 
 - Index information
@@ -39,7 +39,7 @@
 
 ### 3. Binary Enum Unification ✅
 
-**Status**: 100% Complete  
+**Status**: 100% Complete\
 **Details**:
 
 - Removed 69 lines of duplicate code
@@ -49,7 +49,7 @@
 
 ### 4. Integration Tests for Enum Workflows ✅
 
-**Status**: 100% Complete  
+**Status**: 100% Complete\
 **Details**: 6 comprehensive test functions, all passing
 
 - `TestEnumWorkflow_IntegerFormat`
@@ -61,7 +61,7 @@
 
 ### 5. Enum Validation at Config Boundaries ✅
 
-**Status**: 100% Complete  
+**Status**: 100% Complete\
 **Details**: Added validation for:
 
 - RiskLevel enum
@@ -73,7 +73,7 @@
 
 ### 6. Docker Cleaner Enum Refactoring ✅
 
-**Status**: 100% Complete  
+**Status**: 100% Complete\
 **Details**:
 
 - Migrated from local enum (aggression levels) to domain enum (resource types)
@@ -105,7 +105,7 @@
 
 ### Complexity Reduction in Top 5 Functions
 
-**Status**: 5% Complete  
+**Status**: 5% Complete\
 **Details**:
 
 - Identified 21 functions with cyclomatic complexity > 10
@@ -128,8 +128,8 @@
 
 #### 1. SystemCache Cleaner Refactoring
 
-**Status**: NOT STARTED  
-**Impact**: HIGH  
+**Status**: NOT STARTED\
+**Impact**: HIGH\
 **Issue**: Enum inconsistency - local `SystemCacheType` vs domain `CacheType`
 
 - Local enum: Lowercase strings ("spotlight", "xcode", "cocoapods", "homebrew")
@@ -140,9 +140,9 @@
 
 #### 2. Extract Generic Cleaner Interface
 
-**Status**: NOT STARTED  
-**Impact**: HIGH  
-**Effort**: 1 day  
+**Status**: NOT STARTED\
+**Impact**: HIGH\
+**Effort**: 1 day\
 **Details**:
 
 - 11+ cleaner implementations with identical patterns
@@ -166,8 +166,8 @@ type Cleaner interface {
 
 #### 3. NodePackages Cleaner Refactoring
 
-**Status**: NOT STARTED  
-**Impact**: MEDIUM  
+**Status**: NOT STARTED\
+**Impact**: MEDIUM\
 **Issue**: Type mismatch - local string enum vs domain integer enum
 
 - Local enum: String type ("pnpm", "pnpm", "yarn", "bun")
@@ -177,8 +177,8 @@ type Cleaner interface {
 
 #### 4. BuildCache Cleaner Refactoring
 
-**Status**: NOT STARTED  
-**Impact**: MEDIUM  
+**Status**: NOT STARTED\
+**Impact**: MEDIUM\
 **Issue**: Complete abstraction mismatch
 
 - Local enum: Build tools ("gradle", "maven", "sbt")
@@ -191,8 +191,8 @@ type Cleaner interface {
 
 #### 5. LangVersionManager Cleaner Refactoring
 
-**Status**: NOT STARTED  
-**Impact**: LOW  
+**Status**: NOT STARTED\
+**Impact**: LOW\
 **Issue**: Subset issue - less critical
 
 - Local enum: ("nvm", "pyenv", "rbenv")
@@ -216,62 +216,62 @@ Everything is working correctly. All tests pass. No critical issues.
 
 #### Enum Consistency Across Layers
 
-**Issue**: Local enums in cleaners don't align with domain enums  
-**Impact**: Configuration/validation mismatch with actual cleaner implementation  
+**Issue**: Local enums in cleaners don't align with domain enums\
+**Impact**: Configuration/validation mismatch with actual cleaner implementation\
 **Solution**: Refactor all cleaners to use domain enums (in progress - 1 of 5 done)
 
 #### Cleaner Interface Extraction
 
-**Issue**: No shared interface for polymorphism  
-**Impact**: Can't iterate over cleaners, no mock interface  
+**Issue**: No shared interface for polymorphism\
+**Impact**: Can't iterate over cleaners, no mock interface\
 **Solution**: Extract generic Cleaner interface (Task 2.1 in plan)
 
 ### 2. Error Messages
 
 #### Add File Paths, Line Numbers, Suggested Fixes
 
-**Issue**: Error messages lack context for debugging  
-**Impact**: Difficult troubleshooting  
+**Issue**: Error messages lack context for debugging\
+**Impact**: Difficult troubleshooting\
 **Solution**: Enhance error context preservation
 
 ### 3. Testing
 
 #### Edge Case Coverage
 
-**Issue**: Limited edge case testing for enum unmarshaling  
-**Impact**: Potential for uncaught bugs  
+**Issue**: Limited edge case testing for enum unmarshaling\
+**Impact**: Potential for uncaught bugs\
 **Solution**: Add tests for negative integers, out-of-range values, mixed case strings
 
 ### 4. Documentation
 
 #### YAML Enum Format Examples
 
-**Issue**: Documentation exists but could be more comprehensive  
-**Impact**: Developer onboarding friction  
+**Issue**: Documentation exists but could be more comprehensive\
+**Impact**: Developer onboarding friction\
 **Solution**: Add more examples and quick reference guide
 
 ### 5. Performance
 
 #### Validation Caching
 
-**Issue**: No caching for repeated validation operations  
-**Impact**: Unnecessary overhead  
+**Issue**: No caching for repeated validation operations\
+**Impact**: Unnecessary overhead\
 **Solution**: Implement validation result caching
 
 ### 6. Code Quality
 
 #### Replace Deprecated Strategy Constants
 
-**Issue**: 49 deprecation warnings for Strategy constants  
-**Impact**: Technical debt  
+**Issue**: 49 deprecation warnings for Strategy constants\
+**Impact**: Technical debt\
 **Solution**: Migrate to type-safe constants
 
 ### 7. Type Safety
 
 #### Add Utility Enum Methods
 
-**Issue**: Missing helper methods for enum operations  
-**Impact**: Verbose code  
+**Issue**: Missing helper methods for enum operations\
+**Impact**: Verbose code\
 **Solution**: Add `IsValid()`, `String()`, `MarshalJSON()` consistently
 
 ---
@@ -402,6 +402,6 @@ This decision affects the architectural integrity of the entire system and shoul
 
 ---
 
-**Report Generated**: 2026-02-09 07:48 UTC  
-**Author**: Crush AI Assistant  
+**Report Generated**: 2026-02-09 07:48 UTC\
+**Author**: Crush AI Assistant\
 **Status**: Ready for Execution ✅

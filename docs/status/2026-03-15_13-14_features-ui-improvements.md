@@ -160,33 +160,33 @@
 
 ## F) TOP 25 THINGS TO DO NEXT 🎯
 
-| #   | Priority | Task                                  | Effort | Impact |
-| --- | -------- | ------------------------------------- | ------ | ------ |
-| 1   | P0       | Add progress indicators during scans  | 2h     | High   |
-| 2   | P0       | Add `--quiet` flag for scripting      | 1h     | Medium |
-| 3   | P0       | Write CLI integration tests           | 4h     | High   |
-| 4   | P1       | Add global `--dry-run` flag           | 2h     | Medium |
-| 5   | P1       | Add color-coded risk levels           | 1h     | Medium |
-| 6   | P1       | Implement error recovery/retry        | 3h     | High   |
-| 7   | P1       | Add shell completion scripts          | 2h     | Low    |
-| 8   | P1       | Extract TUI patterns to shared module | 3h     | Medium |
-| 9   | P2       | Add config hot reload                 | 4h     | Medium |
-| 10  | P2       | Add profile export/import             | 3h     | Medium |
-| 11  | P2       | Implement parallel scanning           | 4h     | High   |
-| 12  | P2       | Add scan result caching               | 3h     | Medium |
-| 13  | P2       | Add structured logging                | 3h     | Medium |
-| 14  | P2       | Add debug/verbose mode                | 2h     | Medium |
-| 15  | P2       | Add man page generation               | 2h     | Low    |
-| 16  | P3       | Add scheduling/automation hooks       | 4h     | Medium |
-| 17  | P3       | Add keyboard shortcuts                | 3h     | Low    |
-| 18  | P3       | Improve narrow terminal support       | 2h     | Low    |
-| 19  | P3       | Add i18n infrastructure               | 4h     | Low    |
-| 20  | P3       | Add incremental scan mode             | 4h     | Medium |
-| 21  | P3       | Add streaming JSON output             | 3h     | Medium |
-| 22  | P3       | Lazy load cleaner availability        | 2h     | Medium |
-| 23  | P4       | Add partial success handling          | 4h     | Medium |
-| 24  | P4       | Add rollback on failures              | 6h     | High   |
-| 25  | P4       | Create CLI user guide                 | 3h     | Medium |
+| #  | Priority | Task                                  | Effort | Impact |
+| -- | -------- | ------------------------------------- | ------ | ------ |
+| 1  | P0       | Add progress indicators during scans  | 2h     | High   |
+| 2  | P0       | Add `--quiet` flag for scripting      | 1h     | Medium |
+| 3  | P0       | Write CLI integration tests           | 4h     | High   |
+| 4  | P1       | Add global `--dry-run` flag           | 2h     | Medium |
+| 5  | P1       | Add color-coded risk levels           | 1h     | Medium |
+| 6  | P1       | Implement error recovery/retry        | 3h     | High   |
+| 7  | P1       | Add shell completion scripts          | 2h     | Low    |
+| 8  | P1       | Extract TUI patterns to shared module | 3h     | Medium |
+| 9  | P2       | Add config hot reload                 | 4h     | Medium |
+| 10 | P2       | Add profile export/import             | 3h     | Medium |
+| 11 | P2       | Implement parallel scanning           | 4h     | High   |
+| 12 | P2       | Add scan result caching               | 3h     | Medium |
+| 13 | P2       | Add structured logging                | 3h     | Medium |
+| 14 | P2       | Add debug/verbose mode                | 2h     | Medium |
+| 15 | P2       | Add man page generation               | 2h     | Low    |
+| 16 | P3       | Add scheduling/automation hooks       | 4h     | Medium |
+| 17 | P3       | Add keyboard shortcuts                | 3h     | Low    |
+| 18 | P3       | Improve narrow terminal support       | 2h     | Low    |
+| 19 | P3       | Add i18n infrastructure               | 4h     | Low    |
+| 20 | P3       | Add incremental scan mode             | 4h     | Medium |
+| 21 | P3       | Add streaming JSON output             | 3h     | Medium |
+| 22 | P3       | Lazy load cleaner availability        | 2h     | Medium |
+| 23 | P4       | Add partial success handling          | 4h     | Medium |
+| 24 | P4       | Add rollback on failures              | 6h     | High   |
+| 25 | P4       | Create CLI user guide                 | 3h     | Medium |
 
 ---
 
@@ -221,11 +221,11 @@ My recommendation: Start with **progress indicators** (best UX improvement) foll
 ## Files Changed Summary
 
 ```
- cmd/clean-wizard/commands/clean.go  | 205 ++++++++++++++++---
- cmd/clean-wizard/commands/config.go |  24 +--
- cmd/clean-wizard/commands/init.go   | 394 +++++++++++++++++++++++++++++++-----
- cmd/clean-wizard/commands/scan.go   | 265 ++++++++++++------------
- 4 files changed, 661 insertions(+), 227 deletions(-)
+cmd/clean-wizard/commands/clean.go  | 205 ++++++++++++++++---
+cmd/clean-wizard/commands/config.go |  24 +--
+cmd/clean-wizard/commands/init.go   | 394 +++++++++++++++++++++++++++++++-----
+cmd/clean-wizard/commands/scan.go   | 265 ++++++++++++------------
+4 files changed, 661 insertions(+), 227 deletions(-)
 ```
 
 ---

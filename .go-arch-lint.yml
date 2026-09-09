@@ -265,7 +265,6 @@ excludeFiles:
   - "integration_test\\.go$" # Integration test files
   - ".*_integration_test\\.go$" # Integration test variations
 
-
 # 📋 ARCHITECTURE VALIDATION RULES & DECISIONS
 #
 # This configuration implements Clean Architecture with Domain-Driven Design:

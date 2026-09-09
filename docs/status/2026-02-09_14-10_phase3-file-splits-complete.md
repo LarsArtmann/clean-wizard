@@ -1,9 +1,9 @@
 # Clean Wizard Project Status Report
 
-**Generated:** 2026-02-09 14:10  
-**Report Type:** Comprehensive Status Update  
-**Project Phase:** Phase 3 Complete - File Splitting for Maintainability  
-**Git Branch:** master  
+**Generated:** 2026-02-09 14:10\
+**Report Type:** Comprehensive Status Update\
+**Project Phase:** Phase 3 Complete - File Splitting for Maintainability\
+**Git Branch:** master\
 **Last Commit:** 1fb8e21 - refactor: split large files under 350 lines for maintainability
 
 ---
@@ -128,15 +128,15 @@ go test ./... -count=1                   # PASSED - All packages
 
 ### Overall Project Metrics
 
-| Metric                | Value | Status                  |
-| --------------------- | ----- | ----------------------- |
-| Total Go files        | 120   | ✅ In scope             |
-| Files under 350 lines | 98    | ✅ 81.7% compliant      |
+| Metric                | Value | Status                 |
+| --------------------- | ----- | ---------------------- |
+| Total Go files        | 120   | ✅ In scope            |
+| Files under 350 lines | 98    | ✅ 81.7% compliant     |
 | Files over 350 lines  | 22    | ⚠️ 18.3% need attention |
-| Test packages         | 14    | ✅ All passing          |
-| Build errors          | 0     | ✅ Clean                |
-| Lint warnings         | 4     | 🟢 Minor                |
-| Benchmark test files  | 5     | ✅ Ready                |
+| Test packages         | 14    | ✅ All passing         |
+| Build errors          | 0     | ✅ Clean               |
+| Lint warnings         | 4     | 🟢 Minor               |
+| Benchmark test files  | 5     | ✅ Ready               |
 
 ### File Size Distribution
 
@@ -156,7 +156,7 @@ go test ./... -count=1                   # PASSED - All packages
 | ----------------- | ---------- | ------------------------------------ |
 | Unit tests        | ✅ PASSING | All 14 packages pass                 |
 | BDD tests         | ✅ PASSING | Nix workflow, configuration workflow |
-| Integration tests | ⚠️ PARTIAL | Enum workflows 75% complete          |
+| Integration tests | ⚠️ PARTIAL  | Enum workflows 75% complete          |
 | Benchmark tests   | ✅ READY   | 5 benchmark files, 642 lines         |
 | Test coverage     | 📊 UNKNOWN | No coverage tool configured          |
 
@@ -286,16 +286,16 @@ registry.Register(OperationNix, cleaner)  // Type-safe keys
 
 ### Identified Technical Debt Items
 
-| #   | Item                               | Severity  | Effort to Fix | Impact          |
-| --- | ---------------------------------- | --------- | ------------- | --------------- |
-| 1   | 22 files over 350 lines            | 🟠 MEDIUM | 4-6 hours     | Maintainability |
-| 2   | Scattered error definitions        | 🟠 MEDIUM | 2 hours       | Consistency     |
-| 3   | String keys in registry            | 🟠 MEDIUM | 1 hour        | Type safety     |
-| 4   | Boolean parameters in constructors | 🟢 LOW    | 2 hours       | API clarity     |
-| 5   | No configuration versioning        | 🟠 MEDIUM | 2 hours       | Future-proofing |
-| 6   | 4 unused import warnings           | 🟢 LOW    | 15 min        | Code quality    |
-| 7   | No OpenAPI documentation           | 🟡 LOW    | 3 hours       | DX              |
-| 8   | No contribution guidelines         | 🟢 LOW    | 1 hour        | Onboarding      |
+| # | Item                               | Severity  | Effort to Fix | Impact          |
+| - | ---------------------------------- | --------- | ------------- | --------------- |
+| 1 | 22 files over 350 lines            | 🟠 MEDIUM | 4-6 hours     | Maintainability |
+| 2 | Scattered error definitions        | 🟠 MEDIUM | 2 hours       | Consistency     |
+| 3 | String keys in registry            | 🟠 MEDIUM | 1 hour        | Type safety     |
+| 4 | Boolean parameters in constructors | 🟢 LOW    | 2 hours       | API clarity     |
+| 5 | No configuration versioning        | 🟠 MEDIUM | 2 hours       | Future-proofing |
+| 6 | 4 unused import warnings           | 🟢 LOW    | 15 min        | Code quality    |
+| 7 | No OpenAPI documentation           | 🟡 LOW    | 3 hours       | DX              |
+| 8 | No contribution guidelines         | 🟢 LOW    | 1 hour        | Onboarding      |
 
 ---
 

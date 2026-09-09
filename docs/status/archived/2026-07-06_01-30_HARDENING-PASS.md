@@ -17,21 +17,21 @@ Completed the DI + workflow migration hardening pass. Fixed 4 critical bugs, rem
 
 ### Critical Bug Fixes
 
-| #   | Fix                                                             | File                        |
-| --- | --------------------------------------------------------------- | --------------------------- |
-| 1   | Workflow errors no longer silently dropped when steps exist     | `execution/workflow.go`     |
-| 2   | Panics in cleaners now recovered and recorded as failed steps   | `execution/builder.go`      |
-| 3   | `isProcessRunning` now fails closed when `pgrep` is unavailable | `cleaner/golang_cleaner.go` |
-| 4   | Results sorted by registration order for deterministic output   | `execution/results.go`      |
+| # | Fix                                                             | File                        |
+| - | --------------------------------------------------------------- | --------------------------- |
+| 1 | Workflow errors no longer silently dropped when steps exist     | `execution/workflow.go`     |
+| 2 | Panics in cleaners now recovered and recorded as failed steps   | `execution/builder.go`      |
+| 3 | `isProcessRunning` now fails closed when `pgrep` is unavailable | `cleaner/golang_cleaner.go` |
+| 4 | Results sorted by registration order for deterministic output   | `execution/results.go`      |
 
 ### Quality Improvements
 
-| #   | Change                                                                                 | Impact                            |
-| --- | -------------------------------------------------------------------------------------- | --------------------------------- |
-| 5   | `resultCollector` mutex changed from `*sync.Mutex` to value `sync.Mutex` + constructor | Eliminates nil-pointer risk       |
-| 6   | `TotalItemsFailed` now aggregates from ALL steps, not just successful ones             | Correct accounting                |
-| 7   | Typed `NotAvailableError` + `IsNotAvailableError()` replaces fragile string matching   | Future-proof error classification |
-| 8   | JSON error serialization verified correct (false positive from review)                 | No action needed                  |
+| # | Change                                                                                 | Impact                            |
+| - | -------------------------------------------------------------------------------------- | --------------------------------- |
+| 5 | `resultCollector` mutex changed from `*sync.Mutex` to value `sync.Mutex` + constructor | Eliminates nil-pointer risk       |
+| 6 | `TotalItemsFailed` now aggregates from ALL steps, not just successful ones             | Correct accounting                |
+| 7 | Typed `NotAvailableError` + `IsNotAvailableError()` replaces fragile string matching   | Future-proof error classification |
+| 8 | JSON error serialization verified correct (false positive from review)                 | No action needed                  |
 
 ### Dead Code Removed (675 lines)
 
@@ -46,13 +46,13 @@ Completed the DI + workflow migration hardening pass. Fixed 4 critical bugs, rem
 
 ### New Features
 
-| #   | Feature                                                         | Files                                        |
-| --- | --------------------------------------------------------------- | -------------------------------------------- |
-| 9   | `--config` flag for scan command                                | `scan.go`                                    |
-| 10  | Scan command wired to `execution.RunScans` (parallel execution) | `scan.go`                                    |
-| 11  | `RetryConfig` + `flow.Retry` with exponential backoff           | `execution/retry.go`, `execution/options.go` |
-| 12  | `cenkalti/backoff/v4` promoted to direct dependency             | `go.mod`                                     |
-| 13  | `MaxConcurrency` field in `RunSettings`                         | `di/options.go`                              |
+| #  | Feature                                                         | Files                                        |
+| -- | --------------------------------------------------------------- | -------------------------------------------- |
+| 9  | `--config` flag for scan command                                | `scan.go`                                    |
+| 10 | Scan command wired to `execution.RunScans` (parallel execution) | `scan.go`                                    |
+| 11 | `RetryConfig` + `flow.Retry` with exponential backoff           | `execution/retry.go`, `execution/options.go` |
+| 12 | `cenkalti/backoff/v4` promoted to direct dependency             | `go.mod`                                     |
+| 13 | `MaxConcurrency` field in `RunSettings`                         | `di/options.go`                              |
 
 ### Test Coverage Added (16 new tests)
 

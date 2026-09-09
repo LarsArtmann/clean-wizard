@@ -160,33 +160,33 @@ Untracked files:
 
 ## Top #25 Things To Do Next
 
-| #   | Task                                 | Priority    | Effort |
-| --- | ------------------------------------ | ----------- | ------ |
-| 1   | Commit BDD test file                 | 🔴 Critical | 2 min  |
-| 2   | Commit this status report            | 🔴 Critical | 2 min  |
-| 3   | Run full test suite                  | 🔴 Critical | 5 min  |
-| 4   | Manual end-to-end test               | 🟠 High     | 10 min |
-| 5   | Add integration test for filter-repo | 🟠 High     | 30 min |
-| 6   | Test with nix provider               | 🟡 Medium   | 15 min |
-| 7   | Fix exhaustruct warnings             | 🟡 Medium   | 20 min |
-| 8   | Fix funcorder warnings               | 🟡 Medium   | 15 min |
-| 9   | Add more BDD scenarios               | 🟡 Medium   | 1 hr   |
-| 10  | Update FEATURES.md                   | 🟡 Medium   | 10 min |
-| 11  | Add justfile targets                 | 🟢 Low      | 30 min |
-| 12  | Add CI/CD config                     | 🟢 Low      | 1 hr   |
-| 13  | Add pre-commit hooks                 | 🟢 Low      | 30 min |
-| 14  | Improve error messages               | 🟢 Low      | 30 min |
-| 15  | Add godoc examples                   | 🟢 Low      | 30 min |
-| 16  | Add progress indicator               | 🟢 Low      | 1 hr   |
-| 17  | Add benchmark tests                  | 🟢 Low      | 1 hr   |
-| 18  | Add cancellation support             | 🟢 Low      | 2 hr   |
-| 19  | Add rollback capability              | 🟢 Low      | 2 hr   |
-| 20  | Add custom args support              | 🟢 Low      | 1 hr   |
-| 21  | Add interactive selection            | 🟢 Low      | 2 hr   |
-| 22  | Add scheduled jobs                   | 🟢 Low      | 3 hr   |
-| 23  | Add remote repo support              | 🟢 Low      | 4 hr   |
-| 24  | Add pre/post hooks                   | 🟢 Low      | 2 hr   |
-| 25  | Add metrics/logging                  | 🟢 Low      | 2 hr   |
+| #  | Task                                 | Priority    | Effort |
+| -- | ------------------------------------ | ----------- | ------ |
+| 1  | Commit BDD test file                 | 🔴 Critical | 2 min  |
+| 2  | Commit this status report            | 🔴 Critical | 2 min  |
+| 3  | Run full test suite                  | 🔴 Critical | 5 min  |
+| 4  | Manual end-to-end test               | 🟠 High     | 10 min |
+| 5  | Add integration test for filter-repo | 🟠 High     | 30 min |
+| 6  | Test with nix provider               | 🟡 Medium   | 15 min |
+| 7  | Fix exhaustruct warnings             | 🟡 Medium   | 20 min |
+| 8  | Fix funcorder warnings               | 🟡 Medium   | 15 min |
+| 9  | Add more BDD scenarios               | 🟡 Medium   | 1 hr   |
+| 10 | Update FEATURES.md                   | 🟡 Medium   | 10 min |
+| 11 | Add justfile targets                 | 🟢 Low      | 30 min |
+| 12 | Add CI/CD config                     | 🟢 Low      | 1 hr   |
+| 13 | Add pre-commit hooks                 | 🟢 Low      | 30 min |
+| 14 | Improve error messages               | 🟢 Low      | 30 min |
+| 15 | Add godoc examples                   | 🟢 Low      | 30 min |
+| 16 | Add progress indicator               | 🟢 Low      | 1 hr   |
+| 17 | Add benchmark tests                  | 🟢 Low      | 1 hr   |
+| 18 | Add cancellation support             | 🟢 Low      | 2 hr   |
+| 19 | Add rollback capability              | 🟢 Low      | 2 hr   |
+| 20 | Add custom args support              | 🟢 Low      | 1 hr   |
+| 21 | Add interactive selection            | 🟢 Low      | 2 hr   |
+| 22 | Add scheduled jobs                   | 🟢 Low      | 3 hr   |
+| 23 | Add remote repo support              | 🟢 Low      | 4 hr   |
+| 24 | Add pre/post hooks                   | 🟢 Low      | 2 hr   |
+| 25 | Add metrics/logging                  | 🟢 Low      | 2 hr   |
 
 ---
 

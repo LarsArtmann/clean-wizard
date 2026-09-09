@@ -92,9 +92,9 @@
 
 ### Linter Diagnostics (70% Clean)
 
-| Category | Count | Severity                     |
-| -------- | ----- | ---------------------------- |
-| Errors   | 0     | ✅ None                      |
+| Category | Count | Severity                    |
+| -------- | ----- | --------------------------- |
+| Errors   | 0     | ✅ None                     |
 | Warnings | 179   | ⚠️ Needs attention           |
 | Hints    | ~230  | ℹ️ Code quality improvements |
 
@@ -194,63 +194,63 @@ Specific issues identified:
 
 ### Priority 1: Fix Test Failures (Critical)
 
-| #   | Task                                                                                | Effort | Impact |
-| --- | ----------------------------------------------------------------------------------- | ------ | ------ |
-| 1   | Fix `TestDetectFilterRepoProvider` - Mock nix detection or skip when unavailable    | 1h     | HIGH   |
-| 2   | Fix `TestSystemCacheCleaner_Clean_DryRun` - Create test fixtures or mock filesystem | 1h     | HIGH   |
+| # | Task                                                                                | Effort | Impact |
+| - | ----------------------------------------------------------------------------------- | ------ | ------ |
+| 1 | Fix `TestDetectFilterRepoProvider` - Mock nix detection or skip when unavailable    | 1h     | HIGH   |
+| 2 | Fix `TestSystemCacheCleaner_Clean_DryRun` - Create test fixtures or mock filesystem | 1h     | HIGH   |
 
 ### Priority 2: Code Quality (High)
 
-| #   | Task                                                                                 | Effort | Impact |
-| --- | ------------------------------------------------------------------------------------ | ------ | ------ |
-| 3   | Fix `githistory.go:443-448` - Replace WriteString(fmt.Sprintf(...)) with fmt.Fprintf | 15min  | MEDIUM |
-| 4   | Remove unused function `printCleanerResult` in `clean.go:299`                        | 5min   | LOW    |
-| 5   | Address `unusedparams` warnings in CLI commands                                      | 30min  | LOW    |
-| 6   | Remove unnecessary type arguments in `cleaner_implementations.go`                    | 10min  | LOW    |
-| 7   | Run `golangci-lint run --fix` for auto-fixable issues                                | 10min  | MEDIUM |
+| # | Task                                                                                 | Effort | Impact |
+| - | ------------------------------------------------------------------------------------ | ------ | ------ |
+| 3 | Fix `githistory.go:443-448` - Replace WriteString(fmt.Sprintf(...)) with fmt.Fprintf | 15min  | MEDIUM |
+| 4 | Remove unused function `printCleanerResult` in `clean.go:299`                        | 5min   | LOW    |
+| 5 | Address `unusedparams` warnings in CLI commands                                      | 30min  | LOW    |
+| 6 | Remove unnecessary type arguments in `cleaner_implementations.go`                    | 10min  | LOW    |
+| 7 | Run `golangci-lint run --fix` for auto-fixable issues                                | 10min  | MEDIUM |
 
 ### Priority 3: CI/CD (High)
 
-| #   | Task                                                      | Effort | Impact |
-| --- | --------------------------------------------------------- | ------ | ------ |
-| 8   | Create `.github/workflows/test.yml` for automated testing | 30min  | HIGH   |
-| 9   | Add `golangci-lint` to CI pipeline                        | 15min  | HIGH   |
-| 10  | Add test coverage reporting to CI                         | 30min  | MEDIUM |
-| 11  | Add release automation (goreleaser)                       | 1h     | MEDIUM |
+| #  | Task                                                      | Effort | Impact |
+| -- | --------------------------------------------------------- | ------ | ------ |
+| 8  | Create `.github/workflows/test.yml` for automated testing | 30min  | HIGH   |
+| 9  | Add `golangci-lint` to CI pipeline                        | 15min  | HIGH   |
+| 10 | Add test coverage reporting to CI                         | 30min  | MEDIUM |
+| 11 | Add release automation (goreleaser)                       | 1h     | MEDIUM |
 
 ### Priority 4: Testing (Medium)
 
-| #   | Task                                               | Effort | Impact |
-| --- | -------------------------------------------------- | ------ | ------ |
-| 12  | Add integration test fixtures for reliable testing | 2h     | HIGH   |
-| 13  | Increase test coverage to 80%+                     | 4h     | MEDIUM |
-| 14  | Add benchmark tests for performance-critical paths | 2h     | MEDIUM |
-| 15  | Add mutation testing (go-mutesting)                | 2h     | LOW    |
+| #  | Task                                               | Effort | Impact |
+| -- | -------------------------------------------------- | ------ | ------ |
+| 12 | Add integration test fixtures for reliable testing | 2h     | HIGH   |
+| 13 | Increase test coverage to 80%+                     | 4h     | MEDIUM |
+| 14 | Add benchmark tests for performance-critical paths | 2h     | MEDIUM |
+| 15 | Add mutation testing (go-mutesting)                | 2h     | LOW    |
 
 ### Priority 5: Documentation (Medium)
 
-| #   | Task                                          | Effort | Impact |
-| --- | --------------------------------------------- | ------ | ------ |
-| 16  | Generate and publish godoc documentation      | 1h     | MEDIUM |
-| 17  | Add CONTRIBUTING.md for open source readiness | 30min  | MEDIUM |
-| 18  | Add CHANGELOG.md for version tracking         | 30min  | MEDIUM |
-| 19  | Create user guide with examples               | 2h     | HIGH   |
+| #  | Task                                          | Effort | Impact |
+| -- | --------------------------------------------- | ------ | ------ |
+| 16 | Generate and publish godoc documentation      | 1h     | MEDIUM |
+| 17 | Add CONTRIBUTING.md for open source readiness | 30min  | MEDIUM |
+| 18 | Add CHANGELOG.md for version tracking         | 30min  | MEDIUM |
+| 19 | Create user guide with examples               | 2h     | HIGH   |
 
 ### Priority 6: Features (Lower)
 
-| #   | Task                                          | Effort | Impact |
-| --- | --------------------------------------------- | ------ | ------ |
-| 20  | Add `--json` output format for all commands   | 2h     | MEDIUM |
-| 21  | Add progress bars for long-running operations | 2h     | LOW    |
-| 22  | Add shell completion (bash, zsh, fish)        | 2h     | MEDIUM |
-| 23  | Add verbose logging with `--debug` flag       | 1h     | LOW    |
+| #  | Task                                          | Effort | Impact |
+| -- | --------------------------------------------- | ------ | ------ |
+| 20 | Add `--json` output format for all commands   | 2h     | MEDIUM |
+| 21 | Add progress bars for long-running operations | 2h     | LOW    |
+| 22 | Add shell completion (bash, zsh, fish)        | 2h     | MEDIUM |
+| 23 | Add verbose logging with `--debug` flag       | 1h     | LOW    |
 
 ### Priority 7: Architecture (Lower)
 
-| #   | Task                                    | Effort | Impact |
-| --- | --------------------------------------- | ------ | ------ |
-| 24  | Evaluate error handling standardization | 2h     | MEDIUM |
-| 25  | Plan plugin architecture for cleaners   | 4h     | LOW    |
+| #  | Task                                    | Effort | Impact |
+| -- | --------------------------------------- | ------ | ------ |
+| 24 | Evaluate error handling standardization | 2h     | MEDIUM |
+| 25 | Plan plugin architecture for cleaners   | 4h     | LOW    |
 
 ---
 

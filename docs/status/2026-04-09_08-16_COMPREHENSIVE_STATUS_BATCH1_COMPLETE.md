@@ -1,9 +1,9 @@
 # Clean Wizard - Comprehensive Status Report
 
-**Date:** 2026-04-09 08:16:16  
-**Branch:** master  
-**Commits Ahead of Origin:** 1  
-**Go Version:** 1.26.1 (darwin/arm64)  
+**Date:** 2026-04-09 08:16:16\
+**Branch:** master\
+**Commits Ahead of Origin:** 1\
+**Go Version:** 1.26.1 (darwin/arm64)\
 **Total Go Files:** 197
 
 ---
@@ -94,14 +94,14 @@ The following items remain in the backlog:
 
 ### Outstanding TODO_LIST.md Items
 
-| #   | Task                                         | Impact | Effort |
-| --- | -------------------------------------------- | ------ | ------ |
-| 1   | Add tests for getRegistryName reverse lookup | MED    | LOW    |
-| 2   | Add profile command tests                    | MED    | MED    |
-| 3   | Add scan command tests                       | MED    | MED    |
-| 4   | Add clean command tests                      | MED    | HIGH   |
-| 5   | Set up CI pipeline                           | HIGH   | MED    |
-| 6   | Fix pre-commit hook timeout                  | MED    | LOW    |
+| # | Task                                         | Impact | Effort |
+| - | -------------------------------------------- | ------ | ------ |
+| 1 | Add tests for getRegistryName reverse lookup | MED    | LOW    |
+| 2 | Add profile command tests                    | MED    | MED    |
+| 3 | Add scan command tests                       | MED    | MED    |
+| 4 | Add clean command tests                      | MED    | HIGH   |
+| 5 | Set up CI pipeline                           | HIGH   | MED    |
+| 6 | Fix pre-commit hook timeout                  | MED    | LOW    |
 
 ---
 
@@ -223,48 +223,48 @@ The following items remain in the backlog:
 
 ### Critical (Do First)
 
-| #   | Task                               | Category       | Impact   | Effort |
-| --- | ---------------------------------- | -------------- | -------- | ------ |
-| 1   | **Fix Go build cache**             | Infrastructure | CRITICAL | LOW    |
-| 2   | **Complete Batch 1 bug fixes**     | Bug Fix        | HIGH     | LOW    |
-| 3   | **Verify Batch 1 with tests**      | Quality        | HIGH     | LOW    |
-| 4   | **Commit Batch 1 remaining**       | Process        | HIGH     | LOW    |
-| 5   | **Extract IsToolAvailable helper** | Refactor       | MED      | LOW    |
+| # | Task                               | Category       | Impact   | Effort |
+| - | ---------------------------------- | -------------- | -------- | ------ |
+| 1 | **Fix Go build cache**             | Infrastructure | CRITICAL | LOW    |
+| 2 | **Complete Batch 1 bug fixes**     | Bug Fix        | HIGH     | LOW    |
+| 3 | **Verify Batch 1 with tests**      | Quality        | HIGH     | LOW    |
+| 4 | **Commit Batch 1 remaining**       | Process        | HIGH     | LOW    |
+| 5 | **Extract IsToolAvailable helper** | Refactor       | MED      | LOW    |
 
 ### High Priority
 
-| #   | Task                                       | Category | Impact | Effort |
-| --- | ------------------------------------------ | -------- | ------ | ------ |
-| 6   | **Extract ParseSizeString helper**         | Refactor | MED    | LOW    |
-| 7   | **Remove projectsmanagementautomation.go** | Cleanup  | MED    | LOW    |
-| 8   | **Remove scanDockerResources**             | Cleanup  | LOW    | LOW    |
-| 9   | **Commit Batch 2**                         | Process  | MED    | LOW    |
-| 10  | **Add clean command tests**                | Testing  | HIGH   | HIGH   |
-| 11  | **Set up CI pipeline**                     | DevOps   | HIGH   | MED    |
-| 12  | **Fix pre-commit hook timeout**            | DevEx    | MED    | LOW    |
-| 13  | **Add profile command tests**              | Testing  | MED    | MED    |
-| 14  | **Add scan command tests**                 | Testing  | MED    | MED    |
-| 15  | **Fix golangci-lint warnings**             | Quality  | MED    | MED    |
+| #  | Task                                       | Category | Impact | Effort |
+| -- | ------------------------------------------ | -------- | ------ | ------ |
+| 6  | **Extract ParseSizeString helper**         | Refactor | MED    | LOW    |
+| 7  | **Remove projectsmanagementautomation.go** | Cleanup  | MED    | LOW    |
+| 8  | **Remove scanDockerResources**             | Cleanup  | LOW    | LOW    |
+| 9  | **Commit Batch 2**                         | Process  | MED    | LOW    |
+| 10 | **Add clean command tests**                | Testing  | HIGH   | HIGH   |
+| 11 | **Set up CI pipeline**                     | DevOps   | HIGH   | MED    |
+| 12 | **Fix pre-commit hook timeout**            | DevEx    | MED    | LOW    |
+| 13 | **Add profile command tests**              | Testing  | MED    | MED    |
+| 14 | **Add scan command tests**                 | Testing  | MED    | MED    |
+| 15 | **Fix golangci-lint warnings**             | Quality  | MED    | MED    |
 
 ### Medium Priority
 
-| #   | Task                                    | Category    | Impact | Effort |
-| --- | --------------------------------------- | ----------- | ------ | ------ |
-| 16  | Implement Go in BuildToolType           | Feature     | MED    | MED    |
-| 17  | Implement Node in BuildToolType         | Feature     | MED    | MED    |
-| 18  | Implement Python in BuildToolType       | Feature     | MED    | MED    |
-| 19  | Implement Rust in BuildToolType         | Feature     | MED    | MED    |
-| 20  | Add real size estimation to Nix cleaner | Enhancement | MED    | MED    |
-| 21  | Add dry-run support to Homebrew cleaner | Enhancement | MED    | MED    |
+| #  | Task                                    | Category    | Impact | Effort |
+| -- | --------------------------------------- | ----------- | ------ | ------ |
+| 16 | Implement Go in BuildToolType           | Feature     | MED    | MED    |
+| 17 | Implement Node in BuildToolType         | Feature     | MED    | MED    |
+| 18 | Implement Python in BuildToolType       | Feature     | MED    | MED    |
+| 19 | Implement Rust in BuildToolType         | Feature     | MED    | MED    |
+| 20 | Add real size estimation to Nix cleaner | Enhancement | MED    | MED    |
+| 21 | Add dry-run support to Homebrew cleaner | Enhancement | MED    | MED    |
 
 ### Lower Priority / Strategic
 
-| #   | Task                                       | Category      | Impact | Effort |
-| --- | ------------------------------------------ | ------------- | ------ | ------ |
-| 22  | Implement Language Version Manager cleaner | Feature       | LOW    | HIGH   |
-| 23  | Remove Projects Management Automation      | Cleanup       | LOW    | LOW    |
-| 24  | Add contributing guidelines                | Documentation | LOW    | LOW    |
-| 25  | Create architecture decision records       | Documentation | LOW    | LOW    |
+| #  | Task                                       | Category      | Impact | Effort |
+| -- | ------------------------------------------ | ------------- | ------ | ------ |
+| 22 | Implement Language Version Manager cleaner | Feature       | LOW    | HIGH   |
+| 23 | Remove Projects Management Automation      | Cleanup       | LOW    | LOW    |
+| 24 | Add contributing guidelines                | Documentation | LOW    | LOW    |
+| 25 | Create architecture decision records       | Documentation | LOW    | LOW    |
 
 ---
 
@@ -371,5 +371,5 @@ Date:   Thu Apr 9 08:04:57 2026 +0200
 
 ---
 
-_Report generated: 2026-04-09 08:16:16_  
+_Report generated: 2026-04-09 08:16:16_\
 _Status: Waiting for build environment resolution_

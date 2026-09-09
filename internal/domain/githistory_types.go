@@ -153,7 +153,7 @@ func (r GitHistorySafetyReport) CanProceed() bool {
 
 // GitHistoryMode represents the mode of operation for git history cleaning.
 //
-//nolint:recvcheck
+
 type GitHistoryMode int
 
 const (

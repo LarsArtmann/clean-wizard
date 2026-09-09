@@ -154,58 +154,58 @@
 
 ### Priority 1: Quick Wins (1-2 hours total)
 
-| #   | Task                                            | Effort | Impact |
-| --- | ----------------------------------------------- | ------ | ------ |
-| 1   | Add `.golangci.yml` to suppress false positives | 15min  | High   |
-| 2   | Remove unused code (24 items)                   | 30min  | Medium |
-| 3   | Extract magic numbers to named constants        | 30min  | Medium |
-| 4   | Fix simple wrapcheck warnings                   | 20min  | Medium |
+| # | Task                                            | Effort | Impact |
+| - | ----------------------------------------------- | ------ | ------ |
+| 1 | Add `.golangci.yml` to suppress false positives | 15min  | High   |
+| 2 | Remove unused code (24 items)                   | 30min  | Medium |
+| 3 | Extract magic numbers to named constants        | 30min  | Medium |
+| 4 | Fix simple wrapcheck warnings                   | 20min  | Medium |
 
 ### Priority 2: Code Quality (2-4 hours)
 
-| #   | Task                                        | Effort | Impact |
-| --- | ------------------------------------------- | ------ | ------ |
-| 5   | Refactor top 5 highest complexity functions | 1hr    | High   |
-| 6   | Add `t.Parallel()` to tests where safe      | 30min  | Medium |
-| 7   | Reorder functions for funcorder compliance  | 30min  | Low    |
-| 8   | Add package comments for revive             | 20min  | Low    |
+| # | Task                                        | Effort | Impact |
+| - | ------------------------------------------- | ------ | ------ |
+| 5 | Refactor top 5 highest complexity functions | 1hr    | High   |
+| 6 | Add `t.Parallel()` to tests where safe      | 30min  | Medium |
+| 7 | Reorder functions for funcorder compliance  | 30min  | Low    |
+| 8 | Add package comments for revive             | 20min  | Low    |
 
 ### Priority 3: Architecture (4-8 hours)
 
-| #   | Task                                           | Effort | Impact |
-| --- | ---------------------------------------------- | ------ | ------ |
-| 9   | Extract common cleaner patterns to shared base | 2hr    | High   |
-| 10  | Unify error types across packages              | 2hr    | High   |
-| 11  | Add integration tests for CLI commands         | 2hr    | High   |
-| 12  | Document public API with examples              | 2hr    | Medium |
+| #  | Task                                           | Effort | Impact |
+| -- | ---------------------------------------------- | ------ | ------ |
+| 9  | Extract common cleaner patterns to shared base | 2hr    | High   |
+| 10 | Unify error types across packages              | 2hr    | High   |
+| 11 | Add integration tests for CLI commands         | 2hr    | High   |
+| 12 | Document public API with examples              | 2hr    | Medium |
 
 ### Priority 4: Testing (2-4 hours)
 
-| #   | Task                                         | Effort | Impact |
-| --- | -------------------------------------------- | ------ | ------ |
-| 13  | Increase test coverage on low-coverage files | 2hr    | High   |
-| 14  | Add fuzz tests for parsing functions         | 1hr    | Medium |
-| 15  | Add benchmark tests for hot paths            | 1hr    | Medium |
+| #  | Task                                         | Effort | Impact |
+| -- | -------------------------------------------- | ------ | ------ |
+| 13 | Increase test coverage on low-coverage files | 2hr    | High   |
+| 14 | Add fuzz tests for parsing functions         | 1hr    | Medium |
+| 15 | Add benchmark tests for hot paths            | 1hr    | Medium |
 
 ### Priority 5: Documentation (1-2 hours)
 
-| #   | Task                                   | Effort | Impact |
-| --- | -------------------------------------- | ------ | ------ |
-| 16  | Update README with current features    | 30min  | High   |
-| 17  | Add CONTRIBUTING.md                    | 30min  | Medium |
-| 18  | Add CHANGELOG.md                       | 30min  | Medium |
-| 19  | Document cleaner configuration options | 30min  | Medium |
+| #  | Task                                   | Effort | Impact |
+| -- | -------------------------------------- | ------ | ------ |
+| 16 | Update README with current features    | 30min  | High   |
+| 17 | Add CONTRIBUTING.md                    | 30min  | Medium |
+| 18 | Add CHANGELOG.md                       | 30min  | Medium |
+| 19 | Document cleaner configuration options | 30min  | Medium |
 
 ### Priority 6: Future Features (Future consideration)
 
-| #   | Task                                  | Effort | Impact |
-| --- | ------------------------------------- | ------ | ------ |
-| 20  | Add Windows support for cleaners      | 4hr    | Medium |
-| 21  | Add progress bars for long operations | 2hr    | Medium |
-| 22  | Add scheduled cleanup mode            | 2hr    | Medium |
-| 23  | Add configuration profiles            | 2hr    | Medium |
-| 24  | Add remote config support             | 3hr    | Low    |
-| 25  | Add telemetry/opt-out                 | 2hr    | Low    |
+| #  | Task                                  | Effort | Impact |
+| -- | ------------------------------------- | ------ | ------ |
+| 20 | Add Windows support for cleaners      | 4hr    | Medium |
+| 21 | Add progress bars for long operations | 2hr    | Medium |
+| 22 | Add scheduled cleanup mode            | 2hr    | Medium |
+| 23 | Add configuration profiles            | 2hr    | Medium |
+| 24 | Add remote config support             | 3hr    | Low    |
+| 25 | Add telemetry/opt-out                 | 2hr    | Low    |
 
 ---
 

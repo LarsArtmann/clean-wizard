@@ -10,6 +10,7 @@
 ## Executive Summary
 
 Loaded the `docs-health` skill and applied it across the entire 2026-07-06 → 2026-08-05 docs surface. Verified every claim in `TODO_LIST.md`, `FEATURES.md`, `ROADMAP.md`, and `CHANGELOG.md` against code. Found two real defects:
+
 1. **Real test failure** — `TestRunCleaners_Retry` was asserting the deprecated `FreedBytes` field (always 0); also `recordFinal` had a copy-in-loop bug that silently dropped the in-place assignment on retry attempts. Both fixed.
 2. **Docs drift** — `FEATURES.md` described `ProjectsManagementAutomation` cleaner as `BROKEN/MOCKED` when it actually returns proper `*NotAvailableError`; `TODO_LIST.md` had items that were already complete (`GetOperationType` complexity, mixed receivers).
 
@@ -23,43 +24,43 @@ Refreshed all four living docs with 2026-08-10 dates and harvested items from th
 
 ### Real Bugs Fixed
 
-| #   | Fix                                                                                                                                                              | Evidence                                                                                  |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| 1   | **`recordFinal` copy-in-loop bug** — `internal/execution/results.go` was iterating `for _, v := range slices.Backward(rc.results)` and mutating `v` (a copy), so the in-place assignment was dropped. Retry-succeeded steps were therefore reported as failed because the original error remained. Replaced with index-based `rc.results[i] = ...`. Also removed unused `slices` import. | `go test ./internal/execution/ -short` PASSES (was failing with `actual: 0x0`/`"failed"`)  |
-| 2   | **`TestRunCleaners_Retry` regression assertion** — was asserting `wr.Steps[0].Clean.FreedBytes == 42` against the deprecated `FreedBytes` field. Migrated to `wr.Steps[0].Clean.SizeEstimate.Value()` and updated the mock to return `domain.CleanResult{SizeEstimate: SizeEstimate{Known: 42, Status: SizeEstimateStatusKnown}, ItemsRemoved: 1}`. | Same test run PASSES                                                                      |
-| 3   | **All execution package tests now pass**                                                                                                                         | `ok github.com/LarsArtmann/clean-wizard/internal/execution 0.054s`                        |
-| 4   | **All DI, format, domain, config, conversions, middleware, result, schema, strings, validation, version, logger, tests/bdd, tests/benchmark packages pass**      | 22/23 packages PASS                                                                       |
+| # | Fix                                                                                                                                                                                                                                                                                                                                                                                      | Evidence                                                                                  |
+| - | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 1 | **`recordFinal` copy-in-loop bug** — `internal/execution/results.go` was iterating `for _, v := range slices.Backward(rc.results)` and mutating `v` (a copy), so the in-place assignment was dropped. Retry-succeeded steps were therefore reported as failed because the original error remained. Replaced with index-based `rc.results[i] = ...`. Also removed unused `slices` import. | `go test ./internal/execution/ -short` PASSES (was failing with `actual: 0x0`/`"failed"`) |
+| 2 | **`TestRunCleaners_Retry` regression assertion** — was asserting `wr.Steps[0].Clean.FreedBytes == 42` against the deprecated `FreedBytes` field. Migrated to `wr.Steps[0].Clean.SizeEstimate.Value()` and updated the mock to return `domain.CleanResult{SizeEstimate: SizeEstimate{Known: 42, Status: SizeEstimateStatusKnown}, ItemsRemoved: 1}`.                                      | Same test run PASSES                                                                      |
+| 3 | **All execution package tests now pass**                                                                                                                                                                                                                                                                                                                                                 | `ok github.com/LarsArtmann/clean-wizard/internal/execution 0.054s`                        |
+| 4 | **All DI, format, domain, config, conversions, middleware, result, schema, strings, validation, version, logger, tests/bdd, tests/benchmark packages pass**                                                                                                                                                                                                                              | 22/23 packages PASS                                                                       |
 
 ### Living Docs Refreshed
 
-| #   | Doc                                              | Change                                                                                                                                                                                                                                            |
-| --- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 5   | `TODO_LIST.md` (full rewrite)                    | Verified every claim against code. Dropped `GetOperationType` complexity reduction (#14 — already a map lookup in `operation_types.go:179`). Dropped mixed receivers (#9 — fixed at `1c2bec6`). Added 4 new items from 2026-08-05 linter report. |
-| 6   | `ROADMAP.md`                                     | Date bumped to 2026-08-10. Added Theme #4 (Honest Size Estimation — Nix hardcoded 50MB), Theme #5 (Quality Gates — `flake.nix` checks + go-humanize-linter). Added 3 raw ideas. Added non-goal #5 (re-introducing `cockroachdb/errors`).        |
-| 7   | `FEATURES.md`                                    | Corrected Projects Management Automation cleaner status from `🚧 BROKEN / 🧪 MOCKED` to `✅ FULLY_FUNCTIONAL` with proper typed `*NotAvailableError` description. Updated Recent Improvements with 2026-07-14/15 and 2026-08-05/10 entries.        |
-| 8   | `CHANGELOG.md`                                   | Append-only entries for 2026-08-10, 2026-08-05, 2026-07-15, 2026-07-14 (above existing 2026-07-06 block). Added Fixed entries for `recordFinal` bug and `TestRunCleaners_Retry` regression.                                                       |
-| 9   | `AGENTS.md`                                      | Added "Last Reviewed: 2026-08-10 (docs-health audit)" header                                                                                                                                                                                       |
+| # | Doc                           | Change                                                                                                                                                                                                                                           |
+| - | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 5 | `TODO_LIST.md` (full rewrite) | Verified every claim against code. Dropped `GetOperationType` complexity reduction (#14 — already a map lookup in `operation_types.go:179`). Dropped mixed receivers (#9 — fixed at `1c2bec6`). Added 4 new items from 2026-08-05 linter report. |
+| 6 | `ROADMAP.md`                  | Date bumped to 2026-08-10. Added Theme #4 (Honest Size Estimation — Nix hardcoded 50MB), Theme #5 (Quality Gates — `flake.nix` checks + go-humanize-linter). Added 3 raw ideas. Added non-goal #5 (re-introducing `cockroachdb/errors`).         |
+| 7 | `FEATURES.md`                 | Corrected Projects Management Automation cleaner status from `🚧 BROKEN / 🧪 MOCKED` to `✅ FULLY_FUNCTIONAL` with proper typed `*NotAvailableError` description. Updated Recent Improvements with 2026-07-14/15 and 2026-08-05/10 entries.      |
+| 8 | `CHANGELOG.md`                | Append-only entries for 2026-08-10, 2026-08-05, 2026-07-15, 2026-07-14 (above existing 2026-07-06 block). Added Fixed entries for `recordFinal` bug and `TestRunCleaners_Retry` regression.                                                      |
+| 9 | `AGENTS.md`                   | Added "Last Reviewed: 2026-08-10 (docs-health audit)" header                                                                                                                                                                                     |
 
 ### Historical Docs Annotated + Archived
 
-| #   | Doc                                                                                  | Action                                                                                                                                                                                                              |
-| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 10  | `docs/status/2026-07-06_01-38_FULL-SESSION-REVIEW.md` (25 items)                    | Full inline strikethrough of all 25 numbered items in section f), all 13 in c), all 5 in b), all 5 in d). Each marked with `done at <hash>` or `NOT-DO`.                                                              |
-| 11  | `docs/status/2026-07-06_02-37_PARETO-HARDENING-FINAL.md` (25 items)                | Full inline strikethrough of all 25 items + sections b/c/d/e/g                                                                                                                                                     |
-| 12  | `docs/status/2026-07-06_03-42_HARDENING-EXECUTION.md` (21 + 25 items)               | Full inline strikethrough                                                                                                                                                                                          |
-| 13  | `docs/status/2026-07-06_05-19_GO-ERROR-FAMILY-ADOPTION.md` (25 items)               | Full inline strikethrough                                                                                                                                                                                          |
-| 14  | All 11 remaining 2026-07-* and 2026-08-* docs                                       | Header-level "Resolution (2026-08-10)" block summarizing current state, which commits shipped each item, where the open items live in `TODO_LIST.md`                                                                 |
-| 15  | All 15 historical files                                                              | `git mv` to `archived/` subdirectory (14 status files → `docs/status/archived/`, 1 planning file → `docs/planning/archived/`)                                                                                       |
+| #  | Doc                                                                   | Action                                                                                                                                                   |
+| -- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 10 | `docs/status/2026-07-06_01-38_FULL-SESSION-REVIEW.md` (25 items)      | Full inline strikethrough of all 25 numbered items in section f), all 13 in c), all 5 in b), all 5 in d). Each marked with `done at <hash>` or `NOT-DO`. |
+| 11 | `docs/status/2026-07-06_02-37_PARETO-HARDENING-FINAL.md` (25 items)   | Full inline strikethrough of all 25 items + sections b/c/d/e/g                                                                                           |
+| 12 | `docs/status/2026-07-06_03-42_HARDENING-EXECUTION.md` (21 + 25 items) | Full inline strikethrough                                                                                                                                |
+| 13 | `docs/status/2026-07-06_05-19_GO-ERROR-FAMILY-ADOPTION.md` (25 items) | Full inline strikethrough                                                                                                                                |
+| 14 | All 11 remaining 2026-07-* and 2026-08-* docs                         | Header-level "Resolution (2026-08-10)" block summarizing current state, which commits shipped each item, where the open items live in `TODO_LIST.md`     |
+| 15 | All 15 historical files                                               | `git mv` to `archived/` subdirectory (14 status files → `docs/status/archived/`, 1 planning file → `docs/planning/archived/`)                            |
 
 ### Verification
 
-| #   | Check                                      | Result                                                                                                                                            |
-| --- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 16  | `GOEXPERIMENT=jsonv2 go build ./...`       | PASS (no output)                                                                                                                                  |
-| 17  | `GOEXPERIMENT=jsonv2 go vet ./...`         | PASS (no output)                                                                                                                                  |
-| 18  | `go test ./internal/execution/ -short`     | PASS (was failing — `TestRunCleaners_Retry`)                                                                                                     |
-| 19  | `go test ./internal/cleaner/ -short`       | 243 Ginkgo specs PASS, plus 1 pre-existing Cargo flake (TODO #24 — environment-dependent, not my regression)                                      |
-| 20  | All 22 other packages short tests          | PASS                                                                                                                                              |
+| #  | Check                                  | Result                                                                                                       |
+| -- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| 16 | `GOEXPERIMENT=jsonv2 go build ./...`   | PASS (no output)                                                                                             |
+| 17 | `GOEXPERIMENT=jsonv2 go vet ./...`     | PASS (no output)                                                                                             |
+| 18 | `go test ./internal/execution/ -short` | PASS (was failing — `TestRunCleaners_Retry`)                                                                 |
+| 19 | `go test ./internal/cleaner/ -short`   | 243 Ginkgo specs PASS, plus 1 pre-existing Cargo flake (TODO #24 — environment-dependent, not my regression) |
+| 20 | All 22 other packages short tests      | PASS                                                                                                         |
 
 ---
 
@@ -129,12 +130,15 @@ Discovered while harvesting items from `2026-08-05_03-06_GO-HUMANIZE-LINTER-FIX.
 `TestRunCleaners_Retry` was failing in `go test ./internal/execution/ -short`. The failure is NOT a flake — it's a regression from the 2026-07-06 hardening pass. Two interacting bugs:
 
 **Bug A: Deprecated field assertion**
+
 ```go
 assert.Equal(t, uint64(42), wr.Steps[0].Clean.FreedBytes)
 ```
+
 `CleanResult.FreedBytes` was marked `// Deprecated: Use SizeEstimate instead`. The mock returned `{FreedBytes: 42}` but the field is always 0 in the new model. Even with bug A fixed, the test would still fail because of bug B.
 
 **Bug B: Copy-in-loop in `recordFinal`**
+
 ```go
 for _, v := range slices.Backward(rc.results) {  // v is a COPY
     if v.Name == name {
@@ -143,6 +147,7 @@ for _, v := range slices.Backward(rc.results) {  // v is a COPY
     }
 }
 ```
+
 The intent was "replace the previous entry for this step name on retry" — but the assignment was discarded. So even on a successful retry, `recordFinal` left the original failed entry in place. The test caught this because `TestRunCleaners_Retry` correctly asserted `len(Steps) == 1` AND `StepStatusSucceeded` — but the entry was still the original failure.
 
 **Why neither was caught:** the test assertion for `FreedBytes == 42` was failing first (before the loop bug could be observed). When you fix the assertion, you find the loop bug. Both bugs coexisted since the 2026-07-06 hardening pass.
@@ -269,6 +274,7 @@ The user did not say "commit". All changes (renamed + content-modified historica
 ### Question 1: Should the docs archive be committed to git, or only the renames?
 
 I used `git mv` for the renames (preserves history) and added inline content modifications. The user might prefer:
+
 - (a) Keep all renames + modifications committed (full history visible, but `docs/status/` is now empty)
 - (b) Move content to `archived/` but commit content as-is (no inline strikethrough — strikethroughs live only in the new docs)
 - (c) Squash all historical docs into a single `docs/historical-2026-Q3.tar.gz` blob (loses individual history)
@@ -278,6 +284,7 @@ The renames preserve git history (which is the right choice per skill), but the 
 ### Question 2: Should the `recordFinal` fix be its own commit, or part of the docs commit?
 
 The fix is logically unrelated to the docs-health audit (it's a latent test bug). Commit hygiene suggests separating them:
+
 - Commit 1: `fix(execution): recordFinal in-place mutation + retry test SizeEstimate assertion`
 - Commit 2: `docs: docs-health second pass + archive historical reports`
 
@@ -286,6 +293,7 @@ But the test fix was discovered DURING the docs-health verification step, so tem
 ### Question 3: Should `FEATURES.md` Projects Mgmt row be left at `⚠️ Tool-Dependent` or split into two states?
 
 The cleaner section text now correctly says `FULLY_FUNCTIONAL` (it returns `*NotAvailableError` properly). But the feature matrix row uses `⚠️` for all 5 columns (Available, Scan, Clean, Dry-Run, Size Accurate) — implying partial capability. In reality:
+
 - If `projects-management-automation` CLI is installed: full functionality ✅
 - If NOT installed: `*NotAvailableError` → Skipped (also ✅, not BROKEN)
 

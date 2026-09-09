@@ -141,10 +141,10 @@ func (cv *ConfigValidator) validateProtectedPathsConflict(
 	op domain.CleanupOperation,
 ) error {
 	switch op.Name {
-	case "temp-files": //nolint:goconst
+	case "temp-files":
 		// Check if temp files cleanup might affect protected paths
 		return cv.checkTempFilesConflict(protected, op)
-	case "nix-generations": //nolint:goconst
+	case "nix-generations":
 		// Check if nix cleanup might affect protected paths
 		return cv.checkNixConflict(protected, op)
 	default:

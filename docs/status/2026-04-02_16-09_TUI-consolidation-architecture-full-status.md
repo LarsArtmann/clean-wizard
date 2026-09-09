@@ -1,8 +1,8 @@
 # Comprehensive Status Report — TUI Consolidation, Dead Code, Architecture
 
-**Date:** 2026-04-02 16:09  
-**Branch:** master  
-**HEAD:** `fe6d0c2` fix(clean_cmd): differentiate standard vs aggressive preset modes  
+**Date:** 2026-04-02 16:09\
+**Branch:** master\
+**HEAD:** `fe6d0c2` fix(clean_cmd): differentiate standard vs aggressive preset modes\
 **Working tree:** 13 modified files, 1 untracked file (this report)
 
 ---
@@ -125,33 +125,33 @@ All safe, mechanical changes — unused `ctx`, `cmd`, `args`, `config` parameter
 
 Sorted by **impact × effort** (highest ROI first):
 
-| #   | Task                                                                   | Impact      | Effort | Category     |
-| --- | ---------------------------------------------------------------------- | ----------- | ------ | ------------ |
-| 1   | Commit the uncommitted metadata map + LSP fixes (fix broken HEAD)      | 🔴 CRITICAL | LOW    | Immediate    |
-| 2   | Push to remote (HEAD is broken, remote needs fix)                      | 🔴 CRITICAL | LOW    | Immediate    |
-| 3   | Fix or remove `~/projects/go.work` (breaks all Go builds in subdirs)   | HIGH        | LOW    | DX           |
-| 4   | Add unit tests for `cleanerMetadata` (completeness, uniqueness)        | HIGH        | LOW    | Testing      |
-| 5   | Fix pre-commit hook golangci-lint timeout                              | MED         | LOW    | DX           |
-| 6   | Add `init()` validation: metadata keys ↔ operationType map consistency | MED         | LOW    | Safety       |
-| 7   | Replace `runCleaner()` switch with factory map                         | HIGH        | MED    | Architecture |
-| 8   | Remove `langversion` cleaner stub or implement it                      | MED         | LOW    | Debt         |
-| 9   | Update `FEATURES.md` / `TODO_LIST.md` to reflect current state         | LOW         | LOW    | Docs         |
-| 10  | Commit LSP unused-param fixes as separate lint commit                  | LOW         | LOW    | Quality      |
-| 11  | Add tests for `getRegistryName` reverse lookup                         | MED         | LOW    | Testing      |
-| 12  | Evaluate `stringer` codegen for `CleanerType` enum                     | MED         | MED    | DX           |
-| 13  | Consider merging `CleanerType` with registry name strings              | HIGH        | HIGH   | Architecture |
-| 14  | Add profile command tests                                              | MED         | MED    | Testing      |
-| 15  | Add scan command tests                                                 | MED         | MED    | Testing      |
-| 16  | Add clean command tests                                                | MED         | HIGH   | Testing      |
-| 17  | Extract TUI display metadata to `metadata.go` file                     | LOW         | LOW    | Organization |
-| 18  | Review `OperationType` vs `CleanerType` — are both needed?             | MED         | HIGH   | Architecture |
-| 19  | GitHistory cleaner — unify into TUI or keep separate?                  | LOW         | HIGH   | Design       |
-| 20  | Set up CI pipeline (at minimum: `go build` + `go test -short`)         | HIGH        | MED    | CI           |
-| 21  | BDD test performance (322s) — parallelize or optimize                  | MED         | MED    | CI           |
-| 22  | Review error handling patterns in commands                             | MED         | MED    | Quality      |
-| 23  | Evaluate Fang DI for cleaner registration                              | MED         | MED    | Architecture |
-| 24  | Structured logging instead of `fmt.Println` in commands                | MED         | MED    | Quality      |
-| 25  | Add `Makefile` or improve `justfile` for common dev tasks              | LOW         | LOW    | DX           |
+| #  | Task                                                                   | Impact      | Effort | Category     |
+| -- | ---------------------------------------------------------------------- | ----------- | ------ | ------------ |
+| 1  | Commit the uncommitted metadata map + LSP fixes (fix broken HEAD)      | 🔴 CRITICAL | LOW    | Immediate    |
+| 2  | Push to remote (HEAD is broken, remote needs fix)                      | 🔴 CRITICAL | LOW    | Immediate    |
+| 3  | Fix or remove `~/projects/go.work` (breaks all Go builds in subdirs)   | HIGH        | LOW    | DX           |
+| 4  | Add unit tests for `cleanerMetadata` (completeness, uniqueness)        | HIGH        | LOW    | Testing      |
+| 5  | Fix pre-commit hook golangci-lint timeout                              | MED         | LOW    | DX           |
+| 6  | Add `init()` validation: metadata keys ↔ operationType map consistency | MED         | LOW    | Safety       |
+| 7  | Replace `runCleaner()` switch with factory map                         | HIGH        | MED    | Architecture |
+| 8  | Remove `langversion` cleaner stub or implement it                      | MED         | LOW    | Debt         |
+| 9  | Update `FEATURES.md` / `TODO_LIST.md` to reflect current state         | LOW         | LOW    | Docs         |
+| 10 | Commit LSP unused-param fixes as separate lint commit                  | LOW         | LOW    | Quality      |
+| 11 | Add tests for `getRegistryName` reverse lookup                         | MED         | LOW    | Testing      |
+| 12 | Evaluate `stringer` codegen for `CleanerType` enum                     | MED         | MED    | DX           |
+| 13 | Consider merging `CleanerType` with registry name strings              | HIGH        | HIGH   | Architecture |
+| 14 | Add profile command tests                                              | MED         | MED    | Testing      |
+| 15 | Add scan command tests                                                 | MED         | MED    | Testing      |
+| 16 | Add clean command tests                                                | MED         | HIGH   | Testing      |
+| 17 | Extract TUI display metadata to `metadata.go` file                     | LOW         | LOW    | Organization |
+| 18 | Review `OperationType` vs `CleanerType` — are both needed?             | MED         | HIGH   | Architecture |
+| 19 | GitHistory cleaner — unify into TUI or keep separate?                  | LOW         | HIGH   | Design       |
+| 20 | Set up CI pipeline (at minimum: `go build` + `go test -short`)         | HIGH        | MED    | CI           |
+| 21 | BDD test performance (322s) — parallelize or optimize                  | MED         | MED    | CI           |
+| 22 | Review error handling patterns in commands                             | MED         | MED    | Quality      |
+| 23 | Evaluate Fang DI for cleaner registration                              | MED         | MED    | Architecture |
+| 24 | Structured logging instead of `fmt.Println` in commands                | MED         | MED    | Quality      |
+| 25 | Add `Makefile` or improve `justfile` for common dev tasks              | LOW         | LOW    | DX           |
 
 ---
 
@@ -177,13 +177,13 @@ This dual-type system caused the original bug. But merging them requires decidin
 
 ## Session Metrics
 
-| Metric                            | Value                                              |
-| --------------------------------- | -------------------------------------------------- |
-| Commits this multi-session effort | 3 committed + 2 pending                            |
-| Files in working tree             | 13 modified + 1 new                                |
-| Lines changed (pending)           | +53 / -70 (net: -17)                               |
-| Switch statements eliminated      | 4 of 6                                             |
-| Manual maps eliminated            | 1 of 2 (`registryNameToCleanerType` now derived)   |
-| Build                             | PASS (`GOWORK=off go build ./...`)                 |
-| Tests                             | ALL PASS                                           |
+| Metric                            | Value                                             |
+| --------------------------------- | ------------------------------------------------- |
+| Commits this multi-session effort | 3 committed + 2 pending                           |
+| Files in working tree             | 13 modified + 1 new                               |
+| Lines changed (pending)           | +53 / -70 (net: -17)                              |
+| Switch statements eliminated      | 4 of 6                                            |
+| Manual maps eliminated            | 1 of 2 (`registryNameToCleanerType` now derived)  |
+| Build                             | PASS (`GOWORK=off go build ./...`)                |
+| Tests                             | ALL PASS                                          |
 | HEAD state                        | ⚠️ BROKEN — references undefined `cleanerMetadata` |

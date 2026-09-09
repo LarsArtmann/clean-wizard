@@ -21,12 +21,12 @@ The `clean-wizard` project is a robust tool designed to identify and remove redu
 
 The primary motivations for splitting the `clean-wizard` project are:
 
-1.  **Decoupling Concerns:** Separating distinct functionalities into their own projects ensures each component adheres to the Single Responsibility Principle.
-2.  **Improved Maintainability:** Smaller codebases are easier to understand, debug, and maintain. Changes in one area are less likely to introduce regressions in unrelated parts.
-3.  **Enhanced Reusability:** Core components, such as cleaning logic and configuration parsers, can be reused in other projects or integrated into different interfaces (e.g., a GUI, a web service) without carrying the weight of the entire CLI application.
-4.  **Independent Development & Deployment:** Teams can work on specific sub-projects without affecting others, allowing for faster iterations and independent release cycles.
-5.  **Simplified Testing:** Each project can be tested in isolation, leading to more focused and efficient test suites.
-6.  **Scalability:** The modular architecture better supports future growth and the addition of new features or cleaners.
+1. **Decoupling Concerns:** Separating distinct functionalities into their own projects ensures each component adheres to the Single Responsibility Principle.
+2. **Improved Maintainability:** Smaller codebases are easier to understand, debug, and maintain. Changes in one area are less likely to introduce regressions in unrelated parts.
+3. **Enhanced Reusability:** Core components, such as cleaning logic and configuration parsers, can be reused in other projects or integrated into different interfaces (e.g., a GUI, a web service) without carrying the weight of the entire CLI application.
+4. **Independent Development & Deployment:** Teams can work on specific sub-projects without affecting others, allowing for faster iterations and independent release cycles.
+5. **Simplified Testing:** Each project can be tested in isolation, leading to more focused and efficient test suites.
+6. **Scalability:** The modular architecture better supports future growth and the addition of new features or cleaners.
 
 ## Proposed Project Structure
 

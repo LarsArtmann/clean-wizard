@@ -140,13 +140,13 @@ The `estimateCleanerSize()` function uses hardcoded values (150MB, 200MB, etc.) 
 
 ## E) IMMEDIATE ACTION ITEMS
 
-| #   | Task                                      | Priority    | Effort | Blocker |
-| --- | ----------------------------------------- | ----------- | ------ | ------- |
-| 1   | Add CLI integration for compiled-binaries | 🔴 Critical | 30m    | None    |
-| 2   | Free disk space (run clean-wizard)        | 🔴 Critical | 10m    | None    |
-| 3   | Run test suite after disk cleanup         | 🟡 High     | 5m     | #2      |
-| 4   | Add project-executables to CLI            | 🟡 High     | 20m    | None    |
-| 5   | Add CLI integration tests                 | 🟢 Medium   | 2h     | None    |
+| # | Task                                      | Priority    | Effort | Blocker |
+| - | ----------------------------------------- | ----------- | ------ | ------- |
+| 1 | Add CLI integration for compiled-binaries | 🔴 Critical | 30m    | None    |
+| 2 | Free disk space (run clean-wizard)        | 🔴 Critical | 10m    | None    |
+| 3 | Run test suite after disk cleanup         | 🟡 High     | 5m     | #2      |
+| 4 | Add project-executables to CLI            | 🟡 High     | 20m    | None    |
+| 5 | Add CLI integration tests                 | 🟢 Medium   | 2h     | None    |
 
 ---
 

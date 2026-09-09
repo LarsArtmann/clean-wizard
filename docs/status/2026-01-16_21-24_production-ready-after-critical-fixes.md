@@ -112,8 +112,8 @@ id, err := strconv.Atoi(pathParts[len(pathParts)-1])
 But actual output without `--profile` is:
 
 ```
-  32   2026-01-12 08:03:14
-  33   2026-01-15 21:14:05   (current)
+32   2026-01-12 08:03:14
+33   2026-01-15 21:14:05   (current)
 ```
 
 **Fix:**

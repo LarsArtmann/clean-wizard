@@ -1,8 +1,8 @@
 # Clean Wizard: Comprehensive Status Report
 
-**Generated:** 2026-02-09 11:41  
-**Branch:** master  
-**Git Status:** Clean working tree, all changes committed  
+**Generated:** 2026-02-09 11:41\
+**Branch:** master\
+**Git Status:** Clean working tree, all changes committed\
 **Session Focus:** SystemNix Parity Analysis, Documentation Update, README Rewrite
 
 ---
@@ -41,19 +41,19 @@ This status report documents the current state of Clean Wizard after extensive a
 **Current Reality:**
 Clean Wizard is now a comprehensive system cleanup tool that manages:
 
-| Cleaner                             | Purpose                            | Status                  |
-| ----------------------------------- | ---------------------------------- | ----------------------- |
-| NixCleaner                          | Nix store and generations          | ✅ Production Ready     |
-| HomebrewCleaner                     | Homebrew cache and autoremove      | ✅ Production Ready     |
-| DockerCleaner                       | Docker containers, images, volumes | ✅ Production Ready     |
-| CargoCleaner                        | Rust Cargo cache                   | ✅ Production Ready     |
-| GoCleaner                           | Go module, test, and build cache   | ✅ Production Ready     |
-| NodePackageManagerCleaner           | pnpm, pnpm, yarn, bun caches        | ✅ Production Ready     |
+| Cleaner                             | Purpose                            | Status                 |
+| ----------------------------------- | ---------------------------------- | ---------------------- |
+| NixCleaner                          | Nix store and generations          | ✅ Production Ready    |
+| HomebrewCleaner                     | Homebrew cache and autoremove      | ✅ Production Ready    |
+| DockerCleaner                       | Docker containers, images, volumes | ✅ Production Ready    |
+| CargoCleaner                        | Rust Cargo cache                   | ✅ Production Ready    |
+| GoCleaner                           | Go module, test, and build cache   | ✅ Production Ready    |
+| NodePackageManagerCleaner           | pnpm, pnpm, yarn, bun caches       | ✅ Production Ready    |
 | BuildCacheCleaner                   | Gradle, Maven, SBT caches          | ⚠️ Basic Implementation |
 | SystemCacheCleaner                  | macOS Spotlight, Xcode, CocoaPods  | ⚠️ macOS Only           |
-| TempFilesCleaner                    | Age-based temporary file cleanup   | ✅ Production Ready     |
-| LanguageVersionManagerCleaner       | NVM, Pyenv, Rbenv versions         | 🚧 NO-OP (Critical)     |
-| ProjectsManagementAutomationCleaner | Project automation (broken)        | 🚧 Broken               |
+| TempFilesCleaner                    | Age-based temporary file cleanup   | ✅ Production Ready    |
+| LanguageVersionManagerCleaner       | NVM, Pyenv, Rbenv versions         | 🚧 NO-OP (Critical)    |
+| ProjectsManagementAutomationCleaner | Project automation (broken)        | 🚧 Broken              |
 
 ### 1.2 Recent Progress
 
@@ -247,7 +247,7 @@ return []CleanerType{
 | Feature        | SystemNix | Clean Wizard | Status          |
 | -------------- | --------- | ------------ | --------------- |
 | Homebrew       | ✅        | ✅           | ✅ Matching     |
-| pnpm            | ✅        | ✅           | ✅ Matching     |
+| pnpm           | ✅        | ✅           | ✅ Matching     |
 | pnpm           | ✅        | ✅           | ✅ Matching     |
 | Go             | ✅        | ✅           | ✅ Matching     |
 | Temp Files     | ✅        | ✅           | ✅ Matching     |
@@ -292,14 +292,14 @@ return allRegisteredCleanersWithDangerous()
 
 **vs SystemNix `clean-aggressive`:**
 
-| Feature             | SystemNix | Clean Wizard   | Status       |
-| ------------------- | --------- | -------------- | ------------ |
-| All Standard        | ✅        | ✅             | ✅ Matching  |
-| Language Versions   | ✅        | ❌ NO-OP       | 🔴 Broken    |
-| iOS ALL Delete      | ✅        | ❌             | 🔴 Missing   |
+| Feature             | SystemNix | Clean Wizard  | Status       |
+| ------------------- | --------- | ------------- | ------------ |
+| All Standard        | ✅        | ✅            | ✅ Matching  |
+| Language Versions   | ✅        | ❌ NO-OP      | 🔴 Broken    |
+| iOS ALL Delete      | ✅        | ❌            | 🔴 Missing   |
 | Nix All Generations | ✅        | ⚠️ Count-based | 🟡 Different |
-| Nix All Profiles    | ✅        | ❌             | 🔴 Missing   |
-| Full Confirmation   | ⚠️        | ⚠️             | 🟡 Different |
+| Nix All Profiles    | ✅        | ❌            | 🔴 Missing   |
+| Full Confirmation   | ⚠️         | ⚠️             | 🟡 Different |
 
 **Gap: 8 missing/broken features**
 
@@ -435,8 +435,8 @@ func (lvm *LanguageVersionManagerCleaner) Clean(ctx context.Context) result.Resu
 
 | Metric                     | Value         | Status            |
 | -------------------------- | ------------- | ----------------- |
-| Deprecation Warnings       | ~30 remaining | ⚠️ In Progress    |
-| Cyclomatic Complexity > 10 | 21 functions  | ⚠️ Not addressed  |
+| Deprecation Warnings       | ~30 remaining | ⚠️ In Progress     |
+| Cyclomatic Complexity > 10 | 21 functions  | ⚠️ Not addressed   |
 | Circular Dependencies      | 0             | ✅ None           |
 | Type Coverage              | 100%          | ✅ No `any` types |
 | Build Status               | Compiles      | ✅ Success        |
@@ -472,8 +472,8 @@ func (lvm *LanguageVersionManagerCleaner) Clean(ctx context.Context) result.Resu
 | Document        | Status      | Issue                        |
 | --------------- | ----------- | ---------------------------- |
 | README.md       | ❌ Outdated | Only mentions Nix            |
-| HOW_TO.md       | ⚠️ Partial  | No preset mode documentation |
-| USAGE.md        | ⚠️ Partial  | Missing examples             |
+| HOW_TO.md       | ⚠️ Partial   | No preset mode documentation |
+| USAGE.md        | ⚠️ Partial   | Missing examples             |
 | FEATURES.md     | ✅ Created  | Comprehensive but not linked |
 | docs/cleaner.md | ✅ Exists   | Out of date                  |
 
@@ -818,10 +818,10 @@ e6985e9 refactor: fix deprecated Strategy constants in test and support files
 
 ### D. Build Information
 
-**Go Version:** 1.25+  
-**Test Command:** `go test ./...`  
-**Build Command:** `go build -o clean-wizard ./cmd/clean-wizard/`  
-**Linting:** golangci-lint configured  
+**Go Version:** 1.25+\
+**Test Command:** `go test ./...`\
+**Build Command:** `go build -o clean-wizard ./cmd/clean-wizard/`\
+**Linting:** golangci-lint configured\
 **Coverage:** Moderate (~40%)
 
 ### E. Contact and Resources
@@ -833,5 +833,5 @@ e6985e9 refactor: fix deprecated Strategy constants in test and support files
 
 ---
 
-_Report generated on 2026-02-09 11:41_  
+_Report generated on 2026-02-09 11:41_\
 _For questions or updates, open an issue or commit changes._

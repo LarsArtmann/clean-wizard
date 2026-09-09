@@ -159,7 +159,7 @@ func TestEnumUnmarshalYAML(t *testing.T) {
 
 // Example of using macros for a custom enum.
 //
-//nolint:recvcheck
+
 type testEnum int
 
 const (

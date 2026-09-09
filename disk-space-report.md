@@ -11,14 +11,14 @@ The project is relatively small, but there are opportunities to reclaim ~60MB+ b
 
 ## Disk Usage Breakdown
 
-| Directory/File  | Size  | Status                           |
-| --------------- | ----- | -------------------------------- |
+| Directory/File  | Size  | Status                          |
+| --------------- | ----- | ------------------------------- |
 | `.git/`         | 65MB  | ⚠️ Bloated (binaries in history) |
 | `reports/`      | 2.6MB | ⚠️ Generated file                |
-| `docs/`         | 2.1MB | OK                               |
-| `internal/`     | 1.2MB | OK                               |
-| `cmd/`          | 88KB  | OK                               |
-| Everything else | <1MB  | OK                               |
+| `docs/`         | 2.1MB | OK                              |
+| `internal/`     | 1.2MB | OK                              |
+| `cmd/`          | 88KB  | OK                              |
+| Everything else | <1MB  | OK                              |
 
 ---
 

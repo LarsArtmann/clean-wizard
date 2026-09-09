@@ -222,33 +222,33 @@ The JSON output path reconstructs `skipped` and `failed` maps from `WorkflowResu
 
 ## f) Up to 25 Things to Do Next (Prioritized)
 
-| #   | Task                                                                              | Impact   | Effort |
-| --- | --------------------------------------------------------------------------------- | -------- | ------ |
-| 1   | **Integration test: run `clean --dry-run` through workflow engine end-to-end**    | Critical | M      |
-| 2   | Register individual cleaners as separate DI providers (not monolithic factory)    | High     | L      |
-| 3   | Pass user config profile settings to individual cleaner providers                 | High     | L      |
-| 4   | Migrate `githistory` command to use DI container                                  | Medium   | S      |
-| 5   | Migrate `init`, `profile`, `config` commands to use DI container                  | Medium   | M      |
-| 6   | Make adapters interface-backed and register in DI with `do.As`                    | High     | L      |
-| 7   | Implement `do.ShutdownerWithError` on `CacheManager`, `HTTPClient`                | Medium   | S      |
-| 8   | Add retry support to execution layer (`flow.Retry` with backoff)                  | High     | M      |
-| 9   | Add per-cleaner timeout support (`flow.Timeout`)                                  | Medium   | S      |
-| 10  | Wire `WithMaxConcurrency` from config or `--concurrency` CLI flag                 | Medium   | S      |
-| 11  | Remove dormant `result.FlowBuilder` / `BranchFlow` / `ParallelFlow`               | Medium   | S      |
-| 12  | Remove `cleaner.ParallelExecutor` and `Registry.CleanAllParallel`                 | Low      | S      |
-| 13  | Update `format.CleanResultsToJSON` to accept `*WorkflowResult`                    | Low      | S      |
-| 14  | Add `--keep-generations` flag for Nix cleaner                                     | Low      | S      |
-| 15  | Add deterministic sorting of `WorkflowResult.Steps` by registration order         | Medium   | S      |
-| 16  | Add `flow.If` conditional for Docker cleaner (check daemon running)               | Medium   | S      |
-| 17  | Add BDD tests for execution layer (Ginkgo)                                        | Medium   | M      |
-| 18  | Consolidate `cleaner.Cleaner` and `domain.OperationHandler` interface             | High     | L      |
-| 19  | Add `do.ExplainInjector` debug output behind `--di-debug` flag                    | Low      | S      |
-| 20  | Create `internal/bootstrap/` package for application-global DI setup              | Medium   | M      |
-| 21  | Add step progress TUI (like BuildFlow's `ProgressBridge`)                         | Low      | L      |
-| 22  | Add resume/checkpoint support via `flow.Workflow` state                           | Low      | L      |
-| 23  | Add `flow.Switch` for Nix cleaner generation-count branching                      | Low      | M      |
-| 24  | Add audit log of DI service registrations (like BuildFlow's `samber-do-auditlog`) | Low      | S      |
-| 25  | **Commit the migration** as a feature branch with proper commit message           | Critical | S      |
+| #  | Task                                                                              | Impact   | Effort |
+| -- | --------------------------------------------------------------------------------- | -------- | ------ |
+| 1  | **Integration test: run `clean --dry-run` through workflow engine end-to-end**    | Critical | M      |
+| 2  | Register individual cleaners as separate DI providers (not monolithic factory)    | High     | L      |
+| 3  | Pass user config profile settings to individual cleaner providers                 | High     | L      |
+| 4  | Migrate `githistory` command to use DI container                                  | Medium   | S      |
+| 5  | Migrate `init`, `profile`, `config` commands to use DI container                  | Medium   | M      |
+| 6  | Make adapters interface-backed and register in DI with `do.As`                    | High     | L      |
+| 7  | Implement `do.ShutdownerWithError` on `CacheManager`, `HTTPClient`                | Medium   | S      |
+| 8  | Add retry support to execution layer (`flow.Retry` with backoff)                  | High     | M      |
+| 9  | Add per-cleaner timeout support (`flow.Timeout`)                                  | Medium   | S      |
+| 10 | Wire `WithMaxConcurrency` from config or `--concurrency` CLI flag                 | Medium   | S      |
+| 11 | Remove dormant `result.FlowBuilder` / `BranchFlow` / `ParallelFlow`               | Medium   | S      |
+| 12 | Remove `cleaner.ParallelExecutor` and `Registry.CleanAllParallel`                 | Low      | S      |
+| 13 | Update `format.CleanResultsToJSON` to accept `*WorkflowResult`                    | Low      | S      |
+| 14 | Add `--keep-generations` flag for Nix cleaner                                     | Low      | S      |
+| 15 | Add deterministic sorting of `WorkflowResult.Steps` by registration order         | Medium   | S      |
+| 16 | Add `flow.If` conditional for Docker cleaner (check daemon running)               | Medium   | S      |
+| 17 | Add BDD tests for execution layer (Ginkgo)                                        | Medium   | M      |
+| 18 | Consolidate `cleaner.Cleaner` and `domain.OperationHandler` interface             | High     | L      |
+| 19 | Add `do.ExplainInjector` debug output behind `--di-debug` flag                    | Low      | S      |
+| 20 | Create `internal/bootstrap/` package for application-global DI setup              | Medium   | M      |
+| 21 | Add step progress TUI (like BuildFlow's `ProgressBridge`)                         | Low      | L      |
+| 22 | Add resume/checkpoint support via `flow.Workflow` state                           | Low      | L      |
+| 23 | Add `flow.Switch` for Nix cleaner generation-count branching                      | Low      | M      |
+| 24 | Add audit log of DI service registrations (like BuildFlow's `samber-do-auditlog`) | Low      | S      |
+| 25 | **Commit the migration** as a feature branch with proper commit message           | Critical | S      |
 
 ---
 

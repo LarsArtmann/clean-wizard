@@ -1,8 +1,8 @@
 # Clean Wizard - Comprehensive Multi-Step Execution Plan
 
-**Date:** 2026-03-22  
-**Status:** Ready for Execution  
-**Estimated Total Effort:** 40-60 hours  
+**Date:** 2026-03-22\
+**Status:** Ready for Execution\
+**Estimated Total Effort:** 40-60 hours\
 **Priority:** Sorted by Impact/Effort Ratio
 
 ---
@@ -83,8 +83,8 @@
 
 **Impact:** HIGH | **Effort:** 1h | **Value/Effort:** ⭐⭐⭐⭐⭐
 
-**Problem:** Misses `/private/var/folders/*/T/go-build*` on macOS  
-**Impact:** Hundreds of MB to several GB uncleaned  
+**Problem:** Misses `/private/var/folders/*/T/go-build*` on macOS\
+**Impact:** Hundreds of MB to several GB uncleaned\
 **Existing Code:** Already documented in `docs/issues/go-build-cache-gap.md`
 
 **Implementation:**
@@ -112,7 +112,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 
 **Impact:** HIGH | **Effort:** 4h | **Value/Effort:** ⭐⭐⭐⭐
 
-**Problem:** Each enum has ~50 lines of boilerplate  
+**Problem:** Each enum has ~50 lines of boilerplate\
 **Existing Pattern:** `internal/domain/type_safe_enums.go` - 539 lines of repetition
 
 **Implementation:**
@@ -141,7 +141,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(ctx context.Context) result.Result[
 
 **Impact:** HIGH | **Effort:** 3h | **Value/Effort:** ⭐⭐⭐⭐
 
-**Problem:** Scattered `fmt.Println`, no log levels, no structured output  
+**Problem:** Scattered `fmt.Println`, no log levels, no structured output\
 **Library:** `go.uber.org/zap` (industry standard)
 
 **Implementation:**
@@ -191,7 +191,7 @@ logger.L.Info("cleaning cache",
 
 **Impact:** MEDIUM | **Effort:** 4h | **Value/Effort:** ⭐⭐⭐
 
-**Problem:** No standardized way to handle age-based cleanup  
+**Problem:** No standardized way to handle age-based cleanup\
 **Existing Code:** SystemCache has custom duration parsing
 
 **New Interface:**
@@ -225,7 +225,7 @@ func CleanWithAgeFilter(ctx context.Context, paths []string, maxAge time.Duratio
 
 **Impact:** HIGH | **Effort:** 6h | **Value/Effort:** ⭐⭐⭐⭐
 
-**Problem:** Cleaner logic is monolithic  
+**Problem:** Cleaner logic is monolithic\
 **Pattern:** Strategy + Decorator + Pipeline
 
 **New Types:**
@@ -263,7 +263,7 @@ type CleanerPipeline []Cleaner
 
 **Impact:** HIGH | **Effort:** 4h | **Value/Effort:** ⭐⭐⭐⭐
 
-**Problem:** Cleaners run sequentially  
+**Problem:** Cleaners run sequentially\
 **Existing Code:** `internal/cleaner/registry.go` - sequential iteration
 
 **Implementation:**
@@ -405,7 +405,7 @@ rootCmd.AddCommand(&cobra.Command{
 
 **Impact:** MEDIUM | **Effort:** 3h | **Value/Effort:** ⭐⭐⭐
 
-**Problem:** Only 3 hardcoded profiles (conservative, balanced, aggressive)  
+**Problem:** Only 3 hardcoded profiles (conservative, balanced, aggressive)\
 **Feature:** User-defined profiles + community templates
 
 **Implementation:**
@@ -650,5 +650,5 @@ After completing this plan:
 
 ---
 
-_Plan created by: Parakletos_  
+_Plan created by: Parakletos_\
 _Last updated: 2026-03-22 23:40_

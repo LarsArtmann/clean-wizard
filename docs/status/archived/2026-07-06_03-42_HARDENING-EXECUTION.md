@@ -20,36 +20,36 @@ This session started with a brutal self-review of the previous migration session
 
 ### Commit 1: `6a539e7` — Test Hardening + Dead Code Removal
 
-| #   | Task                               | Detail                                                                                                                                                                                                                                  |
-| --- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Retry test assertions**          | `TestRunCleaners_Retry` now asserts `len(Steps) == 1`, `StepStatusSucceeded`, `FreedBytes == 42`, and `attempts == 3`. This verifies the `recordFinal()` fix prevents duplicate entries — a regression would fail immediately.          |
-| 2   | **Dead `record()` method removed** | Old `resultCollector.record()` method deleted from `results.go`. Had zero callers after the `recordFinal()` migration.                                                                                                                  |
-| 3   | **Integration test skip guards**   | 3 tests now skip under `testing.Short()`: `TestRunCleaners_RealRegistry_DryRun`, `TestRunScans_RealRegistry_DryRun`, `TestRunCleanCommand_DryRun_JSON`. These invoke real system cleaners and were adding 35s+ to every short test run. |
+| # | Task                               | Detail                                                                                                                                                                                                                                  |
+| - | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **Retry test assertions**          | `TestRunCleaners_Retry` now asserts `len(Steps) == 1`, `StepStatusSucceeded`, `FreedBytes == 42`, and `attempts == 3`. This verifies the `recordFinal()` fix prevents duplicate entries — a regression would fail immediately.          |
+| 2 | **Dead `record()` method removed** | Old `resultCollector.record()` method deleted from `results.go`. Had zero callers after the `recordFinal()` migration.                                                                                                                  |
+| 3 | **Integration test skip guards**   | 3 tests now skip under `testing.Short()`: `TestRunCleaners_RealRegistry_DryRun`, `TestRunScans_RealRegistry_DryRun`, `TestRunCleanCommand_DryRun_JSON`. These invoke real system cleaners and were adding 35s+ to every short test run. |
 
 ### Commit 2: `c102e0f` — NotAvailableError Migration Complete
 
-| #   | Cleaner                        | Before                                                                              | After                                                                               |
-| --- | ------------------------------ | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| 4   | `projectsmanagementautomation` | `errors.New("projects-management-automation not available")`                        | `&NotAvailableError{CleanerName: "projects-management-automation"}`                 |
-| 5   | `systemcache`                  | `errors.New("not available on this platform (requires macOS or Linux)")`            | `&NotAvailableError{CleanerName: "systemcache", Reason: "requires macOS or Linux"}` |
-| 6   | `golang_cleaner` (sentinel)    | `ErrGoCacheNotAvailable = &NotAvailableError{CleanerName: "go"}` (pointer sentinel) | Removed sentinel entirely; returns `&NotAvailableError{CleanerName: "go"}` inline   |
+| # | Cleaner                        | Before                                                                              | After                                                                               |
+| - | ------------------------------ | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 4 | `projectsmanagementautomation` | `errors.New("projects-management-automation not available")`                        | `&NotAvailableError{CleanerName: "projects-management-automation"}`                 |
+| 5 | `systemcache`                  | `errors.New("not available on this platform (requires macOS or Linux)")`            | `&NotAvailableError{CleanerName: "systemcache", Reason: "requires macOS or Linux"}` |
+| 6 | `golang_cleaner` (sentinel)    | `ErrGoCacheNotAvailable = &NotAvailableError{CleanerName: "go"}` (pointer sentinel) | Removed sentinel entirely; returns `&NotAvailableError{CleanerName: "go"}` inline   |
 
 **Why the sentinel was removed:** `ErrGoCacheNotAvailable` was never checked via `errors.Is()` — classification always went through `IsNotAvailableError()`'s `errors.As` path. The sentinel abstraction added zero value while creating a latent footgun: if any code created its own `&NotAvailableError{CleanerName: "go"}`, `errors.Is` comparison would fail due to pointer-identity mismatch.
 
 ### Commit 3: `1b96d06` — Scan Command Parity + Retry Default
 
-| #   | Feature                          | Detail                                                                                                                                                                                                                                                                               |
-| --- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 7   | **`--retries` on scan**          | Scan command now accepts `--retries N` flag, matching clean. When N > 0, passes `RetryConfig` to `execution.RunScans`.                                                                                                                                                               |
-| 8   | **`--concurrency`/`-C` on scan** | Scan command now accepts `--concurrency N` flag, matching clean. When N > 0, passes to `execution.WithMaxConcurrency()` and sets `RunSettings.MaxConcurrency`.                                                                                                                       |
-| 9   | **`--retries` default = 3**      | Both clean and scan commands now default to 3 retries. Production runs recover from transient failures (Nix store locks, Docker daemon hiccups) by default. `IsNotAvailableError` smart retry ensures non-retryable errors stop immediately with zero delay. `--retries 0` disables. |
-| 10  | **`--profile` warning in scan**  | Previously, `scan --profile daily` silently discarded the value (parameter was `_ string`). Now prints: `⚠️ Warning: --profile "daily" is not yet supported for scan; showing all available cleaners`                                                                                |
+| #  | Feature                          | Detail                                                                                                                                                                                                                                                                               |
+| -- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 7  | **`--retries` on scan**          | Scan command now accepts `--retries N` flag, matching clean. When N > 0, passes `RetryConfig` to `execution.RunScans`.                                                                                                                                                               |
+| 8  | **`--concurrency`/`-C` on scan** | Scan command now accepts `--concurrency N` flag, matching clean. When N > 0, passes to `execution.WithMaxConcurrency()` and sets `RunSettings.MaxConcurrency`.                                                                                                                       |
+| 9  | **`--retries` default = 3**      | Both clean and scan commands now default to 3 retries. Production runs recover from transient failures (Nix store locks, Docker daemon hiccups) by default. `IsNotAvailableError` smart retry ensures non-retryable errors stop immediately with zero delay. `--retries 0` disables. |
+| 10 | **`--profile` warning in scan**  | Previously, `scan --profile daily` silently discarded the value (parameter was `_ string`). Now prints: `⚠️ Warning: --profile "daily" is not yet supported for scan; showing all available cleaners`                                                                                 |
 
 ### Commit 4: `c2ce0dc` — Documentation Update
 
-| #   | Change                                                                                                                                                                                                                                                                                          |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 11  | Updated `AGENTS.md` with: retry-by-default behavior, complete `*NotAvailableError` migration status, specific error package locations in Known Issues, logger globals as a known issue, updated test facts (CLI integration test exists, `testing.Short()` guards), removed stale `err113` note |
+| #  | Change                                                                                                                                                                                                                                                                                          |
+| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 11 | Updated `AGENTS.md` with: retry-by-default behavior, complete `*NotAvailableError` migration status, specific error package locations in Known Issues, logger globals as a known issue, updated test facts (CLI integration test exists, `testing.Short()` guards), removed stale `err113` note |
 
 ### Verification Results
 
@@ -133,33 +133,33 @@ BuildFlow pre-commit        → 27/27 green (every commit)
 
 ## f) Top 25 Things to Do Next
 
-| #   | Task                                                                 | Resolution |
-| --- | -------------------------------------------------------------------- | ---------- |
-| 1   | ~~**Add test: smart retry stops on NotAvailableError**~~             | done at `edaff33` |
-| 2   | ~~**Extract shared retry config builder**~~                          | done at `edaff33` |
-| 3   | ~~**Use `DefaultRetryConfig()`** in commands~~                       | done at `edaff33` |
-| 4   | Log warning when keyword fallback in `IsNotAvailableError` fires     | NOT-DO |
-| 5   | ~~Clean up stale status reports~~                                   | done at 2026-07-13 + 2026-08-10 audits |
-| 6   | Add `--timeout` per-cleaner flag                                     | NOT-DO |
-| 7   | Wire `OperationSettings` from config to cleaner constructors         | still open — TODO #6 |
-| 8   | Implement `scan --profile` filtering or remove the flag              | still open — TODO #10 |
-| 9   | ~~Adopt `go-error-family`~~                                         | done at `edaff33` |
-| 10  | ~~Add `RetryProfile` type~~                                          | done at `132f5f6` |
-| 11  | Logger globals → DI-injected logger                                  | still open — TODO #11 |
-| 12  | Re-enable `t.Parallel()` on logger tests                             | blocked by #11 |
-| 13  | ~~Consolidate 4 error packages~~                                    | done at `edaff33` |
-| 14  | Register individual cleaners as separate DI providers                | still open — TODO #29 |
-| 15  | Make adapters interface-backed with `do.As`                          | still open — TODO #30 |
-| 16  | Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`           | NOT-DO |
-| 17  | Add BDD tests for execution layer (Ginkgo)                           | still open — TODO #7 |
-| 18  | Migrate `githistory` command to DI                                   | NOT-DO |
-| 19  | Add `flow.If` for Docker daemon check                                | NOT-DO |
-| 20  | Implement `do.ShutdownerWithError` on resource holders               | NOT-DO |
-| 21  | Split `internal/domain/` god package (23 files)                      | still open — TODO #27 |
-| 22  | Split `internal/cleaner/` flat structure (50+ files)                 | still open — TODO #28 |
-| 23  | Add progress TUI                                                     | aspirational |
-| 24  | Add `--keep-generations` flag for Nix cleaner                        | still open — TODO #23 |
-| 25  | Add `--dry-run` to scan command (parity with clean)                  | still open — TODO #22 |
+| #  | Task                                                             | Resolution                             |
+| -- | ---------------------------------------------------------------- | -------------------------------------- |
+| 1  | ~~**Add test: smart retry stops on NotAvailableError**~~         | done at `edaff33`                      |
+| 2  | ~~**Extract shared retry config builder**~~                      | done at `edaff33`                      |
+| 3  | ~~**Use `DefaultRetryConfig()`** in commands~~                   | done at `edaff33`                      |
+| 4  | Log warning when keyword fallback in `IsNotAvailableError` fires | NOT-DO                                 |
+| 5  | ~~Clean up stale status reports~~                                | done at 2026-07-13 + 2026-08-10 audits |
+| 6  | Add `--timeout` per-cleaner flag                                 | NOT-DO                                 |
+| 7  | Wire `OperationSettings` from config to cleaner constructors     | still open — TODO #6                   |
+| 8  | Implement `scan --profile` filtering or remove the flag          | still open — TODO #10                  |
+| 9  | ~~Adopt `go-error-family`~~                                      | done at `edaff33`                      |
+| 10 | ~~Add `RetryProfile` type~~                                      | done at `132f5f6`                      |
+| 11 | Logger globals → DI-injected logger                              | still open — TODO #11                  |
+| 12 | Re-enable `t.Parallel()` on logger tests                         | blocked by #11                         |
+| 13 | ~~Consolidate 4 error packages~~                                 | done at `edaff33`                      |
+| 14 | Register individual cleaners as separate DI providers            | still open — TODO #29                  |
+| 15 | Make adapters interface-backed with `do.As`                      | still open — TODO #30                  |
+| 16 | Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`       | NOT-DO                                 |
+| 17 | Add BDD tests for execution layer (Ginkgo)                       | still open — TODO #7                   |
+| 18 | Migrate `githistory` command to DI                               | NOT-DO                                 |
+| 19 | Add `flow.If` for Docker daemon check                            | NOT-DO                                 |
+| 20 | Implement `do.ShutdownerWithError` on resource holders           | NOT-DO                                 |
+| 21 | Split `internal/domain/` god package (23 files)                  | still open — TODO #27                  |
+| 22 | Split `internal/cleaner/` flat structure (50+ files)             | still open — TODO #28                  |
+| 23 | Add progress TUI                                                 | aspirational                           |
+| 24 | Add `--keep-generations` flag for Nix cleaner                    | still open — TODO #23                  |
+| 25 | Add `--dry-run` to scan command (parity with clean)              | still open — TODO #22                  |
 
 ## g) Top #1 Question I Cannot Answer Myself
 

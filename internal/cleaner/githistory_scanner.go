@@ -404,7 +404,7 @@ func (s *GitHistoryScanner) isLikelyBinary(f domain.GitHistoryFile) bool {
 		}
 
 		// Check for common binary names
-		binaryNames := []string{"main", "app", "server", "cli", "cmd", "run", "start", "stop"} //nolint:goconst
+		binaryNames := []string{"main", "app", "server", "cli", "cmd", "run", "start", "stop"}
 
 		base := filepath.Base(f.Path)
 		if slices.Contains(binaryNames, base) {

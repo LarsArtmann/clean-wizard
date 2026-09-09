@@ -96,11 +96,11 @@ Pushed to: `origin/master`
 
 ### Build Status
 
-| Check                                        | Status   | Details                        |
-| -------------------------------------------- | -------- | ------------------------------ |
-| `go build ./...`                             | ✅ PASS  | No compilation errors          |
-| `go test ./internal/shared/utils/schema/...` | ✅ PASS  | 8/8 tests pass                 |
-| `go test ./internal/cleaner/... -short`      | ⏳ SLOW  | Tests pass but slow            |
+| Check                                        | Status  | Details                        |
+| -------------------------------------------- | ------- | ------------------------------ |
+| `go build ./...`                             | ✅ PASS | No compilation errors          |
+| `go test ./internal/shared/utils/schema/...` | ✅ PASS | 8/8 tests pass                 |
+| `go test ./internal/cleaner/... -short`      | ⏳ SLOW | Tests pass but slow            |
 | gopls Diagnostics                            | ⚠️ STALE | Shows old errors (cache issue) |
 
 ### Test Coverage Summary
@@ -114,32 +114,32 @@ Pushed to: `origin/master`
 
 ### Code Quality Metrics
 
-| Metric               | Value   | Target | Status        |
-| -------------------- | ------- | ------ | ------------- |
+| Metric               | Value   | Target | Status       |
+| -------------------- | ------- | ------ | ------------ |
 | Files over 350 lines | 23      | 0      | ⚠️ NEEDS WORK |
 | Disabled linters     | 107     | <50    | ⚠️ NEEDS WORK |
 | Test coverage        | ~70%    | 80%    | ⚠️ MODERATE   |
-| Dead code            | Minimal | 0      | ✅ GOOD       |
+| Dead code            | Minimal | 0      | ✅ GOOD      |
 
 ---
 
 ## Cleaner Status Matrix
 
-| #   | Cleaner           | Available | Scan | Clean | Dry-Run | Size Accurate | Status             |
-| --- | ----------------- | --------- | ---- | ----- | ------- | ------------- | ------------------ |
-| 1   | Nix               | ✅        | ✅   | ✅    | 🧪      | 🧪            | ✅ Production      |
-| 2   | Homebrew          | ✅        | ✅   | ✅    | 🚧      | 🧪            | ✅ Production      |
-| 3   | Docker            | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
-| 4   | Go                | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
-| 5   | Cargo             | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
-| 6   | Node Packages     | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
-| 7   | Build Cache       | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools   |
-| 8   | System Cache      | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
-| 9   | Temp Files        | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
-| 10  | Git History       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
-| 11  | Lang Version Mgr  | ✅        | ✅   | 📝    | 📝      | N/A           | 📝 Not Implemented |
-| 12  | Projects Mgmt     | 🚧        | 🧪   | 🚧    | 🧪      | 🧪            | 🚧 Non-Functional  |
-| 13  | Compiled Binaries | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| #  | Cleaner           | Available | Scan | Clean | Dry-Run | Size Accurate | Status             |
+| -- | ----------------- | --------- | ---- | ----- | ------- | ------------- | ------------------ |
+| 1  | Nix               | ✅        | ✅   | ✅    | 🧪      | 🧪            | ✅ Production      |
+| 2  | Homebrew          | ✅        | ✅   | ✅    | 🚧      | 🧪            | ✅ Production      |
+| 3  | Docker            | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| 4  | Go                | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| 5  | Cargo             | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| 6  | Node Packages     | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| 7  | Build Cache       | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools    |
+| 8  | System Cache      | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| 9  | Temp Files        | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| 10 | Git History       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
+| 11 | Lang Version Mgr  | ✅        | ✅   | 📝    | 📝      | N/A           | 📝 Not Implemented |
+| 12 | Projects Mgmt     | 🚧        | 🧪   | 🚧    | 🧪      | 🧪            | 🚧 Non-Functional  |
+| 13 | Compiled Binaries | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
 
 **Legend:**
 
@@ -158,28 +158,28 @@ Pushed to: `origin/master`
 
 ### Priority 1 - High Impact
 
-| #   | Issue                                                       | Impact | Effort | File(s)           |
-| --- | ----------------------------------------------------------- | ------ | ------ | ----------------- |
-| 1   | File too large: compiledbinaries_ginkgo_test.go (855 lines) | HIGH   | MEDIUM | internal/cleaner/ |
-| 2   | File too large: compiledbinaries.go (549 lines)             | HIGH   | MEDIUM | internal/cleaner/ |
-| 3   | 107 disabled golangci-lint linters                          | MEDIUM | LOW    | .golangci.yml     |
+| # | Issue                                                       | Impact | Effort | File(s)           |
+| - | ----------------------------------------------------------- | ------ | ------ | ----------------- |
+| 1 | File too large: compiledbinaries_ginkgo_test.go (855 lines) | HIGH   | MEDIUM | internal/cleaner/ |
+| 2 | File too large: compiledbinaries.go (549 lines)             | HIGH   | MEDIUM | internal/cleaner/ |
+| 3 | 107 disabled golangci-lint linters                          | MEDIUM | LOW    | .golangci.yml     |
 
 ### Priority 2 - Medium Impact
 
-| #   | Issue                                                         | Impact | Effort | File(s)                      |
-| --- | ------------------------------------------------------------- | ------ | ------ | ---------------------------- |
-| 4   | File too large: projectexecutables_ginkgo_test.go (742 lines) | MEDIUM | MEDIUM | internal/cleaner/            |
-| 5   | File too large: nodepackages.go (470 lines)                   | MEDIUM | MEDIUM | internal/cleaner/            |
-| 6   | File too large: type_safe_enums.go (499 lines)                | MEDIUM | MEDIUM | internal/domain/             |
-| 7   | Nix cleaner uses hardcoded 50MB estimate                      | LOW    | MEDIUM | internal/cleaner/nix.go      |
-| 8   | Homebrew lacks dry-run support                                | LOW    | LOW    | internal/cleaner/homebrew.go |
+| # | Issue                                                         | Impact | Effort | File(s)                      |
+| - | ------------------------------------------------------------- | ------ | ------ | ---------------------------- |
+| 4 | File too large: projectexecutables_ginkgo_test.go (742 lines) | MEDIUM | MEDIUM | internal/cleaner/            |
+| 5 | File too large: nodepackages.go (470 lines)                   | MEDIUM | MEDIUM | internal/cleaner/            |
+| 6 | File too large: type_safe_enums.go (499 lines)                | MEDIUM | MEDIUM | internal/domain/             |
+| 7 | Nix cleaner uses hardcoded 50MB estimate                      | LOW    | MEDIUM | internal/cleaner/nix.go      |
+| 8 | Homebrew lacks dry-run support                                | LOW    | LOW    | internal/cleaner/homebrew.go |
 
 ### Priority 3 - Low Impact
 
-| #   | Issue                                        | Impact | Effort | File(s)                             |
-| --- | -------------------------------------------- | ------ | ------ | ----------------------------------- |
-| 9   | Lang Version Mgr cleaner not implemented     | LOW    | HIGH   | internal/cleaner/languageversion.go |
-| 10  | Projects Mgmt cleaner requires external tool | LOW    | MEDIUM | internal/cleaner/projectsmgmt.go    |
+| #  | Issue                                        | Impact | Effort | File(s)                             |
+| -- | -------------------------------------------- | ------ | ------ | ----------------------------------- |
+| 9  | Lang Version Mgr cleaner not implemented     | LOW    | HIGH   | internal/cleaner/languageversion.go |
+| 10 | Projects Mgmt cleaner requires external tool | LOW    | MEDIUM | internal/cleaner/projectsmgmt.go    |
 
 ---
 

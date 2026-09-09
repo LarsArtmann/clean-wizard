@@ -36,7 +36,6 @@
           version = self.rev or self.dirtyRev or "dev";
 
           vendorHash = "sha256-LWmBusRYFQaZA88N2Of704QGPhn11TgtQ29ymXBCFgA=";
-          proxyVendor = true;
 
           ldflags = [
             "-s"
@@ -102,11 +101,11 @@
             format = config.treefmt.build.check self;
             build = clean-wizard;
 
-            test = clean-wizard.overrideAttrs (old: {
+            test = clean-wizard.overrideAttrs (_old: {
               doCheck = true;
             });
 
-            go-vet = clean-wizard.overrideAttrs (old: {
+            go-vet = clean-wizard.overrideAttrs (_old: {
               doCheck = false;
               buildPhase = ''
                 runHook preBuild

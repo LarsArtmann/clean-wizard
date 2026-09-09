@@ -1,9 +1,9 @@
 # Clean Wizard: Execution Plan & Comprehensive Status Report
 
-**Date**: February 9, 2026, 07:56 UTC  
-**Status**: Docker Refactoring COMPLETE - Ready for Next Phase  
-**Quality Score**: 90.1/100  
-**Branch**: master  
+**Date**: February 9, 2026, 07:56 UTC\
+**Status**: Docker Refactoring COMPLETE - Ready for Next Phase\
+**Quality Score**: 90.1/100\
+**Branch**: master\
 **Last Commit**: cd63d36 (docs(status): add comprehensive status report)
 
 ---
@@ -389,43 +389,43 @@ func TestCleaner_EnumWorkflow(t *testing.T) {
 
 ### Pareto 1% → 51% (High Impact, Low Effort)
 
-| #   | Task                       | Work | Impact | Priority |
-| --- | -------------------------- | ---- | ------ | -------- |
-| 1   | Fix deprecation warnings   | 0.5d | HIGH   | CRITICAL |
-| 2   | Extract Cleaner interface  | 1d   | HIGH   | CRITICAL |
-| 3   | Create Cleaner registry    | 0.5d | MEDIUM | HIGH     |
-| 4   | Research CacheType usage   | 0.5d | HIGH   | HIGH     |
-| 5   | Refactor NodePackages enum | 0.5d | MEDIUM | MEDIUM   |
+| # | Task                       | Work | Impact | Priority |
+| - | -------------------------- | ---- | ------ | -------- |
+| 1 | Fix deprecation warnings   | 0.5d | HIGH   | CRITICAL |
+| 2 | Extract Cleaner interface  | 1d   | HIGH   | CRITICAL |
+| 3 | Create Cleaner registry    | 0.5d | MEDIUM | HIGH     |
+| 4 | Research CacheType usage   | 0.5d | HIGH   | HIGH     |
+| 5 | Refactor NodePackages enum | 0.5d | MEDIUM | MEDIUM   |
 
 ### Pareto 4% → 64% (High Impact, Medium Effort)
 
-| #   | Task                                  | Work | Impact | Priority |
-| --- | ------------------------------------- | ---- | ------ | -------- |
-| 6   | Refactor SystemCache cleaner          | 1d   | HIGH   | HIGH     |
-| 7   | Reduce LoadWithContext complexity     | 1d   | MEDIUM | MEDIUM   |
-| 8   | Add integration tests (5 cleaners)    | 2d   | HIGH   | HIGH     |
-| 9   | Investigate BuildCache direction      | 0.5d | HIGH   | HIGH     |
-| 10  | Reduce validateProfileName complexity | 0.5d | MEDIUM | MEDIUM   |
+| #  | Task                                  | Work | Impact | Priority |
+| -- | ------------------------------------- | ---- | ------ | -------- |
+| 6  | Refactor SystemCache cleaner          | 1d   | HIGH   | HIGH     |
+| 7  | Reduce LoadWithContext complexity     | 1d   | MEDIUM | MEDIUM   |
+| 8  | Add integration tests (5 cleaners)    | 2d   | HIGH   | HIGH     |
+| 9  | Investigate BuildCache direction      | 0.5d | HIGH   | HIGH     |
+| 10 | Reduce validateProfileName complexity | 0.5d | MEDIUM | MEDIUM   |
 
 ### Medium Impact, Medium Effort
 
-| #   | Task                                  | Work | Impact | Priority |
-| --- | ------------------------------------- | ---- | ------ | -------- |
-| 11  | Reduce remaining complexity (3 funcs) | 1d   | MEDIUM | MEDIUM   |
-| 12  | Add edge case tests                   | 1d   | MEDIUM | MEDIUM   |
-| 13  | Refactor BuildCache (after decision)  | 1d   | MEDIUM | MEDIUM   |
-| 14  | Refactor LangVersionManager           | 0.5d | LOW    | LOW      |
-| 15  | Create architecture docs              | 1d   | LOW    | LOW      |
+| #  | Task                                  | Work | Impact | Priority |
+| -- | ------------------------------------- | ---- | ------ | -------- |
+| 11 | Reduce remaining complexity (3 funcs) | 1d   | MEDIUM | MEDIUM   |
+| 12 | Add edge case tests                   | 1d   | MEDIUM | MEDIUM   |
+| 13 | Refactor BuildCache (after decision)  | 1d   | MEDIUM | MEDIUM   |
+| 14 | Refactor LangVersionManager           | 0.5d | LOW    | LOW      |
+| 15 | Create architecture docs              | 1d   | LOW    | LOW      |
 
 ### Lower Priority
 
-| #   | Task                                        | Work | Impact | Priority |
-| --- | ------------------------------------------- | ---- | ------ | -------- |
-| 16  | Add benchmark regression detection          | 0.5d | LOW    | LOW      |
-| 17  | Investigate RiskLevelType manual processing | 0.5d | MEDIUM | LOW      |
-| 18  | Add dependency injection (samber/do)        | 2d   | LOW    | LOW      |
-| 19  | Create enum quick reference                 | 0.5d | LOW    | LOW      |
-| 20  | Add fuzz testing                            | 1d   | LOW    | LOW      |
+| #  | Task                                        | Work | Impact | Priority |
+| -- | ------------------------------------------- | ---- | ------ | -------- |
+| 16 | Add benchmark regression detection          | 0.5d | LOW    | LOW      |
+| 17 | Investigate RiskLevelType manual processing | 0.5d | MEDIUM | LOW      |
+| 18 | Add dependency injection (samber/do)        | 2d   | LOW    | LOW      |
+| 19 | Create enum quick reference                 | 0.5d | LOW    | LOW      |
+| 20 | Add fuzz testing                            | 1d   | LOW    | LOW      |
 
 ---
 
@@ -699,5 +699,5 @@ All tests passing, no critical issues.
 
 ---
 
-**Report Generated**: 2026-02-09 07:56 UTC  
+**Report Generated**: 2026-02-09 07:56 UTC\
 **Next Action**: Waiting for your instructions on which task to tackle first

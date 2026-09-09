@@ -1,7 +1,7 @@
 # Branching-Flow Mixins Analysis Report
 
-**Date:** 2026-04-01  
-**Tool:** branching-flow `mixins`  
+**Date:** 2026-04-01\
+**Tool:** branching-flow `mixins`\
 **Command:** `branching-flow mixins . --type-strategy semantic --show-all-locations --format markdown`
 
 ## Executive Summary
@@ -98,8 +98,8 @@ TypeSafeValidationRules vs ConfigValidationRules share 7 fields. NumericValidati
 
 The validation type consolidation (Phase 1–2) is the most impactful change but requires an architectural decision:
 
-**Option A:** Pick one canonical package (e.g., `domain/`) and have all others import from it.  
-**Option B:** Create a dedicated `internal/validation/types/` package with shared types.  
+**Option A:** Pick one canonical package (e.g., `domain/`) and have all others import from it.\
+**Option B:** Create a dedicated `internal/validation/types/` package with shared types.\
 **Option C:** Extract shared fields into mixins embedded by each package-specific type.
 
 Each approach has tradeoffs around coupling, import cycles, and semantic clarity.

@@ -62,7 +62,7 @@ Clean Wizard is a **production-ready** system cleanup tool with 15 cleaners, 9 o
 | Generation Listing     | ✅     | Real data when available, mock in CI        |
 | Generation Cleanup     | ✅     | Keeps current + N generations               |
 | Garbage Collection     | ✅     | Runs `nix-collect-garbage`                  |
-| Dry-Run                | ⚠️     | Uses hardcoded 50MB per generation estimate |
+| Dry-Run                | ⚠️      | Uses hardcoded 50MB per generation estimate |
 | Size Accuracy          | 🧪     | Estimated, not actual scan                  |
 
 **File:** `internal/cleaner/nix.go` (215 lines)
@@ -163,38 +163,38 @@ The following gopls errors are **FALSE POSITIVES** - actual builds pass:
 
 ### High Impact, Low Effort (Quick Wins)
 
-| #   | Improvement                                       | Effort | Impact | File(s)     |
-| --- | ------------------------------------------------- | ------ | ------ | ----------- |
-| 1   | Add `IsCommandAvailable(name string) bool` helper | 5 min  | Medium | helpers.go  |
-| 2   | Nix dry-run: scan actual generation sizes         | 30 min | High   | nix.go      |
-| 3   | Homebrew dry-run: parse `brew cleanup -n` output  | 1 hr   | High   | homebrew.go |
-| 4   | Remove unused enum values or implement them       | 30 min | Medium | domain/     |
+| # | Improvement                                       | Effort | Impact | File(s)     |
+| - | ------------------------------------------------- | ------ | ------ | ----------- |
+| 1 | Add `IsCommandAvailable(name string) bool` helper | 5 min  | Medium | helpers.go  |
+| 2 | Nix dry-run: scan actual generation sizes         | 30 min | High   | nix.go      |
+| 3 | Homebrew dry-run: parse `brew cleanup -n` output  | 1 hr   | High   | homebrew.go |
+| 4 | Remove unused enum values or implement them       | 30 min | Medium | domain/     |
 
 ### Medium Impact, Medium Effort
 
-| #   | Improvement                           | Effort | Impact | Description            |
-| --- | ------------------------------------- | ------ | ------ | ---------------------- |
-| 5   | Implement `scan` CLI command          | 2 hr   | High   | Documented but missing |
-| 6   | Implement `config` CLI command        | 2 hr   | Medium | Documented but missing |
-| 7   | Consolidate IsAvailable patterns      | 1 hr   | Low    | DRY improvement        |
-| 8   | Add language version manager cleaning | 4 hr   | Medium | Currently NO-OP        |
+| # | Improvement                           | Effort | Impact | Description            |
+| - | ------------------------------------- | ------ | ------ | ---------------------- |
+| 5 | Implement `scan` CLI command          | 2 hr   | High   | Documented but missing |
+| 6 | Implement `config` CLI command        | 2 hr   | Medium | Documented but missing |
+| 7 | Consolidate IsAvailable patterns      | 1 hr   | Low    | DRY improvement        |
+| 8 | Add language version manager cleaning | 4 hr   | Medium | Currently NO-OP        |
 
 ### High Impact, High Effort
 
-| #   | Improvement                  | Effort | Impact | Description                |
-| --- | ---------------------------- | ------ | ------ | -------------------------- |
-| 9   | Implement all CLI commands   | 8 hr   | High   | Complete documented API    |
-| 10  | Implement all enum values    | 4 hr   | Medium | GO, RUST, NODE build tools |
-| 11  | Add configuration hot-reload | 4 hr   | Low    | Nice-to-have feature       |
+| #  | Improvement                  | Effort | Impact | Description                |
+| -- | ---------------------------- | ------ | ------ | -------------------------- |
+| 9  | Implement all CLI commands   | 8 hr   | High   | Complete documented API    |
+| 10 | Implement all enum values    | 4 hr   | Medium | GO, RUST, NODE build tools |
+| 11 | Add configuration hot-reload | 4 hr   | Low    | Nice-to-have feature       |
 
 ### Code Quality Improvements
 
-| #   | Area           | Current State                            | Recommendation              |
-| --- | -------------- | ---------------------------------------- | --------------------------- |
-| 12  | File Sizes     | Largest: compiledbinaries.go (560 lines) | Consider splitting if grows |
-| 13  | Test Coverage  | Good but not comprehensive               | Add edge case tests         |
-| 14  | Error Messages | Good                                     | Could add more context      |
-| 15  | Documentation  | FEATURES.md excellent                    | Keep updated                |
+| #  | Area           | Current State                            | Recommendation              |
+| -- | -------------- | ---------------------------------------- | --------------------------- |
+| 12 | File Sizes     | Largest: compiledbinaries.go (560 lines) | Consider splitting if grows |
+| 13 | Test Coverage  | Good but not comprehensive               | Add edge case tests         |
+| 14 | Error Messages | Good                                     | Could add more context      |
+| 15 | Documentation  | FEATURES.md excellent                    | Keep updated                |
 
 ---
 

@@ -92,7 +92,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool) error {
 	// Project executables cleaner
 	registry.Register(
 		CleanerProjectExec,
-		NewProjectExecutablesCleaner(verbose, dryRun, []string{".sh"}, []string{}), //nolint:goconst
+		NewProjectExecutablesCleaner(verbose, dryRun, []string{".sh"}, []string{}),
 	)
 
 	// Compiled binaries cleaner (default: 10MB, any age, ~/projects)

@@ -535,28 +535,28 @@ go build ./cmd/clean-wizard/
 
 ## EXECUTION SUMMARY TABLE
 
-| ID  | Task                             | Priority     | Impact | Effort | Status     |
-| --- | -------------------------------- | ------------ | ------ | ------ | ---------- |
-| C1  | Fix Diagnostics Warnings         | 🔴 CRITICAL  | 90%    | 12min  | ⏳ PENDING |
-| H1  | NodePackages Enum Refactor       | 🔴 HIGH      | 80%    | 30min  | ⏳ PENDING |
-| H2  | BuildCache Decision              | 🔴 HIGH      | 70%    | 15min  | ⏳ PENDING |
-| H3  | Eliminate Aliases (3 phases)     | 🟠 HIGH      | 70%    | 60min  | ⏳ PENDING |
-| H4  | Domain Model Enhancement         | 🟠 HIGH      | 50%    | 45min  | ⏳ PENDING |
-| H5  | Type Model Improvements          | 🟠 HIGH      | 60%    | 30min  | ⏳ PENDING |
-| H6  | Result Type Enhancement          | 🟠 HIGH      | 50%    | 20min  | ⏳ PENDING |
-| H7  | Schema Min/Max Utility           | 🟠 HIGH      | 50%    | 12min  | ⏳ PENDING |
-| H8  | LoadWithContext Complexity       | 🟠 HIGH      | 70%    | 60min  | ⏳ PENDING |
-| H9  | validateProfileName Complexity   | 🟠 HIGH      | 60%    | 30min  | ⏳ PENDING |
-| M1  | Additional Complexity Reductions | 🟡 MEDIUM    | 50%    | 60min  | ⏳ PENDING |
-| M2  | BDD Helper Refactoring           | 🟡 MEDIUM    | 40%    | 30min  | ⏳ PENDING |
-| M3  | SystemCache Research             | 🟡 MEDIUM    | 50%    | 60min  | ⏳ PENDING |
-| M4  | RiskLevelType Investigation      | 🟡 MEDIUM    | 40%    | 60min  | ⏳ PENDING |
-| S1  | Size Reporting                   | 🟢 STRATEGIC | 60%    | 120min | ⏳ PENDING |
-| S2  | Linux SystemCache                | 🟢 STRATEGIC | 50%    | 120min | ⏳ PENDING |
-| S3  | Registry Documentation           | 🟢 STRATEGIC | 30%    | 30min  | ⏳ PENDING |
-| S4  | Architecture Documentation       | 🟢 STRATEGIC | 40%    | 120min | ⏳ PENDING |
-| S5  | Enum Quick Reference             | 🟢 STRATEGIC | 30%    | 30min  | ⏳ PENDING |
-| S6  | DI Investigation                 | 🟢 STRATEGIC | 40%    | 120min | ⏳ PENDING |
+| ID | Task                             | Priority     | Impact | Effort | Status     |
+| -- | -------------------------------- | ------------ | ------ | ------ | ---------- |
+| C1 | Fix Diagnostics Warnings         | 🔴 CRITICAL  | 90%    | 12min  | ⏳ PENDING |
+| H1 | NodePackages Enum Refactor       | 🔴 HIGH      | 80%    | 30min  | ⏳ PENDING |
+| H2 | BuildCache Decision              | 🔴 HIGH      | 70%    | 15min  | ⏳ PENDING |
+| H3 | Eliminate Aliases (3 phases)     | 🟠 HIGH      | 70%    | 60min  | ⏳ PENDING |
+| H4 | Domain Model Enhancement         | 🟠 HIGH      | 50%    | 45min  | ⏳ PENDING |
+| H5 | Type Model Improvements          | 🟠 HIGH      | 60%    | 30min  | ⏳ PENDING |
+| H6 | Result Type Enhancement          | 🟠 HIGH      | 50%    | 20min  | ⏳ PENDING |
+| H7 | Schema Min/Max Utility           | 🟠 HIGH      | 50%    | 12min  | ⏳ PENDING |
+| H8 | LoadWithContext Complexity       | 🟠 HIGH      | 70%    | 60min  | ⏳ PENDING |
+| H9 | validateProfileName Complexity   | 🟠 HIGH      | 60%    | 30min  | ⏳ PENDING |
+| M1 | Additional Complexity Reductions | 🟡 MEDIUM    | 50%    | 60min  | ⏳ PENDING |
+| M2 | BDD Helper Refactoring           | 🟡 MEDIUM    | 40%    | 30min  | ⏳ PENDING |
+| M3 | SystemCache Research             | 🟡 MEDIUM    | 50%    | 60min  | ⏳ PENDING |
+| M4 | RiskLevelType Investigation      | 🟡 MEDIUM    | 40%    | 60min  | ⏳ PENDING |
+| S1 | Size Reporting                   | 🟢 STRATEGIC | 60%    | 120min | ⏳ PENDING |
+| S2 | Linux SystemCache                | 🟢 STRATEGIC | 50%    | 120min | ⏳ PENDING |
+| S3 | Registry Documentation           | 🟢 STRATEGIC | 30%    | 30min  | ⏳ PENDING |
+| S4 | Architecture Documentation       | 🟢 STRATEGIC | 40%    | 120min | ⏳ PENDING |
+| S5 | Enum Quick Reference             | 🟢 STRATEGIC | 30%    | 30min  | ⏳ PENDING |
+| S6 | DI Investigation                 | 🟢 STRATEGIC | 40%    | 120min | ⏳ PENDING |
 
 **Total Tasks:** 20
 **Total Effort:** ~14.5 hours

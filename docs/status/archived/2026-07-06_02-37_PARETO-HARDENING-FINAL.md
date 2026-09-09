@@ -12,41 +12,41 @@
 
 ### Bug Fixes
 
-| #   | Fix                              | Detail                                                                                                                                                                                                     |
-| --- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Retry duplicate recording**    | `makeCleanStepFunc` now records only the final outcome via `recordFinal()` in the `defer` block — replaces previous entry for same step name instead of appending. Same fix applied to `makeScanStepFunc`. |
-| 2   | **Dead code: `scanCleanerReal`** | 50-line function removed from `scan.go` — zero callers after scan migration to `execution.RunScans`                                                                                                        |
-| 3   | **Dead code: `record()` method** | Old `record()` method on `resultCollector` is now unused — only `recordFinal()` is called. The old method still exists but has zero callers.                                                               |
+| # | Fix                              | Detail                                                                                                                                                                                                     |
+| - | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **Retry duplicate recording**    | `makeCleanStepFunc` now records only the final outcome via `recordFinal()` in the `defer` block — replaces previous entry for same step name instead of appending. Same fix applied to `makeScanStepFunc`. |
+| 2 | **Dead code: `scanCleanerReal`** | 50-line function removed from `scan.go` — zero callers after scan migration to `execution.RunScans`                                                                                                        |
+| 3 | **Dead code: `record()` method** | Old `record()` method on `resultCollector` is now unused — only `recordFinal()` is called. The old method still exists but has zero callers.                                                               |
 
 ### CLI Features Wired
 
-| #   | Feature                         | Flags           | Detail                                                                                                           |
-| --- | ------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- |
-| 4   | `--retries N`                   | `clean` command | When N > 0, passes `RetryConfig{MaxAttempts: N, InitialBackoff: 2s, MaxBackoff: 30s}` to `execution.WithRetry()` |
-| 5   | `--concurrency N` / `-C`        | `clean` command | When N > 0, passes to `execution.WithMaxConcurrency()` and sets `RunSettings.MaxConcurrency`                     |
-| 6   | `MaxConcurrency` in RunSettings | DI layer        | Now populated from `--concurrency` flag in `clean` command                                                       |
+| # | Feature                         | Flags           | Detail                                                                                                           |
+| - | ------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 4 | `--retries N`                   | `clean` command | When N > 0, passes `RetryConfig{MaxAttempts: N, InitialBackoff: 2s, MaxBackoff: 30s}` to `execution.WithRetry()` |
+| 5 | `--concurrency N` / `-C`        | `clean` command | When N > 0, passes to `execution.WithMaxConcurrency()` and sets `RunSettings.MaxConcurrency`                     |
+| 6 | `MaxConcurrency` in RunSettings | DI layer        | Now populated from `--concurrency` flag in `clean` command                                                       |
 
 ### Smart Retry
 
-| #   | Feature                                       | Detail                                                                                                                                                                                   |
-| --- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 7   | `NextBackOff` hook with `IsNotAvailableError` | Retry engine now calls `cleaner.IsNotAvailableError(re.Error)` — if true, returns `backoff.Stop` immediately. No more wasting 30s of exponential backoff retrying "cargo not installed". |
+| # | Feature                                       | Detail                                                                                                                                                                                   |
+| - | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 7 | `NextBackOff` hook with `IsNotAvailableError` | Retry engine now calls `cleaner.IsNotAvailableError(re.Error)` — if true, returns `backoff.Stop` immediately. No more wasting 30s of exponential backoff retrying "cargo not installed". |
 
 ### Typed Error Migration
 
-| #   | Cleaner           | Before                                    | After                                            |
-| --- | ----------------- | ----------------------------------------- | ------------------------------------------------ |
-| 8   | cargo             | `errors.New("cargo not available")`       | `&NotAvailableError{CleanerName: "cargo"}`       |
-| 9   | docker            | `errors.New("docker not available")`      | `&NotAvailableError{CleanerName: "docker"}`      |
-| 10  | homebrew (×2)     | `errors.New("homebrew not available")`    | `&NotAvailableError{CleanerName: "homebrew"}`    |
-| 11  | go                | `errors.New("go not available")` sentinel | `&NotAvailableError{CleanerName: "go"}` sentinel |
-| 12  | helpers (generic) | `fmt.Errorf("%s not available", name)`    | `&NotAvailableError{CleanerName: name}`          |
+| #  | Cleaner           | Before                                    | After                                            |
+| -- | ----------------- | ----------------------------------------- | ------------------------------------------------ |
+| 8  | cargo             | `errors.New("cargo not available")`       | `&NotAvailableError{CleanerName: "cargo"}`       |
+| 9  | docker            | `errors.New("docker not available")`      | `&NotAvailableError{CleanerName: "docker"}`      |
+| 10 | homebrew (×2)     | `errors.New("homebrew not available")`    | `&NotAvailableError{CleanerName: "homebrew"}`    |
+| 11 | go                | `errors.New("go not available")` sentinel | `&NotAvailableError{CleanerName: "go"}` sentinel |
+| 12 | helpers (generic) | `fmt.Errorf("%s not available", name)`    | `&NotAvailableError{CleanerName: name}`          |
 
 ### Tests
 
-| #   | Test                 | Coverage                                                                                                                                                                   |
-| --- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 13  | CLI integration test | `TestRunCleanCommand_DryRun_JSON` — full pipeline: cobra → config → DI → registry → workflow → JSON output. Verified real output with 11 cleaners, 96 GiB estimated freed. |
+| #  | Test                 | Coverage                                                                                                                                                                   |
+| -- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 13 | CLI integration test | `TestRunCleanCommand_DryRun_JSON` — full pipeline: cobra → config → DI → registry → workflow → JSON output. Verified real output with 11 cleaners, 96 GiB estimated freed. |
 
 ---
 
@@ -113,33 +113,33 @@
 
 ## f) Top 25 Things to Do Next
 
-| #   | Task                                                                               | Resolution |
-| --- | ---------------------------------------------------------------------------------- | ---------- |
-| 1   | ~~**Add test: assert step count = 1 after retry**~~                               | done at `6a539e7` + 2026-08-10 |
-| 2   | ~~**Remove dead `record()` method** from resultCollector~~                       | done at `6a539e7` |
-| 3   | ~~**Migrate `projectsmanagementautomation` + `systemcache` to `*NotAvailableError`**~~ | done at `c102e0f` |
-| 4   | ~~**Add `--retries` and `--concurrency` to scan command**~~                        | done at `1b96d06` |
-| 5   | ~~**Tag/skip integration test for short mode**~~                                  | done at `6a539e7` |
-| 6   | ~~**Set `--retries` default to 3** (or 2) for production resilience~~              | done at `1b96d06` |
-| 7   | Wire `OperationSettings` from config to cleaner constructors                       | still open — TODO #6 |
-| 8   | Implement `scan --profile` filtering or remove the flag                            | still open — TODO #10 |
-| 9   | Add `--timeout` per-cleaner flag                                                    | NOT-DO |
-| 10  | ~~**Consolidate 4 error packages into one coherent design**~~                     | done at `edaff33` |
-| 11  | ~~Clean up stale status reports (reference deleted types)~~                       | done at 2026-07-13 + 2026-08-10 audits |
-| 12  | Add `--keep-generations` flag for Nix cleaner                                      | still open — TODO #23 |
-| 13  | Register individual cleaners as separate DI providers                              | still open — TODO #29 |
-| 14  | Make adapters interface-backed with `do.As`                                        | still open — TODO #30 |
-| 15  | Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`                         | NOT-DO |
-| 16  | Implement `do.ShutdownerWithError` on adapters with resources                      | NOT-DO |
-| 17  | Add BDD tests for execution layer (Ginkgo)                                         | still open — TODO #7 |
-| 18  | Add progress TUI                                                                   | aspirational |
-| 19  | Add `do.ExplainInjector` debug output behind `--di-debug`                          | NOT-DO |
-| 20  | Create application-global DI bootstrap shared by all commands                      | NOT-DO |
-| 21  | Migrate `githistory` command to DI                                                 | NOT-DO |
-| 22  | Add `flow.If` conditional for Docker                                               | NOT-DO |
-| 23  | Add audit log of DI registrations                                                  | NOT-DO |
-| 24  | ~~Fix `ErrGoCacheNotAvailable` sentinel — make it a value, not pointer~~           | done at `c102e0f` (sentinel removed entirely) |
-| 25  | Profile-guided cleaner selection                                                   | still open — TODO #6 (subsumed) |
+| #  | Task                                                                                   | Resolution                                    |
+| -- | -------------------------------------------------------------------------------------- | --------------------------------------------- |
+| 1  | ~~**Add test: assert step count = 1 after retry**~~                                    | done at `6a539e7` + 2026-08-10                |
+| 2  | ~~**Remove dead `record()` method** from resultCollector~~                             | done at `6a539e7`                             |
+| 3  | ~~**Migrate `projectsmanagementautomation` + `systemcache` to `*NotAvailableError`**~~ | done at `c102e0f`                             |
+| 4  | ~~**Add `--retries` and `--concurrency` to scan command**~~                            | done at `1b96d06`                             |
+| 5  | ~~**Tag/skip integration test for short mode**~~                                       | done at `6a539e7`                             |
+| 6  | ~~**Set `--retries` default to 3** (or 2) for production resilience~~                  | done at `1b96d06`                             |
+| 7  | Wire `OperationSettings` from config to cleaner constructors                           | still open — TODO #6                          |
+| 8  | Implement `scan --profile` filtering or remove the flag                                | still open — TODO #10                         |
+| 9  | Add `--timeout` per-cleaner flag                                                       | NOT-DO                                        |
+| 10 | ~~**Consolidate 4 error packages into one coherent design**~~                          | done at `edaff33`                             |
+| 11 | ~~Clean up stale status reports (reference deleted types)~~                            | done at 2026-07-13 + 2026-08-10 audits        |
+| 12 | Add `--keep-generations` flag for Nix cleaner                                          | still open — TODO #23                         |
+| 13 | Register individual cleaners as separate DI providers                                  | still open — TODO #29                         |
+| 14 | Make adapters interface-backed with `do.As`                                            | still open — TODO #30                         |
+| 15 | Consolidate `cleaner.Cleaner` vs `domain.OperationHandler`                             | NOT-DO                                        |
+| 16 | Implement `do.ShutdownerWithError` on adapters with resources                          | NOT-DO                                        |
+| 17 | Add BDD tests for execution layer (Ginkgo)                                             | still open — TODO #7                          |
+| 18 | Add progress TUI                                                                       | aspirational                                  |
+| 19 | Add `do.ExplainInjector` debug output behind `--di-debug`                              | NOT-DO                                        |
+| 20 | Create application-global DI bootstrap shared by all commands                          | NOT-DO                                        |
+| 21 | Migrate `githistory` command to DI                                                     | NOT-DO                                        |
+| 22 | Add `flow.If` conditional for Docker                                                   | NOT-DO                                        |
+| 23 | Add audit log of DI registrations                                                      | NOT-DO                                        |
+| 24 | ~~Fix `ErrGoCacheNotAvailable` sentinel — make it a value, not pointer~~               | done at `c102e0f` (sentinel removed entirely) |
+| 25 | Profile-guided cleaner selection                                                       | still open — TODO #6 (subsumed)               |
 
 ## g) Top #1 Question I Cannot Answer Myself
 

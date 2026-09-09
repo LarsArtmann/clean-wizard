@@ -265,7 +265,7 @@ Choose one of:
 | **Type Safety**       | 10/10      | ✅ Perfect     |
 | **Error Handling**    | 9/10       | ✅ Excellent   |
 | **Duplication**       | 8/10       | ✅ Improved    |
-| **Complexity**        | 6/10       | ⚠️ Needs work  |
+| **Complexity**        | 6/10       | ⚠️ Needs work   |
 | **Integration Tests** | 3/10       | ❌ Missing     |
 | **Overall**           | **8.2/10** | ✅ Healthy     |
 

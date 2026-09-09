@@ -82,20 +82,20 @@ graph TD
 
 ## Phase 1: 1% → 51% (4 tasks, ~40min each)
 
-| #   | Task                                                      | Impact   | Effort | File                   |
-| --- | --------------------------------------------------------- | -------- | ------ | ---------------------- |
-| T1  | Fix retry duplicate recording — only record final outcome | CRITICAL | 15min  | `execution/builder.go` |
-| T2  | Remove dead `scanCleanerReal` function                    | HIGH     | 5min   | `scan.go`              |
-| T3  | Wire `--retries` CLI flag to `RetryConfig`                | HIGH     | 15min  | `clean.go`             |
-| T4  | Wire `--concurrency` CLI flag to `MaxConcurrency`         | HIGH     | 15min  | `clean.go`, `scan.go`  |
+| #  | Task                                                      | Impact   | Effort | File                   |
+| -- | --------------------------------------------------------- | -------- | ------ | ---------------------- |
+| T1 | Fix retry duplicate recording — only record final outcome | CRITICAL | 15min  | `execution/builder.go` |
+| T2 | Remove dead `scanCleanerReal` function                    | HIGH     | 5min   | `scan.go`              |
+| T3 | Wire `--retries` CLI flag to `RetryConfig`                | HIGH     | 15min  | `clean.go`             |
+| T4 | Wire `--concurrency` CLI flag to `MaxConcurrency`         | HIGH     | 15min  | `clean.go`, `scan.go`  |
 
 ## Phase 2: 4% → 64% (3 tasks, ~40min each)
 
-| #   | Task                                                                     | Impact | Effort | File                                        |
-| --- | ------------------------------------------------------------------------ | ------ | ------ | ------------------------------------------- |
-| T5  | Smart retry — `IsNotAvailableError` in `NextBackOff` stops non-retryable | HIGH   | 20min  | `execution/retry.go`                        |
-| T6  | CLI integration test — `clean --dry-run` full pipeline                   | HIGH   | 30min  | `execution/integration_test.go`             |
-| T7  | Migrate 5 key cleaners to return `*NotAvailableError`                    | MEDIUM | 30min  | `cleaner/{cargo,docker,homebrew,go,nix}.go` |
+| #  | Task                                                                     | Impact | Effort | File                                        |
+| -- | ------------------------------------------------------------------------ | ------ | ------ | ------------------------------------------- |
+| T5 | Smart retry — `IsNotAvailableError` in `NextBackOff` stops non-retryable | HIGH   | 20min  | `execution/retry.go`                        |
+| T6 | CLI integration test — `clean --dry-run` full pipeline                   | HIGH   | 30min  | `execution/integration_test.go`             |
+| T7 | Migrate 5 key cleaners to return `*NotAvailableError`                    | MEDIUM | 30min  | `cleaner/{cargo,docker,homebrew,go,nix}.go` |
 
 ## Phase 3: 20% → 80% (5 tasks, ~30-60min each)
 

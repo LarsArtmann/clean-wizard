@@ -191,7 +191,7 @@ func Save(config *domain.Config) error {
 
 	// Build the config map for YAML output
 	configMap := map[string]any{
-		"version":                config.Version,           //nolint:goconst
+		"version":                config.Version,
 		"safe_mode":              config.SafeMode.String(), //nolint:goconst
 		"max_disk_usage_percent": config.MaxDiskUsage,
 		"protected":              config.Protected, //nolint:goconst
@@ -349,16 +349,16 @@ func GetDefaultConfig() *domain.Config {
 	now := GetCurrentTime()
 
 	return &domain.Config{ //nolint:exhaustruct
-		Version:      "1.0.0",                //nolint:goconst
+		Version:      "1.0.0",
 		SafeMode:     domain.SafeModeEnabled, // Default to safe mode
 		MaxDiskUsage: DefaultMaxDiskUsage,
 		Protected: []string{
-			"/System",       //nolint:goconst
-			"/Applications", //nolint:goconst
-			"/Library",      //nolint:goconst
+			"/System",
+			"/Applications",
+			"/Library",
 		},
 		Profiles: map[string]*domain.Profile{
-			"daily": newProfile("daily", "Quick daily cleanup", []domain.CleanupOperation{ //nolint:goconst
+			"daily": newProfile("daily", "Quick daily cleanup", []domain.CleanupOperation{
 				newCleanupOperation(
 					"nix-generations",
 					"Clean old Nix generations",

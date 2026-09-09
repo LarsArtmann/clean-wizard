@@ -1,7 +1,7 @@
 # Architecture Refactoring Status Report
 
-**Date:** 2026-03-22  
-**Scope:** Comprehensive Architecture Review & Split Brain Elimination  
+**Date:** 2026-03-22\
+**Scope:** Comprehensive Architecture Review & Split Brain Elimination\
 **Status:** ✅ PHASE 1 COMPLETE
 
 ---
@@ -18,14 +18,14 @@ Completed critical architecture refactoring to eliminate split-brain type defini
 
 #### 1. ValidationError Split Brain Elimination
 
-**Impact:** CRITICAL - Eliminated duplicate type definitions  
+**Impact:** CRITICAL - Eliminated duplicate type definitions\
 **Files Changed:**
 
 - `internal/domain/operation_validation.go` - Extended with comprehensive fields
 - `internal/config/validator.go` - Converted to type alias
 - `internal/config/validator_rules.go` - Converted ValidationSeverity to alias
 
-**Before:** Two separate ValidationError types with different fields  
+**Before:** Two separate ValidationError types with different fields\
 **After:** Single source of truth in domain, type aliases in config
 
 ```go
@@ -46,8 +46,8 @@ type ValidationError = domain.ValidationError
 
 #### 2. Protected Paths Constants Extraction
 
-**Impact:** HIGH - Eliminated magic strings  
-**Files Changed:** 9 files modified, 2 new files  
+**Impact:** HIGH - Eliminated magic strings\
+**Files Changed:** 9 files modified, 2 new files\
 **Lines Removed:** 40 lines through consolidation
 
 **New Files:**
@@ -78,7 +78,7 @@ const (
 
 #### 3. Package Boundary Documentation
 
-**Impact:** MEDIUM - Prevents future split brains  
+**Impact:** MEDIUM - Prevents future split brains\
 **New File:** `docs/PACKAGE_BOUNDARY.md`
 
 Documents:
@@ -147,7 +147,7 @@ Documents:
 
 #### 1. Boolean Blindness in GitHistorySafetyReport
 
-**Location:** `internal/domain/githistory_types.go:110-145`  
+**Location:** `internal/domain/githistory_types.go:110-145`\
 **Issue:** 10 boolean fields that should be enums:
 
 ```go
@@ -352,33 +352,33 @@ CLI → Command → CleanerRegistry → Cleaner.Clean() → Result
 
 ## Top 25 Tasks
 
-| #   | Task                                             | Impact | Effort | Status      |
-| --- | ------------------------------------------------ | ------ | ------ | ----------- |
-| 1   | Convert GitHistorySafetyReport booleans to enums | HIGH   | MEDIUM | NOT STARTED |
-| 2   | Split compiledbinaries.go into smaller files     | HIGH   | MEDIUM | NOT STARTED |
-| 3   | Split type_safe_enums.go by category             | MEDIUM | MEDIUM | NOT STARTED |
-| 4   | Add uint constraints to numeric types            | MEDIUM | LOW    | NOT STARTED |
-| 5   | Create cleaner/githistory/ subpackage            | MEDIUM | HIGH   | NOT STARTED |
-| 6   | Add BDD assertions for Nix operations            | HIGH   | MEDIUM | NOT STARTED |
-| 7   | Remove unused parameters and methods             | LOW    | LOW    | NOT STARTED |
-| 8   | Standardize on Result[T] return types            | MEDIUM | MEDIUM | NOT STARTED |
-| 9   | Add property-based tests for enums               | MEDIUM | MEDIUM | NOT STARTED |
-| 10  | Document all public APIs                         | MEDIUM | HIGH   | NOT STARTED |
-| 11  | Create performance benchmarks                    | LOW    | MEDIUM | NOT STARTED |
-| 12  | Split nodepackages.go by package manager         | MEDIUM | MEDIUM | NOT STARTED |
-| 13  | Split docker.go by prune mode                    | LOW    | MEDIUM | NOT STARTED |
-| 14  | Add tracing to cleaner operations                | LOW    | HIGH   | NOT STARTED |
-| 15  | Create adapter test mocks                        | MEDIUM | MEDIUM | NOT STARTED |
-| 16  | Add fuzz testing for config parsing              | MEDIUM | LOW    | NOT STARTED |
-| 17  | Consolidate test helpers                         | LOW    | MEDIUM | NOT STARTED |
-| 18  | Add integration tests for git history            | HIGH   | HIGH   | NOT STARTED |
-| 19  | Create metrics collection                        | LOW    | HIGH   | NOT STARTED |
-| 20  | Add config migration tests                       | MEDIUM | MEDIUM | NOT STARTED |
-| 21  | Document error handling patterns                 | LOW    | LOW    | NOT STARTED |
-| 22  | Add concurrency tests                            | MEDIUM | MEDIUM | NOT STARTED |
-| 23  | Create CLI test suite                            | MEDIUM | HIGH   | NOT STARTED |
-| 24  | Add security scanning                            | LOW    | LOW    | NOT STARTED |
-| 25  | Create release automation                        | LOW    | MEDIUM | NOT STARTED |
+| #  | Task                                             | Impact | Effort | Status      |
+| -- | ------------------------------------------------ | ------ | ------ | ----------- |
+| 1  | Convert GitHistorySafetyReport booleans to enums | HIGH   | MEDIUM | NOT STARTED |
+| 2  | Split compiledbinaries.go into smaller files     | HIGH   | MEDIUM | NOT STARTED |
+| 3  | Split type_safe_enums.go by category             | MEDIUM | MEDIUM | NOT STARTED |
+| 4  | Add uint constraints to numeric types            | MEDIUM | LOW    | NOT STARTED |
+| 5  | Create cleaner/githistory/ subpackage            | MEDIUM | HIGH   | NOT STARTED |
+| 6  | Add BDD assertions for Nix operations            | HIGH   | MEDIUM | NOT STARTED |
+| 7  | Remove unused parameters and methods             | LOW    | LOW    | NOT STARTED |
+| 8  | Standardize on Result[T] return types            | MEDIUM | MEDIUM | NOT STARTED |
+| 9  | Add property-based tests for enums               | MEDIUM | MEDIUM | NOT STARTED |
+| 10 | Document all public APIs                         | MEDIUM | HIGH   | NOT STARTED |
+| 11 | Create performance benchmarks                    | LOW    | MEDIUM | NOT STARTED |
+| 12 | Split nodepackages.go by package manager         | MEDIUM | MEDIUM | NOT STARTED |
+| 13 | Split docker.go by prune mode                    | LOW    | MEDIUM | NOT STARTED |
+| 14 | Add tracing to cleaner operations                | LOW    | HIGH   | NOT STARTED |
+| 15 | Create adapter test mocks                        | MEDIUM | MEDIUM | NOT STARTED |
+| 16 | Add fuzz testing for config parsing              | MEDIUM | LOW    | NOT STARTED |
+| 17 | Consolidate test helpers                         | LOW    | MEDIUM | NOT STARTED |
+| 18 | Add integration tests for git history            | HIGH   | HIGH   | NOT STARTED |
+| 19 | Create metrics collection                        | LOW    | HIGH   | NOT STARTED |
+| 20 | Add config migration tests                       | MEDIUM | MEDIUM | NOT STARTED |
+| 21 | Document error handling patterns                 | LOW    | LOW    | NOT STARTED |
+| 22 | Add concurrency tests                            | MEDIUM | MEDIUM | NOT STARTED |
+| 23 | Create CLI test suite                            | MEDIUM | HIGH   | NOT STARTED |
+| 24 | Add security scanning                            | LOW    | LOW    | NOT STARTED |
+| 25 | Create release automation                        | LOW    | MEDIUM | NOT STARTED |
 
 ---
 
@@ -415,5 +415,5 @@ The foundation is solid. Next phase should focus on:
 2. File size reduction
 3. Test coverage enhancement
 
-**Overall Architecture Grade: B+**  
+**Overall Architecture Grade: B+**\
 _Excellent type safety and composition, needs work on file organization and boolean enums._

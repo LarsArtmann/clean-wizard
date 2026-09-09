@@ -25,11 +25,11 @@ func (p FilterRepoProvider) String() string {
 	case FilterRepoNone:
 		return "none"
 	case FilterRepoSystem:
-		return "system" //nolint:goconst
+		return "system"
 	case FilterRepoNix:
 		return "nix" //nolint:goconst
 	default:
-		return "unknown" //nolint:goconst
+		return "unknown"
 	}
 }
 

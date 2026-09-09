@@ -35,8 +35,8 @@ The golangci-lint cache cleaner feature is **PARTIALLY COMPLETE**. A new `Golang
 
 ### B) PARTIALLY DONE ⚠️
 
-| Task                  | Status        | Details                                                      |
-| --------------------- | ------------- | ------------------------------------------------------------ |
+| Task                  | Status       | Details                                                      |
+| --------------------- | ------------ | ------------------------------------------------------------ |
 | Deprecate old cleaner | ⚠️ PARTIAL    | `GolangciLintCleaner` still exists in golang_lint_adapter.go |
 | Settings struct       | ⚠️ NOT NEEDED | No custom settings required for this cleaner                 |
 | CLI flag              | ⚠️ N/A        | Uses TUI selection, no standalone flag needed                |
@@ -110,7 +110,7 @@ internal/cleaner/registry_factory.go                | +3 lines
 | --------------- | ----------------------- | ---------------------------- |
 | Location        | golang_lint_adapter.go  | golangcilint.go              |
 | Size Method     | Directory scan          | `golangci-lint cache status` |
-| Accurate Sizing | ⚠️ Partial              | ✅ Accurate                  |
+| Accurate Sizing | ⚠️ Partial               | ✅ Accurate                  |
 | Integration     | Via GoCleaner           | Standalone + via GoCleaner   |
 | Status          | Still exists            | New                          |
 

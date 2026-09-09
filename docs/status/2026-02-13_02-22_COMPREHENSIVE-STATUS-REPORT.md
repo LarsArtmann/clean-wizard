@@ -119,7 +119,7 @@ Clean Wizard is in **healthy, production-ready state** for core functionality. T
 | Cargo               | ✅        | ✅      | ✅       | 🧪 Mock | ❌ (0 bytes)  | Production     |
 | Node Packages       | ✅        | ✅      | ✅       | 🧪 Mock | ✅            | Production     |
 | Build Cache         | ✅        | ✅      | ✅       | ✅      | ✅            | Production     |
-| System Cache        | ⚠️ macOS  | ✅      | ✅       | ✅      | ✅            | Partial        |
+| System Cache        | ⚠️ macOS   | ✅      | ✅       | ✅      | ✅            | Partial        |
 | Temp Files          | ✅        | ✅      | ✅       | ✅      | ✅            | Production     |
 | Lang Version Mgr    | ✅        | ✅      | ❌ NO-OP | ❌      | N/A           | Non-Functional |
 | Projects Mgmt       | ❌ Rare   | 🧪 Mock | ❌       | 🧪 Mock | 🧪 Mock       | Non-Functional |
@@ -277,24 +277,24 @@ clean-wizard/
 | Build Success         | ✅               | ✅      | ✅     |
 | Test Pass Rate        | 100%             | 100%    | ✅     |
 | Lint Warnings         | 0                | 0       | ✅     |
-| Cyclomatic Complexity | 21 functions >10 | All <10 | ⚠️     |
-| Test Coverage         | ~70%             | 85%     | ⚠️     |
+| Cyclomatic Complexity | 21 functions >10 | All <10 | ⚠️      |
+| Test Coverage         | ~70%             | 85%     | ⚠️      |
 
 ### Feature Completeness
 
 | Metric              | Current       | Target        | Status |
 | ------------------- | ------------- | ------------- | ------ |
-| Production Cleaners | 10/13 (77%)   | 12/13 (92%)   | ⚠️     |
+| Production Cleaners | 10/13 (77%)   | 12/13 (92%)   | ⚠️      |
 | CLI Commands        | 5/5 (100%)    | 5/5 (100%)    | ✅     |
-| Platform Support    | macOS only    | macOS + Linux | ⚠️     |
-| Size Reporting      | ~50% accurate | 95% accurate  | ⚠️     |
+| Platform Support    | macOS only    | macOS + Linux | ⚠️      |
+| Size Reporting      | ~50% accurate | 95% accurate  | ⚠️      |
 
 ### Developer Experience
 
 | Metric               | Current | Target        | Status |
 | -------------------- | ------- | ------------- | ------ |
-| Architecture Docs    | Partial | Comprehensive | ⚠️     |
-| Onboarding Time      | ~2h     | <1h           | ⚠️     |
+| Architecture Docs    | Partial | Comprehensive | ⚠️      |
+| Onboarding Time      | ~2h     | <1h           | ⚠️      |
 | New Cleaner Add Time | ~1h     | <30min        | ✅     |
 
 ---

@@ -202,33 +202,33 @@ The LSP version mismatch causes 9 project errors. Either:
 
 Sorted by **impact × effort** (highest ROI first):
 
-| #   | Task                                                                | Impact | Effort | Category     |
-| --- | ------------------------------------------------------------------- | ------ | ------ | ------------ |
-| 1   | Add tests for `getCleanerName/Description/Icon`                     | HIGH   | LOW    | Testing      |
-| 2   | Fix pre-commit hook golangci-lint timeout                           | MED    | LOW    | DX           |
-| 3   | Set up CI pipeline (go build + go test)                             | HIGH   | MED    | CI           |
-| 4   | Add profile command tests                                           | MED    | MED    | Testing      |
-| 5   | Add scan command tests                                              | MED    | MED    | Testing      |
-| 6   | Restart LSP server to fix version mismatch                          | LOW    | LOW    | DX           |
-| 7   | Add clean command tests                                             | MED    | HIGH   | Testing      |
-| 8   | Add `init()` validation for CleanerType ↔ CleanerConfig consistency | MED    | LOW    | Safety       |
-| 9   | Replace `runCleaner()` switch with factory map                      | MED    | MED    | Architecture |
-| 10  | Update `FEATURES.md` to reflect current state                       | LOW    | LOW    | Docs         |
-| 11  | Evaluate `stringer` codegen for `CleanerType` enum                  | MED    | MED    | DX           |
-| 12  | Consider merging `CleanerType` with registry name strings           | HIGH   | HIGH   | Architecture |
-| 13  | Add TUI form rendering tests                                        | MED    | MED    | Testing      |
-| 14  | Review `OperationType` vs `CleanerType` — are both needed?          | MED    | HIGH   | Architecture |
-| 15  | GitHistory cleaner — unify into TUI or keep separate?               | LOW    | HIGH   | Design       |
-| 16  | BDD test performance (322s) — parallelize or optimize               | MED    | MED    | CI           |
-| 17  | Review error handling patterns in commands                          | MED    | MED    | Quality      |
-| 18  | Evaluate Fang DI for cleaner registration                           | MED    | MED    | Architecture |
-| 19  | Structured logging instead of `fmt.Println` in commands             | MED    | MED    | Quality      |
-| 20  | Add `justfile` improvements for common dev tasks                    | LOW    | LOW    | DX           |
-| 21  | Fix `~/projects/go.work` (add clean-wizard or document)             | MED    | LOW    | DX           |
-| 22  | Add profile validation tests                                        | MED    | LOW    | Testing      |
-| 23  | Add cleaner availability detection tests                            | MED    | MED    | Testing      |
-| 24  | Document preset modes (quick/standard/aggressive)                   | LOW    | LOW    | Docs         |
-| 25  | Add auto-approve flag tests                                         | LOW    | LOW    | Testing      |
+| #  | Task                                                                | Impact | Effort | Category     |
+| -- | ------------------------------------------------------------------- | ------ | ------ | ------------ |
+| 1  | Add tests for `getCleanerName/Description/Icon`                     | HIGH   | LOW    | Testing      |
+| 2  | Fix pre-commit hook golangci-lint timeout                           | MED    | LOW    | DX           |
+| 3  | Set up CI pipeline (go build + go test)                             | HIGH   | MED    | CI           |
+| 4  | Add profile command tests                                           | MED    | MED    | Testing      |
+| 5  | Add scan command tests                                              | MED    | MED    | Testing      |
+| 6  | Restart LSP server to fix version mismatch                          | LOW    | LOW    | DX           |
+| 7  | Add clean command tests                                             | MED    | HIGH   | Testing      |
+| 8  | Add `init()` validation for CleanerType ↔ CleanerConfig consistency | MED    | LOW    | Safety       |
+| 9  | Replace `runCleaner()` switch with factory map                      | MED    | MED    | Architecture |
+| 10 | Update `FEATURES.md` to reflect current state                       | LOW    | LOW    | Docs         |
+| 11 | Evaluate `stringer` codegen for `CleanerType` enum                  | MED    | MED    | DX           |
+| 12 | Consider merging `CleanerType` with registry name strings           | HIGH   | HIGH   | Architecture |
+| 13 | Add TUI form rendering tests                                        | MED    | MED    | Testing      |
+| 14 | Review `OperationType` vs `CleanerType` — are both needed?          | MED    | HIGH   | Architecture |
+| 15 | GitHistory cleaner — unify into TUI or keep separate?               | LOW    | HIGH   | Design       |
+| 16 | BDD test performance (322s) — parallelize or optimize               | MED    | MED    | CI           |
+| 17 | Review error handling patterns in commands                          | MED    | MED    | Quality      |
+| 18 | Evaluate Fang DI for cleaner registration                           | MED    | MED    | Architecture |
+| 19 | Structured logging instead of `fmt.Println` in commands             | MED    | MED    | Quality      |
+| 20 | Add `justfile` improvements for common dev tasks                    | LOW    | LOW    | DX           |
+| 21 | Fix `~/projects/go.work` (add clean-wizard or document)             | MED    | LOW    | DX           |
+| 22 | Add profile validation tests                                        | MED    | LOW    | Testing      |
+| 23 | Add cleaner availability detection tests                            | MED    | MED    | Testing      |
+| 24 | Document preset modes (quick/standard/aggressive)                   | LOW    | LOW    | Docs         |
+| 25 | Add auto-approve flag tests                                         | LOW    | LOW    | Testing      |
 
 ---
 

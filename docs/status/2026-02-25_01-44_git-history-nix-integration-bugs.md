@@ -130,8 +130,8 @@ githistory_executor.go
 | --------------------------- | ------ | ---------------------------------------- |
 | `--protect-blobs-from` flag | ❌     | Doesn't exist in git-filter-repo         |
 | Detection caching           | ❌     | Caches failures permanently              |
-| Error messaging             | ⚠️     | Doesn't explain WHY nix detection failed |
-| Verbose logging             | ⚠️     | No debug output for detection process    |
+| Error messaging             | ⚠️      | Doesn't explain WHY nix detection failed |
+| Verbose logging             | ⚠️      | No debug output for detection process    |
 
 ---
 
@@ -139,25 +139,25 @@ githistory_executor.go
 
 ### Priority 1: CRITICAL
 
-| #   | Task                                        | File                       | Effort |
-| --- | ------------------------------------------- | -------------------------- | ------ |
-| 1   | Find and remove `--protect-blobs-from HEAD` | Unknown                    | 30min  |
-| 2   | Fix caching to not cache failures           | `githistory_filterrepo.go` | 15min  |
+| # | Task                                        | File                       | Effort |
+| - | ------------------------------------------- | -------------------------- | ------ |
+| 1 | Find and remove `--protect-blobs-from HEAD` | Unknown                    | 30min  |
+| 2 | Fix caching to not cache failures           | `githistory_filterrepo.go` | 15min  |
 
 ### Priority 2: HIGH
 
-| #   | Task                                   | File                       | Effort |
-| --- | -------------------------------------- | -------------------------- | ------ |
-| 3   | Add verbose debug output for detection | `githistory_filterrepo.go` | 15min  |
-| 4   | Add error context when detection fails | `githistory_filterrepo.go` | 10min  |
+| # | Task                                   | File                       | Effort |
+| - | -------------------------------------- | -------------------------- | ------ |
+| 3 | Add verbose debug output for detection | `githistory_filterrepo.go` | 15min  |
+| 4 | Add error context when detection fails | `githistory_filterrepo.go` | 10min  |
 
 ### Priority 3: MEDIUM
 
-| #   | Task                                           | File                       | Effort |
-| --- | ---------------------------------------------- | -------------------------- | ------ |
-| 5   | Consider `nix shell` for better error handling | `githistory_filterrepo.go` | 30min  |
-| 6   | Add retry logic for transient nix failures     | `githistory_filterrepo.go` | 20min  |
-| 7   | Increase detection timeout (currently 5s)      | `githistory_filterrepo.go` | 5min   |
+| # | Task                                           | File                       | Effort |
+| - | ---------------------------------------------- | -------------------------- | ------ |
+| 5 | Consider `nix shell` for better error handling | `githistory_filterrepo.go` | 30min  |
+| 6 | Add retry logic for transient nix failures     | `githistory_filterrepo.go` | 20min  |
+| 7 | Increase detection timeout (currently 5s)      | `githistory_filterrepo.go` | 5min   |
 
 ---
 

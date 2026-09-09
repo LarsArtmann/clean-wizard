@@ -359,7 +359,17 @@ presets:
   quick:
     cleaners: [homebrew, go, node, tempfiles, buildcache]
   standard:
-    cleaners: [homebrew, go, node, cargo, tempfiles, buildcache, systemcache, docker, nix]
+    cleaners: [
+      homebrew,
+      go,
+      node,
+      cargo,
+      tempfiles,
+      buildcache,
+      systemcache,
+      docker,
+      nix,
+    ]
   aggressive:
     cleaners: [all]
     include_dangerous: true

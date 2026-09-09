@@ -1,13 +1,13 @@
 # Enum Consolidation Refactor — Full Status Report
 
-**Date:** 2026-04-03 05:02  
-**Session:** Multi-session meta-improvement (session 3)  
-**Author:** Crush (GLM-5.1)  
-**Branch:** master  
-**Ahead of origin:** 1 commit (unpushed)  
-**Uncommitted changes:** 3 files (operation_settings.go rewrite + test + macro fix)  
-**Disk:** 3.5GB free (was 800MB — cleared Go build cache)  
-**Build:** `go build ./...` PASS  
+**Date:** 2026-04-03 05:02\
+**Session:** Multi-session meta-improvement (session 3)\
+**Author:** Crush (GLM-5.1)\
+**Branch:** master\
+**Ahead of origin:** 1 commit (unpushed)\
+**Uncommitted changes:** 3 files (operation_settings.go rewrite + test + macro fix)\
+**Disk:** 3.5GB free (was 800MB — cleared Go build cache)\
+**Build:** `go build ./...` PASS\
 **Tests:** `go test ./internal/domain/... -short` PASS
 
 ---
@@ -148,33 +148,33 @@ After all enums are consolidated:
 
 Sorted by **impact × feasibility / effort**:
 
-| #   | Task                                                                               | Impact   | Effort | Category       |
-| --- | ---------------------------------------------------------------------------------- | -------- | ------ | -------------- |
-| 1   | Commit operation_settings.go consolidation (already done, just needs commit)       | HIGH     | ZERO   | Uncommitted    |
-| 2   | Consolidate type_safe_enums.go using enum macros (539→~280 lines)                  | HIGH     | MED    | Enum refactor  |
-| 3   | Migrate githistory_types.go `GitHistoryMode` to `EnumUnmarshalJSON`                | MED      | LOW    | Enum refactor  |
-| 4   | Remove dead `UnmarshalYAMLEnum`/`UnmarshalJSONEnum`/`UnmarshalYAMLEnumWithDefault` | HIGH     | LOW    | Dead code      |
-| 5   | Update TODO_LIST.md with enum consolidation progress                               | MED      | LOW    | Docs           |
-| 6   | Update FEATURES.md (last updated Feb 2026 — 2 months stale)                        | MED      | LOW    | Docs           |
-| 7   | Push all commits to origin                                                         | MED      | ZERO   | Git            |
-| 8   | Free 20-30GB disk space (external action needed)                                   | CRITICAL | EXT    | Environment    |
-| 9   | Split `enum_yaml_test.go` (619 lines) into focused test files                      | MED      | LOW    | Test quality   |
-| 10  | Add config round-trip integration test (YAML load → save → reload)                 | MED      | MED    | Testing        |
-| 11  | Extract `stringUnknown` to a proper shared location or eliminate it                | LOW      | LOW    | Code quality   |
-| 12  | Add tests for `githistory.go` command (525 lines, 0 tests)                         | MED      | MED    | Testing        |
-| 13  | Add tests for `init.go` command (492 lines, 0 tests)                               | MED      | MED    | Testing        |
-| 14  | Consider using `go-enum` or similar codegen for enum types                         | MED      | MED    | Architecture   |
-| 15  | Split `compiledbinaries.go` (585 lines) into scanner/executor/cleaner              | MED      | MED    | File splitting |
-| 16  | Split `docker.go` (524 lines) into scanner/executor/pruner                         | MED      | MED    | File splitting |
-| 17  | Split `nodepackages.go` (523 lines) into scanner/executor                          | MED      | MED    | File splitting |
-| 18  | Set up CI pipeline (at minimum: `go build` + `go test -short`)                     | HIGH     | MED    | DevOps         |
-| 19  | Fix pre-commit hook golangci-lint timeout (654 issues)                             | MED      | HIGH   | DevOps         |
-| 20  | Add `scan` command tests                                                           | MED      | MED    | Testing        |
-| 21  | Add `clean` command tests                                                          | MED      | HIGH   | Testing        |
-| 22  | Add `profile` command tests                                                        | MED      | MED    | Testing        |
-| 23  | Consider replacing hand-rolled enum system with established lib                    | MED      | MED    | Architecture   |
-| 24  | Document YAML enum format change (int→string) in migration guide                   | LOW      | LOW    | Docs           |
-| 25  | Evaluate `result.Result[T]` package for potential simplification                   | LOW      | MED    | Architecture   |
+| #  | Task                                                                               | Impact   | Effort | Category       |
+| -- | ---------------------------------------------------------------------------------- | -------- | ------ | -------------- |
+| 1  | Commit operation_settings.go consolidation (already done, just needs commit)       | HIGH     | ZERO   | Uncommitted    |
+| 2  | Consolidate type_safe_enums.go using enum macros (539→~280 lines)                  | HIGH     | MED    | Enum refactor  |
+| 3  | Migrate githistory_types.go `GitHistoryMode` to `EnumUnmarshalJSON`                | MED      | LOW    | Enum refactor  |
+| 4  | Remove dead `UnmarshalYAMLEnum`/`UnmarshalJSONEnum`/`UnmarshalYAMLEnumWithDefault` | HIGH     | LOW    | Dead code      |
+| 5  | Update TODO_LIST.md with enum consolidation progress                               | MED      | LOW    | Docs           |
+| 6  | Update FEATURES.md (last updated Feb 2026 — 2 months stale)                        | MED      | LOW    | Docs           |
+| 7  | Push all commits to origin                                                         | MED      | ZERO   | Git            |
+| 8  | Free 20-30GB disk space (external action needed)                                   | CRITICAL | EXT    | Environment    |
+| 9  | Split `enum_yaml_test.go` (619 lines) into focused test files                      | MED      | LOW    | Test quality   |
+| 10 | Add config round-trip integration test (YAML load → save → reload)                 | MED      | MED    | Testing        |
+| 11 | Extract `stringUnknown` to a proper shared location or eliminate it                | LOW      | LOW    | Code quality   |
+| 12 | Add tests for `githistory.go` command (525 lines, 0 tests)                         | MED      | MED    | Testing        |
+| 13 | Add tests for `init.go` command (492 lines, 0 tests)                               | MED      | MED    | Testing        |
+| 14 | Consider using `go-enum` or similar codegen for enum types                         | MED      | MED    | Architecture   |
+| 15 | Split `compiledbinaries.go` (585 lines) into scanner/executor/cleaner              | MED      | MED    | File splitting |
+| 16 | Split `docker.go` (524 lines) into scanner/executor/pruner                         | MED      | MED    | File splitting |
+| 17 | Split `nodepackages.go` (523 lines) into scanner/executor                          | MED      | MED    | File splitting |
+| 18 | Set up CI pipeline (at minimum: `go build` + `go test -short`)                     | HIGH     | MED    | DevOps         |
+| 19 | Fix pre-commit hook golangci-lint timeout (654 issues)                             | MED      | HIGH   | DevOps         |
+| 20 | Add `scan` command tests                                                           | MED      | MED    | Testing        |
+| 21 | Add `clean` command tests                                                          | MED      | HIGH   | Testing        |
+| 22 | Add `profile` command tests                                                        | MED      | MED    | Testing        |
+| 23 | Consider replacing hand-rolled enum system with established lib                    | MED      | MED    | Architecture   |
+| 24 | Document YAML enum format change (int→string) in migration guide                   | LOW      | LOW    | Docs           |
+| 25 | Evaluate `result.Result[T]` package for potential simplification                   | LOW      | MED    | Architecture   |
 
 ---
 

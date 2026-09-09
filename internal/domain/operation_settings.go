@@ -4,7 +4,7 @@ import "gopkg.in/yaml.v3"
 
 // CacheCleanupMode represents cache cleanup behavior as a type-safe enum.
 //
-//nolint:recvcheck
+
 type CacheCleanupMode int
 
 const (
@@ -32,7 +32,7 @@ func (cm *CacheCleanupMode) UnmarshalYAML(value *yaml.Node) error {
 
 // DockerPruneMode represents Docker prune behavior as a type-safe enum.
 //
-//nolint:recvcheck
+
 type DockerPruneMode int
 
 const (
@@ -49,11 +49,11 @@ const (
 )
 
 var dockerPruneModeStrings = []string{ //nolint:gochecknoglobals
-	"ALL",        //nolint:goconst
-	"IMAGES",     //nolint:goconst
-	"CONTAINERS", //nolint:goconst
-	"VOLUMES",    //nolint:goconst
-	"BUILDS",     //nolint:goconst
+	"ALL",
+	"IMAGES",
+	"CONTAINERS",
+	"VOLUMES",
+	"BUILDS",
 }
 
 func (pm DockerPruneMode) String() string { return EnumString(pm, dockerPruneModeStrings) }
@@ -72,7 +72,7 @@ func (pm *DockerPruneMode) UnmarshalYAML(value *yaml.Node) error {
 
 // BuildToolType represents build tool types as a type-safe enum.
 //
-//nolint:recvcheck
+
 type BuildToolType int
 
 const (
@@ -105,7 +105,7 @@ func (bt *BuildToolType) UnmarshalYAML(value *yaml.Node) error {
 
 // CacheType represents system cache types as a type-safe enum.
 //
-//nolint:recvcheck
+
 type CacheType int
 
 const (
@@ -166,8 +166,8 @@ const (
 )
 
 var cacheTypeStrings = []string{ //nolint:gochecknoglobals
-	"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP", //nolint:goconst
-	"NPM", "YARN", "CCACHE", "XDG_CACHE", "THUMBNAILS", //nolint:goconst
+	"SPOTLIGHT", "XCODE", "COCOAPODS", "HOMEBREW", "PIP",
+	"NPM", "YARN", "CCACHE", "XDG_CACHE", "THUMBNAILS",
 	"PUPPETEER", "TERRAFORM", "GRADLE_WRAPPER", "KONAN", "RUSTUP",
 	"GOPLS", "GOIMPORTS", "JETBRAINS", "BUN_CACHE", "PLAYWRIGHT",
 	"MOZILLA", "NIX_CACHE", "ZIG", "UV", "TINYGO",
@@ -184,7 +184,7 @@ func (ct *CacheType) UnmarshalYAML(value *yaml.Node) error {
 
 // PackageManagerType represents Node.js package manager types as a type-safe enum.
 //
-//nolint:recvcheck
+
 type PackageManagerType int
 
 const (

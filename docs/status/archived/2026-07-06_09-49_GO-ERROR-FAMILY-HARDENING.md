@@ -238,33 +238,33 @@ Items from the previous report's 25-task list that were not addressed this sessi
 
 ## f) 25 Things We Should Get Done Next
 
-| #   | Task                                                                    | Priority | Effort | Status      |
-| --- | ----------------------------------------------------------------------- | -------- | ------ | ----------- |
-| 1   | Migrate `init.go` fmt.Errorf (8 sites) → errorfamily.Wrap\*             | HIGH     | 15 min | Ready       |
-| 2   | Migrate `githistory.go` fmt.Errorf (10 sites) → errorfamily.Wrap\*      | HIGH     | 20 min | Ready       |
-| 3   | Migrate `config.go` fmt.Errorf (5 sites) → errorfamily.Wrap\*           | HIGH     | 10 min | Ready       |
-| 4   | Migrate `clean_select.go` fmt.Errorf (5 sites) → errorfamily.Wrap\*     | HIGH     | 10 min | Ready       |
-| 5   | Migrate `profile.go` fmt.Errorf (2 sites) → errorfamily.Wrap\*          | HIGH     | 5 min  | Ready       |
-| 6   | Fix 2 workflow fmt.Errorf wraps → errorfamily.WrapTransient             | HIGH     | 2 min  | Ready       |
-| 7   | Classify ErrGitNotAvailable → errorfamily.NewInfrastructure             | HIGH     | 5 min  | Ready       |
-| 8   | Classify testhelper go_cleaner → NewNotAvailableError or Infrastructure | MEDIUM   | 5 min  | Ready       |
-| 9   | Enrich scan JSON output with family/code/retryable fields               | HIGH     | 20 min | Ready       |
-| 10  | Fix scan JSON error swallowing (return error instead of printing)       | HIGH     | 10 min | Ready       |
-| 11  | Unify clean + scan JSON schemas into shared format package              | MEDIUM   | 1h     | Ready       |
-| 12  | Wire HandleErrorDetailed in main.go to consume message templates        | MEDIUM   | 30 min | Ready       |
-| 13  | Add CLI exit code integration test (verify sysexits mapping)            | MEDIUM   | 30 min | Ready       |
-| 14  | Add --retry-profile integration test                                    | MEDIUM   | 30 min | Ready       |
-| 15  | Add errorfamilytest assertions to cleaner package tests                 | LOW      | 30 min | Ready       |
-| 16  | Consolidate context.DeadlineExceeded checks to use errorfamily.Classify | LOW      | 30 min | Ready       |
-| 17  | Wire OperationSettings from YAML config → cleaner constructors          | HIGH     | 4h     | Not started |
-| 18  | Implement scan --profile filtering                                      | MEDIUM   | 2h     | Not started |
-| 19  | Logger globals → DI-injected (root cause of test races)                 | HIGH     | 4h     | Not started |
-| 20  | Split internal/domain/ god package (23 files)                           | MEDIUM   | 8h     | Not started |
-| 21  | Split internal/cleaner/ flat structure (50+ files)                      | MEDIUM   | 8h     | Not started |
-| 22  | Add BDD tests for execution layer (Ginkgo)                              | MEDIUM   | 4h     | Not started |
-| 23  | Add RetryBudget for system-wide retry pressure                          | MEDIUM   | 2h     | Ready       |
-| 24  | Register individual cleaners as DI providers                            | MEDIUM   | 4h     | Not started |
-| 25  | Add --retry-profile to FEATURES.md and README                           | LOW      | 15 min | Ready       |
+| #  | Task                                                                    | Priority | Effort | Status      |
+| -- | ----------------------------------------------------------------------- | -------- | ------ | ----------- |
+| 1  | Migrate `init.go` fmt.Errorf (8 sites) → errorfamily.Wrap\*             | HIGH     | 15 min | Ready       |
+| 2  | Migrate `githistory.go` fmt.Errorf (10 sites) → errorfamily.Wrap\*      | HIGH     | 20 min | Ready       |
+| 3  | Migrate `config.go` fmt.Errorf (5 sites) → errorfamily.Wrap\*           | HIGH     | 10 min | Ready       |
+| 4  | Migrate `clean_select.go` fmt.Errorf (5 sites) → errorfamily.Wrap\*     | HIGH     | 10 min | Ready       |
+| 5  | Migrate `profile.go` fmt.Errorf (2 sites) → errorfamily.Wrap\*          | HIGH     | 5 min  | Ready       |
+| 6  | Fix 2 workflow fmt.Errorf wraps → errorfamily.WrapTransient             | HIGH     | 2 min  | Ready       |
+| 7  | Classify ErrGitNotAvailable → errorfamily.NewInfrastructure             | HIGH     | 5 min  | Ready       |
+| 8  | Classify testhelper go_cleaner → NewNotAvailableError or Infrastructure | MEDIUM   | 5 min  | Ready       |
+| 9  | Enrich scan JSON output with family/code/retryable fields               | HIGH     | 20 min | Ready       |
+| 10 | Fix scan JSON error swallowing (return error instead of printing)       | HIGH     | 10 min | Ready       |
+| 11 | Unify clean + scan JSON schemas into shared format package              | MEDIUM   | 1h     | Ready       |
+| 12 | Wire HandleErrorDetailed in main.go to consume message templates        | MEDIUM   | 30 min | Ready       |
+| 13 | Add CLI exit code integration test (verify sysexits mapping)            | MEDIUM   | 30 min | Ready       |
+| 14 | Add --retry-profile integration test                                    | MEDIUM   | 30 min | Ready       |
+| 15 | Add errorfamilytest assertions to cleaner package tests                 | LOW      | 30 min | Ready       |
+| 16 | Consolidate context.DeadlineExceeded checks to use errorfamily.Classify | LOW      | 30 min | Ready       |
+| 17 | Wire OperationSettings from YAML config → cleaner constructors          | HIGH     | 4h     | Not started |
+| 18 | Implement scan --profile filtering                                      | MEDIUM   | 2h     | Not started |
+| 19 | Logger globals → DI-injected (root cause of test races)                 | HIGH     | 4h     | Not started |
+| 20 | Split internal/domain/ god package (23 files)                           | MEDIUM   | 8h     | Not started |
+| 21 | Split internal/cleaner/ flat structure (50+ files)                      | MEDIUM   | 8h     | Not started |
+| 22 | Add BDD tests for execution layer (Ginkgo)                              | MEDIUM   | 4h     | Not started |
+| 23 | Add RetryBudget for system-wide retry pressure                          | MEDIUM   | 2h     | Ready       |
+| 24 | Register individual cleaners as DI providers                            | MEDIUM   | 4h     | Not started |
+| 25 | Add --retry-profile to FEATURES.md and README                           | LOW      | 15 min | Ready       |
 
 ---
 

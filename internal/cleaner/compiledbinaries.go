@@ -492,7 +492,7 @@ func (s *defaultBinaryScanner) categorizeBinary(path, baseDir string) BinaryCate
 
 	for _, part := range parts {
 		switch part {
-		case "tmp": //nolint:goconst
+		case "tmp":
 			return CategoryTmp
 		case "bin":
 			return CategoryBin

@@ -42,17 +42,17 @@ repo and run automatically.
 
 ## Raw Ideas
 
-| Category             | Idea                              | Notes                                                                      |
-| -------------------- | --------------------------------- | -------------------------------------------------------------------------- |
-| Plugin Architecture  | Plugin system for cleaners        | Third-party cleaners loaded dynamically; not required for v1               |
-| Progress TUI         | Live per-cleaner status display   | Like BuildFlow's ProgressBridge; requires workflow engine hooks            |
-| Resume Support       | Checkpoint interrupted clean runs | `flow.Workflow` state persistence; low priority                            |
-| RiskLevel Automation | Auto mapstructure decode hook     | Investigated: manual mapstructure processing works; auto needs extra hooks |
-| Web UI               | Configuration and monitoring UI   | Long-term; CLI-first for now                                               |
-| Cloud Integration    | Remote execution / cloud storage  | Very long-term; no current use case                                        |
-| Shared Size Parsing  | `conversions.ParseIECBytes(s)`    | Wrap `humanize.ParseBytes` once for all cleaners — eliminates H007 risk   |
-| Linter Distribution  | Move `/tmp/go-humanize-linter` into `tools/lint/` | Makes H007 reproducible; wire into flake.nix `checks`              |
-| Cleaner Refactor     | Split `internal/cleaner/` by platform domain | Group `nix/`, `docker/`, `golang/`, `macos/`, `linux/` — supports modular loading |
+| Category             | Idea                                              | Notes                                                                             |
+| -------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Plugin Architecture  | Plugin system for cleaners                        | Third-party cleaners loaded dynamically; not required for v1                      |
+| Progress TUI         | Live per-cleaner status display                   | Like BuildFlow's ProgressBridge; requires workflow engine hooks                   |
+| Resume Support       | Checkpoint interrupted clean runs                 | `flow.Workflow` state persistence; low priority                                   |
+| RiskLevel Automation | Auto mapstructure decode hook                     | Investigated: manual mapstructure processing works; auto needs extra hooks        |
+| Web UI               | Configuration and monitoring UI                   | Long-term; CLI-first for now                                                      |
+| Cloud Integration    | Remote execution / cloud storage                  | Very long-term; no current use case                                               |
+| Shared Size Parsing  | `conversions.ParseIECBytes(s)`                    | Wrap `humanize.ParseBytes` once for all cleaners — eliminates H007 risk           |
+| Linter Distribution  | Move `/tmp/go-humanize-linter` into `tools/lint/` | Makes H007 reproducible; wire into flake.nix `checks`                             |
+| Cleaner Refactor     | Split `internal/cleaner/` by platform domain      | Group `nix/`, `docker/`, `golang/`, `macos/`, `linux/` — supports modular loading |
 
 ---
 

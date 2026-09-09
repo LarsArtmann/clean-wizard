@@ -108,7 +108,7 @@ ok      github.com/LarsArtmann/clean-wizard/internal/version    0.479s
 | Go               | ✅ Production     | ✅ Yes  | ✅ Yes        |
 | Cargo            | ✅ Production     | ✅ Yes  | ✅ Yes        |
 | Node Packages    | ✅ Production     | ✅ Yes  | ✅ Yes        |
-| Build Cache      | ⚠️ Limited        | ✅ Yes  | ✅ Yes        |
+| Build Cache      | ⚠️ Limited         | ✅ Yes  | ✅ Yes        |
 | System Cache     | ✅ Production     | ✅ Yes  | ✅ Yes        |
 | Temp Files       | ✅ Production     | ✅ Yes  | ✅ Yes        |
 | Lang Version Mgr | 📝 Placeholder    | N/A     | N/A           |

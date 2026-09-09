@@ -1,7 +1,7 @@
 # Clean Wizard: Path to SystemNix Parity
 
-**Analysis Date:** 2026-02-09  
-**Goal:** Fully replace SystemNix `clean-quick`, `clean`, `clean-aggressive` commands  
+**Analysis Date:** 2026-02-09\
+**Goal:** Fully replace SystemNix `clean-quick`, `clean`, `clean-aggressive` commands\
 **Current State:** ⚠️ Partial feature coverage with critical gaps
 
 ---
@@ -30,7 +30,7 @@ Clean Wizard currently has the **architectural foundation** to replace SystemNix
 | **npm**            | ✅ `npm cache clean --force`              | ✅ `npm cache clean --force`              | ✅ Matching     |
 | **pnpm**           | ✅ `pnpm store prune`                     | ✅ `pnpm store prune`                     | ✅ Matching     |
 | **Go**             | ✅ `go clean -cache`                      | ✅ `go clean -cache -testcache -modcache` | ✅ Better       |
-| **Temp Files**     | ✅ `/tmp/nix-build-*`                     | ✅ Configurable age-based                 | ⚠️ Partial      |
+| **Temp Files**     | ✅ `/tmp/nix-build-*`                     | ✅ Configurable age-based                 | ⚠️ Partial       |
 | **Build Cache**    | ❌ Not included                           | ✅ Gradle, Maven, SBT                     | ✅ Clean Wizard |
 | **Docker Light**   | ✅ `docker system prune -f`               | ❌ Not implemented                        | 🔴 **MISSING**  |
 | **Nix Temp Files** | ✅ `/tmp/nix-build-*`, `/tmp/nix-shell-*` | ❌ Not implemented                        | 🔴 **MISSING**  |
@@ -41,16 +41,16 @@ Clean Wizard currently has the **architectural foundation** to replace SystemNix
 
 ### 1.2 `clean` (Standard) Comparison
 
-| Feature                    | SystemNix                            | Clean Wizard                           | Status                |
-| -------------------------- | ------------------------------------ | -------------------------------------- | --------------------- |
-| **Everything from quick**  | ✅                                   | ⚠️ Partial                             | See above             |
+| Feature                    | SystemNix                            | Clean Wizard                           | Status               |
+| -------------------------- | ------------------------------------ | -------------------------------------- | -------------------- |
+| **Everything from quick**  | ✅                                   | ⚠️ Partial                              | See above            |
 | **Nix GC**                 | ✅ `--delete-older-than 1d`          | ✅ Count-based (N generations)         | ⚠️ Different strategy |
-| **Nix Store Optimization** | ✅ `nix-store --optimize`            | ❌ Not implemented                     | 🔴 **MISSING**        |
-| **Nix Profile Wipe**       | ✅ `nix profile wipe-history`        | ❌ Not implemented                     | 🔴 **MISSING**        |
-| **Docker Full Prune**      | ✅ `docker system prune -af`         | ✅ `docker system prune -af --volumes` | ✅ Better             |
-| **Xcode Simulators**       | ✅ `xcrun simctl delete unavailable` | ❌ Not implemented                     | 🔴 **MISSING**        |
-| **Size Before/After**      | ✅ `du -sh` output                   | ❌ Not implemented                     | 🔴 **MISSING**        |
-| **Disk Space Display**     | ✅ `df -h`                           | ❌ Not implemented                     | 🔴 **MISSING**        |
+| **Nix Store Optimization** | ✅ `nix-store --optimize`            | ❌ Not implemented                     | 🔴 **MISSING**       |
+| **Nix Profile Wipe**       | ✅ `nix profile wipe-history`        | ❌ Not implemented                     | 🔴 **MISSING**       |
+| **Docker Full Prune**      | ✅ `docker system prune -af`         | ✅ `docker system prune -af --volumes` | ✅ Better            |
+| **Xcode Simulators**       | ✅ `xcrun simctl delete unavailable` | ❌ Not implemented                     | 🔴 **MISSING**       |
+| **Size Before/After**      | ✅ `du -sh` output                   | ❌ Not implemented                     | 🔴 **MISSING**       |
+| **Disk Space Display**     | ✅ `df -h`                           | ❌ Not implemented                     | 🔴 **MISSING**       |
 
 ### `clean` Gap: **5 missing features**
 
@@ -58,19 +58,19 @@ Clean Wizard currently has the **architectural foundation** to replace SystemNix
 
 ### 1.3 `clean-aggressive` Comparison
 
-| Feature                   | SystemNix                           | Clean Wizard           | Status         |
-| ------------------------- | ----------------------------------- | ---------------------- | -------------- |
+| Feature                   | SystemNix                           | Clean Wizard          | Status         |
+| ------------------------- | ----------------------------------- | --------------------- | -------------- |
 | **Everything from clean** | ✅                                  | ⚠️ Partial             | See above      |
-| **Nix ALL Generations**   | ✅ No threshold                     | ⚠️ Count-based only    | ⚠️ Partial     |
-| **Nix ALL Profiles**      | ✅ Full wipe                        | ❌ Not implemented     | 🔴 **MISSING** |
+| **Nix ALL Generations**   | ✅ No threshold                     | ⚠️ Count-based only    | ⚠️ Partial      |
+| **Nix ALL Profiles**      | ✅ Full wipe                        | ❌ Not implemented    | 🔴 **MISSING** |
 | **NVM Cleanup**           | ✅ Deletes `~/.nvm/versions/node/*` | ⚠️ Scans only (NO-OP)  | 🔴 **BROKEN**  |
 | **Pyenv Cleanup**         | ✅ Deletes `~/.pyenv/versions/*`    | ⚠️ Scans only (NO-OP)  | 🔴 **BROKEN**  |
 | **Rbenv Cleanup**         | ✅ Deletes `~/.rbenv/versions/*`    | ⚠️ Scans only (NO-OP)  | 🔴 **BROKEN**  |
-| **Full Cache Wipe**       | ✅ `rm -rf ~/.cache`                | ⚠️ Via BuildCache only | ⚠️ Partial     |
-| **Xcode DerivedData**     | ✅ Full wipe                        | ✅ Via SystemCache     | ✅ Matching    |
-| **Docker with Volumes**   | ✅ `--volumes`                      | ✅ `--volumes`         | ✅ Matching    |
-| **iOS ALL Simulators**    | ✅ `xcrun simctl delete all`        | ❌ Not implemented     | 🔴 **MISSING** |
-| **Confirmation Prompt**   | ✅ Explicit interactive pause       | ⚠️ Generic Yes/No      | ⚠️ Different   |
+| **Full Cache Wipe**       | ✅ `rm -rf ~/.cache`                | ⚠️ Via BuildCache only | ⚠️ Partial      |
+| **Xcode DerivedData**     | ✅ Full wipe                        | ✅ Via SystemCache    | ✅ Matching    |
+| **Docker with Volumes**   | ✅ `--volumes`                      | ✅ `--volumes`        | ✅ Matching    |
+| **iOS ALL Simulators**    | ✅ `xcrun simctl delete all`        | ❌ Not implemented    | 🔴 **MISSING** |
+| **Confirmation Prompt**   | ✅ Explicit interactive pause       | ⚠️ Generic Yes/No      | ⚠️ Different    |
 
 ### `clean-aggressive` Gap: **8 missing/broken features**
 
@@ -618,5 +618,5 @@ Clean Wizard has the **foundation** to become your ultimate MacBook cleanup tool
 
 ---
 
-_Document created: 2026-02-09_  
+_Document created: 2026-02-09_\
 _For questions or updates, open an issue._

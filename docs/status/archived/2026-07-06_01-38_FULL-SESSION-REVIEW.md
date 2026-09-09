@@ -27,21 +27,21 @@
 
 #### Critical Bug Fixes (4)
 
-| #   | Bug                                                                      | Fix                                                            | File                        |
-| --- | ------------------------------------------------------------------------ | -------------------------------------------------------------- | --------------------------- |
-| 1   | Workflow errors silently dropped when steps existed                      | Error now preserved; returned only when zero steps collected   | `execution/workflow.go`     |
-| 2   | Panics in cleaners disappeared without trace                             | `recover()` in step functions records panicked steps as failed | `execution/builder.go`      |
-| 3   | `isProcessRunning` failed open (returned false) when `pgrep` unavailable | Now fails closed — checks `exec.LookPath("pgrep")` first       | `cleaner/golang_cleaner.go` |
-| 4   | Non-deterministic result ordering from parallel execution                | Results sorted by registration order via `orderIndex` map      | `execution/results.go`      |
+| # | Bug                                                                      | Fix                                                            | File                        |
+| - | ------------------------------------------------------------------------ | -------------------------------------------------------------- | --------------------------- |
+| 1 | Workflow errors silently dropped when steps existed                      | Error now preserved; returned only when zero steps collected   | `execution/workflow.go`     |
+| 2 | Panics in cleaners disappeared without trace                             | `recover()` in step functions records panicked steps as failed | `execution/builder.go`      |
+| 3 | `isProcessRunning` failed open (returned false) when `pgrep` unavailable | Now fails closed — checks `exec.LookPath("pgrep")` first       | `cleaner/golang_cleaner.go` |
+| 4 | Non-deterministic result ordering from parallel execution                | Results sorted by registration order via `orderIndex` map      | `execution/results.go`      |
 
 #### Quality Improvements (4)
 
-| #   | Change                                                                                                                                          |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| 5   | `resultCollector` mutex changed from `*sync.Mutex` (nil-pointer risk) to value `sync.Mutex` with constructor                                    |
-| 6   | `TotalItemsFailed` aggregates from ALL steps, not just successful ones                                                                          |
-| 7   | Typed `cleaner.NotAvailableError` + `cleaner.IsNotAvailableError()` replaces fragile string matching — uses `errors.As` first, keyword fallback |
-| 8   | JSON error serialization verified correct — `format.CleanResultsToJSON` already calls `.Error()` on errors                                      |
+| # | Change                                                                                                                                          |
+| - | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 5 | `resultCollector` mutex changed from `*sync.Mutex` (nil-pointer risk) to value `sync.Mutex` with constructor                                    |
+| 6 | `TotalItemsFailed` aggregates from ALL steps, not just successful ones                                                                          |
+| 7 | Typed `cleaner.NotAvailableError` + `cleaner.IsNotAvailableError()` replaces fragile string matching — uses `errors.As` first, keyword fallback |
+| 8 | JSON error serialization verified correct — `format.CleanResultsToJSON` already calls `.Error()` on errors                                      |
 
 #### Dead Code Removed — 1472 lines net
 
@@ -56,13 +56,13 @@
 
 #### New Features (5)
 
-| #   | Feature                                                                     | Files                                                                |
-| --- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| 9   | `--config` flag for `scan` command (matching `clean`)                       | `scan.go`                                                            |
-| 10  | Scan command wired to `execution.RunScans` for parallel execution           | `scan.go`, `execution/workflow.go`                                   |
-| 11  | `RetryConfig` + `flow.Retry` with `cenkalti/backoff/v4` exponential backoff | `execution/retry.go`, `execution/options.go`, `execution/builder.go` |
-| 12  | `cenkalti/backoff/v4` promoted from indirect to direct dependency           | `go.mod`                                                             |
-| 13  | `MaxConcurrency` field in `RunSettings`                                     | `di/options.go`                                                      |
+| #  | Feature                                                                     | Files                                                                |
+| -- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| 9  | `--config` flag for `scan` command (matching `clean`)                       | `scan.go`                                                            |
+| 10 | Scan command wired to `execution.RunScans` for parallel execution           | `scan.go`, `execution/workflow.go`                                   |
+| 11 | `RetryConfig` + `flow.Retry` with `cenkalti/backoff/v4` exponential backoff | `execution/retry.go`, `execution/options.go`, `execution/builder.go` |
+| 12 | `cenkalti/backoff/v4` promoted from indirect to direct dependency           | `go.mod`                                                             |
+| 13 | `MaxConcurrency` field in `RunSettings`                                     | `di/options.go`                                                      |
 
 #### Test Coverage — 23 new test functions
 
@@ -144,33 +144,33 @@
 
 ## f) Top 25 Things to Do Next
 
-| #   | Task                                                                     | Resolution |
-| --- | ------------------------------------------------------------------------ | ---------- |
-| 1   | ~~**Fix retry duplicate recording bug** in `makeCleanStepFunc`~~         | done at `6a539e7`; in-place mutation fixed at 2026-08-10 |
-| 2   | ~~Remove dead `scanCleanerReal` function from `scan.go`~~                | done at `de105b0` |
-| 3   | ~~Add `--retries` CLI flag wired to `RetryConfig`~~                     | done at `de105b0` + `1b96d06` |
-| 4   | ~~Add `--concurrency` CLI flag wired to `MaxConcurrency`~~              | done at `de105b0` + `1b96d06` |
-| 5   | CLI integration test: invoke `clean --dry-run` as full command           | partial — covered for clean; tracked as TODO #13 |
-| 6   | ~~Test retry step count (verify no duplicates after retries)~~          | done at `6a539e7`; assertion updated at 2026-08-10 |
-| 7   | ~~Migrate cleaners to return `*NotAvailableError` instead of string errors~~ | done at `c102e0f` |
-| 8   | Register individual cleaners as separate DI providers                    | still open — TODO #29 |
-| 9   | Pass user config profile settings to individual cleaner providers        | still open — TODO #6 |
-| 10  | ~~Wire `MaxConcurrency` from `RunSettings` in clean/scan commands~~    | done at `de105b0` + `1b96d06` |
-| 11  | ~~Migrate `githistory` command to use DI container~~                     | NOT-DO — explicitly deferred in 2026-07-06_03-42 Pareto pass |
-| 12  | ~~Migrate `init`, `profile`, `config` commands to use DI~~              | NOT-DO — explicitly deferred |
-| 13  | ~~Make adapters interface-backed, register in DI with `do.As`~~         | still open — TODO #30 |
-| 14  | ~~Implement `do.ShutdownerWithError` on `CacheManager`, `HTTPClient`~~  | NOT-DO — no resources to shut down |
-| 15  | ~~Add `flow.If` conditional for Docker cleaner (check daemon)~~        | NOT-DO — handled by `IsAvailable` → `*NotAvailableError` |
-| 16  | ~~Add per-cleaner timeout via `flow.Timeout`~~                         | NOT-DO — complexity > value |
-| 17  | Add BDD tests for execution layer (Ginkgo)                               | still open — TODO #7 |
-| 18  | ~~Consolidate `cleaner.Cleaner` and `domain.OperationHandler`~~         | NOT-DO — risky refactor |
-| 19  | Implement profile-based filtering for scan `--profile` flag              | still open — TODO #10 |
-| 20  | ~~Add `do.ExplainInjector` debug output behind `--di-debug` flag~~      | NOT-DO — YAGNI |
-| 21  | ~~Create `internal/bootstrap/` for application-global DI setup~~       | NOT-DO — per-command is sufficient |
-| 22  | Add progress TUI (like BuildFlow's `ProgressBridge`)                     | aspirational — ROADMAP Theme #3 |
-| 23  | Add `--keep-generations` flag for Nix cleaner                            | still open — TODO #23 |
-| 24  | ~~Clean up stale status report references to deleted types~~            | done at 2026-07-13 audit + 2026-08-10 docs-health |
-| 25  | ~~Add audit log of DI service registrations~~                           | NOT-DO — YAGNI |
+| #  | Task                                                                         | Resolution                                                   |
+| -- | ---------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| 1  | ~~**Fix retry duplicate recording bug** in `makeCleanStepFunc`~~             | done at `6a539e7`; in-place mutation fixed at 2026-08-10     |
+| 2  | ~~Remove dead `scanCleanerReal` function from `scan.go`~~                    | done at `de105b0`                                            |
+| 3  | ~~Add `--retries` CLI flag wired to `RetryConfig`~~                          | done at `de105b0` + `1b96d06`                                |
+| 4  | ~~Add `--concurrency` CLI flag wired to `MaxConcurrency`~~                   | done at `de105b0` + `1b96d06`                                |
+| 5  | CLI integration test: invoke `clean --dry-run` as full command               | partial — covered for clean; tracked as TODO #13             |
+| 6  | ~~Test retry step count (verify no duplicates after retries)~~               | done at `6a539e7`; assertion updated at 2026-08-10           |
+| 7  | ~~Migrate cleaners to return `*NotAvailableError` instead of string errors~~ | done at `c102e0f`                                            |
+| 8  | Register individual cleaners as separate DI providers                        | still open — TODO #29                                        |
+| 9  | Pass user config profile settings to individual cleaner providers            | still open — TODO #6                                         |
+| 10 | ~~Wire `MaxConcurrency` from `RunSettings` in clean/scan commands~~          | done at `de105b0` + `1b96d06`                                |
+| 11 | ~~Migrate `githistory` command to use DI container~~                         | NOT-DO — explicitly deferred in 2026-07-06_03-42 Pareto pass |
+| 12 | ~~Migrate `init`, `profile`, `config` commands to use DI~~                   | NOT-DO — explicitly deferred                                 |
+| 13 | ~~Make adapters interface-backed, register in DI with `do.As`~~              | still open — TODO #30                                        |
+| 14 | ~~Implement `do.ShutdownerWithError` on `CacheManager`, `HTTPClient`~~       | NOT-DO — no resources to shut down                           |
+| 15 | ~~Add `flow.If` conditional for Docker cleaner (check daemon)~~              | NOT-DO — handled by `IsAvailable` → `*NotAvailableError`     |
+| 16 | ~~Add per-cleaner timeout via `flow.Timeout`~~                               | NOT-DO — complexity > value                                  |
+| 17 | Add BDD tests for execution layer (Ginkgo)                                   | still open — TODO #7                                         |
+| 18 | ~~Consolidate `cleaner.Cleaner` and `domain.OperationHandler`~~              | NOT-DO — risky refactor                                      |
+| 19 | Implement profile-based filtering for scan `--profile` flag                  | still open — TODO #10                                        |
+| 20 | ~~Add `do.ExplainInjector` debug output behind `--di-debug` flag~~           | NOT-DO — YAGNI                                               |
+| 21 | ~~Create `internal/bootstrap/` for application-global DI setup~~             | NOT-DO — per-command is sufficient                           |
+| 22 | Add progress TUI (like BuildFlow's `ProgressBridge`)                         | aspirational — ROADMAP Theme #3                              |
+| 23 | Add `--keep-generations` flag for Nix cleaner                                | still open — TODO #23                                        |
+| 24 | ~~Clean up stale status report references to deleted types~~                 | done at 2026-07-13 audit + 2026-08-10 docs-health            |
+| 25 | ~~Add audit log of DI service registrations~~                                | NOT-DO — YAGNI                                               |
 
 ---
 

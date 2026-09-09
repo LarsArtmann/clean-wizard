@@ -84,13 +84,13 @@ Clean Wizard is a production-ready system cleaning CLI tool with 8 fully functio
 
 ### Configuration System
 
-| Aspect              | Status                                           |
-| ------------------- | ------------------------------------------------ |
-| YAML Configuration  | ✅ Working                                       |
-| Profile System      | ✅ Working                                       |
-| Validation          | ✅ Working                                       |
+| Aspect              | Status                                          |
+| ------------------- | ----------------------------------------------- |
+| YAML Configuration  | ✅ Working                                      |
+| Profile System      | ✅ Working                                      |
+| Validation          | ✅ Working                                      |
 | **CLI Flag Wiring** | ⚠️ Partial - flags exist but not fully connected |
-| **Hot Reload**      | 📝 Not implemented                               |
+| **Hot Reload**      | 📝 Not implemented                              |
 
 ### Nix Cleaner
 

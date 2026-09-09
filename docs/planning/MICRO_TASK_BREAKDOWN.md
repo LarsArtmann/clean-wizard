@@ -1,7 +1,7 @@
 # Micro-Task Breakdown - Clean Wizard Consolidation
 
-**Generated:** 2026-03-28 10:46 CET  
-**Total Tasks:** 38 micro-tasks  
+**Generated:** 2026-03-28 10:46 CET\
+**Total Tasks:** 38 micro-tasks\
 **Target Duration:** 12 minutes per task
 
 ---
@@ -17,7 +17,7 @@
 | 1.1.3 | Delete internal/application directory    | 1 min | `rm -rf internal/application/`              | Directory gone |
 | 1.1.4 | Delete internal/infrastructure directory | 1 min | `rm -rf internal/infrastructure/`           | Directory gone |
 
-**Dependencies:** None  
+**Dependencies:** None\
 **Total Time:** 6 minutes
 
 ### Task Group 1.2: Remove Old GolangciLintCleaner (4 micro-tasks)
@@ -29,7 +29,7 @@
 | 1.2.3 | Update CLI to remove old references        | 10 min | Edit cleaner_implementations.go, cleaner_config.go   | Build passes |
 | 1.2.4 | Delete golang_lint_adapter.go              | 5 min  | `rm internal/cleaner/golang_lint_adapter.go`         | File gone    |
 
-**Dependencies:** 1.2.1 before 1.2.2 before 1.2.3 before 1.2.4  
+**Dependencies:** 1.2.1 before 1.2.2 before 1.2.3 before 1.2.4\
 **Total Time:** 30 minutes
 
 ### Task Group 1.3: Fix Unused Parameters (7 micro-tasks)
@@ -44,7 +44,7 @@
 | 1.3.6 | Fix enhanced_loader.go unused ctx         | 5 min  | enhanced_loader.go         | 14      | Prefix with `_` or use |
 | 1.3.7 | Fix enhanced_loader_private unused params | 10 min | enhanced_loader_private.go | 57,91   | Prefix with `_` or use |
 
-**Dependencies:** None (can be done in parallel)  
+**Dependencies:** None (can be done in parallel)\
 **Total Time:** 45 minutes
 
 ### Task Group 1.4: Remove Deprecated Aliases (3 micro-tasks)
@@ -55,7 +55,7 @@
 | 1.4.2 | Update domain/types.go to remove aliases     | 10 min | Edit types.go                                   | Build passes |
 | 1.4.3 | Update all references to use type-safe enums | 15 min | `grep -r "domain.RiskLow\|domain.RiskMedium"`   | Update refs  |
 
-**Dependencies:** 1.4.1 before 1.4.2 before 1.4.3  
+**Dependencies:** 1.4.1 before 1.4.2 before 1.4.3\
 **Total Time:** 30 minutes
 
 ---
@@ -73,7 +73,7 @@
 | 2.1.5 | Replace manual Reduce with lo.Reduce | 10 min | Edit result handling            | Build passes                   |
 | 2.1.6 | Review and test all changes          | 10 min | `go test ./...`                 | Tests pass                     |
 
-**Dependencies:** None  
+**Dependencies:** None\
 **Total Time:** 52 minutes
 
 ### Task Group 2.2: Add samber/mo (3 micro-tasks)
@@ -84,7 +84,7 @@
 | 2.2.2 | Evaluate mo vs result.Result overlap | 10 min | Compare types                 | Decision doc              |
 | 2.2.3 | Add samber/mo to go.mod or skip      | 2 min  | `go get github.com/samber/mo` | In go.mod or skip         |
 
-**Dependencies:** None  
+**Dependencies:** None\
 **Total Time:** 22 minutes (or skip if not needed)
 
 ### Task Group 2.3: Reduce Function Complexity (8 micro-tasks)
@@ -100,7 +100,7 @@
 | 2.3.7 | Profile validateEnumDefaults              | 5 min  | operation_defaults.go   | Measure current           |
 | 2.3.8 | Convert to map-based validation           | 15 min | operation_defaults.go   | Map-based validation      |
 
-**Dependencies:** 2.3.1→2.3.4, 2.3.5→2.3.6, 2.3.7→2.3.8  
+**Dependencies:** 2.3.1→2.3.4, 2.3.5→2.3.6, 2.3.7→2.3.8\
 **Total Time:** 90 minutes
 
 ---

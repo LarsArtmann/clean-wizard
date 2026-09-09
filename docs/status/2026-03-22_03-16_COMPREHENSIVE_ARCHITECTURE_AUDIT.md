@@ -1,8 +1,8 @@
 # Comprehensive Architecture Audit & Status Report
 
-**Date:** 2026-03-22 03:16  
-**Auditor:** Senior Software Architect (AI)  
-**Project:** Clean Wizard  
+**Date:** 2026-03-22 03:16\
+**Auditor:** Senior Software Architect (AI)\
+**Project:** Clean Wizard\
 **Lines of Code:** 28,859 (189 Go files, 59 test files)
 
 ---
@@ -172,48 +172,48 @@ Files using non-centralized errors:
 
 ### Critical (Do First)
 
-| #   | Task                                     | Impact      | Effort  | Customer Value  |
-| --- | ---------------------------------------- | ----------- | ------- | --------------- |
-| 1   | Consolidate ValidationError split brain  | 🔴 Critical | 30 min  | Prevents bugs   |
-| 2   | Extract protected paths constants        | 🔴 Critical | 1 hour  | Safety          |
-| 3   | Convert SanitizationRules bools to enums | 🟡 High     | 4 hours | Type safety     |
-| 4   | Split type_safe_enums.go (539 lines)     | 🟡 High     | 3 hours | Maintainability |
-| 5   | Split config_methods.go (470 lines)      | 🟡 High     | 3 hours | Maintainability |
-| 6   | Split docker.go (524 lines)              | 🟡 High     | 4 hours | Maintainability |
+| # | Task                                     | Impact      | Effort  | Customer Value  |
+| - | ---------------------------------------- | ----------- | ------- | --------------- |
+| 1 | Consolidate ValidationError split brain  | 🔴 Critical | 30 min  | Prevents bugs   |
+| 2 | Extract protected paths constants        | 🔴 Critical | 1 hour  | Safety          |
+| 3 | Convert SanitizationRules bools to enums | 🟡 High     | 4 hours | Type safety     |
+| 4 | Split type_safe_enums.go (539 lines)     | 🟡 High     | 3 hours | Maintainability |
+| 5 | Split config_methods.go (470 lines)      | 🟡 High     | 3 hours | Maintainability |
+| 6 | Split docker.go (524 lines)              | 🟡 High     | 4 hours | Maintainability |
 
 ### High Priority
 
-| #   | Task                                   | Impact  | Effort  | Customer Value  |
-| --- | -------------------------------------- | ------- | ------- | --------------- |
-| 7   | Add BDD tests for Nix cleaner          | 🟡 High | 2 days  | Reliability     |
-| 8   | Standardize error handling             | 🟡 High | 1 day   | Consistency     |
-| 9   | Split clean.go (611 lines)             | 🟡 High | 3 hours | Maintainability |
-| 10  | Split compiledbinaries.go (599 lines)  | 🟡 High | 4 hours | Maintainability |
-| 11  | Add parallel execution to Ginkgo tests | 🟡 High | 2 hours | Test speed      |
-| 12  | Create constants for docker commands   | 🟡 High | 1 hour  | Maintainability |
+| #  | Task                                   | Impact  | Effort  | Customer Value  |
+| -- | -------------------------------------- | ------- | ------- | --------------- |
+| 7  | Add BDD tests for Nix cleaner          | 🟡 High | 2 days  | Reliability     |
+| 8  | Standardize error handling             | 🟡 High | 1 day   | Consistency     |
+| 9  | Split clean.go (611 lines)             | 🟡 High | 3 hours | Maintainability |
+| 10 | Split compiledbinaries.go (599 lines)  | 🟡 High | 4 hours | Maintainability |
+| 11 | Add parallel execution to Ginkgo tests | 🟡 High | 2 hours | Test speed      |
+| 12 | Create constants for docker commands   | 🟡 High | 1 hour  | Maintainability |
 
 ### Medium Priority
 
-| #   | Task                                   | Impact    | Effort  | Customer Value  |
-| --- | -------------------------------------- | --------- | ------- | --------------- |
-| 13  | Split config.go (395 lines)            | 🟠 Medium | 2 hours | Maintainability |
-| 14  | Split compiledbinaries_ginkgo_test.go  | 🟠 Medium | 3 hours | Test speed      |
-| 15  | Extract string trimming utilities      | 🟠 Medium | 2 hours | Reusability     |
-| 16  | Create phantom types for paths         | 🟠 Medium | 3 hours | Type safety     |
-| 17  | Review TypeSpec for generation         | 🟠 Medium | 1 day   | Code generation |
-| 18  | Add uint usage for non-negative values | 🟠 Medium | 2 hours | Type safety     |
+| #  | Task                                   | Impact    | Effort  | Customer Value  |
+| -- | -------------------------------------- | --------- | ------- | --------------- |
+| 13 | Split config.go (395 lines)            | 🟠 Medium | 2 hours | Maintainability |
+| 14 | Split compiledbinaries_ginkgo_test.go  | 🟠 Medium | 3 hours | Test speed      |
+| 15 | Extract string trimming utilities      | 🟠 Medium | 2 hours | Reusability     |
+| 16 | Create phantom types for paths         | 🟠 Medium | 3 hours | Type safety     |
+| 17 | Review TypeSpec for generation         | 🟠 Medium | 1 day   | Code generation |
+| 18 | Add uint usage for non-negative values | 🟠 Medium | 2 hours | Type safety     |
 
 ### Lower Priority
 
-| #   | Task                             | Impact | Effort  | Customer Value  |
-| --- | -------------------------------- | ------ | ------- | --------------- |
-| 19  | Fix remaining linter warnings    | 🟢 Low | 2 days  | Code quality    |
-| 20  | Add integration tests for Docker | 🟢 Low | 1 day   | Reliability     |
-| 21  | Document architecture decisions  | 🟢 Low | 1 day   | Team onboarding |
-| 22  | Create ADRs for major decisions  | 🟢 Low | 1 day   | Documentation   |
-| 23  | Add performance benchmarks       | 🟢 Low | 3 hours | Performance     |
-| 24  | Review plugin architecture       | 🟢 Low | 1 day   | Extensibility   |
-| 25  | Add property-based tests         | 🟢 Low | 2 days  | Reliability     |
+| #  | Task                             | Impact | Effort  | Customer Value  |
+| -- | -------------------------------- | ------ | ------- | --------------- |
+| 19 | Fix remaining linter warnings    | 🟢 Low | 2 days  | Code quality    |
+| 20 | Add integration tests for Docker | 🟢 Low | 1 day   | Reliability     |
+| 21 | Document architecture decisions  | 🟢 Low | 1 day   | Team onboarding |
+| 22 | Create ADRs for major decisions  | 🟢 Low | 1 day   | Documentation   |
+| 23 | Add performance benchmarks       | 🟢 Low | 3 hours | Performance     |
+| 24 | Review plugin architecture       | 🟢 Low | 1 day   | Extensibility   |
+| 25 | Add property-based tests         | 🟢 Low | 2 days  | Reliability     |
 
 ---
 
@@ -273,11 +273,11 @@ External Tools (nix, docker, brew, etc.)
 
 ### Indirect Value (Developer Experience)
 
-| Aspect          | Status      | Impact           |
-| --------------- | ----------- | ---------------- |
-| Type Safety     | ✅ Strong   | Reduces bugs     |
+| Aspect          | Status     | Impact           |
+| --------------- | ---------- | ---------------- |
+| Type Safety     | ✅ Strong  | Reduces bugs     |
 | Test Coverage   | ⚠️ Moderate | Needs BDD        |
-| Documentation   | ✅ Good     | Well documented  |
+| Documentation   | ✅ Good    | Well documented  |
 | Maintainability | ⚠️ Fair     | File size issues |
 
 ---
@@ -346,5 +346,5 @@ The codebase is **production-ready** but needs **consolidation** to achieve exce
 
 ---
 
-_Report generated by Senior Software Architect (AI)_  
+_Report generated by Senior Software Architect (AI)_\
 _Methodology: Branching-flow analysis, static analysis, manual code review_

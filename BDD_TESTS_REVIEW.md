@@ -12,7 +12,7 @@
 | --------------------------- | -------------------------- | --------------------------------- |
 | **Ginkgo Usage**            | ✅ Yes (v2.28.1)           | Framework properly adopted        |
 | **BDD Test Files**          | 9 files using Ginkgo style | Good foundation                   |
-| **End-User Perspective**    | ⚠️ Partial                 | Mix of technical and user-focused |
+| **End-User Perspective**    | ⚠️ Partial                  | Mix of technical and user-focused |
 | **Feature Files (Gherkin)** | 0                          | Not using .feature specification  |
 | **Total Test Files**        | 63                         | Extensive test suite              |
 | **Total Test Functions**    | 298                        | Comprehensive coverage            |
@@ -32,13 +32,13 @@ The project has solid Ginkgo-based BDD tests for some cleaners, but lacks true e
 | ---------------------------------------------------- | ------------------- | ----- | ---------------- |
 | `tests/bdd/githistory_test.go`                       | Git History Cleaner | 385   | ✅ Good          |
 | `tests/bdd/nix_ginkgo_test.go`                       | Nix Store Cleaner   | 338   | ✅ Good          |
-| `tests/bdd/nix_test.go`                              | Nix CLI (skipped)   | 68    | ⚠️ Disabled      |
+| `tests/bdd/nix_test.go`                              | Nix CLI (skipped)   | 68    | ⚠️ Disabled       |
 | `tests/bdd/helper_test.go`                           | Test helpers        | 59    | N/A              |
-| `internal/cleaner/compiledbinaries_ginkgo_test.go`   | Compiled Binaries   | 902   | ⚠️ Technical     |
-| `internal/cleaner/projectexecutables_ginkgo_test.go` | Project Executables | 787   | ⚠️ Technical     |
-| `internal/cleaner/githistory_test.go`                | Git History Unit    | 200+  | ⚠️ Technical     |
-| `internal/cleaner/githistory_scanner_test.go`        | Git History Scanner | 150+  | ⚠️ Technical     |
-| `internal/cleaner/githistory_safety_test.go`         | Git History Safety  | 100+  | ⚠️ Technical     |
+| `internal/cleaner/compiledbinaries_ginkgo_test.go`   | Compiled Binaries   | 902   | ⚠️ Technical      |
+| `internal/cleaner/projectexecutables_ginkgo_test.go` | Project Executables | 787   | ⚠️ Technical      |
+| `internal/cleaner/githistory_test.go`                | Git History Unit    | 200+  | ⚠️ Technical      |
+| `internal/cleaner/githistory_scanner_test.go`        | Git History Scanner | 150+  | ⚠️ Technical      |
+| `internal/cleaner/githistory_safety_test.go`         | Git History Safety  | 100+  | ⚠️ Technical      |
 
 ### BDD Test Coverage by Cleaner
 
@@ -46,8 +46,8 @@ The project has solid Ginkgo-based BDD tests for some cleaners, but lacks true e
 | ------------------- | ------------- | -------------- | ------ | --------------- |
 | Nix                 | ✅            | ✅             | ✅     | **Good**        |
 | Git History         | ✅            | ✅             | ✅     | **Good**        |
-| Compiled Binaries   | ✅            | ⚠️             | ✅     | Technical focus |
-| Project Executables | ✅            | ⚠️             | ✅     | Technical focus |
+| Compiled Binaries   | ✅            | ⚠️              | ✅     | Technical focus |
+| Project Executables | ✅            | ⚠️              | ✅     | Technical focus |
 | Homebrew            | ❌            | ❌             | ❌     | **Missing**     |
 | Docker              | ❌            | ❌             | ❌     | **Missing**     |
 | Go                  | ❌            | ❌             | ❌     | **Missing**     |
@@ -305,7 +305,7 @@ Test user-facing error scenarios:
 | Area                | Unit Tests   | BDD Tests | Integration | Coverage |
 | ------------------- | ------------ | --------- | ----------- | -------- |
 | Domain Types        | ✅ Extensive | ❌ None   | ❌ None     | 70%      |
-| Cleaners (13 total) | ✅ Good      | ⚠️ 4/13   | ✅ Some     | 60%      |
+| Cleaners (13 total) | ✅ Good      | ⚠️ 4/13    | ✅ Some     | 60%      |
 | CLI Commands        | ❌ None      | ❌ None   | ❌ None     | 10%      |
 | Configuration       | ✅ Good      | ❌ None   | ❌ None     | 50%      |
 | TUI (Huh forms)     | ❌ None      | ❌ None   | ❌ None     | 0%       |
@@ -382,8 +382,8 @@ Test user-facing error scenarios:
 | Question                               | Answer                                    |
 | -------------------------------------- | ----------------------------------------- |
 | **Are we using Ginkgo?**               | ✅ Yes, v2.28.1                           |
-| **Enough superb BDD tests?**           | ⚠️ No - only 4/13 cleaners have BDD tests |
-| **Written from end-user perspective?** | ⚠️ Partially - mostly technical focus     |
+| **Enough superb BDD tests?**           | ⚠️ No - only 4/13 cleaners have BDD tests  |
+| **Written from end-user perspective?** | ⚠️ Partially - mostly technical focus      |
 | **Actually helpful?**                  | ✅ Yes for existing tests, but gaps exist |
 
 ---

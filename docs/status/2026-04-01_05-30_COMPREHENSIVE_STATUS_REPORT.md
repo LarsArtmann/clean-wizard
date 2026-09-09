@@ -186,33 +186,33 @@ Both files are referenced in `AGENTS.md` as "source of truth" but neither exists
 
 ## F) Top 25 Things We Should Get Done Next
 
-| #   | Priority | Task                                                                    | Effort | Impact                           |
-| --- | -------- | ----------------------------------------------------------------------- | ------ | -------------------------------- |
-| 1   | P0       | Free disk space (clear caches, prune docker images)                     | 5min   | Critical — blocks all work       |
-| 2   | P0       | Remove deprecated aliases from `domain/types.go` + update 12 references | 30min  | Removes dead code + linter noise |
-| 3   | P0       | Fix unnecessary type arguments (5 locations)                            | 10min  | Clean LSP diagnostics            |
-| 4   | P0       | Fix 6 unused parameter warnings                                         | 15min  | Clean LSP diagnostics            |
-| 5   | P1       | Run `golangci-lint run` and fix/annotate all findings                   | 1hr    | Quality gate                     |
-| 6   | P1       | Create `justfile` with `build`, `test`, `lint`, `fmt` targets           | 30min  | Standardized workflow            |
-| 7   | P1       | Remove `FreedBytes` from `CleanResult` (deprecated field)               | 30min  | Removes deprecated API           |
-| 8   | P1       | Remove deprecated `Scan` method in `docker.go:119`                      | 15min  | Removes dead code                |
-| 9   | P1       | Wire up GitHub Actions CI (build + test + lint)                         | 1hr    | Automated quality                |
-| 10  | P1       | Create `TODO_LIST.md` (referenced in AGENTS.md but missing)             | 15min  | Project tracking                 |
-| 11  | P1       | Create `FEATURES.md` (referenced in AGENTS.md but missing)              | 15min  | Feature tracking                 |
-| 12  | P2       | Split `internal/cleaner/` into sub-packages by domain                   | 2hr    | Package organization             |
-| 13  | P2       | Consolidate test helpers (6 files → 2-3)                                | 1hr    | Reduce test code noise           |
-| 14  | P2       | Consolidate `internal/testhelper/` + `internal/testing/`                | 30min  | Package hygiene                  |
-| 15  | P2       | Evaluate `internal/api/` — wire in or remove                            | 30min  | Dead code decision               |
-| 16  | P2       | Evaluate `internal/middleware/` — wire in or remove                     | 15min  | Dead code decision               |
-| 17  | P2       | Remove deprecated `ProjectsManagementAutomation` cleaner                | 30min  | Remove unsupported feature       |
-| 18  | P2       | Remove deprecated `ToMap` from `adapters/environment.go`                | 10min  | Remove dead code                 |
-| 19  | P2       | Archive old status reports (88 files → keep last 5)                     | 15min  | Doc hygiene                      |
-| 20  | P2       | Archive old planning docs (30 files → keep active ones)                 | 15min  | Doc hygiene                      |
-| 21  | P3       | Add `CONTRIBUTING.md`                                                   | 30min  | Open source readiness            |
-| 22  | P3       | Set up release workflow (goreleaser or similar)                         | 2hr    | Release automation               |
-| 23  | P3       | Add benchmarks for hot paths (scanner, size estimation)                 | 1hr    | Performance tracking             |
-| 24  | P3       | Fix all `exhaustruct` warnings (missing `Status` field)                 | 30min  | Linter compliance                |
-| 25  | P3       | Update `AGENTS.md` to remove references to missing files                | 5min   | Accuracy                         |
+| #  | Priority | Task                                                                    | Effort | Impact                           |
+| -- | -------- | ----------------------------------------------------------------------- | ------ | -------------------------------- |
+| 1  | P0       | Free disk space (clear caches, prune docker images)                     | 5min   | Critical — blocks all work       |
+| 2  | P0       | Remove deprecated aliases from `domain/types.go` + update 12 references | 30min  | Removes dead code + linter noise |
+| 3  | P0       | Fix unnecessary type arguments (5 locations)                            | 10min  | Clean LSP diagnostics            |
+| 4  | P0       | Fix 6 unused parameter warnings                                         | 15min  | Clean LSP diagnostics            |
+| 5  | P1       | Run `golangci-lint run` and fix/annotate all findings                   | 1hr    | Quality gate                     |
+| 6  | P1       | Create `justfile` with `build`, `test`, `lint`, `fmt` targets           | 30min  | Standardized workflow            |
+| 7  | P1       | Remove `FreedBytes` from `CleanResult` (deprecated field)               | 30min  | Removes deprecated API           |
+| 8  | P1       | Remove deprecated `Scan` method in `docker.go:119`                      | 15min  | Removes dead code                |
+| 9  | P1       | Wire up GitHub Actions CI (build + test + lint)                         | 1hr    | Automated quality                |
+| 10 | P1       | Create `TODO_LIST.md` (referenced in AGENTS.md but missing)             | 15min  | Project tracking                 |
+| 11 | P1       | Create `FEATURES.md` (referenced in AGENTS.md but missing)              | 15min  | Feature tracking                 |
+| 12 | P2       | Split `internal/cleaner/` into sub-packages by domain                   | 2hr    | Package organization             |
+| 13 | P2       | Consolidate test helpers (6 files → 2-3)                                | 1hr    | Reduce test code noise           |
+| 14 | P2       | Consolidate `internal/testhelper/` + `internal/testing/`                | 30min  | Package hygiene                  |
+| 15 | P2       | Evaluate `internal/api/` — wire in or remove                            | 30min  | Dead code decision               |
+| 16 | P2       | Evaluate `internal/middleware/` — wire in or remove                     | 15min  | Dead code decision               |
+| 17 | P2       | Remove deprecated `ProjectsManagementAutomation` cleaner                | 30min  | Remove unsupported feature       |
+| 18 | P2       | Remove deprecated `ToMap` from `adapters/environment.go`                | 10min  | Remove dead code                 |
+| 19 | P2       | Archive old status reports (88 files → keep last 5)                     | 15min  | Doc hygiene                      |
+| 20 | P2       | Archive old planning docs (30 files → keep active ones)                 | 15min  | Doc hygiene                      |
+| 21 | P3       | Add `CONTRIBUTING.md`                                                   | 30min  | Open source readiness            |
+| 22 | P3       | Set up release workflow (goreleaser or similar)                         | 2hr    | Release automation               |
+| 23 | P3       | Add benchmarks for hot paths (scanner, size estimation)                 | 1hr    | Performance tracking             |
+| 24 | P3       | Fix all `exhaustruct` warnings (missing `Status` field)                 | 30min  | Linter compliance                |
+| 25 | P3       | Update `AGENTS.md` to remove references to missing files                | 5min   | Accuracy                         |
 
 ---
 

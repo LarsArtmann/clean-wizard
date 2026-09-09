@@ -1,7 +1,7 @@
 # Clean Wizard — Comprehensive Status Report
 
-**Date:** 2026-04-01  
-**Status:** ENUM CONSOLIDATION COMPLETE  
+**Date:** 2026-04-01\
+**Status:** ENUM CONSOLIDATION COMPLETE\
 **Branch:** master (up to date with origin)
 
 ---
@@ -75,11 +75,11 @@ All 7 enum consolidation commits are **pushed to origin**.
 
 ### Build & Test Status
 
-| Check                  | Status     | Notes                                              |
-| ---------------------- | ---------- | -------------------------------------------------- |
-| `go build ./...`       | ✅ PASS    | No errors                                          |
-| `go test ./... -short` | ✅ PASS    | All domain tests pass                              |
-| `go vet ./...`         | ✅ PASS    | Clean                                              |
+| Check                  | Status    | Notes                                              |
+| ---------------------- | --------- | -------------------------------------------------- |
+| `go build ./...`       | ✅ PASS   | No errors                                          |
+| `go test ./... -short` | ✅ PASS   | All domain tests pass                              |
+| `go vet ./...`         | ✅ PASS   | Clean                                              |
 | `golangci-lint`        | ⚠️ TIMEOUT | Pre-existing issues (654+), disk space constraints |
 
 ### Disk Space
@@ -103,9 +103,9 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers:
 | -------------------------- | ------------------------------------------------------------- | ---------- |
 | **CacheCleanupMode**       | DISABLED, ENABLED                                             | ✅ Working |
 | **DockerPruneMode**        | ALL, IMAGES, CONTAINERS, VOLUMES, BUILDS                      | ✅ Working |
-| **BuildToolType**          | GO, RUST, NODE, PYTHON, JAVA, SCALA                           | ⚠️ Partial |
-| **CacheType**              | SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, CCACHE | ⚠️ Partial |
-| **VersionManagerType**     | NVM, PYENV, GVM, RBENV, SDKMAN, JENV                          | ⚠️ Partial |
+| **BuildToolType**          | GO, RUST, NODE, PYTHON, JAVA, SCALA                           | ⚠️ Partial  |
+| **CacheType**              | SPOTLIGHT, XCODE, COCOAPODS, HOMEBREW, PIP, NPM, YARN, CCACHE | ⚠️ Partial  |
+| **VersionManagerType**     | NVM, PYENV, GVM, RBENV, SDKMAN, JENV                          | ⚠️ Partial  |
 | **PackageManagerType**     | NPM, PNPM, YARN, BUN                                          | ✅ Working |
 | **RiskLevel**              | LOW, MEDIUM, HIGH, CRITICAL                                   | ✅ Working |
 | **ValidationLevel**        | NONE, BASIC, COMPREHENSIVE, STRICT                            | ✅ Working |
@@ -129,7 +129,7 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers:
 | Go               | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
 | Cargo            | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
 | Node Packages    | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
-| Build Cache      | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools   |
+| Build Cache      | ✅        | ✅   | ✅    | ✅      | ✅            | ⚠️ Limited Tools    |
 | System Cache     | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
 | Temp Files       | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
 | Git History      | ✅        | ✅   | ✅    | ✅      | ✅            | ✅ Production      |
@@ -186,14 +186,14 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers:
 
 ## 7. Pending Work (From Original Meta-Improvement Request)
 
-| #   | Task                                         | Impact | Effort | Notes                              |
-| --- | -------------------------------------------- | ------ | ------ | ---------------------------------- |
-| 1   | Add tests for getRegistryName reverse lookup | MED    | LOW    | Related to metadata consolidation  |
-| 2   | Add profile command tests                    | MED    | MED    | No test files for commands package |
-| 3   | Add scan command tests                       | MED    | MED    | No test files for commands package |
-| 4   | Add clean command tests                      | MED    | HIGH   | No test files for commands package |
-| 5   | Set up CI pipeline                           | HIGH   | MED    | At minimum: go build + go test     |
-| 6   | Fix pre-commit hook timeout                  | MED    | LOW    | golangci-lint times out            |
+| # | Task                                         | Impact | Effort | Notes                              |
+| - | -------------------------------------------- | ------ | ------ | ---------------------------------- |
+| 1 | Add tests for getRegistryName reverse lookup | MED    | LOW    | Related to metadata consolidation  |
+| 2 | Add profile command tests                    | MED    | MED    | No test files for commands package |
+| 3 | Add scan command tests                       | MED    | MED    | No test files for commands package |
+| 4 | Add clean command tests                      | MED    | HIGH   | No test files for commands package |
+| 5 | Set up CI pipeline                           | HIGH   | MED    | At minimum: go build + go test     |
+| 6 | Fix pre-commit hook timeout                  | MED    | LOW    | golangci-lint times out            |
 
 ---
 

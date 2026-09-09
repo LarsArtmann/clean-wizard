@@ -1,8 +1,8 @@
 # Clean Wizard - Comprehensive Executive Status Report
 
-**Date:** 2026-03-24 03:11:21  
-**Branch:** master  
-**Commits Ahead:** 0 (up to date with origin)  
+**Date:** 2026-03-24 03:11:21\
+**Branch:** master\
+**Commits Ahead:** 0 (up to date with origin)\
 **Report Type:** BRUTALLY HONEST ASSESSMENT
 
 ---
@@ -134,33 +134,33 @@ Zap usages:    55 locations (mostly in new logger package)
 
 ### High Priority
 
-| #   | Task                        | Impact | Effort |
-| --- | --------------------------- | ------ | ------ |
-| 1   | Age-Based Cleaner Interface | Medium | 4h     |
-| 2   | Parallel Cleaner Execution  | High   | 6h     |
-| 3   | Metrics & Observability     | Medium | 8h     |
-| 4   | Shell Completions           | Low    | 4h     |
-| 5   | Migration to Enum Macros    | Medium | 6h     |
+| # | Task                        | Impact | Effort |
+| - | --------------------------- | ------ | ------ |
+| 1 | Age-Based Cleaner Interface | Medium | 4h     |
+| 2 | Parallel Cleaner Execution  | High   | 6h     |
+| 3 | Metrics & Observability     | Medium | 8h     |
+| 4 | Shell Completions           | Low    | 4h     |
+| 5 | Migration to Enum Macros    | Medium | 6h     |
 
 ### Medium Priority
 
-| #   | Task                                        | Impact | Effort |
-| --- | ------------------------------------------- | ------ | ------ |
-| 6   | gopls Warning Fixes                         | Low    | 2h     |
-| 7   | File Size Violations (30 files > 350 lines) | Medium | 10h    |
-| 8   | Error Handling Unification                  | Medium | 4h     |
-| 9   | Tracing for Long Operations                 | Low    | 4h     |
-| 10  | Caching of Scan Results                     | Medium | 6h     |
+| #  | Task                                        | Impact | Effort |
+| -- | ------------------------------------------- | ------ | ------ |
+| 6  | gopls Warning Fixes                         | Low    | 2h     |
+| 7  | File Size Violations (30 files > 350 lines) | Medium | 10h    |
+| 8  | Error Handling Unification                  | Medium | 4h     |
+| 9  | Tracing for Long Operations                 | Low    | 4h     |
+| 10 | Caching of Scan Results                     | Medium | 6h     |
 
 ### Lower Priority
 
-| #   | Task                        | Impact | Effort |
-| --- | --------------------------- | ------ | ------ |
-| 11  | Man Pages                   | Low    | 4h     |
-| 12  | Verbose Log Levels          | Low    | 2h     |
-| 13  | User Feedback Mechanism     | Low    | 4h     |
-| 14  | Performance Timing          | Low    | 3h     |
-| 15  | Config Profiles Beyond Risk | Low    | 6h     |
+| #  | Task                        | Impact | Effort |
+| -- | --------------------------- | ------ | ------ |
+| 11 | Man Pages                   | Low    | 4h     |
+| 12 | Verbose Log Levels          | Low    | 2h     |
+| 13 | User Feedback Mechanism     | Low    | 4h     |
+| 14 | Performance Timing          | Low    | 3h     |
+| 15 | Config Profiles Beyond Risk | Low    | 6h     |
 
 ---
 
@@ -168,8 +168,8 @@ Zap usages:    55 locations (mostly in new logger package)
 
 ### Critical Issue: Dual Logging Systems
 
-**Severity:** HIGH  
-**Category:** Architecture Violation  
+**Severity:** HIGH\
+**Category:** Architecture Violation\
 **Files Affected:** Entire codebase (logging inconsistency)
 
 **What Happened:**
@@ -264,48 +264,48 @@ grep -r "logrus\|logger\|Logger" go.mod internal/ --include="*.go"
 
 ### CRITICAL (Fix Immediately)
 
-| #   | Task                                                     | Impact | Effort | Priority   |
-| --- | -------------------------------------------------------- | ------ | ------ | ---------- |
-| 1   | **Fix Dual Logging** - Remove zap OR migrate from logrus | HIGH   | 2h     | ⭐⭐⭐⭐⭐ |
-| 2   | Migrate Existing Enums to Use Macro Framework            | HIGH   | 4h     | ⭐⭐⭐⭐⭐ |
-| 3   | Add Tests for Go Cache Bug Fix                           | HIGH   | 1h     | ⭐⭐⭐⭐⭐ |
+| # | Task                                                     | Impact | Effort | Priority   |
+| - | -------------------------------------------------------- | ------ | ------ | ---------- |
+| 1 | **Fix Dual Logging** - Remove zap OR migrate from logrus | HIGH   | 2h     | ⭐⭐⭐⭐⭐ |
+| 2 | Migrate Existing Enums to Use Macro Framework            | HIGH   | 4h     | ⭐⭐⭐⭐⭐ |
+| 3 | Add Tests for Go Cache Bug Fix                           | HIGH   | 1h     | ⭐⭐⭐⭐⭐ |
 
 ### HIGH PRIORITY (This Week)
 
-| #   | Task                                   | Impact | Effort | Priority |
-| --- | -------------------------------------- | ------ | ------ | -------- |
-| 4   | Create Age-Based Cleaner Interface     | MEDIUM | 4h     | ⭐⭐⭐⭐ |
-| 5   | Implement Parallel Cleaner Execution   | HIGH   | 6h     | ⭐⭐⭐⭐ |
-| 6   | Add Metrics/Observability (Prometheus) | MEDIUM | 8h     | ⭐⭐⭐⭐ |
-| 7   | Fix gopls Warnings (45 issues)         | LOW    | 2h     | ⭐⭐⭐   |
-| 8   | Unify Error Wrapping Styles            | MEDIUM | 4h     | ⭐⭐⭐   |
-| 9   | Add Tracing for Long Operations        | LOW    | 4h     | ⭐⭐⭐   |
+| # | Task                                   | Impact | Effort | Priority |
+| - | -------------------------------------- | ------ | ------ | -------- |
+| 4 | Create Age-Based Cleaner Interface     | MEDIUM | 4h     | ⭐⭐⭐⭐ |
+| 5 | Implement Parallel Cleaner Execution   | HIGH   | 6h     | ⭐⭐⭐⭐ |
+| 6 | Add Metrics/Observability (Prometheus) | MEDIUM | 8h     | ⭐⭐⭐⭐ |
+| 7 | Fix gopls Warnings (45 issues)         | LOW    | 2h     | ⭐⭐⭐   |
+| 8 | Unify Error Wrapping Styles            | MEDIUM | 4h     | ⭐⭐⭐   |
+| 9 | Add Tracing for Long Operations        | LOW    | 4h     | ⭐⭐⭐   |
 
 ### MEDIUM PRIORITY (Next 2 Weeks)
 
-| #   | Task                                     | Impact | Effort | Priority |
-| --- | ---------------------------------------- | ------ | ------ | -------- |
-| 10  | Implement Caching for Scan Results       | MEDIUM | 6h     | ⭐⭐⭐   |
-| 11  | Add Shell Completions                    | LOW    | 4h     | ⭐⭐     |
-| 12  | Fix File Size Violations (30 files)      | MEDIUM | 10h    | ⭐⭐     |
-| 13  | Implement Remaining BuildToolType Values | LOW    | 4h     | ⭐⭐     |
-| 14  | Implement Remaining VersionManagerType   | LOW    | 4h     | ⭐⭐     |
-| 15  | Add Performance Timing                   | LOW    | 3h     | ⭐⭐     |
-| 16  | Create ProgressReporter Abstraction      | MEDIUM | 4h     | ⭐⭐     |
+| #  | Task                                     | Impact | Effort | Priority |
+| -- | ---------------------------------------- | ------ | ------ | -------- |
+| 10 | Implement Caching for Scan Results       | MEDIUM | 6h     | ⭐⭐⭐   |
+| 11 | Add Shell Completions                    | LOW    | 4h     | ⭐⭐     |
+| 12 | Fix File Size Violations (30 files)      | MEDIUM | 10h    | ⭐⭐     |
+| 13 | Implement Remaining BuildToolType Values | LOW    | 4h     | ⭐⭐     |
+| 14 | Implement Remaining VersionManagerType   | LOW    | 4h     | ⭐⭐     |
+| 15 | Add Performance Timing                   | LOW    | 3h     | ⭐⭐     |
+| 16 | Create ProgressReporter Abstraction      | MEDIUM | 4h     | ⭐⭐     |
 
 ### LOWER PRIORITY (Backlog)
 
-| #   | Task                             | Impact | Effort | Priority |
-| --- | -------------------------------- | ------ | ------ | -------- |
-| 17  | Add Man Pages                    | LOW    | 4h     | ⭐       |
-| 18  | Implement Verbose Log Levels     | LOW    | 2h     | ⭐       |
-| 19  | Add User Feedback Mechanism      | LOW    | 4h     | ⭐       |
-| 20  | Implement SizeEstimator Strategy | MEDIUM | 6h     | ⭐       |
-| 21  | Add Config Profiles Beyond Risk  | LOW    | 6h     | ⭐       |
-| 22  | Fix Nix Hardcoded Size Estimates | LOW    | 2h     | ⭐       |
-| 23  | Improve Homebrew Dry-Run         | LOW    | 3h     | ⭐       |
-| 24  | Add Plugin Architecture          | LOW    | 20h    | ⭐       |
-| 25  | Evaluate samber/mo for Result[T] | LOW    | 4h     | ⭐       |
+| #  | Task                             | Impact | Effort | Priority |
+| -- | -------------------------------- | ------ | ------ | -------- |
+| 17 | Add Man Pages                    | LOW    | 4h     | ⭐       |
+| 18 | Implement Verbose Log Levels     | LOW    | 2h     | ⭐       |
+| 19 | Add User Feedback Mechanism      | LOW    | 4h     | ⭐       |
+| 20 | Implement SizeEstimator Strategy | MEDIUM | 6h     | ⭐       |
+| 21 | Add Config Profiles Beyond Risk  | LOW    | 6h     | ⭐       |
+| 22 | Fix Nix Hardcoded Size Estimates | LOW    | 2h     | ⭐       |
+| 23 | Improve Homebrew Dry-Run         | LOW    | 3h     | ⭐       |
+| 24 | Add Plugin Architecture          | LOW    | 20h    | ⭐       |
+| 25 | Evaluate samber/mo for Result[T] | LOW    | 4h     | ⭐       |
 
 ---
 
@@ -352,20 +352,20 @@ Decide A, B, or C, and I'll execute immediately.
 | Build                | ✅ Passing | ✅ Passing | ✅     |
 | Tests                | ✅ Passing | ✅ Passing | ✅     |
 | gopls Errors         | 0          | 0          | ✅     |
-| gopls Warnings       | 45         | 0          | ⚠️     |
+| gopls Warnings       | 45         | 0          | ⚠️      |
 | File Size >350 lines | 30         | 0          | ❌     |
-| Unused Parameters    | 40+        | 0          | ⚠️     |
+| Unused Parameters    | 40+        | 0          | ⚠️      |
 
 ### Dependencies
 
-| Library   | Version | Purpose | Status      |
-| --------- | ------- | ------- | ----------- |
+| Library   | Version | Purpose | Status     |
+| --------- | ------- | ------- | ---------- |
 | logrus    | v1.9.4  | Logging | ⚠️ CONFLICT |
 | zap       | v1.27.1 | Logging | ⚠️ CONFLICT |
-| cobra     | v1.8.1  | CLI     | ✅          |
-| viper     | v1.19.0 | Config  | ✅          |
-| bubbletea | v1.1.0  | TUI     | ✅          |
-| testify   | v1.9.0  | Testing | ✅          |
+| cobra     | v1.8.1  | CLI     | ✅         |
+| viper     | v1.19.0 | Config  | ✅         |
+| bubbletea | v1.1.0  | TUI     | ✅         |
+| testify   | v1.9.0  | Testing | ✅         |
 
 ### Test Coverage
 
@@ -419,5 +419,5 @@ Decide A, B, or C, and I'll execute immediately.
 
 ---
 
-_Report Generated:_ 2026-03-24 03:11:21  
+_Report Generated:_ 2026-03-24 03:11:21\
 _Status:_ COMPLETE | AWAITING DECISION

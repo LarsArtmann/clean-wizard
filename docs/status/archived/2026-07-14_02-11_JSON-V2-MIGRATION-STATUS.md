@@ -77,8 +77,8 @@ Both changes require `GOEXPERIMENT=jsonv2` to compile. Without it, Go's build co
 **What I did:** The first edit to `flake.nix` produced misaligned indentation:
 
 ```nix
-            env.CGO_ENABLED = 0;
-          env.GOEXPERIMENT = "jsonv2";   # ← wrong indentation
+  env.CGO_ENABLED = 0;
+env.GOEXPERIMENT = "jsonv2";   # ← wrong indentation
 ```
 
 I caught it during review and fixed it, but it should have been correct the first time. The `multiedit` tool matched `env.CGO_ENABLED = 0;` but I didn't match the surrounding indentation context properly.

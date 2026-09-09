@@ -1,7 +1,7 @@
 # Clean Wizard - Comprehensive Execution Plan
 
-> **Created:** 2026-02-10  
-> **Version:** 1.0  
+> **Created:** 2026-02-10\
+> **Version:** 1.0\
 > **Status:** Ready for Execution
 
 ---
@@ -27,14 +27,14 @@ Based on analysis of TODO_LIST.md and FEATURES.md, this project has significant 
 
 The following tasks deliver 51% of value with minimal effort:
 
-| #   | Task                                                   | Impact      | Effort | Status  |
-| --- | ------------------------------------------------------ | ----------- | ------ | ------- |
-| 1   | Fix UNSAFE EXEC CALLS (9 commands)                     | 🔴 CRITICAL | 30min  | PENDING |
-| 2   | Fix Cleaner Interface Compliance                       | 🔴 CRITICAL | 30min  | PENDING |
-| 3   | Fix Size Reporting (Docker, Cargo)                     | 🟠 HIGH     | 1h     | PENDING |
-| 4   | Add Timeout to All Exec Calls                          | 🔴 CRITICAL | 1h     | PENDING |
-| 5   | Complete nix.go missing Clean(ctx)                     | 🔴 CRITICAL | 15min  | PENDING |
-| 6   | Complete golang_cache_cleaner.go missing IsAvailable() | 🔴 CRITICAL | 15min  | PENDING |
+| # | Task                                                   | Impact      | Effort | Status  |
+| - | ------------------------------------------------------ | ----------- | ------ | ------- |
+| 1 | Fix UNSAFE EXEC CALLS (9 commands)                     | 🔴 CRITICAL | 30min  | PENDING |
+| 2 | Fix Cleaner Interface Compliance                       | 🔴 CRITICAL | 30min  | PENDING |
+| 3 | Fix Size Reporting (Docker, Cargo)                     | 🟠 HIGH     | 1h     | PENDING |
+| 4 | Add Timeout to All Exec Calls                          | 🔴 CRITICAL | 1h     | PENDING |
+| 5 | Complete nix.go missing Clean(ctx)                     | 🔴 CRITICAL | 15min  | PENDING |
+| 6 | Complete golang_cache_cleaner.go missing IsAvailable() | 🔴 CRITICAL | 15min  | PENDING |
 
 ---
 
@@ -44,17 +44,17 @@ The following tasks deliver 51% of value with minimal effort:
 
 **Files and Lines Affected:**
 
-| File                              | Line | Command                   | Risk     |
-| --------------------------------- | ---- | ------------------------- | -------- |
-| `cargo.go`                        | 164  | `cargo-cache --autoclean` | CRITICAL |
-| `cargo.go`                        | 186  | `cargo clean`             | CRITICAL |
+| File                              | Line | Command                    | Risk     |
+| --------------------------------- | ---- | -------------------------- | -------- |
+| `cargo.go`                        | 164  | `cargo-cache --autoclean`  | CRITICAL |
+| `cargo.go`                        | 186  | `cargo clean`              | CRITICAL |
 | `nodepackages.go`                 | 137  | `pnpm config get cache`    | HIGH     |
-| `nodepackages.go`                 | 159  | `pnpm store path`         | HIGH     |
+| `nodepackages.go`                 | 159  | `pnpm store path`          | HIGH     |
 | `nodepackages.go`                 | 279  | `pnpm cache clean --force` | CRITICAL |
-| `nodepackages.go`                 | 290  | `pnpm store prune`        | CRITICAL |
-| `nodepackages.go`                 | 301  | `yarn cache clean`        | HIGH     |
-| `nodepackages.go`                 | 312  | `bun pm cache rm`         | HIGH     |
-| `projectsmanagementautomation.go` | 99   | `--clear-cache`           | HIGH     |
+| `nodepackages.go`                 | 290  | `pnpm store prune`         | CRITICAL |
+| `nodepackages.go`                 | 301  | `yarn cache clean`         | HIGH     |
+| `nodepackages.go`                 | 312  | `bun pm cache rm`          | HIGH     |
+| `projectsmanagementautomation.go` | 99   | `--clear-cache`            | HIGH     |
 
 **Root Cause:** Commands use `exec.CommandContext(ctx, ...)` but ctx may not have timeout set.
 

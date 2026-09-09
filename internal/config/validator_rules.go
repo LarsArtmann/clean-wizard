@@ -104,7 +104,7 @@ func getDefaultValidationRules() *ConfigValidationRules {
 		},
 		ProfileNamePattern: &ValidationRule[string]{ //nolint:exhaustruct
 			Required: true,
-			Pattern:  "^[a-zA-Z0-9_-]+$", //nolint:goconst
+			Pattern:  "^[a-zA-Z0-9_-]+$",
 			Message:  "Profile names must be alphanumeric with underscores and hyphens",
 		},
 		UniquePaths:           true,

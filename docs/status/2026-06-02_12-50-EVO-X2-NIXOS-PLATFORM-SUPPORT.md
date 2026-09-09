@@ -119,33 +119,33 @@
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #   | Task                                                                       | Impact | Effort | Category      |
-| --- | -------------------------------------------------------------------------- | ------ | ------ | ------------- |
-| 1   | Add `nix profile` generation support to NixAdapter (per-user profiles)     | HIGH   | MED    | Feature       |
-| 2   | Add `nix store optimise` to NixCleaner                                     | HIGH   | LOW    | Feature       |
-| 3   | Add marshaling tests for all 27 CacheType values                           | MED    | LOW    | Testing       |
-| 4   | Fix systemcache_test.go mixed test to use platform-aware cache type        | LOW    | LOW    | Testing       |
-| 5   | Consolidate error packages (4→1)                                           | HIGH   | MED    | Architecture  |
-| 6   | Extract test utilities from `internal/cleaner/test_*.go`                   | MED    | MED    | Architecture  |
-| 7   | Add BDD tests for Docker, Homebrew, Go cleaners                            | HIGH   | HIGH   | Testing       |
-| 8   | Fix `err113` lint violations (~40 instances)                               | MED    | MED    | Lint          |
-| 9   | Set up CI pipeline (`go build` + `go test`)                                | HIGH   | MED    | Infra         |
-| 10  | Split `internal/domain/` into sub-packages                                 | HIGH   | HIGH   | Architecture  |
-| 11  | Add `platform` field to `cacheTypeConfig` to prevent cross-platform misuse | MED    | LOW    | Type Model    |
-| 12  | Centralize `runtime.GOOS` checks into a platform detection interface       | MED    | MED    | Architecture  |
-| 13  | Add age-based filtering to goimports/gopls cache cleaning                  | MED    | LOW    | Feature       |
-| 14  | Investigate and handle `net.imput.helium` cache (2.4GB on evo-x2)          | MED    | LOW    | Feature       |
-| 15  | Modernize NixAdapter: `nix store gc` instead of `nix-collect-garbage`      | LOW    | LOW    | Refactor      |
-| 16  | Split files over 350 lines: compiledbinaries, docker, nodepackages         | MED    | MED    | Code Quality  |
-| 17  | Add CLI command tests (scan, clean, profile, config)                       | MED    | HIGH   | Testing       |
-| 18  | Fix mixed receiver warnings (10 enum types)                                | LOW    | LOW    | Lint          |
-| 19  | Reduce `GetOperationType` complexity (17→<10)                              | LOW    | LOW    | Lint          |
-| 20  | Investigate Go `~/.cache/go` directory overlap with GoCacheCleaner         | MED    | LOW    | Investigation |
-| 21  | Add profile command tests                                                  | MED    | MED    | Testing       |
-| 22  | Make NixAdapter discover profile paths dynamically                         | MED    | MED    | Architecture  |
-| 23  | Split `internal/cleaner/` into per-domain sub-packages                     | HIGH   | HIGH   | Architecture  |
-| 24  | Improve Nix size estimation (hardcoded 50MB/generation)                    | MED    | MED    | Feature       |
-| 25  | Add Homebrew dry-run support or document limitation                        | LOW    | MED    | Feature       |
+| #  | Task                                                                       | Impact | Effort | Category      |
+| -- | -------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| 1  | Add `nix profile` generation support to NixAdapter (per-user profiles)     | HIGH   | MED    | Feature       |
+| 2  | Add `nix store optimise` to NixCleaner                                     | HIGH   | LOW    | Feature       |
+| 3  | Add marshaling tests for all 27 CacheType values                           | MED    | LOW    | Testing       |
+| 4  | Fix systemcache_test.go mixed test to use platform-aware cache type        | LOW    | LOW    | Testing       |
+| 5  | Consolidate error packages (4→1)                                           | HIGH   | MED    | Architecture  |
+| 6  | Extract test utilities from `internal/cleaner/test_*.go`                   | MED    | MED    | Architecture  |
+| 7  | Add BDD tests for Docker, Homebrew, Go cleaners                            | HIGH   | HIGH   | Testing       |
+| 8  | Fix `err113` lint violations (~40 instances)                               | MED    | MED    | Lint          |
+| 9  | Set up CI pipeline (`go build` + `go test`)                                | HIGH   | MED    | Infra         |
+| 10 | Split `internal/domain/` into sub-packages                                 | HIGH   | HIGH   | Architecture  |
+| 11 | Add `platform` field to `cacheTypeConfig` to prevent cross-platform misuse | MED    | LOW    | Type Model    |
+| 12 | Centralize `runtime.GOOS` checks into a platform detection interface       | MED    | MED    | Architecture  |
+| 13 | Add age-based filtering to goimports/gopls cache cleaning                  | MED    | LOW    | Feature       |
+| 14 | Investigate and handle `net.imput.helium` cache (2.4GB on evo-x2)          | MED    | LOW    | Feature       |
+| 15 | Modernize NixAdapter: `nix store gc` instead of `nix-collect-garbage`      | LOW    | LOW    | Refactor      |
+| 16 | Split files over 350 lines: compiledbinaries, docker, nodepackages         | MED    | MED    | Code Quality  |
+| 17 | Add CLI command tests (scan, clean, profile, config)                       | MED    | HIGH   | Testing       |
+| 18 | Fix mixed receiver warnings (10 enum types)                                | LOW    | LOW    | Lint          |
+| 19 | Reduce `GetOperationType` complexity (17→<10)                              | LOW    | LOW    | Lint          |
+| 20 | Investigate Go `~/.cache/go` directory overlap with GoCacheCleaner         | MED    | LOW    | Investigation |
+| 21 | Add profile command tests                                                  | MED    | MED    | Testing       |
+| 22 | Make NixAdapter discover profile paths dynamically                         | MED    | MED    | Architecture  |
+| 23 | Split `internal/cleaner/` into per-domain sub-packages                     | HIGH   | HIGH   | Architecture  |
+| 24 | Improve Nix size estimation (hardcoded 50MB/generation)                    | MED    | MED    | Feature       |
+| 25 | Add Homebrew dry-run support or document limitation                        | LOW    | MED    | Feature       |
 
 ---
 

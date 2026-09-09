@@ -11,7 +11,7 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 	// Version validation
 	if cfg.Version == "" {
 		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
-			Field:      "version",  //nolint:goconst
+			Field:      "version",
 			Rule:       "required", //nolint:goconst
 			Value:      cfg.Version,
 			Message:    "Configuration version is required",
