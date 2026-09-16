@@ -259,9 +259,9 @@ func CalculateBytesFreed(
 
 // DiskUsage represents disk usage information for a filesystem.
 type DiskUsage struct {
-	Total       int64
-	Used        int64
-	Free        int64
+	Total       uint64
+	Used        uint64
+	Free        uint64
 	UsedPercent float64
 }
 
@@ -275,8 +275,8 @@ func GetDiskUsage(path string) (DiskUsage, error) {
 		return DiskUsage{}, fmt.Errorf("failed to get disk usage for %s: %w", path, err)
 	}
 
-	total := int64(stat.Blocks) * stat.Bsize
-	free := int64(stat.Bfree) * stat.Bsize
+	total := stat.Blocks * uint64(stat.Bsize)
+	free := stat.Bfree * uint64(stat.Bsize)
 	used := total - free
 
 	usedPercent := 0.0
