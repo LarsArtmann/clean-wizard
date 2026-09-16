@@ -28,13 +28,14 @@ evidence, 8 updated with precise status comments.
 ("Node cleaner bullet to read 'pnpm, pnpm, yarn, bun' correctly" — it is not correct).
 
 **Blast radius (code — behavior-breaking):**
-| File | Damage |
-| --- | --- |
-| `internal/cleaner/nodepackages.go` | Duplicate `"pnpm"` map key (**build failure**); `LookPath("npm")`→pnpm; npm scan/clean ran `pnpm config get cache`; wrong validation message |
-| `internal/cleaner/systemcache.go:247` | npm's Linux system-cache path `~/.cache/npm` renamed to `~/.cache/pnpm` |
-| `cmd/.../cleaner_types.go`, `init.go` | User-facing description "Clean pnpm, pnpm, yarn, bun caches" |
-| `internal/domain/operation_settings.go` | Enum doc comments lied (`CacheTypeNpm represents Node.js pnpm cache`) |
-| `nodepackages_test.go` | 3 corrupted comments |
+
+| File                                    | Damage                                                                                                                                       |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `internal/cleaner/nodepackages.go`      | Duplicate `"pnpm"` map key (**build failure**); `LookPath("npm")`→pnpm; npm scan/clean ran `pnpm config get cache`; wrong validation message |
+| `internal/cleaner/systemcache.go:247`   | npm's Linux system-cache path `~/.cache/npm` renamed to `~/.cache/pnpm`                                                                      |
+| `cmd/.../cleaner_types.go`, `init.go`   | User-facing description "Clean pnpm, pnpm, yarn, bun caches"                                                                                 |
+| `internal/domain/operation_settings.go` | Enum doc comments lied (`CacheTypeNpm represents Node.js pnpm cache`)                                                                        |
+| `nodepackages_test.go`                  | 3 corrupted comments                                                                                                                         |
 
 **Blast radius (docs):** AGENTS.md (machine facts — "No: … pnpm" while pnpm IS installed),
 README, FEATURES, HOW_TO_USE, USAGE, DEVELOPMENT, ARCHITECTURE ×2, docs/ENUM_QUICK_REFERENCE,
@@ -43,8 +44,9 @@ docs/architecture/CACHETYPE_DESIGN_ANALYSIS, schemas/README, MIGRATION_TO_NIX_FL
 website cleaners.mdx — plus ~12 archived docs (status/historical/planning) left frozen.
 
 **Fix ownership split:** concurrent agent fixed `nodepackages.go` + `operation_settings.go`
-+ website changelog/sections (auto-commit `1b81c0c`). I fixed the other 16 files
-(auto-commits `9f5a488`/`3de8d5e`/`1c933b9`).
+
+- website changelog/sections (auto-commit `1b81c0c`). I fixed the other 16 files
+  (auto-commits `9f5a488`/`3de8d5e`/`1c933b9`).
 
 **Verification:** `go build ./...` OK; `go test ./internal/cleaner/` OK (198s, full package);
 `go test ./cmd/clean-wizard/commands/ -short` OK; gofmt + vet clean on changed files;
@@ -85,7 +87,7 @@ while pnpm is a listed available tool).
 ## b) PARTIALLY DONE
 
 1. **Regression repair in docs** — live docs 100% fixed; ~12 **archived** docs
-   (docs/status/*, docs/historical/*, docs/planning/*) still contain "pnpm, pnpm" botches.
+   (docs/status/_, docs/historical/_, docs/planning/*) still contain "pnpm, pnpm" botches.
    Deliberate scope decision (archives are point-in-time), but undocumented policy — needs
    an owner decision.
 2. **Issue #30 (zero-valley)** — ~85% done overall; my comment lists exactly what remains
@@ -119,7 +121,7 @@ while pnpm is a listed available tool).
    (not my commit, but it shipped on master with a CI-blind spot: nothing caught a broken
    build for the Go module — worth asking why CI didn't gate it).
 2. **The sed regression itself is the biggest fuckup of the week** — a website tooling
-   change silently rewrote cleaner behavior (npm cleaned *via pnpm commands* would have
+   change silently rewrote cleaner behavior (npm cleaned _via pnpm commands_ would have
    failed or cleaned the wrong store in production use). No test caught it because the npm
    path skips when npm is absent, and no build/test gate ran before the website commit.
 3. **My process slips this session:**
@@ -157,20 +159,21 @@ while pnpm is a listed available tool).
    duplicate map key would have blocked it. Verify why the website workflow commit skipped
    the Go checks (path-filtered workflows?).
 3. **Blanket-sed policy:** no repo-wide textual replacements without reviewing every hit
-   (the `56fe638` diff *contained* the evidence of damage; it just wasn't read).
+   (the `56fe638` diff _contained_ the evidence of damage; it just wasn't read).
 4. **Docs Health sync:** audit findings should flow into TODO_LIST.md (the declared source
    of truth) in the same session, not only into GitHub comments.
 5. **Artifact hygiene:** root-level tool-state files (dedup artifacts, ai-progress) should
    live outside the repo or in a dedicated, gitignored dir.
 6. **Auto-commit daemon messages** blur history for multi-agent sessions; consider a
    convention where agents drop a `docs/status/` note when the daemon races them, so the
-   *why* is always recoverable.
+   _why_ is always recoverable.
 7. **Machine-facts drift:** AGENTS.md tool lists went stale+wrong via sed; a tiny
    "machine facts" script (which npm/pnpm/cargo…) could regenerate that section.
 
 ## f) UP TO 50 THINGS TO DO NEXT (prioritized)
 
 **Guardrails / regression aftermath (this week):**
+
 1. Unit test: enum↔validator-map 1:1 for PackageManagerType (would have caught the sed).
 2. CI grep guard: no `"pnpm, pnpm"` / `"pnpm/pnpm"` patterns anywhere.
 3. Investigate why `56fe638` passed CI; ensure Go build+test gates run on all PRs.
@@ -188,7 +191,7 @@ while pnpm is a listed available tool).
 
 **TODO_LIST Critical (existing, verified 2026-08-10):**
 14. Migrate 5 command files to classified errors (init, githistory, config, clean_select,
-    profile) — 30+ bare `fmt.Errorf` misclassified as Transient.
+profile) — 30+ bare `fmt.Errorf` misclassified as Transient.
 15. Classify `ErrGitNotAvailable` as Infrastructure.
 16. Enrich scan JSON output with family/code/retryable fields.
 17. Fix scan JSON swallowing marshal errors (`outputScanJSON` silent-return).
@@ -230,20 +233,20 @@ while pnpm is a listed available tool).
 43. Issue #30 remainder: `RequireSafeMode bool` → EnforcementLevel enum.
 44. Issue #30 remainder: constrained strings (ProfileName, OperationName, Path).
 45. Issue #30 remainder: constrained numerics (DiskUsagePercentage 1–95, PathCount,
-    ProfileCount 1–10, validated Timeout).
+ProfileCount 1–10, validated Timeout).
 46. Issue #19: config migration engine (detect → migrate → backup → rollback → notify).
 47. Issue #18: interactive init enhancements (protected paths, thresholds, help text,
-    back/forward nav, preview).
+back/forward nav, preview).
 48. Issue #28: fresh duplication scan (jscpd/art-dupl) → triage → extract harmful clones only.
 49. Issue #41 re-scoped: benchmarks in CI + regression detection + expose workflow step
-    timing; defer server-style metrics until Web UI decision.
+timing; defer server-style metrics until Web UI decision.
 50. Issue #35 decision: re-derive API mapping layer from `clean-wizard.tsp` when Web UI is
-    scheduled — or close the issue as not-planned.
+scheduled — or close the issue as not-planned.
 
 ## g) QUESTIONS I CANNOT ANSWER MYSELF
 
 1. **CI gate:** Did `56fe638` skip the Go build/test workflows (path filters?), and do you
-   want a required `go build ./...` gate on *every* PR regardless of touched paths?
+   want a required `go build ./...` gate on _every_ PR regardless of touched paths?
 2. **Archived docs policy:** should the ~12 frozen docs (docs/status, docs/historical,
    docs/planning) carrying the sed corruption be corrected, or stay untouched as
    point-in-time records?

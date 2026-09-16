@@ -163,9 +163,15 @@ linters:
       forbid-spec-pollution: true
     gocognit:
       min-complexity: 50
+    goconst:
+      ignore-tests: true
+      min-len: 4
+      min-occurrences: 5
     gocritic:
       disabled-checks:
         - ifElseChain
+    gocyclo:
+      min-complexity: 20
     gomoddirectives:
       replace-local: true
     gosec:
@@ -200,6 +206,17 @@ linters:
           name: exported
         - disabled: true
           name: package-comments
+    tagalign:
+      align: false
+      order:
+        - binding
+        - json
+        - yaml
+        - xml
+        - toml
+        - validate
+        - mapstructure
+      sort: true
     testifylint:
       disable:
         - go-require
@@ -269,6 +286,14 @@ linters:
           - funlen
           - cyclop
           - goconst
+          - forcetypeassert
+          - gosec
+          - errcheck
+          - wrapcheck
+          - ireturn
+          - recvcheck
+          - contextcheck
+          - exhaustive
       - path: _test\.go
         text: unused
         linters:

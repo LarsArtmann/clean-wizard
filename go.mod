@@ -1,11 +1,11 @@
 module github.com/LarsArtmann/clean-wizard
 
-go 1.26.7
+go 1.27.1
 
 require (
 	charm.land/huh/v2 v2.0.3
-	charm.land/lipgloss/v2 v2.0.5
-	charm.land/log/v2 v2.0.0
+	charm.land/lipgloss/v2 v2.0.6
+	charm.land/log/v2 v2.0.1
 	github.com/Azure/go-workflow v0.1.13
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/cenkalti/backoff/v4 v4.3.0
@@ -15,29 +15,29 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.6
-	github.com/larsartmann/go-error-family v0.10.0
+	github.com/larsartmann/go-error-family v0.10.1
 	github.com/maypok86/otter/v2 v2.3.0
-	github.com/onsi/ginkgo/v2 v2.32.0
-	github.com/onsi/gomega v1.42.1
+	github.com/onsi/ginkgo/v2 v2.32.2
+	github.com/onsi/gomega v1.43.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
-	github.com/stretchr/testify v1.11.1
-	golang.org/x/sys v0.47.0
-	golang.org/x/time v0.15.0
+	github.com/stretchr/testify v1.12.1
+	golang.org/x/sys v0.48.0
+	golang.org/x/time v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	charm.land/bubbles/v2 v2.1.1 // indirect
-	charm.land/bubbletea/v2 v2.0.8 // indirect
+	charm.land/bubbles/v2 v2.2.1 // indirect
+	charm.land/bubbletea/v2 v2.0.9 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
-	github.com/charmbracelet/ultraviolet v0.0.0-20260810092200-402eeaa30986 // indirect
-	github.com/charmbracelet/x/ansi v0.11.7 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260803091719-3755ebad01b1 // indirect
+	github.com/charmbracelet/ultraviolet v0.0.0-20260910203606-6c9e17dc7a16 // indirect
+	github.com/charmbracelet/x/ansi v0.11.8 // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260913004009-c615ff2f7805 // indirect
 	github.com/charmbracelet/x/exp/golden v0.0.0-20251106172358-54469c29c2bc // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
@@ -46,7 +46,6 @@ require (
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.1 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
@@ -54,11 +53,11 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/goccy/go-yaml v1.19.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20260802141513-ef3492d7dac3 // indirect
+	github.com/google/pprof v0.0.0-20260906184651-6331bc6350fe // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.3 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
-	github.com/mattn/go-runewidth v0.0.27 // indirect
+	github.com/mattn/go-runewidth v0.0.30 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
@@ -67,18 +66,17 @@ require (
 	github.com/muesli/mango-cobra v1.3.0 // indirect
 	github.com/muesli/mango-pflag v0.2.0 // indirect
 	github.com/muesli/roff v0.1.0 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.15.0 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
-	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
+	github.com/xo/terminfo v1.2.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 // indirect
-	golang.org/x/mod v0.38.0 // indirect
-	golang.org/x/net v0.57.0 // indirect
-	golang.org/x/sync v0.22.0 // indirect
-	golang.org/x/text v0.40.0 // indirect
-	golang.org/x/tools v0.48.0 // indirect
+	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba // indirect
+	golang.org/x/mod v0.41.0 // indirect
+	golang.org/x/net v0.59.0 // indirect
+	golang.org/x/sync v0.23.0 // indirect
+	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/tools v0.50.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
