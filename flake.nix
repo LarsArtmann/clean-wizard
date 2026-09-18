@@ -174,7 +174,7 @@
         };
 
       flake.overlays.default = final: _prev: {
-        clean-wizard = final.callPackage ./package.nix { };
+        clean-wizard = self.packages.${final.stdenv.system}.default;
       };
     };
 }
