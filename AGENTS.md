@@ -13,7 +13,7 @@ GOEXPERIMENT=jsonv2 go test ./... -short
 
 Or use the Nix devShell (`nix develop`) which sets it automatically.
 
-**Website CI gotcha:** pnpm 11.20 enforces a default 24h `minimumReleaseAge` supply-chain check in `pnpm install`. Dependency bumps whose regenerated lockfile pulls freshly-published transitive deps (e.g. rolldown for astro) fail CI with `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` — not a bug; re-run the jobs ~24h later.
+**Website CI gotcha:** pnpm 11.20 enforces a default 24h `minimumReleaseAge` supply-chain check in `pnpm install`. Dependency bumps whose regenerated lockfile pulls freshly-published transitive deps (e.g. rolldown for astro) fail CI with `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` — not a bug; re-run the jobs ~24h later. Related: build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:` (`esbuild: true`) — pnpm v11 ignores `pnpm.*` in `package.json`; a missing or placeholder entry makes `astro build` fail on a missing esbuild binary (cmdguard incident, fixed 2026-09-19).
 
 ## Target Machines
 
