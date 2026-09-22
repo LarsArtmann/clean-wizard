@@ -56,7 +56,7 @@
             ];
           };
 
-          clean-wizard = pkgs.buildGoModule {
+          clean-wizard = (pkgs.buildGoModule.override { go = pkgs.go_1_27; }) {
             pname = "clean-wizard";
             inherit
               version
