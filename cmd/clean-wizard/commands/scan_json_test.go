@@ -17,7 +17,7 @@ func TestBuildScanResultsRecordsStepErrors(t *testing.T) {
 	t.Parallel()
 
 	notAvailable := cleaner.NewNotAvailableError("cargo", "")
-	wr := &execution.WorkflowResult{
+	workflowResult := &execution.WorkflowResult{
 		Steps: []execution.StepResult{
 			{Name: "go", Clean: domain.CleanResult{ItemsRemoved: 2}, Err: nil, Duration: time.Second},
 			{Name: "cargo", Err: notAvailable, Duration: time.Second},
@@ -29,7 +29,7 @@ func TestBuildScanResultsRecordsStepErrors(t *testing.T) {
 		{Name: "Cargo", Type: CleanerTypeCargoPackages},
 	}
 
-	results := buildScanResults(wr, available)
+	results := buildScanResults(workflowResult, available)
 	require.Len(t, results, 2)
 
 	byName := make(map[string]ScanResult, len(results))
@@ -47,15 +47,15 @@ func captureStdout(t *testing.T, fn func()) string {
 
 	old := os.Stdout
 
-	r, w, err := os.Pipe()
+	r, stdoutW, err := os.Pipe()
 	require.NoError(t, err)
 
-	os.Stdout = w
+	os.Stdout = stdoutW
 
 	defer func() { os.Stdout = old }()
 
 	fn()
-	require.NoError(t, w.Close())
+	require.NoError(t, stdoutW.Close())
 
 	out, err := io.ReadAll(r)
 	require.NoError(t, err)

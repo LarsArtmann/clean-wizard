@@ -320,19 +320,19 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 		{
 			name:     "valid kB output",
 			output:   "Deleted Containers:\nabc123\ndef456\n\nDeleted Images:\nsha256:123\n\nTotal reclaimed space: 1.84kB",
-			expected: int64(1884),
+			expected: int64(1840),
 			wantErr:  false,
 		},
 		{
 			name:     "valid MB output",
 			output:   "Deleted Containers:\nabc123\n\nTotal reclaimed space: 13.5 MB",
-			expected: int64(13.5 * 1024 * 1024),
+			expected: int64(13500000),
 			wantErr:  false,
 		},
 		{
 			name:     "valid GB output",
 			output:   "Deleted Images:\nsha256:123\n\nTotal reclaimed space: 2.5GB",
-			expected: int64(2.5 * 1024 * 1024 * 1024),
+			expected: int64(2500000000),
 			wantErr:  false,
 		},
 		{
@@ -350,7 +350,7 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 		{
 			name:     "valid TB output",
 			output:   "Deleted Volumes:\nvol1\n\nTotal reclaimed space: 1.2TB",
-			expected: int64(1319413953331),
+			expected: int64(1200000000000),
 			wantErr:  false,
 		},
 		{
@@ -392,25 +392,25 @@ func TestParseDockerSize(t *testing.T) {
 		{
 			name:     "kilobytes",
 			sizeStr:  "1.84kB",
-			expected: int64(1884),
+			expected: int64(1840),
 			wantErr:  false,
 		},
 		{
 			name:     "megabytes",
 			sizeStr:  "13.5 MB",
-			expected: int64(13.5 * 1024 * 1024),
+			expected: int64(13500000),
 			wantErr:  false,
 		},
 		{
 			name:     "gigabytes",
 			sizeStr:  "2.5GB",
-			expected: int64(2.5 * 1024 * 1024 * 1024),
+			expected: int64(2500000000),
 			wantErr:  false,
 		},
 		{
 			name:     "terabytes",
 			sizeStr:  "1.2TB",
-			expected: int64(1319413953331),
+			expected: int64(1200000000000),
 			wantErr:  false,
 		},
 		{
