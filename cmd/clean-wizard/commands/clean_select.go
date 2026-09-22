@@ -1,17 +1,17 @@
 package commands
 
 import (
-	"errors"
 	"fmt"
 
 	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
-// Sentinel errors for clean_select.
+// Classified sentinel errors for clean_select.
 var (
-	ErrProfileNotFound   = errors.New("profile not found")
-	ErrProfileNoCleaners = errors.New("profile has no available cleaners")
+	ErrProfileNotFound   = errorfamily.NewRejection("clean.profile_not_found", "profile not found")
+	ErrProfileNoCleaners = errorfamily.NewRejection("clean.profile_no_cleaners", "profile has no available cleaners")
 )
 
 // destructiveCleaners are excluded from "standard" mode because they are
@@ -112,7 +112,7 @@ func selectCleanersInteractive(availableConfigs []CleanerConfig) ([]CleanerType,
 
 	err := form.Run()
 	if err != nil {
-		return nil, fmt.Errorf("form error: %w", err)
+		return nil, errorfamily.WrapRejection(err, "clean.select_form", "form error")
 	}
 
 	if len(selectedTypes) == 0 {
@@ -141,7 +141,7 @@ func confirmExecution(skipConfirmation, dryRun bool) (bool, error) {
 
 	err := confirmForm.Run()
 	if err != nil {
-		return false, fmt.Errorf("confirmation error: %w", err)
+		return false, errorfamily.WrapRejection(err, "clean.confirm", "confirmation error")
 	}
 
 	return confirm, nil
@@ -192,8 +192,7 @@ func getProfileCleaners(
 ) ([]CleanerType, error) {
 	profile, exists := cfg.Profiles[profileName]
 	if !exists {
-		//nolint:err113 // Dynamic error: profile name is dynamic
-		return nil, fmt.Errorf("profile %q not found", profileName)
+		return nil, fmt.Errorf("%w: %q", ErrProfileNotFound, profileName)
 	}
 
 	availableSet := make(map[CleanerType]bool)
@@ -221,8 +220,7 @@ func getProfileCleaners(
 	}
 
 	if len(cleaners) == 0 {
-		//nolint:err113 // Dynamic error: profile name is dynamic
-		return nil, fmt.Errorf("profile %q has no available cleaners", profileName)
+		return nil, fmt.Errorf("%w: %q", ErrProfileNoCleaners, profileName)
 	}
 
 	return cleaners, nil

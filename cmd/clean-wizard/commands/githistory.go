@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -13,15 +12,18 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
 
-// Sentinel errors for git history operations.
+// Classified sentinel errors for git history operations. Wraps that only add
+// context around these stay plain fmt.Errorf: classification flows through the
+// error chain, and an explicit family wrapper would override the sentinel's own.
 var (
-	ErrNoGitRepositoriesFound = errors.New("no git repositories found")
-	ErrGitNotAvailable        = errors.New("not a git repository or git not available")
-	ErrSafetyChecksFailed     = errors.New("safety checks failed")
-	ErrNotAGitRepository      = errors.New("not a git repository")
+	ErrNoGitRepositoriesFound = errorfamily.NewRejection("githistory.no_repositories", "no git repositories found")
+	ErrGitNotAvailable        = errorfamily.NewInfrastructure("githistory.git_not_available", "not a git repository or git not available")
+	ErrSafetyChecksFailed     = errorfamily.NewConflict("githistory.safety_checks_failed", "safety checks failed")
+	ErrNotAGitRepository      = errorfamily.NewRejection("githistory.not_a_git_repository", "not a git repository")
 )
 
 // NewGitHistoryCommand creates the git-history subcommand.
@@ -121,12 +123,12 @@ func runGitHistoryWizard(
 
 		repos, err = cleaner.FindGitRepositories(projectsPath, 3)
 		if err != nil {
-			return fmt.Errorf(
-				"failed to find repositories at basePath=%v, minSizeMB=%v, maxFiles=%v: %w",
+			return errorfamily.WrapRejectionf(
+				err, "githistory.find_repositories",
+				"failed to find repositories at basePath=%v, minSizeMB=%v, maxFiles=%v",
 				projectsPath,
 				minSizeMB,
 				maxFiles,
-				err,
 			)
 		}
 
@@ -163,12 +165,12 @@ func runGitHistoryWizard(
 
 			err := form.Run()
 			if err != nil {
-				return fmt.Errorf(
-					"repos=%v, minSizeMB=%v, maxFiles=%v: selection error: %w",
+				return errorfamily.WrapRejectionf(
+					err, "githistory.repo_select",
+					"repos=%v, minSizeMB=%v, maxFiles=%v: selection error",
 					repos,
 					minSizeMB,
 					maxFiles,
-					err,
 				)
 			}
 
@@ -357,7 +359,7 @@ func scanAndSelectFiles(
 
 	scanResult, err := c.GetScanResult(ctx)
 	if err != nil {
-		return nil, 0, fmt.Errorf("scan failed: %w", err)
+		return nil, 0, errorfamily.WrapTransient(err, "githistory.scan", "scan failed")
 	}
 
 	if len(scanResult.Files) == 0 {
@@ -378,7 +380,7 @@ func scanAndSelectFiles(
 
 	selectedFiles, err := selectFilesToClean(scanResult.Files, force)
 	if err != nil {
-		return nil, 0, fmt.Errorf("selection error: %w", err)
+		return nil, 0, errorfamily.WrapRejection(err, "githistory.scan_select", "selection error")
 	}
 
 	if len(selectedFiles) == 0 {
@@ -493,7 +495,7 @@ func selectFilesToClean(
 
 	err := form.Run()
 	if err != nil {
-		return nil, fmt.Errorf("file selection form failed: %w", err)
+		return nil, errorfamily.WrapRejection(err, "githistory.file_select", "file selection form failed")
 	}
 
 	// Collect selected files
@@ -591,7 +593,7 @@ func ScanRepoForDisplay(ctx context.Context, repoPath string, minSizeMB int) (*S
 
 	scanResult, err := c.GetScanResult(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("scan failed: %w", err)
+		return nil, errorfamily.WrapTransient(err, "githistory.scan", "scan failed")
 	}
 
 	repoSize := c.GetStoreSize(ctx)

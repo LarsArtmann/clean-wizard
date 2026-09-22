@@ -10,6 +10,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
 
@@ -90,7 +91,7 @@ func showConfigJSON(cfg *domain.Config) error {
 	// Use proper JSON marshaling for complete output
 	jsonBytes, err := json.Marshal(cfg, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	if err != nil {
-		return fmt.Errorf("failed to marshal configuration to JSON: %w", err)
+		return errorfamily.WrapCorruption(err, "config.json_marshal", "failed to marshal configuration to JSON")
 	}
 
 	fmt.Println(string(jsonBytes))
@@ -123,7 +124,7 @@ func runConfigEditCommand(_ *cobra.Command, _ []string) error {
 
 		err := config.Save(cfg)
 		if err != nil {
-			return fmt.Errorf("failed to create configuration: %w", err)
+			return errorfamily.WrapRejection(err, "config.create", "failed to create configuration")
 		}
 
 		fmt.Println("✅ Configuration created.")
@@ -191,7 +192,7 @@ func runConfigValidateCommand(_ *cobra.Command, _ []string, _ string) error {
 		fmt.Println("💡 To create a valid configuration:")
 		fmt.Println("   clean-wizard init --minimal")
 
-		return err
+		return errorfamily.WrapRejection(err, "config.load", "configuration validation could not load the config")
 	}
 
 	fmt.Println("✅ Configuration is valid!")
@@ -244,7 +245,7 @@ func runConfigResetCommand(_ *cobra.Command, _ []string, force bool) error {
 
 	// Save configuration
 	if err := config.Save(cfg); err != nil {
-		return fmt.Errorf("failed to save configuration: %w", err)
+		return errorfamily.WrapRejection(err, "config.save", "failed to save configuration")
 	}
 
 	fmt.Println("✅ Configuration reset to defaults!")
@@ -264,7 +265,7 @@ func loadConfigFromPath(configPath string) (*domain.Config, error) {
 	if configPath != "" {
 		cfg, err := config.LoadFromPath(configPath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to load config from %s: %w", configPath, err)
+			return nil, errorfamily.WrapRejectionf(err, "config.load_from_path", "failed to load config from %s", configPath)
 		}
 
 		return cfg, nil
@@ -272,7 +273,7 @@ func loadConfigFromPath(configPath string) (*domain.Config, error) {
 
 	cfg, err := config.Load()
 	if err != nil {
-		return nil, fmt.Errorf("failed to load config: %w", err)
+		return nil, errorfamily.WrapRejection(err, "config.load", "failed to load config")
 	}
 
 	return cfg, nil

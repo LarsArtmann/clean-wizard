@@ -6,6 +6,7 @@ import (
 	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
 
@@ -76,7 +77,7 @@ func runInitCommand(force, minimal bool) error {
 
 		err := confirmForm.Run()
 		if err != nil {
-			return fmt.Errorf("confirmation error: %w", err)
+			return errorfamily.WrapRejection(err, "init.confirm_overwrite", "confirmation error")
 		}
 
 		if !overwrite {
@@ -106,7 +107,7 @@ func createMinimalConfig() error {
 
 	err := config.Save(cfg)
 	if err != nil {
-		return fmt.Errorf("failed to save configuration: %w", err)
+		return errorfamily.WrapRejection(err, "init.config_save", "failed to save configuration")
 	}
 
 	fmt.Println()
@@ -144,7 +145,7 @@ func createInteractiveConfig() error {
 	}
 
 	if err := config.Save(cfg); err != nil {
-		return fmt.Errorf("failed to save configuration: %w", err)
+		return errorfamily.WrapRejection(err, "init.config_save", "failed to save configuration")
 	}
 
 	printConfigSuccess(cfg)
@@ -177,7 +178,10 @@ func selectSetupMode() (string, error) {
 	)
 
 	if err := modeForm.Run(); err != nil {
-		return "", fmt.Errorf("setup mode selection error for setupMode=%v: %w", setupMode, err)
+		return "", errorfamily.WrapRejectionf(
+			err, "init.setup_mode_select",
+			"setup mode selection error for setupMode=%v", setupMode,
+		)
 	}
 
 	return setupMode, nil
@@ -216,7 +220,10 @@ func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) 
 	)
 
 	if err := cleanerForm.Run(); err != nil {
-		return nil, fmt.Errorf("cleaner selection error for setupMode=%v: %w", setupMode, err)
+		return nil, errorfamily.WrapRejectionf(
+			err, "init.cleaner_select",
+			"cleaner selection error for setupMode=%v", setupMode,
+		)
 	}
 
 	if opts.includeDocker {
@@ -230,10 +237,10 @@ func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) 
 			&includeDockerWarning,
 		).Run()
 		if err != nil {
-			return nil, fmt.Errorf(
-				"docker warning error for includeDockerWarning=%v: %w",
+			return nil, errorfamily.WrapRejectionf(
+				err, "init.docker_warning",
+				"docker warning error for includeDockerWarning=%v",
 				includeDockerWarning,
-				err,
 			)
 		}
 
@@ -280,7 +287,7 @@ func configureSafeMode(cfg *domain.Config) error {
 		"No, disable safe mode",
 		&safeMode,
 	).Run(); err != nil {
-		return fmt.Errorf("safe mode selection error: %w", err)
+		return errorfamily.WrapRejection(err, "init.safe_mode_select", "safe mode selection error")
 	}
 
 	cfg.SafeMode = domain.SafeModeEnabled
