@@ -478,28 +478,6 @@ func (c *CleanCounters) RecordFailure(verbose bool, label any, err error) {
 	}
 }
 
-// ParseNumberAndUnit parses a size string like "2.5GB" into a number and unit.
-// This consolidates the common fmt.Sscanf pattern used in multiple cleaners.
-func ParseNumberAndUnit(sizeStr string) (float64, string, error) {
-	sizeStr = strings.TrimSpace(sizeStr)
-
-	var (
-		number float64
-		unit   string
-	)
-
-	if _, err := fmt.Sscanf(sizeStr, "%f%s", &number, &unit); err != nil {
-		return 0, "", fmt.Errorf(
-			"invalid size format: %s for unit=%v, number=%v",
-			sizeStr,
-			unit,
-			number,
-		)
-	}
-
-	return number, unit, nil
-}
-
 // NormalizePaths normalizes a slice of paths using filepath.Clean.
 // This consolidates the common path normalization pattern used in multiple cleaners.
 func NormalizePaths(paths []string) []string {

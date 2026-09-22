@@ -66,27 +66,4 @@ func init() {
 			return errorfamily.Transient, false
 		}
 	})
-
-	// Register user-facing message templates for key error codes. These power
-	// errorfamily.HandleError's What/Why/Fix/WayOut output at the CLI boundary.
-	errorfamily.RegisterTemplate("cleaner.not_available", errorfamily.MessageTemplate{
-		What:   "A cleaner could not run because its prerequisite is not installed.",
-		Why:    "The system does not have the required tool or runtime for this cleaner.",
-		Fix:    "Install the missing tool (e.g. 'brew install nix', 'apt install docker.io').",
-		WayOut: "Run 'clean-wizard scan' to see which cleaners are available on this system.",
-	})
-
-	errorfamily.RegisterTemplate("cleaner.not_found", errorfamily.MessageTemplate{
-		What:   "The requested cleaner does not exist in the registry.",
-		Why:    "The cleaner name was not registered during startup.",
-		Fix:    "Check the cleaner name spelling or run 'clean-wizard scan' to list available cleaners.",
-		WayOut: "Use 'clean-wizard clean --help' to see all available options.",
-	})
-
-	errorfamily.RegisterTemplate("validation.rejected", errorfamily.MessageTemplate{
-		What:   "A configuration or input validation error occurred.",
-		Why:    "The provided settings or configuration file contain invalid values.",
-		Fix:    "Review the error message for the specific field and correct the value.",
-		WayOut: "Run 'clean-wizard init' to generate a fresh configuration file.",
-	})
 }

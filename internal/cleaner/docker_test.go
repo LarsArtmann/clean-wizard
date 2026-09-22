@@ -448,9 +448,10 @@ func TestParseDockerSize(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:    "missing unit",
-			sizeStr: "1.5",
-			wantErr: true,
+			name:     "unit-less number treated as bytes",
+			sizeStr:  "1.5",
+			expected: 1,
+			wantErr:  false,
 		},
 	}
 

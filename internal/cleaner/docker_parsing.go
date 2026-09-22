@@ -3,6 +3,8 @@ package cleaner
 import (
 	"fmt"
 	"strings"
+
+	"github.com/dustin/go-humanize"
 )
 
 const (
@@ -33,34 +35,19 @@ func ParseDockerReclaimedSpace(output string) (int64, error) {
 	return 0, nil // No space found (0 is valid)
 }
 
-// sizeMultiplier converts Docker size unit strings to byte multipliers.
-var sizeMultiplier = map[string]int64{ //nolint:gochecknoglobals
-	"b":  1,
-	"kb": bytesPerKB,
-	"mb": bytesPerMB,
-	"gb": bytesPerGB,
-	"tb": bytesPerTB,
-}
-
-// ParseDockerSize converts Docker size string to bytes.
-// Supports units: B, kB, MB, GB, TB (case-insensitive).
+// ParseDockerSize converts a Docker size string (e.g. "2.5GB", "100MB", "1.84kB", "0B") to bytes.
+// Unit parsing is delegated to humanize.ParseBytes, which natively handles all
+// SI and IEC unit suffixes (case-insensitive); a number without a unit is treated as bytes.
 func ParseDockerSize(sizeStr string) (int64, error) {
-	// Handle "0B" case or empty string
-	if sizeStr == "0B" || sizeStr == "0" || sizeStr == "" {
+	// Empty string means nothing to parse; Docker reports zero as "0B" (handled by humanize).
+	if sizeStr == "" {
 		return 0, nil
 	}
 
-	// Parse number and unit using shared helper
-	number, unit, err := ParseNumberAndUnit(sizeStr)
+	parsed, err := humanize.ParseBytes(sizeStr)
 	if err != nil {
-		return 0, fmt.Errorf("invalid size format: %s", sizeStr)
+		return 0, fmt.Errorf("invalid size format %q: %w", sizeStr, err)
 	}
 
-	// Convert to bytes based on unit
-	multiplier, ok := sizeMultiplier[strings.ToLower(unit)]
-	if !ok {
-		return 0, fmt.Errorf("unknown size unit: %s", unit)
-	}
-
-	return int64(number * float64(multiplier)), nil
+	return int64(parsed), nil
 }

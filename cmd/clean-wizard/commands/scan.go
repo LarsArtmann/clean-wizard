@@ -136,9 +136,8 @@ func runScanCommand(
 
 	if jsonOutput {
 		totalCleanable, totalItems := computeScanTotals(scanResults)
-		outputScanJSON(scanResults, totalCleanable, totalItems)
 
-		return nil
+		return outputScanJSON(scanResults, totalCleanable, totalItems)
 	}
 
 	printScanSummary(ctx, registry, scanResults)
@@ -207,9 +206,13 @@ func buildScanResults(wr *execution.WorkflowResult, available []CleanerConfig) [
 		}
 
 		regName := getRegistryName(cfg.Type)
-		if step, ok := stepByName[regName]; ok && step.Err == nil {
-			sr.ItemsCount = step.Clean.ItemsRemoved
-			sr.BytesCleanable = step.Clean.FreedBytes
+		if step, ok := stepByName[regName]; ok {
+			if step.Err == nil {
+				sr.ItemsCount = step.Clean.ItemsRemoved
+				sr.BytesCleanable = step.Clean.FreedBytes
+			} else {
+				sr.Err = step.Err
+			}
 		}
 
 		results = append(results, sr)
@@ -226,6 +229,9 @@ type ScanResult struct {
 	BytesCleanable uint64
 	Description    string
 	Icon           string
+	// Err carries the workflow step error (if any) so JSON output can enrich
+	// the result with family/code/retryable classification.
+	Err error
 }
 
 func getRegistryName(cleanerType CleanerType) string {
@@ -270,13 +276,18 @@ func printScanTable(results []ScanResult, _ bool) {
 	fmt.Println(t)
 }
 
-// outputScanJSON outputs scan results in JSON format.
-func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
+// outputScanJSON outputs scan results in JSON format. Per-result error
+// classification (family/code/retryable) mirrors the clean command's JSON schema.
+func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) error {
 	type scanJSONResult struct {
 		Name      string `json:"name"`
 		Items     uint   `json:"items"`
 		Bytes     uint64 `json:"bytes"`
 		Available bool   `json:"available"`
+		Error     string `json:"error,omitempty"`
+		Family    string `json:"family,omitempty"`
+		Code      string `json:"code,omitempty"`
+		Retryable bool   `json:"retryable,omitempty"`
 	}
 
 	type scanJSONSummary struct {
@@ -291,12 +302,22 @@ func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
 
 	jsonResults := make([]scanJSONResult, 0, len(results))
 	for _, r := range results {
-		jsonResults = append(jsonResults, scanJSONResult{
+		jr := scanJSONResult{
 			Name:      r.Name,
 			Items:     r.ItemsCount,
 			Bytes:     r.BytesCleanable,
 			Available: r.Available == CleanerAvailabilityAvailable,
-		})
+		}
+
+		if r.Err != nil {
+			family := errorfamily.Classify(r.Err)
+			jr.Error = r.Err.Error()
+			jr.Family = family.String()
+			jr.Code = errorfamily.Code(r.Err)
+			jr.Retryable = family.IsRetryable()
+		}
+
+		jsonResults = append(jsonResults, jr)
 	}
 
 	output := scanJSONOutput{
@@ -309,10 +330,10 @@ func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) {
 
 	jsonBytes, err := json.Marshal(output, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	if err != nil {
-		fmt.Printf("{\"error\": %q}\n", err.Error())
-
-		return
+		return errorfamily.WrapCorruption(err, "scan.json_output", "failed to generate scan JSON output")
 	}
 
 	fmt.Println(string(jsonBytes))
+
+	return nil
 }
