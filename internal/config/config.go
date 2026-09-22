@@ -261,37 +261,71 @@ func GetCurrentTime() time.Time {
 	return time.Now()
 }
 
+// operationRawValue navigates the koanf maps to the raw value of a field inside
+// profiles.<name>.operations.<index>.<field>. koanf does not flatten into slices,
+// so path-style lookups like "operations.0.settings" never resolve; the traversal
+// into the operations array must be done by hand.
+func operationRawValue(k *koanf.Koanf, profileName string, operationIndex int, field string) any {
+	profiles, ok := k.Get("profiles").(map[string]any)
+	if !ok {
+		return nil
+	}
+
+	profile, ok := profiles[profileName].(map[string]any)
+	if !ok {
+		return nil
+	}
+
+	operations, ok := profile["operations"].([]any)
+	if !ok || operationIndex < 0 || operationIndex >= len(operations) {
+		return nil
+	}
+
+	operation, ok := operations[operationIndex].(map[string]any)
+	if !ok {
+		return nil
+	}
+
+	return operation[field]
+}
+
 // parseRiskLevel extracts and converts risk level string from koanf to domain enum.
 func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) domain.RiskLevelType {
-	key := fmt.Sprintf("profiles.%s.operations.%d.risk_level", profileName, operationIndex)
+	switch raw := operationRawValue(k, profileName, operationIndex, "risk_level").(type) {
+	case string:
+		if raw == "" {
+			logger.Warn("No risk level found, defaulting to LOW",
+				"profile", profileName,
+				"operation", operationIndex)
 
-	riskLevelStr := k.String(key)
-	if riskLevelStr == "" {
-		logger.Warn("No risk level found, defaulting to LOW",
-			"profile", profileName,
-			"operation", operationIndex)
+			return domain.RiskLevelLowType
+		}
 
-		return domain.RiskLevelLowType
+		switch strings.ToUpper(raw) {
+		case "LOW":
+			return domain.RiskLevelLowType
+		case "MEDIUM":
+			return domain.RiskLevelMediumType
+		case "HIGH":
+			return domain.RiskLevelHighType
+		case "CRITICAL":
+			return domain.RiskLevelCriticalType
+		}
+	case int:
+		if raw >= 0 && raw <= int(domain.RiskLevelCriticalType) {
+			return domain.RiskLevelType(raw)
+		}
 	}
 
-	switch strings.ToUpper(riskLevelStr) {
-	case "LOW":
-		return domain.RiskLevelLowType
-	case "MEDIUM":
-		return domain.RiskLevelMediumType
-	case "HIGH":
-		return domain.RiskLevelHighType
-	case "CRITICAL":
-		return domain.RiskLevelCriticalType
-	default:
-		logger.Warn("Invalid risk level, defaulting to LOW", "risk_level", riskLevelStr)
+	logger.Warn("Invalid risk level, defaulting to LOW",
+		"profile", profileName,
+		"operation", operationIndex)
 
-		return domain.RiskLevelLowType
-	}
+	return domain.RiskLevelLowType
 }
 
 // unmarshalOperationSettings extracts operation settings from koanf and populates the operation.
-// The settings subtree is re-encoded as YAML and decoded through the domain types so that
+// The raw settings map is re-encoded as YAML and decoded through the domain types so that
 // type-safe enums (which accept both integer and string forms) are parsed by their
 // yaml.UnmarshalYAML hooks instead of being silently dropped by koanf's field-name matching.
 func unmarshalOperationSettings(
@@ -300,9 +334,7 @@ func unmarshalOperationSettings(
 	operationIndex int,
 	op *domain.CleanupOperation,
 ) {
-	settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", profileName, operationIndex)
-
-	raw := k.Get(settingsKey)
+	raw := operationRawValue(k, profileName, operationIndex, "settings")
 	if raw == nil {
 		logger.Debug("No settings map found")
 
