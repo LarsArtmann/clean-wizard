@@ -15,6 +15,7 @@ import (
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 	errorfamily "github.com/larsartmann/go-error-family"
+	yamlv3 "gopkg.in/yaml.v3"
 )
 
 // ErrConfigShouldUnmarshal is returned when the config file was read successfully
@@ -290,6 +291,9 @@ func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) doma
 }
 
 // unmarshalOperationSettings extracts operation settings from koanf and populates the operation.
+// The settings subtree is re-encoded as YAML and decoded through the domain types so that
+// type-safe enums (which accept both integer and string forms) are parsed by their
+// yaml.UnmarshalYAML hooks instead of being silently dropped by koanf's field-name matching.
 func unmarshalOperationSettings(
 	k *koanf.Koanf,
 	profileName string,
@@ -298,27 +302,34 @@ func unmarshalOperationSettings(
 ) {
 	settingsKey := fmt.Sprintf("profiles.%s.operations.%d.settings", profileName, operationIndex)
 
-	if !k.Exists(settingsKey) {
+	raw := k.Get(settingsKey)
+	if raw == nil {
 		logger.Debug("No settings map found")
 
 		return
 	}
 
-	// Check if nix_generations settings exist
-	nixGenKey := settingsKey + ".nix_generations"
-	if k.Exists(nixGenKey) {
-		nixGenSettings := &domain.NixGenerationsSettings{} //nolint:exhaustruct
+	settingsYAML, err := yamlv3.Marshal(raw)
+	if err != nil {
+		logger.Error("Failed to encode operation settings",
+			"error", err,
+			"profile", profileName,
+			"operation_index", operationIndex)
 
-		err := k.Unmarshal(nixGenKey, nixGenSettings)
-		if err == nil {
-			op.Settings = &domain.OperationSettings{} //nolint:exhaustruct
-			op.Settings.NixGenerations = nixGenSettings
-		} else {
-			logger.Error("Failed to unmarshal nix_generations settings", "error", err)
-		}
-	} else {
-		logger.Debug("No nix_generations settings found")
+		return
 	}
+
+	settings := &domain.OperationSettings{} //nolint:exhaustruct
+	if err := yamlv3.Unmarshal(settingsYAML, settings); err != nil {
+		logger.Error("Failed to unmarshal operation settings",
+			"error", err,
+			"profile", profileName,
+			"operation_index", operationIndex)
+
+		return
+	}
+
+	op.Settings = settings
 }
 
 // newCleanupOperation creates a cleanup operation with the specified parameters.
