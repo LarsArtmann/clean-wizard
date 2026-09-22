@@ -6,6 +6,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
 
@@ -210,7 +211,7 @@ func runProfileCreateCommand(_ *cobra.Command, _ []string, name, description str
 
 	// Save configuration
 	if err := config.Save(cfg); err != nil {
-		return fmt.Errorf("failed to save configuration for description=%v: %w", description, err)
+		return errorfamily.WrapRejectionf(err, "profile.config_save", "failed to save configuration for description=%v", description)
 	}
 
 	fmt.Printf("✅ Profile '%s' created successfully!\n", name)
@@ -280,7 +281,7 @@ func runProfileDeleteCommand(_ *cobra.Command, args []string, force bool) error 
 
 	// Save configuration
 	if err := config.Save(cfg); err != nil {
-		return fmt.Errorf("failed to save configuration: %w", err)
+		return errorfamily.WrapRejection(err, "profile.config_save", "failed to save configuration")
 	}
 
 	fmt.Printf("✅ Profile '%s' deleted successfully!\n", profileName)

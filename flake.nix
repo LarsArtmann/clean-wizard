@@ -132,7 +132,7 @@
               inputsFrom = [ config.packages.default ];
 
               packages = with pkgs; [
-                go
+                go_1_27
                 gopls
                 golangci-lint
                 gotools
@@ -155,7 +155,7 @@
 
             ci = pkgs.mkShellNoCC {
               packages = with pkgs; [
-                go
+                go_1_27
                 golangci-lint
                 jq
               ];
