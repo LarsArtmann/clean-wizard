@@ -2,7 +2,6 @@ package format
 
 import (
 	"encoding/json/v2"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -38,7 +37,7 @@ func TestScanOutcomesToSARIFCleanableFinding(t *testing.T) {
 	result := results[0]
 	assert.Equal(t, "nix", result["ruleId"])
 	assert.Equal(t, "note", result["level"])
-	assert.Contains(t, fmt.Sprint(messageText(t, result)), "12 items")
+	assert.Contains(t, messageText(t, result), "12 items")
 
 	props := properties(t, result)
 	assert.Equal(t, "unused", props["go-finding/category"])
@@ -72,7 +71,7 @@ func TestScanOutcomesToSARIFFailureFinding(t *testing.T) {
 	result := results[0]
 	assert.Equal(t, "cargo", result["ruleId"])
 	assert.Equal(t, "error", result["level"])
-	assert.Equal(t, "du command failed", messageText(t, result))
+	assert.Equal(t, "[transient:scan.exec] du command failed", messageText(t, result))
 
 	props := properties(t, result)
 	assert.Equal(t, "transient", props["go-finding/meta/family"])

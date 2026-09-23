@@ -36,6 +36,8 @@ func TestOutputScanSARIFProducesEnvelope(t *testing.T) {
 }
 
 func TestRunScanCommandRejectsConflictingOutputFlags(t *testing.T) {
+	t.Parallel()
+
 	err := runScanCommand(false, "", true, true, "", 3, "", 0)
 	require.Error(t, err)
 
