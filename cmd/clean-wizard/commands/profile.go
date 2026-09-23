@@ -65,7 +65,7 @@ func NewProfileShowCommand() *cobra.Command {
 		Use:   "show [profile]",
 		Short: "Show profile details",
 		Long:  `Show detailed information about a specific profile.`,
-		Args:  cobra.ExactArgs(1),
+		Args:  exactArgsClassified(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runProfileShowCommand(cmd, args, detailed)
 		},
@@ -230,7 +230,7 @@ func NewProfileDeleteCommand() *cobra.Command {
 		Use:   "delete [profile]",
 		Short: "Delete a profile",
 		Long:  `Delete a cleaning profile.`,
-		Args:  cobra.ExactArgs(1),
+		Args:  exactArgsClassified(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runProfileDeleteCommand(cmd, args, force)
 		},
