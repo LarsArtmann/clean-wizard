@@ -69,7 +69,7 @@ func MigrateConfigFile(
 	opts MigrateOptions,
 ) (MigrationReport, error) {
 	if err := ctx.Err(); err != nil {
-		return MigrationReport{}, err
+		return MigrationReport{}, errorfamily.WrapTransient(err, "config.migrate", "context canceled before migration")
 	}
 
 	if _, err := os.Stat(configPath); err != nil {
@@ -97,7 +97,7 @@ func MigrateConfigFile(
 			"configuration format "+from.String()+" is newer than this binary supports ("+CurrentFormatVersion.String()+"); upgrade clean-wizard",
 		)
 	case from.Compare(CurrentFormatVersion) == 0:
-		return MigrationReport{AlreadyCurrent: true}, nil
+		return MigrationReport{AlreadyCurrent: true}, nil //nolint:exhaustruct
 	}
 
 	plan, err := PlanMigration(from)
@@ -111,7 +111,7 @@ func MigrateConfigFile(
 	}
 
 	if opts.Confirm != nil && !opts.Confirm(preview) {
-		return MigrationReport{}, ErrMigrationAborted
+		return MigrationReport{}, ErrMigrationAborted //nolint:exhaustruct
 	}
 
 	return applyMigration(configPath, config, plan, preview, opts)
@@ -143,13 +143,13 @@ func CheckConfigVersion(config *types.Config) error {
 }
 
 func loadConfigForMigration(ctx context.Context, configPath string) (*types.Config, error) {
-	k := setupKoanf()
+	koanfConfig := setupKoanf()
 
 	// A non-error return means the file is missing and defaults were
 	// substituted — there is nothing on disk to migrate.
-	if _, err := readConfigFileFromPath(ctx, k, configPath); err != nil {
+	if _, err := readConfigFileFromPath(ctx, koanfConfig, configPath); err != nil {
 		if errors.Is(err, ErrConfigShouldUnmarshal) {
-			return parseConfig(k)
+			return parseConfig(koanfConfig)
 		}
 
 		return nil, err
@@ -209,7 +209,7 @@ func applyMigration(
 			)
 		}
 
-		return MigrationReport{}, errorfamily.WrapCorruption(cause, "config.migrate", message)
+		return MigrationReport{}, errorfamily.WrapCorruption(cause, "config.migrate", message) //nolint:exhaustruct
 	}
 
 	if _, err := ApplyMigrations(config, plan); err != nil {
@@ -273,8 +273,8 @@ func cloneConfig(config *types.Config) (*types.Config, error) {
 		)
 	}
 
-	clone := &types.Config{}
-	if err := yamlv3.Unmarshal(data, clone); err != nil {
+	clone := &types.Config{} //nolint:exhaustruct
+	if err := yamlv3.Unmarshal(data, clone); err != nil { //nolint:musttag // types.Config carries yaml tags
 		return nil, errorfamily.WrapCorruption(
 			err,
 			"config.migrate",

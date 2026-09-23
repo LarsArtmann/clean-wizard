@@ -31,7 +31,7 @@ func (m Migration) Step() string {
 // migrations is the append-only chain of format migrations. It is a var so
 // tests can register synthetic migrations; production code appends new steps
 // here when a format change ships.
-var migrations = []Migration{}
+var migrations = []Migration{} //nolint:gochecknoglobals
 
 // Migrations returns the registered migration chain in registration order.
 func Migrations() []Migration {
@@ -39,7 +39,8 @@ func Migrations() []Migration {
 }
 
 // PlanMigration returns the migration steps that bring a configuration from
-// from up to CurrentFormatVersion, or an error when no chain covers that path.
+// the given version up to CurrentFormatVersion, or an error when no chain
+// covers that path.
 func PlanMigration(from FormatVersion) ([]Migration, error) {
 	plan := []Migration{}
 
@@ -66,7 +67,7 @@ func findMigration(from FormatVersion) (Migration, bool) {
 		}
 	}
 
-	return Migration{}, false
+	return Migration{}, false //nolint:exhaustruct
 }
 
 // MigrationRecord captures what one migration step changed.
@@ -108,16 +109,24 @@ func ApplyMigrations(target *types.Config, plan []Migration) ([]MigrationRecord,
 	return records, nil
 }
 
+// Flatten field keys shared with the YAML writer; kept as constants so the
+// migration diff keys can never drift from the on-disk field names.
+const (
+	versionKey   = "version"
+	safeModeKey  = "safe_mode"
+	profilesRoot = "profiles"
+)
+
 // flattenConfig renders the configuration as a flat string map so the SDK's
 // diff engine can report what a migration changed. Keys are stable dotted
 // paths; map iteration order is normalized by sorting profile names.
 func flattenConfig(config *types.Config) map[string]string {
 	flat := map[string]string{
-		"version":                config.Version,
-		"safe_mode":              config.SafeMode.String(),
+		versionKey:               config.Version,
+		safeModeKey:              config.SafeMode.String(),
 		"max_disk_usage_percent": strconv.Itoa(config.MaxDiskUsage),
 		"current_profile":        config.CurrentProfile,
-		"protected":              strings.Join(config.Protected, "|"),
+		protectedField:           strings.Join(config.Protected, "|"),
 		"last_clean":             config.LastClean.String(),
 		"updated":                config.Updated.String(),
 	}
@@ -131,7 +140,7 @@ func flattenConfig(config *types.Config) map[string]string {
 
 	for _, name := range profileNames {
 		profile := config.Profiles[name]
-		prefix := "profiles." + name
+		prefix := profilesRoot + "." + name
 
 		flat[prefix+".description"] = profile.Description
 		flat[prefix+".enabled"] = profile.Enabled.String()
@@ -145,7 +154,7 @@ func flattenConfig(config *types.Config) map[string]string {
 			flat[operationPrefix+".enabled"] = operation.Enabled.String()
 
 			if operation.Settings != nil {
-				settingsYAML, err := yamlv3.Marshal(operation.Settings)
+				settingsYAML, err := yamlv3.Marshal(operation.Settings) //nolint:musttag // OperationSettings carries yaml tags
 				if err == nil {
 					flat[operationPrefix+".settings"] = string(settingsYAML)
 				}

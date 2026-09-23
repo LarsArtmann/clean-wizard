@@ -174,18 +174,19 @@ func TestApplyMigrations(t *testing.T) { //nolint:paralleltest
 				From: FormatVersion{1, 0, 0}, To: FormatVersion{1, 1, 0},
 				Description: "explode",
 				Apply: func(*types.Config) error {
-					return errors.New("boom")
+					return errExplode
 				},
 			},
 		)
 
 		config := migrationTestConfig("1.0.0")
+
 		_, err := ApplyMigrations(config, Migrations())
 		if err == nil {
 			t.Fatal("ApplyMigrations expected error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "boom") {
+		if !strings.Contains(err.Error(), "transform exploded") {
 			t.Errorf("error = %v, want the cause to be preserved", err)
 		}
 	})

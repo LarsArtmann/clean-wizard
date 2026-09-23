@@ -38,8 +38,8 @@ func ParseFormatVersion(raw string) (FormatVersion, error) {
 		)
 	}
 
-	nums := make([]int, len(parts))
-	for i, part := range parts {
+	nums := make([]int, 0, len(parts))
+	for _, part := range parts {
 		parsed, err := strconv.Atoi(part)
 		if err != nil || parsed < 0 {
 			return FormatVersion{}, errorfamily.NewRejection(
@@ -48,7 +48,7 @@ func ParseFormatVersion(raw string) (FormatVersion, error) {
 			)
 		}
 
-		nums[i] = parsed
+		nums = append(nums, parsed)
 	}
 
 	return FormatVersion{Major: nums[0], Minor: nums[1], Patch: nums[2]}, nil
