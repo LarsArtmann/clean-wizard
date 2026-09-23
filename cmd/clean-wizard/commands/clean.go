@@ -142,7 +142,7 @@ func runCleanCommand(
 	container, cleanup := di.New()
 	defer cleanup()
 
-	settings := di.RunSettings{Verbose: verbose, DryRun: dryRun, MaxConcurrency: concurrency}
+	settings := di.RunSettings{Verbose: verbose, DryRun: dryRun, MaxConcurrency: concurrency, Profile: profile}
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
 		return errorfamily.WrapRejection(err, "clean.di_register", "failed to register DI services")
 	}

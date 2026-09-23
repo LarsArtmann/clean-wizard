@@ -90,7 +90,7 @@ func runScanCommand(
 	container, cleanup := di.New()
 	defer cleanup()
 
-	settings := di.RunSettings{Verbose: verbose, DryRun: false, MaxConcurrency: concurrency}
+	settings := di.RunSettings{Verbose: verbose, DryRun: false, MaxConcurrency: concurrency, Profile: profile}
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
 		return errorfamily.WrapRejection(err, "scan.di_register", "failed to register DI services")
 	}
