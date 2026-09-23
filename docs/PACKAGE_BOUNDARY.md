@@ -14,7 +14,13 @@ This document clarifies the intended boundary between `internal/config` and the 
 | Package  | Responsibility                                   | Imports                         |
 | -------- | ------------------------------------------------ | ------------------------------- |
 | `domain` | Pure data structures, enums, validation logic    | Standard library only           |
-| `config` | Configuration loading, persistence, sanitization | `domain`, `viper`, `pkg/errors` |
+| `config` | Configuration loading, persistence, sanitization | `domain`, `koanf`, `go-error-family`, `go-business-rules` |
+
+> **2026-09-23:** Config validation is expressed as declarative
+> `go-business-rules` rules (`internal/config/validation_rules.go`) with
+> 4-level severity (`SeverityCritical` added to `operations.ValidationSeverity`,
+> still stdlib-only in domain). See
+> [planning/2026-09-23_go-business-rules-integration.md](planning/2026-09-23_go-business-rules-integration.md).
 
 ## Design Principles
 
