@@ -14,11 +14,8 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// Byte conversion constants.
-const (
-	bytesPerMB = 1024 * 1024
-	bytesPerGB = 1024 * 1024 * 1024
-)
+// Byte conversion constants come from the shared cleaner core
+// (cleaner.BytesPerMB / cleaner.BytesPerGB).
 
 const (
 	// NixMockStoreSizeGB is the mock store size in GB for unavailable Nix.
@@ -26,7 +23,7 @@ const (
 	// NixMaxGenerationsToKeep is the maximum allowed generations to keep.
 	NixMaxGenerationsToKeep = 10
 	// NixDryRunBytesPerGeneration is the estimated bytes freed per generation in dry-run mode.
-	NixDryRunBytesPerGeneration = 50 * bytesPerMB
+	NixDryRunBytesPerGeneration = 50 * cleaner.BytesPerMB
 
 	// Mock generation IDs for testing when Nix is unavailable.
 	mockGenerationIDCurrent = 300
@@ -129,7 +126,7 @@ func (nc *NixCleaner) Clean(ctx context.Context) result.Result[types.CleanResult
 // GetStoreSize gets Nix store size with type safety.
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 	if !nc.store.IsAvailable(ctx) {
-		return int64(NixMockStoreSizeGB * bytesPerGB)
+		return int64(NixMockStoreSizeGB * cleaner.BytesPerGB)
 	}
 
 	storeSizeResult := nc.store.GetStoreSize(ctx)

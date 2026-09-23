@@ -76,38 +76,22 @@ func WithOperationSettings(
 
 // BoolToSafeMode converts boolean to SafeMode enum (standardized across tests).
 func BoolToSafeMode(b bool) enums.SafeMode {
-	if b {
-		return enums.SafeModeEnabled
-	}
-
-	return enums.SafeModeDisabled
+	return enums.SafeModeFromBool(b)
 }
 
 // BoolToProfileStatus converts boolean to ProfileStatus enum (standardized across tests).
 func BoolToProfileStatus(b bool) enums.ProfileStatus {
-	if b {
-		return enums.ProfileStatusEnabled
-	}
-
-	return enums.ProfileStatusDisabled
+	return enums.ProfileStatusFromBool(b)
 }
 
 // BoolToOptimizationMode converts boolean to OptimizationMode enum (standardized across tests).
 func BoolToOptimizationMode(b bool) enums.OptimizationMode {
-	if b {
-		return enums.OptimizationModeEnabled
-	}
-
-	return enums.OptimizationModeDisabled
+	return enums.OptimizationModeFromBool(b)
 }
 
 // BoolToGenerationStatus converts boolean to GenerationStatus enum (standardized across tests).
 func BoolToGenerationStatus(b bool) enums.GenerationStatus {
-	if b {
-		return enums.GenerationStatusCurrent
-	}
-
-	return enums.GenerationStatusHistorical
+	return enums.GenerationStatusFromBool(b)
 }
 
 // ChainModifiers applies multiple config modifiers in sequence.

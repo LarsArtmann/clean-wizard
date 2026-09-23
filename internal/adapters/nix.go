@@ -35,11 +35,7 @@ const (
 
 // boolToGenerationStatus converts boolean to GenerationStatus enum.
 func boolToGenerationStatus(b bool) enums.GenerationStatus {
-	if b {
-		return enums.GenerationStatusCurrent
-	}
-
-	return enums.GenerationStatusHistorical
+	return enums.GenerationStatusFromBool(b)
 }
 
 // NixAdapter wraps Nix package manager operations.

@@ -193,11 +193,7 @@ func LoadWithContextFromPath(ctx context.Context, configPath string) (*types.Con
 
 // boolToSafeMode converts boolean to SafeMode enum.
 func boolToSafeMode(b bool) enums.SafeMode {
-	if b {
-		return enums.SafeModeEnabled
-	}
-
-	return enums.SafeModeDisabled
+	return enums.SafeModeFromBool(b)
 }
 
 // Save saves the configuration to file.

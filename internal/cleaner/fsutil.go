@@ -18,11 +18,8 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// Byte conversion constants for disk size formatting.
-const (
-	bytesPerMB = 1024 * 1024
-	bytesPerGB = 1024 * 1024 * 1024
-)
+// Byte conversion constants for disk size formatting live in size.go
+// (BytesPerMB, BytesPerGB) alongside ParseByteSize.
 
 // Disk usage and formatting constants.
 const (
@@ -304,9 +301,9 @@ func GetDiskUsage(path string) (DiskUsage, error) {
 func FormatDiskUsage(du DiskUsage) string {
 	return fmt.Sprintf(
 		"%.0fG %.0fG %.1fG %.0f%%",
-		float64(du.Total)/bytesPerGB,
-		float64(du.Used)/bytesPerGB,
-		float64(du.Free)/bytesPerGB,
+		float64(du.Total)/BytesPerGB,
+		float64(du.Used)/BytesPerGB,
+		float64(du.Free)/BytesPerGB,
 		du.UsedPercent,
 	)
 }
@@ -416,7 +413,7 @@ func ExecuteTrashPipeline(
 
 	if dryRun {
 		if verbose {
-			fmt.Printf("Would trash %d %s (%.2f MB)\n", len(items), dryRunLabel, float64(totalBytes)/bytesPerMB)
+			fmt.Printf("Would trash %d %s (%.2f MB)\n", len(items), dryRunLabel, float64(totalBytes)/BytesPerMB)
 		}
 
 		return NewDryRunCleanResult(len(items), totalBytes)
