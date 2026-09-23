@@ -458,10 +458,10 @@ func createAggressiveProfile() *types.Profile {
 func createCustomProfile(
 	includeNix, includeHomebrew, includeDocker, includeNode, includeGo bool,
 ) map[string]*types.Profile {
-	operations := make([]types.CleanupOperation, 0)
+	cleanupOps := make([]types.CleanupOperation, 0)
 
 	if includeNix {
-		operations = append(operations, types.CleanupOperation{
+		cleanupOps = append(cleanupOps, types.CleanupOperation{
 			Name:        "nix-generations",
 			Description: "Clean old Nix generations",
 			RiskLevel:   enums.RiskLevelMediumType,
@@ -471,7 +471,7 @@ func createCustomProfile(
 	}
 
 	if includeHomebrew {
-		operations = append(operations, types.CleanupOperation{
+		cleanupOps = append(cleanupOps, types.CleanupOperation{
 			Name:        "homebrew-cleanup",
 			Description: "Clean Homebrew cache and unused packages",
 			RiskLevel:   enums.RiskLevelLowType,
@@ -481,7 +481,7 @@ func createCustomProfile(
 	}
 
 	if includeDocker {
-		operations = append(operations, types.CleanupOperation{
+		cleanupOps = append(cleanupOps, types.CleanupOperation{
 			Name:        "docker",
 			Description: "Clean Docker images, containers, and volumes",
 			RiskLevel:   enums.RiskLevelMediumType,
@@ -491,7 +491,7 @@ func createCustomProfile(
 	}
 
 	if includeNode {
-		operations = append(operations, types.CleanupOperation{
+		cleanupOps = append(cleanupOps, types.CleanupOperation{
 			Name:        "node-packages",
 			Description: "Clean Node.js package caches",
 			RiskLevel:   enums.RiskLevelLowType,
@@ -501,7 +501,7 @@ func createCustomProfile(
 	}
 
 	if includeGo {
-		operations = append(operations, types.CleanupOperation{
+		cleanupOps = append(cleanupOps, types.CleanupOperation{
 			Name:        "go-packages",
 			Description: "Clean Go module and build caches",
 			RiskLevel:   enums.RiskLevelLowType,
@@ -511,7 +511,7 @@ func createCustomProfile(
 	}
 
 	// Always include temp files
-	operations = append(operations, types.CleanupOperation{
+	cleanupOps = append(cleanupOps, types.CleanupOperation{
 		Name:        "temp-files",
 		Description: "Clean temporary files",
 		RiskLevel:   enums.RiskLevelLowType,
@@ -524,7 +524,7 @@ func createCustomProfile(
 			Name:        setupModeCustom,
 			Description: "Custom cleanup profile",
 			Enabled:     enums.ProfileStatusEnabled,
-			Operations:  operations,
+			Operations:  cleanupOps,
 		},
 	}
 }

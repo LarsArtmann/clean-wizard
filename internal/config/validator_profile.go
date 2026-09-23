@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
-	"go/types"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // validateProfiles validates all profiles in configuration.

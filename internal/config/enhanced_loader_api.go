@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
-	"go/types"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"go/types"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"testing"
 )
 

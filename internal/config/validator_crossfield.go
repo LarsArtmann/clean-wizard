@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"go/types"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"strconv"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"

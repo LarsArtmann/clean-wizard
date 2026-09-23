@@ -10,7 +10,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	domaintypes "github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -25,7 +25,7 @@ const (
 type SizeEstimatorFunc[T any] func(item T) int64
 
 // CleanItemFunc is a function that cleans a single item of type T.
-type CleanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[types.CleanResult]
+type CleanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[domaintypes.CleanResult]
 
 // AvailableCheckFunc is a function that checks if the cleaner is available.
 type AvailableCheckFunc func(ctx context.Context) bool
@@ -42,9 +42,9 @@ func cleanWithIterator[T any](
 	verbose bool,
 	dryRun bool,
 	sizeEstimator SizeEstimatorFunc[T],
-) result.Result[types.CleanResult] {
+) result.Result[domaintypes.CleanResult] {
 	if !availableCheck(ctx) {
-		return result.Err[types.CleanResult](NewNotAvailableError(cleanerName, ""))
+		return result.Err[domaintypes.CleanResult](NewNotAvailableError(cleanerName, ""))
 	}
 
 	if dryRun {
@@ -74,7 +74,7 @@ func cleanWithIterator[T any](
 
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[types.CleanResult](
+		return result.Err[domaintypes.CleanResult](
 			fmt.Errorf("failed to get home directory for %s: %w", cleanerName, err),
 		)
 	}
@@ -107,7 +107,7 @@ func cleanWithIterator[T any](
 	))
 }
 
-// ValidateToolTypes validates configured tool types against a set of available types.
+// ValidateToolTypes validates configured tool types against a set of available domaintypes.
 // This eliminates duplicate validation code across different cleaner implementations.
 func ValidateToolTypes(
 	configuredTypes []string,
@@ -167,7 +167,7 @@ func ValidateOptionalSettings[T any](
 
 // ValidateOptionalSettingsWithTypes validates optional settings with type validation.
 // It handles the common pattern of checking if a field is nil, and if not,
-// validating its types against available types.
+// validating its types against available domaintypes.
 func ValidateOptionalSettingsWithTypes[F any](
 	settings *operations.OperationSettings,
 	getField func(*operations.OperationSettings) *F,
@@ -187,7 +187,7 @@ func ValidateOptionalSettingsWithTypes[F any](
 	return ValidateToolTypes(getSlice(field), availableTypes, typeName)
 }
 
-// BuildCacheAvailableTypes defines all valid build cache tool types.
+// BuildCacheAvailableTypes defines all valid build cache tool domaintypes.
 var BuildCacheAvailableTypes = []string{ //nolint:gochecknoglobals
 	enums.BuildToolGo.String(),
 	enums.BuildToolRust.String(),
@@ -258,7 +258,7 @@ func ValidateBuildCacheSettings(settings *operations.OperationSettings) error {
 }
 
 // ScanItemFunc is a function that scans for items of type T and returns scan results.
-type ScanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[[]types.ScanItem]
+type ScanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[[]domaintypes.ScanItem]
 
 // scanWithIterator is a shared helper function that performs the common scan pattern.
 // It iterates over types, calls the scanFunc for each, and aggregates results.
@@ -267,12 +267,12 @@ func scanWithIterator[T any](
 	types []T,
 	scanFunc ScanItemFunc[T],
 	verbose bool,
-) result.Result[[]types.ScanItem] {
-	items := make([]types.ScanItem, 0)
+) result.Result[[]domaintypes.ScanItem] {
+	items := make([]domaintypes.ScanItem, 0)
 
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[[]types.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
+		return result.Err[[]domaintypes.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 	}
 
 	for _, item := range types {
@@ -293,7 +293,7 @@ func scanWithIterator[T any](
 
 // calculateTotalSizeFromScan calculates the total size from scan results.
 // Returns 0 if the scan resulted in an error.
-func calculateTotalSizeFromScan(scanResult result.Result[[]types.ScanItem]) int64 {
+func calculateTotalSizeFromScan(scanResult result.Result[[]domaintypes.ScanItem]) int64 {
 	if scanResult.IsErr() {
 		return 0
 	}

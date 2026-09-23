@@ -1,7 +1,7 @@
 package di
 
 import (
-	"go/types"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"

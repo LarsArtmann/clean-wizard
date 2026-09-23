@@ -1,7 +1,7 @@
 package di
 
 import (
-	"go/types"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	errorfamily "github.com/larsartmann/go-error-family"
