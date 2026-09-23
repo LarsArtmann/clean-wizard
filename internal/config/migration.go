@@ -154,9 +154,8 @@ func flattenConfig(config *types.Config) map[string]string {
 			flat[operationPrefix+".enabled"] = operation.Enabled.String()
 
 			if operation.Settings != nil {
-				settingsYAML, err := yamlv3.Marshal(
-					operation.Settings,
-				) //nolint:musttag // OperationSettings carries yaml tags
+				//nolint:musttag // OperationSettings carries yaml tags
+				settingsYAML, err := yamlv3.Marshal(operation.Settings)
 				if err == nil {
 					flat[operationPrefix+".settings"] = string(settingsYAML)
 				}

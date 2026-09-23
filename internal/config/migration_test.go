@@ -141,6 +141,7 @@ func TestApplyMigrations(t *testing.T) { //nolint:paralleltest
 		)
 
 		config := migrationTestConfig("1.0.0")
+
 		records, err := ApplyMigrations(config, Migrations())
 		if err != nil {
 			t.Fatalf("ApplyMigrations error = %v", err)
