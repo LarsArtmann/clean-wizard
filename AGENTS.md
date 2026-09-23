@@ -15,6 +15,8 @@ Or use the Nix devShell (`nix develop`) which sets it automatically. The devShel
 
 **Website CI gotcha:** pnpm 11.20 enforces a default 24h `minimumReleaseAge` supply-chain check in `pnpm install`. Dependency bumps whose regenerated lockfile pulls freshly-published transitive deps (e.g. rolldown for astro) fail CI with `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` — not a bug; re-run the jobs ~24h later. Related: build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:` (`esbuild: true`) — pnpm v11 ignores `pnpm.*` in `package.json`; a missing or placeholder entry makes `astro build` fail on a missing esbuild binary (cmdguard incident, fixed 2026-09-19).
 
+**flake check gotchas (pre-existing, ticketed TODO #29):** `nix flake check` fails on (a) `treefmt-check`: the sandboxed goimports formatter tries to download the go1.27 toolchain and the offline sandbox refuses DNS — `nix fmt` itself is green; (b) cold-cache `go-modules` builds need network. Formatting ground truth: run `nix fmt` (0 changed = clean) or `buildflow format` inside the devShell.
+
 ## Target Machines
 
 - **evo-x2**: NixOS Linux x86_64, Nix 2.34.7, Go 1.26.3, Docker, pnpm, bun, golangci-lint

@@ -38,6 +38,7 @@
 | 16 | Add tests for `getRegistryName` reverse lookup (`scan.go:246`)                                                                                                    | MED    | LOW    | Pre-existing           |
 | 17 | Move `/tmp/go-humanize-linter` into repo (`tools/lint/`) so CI can reproduce the H007 check                                                                       | MED    | LOW    | 2026-08-05 linter      |
 | 18 | Wire `go-humanize-linter` into `flake.nix` `checks` (or pre-commit) — H007 violations can regress                                                                 | MED    | LOW    | 2026-08-05 linter      |
+| 29 | Fix `nix flake check` treefmt-check: sandboxed goimports tries to download go1.27 toolchain (offline sandbox → DNS refused); wire go_1_27 into the treefmt formatter closure (`nix fmt` itself is green) | MED    | MED    | 2026-09-23 error-family migration |
 
 ## Low Priority / Polish
 
