@@ -17,11 +17,8 @@ import (
 	fileutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/fileutil"
 )
 
-// Byte conversion constants.
-const (
-	bytesPerMB = 1024 * 1024
-	bytesPerGB = 1024 * 1024 * 1024
-)
+// Byte conversion constants come from the shared cleaner core
+// (cleaner.BytesPerMB / cleaner.BytesPerGB).
 
 const (
 	// DefaultMinSizeMB is the default minimum file size in MB for compiled binaries.
@@ -271,7 +268,7 @@ func validateCompiledBinariesSettings(s *operations.CompiledBinariesSettings) er
 
 // Scan scans for compiled binary files in configured directories.
 func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
-	minSizeBytes := int64(c.minSizeMB) * bytesPerMB
+	minSizeBytes := int64(c.minSizeMB) * cleaner.BytesPerMB
 
 	var allBinaries []BinaryInfo
 
@@ -340,7 +337,7 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[types
 			return c.trashOperator.TrashBinary(cleanCtx, item.Path)
 		},
 		func(item types.ScanItem) {
-			fmt.Printf("  ✓ Trashed: %s (%.2f MB)\n", item.Path, float64(item.Size)/bytesPerMB)
+			fmt.Printf("  ✓ Trashed: %s (%.2f MB)\n", item.Path, float64(item.Size)/cleaner.BytesPerMB)
 		},
 	)
 }

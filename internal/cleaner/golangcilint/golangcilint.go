@@ -14,7 +14,6 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
-	"github.com/dustin/go-humanize"
 )
 
 // golangciLintCommandTimeout is the timeout for golangci-lint operations.
@@ -100,14 +99,9 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 }
 
 // parseSize parses a size string like "3.1KiB" or "1.5MiB" into bytes.
-// Delegates to humanize.ParseBytes which handles all SI and IEC suffixes.
+// Delegates to the shared cleaner core (humanize.ParseBytes handles all SI and IEC suffixes).
 func parseSize(sizeStr string) (int64, error) {
-	bytes, err := humanize.ParseBytes(sizeStr)
-	if err != nil {
-		return 0, fmt.Errorf("invalid size format: %q: %w", sizeStr, err)
-	}
-
-	return int64(bytes), nil
+	return cleaner.ParseByteSize(sizeStr)
 }
 
 // getCacheStatus returns the cache status by running "golangci-lint cache status".

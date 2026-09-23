@@ -1,17 +1,9 @@
 package docker
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/dustin/go-humanize"
-)
-
-const (
-	bytesPerKB = 1024
-	bytesPerMB = 1024 * 1024
-	bytesPerGB = 1024 * 1024 * 1024
-	bytesPerTB = 1024 * 1024 * 1024 * 1024
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 )
 
 // ParseDockerReclaimedSpace extracts "Total reclaimed space: X" from docker prune output.
@@ -36,18 +28,13 @@ func ParseDockerReclaimedSpace(output string) (int64, error) {
 }
 
 // ParseDockerSize converts a Docker size string (e.g. "2.5GB", "100MB", "1.84kB", "0B") to bytes.
-// Unit parsing is delegated to humanize.ParseBytes, which natively handles all
-// SI and IEC unit suffixes (case-insensitive); a number without a unit is treated as bytes.
+// Unit parsing is delegated to cleaner.ParseByteSize (humanize.ParseBytes), which natively
+// handles all SI and IEC unit suffixes (case-insensitive); a number without a unit is treated as bytes.
 func ParseDockerSize(sizeStr string) (int64, error) {
 	// Empty string means nothing to parse; Docker reports zero as "0B" (handled by humanize).
 	if sizeStr == "" {
 		return 0, nil
 	}
 
-	parsed, err := humanize.ParseBytes(sizeStr)
-	if err != nil {
-		return 0, fmt.Errorf("invalid size format %q: %w", sizeStr, err)
-	}
-
-	return int64(parsed), nil
+	return cleaner.ParseByteSize(sizeStr)
 }

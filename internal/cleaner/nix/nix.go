@@ -237,13 +237,8 @@ func (nc *NixCleaner) CleanOldGenerations(
 		}
 		// Estimate bytes to free based on average generation size
 		estimatedBytes := avgSize * int64(toRemove)
-		cleanResult := conversions.NewCleanResult(
-			enums.StrategyDryRunType,
-			toRemove,
-			estimatedBytes,
-		)
 
-		return result.Ok(cleanResult)
+		return nc.dryRunCleanResult(toRemove, estimatedBytes)
 	}
 
 	// Real cleaning implementation
@@ -285,6 +280,12 @@ func (nc *NixCleaner) CleanOldGenerations(
 
 	// Dry-run or no generations to remove - use centralized conversion
 	estimatedBytes := int64(toRemove) * NixDryRunBytesPerGeneration
+
+	return nc.dryRunCleanResult(toRemove, estimatedBytes)
+}
+
+// dryRunCleanResult builds the dry-run CleanResult for removing toRemove generations.
+func (nc *NixCleaner) dryRunCleanResult(toRemove int, estimatedBytes int64) result.Result[types.CleanResult] {
 	cleanResult := conversions.NewCleanResult(
 		enums.StrategyDryRunType,
 		toRemove,
