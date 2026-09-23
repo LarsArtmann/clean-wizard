@@ -50,12 +50,7 @@ func (mc *MetricsCollector) RecordStart(cleanerName string) time.Time {
 	mc.mu.Lock()
 	defer mc.mu.Unlock()
 
-	m, exists := mc.cleaners[cleanerName]
-	if !exists {
-		m = &CleanerMetrics{Name: cleanerName} //nolint:exhaustruct
-		mc.cleaners[cleanerName] = m
-	}
-
+	m := mc.getOrCreateMetrics(cleanerName)
 	m.InvocationCount++
 
 	return time.Now()

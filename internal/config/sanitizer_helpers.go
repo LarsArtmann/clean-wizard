@@ -1,5 +1,10 @@
 package config
 
+import (
+	"path/filepath"
+	"strings"
+)
+
 // sanitizePathValue applies the configured string normalizations (trim
 // whitespace, clean path) to a single path entry. Returns the sanitized value.
 func (cs *ConfigSanitizer) sanitizePathValue(path string) string {

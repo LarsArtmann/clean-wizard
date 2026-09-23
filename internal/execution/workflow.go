@@ -8,6 +8,19 @@ import (
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
+// newRunBuilder resolves run options and configures a builder from them,
+// applying retry settings when configured. Shared by RunCleaners and RunScans.
+func newRunBuilder(opts []RunOption) (*Builder, runConfig) {
+	cfg := resolveRunOptions(opts)
+
+	builder := NewBuilder(cfg.verbose)
+	if cfg.retry != nil {
+		builder.WithRetryConfig(cfg.retry)
+	}
+
+	return builder, cfg
+}
+
 // RunCleaners builds and executes a clean workflow for the given selected cleaners.
 // It resolves cleaners from the registry, compiles them into a go-workflow DAG,
 // executes it with the configured options, and returns aggregated results.
@@ -21,12 +34,7 @@ func RunCleaners(
 	selected []string,
 	opts ...RunOption,
 ) (*WorkflowResult, error) {
-	cfg := resolveRunOptions(opts)
-
-	builder := NewBuilder(cfg.verbose)
-	if cfg.retry != nil {
-		builder.WithRetryConfig(cfg.retry)
-	}
+	builder, cfg := newRunBuilder(opts)
 
 	compiled, err := builder.BuildClean(registry, selected)
 	if err != nil {
@@ -44,9 +52,7 @@ func RunScans(
 	selected []string,
 	opts ...RunOption,
 ) (*WorkflowResult, error) {
-	cfg := resolveRunOptions(opts)
-
-	builder := NewBuilder(cfg.verbose)
+	builder, cfg := newRunBuilder(opts)
 
 	compiled, err := builder.BuildScan(registry, selected)
 	if err != nil {

@@ -74,35 +74,36 @@ func generateVersion() string {
 	return time.Now().Format("2006.01.02")
 }
 
-// getGitCommit returns the current git commit hash.
-func getGitCommit() string {
-	cmd := exec.CommandContext(context.Background(), "git", "rev-parse", "--short", "HEAD")
+// gitOutput runs a git command and returns its trimmed stdout.
+func gitOutput(args ...string) (string, error) {
+	cmd := exec.CommandContext(context.Background(), "git", args...)
 
 	output, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(output)), nil
+}
+
+// getGitCommit returns the current git commit hash.
+func getGitCommit() string {
+	commit, err := gitOutput("rev-parse", "--short", "HEAD")
 	if err != nil {
 		return "unknown"
 	}
 
-	return strings.TrimSpace(string(output))
+	return commit
 }
 
 // getGitTag returns the current git tag if available.
 func getGitTag() string {
-	cmd := exec.CommandContext(
-		context.Background(),
-		"git",
-		"describe",
-		"--tags",
-		"--exact-match",
-		"HEAD",
-	)
-
-	output, err := cmd.Output()
+	tag, err := gitOutput("describe", "--tags", "--exact-match", "HEAD")
 	if err != nil {
 		return ""
 	}
 
-	return strings.TrimSpace(string(output))
+	return tag
 }
 
 // isGitDirty returns true if there are uncommitted changes.

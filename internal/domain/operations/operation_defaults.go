@@ -223,18 +223,24 @@ func validateHomebrewDefaults(s *HomebrewSettings) error {
 	return nil
 }
 
+// validateEnumSliceDefaults reports the first invalid enum element in items.
+// typeName identifies the enum in the error message (e.g. "PackageManagerType").
+func validateEnumSliceDefaults[T interface{ IsValid() bool }](items []T, typeName string) error {
+	for i, item := range items {
+		if !item.IsValid() {
+			return fmt.Errorf("invalid default %s at index %d: %d", typeName, i, item)
+		}
+	}
+
+	return nil
+}
+
 func validateNodePackagesDefaults(s *NodePackagesSettings) error {
 	if s == nil {
 		return nil
 	}
 
-	for i, pm := range s.PackageManagers {
-		if !pm.IsValid() {
-			return fmt.Errorf("invalid default PackageManagerType at index %d: %d", i, pm)
-		}
-	}
-
-	return nil
+	return validateEnumSliceDefaults(s.PackageManagers, "PackageManagerType")
 }
 
 func validateGoPackagesDefaults(s *GoPackagesSettings) error {
@@ -291,13 +297,7 @@ func validateBuildCacheDefaults(s *BuildCacheSettings) error {
 		return nil
 	}
 
-	for i, tt := range s.ToolTypes {
-		if !tt.IsValid() {
-			return fmt.Errorf("invalid default BuildToolType at index %d: %d", i, tt)
-		}
-	}
-
-	return nil
+	return validateEnumSliceDefaults(s.ToolTypes, "BuildToolType")
 }
 
 func validateDockerDefaults(s *DockerSettings) error {
@@ -317,13 +317,7 @@ func validateSystemCacheDefaults(s *SystemCacheSettings) error {
 		return nil
 	}
 
-	for i, ct := range s.CacheTypes {
-		if !ct.IsValid() {
-			return fmt.Errorf("invalid default CacheType at index %d: %d", i, ct)
-		}
-	}
-
-	return nil
+	return validateEnumSliceDefaults(s.CacheTypes, "CacheType")
 }
 
 func validateProjectsAutomationDefaults(s *ProjectsManagementAutomationSettings) error {

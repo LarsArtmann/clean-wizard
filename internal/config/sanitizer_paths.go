@@ -68,17 +68,8 @@ func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *types.Config, result *San
 		sanitizedPaths = append(sanitizedPaths, path)
 	}
 
-	// Remove duplicates
-	if cs.rules.RemoveDuplicates {
-		sanitizedPaths = cs.removeDuplicates(sanitizedPaths)
-	}
-
-	// Sort paths
-	if cs.rules.SortArrays {
-		cs.sortStrings(sanitizedPaths)
-	}
-
-	cfg.Protected = sanitizedPaths
+	// Remove duplicates and sort via the shared finalizer
+	cfg.Protected = cs.finalizePathList(sanitizedPaths)
 }
 
 // Helper methods for path sanitization

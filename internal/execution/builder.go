@@ -37,13 +37,17 @@ func (b *Builder) WithRetryConfig(cfg *RetryConfig) *Builder {
 	return b
 }
 
+// newCompiledWorkflow creates an empty panic-safe workflow paired with its result collector.
+func newCompiledWorkflow() (*flow.Workflow, *resultCollector) {
+	return &flow.Workflow{
+		DontPanic: true,
+	}, newResultCollector()
+}
+
 // BuildClean compiles a clean workflow from the given registry and selected cleaner names.
 // Each selected cleaner becomes a parallel flow.FuncIO step with BeforeStep/AfterStep hooks.
 func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*CompiledWorkflow, error) {
-	collector := newResultCollector()
-	wf := &flow.Workflow{
-		DontPanic: true,
-	}
+	wf, collector := newCompiledWorkflow()
 
 	before := makeBeforeHook(b.verbose)
 	after := makeAfterHook(b.verbose)
@@ -86,10 +90,7 @@ func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*Co
 // BuildScan compiles a scan workflow from the given registry and selected cleaner names.
 // Each selected cleaner becomes a parallel flow.FuncIO step.
 func (b *Builder) BuildScan(registry *cleaner.Registry, selected []string) (*CompiledWorkflow, error) {
-	collector := newResultCollector()
-	wf := &flow.Workflow{
-		DontPanic: true,
-	}
+	wf, collector := newCompiledWorkflow()
 
 	for i, name := range selected {
 		c, ok := registry.Get(name)

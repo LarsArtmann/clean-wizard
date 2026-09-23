@@ -105,17 +105,9 @@ func BuildFilterRepoCommand(ctx context.Context, args []string) *exec.Cmd {
 		nixArgs = append(nixArgs, args...)
 
 		return exec.CommandContext(ctx, "nix", nixArgs...)
-	case FilterRepoSystem:
-		// System install: git filter-repo <args>
-		gitArgs := append([]string{"filter-repo"}, args...)
-
-		return exec.CommandContext(ctx, "git", gitArgs...)
-	case FilterRepoNone:
-		// Fallback: still try git filter-repo (will likely fail)
-		gitArgs := append([]string{"filter-repo"}, args...)
-
-		return exec.CommandContext(ctx, "git", gitArgs...)
 	default:
+		// FilterRepoSystem and FilterRepoNone both run "git filter-repo <args>"
+		// (None is the fallback that will likely fail, matching prior behavior).
 		gitArgs := append([]string{"filter-repo"}, args...)
 
 		return exec.CommandContext(ctx, "git", gitArgs...)

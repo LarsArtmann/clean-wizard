@@ -442,43 +442,32 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[types.CleanRes
 	return result.Ok(finalResult)
 }
 
+// verbosePrune logs the prune command about to run (when verbose) and returns its args.
+func (dc *DockerCleaner) verbosePrune(label, commandLine string, args ...string) []string {
+	if dc.GetVerbose() {
+		fmt.Printf("  Running %s: %s\n", label, commandLine)
+	}
+
+	return args
+}
+
 // buildPruneArgs returns the docker command arguments for the prune mode.
 func (dc *DockerCleaner) buildPruneArgs() []string {
 	switch dc.pruneMode {
 	case enums.DockerPruneAll:
-		if dc.GetVerbose() {
-			fmt.Println("  Running full prune: docker system prune -af --volumes")
-		}
-
-		return []string{"system", "prune", "-af", "--volumes"} //nolint:goconst
+		return dc.verbosePrune("full prune", "docker system prune -af --volumes", "system", "prune", "-af", "--volumes") //nolint:goconst
 
 	case enums.DockerPruneImages:
-		if dc.GetVerbose() {
-			fmt.Println("  Running image prune: docker image prune -af")
-		}
-
-		return []string{"image", "prune", "-af"}
+		return dc.verbosePrune("image prune", "docker image prune -af", "image", "prune", "-af")
 
 	case enums.DockerPruneContainers:
-		if dc.GetVerbose() {
-			fmt.Println("  Running container prune: docker container prune -f")
-		}
-
-		return []string{"container", "prune", "-f"}
+		return dc.verbosePrune("container prune", "docker container prune -f", "container", "prune", "-f")
 
 	case enums.DockerPruneVolumes:
-		if dc.GetVerbose() {
-			fmt.Println("  Running volume prune: docker volume prune -f")
-		}
-
-		return []string{"volume", "prune", "-f"}
+		return dc.verbosePrune("volume prune", "docker volume prune -f", "volume", "prune", "-f")
 
 	case enums.DockerPruneBuilds:
-		if dc.GetVerbose() {
-			fmt.Println("  Running builder prune: docker builder prune -af")
-		}
-
-		return []string{"builder", "prune", "-af"}
+		return dc.verbosePrune("builder prune", "docker builder prune -af", "builder", "prune", "-af")
 
 	default:
 		return nil
