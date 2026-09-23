@@ -265,7 +265,12 @@ func loadConfigFromPath(configPath string) (*domain.Config, error) {
 	if configPath != "" {
 		cfg, err := config.LoadFromPath(configPath)
 		if err != nil {
-			return nil, errorfamily.WrapRejectionf(err, "config.load_from_path", "failed to load config from %s", configPath)
+			return nil, errorfamily.WrapRejectionf(
+				err,
+				"config.load_from_path",
+				"failed to load config from %s",
+				configPath,
+			)
 		}
 
 		return cfg, nil

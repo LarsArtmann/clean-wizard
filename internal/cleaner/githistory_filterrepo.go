@@ -27,7 +27,7 @@ func (p FilterRepoProvider) String() string {
 	case FilterRepoSystem:
 		return "system"
 	case FilterRepoNix:
-		return "nix" //nolint:goconst
+		return "nix"
 	default:
 		return "unknown"
 	}
@@ -107,7 +107,7 @@ func BuildFilterRepoCommand(ctx context.Context, args []string) *exec.Cmd {
 		return exec.CommandContext(ctx, "nix", nixArgs...)
 	case FilterRepoSystem:
 		// System install: git filter-repo <args>
-		gitArgs := append([]string{"filter-repo"}, args...) //nolint:goconst
+		gitArgs := append([]string{"filter-repo"}, args...)
 
 		return exec.CommandContext(ctx, "git", gitArgs...)
 	case FilterRepoNone:

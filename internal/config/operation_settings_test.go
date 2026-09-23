@@ -16,12 +16,14 @@ func loadKoanfFromYAML(t *testing.T, yamlContent string) *koanf.Koanf {
 	t.Helper()
 
 	configPath := filepath.Join(t.TempDir(), "config.yaml")
+
 	err := os.WriteFile(configPath, []byte(yamlContent), 0o600)
 	if err != nil {
 		t.Fatalf("failed to write temp config: %v", err)
 	}
 
 	k := koanf.New(".")
+
 	err = k.Load(file.Provider(configPath), yaml.Parser())
 	if err != nil {
 		t.Fatalf("failed to load koanf: %v", err)
@@ -179,7 +181,7 @@ profiles:
 			t.Parallel()
 
 			k := loadKoanfFromYAML(t, tt.yamlContent)
-			op := domain.CleanupOperation{Name: "test-operation"} //nolint:exhaustruct
+			op := domain.CleanupOperation{Name: "test-operation"}
 
 			unmarshalOperationSettings(k, "daily", 0, &op)
 
@@ -209,7 +211,7 @@ profiles:
     operations:
       - name: docker
 `)
-	op := domain.CleanupOperation{Name: "docker"} //nolint:exhaustruct
+	op := domain.CleanupOperation{Name: "docker"}
 
 	unmarshalOperationSettings(k, "daily", 0, &op)
 

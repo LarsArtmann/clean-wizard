@@ -207,7 +207,7 @@ func (vm *ValidationMiddleware) assessChangeRisk(
 		}
 
 		return domain.RiskLevelLowType
-	case "max_disk_usage": //nolint:goconst
+	case "max_disk_usage":
 		// Safe type assertions
 		oldVal, oldOk := old.(int)
 

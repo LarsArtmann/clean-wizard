@@ -36,6 +36,7 @@ profiles:
 		fmt.Printf("marshal err=%v out=%q\n", err, string(out))
 
 		var s domain.OperationSettings
+
 		err = yamlv3.Unmarshal(out, &s)
 		fmt.Printf("unmarshal err=%v docker=%+v\n", err, s.Docker)
 	}

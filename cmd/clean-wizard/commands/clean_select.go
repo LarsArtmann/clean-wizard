@@ -158,7 +158,7 @@ func getPresetSelection(mode string, configs []CleanerConfig) []CleanerType {
 			CleanerTypeTempFiles,
 			CleanerTypeBuildCache,
 		}
-	case "aggressive": //nolint:goconst
+	case "aggressive":
 		return allAvailableTypes(configs)
 	case "standard":
 		var safeTypes []CleanerType

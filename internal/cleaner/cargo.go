@@ -196,7 +196,7 @@ func (cc *CargoCleaner) cleanWithCargoCacheTool(
 func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[domain.CleanResult] {
 	return cc.executeCargoCleanCommand(
 		ctx,
-		"cargo", []string{"clean"}, //nolint:goconst
+		"cargo", []string{"clean"},
 		"cargo clean failed: %w (output: %s)",
 		"  ✓ Cargo cache cleaned",
 	)

@@ -104,7 +104,7 @@ func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult 
 // ValidateField validates a specific configuration field.
 func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	switch field {
-	case "max_disk_usage": //nolint:goconst
+	case "max_disk_usage":
 		return cv.validateMaxDiskUsage(value)
 	case "protected": //nolint:goconst
 		return cv.validateProtectedPaths(value)

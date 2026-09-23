@@ -94,10 +94,10 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 		func(np *domain.NodePackagesSettings) error {
 			packageManagerStrings := PackageManagerTypeToLowerSlice(np.PackageManagers)
 			validPackageManagersMap := map[string]bool{
-				"npm":  true, //nolint:goconst
+				"npm":  true,
 				"pnpm": true,
-				"yarn": true, //nolint:goconst
-				"bun":  true, //nolint:goconst
+				"yarn": true,
+				"bun":  true,
 			}
 
 			return validateSettings(
@@ -490,7 +490,7 @@ func (npmc *NodePackageManagerCleaner) cleanNpmCache(
 	cacheDir, err := npmc.getNpmCacheDir(ctx)
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,
-		[]string{"npm", "cache", "clean", "--force"}, //nolint:goconst
+		[]string{"npm", "cache", "clean", "--force"},
 		"npm cache clean",
 		"Cache")
 }

@@ -24,10 +24,10 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 		},
 		{
 			name: "unknown profile returns nil",
-			config: &Config{ //nolint:exhaustruct
+			config: &Config{
 				Profiles: map[string]*Profile{
-					"daily": { //nolint:exhaustruct
-						Operations: []CleanupOperation{ //nolint:exhaustruct
+					"daily": {
+						Operations: []CleanupOperation{
 							{Name: "temp-files", Settings: &OperationSettings{TempFiles: tempSettings}},
 						},
 					},
@@ -38,11 +38,11 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 		},
 		{
 			name: "profile without settings returns nil",
-			config: &Config{ //nolint:exhaustruct
+			config: &Config{
 				Profiles: map[string]*Profile{
-					"daily": { //nolint:exhaustruct
-						Operations: []CleanupOperation{ //nolint:exhaustruct
-							{Name: "temp-files"}, //nolint:exhaustruct
+					"daily": {
+						Operations: []CleanupOperation{
+							{Name: "temp-files"},
 						},
 					},
 				},
@@ -52,10 +52,10 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 		},
 		{
 			name: "single operation settings are returned",
-			config: &Config{ //nolint:exhaustruct
+			config: &Config{
 				Profiles: map[string]*Profile{
-					"daily": { //nolint:exhaustruct
-						Operations: []CleanupOperation{ //nolint:exhaustruct
+					"daily": {
+						Operations: []CleanupOperation{
 							{Name: "temp-files", Settings: &OperationSettings{TempFiles: tempSettings}},
 						},
 					},
@@ -66,10 +66,10 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 		},
 		{
 			name: "settings from multiple operations are merged",
-			config: &Config{ //nolint:exhaustruct
+			config: &Config{
 				Profiles: map[string]*Profile{
-					"daily": { //nolint:exhaustruct
-						Operations: []CleanupOperation{ //nolint:exhaustruct
+					"daily": {
+						Operations: []CleanupOperation{
 							{Name: "temp-files", Settings: &OperationSettings{TempFiles: tempSettings}},
 							{Name: "docker", Settings: &OperationSettings{Docker: dockerSettings}},
 						},
@@ -81,10 +81,10 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 		},
 		{
 			name: "first settings section wins on conflict",
-			config: &Config{ //nolint:exhaustruct
+			config: &Config{
 				Profiles: map[string]*Profile{
-					"daily": { //nolint:exhaustruct
-						Operations: []CleanupOperation{ //nolint:exhaustruct
+					"daily": {
+						Operations: []CleanupOperation{
 							{Name: "temp-files", Settings: &OperationSettings{TempFiles: tempSettings}},
 							{
 								Name:     "temp-files",
@@ -99,11 +99,11 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 		},
 		{
 			name: "operations without settings do not erase merged sections",
-			config: &Config{ //nolint:exhaustruct
+			config: &Config{
 				Profiles: map[string]*Profile{
-					"daily": { //nolint:exhaustruct
-						Operations: []CleanupOperation{ //nolint:exhaustruct
-							{Name: "temp-files"}, //nolint:exhaustruct
+					"daily": {
+						Operations: []CleanupOperation{
+							{Name: "temp-files"},
 							{Name: "docker", Settings: &OperationSettings{Docker: dockerSettings}},
 						},
 					},

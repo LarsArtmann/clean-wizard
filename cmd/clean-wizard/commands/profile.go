@@ -193,8 +193,8 @@ func runProfileCreateCommand(_ *cobra.Command, _ []string, name, description str
 		Enabled:     domain.ProfileStatusEnabled,
 		Operations: []domain.CleanupOperation{
 			{
-				Name:        "nix-generations",           //nolint:goconst
-				Description: "Clean old Nix generations", //nolint:goconst
+				Name:        "nix-generations",
+				Description: "Clean old Nix generations",
 				RiskLevel:   domain.RiskLevelLowType,
 				Enabled:     domain.ProfileStatusEnabled,
 				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
@@ -211,7 +211,12 @@ func runProfileCreateCommand(_ *cobra.Command, _ []string, name, description str
 
 	// Save configuration
 	if err := config.Save(cfg); err != nil {
-		return errorfamily.WrapRejectionf(err, "profile.config_save", "failed to save configuration for description=%v", description)
+		return errorfamily.WrapRejectionf(
+			err,
+			"profile.config_save",
+			"failed to save configuration for description=%v",
+			description,
+		)
 	}
 
 	fmt.Printf("✅ Profile '%s' created successfully!\n", name)

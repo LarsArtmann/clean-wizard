@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
@@ -123,5 +122,5 @@ func TestCommandSentinelExitCodes(t *testing.T) {
 	assert.Equal(t, 69, errorfamily.ExitCode(ErrGitNotAvailable)) // EX_UNAVAILABLE: Infrastructure
 	assert.Equal(t, 1, errorfamily.ExitCode(ErrNoGitRepositoriesFound))
 	assert.Equal(t, 1, errorfamily.ExitCode(ErrSafetyChecksFailed)) // Conflict maps to 1
-	assert.False(t, errors.Is(ErrGitNotAvailable, ErrNotAGitRepository))
+	assert.NotErrorIs(t, ErrGitNotAvailable, ErrNotAGitRepository)
 }

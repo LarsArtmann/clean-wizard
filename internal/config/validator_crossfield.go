@@ -21,7 +21,7 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 		}
 
 		result.Errors = append(result.Errors, ValidationError{
-			Field:      "max_disk_usage", //nolint:goconst
+			Field:      "max_disk_usage",
 			Rule:       "range",
 			Value:      cfg.MaxDiskUsage,
 			Message:    err.Error(),

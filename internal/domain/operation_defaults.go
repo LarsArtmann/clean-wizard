@@ -113,7 +113,7 @@ func defaultSystemCacheSettings() *OperationSettings {
 	return &OperationSettings{ //nolint:exhaustruct
 		SystemCache: &SystemCacheSettings{
 			CacheTypes: getDefaultSystemCacheTypes(),
-			OlderThan:  "30d", //nolint:goconst
+			OlderThan:  "30d",
 		},
 	}
 }
@@ -357,14 +357,14 @@ func defaultBuildCacheSettings() *BuildCacheSettings {
 // getDefaultSystemCacheTypes returns platform-appropriate default cache types.
 func getDefaultSystemCacheTypes() []CacheType {
 	switch runtime.GOOS {
-	case "darwin": //nolint:goconst
+	case "darwin":
 		return []CacheType{
 			CacheTypeSpotlight,
 			CacheTypeXcode,
 			CacheTypeCocoapods,
 			CacheTypeHomebrew,
 		}
-	case "linux": //nolint:goconst
+	case "linux":
 		return []CacheType{
 			CacheTypeXdgCache,
 			CacheTypeThumbnails,

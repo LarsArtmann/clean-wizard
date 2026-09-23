@@ -78,7 +78,7 @@ var cleanerMetadata = map[CleanerType]cleanerMetadataEntry{ //nolint:gochecknogl
 		Icon:         "🔨",
 	},
 	CleanerTypeDocker: {
-		RegistryName: "docker", //nolint:goconst
+		RegistryName: "docker",
 		DisplayName:  "Docker",
 		Description:  "Clean Docker images, containers, and volumes",
 		Icon:         "🐳",

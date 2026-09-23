@@ -244,12 +244,12 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{ //nolint:gocheckn
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeNpm: {
-		pathComponents: []string{pathComponentDotCache, "npm"}, //nolint:goconst
+		pathComponents: []string{pathComponentDotCache, "npm"},
 		displayName:    "NPM cache",
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeYarn: {
-		pathComponents: []string{pathComponentDotCache, "yarn"}, //nolint:goconst
+		pathComponents: []string{pathComponentDotCache, "yarn"},
 		displayName:    "Yarn cache",
 		scanType:       domain.ScanTypeTemp,
 	},
@@ -300,7 +300,7 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{ //nolint:gocheckn
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeBunCache: {
-		pathComponents: []string{pathComponentDotCache, "bun"}, //nolint:goconst
+		pathComponents: []string{pathComponentDotCache, "bun"},
 		displayName:    "Bun cache",
 		scanType:       domain.ScanTypeTemp,
 	},
@@ -315,7 +315,7 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{ //nolint:gocheckn
 		scanType:       domain.ScanTypeTemp,
 	},
 	domain.CacheTypeNixCache: {
-		pathComponents: []string{pathComponentDotCache, "nix"}, //nolint:goconst
+		pathComponents: []string{pathComponentDotCache, "nix"},
 		displayName:    "Nix evaluator/substituter cache",
 		scanType:       domain.ScanTypeTemp,
 	},
