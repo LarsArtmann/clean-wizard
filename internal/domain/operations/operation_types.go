@@ -1,4 +1,4 @@
-package domain
+package operations
 
 // OperationSettings provides type-safe configuration for different operation types
 // This eliminates map[string]any violations while maintaining flexibility.

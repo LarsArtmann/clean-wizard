@@ -1,4 +1,4 @@
-package domain
+package types
 
 // SettingsForProfile returns the operation settings configured for the named profile.
 // The settings blocks of all operations in the profile are merged into a single

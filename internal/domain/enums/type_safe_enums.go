@@ -1,4 +1,4 @@
-package domain
+package enums
 
 import (
 	"encoding/json/v2"
@@ -213,3 +213,24 @@ func (ses *SizeEstimateStatusType) UnmarshalJSON(data []byte) error {
 		"size estimate status",
 	)
 }
+
+// Short aliases for the most commonly used enum values.
+var (
+	RiskLow      = RiskLevelLowType      //nolint:gochecknoglobals
+	RiskMedium   = RiskLevelMediumType   //nolint:gochecknoglobals
+	RiskHigh     = RiskLevelHighType     //nolint:gochecknoglobals
+	RiskCritical = RiskLevelCriticalType //nolint:gochecknoglobals
+
+	ValidationLevelNone          = ValidationLevelNoneType          //nolint:gochecknoglobals
+	ValidationLevelBasic         = ValidationLevelBasicType         //nolint:gochecknoglobals
+	ValidationLevelComprehensive = ValidationLevelComprehensiveType //nolint:gochecknoglobals
+	ValidationLevelStrict        = ValidationLevelStrictType        //nolint:gochecknoglobals
+
+	OperationAdded    = ChangeOperationAddedType    //nolint:gochecknoglobals
+	OperationRemoved  = ChangeOperationRemovedType  //nolint:gochecknoglobals
+	OperationModified = ChangeOperationModifiedType //nolint:gochecknoglobals
+
+	StrategyAggressive   = StrategyAggressiveType   //nolint:gochecknoglobals
+	StrategyConservative = StrategyConservativeType //nolint:gochecknoglobals
+	StrategyDryRun       = StrategyDryRunType       //nolint:gochecknoglobals
+)

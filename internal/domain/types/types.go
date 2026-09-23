@@ -1,4 +1,4 @@
-package domain
+package types
 
 import (
 	"errors"
@@ -18,27 +18,6 @@ const (
 	// Byte conversion constants.
 	BytesPerKB = 1024
 	BytesPerMB = 1024 * 1024
-)
-
-// Use type-safe constants directly.
-var (
-	RiskLow      = RiskLevelLowType      //nolint:gochecknoglobals
-	RiskMedium   = RiskLevelMediumType   //nolint:gochecknoglobals
-	RiskHigh     = RiskLevelHighType     //nolint:gochecknoglobals
-	RiskCritical = RiskLevelCriticalType //nolint:gochecknoglobals
-
-	ValidationLevelNone          = ValidationLevelNoneType          //nolint:gochecknoglobals
-	ValidationLevelBasic         = ValidationLevelBasicType         //nolint:gochecknoglobals
-	ValidationLevelComprehensive = ValidationLevelComprehensiveType //nolint:gochecknoglobals
-	ValidationLevelStrict        = ValidationLevelStrictType        //nolint:gochecknoglobals
-
-	OperationAdded    = ChangeOperationAddedType    //nolint:gochecknoglobals
-	OperationRemoved  = ChangeOperationRemovedType  //nolint:gochecknoglobals
-	OperationModified = ChangeOperationModifiedType //nolint:gochecknoglobals
-
-	StrategyAggressive   = StrategyAggressiveType   //nolint:gochecknoglobals
-	StrategyConservative = StrategyConservativeType //nolint:gochecknoglobals
-	StrategyDryRun       = StrategyDryRunType       //nolint:gochecknoglobals
 )
 
 // Strong ID types for compile-time type safety on identifiers.

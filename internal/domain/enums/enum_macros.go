@@ -1,4 +1,4 @@
-package domain
+package enums
 
 import (
 	"encoding/json/v2"

@@ -1,4 +1,4 @@
-package domain
+package types
 
 // SanitizationWarning represents a warning during sanitization.
 type SanitizationWarning struct {

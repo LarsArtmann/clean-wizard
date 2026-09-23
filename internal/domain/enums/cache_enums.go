@@ -1,4 +1,4 @@
-package domain
+package enums
 
 import "gopkg.in/yaml.v3"
 
