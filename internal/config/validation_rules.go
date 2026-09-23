@@ -355,7 +355,7 @@ func (cv *ConfigValidator) addCrossFieldRules(set *configRuleSet, cfg *types.Con
 					return nil
 				}),
 			"Consider splitting operations into multiple profiles",
-		), len(profile.Operations), &ValidationContext{
+		), len(profile.Operations), &ValidationContext{ //nolint:exhaustruct
 			Metadata: map[string]string{
 				"operation_count": strconv.Itoa(len(profile.Operations)),
 				"max_operations":  strconv.Itoa(maxOperations),

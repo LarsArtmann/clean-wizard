@@ -91,6 +91,16 @@ Key design principles:
 - **Profile settings wiring** — `--profile` flag → `di.RunSettings.Profile` → `domain.Config.SettingsForProfile(name)` merges each operation's settings block into one `OperationSettings` (first section wins) → `cleaner.DefaultRegistryWithConfig(verbose, dryRun, settings)`. Resolution helpers in `internal/cleaner/registry_settings.go` translate sections to constructor params: a configured section overrides factory defaults field-by-field (empty string/0/nil field → default); fully-disabled go_packages falls back to default cache flags (`GoCacheNone` is an invalid constructor state). Every registered `CleanerWithSettings` is also validated against the settings at registry creation (Rejection on failure)
 - **koanf array-path gotcha** — koanf does NOT flatten into slices, so `k.Get("profiles.x.operations.0.settings")` always returns nil. All per-operation reads go through `operationRawValue` (manual map/slice navigation) in `internal/config/config.go`; settings are then re-encoded as YAML and decoded through domain types so enum `UnmarshalYAML` hooks handle both int and string forms
 
+## Config Validation Engine (go-business-rules, adopted 2026-09-23)
+
+- **Declarative rules, not imperative appends** — every config validation check (structure / field / cross-field / business logic / security) is a `businessrules.Rule` built in `internal/config/validation_rules.go` and executed via `businessrules.NewValidator().AddRules(...).Build()`. `ConfigValidator.ValidateConfig` bridges the outcome back into the project's `ValidationResult` (Critical+Error → `Errors`, Warning+Info → `Warnings`); JSON shape is unchanged
+- **4 severity levels** — `operations.ValidationSeverity` now has `SeverityCritical` (`"critical"`); a `..` parent reference in a protected path escalates to critical. Rule tags carry `[level, kind]` (kind = old rule strings like `required`/`range`/`security`); `WithDescription` carries the fix suggestion; per-rule structured data (value, `ValidationContext`) is restored from maps keyed by rule name because `ViolationError` only keeps the check error as text
+- **Warnings surface at the load boundary** — `validateLoadedConfig` logs every validation warning (`logger.Warn`, field/message/suggestion); previously warnings were computed and silently dropped. Error suggestions are logged too
+- **Deterministic violation order** — profile iteration is sorted; rules execute sequentially in registration order (do not switch to `Stream`, it reorders violations)
+- **MinProtectedPaths is now enforced** (declared-but-dead before); structure-level, guarded to not double-fire on empty paths
+- Removed with the rewrite: `validator_structure.go`, `validator_crossfield.go`, `validateBusinessLogic`/`validateSecurityConstraints`/`addCriticalRiskError`; conflict-check predicates (`validateProtectedPathsConflict`, `checkTempFilesConflict`, `checkNixConflict`, `findMaxRiskLevel`) remain as rule check functions in `validator_business.go`
+- Assessment + non-adopted capabilities (Stream, otel listener, composites, domain-layer rewrite): `docs/planning/2026-09-23_go-business-rules-integration.md`
+
 ## Dependencies
 
 - `charm.land/huh/v2` - TUI forms
@@ -98,6 +108,7 @@ Key design principles:
 - `github.com/charmbracelet/fang` - Help command generation
 - `github.com/larsartmann/go-error-family` - Error classification (5 families: Rejection, Conflict, Transient, Corruption, Infrastructure)
 - `github.com/larsartmann/go-finding` - SARIF 2.1.0 export for scan output (Finding model, Builder API; core module only, no pipeline)
+- `github.com/LarsArtmann/go-business-rules/v2` - Severity-aware validation (Info/Warning/Error/Critical): config validation rules, validator, violation bridging
 - `github.com/onsi/ginkgo/v2` + `github.com/onsi/gomega` - BDD testing
 - `github.com/knadh/koanf/v2` - Configuration
 - `github.com/samber/do/v2` - Dependency injection

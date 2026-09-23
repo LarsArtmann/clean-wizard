@@ -23,19 +23,19 @@ func TestMapViolations_SeverityBucketing(t *testing.T) {
 	set := newConfigRuleSet()
 	set.add(configRule("critical_field", "structure", "required",
 		businessrules.SeverityCritical, "critical rule",
-		func() error { return errStatic("critical failure") },
+		func() error { return errStaticError("critical failure") },
 	), "v", nil)
 	set.add(configRule("error_field", "field", "range",
 		businessrules.SeverityError, "error rule",
-		func() error { return errStatic("error failure") },
+		func() error { return errStaticError("error failure") },
 	), "v", nil)
 	set.add(configRule("warning_field", "cross_field", "max_count",
 		businessrules.SeverityWarning, "warning rule",
-		func() error { return errStatic("warning failure") },
+		func() error { return errStaticError("warning failure") },
 	), "v", nil)
 	set.add(configRule("info_field", "security", "security",
 		businessrules.SeverityInfo, "info rule",
-		func() error { return errStatic("info failure") },
+		func() error { return errStaticError("info failure") },
 	), "v", nil)
 
 	outcome := businessrules.NewValidator().AddRules(set.rules...).Build()
@@ -177,15 +177,12 @@ func TestValidateConfig_DeterministicViolationOrder(t *testing.T) {
 	validator := NewConfigValidator()
 
 	fingerprint := func(result *ValidationResult) string {
-		out := ""
-
-		var outSb181 strings.Builder
+		var violations strings.Builder
 		for _, validationError := range result.Errors {
-			outSb181.WriteString(validationError.Field + "|" + validationError.Message + "\n")
+			violations.WriteString(validationError.Field + "|" + validationError.Message + "\n")
 		}
-		out += outSb181.String()
 
-		return out
+		return violations.String()
 	}
 
 	first := fingerprint(validator.ValidateConfig(cfg))
@@ -223,7 +220,7 @@ func TestValidateConfig_StructuredMetadataForContexts(t *testing.T) {
 	t.Fatalf("expected safe_mode cross-field warning with context, got: %+v", result.Warnings)
 }
 
-// errStatic is a fixed failure used by synthetic bridge-test rules.
-type errStatic string
+// errStaticError is a fixed failure used by synthetic bridge-test rules.
+type errStaticError string
 
-func (e errStatic) Error() string { return string(e) }
+func (e errStaticError) Error() string { return string(e) }
