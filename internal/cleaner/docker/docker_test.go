@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	cln "github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
@@ -232,7 +233,7 @@ func TestDockerCleaner_DryRunStrategy(t *testing.T) {
 
 	cleaner := NewDockerCleaner(false, true, enums.DockerPruneAll)
 
-	cleaner.TestDryRun(t, cleaner.SimpleCleanerConstructorFromInstance(cleaner), "docker", -1)
+	cln.TestDryRun(t, cln.SimpleCleanerConstructorFromInstance(cleaner), "docker", -1)
 }
 
 func TestDockerCleaner_PruneModes(t *testing.T) {

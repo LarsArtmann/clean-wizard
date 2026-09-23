@@ -224,3 +224,6 @@ func (tfc *TempFilesCleaner) isExcluded(path string) bool {
 
 	return false
 }
+
+// GetOlderThan returns the configured age threshold for temp file cleanup.
+func (tfc *TempFilesCleaner) GetOlderThan() time.Duration { return tfc.olderThan }

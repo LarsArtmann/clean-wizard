@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/nix"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -39,7 +39,7 @@ func mockGenerations(count int) []types.NixGeneration {
 
 // getGenerationsOrMock attempts to list real Nix generations, falling back to mocks on error.
 func getGenerationsOrMock(
-	ctx context.Context, nixCleaner *cleaner.NixCleaner, mockCount int,
+	ctx context.Context, nixCleaner *nix.NixCleaner, mockCount int,
 ) result.Result[[]types.NixGeneration] {
 	generations := nixCleaner.ListGenerations(ctx)
 	if generations.IsErr() {
@@ -52,7 +52,7 @@ func getGenerationsOrMock(
 // getGenerationsAndAssertOk gets generations and asserts they are ok.
 // This eliminates duplicate test code for checking generations result.
 func getGenerationsAndAssertOk(
-	ctx context.Context, nixCleaner *cleaner.NixCleaner, mockCount int,
+	ctx context.Context, nixCleaner *nix.NixCleaner, mockCount int,
 ) result.Result[[]types.NixGeneration] {
 	generations := getGenerationsOrMock(ctx, nixCleaner, mockCount)
 	gomega.Expect(generations.IsOk()).To(gomega.BeTrue())
@@ -63,7 +63,7 @@ func getGenerationsAndAssertOk(
 // cleanGenerationsAndVerify gets mock generations and runs CleanOldGenerations,
 // then verifies the result is OK. Returns the clean result for additional assertions.
 func cleanGenerationsAndVerify(
-	ctx context.Context, nixCleaner *cleaner.NixCleaner, minCount, keepCount int,
+	ctx context.Context, nixCleaner *nix.NixCleaner, minCount, keepCount int,
 ) result.Result[types.CleanResult] {
 	_ = getGenerationsOrMock(ctx, nixCleaner, minCount)
 	cleanResult := nixCleaner.CleanOldGenerations(ctx, keepCount)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	cln "github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/onsi/ginkgo/v2"
@@ -118,7 +119,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 		})
 
 		ginkgo.It("should return correct name and type", func() {
-			cleaner.GinkgoAssertNameAndType(cleaner, "git-history", operations.OperationTypeGitHistory)
+			cln.GinkgoAssertNameAndType(cleaner, "git-history", operations.OperationTypeGitHistory)
 		})
 	})
 
@@ -144,7 +145,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 			})
 		})
 
-		cleaner.GinkgoValidateEmptySettingsContext(cleaner, "should return nil when GitHistory is nil")
+		cln.GinkgoValidateEmptySettingsContext(cleaner, "should return nil when GitHistory is nil")
 
 		ginkgo.Context("with valid settings", func() {
 			ginkgo.It("should return nil for valid empty GitHistorySettings", func() {
@@ -161,7 +162,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 						MinSizeMB: 10,
 					},
 				}
-				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+				cln.GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid max_files", func() {
@@ -170,7 +171,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 						MaxFiles: 50,
 					},
 				}
-				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+				cln.GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 		})
 

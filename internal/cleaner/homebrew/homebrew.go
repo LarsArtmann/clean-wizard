@@ -283,3 +283,6 @@ func filterConfusingWarnings(output string) string {
 
 	return strings.Join(filteredLines, "\n")
 }
+
+// GetUnusedOnly returns the configured Homebrew cleanup mode.
+func (hbc *HomebrewCleaner) GetUnusedOnly() enums.HomebrewMode { return hbc.unusedOnly }

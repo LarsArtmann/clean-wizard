@@ -532,3 +532,6 @@ func (dc *DockerCleaner) newDryRunResult(totalBytes int64, itemsCount int) types
 		totalBytes,
 	)
 }
+
+// GetPruneMode returns the configured Docker prune mode.
+func (dc *DockerCleaner) GetPruneMode() enums.DockerPruneMode { return dc.pruneMode }

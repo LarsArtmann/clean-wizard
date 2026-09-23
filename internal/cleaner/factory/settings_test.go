@@ -6,7 +6,11 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/compiledbinaries"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/docker"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/homebrew"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/nix"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/tempfiles"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -235,12 +239,12 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Fatal("registry is empty")
 		}
 
-		homebrew, ok := registry.Get(cleaner.CleanerHomebrew)
+		c, ok := registry.Get(cleaner.CleanerHomebrew)
 		if !ok {
 			t.Fatal("homebrew cleaner not registered")
 		}
 
-		if got := homebrew.(*HomebrewCleaner).unusedOnly; got != enums.HomebrewModeAll {
+		if got := c.(*homebrew.HomebrewCleaner).GetUnusedOnly(); got != enums.HomebrewModeAll {
 			t.Errorf("homebrew mode = %v, want ALL", got)
 		}
 	})
@@ -261,31 +265,31 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Fatalf("DefaultRegistryWithConfig() error = %v", err)
 		}
 
-		if got := mustGetCleaner[*NixCleaner](t, registry, cleaner.CleanerNix).keepCount; got != 3 {
+		if got := mustGetCleaner[*nix.NixCleaner](t, registry, cleaner.CleanerNix).GetKeepCount(); got != 3 {
 			t.Errorf("nix keepCount = %d, want 3", got)
 		}
 
-		if got := mustGetCleaner[*HomebrewCleaner](
+		if got := mustGetCleaner[*homebrew.HomebrewCleaner](
 			t,
 			registry,
 			cleaner.CleanerHomebrew,
-		).unusedOnly; got != enums.HomebrewModeUnusedOnly {
+		).GetUnusedOnly(); got != enums.HomebrewModeUnusedOnly {
 			t.Errorf("homebrew mode = %v, want UNUSED_ONLY", got)
 		}
 
-		if got := mustGetCleaner[*DockerCleaner](
+		if got := mustGetCleaner[*docker.DockerCleaner](
 			t,
 			registry,
 			cleaner.CleanerDocker,
-		).pruneMode; got != enums.DockerPruneVolumes {
+		).GetPruneMode(); got != enums.DockerPruneVolumes {
 			t.Errorf("docker prune mode = %v, want VOLUMES", got)
 		}
 
-		if got := mustGetCleaner[*TempFilesCleaner](t, registry, cleaner.CleanerTempFiles).olderThan; got != 14*24*time.Hour {
+		if got := mustGetCleaner[*tempfiles.TempFilesCleaner](t, registry, cleaner.CleanerTempFiles).GetOlderThan(); got != 14*24*time.Hour {
 			t.Errorf("temp files olderThan = %v, want 14d", got)
 		}
 
-		if got := mustGetCleaner[*GoCleaner](t, registry, cleaner.CleanerGo).caches; got != golang.GoCacheGOCACHE {
+		if got := mustGetCleaner[*golang.GoCleaner](t, registry, cleaner.CleanerGo).GetCaches(); got != golang.GoCacheGOCACHE {
 			t.Errorf("go caches = %v, want GOCACHE only", got)
 		}
 	})

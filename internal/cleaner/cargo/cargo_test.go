@@ -46,7 +46,7 @@ func TestCargoCleaner_GetHomeDir(t *testing.T) { //nolint:paralleltest
 		},
 	}
 
-	RunGetHomeDirTests(t, testCases)
+	cln.RunGetHomeDirTests(t, testCases)
 }
 
 func TestCargoCleaner_GetDirSize(t *testing.T) {

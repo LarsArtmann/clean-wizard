@@ -291,3 +291,6 @@ func countOldGenerations(generations []types.NixGeneration, keepCount int) int {
 
 	return len(generations) - keepCount
 }
+
+// GetKeepCount returns the configured number of generations to keep.
+func (nc *NixCleaner) GetKeepCount() int { return nc.keepCount }

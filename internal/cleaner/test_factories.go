@@ -319,3 +319,28 @@ func CreateBooleanSettingsCleanerTestFunctions(
 		TestBooleanSettingsCleanerCleanDryRun(t, config, config.Constructor)
 	})
 }
+
+// VerboseDryRunCleaner is an interface for cleaners that have verbose and dryRun fields.
+// Used for testing common cleaner initialization patterns.
+type VerboseDryRunCleaner interface {
+	GetVerbose() bool
+	GetDryRun() bool
+}
+
+// AssertCleanerBooleanFields validates that a cleaner's verbose and dryRun fields
+// match the expected values. This eliminates duplicate assertion code across cleaner test files.
+func AssertCleanerBooleanFields(
+	t *testing.T,
+	cleaner VerboseDryRunCleaner,
+	wantVerbose, wantDryRun bool,
+) {
+	t.Helper()
+
+	if got := cleaner.GetVerbose(); got != wantVerbose {
+		t.Errorf("verbose = %v, want %v", got, wantVerbose)
+	}
+
+	if got := cleaner.GetDryRun(); got != wantDryRun {
+		t.Errorf("dryRun = %v, want %v", got, wantDryRun)
+	}
+}

@@ -266,3 +266,6 @@ func isProcessRunning(name string) bool {
 
 	return false
 }
+
+// GetCaches returns the configured set of Go caches to clean.
+func (gc *GoCleaner) GetCaches() GoCacheType { return gc.caches }

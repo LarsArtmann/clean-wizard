@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	cln "github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golangcilint"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
@@ -388,13 +390,13 @@ func TestGoCleaner_DryRunStrategy(t *testing.T) {
 		cacheTypeFromBools(true, true, true, true, true),
 	)
 
-	cleaner.TestDryRun(t, cleaner.SimpleCleanerConstructorFromInstance(cleaner), "go", -1)
+	cln.TestDryRun(t, cln.SimpleCleanerConstructorFromInstance(cleaner), "go", -1)
 }
 
 func TestGoCleaner_CleanGolangciLintCache(t *testing.T) {
 	t.Parallel()
 
-	lintCleaner := NewGolangciLintCacheCleaner(true, false)
+	lintCleaner := golangcilint.NewGolangciLintCacheCleaner(true, false)
 
 	result := lintCleaner.Clean(context.Background())
 	if result.IsErr() {

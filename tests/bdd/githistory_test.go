@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/githistory"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/onsi/ginkgo/v2"
@@ -67,7 +66,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 		ginkgo.Context("when not in a git repository", func() {
 			ginkgo.It("should report not available", func() {
 				testCtx.cleaner = githistory.NewGitHistoryCleaner(
-					cleaner.WithGitHistoryRepoPath(testCtx.repoPath),
+					githistory.WithGitHistoryRepoPath(testCtx.repoPath),
 				)
 				gomega.Expect(testCtx.cleaner.IsAvailable(testCtx.ctx)).To(gomega.BeFalse())
 			})
@@ -81,7 +80,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 
 			ginkgo.It("should report available", func() {
 				testCtx.cleaner = githistory.NewGitHistoryCleaner(
-					cleaner.WithGitHistoryRepoPath(testCtx.repoPath),
+					githistory.WithGitHistoryRepoPath(testCtx.repoPath),
 				)
 				gomega.Expect(testCtx.cleaner.IsAvailable(testCtx.ctx)).To(gomega.BeTrue())
 			})
@@ -92,7 +91,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 		ginkgo.BeforeEach(func() {
 			initGitRepo(testCtx.repoPath)
 			testCtx.cleaner = githistory.NewGitHistoryCleaner(
-				cleaner.WithGitHistoryRepoPath(testCtx.repoPath),
+				githistory.WithGitHistoryRepoPath(testCtx.repoPath),
 			)
 		})
 
@@ -144,8 +143,8 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 		ginkgo.BeforeEach(func() {
 			initGitRepo(testCtx.repoPath)
 			testCtx.cleaner = githistory.NewGitHistoryCleaner(
-				cleaner.WithGitHistoryRepoPath(testCtx.repoPath),
-				cleaner.WithGitHistoryMinSizeMB(1),
+				githistory.WithGitHistoryRepoPath(testCtx.repoPath),
+				githistory.WithGitHistoryMinSizeMB(1),
 			)
 		})
 
@@ -222,9 +221,9 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 		ginkgo.BeforeEach(func() {
 			initGitRepo(testCtx.repoPath)
 			testCtx.cleaner = githistory.NewGitHistoryCleaner(
-				cleaner.WithGitHistoryRepoPath(testCtx.repoPath),
-				cleaner.WithGitHistoryDryRun(true),
-				cleaner.WithGitHistoryVerbose(true),
+				githistory.WithGitHistoryRepoPath(testCtx.repoPath),
+				githistory.WithGitHistoryDryRun(true),
+				githistory.WithGitHistoryVerbose(true),
 			)
 		})
 
@@ -271,8 +270,8 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 			// We test this indirectly by checking that the cleaner
 			// can be initialized and configured without errors
 			testCtx.cleaner = githistory.NewGitHistoryCleaner(
-				cleaner.WithGitHistoryRepoPath(testCtx.repoPath),
-				cleaner.WithGitHistoryDryRun(true),
+				githistory.WithGitHistoryRepoPath(testCtx.repoPath),
+				githistory.WithGitHistoryDryRun(true),
 			)
 			gomega.Expect(testCtx.cleaner).NotTo(gomega.BeNil())
 		})
@@ -290,7 +289,7 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 			initGitRepo(repo1)
 			initGitRepo(repo2)
 
-			repos, err := cleaner.FindGitRepositories(testCtx.repoPath, 3)
+			repos, err := githistory.FindGitRepositories(testCtx.repoPath, 3)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			gomega.Expect(repos).To(gomega.ContainElements(repo1, repo2))
 		})
@@ -301,12 +300,12 @@ var _ = ginkgo.Describe("Git History Cleaner", func() {
 			initGitRepo(deepRepo)
 
 			// With depth 3, should not find the repo
-			repos, err := cleaner.FindGitRepositories(testCtx.repoPath, 3)
+			repos, err := githistory.FindGitRepositories(testCtx.repoPath, 3)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			gomega.Expect(repos).NotTo(gomega.ContainElement(deepRepo))
 
 			// With depth 5, should find the repo
-			repos, err = cleaner.FindGitRepositories(testCtx.repoPath, 5)
+			repos, err = githistory.FindGitRepositories(testCtx.repoPath, 5)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			gomega.Expect(repos).To(gomega.ContainElement(deepRepo))
 		})
