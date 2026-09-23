@@ -10,9 +10,10 @@ import (
 type ValidationSeverity string
 
 const (
-	SeverityError   ValidationSeverity = "error"
-	SeverityWarning ValidationSeverity = "warning"
-	SeverityInfo    ValidationSeverity = "info"
+	SeverityError    ValidationSeverity = "error"
+	SeverityWarning  ValidationSeverity = "warning"
+	SeverityInfo     ValidationSeverity = "info"
+	SeverityCritical ValidationSeverity = "critical"
 )
 
 const tempFilesOlderThanField = "temp_files.older_than"
