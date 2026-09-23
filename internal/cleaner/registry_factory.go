@@ -30,19 +30,34 @@ func DefaultRegistryWithConfig(verbose, dryRun bool, settings *domain.OperationS
 func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *domain.OperationSettings) error {
 	// Nix cleaner (keep count from settings; constructor default 5 when unset)
 	nixKeepCount := resolveNixKeepCount(settings)
-	if err := registerValidated(registry, CleanerNix, NewNixCleaner(verbose, dryRun, nixKeepCount...), settings); err != nil {
+	if err := registerValidated(
+		registry,
+		CleanerNix,
+		NewNixCleaner(verbose, dryRun, nixKeepCount...),
+		settings,
+	); err != nil {
 		return err
 	}
 
 	// Homebrew cleaner
 	homebrewMode := resolveHomebrewMode(settings)
-	if err := registerValidated(registry, CleanerHomebrew, NewHomebrewCleaner(verbose, dryRun, homebrewMode), settings); err != nil {
+	if err := registerValidated(
+		registry,
+		CleanerHomebrew,
+		NewHomebrewCleaner(verbose, dryRun, homebrewMode),
+		settings,
+	); err != nil {
 		return err
 	}
 
 	// Docker cleaner
 	dockerPruneMode := resolveDockerPruneMode(settings)
-	if err := registerValidated(registry, CleanerDocker, NewDockerCleaner(verbose, dryRun, dockerPruneMode), settings); err != nil {
+	if err := registerValidated(
+		registry,
+		CleanerDocker,
+		NewDockerCleaner(verbose, dryRun, dockerPruneMode),
+		settings,
+	); err != nil {
 		return err
 	}
 
@@ -110,7 +125,12 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *dom
 	}
 
 	// Projects management automation cleaner
-	if err := registerValidated(registry, CleanerProjects, NewProjectsManagementAutomationCleaner(verbose, dryRun), settings); err != nil {
+	if err := registerValidated(
+		registry,
+		CleanerProjects,
+		NewProjectsManagementAutomationCleaner(verbose, dryRun),
+		settings,
+	); err != nil {
 		return err
 	}
 
@@ -126,8 +146,9 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *dom
 	}
 
 	// Compiled binaries cleaner
-	compiledMinSizeMB, compiledOlderThan, compiledBasePaths, compiledExcludePatterns :=
-		resolveCompiledBinaries(settings)
+	compiledMinSizeMB, compiledOlderThan, compiledBasePaths, compiledExcludePatterns := resolveCompiledBinaries(
+		settings,
+	)
 	compiledBinariesCleaner := NewCompiledBinariesCleaner(
 		verbose, dryRun, compiledMinSizeMB, compiledOlderThan, compiledBasePaths, compiledExcludePatterns,
 	)
@@ -137,7 +158,12 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *dom
 	}
 
 	// golangci-lint cache cleaner (uses `golangci-lint cache status` for accurate sizing)
-	if err := registerValidated(registry, CleanerGolangciLint, NewGolangciLintCacheCleaner(verbose, dryRun), settings); err != nil {
+	if err := registerValidated(
+		registry,
+		CleanerGolangciLint,
+		NewGolangciLintCacheCleaner(verbose, dryRun),
+		settings,
+	); err != nil {
 		return err
 	}
 
@@ -149,7 +175,12 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *dom
 func registerValidated(registry *Registry, name string, c Cleaner, settings *domain.OperationSettings) error {
 	if withSettings, ok := c.(CleanerWithSettings); ok {
 		if err := withSettings.ValidateSettings(settings); err != nil {
-			return errorfamily.WrapRejectionf(err, "cleaner.settings_invalid", "cleaner=%s has invalid operation settings", name)
+			return errorfamily.WrapRejectionf(
+				err,
+				"cleaner.settings_invalid",
+				"cleaner=%s has invalid operation settings",
+				name,
+			)
 		}
 	}
 

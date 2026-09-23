@@ -165,8 +165,8 @@ type panickingCleaner struct {
 	name string
 }
 
-func (p *panickingCleaner) Name() string                      { return p.name }
-func (p *panickingCleaner) Type() domain.OperationType        { return domain.OperationTypeCargoPackages }
+func (p *panickingCleaner) Name() string                       { return p.name }
+func (p *panickingCleaner) Type() domain.OperationType         { return domain.OperationTypeCargoPackages }
 func (p *panickingCleaner) IsAvailable(_ context.Context) bool { return true }
 
 func (p *panickingCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {

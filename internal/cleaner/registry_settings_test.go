@@ -64,14 +64,32 @@ func TestResolveOperationSettings_ConfiguredSections(t *testing.T) {
 	t.Parallel()
 
 	settings := &domain.OperationSettings{ //nolint:exhaustruct
-		NixGenerations: &domain.NixGenerationsSettings{Generations: 3},                                                       //nolint:exhaustruct
-		Homebrew:       &domain.HomebrewSettings{UnusedOnly: domain.HomebrewModeUnusedOnly},                                  //nolint:exhaustruct
-		Docker:         &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},                                         //nolint:exhaustruct
-		GoPackages:     &domain.GoPackagesSettings{CleanCache: domain.CacheCleanupEnabled},                                   //nolint:exhaustruct
-		NodePackages:   &domain.NodePackagesSettings{PackageManagers: []domain.PackageManagerType{domain.PackageManagerBun}}, //nolint:exhaustruct
-		BuildCache:     &domain.BuildCacheSettings{OlderThan: "14d"},                                                         //nolint:exhaustruct
-		SystemCache:    &domain.SystemCacheSettings{OlderThan: "21d", CacheTypes: []domain.CacheType{domain.CacheTypePip}},   //nolint:exhaustruct
-		TempFiles:      &domain.TempFilesSettings{OlderThan: "14d", Excludes: []string{"/tmp/keep"}},                         //nolint:exhaustruct
+		NixGenerations: &domain.NixGenerationsSettings{
+			Generations: 3,
+		}, //nolint:exhaustruct
+		Homebrew: &domain.HomebrewSettings{
+			UnusedOnly: domain.HomebrewModeUnusedOnly,
+		}, //nolint:exhaustruct
+		Docker: &domain.DockerSettings{
+			PruneMode: domain.DockerPruneVolumes,
+		}, //nolint:exhaustruct
+		GoPackages: &domain.GoPackagesSettings{
+			CleanCache: domain.CacheCleanupEnabled,
+		}, //nolint:exhaustruct
+		NodePackages: &domain.NodePackagesSettings{
+			PackageManagers: []domain.PackageManagerType{domain.PackageManagerBun},
+		}, //nolint:exhaustruct
+		BuildCache: &domain.BuildCacheSettings{
+			OlderThan: "14d",
+		}, //nolint:exhaustruct
+		SystemCache: &domain.SystemCacheSettings{
+			OlderThan:  "21d",
+			CacheTypes: []domain.CacheType{domain.CacheTypePip},
+		}, //nolint:exhaustruct
+		TempFiles: &domain.TempFilesSettings{
+			OlderThan: "14d",
+			Excludes:  []string{"/tmp/keep"},
+		}, //nolint:exhaustruct
 		ProjectExecutables: &domain.ProjectExecutablesSettings{ //nolint:exhaustruct
 			ExcludeExtensions: []string{".bin"},
 			ExcludePatterns:   []string{"vendor/**"},
@@ -243,11 +261,19 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Errorf("nix keepCount = %d, want 3", got)
 		}
 
-		if got := mustGetCleaner[*HomebrewCleaner](t, registry, CleanerHomebrew).unusedOnly; got != domain.HomebrewModeUnusedOnly {
+		if got := mustGetCleaner[*HomebrewCleaner](
+			t,
+			registry,
+			CleanerHomebrew,
+		).unusedOnly; got != domain.HomebrewModeUnusedOnly {
 			t.Errorf("homebrew mode = %v, want UNUSED_ONLY", got)
 		}
 
-		if got := mustGetCleaner[*DockerCleaner](t, registry, CleanerDocker).pruneMode; got != domain.DockerPruneVolumes {
+		if got := mustGetCleaner[*DockerCleaner](
+			t,
+			registry,
+			CleanerDocker,
+		).pruneMode; got != domain.DockerPruneVolumes {
 			t.Errorf("docker prune mode = %v, want VOLUMES", got)
 		}
 

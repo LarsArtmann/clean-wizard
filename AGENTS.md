@@ -88,6 +88,8 @@ Key design principles:
 - **Retry by default** — `--retries 3` on both clean and scan commands; `errorfamily.IsRetryable()` returns false for non-Transient errors → `backoff.Stop` (zero delay); `--retries 0` disables
 - **RetryProfile presets** — `--retry-profile` flag (default/aggressive/conservative/none) on both clean and scan; overrides `--retries` with pre-tuned backoff/attempt combinations
 - **CLI exit codes** — `errorfamily.ExitCode(err)` in `main.go` maps error families to BSD sysexits codes (Rejection=1, Transient=75, Infrastructure=69, Corruption=65); `errorfamily.LogError` adds structured slog output with family/code/retryable fields
+- **Profile settings wiring** — `--profile` flag → `di.RunSettings.Profile` → `domain.Config.SettingsForProfile(name)` merges each operation's settings block into one `OperationSettings` (first section wins) → `cleaner.DefaultRegistryWithConfig(verbose, dryRun, settings)`. Resolution helpers in `internal/cleaner/registry_settings.go` translate sections to constructor params: a configured section overrides factory defaults field-by-field (empty string/0/nil field → default); fully-disabled go_packages falls back to default cache flags (`GoCacheNone` is an invalid constructor state). Every registered `CleanerWithSettings` is also validated against the settings at registry creation (Rejection on failure)
+- **koanf array-path gotcha** — koanf does NOT flatten into slices, so `k.Get("profiles.x.operations.0.settings")` always returns nil. All per-operation reads go through `operationRawValue` (manual map/slice navigation) in `internal/config/config.go`; settings are then re-encoded as YAML and decoded through domain types so enum `UnmarshalYAML` hooks handle both int and string forms
 
 ## Dependencies
 
@@ -141,7 +143,7 @@ Key files:
 
 - `internal/domain/` is a god package (23 files)
 - `internal/cleaner/` has 50+ files flat (no sub-packages)
-- Cleaners still use hardcoded defaults instead of user profile config
+- Settings only flow when a `--profile` is selected; preset/interactive runs (and the nix/cargo/projects/git-history/golangci-lint cleaners whose constructors take no settings params) still use factory defaults. `NixGenerationsSettings.DryRun`/`Optimize` and `BuildCacheSettings.ToolTypes` have no constructor consumption yet
 - Logger uses mutable package-level globals (`L`, `StdLogger`) — causes test race conditions
 
 ## Test Facts

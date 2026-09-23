@@ -18,12 +18,12 @@
 
 ## High Priority
 
-| # | Task                                                                                                        | Impact | Effort | Source                 |
-| - | ----------------------------------------------------------------------------------------------------------- | ------ | ------ | ---------------------- |
-| 6 | Wire `OperationSettings` from YAML config → cleaner constructors (cleaners use hardcoded defaults)          | HIGH   | HIGH   | 2026-07-06 DI/workflow |
-| 7 | Add BDD tests for execution layer (Ginkgo) — workflow DAG, retry, parallel execution                        | HIGH   | MED    | 2026-07-06 BDD audit   |
-| 8 | Add BDD tests for Docker, Homebrew, Go cleaners (9 of 13 cleaners have NO BDD tests)                        | HIGH   | HIGH   | 2026-07-06 BDD audit   |
-| 9 | Migrate `docker_parsing.go` `sizeMultiplier` map to `humanize.ParseBytes` (H007 violation, mirrors b7692ff) | MED    | LOW    | 2026-08-05 linter      |
+| # | Task                                                                                                                                                                                                                                                                                                                                   | Impact | Effort | Source                 |
+| - | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ---------------------- |
+| 6 | ~~Wire `OperationSettings` from YAML config → cleaner constructors (cleaners use hardcoded defaults)~~ DONE 2026-09-23 (profile settings flow: config parse → `SettingsForProfile` merge → DI `RunSettings.Profile` → `DefaultRegistryWithConfig`; also fixed koanf array-path bug that silently dropped ALL settings and risk levels) | HIGH   | HIGH   | 2026-07-06 DI/workflow |
+| 7 | ~~Add BDD tests for execution layer (Ginkgo) — workflow DAG, retry, parallel execution~~ DONE 2026-09-23 (`internal/execution/*_bdd_test.go`, 13 specs)                                                                                                                                                                                | HIGH   | MED    | 2026-07-06 BDD audit   |
+| 8 | ~~Add BDD tests for Docker, Homebrew, Go cleaners~~ DONE 2026-09-23 (`tests/bdd/{docker,homebrew,golang}_test.go`; 6 of 13 cleaners still lack BDD tests)                                                                                                                                                                              | HIGH   | HIGH   | 2026-07-06 BDD audit   |
+| 9 | ~~Migrate `docker_parsing.go` `sizeMultiplier` map to `humanize.ParseBytes`~~ DONE 2026-09-23 (SI decimal semantics now, mirroring b7692ff; dead `ParseNumberAndUnit` removed)                                                                                                                                                         | MED    | LOW    | 2026-08-05 linter      |
 
 ## Medium Priority
 

@@ -58,8 +58,8 @@ func newFakeCleaner(name string, outcomes ...error) *fakeCleaner {
 	return &fakeCleaner{name: name, available: true, outcomes: outcomes}
 }
 
-func (f *fakeCleaner) Name() string                      { return f.name }
-func (f *fakeCleaner) Type() domain.OperationType        { return domain.OperationTypeCargoPackages }
+func (f *fakeCleaner) Name() string                       { return f.name }
+func (f *fakeCleaner) Type() domain.OperationType         { return domain.OperationTypeCargoPackages }
 func (f *fakeCleaner) IsAvailable(_ context.Context) bool { return f.available }
 
 func (f *fakeCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
