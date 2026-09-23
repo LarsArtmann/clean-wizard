@@ -120,32 +120,44 @@ func parseEnumFromInt[T ~int](
 	return trySetEnumFromIndex(i, target, stringsMap, name)
 }
 
+// tryParseEnumValue decodes value as a string (preferred) then an int and parses
+// it into target. It returns handled=true when the node matched either form,
+// carrying the parse outcome (nil on success); handled=false means the node was
+// neither a string nor an int, so the caller reports the type mismatch.
+func tryParseEnumValue[T ~int](
+	value *yaml.Node,
+	target *T,
+	stringsMap []string,
+	name string,
+) (handled bool, err error) {
+	var s string
+
+	if err := value.Decode(&s); err == nil {
+		_, parseErr := parseEnumFromString(s, target, stringsMap, name)
+
+		return true, parseErr
+	}
+
+	var i int
+
+	if err := value.Decode(&i); err == nil {
+		_, parseErr := parseEnumFromInt(i, target, stringsMap, name)
+
+		return true, parseErr
+	}
+
+	return false, nil
+}
+
 func EnumUnmarshalYAML[T ~int](
 	value *yaml.Node,
 	target *T,
 	stringsMap []string,
 	name string,
 ) error {
-	var s string
-
-	err := value.Decode(&s)
-	if err == nil {
-		if ok, parseErr := parseEnumFromString(s, target, stringsMap, name); ok {
-			return parseErr
-		} else if parseErr != nil {
-			return parseErr
-		}
-	}
-
-	var i int
-
-	err = value.Decode(&i)
-	if err == nil {
-		if ok, parseErr := parseEnumFromInt(i, target, stringsMap, name); ok {
-			return parseErr
-		} else if parseErr != nil {
-			return parseErr
-		}
+	handled, parseErr := tryParseEnumValue(value, target, stringsMap, name)
+	if handled {
+		return parseErr
 	}
 
 	return fmt.Errorf("cannot parse %s: expected string or int", name)

@@ -42,6 +42,15 @@ func (sm SafeMode) Values() []SafeMode { return EnumValues(SafeModeStrict) }
 func (sm SafeMode) IsEnabled() bool    { return sm == SafeModeEnabled || sm == SafeModeStrict }
 func (sm SafeMode) IsStrict() bool     { return sm == SafeModeStrict }
 
+// SafeModeFromBool returns SafeModeEnabled for true, SafeModeDisabled otherwise.
+func SafeModeFromBool(b bool) SafeMode {
+	if b {
+		return SafeModeEnabled
+	}
+
+	return SafeModeDisabled
+}
+
 func (sm SafeMode) MarshalYAML() (any, error) {
 	return EnumMarshalYAML(sm, safeModeStrings)
 }
@@ -63,6 +72,15 @@ func (ps ProfileStatus) String() string          { return EnumString(ps, profile
 func (ps ProfileStatus) IsValid() bool           { return EnumIsValid(ps, ProfileStatusEnabled) }
 func (ps ProfileStatus) Values() []ProfileStatus { return EnumValues(ProfileStatusEnabled) }
 func (ps ProfileStatus) IsEnabled() bool         { return ps == ProfileStatusEnabled }
+
+// ProfileStatusFromBool returns ProfileStatusEnabled for true, ProfileStatusDisabled otherwise.
+func ProfileStatusFromBool(b bool) ProfileStatus {
+	if b {
+		return ProfileStatusEnabled
+	}
+
+	return ProfileStatusDisabled
+}
 
 func (ps ProfileStatus) MarshalYAML() (any, error) {
 	return EnumMarshalYAML(ps, profileStatusStrings)
@@ -87,6 +105,15 @@ func (om OptimizationMode) IsValid() bool { return EnumIsValid(om, OptimizationM
 
 func (om OptimizationMode) Values() []OptimizationMode { return EnumValues(OptimizationModeEnabled) }
 func (om OptimizationMode) IsEnabled() bool            { return om == OptimizationModeEnabled }
+
+// OptimizationModeFromBool returns OptimizationModeEnabled for true, OptimizationModeDisabled otherwise.
+func OptimizationModeFromBool(b bool) OptimizationMode {
+	if b {
+		return OptimizationModeEnabled
+	}
+
+	return OptimizationModeDisabled
+}
 
 func (om OptimizationMode) MarshalYAML() (any, error) {
 	return EnumMarshalYAML(om, optimizationModeStrings)
@@ -133,6 +160,15 @@ func (gs GenerationStatus) IsValid() bool { return EnumIsValid(gs, GenerationSta
 
 func (gs GenerationStatus) Values() []GenerationStatus { return EnumValues(GenerationStatusCurrent) }
 func (gs GenerationStatus) IsCurrent() bool            { return gs == GenerationStatusCurrent }
+
+// GenerationStatusFromBool returns GenerationStatusCurrent for true, GenerationStatusHistorical otherwise.
+func GenerationStatusFromBool(b bool) GenerationStatus {
+	if b {
+		return GenerationStatusCurrent
+	}
+
+	return GenerationStatusHistorical
+}
 
 type ScanMode int
 
