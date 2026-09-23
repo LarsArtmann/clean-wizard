@@ -98,6 +98,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *dom
 
 	// System cache cleaner
 	systemCacheOlderThan, systemCacheTypes := resolveSystemCache(settings)
+
 	systemCacheCleaner, err := NewSystemCacheCleaner(verbose, dryRun, systemCacheOlderThan, systemCacheTypes)
 	if err != nil {
 		return errorfamily.WrapRejection(err, "cleaner.systemcache_create", "failed to create SystemCache cleaner")
@@ -109,6 +110,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *dom
 
 	// Temp files cleaner (standard temp paths stay fixed; settings control age and excludes)
 	tempFilesOlderThan, tempFilesExcludes := resolveTempFiles(settings)
+
 	tempFilesCleaner, err := NewTempFilesCleaner(
 		verbose,
 		dryRun,

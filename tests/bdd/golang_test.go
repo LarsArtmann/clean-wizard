@@ -16,6 +16,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 
 	goInstalled := func() bool {
 		_, lookErr := exec.LookPath("go")
+
 		return lookErr == nil
 	}
 
@@ -90,8 +91,8 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			settings := &domain.OperationSettings{ //nolint:exhaustruct
-				GoPackages: &domain.GoPackagesSettings{ //nolint:exhaustruct
+			settings := &domain.OperationSettings{
+				GoPackages: &domain.GoPackagesSettings{
 					CleanCache:      domain.CacheCleanupEnabled,
 					CleanTestCache:  domain.CacheCleanupDisabled,
 					CleanModCache:   domain.CacheCleanupEnabled,
@@ -107,8 +108,8 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			settings := &domain.OperationSettings{ //nolint:exhaustruct
-				GoPackages: &domain.GoPackagesSettings{ //nolint:exhaustruct
+			settings := &domain.OperationSettings{
+				GoPackages: &domain.GoPackagesSettings{
 					CleanCache: domain.CacheCleanupMode(42),
 				},
 			}
@@ -120,7 +121,8 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			gomega.Expect(gc.ValidateSettings(&domain.OperationSettings{})).NotTo(gomega.HaveOccurred()) //nolint:exhaustruct
+			gomega.Expect(gc.ValidateSettings(&domain.OperationSettings{})).
+				NotTo(gomega.HaveOccurred())
 		})
 	})
 })

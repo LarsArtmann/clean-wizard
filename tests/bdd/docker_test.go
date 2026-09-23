@@ -16,6 +16,7 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 
 	dockerInstalled := func() bool {
 		_, lookErr := exec.LookPath("docker")
+
 		return lookErr == nil
 	}
 
@@ -55,7 +56,7 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 				gomega.Expect(cleanRes.IsErr()).To(gomega.BeTrue())
 
 				cleanErr := cleanRes.Error()
-				gomega.Expect(cleanErr).NotTo(gomega.BeNil())
+				gomega.Expect(cleanErr).To(gomega.HaveOccurred())
 				gomega.Expect(errorfamily.Classify(cleanErr)).To(gomega.Equal(errorfamily.Infrastructure))
 			})
 
@@ -79,7 +80,8 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 
 				cleanRes := dc.Clean(ctx)
 				if cleanRes.IsErr() {
-					gomega.Expect(errorfamily.Classify(cleanRes.Error())).NotTo(gomega.Equal(errorfamily.Infrastructure))
+					gomega.Expect(errorfamily.Classify(cleanRes.Error())).
+						NotTo(gomega.Equal(errorfamily.Infrastructure))
 				}
 			})
 		})
@@ -90,8 +92,8 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 			func(pruneMode domain.DockerPruneMode, valid bool) {
 				dc := cleaner.NewDockerCleaner(true, true, pruneMode)
 
-				settings := &domain.OperationSettings{ //nolint:exhaustruct
-					Docker: &domain.DockerSettings{PruneMode: pruneMode}, //nolint:exhaustruct
+				settings := &domain.OperationSettings{
+					Docker: &domain.DockerSettings{PruneMode: pruneMode},
 				}
 
 				err := dc.ValidateSettings(settings)
@@ -112,7 +114,8 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 		ginkgo.It("accepts settings without a docker section", func() {
 			dc := cleaner.NewDockerCleaner(true, true, domain.DockerPruneAll)
 
-			gomega.Expect(dc.ValidateSettings(&domain.OperationSettings{})).NotTo(gomega.HaveOccurred()) //nolint:exhaustruct
+			gomega.Expect(dc.ValidateSettings(&domain.OperationSettings{})).
+				NotTo(gomega.HaveOccurred())
 		})
 	})
 })

@@ -63,38 +63,38 @@ func TestResolveOperationSettings_Defaults(t *testing.T) {
 func TestResolveOperationSettings_ConfiguredSections(t *testing.T) {
 	t.Parallel()
 
-	settings := &domain.OperationSettings{ //nolint:exhaustruct
+	settings := &domain.OperationSettings{
 		NixGenerations: &domain.NixGenerationsSettings{
 			Generations: 3,
-		}, //nolint:exhaustruct
+		},
 		Homebrew: &domain.HomebrewSettings{
 			UnusedOnly: domain.HomebrewModeUnusedOnly,
-		}, //nolint:exhaustruct
+		},
 		Docker: &domain.DockerSettings{
 			PruneMode: domain.DockerPruneVolumes,
-		}, //nolint:exhaustruct
+		},
 		GoPackages: &domain.GoPackagesSettings{
 			CleanCache: domain.CacheCleanupEnabled,
-		}, //nolint:exhaustruct
+		},
 		NodePackages: &domain.NodePackagesSettings{
 			PackageManagers: []domain.PackageManagerType{domain.PackageManagerBun},
-		}, //nolint:exhaustruct
+		},
 		BuildCache: &domain.BuildCacheSettings{
 			OlderThan: "14d",
-		}, //nolint:exhaustruct
+		},
 		SystemCache: &domain.SystemCacheSettings{
 			OlderThan:  "21d",
 			CacheTypes: []domain.CacheType{domain.CacheTypePip},
-		}, //nolint:exhaustruct
+		},
 		TempFiles: &domain.TempFilesSettings{
 			OlderThan: "14d",
 			Excludes:  []string{"/tmp/keep"},
-		}, //nolint:exhaustruct
-		ProjectExecutables: &domain.ProjectExecutablesSettings{ //nolint:exhaustruct
+		},
+		ProjectExecutables: &domain.ProjectExecutablesSettings{
 			ExcludeExtensions: []string{".bin"},
 			ExcludePatterns:   []string{"vendor/**"},
 		},
-		CompiledBinaries: &domain.CompiledBinariesSettings{ //nolint:exhaustruct
+		CompiledBinaries: &domain.CompiledBinariesSettings{
 			MinSizeMB:       50,
 			OlderThan:       "30d",
 			BasePaths:       []string{"~/src"},
@@ -158,13 +158,13 @@ func TestResolveOperationSettings_ZeroValueSemantics(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.OperationSettings //nolint:exhaustruct
+		settings *domain.OperationSettings
 		assert   func(t *testing.T, settings *domain.OperationSettings)
 	}{
 		{
 			name: "empty older_than falls back to default",
-			settings: &domain.OperationSettings{ //nolint:exhaustruct
-				TempFiles: &domain.TempFilesSettings{Excludes: []string{"/tmp/keep"}}, //nolint:exhaustruct
+			settings: &domain.OperationSettings{
+				TempFiles: &domain.TempFilesSettings{Excludes: []string{"/tmp/keep"}},
 			},
 			assert: func(t *testing.T, settings *domain.OperationSettings) {
 				t.Helper()
@@ -181,8 +181,8 @@ func TestResolveOperationSettings_ZeroValueSemantics(t *testing.T) {
 		},
 		{
 			name: "fully disabled go packages fall back to default caches",
-			settings: &domain.OperationSettings{ //nolint:exhaustruct
-				GoPackages: &domain.GoPackagesSettings{}, //nolint:exhaustruct
+			settings: &domain.OperationSettings{
+				GoPackages: &domain.GoPackagesSettings{},
 			},
 			assert: func(t *testing.T, settings *domain.OperationSettings) {
 				t.Helper()
@@ -195,8 +195,8 @@ func TestResolveOperationSettings_ZeroValueSemantics(t *testing.T) {
 		},
 		{
 			name: "nix generations of zero keep the constructor default",
-			settings: &domain.OperationSettings{ //nolint:exhaustruct
-				NixGenerations: &domain.NixGenerationsSettings{}, //nolint:exhaustruct
+			settings: &domain.OperationSettings{
+				NixGenerations: &domain.NixGenerationsSettings{},
 			},
 			assert: func(t *testing.T, settings *domain.OperationSettings) {
 				t.Helper()
@@ -236,7 +236,7 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Fatal("homebrew cleaner not registered")
 		}
 
-		if got := homebrew.(*HomebrewCleaner).unusedOnly; got != domain.HomebrewModeAll { //nolint:forcetypeassert
+		if got := homebrew.(*HomebrewCleaner).unusedOnly; got != domain.HomebrewModeAll {
 			t.Errorf("homebrew mode = %v, want ALL", got)
 		}
 	})
@@ -244,12 +244,12 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 	t.Run("profile settings reach the cleaner constructors", func(t *testing.T) {
 		t.Parallel()
 
-		settings := &domain.OperationSettings{ //nolint:exhaustruct
-			NixGenerations: &domain.NixGenerationsSettings{Generations: 3},                      //nolint:exhaustruct
-			Homebrew:       &domain.HomebrewSettings{UnusedOnly: domain.HomebrewModeUnusedOnly}, //nolint:exhaustruct
-			Docker:         &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},        //nolint:exhaustruct
-			TempFiles:      &domain.TempFilesSettings{OlderThan: "14d"},                         //nolint:exhaustruct
-			GoPackages:     &domain.GoPackagesSettings{CleanCache: domain.CacheCleanupEnabled},  //nolint:exhaustruct
+		settings := &domain.OperationSettings{
+			NixGenerations: &domain.NixGenerationsSettings{Generations: 3},
+			Homebrew:       &domain.HomebrewSettings{UnusedOnly: domain.HomebrewModeUnusedOnly},
+			Docker:         &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},
+			TempFiles:      &domain.TempFilesSettings{OlderThan: "14d"},
+			GoPackages:     &domain.GoPackagesSettings{CleanCache: domain.CacheCleanupEnabled},
 		}
 
 		registry, err := DefaultRegistryWithConfig(false, true, settings)
@@ -289,8 +289,8 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 	t.Run("invalid settings fail registry creation", func(t *testing.T) {
 		t.Parallel()
 
-		settings := &domain.OperationSettings{ //nolint:exhaustruct
-			TempFiles: &domain.TempFilesSettings{OlderThan: "not-a-duration"}, //nolint:exhaustruct
+		settings := &domain.OperationSettings{
+			TempFiles: &domain.TempFilesSettings{OlderThan: "not-a-duration"},
 		}
 
 		_, err := DefaultRegistryWithConfig(false, true, settings)

@@ -13,15 +13,15 @@ import (
 func TestResolveProfileOperationSettings(t *testing.T) {
 	t.Parallel()
 
-	dockerSettings := &domain.OperationSettings{ //nolint:exhaustruct
-		Docker: &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes}, //nolint:exhaustruct
+	dockerSettings := &domain.OperationSettings{
+		Docker: &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},
 	}
 
-	cfg := &domain.Config{ //nolint:exhaustruct
+	cfg := &domain.Config{
 		Profiles: map[string]*domain.Profile{
-			"daily": { //nolint:exhaustruct
-				Operations: []domain.CleanupOperation{ //nolint:exhaustruct
-					{Name: "docker", Settings: dockerSettings}, //nolint:exhaustruct
+			"daily": {
+				Operations: []domain.CleanupOperation{
+					{Name: "docker", Settings: dockerSettings},
 				},
 			},
 		},
@@ -32,6 +32,7 @@ func TestResolveProfileOperationSettings(t *testing.T) {
 
 		injector := do.New()
 		defer injector.Shutdown()
+
 		do.ProvideValue(injector, cfg)
 
 		settings, err := resolveProfileOperationSettings(injector, RunSettings{Verbose: false, DryRun: true})
@@ -44,6 +45,7 @@ func TestResolveProfileOperationSettings(t *testing.T) {
 
 		injector := do.New()
 		defer injector.Shutdown()
+
 		do.ProvideValue(injector, cfg)
 
 		settings, err := resolveProfileOperationSettings(injector, RunSettings{Profile: "daily"})
@@ -57,6 +59,7 @@ func TestResolveProfileOperationSettings(t *testing.T) {
 
 		injector := do.New()
 		defer injector.Shutdown()
+
 		do.ProvideValue(injector, cfg)
 
 		settings, err := resolveProfileOperationSettings(injector, RunSettings{Profile: "weekly"})
@@ -78,14 +81,14 @@ func TestResolveProfileOperationSettings(t *testing.T) {
 func TestRegisterAllServices_ProfileSettingsReachRegistry(t *testing.T) {
 	t.Parallel()
 
-	cfg := &domain.Config{ //nolint:exhaustruct
+	cfg := &domain.Config{
 		Profiles: map[string]*domain.Profile{
-			"daily": { //nolint:exhaustruct
-				Operations: []domain.CleanupOperation{ //nolint:exhaustruct
-					{ //nolint:exhaustruct
+			"daily": {
+				Operations: []domain.CleanupOperation{
+					{
 						Name: "docker",
-						Settings: &domain.OperationSettings{ //nolint:exhaustruct
-							Docker: &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes}, //nolint:exhaustruct
+						Settings: &domain.OperationSettings{
+							Docker: &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},
 						},
 					},
 				},

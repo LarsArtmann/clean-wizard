@@ -16,6 +16,7 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 
 	brewInstalled := func() bool {
 		_, lookErr := exec.LookPath("brew")
+
 		return lookErr == nil
 	}
 
@@ -69,7 +70,8 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 
 				cleanRes := hbc.Clean(ctx)
 				if cleanRes.IsErr() {
-					gomega.Expect(errorfamily.Classify(cleanRes.Error())).NotTo(gomega.Equal(errorfamily.Infrastructure))
+					gomega.Expect(errorfamily.Classify(cleanRes.Error())).
+						NotTo(gomega.Equal(errorfamily.Infrastructure))
 				}
 			})
 		})
@@ -80,8 +82,8 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 			func(unusedOnly domain.HomebrewMode, valid bool) {
 				hbc := cleaner.NewHomebrewCleaner(true, true, unusedOnly)
 
-				settings := &domain.OperationSettings{ //nolint:exhaustruct
-					Homebrew: &domain.HomebrewSettings{UnusedOnly: unusedOnly}, //nolint:exhaustruct
+				settings := &domain.OperationSettings{
+					Homebrew: &domain.HomebrewSettings{UnusedOnly: unusedOnly},
 				}
 
 				err := hbc.ValidateSettings(settings)

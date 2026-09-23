@@ -119,6 +119,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 	ginkgo.Describe("concurrency limits", func() {
 		ginkgo.It("runs at most one cleaner at a time when capped to one", func() {
 			cleaners := make([]*fakeCleaner, 0, 3)
+
 			for _, name := range []string{"one", "two", "three"} {
 				c := newFakeCleaner(name)
 				c.cleanDelay = 30 * time.Millisecond
@@ -137,6 +138,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 
 		ginkgo.It("runs at most two cleaners at a time when capped to two", func() {
 			cleaners := make([]*fakeCleaner, 0, 4)
+
 			for _, name := range []string{"a", "b", "c", "d"} {
 				c := newFakeCleaner(name)
 				c.cleanDelay = 60 * time.Millisecond
@@ -174,5 +176,5 @@ func (p *panickingCleaner) Clean(_ context.Context) result.Result[domain.CleanRe
 }
 
 func (p *panickingCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
-	return result.Ok([]domain.ScanItem{}) //nolint:exhaustruct
+	return result.Ok([]domain.ScanItem{})
 }
