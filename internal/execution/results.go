@@ -52,43 +52,32 @@ type WorkflowResult struct {
 	Duration          time.Duration
 }
 
-// Succeeded returns only steps that completed successfully.
-func (wr *WorkflowResult) Succeeded() []StepResult {
+// filterByStatus returns only steps whose status matches the given status.
+func (wr *WorkflowResult) filterByStatus(status StepStatus) []StepResult {
 	var out []StepResult
 
 	for _, s := range wr.Steps {
-		if s.Status() == StepStatusSucceeded {
+		if s.Status() == status {
 			out = append(out, s)
 		}
 	}
 
 	return out
+}
+
+// Succeeded returns only steps that completed successfully.
+func (wr *WorkflowResult) Succeeded() []StepResult {
+	return wr.filterByStatus(StepStatusSucceeded)
 }
 
 // Skipped returns only steps that were skipped (cleaner not available).
 func (wr *WorkflowResult) Skipped() []StepResult {
-	var out []StepResult
-
-	for _, s := range wr.Steps {
-		if s.Status() == StepStatusSkipped {
-			out = append(out, s)
-		}
-	}
-
-	return out
+	return wr.filterByStatus(StepStatusSkipped)
 }
 
 // Failed returns only steps that failed with a non-availability error.
 func (wr *WorkflowResult) Failed() []StepResult {
-	var out []StepResult
-
-	for _, s := range wr.Steps {
-		if s.Status() == StepStatusFailed {
-			out = append(out, s)
-		}
-	}
-
-	return out
+	return wr.filterByStatus(StepStatusFailed)
 }
 
 // CleanResultsMap builds a name→CleanResult map for successful steps,

@@ -73,10 +73,6 @@ func (p RetryProfile) IsValid() bool {
 // (retries disabled). An empty profile defaults to RetryProfileDefault.
 func (p RetryProfile) Apply() *RetryConfig {
 	switch p {
-	case RetryProfileDefault:
-		cfg := DefaultRetryConfig()
-
-		return &cfg
 	case RetryProfileAggressive:
 		return &RetryConfig{
 			MaxAttempts:    5,
@@ -91,7 +87,7 @@ func (p RetryProfile) Apply() *RetryConfig {
 		}
 	case RetryProfileNone:
 		return nil
-	default: // empty string — treat as default
+	default: // RetryProfileDefault and empty string both use the default config
 		cfg := DefaultRetryConfig()
 
 		return &cfg

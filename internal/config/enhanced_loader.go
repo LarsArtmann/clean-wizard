@@ -16,21 +16,24 @@ func (ecl *EnhancedConfigLoader) applyValidation(
 	config *types.Config,
 	level enums.ValidationLevelType,
 ) *ValidationResult {
+	// comprehensiveValidation runs the base validator plus the comprehensive rule set.
+	comprehensiveValidation := func() *ValidationResult {
+		result := ecl.validator.ValidateConfig(config)
+		ecl.applyComprehensiveValidation(config, result)
+
+		return result
+	}
+
 	switch level {
 	case enums.ValidationLevelNoneType:
 		return &ValidationResult{IsValid: true, Timestamp: time.Now()} //nolint:exhaustruct
 	case enums.ValidationLevelBasicType:
 		return ecl.validator.ValidateConfig(config) // Use existing validator
 	case enums.ValidationLevelComprehensiveType:
-		// Add additional validation rules
-		result := ecl.validator.ValidateConfig(config)
-		ecl.applyComprehensiveValidation(config, result)
-
-		return result
+		return comprehensiveValidation()
 	case enums.ValidationLevelStrictType:
 		// Apply all validation including strict checks
-		result := ecl.validator.ValidateConfig(config)
-		ecl.applyComprehensiveValidation(config, result)
+		result := comprehensiveValidation()
 		ecl.applyStrictValidation(config, result)
 
 		return result

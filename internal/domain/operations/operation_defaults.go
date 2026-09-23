@@ -223,12 +223,18 @@ func validateHomebrewDefaults(s *HomebrewSettings) error {
 	return nil
 }
 
+// validatableEnum constrains to int-backed enums that carry an IsValid method.
+type validatableEnum interface {
+	~int
+	IsValid() bool
+}
+
 // validateEnumSliceDefaults reports the first invalid enum element in items.
 // typeName identifies the enum in the error message (e.g. "PackageManagerType").
-func validateEnumSliceDefaults[T interface{ IsValid() bool }](items []T, typeName string) error {
+func validateEnumSliceDefaults[T validatableEnum](items []T, typeName string) error {
 	for i, item := range items {
 		if !item.IsValid() {
-			return fmt.Errorf("invalid default %s at index %d: %d", typeName, i, item)
+			return fmt.Errorf("invalid default %s at index %d: %d", typeName, i, int(item))
 		}
 	}
 

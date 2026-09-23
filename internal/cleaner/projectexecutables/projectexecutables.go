@@ -276,6 +276,13 @@ type defaultFileOperator struct {
 	verbose           bool
 }
 
+// logSkip prints a skip notice for fullPath when verbose output is enabled.
+func (d *defaultFileOperator) logSkip(reason, fullPath string) {
+	if d.verbose {
+		fmt.Printf("  Skipping (%s): %s\n", reason, fullPath)
+	}
+}
+
 func (d *defaultFileOperator) FindExecutableFiles(dir string) ([]string, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -304,18 +311,14 @@ func (d *defaultFileOperator) FindExecutableFiles(dir string) ([]string, error) 
 
 		// Check exclusion by extension
 		if isExcludedByExtension(filename, d.excludeExtensions) {
-			if d.verbose {
-				fmt.Printf("  Skipping (extension excluded): %s\n", fullPath)
-			}
+			d.logSkip("extension excluded", fullPath)
 
 			continue
 		}
 
 		// Check exclusion by pattern
 		if isExcludedByPattern(filename, d.excludePatterns) {
-			if d.verbose {
-				fmt.Printf("  Skipping (pattern excluded): %s\n", fullPath)
-			}
+			d.logSkip("pattern excluded", fullPath)
 
 			continue
 		}
