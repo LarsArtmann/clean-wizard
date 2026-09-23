@@ -80,7 +80,7 @@ func gitOutput(args ...string) (string, error) {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("git %s: %w", strings.Join(args, " "), err)
 	}
 
 	return strings.TrimSpace(string(output)), nil

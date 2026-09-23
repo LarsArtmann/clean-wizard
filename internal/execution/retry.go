@@ -87,11 +87,15 @@ func (p RetryProfile) Apply() *RetryConfig {
 		}
 	case RetryProfileNone:
 		return nil
-	default: // RetryProfileDefault and empty string both use the default config
-		cfg := DefaultRetryConfig()
-
-		return &cfg
+	case RetryProfileDefault:
+		// Falls through to the shared default config below.
 	}
+
+	// RetryProfileDefault, the empty string, and unknown values all use the
+	// default config.
+	cfg := DefaultRetryConfig()
+
+	return &cfg
 }
 
 // retryOptions converts a RetryConfig into go-workflow retry option funcs.

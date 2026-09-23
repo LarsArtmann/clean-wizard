@@ -455,7 +455,10 @@ func (dc *DockerCleaner) verbosePrune(label, commandLine string, args ...string)
 func (dc *DockerCleaner) buildPruneArgs() []string {
 	switch dc.pruneMode {
 	case enums.DockerPruneAll:
-		return dc.verbosePrune("full prune", "docker system prune -af --volumes", "system", "prune", "-af", "--volumes") //nolint:goconst
+		return dc.verbosePrune(
+			"full prune", "docker system prune -af --volumes",
+			"system", "prune", "-af", "--volumes",
+		)
 
 	case enums.DockerPruneImages:
 		return dc.verbosePrune("image prune", "docker image prune -af", "image", "prune", "-af")

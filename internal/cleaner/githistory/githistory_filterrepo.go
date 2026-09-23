@@ -95,23 +95,20 @@ func isNixAvailable(ctx context.Context) bool {
 
 // BuildFilterRepoCommand builds the command to run git-filter-repo with the given args.
 func BuildFilterRepoCommand(ctx context.Context, args []string) *exec.Cmd {
-	provider := DetectFilterRepoProvider()
-
-	switch provider {
-	case FilterRepoNix:
+	if DetectFilterRepoProvider() == FilterRepoNix {
 		// nix run nixpkgs#git-filter-repo -- <args>
 		nixArgs := make([]string, 0, 3+len(args))
 		nixArgs = append(nixArgs, "run", "nixpkgs#git-filter-repo", "--")
 		nixArgs = append(nixArgs, args...)
 
 		return exec.CommandContext(ctx, "nix", nixArgs...)
-	default:
-		// FilterRepoSystem and FilterRepoNone both run "git filter-repo <args>"
-		// (None is the fallback that will likely fail, matching prior behavior).
-		gitArgs := append([]string{"filter-repo"}, args...)
-
-		return exec.CommandContext(ctx, "git", gitArgs...)
 	}
+
+	// FilterRepoSystem and FilterRepoNone (the fallback that will likely fail)
+	// both run "git filter-repo <args>".
+	gitArgs := append([]string{"filter-repo"}, args...)
+
+	return exec.CommandContext(ctx, "git", gitArgs...)
 }
 
 // GetInstallHint returns a hint for how to install git-filter-repo.
