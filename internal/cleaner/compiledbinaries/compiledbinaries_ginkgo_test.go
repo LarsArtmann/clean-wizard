@@ -1,0 +1,903 @@
+package compiledbinaries
+
+import (
+	"context"
+	"errors"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
+)
+
+// mockBinaryScanner implements BinaryScanner for testing.
+type mockBinaryScanner struct {
+	binaries	[]BinaryInfo
+	scanErr		error
+	scanCallDir	string
+}
+
+func (m *mockBinaryScanner) ScanDirectory(
+	ctx context.Context,
+	dir string,
+	categories []BinaryCategory,
+	minSize int64,
+) ([]BinaryInfo, error) {
+	m.scanCallDir = dir
+
+	return m.binaries, m.scanErr
+}
+
+// mockBinaryTrashOperator implements BinaryTrashOperator for testing.
+type mockBinaryTrashOperator struct {
+	trashErr	error
+	trashedFiles	[]string
+	trashCallCount	int
+	fileSizes	map[string]int64
+	fileModTimes	map[string]time.Time
+}
+
+func (m *mockBinaryTrashOperator) TrashBinary(ctx context.Context, path string) error {
+	m.trashCallCount++
+	m.trashedFiles = append(m.trashedFiles, path)
+
+	return m.trashErr
+}
+
+func (m *mockBinaryTrashOperator) GetFileSize(path string) int64 {
+	if m.fileSizes != nil {
+		return m.fileSizes[path]
+	}
+
+	return 0
+}
+
+func (m *mockBinaryTrashOperator) GetFileModTime(path string) (time.Time, error) {
+	if m.fileModTimes != nil {
+		if t, ok := m.fileModTimes[path]; ok {
+			return t, nil
+		}
+	}
+
+	return time.Time{}, errors.New("file not found")
+}
+
+var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
+	var (
+		ctx		context.Context
+		mockScanner	*mockBinaryScanner
+		mockOperator	*mockBinaryTrashOperator
+		cleaner		*CompiledBinariesCleaner
+		tempDir		string
+	)
+
+	ginkgo.BeforeEach(func() {
+		ctx = context.Background()
+		mockScanner = &mockBinaryScanner{}
+		mockOperator = &mockBinaryTrashOperator{
+			fileSizes:	make(map[string]int64),
+			fileModTimes:	make(map[string]time.Time),
+		}
+		tempDir, _ = os.MkdirTemp("", "compiled-binaries-test-*")
+	})
+
+	// setupCleanerWithMocks sets up the cleaner with mock scanner and operator.
+	// This eliminates duplicate cleaner setup across Scan, Clean, and GetStoreSize Describe blocks.
+	setupCleanerWithMocks := func() {
+		cleaner = NewCompiledBinariesCleaner(
+			false, false, 10, "", []string{tempDir}, nil,
+			WithBinaryScanner(mockScanner),
+			WithBinaryTrashOperator(mockOperator),
+		)
+	}
+
+	ginkgo.AfterEach(func() {
+		if tempDir != "" {
+			_ = os.RemoveAll(tempDir)
+		}
+	})
+
+	// ============================================================================
+	// CONSTRUCTOR TESTS
+	// ============================================================================
+	ginkgo.Describe("NewCompiledBinariesCleaner", func() {
+		ginkgo.Context("with default configuration", func() {
+			ginkgo.It("should create cleaner with default minimum size", func() {
+				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
+				gomega.Expect(cleaner).NotTo(gomega.BeNil())
+				gomega.Expect(cleaner.minSizeMB).To(gomega.Equal(DefaultMinSizeMB))
+			})
+
+			ginkgo.It("should create cleaner with default base paths", func() {
+				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
+				gomega.Expect(cleaner.basePaths).NotTo(gomega.BeEmpty())
+			})
+
+			ginkgo.It("should create cleaner with all categories enabled", func() {
+				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
+				gomega.Expect(cleaner.includeCategories).To(gomega.ContainElements(
+					CategoryTmp, CategoryTest, CategoryBin, CategoryDist, CategoryRoot,
+				))
+			})
+		})
+
+		ginkgo.It("should accept older than setting", func() {
+			tests := []struct {
+				name		string
+				olderThan	string
+				expected	string
+			}{
+				{name: "default older than", olderThan: "", expected: DefaultOlderThan},
+				{name: "custom older than", olderThan: "7d", expected: "7d"},
+			}
+			for _, tt := range tests {
+				ginkgo.By(tt.name, func() {
+					cleaner = NewCompiledBinariesCleaner(false, false, 0, tt.olderThan, nil, nil)
+					gomega.Expect(cleaner.olderThan).To(gomega.Equal(tt.expected))
+				})
+			}
+		})
+
+		ginkgo.Context("with custom configuration", func() {
+			ginkgo.It("should accept custom base paths", func() {
+				paths := []string{"/custom/path1", "/custom/path2"}
+				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", paths, nil)
+				gomega.Expect(cleaner.basePaths).To(gomega.Equal(paths))
+			})
+
+			ginkgo.It("should accept custom exclude patterns", func() {
+				patterns := []string{"*.exclude", "specific-binary"}
+				cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, patterns)
+				gomega.Expect(cleaner.excludePatterns).To(gomega.Equal(patterns))
+			})
+
+			ginkgo.It("should set verbose flag correctly", func() {
+				cleaner = NewCompiledBinariesCleaner(true, false, 0, "", nil, nil)
+				gomega.Expect(cleaner.verbose).To(gomega.BeTrue())
+			})
+
+			ginkgo.It("should set dryRun flag correctly", func() {
+				cleaner = NewCompiledBinariesCleaner(false, true, 0, "", nil, nil)
+				gomega.Expect(cleaner.dryRun).To(gomega.BeTrue())
+			})
+		})
+
+		ginkgo.Context("with functional options", func() {
+			ginkgo.It("should accept custom BinaryScanner via option", func() {
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 0, "", nil, nil,
+					WithBinaryScanner(mockScanner),
+				)
+				gomega.Expect(cleaner.scanner).To(gomega.Equal(mockScanner))
+			})
+
+			ginkgo.It("should accept custom BinaryTrashOperator via option", func() {
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 0, "", nil, nil,
+					WithBinaryTrashOperator(mockOperator),
+				)
+				gomega.Expect(cleaner.trashOperator).To(gomega.Equal(mockOperator))
+			})
+
+			ginkgo.It("should accept custom base paths via option", func() {
+				paths := []string{"/option/path"}
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 0, "", nil, nil,
+					WithBasePaths(paths),
+				)
+				gomega.Expect(cleaner.basePaths).To(gomega.Equal(paths))
+			})
+
+			ginkgo.It("should accept custom categories via option", func() {
+				categories := []BinaryCategory{CategoryTest, CategoryBin}
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 0, "", nil, nil,
+					WithIncludeCategories(categories),
+				)
+				gomega.Expect(cleaner.includeCategories).To(gomega.Equal(categories))
+			})
+
+			ginkgo.It("should accept multiple options together", func() {
+				cleaner = NewCompiledBinariesCleaner(
+					true,
+					true,
+					20,
+					"30d",
+					[]string{"/path"},
+					[]string{},
+					WithBinaryScanner(mockScanner),
+					WithBinaryTrashOperator(mockOperator),
+				)
+				gomega.Expect(cleaner.verbose).To(gomega.BeTrue())
+				gomega.Expect(cleaner.dryRun).To(gomega.BeTrue())
+				gomega.Expect(cleaner.minSizeMB).To(gomega.Equal(20))
+				gomega.Expect(cleaner.olderThan).To(gomega.Equal("30d"))
+				gomega.Expect(cleaner.scanner).To(gomega.Equal(mockScanner))
+				gomega.Expect(cleaner.trashOperator).To(gomega.Equal(mockOperator))
+			})
+		})
+	})
+
+	// ============================================================================
+	// BASIC METHOD TESTS
+	// ============================================================================
+	ginkgo.Describe("Name and Type methods", func() {
+		ginkgo.BeforeEach(func() {
+			cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
+		})
+
+		ginkgo.It("should return correct name and type", func() {
+			cleaner.GinkgoAssertNameAndType(
+				cleaner,
+				"compiled-binaries",
+				operations.OperationTypeCompiledBinaries,
+			)
+		})
+	})
+
+	// ============================================================================
+	// IsAvailable TESTS
+	// ============================================================================
+	ginkgo.Describe("IsAvailable", func() {
+		ginkgo.BeforeEach(func() {
+			cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
+		})
+
+		ginkgo.It("should return a boolean value", func() {
+			cleaner.GinkgoAssertIsAvailableReturnsBoolean(cleaner)
+		})
+
+		ginkgo.It("should not panic when checking availability", func() {
+			cleaner.GinkgoAssertIsAvailableNoPanic(cleaner)
+		})
+
+		ginkgo.It("should handle context parameter", func() {
+			result := cleaner.IsAvailable(context.Background())
+			_ = result
+		})
+
+		ginkgo.It("should work with cancelled context", func() {
+			cleaner.GinkgoAssertIsAvailableWithCancelledContext(cleaner)
+		})
+	})
+
+	// ============================================================================
+	// ValidateSettings TESTS
+	// ============================================================================
+	ginkgo.Describe("ValidateSettings", func() {
+		ginkgo.BeforeEach(func() {
+			cleaner = NewCompiledBinariesCleaner(false, false, 0, "", nil, nil)
+		})
+
+		ginkgo.Context("with nil settings", func() {
+			ginkgo.It("should return nil for nil settings", func() {
+				cleaner.GinkgoValidateNilSettingsTest(cleaner)
+			})
+		})
+
+		ginkgo.Context("with empty OperationSettings", func() {
+			cleaner.GinkgoValidateEmptySettingsTest(
+				cleaner,
+				"should return nil when CompiledBinaries is nil",
+			)
+		})
+
+		ginkgo.Context("with valid settings", func() {
+			ginkgo.It("should return nil for valid empty CompiledBinariesSettings", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{},
+				}
+				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+			})
+
+			ginkgo.It("should return nil for valid min_size_mb", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
+						MinSizeMB: 10,
+					},
+				}
+				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+			})
+
+			ginkgo.It("should return nil for valid older_than with various formats", func() {
+				olderThanFormats := []struct {
+					name	string
+					value	string
+				}{
+					{name: "days", value: "7d"},
+					{name: "hours", value: "24h"},
+				}
+
+				for _, format := range olderThanFormats {
+					settings := &operations.OperationSettings{
+						CompiledBinaries: &operations.CompiledBinariesSettings{
+							OlderThan: format.value,
+						},
+					}
+					cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+				}
+			})
+
+			ginkgo.It("should return nil for valid exclude patterns", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
+						ExcludePatterns: []string{"*.exclude", "specific-*"},
+					},
+				}
+				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+			})
+
+			ginkgo.It("should return nil for valid include categories", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
+						IncludePatterns: []string{"tmp", "test", "bin"},
+					},
+				}
+				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+			})
+
+			ginkgo.It("should return nil for valid combined settings", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
+						MinSizeMB:		20,
+						OlderThan:		"30d",
+						BasePaths:		[]string{"/custom/path"},
+						ExcludePatterns:	[]string{"*.safe"},
+						IncludePatterns:	[]string{"tmp", "test"},
+					},
+				}
+				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+			})
+		})
+
+		ginkgo.Context("with invalid settings", func() {
+			ginkgo.It("should return error for negative min_size_mb", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
+						MinSizeMB: -1,
+					},
+				}
+				assertValidationError(cleaner, settings, "min_size_mb must be >= 0")
+			})
+
+			ginkgo.It("should return error for invalid older_than format", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
+						OlderThan: "invalid",
+					},
+				}
+				err := cleaner.ValidateSettings(settings)
+				gomega.Expect(err).To(gomega.HaveOccurred())
+				gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid older_than format"))
+			})
+
+			ginkgo.It("should return error for invalid glob pattern", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
+						ExcludePatterns: []string{"[invalid"},
+					},
+				}
+				assertValidationError(cleaner, settings, "invalid exclude pattern")
+			})
+
+			ginkgo.It("should return error for invalid include category", func() {
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
+						IncludePatterns: []string{"invalid-category"},
+					},
+				}
+				err := cleaner.ValidateSettings(settings)
+				gomega.Expect(err).To(gomega.HaveOccurred())
+				gomega.Expect(err.Error()).To(gomega.ContainSubstring("invalid include category"))
+			})
+		})
+	})
+
+	// ============================================================================
+	// Scan METHOD TESTS
+	// ============================================================================
+	ginkgo.Describe("Scan", func() {
+		ginkgo.BeforeEach(func() {
+			setupCleanerWithMocks()
+		})
+
+		ginkgo.Context("when scan succeeds", func() {
+			ginkgo.It("should return scan items from scanner", func() {
+				mockScanner.binaries = cleaner.StandardTestBinaries()
+				result := cleaner.Scan(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				items := result.Value()
+				gomega.Expect(items).To(gomega.HaveLen(2))
+			})
+
+			ginkgo.It("should convert BinaryInfo to ScanItem correctly", func() {
+				now := time.Now()
+				mockScanner.binaries = []BinaryInfo{
+					{Path: "/path/to/binary", Size: 1024, ModTime: now, Category: CategoryTmp},
+				}
+				result := cleaner.Scan(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				items := result.Value()
+				gomega.Expect(items[0].Path).To(gomega.Equal("/path/to/binary"))
+				gomega.Expect(items[0].Size).To(gomega.Equal(int64(1024)))
+				gomega.Expect(items[0].ScanType).To(gomega.Equal(types.ScanTypeSystem))
+			})
+
+			ginkgo.It("should return empty slice when no binaries found", func() {
+				cleaner.GinkgoNoItemsToScanTest(ctx, cleaner, func() {
+					mockScanner.binaries = []BinaryInfo{}
+				})
+			})
+		})
+
+		ginkgo.Context("when scan fails", func() {
+			ginkgo.It("should skip directories with errors and continue", func() {
+				mockScanner.scanErr = errors.New("scan error")
+				result := cleaner.Scan(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				gomega.Expect(result.Value()).To(gomega.BeEmpty())
+			})
+		})
+
+		ginkgo.Context("with non-existent paths", func() {
+			ginkgo.It("should skip non-existent base paths", func() {
+				cleaner.GinkgoNoItemsToScanTest(ctx, cleaner, func() {
+					cleaner = NewCompiledBinariesCleaner(
+						false,
+						false,
+						10,
+						"",
+						[]string{"/non/existent/path"},
+						nil,
+						WithBinaryScanner(mockScanner),
+					)
+				})
+			})
+		})
+
+		ginkgo.Context("with age filter", func() {
+			ginkgo.It("should filter files by age when older_than is set", func() {
+				oldTime := time.Now().Add(-8 * 24 * time.Hour)
+				recentTime := time.Now().Add(-1 * 24 * time.Hour)
+
+				mockScanner.binaries = []BinaryInfo{
+					{
+						Path:		"/old/binary",
+						Size:		20 * 1024 * 1024,
+						ModTime:	oldTime,
+						Category:	CategoryTest,
+					},
+					{
+						Path:		"/recent/binary",
+						Size:		20 * 1024 * 1024,
+						ModTime:	recentTime,
+						Category:	CategoryTest,
+					},
+				}
+
+				cleaner = NewCompiledBinariesCleaner(
+					false, false, 10, "7d", []string{tempDir}, nil,
+					WithBinaryScanner(mockScanner),
+				)
+
+				result := cleaner.Scan(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				items := result.Value()
+				gomega.Expect(items).To(gomega.HaveLen(1))
+				gomega.Expect(items[0].Path).To(gomega.Equal("/old/binary"))
+			})
+		})
+	})
+
+	// ============================================================================
+	// Clean METHOD TESTS
+	// ============================================================================
+	ginkgo.Describe("Clean", func() {
+		ginkgo.BeforeEach(func() {
+			setupCleanerWithMocks()
+		})
+
+		// Helper function to test that Clean correctly reports freed bytes for two binaries.
+		assertFreedBytesForTwoBinaries := func() {
+			mockScanner.binaries = cleaner.StandardTestBinaries()
+			result := cleaner.Clean(ctx)
+			gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+			cleanResult := result.Value()
+			gomega.Expect(cleanResult.FreedBytes).To(gomega.Equal(uint64(35 * 1024 * 1024)))
+		}
+
+		ginkgo.Context("with no items to clean", func() {
+			ginkgo.It("should return conservative result when no items found", func() {
+				cleaner.GinkgoNoItemsToCleanTest(ctx, cleaner, func() {
+					mockScanner.binaries = []BinaryInfo{}
+				})
+			})
+		})
+
+		ginkgo.Context("in dry-run mode", func() {
+			ginkgo.BeforeEach(func() {
+				cleaner = NewCompiledBinariesCleaner(
+					false, true, 10, "", []string{tempDir}, nil,
+					WithBinaryScanner(mockScanner),
+					WithBinaryTrashOperator(mockOperator),
+				)
+			})
+
+			ginkgo.It("should return dry-run result without calling trash", func() {
+				mockScanner.binaries = []BinaryInfo{
+					{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
+				}
+				result := cleaner.Clean(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				cleanResult := result.Value()
+				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(enums.StrategyDryRun))
+				gomega.Expect(mockOperator.trashCallCount).To(gomega.Equal(0))
+			})
+
+			ginkgo.It("should report correct size estimate in dry-run", func() {
+				assertFreedBytesForTwoBinaries()
+			})
+		})
+
+		ginkgo.Context("in normal mode", func() {
+			ginkgo.It("should call TrashBinary for each item", func() {
+				mockScanner.binaries = cleaner.StandardTestBinaries()
+				result := cleaner.Clean(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				gomega.Expect(mockOperator.trashCallCount).To(gomega.Equal(2))
+			})
+
+			ginkgo.It("should track items removed count correctly", func() {
+				mockScanner.binaries = []BinaryInfo{
+					{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
+					{Path: "/path/to/binary2", Size: 15 * 1024 * 1024, Category: CategoryBin},
+					{Path: "/path/to/binary3", Size: 10 * 1024 * 1024, Category: CategoryTmp},
+				}
+				result := cleaner.Clean(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				cleanResult := result.Value()
+				gomega.Expect(cleanResult.ItemsRemoved).To(gomega.Equal(uint(3)))
+			})
+
+			ginkgo.It("should track bytes freed correctly", func() {
+				assertFreedBytesForTwoBinaries()
+			})
+
+			ginkgo.It("should handle trash failures gracefully", func() {
+				mockScanner.binaries = cleaner.StandardTestBinaries()
+				mockOperator.trashErr = errors.New("trash failed")
+				result := cleaner.Clean(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				cleanResult := result.Value()
+				gomega.Expect(cleanResult.ItemsFailed).To(gomega.Equal(uint(2)))
+				gomega.Expect(cleanResult.ItemsRemoved).To(gomega.Equal(uint(0)))
+			})
+
+			ginkgo.It("should set aggressive strategy after actual clean", func() {
+				mockScanner.binaries = []BinaryInfo{
+					{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
+				}
+				result := cleaner.Clean(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				cleanResult := result.Value()
+				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(enums.StrategyAggressive))
+			})
+
+			ginkgo.It("should measure clean time", func() {
+				mockScanner.binaries = []BinaryInfo{
+					{Path: "/path/to/binary1", Size: 20 * 1024 * 1024, Category: CategoryTest},
+				}
+				before := time.Now()
+				result := cleaner.Clean(ctx)
+				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
+				cleanResult := result.Value()
+				gomega.Expect(cleanResult.CleanTime).To(gomega.BeNumerically(">=", 0))
+				gomega.Expect(cleanResult.CleanedAt).To(gomega.BeTemporally(">=", before))
+			})
+		})
+	})
+
+	// ============================================================================
+	// GetStoreSize TESTS
+	// ============================================================================
+	ginkgo.Describe("GetStoreSize", func() {
+		ginkgo.BeforeEach(func() {
+			setupCleanerWithMocks()
+		})
+
+		ginkgo.It("should return 0 when scan returns empty", func() {
+			mockScanner.binaries = []BinaryInfo{}
+			size := cleaner.GetStoreSize(ctx)
+			gomega.Expect(size).To(gomega.Equal(int64(0)))
+		})
+
+		ginkgo.It("should return total size of all binaries", func() {
+			mockScanner.binaries = cleaner.StandardTestBinaries()
+			size := cleaner.GetStoreSize(ctx)
+			gomega.Expect(size).To(gomega.Equal(cleaner.StandardTestBinariesTotalSize()))
+		})
+	})
+
+	// ============================================================================
+	// parseAgeDuration TESTS
+	// ============================================================================
+	ginkgo.Describe("parseAgeDuration", func() {
+		type parseTestCase struct {
+			input		string
+			expected	time.Duration
+		}
+
+		ginkgo.DescribeTable(
+			"should parse valid durations correctly",
+			func(tc parseTestCase) {
+				d, err := parseAgeDuration(tc.input)
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				gomega.Expect(d).To(gomega.Equal(tc.expected))
+			},
+			ginkgo.Entry("days", parseTestCase{input: "7d", expected: 7 * 24 * time.Hour}),
+			ginkgo.Entry("hours", parseTestCase{input: "24h", expected: 24 * time.Hour}),
+			ginkgo.Entry("weeks", parseTestCase{input: "2w", expected: 14 * 24 * time.Hour}),
+			ginkgo.Entry("months", parseTestCase{input: "1m", expected: 30 * 24 * time.Hour}),
+			ginkgo.Entry("years", parseTestCase{input: "1y", expected: 365 * 24 * time.Hour}),
+		)
+
+		ginkgo.DescribeTable(
+			"should return error for invalid input",
+			func(input string) {
+				_, err := parseAgeDuration(input)
+				gomega.Expect(err).To(gomega.HaveOccurred())
+			},
+			ginkgo.Entry("invalid format", "invalid"),
+			ginkgo.Entry("too short format", "d"),
+			ginkgo.Entry("unknown unit", "7x"),
+		)
+	})
+})
+
+// ============================================================================
+// DEFAULT SCANNER TESTS
+// ============================================================================.
+var _ = ginkgo.Describe("defaultBinaryScanner", func() {
+	var (
+		scanner	*defaultBinaryScanner
+		tempDir	string
+		ctx	context.Context
+	)
+
+	ginkgo.BeforeEach(func() {
+		scanner = &defaultBinaryScanner{
+			includeCategories: []BinaryCategory{
+				CategoryTmp,
+				CategoryTest,
+				CategoryBin,
+				CategoryDist,
+				CategoryRoot,
+			},
+		}
+		tempDir, _ = os.MkdirTemp("", "scanner-test-*")
+		ctx = context.Background()
+	})
+
+	ginkgo.AfterEach(func() {
+		if tempDir != "" {
+			_ = os.RemoveAll(tempDir)
+		}
+	})
+
+	ginkgo.Describe("ScanDirectory", func() {
+		ginkgo.Context("categorization", func() {
+			// testCategoryFile is a helper to test file-based categorization in root directory.
+			testCategoryFile := func(fileName string, category BinaryCategory) {
+				testFile := filepath.Join(tempDir, fileName)
+				_ = os.WriteFile(testFile, make([]byte, 20*1024*1024), 0o755)
+
+				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{category}, 0)
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				gomega.Expect(binaries).To(gomega.HaveLen(1))
+				gomega.Expect(binaries[0].Category).To(gomega.Equal(category))
+			}
+
+			ginkgo.It("should categorize *.test files as CategoryTest", func() {
+				testCategoryFile("app.test", CategoryTest)
+			})
+
+			// testCategorySubdir is a helper to test subdirectory-based categorization.
+			testCategorySubdir := func(subdirName, binaryName string, category BinaryCategory) {
+				subdir := filepath.Join(tempDir, subdirName)
+				_ = os.MkdirAll(subdir, 0o755)
+				binaryFile := filepath.Join(subdir, binaryName)
+				_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
+
+				binaries, err := scanner.ScanDirectory(ctx, tempDir, []BinaryCategory{category}, 0)
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				gomega.Expect(binaries).To(gomega.HaveLen(1))
+				gomega.Expect(binaries[0].Category).To(gomega.Equal(category))
+			}
+
+			ginkgo.It("should categorize tmp/* files as CategoryTmp", func() {
+				testCategorySubdir("tmp", "build-output", CategoryTmp)
+			})
+
+			ginkgo.It("should categorize bin/* files as CategoryBin", func() {
+				testCategorySubdir("bin", "myapp", CategoryBin)
+			})
+
+			ginkgo.It("should categorize dist/* files as CategoryDist", func() {
+				testCategorySubdir("dist", "release-binary", CategoryDist)
+			})
+
+			ginkgo.It("should categorize root executables as CategoryRoot", func() {
+				testCategoryFile("myapp", CategoryRoot)
+			})
+		})
+
+		ginkgo.Context("size filtering", func() {
+			ginkgo.It("should skip files below minimum size", func() {
+				smallFile := filepath.Join(tempDir, "small.test")
+				_ = os.WriteFile(smallFile, make([]byte, 5*1024*1024), 0o755)
+
+				binaries, err := scanner.ScanDirectory(
+					ctx,
+					tempDir,
+					[]BinaryCategory{CategoryTest},
+					10*1024*1024,
+				)
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				gomega.Expect(binaries).To(gomega.BeEmpty())
+			})
+
+			ginkgo.It("should include files at or above minimum size", func() {
+				largeFile := filepath.Join(tempDir, "large.test")
+				_ = os.WriteFile(largeFile, make([]byte, 15*1024*1024), 0o755)
+
+				binaries, err := scanner.ScanDirectory(
+					ctx,
+					tempDir,
+					[]BinaryCategory{CategoryTest},
+					10*1024*1024,
+				)
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				gomega.Expect(binaries).To(gomega.HaveLen(1))
+			})
+		})
+
+		// assertScanEmpty is a helper to scan directory and assert no binaries are found.
+		assertScanEmpty := func() {
+			binaries, err := scanner.ScanDirectory(ctx, tempDir, scanner.includeCategories, 0)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+			gomega.Expect(binaries).To(gomega.BeEmpty())
+		}
+
+		// createBinaryInSubdir creates a binary file in a subdirectory and returns the file path.
+		createBinaryInSubdir := func(subdir, filename string) {
+			dir := filepath.Join(tempDir, subdir)
+			_ = os.MkdirAll(dir, 0o755)
+			binaryFile := filepath.Join(dir, filename)
+			_ = os.WriteFile(binaryFile, make([]byte, 20*1024*1024), 0o755)
+		}
+
+		ginkgo.Context("directory exclusion", func() {
+			ginkgo.It("should skip node_modules directory", func() {
+				createBinaryInSubdir(filepath.Join("node_modules", ".bin"), "tool")
+				assertScanEmpty()
+			})
+
+			ginkgo.It("should skip venv directory", func() {
+				createBinaryInSubdir(filepath.Join("venv", "bin"), "python")
+				assertScanEmpty()
+			})
+
+			ginkgo.It("should skip .terraform directory", func() {
+				createBinaryInSubdir(filepath.Join(".terraform", "providers"), "provider")
+				assertScanEmpty()
+			})
+
+			ginkgo.It("should skip .git directory", func() {
+				createBinaryInSubdir(filepath.Join(".git", "objects"), "some-file")
+				assertScanEmpty()
+			})
+		})
+
+		ginkgo.Context("binary exclusion", func() {
+			ginkgo.It("should skip chromedriver", func() {
+				chromedriver := filepath.Join(tempDir, "chromedriver")
+				_ = os.WriteFile(chromedriver, make([]byte, 20*1024*1024), 0o755)
+
+				assertScanEmpty()
+			})
+
+			ginkgo.It("should skip geckodriver", func() {
+				geckodriver := filepath.Join(tempDir, "geckodriver")
+				_ = os.WriteFile(geckodriver, make([]byte, 20*1024*1024), 0o755)
+
+				assertScanEmpty()
+			})
+		})
+
+		ginkgo.Context("executable check", func() {
+			ginkgo.It("should skip non-executable files", func() {
+				nonExecFile := filepath.Join(tempDir, "data.txt")
+				_ = os.WriteFile(nonExecFile, make([]byte, 20*1024*1024), 0o644)
+
+				assertScanEmpty()
+			})
+
+			ginkgo.It("should include executable files", func() {
+				execFile := filepath.Join(tempDir, "myapp")
+				_ = os.WriteFile(execFile, make([]byte, 20*1024*1024), 0o755)
+
+				binaries, err := scanner.ScanDirectory(
+					ctx,
+					tempDir,
+					[]BinaryCategory{CategoryRoot},
+					0,
+				)
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				gomega.Expect(binaries).To(gomega.HaveLen(1))
+			})
+		})
+
+		ginkgo.Context("exclude patterns", func() {
+			ginkgo.It("should exclude files matching patterns", func() {
+				scanner.excludePatterns = []string{"*.safe"}
+				binary1 := filepath.Join(tempDir, "myapp")
+				binary2 := filepath.Join(tempDir, "important.safe")
+				_ = os.WriteFile(binary1, make([]byte, 20*1024*1024), 0o755)
+				_ = os.WriteFile(binary2, make([]byte, 20*1024*1024), 0o755)
+
+				binaries, err := scanner.ScanDirectory(
+					ctx,
+					tempDir,
+					[]BinaryCategory{CategoryRoot},
+					0,
+				)
+				gomega.Expect(err).ToNot(gomega.HaveOccurred())
+				gomega.Expect(binaries).To(gomega.HaveLen(1))
+				gomega.Expect(binaries[0].Path).To(gomega.Equal(binary1))
+			})
+		})
+	})
+})
+
+// ============================================================================
+// INTEGRATION TESTS
+// ============================================================================.
+var _ = ginkgo.Describe("CompiledBinariesCleaner Integration", func() {
+	ginkgo.It("should work with default implementations", func() {
+		cleaner := NewCompiledBinariesCleaner(false, false, 10, "", nil, nil)
+		ctx := context.Background()
+
+		if !cleaner.IsAvailable(ctx) {
+			ginkgo.Skip("Skipping integration test: trash not available")
+		}
+
+		scanResult := cleaner.Scan(ctx)
+		cleaner.GinkgoAssertScanResultIsOk(scanResult)
+	})
+
+	ginkgo.It("should handle real filesystem operations", func() {
+		cleaner := NewCompiledBinariesCleaner(false, false, 10, "", nil, nil)
+		ctx := context.Background()
+
+		if !cleaner.IsAvailable(ctx) {
+			ginkgo.Skip("Skipping integration test: trash not available")
+		}
+
+		tmpDir, err := os.MkdirTemp("", "integration-test-*")
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
+		defer func() { _ = os.RemoveAll(tmpDir) }()
+
+		execFile := filepath.Join(tmpDir, "test-binary")
+		err = os.WriteFile(execFile, make([]byte, 15*1024*1024), 0o755)
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
+		info, err := os.Stat(execFile)
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
+		gomega.Expect(info.Mode() & 0o111).NotTo(gomega.Equal(os.FileMode(0)))
+	})
+})

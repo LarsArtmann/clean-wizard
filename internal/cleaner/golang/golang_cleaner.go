@@ -1,0 +1,276 @@
+package golang
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"os"
+	"os/exec"
+	"slices"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/conversions"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
+)
+
+// Sentinel errors for golang_cleaner.
+var (
+	ErrNoCacheTypeSpecified		= errors.New("no cache type specified")
+	ErrLintCacheNotImplemented	= errors.New("lint cache cleaning not yet implemented")
+	ErrGoProcessesRunning		= errors.New(
+		"other Go processes detected (go, gopls, golangci-lint, dlv) — skipping to avoid cache corruption",
+	)
+)
+
+// CleanStats tracks cleaning metrics.
+type CleanStats struct {
+	Removed		uint
+	Failed		uint
+	FreedBytes	uint64
+}
+
+// GoCleaner handles Go language cleanup using type-safe cache flags.
+type GoCleaner struct {
+	cleaner.CleanerBase
+
+	caches		GoCacheType
+	scanner		*GoScanner
+	cleaners	map[GoCacheType]interface {
+		Clean(ctx context.Context) result.Result[types.CleanResult]
+	}
+}
+
+// NewGoCleaner creates Go cleaner with type-safe cache configuration.
+func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) {
+	if !caches.IsValid() {
+		return nil, fmt.Errorf("at least one cache type must be specified for caches=%v", caches)
+	}
+
+	return NewGoCleanerWithSettings(verbose, dryRun, caches), nil
+}
+
+// NewGoCleanerWithSettings creates Go cleaner with type-safe cache configuration (panics on invalid caches).
+// This is a convenience function for tests and backward compatibility.
+func NewGoCleanerWithSettings(verbose, dryRun bool, caches GoCacheType) *GoCleaner {
+	scanner := NewGoScanner(verbose)
+	cleaners := make(map[GoCacheType]interface {
+		Clean(ctx context.Context) result.Result[types.CleanResult]
+	})
+
+	for _, cacheType := range []GoCacheType{GoCacheGOCACHE, GoCacheTestCache, GoCacheModCache, GoCacheBuildCache} {
+		if caches.Has(cacheType) {
+			cleaners[cacheType] = NewGoCacheCleaner(cacheType, verbose, dryRun)
+		}
+	}
+
+	if caches.Has(GoCacheLintCache) {
+		cleaners[GoCacheLintCache] = NewGolangciLintCacheCleaner(verbose, dryRun)
+	}
+
+	return &GoCleaner{
+		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
+		caches:		caches,
+		scanner:	scanner,
+		cleaners:	cleaners,
+	}
+}
+
+// Type returns operation type.
+func (gc *GoCleaner) Type() operations.OperationType {
+	return operations.OperationTypeGoPackages
+}
+
+// Name returns the cleaner name for result tracking.
+func (gc *GoCleaner) Name() string {
+	return "go"
+}
+
+// IsAvailable checks if Go is available.
+func (gc *GoCleaner) IsAvailable(ctx context.Context) bool {
+	_, err := exec.LookPath("go")
+
+	return err == nil
+}
+
+// ValidateSettings validates settings.
+func (gc *GoCleaner) ValidateSettings(settings *operations.OperationSettings) error {
+	return settings.ValidateSettings(operations.OperationTypeGoPackages)
+}
+
+// Scan scans for Go caches.
+func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	return gc.scanner.Scan(ctx, gc.caches)
+}
+
+// Clean removes Go caches.
+// It checks for other running Go processes first to avoid cache corruption.
+func (gc *GoCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
+	if !gc.IsAvailable(ctx) {
+		return result.Err[types.CleanResult](
+			cleaner.NewNotAvailableError("go", ""),
+		)
+	}
+
+	if !gc.dryRun && hasOtherGoProcesses() {
+		return result.Err[types.CleanResult](ErrGoProcessesRunning)
+	}
+
+	if gc.dryRun {
+		return gc.dryRunClean(ctx)
+	}
+
+	startTime := time.Now()
+	stats := CleanStats{}	//nolint:exhaustruct
+
+	for _, cacheType := range gc.caches.EnabledTypes() {
+		cleaner, ok := gc.cleaners[cacheType]
+		if !ok {
+			gc.logWarning("no cleaner for cache type: %v", cacheType)
+
+			continue
+		}
+
+		result := cleaner.Clean(ctx)
+		gc.processCacheResult(result, &stats, cacheType.String())
+	}
+
+	duration := time.Since(startTime)
+
+	return gc.buildCleanResult(stats, duration)
+}
+
+// dryRunClean performs dry-run estimation by scanning actual cache sizes.
+func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[types.CleanResult] {
+	// Scan actual cache directories to get real sizes
+	scanResult := gc.scanner.Scan(ctx, gc.caches)
+
+	var (
+		totalBytes	uint64
+		itemsRemoved	int
+	)
+
+	if scanResult.IsOk() {
+		items := scanResult.Value()
+
+		itemsRemoved = len(items)
+		for _, item := range items {
+			totalBytes += uint64(item.Size)
+		}
+	} else {
+		// Fallback to counting enabled cache types if scan fails
+		itemsRemoved = gc.caches.Count()
+	}
+
+	cleanResult := conversions.NewCleanResult(
+		enums.StrategyDryRunType,
+		itemsRemoved,
+		int64(totalBytes),
+	)
+	cleanResult.SizeEstimate = types.SizeEstimate{Known: totalBytes}	//nolint:exhaustruct
+
+	return result.Ok(cleanResult)
+}
+
+// processCacheResult handles cache cleaning result uniformly.
+func (gc *GoCleaner) processCacheResult(
+	r result.Result[types.CleanResult],
+	stats *CleanStats,
+	cacheName string,
+) {
+	if r.IsErr() {
+		stats.Failed++
+
+		gc.logWarning("failed to clean %s: %v", cacheName, r.Error())
+	} else if r.IsOk() && r.Value().ItemsRemoved > 0 {
+		stats.Removed += r.Value().ItemsRemoved
+		stats.FreedBytes += r.Value().SizeEstimate.Value()
+	}
+}
+
+// buildCleanResult creates CleanResult from stats.
+func (gc *GoCleaner) buildCleanResult(
+	stats CleanStats,
+	duration time.Duration,
+) result.Result[types.CleanResult] {
+	// Create result with honest size estimate - set Status explicitly to avoid validation errors
+	var status enums.SizeEstimateStatusType
+	if stats.FreedBytes > 0 {
+		status = enums.SizeEstimateStatusKnown
+	} else {
+		status = enums.SizeEstimateStatusUnknown
+	}
+
+	sizeEstimate := types.SizeEstimate{
+		Known:	stats.FreedBytes,
+		Status:	status,
+	}
+
+	// Note: conversions.NewCleanResult uses FreedBytes (deprecated), so we update SizeEstimate
+	cleanResult := conversions.NewCleanResult(
+		enums.StrategyConservativeType,
+		int(stats.Removed),
+		int64(stats.FreedBytes),
+	)
+	cleanResult.SizeEstimate = sizeEstimate
+	cleanResult.CleanTime = duration
+	cleanResult.CleanedAt = time.Now()
+
+	return result.Ok(cleanResult)
+}
+
+// logWarning logs warning message if verbose.
+func (gc *GoCleaner) logWarning(format string, args ...any) {
+	if gc.verbose {
+		fmt.Printf("Warning: "+format+"\n", args...)
+	}
+}
+
+// goProcessNames lists Go-related processes whose presence indicates
+// the Go cache may be in active use.
+var goProcessNames = []string{"go", "gopls", "golangci-lint", "dlv"}	//nolint:gochecknoglobals
+
+// hasOtherGoProcesses checks if there are other Go processes running
+// that might be using the Go cache, which could cause cache corruption
+// if the cache is cleaned concurrently.
+// If pgrep is unavailable, this returns true (fail-closed) to protect
+// against cache corruption in minimal environments.
+func hasOtherGoProcesses() bool {
+	// On systems without pgrep, fail closed to prevent cache corruption
+	if _, err := exec.LookPath("pgrep"); err != nil {
+		return true
+	}
+
+	return slices.ContainsFunc(goProcessNames, isProcessRunning)
+}
+
+// isProcessRunning checks if a process with the given name is currently running,
+// excluding the current clean-wizard process itself.
+func isProcessRunning(name string) bool {
+	cmd := exec.CommandContext(context.Background(), "pgrep", "-x", name)
+
+	output, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+
+	pids := strings.Fields(string(output))
+	currentPID := os.Getpid()
+
+	for _, pidStr := range pids {
+		pid, err := strconv.Atoi(pidStr)
+		if err != nil {
+			continue
+		}
+
+		if pid != currentPID {
+			return true
+		}
+	}
+
+	return false
+}

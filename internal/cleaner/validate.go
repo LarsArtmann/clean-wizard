@@ -14,10 +14,10 @@ func formatValidItems(validItems map[string]bool) string {
 	return fmt.Sprintf("%v", items)
 }
 
-// validateSettings validates that all string items in the slice are valid types.
+// ValidateStringItems validates that all string items in the slice are valid types.
 // It returns an error if any item is not in the validItems map.
 // The error message includes full context of invalid items and valid options.
-func validateSettings(
+func ValidateStringItems(
 	items []string,
 	validItems map[string]bool,
 	itemName, validValuesDescription string,

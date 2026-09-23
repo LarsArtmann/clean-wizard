@@ -30,10 +30,10 @@ type CleanItemFunc[T any] func(ctx context.Context, item T, homeDir string) resu
 // AvailableCheckFunc is a function that checks if the cleaner is available.
 type AvailableCheckFunc func(ctx context.Context) bool
 
-// cleanWithIterator is a shared helper function that performs the common clean pattern.
+// CleanWithIterator is a shared helper function that performs the common clean pattern.
 // It iterates over items, calls the cleanFunc for each, and aggregates results.
 // If sizeEstimator is provided, it uses that for dry-run estimates; otherwise uses DryRunBytesPerItem.
-func cleanWithIterator[T any](
+func CleanWithIterator[T any](
 	ctx context.Context,
 	cleanerName string,
 	availableCheck AvailableCheckFunc,
@@ -260,9 +260,9 @@ func ValidateBuildCacheSettings(settings *operations.OperationSettings) error {
 // ScanItemFunc is a function that scans for items of type T and returns scan results.
 type ScanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[[]domaintypes.ScanItem]
 
-// scanWithIterator is a shared helper function that performs the common scan pattern.
+// ScanWithIterator is a shared helper function that performs the common scan pattern.
 // It iterates over types, calls the scanFunc for each, and aggregates results.
-func scanWithIterator[T any](
+func ScanWithIterator[T any](
 	ctx context.Context,
 	types []T,
 	scanFunc ScanItemFunc[T],
@@ -291,9 +291,9 @@ func scanWithIterator[T any](
 	return result.Ok(items)
 }
 
-// calculateTotalSizeFromScan calculates the total size from scan results.
+// CalculateTotalSizeFromScan calculates the total size from scan results.
 // Returns 0 if the scan resulted in an error.
-func calculateTotalSizeFromScan(scanResult result.Result[[]domaintypes.ScanItem]) int64 {
+func CalculateTotalSizeFromScan(scanResult result.Result[[]domaintypes.ScanItem]) int64 {
 	if scanResult.IsErr() {
 		return 0
 	}

@@ -1,0 +1,394 @@
+package buildcache
+
+import (
+	"context"
+	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+)
+
+func TestNewBuildCacheCleaner(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name		string
+		verbose		bool
+		dryRun		bool
+		olderThan	string
+		excludes	[]string
+		basePaths	[]string
+		wantErr		bool
+	}{
+		// Test cases below share the same struct shape by design — Go's table-driven
+		// testing idiom. Each row carries distinct values and a distinct expectation;
+		// collapsing the rows into a helper would obscure the per-case intent.
+		{
+			name:		"valid configuration",
+			verbose:	false,
+			dryRun:		false,
+			olderThan:	"30d",
+			excludes:	[]string{},
+			basePaths:	[]string{},
+			wantErr:	false,
+		},
+		{
+			name:		"verbose dry-run",
+			verbose:	true,
+			dryRun:		true,
+			olderThan:	"7d",
+			excludes:	[]string{"/keep"},
+			basePaths:	[]string{"/custom/path"},
+			wantErr:	false,
+		},
+		{
+			name:		"invalid duration",
+			verbose:	false,
+			dryRun:		false,
+			olderThan:	"invalid",
+			excludes:	[]string{},
+			basePaths:	[]string{},
+			wantErr:	true,
+		},
+		{
+			name:		"empty duration",
+			verbose:	false,
+			dryRun:		false,
+			olderThan:	"",
+			excludes:	[]string{},
+			basePaths:	[]string{},
+			wantErr:	true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			cleaner, err := NewBuildCacheCleaner(
+				tt.verbose,
+				tt.dryRun,
+				tt.olderThan,
+				tt.excludes,
+				tt.basePaths,
+			)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewBuildCacheCleaner() error = %v, wantErr %v", err, tt.wantErr)
+
+				return
+			}
+
+			if !tt.wantErr && cleaner == nil {
+				t.Error("NewBuildCacheCleaner() returned nil cleaner")
+			}
+
+			if cleaner != nil {
+				assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
+			}
+		})
+	}
+}
+
+func TestBuildCacheCleaner_Type(t *testing.T) {
+	t.Parallel()
+
+	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	if err != nil {
+		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+	}
+
+	if cleaner.Type() != operations.OperationTypeBuildCache {
+		t.Errorf("Type() = %v, want %v", cleaner.Type(), operations.OperationTypeBuildCache)
+	}
+}
+
+func TestBuildCacheCleaner_IsAvailable(t *testing.T) {
+	t.Parallel()
+
+	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	if err != nil {
+		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+	}
+
+	available := cleaner.IsAvailable(context.Background())
+
+	// Build cache cleaner should always be available
+	if !available {
+		t.Error("IsAvailable() should always return true for BuildCacheCleaner")
+	}
+}
+
+func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name		string
+		settings	*operations.OperationSettings
+		wantErr		bool
+	}{
+		{
+			name:		"nil settings",
+			settings:	nil,
+			wantErr:	false,
+		},
+		{
+			name:		"nil build cache settings",
+			settings:	&operations.OperationSettings{},
+			wantErr:	false,
+		},
+		{
+			name:	"valid settings with all tools",
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes:	[]enums.BuildToolType{enums.BuildToolJava, enums.BuildToolScala},
+					OlderThan:	"30d",
+				},
+			},
+			wantErr:	false,
+		},
+		{
+			name:	"valid settings with single tool",
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes:	[]enums.BuildToolType{enums.BuildToolJava},
+					OlderThan:	"7d",
+				},
+			},
+			wantErr:	false,
+		},
+		{
+			name:	"valid settings with no tools",
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes:	[]enums.BuildToolType{},
+					OlderThan:	"30d",
+				},
+			},
+			wantErr:	false,
+		},
+		{
+			name:	"invalid tool type",
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes:	[]enums.BuildToolType{999},
+					OlderThan:	"30d",
+				},
+			},
+			wantErr:	true,
+		},
+		{
+			name:	"mixed valid and invalid tools",
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes:	[]enums.BuildToolType{enums.BuildToolJava, 999},
+					OlderThan:	"30d",
+				},
+			},
+			wantErr:	true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+			if err != nil {
+				t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+			}
+
+			err = cleaner.ValidateSettings(tt.settings)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateSettings() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestBuildCacheCleaner_Clean_DryRun(t *testing.T) {
+	t.Parallel()
+
+	cleaner, err := NewBuildCacheCleaner(false, true, "30d", []string{}, []string{})
+	if err != nil {
+		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+	}
+
+	result := cleaner.Clean(context.Background())
+	if result.IsErr() {
+		t.Fatalf("Clean() error = %v", result.Error())
+	}
+
+	cleanResult := result.Value()
+
+	// Dry-run should report items for all tool types (3 tools)
+	if cleanResult.ItemsRemoved != 3 {
+		t.Errorf("Clean() removed %d items, want 3", cleanResult.ItemsRemoved)
+	}
+
+	if cleanResult.Strategy != enums.StrategyDryRunType {
+		t.Errorf(
+			"Clean() strategy = %v, want %v",
+			cleanResult.Strategy,
+			enums.StrategyDryRunType,
+		)
+	}
+
+	if cleanResult.FreedBytes == 0 {
+		t.Errorf("Clean() freed %d bytes, want > 0", cleanResult.FreedBytes)
+	}
+}
+
+func TestBuildCacheCleaner_Scan(t *testing.T) {
+	t.Parallel()
+
+	cleaner, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	if err != nil {
+		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+	}
+
+	result := cleaner.Scan(context.Background())
+
+	// Scan may not find any items if build tools aren't installed
+	// Just verify it doesn't crash
+	if result.IsErr() {
+		t.Fatalf("Scan() error = %v", result.Error())
+	}
+
+	items := result.Value()
+
+	// Items count depends on whether build tools are installed
+	if len(items) == 0 {
+		t.Log("Scan() found 0 items (build tools may not be installed)")
+	}
+}
+
+func TestBuildCacheCleaner_GetHomeDir(t *testing.T) {
+	t.Parallel()
+
+	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	if err != nil {
+		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+	}
+
+	// Test GetHomeDir doesn't crash
+	home, err := cleaner.GetHomeDir()
+
+	// May return empty string if home cannot be determined
+	if home == "" && err == nil {
+		t.Error("GetHomeDir() returned empty string and no error")
+	}
+
+	if home != "" {
+		t.Logf("GetHomeDir() = %s", home)
+	}
+}
+
+func TestBuildCacheCleaner_GetDirSize(t *testing.T) {
+	t.Parallel()
+
+	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	if err != nil {
+		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+	}
+
+	// Test with non-existent path
+	size := cleaner.GetDirSize("/non/existent/path/12345")
+	// Should return 0 for non-existent path
+	if size != 0 {
+		t.Errorf("GetDirSize() for non-existent path = %d, want 0", size)
+	}
+
+	// Test with temp directory
+	tmpDir := t.TempDir()
+	size = cleaner.GetDirSize(tmpDir)
+	// Should be 0 for empty directory
+	if size != 0 {
+		t.Errorf("GetDirSize() for empty dir = %d, want 0", size)
+	}
+}
+
+func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
+	t.Parallel()
+
+	_, err := NewBuildCacheCleaner(false, false, "30d", []string{}, []string{})
+	if err != nil {
+		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+	}
+
+	// Test with non-existent path
+	modTime := cleaner.GetDirModTime("/non/existent/path/12345")
+	if !modTime.IsZero() {
+		t.Errorf("GetDirModTime() for non-existent path = %v, want zero time", modTime)
+	}
+
+	// Test with temp directory
+	tmpDir := t.TempDir()
+
+	modTime = cleaner.GetDirModTime(tmpDir)
+	if modTime.IsZero() {
+		t.Error("GetDirModTime() for temp dir returned zero time")
+	}
+}
+
+func TestAvailableBuildTools(t *testing.T) {
+	t.Parallel()
+
+	expectedTools := []JVMBuildToolType{
+		JVMBuildToolGradle,
+		JVMBuildToolMaven,
+		JVMBuildToolSBT,
+	}
+	availableItemsTestHelper(t, expectedTools, AvailableBuildTools, "AvailableBuildTools")
+}
+
+func TestBuildToolType_String(t *testing.T) {
+	t.Parallel()
+	cleaner.TestTypeString(t, "JVMBuildToolType", []JVMBuildToolType{
+		JVMBuildToolGradle,
+		JVMBuildToolMaven,
+		JVMBuildToolSBT,
+	})
+}
+
+func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {
+	t.Parallel()
+
+	cleaner, err := NewBuildCacheCleaner(false, true, "30d", []string{}, []string{})
+	if err != nil {
+		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
+	}
+
+	cleaner.TestDryRun(t, cleaner.SimpleCleanerConstructorFromInstance(cleaner), "build-cache", -1)
+}
+
+func TestBuildCacheCleaner_ParseDuration(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range CommonDurationTestCases {
+		t.Run(tc.Duration, func(t *testing.T) {
+			t.Parallel()
+
+			cleaner, err := NewBuildCacheCleaner(false, false, tc.Duration, []string{}, []string{})
+
+			if tc.WantValid && err != nil {
+				t.Errorf(
+					"NewBuildCacheCleaner() with duration %s should succeed, got error: %v",
+					tc.Duration,
+					err,
+				)
+			}
+
+			if !tc.WantValid && err == nil {
+				t.Errorf("NewBuildCacheCleaner() with duration %s should fail", tc.Duration)
+			}
+
+			if cleaner != nil {
+				// Verify duration was parsed correctly
+				if cleaner.olderThan <= 0 {
+					t.Errorf("olderThan = %v, want > 0", cleaner.olderThan)
+				}
+			}
+		})
+	}
+}
