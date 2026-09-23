@@ -1,6 +1,13 @@
 # Package Boundary: config vs domain
 
-This document clarifies the intended boundary between `internal/config` and `internal/domain` packages.
+This document clarifies the intended boundary between `internal/config` and the domain packages.
+
+> **2026-09-23:** `internal/domain` was split into `internal/domain/enums`,
+> `internal/domain/operations`, and `internal/domain/types` (dependency DAG:
+> enums <- operations <- types). References to `domain.X` below map to these
+> sub-packages: value types such as `Config`/`Profile` live in `types`, enums in
+> `enums`, and `OperationSettings`/`ValidationError` in `operations`. The
+> boundary rules described here are unchanged.
 
 ## Overview
 
