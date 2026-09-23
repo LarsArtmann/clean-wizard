@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestParseFormatVersion(t *testing.T) {
+func TestParseFormatVersion(t *testing.T) { //nolint:paralleltest
 	tests := []struct {
 		name    string
 		raw     string
@@ -38,7 +38,7 @@ func TestParseFormatVersion(t *testing.T) {
 	}
 }
 
-func TestNormalizeFormatVersion(t *testing.T) {
+func TestNormalizeFormatVersion(t *testing.T) { //nolint:paralleltest
 	t.Run("empty maps to current", func(t *testing.T) {
 		got, err := NormalizeFormatVersion("")
 		if err != nil {
@@ -69,7 +69,7 @@ func TestNormalizeFormatVersion(t *testing.T) {
 	})
 }
 
-func TestFormatVersionCompare(t *testing.T) {
+func TestFormatVersionCompare(t *testing.T) { //nolint:paralleltest
 	tests := []struct {
 		name string
 		a, b FormatVersion
@@ -96,7 +96,7 @@ func TestFormatVersionCompare(t *testing.T) {
 	}
 }
 
-func TestFormatVersionString(t *testing.T) {
+func TestFormatVersionString(t *testing.T) { //nolint:paralleltest
 	version := FormatVersion{Major: 3, Minor: 14, Patch: 159}
 	if got := version.String(); got != "3.14.159" {
 		t.Errorf("String() = %q, want %q", got, "3.14.159")

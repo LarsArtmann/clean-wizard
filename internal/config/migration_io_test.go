@@ -42,12 +42,13 @@ func simpleConfigFileMap(version string) map[string]any {
 			"daily": map[string]any{
 				"name":        "daily",
 				"description": "Quick daily cleanup",
-				"enabled":     enums.ProfileStatusEnabled.String(),
+				"enabled":     int(enums.ProfileStatusEnabled),
 				"operations": []any{
 					map[string]any{
-						"name":       "nix-generations",
-						"risk_level": enums.RiskLevelLowType.String(),
-						"enabled":    enums.ProfileStatusEnabled.String(),
+						"name":        "nix-generations",
+						"description": "Clean old Nix generations",
+						"risk_level":  int(enums.RiskLevelLowType),
+						"enabled":     int(enums.ProfileStatusEnabled),
 					},
 				},
 			},
@@ -55,7 +56,34 @@ func simpleConfigFileMap(version string) map[string]any {
 	}
 }
 
-func TestMigrateConfigFileMissing(t *testing.T) {
+// errExplode is the injected migration failure for rollback tests.
+var errExplode = errors.New("transform exploded")
+
+func TestMigrateConfigFilePreviewFailure(t *testing.T) { //nolint:paralleltest
+	withMigrationChain(t, Migration{
+		From:        FormatVersion{Major: 1, Minor: 0, Patch: 0},
+		To:          FormatVersion{Major: 1, Minor: 1, Patch: 0},
+		Description: "explode in preview",
+		Apply: func(*types.Config) error {
+			return errExplode
+		},
+	})
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".clean-wizard.yaml")
+	writeTestConfigFile(t, path, simpleConfigFileMap("1.0.0"))
+
+	_, err := MigrateConfigFile(context.Background(), path, MigrateOptions{})
+	if err == nil {
+		t.Fatal("MigrateConfigFile expected error, got nil")
+	}
+
+	if errorfamily.Classify(err) != errorfamily.Rejection {
+		t.Errorf("family = %v, want Rejection (preview failure touches nothing)", errorfamily.Classify(err))
+	}
+}
+
+func TestMigrateConfigFileMissing(t *testing.T) { //nolint:paralleltest
 	missing := filepath.Join(t.TempDir(), "absent.yaml")
 
 	_, err := MigrateConfigFile(context.Background(), missing, MigrateOptions{})
@@ -68,7 +96,7 @@ func TestMigrateConfigFileMissing(t *testing.T) {
 	}
 }
 
-func TestMigrateConfigFileAlreadyCurrent(t *testing.T) {
+func TestMigrateConfigFileAlreadyCurrent(t *testing.T) { //nolint:paralleltest
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".clean-wizard.yaml")
 	writeTestConfigFile(t, path, simpleConfigFileMap("1.0.0"))
@@ -87,7 +115,7 @@ func TestMigrateConfigFileAlreadyCurrent(t *testing.T) {
 	}
 }
 
-func TestMigrateConfigFileEmptyVersionIsCurrent(t *testing.T) {
+func TestMigrateConfigFileEmptyVersionIsCurrent(t *testing.T) { //nolint:paralleltest
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".clean-wizard.yaml")
 	writeTestConfigFile(t, path, simpleConfigFileMap(""))
@@ -102,7 +130,7 @@ func TestMigrateConfigFileEmptyVersionIsCurrent(t *testing.T) {
 	}
 }
 
-func TestMigrateConfigFileFromFuture(t *testing.T) {
+func TestMigrateConfigFileFromFuture(t *testing.T) { //nolint:paralleltest
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".clean-wizard.yaml")
 	writeTestConfigFile(t, path, simpleConfigFileMap("9.9.9"))
@@ -121,7 +149,7 @@ func TestMigrateConfigFileFromFuture(t *testing.T) {
 	}
 }
 
-func TestMigrateConfigFileNoMigrationPath(t *testing.T) {
+func TestMigrateConfigFileNoMigrationPath(t *testing.T) { //nolint:paralleltest
 	withMigrationChain(t) // current becomes 1.1.0, but no steps registered
 
 	dir := t.TempDir()
@@ -138,7 +166,7 @@ func TestMigrateConfigFileNoMigrationPath(t *testing.T) {
 	}
 }
 
-func TestMigrateConfigFileSuccess(t *testing.T) {
+func TestMigrateConfigFileSuccess(t *testing.T) { //nolint:paralleltest
 	target := FormatVersion{Major: 1, Minor: 1, Patch: 0}
 	withMigrationChain(t, Migration{
 		From:        FormatVersion{Major: 1, Minor: 0, Patch: 0},
@@ -194,7 +222,7 @@ func TestMigrateConfigFileSuccess(t *testing.T) {
 	}
 }
 
-func TestMigrateConfigFileAborted(t *testing.T) {
+func TestMigrateConfigFileAborted(t *testing.T) { //nolint:paralleltest
 	withMigrationChain(t, Migration{
 		From:        FormatVersion{Major: 1, Minor: 0, Patch: 0},
 		To:          FormatVersion{Major: 1, Minor: 1, Patch: 0},
@@ -227,15 +255,21 @@ func TestMigrateConfigFileAborted(t *testing.T) {
 	}
 }
 
-func TestMigrateConfigFileRollbackOnFailure(t *testing.T) {
+func TestMigrateConfigFileRollbackOnFailure(t *testing.T) { //nolint:paralleltest
+	calls := 0
 	withMigrationChain(t, Migration{
 		From:        FormatVersion{Major: 1, Minor: 0, Patch: 0},
 		To:          FormatVersion{Major: 1, Minor: 1, Patch: 0},
 		Description: "explode after preview",
 		Apply: func(config *types.Config) error {
+			calls++ // the preview run must succeed; only the real apply explodes
+			if calls > 1 {
+				return errExplode
+			}
+
 			config.Protected = append(config.Protected, "/home")
 
-			return errors.New("transform exploded")
+			return nil
 		},
 	})
 
@@ -262,7 +296,7 @@ func TestMigrateConfigFileRollbackOnFailure(t *testing.T) {
 	}
 }
 
-func TestCheckConfigVersionGatesLoad(t *testing.T) {
+func TestCheckConfigVersionGatesLoad(t *testing.T) { //nolint:paralleltest
 	withMigrationChain(t) // current becomes 1.1.0
 
 	dir := t.TempDir()

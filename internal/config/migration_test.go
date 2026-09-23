@@ -35,7 +35,7 @@ func withMigrationChain(t *testing.T, chain ...Migration) {
 }
 
 func migrationTestConfig(version string) *types.Config {
-	return &types.Config{ //nolint:exhaustruct
+	return &types.Config{
 		Version:      version,
 		SafeMode:     enums.SafeModeEnabled,
 		MaxDiskUsage: 50,
@@ -59,7 +59,7 @@ func migrationTestConfig(version string) *types.Config {
 	}
 }
 
-func TestPlanMigration(t *testing.T) {
+func TestPlanMigration(t *testing.T) { //nolint:paralleltest
 	t.Run("current version needs no plan", func(t *testing.T) {
 		plan, err := PlanMigration(CurrentFormatVersion)
 		if err != nil {
@@ -108,6 +108,7 @@ func TestPlanMigration(t *testing.T) {
 	t.Run("non progressive step is skipped", func(t *testing.T) {
 		withMigrationChain(t,
 			Migration{From: FormatVersion{1, 0, 0}, To: FormatVersion{1, 0, 0}, Description: "self loop"},
+			Migration{From: FormatVersion{1, 1, 0}, To: FormatVersion{1, 1, 1}, Description: "unrelated"},
 		)
 
 		_, err := PlanMigration(FormatVersion{1, 0, 0})
@@ -117,7 +118,7 @@ func TestPlanMigration(t *testing.T) {
 	})
 }
 
-func TestApplyMigrations(t *testing.T) {
+func TestApplyMigrations(t *testing.T) { //nolint:paralleltest
 	addPath := func(path string) func(*types.Config) error {
 		return func(config *types.Config) error {
 			config.Protected = append(config.Protected, path)
@@ -190,7 +191,7 @@ func TestApplyMigrations(t *testing.T) {
 	})
 }
 
-func TestFlattenConfigDeterministic(t *testing.T) {
+func TestFlattenConfigDeterministic(t *testing.T) { //nolint:paralleltest
 	config := migrationTestConfig("1.0.0")
 
 	first := flattenConfig(config)
