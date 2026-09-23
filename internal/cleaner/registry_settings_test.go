@@ -64,12 +64,12 @@ func TestResolveOperationSettings_ConfiguredSections(t *testing.T) {
 	t.Parallel()
 
 	settings := &domain.OperationSettings{ //nolint:exhaustruct
-		NixGenerations: &domain.NixGenerationsSettings{Generations: 3},                            //nolint:exhaustruct
-		Homebrew:       &domain.HomebrewSettings{UnusedOnly: domain.HomebrewModeUnusedOnly},       //nolint:exhaustruct
-		Docker:         &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},              //nolint:exhaustruct
-		GoPackages:     &domain.GoPackagesSettings{CleanCache: domain.CacheCleanupEnabled},        //nolint:exhaustruct
+		NixGenerations: &domain.NixGenerationsSettings{Generations: 3},                                                       //nolint:exhaustruct
+		Homebrew:       &domain.HomebrewSettings{UnusedOnly: domain.HomebrewModeUnusedOnly},                                  //nolint:exhaustruct
+		Docker:         &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},                                         //nolint:exhaustruct
+		GoPackages:     &domain.GoPackagesSettings{CleanCache: domain.CacheCleanupEnabled},                                   //nolint:exhaustruct
 		NodePackages:   &domain.NodePackagesSettings{PackageManagers: []domain.PackageManagerType{domain.PackageManagerBun}}, //nolint:exhaustruct
-		BuildCache:     &domain.BuildCacheSettings{OlderThan: "14d"},                              //nolint:exhaustruct
+		BuildCache:     &domain.BuildCacheSettings{OlderThan: "14d"},                                                         //nolint:exhaustruct
 		SystemCache:    &domain.SystemCacheSettings{OlderThan: "21d", CacheTypes: []domain.CacheType{domain.CacheTypePip}},   //nolint:exhaustruct
 		TempFiles:      &domain.TempFilesSettings{OlderThan: "14d", Excludes: []string{"/tmp/keep"}},                         //nolint:exhaustruct
 		ProjectExecutables: &domain.ProjectExecutablesSettings{ //nolint:exhaustruct
@@ -139,10 +139,10 @@ func TestResolveOperationSettings_ZeroValueSemantics(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-			name     string
-			settings *domain.OperationSettings //nolint:exhaustruct
-			assert   func(t *testing.T, settings *domain.OperationSettings)
-		}{
+		name     string
+		settings *domain.OperationSettings //nolint:exhaustruct
+		assert   func(t *testing.T, settings *domain.OperationSettings)
+	}{
 		{
 			name: "empty older_than falls back to default",
 			settings: &domain.OperationSettings{ //nolint:exhaustruct

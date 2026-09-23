@@ -27,17 +27,17 @@
 
 ## Medium Priority
 
-| #  | Task                                                                                                                                                              | Impact | Effort | Source                 |
-| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ---------------------- |
-| 10 | Implement `scan --profile` filtering or remove the flag (currently warns but shows all cleaners)                                                                  | MED    | MED    | 2026-07-06 DI/workflow |
-| 11 | Logger globals (`L`, `StdLogger`) → DI-injected logger — root cause of test race conditions                                                                       | MED    | MED    | 2026-07-06 DI/workflow |
-| 12 | Split files over 350 lines: `compiledbinaries.go` (585), `docker.go` (524), `nodepackages.go` (523)                                                               | MED    | MED    | Code quality           |
-| 13 | Add CLI command tests: profile, config, scan, init (clean integration test exists; root usage-error classification + scan JSON enrichment tests added 2026-09-23) | MED    | HIGH   | 2026-07-06 BDD audit   |
-| 14 | Extract `"go-build*"` string constant in `golang_cache_cleaner.go`                                                                                                | LOW    | LOW    | Lint (goconst)         |
-| 15 | Improve Nix size estimation (currently hardcoded 50MB/generation)                                                                                                 | MED    | MED    | FEATURES audit         |
-| 16 | Add tests for `getRegistryName` reverse lookup (`scan.go:246`)                                                                                                    | MED    | LOW    | Pre-existing           |
-| 17 | Move `/tmp/go-humanize-linter` into repo (`tools/lint/`) so CI can reproduce the H007 check                                                                       | MED    | LOW    | 2026-08-05 linter      |
-| 18 | Wire `go-humanize-linter` into `flake.nix` `checks` (or pre-commit) — H007 violations can regress                                                                 | MED    | LOW    | 2026-08-05 linter      |
+| #  | Task                                                                                                                                                                                                     | Impact | Effort | Source                            |
+| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------- |
+| 10 | Implement `scan --profile` filtering or remove the flag (currently warns but shows all cleaners)                                                                                                         | MED    | MED    | 2026-07-06 DI/workflow            |
+| 11 | Logger globals (`L`, `StdLogger`) → DI-injected logger — root cause of test race conditions                                                                                                              | MED    | MED    | 2026-07-06 DI/workflow            |
+| 12 | Split files over 350 lines: `compiledbinaries.go` (585), `docker.go` (524), `nodepackages.go` (523)                                                                                                      | MED    | MED    | Code quality                      |
+| 13 | Add CLI command tests: profile, config, scan, init (clean integration test exists; root usage-error classification + scan JSON enrichment tests added 2026-09-23)                                        | MED    | HIGH   | 2026-07-06 BDD audit              |
+| 14 | Extract `"go-build*"` string constant in `golang_cache_cleaner.go`                                                                                                                                       | LOW    | LOW    | Lint (goconst)                    |
+| 15 | Improve Nix size estimation (currently hardcoded 50MB/generation)                                                                                                                                        | MED    | MED    | FEATURES audit                    |
+| 16 | Add tests for `getRegistryName` reverse lookup (`scan.go:246`)                                                                                                                                           | MED    | LOW    | Pre-existing                      |
+| 17 | Move `/tmp/go-humanize-linter` into repo (`tools/lint/`) so CI can reproduce the H007 check                                                                                                              | MED    | LOW    | 2026-08-05 linter                 |
+| 18 | Wire `go-humanize-linter` into `flake.nix` `checks` (or pre-commit) — H007 violations can regress                                                                                                        | MED    | LOW    | 2026-08-05 linter                 |
 | 29 | Fix `nix flake check` treefmt-check: sandboxed goimports tries to download go1.27 toolchain (offline sandbox → DNS refused); wire go_1_27 into the treefmt formatter closure (`nix fmt` itself is green) | MED    | MED    | 2026-09-23 error-family migration |
 
 ## Low Priority / Polish

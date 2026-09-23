@@ -16,6 +16,10 @@ const (
 // resolveNixKeepCount returns the variadic keepCount argument for NewNixCleaner.
 // An empty result keeps the constructor default (5).
 func resolveNixKeepCount(settings *domain.OperationSettings) []int {
+	if settings == nil {
+		return nil
+	}
+
 	if settings.NixGenerations != nil && settings.NixGenerations.Generations > 0 {
 		return []int{settings.NixGenerations.Generations}
 	}
@@ -25,6 +29,10 @@ func resolveNixKeepCount(settings *domain.OperationSettings) []int {
 
 // resolveHomebrewMode maps the homebrew settings section to the cleaner's mode.
 func resolveHomebrewMode(settings *domain.OperationSettings) domain.HomebrewMode {
+	if settings == nil {
+		return domain.HomebrewModeAll
+	}
+
 	if settings.Homebrew != nil {
 		return settings.Homebrew.UnusedOnly
 	}
@@ -34,6 +42,10 @@ func resolveHomebrewMode(settings *domain.OperationSettings) domain.HomebrewMode
 
 // resolveDockerPruneMode maps the docker settings section to the cleaner's prune mode.
 func resolveDockerPruneMode(settings *domain.OperationSettings) domain.DockerPruneMode {
+	if settings == nil {
+		return domain.DockerPruneAll
+	}
+
 	if settings.Docker != nil {
 		return settings.Docker.PruneMode
 	}
@@ -48,7 +60,7 @@ func resolveGoCaches(settings *domain.OperationSettings) GoCacheType {
 	const defaultGoCaches = GoCacheGOCACHE | GoCacheTestCache | GoCacheModCache | GoCacheBuildCache
 
 	goSettings := settings.GoPackages
-	if goSettings == nil {
+	if settings == nil || goSettings == nil {
 		return defaultGoCaches
 	}
 
@@ -84,6 +96,10 @@ func resolveGoCaches(settings *domain.OperationSettings) GoCacheType {
 // resolveNodePackageManagers maps the node_packages settings section to the
 // package managers to clean, falling back to whatever is available on this system.
 func resolveNodePackageManagers(settings *domain.OperationSettings) []domain.PackageManagerType {
+	if settings == nil {
+		return AvailableNodePackageManagers()
+	}
+
 	if settings.NodePackages != nil && len(settings.NodePackages.PackageManagers) > 0 {
 		return settings.NodePackages.PackageManagers
 	}
@@ -93,6 +109,10 @@ func resolveNodePackageManagers(settings *domain.OperationSettings) []domain.Pac
 
 // resolveBuildCacheOlderThan maps the build_cache settings section to the age filter.
 func resolveBuildCacheOlderThan(settings *domain.OperationSettings) string {
+	if settings == nil {
+		return defaultBuildCacheOlderThan
+	}
+
 	if settings.BuildCache != nil && settings.BuildCache.OlderThan != "" {
 		return settings.BuildCache.OlderThan
 	}
@@ -105,6 +125,10 @@ func resolveSystemCache(settings *domain.OperationSettings) (string, []domain.Ca
 	olderThan := defaultSystemCacheOlderThan
 
 	var cacheTypes []domain.CacheType
+
+	if settings == nil {
+		return olderThan, cacheTypes
+	}
 
 	if systemSettings := settings.SystemCache; systemSettings != nil {
 		if systemSettings.OlderThan != "" {
@@ -123,6 +147,10 @@ func resolveTempFiles(settings *domain.OperationSettings) (string, []string) {
 
 	var excludes []string
 
+	if settings == nil {
+		return olderThan, excludes
+	}
+
 	if tempSettings := settings.TempFiles; tempSettings != nil {
 		if tempSettings.OlderThan != "" {
 			olderThan = tempSettings.OlderThan
@@ -137,6 +165,10 @@ func resolveTempFiles(settings *domain.OperationSettings) (string, []string) {
 // resolveProjectExecutables maps the project_executables settings section to
 // the exclusion filters. A nil extension list keeps the constructor default (.sh).
 func resolveProjectExecutables(settings *domain.OperationSettings) ([]string, []string) {
+	if settings == nil {
+		return nil, nil
+	}
+
 	if executableSettings := settings.ProjectExecutables; executableSettings != nil {
 		return executableSettings.ExcludeExtensions, executableSettings.ExcludePatterns
 	}
@@ -151,6 +183,10 @@ func resolveCompiledBinaries(settings *domain.OperationSettings) (int, string, [
 	olderThan := DefaultOlderThan
 
 	var basePaths, excludePatterns []string
+
+	if settings == nil {
+		return minSizeMB, olderThan, basePaths, excludePatterns
+	}
 
 	if binarySettings := settings.CompiledBinaries; binarySettings != nil {
 		if binarySettings.MinSizeMB > 0 {
