@@ -14,7 +14,7 @@ import (
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/go-finding"
 	"github.com/larsartmann/go-finding/pipeline"
-	"github.com/larsartmann/linter-autoconfigure-sdk"
+	autoconfigure "github.com/larsartmann/linter-autoconfigure-sdk"
 	yamlv3 "gopkg.in/yaml.v3"
 )
 
@@ -73,7 +73,11 @@ func MigrateConfigFile(
 	}
 
 	if _, err := os.Stat(configPath); err != nil {
-		return MigrationReport{}, errorfamily.WrapRejection(err, "config.migrate", "configuration file not found: "+configPath)
+		return MigrationReport{}, errorfamily.WrapRejection(
+			err,
+			"config.migrate",
+			"configuration file not found: "+configPath,
+		)
 	}
 
 	config, err := loadConfigForMigration(ctx, configPath)
@@ -187,7 +191,11 @@ func applyMigration(
 	backup := pipeline.NewFileBackup(backupDir)
 
 	if err := backup.Backup(configPath); err != nil {
-		return MigrationReport{}, errorfamily.WrapTransient(err, "config.migrate", "failed to back up configuration before migration")
+		return MigrationReport{}, errorfamily.WrapTransient(
+			err,
+			"config.migrate",
+			"failed to back up configuration before migration",
+		)
 	}
 
 	restore := func(cause error, message string) (MigrationReport, error) {
@@ -195,7 +203,9 @@ func applyMigration(
 			return MigrationReport{}, errorfamily.WrapCorruption(
 				errors.Join(cause, restoreErr),
 				"config.migrate",
-				message+"; the backup itself could not be restored — original preserved at "+backup.BackupPath(configPath),
+				message+"; the backup itself could not be restored — original preserved at "+backup.BackupPath(
+					configPath,
+				),
 			)
 		}
 
@@ -256,12 +266,20 @@ func recordChanges(records []MigrationRecord) []autoconfigure.Change {
 func cloneConfig(config *types.Config) (*types.Config, error) {
 	data, err := yamlv3.Marshal(configYAMLMap(config))
 	if err != nil {
-		return nil, errorfamily.WrapCorruption(err, "config.migrate", "failed to encode configuration for migration preview")
+		return nil, errorfamily.WrapCorruption(
+			err,
+			"config.migrate",
+			"failed to encode configuration for migration preview",
+		)
 	}
 
 	clone := &types.Config{}
 	if err := yamlv3.Unmarshal(data, clone); err != nil {
-		return nil, errorfamily.WrapCorruption(err, "config.migrate", "failed to decode configuration for migration preview")
+		return nil, errorfamily.WrapCorruption(
+			err,
+			"config.migrate",
+			"failed to decode configuration for migration preview",
+		)
 	}
 
 	return clone, nil

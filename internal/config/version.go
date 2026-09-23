@@ -15,7 +15,7 @@ import (
 //
 // It is a var (not a const) so migration tests can simulate future formats;
 // production code must treat it as immutable.
-var CurrentFormatVersion = FormatVersion{Major: 1, Minor: 0, Patch: 0}
+var CurrentFormatVersion = FormatVersion{Major: 1, Minor: 0, Patch: 0} //nolint:gochecknoglobals
 
 // FormatVersion identifies the on-disk configuration format. Configurations
 // carry it in the top-level `version` field; the migration engine uses it to
@@ -26,10 +26,12 @@ type FormatVersion struct {
 	Patch int
 }
 
+const formatVersionParts = 3
+
 // ParseFormatVersion parses a "major.minor.patch" format version string.
 func ParseFormatVersion(raw string) (FormatVersion, error) {
 	parts := strings.Split(raw, ".")
-	if len(parts) != 3 {
+	if len(parts) != formatVersionParts {
 		return FormatVersion{}, errorfamily.NewRejection(
 			"config.version",
 			"invalid configuration format version "+strconv.Quote(raw)+`: want "major.minor.patch"`,

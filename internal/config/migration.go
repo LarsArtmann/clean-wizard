@@ -9,7 +9,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
-	"github.com/larsartmann/linter-autoconfigure-sdk"
+	autoconfigure "github.com/larsartmann/linter-autoconfigure-sdk"
 	yamlv3 "gopkg.in/yaml.v3"
 )
 
