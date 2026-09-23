@@ -152,7 +152,7 @@ linters:
         - github.com/maypok86/otter/v2.Options
         - github.com/caarlos0/env/v6.Options
         - github.com/Azure/go-workflow.Workflow
-        - github.com/LarsArtmann/clean-wizard/internal/domain.CleanResult
+        - github.com/LarsArtmann/clean-wizard/internal/domain/types.CleanResult
         - github.com/LarsArtmann/clean-wizard/internal/execution.WorkflowResult
         - github.com/LarsArtmann/clean-wizard/internal/execution.resultCollector
     funlen:
@@ -275,7 +275,7 @@ linters:
         linters:
           - exhaustruct
           - goconst
-      - path: internal/domain/enum_macros\.go
+      - path: internal/domain/enums/enum_macros\.go
         linters:
           - wrapcheck
       - path: _test\.go
