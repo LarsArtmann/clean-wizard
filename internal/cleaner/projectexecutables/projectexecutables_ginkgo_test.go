@@ -305,7 +305,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 						ExcludePatterns: []string{"[invalid"},
 					},
 				}
-				assertValidationError(cleaner, settings, "invalid exclude pattern")
+				cln.AssertValidationError(cleaner, settings, "invalid exclude pattern")
 			})
 
 			ginkgo.It("should return error for invalid glob pattern with unclosed bracket", func() {

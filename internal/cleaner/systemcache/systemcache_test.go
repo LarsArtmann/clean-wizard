@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	cln "github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
@@ -66,7 +66,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 			}
 
 			if cleaner != nil {
-				cleaner.AssertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
+				cln.AssertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
 			}
 		})
 	}
@@ -277,7 +277,7 @@ func TestSystemCacheCleaner_GetHomeDir(t *testing.T) {
 	}
 
 	// Test GetHomeDir doesn't crash
-	home, err := cleaner.GetHomeDir()
+	home, err := cln.GetHomeDir()
 
 	// May return empty string if home cannot be determined
 	if home == "" && err == nil {
@@ -297,13 +297,13 @@ func TestSystemCacheCleaner_DryRunStrategy(t *testing.T) {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
 	}
 
-	cleaner.TestDryRun(t, cleaner.SimpleCleanerConstructorFromInstance(cleaner), "system-cache", -1)
+	cln.TestDryRun(t, cln.SimpleCleanerConstructorFromInstance(cleaner), "system-cache", -1)
 }
 
 func TestSystemCacheCleaner_ParseDuration(t *testing.T) {
 	t.Parallel()
 
-	for _, tc := range CommonDurationTestCases {
+	for _, tc := range cln.CommonDurationTestCases {
 		t.Run(tc.Duration, func(t *testing.T) {
 			t.Parallel()
 

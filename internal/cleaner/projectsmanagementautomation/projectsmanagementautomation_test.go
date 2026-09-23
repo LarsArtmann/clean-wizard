@@ -4,14 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	cln "github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
 	t.Parallel()
-	cleaner.VerifyNewCleanerConstructor(
+	cln.VerifyNewCleanerConstructor(
 		t,
 		NewProjectsManagementAutomationCleaner,
 		"NewProjectsManagementAutomationCleaner",
@@ -21,7 +21,7 @@ func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
 func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
 	t.Parallel()
 
-	cleaner := cleaner.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
+	cleaner := cln.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	if cleaner.Type() != operations.OperationTypeProjectsManagementAutomation {
 		t.Errorf(
@@ -34,13 +34,13 @@ func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
 
 func TestProjectsManagementAutomationCleaner_IsAvailable(t *testing.T) {
 	t.Parallel()
-	cleaner.TestIsAvailable(t, NewProjectsManagementAutomationCleaner)
+	cln.TestIsAvailable(t, NewProjectsManagementAutomationCleaner)
 }
 
 func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
 	t.Parallel()
 
-	cleaner := cleaner.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
+	cleaner := cln.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	size := cleaner.estimateCacheSize()
 	expectedSize := int64(100 * 1024 * 1024) // 100MB
@@ -53,7 +53,7 @@ func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
 func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
 	t.Parallel()
 
-	cleaner := cleaner.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
+	cleaner := cln.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	result := cleaner.Scan(context.Background())
 
@@ -97,7 +97,7 @@ func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
 func TestProjectsManagementAutomationCleaner_Scan_NotAvailable(t *testing.T) {
 	t.Parallel()
 
-	cleaner := cleaner.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
+	cleaner := cln.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	// If tool is not available, should return empty items
 	if !cleaner.IsAvailable(context.Background()) {
@@ -119,7 +119,7 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 	t.Parallel()
 	// This test would fail if projects-management-automation is installed
 	// We just verify error handling logic exists
-	cleaner := cleaner.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
+	cleaner := cln.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	// Can't easily test "tool not available" case without mocking
 	// So we just verify IsAvailable is called
@@ -128,7 +128,7 @@ func TestProjectsManagementAutomationCleaner_Clean_NoAvailable(t *testing.T) {
 
 func TestProjectsManagementAutomationCleaner_StandardTests(t *testing.T) {
 	t.Parallel()
-	cleaner.TestStandardCleaner(t,
-		cleaner.NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
+	cln.TestStandardCleaner(t,
+		cln.NewBooleanSettingsCleanerTestConstructor(NewProjectsManagementAutomationCleaner),
 		"projects-management-automation")
 }

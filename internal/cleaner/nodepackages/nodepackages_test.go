@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	cln "github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
@@ -114,11 +114,11 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
 
-	factory := cleaner.NewCleanerConstructorWithSettings(
+	factory := cln.NewCleanerConstructorWithSettings(
 		NewNodePackageManagerCleaner,
 		AvailableNodePackageManagers,
 	)
-	testCases := []cleaner.ValidateSettingsTestCase{
+	testCases := []cln.ValidateSettingsTestCase{
 		{
 			Name:     "nil settings",
 			Settings: nil,
@@ -181,7 +181,7 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 			WantErr: true,
 		},
 	}
-	cleaner.TestValidateSettings(t, factory, testCases)
+	cln.TestValidateSettings(t, factory, testCases)
 }
 
 func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
@@ -269,7 +269,7 @@ func TestNodePackageManagerCleaner_AvailableNodePackageManagers(t *testing.T) {
 		enums.PackageManagerYarn,
 		enums.PackageManagerBun,
 	}
-	cleaner.TestAvailableTypesGeneric(
+	cln.TestAvailableTypesGeneric(
 		t,
 		"AvailableNodePackageManagers",
 		AvailableNodePackageManagers,
@@ -284,7 +284,7 @@ func TestGetHomeDir(t *testing.T) {
 	// Set HOME explicitly
 	t.Setenv("HOME", "/test/home")
 
-	home, err := cleaner.GetHomeDir()
+	home, err := cln.GetHomeDir()
 	if err != nil {
 		t.Errorf("GetHomeDir() error = %v", err)
 	}
@@ -297,7 +297,7 @@ func TestGetHomeDir(t *testing.T) {
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "C:\\Users\\test")
 
-	home, err = cleaner.GetHomeDir()
+	home, err = cln.GetHomeDir()
 	if err != nil {
 		t.Errorf("GetHomeDir() error = %v", err)
 	}
@@ -310,7 +310,7 @@ func TestGetHomeDir(t *testing.T) {
 	t.Setenv("HOME", "")
 	t.Setenv("USERPROFILE", "")
 
-	_, err = cleaner.GetHomeDir()
+	_, err = cln.GetHomeDir()
 	// On systems where user.Current() succeeds, this won't error
 	// This test only validates that error handling exists
 	_ = err

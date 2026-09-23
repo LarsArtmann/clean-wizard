@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/onsi/gomega"
+
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
@@ -178,6 +180,106 @@ func VerifyNewCleanerConstructor[T any](
 
 			if dryRunField.Bool() != tt.dryRun {
 				t.Errorf("dryRun = %v, want %v", dryRunField.Bool(), tt.dryRun)
+			}
+		})
+	}
+}
+
+// availableItemsTestHelper is a helper function for testing Available* functions.
+// This is called by type-specific test wrappers.
+func AvailableItemsTestHelper[T comparable](
+	t *testing.T,
+	expectedItems []T,
+	availableFn func() []T,
+	testName string,
+) {
+	t.Helper()
+
+	items := availableFn()
+
+	if len(items) != len(expectedItems) {
+		t.Errorf("%s() returned %d items, want %d", testName, len(items), len(expectedItems))
+	}
+
+	for i, item := range items {
+		if !reflect.DeepEqual(item, expectedItems[i]) {
+			t.Errorf("%s()[%d] = %v, want %v", testName, i, item, expectedItems[i])
+		}
+	}
+}
+
+// assertValidationError is a helper for testing that ValidateSettings
+// returns expected errors. Consolidates duplicate validation test patterns
+// across ginkgo test files.
+func AssertValidationError(
+	cleaner CleanerWithSettings, settings *operations.OperationSettings, expectedErrSubstring string,
+) {
+	err := cleaner.ValidateSettings(settings)
+	gomega.Expect(err).To(gomega.HaveOccurred())
+	gomega.Expect(err.Error()).To(gomega.ContainSubstring(expectedErrSubstring))
+}
+
+// DurationParseTestCase holds test data for duration parsing tests.
+type DurationParseTestCase struct {
+	Duration  string
+	WantValid bool
+}
+
+// CommonDurationTestCases provides shared test cases for duration parsing tests.
+// These are used by both BuildCacheCleaner and SystemCacheCleaner.
+var CommonDurationTestCases = []DurationParseTestCase{
+	{Duration: "1h", WantValid: true},
+	{Duration: "24h", WantValid: true},
+	{Duration: "7d", WantValid: true},
+	{Duration: "30d", WantValid: true},
+	{Duration: "1w", WantValid: false}, // Not supported
+	{Duration: "invalid", WantValid: false},
+}
+
+// BooleanSettingsCleanerTestCase represents a test case for cleaners with boolean settings.
+type BooleanSettingsCleanerTestCase struct {
+	Name   string
+	Config BooleanSettingsTestConfig
+}
+
+func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
+	t.Helper()
+	CreateBooleanSettingsCleanerTestFunctions(t, BooleanSettingsCleanerTestConfig{
+		TestName:          config.TestName,
+		ToolName:          config.ToolName,
+		SettingsFieldName: config.SettingsFieldName,
+		ExpectedItems:     config.ExpectedItems,
+		Constructor:       config.Constructor,
+		CreateSettings:    config.CreateSettingsFunc,
+	})
+}
+
+func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
+	t.Helper()
+
+	for _, tt := range testCases {
+		t.Run(tt.Name, func(t *testing.T) {
+			t.Setenv("HOME", tt.HomeValue)
+			t.Setenv("USERPROFILE", tt.ProfileValue)
+
+			home, err := GetHomeDir()
+
+			if tt.WantErr {
+				if err == nil {
+					t.Errorf("GetHomeDir() error = %v, want error for missing home", err)
+				}
+
+				if home != "" {
+					t.Errorf("GetHomeDir() = %v, want empty string", home)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("GetHomeDir() error = %v", err)
+				}
+
+				if home != tt.WantHome {
+					t.Errorf("GetHomeDir() = %v, want %v", home, tt.WantHome)
+				}
 			}
 		})
 	}

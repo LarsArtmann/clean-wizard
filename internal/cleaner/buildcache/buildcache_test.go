@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	cln "github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
@@ -85,7 +85,7 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 			}
 
 			if cleaner != nil {
-				cleaner.AssertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
+				cln.AssertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
 			}
 		})
 	}
@@ -273,7 +273,7 @@ func TestBuildCacheCleaner_GetHomeDir(t *testing.T) {
 	}
 
 	// Test GetHomeDir doesn't crash
-	home, err := cleaner.GetHomeDir()
+	home, err := cln.GetHomeDir()
 
 	// May return empty string if home cannot be determined
 	if home == "" && err == nil {
@@ -294,7 +294,7 @@ func TestBuildCacheCleaner_GetDirSize(t *testing.T) {
 	}
 
 	// Test with non-existent path
-	size := cleaner.GetDirSize("/non/existent/path/12345")
+	size := cln.GetDirSize("/non/existent/path/12345")
 	// Should return 0 for non-existent path
 	if size != 0 {
 		t.Errorf("GetDirSize() for non-existent path = %d, want 0", size)
@@ -302,7 +302,7 @@ func TestBuildCacheCleaner_GetDirSize(t *testing.T) {
 
 	// Test with temp directory
 	tmpDir := t.TempDir()
-	size = cleaner.GetDirSize(tmpDir)
+	size = cln.GetDirSize(tmpDir)
 	// Should be 0 for empty directory
 	if size != 0 {
 		t.Errorf("GetDirSize() for empty dir = %d, want 0", size)
@@ -318,7 +318,7 @@ func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
 	}
 
 	// Test with non-existent path
-	modTime := cleaner.GetDirModTime("/non/existent/path/12345")
+	modTime := cln.GetDirModTime("/non/existent/path/12345")
 	if !modTime.IsZero() {
 		t.Errorf("GetDirModTime() for non-existent path = %v, want zero time", modTime)
 	}
@@ -326,7 +326,7 @@ func TestBuildCacheCleaner_GetDirModTime(t *testing.T) {
 	// Test with temp directory
 	tmpDir := t.TempDir()
 
-	modTime = cleaner.GetDirModTime(tmpDir)
+	modTime = cln.GetDirModTime(tmpDir)
 	if modTime.IsZero() {
 		t.Error("GetDirModTime() for temp dir returned zero time")
 	}
@@ -340,12 +340,12 @@ func TestAvailableBuildTools(t *testing.T) {
 		JVMBuildToolMaven,
 		JVMBuildToolSBT,
 	}
-	availableItemsTestHelper(t, expectedTools, AvailableBuildTools, "AvailableBuildTools")
+	cln.AvailableItemsTestHelper(t, expectedTools, AvailableBuildTools, "AvailableBuildTools")
 }
 
 func TestBuildToolType_String(t *testing.T) {
 	t.Parallel()
-	cleaner.TestTypeString(t, "JVMBuildToolType", []JVMBuildToolType{
+	cln.TestTypeString(t, "JVMBuildToolType", []JVMBuildToolType{
 		JVMBuildToolGradle,
 		JVMBuildToolMaven,
 		JVMBuildToolSBT,
@@ -360,13 +360,13 @@ func TestBuildCacheCleaner_DryRunStrategy(t *testing.T) {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
 	}
 
-	cleaner.TestDryRun(t, cleaner.SimpleCleanerConstructorFromInstance(cleaner), "build-cache", -1)
+	cln.TestDryRun(t, cln.SimpleCleanerConstructorFromInstance(cleaner), "build-cache", -1)
 }
 
 func TestBuildCacheCleaner_ParseDuration(t *testing.T) {
 	t.Parallel()
 
-	for _, tc := range CommonDurationTestCases {
+	for _, tc := range cln.CommonDurationTestCases {
 		t.Run(tc.Duration, func(t *testing.T) {
 			t.Parallel()
 

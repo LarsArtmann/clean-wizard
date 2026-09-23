@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	cln "github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestNewCargoCleaner(t *testing.T) {
 	t.Parallel()
-	cleaner.VerifyNewCleanerConstructor(t, NewCargoCleaner, "NewCargoCleaner")
+	cln.VerifyNewCleanerConstructor(t, NewCargoCleaner, "NewCargoCleaner")
 }
 
 func TestCargoCleaner_Type(t *testing.T) {
@@ -26,11 +26,11 @@ func TestCargoCleaner_Type(t *testing.T) {
 
 func TestCargoCleaner_IsAvailable(t *testing.T) {
 	t.Parallel()
-	cleaner.TestIsAvailable(t, NewCargoCleaner)
+	cln.TestIsAvailable(t, NewCargoCleaner)
 }
 
 func TestCargoCleaner_GetHomeDir(t *testing.T) { //nolint:paralleltest
-	testCases := []cleaner.GetHomeDirTestCase{
+	testCases := []cln.GetHomeDirTestCase{
 		{
 			Name:      "HOME set",
 			HomeValue: "/test/home",
@@ -52,7 +52,7 @@ func TestCargoCleaner_GetHomeDir(t *testing.T) { //nolint:paralleltest
 func TestCargoCleaner_GetDirSize(t *testing.T) {
 	t.Parallel()
 	// Test with non-existent path
-	size := cleaner.GetDirSize("/non/existent/path/12345")
+	size := cln.GetDirSize("/non/existent/path/12345")
 	// Should return 0 for non-existent path
 	if size != 0 {
 		t.Errorf("GetDirSize() for non-existent path = %d, want 0", size)
@@ -60,7 +60,7 @@ func TestCargoCleaner_GetDirSize(t *testing.T) {
 
 	// Test with temp directory
 	tmpDir := t.TempDir()
-	size = cleaner.GetDirSize(tmpDir)
+	size = cln.GetDirSize(tmpDir)
 	// Should return 0 for empty directory
 	if size != 0 {
 		t.Errorf("GetDirSize() for empty dir = %d, want 0", size)
@@ -70,7 +70,7 @@ func TestCargoCleaner_GetDirSize(t *testing.T) {
 func TestCargoCleaner_GetDirModTime(t *testing.T) {
 	t.Parallel()
 	// Test with non-existent path
-	modTime := cleaner.GetDirModTime("/non/existent/path/12345")
+	modTime := cln.GetDirModTime("/non/existent/path/12345")
 	if !modTime.IsZero() {
 		t.Errorf("GetDirModTime() for non-existent path = %v, want zero time", modTime)
 	}
@@ -78,7 +78,7 @@ func TestCargoCleaner_GetDirModTime(t *testing.T) {
 	// Test with temp directory
 	tmpDir := t.TempDir()
 
-	modTime = cleaner.GetDirModTime(tmpDir)
+	modTime = cln.GetDirModTime(tmpDir)
 	if modTime.IsZero() {
 		t.Error("GetDirModTime() for temp dir returned zero time")
 	}
@@ -114,7 +114,7 @@ func TestCargoCleaner_Clean_NoAvailable(t *testing.T) {
 
 func TestCargoCleaner_StandardTests(t *testing.T) {
 	t.Parallel()
-	cleaner.TestStandardCleaner(t, cleaner.NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner), "Cargo")
+	cln.TestStandardCleaner(t, cln.NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner), "Cargo")
 }
 
 func TestCargoCleaner_Scan(t *testing.T) {

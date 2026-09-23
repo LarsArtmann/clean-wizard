@@ -362,7 +362,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 						MinSizeMB: -1,
 					},
 				}
-				assertValidationError(cleaner, settings, "min_size_mb must be >= 0")
+				cln.AssertValidationError(cleaner, settings, "min_size_mb must be >= 0")
 			})
 
 			ginkgo.It("should return error for invalid older_than format", func() {
@@ -382,7 +382,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 						ExcludePatterns: []string{"[invalid"},
 					},
 				}
-				assertValidationError(cleaner, settings, "invalid exclude pattern")
+				cln.AssertValidationError(cleaner, settings, "invalid exclude pattern")
 			})
 
 			ginkgo.It("should return error for invalid include category", func() {

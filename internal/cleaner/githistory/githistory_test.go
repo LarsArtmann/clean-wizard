@@ -181,7 +181,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 						MinSizeMB: -1,
 					},
 				}
-				assertValidationError(cleaner, settings, "min_size_mb must be >= 0")
+				cln.AssertValidationError(cleaner, settings, "min_size_mb must be >= 0")
 			})
 
 			ginkgo.It("should return error for negative max_files", func() {
@@ -190,7 +190,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 						MaxFiles: -1,
 					},
 				}
-				assertValidationError(cleaner, settings, "max_files must be >= 0")
+				cln.AssertValidationError(cleaner, settings, "max_files must be >= 0")
 			})
 		})
 	})

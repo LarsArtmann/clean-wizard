@@ -60,17 +60,6 @@ func CreateBooleanSettingsCleanerTestFunctions(
 //	        },
 //	    })
 //	}
-func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
-	t.Helper()
-	CreateBooleanSettingsCleanerTestFunctions(t, BooleanSettingsCleanerTestConfig{
-		TestName:          config.TestName,
-		ToolName:          config.ToolName,
-		SettingsFieldName: config.SettingsFieldName,
-		ExpectedItems:     config.ExpectedItems,
-		Constructor:       config.Constructor,
-		CreateSettings:    config.CreateSettingsFunc,
-	})
-}
 
 // RunGetHomeDirTests runs GetHomeDir tests for given test cases.
 // This eliminates duplicate error checking code across GetHomeDir tests.
@@ -95,33 +84,3 @@ func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
 //	    }
 //	    RunGetHomeDirTests(t, testCases)
 //	}
-func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
-	t.Helper()
-
-	for _, tt := range testCases {
-		t.Run(tt.Name, func(t *testing.T) {
-			t.Setenv("HOME", tt.HomeValue)
-			t.Setenv("USERPROFILE", tt.ProfileValue)
-
-			home, err := GetHomeDir()
-
-			if tt.WantErr {
-				if err == nil {
-					t.Errorf("GetHomeDir() error = %v, want error for missing home", err)
-				}
-
-				if home != "" {
-					t.Errorf("GetHomeDir() = %v, want empty string", home)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("GetHomeDir() error = %v", err)
-				}
-
-				if home != tt.WantHome {
-					t.Errorf("GetHomeDir() = %v, want %v", home, tt.WantHome)
-				}
-			}
-		})
-	}
-}
