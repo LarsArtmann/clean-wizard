@@ -60,6 +60,9 @@ Or use the Nix devShell (`nix develop`) which sets it automatically. The devShel
 - **CleanerConstructor[T] generic** - `internal/cleaner/test_interfaces.go` defines `type CleanerConstructor[T any] func(verbose, dryRun bool) T` used as alias for `CleanerConstructorWithSettings` and `SimpleCleanerConstructor`
 - **CleanerCore base interface** - Minimum cleaner interface (`IsAvailable` + `Clean`) shared by `CleanerWithSettings` and `SimpleCleaner` to avoid duplicate interface declarations
 - **Error Classification** — `go-error-family` (`github.com/larsartmann/go-error-family`) is the sole error library (cockroachdb/errors fully removed). All errors classify into 5 families (Rejection, Conflict, Transient, Corruption, Infrastructure). `NotAvailableError` implements `Classified` + `Coded` with per-cleaner codes (`cleaner.<name>.not_available`) via the `NewNotAvailableError` factory. `domain.ValidationError` implements `Classified` (→ Rejection). `errorfamily.IsRetryable()` drives retry decisions; `errorfamily.Classify()` drives skip/failed classification; `errorfamily.ExitCode()` drives sysexits exit codes at the CLI boundary.
+- **Shared size parsing (2026-09-23 dedup)** — byte consts (`BytesPerKB/MB/GB/TB`) and `ParseByteSize` (humanize wrapper) live in `internal/cleaner/size.go`; cleaner sub-packages (nix, compiledbinaries, docker, golangcilint) consume them and must not redefine `bytesPer*` consts
+- **Bool→enum constructors** — `enums.SafeModeFromBool/ProfileStatusFromBool/OptimizationModeFromBool/GenerationStatusFromBool` are the single source for bool→enum conversion; config `boolToSafeMode`, adapters `boolToGenerationStatus`, and the BDD `BoolToX` helpers all delegate
+- **Scan retries are wired** — `RunScans` (like `RunCleaners`) applies `cfg.retry` via the shared `newRunBuilder`; before 2026-09-23 the scan command built retry options that execution silently dropped
 
 ## DI + Workflow Architecture
 
