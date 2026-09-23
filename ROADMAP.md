@@ -20,6 +20,11 @@ A plugin system would allow third-party cleaners without modifying the core regi
 The current `Cleaner` interface and registry pattern provide the foundation, but the
 loading and discovery mechanism does not exist yet.
 
+**Deferred until after v1** (2026-09-23, #31). When picked up, evaluate
+`LarsArtmann/plugmarket` and `LarsArtmann/cordis` (fiber-based lifecycle with
+plugins, effects, events) as the contract foundation before building anything
+custom.
+
 ### 3. Observability
 
 Live progress TUI during workflow execution (per-cleaner status, real-time freed space).
