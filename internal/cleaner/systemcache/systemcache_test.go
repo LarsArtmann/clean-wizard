@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
@@ -12,39 +13,39 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		verbose		bool
-		dryRun		bool
-		olderThan	string
-		wantErr		bool
+		name      string
+		verbose   bool
+		dryRun    bool
+		olderThan string
+		wantErr   bool
 	}{
 		{
-			name:		"valid configuration",
-			verbose:	false,
-			dryRun:		false,
-			olderThan:	"30d",
-			wantErr:	false,
+			name:      "valid configuration",
+			verbose:   false,
+			dryRun:    false,
+			olderThan: "30d",
+			wantErr:   false,
 		},
 		{
-			name:		"verbose dry-run",
-			verbose:	true,
-			dryRun:		true,
-			olderThan:	"7d",
-			wantErr:	false,
+			name:      "verbose dry-run",
+			verbose:   true,
+			dryRun:    true,
+			olderThan: "7d",
+			wantErr:   false,
 		},
 		{
-			name:		"invalid duration",
-			verbose:	false,
-			dryRun:		false,
-			olderThan:	"invalid",
-			wantErr:	true,
+			name:      "invalid duration",
+			verbose:   false,
+			dryRun:    false,
+			olderThan: "invalid",
+			wantErr:   true,
 		},
 		{
-			name:		"empty duration",
-			verbose:	false,
-			dryRun:		false,
-			olderThan:	"",
-			wantErr:	true,
+			name:      "empty duration",
+			verbose:   false,
+			dryRun:    false,
+			olderThan: "",
+			wantErr:   true,
 		},
 	}
 
@@ -52,7 +53,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cleaner, err := NewSystemCacheCleaner(tt.verbose, tt.dryRun, tt.olderThan, nil)
+			cleaner, err := NewSystemCacheCleaner(tt.GetVerbose(), tt.GetDryRun(), tt.olderThan, nil)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewSystemCacheCleaner() error = %v, wantErr %v", err, tt.wantErr)
@@ -65,7 +66,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 			}
 
 			if cleaner != nil {
-				assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
+				assertCleanerBooleanFields(t, cleaner, tt.GetVerbose(), tt.GetDryRun())
 			}
 		})
 	}
@@ -104,86 +105,86 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		settings	*operations.OperationSettings
-		wantErr		bool
+		name     string
+		settings *operations.OperationSettings
+		wantErr  bool
 	}{
 		{
-			name:		"nil settings",
-			settings:	nil,
-			wantErr:	false,
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  false,
 		},
 		{
-			name:		"nil system cache settings",
-			settings:	&operations.OperationSettings{},
-			wantErr:	false,
+			name:     "nil system cache settings",
+			settings: &operations.OperationSettings{},
+			wantErr:  false,
 		},
 		{
-			name:	"valid settings with all platform caches",
+			name: "valid settings with all platform caches",
 			settings: func() *operations.OperationSettings {
 				return &operations.OperationSettings{
 					SystemCache: &operations.SystemCacheSettings{
-						CacheTypes:	AvailableSystemCacheTypes(),
-						OlderThan:	"30d",
+						CacheTypes: AvailableSystemCacheTypes(),
+						OlderThan:  "30d",
 					},
 				}
 			}(),
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"valid settings with single platform cache",
+			name: "valid settings with single platform cache",
 			settings: func() *operations.OperationSettings {
 				caches := AvailableSystemCacheTypes()
 				if len(caches) == 0 {
 					return &operations.OperationSettings{
 						SystemCache: &operations.SystemCacheSettings{
-							CacheTypes:	[]enums.CacheType{},
-							OlderThan:	"7d",
+							CacheTypes: []enums.CacheType{},
+							OlderThan:  "7d",
 						},
 					}
 				}
 
 				return &operations.OperationSettings{
 					SystemCache: &operations.SystemCacheSettings{
-						CacheTypes:	[]enums.CacheType{caches[0]},
-						OlderThan:	"7d",
+						CacheTypes: []enums.CacheType{caches[0]},
+						OlderThan:  "7d",
 					},
 				}
 			}(),
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"valid settings with no caches",
+			name: "valid settings with no caches",
 			settings: &operations.OperationSettings{
 				SystemCache: &operations.SystemCacheSettings{
-					CacheTypes:	[]enums.CacheType{},
-					OlderThan:	"30d",
+					CacheTypes: []enums.CacheType{},
+					OlderThan:  "30d",
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"invalid cache type",
+			name: "invalid cache type",
 			settings: &operations.OperationSettings{
 				SystemCache: &operations.SystemCacheSettings{
-					CacheTypes:	[]enums.CacheType{99},	// Invalid value
-					OlderThan:	"30d",
+					CacheTypes: []enums.CacheType{99}, // Invalid value
+					OlderThan:  "30d",
 				},
 			},
-			wantErr:	true,
+			wantErr: true,
 		},
 		{
-			name:	"mixed valid and invalid caches",
+			name: "mixed valid and invalid caches",
 			settings: &operations.OperationSettings{
 				SystemCache: &operations.SystemCacheSettings{
 					CacheTypes: []enums.CacheType{
 						enums.CacheTypeSpotlight,
 						99,
-					},	// Mixed valid and invalid
-					OlderThan:	"30d",
+					}, // Mixed valid and invalid
+					OlderThan: "30d",
 				},
 			},
-			wantErr:	true,
+			wantErr: true,
 		},
 	}
 

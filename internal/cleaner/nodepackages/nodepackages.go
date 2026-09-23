@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -34,7 +35,7 @@ func AvailableNodePackageManagers() []enums.PackageManagerType {
 type NodePackageManagerCleaner struct {
 	cleaner.CleanerBase
 
-	packageManagers	[]enums.PackageManagerType
+	packageManagers []enums.PackageManagerType
 }
 
 // NewNodePackageManagerCleaner creates Node.js package manager cleaner.
@@ -42,8 +43,8 @@ func NewNodePackageManagerCleaner(
 	verbose, dryRun bool, packageManagers []enums.PackageManagerType,
 ) *NodePackageManagerCleaner {
 	return &NodePackageManagerCleaner{
-		CleanerBase:		cleaner.NewCleanerBase(verbose, dryRun),
-		packageManagers:	packageManagers,
+		CleanerBase:     cleaner.NewCleanerBase(verbose, dryRun),
+		packageManagers: packageManagers,
 	}
 }
 
@@ -96,10 +97,10 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *operations.Ope
 		func(np *operations.NodePackagesSettings) error {
 			packageManagerStrings := cleaner.PackageManagerTypeToLowerSlice(np.PackageManagers)
 			validPackageManagersMap := map[string]bool{
-				"npm":	true,
-				"pnpm":	true,
-				"yarn":	true,
-				"bun":	true,
+				"npm":  true,
+				"pnpm": true,
+				"yarn": true,
+				"bun":  true,
 			}
 
 			return cleaner.ValidateStringItems(
@@ -123,7 +124,7 @@ func (npmc *NodePackageManagerCleaner) Scan(ctx context.Context) result.Result[[
 
 		result := npmc.scanPackageManager(ctx, pm)
 		if result.IsErr() {
-			if npmc.verbose {
+			if npmc.GetVerbose() {
 				fmt.Printf("Warning: failed to scan %s: %v\n", pm, result.Error())
 			}
 
@@ -165,13 +166,13 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 		cachePath := strings.TrimSpace(string(output))
 		if cachePath != "" {
 			items = append(items, types.ScanItem{
-				Path:		cachePath,
-				Size:		0,	// Size unknown without checking
-				Created:	time.Time{},
-				ScanType:	types.ScanTypeTemp,
+				Path:     cachePath,
+				Size:     0, // Size unknown without checking
+				Created:  time.Time{},
+				ScanType: types.ScanTypeTemp,
 			})
 
-			if npmc.verbose {
+			if npmc.GetVerbose() {
 				fmt.Printf("Found npm cache: %s\n", cachePath)
 			}
 		}
@@ -196,13 +197,13 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 		storePath := strings.TrimSpace(string(output))
 		if storePath != "" {
 			items = append(items, types.ScanItem{
-				Path:		storePath,
-				Size:		0,	// Size unknown without checking
-				Created:	time.Time{},
-				ScanType:	types.ScanTypeTemp,
+				Path:     storePath,
+				Size:     0, // Size unknown without checking
+				Created:  time.Time{},
+				ScanType: types.ScanTypeTemp,
 			})
 
-			if npmc.verbose {
+			if npmc.GetVerbose() {
 				fmt.Printf("Found pnpm store: %s\n", storePath)
 			}
 		}
@@ -247,14 +248,14 @@ func (npmc *NodePackageManagerCleaner) scanHomeDirCache(
 	cachePath := fmt.Sprintf("%s/%s", homeDir, cacheSuffix)
 	items := []types.ScanItem{
 		{
-			Path:		cachePath,
-			Size:		0,	// Size unknown without checking
-			Created:	time.Time{},
-			ScanType:	types.ScanTypeTemp,
+			Path:     cachePath,
+			Size:     0, // Size unknown without checking
+			Created:  time.Time{},
+			ScanType: types.ScanTypeTemp,
 		},
 	}
 
-	if npmc.verbose {
+	if npmc.GetVerbose() {
 		fmt.Printf("Found %s cache: %s\n", pmName, cachePath)
 	}
 
@@ -330,13 +331,13 @@ func (npmc *NodePackageManagerCleaner) Clean(
 		return result.Err[types.CleanResult](errors.New("no Node.js package managers available"))
 	}
 
-	if npmc.dryRun {
+	if npmc.GetDryRun() {
 		// Scan actual cache directories to get real sizes
 		scanResult := npmc.Scan(ctx)
 
 		var (
-			totalBytes	int64
-			itemsRemoved	int
+			totalBytes   int64
+			itemsRemoved int
 		)
 
 		if scanResult.IsOk() {
@@ -357,7 +358,7 @@ func (npmc *NodePackageManagerCleaner) Clean(
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)}	//nolint:exhaustruct
+		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
 
 		return result.Ok(cleanResult)
 	}
@@ -372,7 +373,7 @@ func (npmc *NodePackageManagerCleaner) Clean(
 
 		result := npmc.cleanPackageManager(ctx, pm)
 		if result.IsErr() {
-			counters.RecordFailure(npmc.verbose, pm, result.Error())
+			counters.RecordFailure(npmc.GetVerbose(), pm, result.Error())
 
 			continue
 		}
@@ -443,7 +444,7 @@ func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
 			)
 		}
 
-		if npmc.verbose {
+		if npmc.GetVerbose() {
 			fmt.Printf("  ✓ %s\n", commandName)
 		}
 
@@ -452,9 +453,9 @@ func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
 
 	bytesFreed, _, _ := cleaner.CalculateBytesFreed(cacheDir, func() error {
 		return npmc.execPackageManagerCommand(ctx, commandArgs, commandName)
-	}, npmc.verbose, cacheLabel)
+	}, npmc.GetVerbose(), cacheLabel)
 
-	if npmc.verbose {
+	if npmc.GetVerbose() {
 		fmt.Printf("  ✓ %s\n", commandName)
 	}
 
@@ -504,7 +505,7 @@ func (npmc *NodePackageManagerCleaner) cleanPnpmStore(
 	cacheDir, err := npmc.getPnpmStoreDir(ctx)
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,
-		[]string{"pnpm", "store", "prune"},	//nolint:goconst
+		[]string{"pnpm", "store", "prune"}, //nolint:goconst
 		"pnpm store prune",
 		"Store")
 }

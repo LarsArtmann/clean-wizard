@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -18,18 +19,18 @@ import (
 type BuildCacheCleaner struct {
 	cleaner.CleanerBase
 
-	olderThan	time.Duration
-	toolTypes	[]JVMBuildToolType
-	basePaths	[]string
+	olderThan time.Duration
+	toolTypes []JVMBuildToolType
+	basePaths []string
 }
 
 // JVMBuildToolType represents different JVM build tool types.
 type JVMBuildToolType string
 
 const (
-	JVMBuildToolGradle	JVMBuildToolType	= "gradle"
-	JVMBuildToolMaven	JVMBuildToolType	= "maven"
-	JVMBuildToolSBT		JVMBuildToolType	= "sbt"
+	JVMBuildToolGradle JVMBuildToolType = "gradle"
+	JVMBuildToolMaven  JVMBuildToolType = "maven"
+	JVMBuildToolSBT    JVMBuildToolType = "sbt"
 )
 
 // AvailableBuildTools returns all available JVM build tool types.
@@ -60,10 +61,10 @@ func NewBuildCacheCleaner(
 	normalizedPaths := cleaner.NormalizePaths(basePaths)
 
 	return &BuildCacheCleaner{
-		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
-		olderThan:	duration,
-		toolTypes:	toolTypes,
-		basePaths:	normalizedPaths,
+		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
+		olderThan:   duration,
+		toolTypes:   toolTypes,
+		basePaths:   normalizedPaths,
 	}, nil
 }
 
@@ -94,7 +95,7 @@ func (bcc *BuildCacheCleaner) Scan(ctx context.Context) result.Result[[]types.Sc
 		ctx,
 		bcc.toolTypes,
 		bcc.scanBuildTool,
-		bcc.verbose,
+		bcc.GetVerbose(),
 	)
 }
 
@@ -127,7 +128,7 @@ func (bcc *BuildCacheCleaner) scanBuildTool(
 			"",
 			types.ScanTypeTemp,
 			"Gradle cache",
-			bcc.verbose,
+			bcc.GetVerbose(),
 			"*",
 			gradleCache,
 		)
@@ -135,12 +136,12 @@ func (bcc *BuildCacheCleaner) scanBuildTool(
 
 	case JVMBuildToolMaven:
 		mavenCache := getCachePath(toolType, homeDir)
-		scanResult := cleaner.ScanDirectory(mavenCache, types.ScanTypeTemp, bcc.verbose)
+		scanResult := cleaner.ScanDirectory(mavenCache, types.ScanTypeTemp, bcc.GetVerbose())
 		items = append(items, scanResult.Items...)
 
 	case JVMBuildToolSBT:
 		sbtCache := getCachePath(toolType, homeDir)
-		scanResult := cleaner.ScanDirectory(sbtCache, types.ScanTypeTemp, bcc.verbose)
+		scanResult := cleaner.ScanDirectory(sbtCache, types.ScanTypeTemp, bcc.GetVerbose())
 		items = append(items, scanResult.Items...)
 	}
 
@@ -155,8 +156,8 @@ func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[types.Cle
 		bcc.IsAvailable,
 		bcc.toolTypes,
 		bcc.cleanBuildTool,
-		bcc.verbose,
-		bcc.dryRun,
+		bcc.GetVerbose(),
+		bcc.GetDryRun(),
 		bcc.estimateBuildToolSize,
 	)
 }
@@ -187,7 +188,7 @@ type RemoveFunc func(path string) error
 
 // printVerbose prints a verbose message if verbose mode is enabled.
 func (bcc *BuildCacheCleaner) printVerbose(action, verboseMsg, baseName string) {
-	if !bcc.verbose {
+	if !bcc.GetVerbose() {
 		return
 	}
 
@@ -220,11 +221,11 @@ func (bcc *BuildCacheCleaner) genericClean(
 	bytesFreed := int64(0)
 
 	for _, match := range matches {
-		if !bcc.dryRun {
+		if !bcc.GetDryRun() {
 			bytesFreed += cleaner.GetDirSize(match)
 		}
 
-		if bcc.dryRun {
+		if bcc.GetDryRun() {
 			itemsRemoved++
 
 			bcc.printVerbose("Would remove", verboseMsg, filepath.Base(match))
@@ -234,7 +235,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 
 		err := removeFn(match)
 		if err != nil {
-			if bcc.verbose {
+			if bcc.GetVerbose() {
 				fmt.Printf("Warning: failed to remove %s: %v\n", match, err)
 			}
 
@@ -246,7 +247,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 		bcc.printVerbose("Removed", verboseMsg, filepath.Base(match))
 	}
 
-	if bcc.verbose && itemsRemoved > 0 {
+	if bcc.GetVerbose() && itemsRemoved > 0 {
 		fmt.Printf("  ✓ %s cleaned\n", toolName)
 	}
 

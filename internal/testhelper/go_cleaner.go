@@ -5,17 +5,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 )
 
-var GoCacheFlags = cleaner.GoCacheGOCACHE | cleaner.GoCacheTestCache | cleaner.GoCacheModCache | cleaner.GoCacheBuildCache //nolint:gochecknoglobals
+var GoCacheFlags = golang.GoCacheGOCACHE | golang.GoCacheTestCache | golang.GoCacheModCache | golang.GoCacheBuildCache //nolint:gochecknoglobals
 
 func GoCleanerTest(ctx context.Context, title string) error {
 	fmt.Printf("=== %s ===\n\n", title)
 
 	// Test 1: Check Go is available
-	goCleaner, err := cleaner.NewGoCleaner(true, false, GoCacheFlags)
+	goCleaner, err := golang.NewGoCleaner(true, false, GoCacheFlags)
 	if err != nil {
 		return fmt.Errorf("failed to create Go cleaner for title=%v: %w", title, err)
 	}
@@ -51,7 +51,7 @@ func GoCleanerTest(ctx context.Context, title string) error {
 	// Test 3: Dry-run clean
 	fmt.Println("🧹 Testing dry-run clean...")
 
-	dryRunCleaner, err := cleaner.NewGoCleaner(true, true, GoCacheFlags)
+	dryRunCleaner, err := golang.NewGoCleaner(true, true, GoCacheFlags)
 	if err != nil {
 		return fmt.Errorf("failed to create Go cleaner for title=%v: %w", title, err)
 	}

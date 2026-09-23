@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )

@@ -1,6 +1,7 @@
 package di
 
 import (
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/factory"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
@@ -52,7 +53,7 @@ func registerCleanerRegistry(injector do.Injector) {
 			return nil, err
 		}
 
-		registry, err := cleaner.DefaultRegistryWithConfig(settings.Verbose, settings.DryRun, operationSettings)
+		registry, err := factory.DefaultRegistryWithConfig(settings.Verbose, settings.DryRun, operationSettings)
 		if err != nil {
 			return nil, errorfamily.WrapRejection(err, "di.create_registry", "failed to create cleaner registry")
 		}

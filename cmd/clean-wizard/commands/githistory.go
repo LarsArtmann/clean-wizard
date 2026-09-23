@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"charm.land/huh/v2"
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/githistory"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -124,7 +124,7 @@ func runGitHistoryWizard(
 
 		var err error
 
-		repos, err = cleaner.FindGitRepositories(projectsPath, 3)
+		repos, err = githistory.FindGitRepositories(projectsPath, 3)
 		if err != nil {
 			return errorfamily.WrapRejectionf(
 				err, "githistory.find_repositories",
@@ -219,7 +219,7 @@ func displaySummary(
 	repoPath string,
 	selectedFiles []types.GitHistoryFile,
 	selectedSize int64,
-	impact *cleaner.ImpactEstimate,
+	impact *githistory.ImpactEstimate,
 ) {
 	fmt.Println()
 	fmt.Println(TitleStyle.Render("📊 Summary"))
@@ -321,18 +321,18 @@ func newGitHistoryCleaner(
 	repoPath string,
 	minSizeMB, maxFiles int,
 	verbose, dryRun, createBackup bool,
-) *cleaner.GitHistoryCleaner {
-	return cleaner.NewGitHistoryCleaner(
-		cleaner.WithGitHistoryRepoPath(repoPath),
-		cleaner.WithGitHistoryMinSizeMB(minSizeMB),
-		cleaner.WithGitHistoryMaxFiles(maxFiles),
-		cleaner.WithGitHistoryVerbose(verbose),
-		cleaner.WithGitHistoryDryRun(dryRun),
-		cleaner.WithGitHistoryCreateBackup(createBackup),
+) *githistory.GitHistoryCleaner {
+	return githistory.NewGitHistoryCleaner(
+		githistory.WithGitHistoryRepoPath(repoPath),
+		githistory.WithGitHistoryMinSizeMB(minSizeMB),
+		githistory.WithGitHistoryMaxFiles(maxFiles),
+		githistory.WithGitHistoryVerbose(verbose),
+		githistory.WithGitHistoryDryRun(dryRun),
+		githistory.WithGitHistoryCreateBackup(createBackup),
 	)
 }
 
-func runSafetyChecks(ctx context.Context, c *cleaner.GitHistoryCleaner) error {
+func runSafetyChecks(ctx context.Context, c *githistory.GitHistoryCleaner) error {
 	fmt.Print("🔒 Running safety checks... ")
 
 	safetyReport := c.GetSafetyReport(ctx)
@@ -355,7 +355,7 @@ func runSafetyChecks(ctx context.Context, c *cleaner.GitHistoryCleaner) error {
 
 func scanAndSelectFiles(
 	ctx context.Context,
-	c *cleaner.GitHistoryCleaner,
+	c *githistory.GitHistoryCleaner,
 	force bool,
 ) ([]types.GitHistoryFile, int64, error) {
 	fmt.Print("🔍 Scanning git history for binary files... ")
@@ -402,7 +402,7 @@ func scanAndSelectFiles(
 
 func confirmAndExecuteCleanup(
 	ctx context.Context,
-	c *cleaner.GitHistoryCleaner,
+	c *githistory.GitHistoryCleaner,
 	repoPath string,
 	selectedFiles []types.GitHistoryFile,
 	selectedSize int64,
@@ -584,10 +584,10 @@ func confirmAction(
 
 // ScanRepoForDisplay is a helper to get scan results formatted for display.
 func ScanRepoForDisplay(ctx context.Context, repoPath string, minSizeMB int) (*ScanDisplay, error) {
-	c := cleaner.NewGitHistoryCleaner(
-		cleaner.WithGitHistoryRepoPath(repoPath),
-		cleaner.WithGitHistoryMinSizeMB(minSizeMB),
-		cleaner.WithGitHistoryVerbose(false),
+	c := githistory.NewGitHistoryCleaner(
+		githistory.WithGitHistoryRepoPath(repoPath),
+		githistory.WithGitHistoryMinSizeMB(minSizeMB),
+		githistory.WithGitHistoryVerbose(false),
 	)
 
 	if !c.IsAvailable(ctx) {

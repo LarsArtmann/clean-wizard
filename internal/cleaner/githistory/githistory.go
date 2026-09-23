@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -18,28 +19,28 @@ import (
 // This is a destructive operation that rewrites history.
 const (
 	// GitHistoryDefaultMinSizeMB is the default minimum file size in MB to consider.
-	GitHistoryDefaultMinSizeMB	= 1
+	GitHistoryDefaultMinSizeMB = 1
 	// GitHistoryDefaultMaxFiles is the default maximum number of files to show.
-	GitHistoryDefaultMaxFiles	= 100
+	GitHistoryDefaultMaxFiles = 100
 	// GitHistoryDefaultMaxSearchDepth is the default maximum depth for repository search.
-	GitHistoryDefaultMaxSearchDepth	= 3
+	GitHistoryDefaultMaxSearchDepth = 3
 )
 
 type GitHistoryCleaner struct {
 	cleaner.CleanerBase
 
-	repoPath	string
-	minSizeMB	int
-	excludeExts	[]string
-	includeExts	[]string
-	excludePaths	[]string
-	maxFiles	int
-	createBackup	bool
-	selectedFiles	[]types.GitHistoryFile
+	repoPath      string
+	minSizeMB     int
+	excludeExts   []string
+	includeExts   []string
+	excludePaths  []string
+	maxFiles      int
+	createBackup  bool
+	selectedFiles []types.GitHistoryFile
 
-	scanner		*GitHistoryScanner
-	safetyChecker	*GitHistorySafetyChecker
-	executor	*GitHistoryExecutor
+	scanner       *GitHistoryScanner
+	safetyChecker *GitHistorySafetyChecker
+	executor      *GitHistoryExecutor
 }
 
 // GitHistoryCleanerOption is a functional option for the cleaner.
@@ -47,11 +48,11 @@ type GitHistoryCleanerOption func(*GitHistoryCleaner)
 
 // NewGitHistoryCleaner creates a new GitHistoryCleaner.
 func NewGitHistoryCleaner(opts ...GitHistoryCleanerOption) *GitHistoryCleaner {
-	c := &GitHistoryCleaner{	//nolint:exhaustruct
-		repoPath:	".",
-		minSizeMB:	GitHistoryDefaultMinSizeMB,
-		maxFiles:	GitHistoryDefaultMaxFiles,
-		createBackup:	true,
+	c := &GitHistoryCleaner{ //nolint:exhaustruct
+		repoPath:     ".",
+		minSizeMB:    GitHistoryDefaultMinSizeMB,
+		maxFiles:     GitHistoryDefaultMaxFiles,
+		createBackup: true,
 	}
 
 	for _, opt := range opts {
@@ -66,11 +67,11 @@ func NewGitHistoryCleaner(opts ...GitHistoryCleanerOption) *GitHistoryCleaner {
 		WithIncludeExtensions(c.includeExts),
 		WithExcludePaths(c.excludePaths),
 		WithMaxFiles(c.maxFiles),
-		WithVerbose(c.verbose),
+		WithVerbose(c.GetVerbose()),
 	)
 
-	c.safetyChecker = NewGitHistorySafetyChecker(c.repoPath, c.verbose)
-	c.executor = NewGitHistoryExecutor(c.repoPath, c.verbose, c.dryRun)
+	c.safetyChecker = NewGitHistorySafetyChecker(c.repoPath, c.GetVerbose())
+	c.executor = NewGitHistoryExecutor(c.repoPath, c.GetVerbose(), c.GetDryRun())
 
 	return c
 }
@@ -127,14 +128,14 @@ func WithGitHistoryCreateBackup(create bool) GitHistoryCleanerOption {
 // WithGitHistoryVerbose sets verbose mode.
 func WithGitHistoryVerbose(verbose bool) GitHistoryCleanerOption {
 	return func(c *GitHistoryCleaner) {
-		c.verbose = verbose
+		c.SetVerbose(verbose)
 	}
 }
 
 // WithGitHistoryDryRun sets dry run mode.
 func WithGitHistoryDryRun(dryRun bool) GitHistoryCleanerOption {
 	return func(c *GitHistoryCleaner) {
-		c.dryRun = dryRun
+		c.SetDryRun(dryRun)
 	}
 }
 
@@ -197,10 +198,10 @@ func (c *GitHistoryCleaner) Scan(ctx context.Context) result.Result[[]types.Scan
 	items := make([]types.ScanItem, len(scanResult.Files))
 	for i, f := range scanResult.Files {
 		items[i] = types.ScanItem{
-			Path:		f.Path,
-			Size:		f.SizeBytes,
-			Created:	f.CommitDate,
-			ScanType:	types.ScanTypeSystem,
+			Path:     f.Path,
+			Size:     f.SizeBytes,
+			Created:  f.CommitDate,
+			ScanType: types.ScanTypeSystem,
 		}
 	}
 
@@ -229,7 +230,7 @@ func (c *GitHistoryCleaner) Clean(ctx context.Context) result.Result[types.Clean
 
 	totalBytes := c.calculateTotalBytes()
 
-	if c.dryRun {
+	if c.GetDryRun() {
 		return c.executeDryRun(totalBytes)
 	}
 
@@ -271,7 +272,7 @@ func (c *GitHistoryCleaner) calculateTotalBytes() int64 {
 
 // executeDryRun returns a result for dry run mode.
 func (c *GitHistoryCleaner) executeDryRun(totalBytes int64) result.Result[types.CleanResult] {
-	if c.verbose {
+	if c.GetVerbose() {
 		fmt.Printf("Would remove %d binary file(s) from git history (%.2f MB)\n",
 			len(c.selectedFiles), float64(totalBytes)/float64(BytesPerMB))
 	}
@@ -288,15 +289,15 @@ func (c *GitHistoryCleaner) executeClean(
 	ctx context.Context,
 	_ int64,
 ) result.Result[types.CleanResult] {
-	execResult, err := c.executor.Execute(ctx, ExecuteOptions{	//nolint:exhaustruct
-		FilesToRemove:	c.selectedFiles,
-		CreateBackup:	c.createBackup,
+	execResult, err := c.executor.Execute(ctx, ExecuteOptions{ //nolint:exhaustruct
+		FilesToRemove: c.selectedFiles,
+		CreateBackup:  c.createBackup,
 	})
 	if err != nil {
 		return result.Err[types.CleanResult](fmt.Errorf("execution failed: %w", err))
 	}
 
-	if c.verbose {
+	if c.GetVerbose() {
 		fmt.Printf("Removed %d file(s) from history, reclaimed %.2f MB\n",
 			len(execResult.FilesRemoved), float64(execResult.BytesReclaimed)/float64(BytesPerMB))
 
@@ -310,8 +311,8 @@ func (c *GitHistoryCleaner) executeClean(
 		len(execResult.FilesRemoved),
 		execResult.BytesRemoved,
 		types.SizeEstimate{
-			Known:	uint64(execResult.BytesReclaimed),
-			Status:	enums.SizeEstimateStatusKnown,
+			Known:  uint64(execResult.BytesReclaimed),
+			Status: enums.SizeEstimateStatusKnown,
 		},
 	))
 }
@@ -402,7 +403,7 @@ func FindGitRepositories(basePath string, maxDepth int) ([]string, error) {
 		if info, err := os.Stat(gitDir); err == nil && info.IsDir() {
 			repos = append(repos, fullPath)
 
-			continue	// Don't search inside git repos
+			continue // Don't search inside git repos
 		}
 
 		// Recurse if we haven't reached max depth

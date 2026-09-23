@@ -37,12 +37,12 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 
 		ginkgo.It("should set verbose flag", func() {
 			executor = NewGitHistoryExecutor(tempDir, true, false)
-			gomega.Expect(executor.verbose).To(gomega.BeTrue())
+			gomega.Expect(executor.GetVerbose()).To(gomega.BeTrue())
 		})
 
 		ginkgo.It("should set dry run flag", func() {
 			executor = NewGitHistoryExecutor(tempDir, false, true)
-			gomega.Expect(executor.dryRun).To(gomega.BeTrue())
+			gomega.Expect(executor.GetDryRun()).To(gomega.BeTrue())
 		})
 	})
 

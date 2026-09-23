@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 // GoScanner handles scanning for Go caches.
 type GoScanner struct {
-	verbose	bool
-	helper	*golangHelpers
+	verbose bool
+	helper  *golangHelpers
 }
 
 // NewGoScanner creates a new GoScanner.
@@ -21,8 +22,8 @@ const goBuildCachePattern = "go-build*"
 
 func NewGoScanner(verbose bool) *GoScanner {
 	return &GoScanner{
-		verbose:	verbose,
-		helper:		&golangHelpers{},
+		verbose: verbose,
+		helper:  &golangHelpers{},
 	}
 }
 
@@ -76,10 +77,10 @@ func (gs *GoScanner) addScanItem(
 	path, cacheName string,
 ) []types.ScanItem {
 	items = append(items, types.ScanItem{
-		Path:		path,
-		Size:		cleaner.GetDirSize(path),
-		Created:	cleaner.GetDirModTime(path),
-		ScanType:	types.ScanTypeTemp,
+		Path:     path,
+		Size:     cleaner.GetDirSize(path),
+		Created:  cleaner.GetDirModTime(path),
+		ScanType: types.ScanTypeTemp,
 	})
 
 	if gs.verbose {

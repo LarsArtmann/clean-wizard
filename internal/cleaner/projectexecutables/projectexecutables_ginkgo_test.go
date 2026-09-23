@@ -17,8 +17,8 @@ import (
 
 // mockProjectLister implements ProjectLister for testing.
 type mockProjectLister struct {
-	projects	[]ProjectInfo
-	err		error
+	projects []ProjectInfo
+	err      error
 }
 
 func (m *mockProjectLister) ListProjects(ctx context.Context) ([]ProjectInfo, error) {
@@ -27,14 +27,14 @@ func (m *mockProjectLister) ListProjects(ctx context.Context) ([]ProjectInfo, er
 
 // mockFileOperator implements FileOperator for testing.
 type mockFileOperator struct {
-	executables	[]string
-	executablesErr	error
-	trashErr	error
-	fileSizes	map[string]int64
-	trashedFiles	[]string
-	trashCallCount	int
+	executables    []string
+	executablesErr error
+	trashErr       error
+	fileSizes      map[string]int64
+	trashedFiles   []string
+	trashCallCount int
 	// perDirExecutables allows specifying different executables per directory
-	perDirExecutables	map[string][]string
+	perDirExecutables map[string][]string
 }
 
 func (m *mockFileOperator) FindExecutableFiles(dir string) ([]string, error) {
@@ -87,10 +87,10 @@ func expectPatternsMatched(cleaner *ProjectExecutablesCleaner, patterns ...strin
 
 var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 	var (
-		ctx		context.Context
-		mockLister	*mockProjectLister
-		mockOperator	*mockFileOperator
-		cleaner		*ProjectExecutablesCleaner
+		ctx          context.Context
+		mockLister   *mockProjectLister
+		mockOperator *mockFileOperator
+		cleaner      *ProjectExecutablesCleaner
 	)
 
 	ginkgo.BeforeEach(func() {
@@ -140,12 +140,12 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 			ginkgo.It("should set verbose flag correctly", func() {
 				cleaner = NewProjectExecutablesCleaner(true, false, nil, nil)
-				gomega.Expect(cleaner.verbose).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetVerbose()).To(gomega.BeTrue())
 			})
 
 			ginkgo.It("should set dryRun flag correctly", func() {
 				cleaner = NewProjectExecutablesCleaner(false, true, nil, nil)
-				gomega.Expect(cleaner.dryRun).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetDryRun()).To(gomega.BeTrue())
 			})
 		})
 
@@ -184,8 +184,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				)
 				gomega.Expect(cleaner.projectLister).To(gomega.Equal(mockLister))
 				gomega.Expect(cleaner.fileOperator).To(gomega.Equal(mockOperator))
-				gomega.Expect(cleaner.verbose).To(gomega.BeTrue())
-				gomega.Expect(cleaner.dryRun).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetVerbose()).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetDryRun()).To(gomega.BeTrue())
 			})
 		})
 	})
@@ -289,8 +289,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			ginkgo.It("should return nil for valid combined settings", func() {
 				settings := &operations.OperationSettings{
 					ProjectExecutables: &operations.ProjectExecutablesSettings{
-						ExcludeExtensions:	[]string{".sh"},
-						ExcludePatterns:	[]string{"Makefile"},
+						ExcludeExtensions: []string{".sh"},
+						ExcludePatterns:   []string{"Makefile"},
 					},
 				}
 				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
@@ -372,8 +372,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					"/path/to/project1/binary2",
 				}
 				mockOperator.fileSizes = map[string]int64{
-					"/path/to/project1/binary1":	1024,
-					"/path/to/project1/binary2":	2048,
+					"/path/to/project1/binary1": 1024,
+					"/path/to/project1/binary2": 2048,
 				}
 				result := cleaner.Scan(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
@@ -527,8 +527,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					"/path/to/project1/binary2",
 				}
 				mockOperator.fileSizes = map[string]int64{
-					"/path/to/project1/binary1":	1024,
-					"/path/to/project1/binary2":	2048,
+					"/path/to/project1/binary1": 1024,
+					"/path/to/project1/binary2": 2048,
 				}
 				result := cleaner.Clean(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
@@ -559,8 +559,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 					"/path/to/project1/binary2",
 				}
 				mockOperator.fileSizes = map[string]int64{
-					"/path/to/project1/binary1":	1024,
-					"/path/to/project1/binary2":	2048,
+					"/path/to/project1/binary1": 1024,
+					"/path/to/project1/binary2": 2048,
 				}
 				result := cleaner.Clean(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
@@ -703,8 +703,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				"/path/to/project1/binary2",
 			}
 			mockOperator.fileSizes = map[string]int64{
-				"/path/to/project1/binary1":	1024,
-				"/path/to/project1/binary2":	2048,
+				"/path/to/project1/binary1": 1024,
+				"/path/to/project1/binary2": 2048,
 			}
 			size := cleaner.GetStoreSize(ctx)
 			gomega.Expect(size).To(gomega.Equal(int64(3072)))

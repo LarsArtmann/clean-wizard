@@ -12,40 +12,40 @@ func TestNewDockerCleaner(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		verbose		bool
-		dryRun		bool
-		pruneMode	enums.DockerPruneMode
+		name      string
+		verbose   bool
+		dryRun    bool
+		pruneMode enums.DockerPruneMode
 	}{
 		{
-			name:		"ALL mode",
-			verbose:	false,
-			dryRun:		false,
-			pruneMode:	enums.DockerPruneAll,
+			name:      "ALL mode",
+			verbose:   false,
+			dryRun:    false,
+			pruneMode: enums.DockerPruneAll,
 		},
 		{
-			name:		"IMAGES mode",
-			verbose:	true,
-			dryRun:		false,
-			pruneMode:	enums.DockerPruneImages,
+			name:      "IMAGES mode",
+			verbose:   true,
+			dryRun:    false,
+			pruneMode: enums.DockerPruneImages,
 		},
 		{
-			name:		"CONTAINERS mode",
-			verbose:	false,
-			dryRun:		true,
-			pruneMode:	enums.DockerPruneContainers,
+			name:      "CONTAINERS mode",
+			verbose:   false,
+			dryRun:    true,
+			pruneMode: enums.DockerPruneContainers,
 		},
 		{
-			name:		"VOLUMES mode",
-			verbose:	true,
-			dryRun:		true,
-			pruneMode:	enums.DockerPruneVolumes,
+			name:      "VOLUMES mode",
+			verbose:   true,
+			dryRun:    true,
+			pruneMode: enums.DockerPruneVolumes,
 		},
 		{
-			name:		"BUILDS mode",
-			verbose:	false,
-			dryRun:		false,
-			pruneMode:	enums.DockerPruneBuilds,
+			name:      "BUILDS mode",
+			verbose:   false,
+			dryRun:    false,
+			pruneMode: enums.DockerPruneBuilds,
 		},
 	}
 
@@ -53,7 +53,7 @@ func TestNewDockerCleaner(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cleaner := NewDockerCleaner(tt.verbose, tt.dryRun, tt.pruneMode)
+			cleaner := NewDockerCleaner(tt.GetVerbose(), tt.GetDryRun(), tt.pruneMode)
 
 			if cleaner == nil {
 				t.Fatal("NewDockerCleaner() returned nil cleaner")
@@ -92,55 +92,55 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		settings	*operations.OperationSettings
-		wantErr		bool
+		name     string
+		settings *operations.OperationSettings
+		wantErr  bool
 	}{
 		{
-			name:		"nil settings",
-			settings:	nil,
-			wantErr:	false,
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  false,
 		},
 		{
-			name:		"nil docker settings",
-			settings:	&operations.OperationSettings{},
-			wantErr:	false,
+			name:     "nil docker settings",
+			settings: &operations.OperationSettings{},
+			wantErr:  false,
 		},
 		{
-			name:	"valid light mode",
+			name: "valid light mode",
 			settings: &operations.OperationSettings{
 				Docker: &operations.DockerSettings{
 					PruneMode: enums.DockerPruneAll,
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"valid standard mode",
+			name: "valid standard mode",
 			settings: &operations.OperationSettings{
 				Docker: &operations.DockerSettings{
 					PruneMode: enums.DockerPruneImages,
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"valid aggressive mode",
+			name: "valid aggressive mode",
 			settings: &operations.OperationSettings{
 				Docker: &operations.DockerSettings{
 					PruneMode: enums.DockerPruneContainers,
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"invalid prune mode",
+			name: "invalid prune mode",
 			settings: &operations.OperationSettings{
 				Docker: &operations.DockerSettings{
 					PruneMode: enums.DockerPruneMode(999),
 				},
 			},
-			wantErr:	true,
+			wantErr: true,
 		},
 	}
 
@@ -239,8 +239,8 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		pruneMode	enums.DockerPruneMode
+		name      string
+		pruneMode enums.DockerPruneMode
 	}{
 		{"ALL mode", enums.DockerPruneAll},
 		{"IMAGES mode", enums.DockerPruneImages},
@@ -275,7 +275,7 @@ func TestDockerCleaner_Clean_Verbose(t *testing.T) {
 	}
 
 	// Just verify verbose flag is set
-	if !cleaner.verbose {
+	if !cleaner.GetVerbose() {
 		t.Error("verbose flag should be set")
 	}
 }
@@ -313,52 +313,52 @@ func TestParseDockerReclaimedSpace(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		output		string
-		expected	int64
-		wantErr		bool
+		name     string
+		output   string
+		expected int64
+		wantErr  bool
 	}{
 		{
-			name:		"valid kB output",
-			output:		"Deleted Containers:\nabc123\ndef456\n\nDeleted Images:\nsha256:123\n\nTotal reclaimed space: 1.84kB",
-			expected:	int64(1840),
-			wantErr:	false,
+			name:     "valid kB output",
+			output:   "Deleted Containers:\nabc123\ndef456\n\nDeleted Images:\nsha256:123\n\nTotal reclaimed space: 1.84kB",
+			expected: int64(1840),
+			wantErr:  false,
 		},
 		{
-			name:		"valid MB output",
-			output:		"Deleted Containers:\nabc123\n\nTotal reclaimed space: 13.5 MB",
-			expected:	int64(13500000),
-			wantErr:	false,
+			name:     "valid MB output",
+			output:   "Deleted Containers:\nabc123\n\nTotal reclaimed space: 13.5 MB",
+			expected: int64(13500000),
+			wantErr:  false,
 		},
 		{
-			name:		"valid GB output",
-			output:		"Deleted Images:\nsha256:123\n\nTotal reclaimed space: 2.5GB",
-			expected:	int64(2500000000),
-			wantErr:	false,
+			name:     "valid GB output",
+			output:   "Deleted Images:\nsha256:123\n\nTotal reclaimed space: 2.5GB",
+			expected: int64(2500000000),
+			wantErr:  false,
 		},
 		{
-			name:		"zero bytes output",
-			output:		"Total reclaimed space: 0B",
-			expected:	0,
-			wantErr:	false,
+			name:     "zero bytes output",
+			output:   "Total reclaimed space: 0B",
+			expected: 0,
+			wantErr:  false,
 		},
 		{
-			name:		"no reclaimed space line",
-			output:		"Deleted Containers:\nabc123\n",
-			expected:	0,
-			wantErr:	false,
+			name:     "no reclaimed space line",
+			output:   "Deleted Containers:\nabc123\n",
+			expected: 0,
+			wantErr:  false,
 		},
 		{
-			name:		"valid TB output",
-			output:		"Deleted Volumes:\nvol1\n\nTotal reclaimed space: 1.2TB",
-			expected:	int64(1200000000000),
-			wantErr:	false,
+			name:     "valid TB output",
+			output:   "Deleted Volumes:\nvol1\n\nTotal reclaimed space: 1.2TB",
+			expected: int64(1200000000000),
+			wantErr:  false,
 		},
 		{
-			name:		"valid B output",
-			output:		"Total reclaimed space: 512B",
-			expected:	512,
-			wantErr:	false,
+			name:     "valid B output",
+			output:   "Total reclaimed space: 512B",
+			expected: 512,
+			wantErr:  false,
 		},
 	}
 
@@ -385,74 +385,74 @@ func TestParseDockerSize(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		sizeStr		string
-		expected	int64
-		wantErr		bool
+		name     string
+		sizeStr  string
+		expected int64
+		wantErr  bool
 	}{
 		{
-			name:		"kilobytes",
-			sizeStr:	"1.84kB",
-			expected:	int64(1840),
-			wantErr:	false,
+			name:     "kilobytes",
+			sizeStr:  "1.84kB",
+			expected: int64(1840),
+			wantErr:  false,
 		},
 		{
-			name:		"megabytes",
-			sizeStr:	"13.5 MB",
-			expected:	int64(13500000),
-			wantErr:	false,
+			name:     "megabytes",
+			sizeStr:  "13.5 MB",
+			expected: int64(13500000),
+			wantErr:  false,
 		},
 		{
-			name:		"gigabytes",
-			sizeStr:	"2.5GB",
-			expected:	int64(2500000000),
-			wantErr:	false,
+			name:     "gigabytes",
+			sizeStr:  "2.5GB",
+			expected: int64(2500000000),
+			wantErr:  false,
 		},
 		{
-			name:		"terabytes",
-			sizeStr:	"1.2TB",
-			expected:	int64(1200000000000),
-			wantErr:	false,
+			name:     "terabytes",
+			sizeStr:  "1.2TB",
+			expected: int64(1200000000000),
+			wantErr:  false,
 		},
 		{
-			name:		"bytes",
-			sizeStr:	"512B",
-			expected:	512,
-			wantErr:	false,
+			name:     "bytes",
+			sizeStr:  "512B",
+			expected: 512,
+			wantErr:  false,
 		},
 		{
-			name:		"zero bytes",
-			sizeStr:	"0B",
-			expected:	0,
-			wantErr:	false,
+			name:     "zero bytes",
+			sizeStr:  "0B",
+			expected: 0,
+			wantErr:  false,
 		},
 		{
-			name:		"zero with no unit",
-			sizeStr:	"0",
-			expected:	0,
-			wantErr:	false,
+			name:     "zero with no unit",
+			sizeStr:  "0",
+			expected: 0,
+			wantErr:  false,
 		},
 		{
-			name:		"empty string",
-			sizeStr:	"",
-			expected:	0,
-			wantErr:	false,
+			name:     "empty string",
+			sizeStr:  "",
+			expected: 0,
+			wantErr:  false,
 		},
 		{
-			name:		"invalid unit",
-			sizeStr:	"1.5XB",
-			wantErr:	true,
+			name:    "invalid unit",
+			sizeStr: "1.5XB",
+			wantErr: true,
 		},
 		{
-			name:		"invalid format",
-			sizeStr:	"invalid",
-			wantErr:	true,
+			name:    "invalid format",
+			sizeStr: "invalid",
+			wantErr: true,
 		},
 		{
-			name:		"unit-less number treated as bytes",
-			sizeStr:	"1.5",
-			expected:	1,
-			wantErr:	false,
+			name:     "unit-less number treated as bytes",
+			sizeStr:  "1.5",
+			expected: 1,
+			wantErr:  false,
 		},
 	}
 

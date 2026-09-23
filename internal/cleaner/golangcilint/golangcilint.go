@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -59,8 +60,8 @@ func (glcc *GolangciLintCacheCleaner) ValidateSettings(_ *operations.OperationSe
 
 // cacheStatus holds the parsed output of golangci-lint cache status.
 type cacheStatus struct {
-	Dir	string
-	Size	int64
+	Dir  string
+	Size int64
 }
 
 // parseCacheStatus parses the output of "golangci-lint cache status".
@@ -74,7 +75,7 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 		return nil, fmt.Errorf("unexpected output format: %s", output)
 	}
 
-	status := &cacheStatus{}	//nolint:exhaustruct
+	status := &cacheStatus{} //nolint:exhaustruct
 
 	for _, line := range lines {
 		if after, ok := strings.CutPrefix(line, "Dir:"); ok {
@@ -144,7 +145,7 @@ func (glcc *GolangciLintCacheCleaner) Scan(ctx context.Context) result.Result[[]
 
 	status, err := glcc.getCacheStatus(ctx)
 	if err != nil {
-		if glcc.verbose {
+		if glcc.GetVerbose() {
 			fmt.Printf("Warning: failed to get golangci-lint cache status: %v\n", err)
 		}
 
@@ -152,13 +153,13 @@ func (glcc *GolangciLintCacheCleaner) Scan(ctx context.Context) result.Result[[]
 	}
 
 	items = append(items, types.ScanItem{
-		Path:		status.Dir,
-		Size:		status.Size,
-		Created:	cleaner.GetDirModTime(status.Dir),
-		ScanType:	types.ScanTypeCache,
+		Path:     status.Dir,
+		Size:     status.Size,
+		Created:  cleaner.GetDirModTime(status.Dir),
+		ScanType: types.ScanTypeCache,
 	})
 
-	if glcc.verbose {
+	if glcc.GetVerbose() {
 		fmt.Printf("Found golangci-lint cache: %s\n", status.Dir)
 	}
 
@@ -168,7 +169,7 @@ func (glcc *GolangciLintCacheCleaner) Scan(ctx context.Context) result.Result[[]
 // Clean removes golangci-lint cache.
 func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	if !glcc.IsAvailable(ctx) {
-		if glcc.verbose {
+		if glcc.GetVerbose() {
 			fmt.Println("  ⚠️  golangci-lint not found, skipping cache cleanup")
 			fmt.Println(
 				"  💡 Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest",
@@ -179,11 +180,11 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[t
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			enums.StrategyConservativeType,
 			0, int64(0),
-			types.SizeEstimate{Status: enums.SizeEstimateStatusUnknown},	//nolint:exhaustruct
+			types.SizeEstimate{Status: enums.SizeEstimateStatusUnknown}, //nolint:exhaustruct
 		))
 	}
 
-	if glcc.dryRun {
+	if glcc.GetDryRun() {
 		itemsResult := glcc.Scan(ctx)
 		if itemsResult.IsErr() {
 			return result.Err[types.CleanResult](itemsResult.Error())
@@ -199,7 +200,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[t
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			enums.StrategyDryRunType,
 			len(items), totalSize,
-			types.SizeEstimate{Known: uint64(totalSize)},	//nolint:exhaustruct
+			types.SizeEstimate{Known: uint64(totalSize)}, //nolint:exhaustruct
 		))
 	}
 
@@ -207,7 +208,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[t
 
 	status, err := glcc.getCacheStatus(ctx)
 	if err != nil {
-		if glcc.verbose {
+		if glcc.GetVerbose() {
 			fmt.Printf("Warning: failed to get cache status: %v\n", err)
 		}
 	} else {
@@ -239,14 +240,14 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[t
 		)
 	}
 
-	if glcc.verbose {
+	if glcc.GetVerbose() {
 		fmt.Println("  ✓ golangci-lint cache cleaned")
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 		enums.StrategyConservativeType,
 		1, bytesFreed,
-		types.SizeEstimate{Known: uint64(bytesFreed)},	//nolint:exhaustruct
+		types.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
 	))
 }
 

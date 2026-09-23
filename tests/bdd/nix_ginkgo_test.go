@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/nix"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/onsi/ginkgo/v2"
@@ -53,7 +54,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 	ginkgo.Describe("Background", func() {
 		ginkgo.Context("system setup", func() {
 			ginkgo.It("should have Nix package manager available", func() {
-				testCtx.nixCleaner = cleaner.NewNixCleaner(true, false)
+				testCtx.nixCleaner = nix.NewNixCleaner(true, false)
 				gomega.Expect(testCtx.nixCleaner).NotTo(gomega.BeNil())
 			})
 
@@ -67,7 +68,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 	ginkgo.Describe("List available Nix generations", func() {
 		ginkgo.BeforeEach(func() {
-			testCtx.nixCleaner = cleaner.NewNixCleaner(true, false)
+			testCtx.nixCleaner = nix.NewNixCleaner(true, false)
 		})
 
 		ginkgo.It("should list Nix generations when running scan", func() {
@@ -107,7 +108,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 	ginkgo.Describe("Clean old Nix generations safely", func() {
 		ginkgo.BeforeEach(func() {
-			testCtx.nixCleaner = cleaner.NewNixCleaner(true, true) // verbose, dryRun
+			testCtx.nixCleaner = nix.NewNixCleaner(true, true) // verbose, dryRun
 		})
 
 		ginkgo.It("should show what would be cleaned in dry-run mode", func() {
@@ -133,7 +134,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 		ginkgo.It("should not perform actual cleaning in dry-run mode", func() {
 			testCtx.dryRun = true
-			testCtx.nixCleaner = cleaner.NewNixCleaner(true, true)
+			testCtx.nixCleaner = nix.NewNixCleaner(true, true)
 			testCtx.generations = getGenerationsOrMock(testCtx.ctx, testCtx.nixCleaner, 1)
 			testCtx.cleanResult = testCtx.nixCleaner.CleanOldGenerations(testCtx.ctx, 3)
 			gomega.Expect(testCtx.dryRun).To(gomega.BeTrue())
@@ -142,7 +143,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 
 	ginkgo.Describe("Clean old Nix generations for real", func() {
 		ginkgo.BeforeEach(func() {
-			testCtx.nixCleaner = cleaner.NewNixCleaner(
+			testCtx.nixCleaner = nix.NewNixCleaner(
 				false,
 				true,
 			) // not verbose, dryRun for safety
@@ -163,7 +164,7 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 	ginkgo.Describe("Handle Nix not available gracefully", func() {
 		ginkgo.BeforeEach(func() {
 			// Simulate Nix not being available
-			testCtx.nixCleaner = cleaner.NewNixCleaner(true, false)
+			testCtx.nixCleaner = nix.NewNixCleaner(true, false)
 			testCtx.generations = result.Err[[]types.NixGeneration](
 				errors.New("Nix is not available"),
 			)
@@ -199,7 +200,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 			output: &bytes.Buffer{},
 			dryRun: true,
 		}
-		nixCtx.nixCleaner = cleaner.NewNixCleaner(true, true)
+		nixCtx.nixCleaner = nix.NewNixCleaner(true, true)
 	})
 
 	ginkgo.Describe("List available Nix generations", func() {
@@ -288,14 +289,14 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 	ginkgo.Describe("Clean with dry-run mode", func() {
 		ginkgo.It("should show what would be deleted without deleting", func() {
 			nixCtx.dryRun = true
-			nixCtx.nixCleaner = cleaner.NewNixCleaner(true, true)
+			nixCtx.nixCleaner = nix.NewNixCleaner(true, true)
 			nixCtx.cleanResult = nixCtx.nixCleaner.CleanOldGenerations(nixCtx.ctx, 3)
 			assertCleanResultStrategyValid(nixCtx.cleanResult)
 		})
 
 		ginkgo.It("should not actually delete generations in dry-run", func() {
 			nixCtx.dryRun = true
-			nixCtx.nixCleaner = cleaner.NewNixCleaner(true, true)
+			nixCtx.nixCleaner = nix.NewNixCleaner(true, true)
 			nixCtx.cleanResult = nixCtx.nixCleaner.CleanOldGenerations(nixCtx.ctx, 3)
 			gomega.Expect(nixCtx.dryRun).To(gomega.BeTrue())
 		})

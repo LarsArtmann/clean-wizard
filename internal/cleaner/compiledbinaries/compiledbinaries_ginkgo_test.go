@@ -16,9 +16,9 @@ import (
 
 // mockBinaryScanner implements BinaryScanner for testing.
 type mockBinaryScanner struct {
-	binaries	[]BinaryInfo
-	scanErr		error
-	scanCallDir	string
+	binaries    []BinaryInfo
+	scanErr     error
+	scanCallDir string
 }
 
 func (m *mockBinaryScanner) ScanDirectory(
@@ -34,11 +34,11 @@ func (m *mockBinaryScanner) ScanDirectory(
 
 // mockBinaryTrashOperator implements BinaryTrashOperator for testing.
 type mockBinaryTrashOperator struct {
-	trashErr	error
-	trashedFiles	[]string
-	trashCallCount	int
-	fileSizes	map[string]int64
-	fileModTimes	map[string]time.Time
+	trashErr       error
+	trashedFiles   []string
+	trashCallCount int
+	fileSizes      map[string]int64
+	fileModTimes   map[string]time.Time
 }
 
 func (m *mockBinaryTrashOperator) TrashBinary(ctx context.Context, path string) error {
@@ -68,19 +68,19 @@ func (m *mockBinaryTrashOperator) GetFileModTime(path string) (time.Time, error)
 
 var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 	var (
-		ctx		context.Context
-		mockScanner	*mockBinaryScanner
-		mockOperator	*mockBinaryTrashOperator
-		cleaner		*CompiledBinariesCleaner
-		tempDir		string
+		ctx          context.Context
+		mockScanner  *mockBinaryScanner
+		mockOperator *mockBinaryTrashOperator
+		cleaner      *CompiledBinariesCleaner
+		tempDir      string
 	)
 
 	ginkgo.BeforeEach(func() {
 		ctx = context.Background()
 		mockScanner = &mockBinaryScanner{}
 		mockOperator = &mockBinaryTrashOperator{
-			fileSizes:	make(map[string]int64),
-			fileModTimes:	make(map[string]time.Time),
+			fileSizes:    make(map[string]int64),
+			fileModTimes: make(map[string]time.Time),
 		}
 		tempDir, _ = os.MkdirTemp("", "compiled-binaries-test-*")
 	})
@@ -127,9 +127,9 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 		ginkgo.It("should accept older than setting", func() {
 			tests := []struct {
-				name		string
-				olderThan	string
-				expected	string
+				name      string
+				olderThan string
+				expected  string
 			}{
 				{name: "default older than", olderThan: "", expected: DefaultOlderThan},
 				{name: "custom older than", olderThan: "7d", expected: "7d"},
@@ -157,12 +157,12 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 			ginkgo.It("should set verbose flag correctly", func() {
 				cleaner = NewCompiledBinariesCleaner(true, false, 0, "", nil, nil)
-				gomega.Expect(cleaner.verbose).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetVerbose()).To(gomega.BeTrue())
 			})
 
 			ginkgo.It("should set dryRun flag correctly", func() {
 				cleaner = NewCompiledBinariesCleaner(false, true, 0, "", nil, nil)
-				gomega.Expect(cleaner.dryRun).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetDryRun()).To(gomega.BeTrue())
 			})
 		})
 
@@ -212,8 +212,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 					WithBinaryScanner(mockScanner),
 					WithBinaryTrashOperator(mockOperator),
 				)
-				gomega.Expect(cleaner.verbose).To(gomega.BeTrue())
-				gomega.Expect(cleaner.dryRun).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetVerbose()).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetDryRun()).To(gomega.BeTrue())
 				gomega.Expect(cleaner.minSizeMB).To(gomega.Equal(20))
 				gomega.Expect(cleaner.olderThan).To(gomega.Equal("30d"))
 				gomega.Expect(cleaner.scanner).To(gomega.Equal(mockScanner))
@@ -305,8 +305,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 			ginkgo.It("should return nil for valid older_than with various formats", func() {
 				olderThanFormats := []struct {
-					name	string
-					value	string
+					name  string
+					value string
 				}{
 					{name: "days", value: "7d"},
 					{name: "hours", value: "24h"},
@@ -343,11 +343,11 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			ginkgo.It("should return nil for valid combined settings", func() {
 				settings := &operations.OperationSettings{
 					CompiledBinaries: &operations.CompiledBinariesSettings{
-						MinSizeMB:		20,
-						OlderThan:		"30d",
-						BasePaths:		[]string{"/custom/path"},
-						ExcludePatterns:	[]string{"*.safe"},
-						IncludePatterns:	[]string{"tmp", "test"},
+						MinSizeMB:       20,
+						OlderThan:       "30d",
+						BasePaths:       []string{"/custom/path"},
+						ExcludePatterns: []string{"*.safe"},
+						IncludePatterns: []string{"tmp", "test"},
 					},
 				}
 				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
@@ -466,16 +466,16 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 				mockScanner.binaries = []BinaryInfo{
 					{
-						Path:		"/old/binary",
-						Size:		20 * 1024 * 1024,
-						ModTime:	oldTime,
-						Category:	CategoryTest,
+						Path:     "/old/binary",
+						Size:     20 * 1024 * 1024,
+						ModTime:  oldTime,
+						Category: CategoryTest,
 					},
 					{
-						Path:		"/recent/binary",
-						Size:		20 * 1024 * 1024,
-						ModTime:	recentTime,
-						Category:	CategoryTest,
+						Path:     "/recent/binary",
+						Size:     20 * 1024 * 1024,
+						ModTime:  recentTime,
+						Category: CategoryTest,
 					},
 				}
 
@@ -627,8 +627,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 	// ============================================================================
 	ginkgo.Describe("parseAgeDuration", func() {
 		type parseTestCase struct {
-			input		string
-			expected	time.Duration
+			input    string
+			expected time.Duration
 		}
 
 		ginkgo.DescribeTable(
@@ -663,9 +663,9 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 // ============================================================================.
 var _ = ginkgo.Describe("defaultBinaryScanner", func() {
 	var (
-		scanner	*defaultBinaryScanner
-		tempDir	string
-		ctx	context.Context
+		scanner *defaultBinaryScanner
+		tempDir string
+		ctx     context.Context
 	)
 
 	ginkgo.BeforeEach(func() {

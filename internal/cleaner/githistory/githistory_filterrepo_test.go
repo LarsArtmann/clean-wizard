@@ -4,9 +4,11 @@ import (
 	"context"
 	"testing"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 )
 
-func TestDetectFilterRepoProvider(t *testing.T) {	//nolint:paralleltest
+func TestDetectFilterRepoProvider(t *testing.T) { //nolint:paralleltest
 	// Reset detector for clean test
 	ResetDetector()
 
@@ -44,8 +46,8 @@ func TestFilterRepoProvider_String(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		provider	FilterRepoProvider
-		want		string
+		provider FilterRepoProvider
+		want     string
 	}{
 		{FilterRepoNone, "none"},
 		{FilterRepoSystem, "system"},
@@ -64,7 +66,7 @@ func TestFilterRepoProvider_String(t *testing.T) {
 	}
 }
 
-func TestBuildFilterRepoCommand(t *testing.T) {	//nolint:paralleltest
+func TestBuildFilterRepoCommand(t *testing.T) { //nolint:paralleltest
 	ResetDetector()
 
 	ctx := context.Background()
@@ -91,7 +93,7 @@ func TestBuildFilterRepoCommand(t *testing.T) {	//nolint:paralleltest
 	}
 }
 
-func TestGetInstallHint(t *testing.T) {	//nolint:paralleltest
+func TestGetInstallHint(t *testing.T) { //nolint:paralleltest
 	ResetDetector()
 
 	hint := GetInstallHint()

@@ -18,6 +18,12 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+// Byte conversion constants for disk size formatting.
+const (
+	bytesPerMB = 1024 * 1024
+	bytesPerGB = 1024 * 1024 * 1024
+)
+
 // Disk usage and formatting constants.
 const (
 	// PercentConversionFactor converts fraction to percentage.

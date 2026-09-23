@@ -9,6 +9,18 @@ import (
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
+// Sentinel errors for cleaner implementations, classified in init() below.
+var (
+	// ErrNoCacheTypeSpecified indicates a Go cleaner invocation without a cache type.
+	ErrNoCacheTypeSpecified = errors.New("no cache type specified")
+	// ErrLintCacheNotImplemented indicates lint cache cleaning is not yet supported.
+	ErrLintCacheNotImplemented = errors.New("lint cache cleaning not yet implemented")
+	// ErrGoProcessesRunning indicates a state conflict: Go tooling is active.
+	ErrGoProcessesRunning = errors.New(
+		"other Go processes detected (go, gopls, golangci-lint, dlv) — skipping to avoid cache corruption",
+	)
+)
+
 // init registers error classifications so that errorfamily.Classify can
 // correctly categorize errors from the standard library and exec subsystem
 // without relying on fragile keyword matching.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
@@ -42,7 +43,7 @@ func TestProjectsManagementAutomationCleaner_EstimateCacheSize(t *testing.T) {
 	cleaner := cleaner.NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
 	size := cleaner.estimateCacheSize()
-	expectedSize := int64(100 * 1024 * 1024)	// 100MB
+	expectedSize := int64(100 * 1024 * 1024) // 100MB
 
 	if size != expectedSize {
 		t.Errorf("estimateCacheSize() = %d, want %d (100MB)", size, expectedSize)

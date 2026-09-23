@@ -10,44 +10,51 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	fileutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/fileutil"
 )
 
+// Byte conversion constants.
+const (
+	bytesPerMB = 1024 * 1024
+	bytesPerGB = 1024 * 1024 * 1024
+)
+
 const (
 	// DefaultMinSizeMB is the default minimum file size in MB for compiled binaries.
-	DefaultMinSizeMB	= 10
+	DefaultMinSizeMB = 10
 	// DefaultOlderThan is the default age filter (0 = any age).
-	DefaultOlderThan	= "0"
+	DefaultOlderThan = "0"
 	// DefaultCompiledBinariesTimeout is the default timeout for file operations.
-	DefaultCompiledBinariesTimeout	= 5 * time.Minute
+	DefaultCompiledBinariesTimeout = 5 * time.Minute
 	// MinAgeStringLength is the minimum length for age duration strings.
-	MinAgeStringLength	= 2
+	MinAgeStringLength = 2
 	// DurationUnitDays represents days in hours.
-	DurationUnitDays	= 24 * time.Hour
+	DurationUnitDays = 24 * time.Hour
 	// DurationUnitWeeks represents weeks in hours.
-	DurationUnitWeeks	= 7 * 24 * time.Hour
+	DurationUnitWeeks = 7 * 24 * time.Hour
 	// DurationUnitMonths represents months in hours (30 days).
-	DurationUnitMonths	= 30 * 24 * time.Hour
+	DurationUnitMonths = 30 * 24 * time.Hour
 	// DurationUnitYears represents years in hours.
-	DurationUnitYears	= 365 * 24 * time.Hour
+	DurationUnitYears = 365 * 24 * time.Hour
 )
 
 // BinaryCategory represents a category of compiled binaries to clean.
 type BinaryCategory string
 
 const (
-	CategoryTmp	BinaryCategory	= "tmp"
-	CategoryTest	BinaryCategory	= "test"
-	CategoryBin	BinaryCategory	= "bin"
-	CategoryDist	BinaryCategory	= "dist"
-	CategoryRoot	BinaryCategory	= "root"
+	CategoryTmp  BinaryCategory = "tmp"
+	CategoryTest BinaryCategory = "test"
+	CategoryBin  BinaryCategory = "bin"
+	CategoryDist BinaryCategory = "dist"
+	CategoryRoot BinaryCategory = "root"
 )
 
 // DefaultExcludeDirectories are directories that should never be scanned.
-var DefaultExcludeDirectories = []string{	//nolint:gochecknoglobals
+var DefaultExcludeDirectories = []string{ //nolint:gochecknoglobals
 	"node_modules",
 	"venv",
 	".venv",
@@ -59,7 +66,7 @@ var DefaultExcludeDirectories = []string{	//nolint:gochecknoglobals
 }
 
 // DefaultExcludeBinaries are specific binaries that should not be cleaned (required by tools).
-var DefaultExcludeBinaries = []string{	//nolint:gochecknoglobals
+var DefaultExcludeBinaries = []string{ //nolint:gochecknoglobals
 	"chromedriver",
 	"geckodriver",
 	"edgedriver",
@@ -84,10 +91,10 @@ type BinaryTrashOperator interface {
 
 // BinaryInfo represents information about a compiled binary.
 type BinaryInfo struct {
-	Path		string
-	Size		int64
-	ModTime		time.Time
-	Category	BinaryCategory
+	Path     string
+	Size     int64
+	ModTime  time.Time
+	Category BinaryCategory
 }
 
 // CompiledBinariesCleaner removes large compiled binary files that can be regenerated.
@@ -95,13 +102,13 @@ type BinaryInfo struct {
 type CompiledBinariesCleaner struct {
 	cleaner.CleanerBase
 
-	minSizeMB		int
-	olderThan		string
-	basePaths		[]string
-	excludePatterns		[]string
-	includeCategories	[]BinaryCategory
-	scanner			BinaryScanner
-	trashOperator		BinaryTrashOperator
+	minSizeMB         int
+	olderThan         string
+	basePaths         []string
+	excludePatterns   []string
+	includeCategories []BinaryCategory
+	scanner           BinaryScanner
+	trashOperator     BinaryTrashOperator
 }
 
 // CompiledBinariesOption is a functional option for configuring the cleaner.
@@ -159,12 +166,12 @@ func NewCompiledBinariesCleaner(
 		}
 	}
 
-	cleaner := &CompiledBinariesCleaner{	//nolint:exhaustruct
-		CleanerBase:		cleaner.NewCleanerBase(verbose, dryRun),
-		minSizeMB:		minSizeMB,
-		olderThan:		olderThan,
-		basePaths:		basePaths,
-		excludePatterns:	excludePatterns,
+	cleaner := &CompiledBinariesCleaner{ //nolint:exhaustruct
+		CleanerBase:     cleaner.NewCleanerBase(verbose, dryRun),
+		minSizeMB:       minSizeMB,
+		olderThan:       olderThan,
+		basePaths:       basePaths,
+		excludePatterns: excludePatterns,
 		includeCategories: []BinaryCategory{
 			CategoryTmp,
 			CategoryTest,
@@ -182,9 +189,9 @@ func NewCompiledBinariesCleaner(
 	// Set default implementations if not provided
 	if cleaner.scanner == nil {
 		cleaner.scanner = &defaultBinaryScanner{
-			excludePatterns:	excludePatterns,
-			includeCategories:	cleaner.includeCategories,
-			verbose:		verbose,
+			excludePatterns:   excludePatterns,
+			includeCategories: cleaner.includeCategories,
+			verbose:           verbose,
 		}
 	}
 
@@ -244,11 +251,11 @@ func validateCompiledBinariesSettings(s *operations.CompiledBinariesSettings) er
 
 	// Validate include patterns are valid categories
 	validCategories := map[string]bool{
-		string(CategoryTmp):	true,
-		string(CategoryTest):	true,
-		string(CategoryBin):	true,
-		string(CategoryDist):	true,
-		string(CategoryRoot):	true,
+		string(CategoryTmp):  true,
+		string(CategoryTest): true,
+		string(CategoryBin):  true,
+		string(CategoryDist): true,
+		string(CategoryRoot): true,
 	}
 	for _, cat := range s.IncludePatterns {
 		if !validCategories[cat] {
@@ -270,7 +277,7 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]type
 
 	for _, basePath := range c.basePaths {
 		if _, err := os.Stat(basePath); os.IsNotExist(err) {
-			if c.verbose {
+			if c.GetVerbose() {
 				fmt.Printf("Skipping non-existent path: %s\n", basePath)
 			}
 
@@ -279,7 +286,7 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]type
 
 		binaries, err := c.scanner.ScanDirectory(ctx, basePath, c.includeCategories, minSizeBytes)
 		if err != nil {
-			if c.verbose {
+			if c.GetVerbose() {
 				fmt.Printf("Warning: failed to scan %s: %v\n", basePath, err)
 			}
 
@@ -311,10 +318,10 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]type
 	items := make([]types.ScanItem, 0, len(allBinaries))
 	for _, b := range allBinaries {
 		items = append(items, types.ScanItem{
-			Path:		b.Path,
-			Size:		b.Size,
-			Created:	b.ModTime,
-			ScanType:	types.ScanTypeSystem,
+			Path:     b.Path,
+			Size:     b.Size,
+			Created:  b.ModTime,
+			ScanType: types.ScanTypeSystem,
 		})
 	}
 
@@ -326,8 +333,8 @@ func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[types
 	return cleaner.ExecuteTrashPipeline(
 		ctx,
 		c.Scan(ctx),
-		c.dryRun,
-		c.verbose,
+		c.GetDryRun(),
+		c.GetVerbose(),
 		"compiled binary file(s)",
 		func(cleanCtx context.Context, item types.ScanItem) error {
 			return c.trashOperator.TrashBinary(cleanCtx, item.Path)
@@ -384,9 +391,9 @@ func parseAgeDuration(s string) (time.Duration, error) {
 // Default implementations
 
 type defaultBinaryScanner struct {
-	excludePatterns		[]string
-	includeCategories	[]BinaryCategory
-	verbose			bool
+	excludePatterns   []string
+	includeCategories []BinaryCategory
+	verbose           bool
 }
 
 func (s *defaultBinaryScanner) ScanDirectory(
@@ -404,7 +411,7 @@ func (s *defaultBinaryScanner) ScanDirectory(
 
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return nil	//nolint:nilerr // Skip files we can't access
+			return nil //nolint:nilerr // Skip files we can't access
 		}
 
 		// Skip directories (but continue walking)
@@ -447,10 +454,10 @@ func (s *defaultBinaryScanner) ScanDirectory(
 		}
 
 		binaries = append(binaries, BinaryInfo{
-			Path:		path,
-			Size:		info.Size(),
-			ModTime:	info.ModTime(),
-			Category:	category,
+			Path:     path,
+			Size:     info.Size(),
+			ModTime:  info.ModTime(),
+			Category: category,
 		})
 
 		return nil

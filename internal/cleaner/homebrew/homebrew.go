@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -28,14 +29,14 @@ const homebrewCommandTimeout = 5 * time.Minute
 type HomebrewCleaner struct {
 	cleaner.CleanerBase
 
-	unusedOnly	enums.HomebrewMode
+	unusedOnly enums.HomebrewMode
 }
 
 // NewHomebrewCleaner creates Homebrew cleaner with proper configuration.
 func NewHomebrewCleaner(verbose, dryRun bool, unusedOnly enums.HomebrewMode) *HomebrewCleaner {
 	return &HomebrewCleaner{
-		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
-		unusedOnly:	unusedOnly,
+		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
+		unusedOnly:  unusedOnly,
 	}
 }
 
@@ -105,13 +106,13 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]types.Scan
 			currentVersion := fields[1]
 
 			items = append(items, types.ScanItem{
-				Path:		"homebrew://" + packageName,
-				Size:		0,	// Size unknown without checking
-				Created:	time.Time{},
-				ScanType:	types.ScanTypeHomebrew,
+				Path:     "homebrew://" + packageName,
+				Size:     0, // Size unknown without checking
+				Created:  time.Time{},
+				ScanType: types.ScanTypeHomebrew,
 			})
 
-			if hbc.verbose {
+			if hbc.GetVerbose() {
 				fmt.Printf(
 					"Found outdated package: %s (current: %s)\n",
 					packageName,
@@ -130,7 +131,7 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[types.Clean
 		return result.Err[types.CleanResult](cleaner.NewNotAvailableError("homebrew", ""))
 	}
 
-	if hbc.dryRun {
+	if hbc.GetDryRun() {
 		return hbc.handleDryRun()
 	}
 
@@ -189,7 +190,7 @@ func (hbc *HomebrewCleaner) executeCleanup(
 			itemsRemoved, itemsFailed = hbc.runCleanupCommands(ctx, commands)
 
 			return nil
-		}, hbc.verbose, "Homebrew Cache")
+		}, hbc.GetVerbose(), "Homebrew Cache")
 	} else {
 		itemsRemoved, itemsFailed = hbc.runCleanupCommands(ctx, commands)
 	}
@@ -229,21 +230,21 @@ func (hbc *HomebrewCleaner) runCleanupCommands(
 
 // logCommandStart logs command start if verbose.
 func (hbc *HomebrewCleaner) logCommandStart(cmd string) {
-	if hbc.verbose {
+	if hbc.GetVerbose() {
 		fmt.Printf("🔧 Running 'brew %s'\n", cmd)
 	}
 }
 
 // logCommandError logs command error if verbose.
 func (hbc *HomebrewCleaner) logCommandError(cmd, output string) {
-	if hbc.verbose {
+	if hbc.GetVerbose() {
 		fmt.Printf("Warning: 'brew %s' failed: %s\n", cmd, output)
 	}
 }
 
 // logCommandSuccess logs command success if verbose.
 func (hbc *HomebrewCleaner) logCommandSuccess(cmd string) {
-	if hbc.verbose {
+	if hbc.GetVerbose() {
 		fmt.Printf("✅ 'brew %s' completed\n", cmd)
 	}
 }

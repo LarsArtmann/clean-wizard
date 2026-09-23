@@ -10,6 +10,9 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/docker"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/systemcache"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/stretchr/testify/assert"
@@ -323,7 +326,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				assert.True(t, pruneMode.IsValid(), "DockerPruneMode should be valid")
 
 				// Create docker cleaner with enum
-				dockerCleaner := cleaner.NewDockerCleaner(false, true, pruneMode)
+				dockerCleaner := docker.NewDockerCleaner(false, true, pruneMode)
 				assert.NotNil(t, dockerCleaner, "Docker cleaner should be created")
 
 				// Test cleaner availability
@@ -351,18 +354,18 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				}
 
 				// Create Go cleaner with enum flags
-				caches := cleaner.GoCacheNone
+				caches := golang.GoCacheNone
 				if expectedCleanCache {
-					caches |= cleaner.GoCacheGOCACHE
+					caches |= golang.GoCacheGOCACHE
 				}
 				if expectedTestCache {
-					caches |= cleaner.GoCacheTestCache
+					caches |= golang.GoCacheTestCache
 				}
 				if expectedBuildCache {
-					caches |= cleaner.GoCacheBuildCache
+					caches |= golang.GoCacheBuildCache
 				}
 
-				goCleaner, err := cleaner.NewGoCleaner(false, true, caches)
+				goCleaner, err := golang.NewGoCleaner(false, true, caches)
 				require.NoError(t, err, "Failed to create Go cleaner")
 
 				// Test cleaner availability
@@ -388,7 +391,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				}
 
 				// Create system cache cleaner
-				systemCleaner, err := cleaner.NewSystemCacheCleaner(
+				systemCleaner, err := systemcache.NewSystemCacheCleaner(
 					false,
 					true,
 					op.SystemCache.OlderThan,
@@ -647,7 +650,7 @@ func TestEnumErrorMessages_ThroughWorkflow(t *testing.T) {
 	require.NoError(t, err, "Should parse valid config")
 
 	// Test with cleaner
-	dockerCleaner := cleaner.NewDockerCleaner(false, true, validDockerSettings.PruneMode)
+	dockerCleaner := docker.NewDockerCleaner(false, true, validDockerSettings.PruneMode)
 	assertDockerCleanerExecution(t, dockerCleaner)
 }
 
@@ -677,7 +680,7 @@ func TestEnumValues_ThroughExecution(t *testing.T) {
 			assert.True(t, pm.mode.IsValid(), "%s should be valid", pm.name)
 
 			// Create cleaner with enum
-			dockerCleaner := cleaner.NewDockerCleaner(
+			dockerCleaner := docker.NewDockerCleaner(
 				false,
 				true,
 				cleaner.DockerPruneMode(pm.mode.String()),

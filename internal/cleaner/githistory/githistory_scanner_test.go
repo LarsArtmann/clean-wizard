@@ -76,7 +76,7 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 
 			ginkgo.It("should accept verbose option", func() {
 				scanner = NewGitHistoryScanner(tempDir, WithVerbose(true))
-				gomega.Expect(scanner.verbose).To(gomega.BeTrue())
+				gomega.Expect(scanner.GetVerbose()).To(gomega.BeTrue())
 			})
 
 			ginkgo.It("should accept exclude paths option", func() {
@@ -94,7 +94,7 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 				)
 				gomega.Expect(scanner.minSizeBytes).To(gomega.Equal(int64(5 * 1024 * 1024)))
 				gomega.Expect(scanner.maxFiles).To(gomega.Equal(25))
-				gomega.Expect(scanner.verbose).To(gomega.BeTrue())
+				gomega.Expect(scanner.GetVerbose()).To(gomega.BeTrue())
 			})
 		})
 	})

@@ -1,8 +1,10 @@
 package di
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/cargo"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/samber/do/v2"
@@ -109,7 +111,7 @@ func TestOverrideRegistry_ReplacesRegistry(t *testing.T) {
 
 	// Create a custom registry with just one cleaner
 	mockRegistry := cleaner.NewRegistry()
-	mockRegistry.Register("test-only", cleaner.NewCargoCleaner(false, false))
+	mockRegistry.Register("test-only", cargo.NewCargoCleaner(false, false))
 
 	OverrideRegistry(container.Injector(), mockRegistry)
 

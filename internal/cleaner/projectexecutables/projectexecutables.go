@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -35,10 +36,10 @@ type FileOperator interface {
 
 // ProjectInfo represents a project from projects-management-automation list.
 type ProjectInfo struct {
-	Name	string	`json:"name"`
-	Path	string	`json:"path"`
-	Type	string	`json:"type"`
-	Status	string	`json:"status"`
+	Name   string `json:"name"`
+	Path   string `json:"path"`
+	Type   string `json:"type"`
+	Status string `json:"status"`
 }
 
 // ProjectExecutablesCleaner removes executable files (not shell scripts) from project directories.
@@ -46,10 +47,10 @@ type ProjectInfo struct {
 type ProjectExecutablesCleaner struct {
 	cleaner.CleanerBase
 
-	excludeExtensions	[]string
-	excludePatterns		[]string
-	projectLister		ProjectLister
-	fileOperator		FileOperator
+	excludeExtensions []string
+	excludePatterns   []string
+	projectLister     ProjectLister
+	fileOperator      FileOperator
 }
 
 // ProjectExecutablesOption is a functional option for configuring the cleaner.
@@ -79,10 +80,10 @@ func NewProjectExecutablesCleaner(
 		excludeExtensions = []string{".sh"}
 	}
 
-	cleaner := &ProjectExecutablesCleaner{	//nolint:exhaustruct
-		CleanerBase:		cleaner.NewCleanerBase(verbose, dryRun),
-		excludeExtensions:	excludeExtensions,
-		excludePatterns:	excludePatterns,
+	cleaner := &ProjectExecutablesCleaner{ //nolint:exhaustruct
+		CleanerBase:       cleaner.NewCleanerBase(verbose, dryRun),
+		excludeExtensions: excludeExtensions,
+		excludePatterns:   excludePatterns,
 	}
 
 	// Apply options
@@ -97,9 +98,9 @@ func NewProjectExecutablesCleaner(
 
 	if cleaner.fileOperator == nil {
 		cleaner.fileOperator = &defaultFileOperator{
-			excludeExtensions:	excludeExtensions,
-			excludePatterns:	excludePatterns,
-			verbose:		verbose,
+			excludeExtensions: excludeExtensions,
+			excludePatterns:   excludePatterns,
+			verbose:           verbose,
 		}
 	}
 
@@ -156,7 +157,7 @@ func (p *ProjectExecutablesCleaner) Scan(ctx context.Context) result.Result[[]ty
 	for _, project := range projects {
 		executables, err := p.fileOperator.FindExecutableFiles(project.Path)
 		if err != nil {
-			if p.verbose {
+			if p.GetVerbose() {
 				fmt.Printf("Warning: %v\n", err)
 			}
 
@@ -165,14 +166,14 @@ func (p *ProjectExecutablesCleaner) Scan(ctx context.Context) result.Result[[]ty
 
 		for _, execPath := range executables {
 			items = append(items, types.ScanItem{
-				Path:		execPath,
-				Size:		p.fileOperator.GetFileSize(execPath),
-				Created:	time.Now(),
-				ScanType:	types.ScanTypeSystem,
+				Path:     execPath,
+				Size:     p.fileOperator.GetFileSize(execPath),
+				Created:  time.Now(),
+				ScanType: types.ScanTypeSystem,
 			})
 		}
 
-		if p.verbose && len(executables) > 0 {
+		if p.GetVerbose() && len(executables) > 0 {
 			fmt.Printf("Found %d executable(s) in %s\n", len(executables), project.Name)
 		}
 	}
@@ -185,8 +186,8 @@ func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[typ
 	return cleaner.ExecuteTrashPipeline(
 		ctx,
 		p.Scan(ctx),
-		p.dryRun,
-		p.verbose,
+		p.GetDryRun(),
+		p.GetVerbose(),
 		"executable file(s)",
 		func(cleanCtx context.Context, item types.ScanItem) error {
 			return p.fileOperator.TrashFile(cleanCtx, item.Path)
@@ -270,9 +271,9 @@ func (d *defaultProjectLister) ListProjects(ctx context.Context) ([]ProjectInfo,
 }
 
 type defaultFileOperator struct {
-	excludeExtensions	[]string
-	excludePatterns		[]string
-	verbose			bool
+	excludeExtensions []string
+	excludePatterns   []string
+	verbose           bool
 }
 
 func (d *defaultFileOperator) FindExecutableFiles(dir string) ([]string, error) {

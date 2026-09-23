@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -23,24 +24,24 @@ const dockerCommandTimeout = 2 * time.Minute
 type DockerResourceType string
 
 const (
-	dockerImage	DockerResourceType	= "image"
-	dockerContainer	DockerResourceType	= "container"
-	dockerVolume	DockerResourceType	= "volume"
+	dockerImage     DockerResourceType = "image"
+	dockerContainer DockerResourceType = "container"
+	dockerVolume    DockerResourceType = "volume"
 	// DockerParseTabSplitCount is the expected split count for parsing Docker output with tab delimiter.
-	DockerParseTabSplitCount	= 2
+	DockerParseTabSplitCount = 2
 )
 
 type DockerCleaner struct {
 	cleaner.CleanerBase
 
-	pruneMode	enums.DockerPruneMode
+	pruneMode enums.DockerPruneMode
 }
 
 // NewDockerCleaner creates Docker cleaner.
 func NewDockerCleaner(verbose, dryRun bool, pruneMode enums.DockerPruneMode) *DockerCleaner {
 	return &DockerCleaner{
-		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
-		pruneMode:	pruneMode,
+		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
+		pruneMode:   pruneMode,
 	}
 }
 
@@ -87,7 +88,7 @@ func (dc *DockerCleaner) Scan(ctx context.Context) result.Result[[]types.ScanIte
 	// Scan for dangling images
 	imagesResult := dc.scanDanglingImages(ctx)
 	if imagesResult.IsErr() {
-		if dc.verbose {
+		if dc.GetVerbose() {
 			fmt.Printf("Warning: failed to scan dangling images: %v\n", imagesResult.Error())
 		}
 	} else {
@@ -97,7 +98,7 @@ func (dc *DockerCleaner) Scan(ctx context.Context) result.Result[[]types.ScanIte
 	// Scan for unused containers
 	containersResult := dc.scanUnusedContainers(ctx)
 	if containersResult.IsErr() {
-		if dc.verbose {
+		if dc.GetVerbose() {
 			fmt.Printf("Warning: failed to scan unused containers: %v\n", containersResult.Error())
 		}
 	} else {
@@ -107,7 +108,7 @@ func (dc *DockerCleaner) Scan(ctx context.Context) result.Result[[]types.ScanIte
 	// Scan for unused volumes
 	volumesResult := dc.scanUnusedVolumes(ctx)
 	if volumesResult.IsErr() {
-		if dc.verbose {
+		if dc.GetVerbose() {
 			fmt.Printf("Warning: failed to scan unused volumes: %v\n", volumesResult.Error())
 		}
 	} else {
@@ -145,13 +146,13 @@ func (dc *DockerCleaner) addScanItem(
 	}
 
 	*items = append(*items, types.ScanItem{
-		Path:		fmt.Sprintf("docker:%s:%s", resourceType, id),
-		Size:		size,
-		Created:	time.Time{},
-		ScanType:	types.ScanTypeTemp,
+		Path:     fmt.Sprintf("docker:%s:%s", resourceType, id),
+		Size:     size,
+		Created:  time.Time{},
+		ScanType: types.ScanTypeTemp,
 	})
 
-	if dc.verbose {
+	if dc.GetVerbose() {
 		fmt.Printf("Found %s: %s (size: %s)\n", resourceType, id, format.Bytes(size))
 	}
 }
@@ -295,7 +296,7 @@ func (dc *DockerCleaner) parseDockerSizeFromOutput(
 	}
 
 	size, err := ParseDockerSize(sizeStr)
-	if err != nil && dc.verbose {
+	if err != nil && dc.GetVerbose() {
 		fmt.Printf("Warning: failed to parse size '%s': %v\n", sizeStr, err)
 	}
 
@@ -410,7 +411,7 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[types.CleanRes
 		return result.Err[types.CleanResult](cleaner.NewNotAvailableError("docker", ""))
 	}
 
-	if dc.dryRun {
+	if dc.GetDryRun() {
 		// Scan for actual sizes instead of using hardcoded estimates
 		totalBytes := dc.estimateSizeFromScan(ctx)
 
@@ -445,35 +446,35 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[types.CleanRes
 func (dc *DockerCleaner) buildPruneArgs() []string {
 	switch dc.pruneMode {
 	case enums.DockerPruneAll:
-		if dc.verbose {
+		if dc.GetVerbose() {
 			fmt.Println("  Running full prune: docker system prune -af --volumes")
 		}
 
-		return []string{"system", "prune", "-af", "--volumes"}	//nolint:goconst
+		return []string{"system", "prune", "-af", "--volumes"} //nolint:goconst
 
 	case enums.DockerPruneImages:
-		if dc.verbose {
+		if dc.GetVerbose() {
 			fmt.Println("  Running image prune: docker image prune -af")
 		}
 
 		return []string{"image", "prune", "-af"}
 
 	case enums.DockerPruneContainers:
-		if dc.verbose {
+		if dc.GetVerbose() {
 			fmt.Println("  Running container prune: docker container prune -f")
 		}
 
 		return []string{"container", "prune", "-f"}
 
 	case enums.DockerPruneVolumes:
-		if dc.verbose {
+		if dc.GetVerbose() {
 			fmt.Println("  Running volume prune: docker volume prune -f")
 		}
 
 		return []string{"volume", "prune", "-f"}
 
 	case enums.DockerPruneBuilds:
-		if dc.verbose {
+		if dc.GetVerbose() {
 			fmt.Println("  Running builder prune: docker builder prune -af")
 		}
 
@@ -503,14 +504,14 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[types.Cl
 		)
 	}
 
-	if dc.verbose {
+	if dc.GetVerbose() {
 		fmt.Printf("  ✓ Docker prune completed\n")
 		fmt.Printf("  Output: %s\n", string(output))
 	}
 
 	// Parse reclaimed space from docker output
 	bytesFreed, err := ParseDockerReclaimedSpace(string(output))
-	if err != nil && dc.verbose {
+	if err != nil && dc.GetVerbose() {
 		fmt.Printf("  Warning: failed to parse reclaimed space: %v\n", err)
 	}
 

@@ -3,6 +3,20 @@ package factory
 import (
 	"path/filepath"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/buildcache"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/cargo"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/compiledbinaries"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/docker"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golangcilint"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/homebrew"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/nix"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/nodepackages"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/projectexecutables"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/projectsmanagementautomation"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/systemcache"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/tempfiles"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
@@ -13,8 +27,8 @@ import (
 // section) keeps each cleaner's factory default. This is the single factory used
 // by the DI container to create the cleaner registry.
 // Returns an error if any cleaner fails to initialize or has invalid settings.
-func DefaultRegistryWithConfig(verbose, dryRun bool, settings *operations.OperationSettings) (*Registry, error) {
-	registry := NewRegistry()
+func DefaultRegistryWithConfig(verbose, dryRun bool, settings *operations.OperationSettings) (*cleaner.Registry, error) {
+	registry := cleaner.NewRegistry()
 
 	err := registerAllCleaners(registry, verbose, dryRun, settings)
 	if err != nil {
@@ -27,13 +41,13 @@ func DefaultRegistryWithConfig(verbose, dryRun bool, settings *operations.Operat
 // registerAllCleaners registers all available cleaners with the given configuration.
 // This helper function eliminates duplication between DefaultRegistry and DefaultRegistryWithConfig.
 // Returns an error if any cleaner fails to initialize.
-func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *operations.OperationSettings) error {
+func registerAllCleaners(registry *cleaner.Registry, verbose, dryRun bool, settings *operations.OperationSettings) error {
 	// Nix cleaner (keep count from settings; constructor default 5 when unset)
 	nixKeepCount := resolveNixKeepCount(settings)
 	if err := registerValidated(
 		registry,
-		CleanerNix,
-		NewNixCleaner(verbose, dryRun, nixKeepCount...),
+		cleaner.CleanerNix,
+		nix.NewNixCleaner(verbose, dryRun, nixKeepCount...),
 		settings,
 	); err != nil {
 		return err
@@ -43,8 +57,8 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *ope
 	homebrewMode := resolveHomebrewMode(settings)
 	if err := registerValidated(
 		registry,
-		CleanerHomebrew,
-		NewHomebrewCleaner(verbose, dryRun, homebrewMode),
+		cleaner.CleanerHomebrew,
+		homebrew.NewHomebrewCleaner(verbose, dryRun, homebrewMode),
 		settings,
 	); err != nil {
 		return err
@@ -54,64 +68,64 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *ope
 	dockerPruneMode := resolveDockerPruneMode(settings)
 	if err := registerValidated(
 		registry,
-		CleanerDocker,
-		NewDockerCleaner(verbose, dryRun, dockerPruneMode),
+		cleaner.CleanerDocker,
+		docker.NewDockerCleaner(verbose, dryRun, dockerPruneMode),
 		settings,
 	); err != nil {
 		return err
 	}
 
 	// Cargo cleaner
-	if err := registerValidated(registry, CleanerCargo, NewCargoCleaner(verbose, dryRun), settings); err != nil {
+	if err := registerValidated(registry, cleaner.CleanerCargo, cargo.NewCargoCleaner(verbose, dryRun), settings); err != nil {
 		return err
 	}
 
 	// Go cleaner (cache selection from settings)
-	goCleaner, err := NewGoCleaner(verbose, dryRun, resolveGoCaches(settings))
+	goCleaner, err := golang.NewGoCleaner(verbose, dryRun, resolveGoCaches(settings))
 	if err != nil {
 		return errorfamily.WrapRejection(err, "cleaner.go_create", "failed to create Go cleaner")
 	}
 
-	if err := registerValidated(registry, CleanerGo, goCleaner, settings); err != nil {
+	if err := registerValidated(registry, cleaner.CleanerGo, goCleaner, settings); err != nil {
 		return err
 	}
 
 	// Node packages cleaner (falls back to all available package managers)
 	if err := registerValidated(
 		registry,
-		CleanerNode,
-		NewNodePackageManagerCleaner(verbose, dryRun, resolveNodePackageManagers(settings)),
+		cleaner.CleanerNode,
+		nodepackages.NewNodePackageManagerCleaner(verbose, dryRun, resolveNodePackageManagers(settings)),
 		settings,
 	); err != nil {
 		return err
 	}
 
 	// Build cache cleaner
-	buildCacheCleaner, err := NewBuildCacheCleaner(verbose, dryRun, resolveBuildCacheOlderThan(settings), nil, nil)
+	buildCacheCleaner, err := buildcache.NewBuildCacheCleaner(verbose, dryRun, resolveBuildCacheOlderThan(settings), nil, nil)
 	if err != nil {
 		return errorfamily.WrapRejection(err, "cleaner.buildcache_create", "failed to create BuildCache cleaner")
 	}
 
-	if err := registerValidated(registry, CleanerBuildCache, buildCacheCleaner, settings); err != nil {
+	if err := registerValidated(registry, cleaner.CleanerBuildCache, buildCacheCleaner, settings); err != nil {
 		return err
 	}
 
 	// System cache cleaner
 	systemCacheOlderThan, systemCacheTypes := resolveSystemCache(settings)
 
-	systemCacheCleaner, err := NewSystemCacheCleaner(verbose, dryRun, systemCacheOlderThan, systemCacheTypes)
+	systemCacheCleaner, err := systemcache.NewSystemCacheCleaner(verbose, dryRun, systemCacheOlderThan, systemCacheTypes)
 	if err != nil {
 		return errorfamily.WrapRejection(err, "cleaner.systemcache_create", "failed to create SystemCache cleaner")
 	}
 
-	if err := registerValidated(registry, CleanerSystemCache, systemCacheCleaner, settings); err != nil {
+	if err := registerValidated(registry, cleaner.CleanerSystemCache, systemCacheCleaner, settings); err != nil {
 		return err
 	}
 
 	// Temp files cleaner (standard temp paths stay fixed; settings control age and excludes)
 	tempFilesOlderThan, tempFilesExcludes := resolveTempFiles(settings)
 
-	tempFilesCleaner, err := NewTempFilesCleaner(
+	tempFilesCleaner, err := tempfiles.NewTempFilesCleaner(
 		verbose,
 		dryRun,
 		tempFilesOlderThan,
@@ -122,15 +136,15 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *ope
 		return errorfamily.WrapRejection(err, "cleaner.tempfiles_create", "failed to create TempFiles cleaner")
 	}
 
-	if err := registerValidated(registry, CleanerTempFiles, tempFilesCleaner, settings); err != nil {
+	if err := registerValidated(registry, cleaner.CleanerTempFiles, tempFilesCleaner, settings); err != nil {
 		return err
 	}
 
 	// Projects management automation cleaner
 	if err := registerValidated(
 		registry,
-		CleanerProjects,
-		NewProjectsManagementAutomationCleaner(verbose, dryRun),
+		cleaner.CleanerProjects,
+		projectsmanagementautomation.NewProjectsManagementAutomationCleaner(verbose, dryRun),
 		settings,
 	); err != nil {
 		return err
@@ -140,8 +154,8 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *ope
 	projectExecExcludeExtensions, projectExecExcludePatterns := resolveProjectExecutables(settings)
 	if err := registerValidated(
 		registry,
-		CleanerProjectExec,
-		NewProjectExecutablesCleaner(verbose, dryRun, projectExecExcludeExtensions, projectExecExcludePatterns),
+		cleaner.CleanerProjectExec,
+		projectexecutables.NewProjectExecutablesCleaner(verbose, dryRun, projectExecExcludeExtensions, projectExecExcludePatterns),
 		settings,
 	); err != nil {
 		return err
@@ -151,19 +165,19 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *ope
 	compiledMinSizeMB, compiledOlderThan, compiledBasePaths, compiledExcludePatterns := resolveCompiledBinaries(
 		settings,
 	)
-	compiledBinariesCleaner := NewCompiledBinariesCleaner(
+	compiledBinariesCleaner := compiledbinaries.NewCompiledBinariesCleaner(
 		verbose, dryRun, compiledMinSizeMB, compiledOlderThan, compiledBasePaths, compiledExcludePatterns,
 	)
 
-	if err := registerValidated(registry, CleanerCompiledBinaries, compiledBinariesCleaner, settings); err != nil {
+	if err := registerValidated(registry, cleaner.CleanerCompiledBinaries, compiledBinariesCleaner, settings); err != nil {
 		return err
 	}
 
 	// golangci-lint cache cleaner (uses `golangci-lint cache status` for accurate sizing)
 	if err := registerValidated(
 		registry,
-		CleanerGolangciLint,
-		NewGolangciLintCacheCleaner(verbose, dryRun),
+		cleaner.CleanerGolangciLint,
+		golangcilint.NewGolangciLintCacheCleaner(verbose, dryRun),
 		settings,
 	); err != nil {
 		return err
@@ -174,8 +188,8 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *ope
 
 // registerValidated validates the cleaner's settings against the resolved
 // operation settings (when the cleaner supports settings), then registers it.
-func registerValidated(registry *Registry, name string, c Cleaner, settings *operations.OperationSettings) error {
-	if withSettings, ok := c.(CleanerWithSettings); ok {
+func registerValidated(registry *cleaner.Registry, name string, c cleaner.Cleaner, settings *operations.OperationSettings) error {
+	if withSettings, ok := c.(cleaner.CleanerWithSettings); ok {
 		if err := withSettings.ValidateSettings(settings); err != nil {
 			return errorfamily.WrapRejectionf(
 				err,

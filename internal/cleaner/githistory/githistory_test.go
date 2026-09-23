@@ -12,9 +12,9 @@ import (
 
 var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 	var (
-		cleaner	*GitHistoryCleaner
-		tempDir	string
-		ctx	context.Context
+		cleaner *GitHistoryCleaner
+		tempDir string
+		ctx     context.Context
 	)
 
 	ginkgo.BeforeEach(func() {
@@ -63,12 +63,12 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 
 			ginkgo.It("should accept verbose option", func() {
 				cleaner = NewGitHistoryCleaner(WithGitHistoryVerbose(true))
-				gomega.Expect(cleaner.verbose).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetVerbose()).To(gomega.BeTrue())
 			})
 
 			ginkgo.It("should accept dry run option", func() {
 				cleaner = NewGitHistoryCleaner(WithGitHistoryDryRun(true))
-				gomega.Expect(cleaner.dryRun).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetDryRun()).To(gomega.BeTrue())
 			})
 
 			ginkgo.It("should accept exclude extensions option", func() {
@@ -106,8 +106,8 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 				)
 				gomega.Expect(cleaner.repoPath).To(gomega.Equal(tempDir))
 				gomega.Expect(cleaner.minSizeMB).To(gomega.Equal(5))
-				gomega.Expect(cleaner.verbose).To(gomega.BeTrue())
-				gomega.Expect(cleaner.dryRun).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetVerbose()).To(gomega.BeTrue())
+				gomega.Expect(cleaner.GetDryRun()).To(gomega.BeTrue())
 			})
 		})
 	})

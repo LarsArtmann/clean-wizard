@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"sync"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // ConfigCache provides configuration caching with TTL.

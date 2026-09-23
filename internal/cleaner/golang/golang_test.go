@@ -40,44 +40,44 @@ func TestNewGoCleaner(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		verbose		bool
-		dryRun		bool
-		cleanCache	bool
-		cleanTestCache	bool
-		cleanModCache	bool
-		cleanBuildCache	bool
-		cleanLintCache	bool
+		name            string
+		verbose         bool
+		dryRun          bool
+		cleanCache      bool
+		cleanTestCache  bool
+		cleanModCache   bool
+		cleanBuildCache bool
+		cleanLintCache  bool
 	}{
 		{
-			name:			"all caches enabled",
-			verbose:		false,
-			dryRun:			false,
-			cleanCache:		true,
-			cleanTestCache:		true,
-			cleanModCache:		true,
-			cleanBuildCache:	true,
-			cleanLintCache:		true,
+			name:            "all caches enabled",
+			verbose:         false,
+			dryRun:          false,
+			cleanCache:      true,
+			cleanTestCache:  true,
+			cleanModCache:   true,
+			cleanBuildCache: true,
+			cleanLintCache:  true,
 		},
 		{
-			name:			"only cache enabled",
-			verbose:		true,
-			dryRun:			true,
-			cleanCache:		true,
-			cleanTestCache:		false,
-			cleanModCache:		false,
-			cleanBuildCache:	false,
-			cleanLintCache:		false,
+			name:            "only cache enabled",
+			verbose:         true,
+			dryRun:          true,
+			cleanCache:      true,
+			cleanTestCache:  false,
+			cleanModCache:   false,
+			cleanBuildCache: false,
+			cleanLintCache:  false,
 		},
 		{
-			name:			"dry-run with all caches",
-			verbose:		false,
-			dryRun:			true,
-			cleanCache:		true,
-			cleanTestCache:		true,
-			cleanModCache:		true,
-			cleanBuildCache:	true,
-			cleanLintCache:		true,
+			name:            "dry-run with all caches",
+			verbose:         false,
+			dryRun:          true,
+			cleanCache:      true,
+			cleanTestCache:  true,
+			cleanModCache:   true,
+			cleanBuildCache: true,
+			cleanLintCache:  true,
 		},
 	}
 
@@ -86,8 +86,8 @@ func TestNewGoCleaner(t *testing.T) {
 			t.Parallel()
 
 			cleaner := NewGoCleanerWithSettings(
-				tt.verbose,
-				tt.dryRun,
+				tt.GetVerbose(),
+				tt.GetDryRun(),
 				cacheTypeFromBools(
 					tt.cleanCache,
 					tt.cleanTestCache,
@@ -104,8 +104,8 @@ func TestNewGoCleaner(t *testing.T) {
 			assertGoCleanerFields(
 				t,
 				cleaner,
-				tt.verbose,
-				tt.dryRun,
+				tt.GetVerbose(),
+				tt.GetDryRun(),
 				tt.cleanCache,
 				tt.cleanTestCache,
 				tt.cleanModCache,
@@ -122,12 +122,12 @@ func assertGoCleanerFields(
 ) {
 	t.Helper()
 
-	if cleaner.verbose != verbose {
-		t.Errorf("verbose = %v, want %v", cleaner.verbose, verbose)
+	if cleaner.GetVerbose() != verbose {
+		t.Errorf("verbose = %v, want %v", cleaner.GetVerbose(), verbose)
 	}
 
-	if cleaner.dryRun != dryRun {
-		t.Errorf("dryRun = %v, want %v", cleaner.dryRun, dryRun)
+	if cleaner.GetDryRun() != dryRun {
+		t.Errorf("dryRun = %v, want %v", cleaner.GetDryRun(), dryRun)
 	}
 
 	if cleaner.caches.Has(GoCacheGOCACHE) != cleanCache {
@@ -190,55 +190,55 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		settings	*operations.OperationSettings
-		wantErr		bool
+		name     string
+		settings *operations.OperationSettings
+		wantErr  bool
 	}{
 		{
-			name:		"nil settings",
-			settings:	nil,
-			wantErr:	false,
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  false,
 		},
 		{
-			name:		"nil Go packages settings",
-			settings:	&operations.OperationSettings{},
-			wantErr:	false,
+			name:     "nil Go packages settings",
+			settings: &operations.OperationSettings{},
+			wantErr:  false,
 		},
 		{
-			name:	"valid settings with all caches",
+			name: "valid settings with all caches",
 			settings: &operations.OperationSettings{
 				GoPackages: &operations.GoPackagesSettings{
-					CleanCache:		enums.CacheCleanupEnabled,
-					CleanTestCache:		enums.CacheCleanupEnabled,
-					CleanModCache:		enums.CacheCleanupEnabled,
-					CleanBuildCache:	enums.CacheCleanupEnabled,
+					CleanCache:      enums.CacheCleanupEnabled,
+					CleanTestCache:  enums.CacheCleanupEnabled,
+					CleanModCache:   enums.CacheCleanupEnabled,
+					CleanBuildCache: enums.CacheCleanupEnabled,
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"valid settings with no caches",
+			name: "valid settings with no caches",
 			settings: &operations.OperationSettings{
 				GoPackages: &operations.GoPackagesSettings{
-					CleanCache:		enums.CacheCleanupDisabled,
-					CleanTestCache:		enums.CacheCleanupDisabled,
-					CleanModCache:		enums.CacheCleanupDisabled,
-					CleanBuildCache:	enums.CacheCleanupDisabled,
+					CleanCache:      enums.CacheCleanupDisabled,
+					CleanTestCache:  enums.CacheCleanupDisabled,
+					CleanModCache:   enums.CacheCleanupDisabled,
+					CleanBuildCache: enums.CacheCleanupDisabled,
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"valid settings with mixed caches",
+			name: "valid settings with mixed caches",
 			settings: &operations.OperationSettings{
 				GoPackages: &operations.GoPackagesSettings{
-					CleanCache:		enums.CacheCleanupEnabled,
-					CleanTestCache:		enums.CacheCleanupDisabled,
-					CleanModCache:		enums.CacheCleanupEnabled,
-					CleanBuildCache:	enums.CacheCleanupDisabled,
+					CleanCache:      enums.CacheCleanupEnabled,
+					CleanTestCache:  enums.CacheCleanupDisabled,
+					CleanModCache:   enums.CacheCleanupEnabled,
+					CleanBuildCache: enums.CacheCleanupDisabled,
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 	}
 
@@ -264,45 +264,45 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		cleanCache	bool
-		cleanTestCache	bool
-		cleanModCache	bool
-		cleanBuildCache	bool
-		wantMinItems	uint	// Minimum expected items (actual depends on what caches exist)
-		wantExactItems	uint	// If set, require exact match
+		name            string
+		cleanCache      bool
+		cleanTestCache  bool
+		cleanModCache   bool
+		cleanBuildCache bool
+		wantMinItems    uint // Minimum expected items (actual depends on what caches exist)
+		wantExactItems  uint // If set, require exact match
 	}{
 		{
-			name:			"dry-run with all caches",
-			cleanCache:		true,
-			cleanTestCache:		true,
-			cleanModCache:		true,
-			cleanBuildCache:	true,
-			wantMinItems:		1,	// At least GOCACHE or GOMODCACHE should exist
+			name:            "dry-run with all caches",
+			cleanCache:      true,
+			cleanTestCache:  true,
+			cleanModCache:   true,
+			cleanBuildCache: true,
+			wantMinItems:    1, // At least GOCACHE or GOMODCACHE should exist
 		},
 		{
-			name:			"dry-run with single cache",
-			cleanCache:		true,
-			cleanTestCache:		false,
-			cleanModCache:		false,
-			cleanBuildCache:	false,
-			wantMinItems:		1,	// GOCACHE should exist
+			name:            "dry-run with single cache",
+			cleanCache:      true,
+			cleanTestCache:  false,
+			cleanModCache:   false,
+			cleanBuildCache: false,
+			wantMinItems:    1, // GOCACHE should exist
 		},
 		{
-			name:			"dry-run with mixed caches",
-			cleanCache:		true,
-			cleanTestCache:		false,
-			cleanModCache:		true,
-			cleanBuildCache:	false,
-			wantMinItems:		1,	// At least one should exist
+			name:            "dry-run with mixed caches",
+			cleanCache:      true,
+			cleanTestCache:  false,
+			cleanModCache:   true,
+			cleanBuildCache: false,
+			wantMinItems:    1, // At least one should exist
 		},
 		{
-			name:			"dry-run with no caches",
-			cleanCache:		false,
-			cleanTestCache:		false,
-			cleanModCache:		false,
-			cleanBuildCache:	false,
-			wantExactItems:		0,
+			name:            "dry-run with no caches",
+			cleanCache:      false,
+			cleanTestCache:  false,
+			cleanModCache:   false,
+			cleanBuildCache: false,
+			wantExactItems:  0,
 		},
 	}
 

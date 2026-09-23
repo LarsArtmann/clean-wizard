@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -232,7 +233,7 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Fatal("registry is empty")
 		}
 
-		homebrew, ok := registry.Get(CleanerHomebrew)
+		homebrew, ok := registry.Get(cleaner.CleanerHomebrew)
 		if !ok {
 			t.Fatal("homebrew cleaner not registered")
 		}
@@ -258,14 +259,14 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Fatalf("DefaultRegistryWithConfig() error = %v", err)
 		}
 
-		if got := mustGetCleaner[*NixCleaner](t, registry, CleanerNix).keepCount; got != 3 {
+		if got := mustGetCleaner[*NixCleaner](t, registry, cleaner.CleanerNix).keepCount; got != 3 {
 			t.Errorf("nix keepCount = %d, want 3", got)
 		}
 
 		if got := mustGetCleaner[*HomebrewCleaner](
 			t,
 			registry,
-			CleanerHomebrew,
+			cleaner.CleanerHomebrew,
 		).unusedOnly; got != enums.HomebrewModeUnusedOnly {
 			t.Errorf("homebrew mode = %v, want UNUSED_ONLY", got)
 		}
@@ -273,16 +274,16 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 		if got := mustGetCleaner[*DockerCleaner](
 			t,
 			registry,
-			CleanerDocker,
+			cleaner.CleanerDocker,
 		).pruneMode; got != enums.DockerPruneVolumes {
 			t.Errorf("docker prune mode = %v, want VOLUMES", got)
 		}
 
-		if got := mustGetCleaner[*TempFilesCleaner](t, registry, CleanerTempFiles).olderThan; got != 14*24*time.Hour {
+		if got := mustGetCleaner[*TempFilesCleaner](t, registry, cleaner.CleanerTempFiles).olderThan; got != 14*24*time.Hour {
 			t.Errorf("temp files olderThan = %v, want 14d", got)
 		}
 
-		if got := mustGetCleaner[*GoCleaner](t, registry, CleanerGo).caches; got != GoCacheGOCACHE {
+		if got := mustGetCleaner[*GoCleaner](t, registry, cleaner.CleanerGo).caches; got != GoCacheGOCACHE {
 			t.Errorf("go caches = %v, want GOCACHE only", got)
 		}
 	})
@@ -306,7 +307,7 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 }
 
 // mustGetCleaner fetches a cleaner from the registry and type-asserts it.
-func mustGetCleaner[T Cleaner](t *testing.T, registry *Registry, name string) T {
+func mustGetCleaner[T cleaner.Cleaner](t *testing.T, registry *cleaner.Registry, name string) T {
 	t.Helper()
 
 	c, ok := registry.Get(name)

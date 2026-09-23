@@ -4,7 +4,7 @@ import (
 	"context"
 	"os/exec"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -27,7 +27,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 
 	ginkgo.Describe("identity", func() {
 		ginkgo.It("exposes the go cleaner name and operation type", func() {
-			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
+			gc, err := golang.NewGoCleaner(true, true, golang.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			gomega.Expect(gc.Name()).To(gomega.Equal("go"))
@@ -37,7 +37,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 
 	ginkgo.Describe("availability", func() {
 		ginkgo.It("reports availability that matches the go binary", func() {
-			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
+			gc, err := golang.NewGoCleaner(true, true, golang.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			gomega.Expect(gc.IsAvailable(ctx)).To(gomega.Equal(goInstalled()))
@@ -53,7 +53,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			})
 
 			ginkgo.It("refuses to clean with an infrastructure error", func() {
-				gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
+				gc, err := golang.NewGoCleaner(true, true, golang.GoCacheGOCACHE)
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 				cleanRes := gc.Clean(ctx)
@@ -70,7 +70,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			})
 
 			ginkgo.It("performs a dry run without deleting caches", func() {
-				gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache)
+				gc, err := golang.NewGoCleaner(true, true, golang.GoCacheGOCACHE|golang.GoCacheTestCache)
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 				cleanRes := gc.Clean(ctx)
@@ -78,7 +78,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			})
 
 			ginkgo.It("scans caches without deleting them", func() {
-				gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
+				gc, err := golang.NewGoCleaner(true, true, golang.GoCacheGOCACHE)
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 				scanRes := gc.Scan(ctx)
@@ -89,7 +89,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 
 	ginkgo.Describe("settings validation", func() {
 		ginkgo.It("accepts a fully specified go_packages section", func() {
-			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
+			gc, err := golang.NewGoCleaner(true, true, golang.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			settings := &operations.OperationSettings{
@@ -106,7 +106,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 		})
 
 		ginkgo.It("rejects an invalid cache cleanup mode", func() {
-			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
+			gc, err := golang.NewGoCleaner(true, true, golang.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			settings := &operations.OperationSettings{
@@ -119,7 +119,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 		})
 
 		ginkgo.It("accepts settings without a go_packages section", func() {
-			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
+			gc, err := golang.NewGoCleaner(true, true, golang.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			gomega.Expect(gc.ValidateSettings(&operations.OperationSettings{})).

@@ -8,7 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/homebrew"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/nix"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/tempfiles"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,7 +25,7 @@ func TestNixCleaner_Integration(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	nixCleaner := cleaner.NewNixCleaner(false, false)
+	nixCleaner := nix.NewNixCleaner(false, false)
 
 	// Check if Nix is available
 	if !nixCleaner.IsAvailable(ctx) {
@@ -59,10 +62,10 @@ func TestGoCleaner_Integration(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	goCleaner, err := cleaner.NewGoCleaner(
+	goCleaner, err := golang.NewGoCleaner(
 		false,
 		false,
-		cleaner.GoCacheGOCACHE|cleaner.GoCacheTestCache,
+		golang.GoCacheGOCACHE|golang.GoCacheTestCache,
 	)
 	require.NoError(t, err)
 
@@ -88,7 +91,7 @@ func TestHomebrewCleaner_Integration(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	homebrewCleaner := cleaner.NewHomebrewCleaner(false, false, enums.HomebrewModeAll)
+	homebrewCleaner := homebrew.NewHomebrewCleaner(false, false, enums.HomebrewModeAll)
 
 	// Check if Homebrew is available
 	if !homebrewCleaner.IsAvailable(ctx) {
@@ -116,12 +119,12 @@ func TestMultiCleaner_Integration(t *testing.T) {
 		name    string
 		cleaner interface{ IsAvailable(context.Context) bool }
 	}{
-		{"nix", cleaner.NewNixCleaner(false, false)},
-		{"go", cleaner.NewGoCleanerWithSettings(false, false, cleaner.GoCacheGOCACHE)},
+		{"nix", nix.NewNixCleaner(false, false)},
+		{"go", golang.NewGoCleanerWithSettings(false, false, golang.GoCacheGOCACHE)},
 	}
 
 	// Add temp cleaner separately to handle error
-	tempCleaner, err := cleaner.NewTempFilesCleaner(
+	tempCleaner, err := tempfiles.NewTempFilesCleaner(
 		false,
 		false,
 		"7d",
@@ -156,7 +159,7 @@ func TestCleanerTimeout_Integration(t *testing.T) {
 	defer cancel()
 
 	// Use a cleaner that should complete within 1 second
-	tempCleaner, err := cleaner.NewTempFilesCleaner(
+	tempCleaner, err := tempfiles.NewTempFilesCleaner(
 		false,
 		false,
 		"7d",

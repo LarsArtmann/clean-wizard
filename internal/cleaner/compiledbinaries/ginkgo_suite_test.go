@@ -1,4 +1,4 @@
-package cleaner
+package compiledbinaries
 
 import (
 	"testing"
@@ -7,8 +7,8 @@ import (
 	"github.com/onsi/gomega"
 )
 
-func TestCleanerSuite(t *testing.T) {
+func TestCompiledBinariesSuite(t *testing.T) {
 	t.Parallel()
 	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "Cleaner Suite")
+	ginkgo.RunSpecs(t, "CompiledBinaries Suite")
 }

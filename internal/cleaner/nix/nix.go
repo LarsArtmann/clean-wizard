@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -13,35 +14,41 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// Byte conversion constants.
+const (
+	bytesPerMB = 1024 * 1024
+	bytesPerGB = 1024 * 1024 * 1024
+)
+
 const (
 	// NixMockStoreSizeGB is the mock store size in GB for unavailable Nix.
-	NixMockStoreSizeGB	= 300
+	NixMockStoreSizeGB = 300
 	// NixMaxGenerationsToKeep is the maximum allowed generations to keep.
-	NixMaxGenerationsToKeep	= 10
+	NixMaxGenerationsToKeep = 10
 	// NixDryRunBytesPerGeneration is the estimated bytes freed per generation in dry-run mode.
-	NixDryRunBytesPerGeneration	= 50 * bytesPerMB
+	NixDryRunBytesPerGeneration = 50 * bytesPerMB
 
 	// Mock generation IDs for testing when Nix is unavailable.
-	mockGenerationIDCurrent	= 300
-	mockGenerationIDRecent1	= 299
-	mockGenerationIDRecent2	= 298
-	mockGenerationIDOlder1	= 297
-	mockGenerationIDOlder2	= 296
+	mockGenerationIDCurrent = 300
+	mockGenerationIDRecent1 = 299
+	mockGenerationIDRecent2 = 298
+	mockGenerationIDOlder1  = 297
+	mockGenerationIDOlder2  = 296
 
 	// Mock generation age offsets in hours.
-	mockGenerationAgeCurrent	= 24
-	mockGenerationAgeRecent		= 48
-	mockGenerationAgeOlder		= 72
-	mockGenerationAgeOld		= 96
-	mockGenerationAgeVeryOld	= 120
+	mockGenerationAgeCurrent = 24
+	mockGenerationAgeRecent  = 48
+	mockGenerationAgeOlder   = 72
+	mockGenerationAgeOld     = 96
+	mockGenerationAgeVeryOld = 120
 )
 
 // NixCleaner handles Nix package manager cleanup with proper type safety.
 type NixCleaner struct {
 	cleaner.CleanerBase
 
-	adapter		*adapters.NixAdapter
-	keepCount	int
+	adapter   *adapters.NixAdapter
+	keepCount int
 }
 
 // NewNixCleaner creates Nix cleaner with proper configuration.
@@ -53,11 +60,11 @@ func NewNixCleaner(verbose, dryRun bool, keepCount ...int) *NixCleaner {
 	}
 
 	nc := &NixCleaner{
-		adapter:	adapters.NewNixAdapter(0, 0),
-		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
-		keepCount:	kc,
+		adapter:     adapters.NewNixAdapter(0, 0),
+		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
+		keepCount:   kc,
 	}
-	nc.adapter.SetDryRun(dryRun)	// Pass dry-run to adapter
+	nc.adapter.SetDryRun(dryRun) // Pass dry-run to adapter
 
 	return nc
 }
@@ -89,10 +96,10 @@ func (nc *NixCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] 
 
 	for _, gen := range generations {
 		items = append(items, types.ScanItem{
-			Path:		gen.Path,
-			Size:		0,	// Individual generation size is hard to determine
-			Created:	gen.Date,
-			ScanType:	types.ScanTypeNixStore,
+			Path:     gen.Path,
+			Size:     0, // Individual generation size is hard to determine
+			Created:  gen.Date,
+			ScanType: types.ScanTypeNixStore,
 		})
 	}
 
@@ -152,39 +159,39 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]types
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]types.NixGeneration{
 			{
-				ID:	mockGenerationIDCurrent,
-				Path:	"/nix/var/nix/profiles/default-300-link",
+				ID:   mockGenerationIDCurrent,
+				Path: "/nix/var/nix/profiles/default-300-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeCurrent * time.Hour),
-				Current:	enums.GenerationStatusCurrent,
+				Current: enums.GenerationStatusCurrent,
 			},
 			{
-				ID:	mockGenerationIDRecent1,
-				Path:	"/nix/var/nix/profiles/default-299-link",
+				ID:   mockGenerationIDRecent1,
+				Path: "/nix/var/nix/profiles/default-299-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeRecent * time.Hour),
-				Current:	enums.GenerationStatusHistorical,
+				Current: enums.GenerationStatusHistorical,
 			},
 			{
-				ID:	mockGenerationIDRecent2,
-				Path:	"/nix/var/nix/profiles/default-298-link",
+				ID:   mockGenerationIDRecent2,
+				Path: "/nix/var/nix/profiles/default-298-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeOlder * time.Hour),
-				Current:	enums.GenerationStatusHistorical,
+				Current: enums.GenerationStatusHistorical,
 			},
 			{
-				ID:	mockGenerationIDOlder1,
-				Path:	"/nix/var/nix/profiles/default-297-link",
+				ID:   mockGenerationIDOlder1,
+				Path: "/nix/var/nix/profiles/default-297-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeOld * time.Hour),
-				Current:	enums.GenerationStatusHistorical,
+				Current: enums.GenerationStatusHistorical,
 			},
 			{
-				ID:	mockGenerationIDOlder2,
-				Path:	"/nix/var/nix/profiles/default-296-link",
+				ID:   mockGenerationIDOlder2,
+				Path: "/nix/var/nix/profiles/default-296-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeVeryOld * time.Hour),
-				Current:	enums.GenerationStatusHistorical,
+				Current: enums.GenerationStatusHistorical,
 			},
 		}, "Nix not available - using mock data")
 	}
@@ -209,7 +216,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 	// Count and remove old generations
 	toRemove := countOldGenerations(generations, keepCount)
 
-	if nc.dryRun {
+	if nc.GetDryRun() {
 		// Use real store size to calculate average generation size
 		storeSize := nc.GetStoreSize(ctx)
 		// Calculate average generation size (avoid division by zero)
@@ -229,7 +236,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 	}
 
 	// Real cleaning implementation
-	if !nc.dryRun && toRemove > 0 {
+	if !nc.GetDryRun() && toRemove > 0 {
 		// Remove old generations individually to track what's cleaned
 		results := make([]types.CleanResult, 0, toRemove)
 		start := time.Now()

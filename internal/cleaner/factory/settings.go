@@ -1,6 +1,9 @@
 package factory
 
 import (
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/compiledbinaries"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/nodepackages"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
@@ -57,8 +60,8 @@ func resolveDockerPruneMode(settings *operations.OperationSettings) enums.Docker
 // resolveGoCaches maps the go_packages settings section to Go cache flags.
 // A section with every cache disabled cannot produce a valid cache set, so it
 // falls back to the factory default rather than constructing an invalid cleaner.
-func resolveGoCaches(settings *operations.OperationSettings) GoCacheType {
-	const defaultGoCaches = GoCacheGOCACHE | GoCacheTestCache | GoCacheModCache | GoCacheBuildCache
+func resolveGoCaches(settings *operations.OperationSettings) golang.GoCacheType {
+	const defaultGoCaches = golang.GoCacheGOCACHE | golang.GoCacheTestCache | golang.GoCacheModCache | golang.GoCacheBuildCache
 
 	if settings == nil {
 		return defaultGoCaches
@@ -69,26 +72,26 @@ func resolveGoCaches(settings *operations.OperationSettings) GoCacheType {
 		return defaultGoCaches
 	}
 
-	var caches GoCacheType
+	var caches golang.GoCacheType
 
 	if goSettings.CleanCache.IsEnabled() {
-		caches |= GoCacheGOCACHE
+		caches |= golang.GoCacheGOCACHE
 	}
 
 	if goSettings.CleanTestCache.IsEnabled() {
-		caches |= GoCacheTestCache
+		caches |= golang.GoCacheTestCache
 	}
 
 	if goSettings.CleanModCache.IsEnabled() {
-		caches |= GoCacheModCache
+		caches |= golang.GoCacheModCache
 	}
 
 	if goSettings.CleanBuildCache.IsEnabled() {
-		caches |= GoCacheBuildCache
+		caches |= golang.GoCacheBuildCache
 	}
 
 	if goSettings.CleanLintCache.IsEnabled() {
-		caches |= GoCacheLintCache
+		caches |= golang.GoCacheLintCache
 	}
 
 	if !caches.IsValid() {
@@ -102,14 +105,14 @@ func resolveGoCaches(settings *operations.OperationSettings) GoCacheType {
 // package managers to clean, falling back to whatever is available on this system.
 func resolveNodePackageManagers(settings *operations.OperationSettings) []enums.PackageManagerType {
 	if settings == nil {
-		return AvailableNodePackageManagers()
+		return nodepackages.AvailableNodePackageManagers()
 	}
 
 	if settings.NodePackages != nil && len(settings.NodePackages.PackageManagers) > 0 {
 		return settings.NodePackages.PackageManagers
 	}
 
-	return AvailableNodePackageManagers()
+	return nodepackages.AvailableNodePackageManagers()
 }
 
 // resolveBuildCacheOlderThan maps the build_cache settings section to the age filter.
@@ -184,8 +187,8 @@ func resolveProjectExecutables(settings *operations.OperationSettings) ([]string
 // resolveCompiledBinaries maps the compiled_binaries settings section to size,
 // age, and path filters.
 func resolveCompiledBinaries(settings *operations.OperationSettings) (int, string, []string, []string) {
-	minSizeMB := DefaultMinSizeMB
-	olderThan := DefaultOlderThan
+	minSizeMB := compiledbinaries.DefaultMinSizeMB
+	olderThan := compiledbinaries.DefaultOlderThan
 
 	var basePaths, excludePatterns []string
 

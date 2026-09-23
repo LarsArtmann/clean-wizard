@@ -4,7 +4,7 @@ import (
 	"context"
 	"os/exec"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/homebrew"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -27,7 +27,7 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 
 	ginkgo.Describe("identity", func() {
 		ginkgo.It("exposes the homebrew cleaner name and operation type", func() {
-			hbc := cleaner.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
+			hbc := homebrew.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
 
 			gomega.Expect(hbc.Name()).To(gomega.Equal("homebrew"))
 			gomega.Expect(hbc.Type()).To(gomega.Equal(operations.OperationTypeHomebrew))
@@ -36,7 +36,7 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 
 	ginkgo.Describe("availability", func() {
 		ginkgo.It("reports availability that matches the brew binary", func() {
-			hbc := cleaner.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
+			hbc := homebrew.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
 
 			gomega.Expect(hbc.IsAvailable(ctx)).To(gomega.Equal(brewInstalled()))
 		})
@@ -51,7 +51,7 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 			})
 
 			ginkgo.It("refuses to clean with an infrastructure error", func() {
-				hbc := cleaner.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
+				hbc := homebrew.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
 
 				cleanRes := hbc.Clean(ctx)
 				gomega.Expect(cleanRes.IsErr()).To(gomega.BeTrue())
@@ -67,7 +67,7 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 			})
 
 			ginkgo.It("completes a dry run without reporting missing tooling", func() {
-				hbc := cleaner.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
+				hbc := homebrew.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
 
 				cleanRes := hbc.Clean(ctx)
 				if cleanRes.IsErr() {
@@ -81,7 +81,7 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 	ginkgo.Describe("settings validation", func() {
 		ginkgo.DescribeTable("accepts or rejects homebrew modes",
 			func(unusedOnly enums.HomebrewMode, valid bool) {
-				hbc := cleaner.NewHomebrewCleaner(true, true, unusedOnly)
+				hbc := homebrew.NewHomebrewCleaner(true, true, unusedOnly)
 
 				settings := &operations.OperationSettings{
 					Homebrew: &operations.HomebrewSettings{UnusedOnly: unusedOnly},

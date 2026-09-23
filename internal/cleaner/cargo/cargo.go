@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -68,26 +69,26 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem
 		// Add registry cache location
 		registryCache := cargoHome + "/registry"
 		items = append(items, types.ScanItem{
-			Path:		registryCache,
-			Size:		cleaner.GetDirSize(registryCache),
-			Created:	cleaner.GetDirModTime(registryCache),
-			ScanType:	types.ScanTypeTemp,
+			Path:     registryCache,
+			Size:     cleaner.GetDirSize(registryCache),
+			Created:  cleaner.GetDirModTime(registryCache),
+			ScanType: types.ScanTypeTemp,
 		})
 
-		if cc.verbose {
+		if cc.GetVerbose() {
 			fmt.Printf("Found Cargo registry cache: %s\n", registryCache)
 		}
 
 		// Add source cache location
 		sourceCache := cargoHome + "/git"
 		items = append(items, types.ScanItem{
-			Path:		sourceCache,
-			Size:		cleaner.GetDirSize(sourceCache),
-			Created:	cleaner.GetDirModTime(sourceCache),
-			ScanType:	types.ScanTypeTemp,
+			Path:     sourceCache,
+			Size:     cleaner.GetDirSize(sourceCache),
+			Created:  cleaner.GetDirModTime(sourceCache),
+			ScanType: types.ScanTypeTemp,
 		})
 
-		if cc.verbose {
+		if cc.GetVerbose() {
 			fmt.Printf("Found Cargo source cache: %s\n", sourceCache)
 		}
 	}
@@ -101,7 +102,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[types.CleanResu
 		return result.Err[types.CleanResult](cleaner.NewNotAvailableError("cargo", ""))
 	}
 
-	if cc.dryRun {
+	if cc.GetDryRun() {
 		// Calculate actual cache sizes by scanning directories
 		totalBytes := int64(0)
 		itemsRemoved := 0
@@ -128,7 +129,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[types.CleanResu
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)}	//nolint:exhaustruct
+		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
 
 		return result.Ok(cleanResult)
 	}
@@ -142,7 +143,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[types.CleanResu
 	if cc.hasCargoCacheTool() {
 		cacheToolResult := cc.cleanWithCargoCacheTool(ctx)
 		if cacheToolResult.IsErr() {
-			if cc.verbose {
+			if cc.GetVerbose() {
 				fmt.Printf(
 					"Warning: cargo-cache tool failed, falling back to manual clean: %v\n",
 					cacheToolResult.Error(),
@@ -244,9 +245,9 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 			}
 
 			return nil
-		}, cc.verbose, "Cache")
+		}, cc.GetVerbose(), "Cache")
 
-		if cc.verbose {
+		if cc.GetVerbose() {
 			fmt.Println(successMessage)
 		}
 	} else {
@@ -266,7 +267,7 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 			)
 		}
 
-		if cc.verbose {
+		if cc.GetVerbose() {
 			fmt.Println(successMessage)
 		}
 	}

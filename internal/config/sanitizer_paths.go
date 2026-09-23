@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // sanitizeProtectedPaths sanitizes protected paths array.

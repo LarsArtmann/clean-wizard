@@ -3,10 +3,11 @@ package config
 import (
 	"context"
 	"fmt"
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // loadConfigWithRetry loads configuration with retry logic.

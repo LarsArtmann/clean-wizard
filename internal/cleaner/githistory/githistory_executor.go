@@ -11,28 +11,29 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	gitfilterrepo "github.com/LarsArtmann/clean-wizard/internal/shared/utils/gitfilterrepo"
 )
 
 const (
 	// FilterRepoTimeout is the timeout for git-filter-repo operations.
-	FilterRepoTimeout	= 10 * time.Minute
+	FilterRepoTimeout = 10 * time.Minute
 	// GarbageCollectionTimeout is the timeout for git garbage collection.
-	GarbageCollectionTimeout	= 5 * time.Minute
+	GarbageCollectionTimeout = 5 * time.Minute
 	// BackupTimeout is the timeout for creating repository backups.
-	BackupTimeout	= 5 * time.Minute
+	BackupTimeout = 5 * time.Minute
 	// BytesPerMB is the number of bytes in a megabyte.
-	BytesPerMB	= 1024 * 1024
+	BytesPerMB = 1024 * 1024
 	// DefaultPackRatio is the default pack file compression ratio estimate.
-	DefaultPackRatio	= 0.7
+	DefaultPackRatio = 0.7
 )
 
 // GitHistoryExecutor executes git history rewrites using git-filter-repo.
 type GitHistoryExecutor struct {
-	repoPath	string
+	repoPath string
 	cleaner.CleanerBase
-	packRatio	float64
+	packRatio float64
 }
 
 // GitHistoryExecutorOption is a functional option for the executor.
@@ -52,9 +53,9 @@ func NewGitHistoryExecutor(
 	opts ...GitHistoryExecutorOption,
 ) *GitHistoryExecutor {
 	e := &GitHistoryExecutor{
-		repoPath:	repoPath,
-		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
-		packRatio:	DefaultPackRatio,
+		repoPath:    repoPath,
+		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
+		packRatio:   DefaultPackRatio,
 	}
 
 	for _, opt := range opts {
@@ -66,10 +67,10 @@ func NewGitHistoryExecutor(
 
 // ExecuteOptions configures the history rewrite.
 type ExecuteOptions struct {
-	FilesToRemove	[]types.GitHistoryFile
-	CreateBackup	bool
-	BackupPath	string
-	SkipGC		bool	// Skip garbage collection (for testing)
+	FilesToRemove []types.GitHistoryFile
+	CreateBackup  bool
+	BackupPath    string
+	SkipGC        bool // Skip garbage collection (for testing)
 }
 
 // Execute runs the history rewrite.
@@ -88,11 +89,11 @@ func (e *GitHistoryExecutor) Execute(
 
 	// Create backup if requested
 	var (
-		backupCreated	bool
-		backupPath	string
+		backupCreated bool
+		backupPath    string
 	)
 
-	if opts.CreateBackup && !e.dryRun {
+	if opts.CreateBackup && !e.GetDryRun() {
 		backupPath = opts.BackupPath
 		if backupPath == "" {
 			backupPath = e.getDefaultBackupPath()
@@ -106,15 +107,15 @@ func (e *GitHistoryExecutor) Execute(
 		backupCreated = true
 	}
 
-	if e.dryRun {
-		return &types.GitHistoryRewriteResult{	//nolint:exhaustruct
-			FilesRemoved:		opts.FilesToRemove,
-			BytesRemoved:		e.calculateTotalSize(opts.FilesToRemove),
-			CommitsAffected:	0,
-			OldRepoSize:		oldSize,
-			BackupCreated:		false,
-			ExecutedAt:		time.Now(),
-			Duration:		time.Since(start),
+	if e.GetDryRun() {
+		return &types.GitHistoryRewriteResult{ //nolint:exhaustruct
+			FilesRemoved:    opts.FilesToRemove,
+			BytesRemoved:    e.calculateTotalSize(opts.FilesToRemove),
+			CommitsAffected: 0,
+			OldRepoSize:     oldSize,
+			BackupCreated:   false,
+			ExecutedAt:      time.Now(),
+			Duration:        time.Since(start),
 		}, nil
 	}
 
@@ -127,7 +128,7 @@ func (e *GitHistoryExecutor) Execute(
 	// Run garbage collection
 	if !opts.SkipGC {
 		err := e.runGC(ctx)
-		if err != nil && e.verbose {
+		if err != nil && e.GetVerbose() {
 			fmt.Printf("Warning: garbage collection failed: %v\n", err)
 		}
 	}
@@ -139,16 +140,16 @@ func (e *GitHistoryExecutor) Execute(
 	bytesReclaimed := max(oldSize-newSize, 0)
 
 	return &types.GitHistoryRewriteResult{
-		FilesRemoved:		opts.FilesToRemove,
-		BytesRemoved:		e.calculateTotalSize(opts.FilesToRemove),
-		CommitsAffected:	commitsAffected,
-		OldRepoSize:		oldSize,
-		NewRepoSize:		newSize,
-		BytesReclaimed:		bytesReclaimed,
-		BackupCreated:		backupCreated,
-		BackupPath:		backupPath,
-		ExecutedAt:		time.Now(),
-		Duration:		time.Since(start),
+		FilesRemoved:    opts.FilesToRemove,
+		BytesRemoved:    e.calculateTotalSize(opts.FilesToRemove),
+		CommitsAffected: commitsAffected,
+		OldRepoSize:     oldSize,
+		NewRepoSize:     newSize,
+		BytesReclaimed:  bytesReclaimed,
+		BackupCreated:   backupCreated,
+		BackupPath:      backupPath,
+		ExecutedAt:      time.Now(),
+		Duration:        time.Since(start),
 	}, nil
 }
 
@@ -172,8 +173,8 @@ func (e *GitHistoryExecutor) runFilterRepo(
 	// Invert paths (remove instead of keep)
 	args = append(args, "--invert-paths")
 
-	if e.verbose {
-		gitfilterrepo.LogFilterRepoCommand(e.verbose, args)
+	if e.GetVerbose() {
+		gitfilterrepo.LogFilterRepoCommand(e.GetVerbose(), args)
 	}
 
 	cmd := BuildFilterRepoCommand(ctx, args)
@@ -198,7 +199,7 @@ func (e *GitHistoryExecutor) runGC(ctx context.Context) error {
 	// Run reflog expire first
 	cmd := exec.CommandContext(ctx, "git", "-C", e.repoPath,
 		"reflog", "expire", "--expire=now", "--all")
-	if output, err := cmd.CombinedOutput(); err != nil && e.verbose {
+	if output, err := cmd.CombinedOutput(); err != nil && e.GetVerbose() {
 		fmt.Printf("Warning: reflog expire failed: %v\n%s\n", err, string(output))
 	}
 
@@ -268,7 +269,7 @@ func getGitDirSize(repoPath string) (int64, error) {
 
 	err := filepath.Walk(gitDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return nil	//nolint:nilerr // Skip files we can't access
+			return nil //nolint:nilerr // Skip files we can't access
 		}
 
 		if !info.IsDir() {
@@ -330,41 +331,41 @@ func (e *GitHistoryExecutor) EstimateImpact(
 	totalFileBytes := e.calculateTotalSize(files)
 
 	// Estimate commits affected (rough estimate based on file count)
-	commitsEstimate := len(files) * 2	// Assume each file touches ~2 commits on average
+	commitsEstimate := len(files) * 2 // Assume each file touches ~2 commits on average
 
 	// Estimated new size (files represent roughly packRatio of their size in pack files)
 	estimatedNewSize := max(oldSize-int64(float64(totalFileBytes)*e.packRatio), 0)
 
 	return &ImpactEstimate{
-		CurrentRepoSizeMB:	float64(oldSize) / float64(BytesPerMB),
-		EstimatedNewSizeMB:	float64(estimatedNewSize) / float64(BytesPerMB),
-		SpaceReclaimedMB:	float64(oldSize-estimatedNewSize) / float64(BytesPerMB),
-		FilesToRemove:		len(files),
-		EstimatedCommits:	commitsEstimate,
-		EstimatedDuration:	time.Duration(len(files)) * time.Second,
+		CurrentRepoSizeMB:  float64(oldSize) / float64(BytesPerMB),
+		EstimatedNewSizeMB: float64(estimatedNewSize) / float64(BytesPerMB),
+		SpaceReclaimedMB:   float64(oldSize-estimatedNewSize) / float64(BytesPerMB),
+		FilesToRemove:      len(files),
+		EstimatedCommits:   commitsEstimate,
+		EstimatedDuration:  time.Duration(len(files)) * time.Second,
 	}, nil
 }
 
 // ImpactEstimate contains impact estimates for a history rewrite.
 type ImpactEstimate struct {
-	CurrentRepoSizeMB	float64
-	EstimatedNewSizeMB	float64
-	SpaceReclaimedMB	float64
-	FilesToRemove		int
-	EstimatedCommits	int
-	EstimatedDuration	time.Duration
+	CurrentRepoSizeMB  float64
+	EstimatedNewSizeMB float64
+	SpaceReclaimedMB   float64
+	FilesToRemove      int
+	EstimatedCommits   int
+	EstimatedDuration  time.Duration
 }
 
 // RemoveFilesFromHistory is a convenience method that combines scanning and removal.
 func (e *GitHistoryExecutor) RemoveFilesFromHistory(ctx context.Context, paths []string) error {
 	files := make([]types.GitHistoryFile, len(paths))
 	for i, path := range paths {
-		files[i] = types.GitHistoryFile{Path: path}	//nolint:exhaustruct
+		files[i] = types.GitHistoryFile{Path: path} //nolint:exhaustruct
 	}
 
-	_, err := e.Execute(ctx, ExecuteOptions{	//nolint:exhaustruct
-		FilesToRemove:	files,
-		CreateBackup:	true,
+	_, err := e.Execute(ctx, ExecuteOptions{ //nolint:exhaustruct
+		FilesToRemove: files,
+		CreateBackup:  true,
 	})
 
 	return err
@@ -380,8 +381,8 @@ func (e *GitHistoryExecutor) StripLargeBlobs(ctx context.Context, sizeMB int) er
 		"--strip-blobs-bigger-than", fmt.Sprintf("%dM", sizeMB),
 	}
 
-	if e.verbose {
-		gitfilterrepo.LogFilterRepoCommand(e.verbose, args)
+	if e.GetVerbose() {
+		gitfilterrepo.LogFilterRepoCommand(e.GetVerbose(), args)
 	}
 
 	cmd := BuildFilterRepoCommand(ctx, args)

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
@@ -28,20 +29,20 @@ func TestCargoCleaner_IsAvailable(t *testing.T) {
 	cleaner.TestIsAvailable(t, NewCargoCleaner)
 }
 
-func TestCargoCleaner_GetHomeDir(t *testing.T) {	//nolint:paralleltest
+func TestCargoCleaner_GetHomeDir(t *testing.T) { //nolint:paralleltest
 	testCases := []cleaner.GetHomeDirTestCase{
 		{
-			Name:		"HOME set",
-			HomeValue:	"/test/home",
-			WantErr:	false,
-			WantHome:	"/test/home",
+			Name:      "HOME set",
+			HomeValue: "/test/home",
+			WantErr:   false,
+			WantHome:  "/test/home",
 		},
 		{
-			Name:		"fallback to USERPROFILE",
-			HomeValue:	"",
-			ProfileValue:	"C:\\Users\\test",
-			WantErr:	false,
-			WantHome:	"C:\\Users\\test",
+			Name:         "fallback to USERPROFILE",
+			HomeValue:    "",
+			ProfileValue: "C:\\Users\\test",
+			WantErr:      false,
+			WantHome:     "C:\\Users\\test",
 		},
 	}
 

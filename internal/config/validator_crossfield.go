@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"strconv"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )

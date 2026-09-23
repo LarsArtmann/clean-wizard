@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )

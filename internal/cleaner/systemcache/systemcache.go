@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -19,17 +20,17 @@ import (
 
 const (
 	// pathComponentLibrary is the Library directory component for macOS paths.
-	pathComponentLibrary	= "Library"
+	pathComponentLibrary = "Library"
 	// pathComponentDotCache is the .cache directory component for Linux paths.
-	pathComponentDotCache	= ".cache"
+	pathComponentDotCache = ".cache"
 )
 
 // SystemCacheCleaner handles system cache cleanup for macOS and Linux.
 type SystemCacheCleaner struct {
 	cleaner.CleanerBase
 
-	cacheTypes	[]enums.CacheType
-	olderThan	time.Duration
+	cacheTypes []enums.CacheType
+	olderThan  time.Duration
 }
 
 // AvailableSystemCacheTypes returns all available system cache types for the current platform.
@@ -105,9 +106,9 @@ func NewSystemCacheCleaner(
 	}
 
 	return &SystemCacheCleaner{
-		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
-		cacheTypes:	cacheTypes,
-		olderThan:	duration,
+		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
+		cacheTypes:  cacheTypes,
+		olderThan:   duration,
 	}, nil
 }
 
@@ -181,7 +182,7 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]types.S
 	for _, cacheType := range scc.cacheTypes {
 		result := scc.scanSystemCache(ctx, cacheType, homeDir)
 		if result.IsErr() {
-			if scc.verbose {
+			if scc.GetVerbose() {
 				fmt.Printf("Warning: failed to scan %s: %v\n", cacheType, result.Error())
 			}
 
@@ -196,13 +197,13 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]types.S
 
 // cacheTypeConfig holds configuration for each system cache type.
 type cacheTypeConfig struct {
-	pathComponents	[]string
-	displayName	string
-	scanType	types.ScanType
+	pathComponents []string
+	displayName    string
+	scanType       types.ScanType
 }
 
 // systemCacheConfigs maps cache types to their configuration.
-var systemCacheConfigs = map[enums.CacheType]cacheTypeConfig{	//nolint:gochecknoglobals
+var systemCacheConfigs = map[enums.CacheType]cacheTypeConfig{ //nolint:gochecknoglobals
 	// macOS-specific cache types
 	enums.CacheTypeSpotlight: {
 		pathComponents: []string{
@@ -211,140 +212,140 @@ var systemCacheConfigs = map[enums.CacheType]cacheTypeConfig{	//nolint:gocheckno
 			"CoreSpotlight",
 			"SpotlightKnowledgeEvents",
 		},
-		displayName:	"Spotlight metadata",
-		scanType:	types.ScanTypeTemp,
+		displayName: "Spotlight metadata",
+		scanType:    types.ScanTypeTemp,
 	},
 	enums.CacheTypeXcode: {
-		pathComponents:	[]string{pathComponentLibrary, "Developer", "Xcode", "DerivedData"},
-		displayName:	"Xcode DerivedData",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentLibrary, "Developer", "Xcode", "DerivedData"},
+		displayName:    "Xcode DerivedData",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeCocoapods: {
-		pathComponents:	[]string{pathComponentLibrary, "Caches", "CocoaPods"},
-		displayName:	"CocoaPods cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentLibrary, "Caches", "CocoaPods"},
+		displayName:    "CocoaPods cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeHomebrew: {
-		pathComponents:	[]string{pathComponentLibrary, "Caches", "Homebrew"},
-		displayName:	"Homebrew cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentLibrary, "Caches", "Homebrew"},
+		displayName:    "Homebrew cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	// Linux-specific cache types
 	enums.CacheTypeXdgCache: {
-		pathComponents:	[]string{pathComponentDotCache},
-		displayName:	"XDG cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache},
+		displayName:    "XDG cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeThumbnails: {
-		pathComponents:	[]string{pathComponentDotCache, "thumbnails"},
-		displayName:	"Thumbnail cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "thumbnails"},
+		displayName:    "Thumbnail cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypePip: {
-		pathComponents:	[]string{pathComponentDotCache, "pip"},
-		displayName:	"Pip cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "pip"},
+		displayName:    "Pip cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeNpm: {
-		pathComponents:	[]string{pathComponentDotCache, "npm"},
-		displayName:	"NPM cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "npm"},
+		displayName:    "NPM cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeYarn: {
-		pathComponents:	[]string{pathComponentDotCache, "yarn"},
-		displayName:	"Yarn cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "yarn"},
+		displayName:    "Yarn cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeCcache: {
-		pathComponents:	[]string{pathComponentDotCache, "ccache"},
-		displayName:	"Ccache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "ccache"},
+		displayName:    "Ccache",
+		scanType:       types.ScanTypeTemp,
 	},
 	// Cross-platform cache types
 	enums.CacheTypePuppeteer: {
-		pathComponents:	[]string{pathComponentDotCache, "puppeteer"},
-		displayName:	"Puppeteer browser cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "puppeteer"},
+		displayName:    "Puppeteer browser cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeTerraform: {
-		pathComponents:	[]string{".terraform.d", "plugin-cache"},
-		displayName:	"Terraform plugin cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{".terraform.d", "plugin-cache"},
+		displayName:    "Terraform plugin cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeGradleWrapper: {
-		pathComponents:	[]string{".gradle", "wrapper"},
-		displayName:	"Gradle wrapper distributions",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{".gradle", "wrapper"},
+		displayName:    "Gradle wrapper distributions",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeKonan: {
-		pathComponents:	[]string{".konan", "dependencies"},
-		displayName:	"Kotlin/Native toolchain dependencies",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{".konan", "dependencies"},
+		displayName:    "Kotlin/Native toolchain dependencies",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeRustup: {
-		pathComponents:	[]string{".rustup", "toolchains"},
-		displayName:	"Rust toolchain cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{".rustup", "toolchains"},
+		displayName:    "Rust toolchain cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeGopls: {
-		pathComponents:	[]string{pathComponentDotCache, "gopls"},
-		displayName:	"gopls language server cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "gopls"},
+		displayName:    "gopls language server cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeGoimports: {
-		pathComponents:	[]string{pathComponentDotCache, "goimports"},
-		displayName:	"goimports cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "goimports"},
+		displayName:    "goimports cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeJetBrains: {
-		pathComponents:	[]string{pathComponentDotCache, "JetBrains"},
-		displayName:	"JetBrains IDE cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "JetBrains"},
+		displayName:    "JetBrains IDE cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeBunCache: {
-		pathComponents:	[]string{pathComponentDotCache, "bun"},
-		displayName:	"Bun cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "bun"},
+		displayName:    "Bun cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypePlaywright: {
-		pathComponents:	[]string{pathComponentDotCache, "ms-playwright"},
-		displayName:	"Playwright browser cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "ms-playwright"},
+		displayName:    "Playwright browser cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeMozilla: {
-		pathComponents:	[]string{pathComponentDotCache, "mozilla"},
-		displayName:	"Mozilla/Firefox cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "mozilla"},
+		displayName:    "Mozilla/Firefox cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeNixCache: {
-		pathComponents:	[]string{pathComponentDotCache, "nix"},
-		displayName:	"Nix evaluator/substituter cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "nix"},
+		displayName:    "Nix evaluator/substituter cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeZig: {
-		pathComponents:	[]string{pathComponentDotCache, "zig"},
-		displayName:	"Zig compiler cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "zig"},
+		displayName:    "Zig compiler cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeUv: {
-		pathComponents:	[]string{pathComponentDotCache, "uv"},
-		displayName:	"uv Python package manager cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "uv"},
+		displayName:    "uv Python package manager cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeTinygo: {
-		pathComponents:	[]string{pathComponentDotCache, "tinygo"},
-		displayName:	"TinyGo compiler cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "tinygo"},
+		displayName:    "TinyGo compiler cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeMesaShader: {
-		pathComponents:	[]string{pathComponentDotCache, "mesa_shader_cache"},
-		displayName:	"Mesa shader cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "mesa_shader_cache"},
+		displayName:    "Mesa shader cache",
+		scanType:       types.ScanTypeTemp,
 	},
 	enums.CacheTypeComgr: {
-		pathComponents:	[]string{pathComponentDotCache, "comgr"},
-		displayName:	"AMD GPU compiler cache",
-		scanType:	types.ScanTypeTemp,
+		pathComponents: []string{pathComponentDotCache, "comgr"},
+		displayName:    "AMD GPU compiler cache",
+		scanType:       types.ScanTypeTemp,
 	},
 }
 
@@ -377,13 +378,13 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[types.Cl
 		)
 	}
 
-	if scc.dryRun {
+	if scc.GetDryRun() {
 		// Scan actual cache directories to get real sizes
 		scanResult := scc.Scan(ctx)
 
 		var (
-			totalBytes	int64
-			itemsRemoved	int
+			totalBytes   int64
+			itemsRemoved int
 		)
 
 		if scanResult.IsOk() {
@@ -404,8 +405,8 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[types.Cl
 			totalBytes,
 		)
 		cleanResult.SizeEstimate = types.SizeEstimate{
-			Known:	uint64(totalBytes),
-			Status:	enums.SizeEstimateStatusKnown,
+			Known:  uint64(totalBytes),
+			Status: enums.SizeEstimateStatusKnown,
 		}
 
 		return result.Ok(cleanResult)
@@ -426,7 +427,7 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[types.Cl
 	for _, cacheType := range scc.cacheTypes {
 		result := scc.cleanSystemCache(ctx, cacheType, homeDir)
 		if result.IsErr() {
-			counters.RecordFailure(scc.verbose, cacheType, result.Error())
+			counters.RecordFailure(scc.GetVerbose(), cacheType, result.Error())
 
 			continue
 		}
@@ -453,10 +454,10 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[types.Cl
 func (scc *SystemCacheCleaner) removeCachePath(
 	path, successMessage string,
 ) result.Result[types.CleanResult] {
-	if scc.dryRun {
+	if scc.GetDryRun() {
 		// Estimate size for dry-run
 		estimatedSize := cleaner.GetDirSize(path)
-		if scc.verbose {
+		if scc.GetVerbose() {
 			fmt.Printf("  [DRY RUN] Would remove: %s (%s)\n", path, format.Bytes(estimatedSize))
 		}
 
@@ -465,8 +466,8 @@ func (scc *SystemCacheCleaner) removeCachePath(
 			1,
 			estimatedSize,
 			types.SizeEstimate{
-				Known:	uint64(estimatedSize),
-				Status:	enums.SizeEstimateStatusKnown,
+				Known:  uint64(estimatedSize),
+				Status: enums.SizeEstimateStatusKnown,
 			},
 		))
 	}
@@ -481,7 +482,7 @@ func (scc *SystemCacheCleaner) removeCachePath(
 		)
 	}
 
-	if scc.verbose {
+	if scc.GetVerbose() {
 		fmt.Printf("  ✓ %s (%s freed)\n", successMessage, format.Bytes(bytesFreed))
 	}
 
@@ -502,7 +503,7 @@ func (scc *SystemCacheCleaner) scanCachePathWithConfig(
 		homeDir,
 		config.scanType,
 		config.displayName,
-		scc.verbose,
+		scc.GetVerbose(),
 		"",
 		config.pathComponents...,
 	)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
@@ -12,52 +13,52 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		verbose		bool
-		dryRun		bool
-		olderThan	string
-		excludes	[]string
-		basePaths	[]string
-		wantErr		bool
+		name      string
+		verbose   bool
+		dryRun    bool
+		olderThan string
+		excludes  []string
+		basePaths []string
+		wantErr   bool
 	}{
 		// Test cases below share the same struct shape by design — Go's table-driven
 		// testing idiom. Each row carries distinct values and a distinct expectation;
 		// collapsing the rows into a helper would obscure the per-case intent.
 		{
-			name:		"valid configuration",
-			verbose:	false,
-			dryRun:		false,
-			olderThan:	"30d",
-			excludes:	[]string{},
-			basePaths:	[]string{},
-			wantErr:	false,
+			name:      "valid configuration",
+			verbose:   false,
+			dryRun:    false,
+			olderThan: "30d",
+			excludes:  []string{},
+			basePaths: []string{},
+			wantErr:   false,
 		},
 		{
-			name:		"verbose dry-run",
-			verbose:	true,
-			dryRun:		true,
-			olderThan:	"7d",
-			excludes:	[]string{"/keep"},
-			basePaths:	[]string{"/custom/path"},
-			wantErr:	false,
+			name:      "verbose dry-run",
+			verbose:   true,
+			dryRun:    true,
+			olderThan: "7d",
+			excludes:  []string{"/keep"},
+			basePaths: []string{"/custom/path"},
+			wantErr:   false,
 		},
 		{
-			name:		"invalid duration",
-			verbose:	false,
-			dryRun:		false,
-			olderThan:	"invalid",
-			excludes:	[]string{},
-			basePaths:	[]string{},
-			wantErr:	true,
+			name:      "invalid duration",
+			verbose:   false,
+			dryRun:    false,
+			olderThan: "invalid",
+			excludes:  []string{},
+			basePaths: []string{},
+			wantErr:   true,
 		},
 		{
-			name:		"empty duration",
-			verbose:	false,
-			dryRun:		false,
-			olderThan:	"",
-			excludes:	[]string{},
-			basePaths:	[]string{},
-			wantErr:	true,
+			name:      "empty duration",
+			verbose:   false,
+			dryRun:    false,
+			olderThan: "",
+			excludes:  []string{},
+			basePaths: []string{},
+			wantErr:   true,
 		},
 	}
 
@@ -66,8 +67,8 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 			t.Parallel()
 
 			cleaner, err := NewBuildCacheCleaner(
-				tt.verbose,
-				tt.dryRun,
+				tt.GetVerbose(),
+				tt.GetDryRun(),
 				tt.olderThan,
 				tt.excludes,
 				tt.basePaths,
@@ -84,7 +85,7 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 			}
 
 			if cleaner != nil {
-				assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
+				assertCleanerBooleanFields(t, cleaner, tt.GetVerbose(), tt.GetDryRun())
 			}
 		})
 	}
@@ -123,69 +124,69 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name		string
-		settings	*operations.OperationSettings
-		wantErr		bool
+		name     string
+		settings *operations.OperationSettings
+		wantErr  bool
 	}{
 		{
-			name:		"nil settings",
-			settings:	nil,
-			wantErr:	false,
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  false,
 		},
 		{
-			name:		"nil build cache settings",
-			settings:	&operations.OperationSettings{},
-			wantErr:	false,
+			name:     "nil build cache settings",
+			settings: &operations.OperationSettings{},
+			wantErr:  false,
 		},
 		{
-			name:	"valid settings with all tools",
+			name: "valid settings with all tools",
 			settings: &operations.OperationSettings{
 				BuildCache: &operations.BuildCacheSettings{
-					ToolTypes:	[]enums.BuildToolType{enums.BuildToolJava, enums.BuildToolScala},
-					OlderThan:	"30d",
+					ToolTypes: []enums.BuildToolType{enums.BuildToolJava, enums.BuildToolScala},
+					OlderThan: "30d",
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"valid settings with single tool",
+			name: "valid settings with single tool",
 			settings: &operations.OperationSettings{
 				BuildCache: &operations.BuildCacheSettings{
-					ToolTypes:	[]enums.BuildToolType{enums.BuildToolJava},
-					OlderThan:	"7d",
+					ToolTypes: []enums.BuildToolType{enums.BuildToolJava},
+					OlderThan: "7d",
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"valid settings with no tools",
+			name: "valid settings with no tools",
 			settings: &operations.OperationSettings{
 				BuildCache: &operations.BuildCacheSettings{
-					ToolTypes:	[]enums.BuildToolType{},
-					OlderThan:	"30d",
+					ToolTypes: []enums.BuildToolType{},
+					OlderThan: "30d",
 				},
 			},
-			wantErr:	false,
+			wantErr: false,
 		},
 		{
-			name:	"invalid tool type",
+			name: "invalid tool type",
 			settings: &operations.OperationSettings{
 				BuildCache: &operations.BuildCacheSettings{
-					ToolTypes:	[]enums.BuildToolType{999},
-					OlderThan:	"30d",
+					ToolTypes: []enums.BuildToolType{999},
+					OlderThan: "30d",
 				},
 			},
-			wantErr:	true,
+			wantErr: true,
 		},
 		{
-			name:	"mixed valid and invalid tools",
+			name: "mixed valid and invalid tools",
 			settings: &operations.OperationSettings{
 				BuildCache: &operations.BuildCacheSettings{
-					ToolTypes:	[]enums.BuildToolType{enums.BuildToolJava, 999},
-					OlderThan:	"30d",
+					ToolTypes: []enums.BuildToolType{enums.BuildToolJava, 999},
+					OlderThan: "30d",
 				},
 			},
-			wantErr:	true,
+			wantErr: true,
 		},
 	}
 

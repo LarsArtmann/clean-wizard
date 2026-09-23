@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -17,11 +18,13 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+const bytesPerKB = 1024
+
 const (
 	// DefaultProjectsAutomationTimeout is the default timeout for automation commands.
-	DefaultProjectsAutomationTimeout	= 2 * time.Minute
+	DefaultProjectsAutomationTimeout = 2 * time.Minute
 	// DefaultProjectsAutomationCacheSizeMB is the default cache size estimate in MB.
-	DefaultProjectsAutomationCacheSizeMB	= 100
+	DefaultProjectsAutomationCacheSizeMB = 100
 )
 
 // ProjectsManagementAutomationCleaner handles projects-management-automation cache cleanup.
@@ -85,13 +88,13 @@ func (pc *ProjectsManagementAutomationCleaner) Scan(
 
 	// Add cache item
 	items = append(items, types.ScanItem{
-		Path:		"~/.config/projects-management-automation/cache",
-		Size:		pc.estimateCacheSize(),
-		Created:	time.Now(),
-		ScanType:	types.ScanTypeSystem,
+		Path:     "~/.config/projects-management-automation/cache",
+		Size:     pc.estimateCacheSize(),
+		Created:  time.Now(),
+		ScanType: types.ScanTypeSystem,
 	})
 
-	if pc.verbose {
+	if pc.GetVerbose() {
 		fmt.Printf("Found Projects Management Automation cache\n")
 	}
 
@@ -112,7 +115,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 	itemsRemoved := 0
 	bytesFreed := int64(0)
 
-	if pc.dryRun {
+	if pc.GetDryRun() {
 		// Estimate cache sizes
 		totalBytes := pc.estimateCacheSize()
 		itemsRemoved := 1
@@ -143,7 +146,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 	itemsRemoved++
 	bytesFreed += pc.estimateCacheSize()
 
-	if pc.verbose {
+	if pc.GetVerbose() {
 		fmt.Println("  ✓ Projects Management Automation cache cleared")
 	}
 

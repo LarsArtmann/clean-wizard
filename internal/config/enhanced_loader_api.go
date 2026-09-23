@@ -3,8 +3,9 @@ package config
 import (
 	"context"
 	"fmt"
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	errorfamily "github.com/larsartmann/go-error-family"

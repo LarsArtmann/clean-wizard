@@ -24,8 +24,14 @@ func NewCleanerBase(verbose, dryRun bool) CleanerBase {
 // GetVerbose returns the verbose setting.
 func (cb CleanerBase) GetVerbose() bool { return cb.verbose }
 
+// SetVerbose updates the verbose setting.
+func (cb *CleanerBase) SetVerbose(verbose bool) { cb.verbose = verbose }
+
 // GetDryRun returns the dryRun setting.
 func (cb CleanerBase) GetDryRun() bool { return cb.dryRun }
+
+// SetDryRun updates the dryRun setting.
+func (cb *CleanerBase) SetDryRun(dryRun bool) { cb.dryRun = dryRun }
 
 // Cleaner defines the interface for all cleaner implementations.
 type Cleaner interface {

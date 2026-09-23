@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // TestIntegration_ValidationSanitizationPipeline tests complete validation and sanitization workflow.

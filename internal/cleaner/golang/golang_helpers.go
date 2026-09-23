@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 )
 
 // golangHelpers provides utility methods for Go cleaner operations.

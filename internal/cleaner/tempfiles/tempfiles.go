@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -20,9 +21,9 @@ import (
 type TempFilesCleaner struct {
 	cleaner.CleanerBase
 
-	olderThan	time.Duration
-	excludes	[]string
-	basePaths	[]string
+	olderThan time.Duration
+	excludes  []string
+	basePaths []string
 }
 
 // NewTempFilesCleaner creates temp files cleaner with proper configuration.
@@ -45,10 +46,10 @@ func NewTempFilesCleaner(
 	normalizedPaths := cleaner.NormalizePaths(basePaths)
 
 	return &TempFilesCleaner{
-		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
-		olderThan:	duration,
-		excludes:	normalizedExcludes,
-		basePaths:	normalizedPaths,
+		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
+		olderThan:   duration,
+		excludes:    normalizedExcludes,
+		basePaths:   normalizedPaths,
 	}, nil
 }
 
@@ -107,7 +108,7 @@ func (tfc *TempFilesCleaner) Scan(ctx context.Context) result.Result[[]types.Sca
 		err := filepath.Walk(basePath, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				// Skip files we can't access
-				return nil	//nolint:nilerr
+				return nil //nolint:nilerr
 			}
 
 			// Skip directories
@@ -123,17 +124,17 @@ func (tfc *TempFilesCleaner) Scan(ctx context.Context) result.Result[[]types.Sca
 			// Check if file is older than cutoff
 			if info.ModTime().Before(cutoffTime) {
 				items = append(items, types.ScanItem{
-					Path:		path,
-					Size:		info.Size(),
-					Created:	info.ModTime(),
-					ScanType:	types.ScanTypeTemp,
+					Path:     path,
+					Size:     info.Size(),
+					Created:  info.ModTime(),
+					ScanType: types.ScanTypeTemp,
 				})
 			}
 
 			return nil
 		})
 
-		if err != nil && tfc.verbose {
+		if err != nil && tfc.GetVerbose() {
 			fmt.Printf("Warning: error scanning %s: %v\n", basePath, err)
 		}
 	}
@@ -162,7 +163,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[types.Clea
 		return result.Ok(cleanResult)
 	}
 
-	if tfc.dryRun {
+	if tfc.GetDryRun() {
 		// Calculate total bytes that would be freed
 		var totalBytes int64
 		for _, item := range items {
@@ -189,7 +190,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[types.Clea
 		if err != nil {
 			itemsFailed++
 
-			if tfc.verbose {
+			if tfc.GetVerbose() {
 				fmt.Printf("Warning: failed to remove %s: %v\n", item.Path, err)
 			}
 

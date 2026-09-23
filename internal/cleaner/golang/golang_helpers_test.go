@@ -3,6 +3,8 @@ package golang
 import (
 	"os"
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 )
 
 func TestGolangHelpers_getHomeDir(t *testing.T) {
@@ -55,7 +57,7 @@ func TestGolangHelpers_getDirSize(t *testing.T) {
 
 	size = cleaner.GetDirSize(testDir)
 
-	expectedSize := int64(5 + 5 + 5)	// 5+5+5 = 15 bytes
+	expectedSize := int64(5 + 5 + 5) // 5+5+5 = 15 bytes
 	if size != expectedSize {
 		t.Errorf("GetDirSize() = %v, want %v", size, expectedSize)
 	}

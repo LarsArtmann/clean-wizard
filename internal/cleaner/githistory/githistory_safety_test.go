@@ -37,7 +37,7 @@ var _ = ginkgo.Describe("GitHistorySafetyChecker", func() {
 
 		ginkgo.It("should set verbose flag", func() {
 			checker = NewGitHistorySafetyChecker(tempDir, true)
-			gomega.Expect(checker.verbose).To(gomega.BeTrue())
+			gomega.Expect(checker.GetVerbose()).To(gomega.BeTrue())
 		})
 	})
 

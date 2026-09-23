@@ -2,7 +2,6 @@ package golang
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golangcilint"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -18,29 +19,20 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
-// Sentinel errors for golang_cleaner.
-var (
-	ErrNoCacheTypeSpecified		= errors.New("no cache type specified")
-	ErrLintCacheNotImplemented	= errors.New("lint cache cleaning not yet implemented")
-	ErrGoProcessesRunning		= errors.New(
-		"other Go processes detected (go, gopls, golangci-lint, dlv) — skipping to avoid cache corruption",
-	)
-)
-
 // CleanStats tracks cleaning metrics.
 type CleanStats struct {
-	Removed		uint
-	Failed		uint
-	FreedBytes	uint64
+	Removed    uint
+	Failed     uint
+	FreedBytes uint64
 }
 
 // GoCleaner handles Go language cleanup using type-safe cache flags.
 type GoCleaner struct {
 	cleaner.CleanerBase
 
-	caches		GoCacheType
-	scanner		*GoScanner
-	cleaners	map[GoCacheType]interface {
+	caches   GoCacheType
+	scanner  *GoScanner
+	cleaners map[GoCacheType]interface {
 		Clean(ctx context.Context) result.Result[types.CleanResult]
 	}
 }
@@ -69,14 +61,14 @@ func NewGoCleanerWithSettings(verbose, dryRun bool, caches GoCacheType) *GoClean
 	}
 
 	if caches.Has(GoCacheLintCache) {
-		cleaners[GoCacheLintCache] = NewGolangciLintCacheCleaner(verbose, dryRun)
+		cleaners[GoCacheLintCache] = golangcilint.NewGolangciLintCacheCleaner(verbose, dryRun)
 	}
 
 	return &GoCleaner{
-		CleanerBase:	cleaner.NewCleanerBase(verbose, dryRun),
-		caches:		caches,
-		scanner:	scanner,
-		cleaners:	cleaners,
+		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
+		caches:      caches,
+		scanner:     scanner,
+		cleaners:    cleaners,
 	}
 }
 
@@ -116,16 +108,16 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[types.CleanResult]
 		)
 	}
 
-	if !gc.dryRun && hasOtherGoProcesses() {
-		return result.Err[types.CleanResult](ErrGoProcessesRunning)
+	if !gc.GetDryRun() && hasOtherGoProcesses() {
+		return result.Err[types.CleanResult](cleaner.ErrGoProcessesRunning)
 	}
 
-	if gc.dryRun {
+	if gc.GetDryRun() {
 		return gc.dryRunClean(ctx)
 	}
 
 	startTime := time.Now()
-	stats := CleanStats{}	//nolint:exhaustruct
+	stats := CleanStats{} //nolint:exhaustruct
 
 	for _, cacheType := range gc.caches.EnabledTypes() {
 		cleaner, ok := gc.cleaners[cacheType]
@@ -150,8 +142,8 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[types.CleanR
 	scanResult := gc.scanner.Scan(ctx, gc.caches)
 
 	var (
-		totalBytes	uint64
-		itemsRemoved	int
+		totalBytes   uint64
+		itemsRemoved int
 	)
 
 	if scanResult.IsOk() {
@@ -171,7 +163,7 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[types.CleanR
 		itemsRemoved,
 		int64(totalBytes),
 	)
-	cleanResult.SizeEstimate = types.SizeEstimate{Known: totalBytes}	//nolint:exhaustruct
+	cleanResult.SizeEstimate = types.SizeEstimate{Known: totalBytes} //nolint:exhaustruct
 
 	return result.Ok(cleanResult)
 }
@@ -206,8 +198,8 @@ func (gc *GoCleaner) buildCleanResult(
 	}
 
 	sizeEstimate := types.SizeEstimate{
-		Known:	stats.FreedBytes,
-		Status:	status,
+		Known:  stats.FreedBytes,
+		Status: status,
 	}
 
 	// Note: conversions.NewCleanResult uses FreedBytes (deprecated), so we update SizeEstimate
@@ -225,14 +217,14 @@ func (gc *GoCleaner) buildCleanResult(
 
 // logWarning logs warning message if verbose.
 func (gc *GoCleaner) logWarning(format string, args ...any) {
-	if gc.verbose {
+	if gc.GetVerbose() {
 		fmt.Printf("Warning: "+format+"\n", args...)
 	}
 }
 
 // goProcessNames lists Go-related processes whose presence indicates
 // the Go cache may be in active use.
-var goProcessNames = []string{"go", "gopls", "golangci-lint", "dlv"}	//nolint:gochecknoglobals
+var goProcessNames = []string{"go", "gopls", "golangci-lint", "dlv"} //nolint:gochecknoglobals
 
 // hasOtherGoProcesses checks if there are other Go processes running
 // that might be using the Go cache, which could cause cache corruption
