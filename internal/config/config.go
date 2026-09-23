@@ -13,10 +13,10 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/logger"
-	atomicwrite "github.com/larsartmann/go-atomic-write"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
+	atomicwrite "github.com/larsartmann/go-atomic-write"
 	errorfamily "github.com/larsartmann/go-error-family"
 	yamlv3 "gopkg.in/yaml.v3"
 )
@@ -106,14 +106,24 @@ func parseConfig(k *koanf.Koanf) (*types.Config, error) {
 	config.MaxDiskUsage = k.Int("max_disk_usage_percent")
 	config.Protected = k.Strings("protected")
 
-	// Unmarshal profiles section
+	// Unmarshal profiles section. koanf's own struct decoder bypasses the
+	// enums' UnmarshalYAML hooks (it string-parses int-backed fields), so the
+	// raw map is re-encoded as YAML and decoded through yamlv3 instead — the
+	// same pattern unmarshalOperationSettings uses for settings. This accepts
+	// both symbolic ("enabled") and numeric enum forms.
 	profilesKey := "profiles"
 	if k.Exists(profilesKey) {
-		err := k.Unmarshal(profilesKey, &config.Profiles)
-		if err != nil {
-			logger.Error("Failed to unmarshal profiles", "error", err)
+		profilesYAML, encodeErr := yamlv3.Marshal(k.Get(profilesKey))
+		if encodeErr != nil {
+			logger.Error("Failed to encode profiles", "error", encodeErr)
 
-			return nil, errorfamily.WrapRejection(err, "config.load", "failed to unmarshal profiles")
+			return nil, errorfamily.WrapRejection(encodeErr, "config.load", "failed to encode profiles")
+		}
+
+		if decodeErr := yamlv3.Unmarshal(profilesYAML, &config.Profiles); decodeErr != nil {
+			logger.Error("Failed to unmarshal profiles", "error", decodeErr)
+
+			return nil, errorfamily.WrapRejection(decodeErr, "config.load", "failed to unmarshal profiles")
 		}
 	}
 

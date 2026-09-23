@@ -9,12 +9,12 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/logger"
+	"github.com/knadh/koanf/parsers/yaml"
 	atomicwrite "github.com/larsartmann/go-atomic-write"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/go-finding"
 	"github.com/larsartmann/go-finding/pipeline"
 	"github.com/larsartmann/linter-autoconfigure-sdk"
-	"github.com/knadh/koanf/parsers/yaml"
 	yamlv3 "gopkg.in/yaml.v3"
 )
 

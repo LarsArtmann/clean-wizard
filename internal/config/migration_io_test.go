@@ -11,8 +11,8 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
-	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/knadh/koanf/parsers/yaml"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // writeTestConfigFile renders a configuration through the production save
