@@ -257,6 +257,7 @@ func TestMigrateConfigFileAborted(t *testing.T) { //nolint:paralleltest
 
 func TestMigrateConfigFileRollbackOnFailure(t *testing.T) { //nolint:paralleltest
 	calls := 0
+
 	withMigrationChain(t, Migration{
 		From:        FormatVersion{Major: 1, Minor: 0, Patch: 0},
 		To:          FormatVersion{Major: 1, Minor: 1, Patch: 0},

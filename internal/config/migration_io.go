@@ -111,7 +111,7 @@ func MigrateConfigFile(
 	}
 
 	if opts.Confirm != nil && !opts.Confirm(preview) {
-		return MigrationReport{}, ErrMigrationAborted //nolint:exhaustruct
+		return MigrationReport{}, ErrMigrationAborted
 	}
 
 	return applyMigration(configPath, config, plan, preview, opts)
@@ -209,7 +209,7 @@ func applyMigration(
 			)
 		}
 
-		return MigrationReport{}, errorfamily.WrapCorruption(cause, "config.migrate", message) //nolint:exhaustruct
+		return MigrationReport{}, errorfamily.WrapCorruption(cause, "config.migrate", message)
 	}
 
 	if _, err := ApplyMigrations(config, plan); err != nil {
@@ -234,7 +234,7 @@ func applyMigration(
 		return restore(err, "failed to write migrated configuration; original configuration restored from backup")
 	}
 
-	report := MigrationReport{
+	report := MigrationReport{ //nolint:exhaustruct
 		Records:    preview.Records,
 		Diff:       preview.Diff,
 		BackupPath: backup.BackupPath(configPath),
@@ -273,7 +273,7 @@ func cloneConfig(config *types.Config) (*types.Config, error) {
 		)
 	}
 
-	clone := &types.Config{} //nolint:exhaustruct
+	clone := &types.Config{}                              //nolint:exhaustruct
 	if err := yamlv3.Unmarshal(data, clone); err != nil { //nolint:musttag // types.Config carries yaml tags
 		return nil, errorfamily.WrapCorruption(
 			err,

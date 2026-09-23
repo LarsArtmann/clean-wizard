@@ -132,12 +132,12 @@ func writeMigrationSarif(sarifOut string, report config.MigrationReport) error {
 	}
 
 	if sarifOut == "-" {
-		fmt.Println(string(data))
+		fmt.Println(string(data)) //nolint:forbidigo
 
 		return nil
 	}
 
-	if writeErr := os.WriteFile(sarifOut, data, 0o600); writeErr != nil {
+	if writeErr := os.WriteFile(sarifOut, data, 0o600); writeErr != nil { //nolint:mnd
 		return errorfamily.WrapRejection(writeErr, "config.sarif_output", "failed to write SARIF output: "+sarifOut)
 	}
 

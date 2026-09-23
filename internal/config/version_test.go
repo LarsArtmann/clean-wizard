@@ -20,7 +20,7 @@ func TestParseFormatVersion(t *testing.T) { //nolint:paralleltest
 		{name: "empty", raw: "", wantErr: true},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := ParseFormatVersion(tt.raw)
 			if (err != nil) != tt.wantErr {
@@ -83,7 +83,7 @@ func TestFormatVersionCompare(t *testing.T) { //nolint:paralleltest
 		{name: "patch greater", a: FormatVersion{1, 2, 1}, b: FormatVersion{1, 2, 0}, want: 1},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.a.Compare(tt.b); got != tt.want {
 				t.Errorf("Compare = %d, want %d", got, tt.want)

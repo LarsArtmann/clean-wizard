@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -60,7 +59,7 @@ func migrationTestConfig(version string) *types.Config {
 }
 
 func TestPlanMigration(t *testing.T) { //nolint:paralleltest
-	t.Run("current version needs no plan", func(t *testing.T) {
+	t.Run("current version needs no plan", func(t *testing.T) { //nolint:paralleltest
 		plan, err := PlanMigration(CurrentFormatVersion)
 		if err != nil {
 			t.Fatalf("PlanMigration error = %v", err)
@@ -71,7 +70,7 @@ func TestPlanMigration(t *testing.T) { //nolint:paralleltest
 		}
 	})
 
-	t.Run("chains multiple steps in order", func(t *testing.T) {
+	t.Run("chains multiple steps in order", func(t *testing.T) { //nolint:paralleltest
 		withMigrationChain(t,
 			Migration{From: FormatVersion{1, 0, 0}, To: FormatVersion{1, 1, 0}, Description: "step one"},
 			Migration{From: FormatVersion{1, 1, 0}, To: FormatVersion{1, 2, 0}, Description: "step two"},
@@ -92,7 +91,7 @@ func TestPlanMigration(t *testing.T) { //nolint:paralleltest
 		}
 	})
 
-	t.Run("missing link rejected", func(t *testing.T) {
+	t.Run("missing link rejected", func(t *testing.T) { //nolint:paralleltest
 		withMigrationChain(t) // no migrations registered
 
 		_, err := PlanMigration(FormatVersion{1, 0, 0})
@@ -105,7 +104,7 @@ func TestPlanMigration(t *testing.T) { //nolint:paralleltest
 		}
 	})
 
-	t.Run("non progressive step is skipped", func(t *testing.T) {
+	t.Run("non progressive step is skipped", func(t *testing.T) { //nolint:paralleltest
 		withMigrationChain(t,
 			Migration{From: FormatVersion{1, 0, 0}, To: FormatVersion{1, 0, 0}, Description: "self loop"},
 			Migration{From: FormatVersion{1, 1, 0}, To: FormatVersion{1, 1, 1}, Description: "unrelated"},
@@ -127,7 +126,7 @@ func TestApplyMigrations(t *testing.T) { //nolint:paralleltest
 		}
 	}
 
-	t.Run("applies steps in order and stamps version", func(t *testing.T) {
+	t.Run("applies steps in order and stamps version", func(t *testing.T) { //nolint:paralleltest
 		withMigrationChain(t,
 			Migration{
 				From: FormatVersion{1, 0, 0}, To: FormatVersion{1, 1, 0},
@@ -168,7 +167,7 @@ func TestApplyMigrations(t *testing.T) { //nolint:paralleltest
 		}
 	})
 
-	t.Run("apply failure aborts with corruption classification", func(t *testing.T) {
+	t.Run("apply failure aborts with corruption classification", func(t *testing.T) { //nolint:paralleltest
 		withMigrationChain(t,
 			Migration{
 				From: FormatVersion{1, 0, 0}, To: FormatVersion{1, 1, 0},
