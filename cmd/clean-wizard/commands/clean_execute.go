@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 )
@@ -114,7 +114,7 @@ func displayWarnings(wr *execution.WorkflowResult) {
 
 // printCleanResultsTable prints clean results as a formatted table.
 func printCleanResultsTable(
-	results map[string]domain.CleanResult,
+	results map[string]types.CleanResult,
 	totalBytes uint64,
 	totalItems uint,
 	duration time.Duration,

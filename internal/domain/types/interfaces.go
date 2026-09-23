@@ -1,13 +1,17 @@
 package types
 
-import "context"
+import (
+	"context"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+)
 
 // OperationHandler interface for all cleaning operations with type-safe settings.
 type OperationHandler interface {
-	Type() OperationType
+	Type() operations.OperationType
 	IsAvailable(ctx context.Context) bool
 	GetStoreSize(ctx context.Context) int64
-	ValidateSettings(settings *OperationSettings) error
+	ValidateSettings(settings *operations.OperationSettings) error
 }
 
 // GenerationCleaner is an OperationHandler interface for generation-based cleaners (Nix).
@@ -21,7 +25,7 @@ type GenerationCleaner interface {
 type PackageCleaner interface {
 	OperationHandler
 	ListPackages(ctx context.Context) []string
-	CleanOldPackages(ctx context.Context, settings *OperationSettings) CleanResult
+	CleanOldPackages(ctx context.Context, settings *operations.OperationSettings) CleanResult
 }
 
 // Scanner interface for all scanning operations.

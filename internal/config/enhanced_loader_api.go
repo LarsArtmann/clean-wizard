@@ -3,9 +3,10 @@ package config
 import (
 	"context"
 	"fmt"
+	"go/types"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
@@ -13,7 +14,7 @@ import (
 func (ecl *EnhancedConfigLoader) LoadConfig(
 	ctx context.Context,
 	options *ConfigLoadOptions,
-) (*domain.Config, error) {
+) (*types.Config, error) {
 	if options == nil {
 		options = getDefaultLoadOptions()
 	}
@@ -65,9 +66,9 @@ func (ecl *EnhancedConfigLoader) LoadConfig(
 // SaveConfig saves configuration with validation and cache update.
 func (ecl *EnhancedConfigLoader) SaveConfig(
 	ctx context.Context,
-	config *domain.Config,
+	config *types.Config,
 	options *ConfigSaveOptions,
-) (*domain.Config, error) {
+) (*types.Config, error) {
 	if options == nil {
 		options = getDefaultSaveOptions()
 	}
@@ -95,7 +96,7 @@ func (ecl *EnhancedConfigLoader) SaveConfig(
 // handleBackup creates a backup if requested.
 func (ecl *EnhancedConfigLoader) handleBackup(
 	ctx context.Context,
-	config *domain.Config,
+	config *types.Config,
 	options *ConfigSaveOptions,
 ) {
 	if options.CreateBackup != BackupOptionEnabled && options.BackupEnabled != BackupOptionEnabled {
@@ -117,7 +118,7 @@ func (ecl *EnhancedConfigLoader) handleBackup(
 // validateAndSanitize validates and optionally sanitizes the config.
 func (ecl *EnhancedConfigLoader) validateAndSanitize(
 	ctx context.Context,
-	config *domain.Config,
+	config *types.Config,
 	options *ConfigSaveOptions,
 ) *ValidationResult {
 	validationResult := ecl.applyValidation(ctx, config, options.ValidationLevel)
@@ -171,7 +172,7 @@ func (ecl *EnhancedConfigLoader) logSaveResult(
 
 // ValidateConfig validates configuration at specified level.
 func (ecl *EnhancedConfigLoader) ValidateConfig(
-	ctx context.Context, config *domain.Config, level domain.ValidationLevelType,
+	ctx context.Context, config *types.Config, level enums.ValidationLevelType,
 ) *ValidationResult {
 	return ecl.applyValidation(ctx, config, level)
 }

@@ -5,7 +5,9 @@ import (
 	"os"
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
@@ -187,24 +189,24 @@ func runProfileCreateCommand(_ *cobra.Command, _ []string, name, description str
 	}
 
 	// Create new profile with default operations
-	cfg.Profiles[name] = &domain.Profile{
+	cfg.Profiles[name] = &types.Profile{
 		Name:        name,
 		Description: description,
-		Enabled:     domain.ProfileStatusEnabled,
-		Operations: []domain.CleanupOperation{
+		Enabled:     enums.ProfileStatusEnabled,
+		Operations: []types.CleanupOperation{
 			{
 				Name:        "nix-generations",
 				Description: "Clean old Nix generations",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+				RiskLevel:   enums.RiskLevelLowType,
+				Enabled:     enums.ProfileStatusEnabled,
+				Settings:    operations.DefaultSettings(operations.OperationTypeNixGenerations),
 			},
 			{
 				Name:        "temp-files",
 				Description: "Clean temporary files",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
+				RiskLevel:   enums.RiskLevelLowType,
+				Enabled:     enums.ProfileStatusEnabled,
+				Settings:    operations.DefaultSettings(operations.OperationTypeTempFiles),
 			},
 		},
 	}
@@ -295,11 +297,11 @@ func runProfileDeleteCommand(_ *cobra.Command, args []string, force bool) error 
 }
 
 // formatProfileStatus formats profile status for display.
-func formatProfileStatus(status domain.ProfileStatus) string {
+func formatProfileStatus(status enums.ProfileStatus) string {
 	switch status {
-	case domain.ProfileStatusEnabled:
+	case enums.ProfileStatusEnabled:
 		return "✅ Enabled"
-	case domain.ProfileStatusDisabled:
+	case enums.ProfileStatusDisabled:
 		return "⚪ Disabled"
 	default:
 		return "Unknown"

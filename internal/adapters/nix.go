@@ -10,7 +10,8 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -33,12 +34,12 @@ const (
 )
 
 // boolToGenerationStatus converts boolean to GenerationStatus enum.
-func boolToGenerationStatus(b bool) domain.GenerationStatus {
+func boolToGenerationStatus(b bool) enums.GenerationStatus {
 	if b {
-		return domain.GenerationStatusCurrent
+		return enums.GenerationStatusCurrent
 	}
 
-	return domain.GenerationStatusHistorical
+	return enums.GenerationStatusHistorical
 }
 
 // NixAdapter wraps Nix package manager operations.
@@ -63,9 +64,9 @@ func (n *NixAdapter) SetDryRun(dryRun bool) {
 
 // ListGenerations lists Nix generations.
 // In dry-run mode, still lists real generations but won't actually delete them.
-func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
+func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]types.NixGeneration] {
 	if !n.IsAvailable(ctx) {
-		return result.Err[[]domain.NixGeneration](errors.New("nix not available"))
+		return result.Err[[]types.NixGeneration](errors.New("nix not available"))
 	}
 
 	// Use nix-env without --profile to let it use the default user profile
@@ -73,10 +74,10 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 
 	output, err := cmd.Output()
 	if err != nil {
-		return result.Err[[]domain.NixGeneration](fmt.Errorf("failed to list generations: %w", err))
+		return result.Err[[]types.NixGeneration](fmt.Errorf("failed to list generations: %w", err))
 	}
 
-	var generations []domain.NixGeneration
+	var generations []types.NixGeneration
 
 	lines := strings.SplitSeq(string(output), "\n")
 
@@ -88,7 +89,7 @@ func (n *NixAdapter) ListGenerations(ctx context.Context) result.Result[[]domain
 
 		gen, err := n.ParseGeneration(line)
 		if err != nil {
-			return result.Err[[]domain.NixGeneration](
+			return result.Err[[]types.NixGeneration](
 				fmt.Errorf("failed to parse generation: %w", err),
 			)
 		}
@@ -130,11 +131,11 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 // CollectGarbage runs garbage collection on the Nix store.
 // Uses the modern "nix store gc" command (Nix 2.4+).
 // In dry-run mode, returns a success result without actually running garbage collection.
-func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.CleanResult] {
+func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[types.CleanResult] {
 	if n.dryRun {
 		estimatedFreed := int64(NixDryRunGCSizeMB * bytesPerMB)
 		cleanResult := conversions.NewCleanResultWithTiming(
-			domain.StrategyAggressiveType,
+			enums.StrategyAggressiveType,
 			1,
 			estimatedFreed,
 			0,
@@ -171,7 +172,7 @@ func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[domain.Cl
 	bytesFreed := max(beforeSize-afterSize, 0)
 
 	cleanResult := conversions.NewCleanResultWithTiming(
-		domain.StrategyAggressiveType,
+		enums.StrategyAggressiveType,
 		1,
 		bytesFreed,
 		time.Since(startTime),
@@ -206,14 +207,14 @@ func (n *NixAdapter) getActualStoreSize(ctx context.Context) (int64, error) {
 // In dry-run mode, returns a success result without actually deleting.
 func (n *NixAdapter) RemoveGeneration(
 	ctx context.Context,
-	genID domain.NixGenerationID,
-) result.Result[domain.CleanResult] {
+	genID types.NixGenerationID,
+) result.Result[types.CleanResult] {
 	// In dry-run mode, return success without actually removing
 	if n.dryRun {
 		// Return a success result with estimated bytes freed
 		estimatedFreed := int64(NixDryRunGenerationSizeMB * bytesPerMB)
 		cleanResult := conversions.NewCleanResultWithTiming(
-			domain.StrategyConservativeType,
+			enums.StrategyConservativeType,
 			1,
 			estimatedFreed,
 			0,
@@ -256,7 +257,7 @@ func (n *NixAdapter) RemoveGeneration(
 
 	// Use centralized conversion with proper timing
 	cleanResult := conversions.NewCleanResultWithTiming(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1,
 		bytesFreed,
 		time.Since(startTime),
@@ -270,16 +271,16 @@ func (n *NixAdapter) RemoveGeneration(
 //
 //	"32   2026-01-12 08:03:14"
 //	"33   2026-01-15 21:14:05   (current)"
-func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) {
+func (n *NixAdapter) ParseGeneration(line string) (types.NixGeneration, error) {
 	fields := strings.Fields(line)
 	if len(fields) < NixGenerationMinFields {
-		return domain.NixGeneration{}, fmt.Errorf("invalid generation line: %s", line)
+		return types.NixGeneration{}, fmt.Errorf("invalid generation line: %s", line)
 	}
 
 	// Parse generation ID from first field
 	id, err := strconv.Atoi(fields[0])
 	if err != nil {
-		return domain.NixGeneration{}, fmt.Errorf("invalid generation ID: %s", fields[0])
+		return types.NixGeneration{}, fmt.Errorf("invalid generation ID: %s", fields[0])
 	}
 
 	// Parse date and time from second and third fields
@@ -287,7 +288,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 
 	date, err := time.Parse("2006-01-02 15:04:05", dateTimeStr)
 	if err != nil {
-		return domain.NixGeneration{}, fmt.Errorf("invalid date/time: %s %s", fields[1], fields[2])
+		return types.NixGeneration{}, fmt.Errorf("invalid date/time: %s %s", fields[1], fields[2])
 	}
 
 	// Build the profile path using the standard Nix profile directory
@@ -296,7 +297,7 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 	// or ~/.nix-profile/ (Linux fallback)
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return domain.NixGeneration{}, fmt.Errorf("failed to get home directory: %w", err)
+		return types.NixGeneration{}, fmt.Errorf("failed to get home directory: %w", err)
 	}
 
 	path := fmt.Sprintf("%s/.local/state/nix/profiles/profile-%d-link", homeDir, id)
@@ -304,8 +305,8 @@ func (n *NixAdapter) ParseGeneration(line string) (domain.NixGeneration, error) 
 	// Check if this is the current generation
 	isCurrent := strings.Contains(line, "current")
 
-	return domain.NixGeneration{
-		ID:      domain.NixGenerationID(id),
+	return types.NixGeneration{
+		ID:      types.NixGenerationID(id),
 		Path:    path,
 		Date:    date,
 		Current: boolToGenerationStatus(isCurrent),

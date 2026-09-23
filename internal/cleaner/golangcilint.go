@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/dustin/go-humanize"
 )
@@ -33,8 +35,8 @@ func NewGolangciLintCacheCleaner(verbose, dryRun bool) *GolangciLintCacheCleaner
 }
 
 // Type returns operation type.
-func (glcc *GolangciLintCacheCleaner) Type() domain.OperationType {
-	return domain.OperationTypeGolangciLintCache
+func (glcc *GolangciLintCacheCleaner) Type() operations.OperationType {
+	return operations.OperationTypeGolangciLintCache
 }
 
 // Name returns the cleaner name for result tracking.
@@ -51,7 +53,7 @@ func (glcc *GolangciLintCacheCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates settings.
 // golangci-lint has no configurable settings, so this is always a no-op.
-func (glcc *GolangciLintCacheCleaner) ValidateSettings(_ *domain.OperationSettings) error {
+func (glcc *GolangciLintCacheCleaner) ValidateSettings(_ *operations.OperationSettings) error {
 	return nil
 }
 
@@ -133,8 +135,8 @@ func (glcc *GolangciLintCacheCleaner) getCacheStatus(ctx context.Context) (*cach
 }
 
 // Scan scans for golangci-lint cache.
-func (glcc *GolangciLintCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0, 1)
+func (glcc *GolangciLintCacheCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0, 1)
 
 	if !glcc.IsAvailable(ctx) {
 		return result.Ok(items)
@@ -149,11 +151,11 @@ func (glcc *GolangciLintCacheCleaner) Scan(ctx context.Context) result.Result[[]
 		return result.Ok(items)
 	}
 
-	items = append(items, domain.ScanItem{
+	items = append(items, types.ScanItem{
 		Path:     status.Dir,
 		Size:     status.Size,
 		Created:  GetDirModTime(status.Dir),
-		ScanType: domain.ScanTypeCache,
+		ScanType: types.ScanTypeCache,
 	})
 
 	if glcc.verbose {
@@ -164,7 +166,7 @@ func (glcc *GolangciLintCacheCleaner) Scan(ctx context.Context) result.Result[[]
 }
 
 // Clean removes golangci-lint cache.
-func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	if !glcc.IsAvailable(ctx) {
 		if glcc.verbose {
 			fmt.Println("  ⚠️  golangci-lint not found, skipping cache cleanup")
@@ -175,16 +177,16 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 		}
 
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.StrategyConservativeType,
+			enums.StrategyConservativeType,
 			0, int64(0),
-			domain.SizeEstimate{Status: domain.SizeEstimateStatusUnknown}, //nolint:exhaustruct
+			types.SizeEstimate{Status: enums.SizeEstimateStatusUnknown}, //nolint:exhaustruct
 		))
 	}
 
 	if glcc.dryRun {
 		itemsResult := glcc.Scan(ctx)
 		if itemsResult.IsErr() {
-			return result.Err[domain.CleanResult](itemsResult.Error())
+			return result.Err[types.CleanResult](itemsResult.Error())
 		}
 
 		items := itemsResult.Value()
@@ -195,9 +197,9 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 		}
 
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 			len(items), totalSize,
-			domain.SizeEstimate{Known: uint64(totalSize)}, //nolint:exhaustruct
+			types.SizeEstimate{Known: uint64(totalSize)}, //nolint:exhaustruct
 		))
 	}
 
@@ -220,7 +222,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
-			return result.Err[domain.CleanResult](
+			return result.Err[types.CleanResult](
 				fmt.Errorf(
 					"golangci-lint cache clean timed out after %v for bytesFreed=%v",
 					golangciLintCommandTimeout,
@@ -229,7 +231,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 			)
 		}
 
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf(
 				"golangci-lint cache clean failed: %w (output: %s)",
 				err, string(output),
@@ -242,9 +244,9 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[d
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1, bytesFreed,
-		domain.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
+		types.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
 	))
 }
 

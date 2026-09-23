@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
@@ -55,7 +55,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 			ginkgo.It("should return error", func() {
 				_, err := executor.Execute(
 					ctx,
-					ExecuteOptions{FilesToRemove: []domain.GitHistoryFile{}},
+					ExecuteOptions{FilesToRemove: []types.GitHistoryFile{}},
 				)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 				gomega.Expect(err.Error()).To(gomega.ContainSubstring("no files to remove"))
@@ -64,7 +64,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 
 		ginkgo.Context("in dry run mode", func() {
 			ginkgo.It("should return result without executing", func() {
-				files := []domain.GitHistoryFile{
+				files := []types.GitHistoryFile{
 					{Path: "binary.exe", SizeBytes: 5 * 1024 * 1024},
 				}
 				result, err := executor.Execute(ctx, ExecuteOptions{
@@ -78,7 +78,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 			})
 
 			ginkgo.It("should calculate bytes removed correctly", func() {
-				files := []domain.GitHistoryFile{
+				files := []types.GitHistoryFile{
 					{Path: "binary1.exe", SizeBytes: 5 * 1024 * 1024},
 					{Path: "binary2.dll", SizeBytes: 3 * 1024 * 1024},
 				}
@@ -98,7 +98,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 		})
 
 		ginkgo.It("should sum file sizes correctly", func() {
-			files := []domain.GitHistoryFile{
+			files := []types.GitHistoryFile{
 				{Path: "a.exe", SizeBytes: 1000},
 				{Path: "b.dll", SizeBytes: 2000},
 				{Path: "c.so", SizeBytes: 3000},
@@ -108,7 +108,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 		})
 
 		ginkgo.It("should return 0 for empty slice", func() {
-			files := []domain.GitHistoryFile{}
+			files := []types.GitHistoryFile{}
 			total := executor.calculateTotalSize(files)
 			gomega.Expect(total).To(gomega.Equal(int64(0)))
 		})
@@ -191,7 +191,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 		})
 
 		ginkgo.It("should work with empty .git directory", func() {
-			files := []domain.GitHistoryFile{
+			files := []types.GitHistoryFile{
 				{Path: "binary.exe", SizeBytes: 5 * 1024 * 1024},
 			}
 			// getRepoSize returns 0, nil for non-existent .git directory
@@ -204,7 +204,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 
 	ginkgo.Describe("GetFilesToRemoveFromSelection", func() {
 		ginkgo.It("should return selected files", func() {
-			allFiles := []domain.GitHistoryFile{
+			allFiles := []types.GitHistoryFile{
 				{Path: "a.exe"},
 				{Path: "b.dll"},
 				{Path: "c.so"},
@@ -216,7 +216,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 		})
 
 		ginkgo.It("should handle empty selection", func() {
-			allFiles := []domain.GitHistoryFile{
+			allFiles := []types.GitHistoryFile{
 				{Path: "a.exe"},
 			}
 			selected := GetFilesToRemoveFromSelection(allFiles, []int{})
@@ -224,7 +224,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 		})
 
 		ginkgo.It("should handle invalid indices", func() {
-			allFiles := []domain.GitHistoryFile{
+			allFiles := []types.GitHistoryFile{
 				{Path: "a.exe"},
 			}
 			selected := GetFilesToRemoveFromSelection(allFiles, []int{-1, 5, 100})
@@ -234,7 +234,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 
 	ginkgo.Describe("GetUniquePaths", func() {
 		ginkgo.It("should return unique paths sorted", func() {
-			files := []domain.GitHistoryFile{
+			files := []types.GitHistoryFile{
 				{Path: "b.exe"},
 				{Path: "a.dll"},
 				{Path: "b.exe"}, // duplicate
@@ -245,7 +245,7 @@ var _ = ginkgo.Describe("GitHistoryExecutor", func() {
 		})
 
 		ginkgo.It("should handle empty slice", func() {
-			paths := GetUniquePaths([]domain.GitHistoryFile{})
+			paths := GetUniquePaths([]types.GitHistoryFile{})
 			gomega.Expect(paths).To(gomega.BeEmpty())
 		})
 	})

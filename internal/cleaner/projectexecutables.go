@@ -10,7 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	fileutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/fileutil"
 )
@@ -106,8 +107,8 @@ func NewProjectExecutablesCleaner(
 }
 
 // Type returns operation type for Project Executables cleaner.
-func (p *ProjectExecutablesCleaner) Type() domain.OperationType {
-	return domain.OperationTypeProjectExecutables
+func (p *ProjectExecutablesCleaner) Type() operations.OperationType {
+	return operations.OperationTypeProjectExecutables
 }
 
 // Name returns the cleaner name for result tracking.
@@ -124,11 +125,13 @@ func (p *ProjectExecutablesCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // ValidateSettings validates Project Executables cleaner settings.
-func (p *ProjectExecutablesCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (p *ProjectExecutablesCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.ProjectExecutablesSettings { return s.ProjectExecutables },
-		func(pe *domain.ProjectExecutablesSettings) error {
+		func(s *operations.OperationSettings) *operations.ProjectExecutablesSettings {
+			return s.ProjectExecutables
+		},
+		func(pe *operations.ProjectExecutablesSettings) error {
 			// Validate exclude patterns are valid globs
 			for _, pattern := range pe.ExcludePatterns {
 				if _, err := filepath.Match(pattern, "test"); err != nil {
@@ -142,13 +145,13 @@ func (p *ProjectExecutablesCleaner) ValidateSettings(settings *domain.OperationS
 }
 
 // Scan scans for executable files in project directories.
-func (p *ProjectExecutablesCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (p *ProjectExecutablesCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
 	projects, err := p.projectLister.ListProjects(ctx)
 	if err != nil {
-		return result.Err[[]domain.ScanItem](err)
+		return result.Err[[]types.ScanItem](err)
 	}
 
-	items := make([]domain.ScanItem, 0)
+	items := make([]types.ScanItem, 0)
 
 	for _, project := range projects {
 		executables, err := p.fileOperator.FindExecutableFiles(project.Path)
@@ -161,11 +164,11 @@ func (p *ProjectExecutablesCleaner) Scan(ctx context.Context) result.Result[[]do
 		}
 
 		for _, execPath := range executables {
-			items = append(items, domain.ScanItem{
+			items = append(items, types.ScanItem{
 				Path:     execPath,
 				Size:     p.fileOperator.GetFileSize(execPath),
 				Created:  time.Now(),
-				ScanType: domain.ScanTypeSystem,
+				ScanType: types.ScanTypeSystem,
 			})
 		}
 
@@ -178,17 +181,17 @@ func (p *ProjectExecutablesCleaner) Scan(ctx context.Context) result.Result[[]do
 }
 
 // Clean removes executable files from project directories using trash.
-func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (p *ProjectExecutablesCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	return ExecuteTrashPipeline(
 		ctx,
 		p.Scan(ctx),
 		p.dryRun,
 		p.verbose,
 		"executable file(s)",
-		func(cleanCtx context.Context, item domain.ScanItem) error {
+		func(cleanCtx context.Context, item types.ScanItem) error {
 			return p.fileOperator.TrashFile(cleanCtx, item.Path)
 		},
-		func(item domain.ScanItem) {
+		func(item types.ScanItem) {
 			fmt.Printf("  ✓ Trashed: %s\n", item.Path)
 		},
 	)

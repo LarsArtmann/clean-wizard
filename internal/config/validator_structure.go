@@ -3,11 +3,11 @@ package config
 import (
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // validateBasicStructure validates basic configuration structure.
-func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *ValidationResult) {
+func (cv *ConfigValidator) validateBasicStructure(cfg *types.Config, result *ValidationResult) {
 	// Version validation
 	if cfg.Version == "" {
 		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
@@ -40,7 +40,7 @@ func (cv *ConfigValidator) validateBasicStructure(cfg *domain.Config, result *Va
 			Value:      cfg.Protected,
 			Message:    "Protected paths cannot be empty",
 			Severity:   SeverityError,
-			Suggestion: "Add system paths like " + strings.Join(domain.DefaultProtectedPaths(), ", "),
+			Suggestion: "Add system paths like " + strings.Join(types.DefaultProtectedPaths(), ", "),
 		})
 	}
 }

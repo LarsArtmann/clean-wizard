@@ -1,9 +1,10 @@
 package config
 
 import (
+	"go/types"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )
 
 func TestConfigValidator_ValidateConfig(t *testing.T) {
@@ -13,7 +14,7 @@ func TestConfigValidator_ValidateConfig(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		config      *domain.Config
+		config      *types.Config
 		expectValid bool
 		expectError string
 	}{
@@ -92,8 +93,8 @@ func newTestValidator() *ConfigValidator {
 			"/Library",
 		},
 		RequireSafeMode: true,
-		MaxRiskLevel:    domain.RiskLevelHighType,
-		BackupRequired:  domain.RiskLevelMediumType,
+		MaxRiskLevel:    enums.RiskLevelHighType,
+		BackupRequired:  enums.RiskLevelMediumType,
 	}
 
 	return NewConfigValidatorWithRules(testRules)

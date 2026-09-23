@@ -11,7 +11,9 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -19,12 +21,12 @@ import (
 const DefaultNodePackageManagerTimeout = 2 * time.Minute
 
 // AvailableNodePackageManagers returns all available Node.js package managers.
-func AvailableNodePackageManagers() []domain.PackageManagerType {
-	return []domain.PackageManagerType{
-		domain.PackageManagerNpm,
-		domain.PackageManagerPnpm,
-		domain.PackageManagerYarn,
-		domain.PackageManagerBun,
+func AvailableNodePackageManagers() []enums.PackageManagerType {
+	return []enums.PackageManagerType{
+		enums.PackageManagerNpm,
+		enums.PackageManagerPnpm,
+		enums.PackageManagerYarn,
+		enums.PackageManagerBun,
 	}
 }
 
@@ -32,12 +34,12 @@ func AvailableNodePackageManagers() []domain.PackageManagerType {
 type NodePackageManagerCleaner struct {
 	CleanerBase
 
-	packageManagers []domain.PackageManagerType
+	packageManagers []enums.PackageManagerType
 }
 
 // NewNodePackageManagerCleaner creates Node.js package manager cleaner.
 func NewNodePackageManagerCleaner(
-	verbose, dryRun bool, packageManagers []domain.PackageManagerType,
+	verbose, dryRun bool, packageManagers []enums.PackageManagerType,
 ) *NodePackageManagerCleaner {
 	return &NodePackageManagerCleaner{
 		CleanerBase:     NewCleanerBase(verbose, dryRun),
@@ -46,8 +48,8 @@ func NewNodePackageManagerCleaner(
 }
 
 // Type returns operation type for Node package manager cleaner.
-func (npmc *NodePackageManagerCleaner) Type() domain.OperationType {
-	return domain.OperationTypeNodePackages
+func (npmc *NodePackageManagerCleaner) Type() operations.OperationType {
+	return operations.OperationTypeNodePackages
 }
 
 // Name returns the cleaner name for result tracking.
@@ -62,22 +64,22 @@ func (npmc *NodePackageManagerCleaner) IsAvailable(ctx context.Context) bool {
 
 // isPackageManagerAvailable checks if a specific package manager is available.
 func (npmc *NodePackageManagerCleaner) isPackageManagerAvailable(
-	pm domain.PackageManagerType,
+	pm enums.PackageManagerType,
 ) bool {
 	switch pm {
-	case domain.PackageManagerNpm:
+	case enums.PackageManagerNpm:
 		_, err := exec.LookPath("npm")
 
 		return err == nil
-	case domain.PackageManagerPnpm:
+	case enums.PackageManagerPnpm:
 		_, err := exec.LookPath("pnpm")
 
 		return err == nil
-	case domain.PackageManagerYarn:
+	case enums.PackageManagerYarn:
 		_, err := exec.LookPath("yarn")
 
 		return err == nil
-	case domain.PackageManagerBun:
+	case enums.PackageManagerBun:
 		_, err := exec.LookPath("bun")
 
 		return err == nil
@@ -87,11 +89,11 @@ func (npmc *NodePackageManagerCleaner) isPackageManagerAvailable(
 }
 
 // ValidateSettings validates Node package manager cleaner settings.
-func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.NodePackagesSettings { return s.NodePackages },
-		func(np *domain.NodePackagesSettings) error {
+		func(s *operations.OperationSettings) *operations.NodePackagesSettings { return s.NodePackages },
+		func(np *operations.NodePackagesSettings) error {
 			packageManagerStrings := PackageManagerTypeToLowerSlice(np.PackageManagers)
 			validPackageManagersMap := map[string]bool{
 				"npm":  true,
@@ -111,8 +113,8 @@ func (npmc *NodePackageManagerCleaner) ValidateSettings(settings *domain.Operati
 }
 
 // Scan scans for Node.js package manager caches.
-func (npmc *NodePackageManagerCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+func (npmc *NodePackageManagerCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	for _, pm := range npmc.packageManagers {
 		if !npmc.isPackageManagerAvailable(pm) {
@@ -137,12 +139,12 @@ func (npmc *NodePackageManagerCleaner) Scan(ctx context.Context) result.Result[[
 // scanPackageManager scans cache for a specific package manager.
 func (npmc *NodePackageManagerCleaner) scanPackageManager(
 	ctx context.Context,
-	pm domain.PackageManagerType,
-) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+	pm enums.PackageManagerType,
+) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	switch pm {
-	case domain.PackageManagerNpm:
+	case enums.PackageManagerNpm:
 		// Get npm cache location
 		cmd := adapters.ExecWithTimeout(
 			ctx,
@@ -155,18 +157,18 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			return result.Err[[]domain.ScanItem](
+			return result.Err[[]types.ScanItem](
 				fmt.Errorf("failed to get npm cache location for pm=%v: %w", pm, err),
 			)
 		}
 
 		cachePath := strings.TrimSpace(string(output))
 		if cachePath != "" {
-			items = append(items, domain.ScanItem{
+			items = append(items, types.ScanItem{
 				Path:     cachePath,
 				Size:     0, // Size unknown without checking
 				Created:  time.Time{},
-				ScanType: domain.ScanTypeTemp,
+				ScanType: types.ScanTypeTemp,
 			})
 
 			if npmc.verbose {
@@ -174,7 +176,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 			}
 		}
 
-	case domain.PackageManagerPnpm:
+	case enums.PackageManagerPnpm:
 		// Get pnpm store location
 		cmd := adapters.ExecWithTimeout(
 			ctx,
@@ -186,18 +188,18 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			return result.Err[[]domain.ScanItem](
+			return result.Err[[]types.ScanItem](
 				fmt.Errorf("failed to get pnpm store location for pm=%v: %w", pm, err),
 			)
 		}
 
 		storePath := strings.TrimSpace(string(output))
 		if storePath != "" {
-			items = append(items, domain.ScanItem{
+			items = append(items, types.ScanItem{
 				Path:     storePath,
 				Size:     0, // Size unknown without checking
 				Created:  time.Time{},
-				ScanType: domain.ScanTypeTemp,
+				ScanType: types.ScanTypeTemp,
 			})
 
 			if npmc.verbose {
@@ -205,7 +207,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 			}
 		}
 
-	case domain.PackageManagerYarn:
+	case enums.PackageManagerYarn:
 		cacheResult := npmc.scanHomeDirCache(ctx, ".yarn/cache", "yarn")
 		if cacheResult.IsOk() {
 			items = append(items, cacheResult.Value()...)
@@ -213,7 +215,7 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 			return cacheResult
 		}
 
-	case domain.PackageManagerBun:
+	case enums.PackageManagerBun:
 		cacheResult := npmc.scanHomeDirCache(ctx, ".bun/install/cache", "bun")
 		if cacheResult.IsOk() {
 			items = append(items, cacheResult.Value()...)
@@ -229,10 +231,10 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 func (npmc *NodePackageManagerCleaner) scanHomeDirCache(
 	_ context.Context,
 	cacheSuffix, pmName string,
-) result.Result[[]domain.ScanItem] {
+) result.Result[[]types.ScanItem] {
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](
+		return result.Err[[]types.ScanItem](
 			fmt.Errorf(
 				"failed to get home directory for cacheSuffix=%v, pmName=%v: %w",
 				cacheSuffix,
@@ -243,12 +245,12 @@ func (npmc *NodePackageManagerCleaner) scanHomeDirCache(
 	}
 
 	cachePath := fmt.Sprintf("%s/%s", homeDir, cacheSuffix)
-	items := []domain.ScanItem{
+	items := []types.ScanItem{
 		{
 			Path:     cachePath,
 			Size:     0, // Size unknown without checking
 			Created:  time.Time{},
-			ScanType: domain.ScanTypeTemp,
+			ScanType: types.ScanTypeTemp,
 		},
 	}
 
@@ -323,9 +325,9 @@ func (npmc *NodePackageManagerCleaner) getBunCacheDir() (string, error) {
 // Clean removes Node.js package manager caches.
 func (npmc *NodePackageManagerCleaner) Clean(
 	ctx context.Context,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	if !npmc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](errors.New("no Node.js package managers available"))
+		return result.Err[types.CleanResult](errors.New("no Node.js package managers available"))
 	}
 
 	if npmc.dryRun {
@@ -351,11 +353,11 @@ func (npmc *NodePackageManagerCleaner) Clean(
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
+		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
 
 		return result.Ok(cleanResult)
 	}
@@ -380,15 +382,15 @@ func (npmc *NodePackageManagerCleaner) Clean(
 	}
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		counters.ItemsRemoved, counters.ItemsFailed, counters.BytesFreed, counters.Duration(),
 	))
 }
 
 // createDefaultCleanResult returns a default CleanResult for package manager operations.
-func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() domain.CleanResult {
+func (npmc *NodePackageManagerCleaner) createDefaultCleanResult() types.CleanResult {
 	return conversions.NewCleanResult(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1, 0,
 	)
 }
@@ -424,12 +426,12 @@ func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
 	commandArgs []string,
 	commandName string,
 	cacheLabel string,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	if cacheDirErr != nil {
 		// Cache directory not found, execute command anyway
 		err := npmc.execPackageManagerCommand(ctx, commandArgs, commandName)
 		if err != nil {
-			return result.Err[domain.CleanResult](
+			return result.Err[types.CleanResult](
 				fmt.Errorf(
 					"cacheDirErr=%w, cacheDir=%v, commandName=%v, cacheLabel=%v: %w",
 					cacheDirErr,
@@ -457,26 +459,26 @@ func (npmc *NodePackageManagerCleaner) cleanCacheWithFallback(
 	}
 
 	return result.Ok(conversions.NewCleanResult(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1, bytesFreed,
 	))
 }
 
 // cleanPackageManager cleans cache for a specific package manager.
 func (npmc *NodePackageManagerCleaner) cleanPackageManager(
-	ctx context.Context, pm domain.PackageManagerType,
-) result.Result[domain.CleanResult] {
+	ctx context.Context, pm enums.PackageManagerType,
+) result.Result[types.CleanResult] {
 	switch pm {
-	case domain.PackageManagerNpm:
+	case enums.PackageManagerNpm:
 		return npmc.cleanNpmCache(ctx)
 
-	case domain.PackageManagerPnpm:
+	case enums.PackageManagerPnpm:
 		return npmc.cleanPnpmStore(ctx)
 
-	case domain.PackageManagerYarn:
+	case enums.PackageManagerYarn:
 		return npmc.cleanYarnCache(ctx)
 
-	case domain.PackageManagerBun:
+	case enums.PackageManagerBun:
 		return npmc.cleanBunCache(ctx)
 	}
 
@@ -486,7 +488,7 @@ func (npmc *NodePackageManagerCleaner) cleanPackageManager(
 // cleanNpmCache cleans the npm cache and returns bytes freed.
 func (npmc *NodePackageManagerCleaner) cleanNpmCache(
 	ctx context.Context,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	cacheDir, err := npmc.getNpmCacheDir(ctx)
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,
@@ -498,7 +500,7 @@ func (npmc *NodePackageManagerCleaner) cleanNpmCache(
 // cleanPnpmStore cleans the pnpm store and returns bytes freed.
 func (npmc *NodePackageManagerCleaner) cleanPnpmStore(
 	ctx context.Context,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	cacheDir, err := npmc.getPnpmStoreDir(ctx)
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,
@@ -510,7 +512,7 @@ func (npmc *NodePackageManagerCleaner) cleanPnpmStore(
 // cleanYarnCache cleans the yarn cache and returns bytes freed.
 func (npmc *NodePackageManagerCleaner) cleanYarnCache(
 	ctx context.Context,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	cacheDir, err := npmc.getYarnCacheDir()
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,
@@ -522,7 +524,7 @@ func (npmc *NodePackageManagerCleaner) cleanYarnCache(
 // cleanBunCache cleans the bun cache and returns bytes freed.
 func (npmc *NodePackageManagerCleaner) cleanBunCache(
 	ctx context.Context,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	cacheDir, err := npmc.getBunCacheDir()
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,

@@ -3,14 +3,15 @@ package cleaner
 import (
 	"context"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 // ValidateSettingsTestCase represents a test case for ValidateSettings.
 type ValidateSettingsTestCase struct {
 	Name     string
-	Settings *domain.OperationSettings
+	Settings *operations.OperationSettings
 	WantErr  bool
 }
 
@@ -27,7 +28,7 @@ type IsAvailableTestCase struct {
 // CleanerWithSettings and SimpleCleaner both build on this.
 type CleanerCore interface {
 	IsAvailable(ctx context.Context) bool
-	Clean(ctx context.Context) result.Result[domain.CleanResult]
+	Clean(ctx context.Context) result.Result[types.CleanResult]
 }
 
 // CleanerConstructor is the standard constructor signature for test cleaners:
@@ -38,7 +39,7 @@ type CleanerConstructor[T any] func(verbose, dryRun bool) T
 // This eliminates duplicate interface declarations in test helper functions.
 type CleanerWithSettings interface {
 	CleanerCore
-	ValidateSettings(*domain.OperationSettings) error
+	ValidateSettings(*operations.OperationSettings) error
 }
 
 // CleanerConstructorWithSettings is a function type for creating cleaners in tests that need ValidateSettings.
@@ -65,7 +66,7 @@ type BooleanSettingsCleanerTestConfig struct {
 	TestName          string
 	ToolName          string
 	SettingsFieldName string
-	CreateSettings    func(bool) *domain.OperationSettings
+	CreateSettings    func(bool) *operations.OperationSettings
 	ExpectedItems     uint
 	Constructor       CleanerConstructorWithSettings
 }
@@ -78,5 +79,5 @@ type BooleanSettingsTestConfig struct {
 	SettingsFieldName  string
 	ExpectedItems      uint
 	Constructor        CleanerConstructorWithSettings
-	CreateSettingsFunc func(bool) *domain.OperationSettings
+	CreateSettingsFunc func(bool) *operations.OperationSettings
 }

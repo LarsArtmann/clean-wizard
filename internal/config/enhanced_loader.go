@@ -6,27 +6,28 @@ import (
 	"slices"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // applyValidation applies validation at the specified level.
 func (ecl *EnhancedConfigLoader) applyValidation(
 	_ context.Context,
-	config *domain.Config,
-	level domain.ValidationLevelType,
+	config *types.Config,
+	level enums.ValidationLevelType,
 ) *ValidationResult {
 	switch level {
-	case domain.ValidationLevelNoneType:
+	case enums.ValidationLevelNoneType:
 		return &ValidationResult{IsValid: true, Timestamp: time.Now()} //nolint:exhaustruct
-	case domain.ValidationLevelBasicType:
+	case enums.ValidationLevelBasicType:
 		return ecl.validator.ValidateConfig(config) // Use existing validator
-	case domain.ValidationLevelComprehensiveType:
+	case enums.ValidationLevelComprehensiveType:
 		// Add additional validation rules
 		result := ecl.validator.ValidateConfig(config)
 		ecl.applyComprehensiveValidation(config, result)
 
 		return result
-	case domain.ValidationLevelStrictType:
+	case enums.ValidationLevelStrictType:
 		// Apply all validation including strict checks
 		result := ecl.validator.ValidateConfig(config)
 		ecl.applyComprehensiveValidation(config, result)
@@ -40,7 +41,7 @@ func (ecl *EnhancedConfigLoader) applyValidation(
 
 // applyComprehensiveValidation applies comprehensive validation rules.
 func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(
-	config *domain.Config,
+	config *types.Config,
 	result *ValidationResult,
 ) {
 	// Additional comprehensive validation rules
@@ -58,7 +59,7 @@ func (ecl *EnhancedConfigLoader) applyComprehensiveValidation(
 
 // applyStrictValidation applies strict validation rules.
 func (ecl *EnhancedConfigLoader) applyStrictValidation(
-	config *domain.Config,
+	config *types.Config,
 	result *ValidationResult,
 ) {
 	// Strict validation rules that might fail
@@ -81,7 +82,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(
 	if len(requiredPaths) == 0 {
 		requiredPaths = ecl.validator.rules.DefaultProtectedPaths
 		if len(requiredPaths) == 0 {
-			requiredPaths = domain.DefaultProtectedPaths() // Final fallback
+			requiredPaths = types.DefaultProtectedPaths() // Final fallback
 		}
 	}
 
@@ -100,7 +101,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(
 }
 
 // hasCriticalRiskOperations checks if config contains critical risk operations.
-func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *domain.Config) bool {
+func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *types.Config) bool {
 	for _, profile := range config.Profiles {
 		// Guard against nil profiles (e.g., from "profile: null" in YAML)
 		if profile == nil {
@@ -108,7 +109,7 @@ func (ecl *EnhancedConfigLoader) hasCriticalRiskOperations(config *domain.Config
 		}
 
 		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskLevelCriticalType {
+			if op.RiskLevel == enums.RiskLevelCriticalType {
 				return true
 			}
 		}

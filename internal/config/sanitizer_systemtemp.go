@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // sanitizeSystemTempSettings sanitizes system temp settings.
 func (cs *ConfigSanitizer) sanitizeSystemTempSettings(
-	fieldPrefix string, settings *domain.SystemTempSettings, result *SanitizationResult,
+	fieldPrefix string, settings *operations.SystemTempSettings, result *SanitizationResult,
 ) {
 	if settings == nil {
 		return

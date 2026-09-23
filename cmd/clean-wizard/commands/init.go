@@ -5,7 +5,9 @@ import (
 
 	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
@@ -101,7 +103,7 @@ func createMinimalConfig() error {
 	cfg := config.GetDefaultConfig()
 	// Keep only the daily profile for minimal config
 	daily := cfg.Profiles["daily"]
-	cfg.Profiles = map[string]*domain.Profile{
+	cfg.Profiles = map[string]*types.Profile{
 		"daily": daily,
 	}
 
@@ -250,12 +252,12 @@ func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) 
 	return &opts, nil
 }
 
-func buildConfigFromSetupMode(setupMode string, customOpts *customCleanerOptions) *domain.Config {
+func buildConfigFromSetupMode(setupMode string, customOpts *customCleanerOptions) *types.Config {
 	cfg := config.GetDefaultConfig()
 
 	switch setupMode {
 	case "quick":
-		cfg.Profiles = map[string]*domain.Profile{
+		cfg.Profiles = map[string]*types.Profile{
 			"daily": createDailyProfile(),
 		}
 	case setupModeCustom:
@@ -267,7 +269,7 @@ func buildConfigFromSetupMode(setupMode string, customOpts *customCleanerOptions
 			customOpts.includeGo,
 		)
 	case "full":
-		cfg.Profiles = map[string]*domain.Profile{
+		cfg.Profiles = map[string]*types.Profile{
 			"daily":      createDailyProfile(),
 			"weekly":     createWeeklyProfile(),
 			"aggressive": createAggressiveProfile(),
@@ -277,7 +279,7 @@ func buildConfigFromSetupMode(setupMode string, customOpts *customCleanerOptions
 	return cfg
 }
 
-func configureSafeMode(cfg *domain.Config) error {
+func configureSafeMode(cfg *types.Config) error {
 	safeMode := true
 
 	if err := newConfirmForm(
@@ -290,15 +292,15 @@ func configureSafeMode(cfg *domain.Config) error {
 		return errorfamily.WrapRejection(err, "init.safe_mode_select", "safe mode selection error")
 	}
 
-	cfg.SafeMode = domain.SafeModeEnabled
+	cfg.SafeMode = enums.SafeModeEnabled
 	if !safeMode {
-		cfg.SafeMode = domain.SafeModeDisabled
+		cfg.SafeMode = enums.SafeModeDisabled
 	}
 
 	return nil
 }
 
-func printConfigSuccess(cfg *domain.Config) {
+func printConfigSuccess(cfg *types.Config) {
 	fmt.Println()
 	fmt.Println(SuccessStyle.Render("✅ Configuration created successfully!"))
 	printConfigSavedNotice()
@@ -307,7 +309,7 @@ func printConfigSuccess(cfg *domain.Config) {
 
 	for name, profile := range cfg.Profiles {
 		status := "enabled"
-		if profile.Enabled == domain.ProfileStatusDisabled {
+		if profile.Enabled == enums.ProfileStatusDisabled {
 			status = "disabled"
 		}
 
@@ -336,57 +338,57 @@ func printGettingStartedHints() {
 }
 
 // createDailyProfile creates the daily cleanup profile.
-func createDailyProfile() *domain.Profile {
-	return &domain.Profile{
+func createDailyProfile() *types.Profile {
+	return &types.Profile{
 		Name:        "daily",
 		Description: "Quick daily cleanup with safe operations",
-		Enabled:     domain.ProfileStatusEnabled,
-		Operations: []domain.CleanupOperation{
+		Enabled:     enums.ProfileStatusEnabled,
+		Operations: []types.CleanupOperation{
 			createLowRiskOperation(
 				"temp-files",
 				"Clean temporary files",
-				domain.OperationTypeTempFiles,
+				operations.OperationTypeTempFiles,
 			),
 			createLowRiskOperation(
 				"go-packages",
 				"Clean Go module cache",
-				domain.OperationTypeGoPackages,
+				operations.OperationTypeGoPackages,
 			),
 			createLowRiskOperation(
 				"node-packages",
 				"Clean Node.js package caches",
-				domain.OperationTypeNodePackages,
+				operations.OperationTypeNodePackages,
 			),
 		},
 	}
 }
 
 // createWeeklyProfile creates the weekly cleanup profile.
-func createWeeklyProfile() *domain.Profile {
-	return &domain.Profile{
+func createWeeklyProfile() *types.Profile {
+	return &types.Profile{
 		Name:        "weekly",
 		Description: "Weekly comprehensive cleanup",
-		Enabled:     domain.ProfileStatusEnabled,
-		Operations: []domain.CleanupOperation{
+		Enabled:     enums.ProfileStatusEnabled,
+		Operations: []types.CleanupOperation{
 			createMediumRiskOperation(
 				"docker",
 				"Clean Docker images, containers, and volumes",
-				domain.OperationTypeDocker,
+				operations.OperationTypeDocker,
 			),
 			createLowRiskOperation(
 				"go-packages",
 				"Clean Go build cache",
-				domain.OperationTypeGoPackages,
+				operations.OperationTypeGoPackages,
 			),
 			createLowRiskOperation(
 				"node-packages",
 				"Clean Node.js package caches",
-				domain.OperationTypeNodePackages,
+				operations.OperationTypeNodePackages,
 			),
 			createLowRiskOperation(
 				"homebrew-cleanup",
 				"Clean Homebrew cache",
-				domain.OperationTypeHomebrew,
+				operations.OperationTypeHomebrew,
 			),
 		},
 	}
@@ -395,58 +397,58 @@ func createWeeklyProfile() *domain.Profile {
 // createLowRiskOperation creates a low risk cleanup operation.
 func createLowRiskOperation(
 	name, description string,
-	operationType domain.OperationType,
-) domain.CleanupOperation {
-	return domain.CleanupOperation{
+	operationType operations.OperationType,
+) types.CleanupOperation {
+	return types.CleanupOperation{
 		Name:        name,
 		Description: description,
-		RiskLevel:   domain.RiskLevelLowType,
-		Enabled:     domain.ProfileStatusEnabled,
-		Settings:    domain.DefaultSettings(operationType),
+		RiskLevel:   enums.RiskLevelLowType,
+		Enabled:     enums.ProfileStatusEnabled,
+		Settings:    operations.DefaultSettings(operationType),
 	}
 }
 
 // createMediumRiskOperation creates a medium risk cleanup operation.
 func createMediumRiskOperation(
 	name, description string,
-	operationType domain.OperationType,
-) domain.CleanupOperation {
-	return domain.CleanupOperation{
+	operationType operations.OperationType,
+) types.CleanupOperation {
+	return types.CleanupOperation{
 		Name:        name,
 		Description: description,
-		RiskLevel:   domain.RiskLevelMediumType,
-		Enabled:     domain.ProfileStatusEnabled,
-		Settings:    domain.DefaultSettings(operationType),
+		RiskLevel:   enums.RiskLevelMediumType,
+		Enabled:     enums.ProfileStatusEnabled,
+		Settings:    operations.DefaultSettings(operationType),
 	}
 }
 
 // createAggressiveProfile creates the aggressive cleanup profile.
-func createAggressiveProfile() *domain.Profile {
-	return &domain.Profile{
+func createAggressiveProfile() *types.Profile {
+	return &types.Profile{
 		Name:        "aggressive",
 		Description: "Deep aggressive cleanup (may remove useful items)",
-		Enabled:     domain.ProfileStatusDisabled,
-		Operations: []domain.CleanupOperation{
+		Enabled:     enums.ProfileStatusDisabled,
+		Operations: []types.CleanupOperation{
 			{
 				Name:        "nix-generations",
 				Description: "Clean old Nix generations",
-				RiskLevel:   domain.RiskLevelHighType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+				RiskLevel:   enums.RiskLevelHighType,
+				Enabled:     enums.ProfileStatusEnabled,
+				Settings:    operations.DefaultSettings(operations.OperationTypeNixGenerations),
 			},
 			{
 				Name:        "homebrew-cleanup",
 				Description: "Clean old Homebrew packages",
-				RiskLevel:   domain.RiskLevelMediumType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
+				RiskLevel:   enums.RiskLevelMediumType,
+				Enabled:     enums.ProfileStatusEnabled,
+				Settings:    operations.DefaultSettings(operations.OperationTypeHomebrew),
 			},
 			{
 				Name:        "docker",
 				Description: "Clean all unused Docker resources",
-				RiskLevel:   domain.RiskLevelHighType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings:    domain.DefaultSettings(domain.OperationTypeDocker),
+				RiskLevel:   enums.RiskLevelHighType,
+				Enabled:     enums.ProfileStatusEnabled,
+				Settings:    operations.DefaultSettings(operations.OperationTypeDocker),
 			},
 		},
 	}
@@ -455,73 +457,73 @@ func createAggressiveProfile() *domain.Profile {
 // createCustomProfile creates a custom profile based on user selections.
 func createCustomProfile(
 	includeNix, includeHomebrew, includeDocker, includeNode, includeGo bool,
-) map[string]*domain.Profile {
-	operations := make([]domain.CleanupOperation, 0)
+) map[string]*types.Profile {
+	operations := make([]types.CleanupOperation, 0)
 
 	if includeNix {
-		operations = append(operations, domain.CleanupOperation{
+		operations = append(operations, types.CleanupOperation{
 			Name:        "nix-generations",
 			Description: "Clean old Nix generations",
-			RiskLevel:   domain.RiskLevelMediumType,
-			Enabled:     domain.ProfileStatusEnabled,
-			Settings:    domain.DefaultSettings(domain.OperationTypeNixGenerations),
+			RiskLevel:   enums.RiskLevelMediumType,
+			Enabled:     enums.ProfileStatusEnabled,
+			Settings:    operations.DefaultSettings(operations.OperationTypeNixGenerations),
 		})
 	}
 
 	if includeHomebrew {
-		operations = append(operations, domain.CleanupOperation{
+		operations = append(operations, types.CleanupOperation{
 			Name:        "homebrew-cleanup",
 			Description: "Clean Homebrew cache and unused packages",
-			RiskLevel:   domain.RiskLevelLowType,
-			Enabled:     domain.ProfileStatusEnabled,
-			Settings:    domain.DefaultSettings(domain.OperationTypeHomebrew),
+			RiskLevel:   enums.RiskLevelLowType,
+			Enabled:     enums.ProfileStatusEnabled,
+			Settings:    operations.DefaultSettings(operations.OperationTypeHomebrew),
 		})
 	}
 
 	if includeDocker {
-		operations = append(operations, domain.CleanupOperation{
+		operations = append(operations, types.CleanupOperation{
 			Name:        "docker",
 			Description: "Clean Docker images, containers, and volumes",
-			RiskLevel:   domain.RiskLevelMediumType,
-			Enabled:     domain.ProfileStatusEnabled,
-			Settings:    domain.DefaultSettings(domain.OperationTypeDocker),
+			RiskLevel:   enums.RiskLevelMediumType,
+			Enabled:     enums.ProfileStatusEnabled,
+			Settings:    operations.DefaultSettings(operations.OperationTypeDocker),
 		})
 	}
 
 	if includeNode {
-		operations = append(operations, domain.CleanupOperation{
+		operations = append(operations, types.CleanupOperation{
 			Name:        "node-packages",
 			Description: "Clean Node.js package caches",
-			RiskLevel:   domain.RiskLevelLowType,
-			Enabled:     domain.ProfileStatusEnabled,
-			Settings:    domain.DefaultSettings(domain.OperationTypeNodePackages),
+			RiskLevel:   enums.RiskLevelLowType,
+			Enabled:     enums.ProfileStatusEnabled,
+			Settings:    operations.DefaultSettings(operations.OperationTypeNodePackages),
 		})
 	}
 
 	if includeGo {
-		operations = append(operations, domain.CleanupOperation{
+		operations = append(operations, types.CleanupOperation{
 			Name:        "go-packages",
 			Description: "Clean Go module and build caches",
-			RiskLevel:   domain.RiskLevelLowType,
-			Enabled:     domain.ProfileStatusEnabled,
-			Settings:    domain.DefaultSettings(domain.OperationTypeGoPackages),
+			RiskLevel:   enums.RiskLevelLowType,
+			Enabled:     enums.ProfileStatusEnabled,
+			Settings:    operations.DefaultSettings(operations.OperationTypeGoPackages),
 		})
 	}
 
 	// Always include temp files
-	operations = append(operations, domain.CleanupOperation{
+	operations = append(operations, types.CleanupOperation{
 		Name:        "temp-files",
 		Description: "Clean temporary files",
-		RiskLevel:   domain.RiskLevelLowType,
-		Enabled:     domain.ProfileStatusEnabled,
-		Settings:    domain.DefaultSettings(domain.OperationTypeTempFiles),
+		RiskLevel:   enums.RiskLevelLowType,
+		Enabled:     enums.ProfileStatusEnabled,
+		Settings:    operations.DefaultSettings(operations.OperationTypeTempFiles),
 	})
 
-	return map[string]*domain.Profile{
+	return map[string]*types.Profile{
 		setupModeCustom: {
 			Name:        setupModeCustom,
 			Description: "Custom cleanup profile",
-			Enabled:     domain.ProfileStatusEnabled,
+			Enabled:     enums.ProfileStatusEnabled,
 			Operations:  operations,
 		},
 	}
@@ -529,6 +531,6 @@ func createCustomProfile(
 
 // GetDefaultConfig returns the default configuration.
 // This is a wrapper around config.GetDefaultConfig for use in commands.
-func GetDefaultConfig() *domain.Config {
+func GetDefaultConfig() *types.Config {
 	return config.GetDefaultConfig()
 }

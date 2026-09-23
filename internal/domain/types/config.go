@@ -4,12 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // Config represents application configuration with type safety.
 type Config struct {
 	Version        string              `json:"version"                   yaml:"version"`
-	SafeMode       SafeMode            `json:"safe_mode"                 yaml:"safe_mode"`
+	SafeMode       enums.SafeMode      `json:"safe_mode"                 yaml:"safe_mode"`
 	MaxDiskUsage   int                 `json:"max_disk_usage"            yaml:"max_disk_usage"`
 	Protected      []string            `json:"protected"                 yaml:"protected"`
 	Profiles       map[string]*Profile `json:"profiles"                  yaml:"profiles"`
@@ -73,10 +76,10 @@ func (c *Config) Validate() error {
 
 // Profile represents cleanup profile.
 type Profile struct {
-	Name        string             `json:"name"        yaml:"name"`
-	Description string             `json:"description" yaml:"description"`
-	Operations  []CleanupOperation `json:"operations"  yaml:"operations"`
-	Enabled     ProfileStatus      `json:"enabled"     yaml:"enabled"`
+	Name        string              `json:"name"        yaml:"name"`
+	Description string              `json:"description" yaml:"description"`
+	Operations  []CleanupOperation  `json:"operations"  yaml:"operations"`
+	Enabled     enums.ProfileStatus `json:"enabled"     yaml:"enabled"`
 }
 
 // IsValid validates profile.
@@ -128,11 +131,11 @@ func (p *Profile) Validate(name string) error {
 
 // CleanupOperation represents single cleanup operation with type-safe settings.
 type CleanupOperation struct {
-	Name        string             `json:"name"               yaml:"name"`
-	Description string             `json:"description"        yaml:"description"`
-	RiskLevel   RiskLevelType      `json:"risk_level"         yaml:"risk_level"`
-	Enabled     ProfileStatus      `json:"enabled"            yaml:"enabled"`
-	Settings    *OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
+	Name        string                        `json:"name"               yaml:"name"`
+	Description string                        `json:"description"        yaml:"description"`
+	RiskLevel   enums.RiskLevelType           `json:"risk_level"         yaml:"risk_level"`
+	Enabled     enums.ProfileStatus           `json:"enabled"            yaml:"enabled"`
+	Settings    *operations.OperationSettings `json:"settings,omitempty" yaml:"settings,omitempty"`
 }
 
 // IsValid validates cleanup operation.
@@ -180,7 +183,7 @@ func (op CleanupOperation) Validate() error {
 
 	// Validate settings if present
 	if op.Settings != nil {
-		opType := GetOperationType(op.Name)
+		opType := operations.GetOperationType(op.Name)
 
 		err := op.Settings.ValidateSettings(opType)
 		if err != nil {

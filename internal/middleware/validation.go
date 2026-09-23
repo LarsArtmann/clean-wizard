@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/validation"
 )
@@ -20,28 +21,28 @@ func NewValidationMiddleware() *ValidationMiddleware {
 // ValidateScanRequest validates scan request before processing.
 func (vm *ValidationMiddleware) ValidateScanRequest(
 	_ context.Context,
-	req domain.ScanRequest,
-) result.Result[domain.ScanRequest] {
+	req types.ScanRequest,
+) result.Result[types.ScanRequest] {
 	return validation.ValidateAndWrap(req, "scan request")
 }
 
 // ValidateCleanRequest validates clean request before processing.
 func (vm *ValidationMiddleware) ValidateCleanRequest(
 	_ context.Context,
-	req domain.CleanRequest,
-) result.Result[domain.CleanRequest] {
+	req types.CleanRequest,
+) result.Result[types.CleanRequest] {
 	return validation.ValidateAndWrap(req, "clean request")
 }
 
 // ValidateCleanerSettings validates cleaner settings with type safety.
 func (vm *ValidationMiddleware) ValidateCleanerSettings(
 	_ context.Context,
-	cleaner domain.OperationHandler,
-	settings *domain.OperationSettings,
-) result.Result[*domain.OperationSettings] {
+	cleaner types.OperationHandler,
+	settings *operations.OperationSettings,
+) result.Result[*operations.OperationSettings] {
 	err := cleaner.ValidateSettings(settings)
 	if err != nil {
-		return result.Err[*domain.OperationSettings](
+		return result.Err[*operations.OperationSettings](
 			fmt.Errorf("invalid cleaner settings for %s: %w", cleaner.Type(), err),
 		)
 	}

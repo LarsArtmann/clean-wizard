@@ -4,21 +4,21 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // sanitizeOperationSettings sanitizes operation settings with type safety.
 func (cs *ConfigSanitizer) sanitizeOperationSettings(
 	fieldPrefix, operationName string,
-	settings *domain.OperationSettings, result *SanitizationResult,
+	settings *operations.OperationSettings, result *SanitizationResult,
 ) {
-	opType := domain.GetOperationType(operationName)
+	opType := operations.GetOperationType(operationName)
 
 	// Validate settings first
 	err := settings.ValidateSettings(opType)
 	if err != nil {
 		// Convert validation errors to warnings since the result type doesn't have an Errors field
-		validationErr := &domain.ValidationError{} //nolint:exhaustruct
+		validationErr := &operations.ValidationError{} //nolint:exhaustruct
 		if errors.As(err, &validationErr) {
 			result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct
 				Field:     fieldPrefix + "." + validationErr.Field,
@@ -40,29 +40,29 @@ func (cs *ConfigSanitizer) sanitizeOperationSettings(
 
 	// Type-aware sanitization based on operation type
 	switch opType {
-	case domain.OperationTypeNixGenerations:
+	case operations.OperationTypeNixGenerations:
 		cs.sanitizeNixGenerationsSettings(fieldPrefix, settings.NixGenerations, result)
 
-	case domain.OperationTypeTempFiles:
+	case operations.OperationTypeTempFiles:
 		cs.sanitizeTempFilesSettings(fieldPrefix, settings.TempFiles, result)
 
-	case domain.OperationTypeHomebrew:
+	case operations.OperationTypeHomebrew:
 		cs.sanitizeHomebrewSettings(fieldPrefix, settings.Homebrew, result)
 
-	case domain.OperationTypeSystemTemp:
+	case operations.OperationTypeSystemTemp:
 		cs.sanitizeSystemTempSettings(fieldPrefix, settings.SystemTemp, result)
 
-	case domain.OperationTypeNodePackages,
-		domain.OperationTypeGoPackages,
-		domain.OperationTypeCargoPackages,
-		domain.OperationTypeBuildCache,
-		domain.OperationTypeDocker,
-		domain.OperationTypeSystemCache,
-		domain.OperationTypeProjectsManagementAutomation,
-		domain.OperationTypeProjectExecutables,
-		domain.OperationTypeCompiledBinaries,
-		domain.OperationTypeGitHistory,
-		domain.OperationTypeGolangciLintCache:
+	case operations.OperationTypeNodePackages,
+		operations.OperationTypeGoPackages,
+		operations.OperationTypeCargoPackages,
+		operations.OperationTypeBuildCache,
+		operations.OperationTypeDocker,
+		operations.OperationTypeSystemCache,
+		operations.OperationTypeProjectsManagementAutomation,
+		operations.OperationTypeProjectExecutables,
+		operations.OperationTypeCompiledBinaries,
+		operations.OperationTypeGitHistory,
+		operations.OperationTypeGolangciLintCache:
 		// These operation types have no specific sanitization logic yet
 		// Fall through to default handling
 

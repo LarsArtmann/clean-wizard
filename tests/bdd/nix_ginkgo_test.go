@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -32,8 +32,8 @@ func TestCleanWizardBDDSuite(t *testing.T) {
 type NixTestContext struct {
 	ctx         context.Context //nolint:containedctx // Test helper struct, context storage is acceptable
 	nixCleaner  *cleaner.NixCleaner
-	generations result.Result[[]domain.NixGeneration]
-	cleanResult result.Result[domain.CleanResult]
+	generations result.Result[[]types.NixGeneration]
+	cleanResult result.Result[types.CleanResult]
 	storeSize   result.Result[int64]
 	output      *bytes.Buffer
 	dryRun      bool
@@ -164,11 +164,11 @@ var _ = ginkgo.Describe("Nix Store Management", func() {
 		ginkgo.BeforeEach(func() {
 			// Simulate Nix not being available
 			testCtx.nixCleaner = cleaner.NewNixCleaner(true, false)
-			testCtx.generations = result.Err[[]domain.NixGeneration](
+			testCtx.generations = result.Err[[]types.NixGeneration](
 				errors.New("Nix is not available"),
 			)
 			testCtx.storeSize = result.Err[int64](errors.New("Nix is not available"))
-			testCtx.cleanResult = result.Err[domain.CleanResult](errors.New("Nix is not available"))
+			testCtx.cleanResult = result.Err[types.CleanResult](errors.New("Nix is not available"))
 		})
 
 		ginkgo.It("should show helpful error message", func() {
@@ -243,7 +243,7 @@ var _ = ginkgo.Describe("Nix Store Cleaning", func() {
 			nixCtx.generations = getGenerationsOrMock(nixCtx.ctx, nixCtx.nixCleaner, 1)
 			generations := nixCtx.generations.Value()
 			// Find current generation
-			var currentGen *domain.NixGeneration
+			var currentGen *types.NixGeneration
 
 			for i := range generations {
 				if generations[i].Current.IsCurrent() {

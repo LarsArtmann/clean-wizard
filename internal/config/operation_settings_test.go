@@ -5,7 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
@@ -39,7 +41,7 @@ func TestUnmarshalOperationSettings(t *testing.T) {
 		name           string
 		yamlContent    string
 		wantSettings   bool
-		validateResult func(t *testing.T, settings *domain.OperationSettings)
+		validateResult func(t *testing.T, settings *operations.OperationSettings)
 	}{
 		{
 			name: "nix generations settings are parsed (string and integer enums)",
@@ -55,7 +57,7 @@ profiles:
             dry_run: 2
 `,
 			wantSettings: true,
-			validateResult: func(t *testing.T, settings *domain.OperationSettings) {
+			validateResult: func(t *testing.T, settings *operations.OperationSettings) {
 				t.Helper()
 
 				nix := settings.NixGenerations
@@ -67,11 +69,11 @@ profiles:
 					t.Errorf("Generations = %d, want 3", nix.Generations)
 				}
 
-				if nix.Optimize != domain.OptimizationModeEnabled {
+				if nix.Optimize != enums.OptimizationModeEnabled {
 					t.Errorf("Optimize = %v, want ENABLED", nix.Optimize)
 				}
 
-				if nix.DryRun != domain.ExecutionModeForce {
+				if nix.DryRun != enums.ExecutionModeForce {
 					t.Errorf("DryRun = %v, want FORCE", nix.DryRun)
 				}
 			},
@@ -88,14 +90,14 @@ profiles:
             prune_mode: "VOLUMES"
 `,
 			wantSettings: true,
-			validateResult: func(t *testing.T, settings *domain.OperationSettings) {
+			validateResult: func(t *testing.T, settings *operations.OperationSettings) {
 				t.Helper()
 
 				if settings.Docker == nil {
 					t.Fatal("Docker settings not parsed")
 				}
 
-				if settings.Docker.PruneMode != domain.DockerPruneVolumes {
+				if settings.Docker.PruneMode != enums.DockerPruneVolumes {
 					t.Errorf("PruneMode = %v, want VOLUMES", settings.Docker.PruneMode)
 				}
 			},
@@ -115,7 +117,7 @@ profiles:
               - "/var/tmp/keep"
 `,
 			wantSettings: true,
-			validateResult: func(t *testing.T, settings *domain.OperationSettings) {
+			validateResult: func(t *testing.T, settings *operations.OperationSettings) {
 				t.Helper()
 
 				temp := settings.TempFiles
@@ -146,14 +148,14 @@ profiles:
             some_key: true
 `,
 			wantSettings: true,
-			validateResult: func(t *testing.T, settings *domain.OperationSettings) {
+			validateResult: func(t *testing.T, settings *operations.OperationSettings) {
 				t.Helper()
 
 				if settings.Docker == nil {
 					t.Fatal("Docker settings not parsed")
 				}
 
-				if settings.Docker.PruneMode != domain.DockerPruneAll {
+				if settings.Docker.PruneMode != enums.DockerPruneAll {
 					t.Errorf("PruneMode = %v, want ALL", settings.Docker.PruneMode)
 				}
 			},
@@ -170,7 +172,7 @@ profiles:
             prune_mode: "NOT_A_MODE"
 `,
 			wantSettings: false,
-			validateResult: func(t *testing.T, settings *domain.OperationSettings) {
+			validateResult: func(t *testing.T, settings *operations.OperationSettings) {
 				t.Helper()
 			},
 		},
@@ -181,7 +183,7 @@ profiles:
 			t.Parallel()
 
 			k := loadKoanfFromYAML(t, tt.yamlContent)
-			op := domain.CleanupOperation{Name: "test-operation"}
+			op := types.CleanupOperation{Name: "test-operation"}
 
 			unmarshalOperationSettings(k, "daily", 0, &op)
 
@@ -211,7 +213,7 @@ profiles:
     operations:
       - name: docker
 `)
-	op := domain.CleanupOperation{Name: "docker"}
+	op := types.CleanupOperation{Name: "docker"}
 
 	unmarshalOperationSettings(k, "daily", 0, &op)
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -107,9 +107,9 @@ func (r *Registry) Available(ctx context.Context) []Cleaner {
 
 // CleanAll runs all available cleaners and aggregates results.
 // Returns a map of cleaner name to result.
-func (r *Registry) CleanAll(ctx context.Context) map[string]result.Result[domain.CleanResult] {
+func (r *Registry) CleanAll(ctx context.Context) map[string]result.Result[types.CleanResult] {
 	available := r.Available(ctx)
-	results := make(map[string]result.Result[domain.CleanResult], len(available))
+	results := make(map[string]result.Result[types.CleanResult], len(available))
 
 	for _, c := range available {
 		res := c.Clean(ctx)

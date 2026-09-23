@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestNewCargoCleaner(t *testing.T) {
@@ -18,8 +18,8 @@ func TestCargoCleaner_Type(t *testing.T) {
 
 	cleaner := NewCargoCleaner(false, false)
 
-	if cleaner.Type() != domain.OperationTypeCargoPackages {
-		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeCargoPackages)
+	if cleaner.Type() != operations.OperationTypeCargoPackages {
+		t.Errorf("Type() = %v, want %v", cleaner.Type(), operations.OperationTypeCargoPackages)
 	}
 }
 

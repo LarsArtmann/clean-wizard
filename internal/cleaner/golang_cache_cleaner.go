@@ -10,7 +10,8 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -49,8 +50,8 @@ func (gcc *GoCacheCleaner) Name() string {
 }
 
 // Scan scans for the configured cache type and returns scan items.
-func (gcc *GoCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+func (gcc *GoCacheCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	switch gcc.cacheType {
 	case GoCacheGOCACHE:
@@ -70,18 +71,18 @@ func (gcc *GoCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.Scan
 }
 
 // scanGoEnvCache scans a Go environment variable cache path.
-func (gcc *GoCacheCleaner) scanGoEnvCache(ctx context.Context, envVar string) []domain.ScanItem {
+func (gcc *GoCacheCleaner) scanGoEnvCache(ctx context.Context, envVar string) []types.ScanItem {
 	cachePath, err := gcc.helper.getGoEnv(ctx, envVar)
 	if err != nil || cachePath == "" {
-		return []domain.ScanItem{}
+		return []types.ScanItem{}
 	}
 
-	return []domain.ScanItem{
+	return []types.ScanItem{
 		{
 			Path:     cachePath,
 			Size:     GetDirSize(cachePath),
 			Created:  GetDirModTime(cachePath),
-			ScanType: domain.ScanTypeTemp,
+			ScanType: types.ScanTypeTemp,
 		},
 	}
 }
@@ -110,8 +111,8 @@ func (gcc *GoCacheCleaner) getGoBuildCacheLocations() []string {
 }
 
 // scanGoBuildCache scans go-build* folders in temp directories.
-func (gcc *GoCacheCleaner) scanGoBuildCache() []domain.ScanItem {
-	items := make([]domain.ScanItem, 0)
+func (gcc *GoCacheCleaner) scanGoBuildCache() []types.ScanItem {
+	items := make([]types.ScanItem, 0)
 	buildCachePattern := "go-build*"
 	seen := make(map[string]bool) // Prevent duplicates
 
@@ -129,11 +130,11 @@ func (gcc *GoCacheCleaner) scanGoBuildCache() []domain.ScanItem {
 
 			seen[match] = true
 
-			items = append(items, domain.ScanItem{
+			items = append(items, types.ScanItem{
 				Path:     match,
 				Size:     GetDirSize(match),
 				Created:  GetDirModTime(match),
-				ScanType: domain.ScanTypeTemp,
+				ScanType: types.ScanTypeTemp,
 			})
 		}
 	}
@@ -142,7 +143,7 @@ func (gcc *GoCacheCleaner) scanGoBuildCache() []domain.ScanItem {
 }
 
 // Clean cleans the specified cache type.
-func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	switch gcc.cacheType {
 	case GoCacheGOCACHE:
 		return gcc.cleanGoCache(ctx)
@@ -153,12 +154,12 @@ func (gcc *GoCacheCleaner) Clean(ctx context.Context) result.Result[domain.Clean
 	case GoCacheBuildCache:
 		return gcc.cleanGoBuildCache(ctx)
 	case GoCacheNone:
-		return result.Err[domain.CleanResult](ErrNoCacheTypeSpecified)
+		return result.Err[types.CleanResult](ErrNoCacheTypeSpecified)
 	case GoCacheLintCache:
-		return result.Err[domain.CleanResult](ErrLintCacheNotImplemented)
+		return result.Err[types.CleanResult](ErrLintCacheNotImplemented)
 	default:
 		//nolint:err113 // Dynamic: cacheType is included for debugging
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("unsupported cache type: %v", gcc.cacheType),
 		)
 	}
@@ -170,7 +171,7 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 	cleanFlag string,
 	successMessage string,
 	sizeEstimate uint64,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	// Create a timeout context to prevent hanging
 	timeoutCtx, cancel := context.WithTimeout(ctx, goCommandTimeout)
 	defer cancel()
@@ -181,7 +182,7 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 	if err != nil {
 		// Check if it's a timeout error
 		if errors.Is(timeoutCtx.Err(), context.DeadlineExceeded) {
-			return result.Err[domain.CleanResult](
+			return result.Err[types.CleanResult](
 				fmt.Errorf(
 					"go clean -%s timed out after %v for successMessage=%v, sizeEstimate=%v (command may be hanging)",
 					cleanFlag,
@@ -192,7 +193,7 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 			)
 		}
 
-		return result.Err[domain.CleanResult](fmt.Errorf("go clean -%s failed: %w (output: %s)",
+		return result.Err[types.CleanResult](fmt.Errorf("go clean -%s failed: %w (output: %s)",
 			cleanFlag, err, string(output)))
 	}
 
@@ -201,9 +202,9 @@ func (gcc *GoCacheCleaner) executeGoCleanCommand(
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1, int64(sizeEstimate),
-		domain.SizeEstimate{Known: sizeEstimate, Status: domain.SizeEstimateStatusKnown},
+		types.SizeEstimate{Known: sizeEstimate, Status: enums.SizeEstimateStatusKnown},
 	))
 }
 
@@ -213,7 +214,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 	envVar string,
 	cleanFlag string,
 	successMessage string,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	cachePath, err := gcc.helper.getGoEnv(ctx, envVar)
 	if err != nil || cachePath == "" {
 		return gcc.executeGoCleanCommand(ctx, cleanFlag, successMessage, 0)
@@ -255,7 +256,7 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 		}, gcc.verbose, "Cache")
 
 		if cleanupErr != nil {
-			return result.Err[domain.CleanResult](
+			return result.Err[types.CleanResult](
 				fmt.Errorf(
 					"envVar=%v, successMessage=%v, bytesFreed=%v: %w",
 					envVar,
@@ -271,9 +272,9 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 		}
 
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.StrategyConservativeType,
+			enums.StrategyConservativeType,
 			1, bytesFreed,
-			domain.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
+			types.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
 		))
 	}
 
@@ -281,36 +282,36 @@ func (gcc *GoCacheCleaner) cleanGoCacheEnv(
 	bytesFreed = GetDirSize(cachePath)
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1, bytesFreed,
-		domain.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
+		types.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
 	))
 }
 
 // cleanGoCache cleans GOCACHE.
-func (gcc *GoCacheCleaner) cleanGoCache(ctx context.Context) result.Result[domain.CleanResult] {
+func (gcc *GoCacheCleaner) cleanGoCache(ctx context.Context) result.Result[types.CleanResult] {
 	return gcc.cleanGoCacheEnv(ctx, "GOCACHE", "cache", "  ✓ Go cache cleaned")
 }
 
 // cleanGoTestCache cleans GOTESTCACHE.
-func (gcc *GoCacheCleaner) cleanGoTestCache(ctx context.Context) result.Result[domain.CleanResult] {
+func (gcc *GoCacheCleaner) cleanGoTestCache(ctx context.Context) result.Result[types.CleanResult] {
 	return gcc.executeGoCleanCommand(ctx, "testcache", "  ✓ Go test cache cleaned", 0)
 }
 
 // cleanGoModCache cleans GOMODCACHE.
-func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[domain.CleanResult] {
+func (gcc *GoCacheCleaner) cleanGoModCache(ctx context.Context) result.Result[types.CleanResult] {
 	return gcc.cleanGoCacheEnv(ctx, "GOMODCACHE", "modcache", "  ✓ Go module cache cleaned")
 }
 
 // cleanGoBuildCache removes go-build* folders from all temp locations.
 func (gcc *GoCacheCleaner) cleanGoBuildCache(
 	_ context.Context,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	buildCachePattern := "go-build*"
 	seen := make(map[string]bool) // Prevent cleaning same path twice
 	itemsRemoved := 0
 
-	var totalSizeEstimate domain.SizeEstimate
+	var totalSizeEstimate types.SizeEstimate
 
 	for _, tempDir := range gcc.getGoBuildCacheLocations() {
 		matches, err := filepath.Glob(filepath.Join(tempDir, buildCachePattern))
@@ -328,7 +329,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(
 
 			// Calculate size before removal (always, for accurate dry-run estimates)
 			bytesFreed := GetDirSize(match)
-			totalSizeEstimate = domain.SizeEstimate{ //nolint:exhaustruct
+			totalSizeEstimate = types.SizeEstimate{ //nolint:exhaustruct
 				Known: totalSizeEstimate.Known + uint64(bytesFreed),
 			}
 
@@ -360,7 +361,7 @@ func (gcc *GoCacheCleaner) cleanGoBuildCache(
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		itemsRemoved, int64(totalSizeEstimate.Value()),
 		totalSizeEstimate,
 	))

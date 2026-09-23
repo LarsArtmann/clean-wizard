@@ -5,7 +5,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,13 +20,13 @@ type mockCleaner struct {
 	cleanCalled bool
 }
 
-func (m *mockCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (m *mockCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	m.cleanCalled = true
 
-	return result.Ok(domain.CleanResult{
+	return result.Ok(types.CleanResult{
 		ItemsRemoved: 1,
 		FreedBytes:   1024,
-		Strategy:     domain.StrategyConservativeType,
+		Strategy:     enums.StrategyConservativeType,
 	})
 }
 
@@ -36,13 +38,13 @@ func (m *mockCleaner) Name() string {
 	return m.name
 }
 
-func (m *mockCleaner) Type() domain.OperationType {
-	return domain.OperationTypeTempFiles
+func (m *mockCleaner) Type() operations.OperationType {
+	return operations.OperationTypeTempFiles
 }
 
-func (m *mockCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	return result.Ok([]domain.ScanItem{
-		{Path: "/test/path", Size: 1024, ScanType: domain.ScanTypeTemp},
+func (m *mockCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	return result.Ok([]types.ScanItem{
+		{Path: "/test/path", Size: 1024, ScanType: types.ScanTypeTemp},
 	})
 }
 

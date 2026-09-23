@@ -10,7 +10,8 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -79,7 +80,7 @@ func createYAMLNode(value interface{}) *yaml.Node {
 
 // enumTestCaseExpected holds expected values for enum workflow test cases.
 type enumTestCaseExpected struct {
-	dockerMode       domain.DockerPruneMode
+	dockerMode       enums.DockerPruneMode
 	cleanCache       bool
 	testCache        bool
 	modCache         bool
@@ -90,7 +91,7 @@ type enumTestCaseExpected struct {
 
 // dockerPruneAllExpected are the expected results for DockerPruneAll test cases.
 var dockerPruneAllExpected = enumTestCaseExpected{
-	dockerMode:       domain.DockerPruneAll,
+	dockerMode:       enums.DockerPruneAll,
 	cleanCache:       true,
 	testCache:        true,
 	modCache:         false,
@@ -109,7 +110,7 @@ type enumTestCase struct {
 	goBuildCache             interface{}
 	goLintCache              interface{}
 	systemCacheTypes         []interface{}
-	expectedDockerMode       domain.DockerPruneMode
+	expectedDockerMode       enums.DockerPruneMode
 	expectedCleanCache       bool
 	expectedTestCache        bool
 	expectedModCache         bool
@@ -174,7 +175,7 @@ func TestEnumWorkflow_Integration(t *testing.T) {
 			goBuildCache:             1,
 			goLintCache:              0,
 			systemCacheTypes:         []interface{}{0, "XCODE", "COCOAPODS", 3},
-			expectedDockerMode:       domain.DockerPruneContainers,
+			expectedDockerMode:       enums.DockerPruneContainers,
 			expectedCleanCache:       true,
 			expectedTestCache:        true,
 			expectedModCache:         false,
@@ -269,7 +270,7 @@ func formatYAMLValue(v interface{}) string {
 
 // testEnumWorkflow tests the full workflow from YAML config to cleaner execution.
 func testEnumWorkflow(t *testing.T, configYAML string,
-	expectedDockerMode domain.DockerPruneMode,
+	expectedDockerMode enums.DockerPruneMode,
 	expectedCleanCache, expectedTestCache,
 	expectedModCache, expectedBuildCache, expectedLintCache bool,
 	expectedSystemCacheEmpty bool,
@@ -307,7 +308,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 		case "docker":
 			if op.Docker != nil {
 				// Unmarshal docker prune mode enum
-				var pruneMode domain.DockerPruneMode
+				var pruneMode enums.DockerPruneMode
 				requireEnumUnmarshal(t, op.Docker.PruneMode, &pruneMode, "DockerPruneMode")
 
 				// Verify enum value
@@ -332,7 +333,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 		case "go-packages":
 			if op.GoPackages != nil {
 				// Unmarshal cache cleanup mode enums
-				modes := map[interface{}]*domain.CacheCleanupMode{
+				modes := map[interface{}]*enums.CacheCleanupMode{
 					op.GoPackages.CleanCache:      nil,
 					op.GoPackages.CleanTestCache:  nil,
 					op.GoPackages.CleanModCache:   nil,
@@ -341,7 +342,7 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 				}
 
 				for val := range modes {
-					var mode domain.CacheCleanupMode
+					var mode enums.CacheCleanupMode
 					requireEnumUnmarshal(t, val, &mode, "CacheCleanupMode")
 
 					if mode.IsValid() {
@@ -371,9 +372,9 @@ func testEnumWorkflow(t *testing.T, configYAML string,
 		case "system-cache":
 			if op.SystemCache != nil {
 				// Unmarshal cache type enums
-				var cacheTypes []domain.CacheType
+				var cacheTypes []enums.CacheType
 				for _, ct := range op.SystemCache.CacheTypes {
-					var cacheType domain.CacheType
+					var cacheType enums.CacheType
 					requireEnumUnmarshal(t, ct, &cacheType, "CacheType")
 
 					if cacheType.IsValid() {
@@ -451,20 +452,20 @@ operations:
 		switch op.Type {
 		case "docker":
 			if op.Docker != nil {
-				var pruneMode domain.DockerPruneMode
+				var pruneMode enums.DockerPruneMode
 				assertEnumUnmarshalError(t, op.Docker.PruneMode, &pruneMode, "DockerPruneMode")
 			}
 
 		case "go-packages":
 			if op.GoPackages != nil {
-				var mode domain.CacheCleanupMode
+				var mode enums.CacheCleanupMode
 				assertEnumUnmarshalError(t, op.GoPackages.CleanCache, &mode, "CacheCleanupMode")
 			}
 
 		case "system-cache":
 			if op.SystemCache != nil {
 				for _, ct := range op.SystemCache.CacheTypes {
-					var cacheType domain.CacheType
+					var cacheType enums.CacheType
 					node := &yaml.Node{Kind: yaml.ScalarNode}
 					if str, ok := ct.(string); ok {
 						node.Value = str
@@ -492,25 +493,25 @@ func TestDefaultSettings_WithEnums(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	testCases := []domain.OperationType{
-		domain.OperationTypeNixGenerations,
-		domain.OperationTypeHomebrew,
-		domain.OperationTypeNodePackages,
-		domain.OperationTypeGoPackages,
-		domain.OperationTypeCargoPackages,
-		domain.OperationTypeBuildCache,
-		domain.OperationTypeDocker,
-		domain.OperationTypeSystemCache,
+	testCases := []operations.OperationType{
+		operations.OperationTypeNixGenerations,
+		operations.OperationTypeHomebrew,
+		operations.OperationTypeNodePackages,
+		operations.OperationTypeGoPackages,
+		operations.OperationTypeCargoPackages,
+		operations.OperationTypeBuildCache,
+		operations.OperationTypeDocker,
+		operations.OperationTypeSystemCache,
 		domain.OperationTypeLangVersionManager,
-		domain.OperationTypeSystemTemp,
-		domain.OperationTypeProjectsManagementAutomation,
+		operations.OperationTypeSystemTemp,
+		operations.OperationTypeProjectsManagementAutomation,
 	}
 
 	for _, opType := range testCases {
 		t.Run(string(opType), func(t *testing.T) {
 			t.Parallel()
 			// Get default settings
-			settings := domain.DefaultSettings(opType)
+			settings := operations.DefaultSettings(opType)
 			require.NotNil(t, settings, "DefaultSettings should not return nil")
 
 			// Validate settings
@@ -521,7 +522,7 @@ func TestDefaultSettings_WithEnums(t *testing.T) {
 			data, err := yaml.Marshal(settings)
 			require.NoError(t, err, "Should marshal settings")
 
-			var unmarshaled domain.OperationSettings
+			var unmarshaled operations.OperationSettings
 			err = yaml.Unmarshal(data, &unmarshaled)
 			require.NoError(t, err, "Should unmarshal settings")
 
@@ -551,21 +552,21 @@ func TestEnumRoundtrip_ThroughConfig(t *testing.T) {
 	}
 
 	// Original settings with enum values
-	originalSettings := &domain.OperationSettings{
-		Docker: &domain.DockerSettings{
-			PruneMode: domain.DockerPruneImages,
+	originalSettings := &operations.OperationSettings{
+		Docker: &operations.DockerSettings{
+			PruneMode: enums.DockerPruneImages,
 		},
-		GoPackages: &domain.GoPackagesSettings{
-			CleanCache:      domain.CacheCleanupEnabled,
-			CleanTestCache:  domain.CacheCleanupEnabled,
-			CleanModCache:   domain.CacheCleanupDisabled,
-			CleanBuildCache: domain.CacheCleanupEnabled,
-			CleanLintCache:  domain.CacheCleanupDisabled,
+		GoPackages: &operations.GoPackagesSettings{
+			CleanCache:      enums.CacheCleanupEnabled,
+			CleanTestCache:  enums.CacheCleanupEnabled,
+			CleanModCache:   enums.CacheCleanupDisabled,
+			CleanBuildCache: enums.CacheCleanupEnabled,
+			CleanLintCache:  enums.CacheCleanupDisabled,
 		},
-		SystemCache: &domain.SystemCacheSettings{
-			CacheTypes: []domain.CacheType{
-				domain.CacheTypeSpotlight,
-				domain.CacheTypeXcode,
+		SystemCache: &operations.SystemCacheSettings{
+			CacheTypes: []enums.CacheType{
+				enums.CacheTypeSpotlight,
+				enums.CacheTypeXcode,
 			},
 			OlderThan: "30d",
 		},
@@ -576,7 +577,7 @@ func TestEnumRoundtrip_ThroughConfig(t *testing.T) {
 	require.NoError(t, err, "Should marshal settings")
 
 	// Unmarshal from YAML
-	var unmarshaledSettings domain.OperationSettings
+	var unmarshaledSettings operations.OperationSettings
 	err = yaml.Unmarshal(data, &unmarshaledSettings)
 	require.NoError(t, err, "Should unmarshal settings")
 
@@ -633,7 +634,7 @@ func TestEnumErrorMessages_ThroughWorkflow(t *testing.T) {
 
 	// Test invalid Docker prune mode - should error during YAML unmarshaling
 	invalidConfig := `prune_mode: "INVALID"`
-	var dockerSettings domain.DockerSettings
+	var dockerSettings operations.DockerSettings
 	err := yaml.Unmarshal([]byte(invalidConfig), &dockerSettings)
 	assert.Error(t, err, "Should error on invalid DockerPruneMode during unmarshaling")
 	assert.Contains(t, err.Error(), "Valid options", "Error should list valid options")
@@ -641,7 +642,7 @@ func TestEnumErrorMessages_ThroughWorkflow(t *testing.T) {
 
 	// Test valid enum value with cleaner
 	validConfig := `prune_mode: "ALL"`
-	var validDockerSettings domain.DockerSettings
+	var validDockerSettings operations.DockerSettings
 	err = yaml.Unmarshal([]byte(validConfig), &validDockerSettings)
 	require.NoError(t, err, "Should parse valid config")
 
@@ -661,12 +662,12 @@ func TestEnumValues_ThroughExecution(t *testing.T) {
 
 	// Test Docker cleaner with different prune modes
 	pruneModes := []struct {
-		mode domain.DockerPruneMode
+		mode enums.DockerPruneMode
 		name string
 	}{
-		{domain.DockerPruneAll, "ALL"},
-		{domain.DockerPruneImages, "IMAGES"},
-		{domain.DockerPruneContainers, "CONTAINERS"},
+		{enums.DockerPruneAll, "ALL"},
+		{enums.DockerPruneImages, "IMAGES"},
+		{enums.DockerPruneContainers, "CONTAINERS"},
 	}
 
 	for _, pm := range pruneModes {
@@ -684,8 +685,8 @@ func TestEnumValues_ThroughExecution(t *testing.T) {
 			assert.NotNil(t, dockerCleaner, "Docker cleaner should be created")
 
 			// Verify settings validation
-			settings := &domain.OperationSettings{
-				Docker: &domain.DockerSettings{
+			settings := &operations.OperationSettings{
+				Docker: &operations.DockerSettings{
 					PruneMode: pm.mode,
 				},
 			}

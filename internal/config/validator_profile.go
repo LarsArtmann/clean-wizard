@@ -3,12 +3,11 @@ package config
 import (
 	"errors"
 	"fmt"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"go/types"
 )
 
 // validateProfiles validates all profiles in configuration.
-func (cv *ConfigValidator) validateProfiles(cfg *domain.Config) error {
+func (cv *ConfigValidator) validateProfiles(cfg *types.Config) error {
 	for name, profile := range cfg.Profiles {
 		// Validate profile name
 		err := cv.validateProfileName(name)

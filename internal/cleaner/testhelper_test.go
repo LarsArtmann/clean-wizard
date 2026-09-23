@@ -5,7 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/onsi/gomega"
 )
 
@@ -13,7 +14,7 @@ import (
 // returns expected errors. Consolidates duplicate validation test patterns
 // across ginkgo test files.
 func assertValidationError(
-	cleaner CleanerWithSettings, settings *domain.OperationSettings, expectedErrSubstring string,
+	cleaner CleanerWithSettings, settings *operations.OperationSettings, expectedErrSubstring string,
 ) {
 	err := cleaner.ValidateSettings(settings)
 	gomega.Expect(err).To(gomega.HaveOccurred())
@@ -101,14 +102,14 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				SettingsFieldName: "cargo packages",
 				ExpectedItems:     2,
 				Constructor:       NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner),
-				CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
-					cleanupMode := domain.CacheCleanupDisabled
+				CreateSettingsFunc: func(enabled bool) *operations.OperationSettings {
+					cleanupMode := enums.CacheCleanupDisabled
 					if enabled {
-						cleanupMode = domain.CacheCleanupEnabled
+						cleanupMode = enums.CacheCleanupEnabled
 					}
 
-					return &domain.OperationSettings{
-						CargoPackages: &domain.CargoPackagesSettings{
+					return &operations.OperationSettings{
+						CargoPackages: &operations.CargoPackagesSettings{
 							Autoclean: cleanupMode,
 						},
 					}
@@ -125,14 +126,14 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				Constructor: NewBooleanSettingsCleanerTestConstructor(
 					NewProjectsManagementAutomationCleaner,
 				),
-				CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
-					cleanupMode := domain.CacheCleanupDisabled
+				CreateSettingsFunc: func(enabled bool) *operations.OperationSettings {
+					cleanupMode := enums.CacheCleanupDisabled
 					if enabled {
-						cleanupMode = domain.CacheCleanupEnabled
+						cleanupMode = enums.CacheCleanupEnabled
 					}
 
-					return &domain.OperationSettings{
-						ProjectsManagementAutomation: &domain.ProjectsManagementAutomationSettings{
+					return &operations.OperationSettings{
+						ProjectsManagementAutomation: &operations.ProjectsManagementAutomationSettings{
 							ClearCache: cleanupMode,
 						},
 					}

@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // addCriticalRiskError adds a validation error for critical risk operations without safe mode.
 func (cv *ConfigValidator) addCriticalRiskError(
-	result *ValidationResult, profileName string, op domain.CleanupOperation,
+	result *ValidationResult, profileName string, op types.CleanupOperation,
 	rule, message, suggestion string,
 ) {
 	result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
@@ -23,7 +25,7 @@ func (cv *ConfigValidator) addCriticalRiskError(
 }
 
 // validateBusinessLogic validates business logic constraints.
-func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *ValidationResult) {
+func (cv *ConfigValidator) validateBusinessLogic(cfg *types.Config, result *ValidationResult) {
 	for name, profile := range cfg.Profiles {
 		// Validate profile business logic
 		if len(profile.Operations) == 0 {
@@ -41,7 +43,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 		for _, op := range profile.Operations {
 			// Validate risk vs safe mode
 			if !cfg.SafeMode.IsEnabled() &&
-				op.RiskLevel == domain.RiskLevelCriticalType {
+				op.RiskLevel == enums.RiskLevelCriticalType {
 				cv.addCriticalRiskError(result, name, op, "business_logic",
 					"Critical risk operation '%s' not allowed in unsafe mode",
 					"Enable safe mode or remove critical risk operation")
@@ -49,7 +51,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 
 			// Validate operation settings
 			if op.Settings != nil {
-				opType := domain.GetOperationType(op.Name)
+				opType := operations.GetOperationType(op.Name)
 
 				err := op.Settings.ValidateSettings(opType)
 				if err != nil {
@@ -91,7 +93,7 @@ func (cv *ConfigValidator) validateBusinessLogic(cfg *domain.Config, result *Val
 
 // validateSecurityConstraints validates security-related constraints.
 func (cv *ConfigValidator) validateSecurityConstraints(
-	cfg *domain.Config,
+	cfg *types.Config,
 	result *ValidationResult,
 ) {
 	// Validate no protected paths contain dangerous patterns
@@ -125,7 +127,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(
 	// Validate no profiles have critical operations without explicit consent
 	for name, profile := range cfg.Profiles {
 		for _, op := range profile.Operations {
-			if op.RiskLevel == domain.RiskLevelCriticalType &&
+			if op.RiskLevel == enums.RiskLevelCriticalType &&
 				!cfg.SafeMode.IsEnabled() {
 				cv.addCriticalRiskError(result, name, op, "security",
 					"Critical risk operation '%s' requires safe mode enabled",
@@ -138,7 +140,7 @@ func (cv *ConfigValidator) validateSecurityConstraints(
 // validateProtectedPathsConflict checks if operations might affect protected paths.
 func (cv *ConfigValidator) validateProtectedPathsConflict(
 	protected []string,
-	op domain.CleanupOperation,
+	op types.CleanupOperation,
 ) error {
 	switch op.Name {
 	case "temp-files":
@@ -156,7 +158,7 @@ func (cv *ConfigValidator) validateProtectedPathsConflict(
 // checkTempFilesConflict checks for temp files conflicts.
 func (cv *ConfigValidator) checkTempFilesConflict(
 	protected []string,
-	op domain.CleanupOperation,
+	op types.CleanupOperation,
 ) error {
 	if op.Settings != nil && op.Settings.TempFiles != nil {
 		for _, exclude := range op.Settings.TempFiles.Excludes {
@@ -177,7 +179,7 @@ func (cv *ConfigValidator) checkTempFilesConflict(
 }
 
 // checkNixConflict checks for Nix conflicts.
-func (cv *ConfigValidator) checkNixConflict(protected []string, _ domain.CleanupOperation) error {
+func (cv *ConfigValidator) checkNixConflict(protected []string, _ types.CleanupOperation) error {
 	// Nix operations typically affect /nix/store, check if protected paths overlap
 	nixStorePath := "/nix/store"
 	for _, protectedPath := range protected {
@@ -191,12 +193,12 @@ func (cv *ConfigValidator) checkNixConflict(protected []string, _ domain.Cleanup
 }
 
 // findMaxRiskLevel finds the maximum risk level in configuration.
-func (cv *ConfigValidator) findMaxRiskLevel(cfg *domain.Config) domain.RiskLevelType {
-	maxRisk := domain.RiskLevelLowType
+func (cv *ConfigValidator) findMaxRiskLevel(cfg *types.Config) enums.RiskLevelType {
+	maxRisk := enums.RiskLevelLowType
 	for _, profile := range cfg.Profiles {
 		maxRisk = maxRiskLevelFromOperations(profile.Operations, maxRisk)
-		if maxRisk == domain.RiskLevelCriticalType {
-			return domain.RiskLevelCriticalType
+		if maxRisk == enums.RiskLevelCriticalType {
+			return enums.RiskLevelCriticalType
 		}
 	}
 

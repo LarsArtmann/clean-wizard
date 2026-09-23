@@ -2,19 +2,22 @@ package types
 
 import (
 	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestConfig_SettingsForProfile(t *testing.T) {
 	t.Parallel()
 
-	tempSettings := &TempFilesSettings{OlderThan: "14d"}
-	dockerSettings := &DockerSettings{PruneMode: DockerPruneVolumes}
+	tempSettings := &operations.TempFilesSettings{OlderThan: "14d"}
+	dockerSettings := &operations.DockerSettings{PruneMode: enums.DockerPruneVolumes}
 
 	tests := []struct {
 		name        string
 		config      *Config
 		profileName string
-		want        *OperationSettings
+		want        *operations.OperationSettings
 	}{
 		{
 			name:        "nil config returns nil",
@@ -28,7 +31,7 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 				Profiles: map[string]*Profile{
 					"daily": {
 						Operations: []CleanupOperation{
-							{Name: "temp-files", Settings: &OperationSettings{TempFiles: tempSettings}},
+							{Name: "temp-files", Settings: &operations.OperationSettings{TempFiles: tempSettings}},
 						},
 					},
 				},
@@ -56,13 +59,13 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 				Profiles: map[string]*Profile{
 					"daily": {
 						Operations: []CleanupOperation{
-							{Name: "temp-files", Settings: &OperationSettings{TempFiles: tempSettings}},
+							{Name: "temp-files", Settings: &operations.OperationSettings{TempFiles: tempSettings}},
 						},
 					},
 				},
 			},
 			profileName: "daily",
-			want:        &OperationSettings{TempFiles: tempSettings},
+			want:        &operations.OperationSettings{TempFiles: tempSettings},
 		},
 		{
 			name: "settings from multiple operations are merged",
@@ -70,14 +73,14 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 				Profiles: map[string]*Profile{
 					"daily": {
 						Operations: []CleanupOperation{
-							{Name: "temp-files", Settings: &OperationSettings{TempFiles: tempSettings}},
-							{Name: "docker", Settings: &OperationSettings{Docker: dockerSettings}},
+							{Name: "temp-files", Settings: &operations.OperationSettings{TempFiles: tempSettings}},
+							{Name: "docker", Settings: &operations.OperationSettings{Docker: dockerSettings}},
 						},
 					},
 				},
 			},
 			profileName: "daily",
-			want:        &OperationSettings{TempFiles: tempSettings, Docker: dockerSettings},
+			want:        &operations.OperationSettings{TempFiles: tempSettings, Docker: dockerSettings},
 		},
 		{
 			name: "first settings section wins on conflict",
@@ -85,17 +88,17 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 				Profiles: map[string]*Profile{
 					"daily": {
 						Operations: []CleanupOperation{
-							{Name: "temp-files", Settings: &OperationSettings{TempFiles: tempSettings}},
+							{Name: "temp-files", Settings: &operations.OperationSettings{TempFiles: tempSettings}},
 							{
 								Name:     "temp-files",
-								Settings: &OperationSettings{TempFiles: &TempFilesSettings{OlderThan: "1h"}},
+								Settings: &operations.OperationSettings{TempFiles: &operations.TempFilesSettings{OlderThan: "1h"}},
 							},
 						},
 					},
 				},
 			},
 			profileName: "daily",
-			want:        &OperationSettings{TempFiles: tempSettings},
+			want:        &operations.OperationSettings{TempFiles: tempSettings},
 		},
 		{
 			name: "operations without settings do not erase merged sections",
@@ -104,13 +107,13 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 					"daily": {
 						Operations: []CleanupOperation{
 							{Name: "temp-files"},
-							{Name: "docker", Settings: &OperationSettings{Docker: dockerSettings}},
+							{Name: "docker", Settings: &operations.OperationSettings{Docker: dockerSettings}},
 						},
 					},
 				},
 			},
 			profileName: "daily",
-			want:        &OperationSettings{Docker: dockerSettings},
+			want:        &operations.OperationSettings{Docker: dockerSettings},
 		},
 	}
 

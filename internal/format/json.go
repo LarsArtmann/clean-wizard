@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
@@ -41,7 +41,7 @@ type CleanerResult struct {
 
 // CleanResultsToJSON converts clean results to JSON output format.
 func CleanResultsToJSON(
-	results map[string]domain.CleanResult, duration time.Duration,
+	results map[string]types.CleanResult, duration time.Duration,
 	dryRun bool, skipped, failed map[string]error,
 ) ([]byte, error) {
 	output := JSONOutput{ //nolint:exhaustruct

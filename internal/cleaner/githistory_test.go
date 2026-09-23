@@ -4,7 +4,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
@@ -89,7 +90,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 			})
 
 			ginkgo.It("should accept selected files option", func() {
-				files := []domain.GitHistoryFile{
+				files := []types.GitHistoryFile{
 					{Path: "binary.exe", SizeBytes: 5 * 1024 * 1024},
 				}
 				cleaner = NewGitHistoryCleaner(WithGitHistorySelectedFiles(files))
@@ -117,7 +118,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 		})
 
 		ginkgo.It("should return correct name and type", func() {
-			GinkgoAssertNameAndType(cleaner, "git-history", domain.OperationTypeGitHistory)
+			GinkgoAssertNameAndType(cleaner, "git-history", operations.OperationTypeGitHistory)
 		})
 	})
 
@@ -147,16 +148,16 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 
 		ginkgo.Context("with valid settings", func() {
 			ginkgo.It("should return nil for valid empty GitHistorySettings", func() {
-				settings := &domain.OperationSettings{
-					GitHistory: &domain.GitHistorySettings{},
+				settings := &operations.OperationSettings{
+					GitHistory: &operations.GitHistorySettings{},
 				}
 				err := cleaner.ValidateSettings(settings)
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			})
 
 			ginkgo.It("should return nil for valid min_size_mb", func() {
-				settings := &domain.OperationSettings{
-					GitHistory: &domain.GitHistorySettings{
+				settings := &operations.OperationSettings{
+					GitHistory: &operations.GitHistorySettings{
 						MinSizeMB: 10,
 					},
 				}
@@ -164,8 +165,8 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 			})
 
 			ginkgo.It("should return nil for valid max_files", func() {
-				settings := &domain.OperationSettings{
-					GitHistory: &domain.GitHistorySettings{
+				settings := &operations.OperationSettings{
+					GitHistory: &operations.GitHistorySettings{
 						MaxFiles: 50,
 					},
 				}
@@ -175,8 +176,8 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 
 		ginkgo.Context("with invalid settings", func() {
 			ginkgo.It("should return error for negative min_size_mb", func() {
-				settings := &domain.OperationSettings{
-					GitHistory: &domain.GitHistorySettings{
+				settings := &operations.OperationSettings{
+					GitHistory: &operations.GitHistorySettings{
 						MinSizeMB: -1,
 					},
 				}
@@ -184,8 +185,8 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 			})
 
 			ginkgo.It("should return error for negative max_files", func() {
-				settings := &domain.OperationSettings{
-					GitHistory: &domain.GitHistorySettings{
+				settings := &operations.OperationSettings{
+					GitHistory: &operations.GitHistorySettings{
 						MaxFiles: -1,
 					},
 				}
@@ -238,7 +239,7 @@ var _ = ginkgo.Describe("GitHistoryCleaner", func() {
 		})
 
 		ginkgo.It("should set selected files", func() {
-			files := []domain.GitHistoryFile{
+			files := []types.GitHistoryFile{
 				{Path: "binary.exe", SizeBytes: 5 * 1024 * 1024},
 			}
 			cleaner.SetSelectedFiles(files)

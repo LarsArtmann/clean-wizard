@@ -1,10 +1,10 @@
 package di
 
 import (
+	"go/types"
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -41,7 +41,7 @@ func TestRegisterAllServices_RegistersConfig(t *testing.T) {
 	container, cleanup := New()
 	defer cleanup()
 
-	cfg := &domain.Config{}
+	cfg := &types.Config{}
 	settings := RunSettings{Verbose: true, DryRun: false}
 
 	err := RegisterAllServices(container.Injector(), cfg, settings)
@@ -58,7 +58,7 @@ func TestRegisterAllServices_RegistersSettings(t *testing.T) {
 	container, cleanup := New()
 	defer cleanup()
 
-	cfg := &domain.Config{}
+	cfg := &types.Config{}
 	settings := RunSettings{Verbose: true, DryRun: true}
 
 	err := RegisterAllServices(container.Injector(), cfg, settings)
@@ -75,7 +75,7 @@ func TestRegisterAllServices_RegistersCleanerRegistry(t *testing.T) {
 	container, cleanup := New()
 	defer cleanup()
 
-	cfg := &domain.Config{}
+	cfg := &types.Config{}
 	settings := RunSettings{Verbose: false, DryRun: true}
 
 	err := RegisterAllServices(container.Injector(), cfg, settings)
@@ -101,7 +101,7 @@ func TestOverrideRegistry_ReplacesRegistry(t *testing.T) {
 	container, cleanup := New()
 	defer cleanup()
 
-	cfg := &domain.Config{}
+	cfg := &types.Config{}
 	settings := RunSettings{}
 
 	err := RegisterAllServices(container.Injector(), cfg, settings)
@@ -124,7 +124,7 @@ func TestOverrideSettings_ReplacesSettings(t *testing.T) {
 	container, cleanup := New()
 	defer cleanup()
 
-	cfg := &domain.Config{}
+	cfg := &types.Config{}
 	originalSettings := RunSettings{Verbose: false, DryRun: false}
 
 	err := RegisterAllServices(container.Injector(), cfg, originalSettings)

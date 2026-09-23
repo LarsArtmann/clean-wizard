@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -88,7 +88,7 @@ func TestHomebrewCleaner_Integration(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	homebrewCleaner := cleaner.NewHomebrewCleaner(false, false, domain.HomebrewModeAll)
+	homebrewCleaner := cleaner.NewHomebrewCleaner(false, false, enums.HomebrewModeAll)
 
 	// Check if Homebrew is available
 	if !homebrewCleaner.IsAvailable(ctx) {

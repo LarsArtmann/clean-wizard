@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // validateChangeBusinessRules validates changes against business rules.
@@ -12,8 +14,8 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 	for _, change := range changes {
 		// Rule: Cannot remove critical protected paths
 		if change.Field == "protected" && //nolint:goconst
-			change.Operation == domain.ChangeOperationRemovedType {
-			criticalPaths := domain.CriticalSystemPaths()
+			change.Operation == enums.ChangeOperationRemovedType {
+			criticalPaths := types.CriticalSystemPaths()
 			for _, critical := range criticalPaths {
 				if change.OldValue == critical {
 					return fmt.Errorf("cannot remove critical protected path: %s", critical)
@@ -44,14 +46,14 @@ func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChan
 // validateOperationSettings validates operation-specific settings with type safety.
 func (vm *ValidationMiddleware) validateOperationSettings(
 	operationName string,
-	op domain.CleanupOperation,
+	op types.CleanupOperation,
 ) error {
 	// Use the already-validated settings from the operation
 	if op.Settings == nil {
 		return nil // Settings are optional
 	}
 
-	opType := domain.GetOperationType(operationName)
+	opType := operations.GetOperationType(operationName)
 
 	return op.Settings.ValidateSettings(opType)
 }

@@ -6,14 +6,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // StepResult holds the outcome of a single cleaner step within the workflow.
 type StepResult struct {
 	Name     string
-	Clean    domain.CleanResult
+	Clean    types.CleanResult
 	Err      error
 	Duration time.Duration
 }
@@ -93,8 +93,8 @@ func (wr *WorkflowResult) Failed() []StepResult {
 
 // CleanResultsMap builds a name→CleanResult map for successful steps,
 // matching the shape expected by the existing display functions.
-func (wr *WorkflowResult) CleanResultsMap() map[string]domain.CleanResult {
-	m := make(map[string]domain.CleanResult)
+func (wr *WorkflowResult) CleanResultsMap() map[string]types.CleanResult {
+	m := make(map[string]types.CleanResult)
 
 	for _, s := range wr.Steps {
 		if s.Status() == StepStatusSucceeded {
@@ -129,7 +129,7 @@ func (rc *resultCollector) register(name string, index int) {
 // recordFinal stores the result of a step, replacing any previous entry for
 // the same step name. This prevents duplicate entries when go-workflow retries
 // a step — only the final outcome is kept.
-func (rc *resultCollector) recordFinal(name string, clean domain.CleanResult, err error, duration time.Duration) {
+func (rc *resultCollector) recordFinal(name string, clean types.CleanResult, err error, duration time.Duration) {
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
 

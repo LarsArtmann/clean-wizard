@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -200,7 +202,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			GinkgoAssertNameAndType(
 				cleaner,
 				"project-executables",
-				domain.OperationTypeProjectExecutables,
+				operations.OperationTypeProjectExecutables,
 			)
 		})
 	})
@@ -260,15 +262,15 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("with valid settings", func() {
 			ginkgo.It("should return nil for valid empty ProjectExecutablesSettings", func() {
-				settings := &domain.OperationSettings{
-					ProjectExecutables: &domain.ProjectExecutablesSettings{},
+				settings := &operations.OperationSettings{
+					ProjectExecutables: &operations.ProjectExecutablesSettings{},
 				}
 				GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid exclude extensions", func() {
-				settings := &domain.OperationSettings{
-					ProjectExecutables: &domain.ProjectExecutablesSettings{
+				settings := &operations.OperationSettings{
+					ProjectExecutables: &operations.ProjectExecutablesSettings{
 						ExcludeExtensions: []string{".sh", ".bash"},
 					},
 				}
@@ -276,8 +278,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			})
 
 			ginkgo.It("should return nil for valid exclude patterns", func() {
-				settings := &domain.OperationSettings{
-					ProjectExecutables: &domain.ProjectExecutablesSettings{
+				settings := &operations.OperationSettings{
+					ProjectExecutables: &operations.ProjectExecutablesSettings{
 						ExcludePatterns: []string{"Makefile", "*.config"},
 					},
 				}
@@ -285,8 +287,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			})
 
 			ginkgo.It("should return nil for valid combined settings", func() {
-				settings := &domain.OperationSettings{
-					ProjectExecutables: &domain.ProjectExecutablesSettings{
+				settings := &operations.OperationSettings{
+					ProjectExecutables: &operations.ProjectExecutablesSettings{
 						ExcludeExtensions: []string{".sh"},
 						ExcludePatterns:   []string{"Makefile"},
 					},
@@ -297,8 +299,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("with invalid glob patterns", func() {
 			ginkgo.It("should return error for invalid glob pattern [invalid", func() {
-				settings := &domain.OperationSettings{
-					ProjectExecutables: &domain.ProjectExecutablesSettings{
+				settings := &operations.OperationSettings{
+					ProjectExecutables: &operations.ProjectExecutablesSettings{
 						ExcludePatterns: []string{"[invalid"},
 					},
 				}
@@ -306,8 +308,8 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			})
 
 			ginkgo.It("should return error for invalid glob pattern with unclosed bracket", func() {
-				settings := &domain.OperationSettings{
-					ProjectExecutables: &domain.ProjectExecutablesSettings{
+				settings := &operations.OperationSettings{
+					ProjectExecutables: &operations.ProjectExecutablesSettings{
 						ExcludePatterns: []string{"test["},
 					},
 				}
@@ -338,7 +340,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			"when ListProjects fails",
 			"should return error when project listing fails",
 			func() { mockLister.err = errors.New("failed to list projects") },
-			func() result.Result[[]domain.ScanItem] { return cleaner.Scan(ctx) },
+			func() result.Result[[]types.ScanItem] { return cleaner.Scan(ctx) },
 		)
 
 		ginkgo.Context("when no projects found", func() {
@@ -417,7 +419,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				result := cleaner.Scan(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				items := result.Value()
-				gomega.Expect(items[0].ScanType).To(gomega.Equal(domain.ScanTypeSystem))
+				gomega.Expect(items[0].ScanType).To(gomega.Equal(types.ScanTypeSystem))
 			})
 
 			ginkgo.It("should set valid Created timestamp", func() {
@@ -465,7 +467,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			"when Scan fails",
 			"should return error when scan fails",
 			func() { mockLister.err = errors.New("scan failed") },
-			func() result.Result[domain.CleanResult] { return cleaner.Clean(ctx) },
+			func() result.Result[types.CleanResult] { return cleaner.Clean(ctx) },
 		)
 
 		ginkgo.Context("with no items to clean", func() {
@@ -496,7 +498,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				result := cleaner.Clean(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				cleanResult := result.Value()
-				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyDryRun))
+				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(enums.StrategyDryRun))
 				gomega.Expect(mockOperator.trashCallCount).To(gomega.Equal(0))
 			})
 
@@ -590,7 +592,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				result := cleaner.Clean(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				cleanResult := result.Value()
-				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyAggressive))
+				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(enums.StrategyAggressive))
 			})
 
 			ginkgo.It("should measure clean time", func() {

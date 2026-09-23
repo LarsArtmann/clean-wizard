@@ -6,7 +6,7 @@ import (
 	"time"
 
 	flow "github.com/Azure/go-workflow"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 )
 
@@ -41,7 +41,7 @@ func makeAfterHook(verbose bool) flow.AfterStep {
 		duration := time.Since(start)
 
 		if verbose && runErr == nil {
-			if fn, ok := step.(*flow.Function[struct{}, domain.CleanResult]); ok {
+			if fn, ok := step.(*flow.Function[struct{}, types.CleanResult]); ok {
 				r := fn.Output
 				fmt.Printf(
 					"  [DEBUG] %s: %d bytes (%s), %d items, took %s\n",

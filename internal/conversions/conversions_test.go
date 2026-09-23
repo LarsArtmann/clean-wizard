@@ -6,14 +6,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
 // assertErrorResult verifies that a CleanResult is an error and matches the expected error.
 func assertErrorResult(
 	t *testing.T,
-	cleanResult result.Result[domain.CleanResult],
+	cleanResult result.Result[types.CleanResult],
 	expectedErr error,
 ) {
 	t.Helper()
@@ -30,8 +31,8 @@ func assertErrorResult(
 // assertStrategyEqual checks that the result's strategy matches the expected strategy.
 func assertStrategyEqual(
 	t *testing.T,
-	value *domain.CleanResult,
-	strategy domain.CleanStrategyType,
+	value *types.CleanResult,
+	strategy enums.CleanStrategyType,
 ) {
 	t.Helper()
 
@@ -43,7 +44,7 @@ func assertStrategyEqual(
 // assertScanResultFields checks common fields of a ScanResult.
 func assertScanResultFields(
 	t *testing.T,
-	scanResult *domain.ScanResult,
+	scanResult *types.ScanResult,
 	totalBytes int64,
 	totalItems int,
 	scannedPaths []string,
@@ -79,7 +80,7 @@ func assertScanResultFields(
 func TestNewCleanResult(t *testing.T) {
 	t.Parallel()
 
-	strategy := domain.StrategyDryRunType
+	strategy := enums.StrategyDryRunType
 	items := 5
 	bytes := int64(1024)
 
@@ -113,7 +114,7 @@ func TestNewCleanResult(t *testing.T) {
 func TestNewCleanResultWithTiming(t *testing.T) {
 	t.Parallel()
 
-	strategy := domain.StrategyDryRunType
+	strategy := enums.StrategyDryRunType
 	items := 3
 	bytes := int64(2048)
 	cleanTime := time.Duration(5) * time.Second
@@ -140,7 +141,7 @@ func TestNewCleanResultWithTiming(t *testing.T) {
 func TestNewCleanResultWithFailures(t *testing.T) {
 	t.Parallel()
 
-	strategy := domain.StrategyDryRunType
+	strategy := enums.StrategyDryRunType
 	itemsRemoved := 8
 	itemsFailed := 2
 	bytes := int64(4096)
@@ -198,7 +199,7 @@ func TestToCleanResult(t *testing.T) {
 		t.Errorf("Expected freed bytes %d, got %d", bytes, value.FreedBytes)
 	}
 
-	if value.Strategy != domain.StrategyConservativeType {
+	if value.Strategy != enums.StrategyConservativeType {
 		t.Errorf("Expected strategy 'conservative', got %s", value.Strategy)
 	}
 }
@@ -217,7 +218,7 @@ func TestToCleanResultWithStrategy(t *testing.T) {
 	t.Parallel()
 
 	bytes := int64(2048)
-	strategy := domain.StrategyDryRunType
+	strategy := enums.StrategyDryRunType
 	bytesResult := result.Ok(bytes)
 
 	cleanResult := ToCleanResultWithStrategy(bytesResult, strategy)
@@ -239,7 +240,7 @@ func TestToCleanResultFromItems(t *testing.T) {
 
 	itemsRemoved := 5
 	bytes := int64(4096)
-	strategy := domain.StrategyDryRunType
+	strategy := enums.StrategyDryRunType
 	bytesResult := result.Ok(bytes)
 
 	cleanResult := ToCleanResultFromItems(itemsRemoved, bytesResult, strategy)
@@ -264,7 +265,7 @@ func TestToTimedCleanResult(t *testing.T) {
 	t.Parallel()
 
 	bytes := int64(8192)
-	strategy := domain.StrategyDryRunType
+	strategy := enums.StrategyDryRunType
 	cleanTime := time.Duration(7) * time.Second
 	bytesResult := result.Ok(bytes)
 
@@ -302,17 +303,17 @@ func TestCombineCleanResults(t *testing.T) {
 	t.Parallel()
 
 	result1 := NewCleanResult(
-		domain.StrategyAggressiveType,
+		enums.StrategyAggressiveType,
 		3,
 		int64(1024),
 	)
 	result2 := NewCleanResult(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		5,
 		int64(2048),
 	)
 
-	results := []domain.CleanResult{result1, result2}
+	results := []types.CleanResult{result1, result2}
 
 	combined := CombineCleanResults(results)
 
@@ -328,7 +329,7 @@ func TestCombineCleanResults(t *testing.T) {
 		t.Errorf("Expected items failed 0, got %d", combined.ItemsFailed)
 	}
 	// When combining different strategies, should default to conservative
-	if combined.Strategy != domain.StrategyConservativeType {
+	if combined.Strategy != enums.StrategyConservativeType {
 		t.Errorf(
 			"Expected combined strategy to be 'conservative' for mixed strategies, got %s",
 			combined.Strategy,
@@ -340,21 +341,21 @@ func TestCombineCleanResultsWithFailures(t *testing.T) {
 	t.Parallel()
 
 	result1 := NewCleanResultWithFailures(
-		domain.StrategyAggressiveType,
+		enums.StrategyAggressiveType,
 		3,
 		1,
 		int64(1024),
 		time.Second,
 	)
 	result2 := NewCleanResultWithFailures(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		5,
 		2,
 		int64(2048),
 		2*time.Second,
 	)
 
-	results := []domain.CleanResult{result1, result2}
+	results := []types.CleanResult{result1, result2}
 
 	combined := CombineCleanResults(results)
 
@@ -378,7 +379,7 @@ func TestCombineCleanResultsWithFailures(t *testing.T) {
 func TestCombineCleanResultsEmpty(t *testing.T) {
 	t.Parallel()
 
-	results := []domain.CleanResult{}
+	results := []types.CleanResult{}
 
 	combined := CombineCleanResults(results)
 
@@ -390,7 +391,7 @@ func TestCombineCleanResultsEmpty(t *testing.T) {
 		t.Errorf("Expected freed bytes 0, got %d", combined.FreedBytes)
 	}
 
-	if combined.Strategy != domain.StrategyConservativeType {
+	if combined.Strategy != enums.StrategyConservativeType {
 		t.Errorf(
 			"Expected strategy 'conservative' (default for empty results), got %s",
 			combined.Strategy,
@@ -403,7 +404,7 @@ func TestExtractBytesFromCleanResult(t *testing.T) {
 
 	bytes := int64(4096)
 	cleanResult := result.Ok(
-		NewCleanResult(domain.StrategyConservativeType, 1, bytes),
+		NewCleanResult(enums.StrategyConservativeType, 1, bytes),
 	)
 
 	extracted := ExtractBytesFromCleanResult(cleanResult)
@@ -421,7 +422,7 @@ func TestExtractBytesFromCleanResultWithError(t *testing.T) {
 	t.Parallel()
 
 	expectedErr := errors.New("test error")
-	cleanResult := result.Err[domain.CleanResult](expectedErr)
+	cleanResult := result.Err[types.CleanResult](expectedErr)
 
 	extracted := ExtractBytesFromCleanResult(cleanResult)
 
@@ -447,7 +448,7 @@ func TestValidateAndConvertCleanResult(t *testing.T) {
 	t.Parallel()
 
 	validResult := NewCleanResult(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1,
 		1024,
 	)
@@ -462,14 +463,14 @@ func TestValidateAndConvertCleanResult(t *testing.T) {
 func TestValidateAndConvertCleanResultInvalid(t *testing.T) {
 	t.Parallel()
 
-	invalidResult := domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{
+	invalidResult := types.CleanResult{
+		SizeEstimate: types.SizeEstimate{
 			Known:  0,
-			Status: domain.SizeEstimateStatusKnown, // Invalid: zero bytes with ItemsRemoved > 0
+			Status: enums.SizeEstimateStatusKnown, // Invalid: zero bytes with ItemsRemoved > 0
 		},
 		ItemsRemoved: 1,
 		CleanedAt:    time.Now(),
-		Strategy:     domain.StrategyDryRunType,
+		Strategy:     enums.StrategyDryRunType,
 		CleanTime:    time.Second, // Non-zero clean time triggers validation
 	}
 

@@ -1,24 +1,26 @@
 package config
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // BDDTestHelpers provides standardized utilities for BDD testing
 // Eliminates duplicate patterns across test files
 
 // ConfigModifier represents a function that modifies a config.
-type ConfigModifier func(*domain.Config) *domain.Config
+type ConfigModifier func(*types.Config) *types.Config
 
 // ProfileOperationModifier modifies specific profile operations.
-type ProfileOperationModifier func(*domain.Profile, *domain.CleanupOperation) bool // returns true if modified
+type ProfileOperationModifier func(*types.Profile, *types.CleanupOperation) bool // returns true if modified
 
 // FindProfileOperation finds a specific operation within a profile by name
 // Returns the operation index, or -1 if not found.
 func FindProfileOperation(
-	cfg *domain.Config,
+	cfg *types.Config,
 	profileName, operationName string,
-) (*domain.Profile, int) {
+) (*types.Profile, int) {
 	if cfg == nil {
 		return nil, -1
 	}
@@ -40,7 +42,7 @@ func FindProfileOperation(
 // ModifyProfileOperation applies a modifier to a specific operation.
 // Returns true if the operation was found and modified.
 func ModifyProfileOperation(
-	cfg *domain.Config, profileName, operationName string,
+	cfg *types.Config, profileName, operationName string,
 	modifier ProfileOperationModifier,
 ) bool {
 	profile, opIndex := FindProfileOperation(cfg, profileName, operationName)
@@ -54,15 +56,15 @@ func ModifyProfileOperation(
 // WithOperationSettings applies a settings modifier to a specific operation.
 // Returns true if the operation was found and modified.
 func WithOperationSettings(
-	cfg *domain.Config,
+	cfg *types.Config,
 	profileName, operationName string,
-	settingsModifier func(*domain.OperationSettings) bool,
+	settingsModifier func(*operations.OperationSettings) bool,
 ) bool {
 	return ModifyProfileOperation(
 		cfg,
 		profileName,
 		operationName,
-		func(profile *domain.Profile, op *domain.CleanupOperation) bool {
+		func(profile *types.Profile, op *types.CleanupOperation) bool {
 			if op.Settings == nil {
 				return false
 			}
@@ -73,44 +75,44 @@ func WithOperationSettings(
 }
 
 // BoolToSafeMode converts boolean to SafeMode enum (standardized across tests).
-func BoolToSafeMode(b bool) domain.SafeMode {
+func BoolToSafeMode(b bool) enums.SafeMode {
 	if b {
-		return domain.SafeModeEnabled
+		return enums.SafeModeEnabled
 	}
 
-	return domain.SafeModeDisabled
+	return enums.SafeModeDisabled
 }
 
 // BoolToProfileStatus converts boolean to ProfileStatus enum (standardized across tests).
-func BoolToProfileStatus(b bool) domain.ProfileStatus {
+func BoolToProfileStatus(b bool) enums.ProfileStatus {
 	if b {
-		return domain.ProfileStatusEnabled
+		return enums.ProfileStatusEnabled
 	}
 
-	return domain.ProfileStatusDisabled
+	return enums.ProfileStatusDisabled
 }
 
 // BoolToOptimizationMode converts boolean to OptimizationMode enum (standardized across tests).
-func BoolToOptimizationMode(b bool) domain.OptimizationMode {
+func BoolToOptimizationMode(b bool) enums.OptimizationMode {
 	if b {
-		return domain.OptimizationModeEnabled
+		return enums.OptimizationModeEnabled
 	}
 
-	return domain.OptimizationModeDisabled
+	return enums.OptimizationModeDisabled
 }
 
 // BoolToGenerationStatus converts boolean to GenerationStatus enum (standardized across tests).
-func BoolToGenerationStatus(b bool) domain.GenerationStatus {
+func BoolToGenerationStatus(b bool) enums.GenerationStatus {
 	if b {
-		return domain.GenerationStatusCurrent
+		return enums.GenerationStatusCurrent
 	}
 
-	return domain.GenerationStatusHistorical
+	return enums.GenerationStatusHistorical
 }
 
 // ChainModifiers applies multiple config modifiers in sequence.
 func ChainModifiers(modifiers ...ConfigModifier) ConfigModifier {
-	return func(cfg *domain.Config) *domain.Config {
+	return func(cfg *types.Config) *types.Config {
 		for _, modifier := range modifiers {
 			cfg = modifier(cfg)
 		}
@@ -123,15 +125,15 @@ func ChainModifiers(modifiers ...ConfigModifier) ConfigModifier {
 // Takes the config, profile name, operation name, and a modifier function.
 // Returns true if the operation was found and modified.
 func WithNixGenerationsSetting(
-	cfg *domain.Config,
+	cfg *types.Config,
 	profileName, operationName string,
-	settingModifier func(*domain.NixGenerationsSettings) bool,
+	settingModifier func(*operations.NixGenerationsSettings) bool,
 ) bool {
 	return WithOperationSettings(
 		cfg,
 		profileName,
 		operationName,
-		func(settings *domain.OperationSettings) bool {
+		func(settings *operations.OperationSettings) bool {
 			if settings.NixGenerations == nil {
 				return false
 			}
@@ -145,14 +147,14 @@ func WithNixGenerationsSetting(
 // Takes the config, profile name, operation name, and a modifier function.
 // Returns true if the operation was found and modified.
 func WithProfileOperationField(
-	cfg *domain.Config, profileName, operationName string,
-	fieldModifier func(*domain.CleanupOperation) bool,
+	cfg *types.Config, profileName, operationName string,
+	fieldModifier func(*types.CleanupOperation) bool,
 ) bool {
 	return ModifyProfileOperation(
 		cfg,
 		profileName,
 		operationName,
-		func(profile *domain.Profile, op *domain.CleanupOperation) bool {
+		func(profile *types.Profile, op *types.CleanupOperation) bool {
 			return fieldModifier(op)
 		},
 	)

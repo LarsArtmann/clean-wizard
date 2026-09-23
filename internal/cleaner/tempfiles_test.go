@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestNewTempFilesCleaner(t *testing.T) {
@@ -271,9 +271,9 @@ func TestTempFilesCleaner_isExcluded(t *testing.T) {
 }
 
 // tempFilesSettings creates an OperationSettings with TempFiles configured.
-func tempFilesSettings(olderThan string, excludes []string) *domain.OperationSettings {
-	return &domain.OperationSettings{
-		TempFiles: &domain.TempFilesSettings{
+func tempFilesSettings(olderThan string, excludes []string) *operations.OperationSettings {
+	return &operations.OperationSettings{
+		TempFiles: &operations.TempFilesSettings{
 			OlderThan: olderThan,
 			Excludes:  excludes,
 		},
@@ -287,7 +287,7 @@ func TestTempFilesCleaner_ValidateSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.OperationSettings
+		settings *operations.OperationSettings
 		wantErr  bool
 	}{
 		{
@@ -297,7 +297,7 @@ func TestTempFilesCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name:     "nil temp files settings",
-			settings: &domain.OperationSettings{},
+			settings: &operations.OperationSettings{},
 			wantErr:  false,
 		},
 		{

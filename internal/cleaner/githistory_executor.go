@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	gitfilterrepo "github.com/LarsArtmann/clean-wizard/internal/shared/utils/gitfilterrepo"
 )
 
@@ -66,7 +66,7 @@ func NewGitHistoryExecutor(
 
 // ExecuteOptions configures the history rewrite.
 type ExecuteOptions struct {
-	FilesToRemove []domain.GitHistoryFile
+	FilesToRemove []types.GitHistoryFile
 	CreateBackup  bool
 	BackupPath    string
 	SkipGC        bool // Skip garbage collection (for testing)
@@ -76,7 +76,7 @@ type ExecuteOptions struct {
 func (e *GitHistoryExecutor) Execute(
 	ctx context.Context,
 	opts ExecuteOptions,
-) (*domain.GitHistoryRewriteResult, error) {
+) (*types.GitHistoryRewriteResult, error) {
 	start := time.Now()
 
 	if len(opts.FilesToRemove) == 0 {
@@ -107,7 +107,7 @@ func (e *GitHistoryExecutor) Execute(
 	}
 
 	if e.dryRun {
-		return &domain.GitHistoryRewriteResult{ //nolint:exhaustruct
+		return &types.GitHistoryRewriteResult{ //nolint:exhaustruct
 			FilesRemoved:    opts.FilesToRemove,
 			BytesRemoved:    e.calculateTotalSize(opts.FilesToRemove),
 			CommitsAffected: 0,
@@ -138,7 +138,7 @@ func (e *GitHistoryExecutor) Execute(
 	// Calculate bytes reclaimed
 	bytesReclaimed := max(oldSize-newSize, 0)
 
-	return &domain.GitHistoryRewriteResult{
+	return &types.GitHistoryRewriteResult{
 		FilesRemoved:    opts.FilesToRemove,
 		BytesRemoved:    e.calculateTotalSize(opts.FilesToRemove),
 		CommitsAffected: commitsAffected,
@@ -155,7 +155,7 @@ func (e *GitHistoryExecutor) Execute(
 // runFilterRepo executes git-filter-repo to remove the specified files.
 func (e *GitHistoryExecutor) runFilterRepo(
 	ctx context.Context,
-	files []domain.GitHistoryFile,
+	files []types.GitHistoryFile,
 ) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, FilterRepoTimeout)
 	defer cancel()
@@ -290,7 +290,7 @@ func (e *GitHistoryExecutor) getDefaultBackupPath() string {
 }
 
 // calculateTotalSize calculates the total size of files to remove.
-func (e *GitHistoryExecutor) calculateTotalSize(files []domain.GitHistoryFile) int64 {
+func (e *GitHistoryExecutor) calculateTotalSize(files []types.GitHistoryFile) int64 {
 	var total int64
 	for _, f := range files {
 		total += f.SizeBytes
@@ -318,7 +318,7 @@ func (e *GitHistoryExecutor) parseCommitCount(output string) int {
 // EstimateImpact estimates the impact of removing files without executing.
 func (e *GitHistoryExecutor) EstimateImpact(
 	ctx context.Context,
-	files []domain.GitHistoryFile,
+	files []types.GitHistoryFile,
 ) (*ImpactEstimate, error) {
 	// Get current repo size
 	oldSize, err := e.getRepoSize()
@@ -357,9 +357,9 @@ type ImpactEstimate struct {
 
 // RemoveFilesFromHistory is a convenience method that combines scanning and removal.
 func (e *GitHistoryExecutor) RemoveFilesFromHistory(ctx context.Context, paths []string) error {
-	files := make([]domain.GitHistoryFile, len(paths))
+	files := make([]types.GitHistoryFile, len(paths))
 	for i, path := range paths {
-		files[i] = domain.GitHistoryFile{Path: path} //nolint:exhaustruct
+		files[i] = types.GitHistoryFile{Path: path} //nolint:exhaustruct
 	}
 
 	_, err := e.Execute(ctx, ExecuteOptions{ //nolint:exhaustruct
@@ -398,10 +398,10 @@ func (e *GitHistoryExecutor) StripLargeBlobs(ctx context.Context, sizeMB int) er
 
 // GetFilesToRemoveFromSelection filters scan results by user selection.
 func GetFilesToRemoveFromSelection(
-	allFiles []domain.GitHistoryFile,
+	allFiles []types.GitHistoryFile,
 	selectedIndices []int,
-) []domain.GitHistoryFile {
-	result := make([]domain.GitHistoryFile, 0, len(selectedIndices))
+) []types.GitHistoryFile {
+	result := make([]types.GitHistoryFile, 0, len(selectedIndices))
 	for _, idx := range selectedIndices {
 		if idx >= 0 && idx < len(allFiles) {
 			result = append(result, allFiles[idx])
@@ -412,7 +412,7 @@ func GetFilesToRemoveFromSelection(
 }
 
 // GetUniquePaths returns unique paths from files.
-func GetUniquePaths(files []domain.GitHistoryFile) []string {
+func GetUniquePaths(files []types.GitHistoryFile) []string {
 	seen := make(map[string]bool)
 
 	var paths []string

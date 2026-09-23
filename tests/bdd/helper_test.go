@@ -6,22 +6,23 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/onsi/gomega"
 )
 
 // mockGenerations creates mock Nix generations for testing in CI environments.
-func mockGenerations(count int) []domain.NixGeneration {
-	gens := make([]domain.NixGeneration, count)
+func mockGenerations(count int) []types.NixGeneration {
+	gens := make([]types.NixGeneration, count)
 	for i := range count {
-		status := domain.GenerationStatusHistorical
+		status := enums.GenerationStatusHistorical
 		if i == 0 {
-			status = domain.GenerationStatusCurrent
+			status = enums.GenerationStatusCurrent
 		}
 
-		gens[i] = domain.NixGeneration{
-			ID:      domain.NixGenerationID(300 - i),
+		gens[i] = types.NixGeneration{
+			ID:      types.NixGenerationID(300 - i),
 			Path:    fmt.Sprintf("/nix/var/nix/profiles/default-%d-link", 300-i),
 			Date:    time.Now().Add(-time.Duration(i*24) * time.Hour),
 			Current: status,
@@ -39,7 +40,7 @@ func mockGenerations(count int) []domain.NixGeneration {
 // getGenerationsOrMock attempts to list real Nix generations, falling back to mocks on error.
 func getGenerationsOrMock(
 	ctx context.Context, nixCleaner *cleaner.NixCleaner, mockCount int,
-) result.Result[[]domain.NixGeneration] {
+) result.Result[[]types.NixGeneration] {
 	generations := nixCleaner.ListGenerations(ctx)
 	if generations.IsErr() {
 		return result.Ok(mockGenerations(mockCount))
@@ -52,7 +53,7 @@ func getGenerationsOrMock(
 // This eliminates duplicate test code for checking generations result.
 func getGenerationsAndAssertOk(
 	ctx context.Context, nixCleaner *cleaner.NixCleaner, mockCount int,
-) result.Result[[]domain.NixGeneration] {
+) result.Result[[]types.NixGeneration] {
 	generations := getGenerationsOrMock(ctx, nixCleaner, mockCount)
 	gomega.Expect(generations.IsOk()).To(gomega.BeTrue())
 
@@ -63,7 +64,7 @@ func getGenerationsAndAssertOk(
 // then verifies the result is OK. Returns the clean result for additional assertions.
 func cleanGenerationsAndVerify(
 	ctx context.Context, nixCleaner *cleaner.NixCleaner, minCount, keepCount int,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	_ = getGenerationsOrMock(ctx, nixCleaner, minCount)
 	cleanResult := nixCleaner.CleanOldGenerations(ctx, keepCount)
 
@@ -72,7 +73,7 @@ func cleanGenerationsAndVerify(
 
 // assertCleanResultItemsRemoved verifies that a clean result has ItemsRemoved >= 0.
 // This eliminates duplicate assertion code across BDD test files.
-func assertCleanResultItemsRemoved(cleanResult result.Result[domain.CleanResult]) {
+func assertCleanResultItemsRemoved(cleanResult result.Result[types.CleanResult]) {
 	gomega.Expect(cleanResult.IsOk()).To(gomega.BeTrue())
 	cleanRes := cleanResult.Value()
 	gomega.Expect(cleanRes.ItemsRemoved).To(gomega.BeNumerically(">=", 0))
@@ -80,7 +81,7 @@ func assertCleanResultItemsRemoved(cleanResult result.Result[domain.CleanResult]
 
 // assertCleanResultStrategyValid verifies that a clean result has a valid Strategy.
 // This eliminates duplicate assertion code across BDD test files.
-func assertCleanResultStrategyValid(cleanResult result.Result[domain.CleanResult]) {
+func assertCleanResultStrategyValid(cleanResult result.Result[types.CleanResult]) {
 	gomega.Expect(cleanResult.IsOk()).To(gomega.BeTrue())
 	cleanRes := cleanResult.Value()
 	gomega.Expect(cleanRes.Strategy.IsValid()).To(gomega.BeTrue())

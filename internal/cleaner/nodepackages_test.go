@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestNewNodePackageManagerCleaner(t *testing.T) {
@@ -14,7 +15,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 		name             string
 		verbose          bool
 		dryRun           bool
-		packageManagers  []domain.PackageManagerType
+		packageManagers  []enums.PackageManagerType
 		wantErr          bool
 		wantPackageCount int
 	}{
@@ -30,7 +31,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 			name:             "valid configuration with single PM",
 			verbose:          true,
 			dryRun:           true,
-			packageManagers:  []domain.PackageManagerType{domain.PackageManagerNpm},
+			packageManagers:  []enums.PackageManagerType{enums.PackageManagerNpm},
 			wantErr:          false,
 			wantPackageCount: 1,
 		},
@@ -38,7 +39,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 			name:             "valid configuration with no PMs",
 			verbose:          false,
 			dryRun:           false,
-			packageManagers:  []domain.PackageManagerType{},
+			packageManagers:  []enums.PackageManagerType{},
 			wantErr:          false,
 			wantPackageCount: 0,
 		},
@@ -70,8 +71,8 @@ func TestNodePackageManagerCleaner_Type(t *testing.T) {
 
 	cleaner := NewNodePackageManagerCleaner(false, false, AvailableNodePackageManagers())
 
-	if cleaner.Type() != domain.OperationTypeNodePackages {
-		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeNodePackages)
+	if cleaner.Type() != operations.OperationTypeNodePackages {
+		t.Errorf("Type() = %v, want %v", cleaner.Type(), operations.OperationTypeNodePackages)
 	}
 }
 
@@ -80,7 +81,7 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 
 	tests := []struct {
 		name              string
-		packageManagers   []domain.PackageManagerType
+		packageManagers   []enums.PackageManagerType
 		shouldBeAvailable bool
 	}{
 		{
@@ -90,7 +91,7 @@ func TestNodePackageManagerCleaner_IsAvailable(t *testing.T) {
 		},
 		{
 			name:              "empty package managers",
-			packageManagers:   []domain.PackageManagerType{},
+			packageManagers:   []enums.PackageManagerType{},
 			shouldBeAvailable: false,
 		},
 	}
@@ -124,16 +125,16 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			Name:     "nil node packages settings",
-			Settings: &domain.OperationSettings{},
+			Settings: &operations.OperationSettings{},
 			WantErr:  false,
 		},
 		{
 			Name: "valid settings with all PMs",
-			Settings: &domain.OperationSettings{
-				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []domain.PackageManagerType{
-						domain.PackageManagerNpm, domain.PackageManagerPnpm,
-						domain.PackageManagerYarn, domain.PackageManagerBun,
+			Settings: &operations.OperationSettings{
+				NodePackages: &operations.NodePackagesSettings{
+					PackageManagers: []enums.PackageManagerType{
+						enums.PackageManagerNpm, enums.PackageManagerPnpm,
+						enums.PackageManagerYarn, enums.PackageManagerBun,
 					},
 				},
 			},
@@ -141,37 +142,37 @@ func TestNodePackageManagerCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			Name: "valid settings with single PM",
-			Settings: &domain.OperationSettings{
-				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []domain.PackageManagerType{domain.PackageManagerNpm},
+			Settings: &operations.OperationSettings{
+				NodePackages: &operations.NodePackagesSettings{
+					PackageManagers: []enums.PackageManagerType{enums.PackageManagerNpm},
 				},
 			},
 			WantErr: false,
 		},
 		{
 			Name: "valid settings with no PMs",
-			Settings: &domain.OperationSettings{
-				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []domain.PackageManagerType{},
+			Settings: &operations.OperationSettings{
+				NodePackages: &operations.NodePackagesSettings{
+					PackageManagers: []enums.PackageManagerType{},
 				},
 			},
 			WantErr: false,
 		},
 		{
 			Name: "invalid package manager",
-			Settings: &domain.OperationSettings{
-				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []domain.PackageManagerType{99}, // Invalid value
+			Settings: &operations.OperationSettings{
+				NodePackages: &operations.NodePackagesSettings{
+					PackageManagers: []enums.PackageManagerType{99}, // Invalid value
 				},
 			},
 			WantErr: true,
 		},
 		{
 			Name: "mixed valid and invalid PMs",
-			Settings: &domain.OperationSettings{
-				NodePackages: &domain.NodePackagesSettings{
-					PackageManagers: []domain.PackageManagerType{
-						domain.PackageManagerNpm,
+			Settings: &operations.OperationSettings{
+				NodePackages: &operations.NodePackagesSettings{
+					PackageManagers: []enums.PackageManagerType{
+						enums.PackageManagerNpm,
 						99,
 					}, // Mixed valid and invalid
 				},
@@ -187,7 +188,7 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 
 	tests := []struct {
 		name            string
-		packageManagers []domain.PackageManagerType
+		packageManagers []enums.PackageManagerType
 		wantMinItems    uint // Minimum expected (actual depends on what's installed)
 		shouldTest      bool // Only test if PMs are available
 	}{
@@ -199,7 +200,7 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 		},
 		{
 			name:            "dry-run with single PM",
-			packageManagers: []domain.PackageManagerType{domain.PackageManagerNpm},
+			packageManagers: []enums.PackageManagerType{enums.PackageManagerNpm},
 			wantMinItems:    1,     // npm should be available
 			shouldTest:      false, // Skip if npm not installed
 		},
@@ -229,11 +230,11 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 				t.Skipf("Clean() removed %d items — PM installed but cache empty on CI", cleanResult.ItemsRemoved)
 			}
 
-			if cleanResult.Strategy != domain.StrategyDryRunType {
+			if cleanResult.Strategy != enums.StrategyDryRunType {
 				t.Errorf(
 					"Clean() strategy = %v, want %v",
 					cleanResult.Strategy,
-					domain.StrategyDryRunType,
+					enums.StrategyDryRunType,
 				)
 			}
 
@@ -250,7 +251,7 @@ func TestNodePackageManagerCleaner_Clean_DryRun(t *testing.T) {
 func TestNodePackageManagerCleaner_Clean_NoAvailableManagers(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewNodePackageManagerCleaner(false, false, []domain.PackageManagerType{})
+	cleaner := NewNodePackageManagerCleaner(false, false, []enums.PackageManagerType{})
 
 	result := cleaner.Clean(context.Background())
 	if !result.IsErr() {
@@ -261,11 +262,11 @@ func TestNodePackageManagerCleaner_Clean_NoAvailableManagers(t *testing.T) {
 func TestNodePackageManagerCleaner_AvailableNodePackageManagers(t *testing.T) {
 	t.Parallel()
 
-	expectedPMs := []domain.PackageManagerType{
-		domain.PackageManagerNpm,
-		domain.PackageManagerPnpm,
-		domain.PackageManagerYarn,
-		domain.PackageManagerBun,
+	expectedPMs := []enums.PackageManagerType{
+		enums.PackageManagerNpm,
+		enums.PackageManagerPnpm,
+		enums.PackageManagerYarn,
+		enums.PackageManagerBun,
 	}
 	TestAvailableTypesGeneric(
 		t,

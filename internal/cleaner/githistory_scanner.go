@@ -11,7 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // GitHistoryScanner scans git history for large binary files.
@@ -39,7 +40,7 @@ func NewGitHistoryScanner(repoPath string, opts ...GitHistoryScannerOption) *Git
 	}
 
 	// Add default extensions to keep (not remove)
-	for _, ext := range domain.ExtensionsToKeep {
+	for _, ext := range operations.ExtensionsToKeep {
 		s.excludeExts[strings.ToLower(ext)] = true
 	}
 
@@ -101,7 +102,7 @@ func WithVerbose(verbose bool) GitHistoryScannerOption {
 }
 
 // Scan scans git history for large binary files.
-func (s *GitHistoryScanner) Scan(ctx context.Context) (*domain.GitHistoryScanResult, error) {
+func (s *GitHistoryScanner) Scan(ctx context.Context) (*types.GitHistoryScanResult, error) {
 	start := time.Now()
 
 	// Check if this is a git repo
@@ -117,7 +118,7 @@ func (s *GitHistoryScanner) Scan(ctx context.Context) (*domain.GitHistoryScanRes
 
 	// Filter and sort files
 	files = s.filterFiles(files)
-	domain.SortBySizeDesc(files)
+	types.SortBySizeDesc(files)
 
 	// Limit results
 	if len(files) > s.maxFiles {
@@ -130,7 +131,7 @@ func (s *GitHistoryScanner) Scan(ctx context.Context) (*domain.GitHistoryScanRes
 		totalBytes += f.SizeBytes
 	}
 
-	return &domain.GitHistoryScanResult{
+	return &types.GitHistoryScanResult{
 		Files:      files,
 		TotalBytes: totalBytes,
 		TotalFiles: len(files),
@@ -152,7 +153,7 @@ func (s *GitHistoryScanner) isGitRepo(ctx context.Context) bool {
 }
 
 // findLargeBlobs finds all large blobs in git history.
-func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]domain.GitHistoryFile, error) {
+func (s *GitHistoryScanner) findLargeBlobs(ctx context.Context) ([]types.GitHistoryFile, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
@@ -214,7 +215,7 @@ func (s *GitHistoryScanner) getObjectPaths(ctx context.Context) (map[string]stri
 func (s *GitHistoryScanner) getLargeBlobsFromObjects(
 	ctx context.Context,
 	objectPaths map[string]string,
-) ([]domain.GitHistoryFile, error) {
+) ([]types.GitHistoryFile, error) {
 	cmd := exec.CommandContext(ctx, "git", "-C", s.repoPath,
 		"cat-file", "--batch-check", "--batch-all-objects")
 
@@ -223,7 +224,7 @@ func (s *GitHistoryScanner) getLargeBlobsFromObjects(
 		return nil, fmt.Errorf("git cat-file --batch-check failed: %w", err)
 	}
 
-	var files []domain.GitHistoryFile
+	var files []types.GitHistoryFile
 
 	seenPaths := make(map[string]bool)
 
@@ -245,42 +246,42 @@ func (s *GitHistoryScanner) parseBlobLine(
 	line string,
 	objectPaths map[string]string,
 	seenPaths map[string]bool,
-) (domain.GitHistoryFile, bool) {
+) (types.GitHistoryFile, bool) {
 	if line == "" {
-		return domain.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	parts := strings.Fields(line)
 	if len(parts) < 3 {
-		return domain.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	objHash := parts[0]
 	objType := parts[1]
 
 	if objType != "blob" {
-		return domain.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	path, hasPath := objectPaths[objHash]
 	if !hasPath || path == "" {
-		return domain.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	if seenPaths[path] {
-		return domain.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	seenPaths[path] = true
 
 	size, err := strconv.ParseInt(parts[2], 10, 64)
 	if err != nil || size < s.minSizeBytes {
-		return domain.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct
 	}
 
 	ext := strings.ToLower(filepath.Ext(path))
 
-	return domain.GitHistoryFile{ //nolint:exhaustruct
+	return types.GitHistoryFile{ //nolint:exhaustruct
 		Path:      path,
 		SizeBytes: size,
 		BlobHash:  objHash,
@@ -291,8 +292,8 @@ func (s *GitHistoryScanner) parseBlobLine(
 // enrichWithCommitInfo adds commit hash, date, and author information.
 func (s *GitHistoryScanner) enrichWithCommitInfo(
 	ctx context.Context,
-	files []domain.GitHistoryFile,
-) ([]domain.GitHistoryFile, error) {
+	files []types.GitHistoryFile,
+) ([]types.GitHistoryFile, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
@@ -331,7 +332,7 @@ func (s *GitHistoryScanner) enrichWithCommitInfo(
 }
 
 // markDeletedFiles checks which files no longer exist in HEAD.
-func (s *GitHistoryScanner) markDeletedFiles(_ context.Context, files []domain.GitHistoryFile) {
+func (s *GitHistoryScanner) markDeletedFiles(_ context.Context, files []types.GitHistoryFile) {
 	for i := range files {
 		fullPath := filepath.Join(s.repoPath, files[i].Path)
 		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
@@ -341,8 +342,8 @@ func (s *GitHistoryScanner) markDeletedFiles(_ context.Context, files []domain.G
 }
 
 // filterFiles filters files based on extension and path rules.
-func (s *GitHistoryScanner) filterFiles(files []domain.GitHistoryFile) []domain.GitHistoryFile {
-	var result []domain.GitHistoryFile
+func (s *GitHistoryScanner) filterFiles(files []types.GitHistoryFile) []types.GitHistoryFile {
+	var result []types.GitHistoryFile
 
 	for _, f := range files {
 		ext := strings.ToLower(f.Extension)
@@ -386,11 +387,11 @@ func (s *GitHistoryScanner) filterFiles(files []domain.GitHistoryFile) []domain.
 }
 
 // isLikelyBinary checks if a file is likely a binary based on extension and path.
-func (s *GitHistoryScanner) isLikelyBinary(f domain.GitHistoryFile) bool {
+func (s *GitHistoryScanner) isLikelyBinary(f types.GitHistoryFile) bool {
 	ext := strings.ToLower(f.Extension)
 
 	// Check against known binary extensions
-	if slices.Contains(domain.DefaultBinaryExtensions, ext) {
+	if slices.Contains(operations.DefaultBinaryExtensions, ext) {
 		return true
 	}
 

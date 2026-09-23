@@ -1,9 +1,8 @@
 package config
 
 import (
+	"go/types"
 	"testing"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // BDDFeature represents a BDD feature for behavior-driven development.
@@ -26,13 +25,13 @@ type BDDScenario struct {
 // BDDGiven represents the initial state in BDD.
 type BDDGiven struct {
 	Description string
-	Setup       func() (*domain.Config, error)
+	Setup       func() (*types.Config, error)
 }
 
 // BDDWhen represents the action in BDD.
 type BDDWhen struct {
 	Description string
-	Action      func(*domain.Config) (*ValidationResult, error)
+	Action      func(*types.Config) (*ValidationResult, error)
 }
 
 // BDDThen represents the expected outcome in BDD.
@@ -93,7 +92,7 @@ func (b *BDDTestRunner) runScenario(scenario BDDScenario) {
 
 	// Setup Given conditions
 	var (
-		cfg      *domain.Config
+		cfg      *types.Config
 		setupErr error
 	)
 

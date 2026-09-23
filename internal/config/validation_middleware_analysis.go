@@ -1,14 +1,15 @@
 package config
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // analyzeConfigChanges analyzes differences between current and proposed configuration.
 const protectedField = "protected"
 
 func (vm *ValidationMiddleware) analyzeConfigChanges(
-	current, proposed *domain.Config,
+	current, proposed *types.Config,
 ) []ConfigChange {
 	changes := make([]ConfigChange, 0) //nolint:prealloc // capacity not easily determined
 
@@ -42,8 +43,8 @@ func (vm *ValidationMiddleware) analyzePathChanges(
 		proposed,
 		currentSet,
 		field,
-		domain.ChangeOperationAddedType,
-		domain.RiskLevelLowType,
+		enums.ChangeOperationAddedType,
+		enums.RiskLevelLowType,
 		true,
 	)...)
 
@@ -52,8 +53,8 @@ func (vm *ValidationMiddleware) analyzePathChanges(
 		current,
 		proposedSet,
 		field,
-		domain.ChangeOperationRemovedType,
-		domain.RiskLevelHighType,
+		enums.ChangeOperationRemovedType,
+		enums.RiskLevelHighType,
 		false,
 	)...)
 
@@ -67,8 +68,8 @@ func (vm *ValidationMiddleware) collectPathChanges(
 	paths []string,
 	existingSet map[string]bool,
 	field string,
-	operation domain.ChangeOperationType,
-	risk domain.RiskLevelType,
+	operation enums.ChangeOperationType,
+	risk enums.RiskLevelType,
 	isAdded bool,
 ) []ConfigChange {
 	changes := []ConfigChange{}
@@ -96,7 +97,7 @@ func (vm *ValidationMiddleware) collectPathChanges(
 // analyzeProfileChanges analyzes profile map changes.
 
 func (vm *ValidationMiddleware) analyzeProfileChanges(
-	current, proposed map[string]*domain.Profile,
+	current, proposed map[string]*types.Profile,
 ) []ConfigChange {
 	changes := []ConfigChange{}
 
@@ -112,7 +113,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 				Field:     "profiles." + name,
 				OldValue:  nil,
 				NewValue:  profile.Name,
-				Operation: domain.ChangeOperationAddedType,
+				Operation: enums.ChangeOperationAddedType,
 				Risk:      vm.assessProfileRisk(profile),
 			})
 		}
@@ -125,8 +126,8 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 				Field:     "profiles." + name,
 				OldValue:  profile.Name,
 				NewValue:  nil,
-				Operation: domain.ChangeOperationRemovedType,
-				Risk:      domain.RiskLevelLowType, // Removing profiles is generally safe
+				Operation: enums.ChangeOperationRemovedType,
+				Risk:      enums.RiskLevelLowType, // Removing profiles is generally safe
 			})
 		}
 	}
@@ -146,7 +147,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 					Field:     "profiles." + name,
 					OldValue:  currentProfile.Name,
 					NewValue:  proposedProfile.Name,
-					Operation: domain.ChangeOperationModifiedType,
+					Operation: enums.ChangeOperationModifiedType,
 					Risk:      vm.assessProfileRisk(proposedProfile),
 				})
 			}
@@ -158,7 +159,7 @@ func (vm *ValidationMiddleware) analyzeProfileChanges(
 
 // operationsEqual compares two slices of CleanupOperation for deep equality
 // without using reflect.DeepEqual.
-func operationsEqual(a, b []domain.CleanupOperation) bool {
+func operationsEqual(a, b []types.CleanupOperation) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -185,62 +186,62 @@ func operationsEqual(a, b []domain.CleanupOperation) bool {
 
 // Helper methods for change analysis
 
-func (vm *ValidationMiddleware) getChangeOperation(old, newVal any) domain.ChangeOperationType {
+func (vm *ValidationMiddleware) getChangeOperation(old, newVal any) enums.ChangeOperationType {
 	if old == nil && newVal != nil {
-		return domain.ChangeOperationAddedType
+		return enums.ChangeOperationAddedType
 	}
 
 	if old != nil && newVal == nil {
-		return domain.ChangeOperationRemovedType
+		return enums.ChangeOperationRemovedType
 	}
 
-	return domain.ChangeOperationModifiedType
+	return enums.ChangeOperationModifiedType
 }
 
 func (vm *ValidationMiddleware) assessChangeRisk(
 	field string, old, newVal any,
-) domain.RiskLevelType {
+) enums.RiskLevelType {
 	switch field {
 	case "safe_mode": //nolint:goconst
 		if old == true && newVal == false {
-			return domain.RiskLevelHighType
+			return enums.RiskLevelHighType
 		}
 
-		return domain.RiskLevelLowType
+		return enums.RiskLevelLowType
 	case "max_disk_usage":
 		// Safe type assertions
 		oldVal, oldOk := old.(int)
 
 		newValCast, newOk := newVal.(int)
 		if !oldOk || !newOk {
-			return domain.RiskLevelHighType
+			return enums.RiskLevelHighType
 		}
 
 		if oldVal < newValCast {
-			return domain.RiskLevelMediumType
+			return enums.RiskLevelMediumType
 		}
 
-		return domain.RiskLevelLowType
+		return enums.RiskLevelLowType
 	case protectedField:
 		if newVal == nil {
-			return domain.RiskLevelCriticalType
+			return enums.RiskLevelCriticalType
 		}
 
-		return domain.RiskLevelLowType
+		return enums.RiskLevelLowType
 	default:
-		return domain.RiskLevelLowType
+		return enums.RiskLevelLowType
 	}
 }
 
-func (vm *ValidationMiddleware) assessProfileRisk(profile *domain.Profile) domain.RiskLevelType {
+func (vm *ValidationMiddleware) assessProfileRisk(profile *types.Profile) enums.RiskLevelType {
 	// Guard against nil profile
 	if profile == nil {
-		return domain.RiskLevelHighType
+		return enums.RiskLevelHighType
 	}
 
 	return maxRiskLevelFromOperations(
 		profile.Operations,
-		domain.RiskLevelLowType,
+		enums.RiskLevelLowType,
 	)
 }
 
@@ -256,7 +257,7 @@ func (vm *ValidationMiddleware) makeStringSet(slice []string) map[string]bool {
 // analyzeSimpleFieldChanges analyzes changes for simple comparable fields.
 
 func (vm *ValidationMiddleware) analyzeSimpleFieldChanges(
-	current, proposed *domain.Config,
+	current, proposed *types.Config,
 ) []ConfigChange {
 	changes := []ConfigChange{}
 

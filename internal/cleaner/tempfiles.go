@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -28,7 +30,7 @@ func NewTempFilesCleaner(
 	verbose, dryRun bool, olderThan string, excludes, basePaths []string,
 ) (*TempFilesCleaner, error) {
 	// Parse older than duration using custom duration parser (supports "7d", "24h", etc.)
-	duration, err := domain.ParseCustomDuration(olderThan)
+	duration, err := operations.ParseCustomDuration(olderThan)
 	if err != nil {
 		return nil, fmt.Errorf("invalid older_than duration for olderThan=%v: %w", olderThan, err)
 	}
@@ -51,8 +53,8 @@ func NewTempFilesCleaner(
 }
 
 // Type returns operation type for temp files cleaner.
-func (tfc *TempFilesCleaner) Type() domain.OperationType {
-	return domain.OperationTypeTempFiles
+func (tfc *TempFilesCleaner) Type() operations.OperationType {
+	return operations.OperationTypeTempFiles
 }
 
 // Name returns the cleaner name for result tracking.
@@ -67,22 +69,22 @@ func (tfc *TempFilesCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // ValidateSettings validates temp files cleaner settings with type safety.
-func (tfc *TempFilesCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (tfc *TempFilesCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.TempFilesSettings { return s.TempFiles },
+		func(s *operations.OperationSettings) *operations.TempFilesSettings { return s.TempFiles },
 		validateTempFilesSettings,
 	)
 }
 
 // validateTempFilesSettings validates a non-nil TempFilesSettings struct.
-func validateTempFilesSettings(tf *domain.TempFilesSettings) error {
+func validateTempFilesSettings(tf *operations.TempFilesSettings) error {
 	if tf.OlderThan == "" {
 		return errors.New("older_than must be specified")
 	}
 
 	// Parse older than to validate it's a valid duration using custom parser
-	if _, err := domain.ParseCustomDuration(tf.OlderThan); err != nil {
+	if _, err := operations.ParseCustomDuration(tf.OlderThan); err != nil {
 		return fmt.Errorf("invalid older_than duration: %w", err)
 	}
 
@@ -90,8 +92,8 @@ func validateTempFilesSettings(tf *domain.TempFilesSettings) error {
 }
 
 // Scan scans for temp files that can be cleaned.
-func (tfc *TempFilesCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+func (tfc *TempFilesCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 	cutoffTime := time.Now().Add(-tfc.olderThan)
 
 	// Scan each base path
@@ -120,11 +122,11 @@ func (tfc *TempFilesCleaner) Scan(ctx context.Context) result.Result[[]domain.Sc
 
 			// Check if file is older than cutoff
 			if info.ModTime().Before(cutoffTime) {
-				items = append(items, domain.ScanItem{
+				items = append(items, types.ScanItem{
 					Path:     path,
 					Size:     info.Size(),
 					Created:  info.ModTime(),
-					ScanType: domain.ScanTypeTemp,
+					ScanType: types.ScanTypeTemp,
 				})
 			}
 
@@ -140,7 +142,7 @@ func (tfc *TempFilesCleaner) Scan(ctx context.Context) result.Result[[]domain.Sc
 }
 
 // Clean removes old temp files with proper type safety.
-func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	// Get files to clean first
 	scanResult := tfc.Scan(ctx)
 	if scanResult.IsErr() {
@@ -152,7 +154,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 	if len(items) == 0 {
 		// Nothing to clean
 		cleanResult := conversions.NewCleanResult(
-			domain.StrategyConservativeType,
+			enums.StrategyConservativeType,
 			0,
 			0,
 		)
@@ -168,7 +170,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 			len(items),
 			totalBytes,
 		)
@@ -201,7 +203,7 @@ func (tfc *TempFilesCleaner) Clean(ctx context.Context) result.Result[domain.Cle
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
-		domain.StrategyAggressiveType,
+		enums.StrategyAggressiveType,
 		itemsRemoved,
 		itemsFailed,
 		bytesFreed,

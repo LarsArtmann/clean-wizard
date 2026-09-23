@@ -4,7 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
@@ -15,11 +16,11 @@ func TestResolveOperationSettings_Defaults(t *testing.T) {
 		t.Errorf("resolveNixKeepCount() = %v, want nil (constructor default)", got)
 	}
 
-	if got := resolveHomebrewMode(nil); got != domain.HomebrewModeAll {
+	if got := resolveHomebrewMode(nil); got != enums.HomebrewModeAll {
 		t.Errorf("resolveHomebrewMode() = %v, want ALL", got)
 	}
 
-	if got := resolveDockerPruneMode(nil); got != domain.DockerPruneAll {
+	if got := resolveDockerPruneMode(nil); got != enums.DockerPruneAll {
 		t.Errorf("resolveDockerPruneMode() = %v, want ALL", got)
 	}
 
@@ -63,38 +64,38 @@ func TestResolveOperationSettings_Defaults(t *testing.T) {
 func TestResolveOperationSettings_ConfiguredSections(t *testing.T) {
 	t.Parallel()
 
-	settings := &domain.OperationSettings{
-		NixGenerations: &domain.NixGenerationsSettings{
+	settings := &operations.OperationSettings{
+		NixGenerations: &operations.NixGenerationsSettings{
 			Generations: 3,
 		},
-		Homebrew: &domain.HomebrewSettings{
-			UnusedOnly: domain.HomebrewModeUnusedOnly,
+		Homebrew: &operations.HomebrewSettings{
+			UnusedOnly: enums.HomebrewModeUnusedOnly,
 		},
-		Docker: &domain.DockerSettings{
-			PruneMode: domain.DockerPruneVolumes,
+		Docker: &operations.DockerSettings{
+			PruneMode: enums.DockerPruneVolumes,
 		},
-		GoPackages: &domain.GoPackagesSettings{
-			CleanCache: domain.CacheCleanupEnabled,
+		GoPackages: &operations.GoPackagesSettings{
+			CleanCache: enums.CacheCleanupEnabled,
 		},
-		NodePackages: &domain.NodePackagesSettings{
-			PackageManagers: []domain.PackageManagerType{domain.PackageManagerBun},
+		NodePackages: &operations.NodePackagesSettings{
+			PackageManagers: []enums.PackageManagerType{enums.PackageManagerBun},
 		},
-		BuildCache: &domain.BuildCacheSettings{
+		BuildCache: &operations.BuildCacheSettings{
 			OlderThan: "14d",
 		},
-		SystemCache: &domain.SystemCacheSettings{
+		SystemCache: &operations.SystemCacheSettings{
 			OlderThan:  "21d",
-			CacheTypes: []domain.CacheType{domain.CacheTypePip},
+			CacheTypes: []enums.CacheType{enums.CacheTypePip},
 		},
-		TempFiles: &domain.TempFilesSettings{
+		TempFiles: &operations.TempFilesSettings{
 			OlderThan: "14d",
 			Excludes:  []string{"/tmp/keep"},
 		},
-		ProjectExecutables: &domain.ProjectExecutablesSettings{
+		ProjectExecutables: &operations.ProjectExecutablesSettings{
 			ExcludeExtensions: []string{".bin"},
 			ExcludePatterns:   []string{"vendor/**"},
 		},
-		CompiledBinaries: &domain.CompiledBinariesSettings{
+		CompiledBinaries: &operations.CompiledBinariesSettings{
 			MinSizeMB:       50,
 			OlderThan:       "30d",
 			BasePaths:       []string{"~/src"},
@@ -106,11 +107,11 @@ func TestResolveOperationSettings_ConfiguredSections(t *testing.T) {
 		t.Errorf("resolveNixKeepCount() = %v, want [3]", got)
 	}
 
-	if got := resolveHomebrewMode(settings); got != domain.HomebrewModeUnusedOnly {
+	if got := resolveHomebrewMode(settings); got != enums.HomebrewModeUnusedOnly {
 		t.Errorf("resolveHomebrewMode() = %v, want UNUSED_ONLY", got)
 	}
 
-	if got := resolveDockerPruneMode(settings); got != domain.DockerPruneVolumes {
+	if got := resolveDockerPruneMode(settings); got != enums.DockerPruneVolumes {
 		t.Errorf("resolveDockerPruneMode() = %v, want VOLUMES", got)
 	}
 
@@ -119,7 +120,7 @@ func TestResolveOperationSettings_ConfiguredSections(t *testing.T) {
 	}
 
 	managers := resolveNodePackageManagers(settings)
-	if len(managers) != 1 || managers[0] != domain.PackageManagerBun {
+	if len(managers) != 1 || managers[0] != enums.PackageManagerBun {
 		t.Errorf("resolveNodePackageManagers() = %v, want [bun]", managers)
 	}
 
@@ -128,7 +129,7 @@ func TestResolveOperationSettings_ConfiguredSections(t *testing.T) {
 	}
 
 	olderThan, cacheTypes := resolveSystemCache(settings)
-	if olderThan != "21d" || len(cacheTypes) != 1 || cacheTypes[0] != domain.CacheTypePip {
+	if olderThan != "21d" || len(cacheTypes) != 1 || cacheTypes[0] != enums.CacheTypePip {
 		t.Errorf("resolveSystemCache() = (%q, %v), want (21d, [PIP])", olderThan, cacheTypes)
 	}
 
@@ -158,15 +159,15 @@ func TestResolveOperationSettings_ZeroValueSemantics(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.OperationSettings
-		assert   func(t *testing.T, settings *domain.OperationSettings)
+		settings *operations.OperationSettings
+		assert   func(t *testing.T, settings *operations.OperationSettings)
 	}{
 		{
 			name: "empty older_than falls back to default",
-			settings: &domain.OperationSettings{
-				TempFiles: &domain.TempFilesSettings{Excludes: []string{"/tmp/keep"}},
+			settings: &operations.OperationSettings{
+				TempFiles: &operations.TempFilesSettings{Excludes: []string{"/tmp/keep"}},
 			},
-			assert: func(t *testing.T, settings *domain.OperationSettings) {
+			assert: func(t *testing.T, settings *operations.OperationSettings) {
 				t.Helper()
 
 				olderThan, excludes := resolveTempFiles(settings)
@@ -181,10 +182,10 @@ func TestResolveOperationSettings_ZeroValueSemantics(t *testing.T) {
 		},
 		{
 			name: "fully disabled go packages fall back to default caches",
-			settings: &domain.OperationSettings{
-				GoPackages: &domain.GoPackagesSettings{},
+			settings: &operations.OperationSettings{
+				GoPackages: &operations.GoPackagesSettings{},
 			},
-			assert: func(t *testing.T, settings *domain.OperationSettings) {
+			assert: func(t *testing.T, settings *operations.OperationSettings) {
 				t.Helper()
 
 				got := resolveGoCaches(settings)
@@ -195,10 +196,10 @@ func TestResolveOperationSettings_ZeroValueSemantics(t *testing.T) {
 		},
 		{
 			name: "nix generations of zero keep the constructor default",
-			settings: &domain.OperationSettings{
-				NixGenerations: &domain.NixGenerationsSettings{},
+			settings: &operations.OperationSettings{
+				NixGenerations: &operations.NixGenerationsSettings{},
 			},
-			assert: func(t *testing.T, settings *domain.OperationSettings) {
+			assert: func(t *testing.T, settings *operations.OperationSettings) {
 				t.Helper()
 
 				if got := resolveNixKeepCount(settings); got != nil {
@@ -236,7 +237,7 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Fatal("homebrew cleaner not registered")
 		}
 
-		if got := homebrew.(*HomebrewCleaner).unusedOnly; got != domain.HomebrewModeAll {
+		if got := homebrew.(*HomebrewCleaner).unusedOnly; got != enums.HomebrewModeAll {
 			t.Errorf("homebrew mode = %v, want ALL", got)
 		}
 	})
@@ -244,12 +245,12 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 	t.Run("profile settings reach the cleaner constructors", func(t *testing.T) {
 		t.Parallel()
 
-		settings := &domain.OperationSettings{
-			NixGenerations: &domain.NixGenerationsSettings{Generations: 3},
-			Homebrew:       &domain.HomebrewSettings{UnusedOnly: domain.HomebrewModeUnusedOnly},
-			Docker:         &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},
-			TempFiles:      &domain.TempFilesSettings{OlderThan: "14d"},
-			GoPackages:     &domain.GoPackagesSettings{CleanCache: domain.CacheCleanupEnabled},
+		settings := &operations.OperationSettings{
+			NixGenerations: &operations.NixGenerationsSettings{Generations: 3},
+			Homebrew:       &operations.HomebrewSettings{UnusedOnly: enums.HomebrewModeUnusedOnly},
+			Docker:         &operations.DockerSettings{PruneMode: enums.DockerPruneVolumes},
+			TempFiles:      &operations.TempFilesSettings{OlderThan: "14d"},
+			GoPackages:     &operations.GoPackagesSettings{CleanCache: enums.CacheCleanupEnabled},
 		}
 
 		registry, err := DefaultRegistryWithConfig(false, true, settings)
@@ -265,7 +266,7 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t,
 			registry,
 			CleanerHomebrew,
-		).unusedOnly; got != domain.HomebrewModeUnusedOnly {
+		).unusedOnly; got != enums.HomebrewModeUnusedOnly {
 			t.Errorf("homebrew mode = %v, want UNUSED_ONLY", got)
 		}
 
@@ -273,7 +274,7 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t,
 			registry,
 			CleanerDocker,
-		).pruneMode; got != domain.DockerPruneVolumes {
+		).pruneMode; got != enums.DockerPruneVolumes {
 			t.Errorf("docker prune mode = %v, want VOLUMES", got)
 		}
 
@@ -289,8 +290,8 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 	t.Run("invalid settings fail registry creation", func(t *testing.T) {
 		t.Parallel()
 
-		settings := &domain.OperationSettings{
-			TempFiles: &domain.TempFilesSettings{OlderThan: "not-a-duration"},
+		settings := &operations.OperationSettings{
+			TempFiles: &operations.TempFilesSettings{OlderThan: "not-a-duration"},
 		}
 
 		_, err := DefaultRegistryWithConfig(false, true, settings)

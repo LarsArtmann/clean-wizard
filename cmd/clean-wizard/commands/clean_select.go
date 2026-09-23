@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"charm.land/huh/v2"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
@@ -25,7 +27,7 @@ var destructiveCleaners = map[CleanerType]bool{ //nolint:gochecknoglobals
 // profile > mode > interactive.
 func selectCleaners(
 	profile, mode string,
-	cfg *domain.Config,
+	cfg *types.Config,
 	availableConfigs []CleanerConfig,
 	jsonOutput bool,
 ) ([]CleanerType, error) {
@@ -43,7 +45,7 @@ func selectCleaners(
 
 func selectProfileCleaners(
 	profileName string,
-	cfg *domain.Config,
+	cfg *types.Config,
 	availableConfigs []CleanerConfig,
 	jsonOutput bool,
 ) ([]CleanerType, error) {
@@ -187,7 +189,7 @@ func allAvailableTypes(configs []CleanerConfig) []CleanerType {
 // getProfileCleaners returns the cleaner types for a given profile name.
 func getProfileCleaners(
 	profileName string,
-	cfg *domain.Config,
+	cfg *types.Config,
 	availableConfigs []CleanerConfig,
 ) ([]CleanerType, error) {
 	profile, exists := cfg.Profiles[profileName]
@@ -203,11 +205,11 @@ func getProfileCleaners(
 	var cleaners []CleanerType
 
 	for _, op := range profile.Operations {
-		if op.Enabled != domain.ProfileStatusEnabled {
+		if op.Enabled != enums.ProfileStatusEnabled {
 			continue
 		}
 
-		opType := domain.GetOperationType(op.Name)
+		opType := operations.GetOperationType(op.Name)
 
 		cleanerType, ok := operationTypeToCleanerType[opType]
 		if !ok {

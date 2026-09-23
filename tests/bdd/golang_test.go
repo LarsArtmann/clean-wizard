@@ -5,7 +5,8 @@ import (
 	"os/exec"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -30,7 +31,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			gomega.Expect(gc.Name()).To(gomega.Equal("go"))
-			gomega.Expect(gc.Type()).To(gomega.Equal(domain.OperationTypeGoPackages))
+			gomega.Expect(gc.Type()).To(gomega.Equal(operations.OperationTypeGoPackages))
 		})
 	})
 
@@ -91,13 +92,13 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			settings := &domain.OperationSettings{
-				GoPackages: &domain.GoPackagesSettings{
-					CleanCache:      domain.CacheCleanupEnabled,
-					CleanTestCache:  domain.CacheCleanupDisabled,
-					CleanModCache:   domain.CacheCleanupEnabled,
-					CleanBuildCache: domain.CacheCleanupDisabled,
-					CleanLintCache:  domain.CacheCleanupDisabled,
+			settings := &operations.OperationSettings{
+				GoPackages: &operations.GoPackagesSettings{
+					CleanCache:      enums.CacheCleanupEnabled,
+					CleanTestCache:  enums.CacheCleanupDisabled,
+					CleanModCache:   enums.CacheCleanupEnabled,
+					CleanBuildCache: enums.CacheCleanupDisabled,
+					CleanLintCache:  enums.CacheCleanupDisabled,
 				},
 			}
 
@@ -108,9 +109,9 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			settings := &domain.OperationSettings{
-				GoPackages: &domain.GoPackagesSettings{
-					CleanCache: domain.CacheCleanupMode(42),
+			settings := &operations.OperationSettings{
+				GoPackages: &operations.GoPackagesSettings{
+					CleanCache: enums.CacheCleanupMode(42),
 				},
 			}
 
@@ -121,7 +122,7 @@ var _ = ginkgo.Describe("Go cleaner", func() {
 			gc, err := cleaner.NewGoCleaner(true, true, cleaner.GoCacheGOCACHE)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			gomega.Expect(gc.ValidateSettings(&domain.OperationSettings{})).
+			gomega.Expect(gc.ValidateSettings(&operations.OperationSettings{})).
 				NotTo(gomega.HaveOccurred())
 		})
 	})

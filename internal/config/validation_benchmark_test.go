@@ -3,7 +3,8 @@ package config
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // BenchmarkValidation_ConfigValidation tests full configuration validation performance.
@@ -41,30 +42,30 @@ func BenchmarkValidation_ProfileNameValidation(b *testing.B) {
 
 // BenchmarkValidation_OperationSettingsValidation tests operation settings validation performance.
 func BenchmarkValidation_OperationSettingsValidation(b *testing.B) {
-	settings := &domain.OperationSettings{
-		NixGenerations: &domain.NixGenerationsSettings{
+	settings := &operations.OperationSettings{
+		NixGenerations: &operations.NixGenerationsSettings{
 			Generations: 3,
-			Optimize:    domain.OptimizationModeEnabled,
+			Optimize:    enums.OptimizationModeEnabled,
 		},
-		TempFiles: &domain.TempFilesSettings{
+		TempFiles: &operations.TempFilesSettings{
 			OlderThan: "7d",
 			Excludes:  []string{"/tmp/keep", "/var/tmp/preserve"},
 		},
-		Homebrew: &domain.HomebrewSettings{
-			UnusedOnly: domain.HomebrewModeUnusedOnly,
+		Homebrew: &operations.HomebrewSettings{
+			UnusedOnly: enums.HomebrewModeUnusedOnly,
 			Prune:      "30d",
 		},
-		SystemTemp: &domain.SystemTempSettings{
+		SystemTemp: &operations.SystemTempSettings{
 			Paths:     []string{"/tmp", "/var/tmp", "/tmp/.font-unix"},
 			OlderThan: "14d",
 		},
 	}
 
-	operationTypes := []domain.OperationType{
-		domain.OperationTypeNixGenerations,
-		domain.OperationTypeTempFiles,
-		domain.OperationTypeHomebrew,
-		domain.OperationTypeSystemTemp,
+	operationTypes := []operations.OperationType{
+		operations.OperationTypeNixGenerations,
+		operations.OperationTypeTempFiles,
+		operations.OperationTypeHomebrew,
+		operations.OperationTypeSystemTemp,
 	}
 
 	for b.Loop() {

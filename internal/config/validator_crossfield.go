@@ -2,13 +2,14 @@ package config
 
 import (
 	"fmt"
+	"go/types"
 	"strconv"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )
 
 // validateFieldConstraints validates individual fields against rules.
-func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *ValidationResult) {
+func (cv *ConfigValidator) validateFieldConstraints(cfg *types.Config, result *ValidationResult) {
 	// MaxDiskUsage validation
 	err := cv.validateMaxDiskUsage(cfg.MaxDiskUsage)
 	if err != nil {
@@ -73,12 +74,12 @@ func (cv *ConfigValidator) validateFieldConstraints(cfg *domain.Config, result *
 
 // validateCrossFieldConstraints validates relationships between fields.
 func (cv *ConfigValidator) validateCrossFieldConstraints(
-	cfg *domain.Config, result *ValidationResult,
+	cfg *types.Config, result *ValidationResult,
 ) {
 	// Safe mode vs risk level consistency
 	if !cfg.SafeMode.IsEnabled() {
 		maxRisk := cv.findMaxRiskLevel(cfg)
-		if maxRisk == domain.RiskLevelCriticalType {
+		if maxRisk == enums.RiskLevelCriticalType {
 			result.Warnings = append(result.Warnings, ValidationWarning{
 				Field:      "safe_mode", //nolint:goconst
 				Message:    "Critical risk operations enabled while safe_mode is false",

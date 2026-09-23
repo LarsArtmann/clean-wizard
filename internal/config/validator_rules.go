@@ -4,7 +4,9 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // ConfigValidationRules defines all validation constraints.
@@ -29,8 +31,8 @@ type ConfigValidationRules struct {
 	RequireSafeMode       bool     `json:"require_safe_mode"`
 
 	// Risk Constraints
-	MaxRiskLevel   domain.RiskLevelType `json:"max_risk_level"`
-	BackupRequired domain.RiskLevelType `json:"backup_required"`
+	MaxRiskLevel   enums.RiskLevelType `json:"max_risk_level"`
+	BackupRequired enums.RiskLevelType `json:"backup_required"`
 }
 
 // ValidationRule represents a validation constraint for a specific type.
@@ -48,12 +50,12 @@ type ValidationRule[T comparable] struct {
 }
 
 // ValidationSeverity represents error severity levels.
-type ValidationSeverity = domain.ValidationSeverity
+type ValidationSeverity = operations.ValidationSeverity
 
 const (
-	SeverityError   = domain.SeverityError
-	SeverityWarning = domain.SeverityWarning
-	SeverityInfo    = domain.SeverityInfo
+	SeverityError   = operations.SeverityError
+	SeverityWarning = operations.SeverityWarning
+	SeverityInfo    = operations.SeverityInfo
 )
 
 // GetCompiledRegex returns the compiled regex pattern, creating it once if needed.
@@ -109,10 +111,10 @@ func getDefaultValidationRules() *ConfigValidationRules {
 		},
 		UniquePaths:           true,
 		UniqueProfiles:        true,
-		ProtectedSystemPaths:  domain.AllProtectedSystemPaths(),
-		DefaultProtectedPaths: domain.DefaultProtectedPaths(),
+		ProtectedSystemPaths:  types.AllProtectedSystemPaths(),
+		DefaultProtectedPaths: types.DefaultProtectedPaths(),
 		RequireSafeMode:       true,
-		MaxRiskLevel:          domain.RiskLevelHighType,
-		BackupRequired:        domain.RiskLevelMediumType,
+		MaxRiskLevel:          enums.RiskLevelHighType,
+		BackupRequired:        enums.RiskLevelMediumType,
 	}
 }

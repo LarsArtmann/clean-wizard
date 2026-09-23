@@ -7,7 +7,9 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -61,8 +63,8 @@ func NewNixCleaner(verbose, dryRun bool, keepCount ...int) *NixCleaner {
 }
 
 // Type returns the operation type for Nix cleaner.
-func (nc *NixCleaner) Type() domain.OperationType {
-	return domain.OperationTypeNixGenerations
+func (nc *NixCleaner) Type() operations.OperationType {
+	return operations.OperationTypeNixGenerations
 }
 
 // Name returns the unique identifier for this cleaner.
@@ -76,21 +78,21 @@ func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // Scan scans for Nix generations and returns them as scan items.
-func (nc *NixCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (nc *NixCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
 	genResult := nc.ListGenerations(ctx)
 	if genResult.IsErr() {
-		return result.Err[[]domain.ScanItem](genResult.Error())
+		return result.Err[[]types.ScanItem](genResult.Error())
 	}
 
 	generations := genResult.Value()
-	items := make([]domain.ScanItem, 0, len(generations))
+	items := make([]types.ScanItem, 0, len(generations))
 
 	for _, gen := range generations {
-		items = append(items, domain.ScanItem{
+		items = append(items, types.ScanItem{
 			Path:     gen.Path,
 			Size:     0, // Individual generation size is hard to determine
 			Created:  gen.Date,
-			ScanType: domain.ScanTypeNixStore,
+			ScanType: types.ScanTypeNixStore,
 		})
 	}
 
@@ -99,7 +101,7 @@ func (nc *NixCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem]
 
 // Clean implements the Cleaner interface.
 // It removes old Nix generations, keeping the configured number of generations.
-func (nc *NixCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (nc *NixCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	return nc.CleanOldGenerations(ctx, nc.keepCount)
 }
 
@@ -118,11 +120,11 @@ func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
 }
 
 // ValidateSettings validates Nix cleaner settings with type safety.
-func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (nc *NixCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.NixGenerationsSettings { return s.NixGenerations },
-		func(n *domain.NixGenerationsSettings) error {
+		func(s *operations.OperationSettings) *operations.NixGenerationsSettings { return s.NixGenerations },
+		func(n *operations.NixGenerationsSettings) error {
 			if n.Generations < 1 {
 				return fmt.Errorf(
 					"generations to keep must be at least 1, got: %d",
@@ -144,45 +146,45 @@ func (nc *NixCleaner) ValidateSettings(settings *domain.OperationSettings) error
 }
 
 // ListGenerations lists Nix generations with proper type safety.
-func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domain.NixGeneration] {
+func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]types.NixGeneration] {
 	// Check availability first
 	if !nc.adapter.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
-		return result.MockSuccess([]domain.NixGeneration{
+		return result.MockSuccess([]types.NixGeneration{
 			{
 				ID:   mockGenerationIDCurrent,
 				Path: "/nix/var/nix/profiles/default-300-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeCurrent * time.Hour),
-				Current: domain.GenerationStatusCurrent,
+				Current: enums.GenerationStatusCurrent,
 			},
 			{
 				ID:   mockGenerationIDRecent1,
 				Path: "/nix/var/nix/profiles/default-299-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeRecent * time.Hour),
-				Current: domain.GenerationStatusHistorical,
+				Current: enums.GenerationStatusHistorical,
 			},
 			{
 				ID:   mockGenerationIDRecent2,
 				Path: "/nix/var/nix/profiles/default-298-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeOlder * time.Hour),
-				Current: domain.GenerationStatusHistorical,
+				Current: enums.GenerationStatusHistorical,
 			},
 			{
 				ID:   mockGenerationIDOlder1,
 				Path: "/nix/var/nix/profiles/default-297-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeOld * time.Hour),
-				Current: domain.GenerationStatusHistorical,
+				Current: enums.GenerationStatusHistorical,
 			},
 			{
 				ID:   mockGenerationIDOlder2,
 				Path: "/nix/var/nix/profiles/default-296-link",
 				Date: time.Now().
 					Add(-mockGenerationAgeVeryOld * time.Hour),
-				Current: domain.GenerationStatusHistorical,
+				Current: enums.GenerationStatusHistorical,
 			},
 		}, "Nix not available - using mock data")
 	}
@@ -195,7 +197,7 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]domai
 func (nc *NixCleaner) CleanOldGenerations(
 	ctx context.Context,
 	keepCount int,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	// Get generations first
 	genResult := nc.ListGenerations(ctx)
 	if genResult.IsErr() {
@@ -218,7 +220,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 		// Estimate bytes to free based on average generation size
 		estimatedBytes := avgSize * int64(toRemove)
 		cleanResult := conversions.NewCleanResult(
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 			toRemove,
 			estimatedBytes,
 		)
@@ -229,7 +231,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 	// Real cleaning implementation
 	if !nc.dryRun && toRemove > 0 {
 		// Remove old generations individually to track what's cleaned
-		results := make([]domain.CleanResult, 0, toRemove)
+		results := make([]types.CleanResult, 0, toRemove)
 		start := time.Now()
 
 		for i := len(generations) - toRemove; i < len(generations); i++ {
@@ -258,7 +260,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 		// Combine all results using centralized function
 		combinedResult := conversions.CombineCleanResults(results)
 		combinedResult.CleanTime = time.Since(start)
-		combinedResult.Strategy = domain.StrategyAggressiveType
+		combinedResult.Strategy = enums.StrategyAggressiveType
 
 		return result.Ok(combinedResult)
 	}
@@ -266,7 +268,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 	// Dry-run or no generations to remove - use centralized conversion
 	estimatedBytes := int64(toRemove) * NixDryRunBytesPerGeneration
 	cleanResult := conversions.NewCleanResult(
-		domain.StrategyDryRunType,
+		enums.StrategyDryRunType,
 		toRemove,
 		estimatedBytes,
 	)
@@ -275,7 +277,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 }
 
 // countOldGenerations counts generations to remove (keeping current + N others).
-func countOldGenerations(generations []domain.NixGeneration, keepCount int) int {
+func countOldGenerations(generations []types.NixGeneration, keepCount int) int {
 	if len(generations) <= keepCount {
 		return 0
 	}

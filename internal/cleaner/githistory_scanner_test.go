@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
@@ -123,11 +123,11 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 		})
 
 		// Helper function to create test files with standard size
-		createTestFiles := func(paths []string) []domain.GitHistoryFile {
-			files := make([]domain.GitHistoryFile, len(paths))
+		createTestFiles := func(paths []string) []types.GitHistoryFile {
+			files := make([]types.GitHistoryFile, len(paths))
 			for i, path := range paths {
 				ext := filepath.Ext(path)
-				files[i] = domain.GitHistoryFile{
+				files[i] = types.GitHistoryFile{
 					Path:      path,
 					Extension: ext,
 					SizeBytes: 5 * 1024 * 1024,
@@ -138,7 +138,7 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 		}
 
 		// Helper function to test filtering scenarios
-		assertFilteredResult := func(option GitHistoryScannerOption, files []domain.GitHistoryFile, expectedCount int, expectedPath string) {
+		assertFilteredResult := func(option GitHistoryScannerOption, files []types.GitHistoryFile, expectedCount int, expectedPath string) {
 			if option != nil {
 				scanner = NewGitHistoryScanner(tempDir, option)
 			}
@@ -176,7 +176,7 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 		})
 
 		ginkgo.Context("binary detection", func() {
-			assertFilterCount := func(files []domain.GitHistoryFile, expectedCount int) {
+			assertFilterCount := func(files []types.GitHistoryFile, expectedCount int) {
 				filtered := scanner.filterFiles(files)
 				gomega.Expect(filtered).To(gomega.HaveLen(expectedCount))
 			}
@@ -209,28 +209,28 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 
 	ginkgo.Describe("SortBySizeDesc", func() {
 		ginkgo.It("should sort files by size in descending order", func() {
-			files := []domain.GitHistoryFile{
+			files := []types.GitHistoryFile{
 				{Path: "small.exe", SizeBytes: 1 * 1024 * 1024},
 				{Path: "large.exe", SizeBytes: 10 * 1024 * 1024},
 				{Path: "medium.exe", SizeBytes: 5 * 1024 * 1024},
 			}
-			domain.SortBySizeDesc(files)
+			types.SortBySizeDesc(files)
 			gomega.Expect(files[0].Path).To(gomega.Equal("large.exe"))
 			gomega.Expect(files[1].Path).To(gomega.Equal("medium.exe"))
 			gomega.Expect(files[2].Path).To(gomega.Equal("small.exe"))
 		})
 
 		ginkgo.It("should handle empty slice", func() {
-			files := []domain.GitHistoryFile{}
+			files := []types.GitHistoryFile{}
 
-			gomega.Expect(func() { domain.SortBySizeDesc(files) }).NotTo(gomega.Panic())
+			gomega.Expect(func() { types.SortBySizeDesc(files) }).NotTo(gomega.Panic())
 		})
 
 		ginkgo.It("should handle single element", func() {
-			files := []domain.GitHistoryFile{
+			files := []types.GitHistoryFile{
 				{Path: "only.exe", SizeBytes: 5 * 1024 * 1024},
 			}
-			domain.SortBySizeDesc(files)
+			types.SortBySizeDesc(files)
 			gomega.Expect(files).To(gomega.HaveLen(1))
 			gomega.Expect(files[0].Path).To(gomega.Equal("only.exe"))
 		})
@@ -243,33 +243,33 @@ var _ = ginkgo.Describe("GitHistoryScanner", func() {
 
 		ginkgo.It("should detect known binary extensions", func() {
 			for _, ext := range []string{".exe", ".dll", ".so", ".dylib", ".a", ".o", ".zip", ".tar"} {
-				f := domain.GitHistoryFile{Path: "file" + ext, Extension: ext}
+				f := types.GitHistoryFile{Path: "file" + ext, Extension: ext}
 				gomega.Expect(scanner.isLikelyBinary(f)).To(gomega.BeTrue(), "Should detect "+ext)
 			}
 		})
 
 		ginkgo.It("should detect extensionless files in binary directories", func() {
 			for _, path := range []string{"bin/app", "dist/release", "build/output", "target/app"} {
-				f := domain.GitHistoryFile{Path: path, Extension: ""}
+				f := types.GitHistoryFile{Path: path, Extension: ""}
 				gomega.Expect(scanner.isLikelyBinary(f)).To(gomega.BeTrue(), "Should detect "+path)
 			}
 		})
 
 		ginkgo.It("should detect common binary names", func() {
 			for _, name := range []string{"main", "app", "server", "cli", "cmd"} {
-				f := domain.GitHistoryFile{Path: name, Extension: ""}
+				f := types.GitHistoryFile{Path: name, Extension: ""}
 				gomega.Expect(scanner.isLikelyBinary(f)).To(gomega.BeTrue(), "Should detect "+name)
 			}
 		})
 
 		ginkgo.It("should detect .test files", func() {
-			f := domain.GitHistoryFile{Path: "myapp.test", Extension: ".test"}
+			f := types.GitHistoryFile{Path: "myapp.test", Extension: ".test"}
 			gomega.Expect(scanner.isLikelyBinary(f)).To(gomega.BeTrue())
 		})
 
 		ginkgo.It("should return false for source files", func() {
 			for _, ext := range []string{".go", ".ts", ".js", ".py", ".rs", ".java"} {
-				f := domain.GitHistoryFile{Path: "file" + ext, Extension: ext}
+				f := types.GitHistoryFile{Path: "file" + ext, Extension: ext}
 				gomega.Expect(scanner.isLikelyBinary(f)).
 					To(gomega.BeFalse(), "Should not detect "+ext)
 			}

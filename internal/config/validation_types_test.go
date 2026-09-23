@@ -3,26 +3,28 @@ package config
 import (
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // TestSanitizationTestCase defines a single sanitization test case.
 type TestSanitizationTestCase struct {
 	name             string
-	config           *domain.Config
+	config           *types.Config
 	expectedChanges  []string
 	expectedWarnings int
 }
 
 // CreateTestConfigurations creates test configurations for validation testing.
-func CreateTestConfigurations() map[string]*domain.Config {
-	return map[string]*domain.Config{
+func CreateTestConfigurations() map[string]*types.Config {
+	return map[string]*types.Config{
 		"valid": {
 			Version:      "1.0.0",
-			SafeMode:     domain.SafeModeEnabled,
+			SafeMode:     enums.SafeModeEnabled,
 			MaxDiskUsage: 50,
 			Protected:    []string{"/System", "/Library", "/Applications"},
-			Profiles: map[string]*domain.Profile{
+			Profiles: map[string]*types.Profile{
 				"daily": CreateDailyProfile(),
 			},
 			LastClean: time.Now(),
@@ -30,10 +32,10 @@ func CreateTestConfigurations() map[string]*domain.Config {
 		},
 		"invalid_high_disk": {
 			Version:      "1.0.0",
-			SafeMode:     domain.SafeModeEnabled,
+			SafeMode:     enums.SafeModeEnabled,
 			MaxDiskUsage: 150, // Invalid: too high
 			Protected:    []string{"/System"},
-			Profiles: map[string]*domain.Profile{
+			Profiles: map[string]*types.Profile{
 				"daily": CreateDailyProfile(),
 			},
 			LastClean: time.Now(),
@@ -57,13 +59,13 @@ func CreateTestConfigurations() map[string]*domain.Config {
 //	CreateTestConfig(WithMaxDiskUsage(75))
 //	// Custom protected paths
 //	CreateTestConfig(WithProtectedPaths([]string{"/System"}))
-func CreateTestConfig(opts ...ConfigOption) *domain.Config {
-	cfg := &domain.Config{
+func CreateTestConfig(opts ...ConfigOption) *types.Config {
+	cfg := &types.Config{
 		Version:      "1.0.0",
-		SafeMode:     domain.SafeModeEnabled,
+		SafeMode:     enums.SafeModeEnabled,
 		MaxDiskUsage: 50,
 		Protected:    []string{"/System", "/Library"},
-		Profiles: map[string]*domain.Profile{
+		Profiles: map[string]*types.Profile{
 			"daily": CreateDailyProfile(),
 		},
 	}
@@ -76,40 +78,40 @@ func CreateTestConfig(opts ...ConfigOption) *domain.Config {
 }
 
 // ConfigOption is a function that modifies a test configuration.
-type ConfigOption func(*domain.Config)
+type ConfigOption func(*types.Config)
 
 // WithVersion sets the version of the configuration.
 func WithVersion(version string) ConfigOption {
-	return func(c *domain.Config) {
+	return func(c *types.Config) {
 		c.Version = version
 	}
 }
 
 // WithMaxDiskUsage sets the max disk usage percentage.
 func WithMaxDiskUsage(percent int) ConfigOption {
-	return func(c *domain.Config) {
+	return func(c *types.Config) {
 		c.MaxDiskUsage = percent
 	}
 }
 
 // WithProtectedPaths sets the protected paths.
 func WithProtectedPaths(paths []string) ConfigOption {
-	return func(c *domain.Config) {
+	return func(c *types.Config) {
 		c.Protected = paths
 	}
 }
 
 // WithProfileName sets the profile name.
 func WithProfileName(name string) ConfigOption {
-	return func(c *domain.Config) {
+	return func(c *types.Config) {
 		c.Profiles["daily"] = CreateDailyProfile(WithDailyProfileName(name))
 	}
 }
 
 // WithEmptyProfiles sets the Profiles map to empty.
 func WithEmptyProfiles() ConfigOption {
-	return func(c *domain.Config) {
-		c.Profiles = map[string]*domain.Profile{}
+	return func(c *types.Config) {
+		c.Profiles = map[string]*types.Profile{}
 	}
 }
 
@@ -143,19 +145,19 @@ func GetSanitizationTestCases() []TestSanitizationTestCase {
 }
 
 // CreateDailyProfile creates a test daily profile with customizable options.
-func CreateDailyProfile(opts ...DailyProfileOption) *domain.Profile {
-	profile := &domain.Profile{
+func CreateDailyProfile(opts ...DailyProfileOption) *types.Profile {
+	profile := &types.Profile{
 		Name:        "daily",
 		Description: "Daily cleanup",
-		Operations: []domain.CleanupOperation{
+		Operations: []types.CleanupOperation{
 			{
 				Name:        "nix-generations",
 				Description: "Clean Nix generations",
-				RiskLevel:   domain.RiskLevelLowType,
-				Enabled:     domain.ProfileStatusEnabled,
+				RiskLevel:   enums.RiskLevelLowType,
+				Enabled:     enums.ProfileStatusEnabled,
 			},
 		},
-		Enabled: domain.ProfileStatusEnabled,
+		Enabled: enums.ProfileStatusEnabled,
 	}
 
 	for _, opt := range opts {
@@ -166,48 +168,48 @@ func CreateDailyProfile(opts ...DailyProfileOption) *domain.Profile {
 }
 
 // CreateWeeklyProfile creates a weekly profile for deep cleanup operations.
-func CreateWeeklyProfile() *domain.Profile {
-	return &domain.Profile{
+func CreateWeeklyProfile() *types.Profile {
+	return &types.Profile{
 		Name:        "Weekly Deep Cleanup",
 		Description: "Weekly deep cleanup operations",
-		Operations: []domain.CleanupOperation{
+		Operations: []types.CleanupOperation{
 			{
 				Name:        "nix-generations",
 				Description: "Deep Nix cleanup",
-				RiskLevel:   domain.RiskLevelMediumType,
-				Enabled:     domain.ProfileStatusEnabled,
-				Settings: &domain.OperationSettings{
-					NixGenerations: &domain.NixGenerationsSettings{
+				RiskLevel:   enums.RiskLevelMediumType,
+				Enabled:     enums.ProfileStatusEnabled,
+				Settings: &operations.OperationSettings{
+					NixGenerations: &operations.NixGenerationsSettings{
 						Generations: 5,
-						Optimize:    domain.OptimizationModeEnabled,
+						Optimize:    enums.OptimizationModeEnabled,
 					},
 				},
 			},
 		},
-		Enabled: domain.ProfileStatusEnabled,
+		Enabled: enums.ProfileStatusEnabled,
 	}
 }
 
 // DailyProfileOption is a function that modifies a test profile.
-type DailyProfileOption func(*domain.Profile)
+type DailyProfileOption func(*types.Profile)
 
 // WithDailyProfileName sets the profile name.
 func WithDailyProfileName(name string) DailyProfileOption {
-	return func(p *domain.Profile) {
+	return func(p *types.Profile) {
 		p.Name = name
 	}
 }
 
 // createHomebrewOperation creates a homebrew cleanup operation.
-func createHomebrewOperation() domain.CleanupOperation {
-	return domain.CleanupOperation{
+func createHomebrewOperation() types.CleanupOperation {
+	return types.CleanupOperation{
 		Name:        "homebrew-cleanup",
 		Description: "Clean Homebrew",
-		RiskLevel:   domain.RiskLevelLowType,
-		Enabled:     domain.ProfileStatusEnabled,
-		Settings: &domain.OperationSettings{
-			Homebrew: &domain.HomebrewSettings{
-				UnusedOnly: domain.HomebrewModeUnusedOnly,
+		RiskLevel:   enums.RiskLevelLowType,
+		Enabled:     enums.ProfileStatusEnabled,
+		Settings: &operations.OperationSettings{
+			Homebrew: &operations.HomebrewSettings{
+				UnusedOnly: enums.HomebrewModeUnusedOnly,
 				Prune:      "30d",
 			},
 		},
@@ -215,16 +217,16 @@ func createHomebrewOperation() domain.CleanupOperation {
 }
 
 // createNixGenerationsOperation creates a nix-generations cleanup operation with settings.
-func createNixGenerationsOperation() domain.CleanupOperation {
-	return domain.CleanupOperation{
+func createNixGenerationsOperation() types.CleanupOperation {
+	return types.CleanupOperation{
 		Name:        "nix-generations",
 		Description: "Clean Nix generations",
-		RiskLevel:   domain.RiskLevelLowType,
-		Enabled:     domain.ProfileStatusEnabled,
-		Settings: &domain.OperationSettings{
-			NixGenerations: &domain.NixGenerationsSettings{
+		RiskLevel:   enums.RiskLevelLowType,
+		Enabled:     enums.ProfileStatusEnabled,
+		Settings: &operations.OperationSettings{
+			NixGenerations: &operations.NixGenerationsSettings{
 				Generations: 3,
-				Optimize:    domain.OptimizationModeEnabled,
+				Optimize:    enums.OptimizationModeEnabled,
 			},
 		},
 	}
@@ -232,25 +234,25 @@ func createNixGenerationsOperation() domain.CleanupOperation {
 
 // CreateBenchmarkConfig creates a configuration suitable for benchmarking.
 // This includes a daily profile with multiple operations covering all operation types.
-func CreateBenchmarkConfig() *domain.Config {
-	return &domain.Config{
+func CreateBenchmarkConfig() *types.Config {
+	return &types.Config{
 		Version:      "1.0.0",
-		SafeMode:     domain.SafeModeEnabled,
+		SafeMode:     enums.SafeModeEnabled,
 		MaxDiskUsage: 75,
 		Protected:    []string{"/System", "/Applications", "/Library", "/usr", "/etc", "/var"},
-		Profiles: map[string]*domain.Profile{
+		Profiles: map[string]*types.Profile{
 			"daily": {
 				Name:        "Daily Cleanup",
 				Description: "Daily system cleanup",
-				Operations: []domain.CleanupOperation{
+				Operations: []types.CleanupOperation{
 					createNixGenerationsOperation(),
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskLevelMediumType,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							TempFiles: &domain.TempFilesSettings{
+						RiskLevel:   enums.RiskLevelMediumType,
+						Enabled:     enums.ProfileStatusEnabled,
+						Settings: &operations.OperationSettings{
+							TempFiles: &operations.TempFilesSettings{
 								OlderThan: "7d",
 								Excludes:  []string{"/tmp/keep", "/var/tmp/preserve"},
 							},
@@ -260,17 +262,17 @@ func CreateBenchmarkConfig() *domain.Config {
 					{
 						Name:        "system-temp",
 						Description: "Clean system temp",
-						RiskLevel:   domain.RiskLevelMediumType,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							SystemTemp: &domain.SystemTempSettings{
+						RiskLevel:   enums.RiskLevelMediumType,
+						Enabled:     enums.ProfileStatusEnabled,
+						Settings: &operations.OperationSettings{
+							SystemTemp: &operations.SystemTempSettings{
 								Paths:     []string{"/tmp", "/var/tmp", "/tmp/.font-unix"},
 								OlderThan: "14d",
 							},
 						},
 					},
 				},
-				Enabled: domain.ProfileStatusEnabled,
+				Enabled: enums.ProfileStatusEnabled,
 			},
 			"weekly": CreateWeeklyProfile(),
 		},
@@ -279,36 +281,36 @@ func CreateBenchmarkConfig() *domain.Config {
 
 // CreateIntegrationTestConfig creates a complex configuration for integration testing.
 // This includes multiple profiles with various operations for testing the complete pipeline.
-func CreateIntegrationTestConfig() *domain.Config {
-	return &domain.Config{
+func CreateIntegrationTestConfig() *types.Config {
+	return &types.Config{
 		Version:      " 1.0.0  ",
-		SafeMode:     domain.SafeModeEnabled,
+		SafeMode:     enums.SafeModeEnabled,
 		MaxDiskUsage: 85,
 		Protected:    []string{"/System", "/Library", "/Applications", "/System"},
-		Profiles: map[string]*domain.Profile{
+		Profiles: map[string]*types.Profile{
 			"daily": {
 				Name:        "  Daily Cleanup  ",
 				Description: "Daily system cleanup operations",
-				Operations: []domain.CleanupOperation{
+				Operations: []types.CleanupOperation{
 					{
 						Name:        "nix-generations",
 						Description: " Clean Nix generations ",
-						RiskLevel:   domain.RiskLevelLowType,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							NixGenerations: &domain.NixGenerationsSettings{
+						RiskLevel:   enums.RiskLevelLowType,
+						Enabled:     enums.ProfileStatusEnabled,
+						Settings: &operations.OperationSettings{
+							NixGenerations: &operations.NixGenerationsSettings{
 								Generations: 3,
-								Optimize:    domain.OptimizationModeEnabled,
+								Optimize:    enums.OptimizationModeEnabled,
 							},
 						},
 					},
 					{
 						Name:        "temp-files",
 						Description: "Clean temporary files",
-						RiskLevel:   domain.RiskLevelMediumType,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							TempFiles: &domain.TempFilesSettings{
+						RiskLevel:   enums.RiskLevelMediumType,
+						Enabled:     enums.ProfileStatusEnabled,
+						Settings: &operations.OperationSettings{
+							TempFiles: &operations.TempFilesSettings{
 								OlderThan: " 7d  ",
 								Excludes:  []string{"/tmp/keep", "/var/tmp/preserve", "/tmp/keep"},
 							},
@@ -317,11 +319,11 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "homebrew-cleanup",
 						Description: "Clean Homebrew",
-						RiskLevel:   domain.RiskLevelLowType,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							Homebrew: &domain.HomebrewSettings{
-								UnusedOnly: domain.HomebrewModeUnusedOnly,
+						RiskLevel:   enums.RiskLevelLowType,
+						Enabled:     enums.ProfileStatusEnabled,
+						Settings: &operations.OperationSettings{
+							Homebrew: &operations.HomebrewSettings{
+								UnusedOnly: enums.HomebrewModeUnusedOnly,
 								Prune:      " 30d  ",
 							},
 						},
@@ -329,17 +331,17 @@ func CreateIntegrationTestConfig() *domain.Config {
 					{
 						Name:        "system-temp",
 						Description: "Clean system temp",
-						RiskLevel:   domain.RiskLevelMediumType,
-						Enabled:     domain.ProfileStatusEnabled,
-						Settings: &domain.OperationSettings{
-							SystemTemp: &domain.SystemTempSettings{
+						RiskLevel:   enums.RiskLevelMediumType,
+						Enabled:     enums.ProfileStatusEnabled,
+						Settings: &operations.OperationSettings{
+							SystemTemp: &operations.SystemTempSettings{
 								Paths:     []string{"/tmp", "/var/tmp", " /tmp/extra ", "/tmp"},
 								OlderThan: "14d",
 							},
 						},
 					},
 				},
-				Enabled: domain.ProfileStatusEnabled,
+				Enabled: enums.ProfileStatusEnabled,
 			},
 			"weekly": CreateWeeklyProfile(),
 		},

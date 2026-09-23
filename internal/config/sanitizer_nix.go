@@ -1,8 +1,6 @@
 package config
 
-import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
-)
+import "github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 
 // Nix generations sanitization constants.
 const (
@@ -11,7 +9,7 @@ const (
 
 // sanitizeNixGenerationsSettings sanitizes Nix generations settings.
 func (cs *ConfigSanitizer) sanitizeNixGenerationsSettings(
-	fieldPrefix string, settings *domain.NixGenerationsSettings, result *SanitizationResult,
+	fieldPrefix string, settings *operations.NixGenerationsSettings, result *SanitizationResult,
 ) {
 	if settings == nil {
 		return

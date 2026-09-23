@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -26,73 +28,73 @@ const (
 type SystemCacheCleaner struct {
 	CleanerBase
 
-	cacheTypes []domain.CacheType
+	cacheTypes []enums.CacheType
 	olderThan  time.Duration
 }
 
 // AvailableSystemCacheTypes returns all available system cache types for the current platform.
-func AvailableSystemCacheTypes() []domain.CacheType {
+func AvailableSystemCacheTypes() []enums.CacheType {
 	// Use runtime check at call time for accurate platform detection
 	switch runtime.GOOS {
 	case "darwin":
-		return []domain.CacheType{
-			domain.CacheTypeSpotlight,
-			domain.CacheTypeXcode,
-			domain.CacheTypeCocoapods,
-			domain.CacheTypeHomebrew,
-			domain.CacheTypePuppeteer,
-			domain.CacheTypeTerraform,
-			domain.CacheTypeGradleWrapper,
-			domain.CacheTypeKonan,
-			domain.CacheTypeRustup,
-			domain.CacheTypeGopls,
-			domain.CacheTypeGoimports,
-			domain.CacheTypeJetBrains,
-			domain.CacheTypeBunCache,
-			domain.CacheTypePlaywright,
-			domain.CacheTypeMozilla,
-			domain.CacheTypeNixCache,
-			domain.CacheTypeZig,
-			domain.CacheTypeUv,
-			domain.CacheTypeTinygo,
+		return []enums.CacheType{
+			enums.CacheTypeSpotlight,
+			enums.CacheTypeXcode,
+			enums.CacheTypeCocoapods,
+			enums.CacheTypeHomebrew,
+			enums.CacheTypePuppeteer,
+			enums.CacheTypeTerraform,
+			enums.CacheTypeGradleWrapper,
+			enums.CacheTypeKonan,
+			enums.CacheTypeRustup,
+			enums.CacheTypeGopls,
+			enums.CacheTypeGoimports,
+			enums.CacheTypeJetBrains,
+			enums.CacheTypeBunCache,
+			enums.CacheTypePlaywright,
+			enums.CacheTypeMozilla,
+			enums.CacheTypeNixCache,
+			enums.CacheTypeZig,
+			enums.CacheTypeUv,
+			enums.CacheTypeTinygo,
 		}
 	case "linux":
-		return []domain.CacheType{
-			domain.CacheTypeXdgCache,
-			domain.CacheTypeThumbnails,
-			domain.CacheTypePip,
-			domain.CacheTypeNpm,
-			domain.CacheTypeYarn,
-			domain.CacheTypeCcache,
-			domain.CacheTypePuppeteer,
-			domain.CacheTypeTerraform,
-			domain.CacheTypeGradleWrapper,
-			domain.CacheTypeKonan,
-			domain.CacheTypeRustup,
-			domain.CacheTypeGopls,
-			domain.CacheTypeGoimports,
-			domain.CacheTypeJetBrains,
-			domain.CacheTypeBunCache,
-			domain.CacheTypePlaywright,
-			domain.CacheTypeMozilla,
-			domain.CacheTypeNixCache,
-			domain.CacheTypeZig,
-			domain.CacheTypeUv,
-			domain.CacheTypeTinygo,
-			domain.CacheTypeMesaShader,
-			domain.CacheTypeComgr,
+		return []enums.CacheType{
+			enums.CacheTypeXdgCache,
+			enums.CacheTypeThumbnails,
+			enums.CacheTypePip,
+			enums.CacheTypeNpm,
+			enums.CacheTypeYarn,
+			enums.CacheTypeCcache,
+			enums.CacheTypePuppeteer,
+			enums.CacheTypeTerraform,
+			enums.CacheTypeGradleWrapper,
+			enums.CacheTypeKonan,
+			enums.CacheTypeRustup,
+			enums.CacheTypeGopls,
+			enums.CacheTypeGoimports,
+			enums.CacheTypeJetBrains,
+			enums.CacheTypeBunCache,
+			enums.CacheTypePlaywright,
+			enums.CacheTypeMozilla,
+			enums.CacheTypeNixCache,
+			enums.CacheTypeZig,
+			enums.CacheTypeUv,
+			enums.CacheTypeTinygo,
+			enums.CacheTypeMesaShader,
+			enums.CacheTypeComgr,
 		}
 	default:
-		return []domain.CacheType{}
+		return []enums.CacheType{}
 	}
 }
 
 // NewSystemCacheCleaner creates system cache cleaner.
 func NewSystemCacheCleaner(
-	verbose, dryRun bool, olderThan string, cacheTypes []domain.CacheType,
+	verbose, dryRun bool, olderThan string, cacheTypes []enums.CacheType,
 ) (*SystemCacheCleaner, error) {
 	// Parse older than duration
-	duration, err := domain.ParseCustomDuration(olderThan)
+	duration, err := operations.ParseCustomDuration(olderThan)
 	if err != nil {
 		return nil, fmt.Errorf("invalid older_than duration for olderThan=%v: %w", olderThan, err)
 	}
@@ -110,8 +112,8 @@ func NewSystemCacheCleaner(
 }
 
 // Type returns operation type for system cache cleaner.
-func (scc *SystemCacheCleaner) Type() domain.OperationType {
-	return domain.OperationTypeSystemCache
+func (scc *SystemCacheCleaner) Type() operations.OperationType {
+	return operations.OperationTypeSystemCache
 }
 
 // Name returns the cleaner name for result tracking.
@@ -126,18 +128,18 @@ func (scc *SystemCacheCleaner) IsAvailable(_ context.Context) bool {
 }
 
 // ValidateSettings validates system cache cleaner settings.
-func (scc *SystemCacheCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (scc *SystemCacheCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.SystemCacheSettings { return s.SystemCache },
+		func(s *operations.OperationSettings) *operations.SystemCacheSettings { return s.SystemCache },
 		validateSystemCacheSettings,
 	)
 }
 
 // validateSystemCacheSettings validates a non-nil SystemCacheSettings struct.
-func validateSystemCacheSettings(sc *domain.SystemCacheSettings) error {
+func validateSystemCacheSettings(sc *operations.SystemCacheSettings) error {
 	// Create valid cache types map
-	validCacheTypes := make(map[domain.CacheType]bool)
+	validCacheTypes := make(map[enums.CacheType]bool)
 	for _, ct := range AvailableSystemCacheTypes() {
 		validCacheTypes[ct] = true
 	}
@@ -162,8 +164,8 @@ func validateSystemCacheSettings(sc *domain.SystemCacheSettings) error {
 }
 
 // Scan scans for system caches.
-func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	if !scc.IsAvailable(ctx) {
 		return result.Ok(items)
@@ -172,7 +174,7 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.
 	// Get home directory
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
+		return result.Err[[]types.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 	}
 
 	// Scan for each cache type
@@ -196,13 +198,13 @@ func (scc *SystemCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.
 type cacheTypeConfig struct {
 	pathComponents []string
 	displayName    string
-	scanType       domain.ScanType
+	scanType       types.ScanType
 }
 
 // systemCacheConfigs maps cache types to their configuration.
-var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{ //nolint:gochecknoglobals
+var systemCacheConfigs = map[enums.CacheType]cacheTypeConfig{ //nolint:gochecknoglobals
 	// macOS-specific cache types
-	domain.CacheTypeSpotlight: {
+	enums.CacheTypeSpotlight: {
 		pathComponents: []string{
 			pathComponentLibrary,
 			"Metadata",
@@ -210,151 +212,151 @@ var systemCacheConfigs = map[domain.CacheType]cacheTypeConfig{ //nolint:gocheckn
 			"SpotlightKnowledgeEvents",
 		},
 		displayName: "Spotlight metadata",
-		scanType:    domain.ScanTypeTemp,
+		scanType:    types.ScanTypeTemp,
 	},
-	domain.CacheTypeXcode: {
+	enums.CacheTypeXcode: {
 		pathComponents: []string{pathComponentLibrary, "Developer", "Xcode", "DerivedData"},
 		displayName:    "Xcode DerivedData",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeCocoapods: {
+	enums.CacheTypeCocoapods: {
 		pathComponents: []string{pathComponentLibrary, "Caches", "CocoaPods"},
 		displayName:    "CocoaPods cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeHomebrew: {
+	enums.CacheTypeHomebrew: {
 		pathComponents: []string{pathComponentLibrary, "Caches", "Homebrew"},
 		displayName:    "Homebrew cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
 	// Linux-specific cache types
-	domain.CacheTypeXdgCache: {
+	enums.CacheTypeXdgCache: {
 		pathComponents: []string{pathComponentDotCache},
 		displayName:    "XDG cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeThumbnails: {
+	enums.CacheTypeThumbnails: {
 		pathComponents: []string{pathComponentDotCache, "thumbnails"},
 		displayName:    "Thumbnail cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypePip: {
+	enums.CacheTypePip: {
 		pathComponents: []string{pathComponentDotCache, "pip"},
 		displayName:    "Pip cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeNpm: {
+	enums.CacheTypeNpm: {
 		pathComponents: []string{pathComponentDotCache, "npm"},
 		displayName:    "NPM cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeYarn: {
+	enums.CacheTypeYarn: {
 		pathComponents: []string{pathComponentDotCache, "yarn"},
 		displayName:    "Yarn cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeCcache: {
+	enums.CacheTypeCcache: {
 		pathComponents: []string{pathComponentDotCache, "ccache"},
 		displayName:    "Ccache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
 	// Cross-platform cache types
-	domain.CacheTypePuppeteer: {
+	enums.CacheTypePuppeteer: {
 		pathComponents: []string{pathComponentDotCache, "puppeteer"},
 		displayName:    "Puppeteer browser cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeTerraform: {
+	enums.CacheTypeTerraform: {
 		pathComponents: []string{".terraform.d", "plugin-cache"},
 		displayName:    "Terraform plugin cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeGradleWrapper: {
+	enums.CacheTypeGradleWrapper: {
 		pathComponents: []string{".gradle", "wrapper"},
 		displayName:    "Gradle wrapper distributions",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeKonan: {
+	enums.CacheTypeKonan: {
 		pathComponents: []string{".konan", "dependencies"},
 		displayName:    "Kotlin/Native toolchain dependencies",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeRustup: {
+	enums.CacheTypeRustup: {
 		pathComponents: []string{".rustup", "toolchains"},
 		displayName:    "Rust toolchain cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeGopls: {
+	enums.CacheTypeGopls: {
 		pathComponents: []string{pathComponentDotCache, "gopls"},
 		displayName:    "gopls language server cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeGoimports: {
+	enums.CacheTypeGoimports: {
 		pathComponents: []string{pathComponentDotCache, "goimports"},
 		displayName:    "goimports cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeJetBrains: {
+	enums.CacheTypeJetBrains: {
 		pathComponents: []string{pathComponentDotCache, "JetBrains"},
 		displayName:    "JetBrains IDE cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeBunCache: {
+	enums.CacheTypeBunCache: {
 		pathComponents: []string{pathComponentDotCache, "bun"},
 		displayName:    "Bun cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypePlaywright: {
+	enums.CacheTypePlaywright: {
 		pathComponents: []string{pathComponentDotCache, "ms-playwright"},
 		displayName:    "Playwright browser cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeMozilla: {
+	enums.CacheTypeMozilla: {
 		pathComponents: []string{pathComponentDotCache, "mozilla"},
 		displayName:    "Mozilla/Firefox cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeNixCache: {
+	enums.CacheTypeNixCache: {
 		pathComponents: []string{pathComponentDotCache, "nix"},
 		displayName:    "Nix evaluator/substituter cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeZig: {
+	enums.CacheTypeZig: {
 		pathComponents: []string{pathComponentDotCache, "zig"},
 		displayName:    "Zig compiler cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeUv: {
+	enums.CacheTypeUv: {
 		pathComponents: []string{pathComponentDotCache, "uv"},
 		displayName:    "uv Python package manager cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeTinygo: {
+	enums.CacheTypeTinygo: {
 		pathComponents: []string{pathComponentDotCache, "tinygo"},
 		displayName:    "TinyGo compiler cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeMesaShader: {
+	enums.CacheTypeMesaShader: {
 		pathComponents: []string{pathComponentDotCache, "mesa_shader_cache"},
 		displayName:    "Mesa shader cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
-	domain.CacheTypeComgr: {
+	enums.CacheTypeComgr: {
 		pathComponents: []string{pathComponentDotCache, "comgr"},
 		displayName:    "AMD GPU compiler cache",
-		scanType:       domain.ScanTypeTemp,
+		scanType:       types.ScanTypeTemp,
 	},
 }
 
 // scanSystemCache scans cache for a specific system cache type.
 func (scc *SystemCacheCleaner) scanSystemCache(
 	ctx context.Context,
-	cacheType domain.CacheType,
+	cacheType enums.CacheType,
 	homeDir string,
-) result.Result[[]domain.ScanItem] {
+) result.Result[[]types.ScanItem] {
 	config, exists := systemCacheConfigs[cacheType]
 	if !exists {
-		return result.Err[[]domain.ScanItem](
+		return result.Err[[]types.ScanItem](
 			fmt.Errorf(
 				"unknown system cache type %s for homeDir=%v: %w",
 				cacheType.String(),
@@ -368,9 +370,9 @@ func (scc *SystemCacheCleaner) scanSystemCache(
 }
 
 // Clean removes system caches.
-func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	if !scc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			NewNotAvailableError("systemcache", "requires macOS or Linux"),
 		)
 	}
@@ -397,13 +399,13 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = domain.SizeEstimate{
+		cleanResult.SizeEstimate = types.SizeEstimate{
 			Known:  uint64(totalBytes),
-			Status: domain.SizeEstimateStatusKnown,
+			Status: enums.SizeEstimateStatusKnown,
 		}
 
 		return result.Ok(cleanResult)
@@ -415,7 +417,7 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 	// Get home directory
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("failed to get home directory (itemsFailed=%v): %w", counters.ItemsFailed, err),
 		)
 	}
@@ -433,24 +435,24 @@ func (scc *SystemCacheCleaner) Clean(ctx context.Context) result.Result[domain.C
 		counters.RecordSuccess(int64(cleanResult.FreedBytes))
 	}
 
-	var status domain.SizeEstimateStatusType
+	var status enums.SizeEstimateStatusType
 	if counters.BytesFreed > 0 {
-		status = domain.SizeEstimateStatusKnown
+		status = enums.SizeEstimateStatusKnown
 	} else {
-		status = domain.SizeEstimateStatusUnknown
+		status = enums.SizeEstimateStatusUnknown
 	}
 
 	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		counters.ItemsRemoved, counters.ItemsFailed, counters.BytesFreed, counters.Duration(),
-		domain.SizeEstimate{Known: uint64(counters.BytesFreed), Status: status},
+		types.SizeEstimate{Known: uint64(counters.BytesFreed), Status: status},
 	))
 }
 
 // removeCachePath removes a cache directory and returns the appropriate result.
 func (scc *SystemCacheCleaner) removeCachePath(
 	path, successMessage string,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	if scc.dryRun {
 		// Estimate size for dry-run
 		estimatedSize := GetDirSize(path)
@@ -459,12 +461,12 @@ func (scc *SystemCacheCleaner) removeCachePath(
 		}
 
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-			domain.StrategyConservativeType,
+			enums.StrategyConservativeType,
 			1,
 			estimatedSize,
-			domain.SizeEstimate{
+			types.SizeEstimate{
 				Known:  uint64(estimatedSize),
-				Status: domain.SizeEstimateStatusKnown,
+				Status: enums.SizeEstimateStatusKnown,
 			},
 		))
 	}
@@ -474,7 +476,7 @@ func (scc *SystemCacheCleaner) removeCachePath(
 
 	err := os.RemoveAll(path)
 	if err != nil && !os.IsNotExist(err) {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("failed to remove %s (successMessage=%v): %w", path, successMessage, err),
 		)
 	}
@@ -484,9 +486,9 @@ func (scc *SystemCacheCleaner) removeCachePath(
 	}
 
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1, bytesFreed,
-		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
+		types.SizeEstimate{Known: uint64(bytesFreed), Status: enums.SizeEstimateStatusKnown},
 	))
 }
 
@@ -495,7 +497,7 @@ func (scc *SystemCacheCleaner) scanCachePathWithConfig(
 	_ context.Context,
 	homeDir string,
 	config cacheTypeConfig,
-) result.Result[[]domain.ScanItem] {
+) result.Result[[]types.ScanItem] {
 	scanResult := ScanPath(
 		homeDir,
 		config.scanType,
@@ -511,12 +513,12 @@ func (scc *SystemCacheCleaner) scanCachePathWithConfig(
 // cleanSystemCache cleans cache for a specific system cache type.
 func (scc *SystemCacheCleaner) cleanSystemCache(
 	_ context.Context,
-	cacheType domain.CacheType,
+	cacheType enums.CacheType,
 	homeDir string,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	config, exists := systemCacheConfigs[cacheType]
 	if !exists {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("unknown system cache type: %s", cacheType.String()),
 		)
 	}

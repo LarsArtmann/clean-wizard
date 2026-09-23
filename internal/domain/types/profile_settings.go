@@ -1,5 +1,7 @@
 package types
 
+import "github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+
 // SettingsForProfile returns the operation settings configured for the named profile.
 // The settings blocks of all operations in the profile are merged into a single
 // view; when several operations define the same settings section the first
@@ -9,7 +11,7 @@ package types
 // callers fall back to built-in defaults. Settings of disabled operations are
 // still merged: a disabled operation does not run, but its settings describe
 // how its cleaner should behave when enabled.
-func (c *Config) SettingsForProfile(profileName string) *OperationSettings {
+func (c *Config) SettingsForProfile(profileName string) *operations.OperationSettings {
 	if c == nil {
 		return nil
 	}
@@ -19,7 +21,7 @@ func (c *Config) SettingsForProfile(profileName string) *OperationSettings {
 		return nil
 	}
 
-	var merged *OperationSettings
+	var merged *operations.OperationSettings
 
 	for i := range profile.Operations {
 		opSettings := profile.Operations[i].Settings
@@ -28,7 +30,7 @@ func (c *Config) SettingsForProfile(profileName string) *OperationSettings {
 		}
 
 		if merged == nil {
-			merged = &OperationSettings{} //nolint:exhaustruct
+			merged = &operations.OperationSettings{} //nolint:exhaustruct
 		}
 
 		mergeMissingSettings(merged, opSettings)
@@ -39,7 +41,7 @@ func (c *Config) SettingsForProfile(profileName string) *OperationSettings {
 
 // mergeMissing copies every settings section from src into dst that dst does
 // not define yet. Existing sections in dst are left untouched.
-func mergeMissingSettings(dst, src *OperationSettings) {
+func mergeMissingSettings(dst, src *operations.OperationSettings) {
 	setIfMissing(&dst.NixGenerations, src.NixGenerations)
 	setIfMissing(&dst.TempFiles, src.TempFiles)
 	setIfMissing(&dst.Homebrew, src.Homebrew)

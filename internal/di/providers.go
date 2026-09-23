@@ -1,8 +1,10 @@
 package di
 
 import (
+	"go/types"
+
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/samber/do/v2"
 )
@@ -13,7 +15,7 @@ import (
 //
 // This is the single entry point for service registration, mirroring
 // BuildFlow's di.RegisterAllServices pattern.
-func RegisterAllServices(injector do.Injector, cfg *domain.Config, settings RunSettings) error {
+func RegisterAllServices(injector do.Injector, cfg *types.Config, settings RunSettings) error {
 	do.ProvideValue(injector, cfg)
 	do.ProvideValue(injector, settings)
 
@@ -62,12 +64,12 @@ func registerCleanerRegistry(injector do.Injector) {
 // resolveProfileOperationSettings returns the merged OperationSettings of the
 // selected profile. When no profile was selected (preset or interactive cleaner
 // selection) it returns nil so cleaners fall back to their factory defaults.
-func resolveProfileOperationSettings(injector do.Injector, settings RunSettings) (*domain.OperationSettings, error) {
+func resolveProfileOperationSettings(injector do.Injector, settings RunSettings) (*operations.OperationSettings, error) {
 	if settings.Profile == "" {
 		return nil, nil
 	}
 
-	cfg, err := do.Invoke[*domain.Config](injector)
+	cfg, err := do.Invoke[*types.Config](injector)
 	if err != nil {
 		return nil, errorfamily.WrapRejection(
 			err,

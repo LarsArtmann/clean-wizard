@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -23,7 +25,7 @@ const (
 type SizeEstimatorFunc[T any] func(item T) int64
 
 // CleanItemFunc is a function that cleans a single item of type T.
-type CleanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[domain.CleanResult]
+type CleanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[types.CleanResult]
 
 // AvailableCheckFunc is a function that checks if the cleaner is available.
 type AvailableCheckFunc func(ctx context.Context) bool
@@ -40,9 +42,9 @@ func cleanWithIterator[T any](
 	verbose bool,
 	dryRun bool,
 	sizeEstimator SizeEstimatorFunc[T],
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	if !availableCheck(ctx) {
-		return result.Err[domain.CleanResult](NewNotAvailableError(cleanerName, ""))
+		return result.Err[types.CleanResult](NewNotAvailableError(cleanerName, ""))
 	}
 
 	if dryRun {
@@ -57,7 +59,7 @@ func cleanWithIterator[T any](
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 			len(items),
 			totalBytes,
 		)
@@ -72,7 +74,7 @@ func cleanWithIterator[T any](
 
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("failed to get home directory for %s: %w", cleanerName, err),
 		)
 	}
@@ -97,7 +99,7 @@ func cleanWithIterator[T any](
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		itemsRemoved,
 		itemsFailed,
 		bytesFreed,
@@ -147,8 +149,8 @@ func ValidateSettingsWithTypes[S any](
 // This eliminates the repeated `if settings == nil || settings.X == nil { return nil }`
 // boilerplate across every cleaner's ValidateSettings method.
 func ValidateOptionalSettings[T any](
-	settings *domain.OperationSettings,
-	getField func(*domain.OperationSettings) *T,
+	settings *operations.OperationSettings,
+	getField func(*operations.OperationSettings) *T,
 	validate func(*T) error,
 ) error {
 	if settings == nil {
@@ -167,8 +169,8 @@ func ValidateOptionalSettings[T any](
 // It handles the common pattern of checking if a field is nil, and if not,
 // validating its types against available types.
 func ValidateOptionalSettingsWithTypes[F any](
-	settings *domain.OperationSettings,
-	getField func(*domain.OperationSettings) *F,
+	settings *operations.OperationSettings,
+	getField func(*operations.OperationSettings) *F,
 	getSlice func(*F) []string,
 	availableTypes []string,
 	typeName string,
@@ -187,12 +189,12 @@ func ValidateOptionalSettingsWithTypes[F any](
 
 // BuildCacheAvailableTypes defines all valid build cache tool types.
 var BuildCacheAvailableTypes = []string{ //nolint:gochecknoglobals
-	domain.BuildToolGo.String(),
-	domain.BuildToolRust.String(),
-	domain.BuildToolNode.String(),
-	domain.BuildToolPython.String(),
-	domain.BuildToolJava.String(),
-	domain.BuildToolScala.String(),
+	enums.BuildToolGo.String(),
+	enums.BuildToolRust.String(),
+	enums.BuildToolNode.String(),
+	enums.BuildToolPython.String(),
+	enums.BuildToolJava.String(),
+	enums.BuildToolScala.String(),
 }
 
 type stringer interface {
@@ -219,44 +221,44 @@ func toLowerStringSlice[T stringer](types []T) []string {
 	return result
 }
 
-// BuildToolTypeToStringSlice converts domain.BuildToolType slice to string slice.
-func BuildToolTypeToStringSlice(types []domain.BuildToolType) []string {
+// BuildToolTypeToStringSlice converts enums.BuildToolType slice to string slice.
+func BuildToolTypeToStringSlice(types []enums.BuildToolType) []string {
 	return toStringSlice(types)
 }
 
-// PackageManagerTypeToStringSlice converts domain.PackageManagerType slice to string slice.
-func PackageManagerTypeToStringSlice(types []domain.PackageManagerType) []string {
+// PackageManagerTypeToStringSlice converts enums.PackageManagerType slice to string slice.
+func PackageManagerTypeToStringSlice(types []enums.PackageManagerType) []string {
 	return toStringSlice(types)
 }
 
-// PackageManagerTypeToLowerSlice converts domain.PackageManagerType slice to lowercase string slice.
-func PackageManagerTypeToLowerSlice(types []domain.PackageManagerType) []string {
+// PackageManagerTypeToLowerSlice converts enums.PackageManagerType slice to lowercase string slice.
+func PackageManagerTypeToLowerSlice(types []enums.PackageManagerType) []string {
 	return toLowerStringSlice(types)
 }
 
-// CacheTypeToStringSlice converts domain.CacheType slice to string slice.
-func CacheTypeToStringSlice(types []domain.CacheType) []string {
+// CacheTypeToStringSlice converts enums.CacheType slice to string slice.
+func CacheTypeToStringSlice(types []enums.CacheType) []string {
 	return toStringSlice(types)
 }
 
-// CacheTypeToLowerSlice converts domain.CacheType slice to lowercase string slice.
-func CacheTypeToLowerSlice(types []domain.CacheType) []string {
+// CacheTypeToLowerSlice converts enums.CacheType slice to lowercase string slice.
+func CacheTypeToLowerSlice(types []enums.CacheType) []string {
 	return toLowerStringSlice(types)
 }
 
 // ValidateBuildCacheSettings validates build cache settings.
-func ValidateBuildCacheSettings(settings *domain.OperationSettings) error {
+func ValidateBuildCacheSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettingsWithTypes(
 		settings,
-		func(s *domain.OperationSettings) *domain.BuildCacheSettings { return s.BuildCache },
-		func(f *domain.BuildCacheSettings) []string { return BuildToolTypeToStringSlice(f.ToolTypes) },
+		func(s *operations.OperationSettings) *operations.BuildCacheSettings { return s.BuildCache },
+		func(f *operations.BuildCacheSettings) []string { return BuildToolTypeToStringSlice(f.ToolTypes) },
 		BuildCacheAvailableTypes,
 		"tool",
 	)
 }
 
 // ScanItemFunc is a function that scans for items of type T and returns scan results.
-type ScanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[[]domain.ScanItem]
+type ScanItemFunc[T any] func(ctx context.Context, item T, homeDir string) result.Result[[]types.ScanItem]
 
 // scanWithIterator is a shared helper function that performs the common scan pattern.
 // It iterates over types, calls the scanFunc for each, and aggregates results.
@@ -265,12 +267,12 @@ func scanWithIterator[T any](
 	types []T,
 	scanFunc ScanItemFunc[T],
 	verbose bool,
-) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	homeDir, err := GetHomeDir()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
+		return result.Err[[]types.ScanItem](fmt.Errorf("failed to get home directory: %w", err))
 	}
 
 	for _, item := range types {
@@ -291,7 +293,7 @@ func scanWithIterator[T any](
 
 // calculateTotalSizeFromScan calculates the total size from scan results.
 // Returns 0 if the scan resulted in an error.
-func calculateTotalSizeFromScan(scanResult result.Result[[]domain.ScanItem]) int64 {
+func calculateTotalSizeFromScan(scanResult result.Result[[]types.ScanItem]) int64 {
 	if scanResult.IsErr() {
 		return 0
 	}

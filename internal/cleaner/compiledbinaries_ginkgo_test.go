@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
@@ -232,7 +234,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			GinkgoAssertNameAndType(
 				cleaner,
 				"compiled-binaries",
-				domain.OperationTypeCompiledBinaries,
+				operations.OperationTypeCompiledBinaries,
 			)
 		})
 	})
@@ -286,15 +288,15 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 		ginkgo.Context("with valid settings", func() {
 			ginkgo.It("should return nil for valid empty CompiledBinariesSettings", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{},
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{},
 				}
 				GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid min_size_mb", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
 						MinSizeMB: 10,
 					},
 				}
@@ -311,8 +313,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 				}
 
 				for _, format := range olderThanFormats {
-					settings := &domain.OperationSettings{
-						CompiledBinaries: &domain.CompiledBinariesSettings{
+					settings := &operations.OperationSettings{
+						CompiledBinaries: &operations.CompiledBinariesSettings{
 							OlderThan: format.value,
 						},
 					}
@@ -321,8 +323,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 
 			ginkgo.It("should return nil for valid exclude patterns", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
 						ExcludePatterns: []string{"*.exclude", "specific-*"},
 					},
 				}
@@ -330,8 +332,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 
 			ginkgo.It("should return nil for valid include categories", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
 						IncludePatterns: []string{"tmp", "test", "bin"},
 					},
 				}
@@ -339,8 +341,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 
 			ginkgo.It("should return nil for valid combined settings", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
 						MinSizeMB:       20,
 						OlderThan:       "30d",
 						BasePaths:       []string{"/custom/path"},
@@ -354,8 +356,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 
 		ginkgo.Context("with invalid settings", func() {
 			ginkgo.It("should return error for negative min_size_mb", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
 						MinSizeMB: -1,
 					},
 				}
@@ -363,8 +365,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 
 			ginkgo.It("should return error for invalid older_than format", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
 						OlderThan: "invalid",
 					},
 				}
@@ -374,8 +376,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 
 			ginkgo.It("should return error for invalid glob pattern", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
 						ExcludePatterns: []string{"[invalid"},
 					},
 				}
@@ -383,8 +385,8 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 			})
 
 			ginkgo.It("should return error for invalid include category", func() {
-				settings := &domain.OperationSettings{
-					CompiledBinaries: &domain.CompiledBinariesSettings{
+				settings := &operations.OperationSettings{
+					CompiledBinaries: &operations.CompiledBinariesSettings{
 						IncludePatterns: []string{"invalid-category"},
 					},
 				}
@@ -422,7 +424,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 				items := result.Value()
 				gomega.Expect(items[0].Path).To(gomega.Equal("/path/to/binary"))
 				gomega.Expect(items[0].Size).To(gomega.Equal(int64(1024)))
-				gomega.Expect(items[0].ScanType).To(gomega.Equal(domain.ScanTypeSystem))
+				gomega.Expect(items[0].ScanType).To(gomega.Equal(types.ScanTypeSystem))
 			})
 
 			ginkgo.It("should return empty slice when no binaries found", func() {
@@ -532,7 +534,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 				result := cleaner.Clean(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				cleanResult := result.Value()
-				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyDryRun))
+				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(enums.StrategyDryRun))
 				gomega.Expect(mockOperator.trashCallCount).To(gomega.Equal(0))
 			})
 
@@ -582,7 +584,7 @@ var _ = ginkgo.Describe("CompiledBinariesCleaner", func() {
 				result := cleaner.Clean(ctx)
 				gomega.Expect(result.IsOk()).To(gomega.BeTrue())
 				cleanResult := result.Value()
-				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyAggressive))
+				gomega.Expect(cleanResult.Strategy).To(gomega.Equal(enums.StrategyAggressive))
 			})
 
 			ginkgo.It("should measure clean time", func() {

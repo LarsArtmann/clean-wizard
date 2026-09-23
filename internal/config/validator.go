@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
+	"go/types"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // ConfigValidator provides comprehensive type-safe configuration validation.
@@ -36,10 +37,10 @@ type ValidationSanitizedData struct {
 }
 
 // ValidationContext provides strongly-typed validation context information.
-type ValidationContext = domain.ValidationContext
+type ValidationContext = operations.ValidationContext
 
 // ValidationError represents a specific validation error.
-type ValidationError = domain.ValidationError
+type ValidationError = operations.ValidationError
 
 // ValidationWarning represents a non-critical validation issue.
 type ValidationWarning struct {
@@ -66,7 +67,7 @@ func NewConfigValidatorWithRules(rules *ConfigValidationRules) *ConfigValidator 
 }
 
 // ValidateConfig performs comprehensive configuration validation.
-func (cv *ConfigValidator) ValidateConfig(cfg *domain.Config) *ValidationResult {
+func (cv *ConfigValidator) ValidateConfig(cfg *types.Config) *ValidationResult {
 	start := time.Now()
 	result := &ValidationResult{ //nolint:exhaustruct
 		IsValid:   true,
@@ -109,11 +110,11 @@ func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	case "protected": //nolint:goconst
 		return cv.validateProtectedPaths(value)
 	case "profiles": //nolint:goconst
-		if cfg, ok := value.(*domain.Config); ok {
+		if cfg, ok := value.(*types.Config); ok {
 			return cv.validateProfiles(cfg)
 		}
 
-		return fmt.Errorf("profiles validation requires *domain.Config, got %T", value)
+		return fmt.Errorf("profiles validation requires *types.Config, got %T", value)
 	default:
 		return fmt.Errorf("unknown field: %s", field)
 	}

@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // cacheTypeFromBools converts old boolean parameters to GoCacheType enum.
@@ -163,8 +164,8 @@ func TestGoCleaner_Type(t *testing.T) {
 		GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache,
 	)
 
-	if cleaner.Type() != domain.OperationTypeGoPackages {
-		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeGoPackages)
+	if cleaner.Type() != operations.OperationTypeGoPackages {
+		t.Errorf("Type() = %v, want %v", cleaner.Type(), operations.OperationTypeGoPackages)
 	}
 }
 
@@ -190,7 +191,7 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.OperationSettings
+		settings *operations.OperationSettings
 		wantErr  bool
 	}{
 		{
@@ -200,41 +201,41 @@ func TestGoCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name:     "nil Go packages settings",
-			settings: &domain.OperationSettings{},
+			settings: &operations.OperationSettings{},
 			wantErr:  false,
 		},
 		{
 			name: "valid settings with all caches",
-			settings: &domain.OperationSettings{
-				GoPackages: &domain.GoPackagesSettings{
-					CleanCache:      domain.CacheCleanupEnabled,
-					CleanTestCache:  domain.CacheCleanupEnabled,
-					CleanModCache:   domain.CacheCleanupEnabled,
-					CleanBuildCache: domain.CacheCleanupEnabled,
+			settings: &operations.OperationSettings{
+				GoPackages: &operations.GoPackagesSettings{
+					CleanCache:      enums.CacheCleanupEnabled,
+					CleanTestCache:  enums.CacheCleanupEnabled,
+					CleanModCache:   enums.CacheCleanupEnabled,
+					CleanBuildCache: enums.CacheCleanupEnabled,
 				},
 			},
 			wantErr: false,
 		},
 		{
 			name: "valid settings with no caches",
-			settings: &domain.OperationSettings{
-				GoPackages: &domain.GoPackagesSettings{
-					CleanCache:      domain.CacheCleanupDisabled,
-					CleanTestCache:  domain.CacheCleanupDisabled,
-					CleanModCache:   domain.CacheCleanupDisabled,
-					CleanBuildCache: domain.CacheCleanupDisabled,
+			settings: &operations.OperationSettings{
+				GoPackages: &operations.GoPackagesSettings{
+					CleanCache:      enums.CacheCleanupDisabled,
+					CleanTestCache:  enums.CacheCleanupDisabled,
+					CleanModCache:   enums.CacheCleanupDisabled,
+					CleanBuildCache: enums.CacheCleanupDisabled,
 				},
 			},
 			wantErr: false,
 		},
 		{
 			name: "valid settings with mixed caches",
-			settings: &domain.OperationSettings{
-				GoPackages: &domain.GoPackagesSettings{
-					CleanCache:      domain.CacheCleanupEnabled,
-					CleanTestCache:  domain.CacheCleanupDisabled,
-					CleanModCache:   domain.CacheCleanupEnabled,
-					CleanBuildCache: domain.CacheCleanupDisabled,
+			settings: &operations.OperationSettings{
+				GoPackages: &operations.GoPackagesSettings{
+					CleanCache:      enums.CacheCleanupEnabled,
+					CleanTestCache:  enums.CacheCleanupDisabled,
+					CleanModCache:   enums.CacheCleanupEnabled,
+					CleanBuildCache: enums.CacheCleanupDisabled,
 				},
 			},
 			wantErr: false,
@@ -348,11 +349,11 @@ func TestGoCleaner_Clean_DryRun(t *testing.T) {
 				}
 			}
 
-			if cleanResult.Strategy != domain.StrategyDryRunType {
+			if cleanResult.Strategy != enums.StrategyDryRunType {
 				t.Errorf(
 					"Clean() strategy = %v, want %v",
 					cleanResult.Strategy,
-					domain.StrategyDryRunType,
+					enums.StrategyDryRunType,
 				)
 			}
 

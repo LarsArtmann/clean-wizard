@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )
 
 // FuzzBasicConfig tests basic configuration fuzzing.
@@ -38,24 +38,24 @@ func FuzzBasicConfig(f *testing.F) {
 
 // FuzzValidationLevelBasic tests validation level fuzzing.
 func FuzzValidationLevelBasic(f *testing.F) {
-	f.Add(int32(domain.ValidationLevelBasicType))
+	f.Add(int32(enums.ValidationLevelBasicType))
 
 	f.Fuzz(func(t *testing.T, data int32) {
 		// Should not panic with any int32 input
-		level := domain.ValidationLevelType(data)
+		level := enums.ValidationLevelType(data)
 
 		// IsValid method should not panic
 		_ = level.IsValid()
 
 		// Should handle extreme values gracefully
-		if int32(level) > int32(domain.ValidationLevelStrictType)+100 ||
-			int32(level) < int32(domain.ValidationLevelNoneType)-100 {
+		if int32(level) > int32(enums.ValidationLevelStrictType)+100 ||
+			int32(level) < int32(enums.ValidationLevelNoneType)-100 {
 			// Should still not panic
 			_ = level.IsValid()
 		}
 
 		// Valid range should produce meaningful strings
-		if level >= domain.ValidationLevelNoneType && level <= domain.ValidationLevelStrictType {
+		if level >= enums.ValidationLevelNoneType && level <= enums.ValidationLevelStrictType {
 			isValid := level.IsValid()
 			if !isValid {
 				t.Logf("Valid level %d reported as invalid", level)

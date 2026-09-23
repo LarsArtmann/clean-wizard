@@ -2,16 +2,15 @@ package config
 
 import (
 	"fmt"
+	"go/types"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // sanitizeProtectedPaths sanitizes protected paths array.
-func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *domain.Config, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *types.Config, result *SanitizationResult) {
 	sanitizedPaths := make([]string, 0, len(cfg.Protected))
 
 	for i, path := range cfg.Protected {

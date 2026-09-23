@@ -4,7 +4,9 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -13,14 +15,14 @@ import (
 func TestResolveProfileOperationSettings(t *testing.T) {
 	t.Parallel()
 
-	dockerSettings := &domain.OperationSettings{
-		Docker: &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},
+	dockerSettings := &operations.OperationSettings{
+		Docker: &operations.DockerSettings{PruneMode: enums.DockerPruneVolumes},
 	}
 
-	cfg := &domain.Config{
-		Profiles: map[string]*domain.Profile{
+	cfg := &types.Config{
+		Profiles: map[string]*types.Profile{
 			"daily": {
-				Operations: []domain.CleanupOperation{
+				Operations: []types.CleanupOperation{
 					{Name: "docker", Settings: dockerSettings},
 				},
 			},
@@ -81,14 +83,14 @@ func TestResolveProfileOperationSettings(t *testing.T) {
 func TestRegisterAllServices_ProfileSettingsReachRegistry(t *testing.T) {
 	t.Parallel()
 
-	cfg := &domain.Config{
-		Profiles: map[string]*domain.Profile{
+	cfg := &types.Config{
+		Profiles: map[string]*types.Profile{
 			"daily": {
-				Operations: []domain.CleanupOperation{
+				Operations: []types.CleanupOperation{
 					{
 						Name: "docker",
-						Settings: &domain.OperationSettings{
-							Docker: &domain.DockerSettings{PruneMode: domain.DockerPruneVolumes},
+						Settings: &operations.OperationSettings{
+							Docker: &operations.DockerSettings{PruneMode: enums.DockerPruneVolumes},
 						},
 					},
 				},

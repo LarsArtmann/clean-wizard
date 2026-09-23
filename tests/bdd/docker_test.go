@@ -5,7 +5,8 @@ import (
 	"os/exec"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -26,16 +27,16 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 
 	ginkgo.Describe("identity", func() {
 		ginkgo.It("exposes the docker cleaner name and operation type", func() {
-			dc := cleaner.NewDockerCleaner(true, true, domain.DockerPruneAll)
+			dc := cleaner.NewDockerCleaner(true, true, enums.DockerPruneAll)
 
 			gomega.Expect(dc.Name()).To(gomega.Equal("docker"))
-			gomega.Expect(dc.Type()).To(gomega.Equal(domain.OperationTypeDocker))
+			gomega.Expect(dc.Type()).To(gomega.Equal(operations.OperationTypeDocker))
 		})
 	})
 
 	ginkgo.Describe("availability", func() {
 		ginkgo.It("reports availability that matches the docker binary", func() {
-			dc := cleaner.NewDockerCleaner(true, true, domain.DockerPruneAll)
+			dc := cleaner.NewDockerCleaner(true, true, enums.DockerPruneAll)
 
 			gomega.Expect(dc.IsAvailable(ctx)).To(gomega.Equal(dockerInstalled()))
 		})
@@ -50,7 +51,7 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 			})
 
 			ginkgo.It("refuses to clean with an infrastructure error", func() {
-				dc := cleaner.NewDockerCleaner(true, true, domain.DockerPruneAll)
+				dc := cleaner.NewDockerCleaner(true, true, enums.DockerPruneAll)
 
 				cleanRes := dc.Clean(ctx)
 				gomega.Expect(cleanRes.IsErr()).To(gomega.BeTrue())
@@ -61,7 +62,7 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 			})
 
 			ginkgo.It("refuses to scan with an infrastructure error", func() {
-				dc := cleaner.NewDockerCleaner(true, true, domain.DockerPruneAll)
+				dc := cleaner.NewDockerCleaner(true, true, enums.DockerPruneAll)
 
 				scanRes := dc.Scan(ctx)
 				gomega.Expect(scanRes.IsErr()).To(gomega.BeTrue())
@@ -76,7 +77,7 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 			})
 
 			ginkgo.It("completes a dry run without reporting missing tooling", func() {
-				dc := cleaner.NewDockerCleaner(true, true, domain.DockerPruneAll)
+				dc := cleaner.NewDockerCleaner(true, true, enums.DockerPruneAll)
 
 				cleanRes := dc.Clean(ctx)
 				if cleanRes.IsErr() {
@@ -89,11 +90,11 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 
 	ginkgo.Describe("settings validation", func() {
 		ginkgo.DescribeTable("accepts or rejects prune modes",
-			func(pruneMode domain.DockerPruneMode, valid bool) {
+			func(pruneMode enums.DockerPruneMode, valid bool) {
 				dc := cleaner.NewDockerCleaner(true, true, pruneMode)
 
-				settings := &domain.OperationSettings{
-					Docker: &domain.DockerSettings{PruneMode: pruneMode},
+				settings := &operations.OperationSettings{
+					Docker: &operations.DockerSettings{PruneMode: pruneMode},
 				}
 
 				err := dc.ValidateSettings(settings)
@@ -103,18 +104,18 @@ var _ = ginkgo.Describe("Docker cleaner", func() {
 					gomega.Expect(err).To(gomega.HaveOccurred())
 				}
 			},
-			ginkgo.Entry("all", domain.DockerPruneAll, true),
-			ginkgo.Entry("images", domain.DockerPruneImages, true),
-			ginkgo.Entry("containers", domain.DockerPruneContainers, true),
-			ginkgo.Entry("volumes", domain.DockerPruneVolumes, true),
-			ginkgo.Entry("builds", domain.DockerPruneBuilds, true),
-			ginkgo.Entry("unknown mode", domain.DockerPruneMode(99), false),
+			ginkgo.Entry("all", enums.DockerPruneAll, true),
+			ginkgo.Entry("images", enums.DockerPruneImages, true),
+			ginkgo.Entry("containers", enums.DockerPruneContainers, true),
+			ginkgo.Entry("volumes", enums.DockerPruneVolumes, true),
+			ginkgo.Entry("builds", enums.DockerPruneBuilds, true),
+			ginkgo.Entry("unknown mode", enums.DockerPruneMode(99), false),
 		)
 
 		ginkgo.It("accepts settings without a docker section", func() {
-			dc := cleaner.NewDockerCleaner(true, true, domain.DockerPruneAll)
+			dc := cleaner.NewDockerCleaner(true, true, enums.DockerPruneAll)
 
-			gomega.Expect(dc.ValidateSettings(&domain.OperationSettings{})).
+			gomega.Expect(dc.ValidateSettings(&operations.OperationSettings{})).
 				NotTo(gomega.HaveOccurred())
 		})
 	})

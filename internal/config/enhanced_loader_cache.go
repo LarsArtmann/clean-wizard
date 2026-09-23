@@ -1,16 +1,15 @@
 package config
 
 import (
+	"go/types"
 	"sync"
 	"time"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // ConfigCache provides configuration caching with TTL.
 type ConfigCache struct {
 	mu        sync.RWMutex
-	config    *domain.Config
+	config    *types.Config
 	loadedAt  time.Time
 	ttl       time.Duration
 	validator *ConfigValidator
@@ -25,7 +24,7 @@ func NewConfigCache(ttl time.Duration) *ConfigCache {
 }
 
 // Get retrieves cached configuration if valid and not expired.
-func (cc *ConfigCache) Get() *domain.Config {
+func (cc *ConfigCache) Get() *types.Config {
 	cc.mu.RLock()
 
 	if cc.config == nil || time.Since(cc.loadedAt) > cc.ttl {
@@ -52,7 +51,7 @@ func (cc *ConfigCache) Get() *domain.Config {
 }
 
 // Set stores configuration in cache with current timestamp.
-func (cc *ConfigCache) Set(config *domain.Config) {
+func (cc *ConfigCache) Set(config *types.Config) {
 	cc.mu.Lock()
 	defer cc.mu.Unlock()
 

@@ -3,7 +3,7 @@ package config
 import (
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )
 
 // RefreshOption represents the force refresh option for config loading.
@@ -72,20 +72,20 @@ type EnhancedConfigLoader struct {
 
 // ConfigLoadOptions provides options for configuration loading.
 type ConfigLoadOptions struct {
-	ForceRefresh       RefreshOption              `json:"force_refresh"`
-	EnableCache        CacheOption                `json:"enable_cache"`
-	EnableSanitization SanitizeOption             `json:"enable_sanitization"`
-	ValidationLevel    domain.ValidationLevelType `json:"validation_level"`
-	Timeout            time.Duration              `json:"timeout"`
+	ForceRefresh       RefreshOption             `json:"force_refresh"`
+	EnableCache        CacheOption               `json:"enable_cache"`
+	EnableSanitization SanitizeOption            `json:"enable_sanitization"`
+	ValidationLevel    enums.ValidationLevelType `json:"validation_level"`
+	Timeout            time.Duration             `json:"timeout"`
 }
 
 // ConfigSaveOptions provides options for configuration saving.
 type ConfigSaveOptions struct {
-	EnableSanitization SanitizeOption             `json:"enable_sanitization"`
-	BackupEnabled      BackupOption               `json:"backup_enabled"`
-	ValidationLevel    domain.ValidationLevelType `json:"validation_level"`
-	CreateBackup       BackupOption               `json:"create_backup"`
-	ForceSave          SaveOption                 `json:"force_save"` // Override validation failures
+	EnableSanitization SanitizeOption            `json:"enable_sanitization"`
+	BackupEnabled      BackupOption              `json:"backup_enabled"`
+	ValidationLevel    enums.ValidationLevelType `json:"validation_level"`
+	CreateBackup       BackupOption              `json:"create_backup"`
+	ForceSave          SaveOption                `json:"force_save"` // Override validation failures
 }
 
 // RetryPolicy defines retry behavior for configuration operations.

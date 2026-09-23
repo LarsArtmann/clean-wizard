@@ -12,7 +12,8 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"golang.org/x/sys/unix"
 )
@@ -92,23 +93,23 @@ func GetDirModTime(path string) time.Time {
 
 // ScanDirectoryResult represents the result of scanning a directory.
 type ScanDirectoryResult struct {
-	Items []domain.ScanItem
+	Items []types.ScanItem
 	Found bool
 }
 
 // ScanDirectory scans a directory and returns scan items if it exists and is a directory.
 // This helper consolidates the common pattern of checking if a path exists and is a directory,
 // then creating scan items for it.
-func ScanDirectory(path string, scanType domain.ScanType, verbose bool) ScanDirectoryResult {
+func ScanDirectory(path string, scanType types.ScanType, verbose bool) ScanDirectoryResult {
 	result := ScanDirectoryResult{
-		Items: make([]domain.ScanItem, 0),
+		Items: make([]types.ScanItem, 0),
 		Found: false,
 	}
 
 	info, err := os.Stat(path)
 	if err == nil && info.IsDir() {
 		result.Found = true
-		result.Items = append(result.Items, domain.ScanItem{
+		result.Items = append(result.Items, types.ScanItem{
 			Path:     path,
 			Size:     GetDirSize(path),
 			Created:  GetDirModTime(path),
@@ -125,9 +126,9 @@ func ScanDirectory(path string, scanType domain.ScanType, verbose bool) ScanDire
 
 // appendScanItem appends a scan item for a directory to the items slice with verbose output.
 func appendScanItem(
-	items []domain.ScanItem, path, displayName string, scanType domain.ScanType, verbose bool,
-) []domain.ScanItem {
-	item := domain.ScanItem{
+	items []types.ScanItem, path, displayName string, scanType types.ScanType, verbose bool,
+) []types.ScanItem {
+	item := types.ScanItem{
 		Path:     path,
 		Size:     GetDirSize(path),
 		Created:  GetDirModTime(path),
@@ -148,8 +149,8 @@ func ScanVersionDirectory(
 	ctx context.Context,
 	versionsDir, managerName string,
 	verbose bool,
-) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	info, err := os.Stat(versionsDir)
 	if err != nil || !info.IsDir() {
@@ -158,7 +159,7 @@ func ScanVersionDirectory(
 
 	matches, err := filepath.Glob(filepath.Join(versionsDir, "*"))
 	if err != nil {
-		return result.Err[[]domain.ScanItem](
+		return result.Err[[]types.ScanItem](
 			fmt.Errorf(
 				"failed to find %s versions at versionsDir=%v: %w",
 				managerName,
@@ -169,7 +170,7 @@ func ScanVersionDirectory(
 	}
 
 	for _, match := range matches {
-		items = appendScanItem(items, match, managerName, domain.ScanTypeTemp, verbose)
+		items = appendScanItem(items, match, managerName, types.ScanTypeTemp, verbose)
 	}
 
 	return result.Ok(items)
@@ -183,11 +184,11 @@ func ScanVersionDirectory(
 // If homeDir is empty and pathComponents contains a complete path, it uses that directly.
 // If pattern is provided, it walks the directory to find matching entries instead of scanning.
 func ScanPath(
-	homeDir string, scanType domain.ScanType, displayName string,
+	homeDir string, scanType types.ScanType, displayName string,
 	verbose bool, pattern string, pathComponents ...string,
 ) ScanDirectoryResult {
 	result := ScanDirectoryResult{
-		Items: make([]domain.ScanItem, 0),
+		Items: make([]types.ScanItem, 0),
 		Found: false,
 	}
 
@@ -331,20 +332,20 @@ func DiskUsageBar(du DiskUsage, width int) string {
 }
 
 // NewEmptyCleanResult returns a conservative result for when there are no items to clean.
-func NewEmptyCleanResult() result.Result[domain.CleanResult] {
+func NewEmptyCleanResult() result.Result[types.CleanResult] {
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		0, int64(0),
-		domain.SizeEstimate{Known: 0, Status: domain.SizeEstimateStatusKnown},
+		types.SizeEstimate{Known: 0, Status: enums.SizeEstimateStatusKnown},
 	))
 }
 
 // NewDryRunCleanResult returns a dry-run result with the given item count and total bytes.
-func NewDryRunCleanResult(itemCount int, totalBytes int64) result.Result[domain.CleanResult] {
+func NewDryRunCleanResult(itemCount int, totalBytes int64) result.Result[types.CleanResult] {
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
-		domain.StrategyDryRunType,
+		enums.StrategyDryRunType,
 		itemCount, totalBytes,
-		domain.SizeEstimate{Known: uint64(totalBytes), Status: domain.SizeEstimateStatusKnown},
+		types.SizeEstimate{Known: uint64(totalBytes), Status: enums.SizeEstimateStatusKnown},
 	))
 }
 
@@ -353,20 +354,20 @@ func NewCleanResultWithMetrics(
 	itemsRemoved, itemsFailed int,
 	bytesFreed int64,
 	duration time.Duration,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	return result.Ok(conversions.NewCleanResultWithTimingAndSize(
-		domain.StrategyAggressiveType,
+		enums.StrategyAggressiveType,
 		itemsRemoved, itemsFailed, bytesFreed, duration,
-		domain.SizeEstimate{Known: uint64(bytesFreed), Status: domain.SizeEstimateStatusKnown},
+		types.SizeEstimate{Known: uint64(bytesFreed), Status: enums.SizeEstimateStatusKnown},
 	))
 }
 
 // CleanItemTrashFn trashes a single scan item and returns an error if it fails.
-type CleanItemTrashFn func(ctx context.Context, item domain.ScanItem) error
+type CleanItemTrashFn func(ctx context.Context, item types.ScanItem) error
 
 // CleanItemLogFn logs a successfully trashed item (typically verbose mode).
 // Pass nil to disable per-item logging.
-type CleanItemLogFn func(item domain.ScanItem)
+type CleanItemLogFn func(item types.ScanItem)
 
 // LockedMapLookup reads mu.RLock, fetches the value for key from m, and returns it.
 // Centralizes the idiomatic "RWMutex + map lookup" pattern used by every registry-style
@@ -386,14 +387,14 @@ func LockedMapLookup[K comparable, V any](mu *sync.RWMutex, m map[K]V, key K) (V
 // optional verbose per-item log callback.
 func ExecuteTrashPipeline(
 	ctx context.Context,
-	scanResult result.Result[[]domain.ScanItem],
+	scanResult result.Result[[]types.ScanItem],
 	dryRun, verbose bool,
 	dryRunLabel string,
 	trash CleanItemTrashFn,
 	logItem CleanItemLogFn,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	if scanResult.IsErr() {
-		return result.Err[domain.CleanResult](scanResult.Error())
+		return result.Err[types.CleanResult](scanResult.Error())
 	}
 
 	items := scanResult.Value()

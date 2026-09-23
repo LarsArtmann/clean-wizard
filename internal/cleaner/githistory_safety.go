@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // GitHistorySafetyChecker performs safety checks before rewriting git history.
@@ -39,11 +39,11 @@ var protectedBranches = map[string]bool{ //nolint:gochecknoglobals
 const SafetyCheckTimeout = 30 * time.Second
 
 // Check performs all safety checks and returns a report.
-func (c *GitHistorySafetyChecker) Check(ctx context.Context) *domain.GitHistorySafetyReport {
+func (c *GitHistorySafetyChecker) Check(ctx context.Context) *types.GitHistorySafetyReport {
 	ctx, cancel := context.WithTimeout(ctx, SafetyCheckTimeout)
 	defer cancel()
 
-	report := &domain.GitHistorySafetyReport{ //nolint:exhaustruct
+	report := &types.GitHistorySafetyReport{ //nolint:exhaustruct
 		Warnings: []string{},
 		Blockers: []string{},
 	}
@@ -191,7 +191,7 @@ func (c *GitHistorySafetyChecker) getCurrentBranch(ctx context.Context) string {
 // checkRemote checks for remote configuration.
 func (c *GitHistorySafetyChecker) checkRemote(
 	ctx context.Context,
-	report *domain.GitHistorySafetyReport,
+	report *types.GitHistorySafetyReport,
 ) {
 	cmd := exec.CommandContext(ctx, "git", "-C", c.repoPath, "remote")
 

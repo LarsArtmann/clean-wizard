@@ -6,7 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,9 +21,9 @@ func TestValidationMiddleware(t *testing.T) {
 	t.Run("ValidScanRequest", func(t *testing.T) {
 		t.Parallel()
 
-		req := domain.ScanRequest{
-			Type:      domain.ScanTypeNixStore,
-			Recursive: domain.ScanModeRecursive,
+		req := types.ScanRequest{
+			Type:      types.ScanTypeNixStore,
+			Recursive: enums.ScanModeRecursive,
 			Limit:     100,
 		}
 
@@ -32,9 +34,9 @@ func TestValidationMiddleware(t *testing.T) {
 	t.Run("InvalidScanRequest", func(t *testing.T) {
 		t.Parallel()
 
-		req := domain.ScanRequest{
+		req := types.ScanRequest{
 			Type:      "invalid",
-			Recursive: domain.ScanModeRecursive,
+			Recursive: enums.ScanModeRecursive,
 			Limit:     -1,
 		}
 
@@ -46,11 +48,11 @@ func TestValidationMiddleware(t *testing.T) {
 	t.Run("ValidCleanRequest", func(t *testing.T) {
 		t.Parallel()
 
-		req := domain.CleanRequest{
-			Items: []domain.ScanItem{
-				{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: domain.ScanTypeTemp},
+		req := types.CleanRequest{
+			Items: []types.ScanItem{
+				{Path: "/tmp/file", Size: 1024, Created: time.Now(), ScanType: types.ScanTypeTemp},
 			},
-			Strategy: domain.StrategyConservativeType,
+			Strategy: enums.StrategyConservativeType,
 		}
 
 		result := validator.ValidateCleanRequest(ctx, req)
@@ -60,9 +62,9 @@ func TestValidationMiddleware(t *testing.T) {
 	t.Run("InvalidCleanRequest", func(t *testing.T) {
 		t.Parallel()
 
-		req := domain.CleanRequest{
-			Items:    []domain.ScanItem{},
-			Strategy: domain.CleanStrategyType(999), // Invalid strategy value
+		req := types.CleanRequest{
+			Items:    []types.ScanItem{},
+			Strategy: enums.CleanStrategyType(999), // Invalid strategy value
 		}
 
 		result := validator.ValidateCleanRequest(ctx, req)
@@ -74,8 +76,8 @@ func TestValidationMiddleware(t *testing.T) {
 		t.Parallel()
 
 		cleaner := &mockCleaner{}
-		settings := &domain.OperationSettings{
-			NixGenerations: &domain.NixGenerationsSettings{Generations: 3},
+		settings := &operations.OperationSettings{
+			NixGenerations: &operations.NixGenerationsSettings{Generations: 3},
 		}
 
 		result := validator.ValidateCleanerSettings(ctx, cleaner, settings)
@@ -86,8 +88,8 @@ func TestValidationMiddleware(t *testing.T) {
 		t.Parallel()
 
 		cleaner := &mockCleaner{}
-		settings := &domain.OperationSettings{
-			NixGenerations: &domain.NixGenerationsSettings{Generations: -1},
+		settings := &operations.OperationSettings{
+			NixGenerations: &operations.NixGenerationsSettings{Generations: -1},
 		}
 
 		result := validator.ValidateCleanerSettings(ctx, cleaner, settings)
@@ -96,11 +98,11 @@ func TestValidationMiddleware(t *testing.T) {
 	})
 }
 
-// mockCleaner implements domain.OperationHandler for testing.
+// mockCleaner implements types.OperationHandler for testing.
 type mockCleaner struct{}
 
-func (m *mockCleaner) Type() domain.OperationType {
-	return domain.OperationTypeNixGenerations
+func (m *mockCleaner) Type() operations.OperationType {
+	return operations.OperationTypeNixGenerations
 }
 
 func (m *mockCleaner) IsAvailable(ctx context.Context) bool {
@@ -111,7 +113,7 @@ func (m *mockCleaner) GetStoreSize(ctx context.Context) int64 {
 	return 1000
 }
 
-func (m *mockCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (m *mockCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	if settings != nil && settings.NixGenerations != nil &&
 		settings.NixGenerations.Generations < 1 {
 		return fmt.Errorf(

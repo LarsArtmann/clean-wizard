@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestNewSystemCacheCleaner(t *testing.T) {
@@ -78,8 +79,8 @@ func TestSystemCacheCleaner_Type(t *testing.T) {
 		t.Fatalf("NewSystemCacheCleaner() error = %v", err)
 	}
 
-	if cleaner.Type() != domain.OperationTypeSystemCache {
-		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeSystemCache)
+	if cleaner.Type() != operations.OperationTypeSystemCache {
+		t.Errorf("Type() = %v, want %v", cleaner.Type(), operations.OperationTypeSystemCache)
 	}
 }
 
@@ -104,7 +105,7 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.OperationSettings
+		settings *operations.OperationSettings
 		wantErr  bool
 	}{
 		{
@@ -114,14 +115,14 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name:     "nil system cache settings",
-			settings: &domain.OperationSettings{},
+			settings: &operations.OperationSettings{},
 			wantErr:  false,
 		},
 		{
 			name: "valid settings with all platform caches",
-			settings: func() *domain.OperationSettings {
-				return &domain.OperationSettings{
-					SystemCache: &domain.SystemCacheSettings{
+			settings: func() *operations.OperationSettings {
+				return &operations.OperationSettings{
+					SystemCache: &operations.SystemCacheSettings{
 						CacheTypes: AvailableSystemCacheTypes(),
 						OlderThan:  "30d",
 					},
@@ -131,20 +132,20 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name: "valid settings with single platform cache",
-			settings: func() *domain.OperationSettings {
+			settings: func() *operations.OperationSettings {
 				caches := AvailableSystemCacheTypes()
 				if len(caches) == 0 {
-					return &domain.OperationSettings{
-						SystemCache: &domain.SystemCacheSettings{
-							CacheTypes: []domain.CacheType{},
+					return &operations.OperationSettings{
+						SystemCache: &operations.SystemCacheSettings{
+							CacheTypes: []enums.CacheType{},
 							OlderThan:  "7d",
 						},
 					}
 				}
 
-				return &domain.OperationSettings{
-					SystemCache: &domain.SystemCacheSettings{
-						CacheTypes: []domain.CacheType{caches[0]},
+				return &operations.OperationSettings{
+					SystemCache: &operations.SystemCacheSettings{
+						CacheTypes: []enums.CacheType{caches[0]},
 						OlderThan:  "7d",
 					},
 				}
@@ -153,9 +154,9 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name: "valid settings with no caches",
-			settings: &domain.OperationSettings{
-				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []domain.CacheType{},
+			settings: &operations.OperationSettings{
+				SystemCache: &operations.SystemCacheSettings{
+					CacheTypes: []enums.CacheType{},
 					OlderThan:  "30d",
 				},
 			},
@@ -163,9 +164,9 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name: "invalid cache type",
-			settings: &domain.OperationSettings{
-				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []domain.CacheType{99}, // Invalid value
+			settings: &operations.OperationSettings{
+				SystemCache: &operations.SystemCacheSettings{
+					CacheTypes: []enums.CacheType{99}, // Invalid value
 					OlderThan:  "30d",
 				},
 			},
@@ -173,10 +174,10 @@ func TestSystemCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name: "mixed valid and invalid caches",
-			settings: &domain.OperationSettings{
-				SystemCache: &domain.SystemCacheSettings{
-					CacheTypes: []domain.CacheType{
-						domain.CacheTypeSpotlight,
+			settings: &operations.OperationSettings{
+				SystemCache: &operations.SystemCacheSettings{
+					CacheTypes: []enums.CacheType{
+						enums.CacheTypeSpotlight,
 						99,
 					}, // Mixed valid and invalid
 					OlderThan: "30d",
@@ -226,11 +227,11 @@ func TestSystemCacheCleaner_Clean_DryRun(t *testing.T) {
 	cleanResult := result.Value()
 
 	// Verify dry-run strategy
-	if cleanResult.Strategy != domain.StrategyDryRunType {
+	if cleanResult.Strategy != enums.StrategyDryRunType {
 		t.Errorf(
 			"Clean() strategy = %v, want %v",
 			cleanResult.Strategy,
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 		)
 	}
 

@@ -7,7 +7,8 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -59,14 +60,14 @@ func newFakeCleaner(name string, outcomes ...error) *fakeCleaner {
 }
 
 func (f *fakeCleaner) Name() string                       { return f.name }
-func (f *fakeCleaner) Type() domain.OperationType         { return domain.OperationTypeCargoPackages }
+func (f *fakeCleaner) Type() operations.OperationType     { return operations.OperationTypeCargoPackages }
 func (f *fakeCleaner) IsAvailable(_ context.Context) bool { return f.available }
 
-func (f *fakeCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
-	return result.Ok([]domain.ScanItem{{Size: 100}, {Size: 200}})
+func (f *fakeCleaner) Scan(_ context.Context) result.Result[[]types.ScanItem] {
+	return result.Ok([]types.ScanItem{{Size: 100}, {Size: 200}})
 }
 
-func (f *fakeCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (f *fakeCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	call := f.calls.Add(1)
 
 	if f.tracker != nil {
@@ -77,7 +78,7 @@ func (f *fakeCleaner) Clean(ctx context.Context) result.Result[domain.CleanResul
 	if f.cleanDelay > 0 {
 		select {
 		case <-ctx.Done():
-			return result.Err[domain.CleanResult](ctx.Err())
+			return result.Err[types.CleanResult](ctx.Err())
 		case <-time.After(f.cleanDelay):
 		}
 	}
@@ -88,10 +89,10 @@ func (f *fakeCleaner) Clean(ctx context.Context) result.Result[domain.CleanResul
 	}
 
 	if outcomeIdx >= 0 && f.outcomes[outcomeIdx] != nil {
-		return result.Err[domain.CleanResult](f.outcomes[outcomeIdx])
+		return result.Err[types.CleanResult](f.outcomes[outcomeIdx])
 	}
 
-	return result.Ok(domain.CleanResult{FreedBytes: 100, ItemsRemoved: 1})
+	return result.Ok(types.CleanResult{FreedBytes: 100, ItemsRemoved: 1})
 }
 
 func (f *fakeCleaner) callCount() int32 { return f.calls.Load() }

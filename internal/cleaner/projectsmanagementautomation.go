@@ -11,7 +11,9 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -41,8 +43,8 @@ func NewProjectsManagementAutomationCleaner(
 }
 
 // Type returns operation type for Projects Management Automation cleaner.
-func (pc *ProjectsManagementAutomationCleaner) Type() domain.OperationType {
-	return domain.OperationTypeProjectsManagementAutomation
+func (pc *ProjectsManagementAutomationCleaner) Type() operations.OperationType {
+	return operations.OperationTypeProjectsManagementAutomation
 }
 
 // Name returns the cleaner name for result tracking.
@@ -60,33 +62,33 @@ func (pc *ProjectsManagementAutomationCleaner) IsAvailable(ctx context.Context) 
 // ValidateSettings validates Projects Management Automation cleaner settings.
 // All settings are valid by default; the field is optional.
 func (pc *ProjectsManagementAutomationCleaner) ValidateSettings(
-	settings *domain.OperationSettings,
+	settings *operations.OperationSettings,
 ) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.ProjectsManagementAutomationSettings {
+		func(s *operations.OperationSettings) *operations.ProjectsManagementAutomationSettings {
 			return s.ProjectsManagementAutomation
 		},
-		func(*domain.ProjectsManagementAutomationSettings) error { return nil },
+		func(*operations.ProjectsManagementAutomationSettings) error { return nil },
 	)
 }
 
 // Scan scans for Projects Management Automation cache.
 func (pc *ProjectsManagementAutomationCleaner) Scan(
 	ctx context.Context,
-) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0, 1)
+) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0, 1)
 
 	if !pc.IsAvailable(ctx) {
 		return result.Ok(items)
 	}
 
 	// Add cache item
-	items = append(items, domain.ScanItem{
+	items = append(items, types.ScanItem{
 		Path:     "~/.config/projects-management-automation/cache",
 		Size:     pc.estimateCacheSize(),
 		Created:  time.Now(),
-		ScanType: domain.ScanTypeSystem,
+		ScanType: types.ScanTypeSystem,
 	})
 
 	if pc.verbose {
@@ -99,9 +101,9 @@ func (pc *ProjectsManagementAutomationCleaner) Scan(
 // Clean removes Projects Management Automation cache.
 func (pc *ProjectsManagementAutomationCleaner) Clean(
 	ctx context.Context,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	if !pc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			NewNotAvailableError("projects-management-automation", ""),
 		)
 	}
@@ -118,7 +120,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 
 		return result.Ok(
 			conversions.NewCleanResultWithTiming(
-				domain.StrategyDryRunType,
+				enums.StrategyDryRunType,
 				itemsRemoved,
 				totalBytes,
 				duration,
@@ -132,7 +134,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("projects-management-automation --clear-cache failed: %w (output: %s)",
 				err, string(output)),
 		)
@@ -149,7 +151,7 @@ func (pc *ProjectsManagementAutomationCleaner) Clean(
 
 	return result.Ok(
 		conversions.NewCleanResultWithTiming(
-			domain.StrategyConservativeType,
+			enums.StrategyConservativeType,
 			itemsRemoved,
 			bytesFreed,
 			duration,

@@ -6,7 +6,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -267,21 +267,21 @@ func cleanerTypesToNames(types []CleanerType) []string {
 }
 
 // operationTypeToCleanerType maps domain OperationType to CleanerType.
-var operationTypeToCleanerType = map[domain.OperationType]CleanerType{ //nolint:gochecknoglobals
-	domain.OperationTypeNixGenerations:               CleanerTypeNix,
-	domain.OperationTypeTempFiles:                    CleanerTypeTempFiles,
-	domain.OperationTypeHomebrew:                     CleanerTypeHomebrew,
-	domain.OperationTypeNodePackages:                 CleanerTypeNodePackages,
-	domain.OperationTypeGoPackages:                   CleanerTypeGoPackages,
-	domain.OperationTypeCargoPackages:                CleanerTypeCargoPackages,
-	domain.OperationTypeBuildCache:                   CleanerTypeBuildCache,
-	domain.OperationTypeDocker:                       CleanerTypeDocker,
-	domain.OperationTypeSystemCache:                  CleanerTypeSystemCache,
-	domain.OperationTypeSystemTemp:                   CleanerTypeSystemCache,
-	domain.OperationTypeProjectsManagementAutomation: CleanerTypeProjectsManagementAutomation,
-	domain.OperationTypeProjectExecutables:           CleanerTypeProjectExecutables,
-	domain.OperationTypeCompiledBinaries:             CleanerTypeCompiledBinaries,
-	domain.OperationTypeGolangciLintCache:            CleanerTypeGolangciLintCache,
+var operationTypeToCleanerType = map[operations.OperationType]CleanerType{ //nolint:gochecknoglobals
+	operations.OperationTypeNixGenerations:               CleanerTypeNix,
+	operations.OperationTypeTempFiles:                    CleanerTypeTempFiles,
+	operations.OperationTypeHomebrew:                     CleanerTypeHomebrew,
+	operations.OperationTypeNodePackages:                 CleanerTypeNodePackages,
+	operations.OperationTypeGoPackages:                   CleanerTypeGoPackages,
+	operations.OperationTypeCargoPackages:                CleanerTypeCargoPackages,
+	operations.OperationTypeBuildCache:                   CleanerTypeBuildCache,
+	operations.OperationTypeDocker:                       CleanerTypeDocker,
+	operations.OperationTypeSystemCache:                  CleanerTypeSystemCache,
+	operations.OperationTypeSystemTemp:                   CleanerTypeSystemCache,
+	operations.OperationTypeProjectsManagementAutomation: CleanerTypeProjectsManagementAutomation,
+	operations.OperationTypeProjectExecutables:           CleanerTypeProjectExecutables,
+	operations.OperationTypeCompiledBinaries:             CleanerTypeCompiledBinaries,
+	operations.OperationTypeGolangciLintCache:            CleanerTypeGolangciLintCache,
 }
 
 // validateOperationTypeMapping panics at package init if operationTypeToCleanerType

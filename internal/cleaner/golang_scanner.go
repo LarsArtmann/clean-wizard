@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -31,8 +31,8 @@ func NewGoScanner(verbose bool) *GoScanner {
 func (gs *GoScanner) Scan(
 	ctx context.Context,
 	caches GoCacheType,
-) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	// Scan GOCACHE
 	if caches.Has(GoCacheGOCACHE) {
@@ -59,27 +59,27 @@ func (gs *GoScanner) Scan(
 
 // scanGoCache scans GOCACHE.
 
-func (gs *GoScanner) scanGoCache(ctx context.Context) []domain.ScanItem {
+func (gs *GoScanner) scanGoCache(ctx context.Context) []types.ScanItem {
 	return gs.scanGoEnvCache(ctx, "GOCACHE", "Go cache")
 }
 
 // scanGoModCache scans GOMODCACHE.
 
-func (gs *GoScanner) scanGoModCache(ctx context.Context) []domain.ScanItem {
+func (gs *GoScanner) scanGoModCache(ctx context.Context) []types.ScanItem {
 	return gs.scanGoEnvCache(ctx, "GOMODCACHE", "Go module cache")
 }
 
 // addScanItem creates a scan item for a cache directory and appends it to items.
 
 func (gs *GoScanner) addScanItem(
-	items []domain.ScanItem,
+	items []types.ScanItem,
 	path, cacheName string,
-) []domain.ScanItem {
-	items = append(items, domain.ScanItem{
+) []types.ScanItem {
+	items = append(items, types.ScanItem{
 		Path:     path,
 		Size:     GetDirSize(path),
 		Created:  GetDirModTime(path),
-		ScanType: domain.ScanTypeTemp,
+		ScanType: types.ScanTypeTemp,
 	})
 
 	if gs.verbose {
@@ -94,8 +94,8 @@ func (gs *GoScanner) addScanItem(
 func (gs *GoScanner) scanGoEnvCache(
 	ctx context.Context,
 	envVar, cacheName string,
-) []domain.ScanItem {
-	items := make([]domain.ScanItem, 0)
+) []types.ScanItem {
+	items := make([]types.ScanItem, 0)
 
 	cachePath, err := gs.helper.getGoEnv(ctx, envVar)
 	if err == nil && cachePath != "" {
@@ -107,8 +107,8 @@ func (gs *GoScanner) scanGoEnvCache(
 
 // scanGoBuildCache scans go-build* folders.
 
-func (gs *GoScanner) scanGoBuildCache() []domain.ScanItem {
-	items := make([]domain.ScanItem, 0)
+func (gs *GoScanner) scanGoBuildCache() []types.ScanItem {
+	items := make([]types.ScanItem, 0)
 	buildCachePattern := goBuildCachePattern
 
 	tempDir := filepath.Join("/", "tmp", "build")
@@ -128,8 +128,8 @@ func (gs *GoScanner) scanGoBuildCache() []domain.ScanItem {
 
 // scanLintCache scans for golangci-lint cache.
 
-func (gs *GoScanner) scanLintCache() []domain.ScanItem {
-	items := make([]domain.ScanItem, 0)
+func (gs *GoScanner) scanLintCache() []types.ScanItem {
+	items := make([]types.ScanItem, 0)
 
 	cacheDir := gs.detectLintCacheDir()
 	if cacheDir != "" {

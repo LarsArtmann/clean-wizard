@@ -9,7 +9,7 @@ import (
 	"os/exec"
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
@@ -87,7 +87,7 @@ func runConfigShowCommand(_ *cobra.Command, _ []string, jsonOutput bool) error {
 }
 
 // showConfigJSON outputs config in JSON format.
-func showConfigJSON(cfg *domain.Config) error {
+func showConfigJSON(cfg *types.Config) error {
 	// Use proper JSON marshaling for complete output
 	jsonBytes, err := json.Marshal(cfg, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	if err != nil {
@@ -261,7 +261,7 @@ func runConfigResetCommand(_ *cobra.Command, _ []string, force bool) error {
 
 // loadConfigFromPath loads configuration from an explicit path, falling back
 // to the default discovery path when configPath is empty.
-func loadConfigFromPath(configPath string) (*domain.Config, error) {
+func loadConfigFromPath(configPath string) (*types.Config, error) {
 	if configPath != "" {
 		cfg, err := config.LoadFromPath(configPath)
 		if err != nil {

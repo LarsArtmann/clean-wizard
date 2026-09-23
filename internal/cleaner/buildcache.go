@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -46,7 +48,7 @@ func NewBuildCacheCleaner(
 	_, basePaths []string,
 ) (*BuildCacheCleaner, error) {
 	// Parse older than duration
-	duration, err := domain.ParseCustomDuration(olderThan)
+	duration, err := operations.ParseCustomDuration(olderThan)
 	if err != nil {
 		return nil, fmt.Errorf("invalid older_than duration %v: %w", olderThan, err)
 	}
@@ -66,8 +68,8 @@ func NewBuildCacheCleaner(
 }
 
 // Type returns operation type for build cache cleaner.
-func (bcc *BuildCacheCleaner) Type() domain.OperationType {
-	return domain.OperationTypeBuildCache
+func (bcc *BuildCacheCleaner) Type() operations.OperationType {
+	return operations.OperationTypeBuildCache
 }
 
 // Name returns the cleaner name for result tracking.
@@ -82,12 +84,12 @@ func (bcc *BuildCacheCleaner) IsAvailable(_ context.Context) bool {
 }
 
 // ValidateSettings validates build cache cleaner settings.
-func (bcc *BuildCacheCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (bcc *BuildCacheCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateBuildCacheSettings(settings)
 }
 
 // Scan scans for build tool caches.
-func (bcc *BuildCacheCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (bcc *BuildCacheCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
 	return scanWithIterator(
 		ctx,
 		bcc.toolTypes,
@@ -115,15 +117,15 @@ func (bcc *BuildCacheCleaner) scanBuildTool(
 	_ context.Context,
 	toolType JVMBuildToolType,
 	homeDir string,
-) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	switch toolType {
 	case JVMBuildToolGradle:
 		gradleCache := getCachePath(toolType, homeDir)
 		scanResult := ScanPath(
 			"",
-			domain.ScanTypeTemp,
+			types.ScanTypeTemp,
 			"Gradle cache",
 			bcc.verbose,
 			"*",
@@ -133,12 +135,12 @@ func (bcc *BuildCacheCleaner) scanBuildTool(
 
 	case JVMBuildToolMaven:
 		mavenCache := getCachePath(toolType, homeDir)
-		scanResult := ScanDirectory(mavenCache, domain.ScanTypeTemp, bcc.verbose)
+		scanResult := ScanDirectory(mavenCache, types.ScanTypeTemp, bcc.verbose)
 		items = append(items, scanResult.Items...)
 
 	case JVMBuildToolSBT:
 		sbtCache := getCachePath(toolType, homeDir)
-		scanResult := ScanDirectory(sbtCache, domain.ScanTypeTemp, bcc.verbose)
+		scanResult := ScanDirectory(sbtCache, types.ScanTypeTemp, bcc.verbose)
 		items = append(items, scanResult.Items...)
 	}
 
@@ -146,7 +148,7 @@ func (bcc *BuildCacheCleaner) scanBuildTool(
 }
 
 // Clean removes build tool caches.
-func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (bcc *BuildCacheCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	return cleanWithIterator(
 		ctx,
 		"build cache cleaner",
@@ -179,7 +181,7 @@ func (bcc *BuildCacheCleaner) estimateBuildToolSize(toolType JVMBuildToolType) i
 	return DryRunBytesPerItem
 }
 
-type CacheCleanerFunc func(ctx context.Context, toolType JVMBuildToolType, homeDir string) result.Result[domain.CleanResult]
+type CacheCleanerFunc func(ctx context.Context, toolType JVMBuildToolType, homeDir string) result.Result[types.CleanResult]
 
 type RemoveFunc func(path string) error
 
@@ -200,10 +202,10 @@ func (bcc *BuildCacheCleaner) genericClean(
 	pattern string,
 	verboseMsg string,
 	removeFn RemoveFunc,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	matches, err := filepath.Glob(filepath.Join(baseDir, pattern))
 	if err != nil {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf(
 				"failed to find %s at baseDir=%v, pattern=%v: %w",
 				toolName,
@@ -250,7 +252,7 @@ func (bcc *BuildCacheCleaner) genericClean(
 
 	return result.Ok(
 		conversions.NewCleanResult(
-			domain.StrategyConservativeType,
+			enums.StrategyConservativeType,
 			itemsRemoved,
 			bytesFreed,
 		),
@@ -262,7 +264,7 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(
 	ctx context.Context,
 	toolType JVMBuildToolType,
 	homeDir string,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	switch toolType {
 	case JVMBuildToolGradle:
 		gradleCache := getCachePath(toolType, homeDir)
@@ -287,5 +289,5 @@ func (bcc *BuildCacheCleaner) cleanBuildTool(
 		return bcc.genericClean(ctx, "SBT", sbtCache, "*", "SBT cache", os.RemoveAll)
 	}
 
-	return result.Err[domain.CleanResult](fmt.Errorf("unknown build tool type: %s", toolType))
+	return result.Err[types.CleanResult](fmt.Errorf("unknown build tool type: %s", toolType))
 }

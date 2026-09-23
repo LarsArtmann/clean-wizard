@@ -3,6 +3,8 @@ package operations
 import (
 	"fmt"
 	"runtime"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )
 
 // settingsFactory maps operation types to their default settings factories.
@@ -45,8 +47,8 @@ func defaultNixGenerationsSettings() *OperationSettings {
 	return &OperationSettings{ //nolint:exhaustruct
 		NixGenerations: &NixGenerationsSettings{
 			Generations: 1,
-			Optimize:    OptimizationModeDisabled,
-			DryRun:      ExecutionModeNormal,
+			Optimize:    enums.OptimizationModeDisabled,
+			DryRun:      enums.ExecutionModeNormal,
 		},
 	}
 }
@@ -63,7 +65,7 @@ func defaultTempFilesSettings() *OperationSettings {
 func defaultHomebrewSettings() *OperationSettings {
 	return &OperationSettings{ //nolint:exhaustruct
 		Homebrew: &HomebrewSettings{ //nolint:exhaustruct
-			UnusedOnly: HomebrewModeUnusedOnly,
+			UnusedOnly: enums.HomebrewModeUnusedOnly,
 		},
 	}
 }
@@ -71,11 +73,11 @@ func defaultHomebrewSettings() *OperationSettings {
 func defaultNodePackagesSettings() *OperationSettings {
 	return &OperationSettings{ //nolint:exhaustruct
 		NodePackages: &NodePackagesSettings{
-			PackageManagers: []PackageManagerType{
-				PackageManagerNpm,
-				PackageManagerPnpm,
-				PackageManagerYarn,
-				PackageManagerBun,
+			PackageManagers: []enums.PackageManagerType{
+				enums.PackageManagerNpm,
+				enums.PackageManagerPnpm,
+				enums.PackageManagerYarn,
+				enums.PackageManagerBun,
 			},
 		},
 	}
@@ -84,11 +86,11 @@ func defaultNodePackagesSettings() *OperationSettings {
 func defaultGoPackagesSettings() *OperationSettings {
 	return &OperationSettings{ //nolint:exhaustruct
 		GoPackages: &GoPackagesSettings{
-			CleanCache:      CacheCleanupEnabled,
-			CleanTestCache:  CacheCleanupEnabled,
-			CleanModCache:   CacheCleanupDisabled,
-			CleanBuildCache: CacheCleanupEnabled,
-			CleanLintCache:  CacheCleanupDisabled,
+			CleanCache:      enums.CacheCleanupEnabled,
+			CleanTestCache:  enums.CacheCleanupEnabled,
+			CleanModCache:   enums.CacheCleanupDisabled,
+			CleanBuildCache: enums.CacheCleanupEnabled,
+			CleanLintCache:  enums.CacheCleanupDisabled,
 		},
 	}
 }
@@ -96,7 +98,7 @@ func defaultGoPackagesSettings() *OperationSettings {
 func defaultCargoPackagesSettings() *OperationSettings {
 	return &OperationSettings{ //nolint:exhaustruct
 		CargoPackages: &CargoPackagesSettings{
-			Autoclean: CacheCleanupEnabled,
+			Autoclean: enums.CacheCleanupEnabled,
 		},
 	}
 }
@@ -104,7 +106,7 @@ func defaultCargoPackagesSettings() *OperationSettings {
 func defaultDockerSettings() *OperationSettings {
 	return &OperationSettings{ //nolint:exhaustruct
 		Docker: &DockerSettings{
-			PruneMode: DockerPruneAll,
+			PruneMode: enums.DockerPruneAll,
 		},
 	}
 }
@@ -130,7 +132,7 @@ func defaultSystemTempSettings() *OperationSettings {
 func defaultProjectsManagementAutomationSettings() *OperationSettings {
 	return &OperationSettings{ //nolint:exhaustruct
 		ProjectsManagementAutomation: &ProjectsManagementAutomationSettings{
-			ClearCache: CacheCleanupEnabled,
+			ClearCache: enums.CacheCleanupEnabled,
 		},
 	}
 }
@@ -342,40 +344,40 @@ func validateProjectsAutomationDefaults(s *ProjectsManagementAutomationSettings)
 // defaultBuildCacheSettings returns default settings for build cache cleanup.
 func defaultBuildCacheSettings() *BuildCacheSettings {
 	return &BuildCacheSettings{
-		ToolTypes: []BuildToolType{
-			BuildToolGo,
-			BuildToolRust,
-			BuildToolNode,
-			BuildToolPython,
-			BuildToolJava,
-			BuildToolScala,
+		ToolTypes: []enums.BuildToolType{
+			enums.BuildToolGo,
+			enums.BuildToolRust,
+			enums.BuildToolNode,
+			enums.BuildToolPython,
+			enums.BuildToolJava,
+			enums.BuildToolScala,
 		},
 		OlderThan: "30d",
 	}
 }
 
 // getDefaultSystemCacheTypes returns platform-appropriate default cache types.
-func getDefaultSystemCacheTypes() []CacheType {
+func getDefaultSystemCacheTypes() []enums.CacheType {
 	switch runtime.GOOS {
 	case "darwin":
-		return []CacheType{
-			CacheTypeSpotlight,
-			CacheTypeXcode,
-			CacheTypeCocoapods,
-			CacheTypeHomebrew,
+		return []enums.CacheType{
+			enums.CacheTypeSpotlight,
+			enums.CacheTypeXcode,
+			enums.CacheTypeCocoapods,
+			enums.CacheTypeHomebrew,
 		}
 	case "linux":
-		return []CacheType{
-			CacheTypeXdgCache,
-			CacheTypeThumbnails,
-			CacheTypePip,
-			CacheTypeNpm,
-			CacheTypeYarn,
-			CacheTypeCcache,
+		return []enums.CacheType{
+			enums.CacheTypeXdgCache,
+			enums.CacheTypeThumbnails,
+			enums.CacheTypePip,
+			enums.CacheTypeNpm,
+			enums.CacheTypeYarn,
+			enums.CacheTypeCcache,
 		}
 	default:
-		return []CacheType{
-			CacheTypeHomebrew,
+		return []enums.CacheType{
+			enums.CacheTypeHomebrew,
 		}
 	}
 }

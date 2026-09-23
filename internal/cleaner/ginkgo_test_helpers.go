@@ -3,7 +3,9 @@ package cleaner
 import (
 	"context"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -41,7 +43,7 @@ func assertResultOk[T any](result result.Result[T]) {
 //
 // Parameters:
 //   - ctx: The test context
-//   - cleaner: The cleaner instance to test (must have Clean method returning result.Result[domain.CleanResult])
+//   - cleaner: The cleaner instance to test (must have Clean method returning result.Result[types.CleanResult])
 //   - setupEmptyState: Function that sets up the mock to return empty results
 //
 // Usage:
@@ -54,7 +56,7 @@ func assertResultOk[T any](result result.Result[T]) {
 //		})
 //	})
 func GinkgoNoItemsToCleanTest(ctx context.Context, cleaner interface {
-	Clean(context.Context) result.Result[domain.CleanResult]
+	Clean(context.Context) result.Result[types.CleanResult]
 }, setupEmptyState func(),
 ) {
 	setupEmptyState()
@@ -63,7 +65,7 @@ func GinkgoNoItemsToCleanTest(ctx context.Context, cleaner interface {
 	assertResultOk(result)
 	cleanResult := result.Value()
 	gomega.Expect(cleanResult.ItemsRemoved).To(gomega.Equal(uint(0)))
-	gomega.Expect(cleanResult.Strategy).To(gomega.Equal(domain.StrategyConservative))
+	gomega.Expect(cleanResult.Strategy).To(gomega.Equal(enums.StrategyConservative))
 }
 
 // GinkgoValidateValidSettingsTest tests that ValidateSettings returns no error
@@ -76,8 +78,8 @@ func GinkgoNoItemsToCleanTest(ctx context.Context, cleaner interface {
 // Usage:
 //
 //	ginkgo.It("should return nil for valid settings", func() {
-//		settings := &domain.OperationSettings{
-//			GitHistory: &domain.GitHistorySettings{
+//		settings := &operations.OperationSettings{
+//			GitHistory: &operations.GitHistorySettings{
 //				MaxFiles: 50,
 //			},
 //		}
@@ -85,7 +87,7 @@ func GinkgoNoItemsToCleanTest(ctx context.Context, cleaner interface {
 //	})
 func GinkgoValidateValidSettingsTest(
 	cleaner CleanerWithSettings,
-	settings *domain.OperationSettings,
+	settings *operations.OperationSettings,
 ) {
 	err := cleaner.ValidateSettings(settings)
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -104,7 +106,7 @@ func GinkgoValidateValidSettingsTest(
 //		ginkgo.It("should return error when project listing fails", func() {
 //			GinkgoErrorPropagationTest(
 //				func() { mockLister.err = errors.New("failed to list projects") },
-//				func() result.Result[[]domain.ScanItem] { return cleaner.Scan(ctx) },
+//				func() result.Result[[]types.ScanItem] { return cleaner.Scan(ctx) },
 //			)
 //		})
 //	})
@@ -132,7 +134,7 @@ func GinkgoErrorPropagationTest[T any](setupError func(), operation func() resul
 //		"when ListProjects fails",
 //		"should return error when project listing fails",
 //		func() { mockLister.err = errors.New("failed to list projects") },
-//		func() result.Result[[]domain.ScanItem] { return cleaner.Scan(ctx) },
+//		func() result.Result[[]types.ScanItem] { return cleaner.Scan(ctx) },
 //	)
 func GinkgoErrorPropagationContext[T any](
 	contextName string,
@@ -152,7 +154,7 @@ func GinkgoErrorPropagationContext[T any](
 //
 // Parameters:
 //   - ctx: The test context
-//   - cleaner: The cleaner instance to test (must have Scan method returning result.Result[[]domain.ScanItem])
+//   - cleaner: The cleaner instance to test (must have Scan method returning result.Result[[]types.ScanItem])
 //   - setupEmptyState: Function that sets up the mock to return empty results
 //
 // Usage:
@@ -165,7 +167,7 @@ func GinkgoErrorPropagationContext[T any](
 //		})
 //	})
 func GinkgoNoItemsToScanTest(ctx context.Context, cleaner interface {
-	Scan(context.Context) result.Result[[]domain.ScanItem]
+	Scan(context.Context) result.Result[[]types.ScanItem]
 }, setupEmptyState func(),
 ) {
 	setupEmptyState()
@@ -190,7 +192,7 @@ func GinkgoNoItemsToScanTest(ctx context.Context, cleaner interface {
 //	})
 func GinkgoValidateEmptySettingsTest(cleaner CleanerWithSettings, itName string) {
 	ginkgo.It(itName, func() {
-		settings := &domain.OperationSettings{}
+		settings := &operations.OperationSettings{}
 		err := cleaner.ValidateSettings(settings)
 		gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	})
@@ -280,9 +282,9 @@ func GinkgoAssertIsAvailableReturnsBoolean(cleaner interface{ IsAvailable(contex
 
 // GinkgoAssertScanResultIsOk verifies that a scan result is ok and the value is a slice of ScanItems.
 // This eliminates duplicate scan result assertion code across multiple cleaner integration tests.
-func GinkgoAssertScanResultIsOk(scanResult result.Result[[]domain.ScanItem]) {
+func GinkgoAssertScanResultIsOk(scanResult result.Result[[]types.ScanItem]) {
 	if scanResult.IsOk() {
-		gomega.Expect(scanResult.Value()).To(gomega.BeAssignableToTypeOf([]domain.ScanItem{}))
+		gomega.Expect(scanResult.Value()).To(gomega.BeAssignableToTypeOf([]types.ScanItem{}))
 	}
 }
 
@@ -291,14 +293,14 @@ func GinkgoAssertScanResultIsOk(scanResult result.Result[[]domain.ScanItem]) {
 //
 // Parameters:
 //   - name: Expected cleaner name (e.g., "compiled-binaries")
-//   - expectedType: Expected operation type (e.g., domain.OperationTypeCompiledBinaries)
+//   - expectedType: Expected operation type (e.g., operations.OperationTypeCompiledBinaries)
 //
 // Usage:
 //
 //	ginkgo.It("should return correct name and type", func() {
-//	    GinkgoAssertNameAndType(cleaner, "compiled-binaries", domain.OperationTypeCompiledBinaries)
+//	    GinkgoAssertNameAndType(cleaner, "compiled-binaries", operations.OperationTypeCompiledBinaries)
 //	})
-func GinkgoAssertNameAndType(cleaner Cleaner, name string, expectedType domain.OperationType) {
+func GinkgoAssertNameAndType(cleaner Cleaner, name string, expectedType operations.OperationType) {
 	gomega.Expect(cleaner.Name()).To(gomega.Equal(name))
 	gomega.Expect(cleaner.Type()).To(gomega.Equal(expectedType))
 }

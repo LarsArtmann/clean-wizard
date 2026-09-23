@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestGolangciLintCacheCleaner_Name(t *testing.T) {
@@ -22,8 +22,8 @@ func TestGolangciLintCacheCleaner_Type(t *testing.T) {
 
 	cleaner := NewGolangciLintCacheCleaner(false, false)
 
-	if cleaner.Type() != domain.OperationTypeGolangciLintCache {
-		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeGolangciLintCache)
+	if cleaner.Type() != operations.OperationTypeGolangciLintCache {
+		t.Errorf("Type() = %v, want %v", cleaner.Type(), operations.OperationTypeGolangciLintCache)
 	}
 }
 

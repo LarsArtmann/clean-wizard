@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,7 +15,7 @@ func TestCleanResultsToJSON_IncludesFamilyAndCode(t *testing.T) {
 	t.Parallel()
 
 	naErr := errorfamily.NewInfrastructure("cleaner.cargo.not_available", "cargo not available")
-	results := map[string]domain.CleanResult{
+	results := map[string]types.CleanResult{
 		"nix": {FreedBytes: 1024, ItemsRemoved: 3},
 	}
 	skipped := map[string]error{
@@ -53,7 +53,7 @@ func TestCleanResultsToJSON_IncludesFamilyAndCode(t *testing.T) {
 func TestCleanResultsToJSON_DeterministicOrdering(t *testing.T) {
 	t.Parallel()
 
-	results := map[string]domain.CleanResult{
+	results := map[string]types.CleanResult{
 		"zebra":  {FreedBytes: 1},
 		"alpha":  {FreedBytes: 2},
 		"middle": {FreedBytes: 3},

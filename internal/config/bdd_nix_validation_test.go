@@ -6,30 +6,32 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // Builder helpers for BDD test scenarios
 
 // newBaseNixConfig creates a common config skeleton for Nix tests.
-func newBaseNixConfig(safeMode bool) *domain.Config {
-	return &domain.Config{
+func newBaseNixConfig(safeMode bool) *types.Config {
+	return &types.Config{
 		Version:      "1.0.0",
 		SafeMode:     BoolToSafeMode(safeMode),
 		MaxDiskUsage: 50,
 		Protected:    []string{"/System", "/Applications"},
-		Profiles: map[string]*domain.Profile{
+		Profiles: map[string]*types.Profile{
 			"nix-cleanup": {
 				Name:        "Nix Cleanup",
 				Description: "Clean Nix generations",
-				Operations: []domain.CleanupOperation{
+				Operations: []types.CleanupOperation{
 					{
 						Name:        "nix-generations",
 						Description: "Clean old Nix generations",
-						RiskLevel:   domain.RiskLevelLowType,
+						RiskLevel:   enums.RiskLevelLowType,
 						Enabled:     BoolToProfileStatus(true),
-						Settings: &domain.OperationSettings{
-							NixGenerations: &domain.NixGenerationsSettings{
+						Settings: &operations.OperationSettings{
+							NixGenerations: &operations.NixGenerationsSettings{
 								Generations: 3,
 								Optimize:    BoolToOptimizationMode(true),
 							},
@@ -43,12 +45,12 @@ func newBaseNixConfig(safeMode bool) *domain.Config {
 }
 
 // withGenerations sets/updates the nix-generations operation Generations value.
-func withGenerations(cfg *domain.Config, generations int) *domain.Config {
+func withGenerations(cfg *types.Config, generations int) *types.Config {
 	WithNixGenerationsSetting(
 		cfg,
 		"nix-cleanup",
 		"nix-generations",
-		func(settings *domain.NixGenerationsSettings) bool {
+		func(settings *operations.NixGenerationsSettings) bool {
 			settings.Generations = generations
 
 			return true
@@ -59,15 +61,15 @@ func withGenerations(cfg *domain.Config, generations int) *domain.Config {
 }
 
 // withRiskLevel adjusts the operation RiskLevel and Enabled flags.
-func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Config {
+func withRiskLevel(cfg *types.Config, level enums.RiskLevelType) *types.Config {
 	WithProfileOperationField(
 		cfg,
 		"nix-cleanup",
 		"nix-generations",
-		func(op *domain.CleanupOperation) bool {
+		func(op *types.CleanupOperation) bool {
 			op.RiskLevel = level
 			// Auto-disable critical operations in unsafe mode
-			if level == domain.RiskLevelCriticalType &&
+			if level == enums.RiskLevelCriticalType &&
 				!cfg.SafeMode.IsEnabled() {
 				op.Enabled = BoolToProfileStatus(false)
 			}
@@ -80,14 +82,14 @@ func withRiskLevel(cfg *domain.Config, level domain.RiskLevelType) *domain.Confi
 }
 
 // withOptimize sets the Optimize flag for nix-generations.
-func withOptimize(cfg *domain.Config, optimize bool) *domain.Config {
+func withOptimize(cfg *types.Config, optimize bool) *types.Config {
 	optimizationMode := BoolToOptimizationMode(optimize)
 
 	WithNixGenerationsSetting(
 		cfg,
 		"nix-cleanup",
 		"nix-generations",
-		func(settings *domain.NixGenerationsSettings) bool {
+		func(settings *operations.NixGenerationsSettings) bool {
 			settings.Optimize = optimizationMode
 
 			return true
@@ -194,7 +196,7 @@ func newValidateConfigWhen() []BDDWhen {
 	return []BDDWhen{
 		{
 			Description: "the configuration is validated",
-			Action: func(cfg *domain.Config) (*ValidationResult, error) {
+			Action: func(cfg *types.Config) (*ValidationResult, error) {
 				validator := NewConfigValidator()
 
 				return validator.ValidateConfig(cfg), nil
@@ -219,7 +221,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with valid Nix generations settings",
-						Setup: func() (*domain.Config, error) {
+						Setup: func() (*types.Config, error) {
 							return newBaseNixConfig(true), nil
 						},
 					},
@@ -233,7 +235,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with Nix generations below minimum",
-						Setup: func() (*domain.Config, error) {
+						Setup: func() (*types.Config, error) {
 							return withGenerations(newBaseNixConfig(true), -1), nil
 						},
 					},
@@ -247,7 +249,7 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with Nix generations above maximum",
-						Setup: func() (*domain.Config, error) {
+						Setup: func() (*types.Config, error) {
 							return withGenerations(newBaseNixConfig(true), 15), nil
 						},
 					},
@@ -261,10 +263,10 @@ func TestBDD_NixGenerationsValidation(t *testing.T) {
 				Given: []BDDGiven{
 					{
 						Description: "a configuration with critical Nix operation in unsafe mode",
-						Setup: func() (*domain.Config, error) {
+						Setup: func() (*types.Config, error) {
 							return withRiskLevel(
 								withGenerations(withOptimize(newBaseNixConfig(false), false), 1),
-								domain.RiskLevelCriticalType,
+								enums.RiskLevelCriticalType,
 							), nil
 						},
 					},

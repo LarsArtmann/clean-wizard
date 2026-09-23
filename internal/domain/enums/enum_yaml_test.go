@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"gopkg.in/yaml.v3"
 )
 
@@ -19,39 +21,39 @@ func TestEnumYAMLMarshaling(t *testing.T) {
 		expected string
 	}{
 		// CacheCleanupMode
-		{"CacheCleanupMode Disabled", CacheCleanupDisabled, "DISABLED\n"},
-		{"CacheCleanupMode Enabled", CacheCleanupEnabled, "ENABLED\n"},
+		{"CacheCleanupMode Disabled", enums.CacheCleanupDisabled, "DISABLED\n"},
+		{"CacheCleanupMode Enabled", enums.CacheCleanupEnabled, "ENABLED\n"},
 
 		// DockerPruneMode
-		{"DockerPruneMode All", DockerPruneAll, "ALL\n"},
-		{"DockerPruneMode Images", DockerPruneImages, "IMAGES\n"},
-		{"DockerPruneMode Containers", DockerPruneContainers, "CONTAINERS\n"},
-		{"DockerPruneMode Volumes", DockerPruneVolumes, "VOLUMES\n"},
-		{"DockerPruneMode Builds", DockerPruneBuilds, "BUILDS\n"},
+		{"DockerPruneMode All", enums.DockerPruneAll, "ALL\n"},
+		{"DockerPruneMode Images", enums.DockerPruneImages, "IMAGES\n"},
+		{"DockerPruneMode Containers", enums.DockerPruneContainers, "CONTAINERS\n"},
+		{"DockerPruneMode Volumes", enums.DockerPruneVolumes, "VOLUMES\n"},
+		{"DockerPruneMode Builds", enums.DockerPruneBuilds, "BUILDS\n"},
 
 		// BuildToolType
-		{"BuildToolType Go", BuildToolGo, "GO\n"},
-		{"BuildToolType Rust", BuildToolRust, "RUST\n"},
-		{"BuildToolType Node", BuildToolNode, "NODE\n"},
-		{"BuildToolType Python", BuildToolPython, "PYTHON\n"},
-		{"BuildToolType Java", BuildToolJava, "JAVA\n"},
-		{"BuildToolType Scala", BuildToolScala, "SCALA\n"},
+		{"BuildToolType Go", enums.BuildToolGo, "GO\n"},
+		{"BuildToolType Rust", enums.BuildToolRust, "RUST\n"},
+		{"BuildToolType Node", enums.BuildToolNode, "NODE\n"},
+		{"BuildToolType Python", enums.BuildToolPython, "PYTHON\n"},
+		{"BuildToolType Java", enums.BuildToolJava, "JAVA\n"},
+		{"BuildToolType Scala", enums.BuildToolScala, "SCALA\n"},
 
 		// CacheType
-		{"CacheType Spotlight", CacheTypeSpotlight, "SPOTLIGHT\n"},
-		{"CacheType Xcode", CacheTypeXcode, "XCODE\n"},
-		{"CacheType Cocoapods", CacheTypeCocoapods, "COCOAPODS\n"},
-		{"CacheType Homebrew", CacheTypeHomebrew, "HOMEBREW\n"},
-		{"CacheType Pip", CacheTypePip, "PIP\n"},
-		{"CacheType Npm", CacheTypeNpm, "NPM\n"},
-		{"CacheType Yarn", CacheTypeYarn, "YARN\n"},
-		{"CacheType Ccache", CacheTypeCcache, "CCACHE\n"},
+		{"CacheType Spotlight", enums.CacheTypeSpotlight, "SPOTLIGHT\n"},
+		{"CacheType Xcode", enums.CacheTypeXcode, "XCODE\n"},
+		{"CacheType Cocoapods", enums.CacheTypeCocoapods, "COCOAPODS\n"},
+		{"CacheType Homebrew", enums.CacheTypeHomebrew, "HOMEBREW\n"},
+		{"CacheType Pip", enums.CacheTypePip, "PIP\n"},
+		{"CacheType Npm", enums.CacheTypeNpm, "NPM\n"},
+		{"CacheType Yarn", enums.CacheTypeYarn, "YARN\n"},
+		{"CacheType Ccache", enums.CacheTypeCcache, "CCACHE\n"},
 
 		// PackageManagerType
-		{"PackageManagerType Npm", PackageManagerNpm, "NPM\n"},
-		{"PackageManagerType Pnpm", PackageManagerPnpm, "PNPM\n"},
-		{"PackageManagerType Yarn", PackageManagerYarn, "YARN\n"},
-		{"PackageManagerType Bun", PackageManagerBun, "BUN\n"},
+		{"PackageManagerType Npm", enums.PackageManagerNpm, "NPM\n"},
+		{"PackageManagerType Pnpm", enums.PackageManagerPnpm, "PNPM\n"},
+		{"PackageManagerType Yarn", enums.PackageManagerYarn, "YARN\n"},
+		{"PackageManagerType Bun", enums.PackageManagerBun, "BUN\n"},
 	}
 
 	for _, tt := range tests {
@@ -220,15 +222,15 @@ func generateEnumUnmarshalTestCases(useInt bool) []enumUnmarshalTestCase {
 
 		switch enumType.typeName {
 		case "CacheCleanupMode":
-			typePtr = new(CacheCleanupMode)
+			typePtr = new(enums.CacheCleanupMode)
 		case "DockerPruneMode":
-			typePtr = new(DockerPruneMode)
+			typePtr = new(enums.DockerPruneMode)
 		case "BuildToolType":
-			typePtr = new(BuildToolType)
+			typePtr = new(enums.BuildToolType)
 		case "CacheType":
-			typePtr = new(CacheType)
+			typePtr = new(enums.CacheType)
 		case "PackageManagerType":
-			typePtr = new(PackageManagerType)
+			typePtr = new(enums.PackageManagerType)
 		}
 
 		for i, val := range stringVals {
@@ -236,15 +238,15 @@ func generateEnumUnmarshalTestCases(useInt bool) []enumUnmarshalTestCase {
 
 			switch enumType.typeName {
 			case "CacheCleanupMode":
-				expected = CacheCleanupMode(i)
+				expected = enums.CacheCleanupMode(i)
 			case "DockerPruneMode":
-				expected = DockerPruneMode(i)
+				expected = enums.DockerPruneMode(i)
 			case "BuildToolType":
-				expected = BuildToolType(i)
+				expected = enums.BuildToolType(i)
 			case "CacheType":
-				expected = CacheType(i)
+				expected = enums.CacheType(i)
 			case "PackageManagerType":
-				expected = PackageManagerType(i)
+				expected = enums.PackageManagerType(i)
 			}
 
 			suffix := "string"
@@ -295,15 +297,15 @@ func runEnumMethodTests[T comparable](
 // Returns empty string if the type is not supported.
 func extractEnumString(v any) string {
 	switch val := v.(type) {
-	case CacheCleanupMode:
+	case enums.CacheCleanupMode:
 		return val.String()
-	case DockerPruneMode:
+	case enums.DockerPruneMode:
 		return val.String()
-	case BuildToolType:
+	case enums.BuildToolType:
 		return val.String()
-	case CacheType:
+	case enums.CacheType:
 		return val.String()
-	case PackageManagerType:
+	case enums.PackageManagerType:
 		return val.String()
 	}
 
@@ -314,15 +316,15 @@ func extractEnumString(v any) string {
 // Returns false if the type is not supported.
 func extractEnumValidity(v any) bool {
 	switch val := v.(type) {
-	case CacheCleanupMode:
+	case enums.CacheCleanupMode:
 		return val.IsValid()
-	case DockerPruneMode:
+	case enums.DockerPruneMode:
 		return val.IsValid()
-	case BuildToolType:
+	case enums.BuildToolType:
 		return val.IsValid()
-	case CacheType:
+	case enums.CacheType:
 		return val.IsValid()
-	case PackageManagerType:
+	case enums.PackageManagerType:
 		return val.IsValid()
 	}
 
@@ -344,15 +346,15 @@ func runEnumYAMLUnmarshalingTests(t *testing.T, tests []enumUnmarshalTestCase) {
 			var actual any
 
 			switch v := tt.target.(type) {
-			case *CacheCleanupMode:
+			case *enums.CacheCleanupMode:
 				actual = *v
-			case *DockerPruneMode:
+			case *enums.DockerPruneMode:
 				actual = *v
-			case *BuildToolType:
+			case *enums.BuildToolType:
 				actual = *v
-			case *CacheType:
+			case *enums.CacheType:
 				actual = *v
-			case *PackageManagerType:
+			case *enums.PackageManagerType:
 				actual = *v
 			}
 
@@ -381,44 +383,44 @@ func TestEnumStringMethod(t *testing.T) {
 
 	tests := []enumValueTestCase[string]{
 		// CacheCleanupMode
-		{"CacheCleanupMode Disabled", CacheCleanupDisabled, "DISABLED"},
-		{"CacheCleanupMode Enabled", CacheCleanupEnabled, "ENABLED"},
-		{"CacheCleanupMode Invalid", CacheCleanupMode(99), "UNKNOWN"},
+		{"CacheCleanupMode Disabled", enums.CacheCleanupDisabled, "DISABLED"},
+		{"CacheCleanupMode Enabled", enums.CacheCleanupEnabled, "ENABLED"},
+		{"CacheCleanupMode Invalid", enums.CacheCleanupMode(99), "UNKNOWN"},
 
 		// DockerPruneMode
-		{"DockerPruneMode All", DockerPruneAll, "ALL"},
-		{"DockerPruneMode Images", DockerPruneImages, "IMAGES"},
-		{"DockerPruneMode Containers", DockerPruneContainers, "CONTAINERS"},
-		{"DockerPruneMode Volumes", DockerPruneVolumes, "VOLUMES"},
-		{"DockerPruneMode Builds", DockerPruneBuilds, "BUILDS"},
-		{"DockerPruneMode Invalid", DockerPruneMode(99), "UNKNOWN"},
+		{"DockerPruneMode All", enums.DockerPruneAll, "ALL"},
+		{"DockerPruneMode Images", enums.DockerPruneImages, "IMAGES"},
+		{"DockerPruneMode Containers", enums.DockerPruneContainers, "CONTAINERS"},
+		{"DockerPruneMode Volumes", enums.DockerPruneVolumes, "VOLUMES"},
+		{"DockerPruneMode Builds", enums.DockerPruneBuilds, "BUILDS"},
+		{"DockerPruneMode Invalid", enums.DockerPruneMode(99), "UNKNOWN"},
 
 		// BuildToolType
-		{"BuildToolType Go", BuildToolGo, "GO"},
-		{"BuildToolType Rust", BuildToolRust, "RUST"},
-		{"BuildToolType Node", BuildToolNode, "NODE"},
-		{"BuildToolType Python", BuildToolPython, "PYTHON"},
-		{"BuildToolType Java", BuildToolJava, "JAVA"},
-		{"BuildToolType Scala", BuildToolScala, "SCALA"},
-		{"BuildToolType Invalid", BuildToolType(99), "UNKNOWN"},
+		{"BuildToolType Go", enums.BuildToolGo, "GO"},
+		{"BuildToolType Rust", enums.BuildToolRust, "RUST"},
+		{"BuildToolType Node", enums.BuildToolNode, "NODE"},
+		{"BuildToolType Python", enums.BuildToolPython, "PYTHON"},
+		{"BuildToolType Java", enums.BuildToolJava, "JAVA"},
+		{"BuildToolType Scala", enums.BuildToolScala, "SCALA"},
+		{"BuildToolType Invalid", enums.BuildToolType(99), "UNKNOWN"},
 
 		// CacheType
-		{"CacheType Spotlight", CacheTypeSpotlight, "SPOTLIGHT"},
-		{"CacheType Xcode", CacheTypeXcode, "XCODE"},
-		{"CacheType Cocoapods", CacheTypeCocoapods, "COCOAPODS"},
-		{"CacheType Homebrew", CacheTypeHomebrew, "HOMEBREW"},
-		{"CacheType Pip", CacheTypePip, "PIP"},
-		{"CacheType Npm", CacheTypeNpm, "NPM"},
-		{"CacheType Yarn", CacheTypeYarn, "YARN"},
-		{"CacheType Ccache", CacheTypeCcache, "CCACHE"},
-		{"CacheType Invalid", CacheType(99), "UNKNOWN"},
+		{"CacheType Spotlight", enums.CacheTypeSpotlight, "SPOTLIGHT"},
+		{"CacheType Xcode", enums.CacheTypeXcode, "XCODE"},
+		{"CacheType Cocoapods", enums.CacheTypeCocoapods, "COCOAPODS"},
+		{"CacheType Homebrew", enums.CacheTypeHomebrew, "HOMEBREW"},
+		{"CacheType Pip", enums.CacheTypePip, "PIP"},
+		{"CacheType Npm", enums.CacheTypeNpm, "NPM"},
+		{"CacheType Yarn", enums.CacheTypeYarn, "YARN"},
+		{"CacheType Ccache", enums.CacheTypeCcache, "CCACHE"},
+		{"CacheType Invalid", enums.CacheType(99), "UNKNOWN"},
 
 		// PackageManagerType
-		{"PackageManagerType Npm", PackageManagerNpm, "NPM"},
-		{"PackageManagerType Pnpm", PackageManagerPnpm, "PNPM"},
-		{"PackageManagerType Yarn", PackageManagerYarn, "YARN"},
-		{"PackageManagerType Bun", PackageManagerBun, "BUN"},
-		{"PackageManagerType Invalid", PackageManagerType(99), "UNKNOWN"},
+		{"PackageManagerType Npm", enums.PackageManagerNpm, "NPM"},
+		{"PackageManagerType Pnpm", enums.PackageManagerPnpm, "PNPM"},
+		{"PackageManagerType Yarn", enums.PackageManagerYarn, "YARN"},
+		{"PackageManagerType Bun", enums.PackageManagerBun, "BUN"},
+		{"PackageManagerType Invalid", enums.PackageManagerType(99), "UNKNOWN"},
 	}
 
 	runEnumMethodTests(t, tests, extractEnumString, "String()")
@@ -430,44 +432,44 @@ func TestEnumIsValidMethod(t *testing.T) {
 
 	tests := []enumValueTestCase[bool]{
 		// CacheCleanupMode
-		{"CacheCleanupMode Disabled", CacheCleanupDisabled, true},
-		{"CacheCleanupMode Enabled", CacheCleanupEnabled, true},
-		{"CacheCleanupMode Invalid", CacheCleanupMode(99), false},
+		{"CacheCleanupMode Disabled", enums.CacheCleanupDisabled, true},
+		{"CacheCleanupMode Enabled", enums.CacheCleanupEnabled, true},
+		{"CacheCleanupMode Invalid", enums.CacheCleanupMode(99), false},
 
 		// DockerPruneMode
-		{"DockerPruneMode All", DockerPruneAll, true},
-		{"DockerPruneMode Images", DockerPruneImages, true},
-		{"DockerPruneMode Containers", DockerPruneContainers, true},
-		{"DockerPruneMode Volumes", DockerPruneVolumes, true},
-		{"DockerPruneMode Builds", DockerPruneBuilds, true},
-		{"DockerPruneMode Invalid", DockerPruneMode(99), false},
+		{"DockerPruneMode All", enums.DockerPruneAll, true},
+		{"DockerPruneMode Images", enums.DockerPruneImages, true},
+		{"DockerPruneMode Containers", enums.DockerPruneContainers, true},
+		{"DockerPruneMode Volumes", enums.DockerPruneVolumes, true},
+		{"DockerPruneMode Builds", enums.DockerPruneBuilds, true},
+		{"DockerPruneMode Invalid", enums.DockerPruneMode(99), false},
 
 		// BuildToolType
-		{"BuildToolType Go", BuildToolGo, true},
-		{"BuildToolType Rust", BuildToolRust, true},
-		{"BuildToolType Node", BuildToolNode, true},
-		{"BuildToolType Python", BuildToolPython, true},
-		{"BuildToolType Java", BuildToolJava, true},
-		{"BuildToolType Scala", BuildToolScala, true},
-		{"BuildToolType Invalid", BuildToolType(99), false},
+		{"BuildToolType Go", enums.BuildToolGo, true},
+		{"BuildToolType Rust", enums.BuildToolRust, true},
+		{"BuildToolType Node", enums.BuildToolNode, true},
+		{"BuildToolType Python", enums.BuildToolPython, true},
+		{"BuildToolType Java", enums.BuildToolJava, true},
+		{"BuildToolType Scala", enums.BuildToolScala, true},
+		{"BuildToolType Invalid", enums.BuildToolType(99), false},
 
 		// CacheType
-		{"CacheType Spotlight", CacheTypeSpotlight, true},
-		{"CacheType Xcode", CacheTypeXcode, true},
-		{"CacheType Cocoapods", CacheTypeCocoapods, true},
-		{"CacheType Homebrew", CacheTypeHomebrew, true},
-		{"CacheType Pip", CacheTypePip, true},
-		{"CacheType Npm", CacheTypeNpm, true},
-		{"CacheType Yarn", CacheTypeYarn, true},
-		{"CacheType Ccache", CacheTypeCcache, true},
-		{"CacheType Invalid", CacheType(99), false},
+		{"CacheType Spotlight", enums.CacheTypeSpotlight, true},
+		{"CacheType Xcode", enums.CacheTypeXcode, true},
+		{"CacheType Cocoapods", enums.CacheTypeCocoapods, true},
+		{"CacheType Homebrew", enums.CacheTypeHomebrew, true},
+		{"CacheType Pip", enums.CacheTypePip, true},
+		{"CacheType Npm", enums.CacheTypeNpm, true},
+		{"CacheType Yarn", enums.CacheTypeYarn, true},
+		{"CacheType Ccache", enums.CacheTypeCcache, true},
+		{"CacheType Invalid", enums.CacheType(99), false},
 
 		// PackageManagerType
-		{"PackageManagerType Npm", PackageManagerNpm, true},
-		{"PackageManagerType Pnpm", PackageManagerPnpm, true},
-		{"PackageManagerType Yarn", PackageManagerYarn, true},
-		{"PackageManagerType Bun", PackageManagerBun, true},
-		{"PackageManagerType Invalid", PackageManagerType(99), false},
+		{"PackageManagerType Npm", enums.PackageManagerNpm, true},
+		{"PackageManagerType Pnpm", enums.PackageManagerPnpm, true},
+		{"PackageManagerType Yarn", enums.PackageManagerYarn, true},
+		{"PackageManagerType Bun", enums.PackageManagerBun, true},
+		{"PackageManagerType Invalid", enums.PackageManagerType(99), false},
 	}
 
 	runEnumMethodTests(t, tests, extractEnumValidity, "IsValid()")
@@ -475,18 +477,18 @@ func TestEnumIsValidMethod(t *testing.T) {
 
 // testBuildCacheSettings creates a BuildCacheSettings with Java and Scala tools.
 // Used for testing YAML marshaling/unmarshaling.
-func testBuildCacheSettings() *BuildCacheSettings {
-	return &BuildCacheSettings{
-		ToolTypes: []BuildToolType{BuildToolJava, BuildToolScala},
+func testBuildCacheSettings() *operations.BuildCacheSettings {
+	return &operations.BuildCacheSettings{
+		ToolTypes: []enums.BuildToolType{enums.BuildToolJava, enums.BuildToolScala},
 		OlderThan: "30d",
 	}
 }
 
 // testSystemCacheSettings creates a SystemCacheSettings with Spotlight and Xcode caches.
 // Used for testing YAML marshaling/unmarshaling.
-func testSystemCacheSettings() *SystemCacheSettings {
-	return &SystemCacheSettings{
-		CacheTypes: []CacheType{CacheTypeSpotlight, CacheTypeXcode},
+func testSystemCacheSettings() *operations.SystemCacheSettings {
+	return &operations.SystemCacheSettings{
+		CacheTypes: []enums.CacheType{enums.CacheTypeSpotlight, enums.CacheTypeXcode},
 		OlderThan:  "30d",
 	}
 }
@@ -495,15 +497,15 @@ func testSystemCacheSettings() *SystemCacheSettings {
 func TestOperationSettingsWithEnums(t *testing.T) {
 	t.Parallel()
 
-	settings := &OperationSettings{
-		NodePackages: &NodePackagesSettings{
-			PackageManagers: []PackageManagerType{
-				PackageManagerNpm,
-				PackageManagerPnpm,
+	settings := &operations.OperationSettings{
+		NodePackages: &operations.NodePackagesSettings{
+			PackageManagers: []enums.PackageManagerType{
+				enums.PackageManagerNpm,
+				enums.PackageManagerPnpm,
 			},
 		},
 		BuildCache:  testBuildCacheSettings(),
-		Docker:      &DockerSettings{PruneMode: DockerPruneAll},
+		Docker:      &operations.DockerSettings{PruneMode: enums.DockerPruneAll},
 		SystemCache: testSystemCacheSettings(),
 	}
 
@@ -514,7 +516,7 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 	}
 
 	// Unmarshal from YAML
-	var unmarshaled OperationSettings
+	var unmarshaled operations.OperationSettings
 	if err := yaml.Unmarshal(data, &unmarshaled); err != nil { //nolint:musttag
 		t.Fatalf("Unmarshal() error = %v", err)
 	}
@@ -527,9 +529,9 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 		)
 	}
 
-	if unmarshaled.NodePackages.PackageManagers[0] != PackageManagerNpm {
+	if unmarshaled.NodePackages.PackageManagers[0] != enums.PackageManagerNpm {
 		t.Errorf("NodePackages.PackageManagers[0] = %v, want %v",
-			unmarshaled.NodePackages.PackageManagers[0], PackageManagerNpm)
+			unmarshaled.NodePackages.PackageManagers[0], enums.PackageManagerNpm)
 	}
 
 	// Verify BuildCache
@@ -537,17 +539,17 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 		t.Errorf("BuildCache.ToolTypes length = %d, want 2", len(unmarshaled.BuildCache.ToolTypes))
 	}
 
-	if unmarshaled.BuildCache.ToolTypes[0] != BuildToolJava {
+	if unmarshaled.BuildCache.ToolTypes[0] != enums.BuildToolJava {
 		t.Errorf(
 			"BuildCache.ToolTypes[0] = %v, want %v",
 			unmarshaled.BuildCache.ToolTypes[0],
-			BuildToolJava,
+			enums.BuildToolJava,
 		)
 	}
 
 	// Verify Docker
-	if unmarshaled.Docker.PruneMode != DockerPruneAll {
-		t.Errorf("Docker.PruneMode = %v, want %v", unmarshaled.Docker.PruneMode, DockerPruneAll)
+	if unmarshaled.Docker.PruneMode != enums.DockerPruneAll {
+		t.Errorf("Docker.PruneMode = %v, want %v", unmarshaled.Docker.PruneMode, enums.DockerPruneAll)
 	}
 
 	// Verify SystemCache
@@ -558,11 +560,11 @@ func TestOperationSettingsWithEnums(t *testing.T) {
 		)
 	}
 
-	if unmarshaled.SystemCache.CacheTypes[0] != CacheTypeSpotlight {
+	if unmarshaled.SystemCache.CacheTypes[0] != enums.CacheTypeSpotlight {
 		t.Errorf(
 			"SystemCache.CacheTypes[0] = %v, want %v",
 			unmarshaled.SystemCache.CacheTypes[0],
-			CacheTypeSpotlight,
+			enums.CacheTypeSpotlight,
 		)
 	}
 }
@@ -619,10 +621,10 @@ func TestEnumErrorMessages(t *testing.T) {
 			t.Parallel()
 
 			var (
-				dockerMode    DockerPruneMode
-				buildTool     BuildToolType
-				profileStatus ProfileStatus
-				cacheMode     CacheCleanupMode
+				dockerMode    enums.DockerPruneMode
+				buildTool     enums.BuildToolType
+				profileStatus enums.ProfileStatus
+				cacheMode     enums.CacheCleanupMode
 				err           error
 			)
 

@@ -3,7 +3,7 @@ package cleaner
 import (
 	"path/filepath"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
@@ -13,7 +13,7 @@ import (
 // section) keeps each cleaner's factory default. This is the single factory used
 // by the DI container to create the cleaner registry.
 // Returns an error if any cleaner fails to initialize or has invalid settings.
-func DefaultRegistryWithConfig(verbose, dryRun bool, settings *domain.OperationSettings) (*Registry, error) {
+func DefaultRegistryWithConfig(verbose, dryRun bool, settings *operations.OperationSettings) (*Registry, error) {
 	registry := NewRegistry()
 
 	err := registerAllCleaners(registry, verbose, dryRun, settings)
@@ -27,7 +27,7 @@ func DefaultRegistryWithConfig(verbose, dryRun bool, settings *domain.OperationS
 // registerAllCleaners registers all available cleaners with the given configuration.
 // This helper function eliminates duplication between DefaultRegistry and DefaultRegistryWithConfig.
 // Returns an error if any cleaner fails to initialize.
-func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *domain.OperationSettings) error {
+func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *operations.OperationSettings) error {
 	// Nix cleaner (keep count from settings; constructor default 5 when unset)
 	nixKeepCount := resolveNixKeepCount(settings)
 	if err := registerValidated(
@@ -174,7 +174,7 @@ func registerAllCleaners(registry *Registry, verbose, dryRun bool, settings *dom
 
 // registerValidated validates the cleaner's settings against the resolved
 // operation settings (when the cleaner supports settings), then registers it.
-func registerValidated(registry *Registry, name string, c Cleaner, settings *domain.OperationSettings) error {
+func registerValidated(registry *Registry, name string, c Cleaner, settings *operations.OperationSettings) error {
 	if withSettings, ok := c.(CleanerWithSettings); ok {
 		if err := withSettings.ValidateSettings(settings); err != nil {
 			return errorfamily.WrapRejectionf(

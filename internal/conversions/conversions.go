@@ -3,7 +3,8 @@ package conversions
 import (
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/LarsArtmann/clean-wizard/internal/shared/utils/validation"
 )
@@ -18,18 +19,18 @@ import (
 //   - freedBytes: Total bytes freed by the operation
 //
 // Returns:
-//   - domain.CleanResult: A fully initialized CleanResult with current timestamp
+//   - types.CleanResult: A fully initialized CleanResult with current timestamp
 //
 // Example:
 //
-//	result := NewCleanResult(domain.CleanStrategyType(domain.StrategyAggressiveType), 5, 1024*1024*100)
+//	result := NewCleanResult(enums.CleanStrategyType(enums.StrategyAggressiveType), 5, 1024*1024*100)
 //	fmt.Printf("Freed %d bytes", result.FreedBytes)
 func NewCleanResult(
-	strategy domain.CleanStrategyType,
+	strategy enums.CleanStrategyType,
 	itemsRemoved int,
 	freedBytes int64,
-) domain.CleanResult {
-	return domain.CleanResult{
+) types.CleanResult {
+	return types.CleanResult{
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  0,
@@ -51,19 +52,19 @@ func NewCleanResult(
 //   - cleanTime: Time duration of the cleaning operation
 //
 // Returns:
-//   - domain.CleanResult: A fully initialized CleanResult with timing data
+//   - types.CleanResult: A fully initialized CleanResult with timing data
 //
 // Example:
 //
 //	startTime := time.Now()
 //	// ... perform cleaning ...
 //	cleanTime := time.Since(startTime)
-//	result := NewCleanResultWithTiming(domain.CleanStrategyType(domain.StrategyAggressiveType),
+//	result := NewCleanResultWithTiming(enums.CleanStrategyType(enums.StrategyAggressiveType),
 //		5, 1024*1024*100, cleanTime)
 func NewCleanResultWithTiming(
-	strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64, cleanTime time.Duration,
-) domain.CleanResult {
-	return domain.CleanResult{
+	strategy enums.CleanStrategyType, itemsRemoved int, freedBytes int64, cleanTime time.Duration,
+) types.CleanResult {
+	return types.CleanResult{
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  0,
@@ -86,18 +87,18 @@ func NewCleanResultWithTiming(
 //   - cleanTime: Time duration of the cleaning operation
 //
 // Returns:
-//   - domain.CleanResult: A fully initialized CleanResult with failure tracking
+//   - types.CleanResult: A fully initialized CleanResult with failure tracking
 //
 // Example:
 //
-//	result := NewCleanResultWithFailures(domain.CleanStrategyType(domain.StrategyConservativeType),
+//	result := NewCleanResultWithFailures(enums.CleanStrategyType(enums.StrategyConservativeType),
 //		5, 2, 1024*1024*100, time.Second*30)
 //	fmt.Printf("Success: %d, Failed: %d", result.ItemsRemoved, result.ItemsFailed)
 func NewCleanResultWithFailures(
-	strategy domain.CleanStrategyType, itemsRemoved, itemsFailed int, freedBytes int64,
+	strategy enums.CleanStrategyType, itemsRemoved, itemsFailed int, freedBytes int64,
 	cleanTime time.Duration,
-) domain.CleanResult {
-	return domain.CleanResult{
+) types.CleanResult {
+	return types.CleanResult{
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
 		ItemsFailed:  uint(itemsFailed),
@@ -119,18 +120,18 @@ func NewCleanResultWithFailures(
 //   - sizeEstimate: Size estimate with known bytes and status
 //
 // Returns:
-//   - domain.CleanResult: A fully initialized CleanResult with size estimate
+//   - types.CleanResult: A fully initialized CleanResult with size estimate
 //
 // Example:
 //
-//	estimate := domain.SizeEstimate{Known: 1024*1024*100, Status: domain.SizeEstimateStatusKnown}
-//	result := NewCleanResultWithSizeEstimate(domain.CleanStrategyType(domain.StrategyDryRunType),
+//	estimate := types.SizeEstimate{Known: 1024*1024*100, Status: enums.SizeEstimateStatusKnown}
+//	result := NewCleanResultWithSizeEstimate(enums.CleanStrategyType(enums.StrategyDryRunType),
 //		5, 1024*1024*100, estimate)
 func NewCleanResultWithSizeEstimate(
-	strategy domain.CleanStrategyType, itemsRemoved int, freedBytes int64,
-	sizeEstimate domain.SizeEstimate,
-) domain.CleanResult {
-	return domain.CleanResult{
+	strategy enums.CleanStrategyType, itemsRemoved int, freedBytes int64,
+	sizeEstimate types.SizeEstimate,
+) types.CleanResult {
+	return types.CleanResult{
 		SizeEstimate: sizeEstimate,
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
@@ -155,12 +156,12 @@ func NewCleanResultWithSizeEstimate(
 //   - sizeEstimate: Size estimate with known bytes and status
 //
 // Returns:
-//   - domain.CleanResult: A fully initialized CleanResult with timing and size estimate
+//   - types.CleanResult: A fully initialized CleanResult with timing and size estimate
 func NewCleanResultWithTimingAndSize(
-	strategy domain.CleanStrategyType, itemsRemoved, itemsFailed int,
-	freedBytes int64, cleanTime time.Duration, sizeEstimate domain.SizeEstimate,
-) domain.CleanResult {
-	return domain.CleanResult{
+	strategy enums.CleanStrategyType, itemsRemoved, itemsFailed int,
+	freedBytes int64, cleanTime time.Duration, sizeEstimate types.SizeEstimate,
+) types.CleanResult {
+	return types.CleanResult{
 		SizeEstimate: sizeEstimate,
 		FreedBytes:   uint64(freedBytes),
 		ItemsRemoved: uint(itemsRemoved),
@@ -183,7 +184,7 @@ func NewCleanResultWithTimingAndSize(
 //   - scanDuration: Time taken to perform the scan
 //
 // Returns:
-//   - domain.ScanResult: A fully initialized ScanResult with current timestamp
+//   - types.ScanResult: A fully initialized ScanResult with current timestamp
 //
 // Example:
 //
@@ -192,8 +193,8 @@ func NewCleanResultWithTimingAndSize(
 //	fmt.Printf("Scanned %d items in %v", result.TotalItems, result.ScanTime)
 func NewScanResult(
 	totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration,
-) domain.ScanResult {
-	return domain.ScanResult{
+) types.ScanResult {
+	return types.ScanResult{
 		TotalBytes:   totalBytes,
 		TotalItems:   totalItems,
 		ScannedPaths: scannedPaths,
@@ -204,7 +205,7 @@ func NewScanResult(
 
 // GENERIC CONVERSION FUNCTIONS - Centralized primitive→domain transformations
 
-// ToCleanResult converts primitive Result[int64] to domain Result[domain.CleanResult] with conservative strategy.
+// ToCleanResult converts primitive Result[int64] to domain Result[types.CleanResult] with conservative strategy.
 //
 // This is the simplest conversion function that automatically uses conservative strategy.
 // Use this when you don't need custom strategy information.
@@ -213,7 +214,7 @@ func NewScanResult(
 //   - bytesResult: Result[int64] containing bytes freed from primitive operation
 //
 // Returns:
-//   - result.Result[domain.CleanResult]: Converted result with conservative strategy
+//   - result.Result[types.CleanResult]: Converted result with conservative strategy
 //
 // Example:
 //
@@ -222,14 +223,14 @@ func NewScanResult(
 //	if cleanResult.IsOk() {
 //		fmt.Printf("Freed %d bytes", cleanResult.Value().FreedBytes)
 //	}
-func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanResult] {
+func ToCleanResult(bytesResult result.Result[int64]) result.Result[types.CleanResult] {
 	return ToCleanResultWithStrategy(
 		bytesResult,
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 	)
 }
 
-// ToCleanResultWithStrategy converts primitive Result[int64] to domain.Result[domain.CleanResult] with custom strategy.
+// ToCleanResultWithStrategy converts primitive Result[int64] to domain.Result[types.CleanResult] with custom strategy.
 //
 // Use this function when you need to specify the cleaning strategy used.
 // This provides more detailed tracking of which operation type was performed.
@@ -239,17 +240,17 @@ func ToCleanResult(bytesResult result.Result[int64]) result.Result[domain.CleanR
 //   - strategy: CleanStrategy enum value (e.g., StrategyAggressive, StrategyConservative, StrategyDryRun)
 //
 // Returns:
-//   - result.Result[domain.CleanResult]: Converted result with specified strategy
+//   - result.Result[types.CleanResult]: Converted result with specified strategy
 //
 // Example:
 //
 //	bytesResult := adapter.CollectGarbage(ctx)
-//	cleanResult := ToCleanResultWithStrategy(bytesResult, domain.CleanStrategyType(domain.StrategyAggressiveType))
+//	cleanResult := ToCleanResultWithStrategy(bytesResult, enums.CleanStrategyType(enums.StrategyAggressiveType))
 func ToCleanResultWithStrategy(
-	bytesResult result.Result[int64], strategy domain.CleanStrategyType,
-) result.Result[domain.CleanResult] {
+	bytesResult result.Result[int64], strategy enums.CleanStrategyType,
+) result.Result[types.CleanResult] {
 	if bytesResult.IsErr() {
-		return result.Err[domain.CleanResult](bytesResult.Error())
+		return result.Err[types.CleanResult](bytesResult.Error())
 	}
 
 	bytes := bytesResult.Value()
@@ -258,7 +259,7 @@ func ToCleanResultWithStrategy(
 	return result.Ok(cleanResult)
 }
 
-// ToCleanResultFromItems converts items count and bytes to domain Result[domain.CleanResult].
+// ToCleanResultFromItems converts items count and bytes to domain Result[types.CleanResult].
 //
 // Use this function when you have both the number of items removed and the bytes freed.
 // This provides more detailed metrics than just bytes conversion alone.
@@ -269,22 +270,22 @@ func ToCleanResultWithStrategy(
 //   - strategy: CleanStrategy enum value for the cleaning strategy
 //
 // Returns:
-//   - result.Result[domain.CleanResult]: Converted result with items and bytes data
+//   - result.Result[types.CleanResult]: Converted result with items and bytes data
 //
 // Example:
 //
 //	bytesResult := adapter.CollectGarbage(ctx)
 //	cleanResult := ToCleanResultFromItems(5, bytesResult,
-//		domain.CleanStrategyType(domain.StrategyAggressiveType))
+//		enums.CleanStrategyType(enums.StrategyAggressiveType))
 //	if cleanResult.IsOk() {
 //		fmt.Printf("Removed %d items, freed %d bytes",
 //			cleanResult.Value().ItemsRemoved, cleanResult.Value().FreedBytes)
 //	}
 func ToCleanResultFromItems(
-	itemsRemoved int, bytesResult result.Result[int64], strategy domain.CleanStrategyType,
-) result.Result[domain.CleanResult] {
+	itemsRemoved int, bytesResult result.Result[int64], strategy enums.CleanStrategyType,
+) result.Result[types.CleanResult] {
 	if bytesResult.IsErr() {
-		return result.Err[domain.CleanResult](bytesResult.Error())
+		return result.Err[types.CleanResult](bytesResult.Error())
 	}
 
 	bytes := bytesResult.Value()
@@ -295,10 +296,10 @@ func ToCleanResultFromItems(
 
 // ToTimedCleanResult creates a timed CleanResult from bytes and duration.
 func ToTimedCleanResult(
-	bytesResult result.Result[int64], strategy domain.CleanStrategyType, cleanTime time.Duration,
-) result.Result[domain.CleanResult] {
+	bytesResult result.Result[int64], strategy enums.CleanStrategyType, cleanTime time.Duration,
+) result.Result[types.CleanResult] {
 	if bytesResult.IsErr() {
-		return result.Err[domain.CleanResult](bytesResult.Error())
+		return result.Err[types.CleanResult](bytesResult.Error())
 	}
 
 	bytes := bytesResult.Value()
@@ -307,19 +308,19 @@ func ToTimedCleanResult(
 	return result.Ok(cleanResult)
 }
 
-// ToScanResult converts primitive scanning results to domain.ScanResult.
+// ToScanResult converts primitive scanning results to types.ScanResult.
 func ToScanResult(
 	totalBytes int64, totalItems int, scannedPaths []string, scanDuration time.Duration,
-) domain.ScanResult {
+) types.ScanResult {
 	return NewScanResult(totalBytes, totalItems, scannedPaths, scanDuration)
 }
 
 // UTILITY FUNCTIONS - Helper transformations
 
 // CombineCleanResults combines multiple CleanResults into one.
-func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
+func CombineCleanResults(results []types.CleanResult) types.CleanResult {
 	if len(results) == 0 {
-		return NewCleanResult(domain.StrategyConservativeType, 0, 0)
+		return NewCleanResult(enums.StrategyConservativeType, 0, 0)
 	}
 
 	totalItems := 0
@@ -349,7 +350,7 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	// Otherwise, use conservative as the safest default for mixed operations
 	combinedStrategy := firstStrategy
 	if !allSameStrategy {
-		combinedStrategy = domain.StrategyConservativeType
+		combinedStrategy = enums.StrategyConservativeType
 	}
 
 	return NewCleanResultWithFailures(
@@ -361,9 +362,9 @@ func CombineCleanResults(results []domain.CleanResult) domain.CleanResult {
 	)
 }
 
-// ExtractBytesFromCleanResult extracts int64 from domain.CleanResult (for adapter compatibility).
+// ExtractBytesFromCleanResult extracts int64 from types.CleanResult (for adapter compatibility).
 func ExtractBytesFromCleanResult(
-	cleanResult result.Result[domain.CleanResult],
+	cleanResult result.Result[types.CleanResult],
 ) result.Result[int64] {
 	if cleanResult.IsErr() {
 		return result.Err[int64](cleanResult.Error())
@@ -374,26 +375,26 @@ func ExtractBytesFromCleanResult(
 	return result.Ok[int64](int64(cleanValue.FreedBytes))
 }
 
-// ToCleanResultFromError converts error to Result[domain.CleanResult].
-func ToCleanResultFromError(err error) result.Result[domain.CleanResult] {
-	return result.Err[domain.CleanResult](err)
+// ToCleanResultFromError converts error to Result[types.CleanResult].
+func ToCleanResultFromError(err error) result.Result[types.CleanResult] {
+	return result.Err[types.CleanResult](err)
 }
 
-// ToScanResultFromError converts error to Result[domain.ScanResult].
-func ToScanResultFromError(err error) result.Result[domain.ScanResult] {
-	return result.Err[domain.ScanResult](err)
+// ToScanResultFromError converts error to Result[types.ScanResult].
+func ToScanResultFromError(err error) result.Result[types.ScanResult] {
+	return result.Err[types.ScanResult](err)
 }
 
 // VALIDATION HELPERS
 
 // ValidateAndConvertCleanResult ensures CleanResult is valid before returning.
 func ValidateAndConvertCleanResult(
-	cleanResult domain.CleanResult,
-) result.Result[domain.CleanResult] {
+	cleanResult types.CleanResult,
+) result.Result[types.CleanResult] {
 	return validation.ValidateAndWrap(cleanResult, "CleanResult")
 }
 
 // ValidateAndConvertScanResult ensures ScanResult is valid before returning.
-func ValidateAndConvertScanResult(scanResult domain.ScanResult) result.Result[domain.ScanResult] {
+func ValidateAndConvertScanResult(scanResult types.ScanResult) result.Result[types.ScanResult] {
 	return validation.ValidateAndWrap(scanResult, "ScanResult")
 }

@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
@@ -21,11 +22,11 @@ func TestProjectsManagementAutomationCleaner_Type(t *testing.T) {
 
 	cleaner := NewTestCleaner(NewProjectsManagementAutomationCleaner)()
 
-	if cleaner.Type() != domain.OperationTypeProjectsManagementAutomation {
+	if cleaner.Type() != operations.OperationTypeProjectsManagementAutomation {
 		t.Errorf(
 			"Type() = %v, want %v",
 			cleaner.Type(),
-			domain.OperationTypeProjectsManagementAutomation,
+			operations.OperationTypeProjectsManagementAutomation,
 		)
 	}
 }
@@ -77,11 +78,11 @@ func TestProjectsManagementAutomationCleaner_Scan(t *testing.T) {
 				t.Logf("Scan() returned item with zero size: %s", item.Path)
 			}
 
-			if item.ScanType != domain.ScanTypeSystem {
+			if item.ScanType != types.ScanTypeSystem {
 				t.Errorf(
 					"Scan() returned item with ScanType = %v, want %v",
 					item.ScanType,
-					domain.ScanTypeSystem,
+					types.ScanTypeSystem,
 				)
 			}
 

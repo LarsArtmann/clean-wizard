@@ -9,7 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/logger"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -35,7 +37,7 @@ func setupKoanf() *koanf.Koanf {
 	_ = k.Set("version", "1.0.0")
 	_ = k.Set("safe_mode", true)
 	_ = k.Set("max_disk_usage_percent", DefaultMaxDiskUsage)
-	_ = k.Set("protected", domain.DefaultProtectedPaths())
+	_ = k.Set("protected", types.DefaultProtectedPaths())
 
 	return k
 }
@@ -54,7 +56,7 @@ func readConfigFileFromPath(
 	ctx context.Context,
 	k *koanf.Koanf,
 	configPath string,
-) (*domain.Config, error) {
+) (*types.Config, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err() //nolint:wrapcheck
@@ -72,9 +74,9 @@ func readConfigFileFromPath(
 	}
 }
 
-// unmarshalConfig unmarshals koanf config into domain.Config and validates it.
-func unmarshalConfig(k *koanf.Koanf) (*domain.Config, error) {
-	var config domain.Config
+// unmarshalConfig unmarshals koanf config into types.Config and validates it.
+func unmarshalConfig(k *koanf.Koanf) (*types.Config, error) {
+	var config types.Config
 
 	// Unmarshal basic fields
 	config.Version = k.String("version")
@@ -106,7 +108,7 @@ func unmarshalConfig(k *koanf.Koanf) (*domain.Config, error) {
 }
 
 // fixProfileSettings fixes risk levels and settings after unmarshaling.
-func fixProfileSettings(k *koanf.Koanf, config *domain.Config) {
+func fixProfileSettings(k *koanf.Koanf, config *types.Config) {
 	for name, profile := range config.Profiles {
 		for i := range profile.Operations {
 			op := &profile.Operations[i]
@@ -117,7 +119,7 @@ func fixProfileSettings(k *koanf.Koanf, config *domain.Config) {
 }
 
 // validateLoadedConfig validates the loaded configuration.
-func validateLoadedConfig(config *domain.Config) error {
+func validateLoadedConfig(config *types.Config) error {
 	err := config.Validate()
 	if err != nil {
 		return errorfamily.WrapRejection(err, "config.load", "configuration validation failed")
@@ -146,22 +148,22 @@ func validateLoadedConfig(config *domain.Config) error {
 }
 
 // Load loads the configuration from file or creates default.
-func Load() (*domain.Config, error) {
+func Load() (*types.Config, error) {
 	return LoadWithContext(context.Background())
 }
 
 // LoadFromPath loads configuration from a specific file path.
-func LoadFromPath(configPath string) (*domain.Config, error) {
+func LoadFromPath(configPath string) (*types.Config, error) {
 	return LoadWithContextFromPath(context.Background(), configPath)
 }
 
 // LoadWithContext loads configuration with context support.
-func LoadWithContext(ctx context.Context) (*domain.Config, error) {
+func LoadWithContext(ctx context.Context) (*types.Config, error) {
 	return LoadWithContextFromPath(ctx, getConfigPath())
 }
 
 // LoadWithContextFromPath loads configuration from a specific file path with context support.
-func LoadWithContextFromPath(ctx context.Context, configPath string) (*domain.Config, error) {
+func LoadWithContextFromPath(ctx context.Context, configPath string) (*types.Config, error) {
 	k := setupKoanf()
 
 	config, err := readConfigFileFromPath(ctx, k, configPath)
@@ -177,16 +179,16 @@ func LoadWithContextFromPath(ctx context.Context, configPath string) (*domain.Co
 }
 
 // boolToSafeMode converts boolean to SafeMode enum.
-func boolToSafeMode(b bool) domain.SafeMode {
+func boolToSafeMode(b bool) enums.SafeMode {
 	if b {
-		return domain.SafeModeEnabled
+		return enums.SafeModeEnabled
 	}
 
-	return domain.SafeModeDisabled
+	return enums.SafeModeDisabled
 }
 
 // Save saves the configuration to file.
-func Save(config *domain.Config) error {
+func Save(config *types.Config) error {
 	// Set configuration path
 	configPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 
@@ -290,7 +292,7 @@ func operationRawValue(k *koanf.Koanf, profileName string, operationIndex int, f
 }
 
 // parseRiskLevel extracts and converts risk level string from koanf to domain enum.
-func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) domain.RiskLevelType {
+func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) enums.RiskLevelType {
 	switch raw := operationRawValue(k, profileName, operationIndex, "risk_level").(type) {
 	case string:
 		if raw == "" {
@@ -298,22 +300,22 @@ func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) doma
 				"profile", profileName,
 				"operation", operationIndex)
 
-			return domain.RiskLevelLowType
+			return enums.RiskLevelLowType
 		}
 
 		switch strings.ToUpper(raw) {
 		case "LOW":
-			return domain.RiskLevelLowType
+			return enums.RiskLevelLowType
 		case "MEDIUM":
-			return domain.RiskLevelMediumType
+			return enums.RiskLevelMediumType
 		case "HIGH":
-			return domain.RiskLevelHighType
+			return enums.RiskLevelHighType
 		case "CRITICAL":
-			return domain.RiskLevelCriticalType
+			return enums.RiskLevelCriticalType
 		}
 	case int:
-		if raw >= 0 && raw <= int(domain.RiskLevelCriticalType) {
-			return domain.RiskLevelType(raw)
+		if raw >= 0 && raw <= int(enums.RiskLevelCriticalType) {
+			return enums.RiskLevelType(raw)
 		}
 	}
 
@@ -321,7 +323,7 @@ func parseRiskLevel(k *koanf.Koanf, profileName string, operationIndex int) doma
 		"profile", profileName,
 		"operation", operationIndex)
 
-	return domain.RiskLevelLowType
+	return enums.RiskLevelLowType
 }
 
 // unmarshalOperationSettings extracts operation settings from koanf and populates the operation.
@@ -332,7 +334,7 @@ func unmarshalOperationSettings(
 	k *koanf.Koanf,
 	profileName string,
 	operationIndex int,
-	op *domain.CleanupOperation,
+	op *types.CleanupOperation,
 ) {
 	raw := operationRawValue(k, profileName, operationIndex, "settings")
 	if raw == nil {
@@ -351,7 +353,7 @@ func unmarshalOperationSettings(
 		return
 	}
 
-	settings := &domain.OperationSettings{} //nolint:exhaustruct
+	settings := &operations.OperationSettings{} //nolint:exhaustruct
 	if err := yamlv3.Unmarshal(settingsYAML, settings); err != nil {
 		logger.Error("Failed to unmarshal operation settings",
 			"error", err,
@@ -366,94 +368,94 @@ func unmarshalOperationSettings(
 
 // newCleanupOperation creates a cleanup operation with the specified parameters.
 func newCleanupOperation(
-	name, description string, riskLevel domain.RiskLevelType, opType domain.OperationType,
-) domain.CleanupOperation {
-	return domain.CleanupOperation{
+	name, description string, riskLevel enums.RiskLevelType, opType operations.OperationType,
+) types.CleanupOperation {
+	return types.CleanupOperation{
 		Name:        name,
 		Description: description,
 		RiskLevel:   riskLevel,
-		Enabled:     domain.ProfileStatusEnabled,
-		Settings:    domain.DefaultSettings(opType),
+		Enabled:     enums.ProfileStatusEnabled,
+		Settings:    operations.DefaultSettings(opType),
 	}
 }
 
 // newProfile creates a cleanup profile with the specified name, description, and operations.
-func newProfile(name, description string, operations []domain.CleanupOperation) *domain.Profile {
-	return &domain.Profile{
+func newProfile(name, description string, operations []types.CleanupOperation) *types.Profile {
+	return &types.Profile{
 		Name:        name,
 		Description: description,
 		Operations:  operations,
-		Enabled:     domain.ProfileStatusEnabled,
+		Enabled:     enums.ProfileStatusEnabled,
 	}
 }
 
 // GetDefaultConfig returns the default configuration.
-func GetDefaultConfig() *domain.Config {
+func GetDefaultConfig() *types.Config {
 	now := GetCurrentTime()
 
-	return &domain.Config{ //nolint:exhaustruct
+	return &types.Config{ //nolint:exhaustruct
 		Version:      "1.0.0",
-		SafeMode:     domain.SafeModeEnabled, // Default to safe mode
+		SafeMode:     enums.SafeModeEnabled, // Default to safe mode
 		MaxDiskUsage: DefaultMaxDiskUsage,
 		Protected: []string{
 			"/System",
 			"/Applications",
 			"/Library",
 		},
-		Profiles: map[string]*domain.Profile{
-			"daily": newProfile("daily", "Quick daily cleanup", []domain.CleanupOperation{
+		Profiles: map[string]*types.Profile{
+			"daily": newProfile("daily", "Quick daily cleanup", []types.CleanupOperation{
 				newCleanupOperation(
 					"nix-generations",
 					"Clean old Nix generations",
-					domain.RiskLevelLowType,
-					domain.OperationTypeNixGenerations,
+					enums.RiskLevelLowType,
+					operations.OperationTypeNixGenerations,
 				),
 				newCleanupOperation(
 					"temp-files",
 					"Clean temporary files",
-					domain.RiskLevelLowType,
-					domain.OperationTypeTempFiles,
+					enums.RiskLevelLowType,
+					operations.OperationTypeTempFiles,
 				),
 			}),
 			"aggressive": newProfile(
 				"aggressive",
 				"Deep aggressive cleanup",
-				[]domain.CleanupOperation{
+				[]types.CleanupOperation{
 					newCleanupOperation(
 						"nix-generations",
 						"Clean old Nix generations",
-						domain.RiskLevelHighType,
-						domain.OperationTypeNixGenerations,
+						enums.RiskLevelHighType,
+						operations.OperationTypeNixGenerations,
 					),
 					newCleanupOperation(
 						"homebrew-cleanup",
 						"Clean old Homebrew packages",
-						domain.RiskLevelMediumType,
-						domain.OperationTypeHomebrew,
+						enums.RiskLevelMediumType,
+						operations.OperationTypeHomebrew,
 					),
 				},
 			),
 			"comprehensive": newProfile(
 				"comprehensive",
 				"Complete system cleanup",
-				[]domain.CleanupOperation{
+				[]types.CleanupOperation{
 					newCleanupOperation(
 						"nix-generations",
 						"Clean old Nix generations",
-						domain.RiskLevelCriticalType,
-						domain.OperationTypeNixGenerations,
+						enums.RiskLevelCriticalType,
+						operations.OperationTypeNixGenerations,
 					),
 					newCleanupOperation(
 						"homebrew-cleanup",
 						"Clean old Homebrew packages",
-						domain.RiskLevelMediumType,
-						domain.OperationTypeHomebrew,
+						enums.RiskLevelMediumType,
+						operations.OperationTypeHomebrew,
 					),
 					newCleanupOperation(
 						"system-temp",
 						"Clean system temporary files",
-						domain.RiskLevelMediumType,
-						domain.OperationTypeSystemTemp,
+						enums.RiskLevelMediumType,
+						operations.OperationTypeSystemTemp,
 					),
 				},
 			),

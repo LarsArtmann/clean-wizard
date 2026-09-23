@@ -6,7 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
@@ -48,19 +50,19 @@ type ConfigChangeResult struct {
 
 // ConfigChange represents a single configuration change.
 type ConfigChange struct {
-	Field     string                     `json:"field"`
-	OldValue  any                        `json:"old_value"`
-	NewValue  any                        `json:"new_value"`
-	Operation domain.ChangeOperationType `json:"operation"`
-	Risk      domain.RiskLevelType       `json:"risk"`
+	Field     string                    `json:"field"`
+	OldValue  any                       `json:"old_value"`
+	NewValue  any                       `json:"new_value"`
+	Operation enums.ChangeOperationType `json:"operation"`
+	Risk      enums.RiskLevelType       `json:"risk"`
 }
 
 // ProfileOperationResult represents profile operation validation result.
 type ProfileOperationResult struct {
-	IsValid   bool                     `json:"is_valid"`
-	Operation *domain.CleanupOperation `json:"operation,omitempty"`
-	Error     error                    `json:"error,omitempty"`
-	Timestamp time.Time                `json:"timestamp"`
+	IsValid   bool                    `json:"is_valid"`
+	Operation *types.CleanupOperation `json:"operation,omitempty"`
+	Error     error                   `json:"error,omitempty"`
+	Timestamp time.Time               `json:"timestamp"`
 }
 
 // NewConsoleValidationLogger creates a console-based validation logger.
@@ -163,7 +165,7 @@ func NewValidationMiddlewareWithLogger(logger ValidationLogger) *ValidationMiddl
 }
 
 // ValidateAndLoadConfig loads and validates configuration with comprehensive checks.
-func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*domain.Config, error) {
+func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*types.Config, error) {
 	// Load configuration using existing loader
 	cfg, err := LoadWithContext(ctx)
 	if err != nil {
@@ -181,8 +183,8 @@ func (vm *ValidationMiddleware) ValidateAndLoadConfig(ctx context.Context) (*dom
 // ValidateAndSaveConfig validates and saves configuration.
 func (vm *ValidationMiddleware) ValidateAndSaveConfig(
 	ctx context.Context,
-	cfg *domain.Config,
-) (*domain.Config, error) {
+	cfg *types.Config,
+) (*types.Config, error) {
 	if err := vm.validateConfig(cfg, "ValidateAndSaveConfig"); err != nil {
 		return nil, err
 	}
@@ -198,7 +200,7 @@ func (vm *ValidationMiddleware) ValidateAndSaveConfig(
 }
 
 // validateConfig performs comprehensive validation on a config and returns an error if invalid.
-func (vm *ValidationMiddleware) validateConfig(cfg *domain.Config, operationName string) error {
+func (vm *ValidationMiddleware) validateConfig(cfg *types.Config, operationName string) error {
 	validationResult := vm.validator.ValidateConfig(cfg)
 	vm.logger.LogValidation(validationResult)
 
@@ -220,7 +222,7 @@ func (vm *ValidationMiddleware) validateConfig(cfg *domain.Config, operationName
 // ValidateConfigChange validates a specific configuration change.
 func (vm *ValidationMiddleware) ValidateConfigChange(
 	ctx context.Context,
-	current, proposed *domain.Config,
+	current, proposed *types.Config,
 ) *ConfigChangeResult {
 	changeResult := &ConfigChangeResult{ //nolint:exhaustruct
 		IsValid:   true,
@@ -266,7 +268,7 @@ func (vm *ValidationMiddleware) ValidateConfigChange(
 func (vm *ValidationMiddleware) ValidateProfileOperation(
 	ctx context.Context,
 	profileName, operationName string,
-	settings *domain.OperationSettings,
+	settings *operations.OperationSettings,
 ) *ProfileOperationResult {
 	result := &ProfileOperationResult{ //nolint:exhaustruct
 		IsValid:   true,
@@ -283,11 +285,11 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(
 	}
 
 	// Create temporary operation for validation
-	tempOp := domain.CleanupOperation{
+	tempOp := types.CleanupOperation{
 		Name:        operationName,
 		Description: "Validation operation",
-		RiskLevel:   domain.RiskLevelLowType, // Default to low for validation
-		Enabled:     domain.ProfileStatusEnabled,
+		RiskLevel:   enums.RiskLevelLowType, // Default to low for validation
+		Enabled:     enums.ProfileStatusEnabled,
 		Settings:    settings,
 	}
 

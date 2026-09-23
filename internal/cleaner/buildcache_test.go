@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestNewBuildCacheCleaner(t *testing.T) {
@@ -97,8 +98,8 @@ func TestBuildCacheCleaner_Type(t *testing.T) {
 		t.Fatalf("NewBuildCacheCleaner() error = %v", err)
 	}
 
-	if cleaner.Type() != domain.OperationTypeBuildCache {
-		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeBuildCache)
+	if cleaner.Type() != operations.OperationTypeBuildCache {
+		t.Errorf("Type() = %v, want %v", cleaner.Type(), operations.OperationTypeBuildCache)
 	}
 }
 
@@ -123,7 +124,7 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.OperationSettings
+		settings *operations.OperationSettings
 		wantErr  bool
 	}{
 		{
@@ -133,14 +134,14 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name:     "nil build cache settings",
-			settings: &domain.OperationSettings{},
+			settings: &operations.OperationSettings{},
 			wantErr:  false,
 		},
 		{
 			name: "valid settings with all tools",
-			settings: &domain.OperationSettings{
-				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []domain.BuildToolType{domain.BuildToolJava, domain.BuildToolScala},
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes: []enums.BuildToolType{enums.BuildToolJava, enums.BuildToolScala},
 					OlderThan: "30d",
 				},
 			},
@@ -148,9 +149,9 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name: "valid settings with single tool",
-			settings: &domain.OperationSettings{
-				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []domain.BuildToolType{domain.BuildToolJava},
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes: []enums.BuildToolType{enums.BuildToolJava},
 					OlderThan: "7d",
 				},
 			},
@@ -158,9 +159,9 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name: "valid settings with no tools",
-			settings: &domain.OperationSettings{
-				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []domain.BuildToolType{},
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes: []enums.BuildToolType{},
 					OlderThan: "30d",
 				},
 			},
@@ -168,9 +169,9 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name: "invalid tool type",
-			settings: &domain.OperationSettings{
-				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []domain.BuildToolType{999},
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes: []enums.BuildToolType{999},
 					OlderThan: "30d",
 				},
 			},
@@ -178,9 +179,9 @@ func TestBuildCacheCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name: "mixed valid and invalid tools",
-			settings: &domain.OperationSettings{
-				BuildCache: &domain.BuildCacheSettings{
-					ToolTypes: []domain.BuildToolType{domain.BuildToolJava, 999},
+			settings: &operations.OperationSettings{
+				BuildCache: &operations.BuildCacheSettings{
+					ToolTypes: []enums.BuildToolType{enums.BuildToolJava, 999},
 					OlderThan: "30d",
 				},
 			},
@@ -225,11 +226,11 @@ func TestBuildCacheCleaner_Clean_DryRun(t *testing.T) {
 		t.Errorf("Clean() removed %d items, want 3", cleanResult.ItemsRemoved)
 	}
 
-	if cleanResult.Strategy != domain.StrategyDryRunType {
+	if cleanResult.Strategy != enums.StrategyDryRunType {
 		t.Errorf(
 			"Clean() strategy = %v, want %v",
 			cleanResult.Strategy,
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 		)
 	}
 

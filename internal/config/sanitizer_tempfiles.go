@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // sanitizeTempFilesSettings sanitizes temporary files settings.
 func (cs *ConfigSanitizer) sanitizeTempFilesSettings(
-	fieldPrefix string, settings *domain.TempFilesSettings, result *SanitizationResult,
+	fieldPrefix string, settings *operations.TempFilesSettings, result *SanitizationResult,
 ) {
 	if settings == nil {
 		return

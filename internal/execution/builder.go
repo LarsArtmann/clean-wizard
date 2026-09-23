@@ -7,7 +7,7 @@ import (
 
 	flow "github.com/Azure/go-workflow"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
@@ -128,8 +128,8 @@ func makeCleanStepFunc(
 	name string,
 	c cleaner.Cleaner,
 	collector *resultCollector,
-) func(context.Context, struct{}) (domain.CleanResult, error) {
-	return func(ctx context.Context, _ struct{}) (result domain.CleanResult, err error) {
+) func(context.Context, struct{}) (types.CleanResult, error) {
+	return func(ctx context.Context, _ struct{}) (result types.CleanResult, err error) {
 		startTime := time.Now()
 
 		defer func() {
@@ -137,14 +137,14 @@ func makeCleanStepFunc(
 
 			if r := recover(); r != nil {
 				panicErr := fmt.Errorf("cleaner %s panicked: %v", name, r)
-				collector.recordFinal(name, domain.CleanResult{}, panicErr, duration)
+				collector.recordFinal(name, types.CleanResult{}, panicErr, duration)
 				err = panicErr
 
 				return
 			}
 
 			if err != nil {
-				collector.recordFinal(name, domain.CleanResult{}, err, duration)
+				collector.recordFinal(name, types.CleanResult{}, err, duration)
 
 				return
 			}
@@ -154,7 +154,7 @@ func makeCleanStepFunc(
 
 		res := c.Clean(ctx)
 		if res.IsErr() {
-			return domain.CleanResult{}, res.Error()
+			return types.CleanResult{}, res.Error()
 		}
 
 		result = res.Value()
@@ -170,8 +170,8 @@ func makeScanStepFunc(
 	name string,
 	c cleaner.Cleaner,
 	collector *resultCollector,
-) func(context.Context, struct{}) ([]domain.ScanItem, error) {
-	return func(ctx context.Context, _ struct{}) (items []domain.ScanItem, err error) {
+) func(context.Context, struct{}) ([]types.ScanItem, error) {
+	return func(ctx context.Context, _ struct{}) (items []types.ScanItem, err error) {
 		startTime := time.Now()
 
 		defer func() {
@@ -179,14 +179,14 @@ func makeScanStepFunc(
 
 			if r := recover(); r != nil {
 				panicErr := fmt.Errorf("scanner %s panicked: %v", name, r)
-				collector.recordFinal(name, domain.CleanResult{}, panicErr, duration)
+				collector.recordFinal(name, types.CleanResult{}, panicErr, duration)
 				err = panicErr
 
 				return
 			}
 
 			if err != nil {
-				collector.recordFinal(name, domain.CleanResult{}, err, duration)
+				collector.recordFinal(name, types.CleanResult{}, err, duration)
 
 				return
 			}
@@ -196,7 +196,7 @@ func makeScanStepFunc(
 				totalSize += uint64(item.Size)
 			}
 
-			collector.recordFinal(name, domain.CleanResult{
+			collector.recordFinal(name, types.CleanResult{
 				FreedBytes:   totalSize,
 				ItemsRemoved: uint(len(items)),
 			}, nil, duration)

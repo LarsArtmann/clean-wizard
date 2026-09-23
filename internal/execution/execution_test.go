@@ -6,7 +6,8 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/go-error-family/errorfamilytest"
@@ -18,17 +19,17 @@ import (
 type mockCleaner struct {
 	name     string
 	avail    bool
-	cleanRes result.Result[domain.CleanResult]
-	scanRes  result.Result[[]domain.ScanItem]
+	cleanRes result.Result[types.CleanResult]
+	scanRes  result.Result[[]types.ScanItem]
 }
 
 func (m *mockCleaner) Name() string { return m.name }
 
-func (m *mockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+func (m *mockCleaner) Type() operations.OperationType { return operations.OperationTypeCargoPackages }
 
-func (m *mockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] { return m.cleanRes }
-func (m *mockCleaner) IsAvailable(_ context.Context) bool                        { return m.avail }
-func (m *mockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem]   { return m.scanRes }
+func (m *mockCleaner) Clean(_ context.Context) result.Result[types.CleanResult] { return m.cleanRes }
+func (m *mockCleaner) IsAvailable(_ context.Context) bool                       { return m.avail }
+func (m *mockCleaner) Scan(_ context.Context) result.Result[[]types.ScanItem]   { return m.scanRes }
 
 func TestRunCleaners_SuccessfulSteps(t *testing.T) {
 	t.Parallel()
@@ -38,7 +39,7 @@ func TestRunCleaners_SuccessfulSteps(t *testing.T) {
 	successCleaner := &mockCleaner{
 		name:     "success-cleaner",
 		avail:    true,
-		cleanRes: result.Ok(domain.CleanResult{FreedBytes: 1024, ItemsRemoved: 5}),
+		cleanRes: result.Ok(types.CleanResult{FreedBytes: 1024, ItemsRemoved: 5}),
 	}
 	registry.Register("success-cleaner", successCleaner)
 
@@ -61,17 +62,17 @@ func TestRunCleaners_MixedResults(t *testing.T) {
 	registry.Register("success", &mockCleaner{
 		name:     "success",
 		avail:    true,
-		cleanRes: result.Ok(domain.CleanResult{FreedBytes: 500, ItemsRemoved: 2}),
+		cleanRes: result.Ok(types.CleanResult{FreedBytes: 500, ItemsRemoved: 2}),
 	})
 	registry.Register("failed", &mockCleaner{
 		name:     "failed",
 		avail:    true,
-		cleanRes: result.Err[domain.CleanResult](assertError("cleaner failed: disk error")),
+		cleanRes: result.Err[types.CleanResult](assertError("cleaner failed: disk error")),
 	})
 	registry.Register("skipped", &mockCleaner{
 		name:     "skipped",
 		avail:    true,
-		cleanRes: result.Err[domain.CleanResult](cleaner.NewNotAvailableError("some-tool", "")),
+		cleanRes: result.Err[types.CleanResult](cleaner.NewNotAvailableError("some-tool", "")),
 	})
 
 	wr, err := RunCleaners(context.Background(), registry, []string{"success", "failed", "skipped"})
@@ -120,7 +121,7 @@ func TestRunScans_SuccessfulSteps(t *testing.T) {
 	registry.Register("scanner", &mockCleaner{
 		name:  "scanner",
 		avail: true,
-		scanRes: result.Ok([]domain.ScanItem{
+		scanRes: result.Ok([]types.ScanItem{
 			{Size: 100},
 			{Size: 200},
 			{Size: 300},
@@ -141,9 +142,9 @@ func TestWorkflowResult_CleanResultsMap(t *testing.T) {
 
 	wr := &WorkflowResult{
 		Steps: []StepResult{
-			{Name: "ok1", Clean: domain.CleanResult{FreedBytes: 100}, Err: nil},
-			{Name: "ok2", Clean: domain.CleanResult{FreedBytes: 200}, Err: nil},
-			{Name: "fail", Clean: domain.CleanResult{}, Err: assertError("some error")},
+			{Name: "ok1", Clean: types.CleanResult{FreedBytes: 100}, Err: nil},
+			{Name: "ok2", Clean: types.CleanResult{FreedBytes: 200}, Err: nil},
+			{Name: "fail", Clean: types.CleanResult{}, Err: assertError("some error")},
 		},
 	}
 

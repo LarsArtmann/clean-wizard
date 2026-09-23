@@ -1,7 +1,8 @@
 package cleaner
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // Factory defaults. They preserve the behavior of cleaners when a user profile
@@ -15,7 +16,7 @@ const (
 
 // resolveNixKeepCount returns the variadic keepCount argument for NewNixCleaner.
 // An empty result keeps the constructor default (5).
-func resolveNixKeepCount(settings *domain.OperationSettings) []int {
+func resolveNixKeepCount(settings *operations.OperationSettings) []int {
 	if settings == nil {
 		return nil
 	}
@@ -28,35 +29,35 @@ func resolveNixKeepCount(settings *domain.OperationSettings) []int {
 }
 
 // resolveHomebrewMode maps the homebrew settings section to the cleaner's mode.
-func resolveHomebrewMode(settings *domain.OperationSettings) domain.HomebrewMode {
+func resolveHomebrewMode(settings *operations.OperationSettings) enums.HomebrewMode {
 	if settings == nil {
-		return domain.HomebrewModeAll
+		return enums.HomebrewModeAll
 	}
 
 	if settings.Homebrew != nil {
 		return settings.Homebrew.UnusedOnly
 	}
 
-	return domain.HomebrewModeAll
+	return enums.HomebrewModeAll
 }
 
 // resolveDockerPruneMode maps the docker settings section to the cleaner's prune mode.
-func resolveDockerPruneMode(settings *domain.OperationSettings) domain.DockerPruneMode {
+func resolveDockerPruneMode(settings *operations.OperationSettings) enums.DockerPruneMode {
 	if settings == nil {
-		return domain.DockerPruneAll
+		return enums.DockerPruneAll
 	}
 
 	if settings.Docker != nil {
 		return settings.Docker.PruneMode
 	}
 
-	return domain.DockerPruneAll
+	return enums.DockerPruneAll
 }
 
 // resolveGoCaches maps the go_packages settings section to Go cache flags.
 // A section with every cache disabled cannot produce a valid cache set, so it
 // falls back to the factory default rather than constructing an invalid cleaner.
-func resolveGoCaches(settings *domain.OperationSettings) GoCacheType {
+func resolveGoCaches(settings *operations.OperationSettings) GoCacheType {
 	const defaultGoCaches = GoCacheGOCACHE | GoCacheTestCache | GoCacheModCache | GoCacheBuildCache
 
 	if settings == nil {
@@ -99,7 +100,7 @@ func resolveGoCaches(settings *domain.OperationSettings) GoCacheType {
 
 // resolveNodePackageManagers maps the node_packages settings section to the
 // package managers to clean, falling back to whatever is available on this system.
-func resolveNodePackageManagers(settings *domain.OperationSettings) []domain.PackageManagerType {
+func resolveNodePackageManagers(settings *operations.OperationSettings) []enums.PackageManagerType {
 	if settings == nil {
 		return AvailableNodePackageManagers()
 	}
@@ -112,7 +113,7 @@ func resolveNodePackageManagers(settings *domain.OperationSettings) []domain.Pac
 }
 
 // resolveBuildCacheOlderThan maps the build_cache settings section to the age filter.
-func resolveBuildCacheOlderThan(settings *domain.OperationSettings) string {
+func resolveBuildCacheOlderThan(settings *operations.OperationSettings) string {
 	if settings == nil {
 		return defaultBuildCacheOlderThan
 	}
@@ -125,10 +126,10 @@ func resolveBuildCacheOlderThan(settings *domain.OperationSettings) string {
 }
 
 // resolveSystemCache maps the system_cache settings section to age filter and cache types.
-func resolveSystemCache(settings *domain.OperationSettings) (string, []domain.CacheType) {
+func resolveSystemCache(settings *operations.OperationSettings) (string, []enums.CacheType) {
 	olderThan := defaultSystemCacheOlderThan
 
-	var cacheTypes []domain.CacheType
+	var cacheTypes []enums.CacheType
 
 	if settings == nil {
 		return olderThan, cacheTypes
@@ -146,7 +147,7 @@ func resolveSystemCache(settings *domain.OperationSettings) (string, []domain.Ca
 }
 
 // resolveTempFiles maps the temp_files settings section to age filter and excludes.
-func resolveTempFiles(settings *domain.OperationSettings) (string, []string) {
+func resolveTempFiles(settings *operations.OperationSettings) (string, []string) {
 	olderThan := defaultTempFilesOlderThan
 
 	var excludes []string
@@ -168,7 +169,7 @@ func resolveTempFiles(settings *domain.OperationSettings) (string, []string) {
 
 // resolveProjectExecutables maps the project_executables settings section to
 // the exclusion filters. A nil extension list keeps the constructor default (.sh).
-func resolveProjectExecutables(settings *domain.OperationSettings) ([]string, []string) {
+func resolveProjectExecutables(settings *operations.OperationSettings) ([]string, []string) {
 	if settings == nil {
 		return nil, nil
 	}
@@ -182,7 +183,7 @@ func resolveProjectExecutables(settings *domain.OperationSettings) ([]string, []
 
 // resolveCompiledBinaries maps the compiled_binaries settings section to size,
 // age, and path filters.
-func resolveCompiledBinaries(settings *domain.OperationSettings) (int, string, []string, []string) {
+func resolveCompiledBinaries(settings *operations.OperationSettings) (int, string, []string, []string) {
 	minSizeMB := DefaultMinSizeMB
 	olderThan := DefaultOlderThan
 

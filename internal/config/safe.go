@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )
 
 // SafeConfig represents a validated cleaning configuration.
@@ -13,7 +13,7 @@ type SafeConfig struct {
 	safeMode bool
 	dryRun   bool
 	backup   bool
-	maxRisk  domain.RiskLevelType
+	maxRisk  enums.RiskLevelType
 	profiles []SafeProfile
 	created  time.Time
 }
@@ -23,13 +23,13 @@ type SafeProfile struct {
 	name        string
 	description string
 	operations  []SafeOperation
-	maxRisk     domain.RiskLevelType
+	maxRisk     enums.RiskLevelType
 }
 
 // SafeOperation represents a validated cleaning operation.
 type SafeOperation struct {
 	name    CleanType
-	risk    domain.RiskLevelType
+	risk    enums.RiskLevelType
 	enabled bool
 	backup  bool
 }
@@ -62,7 +62,7 @@ func (ct CleanType) IsValid() bool {
 func NewSafeConfigBuilder() *SafeConfigBuilder {
 	return &SafeConfigBuilder{ //nolint:exhaustruct
 		profiles: []SafeProfile{},
-		maxRisk:  domain.RiskLevelLowType,
+		maxRisk:  enums.RiskLevelLowType,
 	}
 }
 
@@ -71,7 +71,7 @@ type SafeConfigBuilder struct {
 	safeMode bool
 	dryRun   bool
 	backup   bool
-	maxRisk  domain.RiskLevelType
+	maxRisk  enums.RiskLevelType
 	profiles []SafeProfile
 	err      error
 }
@@ -108,7 +108,7 @@ func (scb *SafeConfigBuilder) AddProfile(name, description string) *SafeProfileB
 		description: description,
 		config:      scb,
 		operations:  []SafeOperation{},
-		maxRisk:     domain.RiskLevelLowType,
+		maxRisk:     enums.RiskLevelLowType,
 	}
 }
 
@@ -142,14 +142,14 @@ type SafeProfileBuilder struct {
 	description string
 	config      *SafeConfigBuilder
 	operations  []SafeOperation
-	maxRisk     domain.RiskLevelType
+	maxRisk     enums.RiskLevelType
 	err         error
 }
 
 // AddOperation adds a safe operation.
 func (spb *SafeProfileBuilder) AddOperation(
 	opType CleanType,
-	risk domain.RiskLevelType,
+	risk enums.RiskLevelType,
 ) *SafeProfileBuilder {
 	if spb.err != nil {
 		return spb
@@ -167,7 +167,7 @@ func (spb *SafeProfileBuilder) AddOperation(
 		return spb
 	}
 
-	if risk.IsHigherThan(domain.RiskLevelHighType) && spb.err == nil {
+	if risk.IsHigherThan(enums.RiskLevelHighType) && spb.err == nil {
 		spb.err = errors.New("cannot add critical risk operation to profile")
 
 		return spb
@@ -177,7 +177,7 @@ func (spb *SafeProfileBuilder) AddOperation(
 		name:    opType,
 		risk:    risk,
 		enabled: true,
-		backup:  risk.IsHigherOrEqualThan(domain.RiskLevelMediumType),
+		backup:  risk.IsHigherOrEqualThan(enums.RiskLevelMediumType),
 	}
 
 	spb.operations = append(spb.operations, op)
@@ -202,7 +202,7 @@ func (spb *SafeProfileBuilder) Done() *SafeConfigBuilder {
 		return spb.config
 	}
 
-	if spb.maxRisk.IsHigherThan(domain.RiskLevelHighType) {
+	if spb.maxRisk.IsHigherThan(enums.RiskLevelHighType) {
 		spb.config.err = errors.New("profile risk level cannot exceed HIGH")
 
 		return spb.config

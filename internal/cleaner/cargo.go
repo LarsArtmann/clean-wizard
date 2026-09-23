@@ -9,7 +9,9 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -29,8 +31,8 @@ func NewCargoCleaner(verbose, dryRun bool) *CargoCleaner {
 }
 
 // Type returns operation type for Cargo cleaner.
-func (cc *CargoCleaner) Type() domain.OperationType {
-	return domain.OperationTypeCargoPackages
+func (cc *CargoCleaner) Type() operations.OperationType {
+	return operations.OperationTypeCargoPackages
 }
 
 // Name returns the cleaner name for result tracking.
@@ -47,17 +49,17 @@ func (cc *CargoCleaner) IsAvailable(ctx context.Context) bool {
 
 // ValidateSettings validates Cargo cleaner settings.
 // All Cargo settings are valid by default; the field is optional.
-func (cc *CargoCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (cc *CargoCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.CargoPackagesSettings { return s.CargoPackages },
-		func(*domain.CargoPackagesSettings) error { return nil },
+		func(s *operations.OperationSettings) *operations.CargoPackagesSettings { return s.CargoPackages },
+		func(*operations.CargoPackagesSettings) error { return nil },
 	)
 }
 
 // Scan scans for Cargo caches.
-func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	// Get CARGO_HOME environment variable
 	cargoHome := cc.getCargoCacheDir()
@@ -65,11 +67,11 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 	if cargoHome != "" {
 		// Add registry cache location
 		registryCache := cargoHome + "/registry"
-		items = append(items, domain.ScanItem{
+		items = append(items, types.ScanItem{
 			Path:     registryCache,
 			Size:     GetDirSize(registryCache),
 			Created:  GetDirModTime(registryCache),
-			ScanType: domain.ScanTypeTemp,
+			ScanType: types.ScanTypeTemp,
 		})
 
 		if cc.verbose {
@@ -78,11 +80,11 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 
 		// Add source cache location
 		sourceCache := cargoHome + "/git"
-		items = append(items, domain.ScanItem{
+		items = append(items, types.ScanItem{
 			Path:     sourceCache,
 			Size:     GetDirSize(sourceCache),
 			Created:  GetDirModTime(sourceCache),
-			ScanType: domain.ScanTypeTemp,
+			ScanType: types.ScanTypeTemp,
 		})
 
 		if cc.verbose {
@@ -94,9 +96,9 @@ func (cc *CargoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIte
 }
 
 // Clean removes Cargo caches.
-func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	if !cc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](NewNotAvailableError("cargo", ""))
+		return result.Err[types.CleanResult](NewNotAvailableError("cargo", ""))
 	}
 
 	if cc.dryRun {
@@ -122,11 +124,11 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 		}
 
 		cleanResult := conversions.NewCleanResult(
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = domain.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
+		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
 
 		return result.Ok(cleanResult)
 	}
@@ -155,7 +157,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 			duration := time.Since(startTime)
 
 			return result.Ok(conversions.NewCleanResultWithTiming(
-				domain.StrategyConservativeType,
+				enums.StrategyConservativeType,
 				itemsRemoved, bytesFreed, duration,
 			))
 		}
@@ -164,7 +166,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 	// Manual cleanup using cargo clean command
 	cleanResult := cc.cleanWithCargoClean(ctx)
 	if cleanResult.IsErr() {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("cargo clean failed: %w", cleanResult.Error()),
 		)
 	}
@@ -175,7 +177,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 	duration := time.Since(startTime)
 
 	return result.Ok(conversions.NewCleanResultWithTiming(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		itemsRemoved, bytesFreed, duration,
 	))
 }
@@ -183,7 +185,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[domain.CleanRes
 // cleanWithCargoCacheTool cleans using cargo-cache extension.
 func (cc *CargoCleaner) cleanWithCargoCacheTool(
 	ctx context.Context,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	return cc.executeCargoCleanCommand(
 		ctx,
 		"cargo-cache", []string{"--autoclean"},
@@ -193,7 +195,7 @@ func (cc *CargoCleaner) cleanWithCargoCacheTool(
 }
 
 // cleanWithCargoClean cleans using standard cargo clean command.
-func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[domain.CleanResult] {
+func (cc *CargoCleaner) cleanWithCargoClean(ctx context.Context) result.Result[types.CleanResult] {
 	return cc.executeCargoCleanCommand(
 		ctx,
 		"cargo", []string{"clean"},
@@ -221,7 +223,7 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 	args []string,
 	errorFormat string,
 	successMessage string,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	// Calculate cache size before cleaning
 	var bytesFreed int64
 
@@ -253,7 +255,7 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			return result.Err[domain.CleanResult](
+			return result.Err[types.CleanResult](
 				fmt.Errorf(
 					"cmdName=%v, bytesFreed=%v: "+errorFormat,
 					cmdName,
@@ -270,7 +272,7 @@ func (cc *CargoCleaner) executeCargoCleanCommand(
 	}
 
 	return result.Ok(conversions.NewCleanResult(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		1, bytesFreed,
 	))
 }

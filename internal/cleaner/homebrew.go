@@ -10,7 +10,9 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -26,11 +28,11 @@ const homebrewCommandTimeout = 5 * time.Minute
 type HomebrewCleaner struct {
 	CleanerBase
 
-	unusedOnly domain.HomebrewMode
+	unusedOnly enums.HomebrewMode
 }
 
 // NewHomebrewCleaner creates Homebrew cleaner with proper configuration.
-func NewHomebrewCleaner(verbose, dryRun bool, unusedOnly domain.HomebrewMode) *HomebrewCleaner {
+func NewHomebrewCleaner(verbose, dryRun bool, unusedOnly enums.HomebrewMode) *HomebrewCleaner {
 	return &HomebrewCleaner{
 		CleanerBase: NewCleanerBase(verbose, dryRun),
 		unusedOnly:  unusedOnly,
@@ -38,8 +40,8 @@ func NewHomebrewCleaner(verbose, dryRun bool, unusedOnly domain.HomebrewMode) *H
 }
 
 // Type returns operation type for Homebrew cleaner.
-func (hbc *HomebrewCleaner) Type() domain.OperationType {
-	return domain.OperationTypeHomebrew
+func (hbc *HomebrewCleaner) Type() operations.OperationType {
+	return operations.OperationTypeHomebrew
 }
 
 // Name returns the unique identifier for this cleaner.
@@ -56,13 +58,13 @@ func (hbc *HomebrewCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // ValidateSettings validates Homebrew cleaner settings with type safety.
-func (hbc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (hbc *HomebrewCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.HomebrewSettings { return s.Homebrew },
-		func(h *domain.HomebrewSettings) error {
-			if h.UnusedOnly != domain.HomebrewModeUnusedOnly &&
-				h.UnusedOnly != domain.HomebrewModeAll {
+		func(s *operations.OperationSettings) *operations.HomebrewSettings { return s.Homebrew },
+		func(h *operations.HomebrewSettings) error {
+			if h.UnusedOnly != enums.HomebrewModeUnusedOnly &&
+				h.UnusedOnly != enums.HomebrewModeAll {
 				return errors.New("invalid unused_only mode: must be either 'unused_only' or 'all'")
 			}
 
@@ -72,19 +74,19 @@ func (hbc *HomebrewCleaner) ValidateSettings(settings *domain.OperationSettings)
 }
 
 // Scan scans for Homebrew packages that can be cleaned.
-func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
 	if !hbc.IsAvailable(ctx) {
-		return result.Err[[]domain.ScanItem](NewNotAvailableError("homebrew", ""))
+		return result.Err[[]types.ScanItem](NewNotAvailableError("homebrew", ""))
 	}
 
-	items := make([]domain.ScanItem, 0)
+	items := make([]types.ScanItem, 0)
 
 	// Get list of outdated packages
 	outdatedCmd := adapters.ExecWithTimeout(ctx, homebrewCommandTimeout, "brew", "outdated")
 
 	output, err := outdatedCmd.CombinedOutput()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](
+		return result.Err[[]types.ScanItem](
 			fmt.Errorf("failed to check for outdated packages: %w", err),
 		)
 	}
@@ -102,11 +104,11 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 			packageName := fields[0]
 			currentVersion := fields[1]
 
-			items = append(items, domain.ScanItem{
+			items = append(items, types.ScanItem{
 				Path:     "homebrew://" + packageName,
 				Size:     0, // Size unknown without checking
 				Created:  time.Time{},
-				ScanType: domain.ScanTypeHomebrew,
+				ScanType: types.ScanTypeHomebrew,
 			})
 
 			if hbc.verbose {
@@ -123,9 +125,9 @@ func (hbc *HomebrewCleaner) Scan(ctx context.Context) result.Result[[]domain.Sca
 }
 
 // Clean removes old Homebrew packages with proper type safety.
-func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	if !hbc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](NewNotAvailableError("homebrew", ""))
+		return result.Err[types.CleanResult](NewNotAvailableError("homebrew", ""))
 	}
 
 	if hbc.dryRun {
@@ -139,7 +141,7 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 	itemsRemoved, itemsFailed, bytesFreed := hbc.executeCleanup(ctx, commands, cacheDir)
 
 	return result.Ok(conversions.NewCleanResultWithFailures(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		itemsRemoved,
 		itemsFailed,
 		bytesFreed,
@@ -148,13 +150,13 @@ func (hbc *HomebrewCleaner) Clean(ctx context.Context) result.Result[domain.Clea
 }
 
 // handleDryRun returns result for dry-run mode.
-func (hbc *HomebrewCleaner) handleDryRun() result.Result[domain.CleanResult] {
+func (hbc *HomebrewCleaner) handleDryRun() result.Result[types.CleanResult] {
 	fmt.Println("⚠️  Dry-run mode is not yet supported for Homebrew cleanup.")
 	fmt.Println("   Homebrew does not provide a native dry-run feature.")
 	fmt.Println("   To see what would be cleaned, use: brew cleanup -n (manual check)")
 
 	return result.Ok(
-		conversions.NewCleanResult(domain.StrategyDryRunType, 0, 0),
+		conversions.NewCleanResult(enums.StrategyDryRunType, 0, 0),
 	)
 }
 
@@ -171,7 +173,7 @@ func (hbc *HomebrewCleaner) getCacheDir(ctx context.Context) string {
 // buildCleanupCommands returns the list of cleanup commands to run.
 func (hbc *HomebrewCleaner) buildCleanupCommands() []string {
 	commands := []string{"cleanup"}
-	if hbc.unusedOnly == domain.HomebrewModeUnusedOnly {
+	if hbc.unusedOnly == enums.HomebrewModeUnusedOnly {
 		commands = append(commands, "prune")
 	}
 

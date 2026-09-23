@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // Size estimation constants for generation size calculations.
@@ -34,10 +37,10 @@ type (
 
 // NixGeneration represents Nix store generation.
 type NixGeneration struct {
-	ID      NixGenerationID  `json:"id"`
-	Path    string           `json:"path"`
-	Date    time.Time        `json:"date"`
-	Current GenerationStatus `json:"current"`
+	ID      NixGenerationID        `json:"id"`
+	Path    string                 `json:"path"`
+	Date    time.Time              `json:"date"`
+	Current enums.GenerationStatus `json:"current"`
 }
 
 // IsValid validates generation.
@@ -69,7 +72,7 @@ func (g NixGeneration) EstimateSize() int64 {
 	// Older generations tend to be larger, newer ones smaller
 	baseSize := int64(GenerationBaseSizeMB * BytesPerMB)
 	age := time.Since(g.Date)
-	ageFactor := int64(age.Hours() / HoursPerDay / DaysPerMonth)
+	ageFactor := int64(age.Hours() / operations.HoursPerDay / DaysPerMonth)
 
 	return baseSize + (ageFactor * GenerationAgeFactorMB * BytesPerMB)
 }
@@ -113,9 +116,9 @@ func (st ScanType) Values() []ScanType {
 
 // ScanRequest represents scanning command.
 type ScanRequest struct {
-	Type      ScanType `json:"type"`
-	Recursive ScanMode `json:"recursive"`
-	Limit     int      `json:"limit"`
+	Type      ScanType       `json:"type"`
+	Recursive enums.ScanMode `json:"recursive"`
+	Limit     int            `json:"limit"`
 }
 
 // Validate returns errors for invalid scan request.
@@ -141,8 +144,8 @@ type ScanItem struct {
 
 // CleanRequest represents cleaning command.
 type CleanRequest struct {
-	Items    []ScanItem        `json:"items"`
-	Strategy CleanStrategyType `json:"strategy"`
+	Items    []ScanItem              `json:"items"`
+	Strategy enums.CleanStrategyType `json:"strategy"`
 }
 
 // Validate returns errors for invalid clean request.
@@ -198,13 +201,13 @@ func (sr ScanResult) Validate() error {
 
 // SizeEstimate represents an honest size estimate, handling cases where exact size is unknown.
 type SizeEstimate struct {
-	Known  uint64                 `json:"known"`
-	Status SizeEstimateStatusType `json:"status"`
+	Known  uint64                       `json:"known"`
+	Status enums.SizeEstimateStatusType `json:"status"`
 }
 
 // Value returns the known value, or 0 if unknown.
 func (se SizeEstimate) Value() uint64 {
-	if se.Status == SizeEstimateStatusUnknown {
+	if se.Status == enums.SizeEstimateStatusUnknown {
 		return 0
 	}
 
@@ -213,12 +216,12 @@ func (se SizeEstimate) Value() uint64 {
 
 // IsKnown returns true if the size is known.
 func (se SizeEstimate) IsKnown() bool {
-	return se.Status == SizeEstimateStatusKnown
+	return se.Status == enums.SizeEstimateStatusKnown
 }
 
 // String returns a formatted string representation.
 func (se SizeEstimate) String() string {
-	if se.Status == SizeEstimateStatusUnknown {
+	if se.Status == enums.SizeEstimateStatusUnknown {
 		return "Unknown"
 	}
 	// Note: format.Bytes would be used here, but we avoid import cycle
@@ -228,20 +231,20 @@ func (se SizeEstimate) String() string {
 
 // CleanResult represents successful clean outcome.
 type CleanResult struct {
-	SizeEstimate SizeEstimate      `json:"size_estimate"`
-	FreedBytes   uint64            `json:"freed_bytes"` // Deprecated: Use SizeEstimate instead
-	ItemsRemoved uint              `json:"items_removed"`
-	ItemsFailed  uint              `json:"items_failed"`
-	CleanTime    time.Duration     `json:"clean_time"`
-	CleanedAt    time.Time         `json:"cleaned_at"`
-	Strategy     CleanStrategyType `json:"strategy"`
+	SizeEstimate SizeEstimate            `json:"size_estimate"`
+	FreedBytes   uint64                  `json:"freed_bytes"` // Deprecated: Use SizeEstimate instead
+	ItemsRemoved uint                    `json:"items_removed"`
+	ItemsFailed  uint                    `json:"items_failed"`
+	CleanTime    time.Duration           `json:"clean_time"`
+	CleanedAt    time.Time               `json:"cleaned_at"`
+	Strategy     enums.CleanStrategyType `json:"strategy"`
 }
 
 // IsValid checks if clean result is valid.
 func (cr CleanResult) IsValid() bool {
 	// Cannot remove items without size info unless explicitly marked unknown
 	// Note: Some operations legitimately have 0 size (e.g., test cache when path unavailable)
-	if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == SizeEstimateStatusKnown &&
+	if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == enums.SizeEstimateStatusKnown &&
 		cr.CleanTime == 0 {
 		// If CleanTime is 0, this is likely a synthetic result where size might be 0
 		return true
@@ -258,7 +261,7 @@ func (cr CleanResult) IsValid() bool {
 func (cr CleanResult) Validate() error {
 	// Cannot remove items without size info unless explicitly marked unknown
 	// Note: Some operations legitimately have 0 size (e.g., test cache when path unavailable)
-	if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == SizeEstimateStatusKnown &&
+	if cr.ItemsRemoved > 0 && cr.SizeEstimate.Status == enums.SizeEstimateStatusKnown &&
 		cr.SizeEstimate.Known == 0 && cr.CleanTime > 0 {
 		return errors.New("cannot have zero SizeEstimate when ItemsRemoved is > 0 " +
 			"(set Status: Unknown if size cannot be determined)")

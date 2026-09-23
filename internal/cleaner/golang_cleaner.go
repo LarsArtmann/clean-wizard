@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -39,7 +41,7 @@ type GoCleaner struct {
 	caches   GoCacheType
 	scanner  *GoScanner
 	cleaners map[GoCacheType]interface {
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		Clean(ctx context.Context) result.Result[types.CleanResult]
 	}
 }
 
@@ -57,7 +59,7 @@ func NewGoCleaner(verbose, dryRun bool, caches GoCacheType) (*GoCleaner, error) 
 func NewGoCleanerWithSettings(verbose, dryRun bool, caches GoCacheType) *GoCleaner {
 	scanner := NewGoScanner(verbose)
 	cleaners := make(map[GoCacheType]interface {
-		Clean(ctx context.Context) result.Result[domain.CleanResult]
+		Clean(ctx context.Context) result.Result[types.CleanResult]
 	})
 
 	for _, cacheType := range []GoCacheType{GoCacheGOCACHE, GoCacheTestCache, GoCacheModCache, GoCacheBuildCache} {
@@ -79,8 +81,8 @@ func NewGoCleanerWithSettings(verbose, dryRun bool, caches GoCacheType) *GoClean
 }
 
 // Type returns operation type.
-func (gc *GoCleaner) Type() domain.OperationType {
-	return domain.OperationTypeGoPackages
+func (gc *GoCleaner) Type() operations.OperationType {
+	return operations.OperationTypeGoPackages
 }
 
 // Name returns the cleaner name for result tracking.
@@ -96,26 +98,26 @@ func (gc *GoCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // ValidateSettings validates settings.
-func (gc *GoCleaner) ValidateSettings(settings *domain.OperationSettings) error {
-	return settings.ValidateSettings(domain.OperationTypeGoPackages)
+func (gc *GoCleaner) ValidateSettings(settings *operations.OperationSettings) error {
+	return settings.ValidateSettings(operations.OperationTypeGoPackages)
 }
 
 // Scan scans for Go caches.
-func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (gc *GoCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
 	return gc.scanner.Scan(ctx, gc.caches)
 }
 
 // Clean removes Go caches.
 // It checks for other running Go processes first to avoid cache corruption.
-func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (gc *GoCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	if !gc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			NewNotAvailableError("go", ""),
 		)
 	}
 
 	if !gc.dryRun && hasOtherGoProcesses() {
-		return result.Err[domain.CleanResult](ErrGoProcessesRunning)
+		return result.Err[types.CleanResult](ErrGoProcessesRunning)
 	}
 
 	if gc.dryRun {
@@ -143,7 +145,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult
 }
 
 // dryRunClean performs dry-run estimation by scanning actual cache sizes.
-func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.CleanResult] {
+func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[types.CleanResult] {
 	// Scan actual cache directories to get real sizes
 	scanResult := gc.scanner.Scan(ctx, gc.caches)
 
@@ -165,18 +167,18 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[domain.Clean
 	}
 
 	cleanResult := conversions.NewCleanResult(
-		domain.StrategyDryRunType,
+		enums.StrategyDryRunType,
 		itemsRemoved,
 		int64(totalBytes),
 	)
-	cleanResult.SizeEstimate = domain.SizeEstimate{Known: totalBytes} //nolint:exhaustruct
+	cleanResult.SizeEstimate = types.SizeEstimate{Known: totalBytes} //nolint:exhaustruct
 
 	return result.Ok(cleanResult)
 }
 
 // processCacheResult handles cache cleaning result uniformly.
 func (gc *GoCleaner) processCacheResult(
-	r result.Result[domain.CleanResult],
+	r result.Result[types.CleanResult],
 	stats *CleanStats,
 	cacheName string,
 ) {
@@ -194,23 +196,23 @@ func (gc *GoCleaner) processCacheResult(
 func (gc *GoCleaner) buildCleanResult(
 	stats CleanStats,
 	duration time.Duration,
-) result.Result[domain.CleanResult] {
+) result.Result[types.CleanResult] {
 	// Create result with honest size estimate - set Status explicitly to avoid validation errors
-	var status domain.SizeEstimateStatusType
+	var status enums.SizeEstimateStatusType
 	if stats.FreedBytes > 0 {
-		status = domain.SizeEstimateStatusKnown
+		status = enums.SizeEstimateStatusKnown
 	} else {
-		status = domain.SizeEstimateStatusUnknown
+		status = enums.SizeEstimateStatusUnknown
 	}
 
-	sizeEstimate := domain.SizeEstimate{
+	sizeEstimate := types.SizeEstimate{
 		Known:  stats.FreedBytes,
 		Status: status,
 	}
 
 	// Note: conversions.NewCleanResult uses FreedBytes (deprecated), so we update SizeEstimate
 	cleanResult := conversions.NewCleanResult(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		int(stats.Removed),
 		int64(stats.FreedBytes),
 	)

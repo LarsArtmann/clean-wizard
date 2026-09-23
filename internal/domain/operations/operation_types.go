@@ -1,5 +1,7 @@
 package operations
 
+import "github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+
 // OperationSettings provides type-safe configuration for different operation types
 // This eliminates map[string]any violations while maintaining flexibility.
 type OperationSettings struct {
@@ -47,9 +49,9 @@ type OperationSettings struct {
 
 // NixGenerationsSettings provides type-safe settings for Nix generations cleanup.
 type NixGenerationsSettings struct {
-	Generations int              `json:"generations"       yaml:"generations"`
-	Optimize    OptimizationMode `json:"optimize"          yaml:"optimize"`
-	DryRun      ExecutionMode    `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
+	Generations int                    `json:"generations"       yaml:"generations"`
+	Optimize    enums.OptimizationMode `json:"optimize"          yaml:"optimize"`
+	DryRun      enums.ExecutionMode    `json:"dry_run,omitempty" yaml:"dry_run,omitempty"`
 }
 
 // TempFilesSettings provides type-safe settings for temporary files cleanup.
@@ -60,44 +62,44 @@ type TempFilesSettings struct {
 
 // HomebrewSettings provides type-safe settings for Homebrew cleanup.
 type HomebrewSettings struct {
-	UnusedOnly HomebrewMode `json:"unused_only"     yaml:"unused_only"`
-	Prune      string       `json:"prune,omitempty" yaml:"prune,omitempty"`
+	UnusedOnly enums.HomebrewMode `json:"unused_only"     yaml:"unused_only"`
+	Prune      string             `json:"prune,omitempty" yaml:"prune,omitempty"`
 }
 
 // NodePackagesSettings provides type-safe settings for Node.js package manager cleanup.
 type NodePackagesSettings struct {
-	PackageManagers []PackageManagerType `json:"package_managers" yaml:"package_managers"`
+	PackageManagers []enums.PackageManagerType `json:"package_managers" yaml:"package_managers"`
 }
 
 // GoPackagesSettings provides type-safe settings for Go language cleanup.
 type GoPackagesSettings struct {
-	CleanCache      CacheCleanupMode `json:"clean_cache,omitempty"       yaml:"clean_cache,omitempty"`
-	CleanTestCache  CacheCleanupMode `json:"clean_test_cache,omitempty"  yaml:"clean_test_cache,omitempty"`
-	CleanModCache   CacheCleanupMode `json:"clean_mod_cache,omitempty"   yaml:"clean_mod_cache,omitempty"`
-	CleanBuildCache CacheCleanupMode `json:"clean_build_cache,omitempty" yaml:"clean_build_cache,omitempty"`
-	CleanLintCache  CacheCleanupMode `json:"clean_lint_cache,omitempty"  yaml:"clean_lint_cache,omitempty"`
+	CleanCache      enums.CacheCleanupMode `json:"clean_cache,omitempty"       yaml:"clean_cache,omitempty"`
+	CleanTestCache  enums.CacheCleanupMode `json:"clean_test_cache,omitempty"  yaml:"clean_test_cache,omitempty"`
+	CleanModCache   enums.CacheCleanupMode `json:"clean_mod_cache,omitempty"   yaml:"clean_mod_cache,omitempty"`
+	CleanBuildCache enums.CacheCleanupMode `json:"clean_build_cache,omitempty" yaml:"clean_build_cache,omitempty"`
+	CleanLintCache  enums.CacheCleanupMode `json:"clean_lint_cache,omitempty"  yaml:"clean_lint_cache,omitempty"`
 }
 
 // CargoPackagesSettings provides type-safe settings for Cargo package manager cleanup.
 type CargoPackagesSettings struct {
-	Autoclean CacheCleanupMode `json:"autoclean,omitempty" yaml:"autoclean,omitempty"`
+	Autoclean enums.CacheCleanupMode `json:"autoclean,omitempty" yaml:"autoclean,omitempty"`
 }
 
 // BuildCacheSettings provides type-safe settings for build cache cleanup.
 type BuildCacheSettings struct {
-	ToolTypes []BuildToolType `json:"tool_types,omitempty" yaml:"tool_types,omitempty"`
-	OlderThan string          `json:"older_than,omitempty" yaml:"older_than,omitempty"`
+	ToolTypes []enums.BuildToolType `json:"tool_types,omitempty" yaml:"tool_types,omitempty"`
+	OlderThan string                `json:"older_than,omitempty" yaml:"older_than,omitempty"`
 }
 
 // DockerSettings provides type-safe settings for Docker cleanup.
 type DockerSettings struct {
-	PruneMode DockerPruneMode `json:"prune_mode,omitempty" yaml:"prune_mode,omitempty"`
+	PruneMode enums.DockerPruneMode `json:"prune_mode,omitempty" yaml:"prune_mode,omitempty"`
 }
 
 // SystemCacheSettings provides type-safe settings for macOS system cache cleanup.
 type SystemCacheSettings struct {
-	CacheTypes []CacheType `json:"cache_types,omitempty" yaml:"cache_types,omitempty"`
-	OlderThan  string      `json:"older_than,omitempty"  yaml:"older_than,omitempty"`
+	CacheTypes []enums.CacheType `json:"cache_types,omitempty" yaml:"cache_types,omitempty"`
+	OlderThan  string            `json:"older_than,omitempty"  yaml:"older_than,omitempty"`
 }
 
 // SystemTempSettings provides type-safe settings for system temp cleanup.
@@ -108,7 +110,7 @@ type SystemTempSettings struct {
 
 // ProjectsManagementAutomationSettings provides type-safe settings for projects management automation cleanup.
 type ProjectsManagementAutomationSettings struct {
-	ClearCache CacheCleanupMode `json:"clear_cache" yaml:"clear_cache"`
+	ClearCache enums.CacheCleanupMode `json:"clear_cache" yaml:"clear_cache"`
 }
 
 // ProjectExecutablesSettings provides type-safe settings for project executables cleanup.

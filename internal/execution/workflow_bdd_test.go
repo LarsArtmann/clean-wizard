@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -167,14 +168,16 @@ type panickingCleaner struct {
 	name string
 }
 
-func (p *panickingCleaner) Name() string                       { return p.name }
-func (p *panickingCleaner) Type() domain.OperationType         { return domain.OperationTypeCargoPackages }
+func (p *panickingCleaner) Name() string { return p.name }
+func (p *panickingCleaner) Type() operations.OperationType {
+	return operations.OperationTypeCargoPackages
+}
 func (p *panickingCleaner) IsAvailable(_ context.Context) bool { return true }
 
-func (p *panickingCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {
+func (p *panickingCleaner) Clean(_ context.Context) result.Result[types.CleanResult] {
 	panic("cleaner exploded")
 }
 
-func (p *panickingCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
-	return result.Ok([]domain.ScanItem{})
+func (p *panickingCleaner) Scan(_ context.Context) result.Result[[]types.ScanItem] {
+	return result.Ok([]types.ScanItem{})
 }

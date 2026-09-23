@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -87,7 +87,7 @@ func (mc *MetricsCollector) withMetrics(cleanerName string, fn func(m *CleanerMe
 func (mc *MetricsCollector) RecordSuccess(
 	cleanerName string,
 	startTime time.Time,
-	res domain.CleanResult,
+	res types.CleanResult,
 ) {
 	mc.withMetrics(cleanerName, func(m *CleanerMetrics) {
 		duration := time.Since(startTime)
@@ -167,7 +167,7 @@ func NewTrackedCleaner(c Cleaner, collector *MetricsCollector) *TrackedCleaner {
 }
 
 // Clean executes the cleaner and records metrics.
-func (tc *TrackedCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (tc *TrackedCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	start := tc.collector.RecordStart(tc.Name())
 	res := tc.Cleaner.Clean(ctx)
 
@@ -205,9 +205,9 @@ func (r *MetricsEnabledRegistry) GetCollector() *MetricsCollector {
 // CleanAllWithMetrics runs all cleaners with metrics collection.
 func (r *MetricsEnabledRegistry) CleanAllWithMetrics(
 	ctx context.Context,
-) map[string]result.Result[domain.CleanResult] {
+) map[string]result.Result[types.CleanResult] {
 	available := r.Available(ctx)
-	results := make(map[string]result.Result[domain.CleanResult], len(available))
+	results := make(map[string]result.Result[types.CleanResult], len(available))
 
 	for _, c := range available {
 		tracked := NewTrackedCleaner(c, r.collector)

@@ -10,7 +10,7 @@ import (
 
 	"charm.land/huh/v2"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
@@ -208,7 +208,7 @@ func runGitHistoryWizard(
 }
 
 // displaySafetyWarnings shows safety warnings to the user.
-func displaySafetyWarnings(safetyReport *domain.GitHistorySafetyReport) {
+func displaySafetyWarnings(safetyReport *types.GitHistorySafetyReport) {
 	for _, warning := range safetyReport.Warnings {
 		fmt.Printf("   ⚠️  %s\n", warning)
 	}
@@ -217,7 +217,7 @@ func displaySafetyWarnings(safetyReport *domain.GitHistorySafetyReport) {
 // displaySummary shows the cleanup summary.
 func displaySummary(
 	repoPath string,
-	selectedFiles []domain.GitHistoryFile,
+	selectedFiles []types.GitHistoryFile,
 	selectedSize int64,
 	impact *cleaner.ImpactEstimate,
 ) {
@@ -238,7 +238,7 @@ func displaySummary(
 
 // displayCleanupResults shows the final cleanup results.
 func displayCleanupResults(
-	cleanResult domain.CleanResult,
+	cleanResult types.CleanResult,
 	dryRun, hasRemote bool,
 	remoteName, currentBranch string,
 ) {
@@ -357,7 +357,7 @@ func scanAndSelectFiles(
 	ctx context.Context,
 	c *cleaner.GitHistoryCleaner,
 	force bool,
-) ([]domain.GitHistoryFile, int64, error) {
+) ([]types.GitHistoryFile, int64, error) {
 	fmt.Print("🔍 Scanning git history for binary files... ")
 
 	scanResult, err := c.GetScanResult(ctx)
@@ -404,7 +404,7 @@ func confirmAndExecuteCleanup(
 	ctx context.Context,
 	c *cleaner.GitHistoryCleaner,
 	repoPath string,
-	selectedFiles []domain.GitHistoryFile,
+	selectedFiles []types.GitHistoryFile,
 	selectedSize int64,
 	dryRun, force bool,
 ) error {
@@ -459,16 +459,16 @@ func confirmAndExecuteCleanup(
 
 // selectFilesToClean shows an interactive multi-select for files.
 func selectFilesToClean(
-	files []domain.GitHistoryFile,
+	files []types.GitHistoryFile,
 	force bool,
-) ([]domain.GitHistoryFile, error) {
+) ([]types.GitHistoryFile, error) {
 	if force {
 		// In force mode, select all files
 		return files, nil
 	}
 
 	// Sort files by size (already done by scanner, but ensure)
-	domain.SortBySizeDesc(files)
+	types.SortBySizeDesc(files)
 
 	// Build options with size info
 	var selectedIndices []int
@@ -502,7 +502,7 @@ func selectFilesToClean(
 	}
 
 	// Collect selected files
-	selected := make([]domain.GitHistoryFile, len(selectedIndices))
+	selected := make([]types.GitHistoryFile, len(selectedIndices))
 	for i, idx := range selectedIndices {
 		selected[i] = files[idx]
 	}
@@ -515,7 +515,7 @@ func confirmAction(
 	repoPath string,
 	fileCount int,
 	totalSize int64,
-	report *domain.GitHistorySafetyReport,
+	report *types.GitHistorySafetyReport,
 ) bool {
 	// Build warning message
 	var warnMsg strings.Builder
@@ -614,7 +614,7 @@ func ScanRepoForDisplay(ctx context.Context, repoPath string, minSizeMB int) (*S
 // ScanDisplay holds formatted scan results.
 type ScanDisplay struct {
 	RepoPath   string
-	Files      []domain.GitHistoryFile
+	Files      []types.GitHistoryFile
 	TotalBytes int64
 	TotalFiles int
 	RepoSize   int64

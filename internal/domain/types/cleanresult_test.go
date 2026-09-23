@@ -3,6 +3,8 @@ package types
 import (
 	"testing"
 	"time"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )
 
 // makeTestCleanResult creates a CleanResult for testing with common defaults.
@@ -10,10 +12,9 @@ import (
 func makeTestCleanResult(
 	known uint64,
 	itemsRemoved, itemsFailed uint,
-	strategy CleanStrategyType,
-) CleanResult {
+	strategy enums.CleanStrategyType) CleanResult {
 	return CleanResult{
-		SizeEstimate: SizeEstimate{Known: known, Status: SizeEstimateStatusKnown},
+		SizeEstimate: SizeEstimate{Known: known, Status: enums.SizeEstimateStatusKnown},
 		ItemsRemoved: itemsRemoved,
 		ItemsFailed:  itemsFailed,
 		CleanTime:    time.Second,
@@ -35,13 +36,13 @@ func TestCleanResultValidation(t *testing.T) {
 	}{
 		{
 			name:        "Valid CleanResult with aggressive strategy",
-			result:      makeTestCleanResult(1024, 5, 0, StrategyAggressive),
+			result:      makeTestCleanResult(1024, 5, 0, enums.StrategyAggressive),
 			shouldValid: true,
 			shouldError: false,
 		},
 		{
 			name:        "Valid CleanResult with conservative strategy",
-			result:      makeTestCleanResult(512, 2, 1, StrategyConservative),
+			result:      makeTestCleanResult(512, 2, 1, enums.StrategyConservative),
 			shouldValid: true,
 			shouldError: false,
 		},
@@ -53,14 +54,14 @@ func TestCleanResultValidation(t *testing.T) {
 				ItemsFailed:  0,
 				CleanTime:    0,
 				CleanedAt:    time.Now(),
-				Strategy:     StrategyDryRunType,
+				Strategy:     enums.StrategyDryRunType,
 			},
 			shouldValid: true,
 			shouldError: false,
 		},
 		{
 			name:        "Invalid CleanResult - zero freed bytes with items removed",
-			result:      makeTestCleanResult(0, 1, 0, StrategyAggressive),
+			result:      makeTestCleanResult(0, 1, 0, enums.StrategyAggressive),
 			shouldValid: true, // IsValid() returns true (quick check), but Validate() returns error
 			shouldError: true,
 			errorMsg: "cannot have zero SizeEstimate when ItemsRemoved is > 0 " +
@@ -68,7 +69,7 @@ func TestCleanResultValidation(t *testing.T) {
 		},
 		{
 			name:        "Invalid CleanResult - failed items with no freed bytes",
-			result:      makeTestCleanResult(0, 0, 5, StrategyConservative),
+			result:      makeTestCleanResult(0, 0, 5, enums.StrategyConservative),
 			shouldValid: false,
 			shouldError: true,
 			errorMsg:    "cannot have failed items when no items were processed",
@@ -76,12 +77,12 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Invalid CleanResult - zero cleaned at time",
 			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 100, Status: SizeEstimateStatusKnown},
+				SizeEstimate: SizeEstimate{Known: 100, Status: enums.SizeEstimateStatusKnown},
 				ItemsRemoved: 1,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
 				CleanedAt:    time.Time{}, // Zero time
-				Strategy:     StrategyDryRunType,
+				Strategy:     enums.StrategyDryRunType,
 			},
 			shouldValid: false,
 			shouldError: true,
@@ -90,12 +91,12 @@ func TestCleanResultValidation(t *testing.T) {
 		{
 			name: "Invalid CleanResult - invalid strategy",
 			result: CleanResult{
-				SizeEstimate: SizeEstimate{Known: 100, Status: SizeEstimateStatusKnown},
+				SizeEstimate: SizeEstimate{Known: 100, Status: enums.SizeEstimateStatusKnown},
 				ItemsRemoved: 1,
 				ItemsFailed:  0,
 				CleanTime:    time.Second,
 				CleanedAt:    time.Now(),
-				Strategy:     CleanStrategyType(999), // Invalid strategy (out of range)
+				Strategy:     enums.CleanStrategyType(999), // Invalid strategy (out of range)
 			},
 			shouldValid: false,
 			shouldError: true,

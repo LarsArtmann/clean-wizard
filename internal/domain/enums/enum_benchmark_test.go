@@ -6,42 +6,45 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"gopkg.in/yaml.v3"
 )
 
 // benchmarkTestConfig is a shared Config instance used across benchmark tests.
-var benchmarkTestConfig = &Config{
+var benchmarkTestConfig = &types.Config{
 	Version:      "1.0.0",
-	SafeMode:     SafeModeEnabled,
+	SafeMode:     enums.SafeModeEnabled,
 	MaxDiskUsage: 50,
 	Protected:    []string{"/System", "/Library"},
-	Profiles: map[string]*Profile{
+	Profiles: map[string]*types.Profile{
 		"daily": {
 			Name:        "daily",
 			Description: "Daily cleanup",
-			Enabled:     ProfileStatusEnabled,
-			Operations: []CleanupOperation{
+			Enabled:     enums.ProfileStatusEnabled,
+			Operations: []types.CleanupOperation{
 				{
 					Name:        "nix-generations",
 					Description: "Clean Nix generations",
-					RiskLevel:   RiskLevelLowType,
-					Enabled:     ProfileStatusEnabled,
-					Settings: &OperationSettings{
-						NixGenerations: &NixGenerationsSettings{
+					RiskLevel:   enums.RiskLevelLowType,
+					Enabled:     enums.ProfileStatusEnabled,
+					Settings: &operations.OperationSettings{
+						NixGenerations: &operations.NixGenerationsSettings{
 							Generations: 1,
-							Optimize:    OptimizationModeDisabled,
-							DryRun:      ExecutionModeNormal,
+							Optimize:    enums.OptimizationModeDisabled,
+							DryRun:      enums.ExecutionModeNormal,
 						},
 					},
 				},
 				{
 					Name:        "docker",
 					Description: "Clean Docker resources",
-					RiskLevel:   RiskLevelMediumType,
-					Enabled:     ProfileStatusEnabled,
-					Settings: &OperationSettings{
-						Docker: &DockerSettings{
-							PruneMode: DockerPruneAll,
+					RiskLevel:   enums.RiskLevelMediumType,
+					Enabled:     enums.ProfileStatusEnabled,
+					Settings: &operations.OperationSettings{
+						Docker: &operations.DockerSettings{
+							PruneMode: enums.DockerPruneAll,
 						},
 					},
 				},
@@ -52,12 +55,12 @@ var benchmarkTestConfig = &Config{
 
 // BenchmarkMarshalYAML_DockerPruneMode benchmarks marshaling DockerPruneMode enum to YAML.
 func BenchmarkMarshalYAML_DockerPruneMode(b *testing.B) {
-	testCases := []DockerPruneMode{
-		DockerPruneAll,
-		DockerPruneImages,
-		DockerPruneContainers,
-		DockerPruneVolumes,
-		DockerPruneBuilds,
+	testCases := []enums.DockerPruneMode{
+		enums.DockerPruneAll,
+		enums.DockerPruneImages,
+		enums.DockerPruneContainers,
+		enums.DockerPruneVolumes,
+		enums.DockerPruneBuilds,
 	}
 	runMarshalBenchmark(b, testCases)
 }
@@ -66,7 +69,7 @@ func BenchmarkMarshalYAML_DockerPruneMode(b *testing.B) {
 func BenchmarkUnmarshalYAML_DockerPruneMode_String(b *testing.B) {
 	testCases := []string{"ALL", "IMAGES", "CONTAINERS", "VOLUMES", "BUILDS"}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
-		var result DockerPruneMode
+		var result enums.DockerPruneMode
 
 		yamlData := fmt.Sprintf(`"%s"`, tc)
 
@@ -170,7 +173,7 @@ func runMarshalBenchmark[T yamlMarshaler](b *testing.B, testCases []T) {
 func BenchmarkUnmarshalYAML_DockerPruneMode_Int(b *testing.B) {
 	testCases := []int{0, 1, 2, 3, 4}
 	runUnmarshalIntBenchmark(b, testCases, func(tc int) error {
-		var result DockerPruneMode
+		var result enums.DockerPruneMode
 
 		yamlData := strconv.Itoa(tc)
 
@@ -180,13 +183,13 @@ func BenchmarkUnmarshalYAML_DockerPruneMode_Int(b *testing.B) {
 
 // BenchmarkMarshalYAML_BuildToolType benchmarks marshaling BuildToolType enum to YAML.
 func BenchmarkMarshalYAML_BuildToolType(b *testing.B) {
-	testCases := []BuildToolType{
-		BuildToolGo,
-		BuildToolRust,
-		BuildToolNode,
-		BuildToolPython,
-		BuildToolJava,
-		BuildToolScala,
+	testCases := []enums.BuildToolType{
+		enums.BuildToolGo,
+		enums.BuildToolRust,
+		enums.BuildToolNode,
+		enums.BuildToolPython,
+		enums.BuildToolJava,
+		enums.BuildToolScala,
 	}
 	runMarshalBenchmark(b, testCases)
 }
@@ -195,7 +198,7 @@ func BenchmarkMarshalYAML_BuildToolType(b *testing.B) {
 func BenchmarkUnmarshalYAML_BuildToolType_String(b *testing.B) {
 	testCases := []string{"GO", "RUST", "NODE", "PYTHON", "JAVA", "SCALA"}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
-		var result BuildToolType
+		var result enums.BuildToolType
 
 		yamlData := fmt.Sprintf(`"%s"`, tc)
 
@@ -205,15 +208,15 @@ func BenchmarkUnmarshalYAML_BuildToolType_String(b *testing.B) {
 
 // BenchmarkMarshalYAML_CacheType benchmarks marshaling CacheType enum to YAML.
 func BenchmarkMarshalYAML_CacheType(b *testing.B) {
-	testCases := []CacheType{
-		CacheTypeSpotlight,
-		CacheTypeXcode,
-		CacheTypeCocoapods,
-		CacheTypeHomebrew,
-		CacheTypePip,
-		CacheTypeNpm,
-		CacheTypeYarn,
-		CacheTypeCcache,
+	testCases := []enums.CacheType{
+		enums.CacheTypeSpotlight,
+		enums.CacheTypeXcode,
+		enums.CacheTypeCocoapods,
+		enums.CacheTypeHomebrew,
+		enums.CacheTypePip,
+		enums.CacheTypeNpm,
+		enums.CacheTypeYarn,
+		enums.CacheTypeCcache,
 	}
 	runMarshalBenchmark(b, testCases)
 }
@@ -231,7 +234,7 @@ func BenchmarkUnmarshalYAML_CacheType_String(b *testing.B) {
 		"CCACHE",
 	}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
-		var result CacheType
+		var result enums.CacheType
 
 		yamlData := fmt.Sprintf(`"%s"`, tc)
 
@@ -241,11 +244,11 @@ func BenchmarkUnmarshalYAML_CacheType_String(b *testing.B) {
 
 // BenchmarkMarshalYAML_PackageManagerType benchmarks marshaling PackageManagerType enum to YAML.
 func BenchmarkMarshalYAML_PackageManagerType(b *testing.B) {
-	testCases := []PackageManagerType{
-		PackageManagerNpm,
-		PackageManagerPnpm,
-		PackageManagerYarn,
-		PackageManagerBun,
+	testCases := []enums.PackageManagerType{
+		enums.PackageManagerNpm,
+		enums.PackageManagerPnpm,
+		enums.PackageManagerYarn,
+		enums.PackageManagerBun,
 	}
 	runMarshalBenchmark(b, testCases)
 }
@@ -254,7 +257,7 @@ func BenchmarkMarshalYAML_PackageManagerType(b *testing.B) {
 func BenchmarkUnmarshalYAML_PackageManagerType_String(b *testing.B) {
 	testCases := []string{"NPM", "PNPM", "YARN", "BUN"}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
-		var result PackageManagerType
+		var result enums.PackageManagerType
 
 		yamlData := fmt.Sprintf(`"%s"`, tc)
 
@@ -264,7 +267,7 @@ func BenchmarkUnmarshalYAML_PackageManagerType_String(b *testing.B) {
 
 // BenchmarkMarshalYAML_CacheCleanupMode benchmarks marshaling CacheCleanupMode enum to YAML.
 func BenchmarkMarshalYAML_CacheCleanupMode(b *testing.B) {
-	testCases := []CacheCleanupMode{CacheCleanupDisabled, CacheCleanupEnabled}
+	testCases := []enums.CacheCleanupMode{enums.CacheCleanupDisabled, enums.CacheCleanupEnabled}
 	runMarshalBenchmark(b, testCases)
 }
 
@@ -272,7 +275,7 @@ func BenchmarkMarshalYAML_CacheCleanupMode(b *testing.B) {
 func BenchmarkUnmarshalYAML_CacheCleanupMode_String(b *testing.B) {
 	testCases := []string{"DISABLED", "ENABLED"}
 	runUnmarshalStringBenchmark(b, testCases, func(tc string) error {
-		var result CacheCleanupMode
+		var result enums.CacheCleanupMode
 
 		yamlData := fmt.Sprintf(`"%s"`, tc)
 
@@ -284,7 +287,7 @@ func BenchmarkUnmarshalYAML_CacheCleanupMode_String(b *testing.B) {
 func BenchmarkUnmarshalYAML_CacheCleanupMode_Int(b *testing.B) {
 	testCases := []int{0, 1}
 	runUnmarshalIntBenchmark(b, testCases, func(tc int) error {
-		var result CacheCleanupMode
+		var result enums.CacheCleanupMode
 
 		yamlData := strconv.Itoa(tc)
 
@@ -294,19 +297,19 @@ func BenchmarkUnmarshalYAML_CacheCleanupMode_Int(b *testing.B) {
 
 // BenchmarkRoundTrip_DockerPruneMode benchmarks full marshal→unmarshal round-trip for DockerPruneMode.
 func BenchmarkRoundTrip_DockerPruneMode(b *testing.B) {
-	testCases := []DockerPruneMode{
-		DockerPruneAll,
-		DockerPruneImages,
-		DockerPruneContainers,
-		DockerPruneVolumes,
-		DockerPruneBuilds,
+	testCases := []enums.DockerPruneMode{
+		enums.DockerPruneAll,
+		enums.DockerPruneImages,
+		enums.DockerPruneContainers,
+		enums.DockerPruneVolumes,
+		enums.DockerPruneBuilds,
 	}
 	runRoundTripBenchmark(b, testCases)
 }
 
 // BenchmarkRoundTrip_CacheCleanupMode benchmarks full marshal→unmarshal round-trip for CacheCleanupMode.
 func BenchmarkRoundTrip_CacheCleanupMode(b *testing.B) {
-	testCases := []CacheCleanupMode{CacheCleanupDisabled, CacheCleanupEnabled}
+	testCases := []enums.CacheCleanupMode{enums.CacheCleanupDisabled, enums.CacheCleanupEnabled}
 	runRoundTripBenchmark(b, testCases)
 }
 
@@ -352,7 +355,7 @@ profiles:
             prune_mode: 0`
 
 	for b.Loop() {
-		var config Config
+		var config types.Config
 
 		err := yaml.Unmarshal([]byte(yamlConfig), &config) //nolint:musttag
 		if err != nil {
@@ -369,7 +372,7 @@ func BenchmarkFullConfigRoundTrip(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		var result Config
+		var result types.Config
 		if err := yaml.Unmarshal(yamlBytes, &result); err != nil { //nolint:musttag
 			b.Fatal(err)
 		}
@@ -396,12 +399,12 @@ func runStringMethodBenchmark[T stringer](b *testing.B, testCases []T) {
 
 // BenchmarkEnumString benchmarks the String() method for all enums.
 func BenchmarkEnumString_DockerPruneMode(b *testing.B) {
-	testCases := []DockerPruneMode{
-		DockerPruneAll,
-		DockerPruneImages,
-		DockerPruneContainers,
-		DockerPruneVolumes,
-		DockerPruneBuilds,
+	testCases := []enums.DockerPruneMode{
+		enums.DockerPruneAll,
+		enums.DockerPruneImages,
+		enums.DockerPruneContainers,
+		enums.DockerPruneVolumes,
+		enums.DockerPruneBuilds,
 	}
 	runStringMethodBenchmark(b, testCases)
 }
@@ -427,12 +430,12 @@ func runIsValidBenchmark[T validatable](b *testing.B, testCases []T) {
 
 // BenchmarkEnumIsValid benchmarks the IsValid() method for all enums.
 func BenchmarkEnumIsValid_DockerPruneMode(b *testing.B) {
-	testCases := []DockerPruneMode{
-		DockerPruneAll,
-		DockerPruneImages,
-		DockerPruneContainers,
-		DockerPruneVolumes,
-		DockerPruneBuilds,
+	testCases := []enums.DockerPruneMode{
+		enums.DockerPruneAll,
+		enums.DockerPruneImages,
+		enums.DockerPruneContainers,
+		enums.DockerPruneVolumes,
+		enums.DockerPruneBuilds,
 		99, // invalid value
 	}
 	runIsValidBenchmark(b, testCases)

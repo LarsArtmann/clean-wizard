@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/stretchr/testify/require"
 )
@@ -19,7 +19,7 @@ func TestBuildScanResultsRecordsStepErrors(t *testing.T) {
 	notAvailable := cleaner.NewNotAvailableError("cargo", "")
 	workflowResult := &execution.WorkflowResult{
 		Steps: []execution.StepResult{
-			{Name: "go", Clean: domain.CleanResult{ItemsRemoved: 2}, Err: nil, Duration: time.Second},
+			{Name: "go", Clean: types.CleanResult{ItemsRemoved: 2}, Err: nil, Duration: time.Second},
 			{Name: "cargo", Err: notAvailable, Duration: time.Second},
 		},
 	}

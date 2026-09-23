@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
@@ -18,7 +18,7 @@ type GitHistoryTestContext struct {
 	ctx              context.Context
 	repoPath         string
 	cleaner          *cleaner.GitHistoryCleaner
-	safetyReport     *domain.GitHistorySafetyReport
+	safetyReport     *types.GitHistorySafetyReport
 	hasGitFilterRepo bool
 }
 

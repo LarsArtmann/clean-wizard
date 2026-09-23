@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 )
 
 // Test constants for invalid risk levels to improve readability and maintainability.
 const (
-	testInvalidRiskUnknown  = domain.RiskLevelType(99)  // Unknown risk value outside valid range
-	testInvalidRiskNegative = domain.RiskLevelType(-1)  // Negative risk value
-	testInvalidRiskTooHigh  = domain.RiskLevelType(100) // Risk value above maximum
+	testInvalidRiskUnknown  = enums.RiskLevelType(99)  // Unknown risk value outside valid range
+	testInvalidRiskNegative = enums.RiskLevelType(-1)  // Negative risk value
+	testInvalidRiskTooHigh  = enums.RiskLevelType(100) // Risk value above maximum
 )
 
 // contains helper function.
@@ -23,28 +23,28 @@ func contains(s, substr string) bool {
 // riskLevelTestCases provides reusable test cases for RiskLevel method testing.
 var riskLevelTestCases = []struct {
 	name  string
-	level domain.RiskLevelType
+	level enums.RiskLevelType
 }{
-	{"low risk", domain.RiskLevelLowType},
-	{"medium risk", domain.RiskLevelMediumType},
-	{"high risk", domain.RiskLevelHighType},
-	{"critical risk", domain.RiskLevelCriticalType},
+	{"low risk", enums.RiskLevelLowType},
+	{"medium risk", enums.RiskLevelMediumType},
+	{"high risk", enums.RiskLevelHighType},
+	{"critical risk", enums.RiskLevelCriticalType},
 	{"unknown risk", testInvalidRiskUnknown},
 }
 
 // riskLevelValues defines the ordered risk level keys used for test value maps.
-var riskLevelValues = []domain.RiskLevelType{
-	domain.RiskLevelLowType,
-	domain.RiskLevelMediumType,
-	domain.RiskLevelHighType,
-	domain.RiskLevelCriticalType,
+var riskLevelValues = []enums.RiskLevelType{
+	enums.RiskLevelLowType,
+	enums.RiskLevelMediumType,
+	enums.RiskLevelHighType,
+	enums.RiskLevelCriticalType,
 	testInvalidRiskUnknown,
 }
 
 // newRiskLevelValueMap creates a map of risk levels to values using the provided value function.
 // The value function receives the index (0-4) and should return the corresponding string value.
-func newRiskLevelValueMap(values ...string) map[domain.RiskLevelType]string {
-	m := make(map[domain.RiskLevelType]string, len(riskLevelValues))
+func newRiskLevelValueMap(values ...string) map[enums.RiskLevelType]string {
+	m := make(map[enums.RiskLevelType]string, len(riskLevelValues))
 	for i, level := range riskLevelValues {
 		if i < len(values) {
 			m[level] = values[i]
@@ -63,7 +63,7 @@ var riskLevelEmojiValues = newRiskLevelValueMap("🟢", "🟡", "🟠", "🔴", 
 // testRiskLevelMethod is a helper function that tests RiskLevel methods with a value map.
 func testRiskLevelMethod(
 	t *testing.T, methodName string,
-	method func(domain.RiskLevelType) string, expected map[domain.RiskLevelType]string,
+	method func(enums.RiskLevelType) string, expected map[enums.RiskLevelType]string,
 ) {
 	t.Helper()
 
@@ -112,7 +112,7 @@ func TestRiskLevel_String(t *testing.T) {
 	testRiskLevelMethod(
 		t,
 		"String",
-		func(level domain.RiskLevelType) string { return level.String() },
+		func(level enums.RiskLevelType) string { return level.String() },
 		riskLevelTextValues,
 	)
 }
@@ -120,7 +120,7 @@ func TestRiskLevel_String(t *testing.T) {
 func TestRiskLevel_Icon(t *testing.T) {
 	t.Parallel()
 	testRiskLevelMethod(
-		t, "Icon", func(level domain.RiskLevelType) string { return level.Icon() },
+		t, "Icon", func(level enums.RiskLevelType) string { return level.Icon() },
 		riskLevelEmojiValues,
 	)
 }
@@ -130,13 +130,13 @@ func TestRiskLevel_IsValid(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		value    domain.RiskLevelType
+		value    enums.RiskLevelType
 		expected bool
 	}{
-		{"low risk", domain.RiskLevelLowType, true},
-		{"medium risk", domain.RiskLevelMediumType, true},
-		{"high risk", domain.RiskLevelHighType, true},
-		{"critical risk", domain.RiskLevelCriticalType, true},
+		{"low risk", enums.RiskLevelLowType, true},
+		{"medium risk", enums.RiskLevelMediumType, true},
+		{"high risk", enums.RiskLevelHighType, true},
+		{"critical risk", enums.RiskLevelCriticalType, true},
 		{"unknown risk", testInvalidRiskUnknown, false},
 		{"negative risk", testInvalidRiskNegative, false},
 		{"too high risk", testInvalidRiskTooHigh, false},
@@ -170,7 +170,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 	validBuilderFunc := func() *SafeConfigBuilder {
 		return NewSafeConfigBuilder().
 			AddProfile("test", "test profile").
-			AddOperation(CleanTypeNixStore, domain.RiskLevelLowType).
+			AddOperation(CleanTypeNixStore, enums.RiskLevelLowType).
 			Done()
 	}
 
@@ -201,7 +201,7 @@ func TestSafeConfigBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeConfigBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelCriticalType).
+					AddOperation(CleanTypeNixStore, enums.RiskLevelCriticalType).
 					Done()
 			},
 			expectError: true,
@@ -256,7 +256,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelLowType)
+					AddOperation(CleanTypeNixStore, enums.RiskLevelLowType)
 			},
 			expectError: false,
 		},
@@ -274,7 +274,7 @@ func TestSafeProfileBuilder_Build(t *testing.T) {
 			builderFunc: func() *SafeProfileBuilder {
 				return NewSafeConfigBuilder().
 					AddProfile("test", "test profile").
-					AddOperation(CleanTypeNixStore, domain.RiskLevelHighType)
+					AddOperation(CleanTypeNixStore, enums.RiskLevelHighType)
 			},
 			expectError: false,
 		},

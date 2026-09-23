@@ -1,8 +1,6 @@
 package cleaner
 
-import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
-)
+import "github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 
 // ToSimpleCleanerConstructor converts a constructor with additional methods to one that
 // only exposes Clean and IsAvailable.
@@ -56,7 +54,7 @@ func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 	settingsFieldName string,
 	expectedItems uint,
 	newCleanerFunc CleanerConstructor[T],
-	createSettings func(bool) *domain.OperationSettings,
+	createSettings func(bool) *operations.OperationSettings,
 ) BooleanSettingsCleanerTestConfig {
 	return BooleanSettingsCleanerTestConfig{
 		TestName:          testName,
@@ -74,7 +72,7 @@ func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](
 	testName, toolName, settingsFieldName string,
 	expectedItems uint,
 	constructor CleanerConstructor[T],
-	createSettings func(bool) *domain.OperationSettings,
+	createSettings func(bool) *operations.OperationSettings,
 ) BooleanSettingsCleanerTestConfig {
 	return BooleanSettingsCleanerTestConfig{
 		TestName:          testName,

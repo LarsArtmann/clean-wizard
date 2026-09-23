@@ -10,7 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	fileutil "github.com/LarsArtmann/clean-wizard/internal/shared/utils/fileutil"
 )
@@ -195,8 +196,8 @@ func NewCompiledBinariesCleaner(
 }
 
 // Type returns operation type for Compiled Binaries cleaner.
-func (c *CompiledBinariesCleaner) Type() domain.OperationType {
-	return domain.OperationTypeCompiledBinaries
+func (c *CompiledBinariesCleaner) Type() operations.OperationType {
+	return operations.OperationTypeCompiledBinaries
 }
 
 // Name returns the cleaner name for result tracking.
@@ -212,16 +213,16 @@ func (c *CompiledBinariesCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // ValidateSettings validates Compiled Binaries cleaner settings.
-func (c *CompiledBinariesCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (c *CompiledBinariesCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.CompiledBinariesSettings { return s.CompiledBinaries },
+		func(s *operations.OperationSettings) *operations.CompiledBinariesSettings { return s.CompiledBinaries },
 		validateCompiledBinariesSettings,
 	)
 }
 
 // validateCompiledBinariesSettings validates a non-nil CompiledBinariesSettings struct.
-func validateCompiledBinariesSettings(s *domain.CompiledBinariesSettings) error {
+func validateCompiledBinariesSettings(s *operations.CompiledBinariesSettings) error {
 	// Validate MinSizeMB
 	if s.MinSizeMB < 0 {
 		return fmt.Errorf("min_size_mb must be >= 0, got %d", s.MinSizeMB)
@@ -262,7 +263,7 @@ func validateCompiledBinariesSettings(s *domain.CompiledBinariesSettings) error 
 }
 
 // Scan scans for compiled binary files in configured directories.
-func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
 	minSizeBytes := int64(c.minSizeMB) * bytesPerMB
 
 	var allBinaries []BinaryInfo
@@ -307,13 +308,13 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]doma
 	}
 
 	// Convert to ScanItems
-	items := make([]domain.ScanItem, 0, len(allBinaries))
+	items := make([]types.ScanItem, 0, len(allBinaries))
 	for _, b := range allBinaries {
-		items = append(items, domain.ScanItem{
+		items = append(items, types.ScanItem{
 			Path:     b.Path,
 			Size:     b.Size,
 			Created:  b.ModTime,
-			ScanType: domain.ScanTypeSystem,
+			ScanType: types.ScanTypeSystem,
 		})
 	}
 
@@ -321,17 +322,17 @@ func (c *CompiledBinariesCleaner) Scan(ctx context.Context) result.Result[[]doma
 }
 
 // Clean removes compiled binary files using trash.
-func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (c *CompiledBinariesCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	return ExecuteTrashPipeline(
 		ctx,
 		c.Scan(ctx),
 		c.dryRun,
 		c.verbose,
 		"compiled binary file(s)",
-		func(cleanCtx context.Context, item domain.ScanItem) error {
+		func(cleanCtx context.Context, item types.ScanItem) error {
 			return c.trashOperator.TrashBinary(cleanCtx, item.Path)
 		},
-		func(item domain.ScanItem) {
+		func(item types.ScanItem) {
 			fmt.Printf("  ✓ Trashed: %s (%.2f MB)\n", item.Path, float64(item.Size)/bytesPerMB)
 		},
 	)

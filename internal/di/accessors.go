@@ -1,15 +1,16 @@
 package di
 
 import (
+	"go/types"
+
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/samber/do/v2"
 )
 
 // Config resolves the application configuration from the DI container.
-func Config(i do.Injector) (*domain.Config, error) {
-	cfg, err := do.Invoke[*domain.Config](i)
+func Config(i do.Injector) (*types.Config, error) {
+	cfg, err := do.Invoke[*types.Config](i)
 	if err != nil {
 		return nil, errorfamily.WrapRejection(err, "di.resolve_config", "failed to resolve config service")
 	}

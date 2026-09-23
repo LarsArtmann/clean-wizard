@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 func TestNewDockerCleaner(t *testing.T) {
@@ -14,37 +15,37 @@ func TestNewDockerCleaner(t *testing.T) {
 		name      string
 		verbose   bool
 		dryRun    bool
-		pruneMode domain.DockerPruneMode
+		pruneMode enums.DockerPruneMode
 	}{
 		{
 			name:      "ALL mode",
 			verbose:   false,
 			dryRun:    false,
-			pruneMode: domain.DockerPruneAll,
+			pruneMode: enums.DockerPruneAll,
 		},
 		{
 			name:      "IMAGES mode",
 			verbose:   true,
 			dryRun:    false,
-			pruneMode: domain.DockerPruneImages,
+			pruneMode: enums.DockerPruneImages,
 		},
 		{
 			name:      "CONTAINERS mode",
 			verbose:   false,
 			dryRun:    true,
-			pruneMode: domain.DockerPruneContainers,
+			pruneMode: enums.DockerPruneContainers,
 		},
 		{
 			name:      "VOLUMES mode",
 			verbose:   true,
 			dryRun:    true,
-			pruneMode: domain.DockerPruneVolumes,
+			pruneMode: enums.DockerPruneVolumes,
 		},
 		{
 			name:      "BUILDS mode",
 			verbose:   false,
 			dryRun:    false,
-			pruneMode: domain.DockerPruneBuilds,
+			pruneMode: enums.DockerPruneBuilds,
 		},
 	}
 
@@ -68,17 +69,17 @@ func TestNewDockerCleaner(t *testing.T) {
 func TestDockerCleaner_Type(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
+	cleaner := NewDockerCleaner(false, false, enums.DockerPruneAll)
 
-	if cleaner.Type() != domain.OperationTypeDocker {
-		t.Errorf("Type() = %v, want %v", cleaner.Type(), domain.OperationTypeDocker)
+	if cleaner.Type() != operations.OperationTypeDocker {
+		t.Errorf("Type() = %v, want %v", cleaner.Type(), operations.OperationTypeDocker)
 	}
 }
 
 func TestDockerCleaner_IsAvailable(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
+	cleaner := NewDockerCleaner(false, false, enums.DockerPruneAll)
 	available := cleaner.IsAvailable(context.Background())
 
 	// Result depends on Docker installation
@@ -92,7 +93,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.OperationSettings
+		settings *operations.OperationSettings
 		wantErr  bool
 	}{
 		{
@@ -102,41 +103,41 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 		},
 		{
 			name:     "nil docker settings",
-			settings: &domain.OperationSettings{},
+			settings: &operations.OperationSettings{},
 			wantErr:  false,
 		},
 		{
 			name: "valid light mode",
-			settings: &domain.OperationSettings{
-				Docker: &domain.DockerSettings{
-					PruneMode: domain.DockerPruneAll,
+			settings: &operations.OperationSettings{
+				Docker: &operations.DockerSettings{
+					PruneMode: enums.DockerPruneAll,
 				},
 			},
 			wantErr: false,
 		},
 		{
 			name: "valid standard mode",
-			settings: &domain.OperationSettings{
-				Docker: &domain.DockerSettings{
-					PruneMode: domain.DockerPruneImages,
+			settings: &operations.OperationSettings{
+				Docker: &operations.DockerSettings{
+					PruneMode: enums.DockerPruneImages,
 				},
 			},
 			wantErr: false,
 		},
 		{
 			name: "valid aggressive mode",
-			settings: &domain.OperationSettings{
-				Docker: &domain.DockerSettings{
-					PruneMode: domain.DockerPruneContainers,
+			settings: &operations.OperationSettings{
+				Docker: &operations.DockerSettings{
+					PruneMode: enums.DockerPruneContainers,
 				},
 			},
 			wantErr: false,
 		},
 		{
 			name: "invalid prune mode",
-			settings: &domain.OperationSettings{
-				Docker: &domain.DockerSettings{
-					PruneMode: domain.DockerPruneMode(999),
+			settings: &operations.OperationSettings{
+				Docker: &operations.DockerSettings{
+					PruneMode: enums.DockerPruneMode(999),
 				},
 			},
 			wantErr: true,
@@ -147,7 +148,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
+			cleaner := NewDockerCleaner(false, false, enums.DockerPruneAll)
 
 			err := cleaner.ValidateSettings(tt.settings)
 			if (err != nil) != tt.wantErr {
@@ -160,7 +161,7 @@ func TestDockerCleaner_ValidateSettings(t *testing.T) {
 func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
+	cleaner := NewDockerCleaner(false, true, enums.DockerPruneAll)
 
 	// Skip test if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {
@@ -181,11 +182,11 @@ func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 		t.Errorf("Clean() removed %d items, want > 0", cleanResult.ItemsRemoved)
 	}
 
-	if cleanResult.Strategy != domain.StrategyDryRunType {
+	if cleanResult.Strategy != enums.StrategyDryRunType {
 		t.Errorf(
 			"Clean() strategy = %v, want %v",
 			cleanResult.Strategy,
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 		)
 	}
 
@@ -199,7 +200,7 @@ func TestDockerCleaner_Clean_DryRun(t *testing.T) {
 func TestDockerCleaner_Clean_NoAvailable(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
+	cleaner := NewDockerCleaner(false, false, enums.DockerPruneAll)
 
 	// Can't easily test "Docker not available" case without mocking
 	// So we just verify IsAvailable is called
@@ -209,7 +210,7 @@ func TestDockerCleaner_Clean_NoAvailable(t *testing.T) {
 func TestDockerCleaner_Scan(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewDockerCleaner(false, false, domain.DockerPruneAll)
+	cleaner := NewDockerCleaner(false, false, enums.DockerPruneAll)
 
 	result := cleaner.Scan(context.Background())
 
@@ -229,7 +230,7 @@ func TestDockerCleaner_Scan(t *testing.T) {
 func TestDockerCleaner_DryRunStrategy(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
+	cleaner := NewDockerCleaner(false, true, enums.DockerPruneAll)
 
 	TestDryRun(t, SimpleCleanerConstructorFromInstance(cleaner), "docker", -1)
 }
@@ -239,13 +240,13 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		pruneMode domain.DockerPruneMode
+		pruneMode enums.DockerPruneMode
 	}{
-		{"ALL mode", domain.DockerPruneAll},
-		{"IMAGES mode", domain.DockerPruneImages},
-		{"CONTAINERS mode", domain.DockerPruneContainers},
-		{"VOLUMES mode", domain.DockerPruneVolumes},
-		{"BUILDS mode", domain.DockerPruneBuilds},
+		{"ALL mode", enums.DockerPruneAll},
+		{"IMAGES mode", enums.DockerPruneImages},
+		{"CONTAINERS mode", enums.DockerPruneContainers},
+		{"VOLUMES mode", enums.DockerPruneVolumes},
+		{"BUILDS mode", enums.DockerPruneBuilds},
 	}
 
 	for _, tt := range tests {
@@ -264,7 +265,7 @@ func TestDockerCleaner_PruneModes(t *testing.T) {
 func TestDockerCleaner_Clean_Verbose(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewDockerCleaner(true, false, domain.DockerPruneAll)
+	cleaner := NewDockerCleaner(true, false, enums.DockerPruneAll)
 
 	// Skip if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {
@@ -282,7 +283,7 @@ func TestDockerCleaner_Clean_Verbose(t *testing.T) {
 func TestDockerCleaner_Clean_Aggressive(t *testing.T) {
 	t.Parallel()
 
-	cleaner := NewDockerCleaner(false, true, domain.DockerPruneAll)
+	cleaner := NewDockerCleaner(false, true, enums.DockerPruneAll)
 
 	// Skip if Docker is not available
 	if !cleaner.IsAvailable(context.Background()) {

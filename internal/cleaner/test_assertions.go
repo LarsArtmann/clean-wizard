@@ -5,7 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // TestIsAvailableGeneric runs a standard IsAvailable test suite for cleaners that should
@@ -95,11 +97,11 @@ func TestDryRun(
 
 	cleanResult := result.Value()
 
-	if cleanResult.Strategy != domain.StrategyDryRunType {
+	if cleanResult.Strategy != enums.StrategyDryRunType {
 		t.Errorf(
 			"Clean() strategy = %v, want %v",
 			cleanResult.Strategy,
-			domain.StrategyDryRunType,
+			enums.StrategyDryRunType,
 		)
 	}
 
@@ -137,7 +139,7 @@ func TestDryRun(
 //   - settings with field enabled (valid)
 //   - settings with field disabled (valid)
 func CreateBooleanSettingsTestCases(
-	nilName string, settingsFunc func(bool) *domain.OperationSettings,
+	nilName string, settingsFunc func(bool) *operations.OperationSettings,
 ) []ValidateSettingsTestCase {
 	return []ValidateSettingsTestCase{
 		{
@@ -147,7 +149,7 @@ func CreateBooleanSettingsTestCases(
 		},
 		{
 			Name:     "nil " + nilName + " settings",
-			Settings: &domain.OperationSettings{},
+			Settings: &operations.OperationSettings{},
 			WantErr:  false,
 		},
 		{
@@ -166,14 +168,14 @@ func CreateBooleanSettingsTestCases(
 // CleanResultAnalyzer provides methods for analyzing CleanResult in tests.
 type CleanResultAnalyzer struct {
 	t           *testing.T
-	cleanResult domain.CleanResult
+	cleanResult types.CleanResult
 	elapsed     time.Duration
 }
 
 // NewCleanResultAnalyzer creates a new analyzer for the given CleanResult.
 func NewCleanResultAnalyzer(
 	t *testing.T,
-	cleanResult domain.CleanResult,
+	cleanResult types.CleanResult,
 	elapsed time.Duration,
 ) *CleanResultAnalyzer {
 	t.Helper()

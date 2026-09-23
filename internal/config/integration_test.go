@@ -1,9 +1,8 @@
 package config
 
 import (
+	"go/types"
 	"testing"
-
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
 )
 
 // TestIntegration_ValidationSanitizationPipeline tests complete validation and sanitization workflow.
@@ -24,7 +23,7 @@ func TestIntegration_ValidationSanitizationPipeline(t *testing.T) {
 
 func runValidationPipeline(
 	t *testing.T,
-	cfg *domain.Config,
+	cfg *types.Config,
 ) (*ValidationResult, *ConfigSanitizer, *ValidationResult) {
 	t.Helper()
 
@@ -47,7 +46,7 @@ func verifyValidationPassed(t *testing.T, result *ValidationResult) {
 	}
 }
 
-func verifySanitizationEffects(t *testing.T, cfg *domain.Config, result *ValidationResult) {
+func verifySanitizationEffects(t *testing.T, cfg *types.Config, result *ValidationResult) {
 	t.Helper()
 
 	if result.Duration <= 0 {
@@ -80,7 +79,7 @@ func verifySanitizationEffects(t *testing.T, cfg *domain.Config, result *Validat
 
 func verifyPostValidation(
 	t *testing.T,
-	cfg *domain.Config,
+	cfg *types.Config,
 	validationResult *ValidationResult,
 	sanitizationResult *ValidationResult,
 ) {

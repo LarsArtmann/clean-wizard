@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/stretchr/testify/assert"
@@ -53,7 +55,7 @@ func TestRunCleaners_PanicRecovery(t *testing.T) {
 	registry.Register("panic-cleaner", &mockCleaner{
 		name:     "panic-cleaner",
 		avail:    true,
-		cleanRes: result.Result[domain.CleanResult]{},
+		cleanRes: result.Result[types.CleanResult]{},
 	})
 
 	// Override the clean function to panic
@@ -79,13 +81,13 @@ func TestRunCleaners_DeterministicOrdering(t *testing.T) {
 	registry.Register("slow", &delayedMockCleaner{
 		name:     "slow",
 		avail:    true,
-		cleanRes: result.Ok(domain.CleanResult{FreedBytes: 100}),
+		cleanRes: result.Ok(types.CleanResult{FreedBytes: 100}),
 		delay:    50 * time.Millisecond,
 	})
 	registry.Register("fast", &delayedMockCleaner{
 		name:     "fast",
 		avail:    true,
-		cleanRes: result.Ok(domain.CleanResult{FreedBytes: 200}),
+		cleanRes: result.Ok(types.CleanResult{FreedBytes: 200}),
 		delay:    1 * time.Millisecond,
 	})
 
@@ -241,31 +243,33 @@ type panicCleaner struct {
 
 func (p *panicCleaner) Name() string { return p.name }
 
-func (p *panicCleaner) Type() domain.OperationType                                { return domain.OperationTypeCargoPackages }
-func (p *panicCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] { panic("boom") }
-func (p *panicCleaner) IsAvailable(_ context.Context) bool                        { return true }
-func (p *panicCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
-	return result.Ok([]domain.ScanItem{})
+func (p *panicCleaner) Type() operations.OperationType                           { return operations.OperationTypeCargoPackages }
+func (p *panicCleaner) Clean(_ context.Context) result.Result[types.CleanResult] { panic("boom") }
+func (p *panicCleaner) IsAvailable(_ context.Context) bool                       { return true }
+func (p *panicCleaner) Scan(_ context.Context) result.Result[[]types.ScanItem] {
+	return result.Ok([]types.ScanItem{})
 }
 
 type delayedMockCleaner struct {
 	name     string
 	avail    bool
-	cleanRes result.Result[domain.CleanResult]
+	cleanRes result.Result[types.CleanResult]
 	delay    time.Duration
 }
 
-func (d *delayedMockCleaner) Name() string               { return d.name }
-func (d *delayedMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+func (d *delayedMockCleaner) Name() string { return d.name }
+func (d *delayedMockCleaner) Type() operations.OperationType {
+	return operations.OperationTypeCargoPackages
+}
 
-func (d *delayedMockCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (d *delayedMockCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	time.Sleep(d.delay)
 
 	return d.cleanRes
 }
 func (d *delayedMockCleaner) IsAvailable(_ context.Context) bool { return d.avail }
-func (d *delayedMockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
-	return result.Ok([]domain.ScanItem{})
+func (d *delayedMockCleaner) Scan(_ context.Context) result.Result[[]types.ScanItem] {
+	return result.Ok([]types.ScanItem{})
 }
 
 type retryableMockCleaner struct {
@@ -275,23 +279,25 @@ type retryableMockCleaner struct {
 	attempts  atomic.Int32
 }
 
-func (r *retryableMockCleaner) Name() string               { return r.name }
-func (r *retryableMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+func (r *retryableMockCleaner) Name() string { return r.name }
+func (r *retryableMockCleaner) Type() operations.OperationType {
+	return operations.OperationTypeCargoPackages
+}
 
-func (r *retryableMockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {
+func (r *retryableMockCleaner) Clean(_ context.Context) result.Result[types.CleanResult] {
 	attempt := r.attempts.Add(1)
 	if attempt <= r.failCount {
-		return result.Err[domain.CleanResult](fmt.Errorf("transient failure attempt %d", attempt))
+		return result.Err[types.CleanResult](fmt.Errorf("transient failure attempt %d", attempt))
 	}
 
-	return result.Ok(domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{Known: 42, Status: domain.SizeEstimateStatusKnown},
+	return result.Ok(types.CleanResult{
+		SizeEstimate: types.SizeEstimate{Known: 42, Status: enums.SizeEstimateStatusKnown},
 		ItemsRemoved: 1,
 	})
 }
 func (r *retryableMockCleaner) IsAvailable(_ context.Context) bool { return r.avail }
-func (r *retryableMockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
-	return result.Ok([]domain.ScanItem{})
+func (r *retryableMockCleaner) Scan(_ context.Context) result.Result[[]types.ScanItem] {
+	return result.Ok([]types.ScanItem{})
 }
 
 // countingMockCleaner returns a fixed error until failCount is reached,
@@ -304,23 +310,25 @@ type countingMockCleaner struct {
 	attempts  atomic.Int32
 }
 
-func (c *countingMockCleaner) Name() string               { return c.name }
-func (c *countingMockCleaner) Type() domain.OperationType { return domain.OperationTypeCargoPackages }
+func (c *countingMockCleaner) Name() string { return c.name }
+func (c *countingMockCleaner) Type() operations.OperationType {
+	return operations.OperationTypeCargoPackages
+}
 
-func (c *countingMockCleaner) Clean(_ context.Context) result.Result[domain.CleanResult] {
+func (c *countingMockCleaner) Clean(_ context.Context) result.Result[types.CleanResult] {
 	attempt := c.attempts.Add(1)
 	if c.err != nil {
 		// Always return the same error (for NotAvailable / Transient tests)
-		return result.Err[domain.CleanResult](c.err)
+		return result.Err[types.CleanResult](c.err)
 	}
 
 	if attempt <= c.failCount {
-		return result.Err[domain.CleanResult](fmt.Errorf("failure attempt %d", attempt))
+		return result.Err[types.CleanResult](fmt.Errorf("failure attempt %d", attempt))
 	}
 
-	return result.Ok(domain.CleanResult{FreedBytes: 42})
+	return result.Ok(types.CleanResult{FreedBytes: 42})
 }
 func (c *countingMockCleaner) IsAvailable(_ context.Context) bool { return c.avail }
-func (c *countingMockCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
-	return result.Ok([]domain.ScanItem{})
+func (c *countingMockCleaner) Scan(_ context.Context) result.Result[[]types.ScanItem] {
+	return result.Ok([]types.ScanItem{})
 }

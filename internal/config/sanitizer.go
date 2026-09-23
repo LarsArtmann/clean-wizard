@@ -6,7 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // ConfigSanitizer provides configuration sanitization and normalization.
@@ -35,10 +37,10 @@ type SanitizationRules struct {
 	AddDefaults      bool `json:"add_defaults"`
 
 	// Safety defaults
-	DefaultSafeMode       domain.SafeMode `json:"default_safe_mode"`
-	DefaultMaxDiskUsage   int             `json:"default_max_disk_usage"`
-	DefaultBackup         time.Duration   `json:"default_backup"`
-	DefaultProtectedPaths []string        `json:"default_protected_paths"`
+	DefaultSafeMode       enums.SafeMode `json:"default_safe_mode"`
+	DefaultMaxDiskUsage   int            `json:"default_max_disk_usage"`
+	DefaultBackup         time.Duration  `json:"default_backup"`
+	DefaultProtectedPaths []string       `json:"default_protected_paths"`
 }
 
 // SanitizationChange represents a specific field change with context.
@@ -59,8 +61,8 @@ type SanitizationResult struct {
 
 // SanitizationWarning represents a sanitization warning.
 //
-// Deprecated: Use domain.SanitizationWarning instead. This alias exists for backward compatibility.
-type SanitizationWarning = domain.SanitizationWarning
+// Deprecated: Use types.SanitizationWarning instead. This alias exists for backward compatibility.
+type SanitizationWarning = types.SanitizationWarning
 
 // NewConfigSanitizer creates a configuration sanitizer with default rules.
 func NewConfigSanitizer() *ConfigSanitizer {
@@ -77,7 +79,7 @@ func NewConfigSanitizerWithRules(rules *SanitizationRules) *ConfigSanitizer {
 }
 
 // SanitizeConfig performs comprehensive configuration sanitization.
-func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *ValidationResult) {
+func (cs *ConfigSanitizer) SanitizeConfig(cfg *types.Config, validationResult *ValidationResult) {
 	start := time.Now()
 
 	defer func() {
@@ -142,7 +144,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *domain.Config, validationResult *
 }
 
 // sanitizeBasicFields sanitizes basic configuration fields.
-func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *SanitizationResult) {
+func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *types.Config, result *SanitizationResult) {
 	// Sanitize version
 	if cs.rules.TrimWhitespace {
 		original := cfg.Version
@@ -198,7 +200,7 @@ func (cs *ConfigSanitizer) sanitizeBasicFields(cfg *domain.Config, result *Sanit
 	// Ensure safe mode defaults
 	if cs.rules.DefaultSafeMode.IsEnabled() && !cfg.SafeMode.IsEnabled() {
 		original := cfg.SafeMode
-		cfg.SafeMode = domain.SafeModeEnabled
+		cfg.SafeMode = enums.SafeModeEnabled
 		result.addChange("safe_mode", original, cfg.SafeMode, "enabled safe mode for security")
 	}
 }
@@ -237,10 +239,10 @@ func getDefaultSanitizationRules() *SanitizationRules {
 		SortArrays:            true,
 		RemoveDuplicates:      true,
 		AddDefaults:           true,
-		DefaultSafeMode:       domain.SafeModeEnabled,
+		DefaultSafeMode:       enums.SafeModeEnabled,
 		DefaultMaxDiskUsage:   DefaultMaxDiskUsage,
 		DefaultBackup:         24 * time.Hour,
-		DefaultProtectedPaths: domain.DefaultProtectedPaths(),
+		DefaultProtectedPaths: types.DefaultProtectedPaths(),
 	}
 }
 
@@ -262,7 +264,7 @@ func (cs *ConfigSanitizer) sanitizeOlderThan(
 	}
 
 	// Validate duration format using custom parser
-	if _, err := domain.ParseCustomDuration(*olderThan); err != nil {
+	if _, err := operations.ParseCustomDuration(*olderThan); err != nil {
 		result.addWarning(
 			fieldPrefix+".older_than",
 			*olderThan,

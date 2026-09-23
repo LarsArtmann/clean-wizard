@@ -5,7 +5,8 @@ import (
 	"os/exec"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -26,16 +27,16 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 
 	ginkgo.Describe("identity", func() {
 		ginkgo.It("exposes the homebrew cleaner name and operation type", func() {
-			hbc := cleaner.NewHomebrewCleaner(true, true, domain.HomebrewModeAll)
+			hbc := cleaner.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
 
 			gomega.Expect(hbc.Name()).To(gomega.Equal("homebrew"))
-			gomega.Expect(hbc.Type()).To(gomega.Equal(domain.OperationTypeHomebrew))
+			gomega.Expect(hbc.Type()).To(gomega.Equal(operations.OperationTypeHomebrew))
 		})
 	})
 
 	ginkgo.Describe("availability", func() {
 		ginkgo.It("reports availability that matches the brew binary", func() {
-			hbc := cleaner.NewHomebrewCleaner(true, true, domain.HomebrewModeAll)
+			hbc := cleaner.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
 
 			gomega.Expect(hbc.IsAvailable(ctx)).To(gomega.Equal(brewInstalled()))
 		})
@@ -50,7 +51,7 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 			})
 
 			ginkgo.It("refuses to clean with an infrastructure error", func() {
-				hbc := cleaner.NewHomebrewCleaner(true, true, domain.HomebrewModeAll)
+				hbc := cleaner.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
 
 				cleanRes := hbc.Clean(ctx)
 				gomega.Expect(cleanRes.IsErr()).To(gomega.BeTrue())
@@ -66,7 +67,7 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 			})
 
 			ginkgo.It("completes a dry run without reporting missing tooling", func() {
-				hbc := cleaner.NewHomebrewCleaner(true, true, domain.HomebrewModeAll)
+				hbc := cleaner.NewHomebrewCleaner(true, true, enums.HomebrewModeAll)
 
 				cleanRes := hbc.Clean(ctx)
 				if cleanRes.IsErr() {
@@ -79,11 +80,11 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 
 	ginkgo.Describe("settings validation", func() {
 		ginkgo.DescribeTable("accepts or rejects homebrew modes",
-			func(unusedOnly domain.HomebrewMode, valid bool) {
+			func(unusedOnly enums.HomebrewMode, valid bool) {
 				hbc := cleaner.NewHomebrewCleaner(true, true, unusedOnly)
 
-				settings := &domain.OperationSettings{
-					Homebrew: &domain.HomebrewSettings{UnusedOnly: unusedOnly},
+				settings := &operations.OperationSettings{
+					Homebrew: &operations.HomebrewSettings{UnusedOnly: unusedOnly},
 				}
 
 				err := hbc.ValidateSettings(settings)
@@ -93,9 +94,9 @@ var _ = ginkgo.Describe("Homebrew cleaner", func() {
 					gomega.Expect(err).To(gomega.HaveOccurred())
 				}
 			},
-			ginkgo.Entry("all packages", domain.HomebrewModeAll, true),
-			ginkgo.Entry("unused only", domain.HomebrewModeUnusedOnly, true),
-			ginkgo.Entry("unknown mode", domain.HomebrewMode(42), false),
+			ginkgo.Entry("all packages", enums.HomebrewModeAll, true),
+			ginkgo.Entry("unused only", enums.HomebrewModeUnusedOnly, true),
+			ginkgo.Entry("unknown mode", enums.HomebrewMode(42), false),
 		)
 	})
 })

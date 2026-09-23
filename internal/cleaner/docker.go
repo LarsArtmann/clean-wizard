@@ -9,7 +9,9 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
@@ -31,11 +33,11 @@ const (
 type DockerCleaner struct {
 	CleanerBase
 
-	pruneMode domain.DockerPruneMode
+	pruneMode enums.DockerPruneMode
 }
 
 // NewDockerCleaner creates Docker cleaner.
-func NewDockerCleaner(verbose, dryRun bool, pruneMode domain.DockerPruneMode) *DockerCleaner {
+func NewDockerCleaner(verbose, dryRun bool, pruneMode enums.DockerPruneMode) *DockerCleaner {
 	return &DockerCleaner{
 		CleanerBase: NewCleanerBase(verbose, dryRun),
 		pruneMode:   pruneMode,
@@ -43,8 +45,8 @@ func NewDockerCleaner(verbose, dryRun bool, pruneMode domain.DockerPruneMode) *D
 }
 
 // Type returns operation type for Docker cleaner.
-func (dc *DockerCleaner) Type() domain.OperationType {
-	return domain.OperationTypeDocker
+func (dc *DockerCleaner) Type() operations.OperationType {
+	return operations.OperationTypeDocker
 }
 
 // Name returns the unique identifier for this cleaner.
@@ -60,11 +62,11 @@ func (dc *DockerCleaner) IsAvailable(ctx context.Context) bool {
 }
 
 // ValidateSettings validates Docker cleaner settings.
-func (dc *DockerCleaner) ValidateSettings(settings *domain.OperationSettings) error {
+func (dc *DockerCleaner) ValidateSettings(settings *operations.OperationSettings) error {
 	return ValidateOptionalSettings(
 		settings,
-		func(s *domain.OperationSettings) *domain.DockerSettings { return s.Docker },
-		func(d *domain.DockerSettings) error {
+		func(s *operations.OperationSettings) *operations.DockerSettings { return s.Docker },
+		func(d *operations.DockerSettings) error {
 			if !d.PruneMode.IsValid() {
 				return fmt.Errorf("invalid DockerPruneMode: %d", d.PruneMode)
 			}
@@ -75,8 +77,8 @@ func (dc *DockerCleaner) ValidateSettings(settings *domain.OperationSettings) er
 }
 
 // Scan scans for Docker resources.
-func (dc *DockerCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanItem] {
-	items := make([]domain.ScanItem, 0)
+func (dc *DockerCleaner) Scan(ctx context.Context) result.Result[[]types.ScanItem] {
+	items := make([]types.ScanItem, 0)
 
 	if !dc.IsAvailable(ctx) {
 		return result.Ok(items)
@@ -121,11 +123,11 @@ func (dc *DockerCleaner) Scan(ctx context.Context) result.Result[[]domain.ScanIt
 func (dc *DockerCleaner) scanDockerResources(
 	ids []string,
 	resourceType DockerResourceType,
-) []domain.ScanItem {
-	items := make([]domain.ScanItem, 0, len(ids))
+) []types.ScanItem {
+	items := make([]types.ScanItem, 0, len(ids))
 
 	for _, id := range ids {
-		dc.addScanItem(&items, domain.DockerResourceID(id), resourceType, 0)
+		dc.addScanItem(&items, types.DockerResourceID(id), resourceType, 0)
 	}
 
 	return items
@@ -133,8 +135,8 @@ func (dc *DockerCleaner) scanDockerResources(
 
 // addScanItem adds a single scan item to the items slice.
 func (dc *DockerCleaner) addScanItem(
-	items *[]domain.ScanItem,
-	id domain.DockerResourceID,
+	items *[]types.ScanItem,
+	id types.DockerResourceID,
 	resourceType DockerResourceType,
 	size int64,
 ) {
@@ -142,11 +144,11 @@ func (dc *DockerCleaner) addScanItem(
 		return
 	}
 
-	*items = append(*items, domain.ScanItem{
+	*items = append(*items, types.ScanItem{
 		Path:     fmt.Sprintf("docker:%s:%s", resourceType, id),
 		Size:     size,
 		Created:  time.Time{},
-		ScanType: domain.ScanTypeTemp,
+		ScanType: types.ScanTypeTemp,
 	})
 
 	if dc.verbose {
@@ -155,13 +157,13 @@ func (dc *DockerCleaner) addScanItem(
 }
 
 // scanDanglingImages scans for dangling Docker images with size information.
-func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[]types.ScanItem] {
 	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout,
 		"docker", "images", "-f", "dangling=true", "--format", "{{.ID}}\t{{.Size}}")
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to scan dangling images: %w", err))
+		return result.Err[[]types.ScanItem](fmt.Errorf("failed to scan dangling images: %w", err))
 	}
 
 	items := dc.parseDockerResourceOutput(string(output), dockerImage)
@@ -173,18 +175,18 @@ func (dc *DockerCleaner) scanDanglingImages(ctx context.Context) result.Result[[
 // Returns true if processing should continue (pruneMode is DockerPruneAll), false to return early.
 func (dc *DockerCleaner) scanAndAccumulate(
 	ctx context.Context,
-	checkMode domain.DockerPruneMode,
-	scanFunc func(context.Context) result.Result[[]domain.ScanItem],
+	checkMode enums.DockerPruneMode,
+	scanFunc func(context.Context) result.Result[[]types.ScanItem],
 	totalBytes *int64,
 ) bool {
-	if dc.pruneMode == domain.DockerPruneAll || dc.pruneMode == checkMode {
+	if dc.pruneMode == enums.DockerPruneAll || dc.pruneMode == checkMode {
 		if result := scanFunc(ctx); result.IsOk() {
 			for _, item := range result.Value() {
 				*totalBytes += item.Size
 			}
 		}
 
-		if dc.pruneMode != domain.DockerPruneAll {
+		if dc.pruneMode != enums.DockerPruneAll {
 			return false
 		}
 	}
@@ -195,13 +197,13 @@ func (dc *DockerCleaner) scanAndAccumulate(
 // scanUnusedContainers scans for stopped Docker containers with size information.
 func (dc *DockerCleaner) scanUnusedContainers(
 	ctx context.Context,
-) result.Result[[]domain.ScanItem] {
+) result.Result[[]types.ScanItem] {
 	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout,
 		"docker", "ps", "-a", "--filter", "status=exited", "--format", "{{.ID}}\t{{.Size}}")
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](
+		return result.Err[[]types.ScanItem](
 			fmt.Errorf("failed to scan unused containers: %w", err),
 		)
 	}
@@ -212,7 +214,7 @@ func (dc *DockerCleaner) scanUnusedContainers(
 }
 
 // scanUnusedVolumes scans for unused Docker volumes with size information.
-func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]types.ScanItem] {
 	// Use docker system df -v to get volume sizes
 	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout,
 		"docker", "system", "df", "-v", "--format", "{{json .Volumes}}")
@@ -229,12 +231,12 @@ func (dc *DockerCleaner) scanUnusedVolumes(ctx context.Context) result.Result[[]
 }
 
 // scanVolumesFallback is a fallback method for scanning volumes when system df fails.
-func (dc *DockerCleaner) scanVolumesFallback(ctx context.Context) result.Result[[]domain.ScanItem] {
+func (dc *DockerCleaner) scanVolumesFallback(ctx context.Context) result.Result[[]types.ScanItem] {
 	cmd := adapters.ExecWithTimeout(ctx, dockerCommandTimeout, "docker", "volume", "ls", "-q")
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return result.Err[[]domain.ScanItem](fmt.Errorf("failed to scan volumes: %w", err))
+		return result.Err[[]types.ScanItem](fmt.Errorf("failed to scan volumes: %w", err))
 	}
 
 	volumes := strings.Split(strings.TrimSpace(string(output)), "\n")
@@ -247,9 +249,9 @@ func (dc *DockerCleaner) scanVolumesFallback(ctx context.Context) result.Result[
 func (dc *DockerCleaner) parseDockerResourceOutput(
 	output string,
 	resourceType DockerResourceType,
-) []domain.ScanItem {
+) []types.ScanItem {
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	items := make([]domain.ScanItem, 0, len(lines))
+	items := make([]types.ScanItem, 0, len(lines))
 
 	for _, line := range lines {
 		if line == "" {
@@ -268,7 +270,7 @@ func (dc *DockerCleaner) parseDockerResourceOutput(
 			size = dc.parseDockerSizeFromOutput(parts[1], resourceType)
 		}
 
-		dc.addScanItem(&items, domain.DockerResourceID(id), resourceType, size)
+		dc.addScanItem(&items, types.DockerResourceID(id), resourceType, size)
 	}
 
 	return items
@@ -305,10 +307,10 @@ func (dc *DockerCleaner) estimateSizeFromScan(ctx context.Context) int64 {
 	var totalBytes int64
 
 	switch dc.pruneMode {
-	case domain.DockerPruneAll, domain.DockerPruneImages:
+	case enums.DockerPruneAll, enums.DockerPruneImages:
 		if !dc.scanAndAccumulate(
 			ctx,
-			domain.DockerPruneImages,
+			enums.DockerPruneImages,
 			dc.scanDanglingImages,
 			&totalBytes,
 		) {
@@ -316,10 +318,10 @@ func (dc *DockerCleaner) estimateSizeFromScan(ctx context.Context) int64 {
 		}
 
 		fallthrough
-	case domain.DockerPruneContainers:
+	case enums.DockerPruneContainers:
 		if !dc.scanAndAccumulate(
 			ctx,
-			domain.DockerPruneContainers,
+			enums.DockerPruneContainers,
 			dc.scanUnusedContainers,
 			&totalBytes,
 		) {
@@ -327,10 +329,10 @@ func (dc *DockerCleaner) estimateSizeFromScan(ctx context.Context) int64 {
 		}
 
 		fallthrough
-	case domain.DockerPruneVolumes:
+	case enums.DockerPruneVolumes:
 		if !dc.scanAndAccumulate(
 			ctx,
-			domain.DockerPruneVolumes,
+			enums.DockerPruneVolumes,
 			dc.scanUnusedVolumes,
 			&totalBytes,
 		) {
@@ -338,7 +340,7 @@ func (dc *DockerCleaner) estimateSizeFromScan(ctx context.Context) int64 {
 		}
 
 		fallthrough
-	case domain.DockerPruneBuilds:
+	case enums.DockerPruneBuilds:
 		// Build cache size estimation - try to get from docker system df
 		cmd := adapters.ExecWithTimeout(
 			ctx,
@@ -363,15 +365,15 @@ func (dc *DockerCleaner) estimateSizeFromScan(ctx context.Context) int64 {
 }
 
 // parseVolumeJSONOutput parses JSON output from docker system df -v for volumes.
-func (dc *DockerCleaner) parseVolumeJSONOutput(output string) []domain.ScanItem {
+func (dc *DockerCleaner) parseVolumeJSONOutput(output string) []types.ScanItem {
 	output = strings.TrimSpace(output)
 	if output == "" || output == "null" || output == "[]" {
-		return []domain.ScanItem{}
+		return []types.ScanItem{}
 	}
 
 	// Simple parsing for volume entries - format varies by Docker version
 	// This handles basic cases; complex JSON parsing would require encoding/json
-	items := make([]domain.ScanItem, 0)
+	items := make([]types.ScanItem, 0)
 
 	// Extract volume names using simple string parsing
 	// Look for "Name":"volume_name" patterns
@@ -393,7 +395,7 @@ func (dc *DockerCleaner) parseVolumeJSONOutput(output string) []domain.ScanItem 
 
 		volumeName := output[nameIdx : nameIdx+endIdx]
 		if volumeName != "" {
-			dc.addScanItem(&items, domain.DockerResourceID(volumeName), dockerVolume, 0)
+			dc.addScanItem(&items, types.DockerResourceID(volumeName), dockerVolume, 0)
 		}
 
 		idx = nameIdx + endIdx + 1
@@ -403,9 +405,9 @@ func (dc *DockerCleaner) parseVolumeJSONOutput(output string) []domain.ScanItem 
 }
 
 // Clean removes Docker resources based on prune mode.
-func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
+func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[types.CleanResult] {
 	if !dc.IsAvailable(ctx) {
-		return result.Err[domain.CleanResult](NewNotAvailableError("docker", ""))
+		return result.Err[types.CleanResult](NewNotAvailableError("docker", ""))
 	}
 
 	if dc.dryRun {
@@ -420,7 +422,7 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 
 	pruneResult := dc.pruneDocker(ctx)
 	if pruneResult.IsErr() {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("docker prune failed: %w", pruneResult.Error()),
 		)
 	}
@@ -429,7 +431,7 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 
 	duration := time.Since(startTime)
 	finalResult := conversions.NewCleanResultWithTiming(
-		domain.StrategyConservativeType,
+		enums.StrategyConservativeType,
 		int(cleanResult.ItemsRemoved),
 		int64(cleanResult.FreedBytes),
 		duration,
@@ -442,35 +444,35 @@ func (dc *DockerCleaner) Clean(ctx context.Context) result.Result[domain.CleanRe
 // buildPruneArgs returns the docker command arguments for the prune mode.
 func (dc *DockerCleaner) buildPruneArgs() []string {
 	switch dc.pruneMode {
-	case domain.DockerPruneAll:
+	case enums.DockerPruneAll:
 		if dc.verbose {
 			fmt.Println("  Running full prune: docker system prune -af --volumes")
 		}
 
 		return []string{"system", "prune", "-af", "--volumes"} //nolint:goconst
 
-	case domain.DockerPruneImages:
+	case enums.DockerPruneImages:
 		if dc.verbose {
 			fmt.Println("  Running image prune: docker image prune -af")
 		}
 
 		return []string{"image", "prune", "-af"}
 
-	case domain.DockerPruneContainers:
+	case enums.DockerPruneContainers:
 		if dc.verbose {
 			fmt.Println("  Running container prune: docker container prune -f")
 		}
 
 		return []string{"container", "prune", "-f"}
 
-	case domain.DockerPruneVolumes:
+	case enums.DockerPruneVolumes:
 		if dc.verbose {
 			fmt.Println("  Running volume prune: docker volume prune -f")
 		}
 
 		return []string{"volume", "prune", "-f"}
 
-	case domain.DockerPruneBuilds:
+	case enums.DockerPruneBuilds:
 		if dc.verbose {
 			fmt.Println("  Running builder prune: docker builder prune -af")
 		}
@@ -483,11 +485,11 @@ func (dc *DockerCleaner) buildPruneArgs() []string {
 }
 
 // pruneDocker executes appropriate Docker prune command based on mode.
-func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.CleanResult] {
+func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[types.CleanResult] {
 	args := dc.buildPruneArgs()
 
 	if args == nil {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("unknown Docker prune mode: %s", dc.pruneMode),
 		)
 	}
@@ -496,7 +498,7 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return result.Err[domain.CleanResult](
+		return result.Err[types.CleanResult](
 			fmt.Errorf("docker system prune failed: %w (output: %s)", err, string(output)),
 		)
 	}
@@ -514,7 +516,7 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 
 	return result.Ok(
 		conversions.NewCleanResult(
-			domain.StrategyConservativeType,
+			enums.StrategyConservativeType,
 			1,
 			bytesFreed,
 		),
@@ -522,9 +524,9 @@ func (dc *DockerCleaner) pruneDocker(ctx context.Context) result.Result[domain.C
 }
 
 // newDryRunResult creates a CleanResult for dry-run mode with the estimated size.
-func (dc *DockerCleaner) newDryRunResult(totalBytes int64, itemsCount int) domain.CleanResult {
+func (dc *DockerCleaner) newDryRunResult(totalBytes int64, itemsCount int) types.CleanResult {
 	return conversions.NewCleanResult(
-		domain.StrategyDryRunType,
+		enums.StrategyDryRunType,
 		itemsCount,
 		totalBytes,
 	)

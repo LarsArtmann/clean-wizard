@@ -5,7 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
@@ -52,13 +53,13 @@ func BenchmarkResult_Value(b *testing.B) {
 
 // BenchmarkCleanResult_Validate benchmarks CleanResult validation.
 func BenchmarkCleanResult_Validate(b *testing.B) {
-	cr := domain.CleanResult{
-		SizeEstimate: domain.SizeEstimate{Known: 1024, Status: domain.SizeEstimateStatusKnown},
+	cr := types.CleanResult{
+		SizeEstimate: types.SizeEstimate{Known: 1024, Status: enums.SizeEstimateStatusKnown},
 		ItemsRemoved: 5,
 		ItemsFailed:  0,
 		CleanTime:    0,
 		CleanedAt:    testTime,
-		Strategy:     domain.StrategyAggressiveType,
+		Strategy:     enums.StrategyAggressiveType,
 	}
 
 	b.ReportAllocs()

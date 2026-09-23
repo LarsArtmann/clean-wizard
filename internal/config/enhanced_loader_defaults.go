@@ -1,8 +1,6 @@
 package config
 
-import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
-)
+import "github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 
 // getDefaultLoadOptions returns default load options.
 func getDefaultLoadOptions() *ConfigLoadOptions {
@@ -10,7 +8,7 @@ func getDefaultLoadOptions() *ConfigLoadOptions {
 		ForceRefresh:       RefreshOptionDisabled,
 		EnableCache:        CacheOptionEnabled,
 		EnableSanitization: SanitizeOptionEnabled,
-		ValidationLevel:    domain.ValidationLevelComprehensiveType,
+		ValidationLevel:    enums.ValidationLevelComprehensiveType,
 		Timeout:            DefaultLoadTimeout,
 	}
 }
@@ -20,7 +18,7 @@ func getDefaultSaveOptions() *ConfigSaveOptions {
 	return &ConfigSaveOptions{
 		EnableSanitization: SanitizeOptionEnabled,
 		BackupEnabled:      BackupOptionEnabled,
-		ValidationLevel:    domain.ValidationLevelComprehensiveType,
+		ValidationLevel:    enums.ValidationLevelComprehensiveType,
 		CreateBackup:       BackupOptionDisabled,
 		ForceSave:          SaveOptionDisabled,
 	}

@@ -3,12 +3,12 @@ package config
 import (
 	"strings"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 )
 
 // sanitizeHomebrewSettings sanitizes Homebrew settings.
 func (cs *ConfigSanitizer) sanitizeHomebrewSettings(
-	fieldPrefix string, settings *domain.HomebrewSettings, result *SanitizationResult,
+	fieldPrefix string, settings *operations.HomebrewSettings, result *SanitizationResult,
 ) {
 	if settings == nil {
 		return
