@@ -23,7 +23,7 @@ var _ = ginkgo.Describe("Workflow step retries", func() {
 			transient := assertError{msg: "temporary I/O hiccup"}
 			flaky := newFakeCleaner("flaky", transient, transient, nil)
 
-			registry := registerFakes(flaky)
+			registry, _ := registerFakes(flaky)
 
 			retry := execution.RetryConfigFromAttempts(3)
 			wr, err := execution.RunCleaners(ctx, registry, []string{"flaky"}, execution.WithRetry(retry))
@@ -38,7 +38,7 @@ var _ = ginkgo.Describe("Workflow step retries", func() {
 			transient := assertError{msg: "still broken"}
 			hopeless := newFakeCleaner("hopeless", transient)
 
-			registry := registerFakes(hopeless)
+			registry, _ := registerFakes(hopeless)
 
 			retry := execution.RetryConfigFromAttempts(3)
 			wr, err := execution.RunCleaners(ctx, registry, []string{"hopeless"}, execution.WithRetry(retry))
@@ -53,7 +53,7 @@ var _ = ginkgo.Describe("Workflow step retries", func() {
 			notAvailableErr := cleaner.NewNotAvailableError("some-tool", "")
 			absent := newFakeCleaner("absent", notAvailableErr)
 
-			registry := registerFakes(absent)
+			registry, _ := registerFakes(absent)
 
 			retry := execution.RetryConfigFromAttempts(3)
 			wr, err := execution.RunCleaners(ctx, registry, []string{"absent"}, execution.WithRetry(retry))
@@ -70,7 +70,7 @@ var _ = ginkgo.Describe("Workflow step retries", func() {
 			transient := assertError{msg: "one shot only"}
 			flaky := newFakeCleaner("flaky", transient)
 
-			registry := registerFakes(flaky)
+			registry, _ := registerFakes(flaky)
 
 			wr, err := execution.RunCleaners(ctx, registry, []string{"flaky"})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())

@@ -11,6 +11,38 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/result"
 )
 
+// concurrencyTracker measures how many fake cleaners overlap in time.
+// It is shared by all cleaners in one registry so overlap is visible.
+type concurrencyTracker struct {
+	mu      sync.Mutex
+	current int32
+	peak    int32
+}
+
+func (t *concurrencyTracker) enter() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	t.current++
+	if t.current > t.peak {
+		t.peak = t.current
+	}
+}
+
+func (t *concurrencyTracker) exit() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	t.current--
+}
+
+func (t *concurrencyTracker) peak() int32 {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	return t.peak
+}
+
 // fakeCleaner is a scriptable cleaner double for behavior specs. Outcomes are
 // consumed in order per Clean call; the last outcome repeats for further calls.
 type fakeCleaner struct {
@@ -18,11 +50,8 @@ type fakeCleaner struct {
 	available  bool
 	outcomes   []error
 	cleanDelay time.Duration
+	tracker    *concurrencyTracker
 	calls      atomic.Int32
-
-	concurrencyMu   sync.Mutex
-	current         int32
-	peakConcurrency int32
 }
 
 func newFakeCleaner(name string, outcomes ...error) *fakeCleaner {
@@ -40,18 +69,10 @@ func (f *fakeCleaner) Scan(_ context.Context) result.Result[[]domain.ScanItem] {
 func (f *fakeCleaner) Clean(ctx context.Context) result.Result[domain.CleanResult] {
 	call := f.calls.Add(1)
 
-	f.concurrencyMu.Lock()
-	f.current++
-	if f.current > f.peakConcurrency {
-		f.peakConcurrency = f.current
+	if f.tracker != nil {
+		f.tracker.enter()
+		defer f.tracker.exit()
 	}
-	f.concurrencyMu.Unlock()
-
-	defer func() {
-		f.concurrencyMu.Lock()
-		f.current--
-		f.concurrencyMu.Unlock()
-	}()
 
 	if f.cleanDelay > 0 {
 		select {
@@ -75,19 +96,15 @@ func (f *fakeCleaner) Clean(ctx context.Context) result.Result[domain.CleanResul
 
 func (f *fakeCleaner) callCount() int32 { return f.calls.Load() }
 
-func (f *fakeCleaner) peak() int32 {
-	f.concurrencyMu.Lock()
-	defer f.concurrencyMu.Unlock()
-
-	return f.peakConcurrency
-}
-
-// registerFakes registers the given cleaners in order and returns the registry.
-func registerFakes(cleaners ...*fakeCleaner) *cleaner.Registry {
+// registerFakes registers the given cleaners in order and returns the registry
+// plus a concurrency tracker shared by all of them.
+func registerFakes(cleaners ...*fakeCleaner) (*cleaner.Registry, *concurrencyTracker) {
+	tracker := &concurrencyTracker{}
 	registry := cleaner.NewRegistry()
 	for _, c := range cleaners {
+		c.tracker = tracker
 		registry.Register(c.name, c)
 	}
 
-	return registry
+	return registry, tracker
 }

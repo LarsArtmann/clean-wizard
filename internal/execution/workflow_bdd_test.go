@@ -23,7 +23,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 
 	ginkgo.Describe("running selected cleaners", func() {
 		ginkgo.It("reports succeeded steps with aggregated totals", func() {
-			registry := registerFakes(
+			registry, _ := registerFakes(
 				newFakeCleaner("alpha"),
 				newFakeCleaner("beta"),
 			)
@@ -42,7 +42,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 			slow.cleanDelay = 50 * time.Millisecond
 			fast := newFakeCleaner("fast-cleaner")
 
-			registry := registerFakes(slow, fast)
+			registry, _ := registerFakes(slow, fast)
 
 			wr, err := execution.RunCleaners(ctx, registry, []string{"slow-cleaner", "fast-cleaner"})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -57,7 +57,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 
 		ginkgo.It("classifies unavailable cleaners as skipped and others as failed", func() {
 			notAvailableErr := cleaner.NewNotAvailableError("some-tool", "")
-			registry := registerFakes(
+			registry, _ := registerFakes(
 				newFakeCleaner("healthy"),
 				newFakeCleaner("broken", assertError{msg: "disk exploded"}),
 				newFakeCleaner("absent", notAvailableErr),
@@ -86,7 +86,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 		})
 
 		ginkgo.It("rejects a selection that references an unknown cleaner", func() {
-			registry := registerFakes(newFakeCleaner("known"))
+			registry, _ := registerFakes(newFakeCleaner("known"))
 
 			_, err := execution.RunCleaners(ctx, registry, []string{"does-not-exist"})
 			gomega.Expect(err).To(gomega.HaveOccurred())
@@ -95,7 +95,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 		})
 
 		ginkgo.It("completes with no steps when the selection is empty", func() {
-			registry := registerFakes(newFakeCleaner("idle"))
+			registry, _ := registerFakes(newFakeCleaner("idle"))
 
 			wr, err := execution.RunCleaners(ctx, registry, []string{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -105,7 +105,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 
 	ginkgo.Describe("scanning selected cleaners", func() {
 		ginkgo.It("reports scan totals per cleaner", func() {
-			registry := registerFakes(newFakeCleaner("scanner"))
+			registry, _ := registerFakes(newFakeCleaner("scanner"))
 
 			wr, err := execution.RunScans(ctx, registry, []string{"scanner"})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -125,17 +125,14 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 				cleaners = append(cleaners, c)
 			}
 
-			registry := registerFakes(cleaners...)
+			registry, tracker := registerFakes(cleaners...)
 
 			_, err := execution.RunCleaners(ctx, registry,
 				[]string{"one", "two", "three"},
 				execution.WithMaxConcurrency(1),
 			)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-
-			for _, c := range cleaners {
-				gomega.Expect(c.peak()).To(gomega.Equal(int32(1)))
-			}
+			gomega.Expect(tracker.peak()).To(gomega.Equal(int32(1)))
 		})
 
 		ginkgo.It("runs at most two cleaners at a time when capped to two", func() {
@@ -146,19 +143,14 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 				cleaners = append(cleaners, c)
 			}
 
-			registry := registerFakes(cleaners...)
+			registry, tracker := registerFakes(cleaners...)
 
 			_, err := execution.RunCleaners(ctx, registry,
 				[]string{"a", "b", "c", "d"},
 				execution.WithMaxConcurrency(2),
 			)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-
-			for _, c := range cleaners {
-				gomega.Expect(c.peak()).To(gomega.BeNumerically("<=", 2))
-			}
-
-			gomega.Expect(cleaners[0].peak()).To(gomega.Equal(int32(2)))
+			gomega.Expect(tracker.peak()).To(gomega.Equal(int32(2)))
 		})
 	})
 })
