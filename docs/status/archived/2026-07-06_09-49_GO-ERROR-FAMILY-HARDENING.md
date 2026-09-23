@@ -5,6 +5,8 @@
 
 **Resolution (2026-08-10):** This report produced commit `132f5f6` (`feat: harden go-error-family integration`). All 10 "FULLY DONE" items shipped. Items in PARTIALLY DONE (#1-#5) remain partially open and are tracked in `TODO_LIST.md` (#1, #2, #3, #4, #5). Section f) "25 Things to Get Done Next" maps 1:1 to `TODO_LIST.md`.
 
+**Resolution (2026-09-23):** TODO_LIST items #1-#5 from this report are now done: all 5 command files migrated to classified errors (context-only wraps stay plain `fmt.Errorf` — classification flows through the chain), `ErrGitNotAvailable` is Infrastructure, scan JSON enriched with error/family/code/retryable and propagates marshal errors as Corruption, and the 3 dead message templates were removed (fang renders CLI errors; `HandleError` would duplicate it). Usage errors (flags/args/unknown command) are classified as Rejection at the root command.
+
 ---
 
 ## Executive Summary

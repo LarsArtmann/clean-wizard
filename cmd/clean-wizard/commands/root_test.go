@@ -15,6 +15,14 @@ func executeRoot(t *testing.T, args ...string) error {
 	var out bytes.Buffer
 
 	root := NewRootCmd()
+	root.AddCommand(
+		NewCleanCommand(),
+		NewScanCommand(),
+		NewInitCommand(),
+		NewProfileCommand(),
+		NewConfigCommand(),
+		NewGitHistoryCommand(),
+	)
 	root.SetOut(&out)
 	root.SetErr(&out)
 	root.SetArgs(args)
@@ -74,6 +82,6 @@ func TestUsageErrorsAreClassified(t *testing.T) {
 func TestRootNoArgsPrintsHelpWithoutError(t *testing.T) {
 	t.Parallel()
 
-	 err := executeRoot(t)
+	err := executeRoot(t)
 	require.NoError(t, err)
 }

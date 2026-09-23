@@ -11,7 +11,7 @@ GOEXPERIMENT=jsonv2 go build ./...
 GOEXPERIMENT=jsonv2 go test ./... -short
 ```
 
-Or use the Nix devShell (`nix develop`) which sets it automatically.
+Or use the Nix devShell (`nix develop`) which sets it automatically. The devShell and CI shell install `go_1_27` (matching the `pkgs.go_1_27` used by `buildGoModule`) — go.mod requires Go 1.27, so a host `go` 1.26 binary fails with `GOTOOLCHAIN=local`.
 
 **Website CI gotcha:** pnpm 11.20 enforces a default 24h `minimumReleaseAge` supply-chain check in `pnpm install`. Dependency bumps whose regenerated lockfile pulls freshly-published transitive deps (e.g. rolldown for astro) fail CI with `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` — not a bug; re-run the jobs ~24h later. Related: build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:` (`esbuild: true`) — pnpm v11 ignores `pnpm.*` in `package.json`; a missing or placeholder entry makes `astro build` fail on a missing esbuild binary (cmdguard incident, fixed 2026-09-19).
 
@@ -125,6 +125,15 @@ Key files:
 - `cmd/clean-wizard/main.go` — `errorfamily.ExitCode(err)` + `errorfamily.LogError(err, slog.Default())` at CLI boundary
 
 **Bridge not adopted**: `go-error-family/bridge` connects `samber/oops` to `go-error-family`. Clean-wizard doesn't use oops; core `errorfamily` provides `.WithContext()` for structured context. BuildFlow also implements `Classified` directly without the bridge.
+
+### CLI Error Classification Convention (all 7 command files migrated 2026-09-23)
+
+- **Classify at the site that knows the nature**: wrap unclassified causes (huh form errors, config I/O, marshal failures) with `errorfamily.Wrap{Family}[f](err, "<command>.<where>", msg)`. Codes follow `<command>.<where>` (e.g. `init.config_save`, `scan.json_output`). Config load/save failures are Rejection (matches the `clean.config_load` precedent).
+- **Context-only wraps stay plain `fmt.Errorf`**: `Registry.Classify` walks the unwrap chain via `errors.AsType[Classified]`, so `fmt.Errorf("ctx: %w", someClassifiedErr)` inherits the sentinel's family. Wrapping those with an explicit family would _override_ the true classification — don't.
+- **Sentinels are classified at the source**: `ErrGitNotAvailable` = Infrastructure, `ErrSafetyChecksFailed` = Conflict, `ErrNoGitRepositoriesFound`/`ErrNotAGitRepository`/`ErrProfileNotFound`/`ErrProfileNoCleaners` = Rejection; dynamic detail wraps them with `%w`.
+- **Usage errors are Rejection (exit 1)**: root command sets `SetFlagErrorFunc` (code `cli.flag`), root `RunE` rejects unknown commands (`cli.unknown_command`) while bare invocation prints help, and `exactArgsClassified(n)` (code `cli.args`) wraps positional-args validators. Without this, cobra errors hit the boundary unclassified → Transient → exit 75. Tradeoff: fang's "Try --help" hint disappears for wrapped usage errors (its `HasPrefix` check sees the classification prefix).
+- **Scan JSON** mirrors clean JSON enrichment: per-result `error`/`family`/`code`/`retryable` populated from workflow step errors via `ScanResult.Err`; `outputScanJSON` returns a classified `Corruption` error on marshal failure instead of printing `{"error": ...}`. A missing config file falls back to defaults by design (scan/clean exit 0).
+- **fang owns human error rendering** (`SilenceErrors=true` + styled handler). Do NOT wire `errorfamily.HandleError` in main.go — it would duplicate fang's output. `LogError` + `ExitCode` remain the CLI boundary.
 
 ## Known Issues
 

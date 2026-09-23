@@ -23,8 +23,8 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 			want:        nil,
 		},
 		{
-			name:        "unknown profile returns nil",
-			config:      &Config{ //nolint:exhaustruct
+			name: "unknown profile returns nil",
+			config: &Config{ //nolint:exhaustruct
 				Profiles: map[string]*Profile{
 					"daily": { //nolint:exhaustruct
 						Operations: []CleanupOperation{ //nolint:exhaustruct

@@ -1,6 +1,6 @@
 # TODO LIST
 
-**Last Updated:** 2026-08-10
+**Last Updated:** 2026-09-23
 **Focus:** Actionable items for the next 2-4 weeks
 **Source:** Verified against code on 2026-08-10; harvested from 2026-07-06 through 2026-08-05 status reports
 
@@ -8,13 +8,13 @@
 
 ## Critical (Do First)
 
-| # | Task                                                                                                                                                                                            | Impact | Effort | Source               |
-| - | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------------------- |
-| 1 | Migrate 5 command files to classified errors: `init.go`, `githistory.go`, `config.go`, `clean_select.go`, `profile.go` (30+ bare `fmt.Errorf` calls classify as Transient regardless of nature) | HIGH   | MED    | 2026-07-06 hardening |
-| 2 | Classify `ErrGitNotAvailable` as Infrastructure (`errorfamily.NewInfrastructure`) — currently defaults to Transient                                                                             | MED    | LOW    | 2026-07-06 hardening |
-| 3 | Enrich scan JSON output with `family`/`code`/`retryable` fields — only clean JSON was enriched; scan uses disjoint schema                                                                       | MED    | LOW    | 2026-07-06 hardening |
-| 4 | Fix scan JSON swallowing marshal errors — `outputScanJSON` prints error and returns silently instead of propagating                                                                             | MED    | LOW    | 2026-07-06 hardening |
-| 5 | Wire `errorfamily.HandleError` in `main.go` or remove dead message templates (3 templates registered but never consumed)                                                                        | LOW    | LOW    | 2026-07-06 hardening |
+| # | Task                                                                                                                                                                                                                | Impact | Effort | Source               |
+| - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------------------- |
+| 1 | ~~Migrate 5 command files to classified errors: `init.go`, `githistory.go`, `config.go`, `clean_select.go`, `profile.go` (30+ bare `fmt.Errorf` calls classify as Transient regardless of nature)~~ DONE 2026-09-23 | HIGH   | MED    | 2026-07-06 hardening |
+| 2 | ~~Classify `ErrGitNotAvailable` as Infrastructure (`errorfamily.NewInfrastructure`) — currently defaults to Transient~~ DONE 2026-09-23                                                                             | MED    | LOW    | 2026-07-06 hardening |
+| 3 | ~~Enrich scan JSON output with `family`/`code`/`retryable` fields — only clean JSON was enriched; scan uses disjoint schema~~ DONE 2026-09-23                                                                       | MED    | LOW    | 2026-07-06 hardening |
+| 4 | ~~Fix scan JSON swallowing marshal errors — `outputScanJSON` prints error and returns silently instead of propagating~~ DONE 2026-09-23 (returns classified Corruption error)                                       | MED    | LOW    | 2026-07-06 hardening |
+| 5 | ~~Wire `errorfamily.HandleError` in `main.go` or remove dead message templates (3 templates registered but never consumed)~~ DONE 2026-09-23 (templates removed; fang owns CLI error rendering)                     | LOW    | LOW    | 2026-07-06 hardening |
 
 ## High Priority
 
@@ -27,17 +27,17 @@
 
 ## Medium Priority
 
-| #  | Task                                                                                                | Impact | Effort | Source                 |
-| -- | --------------------------------------------------------------------------------------------------- | ------ | ------ | ---------------------- |
-| 10 | Implement `scan --profile` filtering or remove the flag (currently warns but shows all cleaners)    | MED    | MED    | 2026-07-06 DI/workflow |
-| 11 | Logger globals (`L`, `StdLogger`) → DI-injected logger — root cause of test race conditions         | MED    | MED    | 2026-07-06 DI/workflow |
-| 12 | Split files over 350 lines: `compiledbinaries.go` (585), `docker.go` (524), `nodepackages.go` (523) | MED    | MED    | Code quality           |
-| 13 | Add CLI command tests: profile, config, scan, init (clean integration test exists)                  | MED    | HIGH   | 2026-07-06 BDD audit   |
-| 14 | Extract `"go-build*"` string constant in `golang_cache_cleaner.go`                                  | LOW    | LOW    | Lint (goconst)         |
-| 15 | Improve Nix size estimation (currently hardcoded 50MB/generation)                                   | MED    | MED    | FEATURES audit         |
-| 16 | Add tests for `getRegistryName` reverse lookup (`scan.go:246`)                                      | MED    | LOW    | Pre-existing           |
-| 17 | Move `/tmp/go-humanize-linter` into repo (`tools/lint/`) so CI can reproduce the H007 check         | MED    | LOW    | 2026-08-05 linter      |
-| 18 | Wire `go-humanize-linter` into `flake.nix` `checks` (or pre-commit) — H007 violations can regress   | MED    | LOW    | 2026-08-05 linter      |
+| #  | Task                                                                                                                                                              | Impact | Effort | Source                 |
+| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ---------------------- |
+| 10 | Implement `scan --profile` filtering or remove the flag (currently warns but shows all cleaners)                                                                  | MED    | MED    | 2026-07-06 DI/workflow |
+| 11 | Logger globals (`L`, `StdLogger`) → DI-injected logger — root cause of test race conditions                                                                       | MED    | MED    | 2026-07-06 DI/workflow |
+| 12 | Split files over 350 lines: `compiledbinaries.go` (585), `docker.go` (524), `nodepackages.go` (523)                                                               | MED    | MED    | Code quality           |
+| 13 | Add CLI command tests: profile, config, scan, init (clean integration test exists; root usage-error classification + scan JSON enrichment tests added 2026-09-23) | MED    | HIGH   | 2026-07-06 BDD audit   |
+| 14 | Extract `"go-build*"` string constant in `golang_cache_cleaner.go`                                                                                                | LOW    | LOW    | Lint (goconst)         |
+| 15 | Improve Nix size estimation (currently hardcoded 50MB/generation)                                                                                                 | MED    | MED    | FEATURES audit         |
+| 16 | Add tests for `getRegistryName` reverse lookup (`scan.go:246`)                                                                                                    | MED    | LOW    | Pre-existing           |
+| 17 | Move `/tmp/go-humanize-linter` into repo (`tools/lint/`) so CI can reproduce the H007 check                                                                       | MED    | LOW    | 2026-08-05 linter      |
+| 18 | Wire `go-humanize-linter` into `flake.nix` `checks` (or pre-commit) — H007 violations can regress                                                                 | MED    | LOW    | 2026-08-05 linter      |
 
 ## Low Priority / Polish
 
