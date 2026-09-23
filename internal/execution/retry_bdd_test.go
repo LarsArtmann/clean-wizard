@@ -6,6 +6,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	errorfamily "github.com/larsartmann/go-error-family"
+	"github.com/larsartmann/go-error-family/errorfamilytest"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
@@ -20,7 +21,7 @@ var _ = ginkgo.Describe("Workflow step retries", func() {
 	ginkgo.Describe("when retries are enabled", func() {
 		ginkgo.It("retries transient failures until the step succeeds", func() {
 			transient := assertError{msg: "temporary I/O hiccup"}
-			flaky := newFakeCleaner("flaky", transient, transient)
+			flaky := newFakeCleaner("flaky", transient, transient, nil)
 
 			registry := registerFakes(flaky)
 
@@ -60,7 +61,7 @@ var _ = ginkgo.Describe("Workflow step retries", func() {
 
 			gomega.Expect(absent.callCount()).To(gomega.Equal(int32(1)))
 			gomega.Expect(wr.Skipped()).To(gomega.HaveLen(1))
-			errorfamilytest.AssertFamily(wr.Skipped()[0].Err, errorfamily.Infrastructure)
+			errorfamilytest.AssertFamily(ginkgo.GinkgoTB(), wr.Skipped()[0].Err, errorfamily.Infrastructure)
 		})
 	})
 

@@ -37,14 +37,14 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 			gomega.Expect(wr.TotalItemsRemoved).To(gomega.Equal(uint(2)))
 		})
 
-		ginkgo.It("reports steps in registration order regardless of completion time", func() {
-			slow := newFakeCleaner("slow-first-registered")
+		ginkgo.It("reports steps in selection order regardless of completion time", func() {
+			slow := newFakeCleaner("slow-cleaner")
 			slow.cleanDelay = 50 * time.Millisecond
-			fast := newFakeCleaner("fast-second-registered")
+			fast := newFakeCleaner("fast-cleaner")
 
 			registry := registerFakes(slow, fast)
 
-			wr, err := execution.RunCleaners(ctx, registry, []string{"fast-second-registered", "slow-first-registered"})
+			wr, err := execution.RunCleaners(ctx, registry, []string{"slow-cleaner", "fast-cleaner"})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 			names := make([]string, 0, len(wr.Steps))
@@ -52,7 +52,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 				names = append(names, step.Name)
 			}
 
-			gomega.Expect(names).To(gomega.Equal([]string{"slow-first-registered", "fast-second-registered"}))
+			gomega.Expect(names).To(gomega.Equal([]string{"slow-cleaner", "fast-cleaner"}))
 		})
 
 		ginkgo.It("classifies unavailable cleaners as skipped and others as failed", func() {
@@ -91,7 +91,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 			_, err := execution.RunCleaners(ctx, registry, []string{"does-not-exist"})
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(err.Error()).To(gomega.ContainSubstring("not found in registry"))
-			errorfamilytest.AssertFamily(err, errorfamily.Rejection)
+			errorfamilytest.AssertFamily(ginkgo.GinkgoTB(), err, errorfamily.Rejection)
 		})
 
 		ginkgo.It("completes with no steps when the selection is empty", func() {
@@ -138,7 +138,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 			}
 		})
 
-		ginkgo.It("overlaps cleaners when uncapped", func() {
+		ginkgo.It("runs at most two cleaners at a time when capped to two", func() {
 			cleaners := make([]*fakeCleaner, 0, 4)
 			for _, name := range []string{"a", "b", "c", "d"} {
 				c := newFakeCleaner(name)
@@ -150,10 +150,15 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 
 			_, err := execution.RunCleaners(ctx, registry,
 				[]string{"a", "b", "c", "d"},
+				execution.WithMaxConcurrency(2),
 			)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			gomega.Expect(cleaners[0].peak()).To(gomega.BeNumerically(">", 1))
+			for _, c := range cleaners {
+				gomega.Expect(c.peak()).To(gomega.BeNumerically("<=", 2))
+			}
+
+			gomega.Expect(cleaners[0].peak()).To(gomega.Equal(int32(2)))
 		})
 	})
 })
