@@ -253,7 +253,11 @@ func runProfileDeleteCommand(_ *cobra.Command, args []string, force bool) error 
 
 	cfg, err := config.Load()
 	if err != nil {
-		return errorfamily.WrapRejection(err, "profile.delete", "failed to load configuration; run 'clean-wizard init' to create one")
+		return errorfamily.WrapRejection(
+			err,
+			"profile.delete",
+			"failed to load configuration; run 'clean-wizard init' to create one",
+		)
 	}
 
 	_, ok := cfg.Profiles[profileName]

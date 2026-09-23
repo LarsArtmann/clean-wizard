@@ -104,13 +104,25 @@ Key design principles:
 - Removed with the rewrite: `validator_structure.go`, `validator_crossfield.go`, `validateBusinessLogic`/`validateSecurityConstraints`/`addCriticalRiskError`; conflict-check predicates (`validateProtectedPathsConflict`, `checkTempFilesConflict`, `checkNixConflict`, `findMaxRiskLevel`) remain as rule check functions in `validator_business.go`
 - Assessment + non-adopted capabilities (Stream, otel listener, composites, domain-layer rewrite): `docs/planning/2026-09-23_go-business-rules-integration.md`
 
+## Config Migration Engine (issue #19, built 2026-09-23)
+
+- **Seam** — `internal/config/version.go` (`FormatVersion`, `CurrentFormatVersion` — a var so tests can simulate future formats) + `migration.go` (chain registry, `PlanMigration`, `ApplyMigrations`) + `migration_io.go` (`MigrateConfigFile`, `CheckConfigVersion`). Add a format change by appending a `Migration{From, To, Apply}` to the `migrations` chain; every version must stay reachable from all older ones
+- **Load gate** — `unmarshalConfig` calls `CheckConfigVersion` after parse: outdated config → Rejection telling the user to run `clean-wizard config migrate`; future config → Rejection demanding a binary upgrade. `""` version normalizes to current (matches the sanitizer backfill)
+- **`config migrate` command** — dry-runs the chain on a YAML-roundtrip clone, shows the SDK-formatted diff, confirms via `promptForConfirmation` (or `--yes`), backs up via go-finding `pipeline.FileBackup` (default `<config dir>/.clean-wizard-backups`), applies, validates, writes atomically via `go-atomic-write`; any post-backup failure restores the original and surfaces Corruption. `--sarif` emits migration findings (category `migration`) through `format.FindingsToSARIF`
+- **koanf cannot decode nested enum structs** — `k.Unmarshal("profiles", ...)` bypasses the enums' `UnmarshalYAML` hooks and string-parses int-backed fields, so string-form enums (`enabled: enabled`) failed profile decoding. `parseConfig` now re-encodes the raw profiles map through yamlv3 (the same pattern `unmarshalOperationSettings` pioneered); `fixProfileSettings` still re-derives risk levels/settings on top
+- **`Save` is atomic** — `go-atomic-write.WriteWithPerm`, shared `configYAMLMap` with the migration writer so both emit identical YAML
+- **`CONFIG_PATH` is honored everywhere** — commands resolve paths via `config.DefaultConfigPath()`; the commands package no longer hardcodes `$HOME/.clean-wizard.yaml`. `config show`/`profile delete` surface real load errors instead of printing "No configuration found" (which was unreachable for missing files — the loader substitutes defaults)
+
 ## Dependencies
 
 - `charm.land/huh/v2` - TUI forms
 - `charm.land/lipgloss/v2` - Terminal styling
 - `github.com/charmbracelet/fang` - Help command generation
 - `github.com/larsartmann/go-error-family` - Error classification (5 families: Rejection, Conflict, Transient, Corruption, Infrastructure)
-- `github.com/larsartmann/go-finding` - SARIF 2.1.0 export for scan output (Finding model, Builder API; core module only, no pipeline)
+- `github.com/larsartmann/go-finding` - SARIF 2.1.0 export for scan/migration output (Finding model, Builder API)
+- `github.com/larsartmann/go-finding/pipeline` - `FileBackup` backup/restore for config migration rollback
+- `github.com/larsartmann/linter-autoconfigure-sdk` - `DiffMaps`/`FormatDiff`/`Summary` power the migration change report (also pulls `go-atomic-write`)
+- `github.com/larsartmann/go-atomic-write` - crash-durable config writes (Save + migrate write path)
 - `github.com/LarsArtmann/go-business-rules/v2` - Severity-aware validation (Info/Warning/Error/Critical): config validation rules, validator, violation bridging
 - `github.com/onsi/ginkgo/v2` + `github.com/onsi/gomega` - BDD testing
 - `github.com/knadh/koanf/v2` - Configuration

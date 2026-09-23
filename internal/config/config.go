@@ -127,6 +127,7 @@ func parseConfig(k *koanf.Koanf) (*types.Config, error) {
 			return nil, errorfamily.WrapRejection(encodeErr, "config.load", "failed to encode profiles")
 		}
 
+		//nolint:musttag // Profile and CleanupOperation carry yaml tags
 		if decodeErr := yamlv3.Unmarshal(profilesYAML, &config.Profiles); decodeErr != nil {
 			logger.Error("Failed to unmarshal profiles", "error", decodeErr)
 
