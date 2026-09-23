@@ -57,10 +57,10 @@
 
 | #  | Task                                                                                  | Impact | Effort | Source                 |
 | -- | ------------------------------------------------------------------------------------- | ------ | ------ | ---------------------- |
-| 27 | Split `internal/domain/` into `enums/`, `operations/`, `types/` sub-packages          | HIGH   | HIGH   | Architecture deepening |
-| 28 | Split `internal/cleaner/` into per-domain sub-packages (nix/, docker/, golang/, etc.) | HIGH   | HIGH   | Architecture deepening |
-| 29 | Register individual cleaners as DI providers (enables per-cleaner config)             | HIGH   | HIGH   | 2026-07-06 DI/workflow |
-| 30 | Make adapters interface-backed with `do.As` aliasing                                  | MED    | HIGH   | 2026-07-06 DI/workflow |
+| 27 | ~~Split `internal/domain/` into `enums/`, `operations/`, `types/` sub-packages~~ DONE 2026-09-23 (DAG enums ← operations ← types; all 118 consumers migrated) | HIGH   | HIGH   | Architecture deepening |
+| 28 | ~~Split `internal/cleaner/` into per-domain sub-packages (nix/, docker/, golang/, etc.)~~ DONE 2026-09-23 (14 sub-packages + factory; shared core stays in root) | HIGH   | HIGH   | Architecture deepening |
+| 29 | ~~Register individual cleaners as DI providers (enables per-cleaner config)~~ DONE 2026-09-23 (`cleaner.<name>` services, `di.Cleaner` accessor, factory per-cleaner constructors) | HIGH   | HIGH   | 2026-07-06 DI/workflow |
+| 30 | ~~Make adapters interface-backed with `do.As` aliasing~~ DONE 2026-09-23 (NixStore/HTTPRequester/Limiter/KeyValueCache + `do.MustAs` aliases in AdaptersPackage) | MED    | HIGH   | 2026-07-06 DI/workflow |
 
 ---
 

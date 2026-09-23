@@ -27,10 +27,10 @@ Or use the Nix devShell (`nix develop`) which sets it automatically. The devShel
 ## Project Structure
 
 - `cmd/clean-wizard/` - CLI entry point and commands (Cobra)
-- `internal/di/` - Dependency injection container (samber/do v2)
+- `internal/di/` - Dependency injection container (samber/do v2): per-cleaner providers, adapter aliases, accessors
 - `internal/execution/` - Workflow orchestration engine (Azure/go-workflow)
-- `internal/cleaner/` - 13+ cleaner implementations, registry, factory
-- `internal/domain/` - Domain types, 27 CacheType enums, interfaces, settings
+- `internal/cleaner/` - Shared cleaner core (interfaces, registry, helpers, error classification, test factories) plus one sub-package per cleaner (`nix/`, `homebrew/`, `docker/`, `cargo/`, `golang/`, `golangcilint/`, `nodepackages/`, `buildcache/`, `systemcache/`, `tempfiles/`, `projectsmanagementautomation/`, `projectexecutables/`, `compiledbinaries/`, `githistory/`) and `factory/` (per-cleaner constructors + registry assembly)
+- `internal/domain/` - Split into `enums/` (type-safe enums + generic marshal helpers), `operations/` (OperationType/OperationSettings/validation/defaults, duration parsing, git-history settings), `types/` (scan/clean results, Config/Profile, cleaner ports, system paths); dependency DAG: enums ← operations ← types
 - `internal/config/` - Configuration loading (koanf/yaml), validation
 - `internal/result/` - Result[T] type for functional error handling
 - `internal/adapters/` - External tool adapters (Nix, Exec, HTTP, Cache)
@@ -49,12 +49,12 @@ Or use the Nix devShell (`nix develop`) which sets it automatically. The devShel
 
 ## Architecture Patterns
 
-- **Dependency Injection** - `internal/di/` using samber/do v2; `RegisterAllServices` wires all services into a single container; typed accessors wrap `do.Invoke[T]`
+- **Dependency Injection** - `internal/di/` using samber/do v2; `RegisterAllServices` wires config, run settings, adapters, and cleaners; typed accessors wrap `do.Invoke[T]`; per-cleaner named services (`cleaner.<name>`) resolved via `di.Cleaner(i, name)`
 - **Workflow Orchestration** - `internal/execution/` using Azure/go-workflow; `RunCleaners`/`RunScans` compile cleaners into a DAG of `flow.FuncIO` steps with `BeforeStep`/`AfterStep` hooks
-- **Registry Pattern** - `cleaner.Registry` for thread-safe cleaner management, resolved from DI container
+- **Registry Pattern** - `cleaner.Registry` for thread-safe cleaner management; the DI registry provider aggregates all per-cleaner services in canonical order
 - **Result Type** - `result.Result[T]` for functional error handling in cleaner methods
-- **Type-Safe Enums** - 27 CacheType enums with generic helpers in `enum_macros.go`
-- **Adapter Pattern** - External tools wrapped in `internal/adapters/`
+- **Type-Safe Enums** - 27 CacheType enums with generic helpers in `internal/domain/enums/enum_macros.go`
+- **Adapter Pattern** - External tools in `internal/adapters/` behind interfaces (`NixStore`, `HTTPRequester`, `Limiter`, `KeyValueCache`); `AdaptersPackage` registers concrete adapters and aliases them to interfaces via `do.MustAs`; the nix cleaner consumes `adapters.NixStore`, not `*NixAdapter`
 - **Platform-Aware Defaults** - `DefaultProtectedPaths()`, `getDefaultSystemCacheTypes()` use `runtime.GOOS`
 - **ValidateOptionalSettings helper** - Generic helper in `internal/cleaner/helpers.go` that consolidates the `if settings == nil || settings.X == nil { return nil }` boilerplate shared by every cleaner's `ValidateSettings` method
 - **CleanerConstructor[T] generic** - `internal/cleaner/test_interfaces.go` defines `type CleanerConstructor[T any] func(verbose, dryRun bool) T` used as alias for `CleanerConstructorWithSettings` and `SimpleCleanerConstructor`
@@ -66,7 +66,7 @@ Or use the Nix devShell (`nix develop`) which sets it automatically. The devShel
 The application follows the same pattern as BuildFlow:
 
 1. **CLI parses flags** → loads config → creates DI container per command invocation
-2. **`di.RegisterAllServices(injector, cfg, settings)`** registers config, run settings, and cleaner registry as lazy singletons
+2. **`di.RegisterAllServices(injector, cfg, settings)`** registers config, run settings, adapter services (aliased to interfaces via `do.MustAs`), one named provider per cleaner (`cleaner.<name>`), and the registry that aggregates them
 3. **Command resolves services** from DI via typed accessors (`di.CleanerRegistry(i)`)
 4. **`execution.RunCleaners(ctx, registry, names, opts...)`** compiles cleaners into a go-workflow DAG and executes it
 5. **Workflow steps** wrap each cleaner's `Clean(ctx)` method with panic recovery, collecting results in a thread-safe `resultCollector`
@@ -141,8 +141,8 @@ Key files:
 
 ## Known Issues
 
-- `internal/domain/` is a god package (23 files)
-- `internal/cleaner/` has 50+ files flat (no sub-packages)
+- ~~`internal/domain/` is a god package (23 files)~~ RESOLVED 2026-09-23: split into `enums/`, `operations/`, `types/` (task 27)
+- ~~`internal/cleaner/` has 50+ files flat (no sub-packages)~~ RESOLVED 2026-09-23: split into 14 per-domain sub-packages + factory (task 28)
 - Settings only flow when a `--profile` is selected; preset/interactive runs (and the nix/cargo/projects/git-history/golangci-lint cleaners whose constructors take no settings params) still use factory defaults. `NixGenerationsSettings.DryRun`/`Optimize` and `BuildCacheSettings.ToolTypes` have no constructor consumption yet
 - Logger uses mutable package-level globals (`L`, `StdLogger`) — causes test race conditions
 
