@@ -21,6 +21,7 @@ func NewScanCommand() *cobra.Command {
 		verbose      bool
 		profile      string
 		jsonOut      bool
+		sarifOut     bool
 		configPath   string
 		retries      int
 		retryProfile string
@@ -32,13 +33,14 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(verbose, profile, jsonOut, configPath, retries, retryProfile, concurrency)
+			return runScanCommand(verbose, profile, jsonOut, sarifOut, configPath, retries, retryProfile, concurrency)
 		},
 	}
 
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Show detailed scan information")
 	cmd.Flags().StringVarP(&profile, "profile", "p", "", "Filter results by profile")
 	cmd.Flags().BoolVarP(&jsonOut, "json", "j", false, "Output in JSON format")
+	cmd.Flags().BoolVar(&sarifOut, "sarif", false, "Output in SARIF 2.1.0 format (machine-readable findings)")
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 	cmd.Flags().IntVar(&retries, "retries", 3, "Number of retry attempts per scanner (0=disabled)")
 	cmd.Flags().
@@ -71,12 +73,21 @@ func runScanCommand(
 	verbose bool,
 	profile string,
 	jsonOutput bool,
+	sarifOutput bool,
 	configPath string,
 	retries int,
 	retryProfile string,
 	concurrency int,
 ) error {
 	ctx := context.Background()
+
+	if jsonOutput && sarifOutput {
+		return errorfamily.NewRejection(
+			"scan.flags", "--json and --sarif are mutually exclusive; choose one output format",
+		)
+	}
+
+	machineOutput := jsonOutput || sarifOutput
 
 	if profile != "" {
 		fmt.Printf("⚠️  Warning: --profile %q is not yet supported for scan; showing all available cleaners\n", profile)
@@ -100,7 +111,7 @@ func runScanCommand(
 		return errorfamily.WrapRejection(err, "scan.di_resolve", "failed to resolve cleaner registry from DI")
 	}
 
-	if !jsonOutput {
+	if !machineOutput {
 		fmt.Println(TitleStyle.Render("🔍 Scanning system for cleanable items..."))
 		fmt.Println()
 	}
@@ -108,6 +119,14 @@ func runScanCommand(
 	availableCleaners := getAvailableConfigs(ctx, registry)
 
 	if len(availableCleaners) == 0 {
+		if sarifOutput {
+			return outputScanSARIP(nil)
+		}
+
+		if jsonOutput {
+			return outputScanJSON(nil, 0, 0)
+		}
+
 		fmt.Println("ℹ️  No cleanable items found on this system.")
 		fmt.Println(
 			"   Install package managers (Nix, Homebrew, Docker, etc.) to see cleaning options.",
@@ -116,7 +135,7 @@ func runScanCommand(
 		return nil
 	}
 
-	if !jsonOutput {
+	if !machineOutput {
 		fmt.Printf("✅ Found %d available cleaner(s)\n\n", len(availableCleaners))
 	}
 
@@ -133,6 +152,10 @@ func runScanCommand(
 	}
 
 	scanResults := buildScanResults(wr, availableCleaners)
+
+	if sarifOutput {
+		return outputScanSARIP(scanResults)
+	}
 
 	if jsonOutput {
 		totalCleanable, totalItems := computeScanTotals(scanResults)
@@ -199,13 +222,13 @@ func buildScanResults(wr *execution.WorkflowResult, available []CleanerConfig) [
 	results := make([]ScanResult, 0, len(available))
 	for _, cfg := range available {
 		sr := ScanResult{ //nolint:exhaustruct
-			Name:        cfg.Name,
-			Description: cfg.Description,
-			Icon:        cfg.Icon,
-			Available:   cfg.Available,
+			Name:         cfg.Name,
+			RegistryName: regName,
+			Description:  cfg.Description,
+			Icon:         cfg.Icon,
+			Available:    cfg.Available,
 		}
 
-		regName := getRegistryName(cfg.Type)
 		if step, ok := stepByName[regName]; ok {
 			if step.Err == nil {
 				sr.ItemsCount = step.Clean.ItemsRemoved
@@ -224,6 +247,7 @@ func buildScanResults(wr *execution.WorkflowResult, available []CleanerConfig) [
 // ScanResult holds the scan result for a cleaner.
 type ScanResult struct {
 	Name           string
+	RegistryName   string
 	Available      CleanerAvailability
 	ItemsCount     uint
 	BytesCleanable uint64
@@ -274,6 +298,30 @@ func printScanTable(results []ScanResult, _ bool) {
 	t := newResultsTable(rows...)
 
 	fmt.Println(t)
+}
+
+// outputScanSARIP outputs scan results as a SARIF 2.1.0 document.
+func outputScanSARIP(results []ScanResult) error {
+	outcomes := make([]format.ScanOutcome, 0, len(results))
+	for _, r := range results {
+		outcomes = append(outcomes, format.ScanOutcome{ //nolint:exhaustruct
+			Name:           r.Name,
+			RegistryName:   r.RegistryName,
+			Description:    r.Description,
+			ItemsCount:     r.ItemsCount,
+			BytesCleanable: r.BytesCleanable,
+			Err:            r.Err,
+		})
+	}
+
+	data, err := format.ScanOutcomesToSARIF(outcomes)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(data))
+
+	return nil
 }
 
 // outputScanJSON outputs scan results in JSON format. Per-result error
