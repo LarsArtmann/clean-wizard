@@ -11,7 +11,7 @@ import (
 
 func TestNewProjectsManagementAutomationCleaner(t *testing.T) {
 	t.Parallel()
-	VerifyNewCleanerConstructor(
+	cleaner.VerifyNewCleanerConstructor(
 		t,
 		NewProjectsManagementAutomationCleaner,
 		"NewProjectsManagementAutomationCleaner",

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/compiledbinaries"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
@@ -50,7 +51,7 @@ func TestResolveOperationSettings_Defaults(t *testing.T) {
 	}
 
 	minSizeMB, olderThan, basePaths, excludePatterns := resolveCompiledBinaries(nil)
-	if minSizeMB != DefaultMinSizeMB || olderThan != DefaultOlderThan ||
+	if minSizeMB != compiledbinaries.DefaultMinSizeMB || olderThan != compiledbinaries.DefaultOlderThan ||
 		basePaths != nil || excludePatterns != nil {
 		t.Errorf(
 			"resolveCompiledBinaries() = (%d, %q, %v, %v), want defaults",

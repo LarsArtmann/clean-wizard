@@ -66,7 +66,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 			}
 
 			if cleaner != nil {
-				assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
+				cleaner.AssertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
 			}
 		})
 	}

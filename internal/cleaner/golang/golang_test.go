@@ -86,8 +86,8 @@ func TestNewGoCleaner(t *testing.T) {
 			t.Parallel()
 
 			cleaner := NewGoCleanerWithSettings(
-				tt.GetVerbose(),
-				tt.GetDryRun(),
+				tt.verbose,
+				tt.dryRun,
 				cacheTypeFromBools(
 					tt.cleanCache,
 					tt.cleanTestCache,
@@ -104,8 +104,8 @@ func TestNewGoCleaner(t *testing.T) {
 			assertGoCleanerFields(
 				t,
 				cleaner,
-				tt.GetVerbose(),
-				tt.GetDryRun(),
+				tt.verbose,
+				tt.dryRun,
 				tt.cleanCache,
 				tt.cleanTestCache,
 				tt.cleanModCache,

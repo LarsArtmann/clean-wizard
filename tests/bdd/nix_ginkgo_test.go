@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/nix"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
@@ -32,7 +31,7 @@ func TestCleanWizardBDDSuite(t *testing.T) {
 // NixTestContext holds test state across scenarios.
 type NixTestContext struct {
 	ctx         context.Context //nolint:containedctx // Test helper struct, context storage is acceptable
-	nixCleaner  *cleaner.NixCleaner
+	nixCleaner  *nix.NixCleaner
 	generations result.Result[[]types.NixGeneration]
 	cleanResult result.Result[types.CleanResult]
 	storeSize   result.Result[int64]

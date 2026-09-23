@@ -1,6 +1,11 @@
 package cleaner
 
-import "github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+import (
+	"reflect"
+	"testing"
+
+	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+)
 
 // ToSimpleCleanerConstructor converts a constructor with additional methods to one that
 // only exposes Clean and IsAvailable.
@@ -88,5 +93,92 @@ func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](
 func NewTestCleaner[T any](constructor CleanerConstructor[T]) func() T {
 	return func() T {
 		return constructor(false, false)
+	}
+}
+
+// VerifyNewCleanerConstructor tests a cleaner constructor function with different
+// combinations of verbose and dryRun parameters.
+// This eliminates duplicate test code across multiple cleaner test files.
+//
+// Usage:
+//
+//	func TestNewXxxCleaner(t *testing.T) {
+//	    VerifyNewCleanerConstructor(t, NewXxxCleaner, "NewXxxCleaner")
+//	}
+//
+// Type Parameters:
+//   - T: The cleaner type that must have verbose and dryRun fields
+//
+// Parameters:
+//   - t: The testing.T object
+//   - constructor: Function that creates a cleaner with given verbose and dryRun flags
+//   - cleanerName: Name of the cleaner for error messages
+func VerifyNewCleanerConstructor[T any](
+	t *testing.T,
+	constructor func(bool, bool) T,
+	cleanerName string,
+) {
+	t.Helper()
+
+	tests := []struct {
+		name    string
+		verbose bool
+		dryRun  bool
+	}{
+		{
+			name:    "standard configuration",
+			verbose: false,
+			dryRun:  false,
+		},
+		{
+			name:    "verbose mode",
+			verbose: true,
+			dryRun:  false,
+		},
+		{
+			name:    "dry-run mode",
+			verbose: false,
+			dryRun:  true,
+		},
+		{
+			name:    "verbose dry-run mode",
+			verbose: true,
+			dryRun:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cleaner := constructor(tt.verbose, tt.dryRun)
+
+			cleanerValue := reflect.ValueOf(cleaner)
+			if cleanerValue.Kind() == reflect.Pointer {
+				if cleanerValue.IsNil() {
+					t.Fatalf("%s(%v, %v) returned nil cleaner", cleanerName, tt.verbose, tt.dryRun)
+				}
+
+				cleanerValue = cleanerValue.Elem()
+			} else {
+				cleanerValue = cleanerValue.Elem()
+			}
+
+			verboseField := cleanerValue.FieldByName("verbose")
+			if !verboseField.IsValid() {
+				t.Fatalf("%s cleaner does not have 'verbose' field", cleanerName)
+			}
+
+			if verboseField.Bool() != tt.verbose {
+				t.Errorf("verbose = %v, want %v", verboseField.Bool(), tt.verbose)
+			}
+
+			dryRunField := cleanerValue.FieldByName("dryRun")
+			if !dryRunField.IsValid() {
+				t.Fatalf("%s cleaner does not have 'dryRun' field", cleanerName)
+			}
+
+			if dryRunField.Bool() != tt.dryRun {
+				t.Errorf("dryRun = %v, want %v", dryRunField.Bool(), tt.dryRun)
+			}
+		})
 	}
 }

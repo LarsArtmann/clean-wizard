@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/cargo"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/onsi/gomega"
@@ -51,37 +52,6 @@ func AssertNoItemsToCleanResult(ctx context.Context, cleaner Cleaner, setupEmpty
 	GinkgoNoItemsToCleanTest(ctx, cleaner, setupEmptyState)
 }
 
-// VerboseDryRunCleaner is an interface for cleaners that have verbose and dryRun fields.
-// Used for testing common cleaner initialization patterns.
-type VerboseDryRunCleaner interface {
-	GetVerbose() bool
-	GetDryRun() bool
-}
-
-// assertCleanerBooleanFields validates that a cleaner's verbose and dryRun fields
-// match the expected values. This eliminates duplicate assertion code across cleaner test files.
-//
-// Usage:
-//
-//	if cleaner != nil {
-//		assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
-//	}
-func assertCleanerBooleanFields(
-	t *testing.T,
-	cleaner VerboseDryRunCleaner,
-	wantVerbose, wantDryRun bool,
-) {
-	t.Helper()
-
-	if got := cleaner.GetVerbose(); got != wantVerbose {
-		t.Errorf("verbose = %v, want %v", got, wantVerbose)
-	}
-
-	if got := cleaner.GetDryRun(); got != wantDryRun {
-		t.Errorf("dryRun = %v, want %v", got, wantDryRun)
-	}
-}
-
 // BooleanSettingsCleanerTestCase represents a test case for cleaners with boolean settings.
 type BooleanSettingsCleanerTestCase struct {
 	Name   string
@@ -101,7 +71,7 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				ToolName:          "Cargo",
 				SettingsFieldName: "cargo packages",
 				ExpectedItems:     2,
-				Constructor:       NewBooleanSettingsCleanerTestConstructor(NewCargoCleaner),
+				Constructor:       NewBooleanSettingsCleanerTestConstructor(cargo.NewCargoCleaner),
 				CreateSettingsFunc: func(enabled bool) *operations.OperationSettings {
 					cleanupMode := enums.CacheCleanupDisabled
 					if enabled {
