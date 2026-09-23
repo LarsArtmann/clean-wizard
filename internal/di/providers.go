@@ -18,6 +18,7 @@ func RegisterAllServices(injector do.Injector, cfg *types.Config, settings RunSe
 	do.ProvideValue(injector, cfg)
 	do.ProvideValue(injector, settings)
 
+	AdaptersPackage(injector)
 	CleanerPackage(injector)
 
 	return nil

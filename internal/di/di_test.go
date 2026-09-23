@@ -3,6 +3,8 @@ package di
 import (
 	"testing"
 
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
+
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/cargo"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
@@ -156,4 +158,49 @@ func TestCleanerRegistry_ReturnsErrorWhenNotRegistered(t *testing.T) {
 
 	_, err := CleanerRegistry(injector)
 	assert.Error(t, err)
+}
+
+func TestRegisterAllServices_ResolvesSingleCleanerFromContainer(t *testing.T) {
+	t.Parallel()
+
+	container, cleanup := New()
+	defer cleanup()
+
+	cfg := &types.Config{}
+	settings := RunSettings{Verbose: true, DryRun: true}
+
+	err := RegisterAllServices(container.Injector(), cfg, settings)
+	require.NoError(t, err)
+
+	c, err := Cleaner(container.Injector(), cleaner.CleanerCargo)
+	require.NoError(t, err)
+	assert.Equal(t, cleaner.CleanerCargo, c.Name())
+
+	_, err = Cleaner(container.Injector(), "does-not-exist")
+	assert.Error(t, err)
+}
+
+func TestRegisterAllServices_AdapterInterfaceAliases(t *testing.T) {
+	t.Parallel()
+
+	container, cleanup := New()
+	defer cleanup()
+
+	cfg := &types.Config{}
+	settings := RunSettings{Verbose: false, DryRun: true}
+
+	err := RegisterAllServices(container.Injector(), cfg, settings)
+	require.NoError(t, err)
+
+	store, err := NixStore(container.Injector())
+	require.NoError(t, err)
+	assert.Implements(t, (*adapters.NixStore)(nil), store)
+
+	cache, err := KeyValueCache(container.Injector())
+	require.NoError(t, err)
+	assert.NotNil(t, cache)
+
+	httpRequester, err := do.Invoke[adapters.HTTPRequester](container.Injector())
+	require.NoError(t, err)
+	assert.NotNil(t, httpRequester)
 }

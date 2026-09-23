@@ -44,27 +44,41 @@ const (
 )
 
 // NixCleaner handles Nix package manager cleanup with proper type safety.
+// Store operations go through the adapters.NixStore interface, so real, mock,
+// or DI-provided implementations are interchangeable.
 type NixCleaner struct {
 	cleaner.CleanerBase
 
-	adapter   *adapters.NixAdapter
+	store     adapters.NixStore
 	keepCount int
 }
 
-// NewNixCleaner creates Nix cleaner with proper configuration.
+// NewNixCleaner creates Nix cleaner with proper configuration and the default
+// real Nix adapter.
 func NewNixCleaner(verbose, dryRun bool, keepCount ...int) *NixCleaner {
+	return NewNixCleanerWithStore(verbose, dryRun, nil, keepCount...)
+}
+
+// NewNixCleanerWithStore creates a Nix cleaner backed by the given store. A nil
+// store falls back to the real Nix adapter.
+func NewNixCleanerWithStore(verbose, dryRun bool, store adapters.NixStore, keepCount ...int) *NixCleaner {
 	// Default keep count is 5
 	kc := 5
 	if len(keepCount) > 0 {
 		kc = keepCount[0]
 	}
 
+	if store == nil {
+		store = adapters.NewNixAdapter(0, 0)
+	}
+
+	store.SetDryRun(dryRun) // Pass dry-run to store
+
 	nc := &NixCleaner{
-		adapter:     adapters.NewNixAdapter(0, 0),
+		store:       store,
 		CleanerBase: cleaner.NewCleanerBase(verbose, dryRun),
 		keepCount:   kc,
 	}
-	nc.adapter.SetDryRun(dryRun) // Pass dry-run to adapter
 
 	return nc
 }
@@ -81,7 +95,7 @@ func (nc *NixCleaner) Name() string {
 
 // IsAvailable checks if Nix cleaner is available.
 func (nc *NixCleaner) IsAvailable(ctx context.Context) bool {
-	return nc.adapter.IsAvailable(ctx)
+	return nc.store.IsAvailable(ctx)
 }
 
 // Scan scans for Nix generations and returns them as scan items.
@@ -114,11 +128,11 @@ func (nc *NixCleaner) Clean(ctx context.Context) result.Result[types.CleanResult
 
 // GetStoreSize gets Nix store size with type safety.
 func (nc *NixCleaner) GetStoreSize(ctx context.Context) int64 {
-	if !nc.adapter.IsAvailable(ctx) {
+	if !nc.store.IsAvailable(ctx) {
 		return int64(NixMockStoreSizeGB * bytesPerGB)
 	}
 
-	storeSizeResult := nc.adapter.GetStoreSize(ctx)
+	storeSizeResult := nc.store.GetStoreSize(ctx)
 	if storeSizeResult.IsErr() {
 		return 0
 	}
@@ -155,7 +169,7 @@ func (nc *NixCleaner) ValidateSettings(settings *operations.OperationSettings) e
 // ListGenerations lists Nix generations with proper type safety.
 func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]types.NixGeneration] {
 	// Check availability first
-	if !nc.adapter.IsAvailable(ctx) {
+	if !nc.store.IsAvailable(ctx) {
 		// Return mock data for CI/testing - proper adapter pattern eliminates ghost system
 		return result.MockSuccess([]types.NixGeneration{
 			{
@@ -197,7 +211,7 @@ func (nc *NixCleaner) ListGenerations(ctx context.Context) result.Result[[]types
 	}
 
 	// Only call adapter if available
-	return nc.adapter.ListGenerations(ctx)
+	return nc.store.ListGenerations(ctx)
 }
 
 // CleanOldGenerations removes old Nix generations using centralized conversions.
@@ -248,7 +262,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 			}
 
 			// Remove this generation
-			cleanResult := nc.adapter.RemoveGeneration(ctx, generations[i].ID)
+			cleanResult := nc.store.RemoveGeneration(ctx, generations[i].ID)
 			if cleanResult.IsErr() {
 				return conversions.ToCleanResultFromError(cleanResult.Error())
 			}
@@ -257,7 +271,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 		}
 
 		// Run garbage collection to clean up references
-		gcResult := nc.adapter.CollectGarbage(ctx)
+		gcResult := nc.store.CollectGarbage(ctx)
 		if gcResult.IsErr() {
 			return conversions.ToCleanResultFromError(gcResult.Error())
 		}
