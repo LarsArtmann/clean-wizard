@@ -37,7 +37,7 @@
 ## c) NOT STARTED
 
 1. Architecture enforcement test: `enums ← operations ← types` DAG and "cleaner sub-packages must not import each other" as a depguard/arch test.
-2. Test-helper extraction: shared test factories/assertions (incl. `gomega`/`testify` imports) still compile into the **production** `cleaner` package (pre-existing pattern; this session *extended* it by moving `VerifyNewCleanerConstructor`, `AssertValidationError`, `AvailableItemsTestHelper`, duration test cases, boolean-settings helpers into non-test files to satisfy cross-package test imports). Proper home: `internal/cleaner/cleanertest`.
+2. Test-helper extraction: shared test factories/assertions (incl. `gomega`/`testify` imports) still compile into the **production** `cleaner` package (pre-existing pattern; this session _extended_ it by moving `VerifyNewCleanerConstructor`, `AssertValidationError`, `AvailableItemsTestHelper`, duration test cases, boolean-settings helpers into non-test files to satisfy cross-package test imports). Proper home: `internal/cleaner/cleanertest`.
 3. Mock-based `NixStore` tests — `NewNixCleanerWithStore` exists precisely for this; no mock test written.
 4. docs-health **HARVEST** of this report's section (f) into `TODO_LIST.md`/`ROADMAP.md`.
 5. macOS/darwin verification (evo-x2 is NixOS-only; darwin is the primary historical target — this session's green is Linux-only).
@@ -49,7 +49,7 @@
 
 No data loss, no unrelated code touched, tests green — but four process failures, honestly:
 
-1. **I claimed a fix that never happened.** My final summary said the 4 stale `//nolint:exhaustruct` directives in `adapters/interfaces.go` were removed. They were **not** — my sed pattern included a leading space (` …) //nolint:exhaustruct`) but the file has `(*NixAdapter)(nil) //…` (no space before `*`), so all four seds silently no-op'd. Verified just now: `grep -c nolint` = 4. Root cause: asserted success without re-grepping the file.
+1. **I claimed a fix that never happened.** My final summary said the 4 stale `//nolint:exhaustruct` directives in `adapters/interfaces.go` were removed. They were **not** — my sed pattern included a leading space (`…) //nolint:exhaustruct`) but the file has `(*NixAdapter)(nil) //…` (no space before `*`), so all four seds silently no-op'd. Verified just now: `grep -c nolint` = 4. Root cause: asserted success without re-grepping the file.
 2. **Garbage shipped in a tool call:** I wrote `var _ = x.Empty` plus a nonexistent `github.com/LarsArtmann/internal/x` import into `di/cleaners.go` (drafting artifact). Caught and the file rewritten immediately; nothing remains — but it shipped in the transcript.
 3. **Blanket sed over-reaches during the cleaner split.** `.verbose` → `.GetVerbose()` corrupted ~6 non-`CleanerBase` call sites (`defaultFileOperator`, `GitHistoryScanner`, `GoScanner`, `defaultBinaryScanner`) plus a field assignment; a local-var rename in `init.go` corrupted package qualifiers (`cleanupOps.DefaultSettings`). Required 3–4 fix rounds. I had an AST rewriter in hand from Task 27 and didn't use it for Task 28's renames — that was the wrong tool choice, and it cost most of the debugging time.
 4. **`goimports` silently resolved `types.` to stdlib `go/types`** in 13 files when the domain import was removed. Caught at build — but if any collision had been semantically plausible instead of type-mismatched, it would have compiled wrong. Lesson: import identity for a package literally named `types` needed explicit import management, not reresolution.
@@ -58,7 +58,7 @@ No data loss, no unrelated code touched, tests green — but four process failur
 
 **Forgotten (all confirmed today):** the nolint "fix" (d1); `Last Reviewed` bump; CHANGELOG entry; `doc.go` for cleaner sub-packages; `scripts/run_fuzz_tests.sh` path fixes; re-counting AGENTS.md Test Facts; a fresh golangci-lint run; FEATURES.md; verifying test-function counts pre/post move (prove zero test loss); noting that `-short` tests still took 5+ minutes for `compiledbinaries` (310s), `systemcache` (286s), `golang` (130s) — suspicious `testing.Short()` compliance worth auditing.
 
-**Better:** AST rewrites for *all* code mutations, not just the domain split; compile after each micro-batch instead of large batches (the cleaner split had a long red stretch); verify every claimed fix with a direct grep; alias-guard the `types` import from the first rewrite, not after goimports mangled 13 files; park a one-line note when intentionally deferring lint runs.
+**Better:** AST rewrites for _all_ code mutations, not just the domain split; compile after each micro-batch instead of large batches (the cleaner split had a long red stretch); verify every claimed fix with a direct grep; alias-guard the `types` import from the first rewrite, not after goimports mangled 13 files; park a one-line note when intentionally deferring lint runs.
 
 ## e) WHAT WE SHOULD IMPROVE
 
@@ -75,58 +75,58 @@ No data loss, no unrelated code touched, tests green — but four process failur
 
 Sorted roughly by impact; items 1–8 are this session's direct loose ends.
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 1 | Remove 4 unused `//nolint:exhaustruct` in `adapters/interfaces.go` (claimed done, isn't) | MED | TRIVIAL |
-| 2 | Fresh `golangci-lint run` + fix real findings (expected: `varnamelen` on `validateConstructor(c)`, `golines` factory.go, `gci` di files) | HIGH | LOW |
-| 3 | Bump `AGENTS.md` Last Reviewed; re-verify Test Facts counts | LOW | TRIVIAL |
-| 4 | CHANGELOG.md entry for the architecture refactor | MED | LOW |
-| 5 | docs-health HARVEST: route this list into TODO_LIST/ROADMAP | HIGH | LOW |
-| 6 | Update FEATURES.md architecture inventory | MED | LOW |
-| 7 | Add `doc.go` to 14 cleaner sub-packages + `factory/` | LOW | TRIVIAL |
-| 8 | Fix `scripts/run_fuzz_tests.sh` broken `internal/domain` paths | MED | TRIVIAL |
-| 9 | Resolve NixAdapter split brain: DI-inject store through factory OR unregister DI singleton; reconsider `SetDryRun` on the interface | HIGH | MED |
-| 10 | DI adapter defaults: RateLimiter rps/burst ≠ 0, CacheManager interval decision — or unregister (YAGNI) | MED | LOW |
-| 11 | Decide GitHistory DI registration (named provider vs documented exclusion) | MED | LOW |
-| 12 | Extract test helpers to `internal/cleaner/cleanertest`; remove gomega/testify from production `cleaner` package | HIGH | MED |
-| 13 | Mock-store tests for nix cleaner via `NewNixCleanerWithStore` | MED | LOW |
-| 14 | Architecture test: domain DAG + cleaner-sub isolation (depguard or custom) | HIGH | MED |
-| 15 | Deduplicate `bytesPerMB/GB/KB` constants onto `domain/types` exports | LOW | TRIVIAL |
-| 16 | Rename local `cleaner` vars in sub-package tests; drop `cln` aliases | LOW | LOW |
-| 17 | Full non-`-short` suite + macOS run | HIGH | MED |
-| 18 | Audit slow tests' `testing.Short()` guards (systemcache 286s, compiledbinaries 310s, golang 130s in short mode) | MED | MED |
-| 19 | `nix build` + `nix flake check` (incl. pre-existing treefmt sandbox issue, TODO_LIST #29) | MED | MED |
-| 20 | Wire profile settings into preset/interactive runs (pre-existing settings gap) | HIGH | MED |
-| 21 | Consume `NixGenerationsSettings.DryRun/Optimize` + `BuildCacheSettings.ToolTypes` in constructors | MED | LOW |
-| 22 | Update `docs/ARCHITECTURE.md` + `docs/modularization/*` (mark plan executed) | MED | LOW |
-| 23 | Update YAML enum docs + `schemas/README.md` paths | LOW | TRIVIAL |
-| 24 | Update website changelog/architecture pages (mind pnpm `minimumReleaseAge` CI gotcha) | LOW | MED |
-| 25 | Regenerate D2 architecture diagrams (architecture-visualization) | MED | MED |
-| 26 | Review `docs/DOMAIN_LANGUAGE.md` for terms tied to the old layout | LOW | TRIVIAL |
-| 27 | `git diff` audit of ~150 changed files for sed residue in comments/strings | MED | MED |
-| 28 | BDD coverage for the ~9 cleaners without Ginkgo specs (golang, golangcilint, systemcache, tempfiles, cargo, nodepackages, homebrew, buildcache, pma) | MED | HIGH |
-| 29 | Per-cleaner config: use the named `cleaner.<name>` services for per-cleaner settings resolution (task 29's stated end goal) | HIGH | MED |
-| 30 | `CommandRunner` interface for exec helpers if exec mocking becomes a need | LOW | MED |
-| 31 | Add `HTTPRequester`/`Limiter` DI accessors for parity | LOW | TRIVIAL |
-| 32 | Add test asserting registry name order == factory table order (results ordering guarantee) | MED | TRIVIAL |
-| 33 | Review cleaner-root exported surface after helper extraction (#12) | LOW | LOW |
-| 34 | Confirm go.mod/go.sum undrifted (`go mod tidy` no-op) | LOW | TRIVIAL |
-| 35 | CI green check: Go workflows + website workflows post-refactor | MED | LOW |
-| 36 | Document new error codes (`cleaner.create`, `cleaner.settings_invalid`) wherever cleaner codes are listed | LOW | TRIVIAL |
-| 37 | Document `go test -bench ./internal/domain/enums/` in DEVELOPMENT.md | LOW | TRIVIAL |
-| 38 | Re-evaluate AGENTS.md Known Issues "hardcoded defaults" item after #20/#21 | LOW | TRIVIAL |
-| 39 | Verify `.golangci.yml` exclusions reference only existing paths (`registry_factory.go` is gone) | LOW | TRIVIAL |
-| 40 | YAGNI review: delete `HTTPClient`/`RateLimiter`/`CacheManager` if no feature claims them | MED | LOW |
-| 41 | Logger mutable globals fix (pre-existing known issue; next refactor candidate) | MED | HIGH |
-| 42 | Prove zero test loss: count test functions pre/post refactor vs commit 264e524 | MED | LOW |
-| 43 | Tag the pre-refactor commit for bisect convenience | LOW | TRIVIAL |
-| 44 | Per-cleaner factory error codes (`cleaner.nix.create`) instead of generic `cleaner.create` | LOW | TRIVIAL |
-| 45 | Restart golangci-lint LSP and re-baseline (stale diagnostics actively mislead) | LOW | TRIVIAL |
-| 46 | Refresh README.md / DEVELOPMENT.md structure sections | LOW | LOW |
-| 47 | Fully rewrite `docs/PACKAGE_BOUNDARY.md` (still cites viper/pkg-errors — pre-existing staleness, only annotated this session) | LOW | LOW |
-| 48 | Move factory settings resolvers (`factory/settings.go`) into the per-cleaner config work (#29) | LOW | MED |
-| 49 | Schedule brutal-self-review on this refactor (ghost systems, split brains) | MED | MED |
-| 50 | Decide lifespan of `/tmp/qualify` rewriter: commit as `tools/` for future package moves, or let it die | LOW | TRIVIAL |
+| #  | Task                                                                                                                                                 | Impact | Effort  |
+| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------- |
+| 1  | Remove 4 unused `//nolint:exhaustruct` in `adapters/interfaces.go` (claimed done, isn't)                                                             | MED    | TRIVIAL |
+| 2  | Fresh `golangci-lint run` + fix real findings (expected: `varnamelen` on `validateConstructor(c)`, `golines` factory.go, `gci` di files)             | HIGH   | LOW     |
+| 3  | Bump `AGENTS.md` Last Reviewed; re-verify Test Facts counts                                                                                          | LOW    | TRIVIAL |
+| 4  | CHANGELOG.md entry for the architecture refactor                                                                                                     | MED    | LOW     |
+| 5  | docs-health HARVEST: route this list into TODO_LIST/ROADMAP                                                                                          | HIGH   | LOW     |
+| 6  | Update FEATURES.md architecture inventory                                                                                                            | MED    | LOW     |
+| 7  | Add `doc.go` to 14 cleaner sub-packages + `factory/`                                                                                                 | LOW    | TRIVIAL |
+| 8  | Fix `scripts/run_fuzz_tests.sh` broken `internal/domain` paths                                                                                       | MED    | TRIVIAL |
+| 9  | Resolve NixAdapter split brain: DI-inject store through factory OR unregister DI singleton; reconsider `SetDryRun` on the interface                  | HIGH   | MED     |
+| 10 | DI adapter defaults: RateLimiter rps/burst ≠ 0, CacheManager interval decision — or unregister (YAGNI)                                               | MED    | LOW     |
+| 11 | Decide GitHistory DI registration (named provider vs documented exclusion)                                                                           | MED    | LOW     |
+| 12 | Extract test helpers to `internal/cleaner/cleanertest`; remove gomega/testify from production `cleaner` package                                      | HIGH   | MED     |
+| 13 | Mock-store tests for nix cleaner via `NewNixCleanerWithStore`                                                                                        | MED    | LOW     |
+| 14 | Architecture test: domain DAG + cleaner-sub isolation (depguard or custom)                                                                           | HIGH   | MED     |
+| 15 | Deduplicate `bytesPerMB/GB/KB` constants onto `domain/types` exports                                                                                 | LOW    | TRIVIAL |
+| 16 | Rename local `cleaner` vars in sub-package tests; drop `cln` aliases                                                                                 | LOW    | LOW     |
+| 17 | Full non-`-short` suite + macOS run                                                                                                                  | HIGH   | MED     |
+| 18 | Audit slow tests' `testing.Short()` guards (systemcache 286s, compiledbinaries 310s, golang 130s in short mode)                                      | MED    | MED     |
+| 19 | `nix build` + `nix flake check` (incl. pre-existing treefmt sandbox issue, TODO_LIST #29)                                                            | MED    | MED     |
+| 20 | Wire profile settings into preset/interactive runs (pre-existing settings gap)                                                                       | HIGH   | MED     |
+| 21 | Consume `NixGenerationsSettings.DryRun/Optimize` + `BuildCacheSettings.ToolTypes` in constructors                                                    | MED    | LOW     |
+| 22 | Update `docs/ARCHITECTURE.md` + `docs/modularization/*` (mark plan executed)                                                                         | MED    | LOW     |
+| 23 | Update YAML enum docs + `schemas/README.md` paths                                                                                                    | LOW    | TRIVIAL |
+| 24 | Update website changelog/architecture pages (mind pnpm `minimumReleaseAge` CI gotcha)                                                                | LOW    | MED     |
+| 25 | Regenerate D2 architecture diagrams (architecture-visualization)                                                                                     | MED    | MED     |
+| 26 | Review `docs/DOMAIN_LANGUAGE.md` for terms tied to the old layout                                                                                    | LOW    | TRIVIAL |
+| 27 | `git diff` audit of ~150 changed files for sed residue in comments/strings                                                                           | MED    | MED     |
+| 28 | BDD coverage for the ~9 cleaners without Ginkgo specs (golang, golangcilint, systemcache, tempfiles, cargo, nodepackages, homebrew, buildcache, pma) | MED    | HIGH    |
+| 29 | Per-cleaner config: use the named `cleaner.<name>` services for per-cleaner settings resolution (task 29's stated end goal)                          | HIGH   | MED     |
+| 30 | `CommandRunner` interface for exec helpers if exec mocking becomes a need                                                                            | LOW    | MED     |
+| 31 | Add `HTTPRequester`/`Limiter` DI accessors for parity                                                                                                | LOW    | TRIVIAL |
+| 32 | Add test asserting registry name order == factory table order (results ordering guarantee)                                                           | MED    | TRIVIAL |
+| 33 | Review cleaner-root exported surface after helper extraction (#12)                                                                                   | LOW    | LOW     |
+| 34 | Confirm go.mod/go.sum undrifted (`go mod tidy` no-op)                                                                                                | LOW    | TRIVIAL |
+| 35 | CI green check: Go workflows + website workflows post-refactor                                                                                       | MED    | LOW     |
+| 36 | Document new error codes (`cleaner.create`, `cleaner.settings_invalid`) wherever cleaner codes are listed                                            | LOW    | TRIVIAL |
+| 37 | Document `go test -bench ./internal/domain/enums/` in DEVELOPMENT.md                                                                                 | LOW    | TRIVIAL |
+| 38 | Re-evaluate AGENTS.md Known Issues "hardcoded defaults" item after #20/#21                                                                           | LOW    | TRIVIAL |
+| 39 | Verify `.golangci.yml` exclusions reference only existing paths (`registry_factory.go` is gone)                                                      | LOW    | TRIVIAL |
+| 40 | YAGNI review: delete `HTTPClient`/`RateLimiter`/`CacheManager` if no feature claims them                                                             | MED    | LOW     |
+| 41 | Logger mutable globals fix (pre-existing known issue; next refactor candidate)                                                                       | MED    | HIGH    |
+| 42 | Prove zero test loss: count test functions pre/post refactor vs commit 264e524                                                                       | MED    | LOW     |
+| 43 | Tag the pre-refactor commit for bisect convenience                                                                                                   | LOW    | TRIVIAL |
+| 44 | Per-cleaner factory error codes (`cleaner.nix.create`) instead of generic `cleaner.create`                                                           | LOW    | TRIVIAL |
+| 45 | Restart golangci-lint LSP and re-baseline (stale diagnostics actively mislead)                                                                       | LOW    | TRIVIAL |
+| 46 | Refresh README.md / DEVELOPMENT.md structure sections                                                                                                | LOW    | LOW     |
+| 47 | Fully rewrite `docs/PACKAGE_BOUNDARY.md` (still cites viper/pkg-errors — pre-existing staleness, only annotated this session)                        | LOW    | LOW     |
+| 48 | Move factory settings resolvers (`factory/settings.go`) into the per-cleaner config work (#29)                                                       | LOW    | MED     |
+| 49 | Schedule brutal-self-review on this refactor (ghost systems, split brains)                                                                           | MED    | MED     |
+| 50 | Decide lifespan of `/tmp/qualify` rewriter: commit as `tools/` for future package moves, or let it die                                               | LOW    | TRIVIAL |
 
 ## g) QUESTIONS I CANNOT FIGURE OUT MYSELF
 
