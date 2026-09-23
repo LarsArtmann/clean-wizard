@@ -24,14 +24,7 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(
 		sanitizedExcludes := make([]string, 0, len(settings.Excludes))
 		for i, exclude := range settings.Excludes {
 			original := exclude
-
-			if cs.rules.TrimWhitespace {
-				exclude = strings.TrimSpace(exclude)
-			}
-
-			if cs.rules.NormalizePaths {
-				exclude = filepath.Clean(exclude)
-			}
+			exclude = cs.sanitizePathValue(exclude)
 
 			if original != exclude {
 				result.addChange(
@@ -45,16 +38,7 @@ func (cs *ConfigSanitizer) sanitizeTempFilesSettings(
 			sanitizedExcludes = append(sanitizedExcludes, exclude)
 		}
 
-		// Remove duplicates and sort
-		if cs.rules.RemoveDuplicates {
-			sanitizedExcludes = cs.removeDuplicates(sanitizedExcludes)
-		}
-
-		if cs.rules.SortArrays {
-			cs.sortStrings(sanitizedExcludes)
-		}
-
-		settings.Excludes = sanitizedExcludes
+		settings.Excludes = cs.finalizePathList(sanitizedExcludes)
 	}
 
 	result.SanitizedFields = append(result.SanitizedFields, fieldPrefix+".temp_files")

@@ -21,14 +21,7 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(
 		sanitizedPaths := make([]string, 0, len(settings.Paths))
 		for i, path := range settings.Paths {
 			original := path
-
-			if cs.rules.TrimWhitespace {
-				path = strings.TrimSpace(path)
-			}
-
-			if cs.rules.NormalizePaths {
-				path = filepath.Clean(path)
-			}
+			path = cs.sanitizePathValue(path)
 
 			// Validate absolute path requirement
 			if !filepath.IsAbs(path) {
@@ -54,16 +47,7 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(
 			sanitizedPaths = append(sanitizedPaths, path)
 		}
 
-		// Remove duplicates and sort
-		if cs.rules.RemoveDuplicates {
-			sanitizedPaths = cs.removeDuplicates(sanitizedPaths)
-		}
-
-		if cs.rules.SortArrays {
-			cs.sortStrings(sanitizedPaths)
-		}
-
-		settings.Paths = sanitizedPaths
+		settings.Paths = cs.finalizePathList(sanitizedPaths)
 	}
 
 	// Sanitize older_than duration

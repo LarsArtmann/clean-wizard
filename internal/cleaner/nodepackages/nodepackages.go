@@ -142,90 +142,43 @@ func (npmc *NodePackageManagerCleaner) scanPackageManager(
 	ctx context.Context,
 	pm enums.PackageManagerType,
 ) result.Result[[]types.ScanItem] {
-	items := make([]types.ScanItem, 0)
-
 	switch pm {
 	case enums.PackageManagerNpm:
-		// Get npm cache location
-		cmd := adapters.ExecWithTimeout(
-			ctx,
-			DefaultNodePackageManagerTimeout,
-			"npm",
-			"config",
-			"get",
-			"cache",
-		)
-
-		output, err := cmd.CombinedOutput()
+		cachePath, err := npmc.getNpmCacheDir(ctx)
 		if err != nil {
 			return result.Err[[]types.ScanItem](
-				fmt.Errorf("failed to get npm cache location for pm=%v: %w", pm, err),
+				fmt.Errorf("failed to scan npm for pm=%v: %w", pm, err),
 			)
 		}
 
-		cachePath := strings.TrimSpace(string(output))
-		if cachePath != "" {
-			items = append(items, types.ScanItem{
-				Path:     cachePath,
-				Size:     0, // Size unknown without checking
-				Created:  time.Time{},
-				ScanType: types.ScanTypeTemp,
-			})
-
-			if npmc.GetVerbose() {
-				fmt.Printf("Found npm cache: %s\n", cachePath)
-			}
+		if npmc.GetVerbose() {
+			fmt.Printf("Found npm cache: %s\n", cachePath)
 		}
+
+		return result.Ok([]types.ScanItem{newTempScanItem(cachePath)})
 
 	case enums.PackageManagerPnpm:
-		// Get pnpm store location
-		cmd := adapters.ExecWithTimeout(
-			ctx,
-			DefaultNodePackageManagerTimeout,
-			"pnpm",
-			"store",
-			"path",
-		)
-
-		output, err := cmd.CombinedOutput()
+		storePath, err := npmc.getPnpmStoreDir(ctx)
 		if err != nil {
 			return result.Err[[]types.ScanItem](
-				fmt.Errorf("failed to get pnpm store location for pm=%v: %w", pm, err),
+				fmt.Errorf("failed to scan pnpm for pm=%v: %w", pm, err),
 			)
 		}
 
-		storePath := strings.TrimSpace(string(output))
-		if storePath != "" {
-			items = append(items, types.ScanItem{
-				Path:     storePath,
-				Size:     0, // Size unknown without checking
-				Created:  time.Time{},
-				ScanType: types.ScanTypeTemp,
-			})
-
-			if npmc.GetVerbose() {
-				fmt.Printf("Found pnpm store: %s\n", storePath)
-			}
+		if npmc.GetVerbose() {
+			fmt.Printf("Found pnpm store: %s\n", storePath)
 		}
+
+		return result.Ok([]types.ScanItem{newTempScanItem(storePath)})
 
 	case enums.PackageManagerYarn:
-		cacheResult := npmc.scanHomeDirCache(ctx, ".yarn/cache", "yarn")
-		if cacheResult.IsOk() {
-			items = append(items, cacheResult.Value()...)
-		} else {
-			return cacheResult
-		}
+		return npmc.scanHomeDirCache(ctx, ".yarn/cache", "yarn")
 
 	case enums.PackageManagerBun:
-		cacheResult := npmc.scanHomeDirCache(ctx, ".bun/install/cache", "bun")
-		if cacheResult.IsOk() {
-			items = append(items, cacheResult.Value()...)
-		} else {
-			return cacheResult
-		}
+		return npmc.scanHomeDirCache(ctx, ".bun/install/cache", "bun")
 	}
 
-	return result.Ok(items)
+	return result.Ok([]types.ScanItem{})
 }
 
 // scanHomeDirCache scans a cache directory located under the home directory.
@@ -246,81 +199,74 @@ func (npmc *NodePackageManagerCleaner) scanHomeDirCache(
 	}
 
 	cachePath := fmt.Sprintf("%s/%s", homeDir, cacheSuffix)
-	items := []types.ScanItem{
-		{
-			Path:     cachePath,
-			Size:     0, // Size unknown without checking
-			Created:  time.Time{},
-			ScanType: types.ScanTypeTemp,
-		},
-	}
 
 	if npmc.GetVerbose() {
 		fmt.Printf("Found %s cache: %s\n", pmName, cachePath)
 	}
 
-	return result.Ok(items)
+	return result.Ok([]types.ScanItem{newTempScanItem(cachePath)})
+}
+
+// newTempScanItem builds a ScanItem for a temp cache path of unknown size.
+func newTempScanItem(path string) types.ScanItem {
+	return types.ScanItem{
+		Path:     path,
+		Size:     0, // Size unknown without checking
+		Created:  time.Time{},
+		ScanType: types.ScanTypeTemp,
+	}
 }
 
 // getNpmCacheDir returns the npm cache directory path.
 func (npmc *NodePackageManagerCleaner) getNpmCacheDir(ctx context.Context) (string, error) {
-	cmd := adapters.ExecWithTimeout(
-		ctx,
-		DefaultNodePackageManagerTimeout,
-		"npm",
-		"config",
-		"get",
-		"cache",
-	)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", fmt.Errorf("failed to get npm cache location: %w", err)
-	}
-
-	cachePath := strings.TrimSpace(string(output))
-	if cachePath == "" {
-		return "", errors.New("npm cache path is empty")
-	}
-
-	return cachePath, nil
+	return npmc.getCommandCacheDir(ctx, "npm cache location", "npm", "config", "get", "cache")
 }
 
 // getPnpmStoreDir returns the pnpm store directory path.
 func (npmc *NodePackageManagerCleaner) getPnpmStoreDir(ctx context.Context) (string, error) {
-	cmd := adapters.ExecWithTimeout(ctx, DefaultNodePackageManagerTimeout, "pnpm", "store", "path")
+	return npmc.getCommandCacheDir(ctx, "pnpm store location", "pnpm", "store", "path")
+}
+
+// getCommandCacheDir runs a package-manager command that prints its cache/store
+// location, returning the trimmed non-empty path.
+func (npmc *NodePackageManagerCleaner) getCommandCacheDir(
+	ctx context.Context,
+	what string,
+	commandArgs ...string,
+) (string, error) {
+	cmd := adapters.ExecWithTimeout(ctx, DefaultNodePackageManagerTimeout, commandArgs[0], commandArgs[1:]...)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", fmt.Errorf("failed to get pnpm store location: %w", err)
+		return "", fmt.Errorf("failed to get %s: %w", what, err)
 	}
 
-	storePath := strings.TrimSpace(string(output))
-	if storePath == "" {
-		return "", errors.New("pnpm store path is empty")
+	path := strings.TrimSpace(string(output))
+	if path == "" {
+		return "", fmt.Errorf("%s is empty", what)
 	}
 
-	return storePath, nil
+	return path, nil
+}
+
+// getHomeDirCacheDir returns a cache directory under the home directory.
+func (npmc *NodePackageManagerCleaner) getHomeDirCacheDir(cacheSuffix string) (string, error) {
+	homeDir, err := cleaner.GetHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	return homeDir + "/" + cacheSuffix, nil
 }
 
 // getYarnCacheDir returns the yarn cache directory path.
 func (npmc *NodePackageManagerCleaner) getYarnCacheDir() (string, error) {
-	homeDir, err := cleaner.GetHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
-	}
-
-	return homeDir + "/.yarn/cache", nil
+	return npmc.getHomeDirCacheDir(".yarn/cache")
 }
 
 // getBunCacheDir returns the bun cache directory path.
 func (npmc *NodePackageManagerCleaner) getBunCacheDir() (string, error) {
-	homeDir, err := cleaner.GetHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
-	}
-
-	return homeDir + "/.bun/install/cache", nil
+	return npmc.getHomeDirCacheDir(".bun/install/cache")
 }
 
 // Clean removes Node.js package manager caches.
