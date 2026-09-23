@@ -136,12 +136,25 @@ func validateLoadedConfig(config *types.Config) error {
 			logger.Error("Configuration validation error",
 				"field", err.Field,
 				"error", err.Message)
+
+			if err.Suggestion != "" {
+				logger.Error("Configuration validation suggestion",
+					"field", err.Field,
+					"suggestion", err.Suggestion)
+			}
 		}
 
 		return fmt.Errorf(
 			"configuration validation failed with %d errors",
 			len(validationResult.Errors),
 		)
+	}
+
+	for _, warning := range validationResult.Warnings {
+		logger.Warn("Configuration validation warning",
+			"field", warning.Field,
+			"message", warning.Message,
+			"suggestion", warning.Suggestion)
 	}
 
 	return nil

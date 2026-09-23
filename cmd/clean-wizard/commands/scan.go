@@ -120,7 +120,7 @@ func runScanCommand(
 
 	if len(availableCleaners) == 0 {
 		if sarifOutput {
-			return outputScanSARIP(nil)
+			return outputScanSARIF(nil)
 		}
 
 		if jsonOutput {
@@ -154,7 +154,7 @@ func runScanCommand(
 	scanResults := buildScanResults(wr, availableCleaners)
 
 	if sarifOutput {
-		return outputScanSARIP(scanResults)
+		return outputScanSARIF(scanResults)
 	}
 
 	if jsonOutput {
@@ -221,6 +221,7 @@ func buildScanResults(wr *execution.WorkflowResult, available []CleanerConfig) [
 
 	results := make([]ScanResult, 0, len(available))
 	for _, cfg := range available {
+		regName := getRegistryName(cfg.Type)
 		sr := ScanResult{ //nolint:exhaustruct
 			Name:         cfg.Name,
 			RegistryName: regName,
@@ -300,8 +301,8 @@ func printScanTable(results []ScanResult, _ bool) {
 	fmt.Println(t)
 }
 
-// outputScanSARIP outputs scan results as a SARIF 2.1.0 document.
-func outputScanSARIP(results []ScanResult) error {
+// outputScanSARIF outputs scan results as a SARIF 2.1.0 document.
+func outputScanSARIF(results []ScanResult) error {
 	outcomes := make([]format.ScanOutcome, 0, len(results))
 	for _, r := range results {
 		outcomes = append(outcomes, format.ScanOutcome{ //nolint:exhaustruct

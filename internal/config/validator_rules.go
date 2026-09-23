@@ -53,9 +53,10 @@ type ValidationRule[T comparable] struct {
 type ValidationSeverity = operations.ValidationSeverity
 
 const (
-	SeverityError   = operations.SeverityError
-	SeverityWarning = operations.SeverityWarning
-	SeverityInfo    = operations.SeverityInfo
+	SeverityError    = operations.SeverityError
+	SeverityWarning  = operations.SeverityWarning
+	SeverityInfo     = operations.SeverityInfo
+	SeverityCritical = operations.SeverityCritical
 )
 
 // GetCompiledRegex returns the compiled regex pattern, creating it once if needed.

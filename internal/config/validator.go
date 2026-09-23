@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	businessrules "github.com/LarsArtmann/go-business-rules/v2"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 // ConfigValidator provides comprehensive type-safe configuration validation.
@@ -67,38 +68,18 @@ func NewConfigValidatorWithRules(rules *ConfigValidationRules) *ConfigValidator 
 	}
 }
 
-// ValidateConfig performs comprehensive configuration validation.
+// ValidateConfig performs comprehensive configuration validation. Every
+// check is expressed as a businessrules rule (severity-aware, tagged by
+// validation level) and the outcome is bridged back into ValidationResult.
 func (cv *ConfigValidator) ValidateConfig(cfg *types.Config) *ValidationResult {
 	start := time.Now()
-	result := &ValidationResult{ //nolint:exhaustruct
-		IsValid:   true,
-		Errors:    []ValidationError{},
-		Warnings:  []ValidationWarning{},
-		Sanitized: nil, // Initialize as nil, will be set by sanitizer if needed
-		Timestamp: time.Now(),
-	}
 
-	// Level 1: Basic structure validation
-	cv.validateBasicStructure(cfg, result)
+	ruleSet := cv.buildConfigRules(cfg)
+	outcome := businessrules.NewValidator().AddRules(ruleSet.rules...).Build()
 
-	// Level 2: Field-level validation with rules
-	cv.validateFieldConstraints(cfg, result)
-
-	// Level 3: Cross-field validation
-	cv.validateCrossFieldConstraints(cfg, result)
-
-	// Level 4: Business logic validation
-	cv.validateBusinessLogic(cfg, result)
-
-	// Level 5: Security validation
-	cv.validateSecurityConstraints(cfg, result)
-
-	// NOTE: Sanitization is NOT applied here to preserve original values
-	// Sanitization should be applied separately after validation succeeds
-	// This prevents state mutation during verification
-
+	result := mapViolations(ruleSet, outcome)
 	result.Duration = time.Since(start)
-	result.IsValid = len(result.Errors) == 0
+	result.Timestamp = time.Now()
 
 	return result
 }

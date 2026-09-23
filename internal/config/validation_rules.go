@@ -369,7 +369,7 @@ func (cv *ConfigValidator) addBusinessLogicRules(set *configRuleSet, cfg *types.
 
 		operationsField := fmt.Sprintf("profiles.%s.operations", name)
 		set.add(withSuggestion(
-			configRule(operationsField, levelBusiness, "required", businessrules.SeverityError,
+			configRule(operationsField, levelBusiness, "business_logic", businessrules.SeverityError,
 				"Profile must have at least one operation",
 				func() error {
 					if len(profile.Operations) == 0 {
@@ -402,7 +402,7 @@ func (cv *ConfigValidator) addOperationRules(
 
 	riskField := fmt.Sprintf("profiles.%s.operations.%s.risk_level", profileName, operation.Name)
 	set.add(withSuggestion(
-		configRule(riskField, levelBusiness, "risk_vs_safe_mode", businessrules.SeverityError,
+		configRule(riskField, levelBusiness, "business_logic", businessrules.SeverityError,
 			"Critical risk operation in unsafe mode", unsafeCriticalCheck),
 		"Enable safe mode or remove critical risk operation",
 	), operation.RiskLevel, nil)
@@ -414,7 +414,7 @@ func (cv *ConfigValidator) addOperationRules(
 		settings := operation.Settings
 		opType := operations.GetOperationType(operation.Name)
 		set.add(withSuggestion(
-			configRule(settingsField, levelBusiness, "settings", businessrules.SeverityError,
+			configRule(settingsField, levelBusiness, "validation", businessrules.SeverityError,
 				"Operation settings are invalid",
 				func() error {
 					if err := settings.ValidateSettings(opType); err != nil {
@@ -445,7 +445,7 @@ func (cv *ConfigValidator) addSecurityRules(set *configRuleSet, cfg *types.Confi
 	for _, path := range cfg.Protected {
 		if path == "/" {
 			set.add(withSuggestion(
-				configRule("protected", levelSecurityTag, "root_path", businessrules.SeverityWarning,
+				configRule("protected", levelSecurityTag, "security", businessrules.SeverityWarning,
 					"Protecting root directory may prevent system operations",
 					func() error {
 						return fmt.Errorf(
@@ -460,7 +460,7 @@ func (cv *ConfigValidator) addSecurityRules(set *configRuleSet, cfg *types.Confi
 
 		if strings.Contains(path, "..") {
 			set.add(withSuggestion(
-				configRule("protected", levelSecurityTag, "parent_reference",
+				configRule("protected", levelSecurityTag, "security",
 					businessrules.SeverityCritical,
 					"Protected path contains parent directory reference",
 					func() error {
@@ -495,7 +495,7 @@ func (cv *ConfigValidator) addSecurityRules(set *configRuleSet, cfg *types.Confi
 				"profiles.%s.operations.%s.risk_level", name, operation.Name,
 			)
 			set.add(withSuggestion(
-				configRule(riskField, levelSecurityTag, "safe_mode_required",
+				configRule(riskField, levelSecurityTag, "security",
 					businessrules.SeverityError,
 					"Critical risk operation requires safe mode", requiresSafeMode),
 				"Enable safe mode or remove critical risk operations",
