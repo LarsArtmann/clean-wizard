@@ -421,9 +421,10 @@ func promptForConfirmation(promptMsg, cancelMsg string) bool {
 	return true
 }
 
-// getConfigPath returns the path to the configuration file.
+// getConfigPath returns the path to the configuration file, delegating to the
+// loader so CONFIG_PATH handling matches everywhere.
 func getConfigPath() string {
-	return os.Getenv("HOME") + "/.clean-wizard.yaml"
+	return config.DefaultConfigPath()
 }
 
 // getEditor returns the editor to use for editing configuration.

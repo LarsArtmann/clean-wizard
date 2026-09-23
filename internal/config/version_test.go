@@ -39,7 +39,7 @@ func TestParseFormatVersion(t *testing.T) { //nolint:paralleltest
 }
 
 func TestNormalizeFormatVersion(t *testing.T) { //nolint:paralleltest
-	t.Run("empty maps to current", func(t *testing.T) {
+	t.Run("empty maps to current", func(t *testing.T) { //nolint:paralleltest
 		got, err := NormalizeFormatVersion("")
 		if err != nil {
 			t.Fatalf("NormalizeFormatVersion(\"\") error = %v", err)
@@ -50,7 +50,7 @@ func TestNormalizeFormatVersion(t *testing.T) { //nolint:paralleltest
 		}
 	})
 
-	t.Run("explicit version passes through", func(t *testing.T) {
+	t.Run("explicit version passes through", func(t *testing.T) { //nolint:paralleltest
 		got, err := NormalizeFormatVersion("0.9.1")
 		if err != nil {
 			t.Fatalf("NormalizeFormatVersion error = %v", err)
@@ -62,7 +62,7 @@ func TestNormalizeFormatVersion(t *testing.T) { //nolint:paralleltest
 		}
 	})
 
-	t.Run("invalid version rejected", func(t *testing.T) {
+	t.Run("invalid version rejected", func(t *testing.T) { //nolint:paralleltest
 		if _, err := NormalizeFormatVersion("banana"); err == nil {
 			t.Error("NormalizeFormatVersion(\"banana\") expected error, got nil")
 		}

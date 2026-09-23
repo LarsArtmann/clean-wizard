@@ -52,6 +52,13 @@ func getConfigPath() string {
 	return filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 }
 
+// DefaultConfigPath returns the configuration file path the loader uses,
+// honoring CONFIG_PATH. Commands resolve the file through this so CLI
+// behavior and loader behavior can never diverge.
+func DefaultConfigPath() string {
+	return getConfigPath()
+}
+
 // readConfigFileFromPath attempts to read a config file from the given path.
 func readConfigFileFromPath(
 	ctx context.Context,
