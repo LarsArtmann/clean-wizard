@@ -67,8 +67,8 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 			t.Parallel()
 
 			cleaner, err := NewBuildCacheCleaner(
-				tt.GetVerbose(),
-				tt.GetDryRun(),
+				tt.verbose,
+				tt.dryRun,
 				tt.olderThan,
 				tt.excludes,
 				tt.basePaths,
@@ -85,7 +85,7 @@ func TestNewBuildCacheCleaner(t *testing.T) {
 			}
 
 			if cleaner != nil {
-				assertCleanerBooleanFields(t, cleaner, tt.GetVerbose(), tt.GetDryRun())
+				assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
 			}
 		})
 	}

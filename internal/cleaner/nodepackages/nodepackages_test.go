@@ -50,7 +50,7 @@ func TestNewNodePackageManagerCleaner(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cleaner := NewNodePackageManagerCleaner(tt.GetVerbose(), tt.GetDryRun(), tt.packageManagers)
+			cleaner := NewNodePackageManagerCleaner(tt.verbose, tt.dryRun, tt.packageManagers)
 
 			if cleaner == nil {
 				t.Fatal("NewNodePackageManagerCleaner() returned nil cleaner")

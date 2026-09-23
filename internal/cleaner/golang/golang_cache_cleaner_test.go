@@ -149,12 +149,12 @@ func TestGoCacheCleaner_NewGoCacheCleaner(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cleaner := NewGoCacheCleaner(tt.cacheType, tt.GetVerbose(), tt.GetDryRun())
+			cleaner := NewGoCacheCleaner(tt.cacheType, tt.verbose, tt.dryRun)
 
 			require.NotNil(t, cleaner)
 			assert.Equal(t, tt.cacheType, cleaner.cacheType)
-			assert.Equal(t, tt.GetVerbose(), cleaner.GetVerbose())
-			assert.Equal(t, tt.GetDryRun(), cleaner.GetDryRun())
+			assert.Equal(t, tt.verbose, cleaner.GetVerbose())
+			assert.Equal(t, tt.dryRun, cleaner.GetDryRun())
 			assert.NotNil(t, cleaner.helper)
 		})
 	}

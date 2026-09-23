@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner/golang"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -25,7 +26,7 @@ func TestResolveOperationSettings_Defaults(t *testing.T) {
 		t.Errorf("resolveDockerPruneMode() = %v, want ALL", got)
 	}
 
-	if got := resolveGoCaches(nil); got != GoCacheGOCACHE|GoCacheTestCache|GoCacheModCache|GoCacheBuildCache {
+	if got := resolveGoCaches(nil); got != golang.GoCacheGOCACHE|golang.GoCacheTestCache|golang.GoCacheModCache|golang.GoCacheBuildCache {
 		t.Errorf("resolveGoCaches() = %v, want factory default flags", got)
 	}
 
@@ -116,7 +117,7 @@ func TestResolveOperationSettings_ConfiguredSections(t *testing.T) {
 		t.Errorf("resolveDockerPruneMode() = %v, want VOLUMES", got)
 	}
 
-	if got := resolveGoCaches(settings); got != GoCacheGOCACHE {
+	if got := resolveGoCaches(settings); got != golang.GoCacheGOCACHE {
 		t.Errorf("resolveGoCaches() = %v, want GOCACHE only", got)
 	}
 
@@ -283,7 +284,7 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Errorf("temp files olderThan = %v, want 14d", got)
 		}
 
-		if got := mustGetCleaner[*GoCleaner](t, registry, cleaner.CleanerGo).caches; got != GoCacheGOCACHE {
+		if got := mustGetCleaner[*GoCleaner](t, registry, cleaner.CleanerGo).caches; got != golang.GoCacheGOCACHE {
 			t.Errorf("go caches = %v, want GOCACHE only", got)
 		}
 	})

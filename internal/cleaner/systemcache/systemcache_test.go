@@ -53,7 +53,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cleaner, err := NewSystemCacheCleaner(tt.GetVerbose(), tt.GetDryRun(), tt.olderThan, nil)
+			cleaner, err := NewSystemCacheCleaner(tt.verbose, tt.dryRun, tt.olderThan, nil)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewSystemCacheCleaner() error = %v, wantErr %v", err, tt.wantErr)
@@ -66,7 +66,7 @@ func TestNewSystemCacheCleaner(t *testing.T) {
 			}
 
 			if cleaner != nil {
-				assertCleanerBooleanFields(t, cleaner, tt.GetVerbose(), tt.GetDryRun())
+				assertCleanerBooleanFields(t, cleaner, tt.verbose, tt.dryRun)
 			}
 		})
 	}

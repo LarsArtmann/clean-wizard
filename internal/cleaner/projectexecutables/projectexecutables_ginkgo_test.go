@@ -199,7 +199,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 
 		ginkgo.It("should return correct name and type", func() {
-			cleaner.GinkgoAssertNameAndType(
+			cln.GinkgoAssertNameAndType(
 				cleaner,
 				"project-executables",
 				operations.OperationTypeProjectExecutables,
@@ -222,7 +222,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 
 		ginkgo.It("should not panic when checking availability", func() {
-			cleaner.GinkgoAssertIsAvailableNoPanic(cleaner)
+			cln.GinkgoAssertIsAvailableNoPanic(cleaner)
 		})
 
 		ginkgo.It("should return a boolean value", func() {
@@ -237,7 +237,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 		})
 
 		ginkgo.It("should work with cancelled context", func() {
-			cleaner.GinkgoAssertIsAvailableWithCancelledContext(cleaner)
+			cln.GinkgoAssertIsAvailableWithCancelledContext(cleaner)
 		})
 	})
 
@@ -251,11 +251,11 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("with nil settings", func() {
 			ginkgo.It("should return nil for nil settings", func() {
-				cleaner.GinkgoValidateNilSettingsTest(cleaner)
+				cln.GinkgoValidateNilSettingsTest(cleaner)
 			})
 		})
 
-		cleaner.GinkgoValidateEmptySettingsContext(
+		cln.GinkgoValidateEmptySettingsContext(
 			cleaner,
 			"should return nil when ProjectExecutables is nil",
 		)
@@ -265,7 +265,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 				settings := &operations.OperationSettings{
 					ProjectExecutables: &operations.ProjectExecutablesSettings{},
 				}
-				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+				cln.GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid exclude extensions", func() {
@@ -274,7 +274,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 						ExcludeExtensions: []string{".sh", ".bash"},
 					},
 				}
-				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+				cln.GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid exclude patterns", func() {
@@ -283,7 +283,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 						ExcludePatterns: []string{"Makefile", "*.config"},
 					},
 				}
-				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+				cln.GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 
 			ginkgo.It("should return nil for valid combined settings", func() {
@@ -293,7 +293,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 						ExcludePatterns:   []string{"Makefile"},
 					},
 				}
-				cleaner.GinkgoValidateValidSettingsTest(cleaner, settings)
+				cln.GinkgoValidateValidSettingsTest(cleaner, settings)
 			})
 		})
 
@@ -336,7 +336,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			setupDefaultCleaner(mockLister, mockOperator)
 		})
 
-		cleaner.GinkgoErrorPropagationContext(
+		cln.GinkgoErrorPropagationContext(
 			"when ListProjects fails",
 			"should return error when project listing fails",
 			func() { mockLister.err = errors.New("failed to list projects") },
@@ -345,7 +345,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("when no projects found", func() {
 			ginkgo.It("should return empty slice when no projects", func() {
-				cleaner.GinkgoNoItemsToScanTest(ctx, cleaner, func() {
+				cln.GinkgoNoItemsToScanTest(ctx, cleaner, func() {
 					mockLister.projects = []ProjectInfo{}
 				})
 			})
@@ -353,7 +353,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("when FindExecutableFiles fails", func() {
 			ginkgo.It("should skip directories that cannot be read", func() {
-				cleaner.GinkgoNoItemsToScanTest(ctx, cleaner, func() {
+				cln.GinkgoNoItemsToScanTest(ctx, cleaner, func() {
 					mockLister.projects = []ProjectInfo{
 						{Name: "project1", Path: "/path/to/project1"},
 					}
@@ -463,7 +463,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 			setupDefaultCleaner(mockLister, mockOperator)
 		})
 
-		cleaner.GinkgoErrorPropagationContext(
+		cln.GinkgoErrorPropagationContext(
 			"when Scan fails",
 			"should return error when scan fails",
 			func() { mockLister.err = errors.New("scan failed") },
@@ -472,7 +472,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner", func() {
 
 		ginkgo.Context("with no items to clean", func() {
 			ginkgo.It("should return conservative result when no items found", func() {
-				cleaner.GinkgoNoItemsToCleanTest(ctx, cleaner, func() {
+				cln.GinkgoNoItemsToCleanTest(ctx, cleaner, func() {
 					mockLister.projects = []ProjectInfo{}
 				})
 			})
@@ -763,7 +763,7 @@ var _ = ginkgo.Describe("ProjectExecutablesCleaner Integration", func() {
 
 		// Verify Scan works
 		scanResult := cleaner.Scan(ctx)
-		cleaner.GinkgoAssertScanResultIsOk(scanResult)
+		cln.GinkgoAssertScanResultIsOk(scanResult)
 	})
 
 	ginkgo.It("should handle real filesystem operations", func() {

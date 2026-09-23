@@ -53,7 +53,7 @@ func TestNewDockerCleaner(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cleaner := NewDockerCleaner(tt.GetVerbose(), tt.GetDryRun(), tt.pruneMode)
+			cleaner := NewDockerCleaner(tt.verbose, tt.dryRun, tt.pruneMode)
 
 			if cleaner == nil {
 				t.Fatal("NewDockerCleaner() returned nil cleaner")
