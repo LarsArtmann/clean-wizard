@@ -62,7 +62,7 @@ func (cs *ConfigSanitizer) sanitizeOperations(
 func (cs *ConfigSanitizer) applyDefaults(cfg *types.Config, result *SanitizationResult) {
 	// Set default version if empty
 	if cfg.Version == "" {
-		cfg.Version = "1.0.0"
+		cfg.Version = CurrentFormatVersion.String()
 		result.addChange("version", "", cfg.Version, "applied default version")
 	}
 

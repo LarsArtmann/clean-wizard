@@ -40,11 +40,18 @@ func ScanOutcomesToSARIF(outcomes []ScanOutcome) ([]byte, error) {
 		return nil, err
 	}
 
+	return FindingsToSARIF(findings)
+}
+
+// FindingsToSARIF renders pre-built findings as a SARIF 2.1.0 document under
+// the clean-wizard tool identity. The result is deterministic for a given
+// finding order.
+func FindingsToSARIF(findings []finding.Finding) ([]byte, error) {
 	report := finding.NewReportFromFindings(finding.ToolInfo{Name: sarifToolName}, findings)
 
 	data, err := report.ToSARIF()
 	if err != nil {
-		return nil, errorfamily.WrapCorruption(err, "scan.sarif_output", "failed to generate SARIF output")
+		return nil, errorfamily.WrapCorruption(err, "format.sarif_output", "failed to generate SARIF output")
 	}
 
 	return data, nil

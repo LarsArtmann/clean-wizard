@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json/jsontext"
 	"encoding/json/v2"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	"github.com/LarsArtmann/clean-wizard/internal/format"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
@@ -19,12 +21,129 @@ func NewConfigCommand() *cobra.Command {
 	return newParentCommand(
 		"config",
 		"Manage configuration",
-		"Manage configuration files - show, edit, validate, and reset.",
+		"Manage configuration files - show, edit, validate, migrate, and reset.",
 		NewConfigShowCommand,
 		NewConfigEditCommand,
 		NewConfigValidateCommand,
+		NewConfigMigrateCommand,
 		NewConfigResetCommand,
 	)
+}
+
+// NewConfigMigrateCommand creates a command to migrate the configuration to
+// the current format version.
+func NewConfigMigrateCommand() *cobra.Command {
+	var (
+		assumeYes bool
+		backupDir string
+		sarifOut  string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "migrate",
+		Short: "Migrate configuration to the current format version",
+		Long: `Bring an outdated configuration file up to the current format version.
+
+The migration runs as a dry-run first and shows every change before asking
+for confirmation. The original file is backed up and restored automatically
+if the migrated configuration fails validation or cannot be written.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runConfigMigrateCommand(assumeYes, backupDir, sarifOut)
+		},
+	}
+
+	cmd.Flags().BoolVarP(&assumeYes, "yes", "y", false, "Skip the confirmation prompt")
+	cmd.Flags().StringVar(&backupDir, "backup-dir", "",
+		"Directory for the pre-migration backup (default: <config dir>/.clean-wizard-backups)")
+	cmd.Flags().StringVar(&sarifOut, "sarif", "",
+		"Write migration findings as SARIF 2.1.0 to this file ('-' for stdout)")
+
+	return cmd
+}
+
+// runConfigMigrateCommand executes the config migrate command.
+func runConfigMigrateCommand(assumeYes bool, backupDir, sarifOut string) error {
+	configPath := getConfigPath()
+
+	var confirm func(config.MigrationPreview) bool
+	if !assumeYes {
+		confirm = func(preview config.MigrationPreview) bool {
+			fmt.Println("\nMigration plan:")
+
+			for _, step := range preview.Plan {
+				fmt.Printf("  %s: %s\n", step.Step(), step.Description)
+			}
+
+			if preview.Diff != "" {
+				fmt.Printf("\nChanges:\n%s\n", preview.Diff)
+			}
+
+			fmt.Printf("\nThis rewrites %s. A backup is created first.\n", configPath)
+
+			return promptForConfirmation("Migrate configuration now?", "Migration cancelled.")
+		}
+	}
+
+	report, err := config.MigrateConfigFile(context.Background(), configPath, config.MigrateOptions{
+		Confirm:   confirm,
+		BackupDir: backupDir,
+	})
+	if errors.Is(err, config.ErrMigrationAborted) {
+		fmt.Println("ℹ️  Configuration unchanged.")
+
+		return nil
+	}
+
+	if err != nil {
+		// Engine errors arrive pre-classified; this wrap adds context only so
+		// the original family survives to the CLI boundary.
+		return fmt.Errorf("config migrate: %w", err)
+	}
+
+	if report.AlreadyCurrent {
+		fmt.Printf("✅ Configuration is already at format version %s; nothing to do.\n",
+			config.CurrentFormatVersion.String())
+
+		return nil
+	}
+
+	for _, record := range report.Records {
+		fmt.Printf("✅ %s: %s (%d changes)\n", record.Step(), record.Description, len(record.Changes))
+	}
+
+	if report.Diff != "" {
+		fmt.Printf("\n%s\n", report.Diff)
+	}
+
+	fmt.Printf("Backup: %s\n", report.BackupPath)
+
+	return writeMigrationSarif(sarifOut, report)
+}
+
+// writeMigrationSarif emits the migration report as SARIF when requested.
+func writeMigrationSarif(sarifOut string, report config.MigrationReport) error {
+	if sarifOut == "" {
+		return nil
+	}
+
+	data, err := format.FindingsToSARIF(report.Findings)
+	if err != nil {
+		return fmt.Errorf("config migrate: %w", err)
+	}
+
+	if sarifOut == "-" {
+		fmt.Println(string(data))
+
+		return nil
+	}
+
+	if writeErr := os.WriteFile(sarifOut, data, 0o600); writeErr != nil {
+		return errorfamily.WrapRejection(writeErr, "config.sarif_output", "failed to write SARIF output: "+sarifOut)
+	}
+
+	fmt.Printf("SARIF report: %s\n", sarifOut)
+
+	return nil
 }
 
 // NewConfigShowCommand creates a command to show the configuration.

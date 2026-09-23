@@ -13,6 +13,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/logger"
+	atomicwrite "github.com/larsartmann/go-atomic-write"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
@@ -34,7 +35,7 @@ func setupKoanf() *koanf.Koanf {
 	k := koanf.New(".")
 
 	// Set defaults
-	_ = k.Set("version", "1.0.0")
+	_ = k.Set("version", CurrentFormatVersion.String())
 	_ = k.Set("safe_mode", true)
 	_ = k.Set("max_disk_usage_percent", DefaultMaxDiskUsage)
 	_ = k.Set("protected", types.DefaultProtectedPaths())
@@ -74,8 +75,29 @@ func readConfigFileFromPath(
 	}
 }
 
-// unmarshalConfig unmarshals koanf config into types.Config and validates it.
+// unmarshalConfig unmarshals koanf config into types.Config, checks the format
+// version, and validates it.
 func unmarshalConfig(k *koanf.Koanf) (*types.Config, error) {
+	config, err := parseConfig(k)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := CheckConfigVersion(config); err != nil {
+		return nil, err
+	}
+
+	// Validate configuration
+	err = validateLoadedConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return config, nil
+}
+
+// parseConfig unmarshals koanf config into types.Config without validating it.
+func parseConfig(k *koanf.Koanf) (*types.Config, error) {
 	var config types.Config
 
 	// Unmarshal basic fields
@@ -97,12 +119,6 @@ func unmarshalConfig(k *koanf.Koanf) (*types.Config, error) {
 
 	// Fix risk levels and settings after unmarshaling
 	fixProfileSettings(k, &config)
-
-	// Validate configuration
-	err := validateLoadedConfig(&config)
-	if err != nil {
-		return nil, err
-	}
 
 	return &config, nil
 }
@@ -201,6 +217,35 @@ func Save(config *types.Config) error {
 	// Set configuration path
 	configPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
 
+	// Ensure config directory exists
+	configDir := filepath.Dir(configPath)
+
+	err := os.MkdirAll(configDir, ConfigDirPermission)
+	if err != nil {
+		return errorfamily.WrapRejection(err, "config.save", "failed to create config directory: "+configDir)
+	}
+
+	// Marshal to YAML
+	yamlData, err := yaml.Parser().Marshal(configYAMLMap(config))
+	if err != nil {
+		return errorfamily.WrapRejection(err, "config.save", "failed to marshal config to YAML")
+	}
+
+	// Write configuration file atomically so a crash never leaves a truncated
+	// configuration behind.
+	err = atomicwrite.WriteWithPerm(configPath, yamlData, ConfigFilePermission)
+	if err != nil {
+		return errorfamily.WrapRejection(err, "config.save", "failed to write config file: "+configPath)
+	}
+
+	logger.Info("Configuration saved successfully", "config_path", configPath)
+
+	return nil
+}
+
+// configYAMLMap renders the configuration as the map written to disk. It is
+// shared by Save and the migration engine so both produce identical YAML.
+func configYAMLMap(config *types.Config) map[string]any {
 	// Build the config map for YAML output
 	configMap := map[string]any{
 		"version":                config.Version,
@@ -209,6 +254,10 @@ func Save(config *types.Config) error {
 		"protected":              config.Protected,
 		"last_clean":             config.LastClean,
 		"updated":                config.Updated,
+	}
+
+	if config.CurrentProfile != "" {
+		configMap["current_profile"] = config.CurrentProfile
 	}
 
 	// Build profiles map
@@ -242,29 +291,7 @@ func Save(config *types.Config) error {
 
 	configMap["profiles"] = profilesMap
 
-	// Ensure config directory exists
-	configDir := filepath.Dir(configPath)
-
-	err := os.MkdirAll(configDir, ConfigDirPermission)
-	if err != nil {
-		return errorfamily.WrapRejection(err, "config.save", "failed to create config directory: "+configDir)
-	}
-
-	// Marshal to YAML
-	yamlData, err := yaml.Parser().Marshal(configMap)
-	if err != nil {
-		return errorfamily.WrapRejection(err, "config.save", "failed to marshal config to YAML")
-	}
-
-	// Write configuration file
-	err = os.WriteFile(configPath, yamlData, ConfigFilePermission)
-	if err != nil {
-		return errorfamily.WrapRejection(err, "config.save", "failed to write config file: "+configPath)
-	}
-
-	logger.Info("Configuration saved successfully", "config_path", configPath)
-
-	return nil
+	return configMap
 }
 
 // GetCurrentTime returns current time (helper for testing).
@@ -403,7 +430,7 @@ func GetDefaultConfig() *types.Config {
 	now := GetCurrentTime()
 
 	return &types.Config{ //nolint:exhaustruct
-		Version:      "1.0.0",
+		Version:      CurrentFormatVersion.String(),
 		SafeMode:     enums.SafeModeEnabled, // Default to safe mode
 		MaxDiskUsage: DefaultMaxDiskUsage,
 		Protected: []string{
