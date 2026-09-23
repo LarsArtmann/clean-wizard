@@ -168,13 +168,10 @@ func NewConfigShowCommand() *cobra.Command {
 func runConfigShowCommand(_ *cobra.Command, _ []string, jsonOutput bool) error {
 	cfg, err := config.Load()
 	if err != nil {
-		fmt.Println("❌ No configuration found.")
-		fmt.Println()
-		fmt.Println("💡 To create configuration, run:")
-		fmt.Println("   clean-wizard init           - Interactive setup")
-		fmt.Println("   clean-wizard init --minimal  - Minimal setup")
-
-		return nil //nolint:nilerr // intentional: missing config shows help, not error
+		// A missing file never reaches this branch (the loader substitutes
+		// defaults), so any error here is real — surface it instead of
+		// masquerading as "no configuration found".
+		return err
 	}
 
 	if jsonOutput {

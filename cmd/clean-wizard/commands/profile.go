@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/LarsArtmann/clean-wizard/internal/config"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
@@ -254,9 +253,7 @@ func runProfileDeleteCommand(_ *cobra.Command, args []string, force bool) error 
 
 	cfg, err := config.Load()
 	if err != nil {
-		fmt.Println("❌ No configuration found.")
-		fmt.Println("   Run 'clean-wizard init' to create configuration first.")
-		os.Exit(0)
+		return errorfamily.WrapRejection(err, "profile.delete", "failed to load configuration; run 'clean-wizard init' to create one")
 	}
 
 	_, ok := cfg.Profiles[profileName]
