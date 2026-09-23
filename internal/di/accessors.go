@@ -42,3 +42,20 @@ func CleanerRegistry(i do.Injector) (*cleaner.Registry, error) {
 
 	return registry, nil
 }
+
+// Cleaner resolves a single cleaner by its registry name (e.g. cleaner.CleanerNix)
+// from the DI container. Cleaner services are registered per cleaner, enabling
+// per-cleaner invocation and configuration.
+func Cleaner(i do.Injector, registryName string) (cleaner.Cleaner, error) {
+	c, err := do.InvokeNamed[cleaner.Cleaner](i, "cleaner."+registryName)
+	if err != nil {
+		return nil, errorfamily.WrapRejectionf(
+			err,
+			"di.resolve_cleaner",
+			"failed to resolve cleaner=%s service",
+			registryName,
+		)
+	}
+
+	return c, nil
+}

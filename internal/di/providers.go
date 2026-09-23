@@ -1,10 +1,8 @@
 package di
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner/factory"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/samber/do/v2"
@@ -26,41 +24,13 @@ func RegisterAllServices(injector do.Injector, cfg *types.Config, settings RunSe
 }
 
 // CleanerPackage groups all cleaner-related provider registrations.
-// Using do.Package keeps the registration organized and composable,
-// matching BuildFlow's InfrastructurePackage / ApplicationPackage pattern.
+// Each cleaner is registered as its own named service (enabling per-cleaner
+// resolution and config), and the registry aggregates them, matching
+// BuildFlow's InfrastructurePackage / ApplicationPackage pattern.
 var CleanerPackage = do.Package( //nolint:gochecknoglobals
-	registerCleanerRegistry,
+	registerCleanerProviders,
+	registerCleanerRegistryFromProviders,
 )
-
-// registerCleanerRegistry provides a *cleaner.Registry as a lazy singleton.
-// The registry is created with the verbose/dryRun flags resolved from RunSettings
-// and, when a CLI profile was selected, with the merged operation settings of that
-// profile. This eliminates the former dual-registry pattern where cleaners were
-// instantiated twice (once for discovery, once for execution).
-func registerCleanerRegistry(injector do.Injector) {
-	do.Provide(injector, func(i do.Injector) (*cleaner.Registry, error) {
-		settings, err := do.Invoke[RunSettings](i)
-		if err != nil {
-			return nil, errorfamily.WrapRejection(
-				err,
-				"di.resolve_settings_for_registry",
-				"failed to resolve RunSettings for cleaner registry",
-			)
-		}
-
-		operationSettings, err := resolveProfileOperationSettings(i, settings)
-		if err != nil {
-			return nil, err
-		}
-
-		registry, err := factory.DefaultRegistryWithConfig(settings.Verbose, settings.DryRun, operationSettings)
-		if err != nil {
-			return nil, errorfamily.WrapRejection(err, "di.create_registry", "failed to create cleaner registry")
-		}
-
-		return registry, nil
-	})
-}
 
 // resolveProfileOperationSettings returns the merged OperationSettings of the
 // selected profile. When no profile was selected (preset or interactive cleaner
