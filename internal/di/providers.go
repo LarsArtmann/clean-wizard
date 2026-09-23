@@ -30,9 +30,10 @@ var CleanerPackage = do.Package( //nolint:gochecknoglobals
 )
 
 // registerCleanerRegistry provides a *cleaner.Registry as a lazy singleton.
-// The registry is created with the verbose/dryRun flags resolved from RunSettings,
-// eliminating the former dual-registry pattern where cleaners were instantiated
-// twice (once for discovery, once for execution).
+// The registry is created with the verbose/dryRun flags resolved from RunSettings
+// and, when a CLI profile was selected, with the merged operation settings of that
+// profile. This eliminates the former dual-registry pattern where cleaners were
+// instantiated twice (once for discovery, once for execution).
 func registerCleanerRegistry(injector do.Injector) {
 	do.Provide(injector, func(i do.Injector) (*cleaner.Registry, error) {
 		settings, err := do.Invoke[RunSettings](i)
@@ -44,11 +45,36 @@ func registerCleanerRegistry(injector do.Injector) {
 			)
 		}
 
-		registry, err := cleaner.DefaultRegistryWithConfig(settings.Verbose, settings.DryRun)
+		operationSettings, err := resolveProfileOperationSettings(i, settings)
+		if err != nil {
+			return nil, err
+		}
+
+		registry, err := cleaner.DefaultRegistryWithConfig(settings.Verbose, settings.DryRun, operationSettings)
 		if err != nil {
 			return nil, errorfamily.WrapRejection(err, "di.create_registry", "failed to create cleaner registry")
 		}
 
 		return registry, nil
 	})
+}
+
+// resolveProfileOperationSettings returns the merged OperationSettings of the
+// selected profile. When no profile was selected (preset or interactive cleaner
+// selection) it returns nil so cleaners fall back to their factory defaults.
+func resolveProfileOperationSettings(injector do.Injector, settings RunSettings) (*domain.OperationSettings, error) {
+	if settings.Profile == "" {
+		return nil, nil
+	}
+
+	cfg, err := do.Invoke[*domain.Config](injector)
+	if err != nil {
+		return nil, errorfamily.WrapRejection(
+			err,
+			"di.resolve_config_for_registry",
+			"failed to resolve Config for profile settings",
+		)
+	}
+
+	return cfg.SettingsForProfile(settings.Profile), nil
 }

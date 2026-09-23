@@ -7,4 +7,10 @@ type RunSettings struct {
 	Verbose        bool
 	DryRun         bool
 	MaxConcurrency int
+
+	// Profile is the name of the configuration profile selected on the CLI.
+	// When set, the cleaners in the registry are constructed with the merged
+	// OperationSettings of that profile; empty means no profile was selected
+	// and cleaners use their factory defaults.
+	Profile string
 }
