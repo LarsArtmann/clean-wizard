@@ -36,7 +36,7 @@ func (t *concurrencyTracker) exit() {
 	t.current--
 }
 
-func (t *concurrencyTracker) peak() int32 {
+func (t *concurrencyTracker) Peak() int32 {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 

@@ -132,7 +132,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 				execution.WithMaxConcurrency(1),
 			)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			gomega.Expect(tracker.peak()).To(gomega.Equal(int32(1)))
+			gomega.Expect(tracker.Peak()).To(gomega.Equal(int32(1)))
 		})
 
 		ginkgo.It("runs at most two cleaners at a time when capped to two", func() {
@@ -150,7 +150,7 @@ var _ = ginkgo.Describe("Clean wizard workflow execution", func() {
 				execution.WithMaxConcurrency(2),
 			)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			gomega.Expect(tracker.peak()).To(gomega.Equal(int32(2)))
+			gomega.Expect(tracker.Peak()).To(gomega.Equal(int32(2)))
 		})
 	})
 })
