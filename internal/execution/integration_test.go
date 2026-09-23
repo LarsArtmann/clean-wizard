@@ -25,7 +25,7 @@ func TestRunCleaners_RealRegistry_DryRun(t *testing.T) {
 		t.Skip("integration test: uses real system cleaners (slow)")
 	}
 
-	registry, err := cleaner.DefaultRegistryWithConfig(false, true) // dryRun=true
+	registry, err := cleaner.DefaultRegistryWithConfig(false, true, nil) // dryRun=true
 	require.NoError(t, err)
 	require.NotNil(t, registry)
 
@@ -144,7 +144,7 @@ func TestRunScans_RealRegistry_DryRun(t *testing.T) {
 		t.Skip("integration test: uses real system cleaners (slow)")
 	}
 
-	registry, err := cleaner.DefaultRegistryWithConfig(false, true)
+	registry, err := cleaner.DefaultRegistryWithConfig(false, true, nil)
 	require.NoError(t, err)
 
 	wr, err := RunScans(context.Background(), registry, []string{cleaner.CleanerCargo})
