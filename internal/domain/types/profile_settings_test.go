@@ -90,8 +90,10 @@ func TestConfig_SettingsForProfile(t *testing.T) {
 						Operations: []CleanupOperation{
 							{Name: "temp-files", Settings: &operations.OperationSettings{TempFiles: tempSettings}},
 							{
-								Name:     "temp-files",
-								Settings: &operations.OperationSettings{TempFiles: &operations.TempFilesSettings{OlderThan: "1h"}},
+								Name: "temp-files",
+								Settings: &operations.OperationSettings{
+									TempFiles: &operations.TempFilesSettings{OlderThan: "1h"},
+								},
 							},
 						},
 					},

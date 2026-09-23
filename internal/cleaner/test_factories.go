@@ -4,9 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/onsi/gomega"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/onsi/gomega"
 )
 
 // ToSimpleCleanerConstructor converts a constructor with additional methods to one that

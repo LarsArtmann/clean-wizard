@@ -36,7 +36,7 @@ Or use the Nix devShell (`nix develop`) which sets it automatically. The devShel
 - `internal/adapters/` - External tool adapters (Nix, Exec, HTTP, Cache)
 - `internal/middleware/` - Validation middleware
 - `internal/conversions/` - Unit conversions
-- `internal/format/` - Byte formatting, JSON output
+- `internal/format/` - Byte formatting, JSON output, SARIF output (`sarif.go` converts scan outcomes to findings via go-finding: bytes>0 → info/`unused` finding with clean suggestion, failed scan → error finding with family/code/retryable metadata, unavailable → no finding; locations are `cleaner://<name>` URIs)
 - `tests/bdd/` - Ginkgo-based BDD tests
 - `docs/` - Documentation
 
@@ -97,6 +97,7 @@ Key design principles:
 - `charm.land/lipgloss/v2` - Terminal styling
 - `github.com/charmbracelet/fang` - Help command generation
 - `github.com/larsartmann/go-error-family` - Error classification (5 families: Rejection, Conflict, Transient, Corruption, Infrastructure)
+- `github.com/larsartmann/go-finding` - SARIF 2.1.0 export for scan output (Finding model, Builder API; core module only, no pipeline)
 - `github.com/onsi/ginkgo/v2` + `github.com/onsi/gomega` - BDD testing
 - `github.com/knadh/koanf/v2` - Configuration
 - `github.com/samber/do/v2` - Dependency injection

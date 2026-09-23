@@ -85,7 +85,7 @@ func unmarshalConfig(k *koanf.Koanf) (*types.Config, error) {
 	config.Protected = k.Strings("protected")
 
 	// Unmarshal profiles section
-	profilesKey := "profiles" //nolint:goconst
+	profilesKey := "profiles"
 	if k.Exists(profilesKey) {
 		err := k.Unmarshal(profilesKey, &config.Profiles)
 		if err != nil {
@@ -210,7 +210,7 @@ func Save(config *types.Config) error {
 		"version":                config.Version,
 		"safe_mode":              config.SafeMode.String(), //nolint:goconst
 		"max_disk_usage_percent": config.MaxDiskUsage,
-		"protected":              config.Protected, //nolint:goconst
+		"protected":              config.Protected,
 		"last_clean":             config.LastClean,
 		"updated":                config.Updated,
 	}

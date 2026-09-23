@@ -67,7 +67,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(
 	// Require explicit profiles (no auto-generation)
 	if len(config.Profiles) == 0 {
 		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
-			Field:    "profiles", //nolint:goconst
+			Field:    "profiles",
 			Rule:     "strict",
 			Value:    config.Profiles,
 			Message:  "Strict mode requires at least one explicit profile",
@@ -89,7 +89,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(
 	for _, required := range requiredPaths {
 		if !ecl.isPathProtected(config.Protected, required) {
 			result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
-				Field:    "protected", //nolint:goconst
+				Field:    "protected",
 				Rule:     "strict",
 				Value:    config.Protected,
 				Message:  "Strict mode requires path: " + required,

@@ -27,7 +27,7 @@ type NixStore interface {
 }
 
 // Compile-time proof that the concrete adapter satisfies the interface.
-var _ NixStore = (*NixAdapter)(nil) //nolint:exhaustruct
+var _ NixStore = (*NixAdapter)(nil)
 
 // HTTPRequester abstracts the HTTP verb methods of HTTPClient.
 type HTTPRequester interface {
@@ -37,7 +37,7 @@ type HTTPRequester interface {
 	Delete(ctx context.Context, url string) (*HTTPResponse, error)
 }
 
-var _ HTTPRequester = (*HTTPClient)(nil) //nolint:exhaustruct
+var _ HTTPRequester = (*HTTPClient)(nil)
 
 // Limiter abstracts rate limiting decisions.
 type Limiter interface {
@@ -45,7 +45,7 @@ type Limiter interface {
 	Allow() bool
 }
 
-var _ Limiter = (*RateLimiter)(nil) //nolint:exhaustruct
+var _ Limiter = (*RateLimiter)(nil)
 
 // KeyValueCache abstracts the in-process cache. Values expire lazily on read.
 type KeyValueCache interface {
@@ -58,4 +58,4 @@ type KeyValueCache interface {
 	FlushExpired()
 }
 
-var _ KeyValueCache = (*CacheManager)(nil) //nolint:exhaustruct
+var _ KeyValueCache = (*CacheManager)(nil)

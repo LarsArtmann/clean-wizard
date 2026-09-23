@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 

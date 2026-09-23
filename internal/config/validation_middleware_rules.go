@@ -13,7 +13,7 @@ import (
 func (vm *ValidationMiddleware) validateChangeBusinessRules(changes []ConfigChange) error {
 	for _, change := range changes {
 		// Rule: Cannot remove critical protected paths
-		if change.Field == "protected" && //nolint:goconst
+		if change.Field == "protected" &&
 			change.Operation == enums.ChangeOperationRemovedType {
 			criticalPaths := types.CriticalSystemPaths()
 			for _, critical := range criticalPaths {

@@ -4,11 +4,9 @@ import (
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
-
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/cargo"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
-
-	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

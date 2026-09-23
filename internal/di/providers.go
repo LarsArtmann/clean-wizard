@@ -1,9 +1,8 @@
 package di
 
 import (
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/samber/do/v2"
 )
@@ -36,7 +35,10 @@ var CleanerPackage = do.Package( //nolint:gochecknoglobals
 // resolveProfileOperationSettings returns the merged OperationSettings of the
 // selected profile. When no profile was selected (preset or interactive cleaner
 // selection) it returns nil so cleaners fall back to their factory defaults.
-func resolveProfileOperationSettings(injector do.Injector, settings RunSettings) (*operations.OperationSettings, error) {
+func resolveProfileOperationSettings(
+	injector do.Injector,
+	settings RunSettings,
+) (*operations.OperationSettings, error) {
 	if settings.Profile == "" {
 		return nil, nil
 	}

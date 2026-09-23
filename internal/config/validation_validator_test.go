@@ -3,9 +3,8 @@ package config
 import (
 	"testing"
 
-	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 )
 
 func TestConfigValidator_ValidateConfig(t *testing.T) {

@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
-
-	businessrules "github.com/LarsArtmann/go-business-rules/v2"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	businessrules "github.com/LarsArtmann/go-business-rules/v2"
 )
 
 // Validation level tags classify every rule by the pipeline stage it belongs
@@ -91,6 +91,7 @@ func mapViolations(
 
 	outcome.ForEach(func(violation businessrules.ViolationError) {
 		severity := validationSeverityFromBusinessRules(violation.Rule.Severity())
+
 		message := violation.Context
 		if message == "" {
 			message = violation.Rule.Message()
@@ -275,6 +276,7 @@ func (cv *ConfigValidator) addFieldRules(set *configRuleSet, cfg *types.Config) 
 
 	if cv.rules.MaxProfiles != nil && cv.rules.MaxProfiles.Max != nil {
 		maxProfiles := *cv.rules.MaxProfiles.Max
+
 		set.add(withSuggestion(
 			configRule("profiles", levelField, "max_count", businessrules.SeverityWarning,
 				"Profile count exceeds recommended limit",
@@ -315,7 +317,7 @@ func (cv *ConfigValidator) addCrossFieldRules(set *configRuleSet, cfg *types.Con
 					return nil
 				}
 
-				return fmt.Errorf("Critical risk operations enabled while safe_mode is false")
+				return errors.New("Critical risk operations enabled while safe_mode is false")
 			}),
 		"Enable safe_mode or review critical risk operations",
 	), nil, &ValidationContext{
@@ -353,8 +355,8 @@ func (cv *ConfigValidator) addCrossFieldRules(set *configRuleSet, cfg *types.Con
 			"Consider splitting operations into multiple profiles",
 		), len(profile.Operations), &ValidationContext{
 			Metadata: map[string]string{
-				"operation_count": fmt.Sprintf("%d", len(profile.Operations)),
-				"max_operations":  fmt.Sprintf("%d", maxOperations),
+				"operation_count": strconv.Itoa(len(profile.Operations)),
+				"max_operations":  strconv.Itoa(maxOperations),
 			},
 		})
 	}
@@ -413,12 +415,13 @@ func (cv *ConfigValidator) addOperationRules(
 		)
 		settings := operation.Settings
 		opType := operations.GetOperationType(operation.Name)
+
 		set.add(withSuggestion(
 			configRule(settingsField, levelBusiness, "validation", businessrules.SeverityError,
 				"Operation settings are invalid",
 				func() error {
 					if err := settings.ValidateSettings(opType); err != nil {
-						return fmt.Errorf("Invalid settings for operation '%s': %v", operation.Name, err)
+						return fmt.Errorf("Invalid settings for operation '%s': %w", operation.Name, err)
 					}
 
 					return nil
@@ -448,9 +451,7 @@ func (cv *ConfigValidator) addSecurityRules(set *configRuleSet, cfg *types.Confi
 				configRule("protected", levelSecurityTag, "security", businessrules.SeverityWarning,
 					"Protecting root directory may prevent system operations",
 					func() error {
-						return fmt.Errorf(
-							"Protecting root directory '/' may prevent system operations",
-						)
+						return errors.New("Protecting root directory '/' may prevent system operations")
 					}),
 				"Consider protecting specific system directories instead",
 			), path, &ValidationContext{
@@ -464,9 +465,7 @@ func (cv *ConfigValidator) addSecurityRules(set *configRuleSet, cfg *types.Confi
 					businessrules.SeverityCritical,
 					"Protected path contains parent directory reference",
 					func() error {
-						return fmt.Errorf(
-							"Protected path contains parent directory reference '..'",
-						)
+						return errors.New("Protected path contains parent directory reference '..'")
 					}),
 				"Use absolute paths without parent directory references",
 			), path, nil)

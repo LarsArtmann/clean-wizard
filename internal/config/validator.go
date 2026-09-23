@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	businessrules "github.com/LarsArtmann/go-business-rules/v2"
-
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	businessrules "github.com/LarsArtmann/go-business-rules/v2"
 )
 
 // ConfigValidator provides comprehensive type-safe configuration validation.
@@ -89,9 +88,9 @@ func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	switch field {
 	case "max_disk_usage":
 		return cv.validateMaxDiskUsage(value)
-	case "protected": //nolint:goconst
+	case "protected":
 		return cv.validateProtectedPaths(value)
-	case "profiles": //nolint:goconst
+	case "profiles":
 		if cfg, ok := value.(*types.Config); ok {
 			return cv.validateProfiles(cfg)
 		}

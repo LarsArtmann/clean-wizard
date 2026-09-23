@@ -305,7 +305,7 @@ func printScanTable(results []ScanResult, _ bool) {
 func outputScanSARIF(results []ScanResult) error {
 	outcomes := make([]format.ScanOutcome, 0, len(results))
 	for _, r := range results {
-		outcomes = append(outcomes, format.ScanOutcome{ //nolint:exhaustruct
+		outcomes = append(outcomes, format.ScanOutcome{
 			Name:           r.Name,
 			RegistryName:   r.RegistryName,
 			Description:    r.Description,

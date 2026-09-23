@@ -336,6 +336,17 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 **Note:** Standard and aggressive are currently identical (both use all cleaners).
 
+### Scan Command Features
+
+| Feature              | Status              | Details                                                  |
+| -------------------- | ------------------- | -------------------------------------------------------- |
+| **JSON Output**      | ✅ FULLY_FUNCTIONAL | `--json` flag works                                      |
+| **SARIF Output**     | ✅ FULLY_FUNCTIONAL | `--sarif` emits SARIF 2.1.0 findings via go-finding      |
+| **Retry Support**    | ✅ FULLY_FUNCTIONAL | `--retries` / `--retry-profile` per scanner              |
+| **Nix Store Size**   | ✅ FULLY_FUNCTIONAL | Shows Nix store size when available                      |
+
+SARIF mapping: reclaimable space (bytes > 0) becomes an `info` finding with category `unused` and a `clean --dry-run` fix suggestion; failed scans become `error` findings carrying `family`/`code`/`retryable` metadata; unavailable cleaners produce no finding. Findings locate at `cleaner://<name>`.
+
 ---
 
 ## Configuration System
@@ -498,6 +509,7 @@ Clean Wizard has a **solid foundation** with excellent architecture and type saf
 - **Public website launched** (2026-07-15): `https://cleanwizard.lars.software` with Astro 7 + Starlight + Firebase hosting
 - **`encoding/json/v2` migration** (2026-07-14): all production files migrated, `GOEXPERIMENT=jsonv2` set in flake.nix
 - **`go-humanize` library adopted** (2026-08-05): `parseSize` in golangci-lint cleaner uses `humanize.ParseBytes` instead of 11-entry manual map (H007 fix, commit `b7692ff`)
+- **SARIF 2.1.0 scan output** (2026-09-23): `scan --sarif` emits standard SARIF via `github.com/larsartmann/go-finding` v1.13.0; reclaimable space becomes info findings (category `unused`) with fix suggestions, failed scans become error findings enriched with `family`/`code`/`retryable` metadata; interops with the `go-finding` CLI and SARIF viewers
 - **Retry test regression fixed** (2026-08-10): `recordFinal` index-based assignment replaces copy-in-loop bug; `FreedBytes` → `SizeEstimate.Value()` per deprecation
 - **Enum consolidation refactor** (2026-04-03): 52% line reduction across 4 files, unified generic helpers
 - **Docker, Go, Cargo, Node cleaners** now scan actual cache sizes instead of using hardcoded estimates

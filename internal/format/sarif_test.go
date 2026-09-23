@@ -45,7 +45,11 @@ func TestScanOutcomesToSARIFCleanableFinding(t *testing.T) {
 	assert.Equal(t, "12", props["go-finding/meta/items"])
 	assert.Equal(t, "2500000000", props["go-finding/meta/bytes"])
 	assert.Equal(t, "Nix store generations", props["go-finding/meta/description"])
-	assert.Equal(t, "Run 'clean-wizard clean --dry-run' to preview reclaiming this space", props["go-finding/suggestion"])
+	assert.Equal(
+		t,
+		"Run 'clean-wizard clean --dry-run' to preview reclaiming this space",
+		props["go-finding/suggestion"],
+	)
 
 	uri := sarifLocationURI(t, result)
 	assert.Equal(t, "cleaner://nix", uri)
@@ -175,6 +179,7 @@ func sarifResults(t *testing.T, doc map[string]any) []map[string]any {
 	for _, raw := range rawResults {
 		result, ok := raw.(map[string]any)
 		require.True(t, ok)
+
 		results = append(results, result)
 	}
 

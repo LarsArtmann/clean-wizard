@@ -31,7 +31,9 @@ func TestResolveOperationSettings_Defaults(t *testing.T) {
 		t.Errorf("resolveDockerPruneMode() = %v, want ALL", got)
 	}
 
-	if got := resolveGoCaches(nil); got != golang.GoCacheGOCACHE|golang.GoCacheTestCache|golang.GoCacheModCache|golang.GoCacheBuildCache {
+	if got := resolveGoCaches(
+		nil,
+	); got != golang.GoCacheGOCACHE|golang.GoCacheTestCache|golang.GoCacheModCache|golang.GoCacheBuildCache {
 		t.Errorf("resolveGoCaches() = %v, want factory default flags", got)
 	}
 
@@ -285,11 +287,19 @@ func TestDefaultRegistryWithConfig_Settings(t *testing.T) {
 			t.Errorf("docker prune mode = %v, want VOLUMES", got)
 		}
 
-		if got := mustGetCleaner[*tempfiles.TempFilesCleaner](t, registry, cleaner.CleanerTempFiles).GetOlderThan(); got != 14*24*time.Hour {
+		if got := mustGetCleaner[*tempfiles.TempFilesCleaner](
+			t,
+			registry,
+			cleaner.CleanerTempFiles,
+		).GetOlderThan(); got != 14*24*time.Hour {
 			t.Errorf("temp files olderThan = %v, want 14d", got)
 		}
 
-		if got := mustGetCleaner[*golang.GoCleaner](t, registry, cleaner.CleanerGo).GetCaches(); got != golang.GoCacheGOCACHE {
+		if got := mustGetCleaner[*golang.GoCleaner](
+			t,
+			registry,
+			cleaner.CleanerGo,
+		).GetCaches(); got != golang.GoCacheGOCACHE {
 			t.Errorf("go caches = %v, want GOCACHE only", got)
 		}
 	})

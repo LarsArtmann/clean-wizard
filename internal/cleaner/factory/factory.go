@@ -58,7 +58,10 @@ var cleanerConstructors = []cleanerRegistration{ //nolint:gochecknoglobals
 // section) keeps each cleaner's factory default. This is the single factory used
 // by the DI container to create the cleaner registry.
 // Returns an error if any cleaner fails to initialize or has invalid settings.
-func DefaultRegistryWithConfig(verbose, dryRun bool, settings *operations.OperationSettings) (*cleaner.Registry, error) {
+func DefaultRegistryWithConfig(
+	verbose, dryRun bool,
+	settings *operations.OperationSettings,
+) (*cleaner.Registry, error) {
 	registry := cleaner.NewRegistry()
 
 	if err := registerAllCleaners(registry, verbose, dryRun, settings); err != nil {
@@ -70,7 +73,11 @@ func DefaultRegistryWithConfig(verbose, dryRun bool, settings *operations.Operat
 
 // registerAllCleaners registers all available cleaners with the given configuration.
 // Returns an error if any cleaner fails to initialize.
-func registerAllCleaners(registry *cleaner.Registry, verbose, dryRun bool, settings *operations.OperationSettings) error {
+func registerAllCleaners(
+	registry *cleaner.Registry,
+	verbose, dryRun bool,
+	settings *operations.OperationSettings,
+) error {
 	for _, rc := range cleanerConstructors {
 		c, err := rc.constructor(verbose, dryRun, settings)
 		if err != nil {
@@ -189,7 +196,10 @@ func TempFiles(verbose, dryRun bool, settings *operations.OperationSettings) (cl
 
 // Projects builds the projects management automation cleaner.
 func Projects(verbose, dryRun bool, settings *operations.OperationSettings) (cleaner.Cleaner, error) {
-	return validateConstructor(projectsmanagementautomation.NewProjectsManagementAutomationCleaner(verbose, dryRun), settings)
+	return validateConstructor(
+		projectsmanagementautomation.NewProjectsManagementAutomationCleaner(verbose, dryRun),
+		settings,
+	)
 }
 
 // ProjectExec builds the project executables cleaner (excludes from settings).

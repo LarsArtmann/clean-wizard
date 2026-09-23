@@ -12,7 +12,8 @@ import (
 func makeTestCleanResult(
 	known uint64,
 	itemsRemoved, itemsFailed uint,
-	strategy enums.CleanStrategyType) CleanResult {
+	strategy enums.CleanStrategyType,
+) CleanResult {
 	return CleanResult{
 		SizeEstimate: SizeEstimate{Known: known, Status: enums.SizeEstimateStatusKnown},
 		ItemsRemoved: itemsRemoved,

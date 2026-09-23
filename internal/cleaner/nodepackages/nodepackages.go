@@ -505,7 +505,7 @@ func (npmc *NodePackageManagerCleaner) cleanPnpmStore(
 	cacheDir, err := npmc.getPnpmStoreDir(ctx)
 
 	return npmc.cleanCacheWithFallback(ctx, cacheDir, err,
-		[]string{"pnpm", "store", "prune"}, //nolint:goconst
+		[]string{"pnpm", "store", "prune"},
 		"pnpm store prune",
 		"Store")
 }

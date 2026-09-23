@@ -1,12 +1,12 @@
 package config
 
 import (
+	"strings"
 	"testing"
-
-	businessrules "github.com/LarsArtmann/go-business-rules/v2"
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
+	businessrules "github.com/LarsArtmann/go-business-rules/v2"
 )
 
 func TestSeverityCriticalConstant(t *testing.T) {
@@ -179,9 +179,11 @@ func TestValidateConfig_DeterministicViolationOrder(t *testing.T) {
 	fingerprint := func(result *ValidationResult) string {
 		out := ""
 
+		var outSb181 strings.Builder
 		for _, validationError := range result.Errors {
-			out += validationError.Field + "|" + validationError.Message + "\n"
+			outSb181.WriteString(validationError.Field + "|" + validationError.Message + "\n")
 		}
+		out += outSb181.String()
 
 		return out
 	}
