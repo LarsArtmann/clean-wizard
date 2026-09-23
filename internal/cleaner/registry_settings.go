@@ -59,8 +59,12 @@ func resolveDockerPruneMode(settings *domain.OperationSettings) domain.DockerPru
 func resolveGoCaches(settings *domain.OperationSettings) GoCacheType {
 	const defaultGoCaches = GoCacheGOCACHE | GoCacheTestCache | GoCacheModCache | GoCacheBuildCache
 
+	if settings == nil {
+		return defaultGoCaches
+	}
+
 	goSettings := settings.GoPackages
-	if settings == nil || goSettings == nil {
+	if goSettings == nil {
 		return defaultGoCaches
 	}
 
