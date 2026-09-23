@@ -1,44 +1,5 @@
 package cleaner
 
-import (
-	"testing"
-)
-
-// CreateBooleanSettingsCleanerTestFunctions creates both ValidateSettings and Clean_DryRun test functions
-// for cleaners with a boolean settings field. This eliminates duplicate config and constructor code.
-//
-// Usage:
-//
-//	func TestXxxCleaner_BooleanSettingsTests(t *testing.T) {
-//	    CreateBooleanSettingsCleanerTestFunctions(t, BooleanSettingsCleanerTestFunctionsConfig{
-//	        TestName:          "Xxx",
-//	        ToolName:          "xxx-tool",
-//	        SettingsFieldName: "xxx settings",
-//	        CreateSettings: func(enabled bool) *domain.OperationSettings {
-//	            return &domain.OperationSettings{
-//	                XxxSettings: &domain.XxxSettings{
-//	                    Enabled: enabled,
-//	                },
-//	            }
-//	        },
-//	        ExpectedItems: 1,
-//	        Constructor:   NewBooleanSettingsCleanerTestConstructor(NewXxxCleaner),
-//	    })
-//	}
-func CreateBooleanSettingsCleanerTestFunctions(
-	t *testing.T,
-	config BooleanSettingsCleanerTestConfig,
-) {
-	t.Helper()
-	t.Run("ValidateSettings", func(t *testing.T) {
-		TestBooleanSettingsCleanerValidateSettings(t, config, config.Constructor)
-	})
-
-	t.Run("Clean_DryRun", func(t *testing.T) {
-		TestBooleanSettingsCleanerCleanDryRun(t, config, config.Constructor)
-	})
-}
-
 // CreateBooleanSettingsTest creates a test function for cleaners with boolean settings.
 // This eliminates duplicate test function definitions across test files.
 //
