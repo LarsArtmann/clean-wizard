@@ -56,7 +56,7 @@ func (set *configRuleSet) add(
 
 // configRule builds a named rule tagged with its validation level and
 // semantic rule kind (required, range, format, ...).
-func configRule(
+func configRule( //nolint:ireturn // rules are consumed through the Rule interface
 	field, level, ruleKind string,
 	severity businessrules.Severity,
 	message string,
@@ -68,7 +68,9 @@ func configRule(
 
 // withSuggestion attaches the fix hint as rule description metadata; the
 // bridge surfaces it as ValidationError.Suggestion.
-func withSuggestion(rule businessrules.Rule, suggestion string) businessrules.Rule {
+func withSuggestion( //nolint:ireturn // rules are consumed through the Rule interface
+	rule businessrules.Rule, suggestion string,
+) businessrules.Rule {
 	if impl, ok := rule.(businessrules.RuleImpl); ok {
 		return impl.WithDescription(suggestion)
 	}
@@ -82,7 +84,7 @@ func withSuggestion(rule businessrules.Rule, suggestion string) businessrules.Ru
 func mapViolations(
 	set *configRuleSet, outcome businessrules.ValidationResultError,
 ) *ValidationResult {
-	result := &ValidationResult{
+	result := &ValidationResult{ //nolint:exhaustruct
 		IsValid:   true,
 		Errors:    []ValidationError{},
 		Warnings:  []ValidationWarning{},
@@ -245,7 +247,7 @@ func (cv *ConfigValidator) addFieldRules(set *configRuleSet, cfg *types.Config) 
 				return cv.validateMaxDiskUsage(cfg.MaxDiskUsage)
 			}),
 		diskUsageSuggestion(cv.rules.MaxDiskUsage, minUsage, maxUsage),
-	), cfg.MaxDiskUsage, &ValidationContext{
+	), cfg.MaxDiskUsage, &ValidationContext{ //nolint:exhaustruct
 		MinValue: minUsage,
 		MaxValue: maxUsage,
 	})
@@ -320,10 +322,10 @@ func (cv *ConfigValidator) addCrossFieldRules(set *configRuleSet, cfg *types.Con
 				return errors.New("Critical risk operations enabled while safe_mode is false")
 			}),
 		"Enable safe_mode or review critical risk operations",
-	), nil, &ValidationContext{
+	), nil, &ValidationContext{ //nolint:exhaustruct
 		Metadata: map[string]string{
 			"max_risk_level": cv.findMaxRiskLevel(cfg).String(),
-			"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode),
+			"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode), //nolint:goconst
 		},
 	})
 
@@ -421,7 +423,7 @@ func (cv *ConfigValidator) addOperationRules(
 				"Operation settings are invalid",
 				func() error {
 					if err := settings.ValidateSettings(opType); err != nil {
-						return fmt.Errorf("Invalid settings for operation '%s': %w", operation.Name, err)
+						return fmt.Errorf("invalid settings for operation '%s': %w", operation.Name, err)
 					}
 
 					return nil
@@ -454,7 +456,7 @@ func (cv *ConfigValidator) addSecurityRules(set *configRuleSet, cfg *types.Confi
 						return errors.New("Protecting root directory '/' may prevent system operations")
 					}),
 				"Consider protecting specific system directories instead",
-			), path, &ValidationContext{
+			), path, &ValidationContext{ //nolint:exhaustruct
 				Metadata: map[string]string{"protected_path": path},
 			})
 		}
