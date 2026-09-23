@@ -11,9 +11,9 @@ This document clarifies the intended boundary between `internal/config` and the 
 
 ## Overview
 
-| Package  | Responsibility                                   | Imports                         |
-| -------- | ------------------------------------------------ | ------------------------------- |
-| `domain` | Pure data structures, enums, validation logic    | Standard library only           |
+| Package  | Responsibility                                   | Imports                                                   |
+| -------- | ------------------------------------------------ | --------------------------------------------------------- |
+| `domain` | Pure data structures, enums, validation logic    | Standard library only                                     |
 | `config` | Configuration loading, persistence, sanitization | `domain`, `koanf`, `go-error-family`, `go-business-rules` |
 
 > **2026-09-23:** Config validation is expressed as declarative

@@ -9,7 +9,7 @@
 ## Executive Summary
 
 `go-business-rules` adds severity levels (Info / Warning / Error / Critical) to
-validation: instead of pass/fail, rules report the *degree* of failure. This
+validation: instead of pass/fail, rules report the _degree_ of failure. This
 maps directly onto clean-wizard's config validation, which had a hand-rolled
 mini-framework with the same shape but fewer guarantees.
 
@@ -43,28 +43,28 @@ is now `severity: "critical"`.
 
 ## Why the library fit
 
-| Clean-wizard pain (before)                         | businessrules answer (after)                          |
-| -------------------------------------------------- | ----------------------------------------------------- |
-| Homegrown `ValidationRule[T]` (min/max/pattern/regex cache) — a less-tested re-implementation | Pre-built, fuzz/property-tested rule builders |
-| 3-level severity strings, no critical              | 4-level `Severity`, `result.Errors()/Warnings()/Critical()` filtering |
-| `ValidationError` vs `ValidationWarning` duplicated shapes appended by hand | One violation model; severity decides the bucket |
-| `..` traversal = same severity as a bad percentage  | `SeverityCritical` — blocking failures ranked          |
-| Warnings computed then discarded at `config.Load`  | Severity-aware result is complete; boundary logs them  |
-| Unenforced declared constraints (`MinProtectedPaths`) | Every declared constraint becomes a rule           |
-| Non-deterministic map-iteration violation order    | Sorted profile iteration + sequential rule execution   |
+| Clean-wizard pain (before)                                                                    | businessrules answer (after)                                          |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Homegrown `ValidationRule[T]` (min/max/pattern/regex cache) — a less-tested re-implementation | Pre-built, fuzz/property-tested rule builders                         |
+| 3-level severity strings, no critical                                                         | 4-level `Severity`, `result.Errors()/Warnings()/Critical()` filtering |
+| `ValidationError` vs `ValidationWarning` duplicated shapes appended by hand                   | One violation model; severity decides the bucket                      |
+| `..` traversal = same severity as a bad percentage                                            | `SeverityCritical` — blocking failures ranked                         |
+| Warnings computed then discarded at `config.Load`                                             | Severity-aware result is complete; boundary logs them                 |
+| Unenforced declared constraints (`MinProtectedPaths`)                                         | Every declared constraint becomes a rule                              |
+| Non-deterministic map-iteration violation order                                               | Sorted profile iteration + sequential rule execution                  |
 
 Both projects require `GOEXPERIMENT=jsonv2`, so the library's json/v2
 marshaling is a non-event here.
 
 ## Deliberately NOT adopted (yet)
 
-| Capability                          | Reason                                                                                  |
-| ----------------------------------- | --------------------------------------------------------------------------------------- |
-| `Stream(ctx)` concurrent evaluation | Config rules are cheap (µs); sequential gives deterministic order for free              |
-| `listeners/otel` / cqrslite bridges | No OpenTelemetry or event bus in clean-wizard today                                     |
-| Composite builders (`When`/`All`/`Or`) | Condition checks inside closures read clearer at current rule count                 |
+| Capability                                    | Reason                                                                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `Stream(ctx)` concurrent evaluation           | Config rules are cheap (µs); sequential gives deterministic order for free                                    |
+| `listeners/otel` / cqrslite bridges           | No OpenTelemetry or event bus in clean-wizard today                                                           |
+| Composite builders (`When`/`All`/`Or`)        | Condition checks inside closures read clearer at current rule count                                           |
 | `operations`-level `ValidateSettings` rewrite | `internal/domain` is stdlib-only by design (`docs/PACKAGE_BOUNDARY.md`); library belongs in `internal/config` |
-| `ValidateField` severity retention  | Returns `error` by contract; only used by tests/middleware today                        |
+| `ValidateField` severity retention            | Returns `error` by contract; only used by tests/middleware today                                              |
 
 ## Future opportunities
 

@@ -338,12 +338,12 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### Scan Command Features
 
-| Feature              | Status              | Details                                                  |
-| -------------------- | ------------------- | -------------------------------------------------------- |
-| **JSON Output**      | ✅ FULLY_FUNCTIONAL | `--json` flag works                                      |
-| **SARIF Output**     | ✅ FULLY_FUNCTIONAL | `--sarif` emits SARIF 2.1.0 findings via go-finding      |
-| **Retry Support**    | ✅ FULLY_FUNCTIONAL | `--retries` / `--retry-profile` per scanner              |
-| **Nix Store Size**   | ✅ FULLY_FUNCTIONAL | Shows Nix store size when available                      |
+| Feature            | Status              | Details                                             |
+| ------------------ | ------------------- | --------------------------------------------------- |
+| **JSON Output**    | ✅ FULLY_FUNCTIONAL | `--json` flag works                                 |
+| **SARIF Output**   | ✅ FULLY_FUNCTIONAL | `--sarif` emits SARIF 2.1.0 findings via go-finding |
+| **Retry Support**  | ✅ FULLY_FUNCTIONAL | `--retries` / `--retry-profile` per scanner         |
+| **Nix Store Size** | ✅ FULLY_FUNCTIONAL | Shows Nix store size when available                 |
 
 SARIF mapping: reclaimable space (bytes > 0) becomes an `info` finding with category `unused` and a `clean --dry-run` fix suggestion; failed scans become `error` findings carrying `family`/`code`/`retryable` metadata; unavailable cleaners produce no finding. Findings locate at `cleaner://<name>`.
 
