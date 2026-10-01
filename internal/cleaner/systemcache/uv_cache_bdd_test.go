@@ -30,16 +30,17 @@ func setEnvForSpec(key, value string) {
 }
 
 // installFakeUvForSpec puts a scripted `uv` on PATH: `uv cache dir` reports
-// cacheDir, `uv cache clean` empties cacheDir and writes markerPath. It is
-// the spec-level twin of the helper in the internal test package.
-func installFakeUvForSpec(cacheDir, markerPath string) {
+// cacheDir, `uv cache clean` truncates seedPath (pure shell builtins; the
+// script runs with a restricted PATH) and writes markerPath. It is the
+// spec-level twin of the helper in the internal test package.
+func installFakeUvForSpec(cacheDir, seedPath, markerPath string) {
 	script := "#!/bin/sh\n" +
 		"if [ \"$1\" = \"cache\" ] && [ \"$2\" = \"dir\" ]; then\n" +
 		"\tprintf '%s\\n' \"$FAKE_UV_CACHE_DIR\"\n" +
 		"\texit 0\n" +
 		"fi\n" +
 		"if [ \"$1\" = \"cache\" ] && [ \"$2\" = \"clean\" ]; then\n" +
-		"\tfind \"$FAKE_UV_CACHE_DIR\" -mindepth 1 -delete\n" +
+		"\t: > \"$FAKE_UV_SEED_FILE\"\n" +
 		"\t: > \"$FAKE_UV_CLEAN_MARKER\"\n" +
 		"\texit 0\n" +
 		"fi\n" +
@@ -50,6 +51,7 @@ func installFakeUvForSpec(cacheDir, markerPath string) {
 
 	setEnvForSpec("PATH", binDir)
 	setEnvForSpec("FAKE_UV_CACHE_DIR", cacheDir)
+	setEnvForSpec("FAKE_UV_SEED_FILE", seedPath)
 	setEnvForSpec("FAKE_UV_CLEAN_MARKER", markerPath)
 }
 
@@ -82,7 +84,7 @@ var _ = Describe("uv cache cleaning", func() {
 		BeforeEach(func() {
 			setEnvForSpec("HOME", GinkgoT().TempDir())
 			seedFileForSpec(seededGen, 128)
-			installFakeUvForSpec(cacheDir, filepath.Join(GinkgoT().TempDir(), "cleaned.marker"))
+			installFakeUvForSpec(cacheDir, seededGen, filepath.Join(GinkgoT().TempDir(), "cleaned.marker"))
 		})
 
 		It("scans the cache directory the binary resolves, not the static default", func() {
@@ -104,7 +106,9 @@ var _ = Describe("uv cache cleaning", func() {
 			Expect(cleanResult.IsOk()).To(BeTrue())
 			Expect(cleanResult.Value().ItemsRemoved).To(Equal(uint(1)))
 
-			Expect(seededGen).NotTo(BeAnExistingFile())
+			seededInfo, statErr := os.Stat(seededGen)
+			Expect(statErr).NotTo(HaveOccurred())
+			Expect(seededInfo.Size()).To(Equal(int64(0)))
 		})
 
 		It("reports the freed bytes as a known size estimate", func() {

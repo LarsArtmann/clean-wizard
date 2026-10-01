@@ -98,9 +98,11 @@ func TestUvBinaryAvailable_RespectsPath(t *testing.T) {
 }
 
 // installFakeUvBinary puts a scripted `uv` on PATH: `uv cache dir` reports
-// $FAKE_UV_CACHE_DIR, `uv cache clean` empties that directory and writes a
-// marker file so tests can prove the command ran.
-func installFakeUvBinary(t *testing.T, cacheDir, markerPath string) {
+// $FAKE_UV_CACHE_DIR, `uv cache clean` truncates the seeded entry (simulating
+// entry removal with pure shell builtins; the script runs with a restricted
+// PATH, so no external commands are available) and writes a marker file so
+// tests can prove the command ran.
+func installFakeUvBinary(t *testing.T, cacheDir, seedPath, markerPath string) {
 	t.Helper()
 
 	script := "#!/bin/sh\n" +
@@ -109,7 +111,7 @@ func installFakeUvBinary(t *testing.T, cacheDir, markerPath string) {
 		"\texit 0\n" +
 		"fi\n" +
 		"if [ \"$1\" = \"cache\" ] && [ \"$2\" = \"clean\" ]; then\n" +
-		"\tfind \"$FAKE_UV_CACHE_DIR\" -mindepth 1 -delete\n" +
+		"\t: > \"$FAKE_UV_SEED_FILE\"\n" +
 		"\t: > \"$FAKE_UV_CLEAN_MARKER\"\n" +
 		"\texit 0\n" +
 		"fi\n" +
@@ -122,6 +124,7 @@ func installFakeUvBinary(t *testing.T, cacheDir, markerPath string) {
 
 	t.Setenv("PATH", binDir)
 	t.Setenv("FAKE_UV_CACHE_DIR", cacheDir)
+	t.Setenv("FAKE_UV_SEED_FILE", seedPath)
 	t.Setenv("FAKE_UV_CLEAN_MARKER", markerPath)
 }
 
@@ -135,6 +138,17 @@ func seedFile(t *testing.T, path string, size int) {
 	if err := os.WriteFile(path, bytes.Repeat([]byte("x"), size), 0o644); err != nil {
 		t.Fatalf("failed to seed file %s: %v", path, err)
 	}
+}
+
+func fileEmpty(t *testing.T, path string) bool {
+	t.Helper()
+
+	info, err := os.Stat(path)
+	if err != nil {
+		t.Fatalf("failed to stat %s: %v", path, err)
+	}
+
+	return info.Size() == 0
 }
 
 func newUvOnlyCleaner(t *testing.T) *SystemCacheCleaner {
@@ -157,7 +171,7 @@ func TestCleanUvCache_RunsUvCacheCleanCommand(t *testing.T) {
 	seedFile(t, seeded, seededSize)
 
 	marker := filepath.Join(t.TempDir(), "cleaned.marker")
-	installFakeUvBinary(t, cacheDir, marker)
+	installFakeUvBinary(t, cacheDir, seeded, marker)
 
 	cleaner := newUvOnlyCleaner(t)
 
@@ -185,8 +199,8 @@ func TestCleanUvCache_RunsUvCacheCleanCommand(t *testing.T) {
 		t.Errorf("uv cache clean was not invoked (marker missing): %v", err)
 	}
 
-	if _, err := os.Stat(seeded); !os.IsNotExist(err) {
-		t.Errorf("seeded cache entry %s still exists after clean", seeded)
+	if !fileEmpty(t, seeded) {
+		t.Errorf("seeded cache entry %s not emptied after clean", seeded)
 	}
 }
 
@@ -220,7 +234,7 @@ func TestScanUvCache_ReportsResolvedDir(t *testing.T) {
 	cacheDir := filepath.Join(t.TempDir(), "uv")
 	seedFile(t, filepath.Join(cacheDir, "entry.bin"), 128)
 
-	installFakeUvBinary(t, cacheDir, filepath.Join(t.TempDir(), "cleaned.marker"))
+	installFakeUvBinary(t, cacheDir, filepath.Join(cacheDir, "entry.bin"), filepath.Join(t.TempDir(), "cleaned.marker"))
 
 	cleaner := newUvOnlyCleaner(t)
 
