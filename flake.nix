@@ -38,7 +38,7 @@
         let
           version = self.rev or self.dirtyRev or "dev";
 
-          vendorHash = "sha256-cwlJApKB1gMh88WqRST+6UbTkovbCYXB0sMPbNI+uf0=";
+          vendorHash = "sha256-J3oiNd8JIryBtny4sYDM4CmXn3rWDTarWcAEhe0nyW4=";
 
           ldflags = [
             "-s"
