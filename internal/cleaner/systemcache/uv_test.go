@@ -87,11 +87,13 @@ func TestUvBinaryAvailable_RespectsPath(t *testing.T) {
 	}
 
 	t.Setenv("PATH", binDir)
+
 	if !uvBinaryAvailable() {
 		t.Error("uvBinaryAvailable() = false with fake uv on PATH, want true")
 	}
 
 	t.Setenv("PATH", "")
+
 	if uvBinaryAvailable() {
 		t.Error("uvBinaryAvailable() = true with empty PATH, want false")
 	}
@@ -167,6 +169,7 @@ func TestCleanUvCache_RunsUvCacheCleanCommand(t *testing.T) {
 
 	cacheDir := filepath.Join(t.TempDir(), "uv")
 	seeded := filepath.Join(cacheDir, "archive-v0", "entry.bin")
+
 	const seededSize = 128
 	seedFile(t, seeded, seededSize)
 

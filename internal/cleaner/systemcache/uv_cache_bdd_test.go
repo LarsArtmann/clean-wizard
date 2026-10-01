@@ -5,11 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/systemcache"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 // setEnvForSpec sets an environment variable for the current spec and

@@ -76,6 +76,7 @@ func (scc *SystemCacheCleaner) cleanUvCache(
 	}
 
 	cacheDir, dirErr := uvCacheDir(ctx)
+
 	beforeSize := int64(0)
 	if dirErr == nil {
 		beforeSize = cleaner.GetDirSize(cacheDir)
@@ -87,6 +88,7 @@ func (scc *SystemCacheCleaner) cleanUvCache(
 
 	bytesFreed := int64(0)
 	sizeEstimate := types.SizeEstimate{Status: enums.SizeEstimateStatusUnknown} //nolint:exhaustruct
+
 	if dirErr == nil {
 		afterSize := cleaner.GetDirSize(cacheDir)
 		bytesFreed = max(beforeSize-afterSize, 0)

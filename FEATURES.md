@@ -190,6 +190,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **Age-Based Filtering**  | ✅ Working             | Configurable `older_than` duration                                       |
 | **Dry Run Mode**         | ✅ Working             | Correctly previews actions                                               |
 | **Extended Cache Types** | ✅ Working             | Pip, npm, yarn, ccache implemented for Linux                             |
+| **uv Cache (tool-backed)** | ✅ Working           | `uv cache clean` when uv is installed (`UV_CACHE_DIR`/`XDG_CACHE_HOME` aware, lock-safe); static `~/.cache/uv` fallback without the binary |
 
 **Notes:**
 
