@@ -69,43 +69,43 @@
 
 ## f) NEXT TASKS (35, impact-sorted — HARVEST input for TODO_LIST.md / ROADMAP.md)
 
-| #  | Task                                                                                                          | Impact | Effort | Category      |
-| -- | ------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
-| 1  | Fix #56: ExecWithTimeout returns `(*exec.Cmd, context.CancelFunc)`, update all 12 call sites                   | High   | M      | Bug           |
-| 2  | Runtime-verify docker/homebrew/cargo/nodepackages cleaners after #56 (real binaries, not just unit mocks)      | High   | M      | Bug           |
-| 3  | File + fix the npm/yarn/bun double-clean split brain (drop static paths from systemcache or disable overlap)   | High   | S–M    | Bug           |
-| 4  | Correct FEATURES.md "Production Ready" claims that #56 falsifies (docker/homebrew/cargo/nodepackages rows)     | High   | S      | Documentation |
-| 5  | Add an adapters-level regression test for the ExecWithTimeout contract (deadline-less ctx must execute)        | High   | S      | Quality       |
-| 6  | Run one E2E: `clean-wizard scan --json` with relocated `UV_CACHE_DIR`, assert the uv item points at the dir    | Medium | S      | Quality       |
-| 7  | Harvest this report: route (f) items into TODO_LIST.md, ROADMAP.md via docs-health HARVEST                     | Medium | S      | Documentation |
-| 8  | Pick one deletion policy (trash vs os.RemoveAll) and implement it in removeCachePath or document the exemption | Medium | S      | Cleanup       |
+| #  | Task                                                                                                                                                         | Impact | Effort | Category      |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ------------- |
+| 1  | Fix #56: ExecWithTimeout returns `(*exec.Cmd, context.CancelFunc)`, update all 12 call sites                                                                 | High   | M      | Bug           |
+| 2  | Runtime-verify docker/homebrew/cargo/nodepackages cleaners after #56 (real binaries, not just unit mocks)                                                    | High   | M      | Bug           |
+| 3  | File + fix the npm/yarn/bun double-clean split brain (drop static paths from systemcache or disable overlap)                                                 | High   | S–M    | Bug           |
+| 4  | Correct FEATURES.md "Production Ready" claims that #56 falsifies (docker/homebrew/cargo/nodepackages rows)                                                   | High   | S      | Documentation |
+| 5  | Add an adapters-level regression test for the ExecWithTimeout contract (deadline-less ctx must execute)                                                      | High   | S      | Quality       |
+| 6  | Run one E2E: `clean-wizard scan --json` with relocated `UV_CACHE_DIR`, assert the uv item points at the dir                                                  | Medium | S      | Quality       |
+| 7  | Harvest this report: route (f) items into TODO_LIST.md, ROADMAP.md via docs-health HARVEST                                                                   | Medium | S      | Documentation |
+| 8  | Pick one deletion policy (trash vs os.RemoveAll) and implement it in removeCachePath or document the exemption                                               | Medium | S      | Cleanup       |
 | 9  | Triage the 5 chronically failing buildflow steps (nix-build, nix-hash-fix, test-coverage, nix-build-verify, license-check): fix or skip_steps with rationale | Medium | M      | Quality       |
-| 10 | Correct AGENTS.md wording: golangci-lint gate is "0 errors / 336 warnings", not "clean"                        | Low    | S      | Documentation |
-| 11 | `uv cache prune` option: new `enums.UvCleanMode` + SystemCacheSettings field + validation + schema             | Low    | M      | Feature       |
-| 12 | pip cache env awareness: resolve `pip cache dir`/`PIP_CACHE_DIR` (tool-backed pattern from uv)                 | Medium | M      | Feature       |
-| 13 | yarn/bun cache env awareness in systemcache or drop in favor of nodepackages ownership (depends on #3)         | Medium | S–M    | Feature       |
-| 14 | Close #55 after review: tick checklist, reference in a commit, close via `Closing as done`-style comment       | Low    | S      | Documentation |
-| 15 | Windows platform decision for CacheTypeUv (`%LOCALAPPDATA%\uv\cache`) or explicit platform-scoped exclusion    | Low    | M      | Feature       |
-| 16 | Document `OlderThan` non-applicability to uv (no age-based clean upstream) in config docs                      | Low    | S      | Documentation |
-| 17 | Parse `uv cache clean` output ("Removed N files (X KiB)") to improve freed-bytes accuracy when dir resolution fails | Low | S      | Feature       |
-| 18 | Add Coded errors for uv command failures (`cleaner.systemcache.uv_timeout`) per the CLI classification convention | Low | S      | Quality       |
-| 19 | Deduplicate the fake-uv fixture twins (internal + xtest) into a shared testdata script                         | Low    | S      | Cleanup       |
-| 20 | Dry-run test for the uv path (Clean dry-run aggregates Scan; assert env-aware resolution surfaces in estimate) | Low    | S      | Quality       |
-| 21 | Run `buildflow doctor` (dev run warned 9 tools unavailable) and clear unhealthy tools                          | Medium | S      | Quality       |
-| 22 | Investigate buildflow `go-line-flipflop` preflight warning (go.mod `go` line churned 20/20 commits)            | Medium | M      | Quality       |
-| 23 | Consider `UV_LOCK_TIMEOUT` pass-through so uv fails just before our 60s timeout instead of being killed        | Low    | S      | Quality       |
-| 24 | Property/fuzz tests for `parseUvCacheDirOutput` (empty, multiline, CRLF, unicode paths)                        | Low    | S      | Quality       |
-| 25 | PATH-isolation regression pattern for all tool cleaners (uv fixture generalized; golangcilint tests next)      | Low    | M      | Quality       |
-| 26 | Migrate `systemcache.go:436` off deprecated `FreedBytes` (gopls hint) to SizeEstimate consistently             | Low    | S      | Cleanup       |
-| 27 | BDD specs for the remaining 9 untested cleaners (status-report skill inventory, one per session)               | Medium | L      | Quality       |
-| 28 | CI job that runs the real-uv integration test when uv is available (matrix guard)                              | Low    | S      | Quality       |
-| 29 | ADR for tool-backed vs path-backed cache strategy (docs/planning precedent)                                    | Low    | S      | Documentation |
-| 30 | Website/README feature matrix: uv now tool-backed (marketing accuracy after #55)                               | Low    | S      | Documentation |
-| 31 | CHANGELOG entry for #55 + #56 (repo has no CHANGELOG update this session)                                      | Low    | S      | Documentation |
-| 32 | Annotate superseded status reports via docs-health ANNOTATE (uv claims in 2026-06 reports now stale)           | Low    | S      | Documentation |
-| 33 | Lint debt budget: 336 warnings — decide nolint policy for forbidigo/err113 classes or fix-and-enforce          | Low    | L      | Cleanup       |
-| 34 | Surface degraded resolution (uv fallback to static path) in scan result metadata, not just verbose prints      | Low    | S      | Feature       |
-| 35 | Post-#56: run buildflow full mode end-to-end and confirm test-coverage/nix steps or document their skip        | Medium | M      | Quality       |
+| 10 | Correct AGENTS.md wording: golangci-lint gate is "0 errors / 336 warnings", not "clean"                                                                      | Low    | S      | Documentation |
+| 11 | `uv cache prune` option: new `enums.UvCleanMode` + SystemCacheSettings field + validation + schema                                                           | Low    | M      | Feature       |
+| 12 | pip cache env awareness: resolve `pip cache dir`/`PIP_CACHE_DIR` (tool-backed pattern from uv)                                                               | Medium | M      | Feature       |
+| 13 | yarn/bun cache env awareness in systemcache or drop in favor of nodepackages ownership (depends on #3)                                                       | Medium | S–M    | Feature       |
+| 14 | Close #55 after review: tick checklist, reference in a commit, close via `Closing as done`-style comment                                                     | Low    | S      | Documentation |
+| 15 | Windows platform decision for CacheTypeUv (`%LOCALAPPDATA%\uv\cache`) or explicit platform-scoped exclusion                                                  | Low    | M      | Feature       |
+| 16 | Document `OlderThan` non-applicability to uv (no age-based clean upstream) in config docs                                                                    | Low    | S      | Documentation |
+| 17 | Parse `uv cache clean` output ("Removed N files (X KiB)") to improve freed-bytes accuracy when dir resolution fails                                          | Low    | S      | Feature       |
+| 18 | Add Coded errors for uv command failures (`cleaner.systemcache.uv_timeout`) per the CLI classification convention                                            | Low    | S      | Quality       |
+| 19 | Deduplicate the fake-uv fixture twins (internal + xtest) into a shared testdata script                                                                       | Low    | S      | Cleanup       |
+| 20 | Dry-run test for the uv path (Clean dry-run aggregates Scan; assert env-aware resolution surfaces in estimate)                                               | Low    | S      | Quality       |
+| 21 | Run `buildflow doctor` (dev run warned 9 tools unavailable) and clear unhealthy tools                                                                        | Medium | S      | Quality       |
+| 22 | Investigate buildflow `go-line-flipflop` preflight warning (go.mod `go` line churned 20/20 commits)                                                          | Medium | M      | Quality       |
+| 23 | Consider `UV_LOCK_TIMEOUT` pass-through so uv fails just before our 60s timeout instead of being killed                                                      | Low    | S      | Quality       |
+| 24 | Property/fuzz tests for `parseUvCacheDirOutput` (empty, multiline, CRLF, unicode paths)                                                                      | Low    | S      | Quality       |
+| 25 | PATH-isolation regression pattern for all tool cleaners (uv fixture generalized; golangcilint tests next)                                                    | Low    | M      | Quality       |
+| 26 | Migrate `systemcache.go:436` off deprecated `FreedBytes` (gopls hint) to SizeEstimate consistently                                                           | Low    | S      | Cleanup       |
+| 27 | BDD specs for the remaining 9 untested cleaners (status-report skill inventory, one per session)                                                             | Medium | L      | Quality       |
+| 28 | CI job that runs the real-uv integration test when uv is available (matrix guard)                                                                            | Low    | S      | Quality       |
+| 29 | ADR for tool-backed vs path-backed cache strategy (docs/planning precedent)                                                                                  | Low    | S      | Documentation |
+| 30 | Website/README feature matrix: uv now tool-backed (marketing accuracy after #55)                                                                             | Low    | S      | Documentation |
+| 31 | CHANGELOG entry for #55 + #56 (repo has no CHANGELOG update this session)                                                                                    | Low    | S      | Documentation |
+| 32 | Annotate superseded status reports via docs-health ANNOTATE (uv claims in 2026-06 reports now stale)                                                         | Low    | S      | Documentation |
+| 33 | Lint debt budget: 336 warnings — decide nolint policy for forbidigo/err113 classes or fix-and-enforce                                                        | Low    | L      | Cleanup       |
+| 34 | Surface degraded resolution (uv fallback to static path) in scan result metadata, not just verbose prints                                                    | Low    | S      | Feature       |
+| 35 | Post-#56: run buildflow full mode end-to-end and confirm test-coverage/nix steps or document their skip                                                      | Medium | M      | Quality       |
 
 ## g) QUESTIONS I CANNOT ANSWER MYSELF
 
