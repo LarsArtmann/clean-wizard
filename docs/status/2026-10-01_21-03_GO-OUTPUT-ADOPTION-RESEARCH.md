@@ -19,17 +19,17 @@
 
 ### 2. go-output deep dive — 9/9 research steps completed
 
-| Step | Verified finding | Evidence |
-|---|---|---|
-| Module availability | All 4 modules resolve from **public proxy** at `v0.38.2`; submodule tags exist (17-tag convention holds); repo has 584 tags | `go list -m` × 5 all green; `git tag -l '*/v0.38.2'` |
-| Dependency compatibility | **Zero conflicts**: clean-wizard pins `lipgloss/v2 v2.0.6` (identical to nom's), `bubbletea/v2 v2.0.9` already indirect (identical to tui's) | clean-wizard `go.mod:7,37` vs nom/tui `go.mod` |
-| nom API | `NewNOMSubscriber` + sealed 9-event sum type; `NewInlineRenderer(sub, writer, maxHeight)`; `Finish()` leaves final tree + hands post-run summary to caller; `EnqueueLines` drains log lines above live frame; timing cache medians drive ETA | `nom/event.go:36-140`, `nom/inline_renderer_summary.go:23-74`, `nom/doc.go` |
-| go-workflow hook semantics | **`retry(Before→Do→After)` — hooks fire per attempt**; `RetryOption.NextBackOff` receives `RetryEvent{Attempt, Since, Error}` per retry; clean-wizard already owns that hook at `internal/execution/retry.go:131` | go-workflow v0.1.13 `workflow.go:438-475`, `retry.go:12-60` |
-| tui API | `BubbleTeaProgressReporter` dual-feeds (nom subscriber + `ReportStep/Progress`); inline (no alt-screen); TUI errors non-fatal; `SetCancelFunc` = ctrl-c → ctx cancel | `tui/reporter.go:31`, `tui/lifecycle.go:21-68` |
-| daghtml artifacts | ~21KB **self-contained** page (inline CSS+JS, ships CSP meta); `Node{ID,Label,Color,Tooltip,Error}` / `Edge{From,To}` maps 1:1 onto cleaner outcomes; `GraphHTML` for host-page embedding | golden files in `daghtml/testdata/` (verified bytes + structure) |
-| graph renderers | Clean fenced Mermaid (`flowchart TD`) + Graphviz DOT; constructors from `GraphNode/GraphEdge`, `Table`, `TreeNode` | `graph/testdata/*.golden` |
-| clean-wizard output surface | No live progress exists today (`clean.go:114` "Starting cleanup..." → silence → post-run table); `--json`/`--sarif` gates already on both commands; resultCollector wired into step funcs, not AfterStep | `commands/clean.go:71-78,114,210,218`, `commands/scan.go:40-43`, `execution/builder.go:50-86` |
-| Versioning risk | 57 commits across the 4 modules since 2026-08-01; pre-1.0 (v1.0.0 pending owner decision per go-output TODO #7) | `git log`, go-output `TODO_LIST.md` |
+| Step                        | Verified finding                                                                                                                                                                                                                             | Evidence                                                                                      |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Module availability         | All 4 modules resolve from **public proxy** at `v0.38.2`; submodule tags exist (17-tag convention holds); repo has 584 tags                                                                                                                  | `go list -m` × 5 all green; `git tag -l '*/v0.38.2'`                                          |
+| Dependency compatibility    | **Zero conflicts**: clean-wizard pins `lipgloss/v2 v2.0.6` (identical to nom's), `bubbletea/v2 v2.0.9` already indirect (identical to tui's)                                                                                                 | clean-wizard `go.mod:7,37` vs nom/tui `go.mod`                                                |
+| nom API                     | `NewNOMSubscriber` + sealed 9-event sum type; `NewInlineRenderer(sub, writer, maxHeight)`; `Finish()` leaves final tree + hands post-run summary to caller; `EnqueueLines` drains log lines above live frame; timing cache medians drive ETA | `nom/event.go:36-140`, `nom/inline_renderer_summary.go:23-74`, `nom/doc.go`                   |
+| go-workflow hook semantics  | **`retry(Before→Do→After)` — hooks fire per attempt**; `RetryOption.NextBackOff` receives `RetryEvent{Attempt, Since, Error}` per retry; clean-wizard already owns that hook at `internal/execution/retry.go:131`                            | go-workflow v0.1.13 `workflow.go:438-475`, `retry.go:12-60`                                   |
+| tui API                     | `BubbleTeaProgressReporter` dual-feeds (nom subscriber + `ReportStep/Progress`); inline (no alt-screen); TUI errors non-fatal; `SetCancelFunc` = ctrl-c → ctx cancel                                                                         | `tui/reporter.go:31`, `tui/lifecycle.go:21-68`                                                |
+| daghtml artifacts           | ~21KB **self-contained** page (inline CSS+JS, ships CSP meta); `Node{ID,Label,Color,Tooltip,Error}` / `Edge{From,To}` maps 1:1 onto cleaner outcomes; `GraphHTML` for host-page embedding                                                    | golden files in `daghtml/testdata/` (verified bytes + structure)                              |
+| graph renderers             | Clean fenced Mermaid (`flowchart TD`) + Graphviz DOT; constructors from `GraphNode/GraphEdge`, `Table`, `TreeNode`                                                                                                                           | `graph/testdata/*.golden`                                                                     |
+| clean-wizard output surface | No live progress exists today (`clean.go:114` "Starting cleanup..." → silence → post-run table); `--json`/`--sarif` gates already on both commands; resultCollector wired into step funcs, not AfterStep                                     | `commands/clean.go:71-78,114,210,218`, `commands/scan.go:40-43`, `execution/builder.go:50-86` |
+| Versioning risk             | 57 commits across the 4 modules since 2026-08-01; pre-1.0 (v1.0.0 pending owner decision per go-output TODO #7)                                                                                                                              | `git log`, go-output `TODO_LIST.md`                                                           |
 
 **Deliverable produced:** prioritized benefit matrix (nom #1, daghtml #2, tui #3/phase-2, graph #4/optional) + verified risk table with mitigations, delivered in chat.
 
@@ -59,7 +59,7 @@
 **Nothing destructive — zero mutations to clean-wizard this session.** But honest failures:
 
 1. The **BuildFlow-dogfooding claim** (see b1) — a mitigation presented as verified fact. This is exactly the `verify-external-claims` failure mode the fleet skills exist to prevent.
-2. **Shallow first pass on question 2:** initial answer leaned on the sub-packages' *placeholder* READMEs (a template README with `github.com/username/.` boilerplate!) before the user demanded the critical deep dive. Should have gone straight to source.
+2. **Shallow first pass on question 2:** initial answer leaned on the sub-packages' _placeholder_ READMEs (a template README with `github.com/username/.` boilerplate!) before the user demanded the critical deep dive. Should have gone straight to source.
 3. Minor sloppiness: first exploration used `rg -rn` (`-r` is `--replace`, not "recursive") — harmless here, but a flag misuse that could corrupt output in other contexts.
 
 ## e) WHAT WE SHOULD IMPROVE
@@ -143,4 +143,4 @@
 
 ---
 
-*Auto-commit daemon will pick up this file. Markdown format per explicit user request (skill default is HTML — override flagged). Waiting for instructions.*
+_Auto-commit daemon will pick up this file. Markdown format per explicit user request (skill default is HTML — override flagged). Waiting for instructions._

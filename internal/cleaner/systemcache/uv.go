@@ -140,7 +140,7 @@ func uvCacheDir(ctx context.Context) (string, error) {
 // parseUvCacheDirOutput extracts the cache directory from `uv cache dir`
 // stdout: the first non-empty line, which must be an absolute path.
 func parseUvCacheDirOutput(output string) (string, error) {
-	for _, line := range strings.Split(strings.TrimSpace(output), "\n") {
+	for line := range strings.SplitSeq(strings.TrimSpace(output), "\n") {
 		dir := strings.TrimSpace(line)
 		if dir == "" {
 			continue

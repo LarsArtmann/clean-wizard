@@ -10,19 +10,19 @@
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | Drafted closing + re-scope comments; all 3 passed `check-draft.py` (0 FAIL, 0 WARN) | checker output |
-| 2 | Closed #28 with evidence comment ("Closing as complete: the systematic audit … ran today") | gh issue close output ✓ |
-| 3 | Closed #35 with `--reason "not planned"` + evidence comment (dead-code mapping layer d6beccf, stale .tsp, ROADMAP long-term) | gh issue close output ✓ |
-| 4 | Re-scoped #41: retitled to "🚀 RE-SCOPED: Benchmark CI integration + workflow-level timing"; body rewritten with In scope (benchmark CI job, BeforeStep/AfterStep timing, retry observability) / Out of scope (Prometheus/OTel/pprof/health/dashboards → Web UI idea); history note points at the audit-trail comments | https://github.com/LarsArtmann/clean-wizard/issues/41 |
-| 5 | Posted re-scope comment on #41 (issuecomment-5796861417) | gh output |
-| 6 | Verified final board state: 6 open, titles+states as expected | `gh issue list --state open` |
-| 7 | Interpreted the terse "??" follow-up as "what about the remaining 6" and acted: drafted 3 re-verification comments, all passed voice check (0/0) | checker output |
-| 8 | Posted "Re-verified (2026-09-23): no change since 2026-09-09" comments on #31 (…9858), #19 (…0235), #18 (…0573) — each with the one concrete next step | gh output |
-| 9 | Added missing labels to #30 (`enhancement`, `help wanted` — it was the only labeled-less open issue, 16:29 report item 18) | gh issue edit output |
-| 10 | Delivered a state table: 4 issues implementable as-is (#41, #30, #19, #18), #20 blocked on one design call, #31 blocked on one architecture call | final message |
-| 11 | Mooted 16:29 report item 21 as a side effect: rewriting #41's body removed the stale `ExecutionModeType` reference from the live issue (original body survives in GitHub edit history + the audit-trail comments) | #41 body diff |
+| #  | Item                                                                                                                                                                                                                                                                                                                   | Evidence                                              |
+| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 1  | Drafted closing + re-scope comments; all 3 passed `check-draft.py` (0 FAIL, 0 WARN)                                                                                                                                                                                                                                    | checker output                                        |
+| 2  | Closed #28 with evidence comment ("Closing as complete: the systematic audit … ran today")                                                                                                                                                                                                                             | gh issue close output ✓                               |
+| 3  | Closed #35 with `--reason "not planned"` + evidence comment (dead-code mapping layer d6beccf, stale .tsp, ROADMAP long-term)                                                                                                                                                                                           | gh issue close output ✓                               |
+| 4  | Re-scoped #41: retitled to "🚀 RE-SCOPED: Benchmark CI integration + workflow-level timing"; body rewritten with In scope (benchmark CI job, BeforeStep/AfterStep timing, retry observability) / Out of scope (Prometheus/OTel/pprof/health/dashboards → Web UI idea); history note points at the audit-trail comments | https://github.com/LarsArtmann/clean-wizard/issues/41 |
+| 5  | Posted re-scope comment on #41 (issuecomment-5796861417)                                                                                                                                                                                                                                                               | gh output                                             |
+| 6  | Verified final board state: 6 open, titles+states as expected                                                                                                                                                                                                                                                          | `gh issue list --state open`                          |
+| 7  | Interpreted the terse "??" follow-up as "what about the remaining 6" and acted: drafted 3 re-verification comments, all passed voice check (0/0)                                                                                                                                                                       | checker output                                        |
+| 8  | Posted "Re-verified (2026-09-23): no change since 2026-09-09" comments on #31 (…9858), #19 (…0235), #18 (…0573) — each with the one concrete next step                                                                                                                                                                 | gh output                                             |
+| 9  | Added missing labels to #30 (`enhancement`, `help wanted` — it was the only labeled-less open issue, 16:29 report item 18)                                                                                                                                                                                             | gh issue edit output                                  |
+| 10 | Delivered a state table: 4 issues implementable as-is (#41, #30, #19, #18), #20 blocked on one design call, #31 blocked on one architecture call                                                                                                                                                                       | final message                                         |
+| 11 | Mooted 16:29 report item 21 as a side effect: rewriting #41's body removed the stale `ExecutionModeType` reference from the live issue (original body survives in GitHub edit history + the audit-trail comments)                                                                                                      | #41 body diff                                         |
 
 ## b) PARTIALLY DONE
 
@@ -58,33 +58,33 @@ Nothing shipped is broken. Process fuckups, radical honesty:
 
 ## f) NEXT 50 TASKS (ranked by impact; feeds docs-health HARVEST)
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | Decide `profile select`: persistent active profile vs per-invocation `--profile` final — then update #20 (and TODO_LIST #10 if dropping) | High | S | Product decision |
-| 2 | Decide #31 plugin contract: out-of-process JSON/stdio vs config-declared external cleaners vs defer to ROADMAP | High | S | Architecture decision |
-| 3 | Implement #41 in-scope: CI benchmark job (`tests/benchmark/` + package benches, regression thresholds) | High | M | Quality |
-| 4 | Implement #41 in-scope: surface workflow-level timing from `BeforeStep`/`AfterStep` (internal/execution/hooks.go) | High | S | Quality |
-| 5 | Implement #41 in-scope: make retry activations observable in output/log | Medium | S | Quality |
-| 6 | Implement #30: `RequireSafeMode` → EnforcementLevel enum (validator_rules.go:31) | High | M | Type safety |
-| 7 | Implement #30: `RequireSafeModeConfirmation` → enum or fold (validation_middleware.go:32) | Medium | S | Type safety |
-| 8 | Implement #30: constrained string types (ProfileName, OperationName, validated Path) | Medium | L | Type safety |
-| 9 | Implement #30: constrained numeric types (DiskUsagePercentage 1-95, PathCount, ProfileCount 1-10, Timeout) | Medium | L | Type safety |
-| 10 | Implement #19: migration engine (detection → pipeline → backup → rollback → notify); Version field already wired | Medium | L | Feature |
-| 11 | Implement #18: protected-path prompts, threshold inputs, config preview in `init` huh flow | Medium | M | UX |
-| 12 | Implement #20: `scan --profile` filtering or remove the flag (scan.go:92-93, TODO_LIST #10) | High | M | Feature |
-| 13 | Fix `os.Exit(0)` in `runProfileDeleteCommand` (profile.go:259) → classified Rejection error | High | S | Bug |
-| 14 | Delete or refresh `api/typespec/clean-wizard.tsp` (+ package.json) now that #35 is closed as not planned | Medium | S | Cleanup |
-| 15 | Write the audit-cadence convention into AGENTS.md (one line: stamp every open issue every round) | Medium | S | Process |
-| 16 | Harvest both 2026-09-23 reports (16:12 dedup, 16:29 review, this one) into TODO_LIST.md/ROADMAP.md | High | S | Documentation |
-| 17 | Cross-reference the 6 open issues against TODO_LIST.md; add missing entries (#19 engine, #30 bools/types) | Medium | S | Documentation |
-| 18 | Decide #20's remaining sub-features: templates, import/export, backup (from the Nov-2025 comment) — in scope or never | Low | S | Product decision |
-| 19 | Record in #41 (or close-and-reopen-later) whether the out-of-scope server metrics get their own tracking issue now | Low | S | Issue hygiene |
-| 20 | Add `help wanted`/`good first issue` style guidance comments to the 4 implementable issues (they carry `help wanted` labels but no on-ramp notes for contributors) | Low | S | Issue hygiene |
-| 21 | Verify #30's labels actually render (post-edit re-fetch; closes this session's d-4) | Low | S | Issue hygiene |
-| 22 | Deep-verify the 30 closed issues not yet re-read (16:29 report b-1, still open) | Low | M | Issue hygiene |
-| 23 | Remove compiled test binaries (`internal/api/api.test`, `internal/shared/utils/config/config.test`) | Low | S | Cleanup |
-| 24 | After #6/#7 land: update AGENTS.md zero-valley status lines | Low | S | Documentation |
-| 25 | After #12 lands: remove the scan.go warning branch + update FEATURES.md | Low | S | Documentation |
+| #  | Task                                                                                                                                                               | Impact | Effort | Category              |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | --------------------- |
+| 1  | Decide `profile select`: persistent active profile vs per-invocation `--profile` final — then update #20 (and TODO_LIST #10 if dropping)                           | High   | S      | Product decision      |
+| 2  | Decide #31 plugin contract: out-of-process JSON/stdio vs config-declared external cleaners vs defer to ROADMAP                                                     | High   | S      | Architecture decision |
+| 3  | Implement #41 in-scope: CI benchmark job (`tests/benchmark/` + package benches, regression thresholds)                                                             | High   | M      | Quality               |
+| 4  | Implement #41 in-scope: surface workflow-level timing from `BeforeStep`/`AfterStep` (internal/execution/hooks.go)                                                  | High   | S      | Quality               |
+| 5  | Implement #41 in-scope: make retry activations observable in output/log                                                                                            | Medium | S      | Quality               |
+| 6  | Implement #30: `RequireSafeMode` → EnforcementLevel enum (validator_rules.go:31)                                                                                   | High   | M      | Type safety           |
+| 7  | Implement #30: `RequireSafeModeConfirmation` → enum or fold (validation_middleware.go:32)                                                                          | Medium | S      | Type safety           |
+| 8  | Implement #30: constrained string types (ProfileName, OperationName, validated Path)                                                                               | Medium | L      | Type safety           |
+| 9  | Implement #30: constrained numeric types (DiskUsagePercentage 1-95, PathCount, ProfileCount 1-10, Timeout)                                                         | Medium | L      | Type safety           |
+| 10 | Implement #19: migration engine (detection → pipeline → backup → rollback → notify); Version field already wired                                                   | Medium | L      | Feature               |
+| 11 | Implement #18: protected-path prompts, threshold inputs, config preview in `init` huh flow                                                                         | Medium | M      | UX                    |
+| 12 | Implement #20: `scan --profile` filtering or remove the flag (scan.go:92-93, TODO_LIST #10)                                                                        | High   | M      | Feature               |
+| 13 | Fix `os.Exit(0)` in `runProfileDeleteCommand` (profile.go:259) → classified Rejection error                                                                        | High   | S      | Bug                   |
+| 14 | Delete or refresh `api/typespec/clean-wizard.tsp` (+ package.json) now that #35 is closed as not planned                                                           | Medium | S      | Cleanup               |
+| 15 | Write the audit-cadence convention into AGENTS.md (one line: stamp every open issue every round)                                                                   | Medium | S      | Process               |
+| 16 | Harvest both 2026-09-23 reports (16:12 dedup, 16:29 review, this one) into TODO_LIST.md/ROADMAP.md                                                                 | High   | S      | Documentation         |
+| 17 | Cross-reference the 6 open issues against TODO_LIST.md; add missing entries (#19 engine, #30 bools/types)                                                          | Medium | S      | Documentation         |
+| 18 | Decide #20's remaining sub-features: templates, import/export, backup (from the Nov-2025 comment) — in scope or never                                              | Low    | S      | Product decision      |
+| 19 | Record in #41 (or close-and-reopen-later) whether the out-of-scope server metrics get their own tracking issue now                                                 | Low    | S      | Issue hygiene         |
+| 20 | Add `help wanted`/`good first issue` style guidance comments to the 4 implementable issues (they carry `help wanted` labels but no on-ramp notes for contributors) | Low    | S      | Issue hygiene         |
+| 21 | Verify #30's labels actually render (post-edit re-fetch; closes this session's d-4)                                                                                | Low    | S      | Issue hygiene         |
+| 22 | Deep-verify the 30 closed issues not yet re-read (16:29 report b-1, still open)                                                                                    | Low    | M      | Issue hygiene         |
+| 23 | Remove compiled test binaries (`internal/api/api.test`, `internal/shared/utils/config/config.test`)                                                                | Low    | S      | Cleanup               |
+| 24 | After #6/#7 land: update AGENTS.md zero-valley status lines                                                                                                        | Low    | S      | Documentation         |
+| 25 | After #12 lands: remove the scan.go warning branch + update FEATURES.md                                                                                            | Low    | S      | Documentation         |
 
 (Items 26-50: not fabricated to fill the table — the 16:12 dedup report's section (f) already carries a 50-item implementation-ranked list that supersedes anything invented here; this session adds no new codebase observations beyond the 25 above.)
 
@@ -96,4 +96,4 @@ Nothing shipped is broken. Process fuckups, radical honesty:
 
 ---
 
-*Point-in-time snapshot; goes stale. Section (f) is HARVEST input for TODO_LIST.md. Supersedes the 16:29 report's open items where they overlap.*
+_Point-in-time snapshot; goes stale. Section (f) is HARVEST input for TODO_LIST.md. Supersedes the 16:29 report's open items where they overlap._
