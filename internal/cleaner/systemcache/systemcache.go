@@ -367,6 +367,10 @@ func (scc *SystemCacheCleaner) scanSystemCache(
 		)
 	}
 
+	if cacheType == enums.CacheTypeUv {
+		return scc.scanUvCache(ctx, homeDir)
+	}
+
 	return scc.scanCachePathWithConfig(ctx, homeDir, config)
 }
 
@@ -522,6 +526,10 @@ func (scc *SystemCacheCleaner) cleanSystemCache(
 		return result.Err[types.CleanResult](
 			fmt.Errorf("unknown system cache type: %s", cacheType.String()),
 		)
+	}
+
+	if cacheType == enums.CacheTypeUv {
+		return scc.cleanUvCache(ctx, homeDir)
 	}
 
 	path := filepath.Join(append([]string{homeDir}, config.pathComponents...)...)
