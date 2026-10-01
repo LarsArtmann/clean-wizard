@@ -517,7 +517,7 @@ func (scc *SystemCacheCleaner) scanCachePathWithConfig(
 
 // cleanSystemCache cleans cache for a specific system cache type.
 func (scc *SystemCacheCleaner) cleanSystemCache(
-	_ context.Context,
+	ctx context.Context,
 	cacheType enums.CacheType,
 	homeDir string,
 ) result.Result[types.CleanResult] {
