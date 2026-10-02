@@ -211,8 +211,10 @@ var _ = Describe("Live progress narrative", func() {
 
 	Describe("when a cleaner fails transiently", func() {
 		It("narrates retry attempts without ever reporting an intermediate failure", func() {
+			// Outcome list semantics: the LAST outcome repeats for further
+			// calls, so fail-twice-then-succeed needs three entries.
 			transientErr := errorfamily.NewTransient("bdd.transient", "flaky backend")
-			registry, _ := registerFakes(newFakeCleaner("flaky", transientErr, transientErr))
+			registry, _ := registerFakes(newFakeCleaner("flaky", transientErr, transientErr, nil))
 
 			recorder := newProgressRecorder()
 			wr, err := execution.RunCleaners(ctx, registry, []string{"flaky"},
