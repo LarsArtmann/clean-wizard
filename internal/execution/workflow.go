@@ -104,12 +104,7 @@ func executeWorkflow(ctx context.Context, compiled *CompiledWorkflow, cfg runCon
 		emitTerminalOutcome(em, step)
 	}
 
-	if runErr != nil {
-		em.WorkflowFailed(runErr)
-	} else {
-		em.WorkflowCompleted()
-	}
-
+	em.WorkflowFinished(runErr)
 	em.Finish()
 
 	if runErr != nil && len(result.Steps) == 0 {

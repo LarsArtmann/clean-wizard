@@ -26,8 +26,10 @@ type ProgressEmitter interface {
 	ActivityFailed(name string, err error, duration time.Duration)
 	ActivitySkipped(name string, reason string)
 	Note(line string)
-	WorkflowCompleted()
-	WorkflowFailed(err error)
+	// WorkflowFinished terminates the run-level narrative; a nil error means
+	// success. Terminal per-step outcomes are emitted separately (once, from
+	// the final collector state).
+	WorkflowFinished(err error)
 	Finish()
 }
 
@@ -37,17 +39,16 @@ type ProgressEmitter interface {
 // mode (ADR-0002 safety rail #1).
 type noopProgressEmitter struct{}
 
-func (noopProgressEmitter) WorkflowStarted(string)                          {}
-func (noopProgressEmitter) ActivityRegistered(string)                       {}
-func (noopProgressEmitter) ActivityStarted(string)                          {}
-func (noopProgressEmitter) ActivityRetrying(string, int, string)            {}
-func (noopProgressEmitter) ActivityCompleted(string, time.Duration)         {}
-func (noopProgressEmitter) ActivityFailed(string, error, time.Duration)     {}
-func (noopProgressEmitter) ActivitySkipped(string, string)                  {}
-func (noopProgressEmitter) Note(string)                                     {}
-func (noopProgressEmitter) WorkflowCompleted()                              {}
-func (noopProgressEmitter) WorkflowFailed(error)                            {}
-func (noopProgressEmitter) Finish()                                         {}
+func (noopProgressEmitter) WorkflowStarted(string)                      {}
+func (noopProgressEmitter) ActivityRegistered(string)                   {}
+func (noopProgressEmitter) ActivityStarted(string)                      {}
+func (noopProgressEmitter) ActivityRetrying(string, int, string)        {}
+func (noopProgressEmitter) ActivityCompleted(string, time.Duration)     {}
+func (noopProgressEmitter) ActivityFailed(string, error, time.Duration) {}
+func (noopProgressEmitter) ActivitySkipped(string, string)              {}
+func (noopProgressEmitter) Note(string)                                 {}
+func (noopProgressEmitter) WorkflowFinished(error)                      {}
+func (noopProgressEmitter) Finish()                                     {}
 
 // The single shared no-op instance; stateless, so sharing is safe.
 var noopEmitter ProgressEmitter = noopProgressEmitter{}

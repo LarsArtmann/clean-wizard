@@ -31,7 +31,7 @@ func verboseLine(em ProgressEmitter, format string, args ...any) {
 		return
 	}
 
-	_, _ = fmt.Fprintln(verboseWriter, line)
+	_, _ = io.WriteString(verboseWriter, line+"\n")
 }
 
 // makeBeforeHook creates a BeforeStep hook that records the start time,
