@@ -2,8 +2,10 @@ package commands
 
 import (
 	"testing"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
+	"github.com/LarsArtmann/clean-wizard/internal/progress"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -42,8 +44,7 @@ func TestProgressRequested_NonTTYWriterIsDisabled(t *testing.T) {
 
 	assert.False(t, progressRequested(true, false),
 		"go test stdout is never a TTY; progress must stay disabled")
-	assert.False(t, progress.Enabled(nil), "nil writer must be reported disabled")
-}
+	assert.False(t, progress.Enabled(nil), "nil writer must be reported disabled")}
 
 // fakeProgressEmitter is a minimal non-nil emitter stand-in for option wiring.
 type fakeProgressEmitter struct{}
@@ -52,12 +53,14 @@ func (fakeProgressEmitter) WorkflowStarted(string)               {}
 func (fakeProgressEmitter) ActivityRegistered(string)            {}
 func (fakeProgressEmitter) ActivityStarted(string)               {}
 func (fakeProgressEmitter) ActivityRetrying(string, int, string) {}
-func (fakeProgressEmitter) ActivityCompleted(string, _)          {}
-func (fakeProgressEmitter) ActivityFailed(string, _, _)          {}
-func (fakeProgressEmitter) ActivitySkipped(string, string)       {}
-func (fakeProgressEmitter) Note(string)                          {}
-func (fakeProgressEmitter) WorkflowFinished(_)                   {}
-func (fakeProgressEmitter) Finish()                              {}
+func (fakeProgressEmitter) ActivityCompleted(string, time.Duration) {
+}
+func (fakeProgressEmitter) ActivityFailed(string, error, time.Duration) {
+}
+func (fakeProgressEmitter) ActivitySkipped(string, string) {}
+func (fakeProgressEmitter) Note(string)                    {}
+func (fakeProgressEmitter) WorkflowFinished(error)         {}
+func (fakeProgressEmitter) Finish()                        {}
 
 // TestBuildRunOptions_EmitterAccepted verifies both emitter states build a
 // valid option list; the option's semantics (no-op vs emitting) are owned and
@@ -66,18 +69,19 @@ func TestBuildRunOptions_EmitterAccepted(t *testing.T) {
 	t.Parallel()
 
 	for _, tc := range []struct {
-		name    string
-		emitter execution.ProgressEmitter
+		name        string
+		emitter     execution.ProgressEmitter
+		wantOptions int
 	}{
-		{name: "nil emitter", emitter: nil},
-		{name: "non-nil emitter", emitter: fakeProgressEmitter{}},
+		{name: "nil emitter yields no options", emitter: nil, wantOptions: 0},
+		{name: "non-nil emitter yields exactly the progress option", emitter: fakeProgressEmitter{}, wantOptions: 1},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			opts, err := buildRunOptions(false, 0, 0, "", tc.emitter)
 			require.NoError(t, err)
-			assert.NotEmpty(t, opts)
+			assert.Len(t, opts, tc.wantOptions)
 		})
 	}
 }
