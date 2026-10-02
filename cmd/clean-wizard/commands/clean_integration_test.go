@@ -28,6 +28,7 @@ func TestRunCleanCommand_DryRun_JSON(t *testing.T) {
 		0,     // retries
 		"",    // retryProfile
 		0,     // concurrency
+		false, // progressFlag
 	)
 
 	// Should not error — dry-run is safe and non-destructive
