@@ -1,0 +1,1 @@
+[{"id":"nix","label":"nix","color":"var(--success)","tooltip":"freed 1.5 KiB | 3 items | 2.0 s"},{"id":"homebrew","label":"homebrew","color":"var(--info)","tooltip":"skipped: homebrew not available"},{"id":"docker","label":"docker","color":"var(--error)","tooltip":"failed: [transient:test.transient] docker daemon unreachable","error":true}]

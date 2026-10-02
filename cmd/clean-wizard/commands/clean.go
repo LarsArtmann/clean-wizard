@@ -28,6 +28,13 @@ const (
 var (
 	ErrNoCleanersAvailable  = errorfamily.NewRejection("clean.no_cleaners", "no cleaners available on this system")
 	ErrNoConfigPathProvided = errorfamily.NewRejection("clean.no_config_path", "no config path provided")
+	// ErrReportWithJSON rejects --report combined with --json: the HTML report
+	// is a human artifact; JSON mode is a machine channel and the two would
+	// silently disagree about what the run "output" is.
+	ErrReportWithJSON = errorfamily.NewRejection(
+		"clean.report_json_conflict",
+		"--report and --json are mutually exclusive; the HTML report is a human artifact and cannot ride along with machine output",
+	)
 )
 
 // AppName is the human-facing application name shown by live progress frames.
@@ -49,6 +56,7 @@ func NewCleanCommand() *cobra.Command {
 		retryProfile     string
 		concurrency      int
 		progressFlag     bool
+		reportPath       string
 	)
 
 	cmd := &cobra.Command{
@@ -70,6 +78,7 @@ func NewCleanCommand() *cobra.Command {
 				retryProfile,
 				concurrency,
 				progressFlag,
+				reportPath,
 			)
 		},
 	}
@@ -89,6 +98,8 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max cleaners running concurrently (0=unlimited)")
 	cmd.Flags().BoolVar(&progressFlag, "progress", false,
 		"Show live progress while cleaning (interactive terminals only; off with --json)")
+	cmd.Flags().StringVar(&reportPath, "report", "",
+		"Write a self-contained interactive HTML report to this path (off with --json)")
 
 	return cmd
 }
@@ -138,8 +149,13 @@ func runCleanCommand(
 	retries int, retryProfile string,
 	concurrency int,
 	progressFlag bool,
+	reportPath string,
 ) error {
 	ctx := context.Background()
+
+	if reportPath != "" && jsonOutput {
+		return ErrReportWithJSON
+	}
 
 	cfg, err := loadConfigFromPath(configPath)
 	if err != nil {
@@ -225,9 +241,31 @@ func runCleanCommand(
 		return outputJSON(wr, dryRun)
 	}
 
+	if reportPath != "" {
+		subtitle := fmt.Sprintf("clean run · mode: %s · dry-run: %v", modeOrPreset(mode, profile), dryRun)
+		if err := writeReportFile(reportPath, wr, subtitle, "clean"); err != nil {
+			return err
+		}
+
+		fmt.Printf("📄 HTML report written to %s\n", reportPath)
+	}
+
 	displayResults(wr, dryRun, diskBeforePtr)
 
 	return nil
+}
+
+// modeOrPreset names the run's selection source for report subtitles.
+func modeOrPreset(mode, profile string) string {
+	if profile != "" {
+		return "profile: " + profile
+	}
+
+	if mode != "" {
+		return mode
+	}
+
+	return "interactive"
 }
 
 func outputJSON(wr *execution.WorkflowResult, dryRun bool) error {

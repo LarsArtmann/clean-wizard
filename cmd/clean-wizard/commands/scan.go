@@ -29,6 +29,7 @@ func NewScanCommand() *cobra.Command {
 		retryProfile string
 		concurrency  int
 		progressFlag bool
+		reportPath   string
 	)
 
 	cmd := &cobra.Command{
@@ -36,7 +37,7 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(verbose, profile, jsonOut, sarifOut, configPath, retries, retryProfile, concurrency, progressFlag)
+			return runScanCommand(verbose, profile, jsonOut, sarifOut, configPath, retries, retryProfile, concurrency, progressFlag, reportPath)
 		},
 	}
 
@@ -51,6 +52,8 @@ func NewScanCommand() *cobra.Command {
 	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max scanners running concurrently (0=unlimited)")
 	cmd.Flags().BoolVar(&progressFlag, "progress", false,
 		"Show live progress while scanning (interactive terminals only; off with --json/--sarif)")
+	cmd.Flags().StringVar(&reportPath, "report", "",
+		"Write a self-contained interactive HTML report to this path (off with --json/--sarif)")
 
 	return cmd
 }
@@ -84,12 +87,20 @@ func runScanCommand(
 	retryProfile string,
 	concurrency int,
 	progressFlag bool,
+	reportPath string,
 ) error {
 	ctx := context.Background()
 
 	if jsonOutput && sarifOutput {
 		return errorfamily.NewRejection(
 			"scan.flags", "--json and --sarif are mutually exclusive; choose one output format",
+		)
+	}
+
+	if reportPath != "" && (jsonOutput || sarifOutput) {
+		return errorfamily.NewRejection(
+			"scan.report_machine_output_conflict",
+			"--report and --json/--sarif are mutually exclusive; the HTML report is a human artifact and cannot ride along with machine output",
 		)
 	}
 
@@ -172,6 +183,14 @@ func runScanCommand(
 		totalCleanable, totalItems := computeScanTotals(scanResults)
 
 		return outputScanJSON(scanResults, totalCleanable, totalItems)
+	}
+
+	if reportPath != "" {
+		if err := writeReportFile(reportPath, wr, "scan run", "scan"); err != nil {
+			return err
+		}
+
+		fmt.Printf("📄 HTML report written to %s\n", reportPath)
 	}
 
 	printScanSummary(ctx, registry, scanResults)
