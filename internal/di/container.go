@@ -29,14 +29,17 @@ func New() (*Container, func()) {
 	injector := do.New()
 
 	return &Container{injector: injector}, func() {
-		if report := injector.Shutdown(); report != nil && report.HasErrors() {
-			slogger := logger.StdLogger
-			if slogger == nil {
-				slogger = slog.Default()
-			}
-
-			slogger.Debug("DI shutdown reported service errors", "errors", report.Error())
+		report := injector.Shutdown()
+		if report == nil || len(report.Errors) == 0 {
+			return
 		}
+
+		slogger := logger.StdLogger
+		if slogger == nil {
+			slogger = slog.Default()
+		}
+
+		slogger.Debug("DI shutdown reported service errors", "report", report.Error())
 	}
 }
 
