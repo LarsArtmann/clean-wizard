@@ -1,6 +1,6 @@
 # TODO LIST
 
-**Last Updated:** 2026-09-23
+**Last Updated:** 2026-10-02
 **Focus:** Actionable items for the next 2-4 weeks
 **Source:** Verified against code on 2026-08-10; harvested from 2026-07-06 through 2026-08-05 status reports
 
@@ -41,6 +41,7 @@
 | 30 | Rewrite `ValidationMiddleware.validateChangeBusinessRules` if-chains as go-business-rules tagged rules (same engine as config validation; enables change-level severities)                               | MED    | MED    | 2026-09-23 businessrules adoption |
 | 31 | Use go-business-rules `RuleEvaluated` events for per-rule timing in `-v` verbose output (zero-cost when no listeners)                                                                                    | LOW    | LOW    | 2026-09-23 businessrules adoption |
 | 29 | Fix `nix flake check` treefmt-check: sandboxed goimports tries to download go1.27 toolchain (offline sandbox → DNS refused); wire go_1_27 into the treefmt formatter closure (`nix fmt` itself is green) | MED    | MED    | 2026-09-23 error-family migration |
+| 32 | Adopt cmdguard (`github.com/larsartmann/cmdguard/v4`) as the CLI framework — construction-time validation (missing handlers, duplicate commands, invalid flags) + zero-panic error contract replace the hand-rolled usage-error plumbing (`SetFlagErrorFunc`, `exactArgsClassified`, `cli.*` codes); keep `errorfamily.ExitCode` at the boundary and fang rendering intact | HIGH | HIGH | 2026-10-02 cmdguard adoption |
 
 ## Low Priority / Polish
 
@@ -66,7 +67,7 @@
 
 ---
 
-**Status:** 26 actionable items (5 Critical, 4 High, 9 Medium, 8 Low, 4 Long-term)
+**Status:** 20 actionable items (13 Medium, 7 Low; Critical/High/Long-term all done)
 
 **Build:** `GOEXPERIMENT=jsonv2 go build ./...` ✅ PASS
 **Tests:** `GOEXPERIMENT=jsonv2 go test ./... -short` — 23/23 packages PASS

@@ -44,7 +44,8 @@ func TestProgressRequested_NonTTYWriterIsDisabled(t *testing.T) {
 
 	assert.False(t, progressRequested(true, false),
 		"go test stdout is never a TTY; progress must stay disabled")
-	assert.False(t, progress.Enabled(nil), "nil writer must be reported disabled")}
+	assert.False(t, progress.Enabled(nil), "nil writer must be reported disabled")
+}
 
 // fakeProgressEmitter is a minimal non-nil emitter stand-in for option wiring.
 type fakeProgressEmitter struct{}

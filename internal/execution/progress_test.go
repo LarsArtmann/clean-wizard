@@ -494,11 +494,11 @@ func TestEmitTerminalOutcome_StatusMapping(t *testing.T) {
 	rejection := errorfamily.NewRejection("test.rejection", "bad input")
 
 	tests := []struct {
-		name      string
-		step      StepResult
-		wantKind  emitterEventKind
-		wantName  string
-		wantDur   time.Duration
+		name     string
+		step     StepResult
+		wantKind emitterEventKind
+		wantName string
+		wantDur  time.Duration
 	}{
 		{
 			name:     "succeeded step emits ActivityCompleted",
