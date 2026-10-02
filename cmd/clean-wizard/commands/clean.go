@@ -56,6 +56,7 @@ func NewCleanCommand() *cobra.Command {
 		retryProfile     string
 		concurrency      int
 		progressFlag     bool
+		tuiFlag          bool
 		reportPath       string
 	)
 
@@ -78,6 +79,7 @@ func NewCleanCommand() *cobra.Command {
 				retryProfile,
 				concurrency,
 				progressFlag,
+				tuiFlag,
 				reportPath,
 			)
 		},
@@ -98,6 +100,8 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max cleaners running concurrently (0=unlimited)")
 	cmd.Flags().BoolVar(&progressFlag, "progress", false,
 		"Show live progress while cleaning (interactive terminals only; off with --json)")
+	cmd.Flags().BoolVar(&tuiFlag, "tui", false,
+		"EXPERIMENTAL: render live progress in an interactive BubbleTea TUI (ctrl+c aborts the run)")
 	cmd.Flags().StringVar(&reportPath, "report", "",
 		"Write a self-contained interactive HTML report to this path (off with --json)")
 
@@ -148,7 +152,7 @@ func runCleanCommand(
 	mode, profile, configPath string,
 	retries int, retryProfile string,
 	concurrency int,
-	progressFlag bool,
+	progressFlag, tuiFlag bool,
 	reportPath string,
 ) error {
 	ctx := context.Background()
@@ -223,7 +227,10 @@ func runCleanCommand(
 	selectedNames := cleanerTypesToNames(selectedCleaners)
 
 	var progressEmitter execution.ProgressEmitter
-	if progressRequested(progressFlag, jsonOutput) {
+	switch {
+	case tuiFlag && !jsonOutput && progress.Enabled(os.Stdout):
+		progressEmitter = progress.NewTUIEmitter(ctx)
+	case progressRequested(progressFlag, jsonOutput):
 		progressEmitter = progress.New(ctx, os.Stdout, AppName)
 	}
 

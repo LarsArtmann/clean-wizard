@@ -29,6 +29,7 @@ func TestRunCleanCommand_DryRun_JSON(t *testing.T) {
 		"",    // retryProfile
 		0,     // concurrency
 		false, // progressFlag
+		false, // tuiFlag
 		"",    // reportPath
 	)
 

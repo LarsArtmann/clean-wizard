@@ -137,6 +137,10 @@ github.com/larsartmann/go-output v0.38.1 h1:iiFdggay4OdX+qY3n29aQC2KSRLmvlrovBLA
 github.com/larsartmann/go-output v0.38.1/go.mod h1:E8cCAWWBcND96zqS3Fc0jhRDmyjz43SPXrVNF5Qcg34=
 github.com/larsartmann/go-output/daghtml v0.38.2 h1:8fcBgMJA7zs6QJbJzD6YqrTh6h/s8x5zB+tb6YigY4E=
 github.com/larsartmann/go-output/daghtml v0.38.2/go.mod h1:Veypl8qBIpQ7SEaovLzoG+rd+TUB8g2kDKm4yjXIu20=
+github.com/larsartmann/go-output/escape v0.38.1 h1:T0eild2rOLcmwow1Em3ZOvhXq/uh8JI2t1fQCDR11Ic=
+github.com/larsartmann/go-output/escape v0.38.1/go.mod h1:q4RijNjIZSffgE1Z7vCn9NaP2Zf8y4t02Re6wXl0tZ8=
+github.com/larsartmann/go-output/graph v0.38.2 h1:xx7D8hftYkjFp2C+j84DPuPi1LUhr1eMlibTYma69xo=
+github.com/larsartmann/go-output/graph v0.38.2/go.mod h1:BQbYUIuDd6Hg/Nk4gY8jCo1NhIkVxms3MfayotM60TY=
 github.com/larsartmann/go-output/nom v0.38.2 h1:LncGPvUSfdpdnRbs6AcZCUevfOq4B8Z6DDIMjDCSjF8=
 github.com/larsartmann/go-output/nom v0.38.2/go.mod h1:M3yrGmVtQ+isdnyoxtDUpX1MiVOzsaUBw/Z/wzzAVPo=
 github.com/larsartmann/go-output/tui v0.38.2 h1:PHzqfyh6tL6fndXVqdUVIGsrYNc0fL+9kXYkvSwT6oE=

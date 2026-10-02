@@ -71,6 +71,8 @@ require (
 	github.com/larsartmann/go-finding/toolsdk v1.14.0 // indirect
 	github.com/larsartmann/go-output v0.38.1 // indirect
 	github.com/larsartmann/go-output/daghtml v0.38.2 // indirect
+	github.com/larsartmann/go-output/escape v0.38.1 // indirect
+	github.com/larsartmann/go-output/graph v0.38.2 // indirect
 	github.com/larsartmann/go-output/nom v0.38.2 // indirect
 	github.com/larsartmann/go-output/tui v0.38.2 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect

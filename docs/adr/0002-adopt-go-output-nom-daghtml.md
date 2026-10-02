@@ -117,3 +117,40 @@ BuildFlow and library-policy run the identical `v0.38.2`).
 - P02 scratch build: `/tmp/nom-scratch` (nom@v0.38.2 + clean-wizard pins, MVS green).
 - P03 render harness: `/tmp/nom-scratch/main.go` (pipe + pty captures `out-pipe.txt`, `out-tty.txt`).
 - P04 collector semantics: `internal/execution/integration_test.go:107,205` (green).
+
+## Appendix A (2026-10-02): tui-vs-nom default decision (W3 spike, P16–P17)
+
+**Decision: nom (InlineRenderer) remains the default and only non-experimental
+live-progress mode. The BubbleTea TUI ships as `--tui` (clean only),
+EXPERIMENTAL, opt-in. Revisit before promoting.**
+
+### Spike evidence
+
+- Adapter: `internal/progress/tui.go` maps the identical ProgressEmitter
+  vocabulary onto `tui.BubbleTeaProgressReporter` (compile-time contract
+  proven; event dispatch tests green, `-race`).
+- Cancel wiring: `NewTUIEmitter` wraps the command context and registers the
+  cancel func, so ctrl+c aborts the run gracefully (plan M76).
+- Display mode pinned to `DisplayModeNOM` — the TUI renders the same tree
+  narrative as the inline frame, plus zoom/scroll/click-to-highlight.
+
+### Why not default
+
+1. **Timing-cache isolation violation (ADR-0002 binding rule):** tui v0.38.2
+   constructs its internal NOM subscriber via bare `nom.NewNOMSubscriber()`
+   (reporter.go, `NewProgressModel`) — the default `~/.cache/nom-timing.csv`
+   path BuildFlow also uses. There is no option to inject `WithCachePath`.
+   Adopting tui as default would break the cache-isolation rule we just paid
+   to establish.
+2. **No real-run verdict:** the nom frame was validated on a 7m46s real clean
+   run; the TUI was validated at contract level only. Promoting a default on
+   less evidence than the incumbent would be ass-backwards.
+3. **No user pull yet:** the nom frame already answers the "silent minutes"
+   problem. Interactive extras (zoom, scroll) are nice-to-have, not pain.
+
+### Revisit triggers (append to the list above)
+
+5. go-output/tui exposes a cache-path/subscriber injection option → re-run the
+   spike; if a real-run comparison shows a genuine UX win, promote via a new
+   ADR appendix.
+6. A user (or owner) actually wants click-to-highlight/zoom during long runs.
