@@ -75,7 +75,6 @@ func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*Co
 		}
 
 		collector.register(name, i)
-		b.progress.ActivityRegistered(name)
 
 		step := flow.FuncIO(
 			name,
@@ -116,7 +115,6 @@ func (b *Builder) BuildScan(registry *cleaner.Registry, selected []string) (*Com
 		}
 
 		collector.register(name, i)
-		b.progress.ActivityRegistered(name)
 
 		step := flow.FuncIO(
 			name,
