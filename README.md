@@ -91,6 +91,17 @@ Each cleaner auto-detects whether its target tool is installed and available. Un
 | **Standard**   | `--mode standard`   | All available cleaners                                     |
 | **Aggressive** | `--mode aggressive` | Everything including system caches and full Docker volumes |
 
+## Live Progress
+
+Minutes-long clean runs are no longer silent. Pass `--progress` on an interactive terminal and clean-wizard renders a live frame (powered by [go-output/nom](https://github.com/LarsArtmann/go-output)):
+
+- the **full plan upfront** — every selected cleaner listed before work begins
+- per-cleaner state: pending → running (with elapsed timer) → ✔ done
+- **⟳ retry narration** — a transient failure shows as `⟳2 (transient)` instead of vanishing
+- **skip notes** — unavailable tools drain an explanatory line (`• homebrew: skipped (homebrew not available)`) instead of silently disappearing
+
+The frame never pollutes machine output: `--json` and `--sarif` streams are byte-identical with or without `--progress`, and CI/pipe runs never activate it.
+
 ## Safety First
 
 - **Dry-run mode** — `--dry-run` previews every action without touching the filesystem
@@ -147,6 +158,7 @@ clean-wizard clean [flags]
 | `--retries`           | Retry attempts per cleaner (0=disabled)                 | `3`                                  |
 | `--retry-profile`     | Preset: `default`, `aggressive`, `conservative`, `none` | `""`                                 |
 | `--concurrency`, `-C` | Max concurrent cleaners (0=unlimited)                   | `0`                                  |
+| `--progress`          | Live progress frame while cleaning (interactive terminals only; auto-off with `--json`) | `false` |
 
 ### `clean-wizard scan`
 
@@ -155,8 +167,22 @@ Scans and reports reclaimable space without cleaning:
 ```bash
 clean-wizard scan                  # Scan all available cleaners
 clean-wizard scan --json           # JSON output
+clean-wizard scan --sarif          # SARIF 2.1.0 findings
 clean-wizard scan --verbose        # Detailed breakdown
+clean-wizard scan --progress       # Live progress frame (interactive terminals)
 ```
+
+| Flag                  | Description                                             | Default |
+| --------------------- | ------------------------------------------------------- | ------- |
+| `--json`, `-j`        | JSON output                                             | `false` |
+| `--sarif`             | SARIF 2.1.0 output (machine-readable findings)          | `false` |
+| `--profile`, `-p`     | Filter results by profile                               | `""`    |
+| `--config`, `-c`      | Path to config file                                     | `""`    |
+| `--verbose`, `-v`     | Detailed scan information                               | `false` |
+| `--retries`           | Retry attempts per scanner (0=disabled)                 | `3`     |
+| `--retry-profile`     | Preset: `default`, `aggressive`, `conservative`, `none` | `""`    |
+| `--concurrency`, `-C` | Max concurrent scanners (0=unlimited)                   | `0`     |
+| `--progress`          | Live progress frame (interactive terminals only; auto-off with `--json`/`--sarif`) | `false` |
 
 ## Configuration
 

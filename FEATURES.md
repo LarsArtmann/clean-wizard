@@ -1,6 +1,6 @@
 # Clean Wizard Features
 
-> **Last Updated:** 2026-08-10
+> **Last Updated:** 2026-10-02
 > **Version:** Based on codebase analysis
 > **Status:** BRUTALLY HONEST ASSESSMENT
 
@@ -324,7 +324,8 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **Preset Modes**           | ✅ FULLY_FUNCTIONAL | quick, standard, aggressive   |
 | **Confirmation Prompt**    | ✅ FULLY_FUNCTIONAL | Yes/No before execution       |
 | **Result Aggregation**     | ✅ FULLY_FUNCTIONAL | Totals across all cleaners    |
-| **Progress Display**       | ✅ FULLY_FUNCTIONAL | Per-cleaner progress          |
+| **Post-Run Summary Table** | ✅ FULLY_FUNCTIONAL | Per-cleaner progress          |
+| **Live Progress (`--progress`)** | ✅ FULLY_FUNCTIONAL | go-output/nom live frame: full plan upfront, running/⟳-retry/skipped states, elapsed timers; TTY-only, auto-off with `--json`/`--sarif`/CI |
 | **Encouraging Messages**   | ✅ FULLY_FUNCTIONAL | Celebrates >1GB freed         |
 
 ### Preset Modes
@@ -344,6 +345,7 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **JSON Output**    | ✅ FULLY_FUNCTIONAL | `--json` flag works                                 |
 | **SARIF Output**   | ✅ FULLY_FUNCTIONAL | `--sarif` emits SARIF 2.1.0 findings via go-finding |
 | **Retry Support**  | ✅ FULLY_FUNCTIONAL | `--retries` / `--retry-profile` per scanner         |
+| **Live Progress (`--progress`)** | ✅ FULLY_FUNCTIONAL | Same nom frame as clean; auto-off with `--json`/`--sarif`/CI |
 | **Nix Store Size** | ✅ FULLY_FUNCTIONAL | Shows Nix store size when available                 |
 
 SARIF mapping: reclaimable space (bytes > 0) becomes an `info` finding with category `unused` and a `clean --dry-run` fix suggestion; failed scans become `error` findings carrying `family`/`code`/`retryable` metadata; unavailable cleaners produce no finding. Findings locate at `cleaner://<name>`.
