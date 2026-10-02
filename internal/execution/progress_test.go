@@ -167,6 +167,18 @@ func (r *recordingEmitter) count(kind emitterEventKind) int {
 	return len(r.filter(kind))
 }
 
+// countFor returns how many events of the given kind name the given activity.
+func (r *recordingEmitter) countFor(kind emitterEventKind, name string) int {
+	n := 0
+	for _, e := range r.filter(kind) {
+		if e.name == name {
+			n++
+		}
+	}
+
+	return n
+}
+
 // kinds returns the kind sequence of all captured events as strings, for
 // readable assertion failures.
 func (r *recordingEmitter) dump() string {
@@ -231,7 +243,9 @@ func TestRunCleaners_Progress_HappyPathSequence(t *testing.T) {
 
 	// Registration is announced exactly once per cleaner — a duplicate would
 	// re-render the plan row in the live tree.
-	assert.Equal(t, 1, em.count(evActivityRegistered), "per cleaner")
+	for _, name := range []string{"alpha", "beta"} {
+		assert.Equal(t, 1, em.countFor(evActivityRegistered, name), "exactly one registration for %s", name)
+	}
 
 	// Terminal completions carry the collector's observed duration.
 	for _, e := range em.filter(evActivityCompleted) {
@@ -480,29 +494,39 @@ func TestEmitTerminalOutcome_StatusMapping(t *testing.T) {
 	rejection := errorfamily.NewRejection("test.rejection", "bad input")
 
 	tests := []struct {
-		name     string
-		step     StepResult
-		wantKind emitterEventKind
+		name      string
+		step      StepResult
+		wantKind  emitterEventKind
+		wantName  string
+		wantDur   time.Duration
 	}{
 		{
 			name:     "succeeded step emits ActivityCompleted",
 			step:     StepResult{Name: "ok", Duration: 2 * time.Second},
 			wantKind: evActivityCompleted,
+			wantName: "ok",
+			wantDur:  2 * time.Second,
 		},
 		{
 			name:     "infrastructure error emits ActivitySkipped",
 			step:     StepResult{Name: "skip", Err: notAvailable, Duration: time.Millisecond},
 			wantKind: evActivitySkipped,
+			wantName: "skip",
+			wantDur:  0, // ActivitySkipped carries a reason, not a duration
 		},
 		{
 			name:     "transient error emits ActivityFailed",
 			step:     StepResult{Name: "fail", Err: transient, Duration: time.Second},
 			wantKind: evActivityFailed,
+			wantName: "fail",
+			wantDur:  time.Second,
 		},
 		{
 			name:     "rejection error emits ActivityFailed",
 			step:     StepResult{Name: "reject", Err: rejection, Duration: time.Second},
 			wantKind: evActivityFailed,
+			wantName: "reject",
+			wantDur:  time.Second,
 		},
 	}
 
@@ -515,8 +539,8 @@ func TestEmitTerminalOutcome_StatusMapping(t *testing.T) {
 
 			matched := em.filter(tt.wantKind)
 			require.Len(t, matched, 1)
-			assert.Equal(t, tt.step.Name, matched[0].name)
-			assert.Equal(t, tt.step.Duration, matched[0].duration)
+			assert.Equal(t, tt.wantName, matched[0].name)
+			assert.Equal(t, tt.wantDur, matched[0].duration)
 		})
 	}
 }
