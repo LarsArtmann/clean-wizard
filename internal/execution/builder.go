@@ -21,18 +21,31 @@ type CompiledWorkflow struct {
 // It is DI-agnostic — it receives a *cleaner.Registry and selected names
 // as plain parameters, matching BuildFlow's execution package design.
 type Builder struct {
-	verbose bool
-	retry   *RetryConfig
+	verbose  bool
+	retry    *RetryConfig
+	progress ProgressEmitter
 }
 
 // NewBuilder creates a Builder with the given options.
 func NewBuilder(verbose bool) *Builder {
-	return &Builder{verbose: verbose, retry: nil}
+	return &Builder{verbose: verbose, retry: nil, progress: noopEmitter}
 }
 
 // WithRetryConfig enables per-step retry on the builder.
 func (b *Builder) WithRetryConfig(cfg *RetryConfig) *Builder {
 	b.retry = cfg
+
+	return b
+}
+
+// WithProgressEmitter injects the live-progress emitter used by step hooks,
+// retry scheduling, and workflow boundaries. nil selects the no-op emitter.
+func (b *Builder) WithProgressEmitter(em ProgressEmitter) *Builder {
+	if em == nil {
+		em = noopEmitter
+	}
+
+	b.progress = em
 
 	return b
 }
@@ -49,8 +62,8 @@ func newCompiledWorkflow() (*flow.Workflow, *resultCollector) {
 func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*CompiledWorkflow, error) {
 	wf, collector := newCompiledWorkflow()
 
-	before := makeBeforeHook(b.verbose)
-	after := makeAfterHook(b.verbose)
+	before := makeBeforeHook(b.verbose, b.progress)
+	after := makeAfterHook(b.verbose, b.progress)
 
 	for i, name := range selected {
 		c, ok := registry.Get(name)
@@ -62,6 +75,7 @@ func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*Co
 		}
 
 		collector.register(name, i)
+		b.progress.ActivityRegistered(name)
 
 		step := flow.FuncIO(
 			name,
@@ -73,7 +87,7 @@ func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*Co
 			AfterStep(after)
 
 		if b.retry != nil {
-			if opts := retryOptions(*b.retry); len(opts) > 0 {
+			if opts := retryOptions(*b.retry, b.progress, name); len(opts) > 0 {
 				stepBuilder = stepBuilder.Retry(opts...)
 			}
 		}
@@ -102,6 +116,7 @@ func (b *Builder) BuildScan(registry *cleaner.Registry, selected []string) (*Com
 		}
 
 		collector.register(name, i)
+		b.progress.ActivityRegistered(name)
 
 		step := flow.FuncIO(
 			name,

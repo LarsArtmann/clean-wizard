@@ -7,6 +7,7 @@ type runConfig struct {
 	maxConcurrency int
 	verbose        bool
 	retry          *RetryConfig
+	progress       ProgressEmitter
 }
 
 // WithMaxConcurrency sets the maximum number of cleaners that may run
@@ -24,6 +25,27 @@ func WithVerbose(verbose bool) RunOption {
 // Passing nil disables retries (the default).
 func WithRetry(cfg *RetryConfig) RunOption {
 	return func(c *runConfig) { c.retry = cfg }
+}
+
+// WithProgress injects a live progress renderer (ADR-0002). Passing nil or
+// omitting the option keeps execution completely silent — the no-op emitter
+// makes non-progress runs byte-identical to the pre-progress behavior.
+func WithProgress(emitter ProgressEmitter) RunOption {
+	return func(c *runConfig) {
+		if emitter != nil {
+			c.progress = emitter
+		}
+	}
+}
+
+// emitter returns the configured progress emitter, substituting the no-op
+// when none was injected so call sites never nil-check.
+func (c runConfig) emitter() ProgressEmitter {
+	if c.progress == nil {
+		return noopEmitter
+	}
+
+	return c.progress
 }
 
 func resolveRunOptions(opts []RunOption) runConfig {
