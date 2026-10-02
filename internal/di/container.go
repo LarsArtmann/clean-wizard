@@ -8,6 +8,9 @@
 package di
 
 import (
+	"log/slog"
+
+	"github.com/LarsArtmann/clean-wizard/internal/logger"
 	"github.com/samber/do/v2"
 )
 
@@ -19,12 +22,21 @@ type Container struct {
 
 // New creates a fresh Container with an empty injector.
 // The returned cleanup function must be deferred to ensure all services
-// implementing do.ShutdownerWithError are gracefully stopped.
+// implementing do.ShutdownerWithError are gracefully stopped. Shutdown
+// failures are logged at Debug (they must never mask the command's real
+// outcome, but should be visible when diagnosing leaked resources).
 func New() (*Container, func()) {
 	injector := do.New()
 
 	return &Container{injector: injector}, func() {
-		_ = injector.Shutdown()
+		if report := injector.Shutdown(); report != nil && report.HasErrors() {
+			slogger := logger.StdLogger
+			if slogger == nil {
+				slogger = slog.Default()
+			}
+
+			slogger.Debug("DI shutdown reported service errors", "errors", report.Error())
+		}
 	}
 }
 

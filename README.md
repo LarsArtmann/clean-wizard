@@ -181,6 +181,7 @@ clean-wizard scan --json           # JSON output
 clean-wizard scan --sarif          # SARIF 2.1.0 findings
 clean-wizard scan --verbose        # Detailed breakdown
 clean-wizard scan --progress       # Live progress frame (interactive terminals)
+clean-wizard scan --graph mermaid  # Pipeline preview as Mermaid (or dot)
 ```
 
 | Flag                  | Description                                             | Default |
@@ -194,6 +195,8 @@ clean-wizard scan --progress       # Live progress frame (interactive terminals)
 | `--retry-profile`     | Preset: `default`, `aggressive`, `conservative`, `none` | `""`    |
 | `--concurrency`, `-C` | Max concurrent scanners (0=unlimited)                   | `0`     |
 | `--progress`          | Live progress frame (interactive terminals only; auto-off with `--json`/`--sarif`) | `false` |
+| `--report`            | Write self-contained interactive HTML report             | `""`    |
+| `--graph`             | Pipeline preview format: `mermaid` or `dot` (prints and exits) | `""` |
 
 ## Configuration
 
