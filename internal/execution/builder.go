@@ -101,9 +101,15 @@ func (b *Builder) BuildClean(registry *cleaner.Registry, selected []string) (*Co
 }
 
 // BuildScan compiles a scan workflow from the given registry and selected cleaner names.
-// Each selected cleaner becomes a parallel flow.FuncIO step.
+// Each selected cleaner becomes a parallel flow.FuncIO step. The same step
+// hooks as BuildClean emit ActivityStarted so the live tree shows scans as
+// running (the AfterStep's result detail line is clean-specific and skipped
+// for scan steps by its type assertion).
 func (b *Builder) BuildScan(registry *cleaner.Registry, selected []string) (*CompiledWorkflow, error) {
 	wf, collector := newCompiledWorkflow()
+
+	before := makeBeforeHook(b.verbose, b.progress)
+	after := makeAfterHook(b.verbose, b.progress)
 
 	for i, name := range selected {
 		c, ok := registry.Get(name)
@@ -121,7 +127,7 @@ func (b *Builder) BuildScan(registry *cleaner.Registry, selected []string) (*Com
 			makeScanStepFunc(name, c, collector),
 		)
 
-		wf.Add(flow.Step(step))
+		wf.Add(flow.Step(step).BeforeStep(before).AfterStep(after))
 	}
 
 	return &CompiledWorkflow{
