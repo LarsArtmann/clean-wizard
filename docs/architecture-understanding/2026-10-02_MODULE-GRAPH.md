@@ -21,7 +21,6 @@
 ## Module graph (auto-generated)
 
 ```mermaid
-
 flowchart TD
     cmd_clean_wizard["cmd/clean-wizard"] --> internal_version["internal/version"]
     cmd_clean_wizard_commands["cmd/clean-wizard/commands"] --> internal_cleaner["internal/cleaner"]

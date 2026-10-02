@@ -10,13 +10,13 @@
 
 ### 1. W0 verification gate — all four unverified claims closed (P01–P04)
 
-| Claim / question                                      | Verdict       | Evidence                                                                                                             |
-| ----------------------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------- |
-| "BuildFlow dogfoods nom" (worst slip of last session)  | **TRUE — stronger than claimed** | BuildFlow has DIRECT source imports: `BuildFlow/execution/nom_status.go`, `tui_bridge*.go`, `nom_regression_test.go`, `nom_visibility_test.go`; `universal-workflow/go.mod:16` requires `go-output/nom v0.38.2` directly; `library-policy/go.mod` consumes v0.38.2 (indirect) |
-| License coverage of submodules (b5)                    | Covered       | MIT at repo root (`go-output/LICENSE`); only `graph/` ships its own LICENSE; no per-module licenses elsewhere          |
-| nom@v0.38.2 resolves + builds with clean-wizard's pins (b4/M08) | Green   | scratch module `/tmp/nom-scratch`: `go get nom@v0.38.2` + clean-wizard charm pins (huh v2.0.3, lipgloss v2.0.6, log v2.0.1, bubbles v2.2.1, bubbletea v2.0.10) + tidy + build all green |
-| Failed→Retrying render narrative (b2)                  | VERIFIED rendered | P03 harness: completed line keeps `✔ docker ⟳1 (Transient)`; skip note drains above frame; terminal failure keeps ⚠ in final tree |
-| resultCollector retry semantics (b3)                   | Last-wins confirmed, tests exist + green | `TestRunCleaners_Retry` (1 entry, final outcome kept, 3 attempts) + `TestRunCleaners_SmartRetry_Transient` (exhausted → single Failed) — `recordFinal` overwrites by name |
+| Claim / question                                                | Verdict                                  | Evidence                                                                                                                                                                                                                                                                      |
+| --------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| "BuildFlow dogfoods nom" (worst slip of last session)           | **TRUE — stronger than claimed**         | BuildFlow has DIRECT source imports: `BuildFlow/execution/nom_status.go`, `tui_bridge*.go`, `nom_regression_test.go`, `nom_visibility_test.go`; `universal-workflow/go.mod:16` requires `go-output/nom v0.38.2` directly; `library-policy/go.mod` consumes v0.38.2 (indirect) |
+| License coverage of submodules (b5)                             | Covered                                  | MIT at repo root (`go-output/LICENSE`); only `graph/` ships its own LICENSE; no per-module licenses elsewhere                                                                                                                                                                 |
+| nom@v0.38.2 resolves + builds with clean-wizard's pins (b4/M08) | Green                                    | scratch module `/tmp/nom-scratch`: `go get nom@v0.38.2` + clean-wizard charm pins (huh v2.0.3, lipgloss v2.0.6, log v2.0.1, bubbles v2.2.1, bubbletea v2.0.10) + tidy + build all green                                                                                       |
+| Failed→Retrying render narrative (b2)                           | VERIFIED rendered                        | P03 harness: completed line keeps `✔ docker ⟳1 (Transient)`; skip note drains above frame; terminal failure keeps ⚠ in final tree                                                                                                                                             |
+| resultCollector retry semantics (b3)                            | Last-wins confirmed, tests exist + green | `TestRunCleaners_Retry` (1 entry, final outcome kept, 3 attempts) + `TestRunCleaners_SmartRetry_Transient` (exhausted → single Failed) — `recordFinal` overwrites by name                                                                                                     |
 
 ### 2. P03 mock render harness (f2/f5) — empirical verdicts, not reasoning
 
@@ -82,6 +82,7 @@ Ran `/tmp/nom-scratch/main.go` (14 flat cleaners + 1 transient retry + 1 skip + 
 ## f) Next tasks (up to 50 — brainstorm fuel, not commitments)
 
 **Close W1 (do first):**
+
 1. P10: fake ProgressEmitter test harness (record events, thread-safe) — S
 2. P10: happy-path event sequence assertions (Started→Registered→Started→Completed order) — S
 3. P10: retry-path assertions (Retrying between Starts, no intermediate Failed, attempt numbering) — S

@@ -1,6 +1,6 @@
 module github.com/LarsArtmann/clean-wizard
 
-go 1.27.1
+go 1.27
 
 require (
 	charm.land/huh/v2 v2.0.3
@@ -20,6 +20,11 @@ require (
 	github.com/larsartmann/go-error-family v0.11.0
 	github.com/larsartmann/go-finding v1.13.0
 	github.com/larsartmann/go-finding/pipeline v1.13.0
+	github.com/larsartmann/go-output v0.38.2
+	github.com/larsartmann/go-output/daghtml v0.38.2
+	github.com/larsartmann/go-output/graph v0.38.2
+	github.com/larsartmann/go-output/nom v0.38.2
+	github.com/larsartmann/go-output/tui v0.38.2
 	github.com/larsartmann/linter-autoconfigure-sdk v0.7.0
 	github.com/maypok86/otter/v2 v2.3.0
 	github.com/onsi/ginkgo/v2 v2.33.0
@@ -28,6 +33,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/sys v0.48.0
+	golang.org/x/term v0.46.0
 	golang.org/x/time v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -46,7 +52,6 @@ require (
 	github.com/charmbracelet/ultraviolet v0.0.0-20261001125412-878653296cfd // indirect
 	github.com/charmbracelet/x/ansi v0.11.8 // indirect
 	github.com/charmbracelet/x/exp/charmtone v0.1.0 // indirect
-	github.com/charmbracelet/x/exp/golden v0.0.0-20260705004817-2cc9a8fe1146 // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
@@ -64,17 +69,12 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/gofrs/flock v0.13.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20261001064331-60bf690a9302 // indirect
+	github.com/google/pprof v0.0.0-20261002000307-77d3b59017a0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.3 // indirect
-	github.com/larsartmann/go-branded-id v0.6.0 // indirect
+	github.com/larsartmann/go-branded-id v0.7.0 // indirect
 	github.com/larsartmann/go-finding/toolsdk v1.14.0 // indirect
-	github.com/larsartmann/go-output v0.38.1 // indirect
-	github.com/larsartmann/go-output/daghtml v0.38.2 // indirect
-	github.com/larsartmann/go-output/escape v0.38.1 // indirect
-	github.com/larsartmann/go-output/graph v0.38.2 // indirect
-	github.com/larsartmann/go-output/nom v0.38.2 // indirect
-	github.com/larsartmann/go-output/tui v0.38.2 // indirect
+	github.com/larsartmann/go-output/escape v0.38.2 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.30 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
@@ -86,7 +86,6 @@ require (
 	github.com/muesli/mango-pflag v0.2.0 // indirect
 	github.com/muesli/roff v0.1.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/rogpeppe/go-internal v1.15.0 // indirect
 	github.com/samber/go-type-to-string v1.8.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
@@ -97,7 +96,6 @@ require (
 	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.59.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect
-	golang.org/x/term v0.46.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/tools v0.50.0 // indirect
 )

@@ -19,17 +19,17 @@ gap in the CLI.
 The 2026-10-01 research session verified that `go-output`'s `nom` (live inline
 progress) and `daghtml` (self-contained HTML report) modules are adoptable:
 
-| Fact (all verified this session)                                             | Evidence                                                        |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| All modules resolve from the public proxy at `v0.38.2`                       | `go list -m`; scratch module build (P02)                        |
-| Zero dependency conflicts — `charm.land/lipgloss/v2 v2.0.6` shared           | scratch go.mod MVS check with clean-wizard's exact pins (M08)    |
-| **BuildFlow dogfoods nom/tui** — direct source imports + regression tests    | `BuildFlow/execution/nom_status.go`, `tui_bridge*.go`; `universal-workflow/go.mod` requires `go-output/nom v0.38.2` (P01/M01) |
-| MIT license at repo root covers the submodules (no per-module LICENSE except graph) | `go-output/LICENSE`, P01/M03                             |
-| go-workflow v0.1.13 fires `BeforeStep`/`AfterStep` **per retry attempt**; `NextBackOff` receives every `RetryEvent` | go-workflow `workflow.go:438-475`; clean-wizard owns the hook at `internal/execution/retry.go:131` |
-| resultCollector is **last-wins** under real retries (single entry, final outcome) | `TestRunCleaners_Retry`, `TestRunCleaners_SmartRetry_Transient` (P04, green) |
-| Failed→Retrying narrative renders correctly: completed line keeps `✔ name ⟳1 (Transient)` | P03 mock harness, pipe + TTY captures                   |
-| Flat-fan layout is readable: running pinned on top, ✔/○ stacks, live counts box with % | P03 pipe capture                                       |
-| **Default timing cache path is `~/.cache/nom-timing.csv`** — shared with BuildFlow; **failed-attempt durations are recorded into medians** | `nom/timing_cache.go:18,68`, `nom/subscriber_handlers.go:155-160` (P03/M14) |
+| Fact (all verified this session)                                                                                                           | Evidence                                                                                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| All modules resolve from the public proxy at `v0.38.2`                                                                                     | `go list -m`; scratch module build (P02)                                                                                      |
+| Zero dependency conflicts — `charm.land/lipgloss/v2 v2.0.6` shared                                                                         | scratch go.mod MVS check with clean-wizard's exact pins (M08)                                                                 |
+| **BuildFlow dogfoods nom/tui** — direct source imports + regression tests                                                                  | `BuildFlow/execution/nom_status.go`, `tui_bridge*.go`; `universal-workflow/go.mod` requires `go-output/nom v0.38.2` (P01/M01) |
+| MIT license at repo root covers the submodules (no per-module LICENSE except graph)                                                        | `go-output/LICENSE`, P01/M03                                                                                                  |
+| go-workflow v0.1.13 fires `BeforeStep`/`AfterStep` **per retry attempt**; `NextBackOff` receives every `RetryEvent`                        | go-workflow `workflow.go:438-475`; clean-wizard owns the hook at `internal/execution/retry.go:131`                            |
+| resultCollector is **last-wins** under real retries (single entry, final outcome)                                                          | `TestRunCleaners_Retry`, `TestRunCleaners_SmartRetry_Transient` (P04, green)                                                  |
+| Failed→Retrying narrative renders correctly: completed line keeps `✔ name ⟳1 (Transient)`                                                  | P03 mock harness, pipe + TTY captures                                                                                         |
+| Flat-fan layout is readable: running pinned on top, ✔/○ stacks, live counts box with %                                                     | P03 pipe capture                                                                                                              |
+| **Default timing cache path is `~/.cache/nom-timing.csv`** — shared with BuildFlow; **failed-attempt durations are recorded into medians** | `nom/timing_cache.go:18,68`, `nom/subscriber_handlers.go:155-160` (P03/M14)                                                   |
 
 Risks: go-output is pre-1.0 (57 commits across these modules in 2 months;
 v1.0.0 pending). Mitigation: exact pin + deliberate upgrades (fleet pattern:
@@ -71,11 +71,11 @@ BuildFlow and library-policy run the identical `v0.38.2`).
 
 ### Owner answers recorded (g1–g3)
 
-| Question                                             | Answer adopted                                        |
-| ---------------------------------------------------- | ----------------------------------------------------- |
-| g1 progress default-on vs opt-in                     | **Opt-in `--progress`** first release; flip to default-on only after a release of field evidence |
-| g2 pre-1.0 pin acceptable vs wait v1.0.0             | **Pin `v0.38.2` now**; deliberate upgrade policy; revisit at go-output v1.0.0 |
-| g3 skipped-cleaner rendering                         | **Option (c)**: instant-complete + "skipped (unavailable)" note |
+| Question                                 | Answer adopted                                                                                   |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| g1 progress default-on vs opt-in         | **Opt-in `--progress`** first release; flip to default-on only after a release of field evidence |
+| g2 pre-1.0 pin acceptable vs wait v1.0.0 | **Pin `v0.38.2` now**; deliberate upgrade policy; revisit at go-output v1.0.0                    |
+| g3 skipped-cleaner rendering             | **Option (c)**: instant-complete + "skipped (unavailable)" note                                  |
 
 ## Alternatives considered
 

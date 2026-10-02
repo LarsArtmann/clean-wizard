@@ -313,20 +313,20 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### Clean Command Features
 
-| Feature                    | Status              | Details                       |
-| -------------------------- | ------------------- | ----------------------------- |
-| **Interactive TUI**        | ✅ FULLY_FUNCTIONAL | Beautiful Charm Huh forms     |
-| **Multi-Select**           | ✅ FULLY_FUNCTIONAL | Select multiple cleaners      |
-| **Availability Detection** | ✅ FULLY_FUNCTIONAL | Shows only available cleaners |
-| **Dry Run Mode**           | ✅ FULLY_FUNCTIONAL | `--dry-run` flag works        |
-| **Verbose Mode**           | ✅ FULLY_FUNCTIONAL | `--verbose` flag works        |
-| **JSON Output**            | ✅ FULLY_FUNCTIONAL | `--json` flag works           |
-| **Preset Modes**           | ✅ FULLY_FUNCTIONAL | quick, standard, aggressive   |
-| **Confirmation Prompt**    | ✅ FULLY_FUNCTIONAL | Yes/No before execution       |
-| **Result Aggregation**     | ✅ FULLY_FUNCTIONAL | Totals across all cleaners    |
-| **Post-Run Summary Table** | ✅ FULLY_FUNCTIONAL | Per-cleaner progress          |
+| Feature                          | Status              | Details                                                                                                                                    |
+| -------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Interactive TUI**              | ✅ FULLY_FUNCTIONAL | Beautiful Charm Huh forms                                                                                                                  |
+| **Multi-Select**                 | ✅ FULLY_FUNCTIONAL | Select multiple cleaners                                                                                                                   |
+| **Availability Detection**       | ✅ FULLY_FUNCTIONAL | Shows only available cleaners                                                                                                              |
+| **Dry Run Mode**                 | ✅ FULLY_FUNCTIONAL | `--dry-run` flag works                                                                                                                     |
+| **Verbose Mode**                 | ✅ FULLY_FUNCTIONAL | `--verbose` flag works                                                                                                                     |
+| **JSON Output**                  | ✅ FULLY_FUNCTIONAL | `--json` flag works                                                                                                                        |
+| **Preset Modes**                 | ✅ FULLY_FUNCTIONAL | quick, standard, aggressive                                                                                                                |
+| **Confirmation Prompt**          | ✅ FULLY_FUNCTIONAL | Yes/No before execution                                                                                                                    |
+| **Result Aggregation**           | ✅ FULLY_FUNCTIONAL | Totals across all cleaners                                                                                                                 |
+| **Post-Run Summary Table**       | ✅ FULLY_FUNCTIONAL | Per-cleaner progress                                                                                                                       |
 | **Live Progress (`--progress`)** | ✅ FULLY_FUNCTIONAL | go-output/nom live frame: full plan upfront, running/⟳-retry/skipped states, elapsed timers; TTY-only, auto-off with `--json`/`--sarif`/CI |
-| **Encouraging Messages**   | ✅ FULLY_FUNCTIONAL | Celebrates >1GB freed         |
+| **Encouraging Messages**         | ✅ FULLY_FUNCTIONAL | Celebrates >1GB freed                                                                                                                      |
 
 ### Preset Modes
 
@@ -340,13 +340,13 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### Scan Command Features
 
-| Feature            | Status              | Details                                             |
-| ------------------ | ------------------- | --------------------------------------------------- |
-| **JSON Output**    | ✅ FULLY_FUNCTIONAL | `--json` flag works                                 |
-| **SARIF Output**   | ✅ FULLY_FUNCTIONAL | `--sarif` emits SARIF 2.1.0 findings via go-finding |
-| **Retry Support**  | ✅ FULLY_FUNCTIONAL | `--retries` / `--retry-profile` per scanner         |
+| Feature                          | Status              | Details                                                      |
+| -------------------------------- | ------------------- | ------------------------------------------------------------ |
+| **JSON Output**                  | ✅ FULLY_FUNCTIONAL | `--json` flag works                                          |
+| **SARIF Output**                 | ✅ FULLY_FUNCTIONAL | `--sarif` emits SARIF 2.1.0 findings via go-finding          |
+| **Retry Support**                | ✅ FULLY_FUNCTIONAL | `--retries` / `--retry-profile` per scanner                  |
 | **Live Progress (`--progress`)** | ✅ FULLY_FUNCTIONAL | Same nom frame as clean; auto-off with `--json`/`--sarif`/CI |
-| **Nix Store Size** | ✅ FULLY_FUNCTIONAL | Shows Nix store size when available                 |
+| **Nix Store Size**               | ✅ FULLY_FUNCTIONAL | Shows Nix store size when available                          |
 
 SARIF mapping: reclaimable space (bytes > 0) becomes an `info` finding with category `unused` and a `clean --dry-run` fix suggestion; failed scans become `error` findings carrying `family`/`code`/`retryable` metadata; unavailable cleaners produce no finding. Findings locate at `cleaner://<name>`.
 

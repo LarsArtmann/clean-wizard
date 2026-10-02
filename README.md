@@ -157,19 +157,19 @@ clean-wizard/
 clean-wizard clean [flags]
 ```
 
-| Flag                  | Description                                             | Default                              |
-| --------------------- | ------------------------------------------------------- | ------------------------------------ |
-| `--mode`, `-m`        | Preset: `quick`, `standard`, `aggressive`               | `standard`                           |
-| `--config`, `-c`      | Path to config file                                     | `~/.config/clean-wizard/config.yaml` |
-| `--profile`, `-p`     | Configuration profile                                   | `""`                                 |
-| `--dry-run`           | Preview without making changes                          | `false`                              |
-| `--json`              | Machine-readable JSON output                            | `false`                              |
-| `--verbose`           | Detailed logging                                        | `false`                              |
-| `--yes`, `-y`         | Skip confirmation prompts                               | `false`                              |
-| `--retries`           | Retry attempts per cleaner (0=disabled)                 | `3`                                  |
-| `--retry-profile`     | Preset: `default`, `aggressive`, `conservative`, `none` | `""`                                 |
-| `--concurrency`, `-C` | Max concurrent cleaners (0=unlimited)                   | `0`                                  |
-| `--progress`          | Live progress frame while cleaning (interactive terminals only; auto-off with `--json`) | `false` |
+| Flag                  | Description                                                                             | Default                              |
+| --------------------- | --------------------------------------------------------------------------------------- | ------------------------------------ |
+| `--mode`, `-m`        | Preset: `quick`, `standard`, `aggressive`                                               | `standard`                           |
+| `--config`, `-c`      | Path to config file                                                                     | `~/.config/clean-wizard/config.yaml` |
+| `--profile`, `-p`     | Configuration profile                                                                   | `""`                                 |
+| `--dry-run`           | Preview without making changes                                                          | `false`                              |
+| `--json`              | Machine-readable JSON output                                                            | `false`                              |
+| `--verbose`           | Detailed logging                                                                        | `false`                              |
+| `--yes`, `-y`         | Skip confirmation prompts                                                               | `false`                              |
+| `--retries`           | Retry attempts per cleaner (0=disabled)                                                 | `3`                                  |
+| `--retry-profile`     | Preset: `default`, `aggressive`, `conservative`, `none`                                 | `""`                                 |
+| `--concurrency`, `-C` | Max concurrent cleaners (0=unlimited)                                                   | `0`                                  |
+| `--progress`          | Live progress frame while cleaning (interactive terminals only; auto-off with `--json`) | `false`                              |
 
 ### `clean-wizard scan`
 
@@ -184,19 +184,19 @@ clean-wizard scan --progress       # Live progress frame (interactive terminals)
 clean-wizard scan --graph mermaid  # Pipeline preview as Mermaid (or dot)
 ```
 
-| Flag                  | Description                                             | Default |
-| --------------------- | ------------------------------------------------------- | ------- |
-| `--json`, `-j`        | JSON output                                             | `false` |
-| `--sarif`             | SARIF 2.1.0 output (machine-readable findings)          | `false` |
-| `--profile`, `-p`     | Filter results by profile                               | `""`    |
-| `--config`, `-c`      | Path to config file                                     | `""`    |
-| `--verbose`, `-v`     | Detailed scan information                               | `false` |
-| `--retries`           | Retry attempts per scanner (0=disabled)                 | `3`     |
-| `--retry-profile`     | Preset: `default`, `aggressive`, `conservative`, `none` | `""`    |
-| `--concurrency`, `-C` | Max concurrent scanners (0=unlimited)                   | `0`     |
+| Flag                  | Description                                                                        | Default |
+| --------------------- | ---------------------------------------------------------------------------------- | ------- |
+| `--json`, `-j`        | JSON output                                                                        | `false` |
+| `--sarif`             | SARIF 2.1.0 output (machine-readable findings)                                     | `false` |
+| `--profile`, `-p`     | Filter results by profile                                                          | `""`    |
+| `--config`, `-c`      | Path to config file                                                                | `""`    |
+| `--verbose`, `-v`     | Detailed scan information                                                          | `false` |
+| `--retries`           | Retry attempts per scanner (0=disabled)                                            | `3`     |
+| `--retry-profile`     | Preset: `default`, `aggressive`, `conservative`, `none`                            | `""`    |
+| `--concurrency`, `-C` | Max concurrent scanners (0=unlimited)                                              | `0`     |
 | `--progress`          | Live progress frame (interactive terminals only; auto-off with `--json`/`--sarif`) | `false` |
-| `--report`            | Write self-contained interactive HTML report             | `""`    |
-| `--graph`             | Pipeline preview format: `mermaid` or `dot` (prints and exits) | `""` |
+| `--report`            | Write self-contained interactive HTML report                                       | `""`    |
+| `--graph`             | Pipeline preview format: `mermaid` or `dot` (prints and exits)                     | `""`    |
 
 ## Configuration
 
