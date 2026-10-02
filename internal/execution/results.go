@@ -137,6 +137,24 @@ func (rc *resultCollector) recordFinal(name string, clean types.CleanResult, err
 	})
 }
 
+// registeredNames returns step names in registration order, for announcing
+// the full activity plan to a progress emitter before execution begins.
+func (rc *resultCollector) registeredNames() []string {
+	rc.mu.Lock()
+	defer rc.mu.Unlock()
+
+	names := make([]string, 0, len(rc.orderIndex))
+	for name := range rc.orderIndex {
+		names = append(names, name)
+	}
+
+	sort.Slice(names, func(i, j int) bool {
+		return rc.orderIndex[names[i]] < rc.orderIndex[names[j]]
+	})
+
+	return names
+}
+
 // sortedByRegistration returns results ordered by their original registration
 // index, ensuring deterministic output regardless of parallel completion order.
 func (rc *resultCollector) sortedByRegistration() []StepResult {

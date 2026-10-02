@@ -103,7 +103,14 @@ func (p RetryProfile) Apply() *RetryConfig {
 // non-retryable (Infrastructure, Rejection, Conflict, Corruption) —
 // retrying a permanent condition wastes time. Only Transient errors
 // (timeouts, transient I/O, exec failures) proceed with backoff.
-func retryOptions(cfg RetryConfig) []func(*flow.RetryOption) {
+//
+// NextBackOff is invoked by go-workflow only when the backoff source did not
+// return Stop, i.e. exactly when another attempt WILL run — so it is the one
+// place that can emit ActivityRetrying without false positives. The reason
+// is the error family name (ADR-0002); no ActivityFailed is emitted for
+// intermediate attempts because nom would record that duration into its
+// timing cache and skew ETAs.
+func retryOptions(cfg RetryConfig, em ProgressEmitter, name string) []func(*flow.RetryOption) {
 	if cfg.MaxAttempts <= 0 {
 		return nil
 	}
@@ -132,6 +139,8 @@ func retryOptions(cfg RetryConfig) []func(*flow.RetryOption) {
 				if !errorfamily.IsRetryable(re.Error) {
 					return backoff.Stop
 				}
+
+				em.ActivityRetrying(name, int(re.Attempt)+1, errorfamily.Classify(re.Error).String())
 
 				return expBackoff.NextBackOff()
 			}

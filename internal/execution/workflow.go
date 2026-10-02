@@ -14,6 +14,7 @@ func newRunBuilder(opts []RunOption) (*Builder, runConfig) {
 	cfg := resolveRunOptions(opts)
 
 	builder := NewBuilder(cfg.verbose)
+	builder.WithProgressEmitter(cfg.emitter())
 	if cfg.retry != nil {
 		builder.WithRetryConfig(cfg.retry)
 	}
@@ -41,7 +42,7 @@ func RunCleaners(
 		return nil, err
 	}
 
-	return executeWorkflow(ctx, compiled, cfg)
+	return executeWorkflow(ctx, compiled, cfg, "clean")
 }
 
 // RunScans builds and executes a scan workflow for the given selected cleaners.
@@ -59,14 +60,26 @@ func RunScans(
 		return nil, err
 	}
 
-	return executeWorkflow(ctx, compiled, cfg)
+	return executeWorkflow(ctx, compiled, cfg, "scan")
 }
 
 // executeWorkflow configures and runs a compiled workflow, then aggregates results.
 // Workflow-level errors (e.g. panics recovered by DontPanic) are attached to the
 // WorkflowResult rather than silently dropped, so partial successes are preserved
 // while still surfacing failures.
-func executeWorkflow(ctx context.Context, compiled *CompiledWorkflow, cfg runConfig) (*WorkflowResult, error) {
+//
+// Progress emission (ADR-0002): WorkflowStarted and the upfront ActivityRegistered
+// batch announce the plan before work begins; per-attempt starts and retries are
+// emitted from the step hooks and the retry scheduler; terminal per-step outcomes
+// are derived once from the final collector state after the workflow finishes —
+// the single place that knows whether retries are exhausted.
+func executeWorkflow(ctx context.Context, compiled *CompiledWorkflow, cfg runConfig, workflowName string) (*WorkflowResult, error) {
+	em := cfg.emitter()
+	em.WorkflowStarted(workflowName)
+	for _, name := range compiled.Collector.registeredNames() {
+		em.ActivityRegistered(name)
+	}
+
 	if cfg.maxConcurrency > 0 {
 		compiled.Workflow.MaxConcurrency = cfg.maxConcurrency
 	}
@@ -87,7 +100,17 @@ func executeWorkflow(ctx context.Context, compiled *CompiledWorkflow, cfg runCon
 		}
 
 		result.TotalItemsFailed += step.Clean.ItemsFailed
+
+		emitTerminalOutcome(em, step)
 	}
+
+	if runErr != nil {
+		em.WorkflowFailed(runErr)
+	} else {
+		em.WorkflowCompleted()
+	}
+
+	em.Finish()
 
 	if runErr != nil && len(result.Steps) == 0 {
 		return nil, errorfamily.WrapTransient(
@@ -98,4 +121,29 @@ func executeWorkflow(ctx context.Context, compiled *CompiledWorkflow, cfg runCon
 	}
 
 	return result, nil
+}
+
+// emitTerminalOutcome reports a step's FINAL outcome exactly once, after the
+// workflow has finished. Intermediate retry attempts are never reported as
+// failures (ADR-0002): a transient failure shows as ActivityRetrying from the
+// retry scheduler, and only the exhausted budget produces ActivityFailed.
+func emitTerminalOutcome(em ProgressEmitter, step StepResult) {
+	switch step.Status() {
+	case StepStatusSucceeded:
+		em.ActivityCompleted(step.Name, step.Duration)
+	case StepStatusSkipped:
+		em.ActivitySkipped(step.Name, reasonForSkip(step.Err))
+	case StepStatusFailed:
+		em.ActivityFailed(step.Name, step.Err, step.Duration)
+	}
+}
+
+// reasonForSkip extracts a short human reason from an infrastructure-family
+// error; the empty reason falls back to a stable, non-blaming default.
+func reasonForSkip(err error) string {
+	if err != nil && err.Error() != "" {
+		return err.Error()
+	}
+
+	return "unavailable"
 }
