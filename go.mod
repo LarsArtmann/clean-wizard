@@ -72,6 +72,7 @@ require (
 	github.com/larsartmann/go-output v0.38.1 // indirect
 	github.com/larsartmann/go-output/daghtml v0.38.2 // indirect
 	github.com/larsartmann/go-output/nom v0.38.2 // indirect
+	github.com/larsartmann/go-output/tui v0.38.2 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.30 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect

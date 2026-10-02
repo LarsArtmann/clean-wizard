@@ -139,6 +139,8 @@ github.com/larsartmann/go-output/daghtml v0.38.2 h1:8fcBgMJA7zs6QJbJzD6YqrTh6h/s
 github.com/larsartmann/go-output/daghtml v0.38.2/go.mod h1:Veypl8qBIpQ7SEaovLzoG+rd+TUB8g2kDKm4yjXIu20=
 github.com/larsartmann/go-output/nom v0.38.2 h1:LncGPvUSfdpdnRbs6AcZCUevfOq4B8Z6DDIMjDCSjF8=
 github.com/larsartmann/go-output/nom v0.38.2/go.mod h1:M3yrGmVtQ+isdnyoxtDUpX1MiVOzsaUBw/Z/wzzAVPo=
+github.com/larsartmann/go-output/tui v0.38.2 h1:PHzqfyh6tL6fndXVqdUVIGsrYNc0fL+9kXYkvSwT6oE=
+github.com/larsartmann/go-output/tui v0.38.2/go.mod h1:EQFGeEl1uHytCVtOoN2J8LVH2ThZc80/Bv0K1MweGNE=
 github.com/larsartmann/linter-autoconfigure-sdk v0.7.0 h1:ahUgZ4u9ASjw7eQoq/gMr/dEKV5VJKCFsz5Rd8c0m+M=
 github.com/larsartmann/linter-autoconfigure-sdk v0.7.0/go.mod h1:yhjsL1lBgEEenGv95nkRa+NwTbMil6qyCE/k1FpsLAQ=
 github.com/leanovate/gopter v0.2.11 h1:vRjThO1EKPb/1NsDXuDrzldR28RLkBflWYcU9CvzWu4=

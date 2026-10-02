@@ -102,6 +102,17 @@ Minutes-long clean runs are no longer silent. Pass `--progress` on an interactiv
 
 The frame never pollutes machine output: `--json` and `--sarif` streams are byte-identical with or without `--progress`, and CI/pipe runs never activate it.
 
+## HTML Reports
+
+Pass `--report <path>` to `clean` or `scan` and get a **self-contained interactive HTML file** after the run: every cleaner as a node in a zoomable, pannable graph with status colors (green freed, blue skipped, red failed with an error dot), hover tooltips (`freed 1.5 KiB | 3 items | 2.0 s`), and a summary footer. No external assets, no JavaScript CDN — open it anywhere, email it, archive it.
+
+```bash
+clean-wizard clean --dry-run --mode quick --report run-report.html
+clean-wizard scan --report scan-report.html
+```
+
+The report is a human artifact and cannot combine with `--json`/`--sarif` — machine channels stay byte-clean.
+
 ## Safety First
 
 - **Dry-run mode** — `--dry-run` previews every action without touching the filesystem
