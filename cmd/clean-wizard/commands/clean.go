@@ -3,12 +3,14 @@ package commands
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
+	"github.com/LarsArtmann/clean-wizard/internal/progress"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
@@ -28,6 +30,9 @@ var (
 	ErrNoConfigPathProvided = errorfamily.NewRejection("clean.no_config_path", "no config path provided")
 )
 
+// AppName is the human-facing application name shown by live progress frames.
+const AppName = "clean-wizard"
+
 // NewCleanCommand creates a multi-cleaner command with TUI.
 func NewCleanCommand() *cobra.Command {
 	validateOperationTypeMapping()
@@ -43,6 +48,7 @@ func NewCleanCommand() *cobra.Command {
 		retries          int
 		retryProfile     string
 		concurrency      int
+		progressFlag     bool
 	)
 
 	cmd := &cobra.Command{
@@ -63,6 +69,7 @@ func NewCleanCommand() *cobra.Command {
 				retries,
 				retryProfile,
 				concurrency,
+				progressFlag,
 			)
 		},
 	}
@@ -80,6 +87,8 @@ func NewCleanCommand() *cobra.Command {
 	cmd.Flags().
 		StringVar(&retryProfile, "retry-profile", "", "Retry strategy preset: default, aggressive, conservative, or none (overrides --retries)")
 	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max cleaners running concurrently (0=unlimited)")
+	cmd.Flags().BoolVar(&progressFlag, "progress", false,
+		"Show live progress while cleaning (interactive terminals only; off with --json)")
 
 	return cmd
 }
@@ -128,6 +137,7 @@ func runCleanCommand(
 	mode, profile, configPath string,
 	retries int, retryProfile string,
 	concurrency int,
+	progressFlag bool,
 ) error {
 	ctx := context.Background()
 
@@ -196,7 +206,12 @@ func runCleanCommand(
 
 	selectedNames := cleanerTypesToNames(selectedCleaners)
 
-	runOpts, err := buildRunOptions(verbose, concurrency, retries, retryProfile)
+	var progressEmitter execution.ProgressEmitter
+	if progressRequested(progressFlag, jsonOutput) {
+		progressEmitter = progress.New(ctx, os.Stdout, AppName)
+	}
+
+	runOpts, err := buildRunOptions(verbose, concurrency, retries, retryProfile, progressEmitter)
 	if err != nil {
 		return errorfamily.WrapRejectionf(err, "clean.invalid_options", "mode=%v, profile=%v", mode, profile)
 	}

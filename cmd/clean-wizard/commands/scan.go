@@ -5,12 +5,14 @@ import (
 	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
+	"github.com/LarsArtmann/clean-wizard/internal/progress"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
@@ -26,6 +28,7 @@ func NewScanCommand() *cobra.Command {
 		retries      int
 		retryProfile string
 		concurrency  int
+		progressFlag bool
 	)
 
 	cmd := &cobra.Command{
@@ -33,7 +36,7 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(verbose, profile, jsonOut, sarifOut, configPath, retries, retryProfile, concurrency)
+			return runScanCommand(verbose, profile, jsonOut, sarifOut, configPath, retries, retryProfile, concurrency, progressFlag)
 		},
 	}
 
@@ -46,6 +49,8 @@ func NewScanCommand() *cobra.Command {
 	cmd.Flags().
 		StringVar(&retryProfile, "retry-profile", "", "Retry strategy preset: default, aggressive, conservative, or none (overrides --retries)")
 	cmd.Flags().IntVarP(&concurrency, "concurrency", "C", 0, "Max scanners running concurrently (0=unlimited)")
+	cmd.Flags().BoolVar(&progressFlag, "progress", false,
+		"Show live progress while scanning (interactive terminals only; off with --json/--sarif)")
 
 	return cmd
 }
@@ -78,6 +83,7 @@ func runScanCommand(
 	retries int,
 	retryProfile string,
 	concurrency int,
+	progressFlag bool,
 ) error {
 	ctx := context.Background()
 
@@ -141,7 +147,12 @@ func runScanCommand(
 
 	selectedNames := cleanerConfigsToNames(availableCleaners)
 
-	runOpts, err := buildRunOptions(verbose, concurrency, retries, retryProfile)
+	var progressEmitter execution.ProgressEmitter
+	if progressRequested(progressFlag, machineOutput) {
+		progressEmitter = progress.New(ctx, os.Stdout, AppName)
+	}
+
+	runOpts, err := buildRunOptions(verbose, concurrency, retries, retryProfile, progressEmitter)
 	if err != nil {
 		return errorfamily.WrapRejection(err, "scan.invalid_options", "invalid run options")
 	}
