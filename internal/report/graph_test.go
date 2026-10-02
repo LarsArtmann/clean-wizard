@@ -22,7 +22,7 @@ func TestPipelineGraph_OrderAndParallelShape(t *testing.T) {
 
 	names := make([]string, 0, len(g.Nodes()))
 	for _, node := range g.Nodes() {
-		names = append(names, node.ID())
+		names = append(names, node.ID.String())
 	}
 
 	assert.Equal(t, pipelineNames(), names, "nodes follow selection order")

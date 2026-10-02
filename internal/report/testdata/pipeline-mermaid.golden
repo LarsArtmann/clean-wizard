@@ -1,0 +1,7 @@
+```mermaid
+flowchart TD
+    nix[nix]
+    homebrew[homebrew]
+    docker[docker]
+    cargo[cargo]
+```

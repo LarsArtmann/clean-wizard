@@ -1,0 +1,30 @@
+digraph G {
+  // Graph attributes
+  rankdir=TB;
+  splines=ortho;
+  nodesep=0.5;
+  ranksep=0.5;
+
+  // Default node attributes
+  node [
+    shape=box
+    fontname="Helvetica"
+    fontsize=12
+  ];
+
+  // Nodes
+  "nix" [
+    label="nix"
+  ];
+  "homebrew" [
+    label="homebrew"
+  ];
+  "docker" [
+    label="docker"
+  ];
+  "cargo" [
+    label="cargo"
+  ];
+
+  // Edges
+}

@@ -13,6 +13,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/progress"
+	"github.com/LarsArtmann/clean-wizard/internal/report"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
@@ -30,6 +31,7 @@ func NewScanCommand() *cobra.Command {
 		concurrency  int
 		progressFlag bool
 		reportPath   string
+		graphFormat  string
 	)
 
 	cmd := &cobra.Command{
@@ -37,7 +39,7 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(verbose, profile, jsonOut, sarifOut, configPath, retries, retryProfile, concurrency, progressFlag, reportPath)
+			return runScanCommand(verbose, profile, jsonOut, sarifOut, configPath, retries, retryProfile, concurrency, progressFlag, reportPath, graphFormat)
 		},
 	}
 
@@ -54,6 +56,8 @@ func NewScanCommand() *cobra.Command {
 		"Show live progress while scanning (interactive terminals only; off with --json/--sarif)")
 	cmd.Flags().StringVar(&reportPath, "report", "",
 		"Write a self-contained interactive HTML report to this path (off with --json/--sarif)")
+	cmd.Flags().StringVar(&graphFormat, "graph", "",
+		"Preview the cleaner pipeline as a graph: mermaid or dot (prints and exits without scanning)")
 
 	return cmd
 }
@@ -88,6 +92,7 @@ func runScanCommand(
 	concurrency int,
 	progressFlag bool,
 	reportPath string,
+	graphFormat string,
 ) error {
 	ctx := context.Background()
 
@@ -97,14 +102,30 @@ func runScanCommand(
 		)
 	}
 
-	if reportPath != "" && (jsonOutput || sarifOutput) {
+	machineOutput := jsonOutput || sarifOutput
+
+	if reportPath != "" && machineOutput {
 		return errorfamily.NewRejection(
 			"scan.report_machine_output_conflict",
 			"--report and --json/--sarif are mutually exclusive; the HTML report is a human artifact and cannot ride along with machine output",
 		)
 	}
 
-	machineOutput := jsonOutput || sarifOutput
+	if graphFormat != "" {
+		if !report.IsSupportedGraphFormat(graphFormat) {
+			return errorfamily.NewRejection(
+				"scan.graph_format",
+				fmt.Sprintf("unsupported --graph format %q: use mermaid or dot", graphFormat),
+			)
+		}
+
+		if machineOutput {
+			return errorfamily.NewRejection(
+				"scan.graph_machine_output_conflict",
+				"--graph and --json/--sarif are mutually exclusive; the graph preview prints human-readable output",
+			)
+		}
+	}
 
 	if profile != "" {
 		fmt.Printf("⚠️  Warning: --profile %q is not yet supported for scan; showing all available cleaners\n", profile)
@@ -134,6 +155,14 @@ func runScanCommand(
 	}
 
 	availableCleaners := getAvailableConfigs(ctx, registry)
+
+	if graphFormat != "" {
+		if err := report.WritePipelineGraph(os.Stdout, cleanerConfigsToNames(availableCleaners), graphFormat); err != nil {
+			return errorfamily.WrapCorruption(err, "scan.graph_render", "failed to render pipeline graph")
+		}
+
+		return nil
+	}
 
 	if len(availableCleaners) == 0 {
 		if sarifOutput {

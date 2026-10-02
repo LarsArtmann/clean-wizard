@@ -37,7 +37,7 @@ func TestScanReportMachineOutputExclusivity(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			err := runScanCommand(false, "", !sarif, sarif, "", 0, "", 0, false, "/tmp/should-never-be-written.html")
+			err := runScanCommand(false, "", !sarif, sarif, "", 0, "", 0, false, "/tmp/should-never-be-written.html", "")
 
 			require.Error(t, err)
 			assert.Equal(t, errorfamily.Rejection, errorfamily.Classify(err))
@@ -46,8 +46,6 @@ func TestScanReportMachineOutputExclusivity(t *testing.T) {
 	}
 }
 
-// TestWriteReportFile_SelfContainedArtifact exercises the report write path
-// end-to-end: fixture result → file on disk → valid, self-contained HTML.
 func TestWriteReportFile_SelfContainedArtifact(t *testing.T) {
 	t.Parallel()
 
@@ -96,4 +94,29 @@ func TestWriteReportFile_UnwritablePathIsRejection(t *testing.T) {
 	require.Error(t, err)
 	assert.Equal(t, errorfamily.Rejection, errorfamily.Classify(err))
 	assert.Equal(t, "clean.report_write", errorfamily.Code(err))
+}
+
+// TestScanGraphFlagValidation covers the --graph format validation and its
+// machine-output conflict.
+func TestScanGraphFlagValidation(t *testing.T) {
+	t.Parallel()
+
+	t.Run("unsupported format is rejected", func(t *testing.T) {
+		t.Parallel()
+
+		err := runScanCommand(false, "", false, false, "", 0, "", 0, false, "", "svg")
+
+		require.Error(t, err)
+		assert.Equal(t, "scan.graph_format", errorfamily.Code(err))
+		assert.Contains(t, err.Error(), "use mermaid or dot")
+	})
+
+	t.Run("graph conflicts with machine output", func(t *testing.T) {
+		t.Parallel()
+
+		err := runScanCommand(false, "", true, false, "", 0, "", 0, false, "", "mermaid")
+
+		require.Error(t, err)
+		assert.Equal(t, "scan.graph_machine_output_conflict", errorfamily.Code(err))
+	})
 }
