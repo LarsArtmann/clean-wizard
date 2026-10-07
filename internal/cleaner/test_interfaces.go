@@ -67,7 +67,7 @@ type BooleanSettingsCleanerTestConfig struct {
 	ToolName          string
 	SettingsFieldName string
 	CreateSettings    func(bool) *operations.OperationSettings
-	ExpectedItems     uint
+	MaxItems          uint
 	Constructor       CleanerConstructorWithSettings
 }
 
@@ -77,7 +77,7 @@ type BooleanSettingsTestConfig struct {
 	TestName           string
 	ToolName           string
 	SettingsFieldName  string
-	ExpectedItems      uint
+	MaxItems           uint
 	Constructor        CleanerConstructorWithSettings
 	CreateSettingsFunc func(bool) *operations.OperationSettings
 }

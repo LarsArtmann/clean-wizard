@@ -22,7 +22,7 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				TestName:          "Cargo",
 				ToolName:          "Cargo",
 				SettingsFieldName: "cargo packages",
-				ExpectedItems:     2,
+				MaxItems:          2,
 				Constructor:       cleaner.NewBooleanSettingsCleanerTestConstructor(cargo.NewCargoCleaner),
 				CreateSettingsFunc: func(enabled bool) *operations.OperationSettings {
 					cleanupMode := enums.CacheCleanupDisabled
@@ -44,7 +44,7 @@ func TestBooleanSettingsCleaners(t *testing.T) {
 				TestName:          "ProjectsManagementAutomation",
 				ToolName:          "projects-management-automation",
 				SettingsFieldName: "projects management automation",
-				ExpectedItems:     1,
+				MaxItems:          1,
 				Constructor: cleaner.NewBooleanSettingsCleanerTestConstructor(
 					projectsmanagementautomation.NewProjectsManagementAutomationCleaner,
 				),

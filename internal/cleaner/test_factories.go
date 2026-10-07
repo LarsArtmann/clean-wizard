@@ -58,7 +58,7 @@ func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 	testName string,
 	toolName string,
 	settingsFieldName string,
-	expectedItems uint,
+	maxItems uint,
 	newCleanerFunc CleanerConstructor[T],
 	createSettings func(bool) *operations.OperationSettings,
 ) BooleanSettingsCleanerTestConfig {
@@ -66,7 +66,7 @@ func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 		TestName:          testName,
 		ToolName:          toolName,
 		SettingsFieldName: settingsFieldName,
-		ExpectedItems:     expectedItems,
+		MaxItems:          maxItems,
 		Constructor:       NewBooleanSettingsCleanerTestConstructor(newCleanerFunc),
 		CreateSettings:    createSettings,
 	}
@@ -76,7 +76,7 @@ func NewBooleanSettingsCleanerTestConfig[T CleanerWithSettings](
 // from constructor and settings creation function.
 func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](
 	testName, toolName, settingsFieldName string,
-	expectedItems uint,
+	maxItems uint,
 	constructor CleanerConstructor[T],
 	createSettings func(bool) *operations.OperationSettings,
 ) BooleanSettingsCleanerTestConfig {
@@ -84,7 +84,7 @@ func NewBooleanSettingsCleanerTestConfigFn[T CleanerWithSettings](
 		TestName:          testName,
 		ToolName:          toolName,
 		SettingsFieldName: settingsFieldName,
-		ExpectedItems:     expectedItems,
+		MaxItems:          maxItems,
 		Constructor:       NewBooleanSettingsCleanerTestConstructor(constructor),
 		CreateSettings:    createSettings,
 	}
@@ -247,7 +247,7 @@ func CreateBooleanSettingsTest(t *testing.T, config BooleanSettingsTestConfig) {
 		TestName:          config.TestName,
 		ToolName:          config.ToolName,
 		SettingsFieldName: config.SettingsFieldName,
-		ExpectedItems:     config.ExpectedItems,
+		MaxItems:          config.MaxItems,
 		Constructor:       config.Constructor,
 		CreateSettings:    config.CreateSettingsFunc,
 	})

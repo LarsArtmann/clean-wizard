@@ -78,9 +78,14 @@ func TestValidateSettings(
 // TestDryRun runs a standard dry-run test suite for cleaners.
 // If expectedItemsRemoved is provided (>= 0), it asserts the exact item count;
 // otherwise only strategy and failure invariants are checked.
+// TestDryRun runs a standard dry-run test suite for cleaners.
+// If maxItemsRemoved is provided (>= 0), it is the maximum number of cache
+// locations the cleaner targets; the dry-run reports fewer when a location does
+// not exist on this machine, so the count is environment-dependent.
+// Otherwise only strategy and failure invariants are checked.
 func TestDryRun(
 	t *testing.T, newCleanerFunc SimpleCleanerConstructor,
-	toolName string, expectedItemsRemoved int,
+	toolName string, maxItemsRemoved int,
 ) {
 	cleaner := newCleanerFunc(false, true)
 
@@ -105,23 +110,25 @@ func TestDryRun(
 		)
 	}
 
-	if expectedItemsRemoved >= 0 && cleanResult.ItemsRemoved != uint(expectedItemsRemoved) {
+	if maxItemsRemoved >= 0 {
 		if cleanResult.ItemsRemoved == 0 {
 			t.Skipf("%s installed but cache empty — nothing to clean", toolName)
 		}
 
-		t.Errorf(
-			"Clean() removed %d items, want %d",
-			cleanResult.ItemsRemoved,
-			expectedItemsRemoved,
-		)
+		if cleanResult.ItemsRemoved > uint(maxItemsRemoved) {
+			t.Errorf(
+				"Clean() removed %d items, want at most %d",
+				cleanResult.ItemsRemoved,
+				maxItemsRemoved,
+			)
+		}
 	}
 
-	if expectedItemsRemoved >= 0 && cleanResult.FreedBytes == 0 && cleanResult.ItemsRemoved > 0 {
+	if maxItemsRemoved >= 0 && cleanResult.FreedBytes == 0 && cleanResult.ItemsRemoved > 0 {
 		t.Errorf("Clean() freed %d bytes, want > 0", cleanResult.FreedBytes)
 	}
 
-	if expectedItemsRemoved < 0 && cleanResult.ItemsFailed != 0 {
+	if maxItemsRemoved < 0 && cleanResult.ItemsFailed != 0 {
 		t.Errorf("Clean() failed %d items, want 0", cleanResult.ItemsFailed)
 	}
 }
@@ -264,7 +271,7 @@ func TestBooleanSettingsCleanerCleanDryRun(
 	constructor CleanerConstructorWithSettings,
 ) {
 	simpleConstructor := ToSimpleCleanerConstructor(constructor)
-	TestDryRun(t, simpleConstructor, config.ToolName, int(config.ExpectedItems))
+	TestDryRun(t, simpleConstructor, config.ToolName, int(config.MaxItems))
 }
 
 // TestDryRunStrategyWithConstructor is a helper that creates a DryRunStrategy test.
