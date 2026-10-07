@@ -153,6 +153,7 @@ func (r *recordingEmitter) filter(kinds ...emitterEventKind) []emitterEvent {
 	}
 
 	var out []emitterEvent
+
 	for _, e := range r.snapshot() {
 		if wanted[e.kind] {
 			out = append(out, e)
@@ -170,6 +171,7 @@ func (r *recordingEmitter) count(kind emitterEventKind) int {
 // countFor returns how many events of the given kind name the given activity.
 func (r *recordingEmitter) countFor(kind emitterEventKind, name string) int {
 	n := 0
+
 	for _, e := range r.filter(kind) {
 		if e.name == name {
 			n++
@@ -366,6 +368,7 @@ func TestRunCleaners_Progress_ExhaustedRetriesEmitsSingleFailure(t *testing.T) {
 	// The failure is terminal: it must come after every retry event.
 	lastRetrying := -1
 	failedAt := -1
+
 	for i, e := range em.snapshot() {
 		switch e.kind {
 		case evActivityRetrying:
@@ -441,7 +444,7 @@ func TestRunScans_Progress_EmitsWorkflowNarrative(t *testing.T) {
 	assert.Equal(t, 1, em.count(evActivityStarted))
 	assert.Equal(t, 1, em.count(evActivityCompleted))
 	assert.Equal(t, 1, em.count(evFinish))
-	assert.Equal(t, nil, em.filter(evWorkflowFinished)[0].err)
+	assert.NoError(t, em.filter(evWorkflowFinished)[0].err)
 }
 
 // TestRunCleaners_Progress_ParallelEmittersAreRaceSafe runs several cleaners
@@ -452,6 +455,7 @@ func TestRunCleaners_Progress_ParallelEmittersAreRaceSafe(t *testing.T) {
 	t.Parallel()
 
 	registry := cleaner.NewRegistry()
+
 	names := []string{"p1", "p2", "p3", "p4"}
 	for _, name := range names {
 		registry.Register(name, &mockCleaner{
@@ -475,7 +479,7 @@ func TestRunCleaners_Progress_ParallelEmittersAreRaceSafe(t *testing.T) {
 	assert.Equal(t, len(names), em.count(evActivityStarted))
 	assert.Equal(t, len(names), em.count(evActivityCompleted))
 	assert.Equal(t, 1, em.count(evWorkflowFinished))
-	assert.Nil(t, em.filter(evWorkflowFinished)[0].err)
+	assert.NoError(t, em.filter(evWorkflowFinished)[0].err)
 
 	registered := em.filter(evActivityRegistered)
 	for i, name := range names {
@@ -575,6 +579,7 @@ func TestVerboseLineRouting(t *testing.T) {
 
 		original := verboseWriter
 		verboseWriter = &buf
+
 		t.Cleanup(func() { verboseWriter = original })
 
 		verboseLine(nil, "value %s", "x")

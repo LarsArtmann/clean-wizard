@@ -56,6 +56,7 @@ func (fakeProgressEmitter) ActivityStarted(string)               {}
 func (fakeProgressEmitter) ActivityRetrying(string, int, string) {}
 func (fakeProgressEmitter) ActivityCompleted(string, time.Duration) {
 }
+
 func (fakeProgressEmitter) ActivityFailed(string, error, time.Duration) {
 }
 func (fakeProgressEmitter) ActivitySkipped(string, string) {}

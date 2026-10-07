@@ -96,6 +96,7 @@ func TestWorkflowResultToDAG_GoldenNodes(t *testing.T) {
 	require.NoError(t, err)
 
 	goldenPath := filepath.Join("testdata", "report-nodes.golden.json")
+
 	if *updateGolden {
 		require.NoError(t, os.MkdirAll("testdata", 0o755))
 		require.NoError(t, os.WriteFile(goldenPath, got, 0o600))

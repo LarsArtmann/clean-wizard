@@ -39,7 +39,19 @@ func NewScanCommand() *cobra.Command {
 		Short: "Scan for cleanable items",
 		Long:  `Scan your system for cleanable items and show size estimates.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runScanCommand(verbose, profile, jsonOut, sarifOut, configPath, retries, retryProfile, concurrency, progressFlag, reportPath, graphFormat)
+			return runScanCommand(
+				verbose,
+				profile,
+				jsonOut,
+				sarifOut,
+				configPath,
+				retries,
+				retryProfile,
+				concurrency,
+				progressFlag,
+				reportPath,
+				graphFormat,
+			)
 		},
 	}
 
@@ -157,7 +169,11 @@ func runScanCommand(
 	availableCleaners := getAvailableConfigs(ctx, registry)
 
 	if graphFormat != "" {
-		if err := report.WritePipelineGraph(os.Stdout, cleanerConfigsToNames(availableCleaners), graphFormat); err != nil {
+		if err := report.WritePipelineGraph(
+			os.Stdout,
+			cleanerConfigsToNames(availableCleaners),
+			graphFormat,
+		); err != nil {
 			return errorfamily.WrapCorruption(err, "scan.graph_render", "failed to render pipeline graph")
 		}
 

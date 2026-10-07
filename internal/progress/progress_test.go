@@ -95,13 +95,16 @@ func captureStdout(t *testing.T, run func()) string {
 
 	go func() {
 		defer wg.Done()
+
 		captured, _ = io.ReadAll(reader)
 	}()
 
 	run()
 
 	writer.Close()
+
 	os.Stdout = original
+
 	wg.Wait()
 	reader.Close()
 
@@ -115,7 +118,6 @@ func captureStdout(t *testing.T, run func()) string {
 func TestWorkflowRun_ProgressNeverWritesToStdout(t *testing.T) {
 	// No t.Parallel: swapping the os.Stdout global races with any concurrent
 	// test doing the same.
-
 	sink := &lockedBuffer{}
 	em := New(context.Background(), sink, "clean-wizard-test")
 
@@ -123,6 +125,7 @@ func TestWorkflowRun_ProgressNeverWritesToStdout(t *testing.T) {
 	registry.Register("sink-test-cleaner", &silentCleaner{name: "sink-test-cleaner", delay: 150 * time.Millisecond})
 
 	var runErr error
+
 	stdout := captureStdout(t, func() {
 		_, runErr = execution.RunCleaners(
 			context.Background(),
@@ -144,11 +147,11 @@ func TestWorkflowRun_ProgressNeverWritesToStdout(t *testing.T) {
 // progress emitter the execution layer is fully silent on stdout.
 func TestWorkflowRun_NoEmitterWritesNothingToStdout(t *testing.T) {
 	// No t.Parallel: swaps the os.Stdout global.
-
 	registry := cleaner.NewRegistry()
 	registry.Register("quiet-cleaner", &silentCleaner{name: "quiet-cleaner"})
 
 	var runErr error
+
 	stdout := captureStdout(t, func() {
 		_, runErr = execution.RunCleaners(context.Background(), registry, []string{"quiet-cleaner"})
 	})

@@ -67,6 +67,7 @@ func TestWritePipelineGraph_UnsupportedFormatErrors(t *testing.T) {
 	t.Parallel()
 
 	var buf strings.Builder
+
 	err := report.WritePipelineGraph(&buf, pipelineNames(), "svg")
 
 	require.Error(t, err)

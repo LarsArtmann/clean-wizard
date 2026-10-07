@@ -15,6 +15,7 @@ func newRunBuilder(opts []RunOption) (*Builder, runConfig) {
 
 	builder := NewBuilder(cfg.verbose)
 	builder.WithProgressEmitter(cfg.emitter())
+
 	if cfg.retry != nil {
 		builder.WithRetryConfig(cfg.retry)
 	}
@@ -73,9 +74,15 @@ func RunScans(
 // emitted from the step hooks and the retry scheduler; terminal per-step outcomes
 // are derived once from the final collector state after the workflow finishes —
 // the single place that knows whether retries are exhausted.
-func executeWorkflow(ctx context.Context, compiled *CompiledWorkflow, cfg runConfig, workflowName string) (*WorkflowResult, error) {
+func executeWorkflow(
+	ctx context.Context,
+	compiled *CompiledWorkflow,
+	cfg runConfig,
+	workflowName string,
+) (*WorkflowResult, error) {
 	em := cfg.emitter()
 	em.WorkflowStarted(workflowName)
+
 	for _, name := range compiled.Collector.registeredNames() {
 		em.ActivityRegistered(name)
 	}

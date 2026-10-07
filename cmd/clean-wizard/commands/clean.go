@@ -227,6 +227,7 @@ func runCleanCommand(
 	selectedNames := cleanerTypesToNames(selectedCleaners)
 
 	var progressEmitter execution.ProgressEmitter
+
 	switch {
 	case tuiFlag && !jsonOutput && progress.Enabled(os.Stdout):
 		progressEmitter = progress.NewTUIEmitter(ctx)

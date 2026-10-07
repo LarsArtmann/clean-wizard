@@ -36,7 +36,7 @@
 
 ## b) Partially done
 
-1. **Cargo-test fix is a deliberate semantic weakening.** An upper bound no longer catches a cleaner that removes *fewer* than intended (silently under-counts). I did **not** add a regression test proving `ItemsRemoved > MaxItems` fails. It resolves the flake but trades away some precision.
+1. **Cargo-test fix is a deliberate semantic weakening.** An upper bound no longer catches a cleaner that removes _fewer_ than intended (silently under-counts). I did **not** add a regression test proving `ItemsRemoved > MaxItems` fails. It resolves the flake but trades away some precision.
 2. **Build cache is "rebuilt only incidentally."** The 13G `/mnt/buildcache/go-build` was repopulated by the test run, not deliberately warmed; the first cold builds are slower. No `go clean -cache`-equivalent housekeeping done.
 3. **Formatting done with bare `gofmt`, not the project gate.** Project rule (AGENTS/buildflow skill): formatters are owned by BuildFlow / `nix fmt`. I ran `gofmt -w` directly. The result is Go-correct, but the canonical gate was bypassed and not run to confirm 0-changed.
 4. **No full (non-`-short`) suite, no `-race` run.** Only `-short` + `go vet`.
@@ -62,7 +62,7 @@
 1. **I was my own biggest confounder.** My first `go clean -cache` got auto-backgrounded and kept deleting `go-build` while subsequent builds read it → a cascade of `could not import … no such file or directory` and several wasted diagnostic cycles chasing a "second corruption." I should have checked for running `go` processes **first**. Lesson: before mutating a shared cache, check `ps` for in-flight builds/cleans.
 2. **I bypassed the canonical formatter gate.** Ran raw `gofmt -w` instead of `nix fmt` / `buildflow format`, contradicting a documented project rule (the buildflow skill explicitly owns this).
 3. **I nuked the entire 25G build cache** rather than surgically clearing the one poisoned entry; safe, but heavy-handed and done while other builds were running on the same disk.
-4. **Slow isolation.** I spent several tool calls on the `huh` file (which read fine via `head`/`gofmt`) before realizing a *different* layer (build cache) and a *running process* were the real problem.
+4. **Slow isolation.** I spent several tool calls on the `huh` file (which read fine via `head`/`gofmt`) before realizing a _different_ layer (build cache) and a _running process_ were the real problem.
 5. **Auto-commits hid my own trail.** The daemon committed my edits between steps (`chore: auto-commit N changed file(s) (heuristic)`), so `git status` looked emptier than reality; I briefly had to re-confirm the changes were actually persisted. Not a bug, but it makes "what did I change" auditing hard.
 
 None of these left the repo or the cache in a broken state — final verification is green.
@@ -85,6 +85,7 @@ None of these left the repo or the cache in a broken state — final verificatio
 ## f) Up to 50 things we should get done next
 
 **Immediate / this incident**
+
 1. Delete `/mnt/buildcache/go-mod/.quarantine-corrupt-20261006/` (848M) once approved.
 2. Run a read-only fsck / SMART check on `/dev/sdb1` (needs privileges).
 3. Add `scripts/check-modcache.sh` integrity preflight (see e1) + wire into devShell `shellHook`.
@@ -137,8 +138,8 @@ None of these left the repo or the cache in a broken state — final verificatio
 
 1. **Was there an unclean shutdown, or is `/dev/sdb1` actually failing?** The zero-length files across two caches strongly suggest disk-level trouble. I cannot run `smartctl`/`fsck`/`dmesg` (privileges/commands blocked). Do you want me to attempt a read-only SMART/fsck (needs your approval + sudo), or shall I assume a one-off unclean shutdown?
 2. **May I delete the 848M `.quarantine-corrupt-20261006/` quarantine** (and sweep other quarantines on the machine), or do you want to keep them as evidence until the disk is judged healthy?
-3. **For the Cargo flake — is my choice right?** I made the test assertion an *upper bound* (test-only). The alternative is that the *product* is wrong: `Clean` dry-run should mirror `Scan` and always report both configured cache locations (registry + git), making `2` correct and the count stable. Which is the intended contract — fix the test, or fix the cleaner to match `Scan`?
+3. **For the Cargo flake — is my choice right?** I made the test assertion an _upper bound_ (test-only). The alternative is that the _product_ is wrong: `Clean` dry-run should mirror `Scan` and always report both configured cache locations (registry + git), making `2` correct and the count stable. Which is the intended contract — fix the test, or fix the cleaner to match `Scan`?
 
 ---
 
-*Prepared 2026-10-07 08:55 CEST. Working tree clean; all session edits captured by the auto-commit daemon (`a5713fe`, `c06621a`, …).*
+_Prepared 2026-10-07 08:55 CEST. Working tree clean; all session edits captured by the auto-commit daemon (`a5713fe`, `c06621a`, …)._

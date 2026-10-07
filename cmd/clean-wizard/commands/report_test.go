@@ -20,7 +20,23 @@ import (
 func TestCleanReportJSONExclusivity(t *testing.T) {
 	t.Parallel()
 
-	err := runCleanCommand(nil, nil, true, false, true, true, "", "", "", 0, "", 0, false, false, "/tmp/should-never-be-written.html")
+	err := runCleanCommand(
+		nil,
+		nil,
+		true,
+		false,
+		true,
+		true,
+		"",
+		"",
+		"",
+		0,
+		"",
+		0,
+		false,
+		false,
+		"/tmp/should-never-be-written.html",
+	)
 
 	require.Error(t, err)
 	assert.Equal(t, errorfamily.Rejection, errorfamily.Classify(err))
@@ -37,7 +53,19 @@ func TestScanReportMachineOutputExclusivity(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			err := runScanCommand(false, "", !sarif, sarif, "", 0, "", 0, false, "/tmp/should-never-be-written.html", "")
+			err := runScanCommand(
+				false,
+				"",
+				!sarif,
+				sarif,
+				"",
+				0,
+				"",
+				0,
+				false,
+				"/tmp/should-never-be-written.html",
+				"",
+			)
 
 			require.Error(t, err)
 			assert.Equal(t, errorfamily.Rejection, errorfamily.Classify(err))

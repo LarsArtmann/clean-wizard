@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"log/slog"
-	"strings"
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/logger"
@@ -23,6 +22,7 @@ func swapDebugLogger(t *testing.T) *bytes.Buffer {
 
 	original := logger.StdLogger
 	logger.StdLogger = slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
+
 	t.Cleanup(func() { logger.StdLogger = original })
 
 	return &buf
@@ -59,7 +59,7 @@ func TestCleanupSilentWhenNoShutdownErrors(t *testing.T) {
 
 	cleanup()
 
-	assert.False(t, strings.Contains(buf.String(), "DI shutdown"),
+	assert.NotContains(t, buf.String(), "DI shutdown",
 		"clean shutdown must not log: %s", buf.String())
 }
 

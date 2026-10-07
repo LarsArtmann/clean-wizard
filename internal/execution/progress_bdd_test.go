@@ -3,6 +3,7 @@ package execution_test
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -114,6 +115,7 @@ func (r *progressRecorder) ofKind(kinds ...bddEventKind) []bddEvent {
 	}
 
 	var out []bddEvent
+
 	for _, e := range r.all() {
 		if wanted[e.kind] {
 			out = append(out, e)
@@ -130,9 +132,11 @@ func (r *progressRecorder) countOf(kind bddEventKind) int {
 func (r *progressRecorder) dump() string {
 	msg := ""
 
+	var msgSb133 strings.Builder
 	for _, e := range r.all() {
-		msg += fmt.Sprintf("\n  %+v", e)
+		msgSb133.WriteString(fmt.Sprintf("\n  %+v", e))
 	}
+	msg += msgSb133.String()
 
 	return msg
 }
@@ -174,6 +178,7 @@ var _ = Describe("Live progress narrative", func() {
 			gomega.Expect(events[0].name).To(gomega.Equal("clean"))
 
 			firstStarted := -1
+
 			for i, e := range events {
 				if e.kind == bddStarted {
 					firstStarted = i
@@ -181,6 +186,7 @@ var _ = Describe("Live progress narrative", func() {
 					break
 				}
 			}
+
 			gomega.Expect(firstStarted).To(gomega.BeNumerically(">", 0), "recorder: %s", recorder.dump())
 
 			// The whole plan is on the tree before the first activity runs.
@@ -205,7 +211,7 @@ var _ = Describe("Live progress narrative", func() {
 			gomega.Expect(events).NotTo(gomega.BeEmpty())
 			gomega.Expect(events[len(events)-1].kind).To(gomega.Equal(bddFinish))
 			gomega.Expect(events[len(events)-2].kind).To(gomega.Equal(bddWorkflowFinished))
-			gomega.Expect(events[len(events)-2].err).To(gomega.BeNil())
+			gomega.Expect(events[len(events)-2].err).ToNot(gomega.HaveOccurred())
 		})
 	})
 
@@ -225,7 +231,8 @@ var _ = Describe("Live progress narrative", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			gomega.Expect(wr.Succeeded()).To(gomega.HaveLen(1))
 
-			gomega.Expect(recorder.countOf(bddStarted)).To(gomega.Equal(3), "one start per attempt: %s", recorder.dump())
+			gomega.Expect(recorder.countOf(bddStarted)).
+				To(gomega.Equal(3), "one start per attempt: %s", recorder.dump())
 			gomega.Expect(recorder.countOf(bddFailed)).To(gomega.Equal(0), "intermediate attempts are never failures")
 
 			retries := recorder.ofKind(bddRetrying)

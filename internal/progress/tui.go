@@ -46,25 +46,27 @@ func (e *TUIEmitter) WorkflowStarted(name string) {
 }
 
 func (e *TUIEmitter) ActivityRegistered(name string) {
-	_ = e.Subscriber().OnEvent(e.ctx, nom.ActivityRegistered{ //nolint:exhaustruct_v5 // optional nom fields are absent by design
-		ID:       nom.ActivityID(name),
-		Name:     nom.ActivityName(name),
-		Kind:     nom.ActivityKindTask,
-		Deps:     nil,
-		Category: "",
-	})
+	_ = e.Subscriber().
+		OnEvent(e.ctx, nom.ActivityRegistered{
+			ID:       nom.ActivityID(name),
+			Name:     nom.ActivityName(name),
+			Kind:     nom.ActivityKindTask,
+			Deps:     nil,
+			Category: "",
+		})
 }
 
 func (e *TUIEmitter) ActivityStarted(name string) {
-	_ = e.Subscriber().OnEvent(e.ctx, nom.ActivityStarted{ //nolint:exhaustruct_v5 // optional nom fields are absent by design
-		ID:       nom.ActivityID(name),
-		Name:     nom.ActivityName(name),
-		Kind:     nom.ActivityKindTask,
-		Deps:     nil,
-		Host:     "",
-		Download: nom.DownloadProgress{},
-		Category: "",
-	})
+	_ = e.Subscriber().
+		OnEvent(e.ctx, nom.ActivityStarted{
+			ID:       nom.ActivityID(name),
+			Name:     nom.ActivityName(name),
+			Kind:     nom.ActivityKindTask,
+			Deps:     nil,
+			Host:     "",
+			Download: nom.DownloadProgress{},
+			Category: "",
+		})
 }
 
 func (e *TUIEmitter) ActivityRetrying(name string, attempt int, reason string) {

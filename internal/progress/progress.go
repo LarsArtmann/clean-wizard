@@ -113,7 +113,7 @@ func (e *Emitter) WorkflowStarted(name string) {
 // ActivityRegistered pre-creates an activity as pending so the full plan is
 // visible before work begins.
 func (e *Emitter) ActivityRegistered(name string) {
-	_ = e.sub.OnEvent(e.ctx, nom.ActivityRegistered{ //nolint:exhaustruct_v5 // optional nom fields are absent by design
+	_ = e.sub.OnEvent(e.ctx, nom.ActivityRegistered{
 		ID:       nom.ActivityID(name),
 		Name:     nom.ActivityName(name),
 		Kind:     nom.ActivityKindTask,
@@ -125,7 +125,7 @@ func (e *Emitter) ActivityRegistered(name string) {
 // ActivityStarted marks an activity running; fires per retry attempt, which
 // re-marks the activity as running after a scheduled retry.
 func (e *Emitter) ActivityStarted(name string) {
-	_ = e.sub.OnEvent(e.ctx, nom.ActivityStarted{ //nolint:exhaustruct_v5 // optional nom fields are absent by design
+	_ = e.sub.OnEvent(e.ctx, nom.ActivityStarted{
 		ID:       nom.ActivityID(name),
 		Name:     nom.ActivityName(name),
 		Kind:     nom.ActivityKindTask,
