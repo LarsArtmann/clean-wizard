@@ -301,7 +301,7 @@ func RunGetHomeDirTests(t *testing.T, testCases []GetHomeDirTestCase) {
 //	                },
 //	            }
 //	        },
-//	        ExpectedItems: 1,
+//	        MaxItems: 1,
 //	        Constructor:   NewBooleanSettingsCleanerTestConstructor(NewXxxCleaner),
 //	    })
 //	}

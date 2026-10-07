@@ -185,5 +185,6 @@ Key files:
 - JSON output tests: `internal/format/json_test.go` (family/code fields, deterministic ordering)
 - CLI integration test: `cmd/clean-wizard/commands/clean_integration_test.go` (dry-run JSON pipeline)
 - Integration tests use `testing.Short()` skip guards for real-system tests
+- `TestDryRun`'s expected-count argument (via `BooleanSettingsTestConfig.MaxItems`) is an **upper bound**, not an exact count: dry-run reports only cache locations that actually exist with size > 0, so the number is machine-dependent. Asserting an exact count here (the old `ExpectedItems`) is what made `TestBooleanSettingsCleaners/Cargo` flip-flop between 1 and 2
 - Ginkgo BDD tests exist for: GitHistory, Nix, CompiledBinaries, ProjectExecutables
 - 9 of 13 cleaners have NO BDD tests

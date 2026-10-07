@@ -10,7 +10,7 @@ package cleaner
 //	        TestName:          "Xxx",
 //	        ToolName:          "xxx-tool",
 //	        SettingsFieldName: "xxx settings",
-//	        ExpectedItems:     1,
+//	        MaxItems:          1,
 //	        Constructor:       NewBooleanSettingsCleanerTestConstructor(NewXxxCleaner),
 //	        CreateSettingsFunc: func(enabled bool) *domain.OperationSettings {
 //	            return &domain.OperationSettings{
