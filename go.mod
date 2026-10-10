@@ -15,7 +15,7 @@ require (
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/providers/file v1.2.1
-	github.com/knadh/koanf/v2 v2.3.7
+	github.com/knadh/koanf/v2 v2.3.8
 	github.com/larsartmann/go-atomic-write v0.6.0
 	github.com/larsartmann/go-error-family v0.11.0
 	github.com/larsartmann/go-finding v1.14.0
@@ -32,7 +32,7 @@ require (
 	github.com/samber/do/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/sys v0.48.0
+	golang.org/x/sys v0.49.0
 	golang.org/x/term v0.46.0
 	golang.org/x/time v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
