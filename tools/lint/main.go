@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"os"
 
+	finding "github.com/larsartmann/go-finding"
 	humanizelint "github.com/larsartmann/go-humanize-linter"
-		finding "github.com/larsartmann/go-finding"
 	"github.com/larsartmann/go-linter-sdk"
 )
 

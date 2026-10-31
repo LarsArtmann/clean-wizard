@@ -121,6 +121,31 @@
                 runHook postInstall
               '';
             });
+
+            # H007 (manual byte parsing) regression gate: the humanize-linter
+            # runs over the repo source; findings fail the check (TODO 18).
+            humanize-lint =
+              let
+                lintTool = (pkgs.buildGoModule.override { go = pkgs.go_1_27; }) {
+                  pname = "clean-wizard-humanize-lint";
+                  version = "0.1.0";
+                  src = self;
+                  sourceRoot = "source/tools/lint";
+                  # vendor/ is committed under tools/lint, so no hash needed.
+                  vendorHash = null;
+                  env.GOEXPERIMENT = "jsonv2";
+                  doCheck = false;
+                };
+              in
+              pkgs.runCommand "humanize-lint-check"
+                {
+                  nativeBuildInputs = [ lintTool ];
+                }
+                ''
+                  cd ${self}
+                  lint
+                  touch $out
+                '';
           };
 
           apps = {
@@ -168,6 +193,8 @@
           };
 
           treefmt = {
+            # Vendored third-party code is formatted upstream, not here.
+            settings.excludes = [ "tools/lint/vendor/*" ];
             programs = {
               nixfmt.enable = true;
               gofmt = {
