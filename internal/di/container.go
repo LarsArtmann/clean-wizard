@@ -9,10 +9,16 @@ package di
 
 import (
 	"log/slog"
+	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/logger"
 	"github.com/samber/do/v2"
 )
+
+// DefaultHealthCheckGlobalTimeout bounds the whole container health check so
+// doctor and pre-run gates fail in bounded time even when a service probe
+// hangs (do divides it across probes via per-service timeouts).
+const DefaultHealthCheckGlobalTimeout = 30 * time.Second
 
 // Container wraps a samber/do injector with lifecycle management.
 // It is the single entry point for resolving any service in the application.
@@ -26,7 +32,9 @@ type Container struct {
 // failures are logged at Debug (they must never mask the command's real
 // outcome, but should be visible when diagnosing leaked resources).
 func New() (*Container, func()) {
-	injector := do.New()
+	injector := do.NewWithOpts(&do.InjectorOpts{
+		HealthCheckGlobalTimeout: DefaultHealthCheckGlobalTimeout,
+	})
 
 	return &Container{injector: injector}, func() {
 		report := injector.Shutdown()

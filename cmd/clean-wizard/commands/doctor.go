@@ -2,9 +2,13 @@ package commands
 
 import (
 	"context"
+	"encoding/json/v2"
+	"encoding/json/jsontext"
 	"fmt"
+	"os"
 
 	"github.com/LarsArtmann/clean-wizard/internal/di"
+	"github.com/LarsArtmann/clean-wizard/internal/format"
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/spf13/cobra"
 )
@@ -16,12 +20,22 @@ var ErrDoctorUnhealthy = errorfamily.NewInfrastructure(
 	"one or more DI services failed construction or health check",
 )
 
+// ErrDoctorJSONWithSARIF rejects --json combined with --sarif: both are
+// machine channels and their outputs would silently disagree about what the
+// run "output" is.
+var ErrDoctorJSONWithSARIF = errorfamily.NewRejection(
+	"doctor.json_sarif_conflict",
+	"--json and --sarif are mutually exclusive; both are machine channels",
+)
+
 // NewDoctorCommand creates the health-check command: materialize every DI
 // service, run container health checks, render per-service outcomes.
 func NewDoctorCommand() *cobra.Command {
 	var (
 		verbose    bool
 		configPath string
+		jsonOutput bool
+		sarifPath  string
 	)
 
 	cmd := &cobra.Command{
@@ -31,25 +45,49 @@ func NewDoctorCommand() *cobra.Command {
 
 Prints one line per service: construction plus health-check outcome. Exit code
 is 0 when every service is healthy, 69 (Infrastructure) when any service
-failed — suitable for scripting and CI gates.`,
+failed — suitable for scripting and CI gates.
+
+Machine channels: --json prints a JSON report to stdout; --sarif writes a
+SARIF 2.1.0 document (error findings for unhealthy services only) to a file
+path or "-" for stdout.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDoctorCommand(verbose, configPath)
+			return runDoctorCommand(doctorOptions{
+				verbose:    verbose,
+				configPath: configPath,
+				jsonOutput: jsonOutput,
+				sarifPath:  sarifPath,
+			})
 		},
 	}
 
 	cmd.Flags().BoolVar(&verbose, "verbose", false, "Enable verbose output")
 	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
+	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Output health report in JSON format")
+	cmd.Flags().StringVar(&sarifPath, "sarif", "",
+		"Write health findings as SARIF to this path (or '-' for stdout; off with --json)")
 
 	return cmd
+}
+
+// doctorOptions carries the doctor invocation flags.
+type doctorOptions struct {
+	verbose    bool
+	configPath string
+	jsonOutput bool
+	sarifPath  string
 }
 
 // runDoctorCommand builds the container exactly like clean/scan (config load →
 // di.New → RegisterAllServices), reports health, and maps failures to a
 // classified Infrastructure error.
-func runDoctorCommand(verbose bool, configPath string) error {
+func runDoctorCommand(opts doctorOptions) error {
+	if opts.jsonOutput && opts.sarifPath != "" {
+		return ErrDoctorJSONWithSARIF
+	}
+
 	ctx := context.Background()
 
-	cfg, err := loadConfigFromPath(configPath)
+	cfg, err := loadConfigFromPath(opts.configPath)
 	if err != nil {
 		return errorfamily.WrapRejection(err, "doctor.config_load", "failed to load configuration")
 	}
@@ -57,7 +95,7 @@ func runDoctorCommand(verbose bool, configPath string) error {
 	container, cleanup := di.New()
 	defer cleanup()
 
-	settings := di.RunSettings{Verbose: verbose, DryRun: false, MaxConcurrency: 0, Profile: ""} //nolint:exhaustruct // doctor reads no config profile
+	settings := di.RunSettings{Verbose: opts.verbose, DryRun: false, MaxConcurrency: 0, Profile: ""} //nolint:exhaustruct // doctor reads no config profile
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
 		return errorfamily.WrapRejection(err, "doctor.di_register", "failed to register DI services")
 	}
@@ -67,7 +105,18 @@ func runDoctorCommand(verbose bool, configPath string) error {
 		return errorfamily.WrapInfrastructure(err, "doctor.health_report", "failed to run container health checks")
 	}
 
-	printDoctorReport(report)
+	switch {
+	case opts.jsonOutput:
+		if err := outputDoctorJSON(report); err != nil {
+			return err
+		}
+	case opts.sarifPath != "":
+		if err := writeDoctorSARIF(report, opts.sarifPath); err != nil {
+			return err
+		}
+	default:
+		printDoctorReport(report)
+	}
 
 	summary := di.Summarize(report)
 	if summary.Unhealthy > 0 {
@@ -116,4 +165,98 @@ func shortServiceName(serviceName string) string {
 	}
 
 	return serviceName
+}
+
+// outputDoctorJSON writes the health report as JSON. Per-entry family/code/
+// retryable enrichment mirrors the clean/scan JSON schemas.
+func outputDoctorJSON(report []di.HealthEntry) error {
+	type healthJSONService struct {
+		Service   string `json:"service"`
+		Healthy   bool   `json:"healthy"`
+		Error     string `json:"error,omitempty"`
+		Family    string `json:"family,omitempty"`
+		Code      string `json:"code,omitempty"`
+		Retryable bool   `json:"retryable,omitempty"`
+	}
+
+	type healthJSONSummary struct {
+		Total     int  `json:"total"`
+		Unhealthy int  `json:"unhealthy"`
+		Healthy   bool `json:"healthy"`
+	}
+
+	type healthJSONOutput struct {
+		Services []healthJSONService `json:"services"`
+		Summary  healthJSONSummary   `json:"summary"`
+	}
+
+	jsonServices := make([]healthJSONService, 0, len(report))
+	for _, entry := range report {
+		service := healthJSONService{
+			Service: entry.Service,
+			Healthy: entry.Healthy(),
+		}
+
+		if entry.Error != nil {
+			family := errorfamily.Classify(entry.Error)
+			service.Error = entry.Error.Error()
+			service.Family = family.String()
+			service.Code = errorfamily.Code(entry.Error)
+			service.Retryable = family.IsRetryable()
+		}
+
+		jsonServices = append(jsonServices, service)
+	}
+
+	summary := di.Summarize(report)
+	output := healthJSONOutput{
+		Services: jsonServices,
+		Summary: healthJSONSummary{
+			Total:     summary.Total,
+			Unhealthy: summary.Unhealthy,
+			Healthy:   summary.Unhealthy == 0,
+		},
+	}
+
+	jsonBytes, err := json.Marshal(output, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
+	if err != nil {
+		return errorfamily.WrapCorruption(err, "doctor.json_output", "failed to generate doctor JSON output")
+	}
+
+	fmt.Println(string(jsonBytes))
+
+	return nil
+}
+
+// writeDoctorSARIF writes health findings as a SARIF document to a path (or
+// stdout for "-"). Healthy services produce no finding.
+func writeDoctorSARIF(report []di.HealthEntry, sarifPath string) error {
+	outcomes := make([]format.HealthOutcome, 0, len(report))
+	for _, entry := range report {
+		outcomes = append(outcomes, format.HealthOutcome{Service: entry.Service, Err: entry.Error})
+	}
+
+	data, err := format.HealthOutcomesToSARIF(outcomes)
+	if err != nil {
+		return err
+	}
+
+	if sarifPath == "-" {
+		fmt.Println(string(data))
+
+		return nil
+	}
+
+	if writeErr := os.WriteFile(sarifPath, data, 0o600); writeErr != nil { //nolint:mnd
+		return errorfamily.WrapInfrastructuref(
+			writeErr,
+			"doctor.sarif_write",
+			"failed to write SARIF report to %s",
+			sarifPath,
+		)
+	}
+
+	fmt.Printf("SARIF report written to %s\n", sarifPath)
+
+	return nil
 }
