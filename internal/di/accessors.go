@@ -45,8 +45,8 @@ func CleanerRegistry(i do.Injector) (*cleaner.Registry, error) {
 // Cleaner resolves a single cleaner by its registry name (e.g. cleaner.CleanerNix)
 // from the DI container. Cleaner services are registered per cleaner, enabling
 // per-cleaner invocation and configuration.
-func Cleaner(i do.Injector, registryName string) (cleaner.Cleaner, error) {
-	c, err := do.InvokeNamed[cleaner.Cleaner](i, "cleaner."+registryName)
+func Cleaner(i do.Injector, registryName string) (cleaner.Cleaner, error) { //nolint:ireturn // returning the cleaner interface is the DI contract: consumers depend on the abstraction
+	cleanerInstance, err := do.InvokeNamed[cleaner.Cleaner](i, "cleaner."+registryName)
 	if err != nil {
 		return nil, errorfamily.WrapRejectionf(
 			err,
@@ -56,5 +56,5 @@ func Cleaner(i do.Injector, registryName string) (cleaner.Cleaner, error) {
 		)
 	}
 
-	return c, nil
+	return cleanerInstance, nil
 }

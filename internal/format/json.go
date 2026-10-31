@@ -60,13 +60,13 @@ func CleanResultsToJSON(
 	for name, result := range results {
 		output.ItemsRemoved += result.ItemsRemoved
 		output.ItemsFailed += result.ItemsFailed
-		output.FreedBytes += result.FreedBytes
+		output.FreedBytes += result.SizeEstimate.Value()
 
 		cleanerResult := CleanerResult{ //nolint:exhaustruct
 			Name:         name,
 			ItemsRemoved: result.ItemsRemoved,
 			ItemsFailed:  result.ItemsFailed,
-			FreedBytes:   result.FreedBytes,
+			FreedBytes:   result.SizeEstimate.Value(),
 			FreedHuman:   Bytes(int64(result.FreedBytes)),
 			Status:       "success",
 		}

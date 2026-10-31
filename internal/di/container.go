@@ -53,7 +53,7 @@ func New() (*Container, func()) {
 
 // Injector exposes the underlying samber/do injector for direct use
 // with do.Provide, do.Invoke, etc.
-func (c *Container) Injector() do.Injector {
+func (c *Container) Injector() do.Injector { //nolint:ireturn // exposing the do.Injector interface is the container contract
 	return c.injector
 }
 

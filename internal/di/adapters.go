@@ -33,6 +33,6 @@ func registerAdapters(injector do.Injector) {
 var _ do.HealthcheckerWithContext = (*adapters.NixAdapter)(nil)
 
 // NixStore resolves the Nix store interface from the DI container.
-func NixStore(i do.Injector) (adapters.NixStore, error) {
+func NixStore(i do.Injector) (adapters.NixStore, error) { //nolint:ireturn // returning the adapter interface is the DI contract: implementations stay swappable
 	return do.Invoke[adapters.NixStore](i)
 }

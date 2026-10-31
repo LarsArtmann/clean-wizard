@@ -308,7 +308,7 @@ func buildScanResults(wr *execution.WorkflowResult, available []CleanerConfig) [
 		if step, ok := stepByName[regName]; ok {
 			if step.Err == nil {
 				sr.ItemsCount = step.Clean.ItemsRemoved
-				sr.BytesCleanable = step.Clean.FreedBytes
+				sr.BytesCleanable = step.Clean.SizeEstimate.Value()
 			} else {
 				sr.Err = step.Err
 			}

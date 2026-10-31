@@ -37,6 +37,7 @@ func NewCleanResult(
 		CleanTime:    0, // Will be set by caller
 		CleanedAt:    time.Now(),
 		Strategy:     strategy,
+		SizeEstimate: types.SizeEstimate{Known: uint64(freedBytes), Status: enums.SizeEstimateStatusKnown},
 	}
 }
 
@@ -71,6 +72,7 @@ func NewCleanResultWithTiming(
 		CleanTime:    cleanTime,
 		CleanedAt:    time.Now(),
 		Strategy:     strategy,
+		SizeEstimate: types.SizeEstimate{Known: uint64(freedBytes), Status: enums.SizeEstimateStatusKnown},
 	}
 }
 
@@ -105,6 +107,7 @@ func NewCleanResultWithFailures(
 		CleanTime:    cleanTime,
 		CleanedAt:    time.Now(),
 		Strategy:     strategy,
+		SizeEstimate: types.SizeEstimate{Known: uint64(freedBytes), Status: enums.SizeEstimateStatusKnown},
 	}
 }
 
