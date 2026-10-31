@@ -168,3 +168,10 @@ func (hr *HTTPResponse) IsClientError() bool {
 func (hr *HTTPResponse) IsServerError() bool {
 	return hr.StatusCode >= HTTPServerErrorMinStatus
 }
+
+// Shutdown closes idle connections when the DI container shuts down.
+func (hc *HTTPClient) Shutdown() error {
+	hc.client.GetClient().CloseIdleConnections()
+
+	return nil
+}

@@ -55,7 +55,6 @@ type KeyValueCache interface {
 	Delete(key string)
 	Clear()
 	ItemCount() int
-	FlushExpired()
 }
 
 var _ KeyValueCache = (*CacheManager)(nil)

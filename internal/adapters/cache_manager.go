@@ -27,27 +27,19 @@ func (ci *cacheItem) isExpired() bool {
 
 // CacheManager provides in-memory caching functionality.
 type CacheManager struct {
-	cache           *otter.Cache[string, *cacheItem]
-	defaultExpiry   time.Duration
-	cleanupInterval time.Duration
+	cache *otter.Cache[string, *cacheItem]
 }
 
-// NewCacheManager creates a new cache manager
-// defaultExpiration: default TTL for cache entries
-// cleanupInterval: interval for cleaning expired entries.
-func NewCacheManager(defaultExpiration, cleanupInterval time.Duration) *CacheManager {
-	// Create otter cache - items are stored with expiration metadata
+// NewCacheManager creates a new cache manager. Entries expire lazily on read
+// after DefaultCacheExpiry (otter's expiry calculator); there is no background
+// cleanup loop.
+func NewCacheManager() *CacheManager {
 	cache := otter.Must(&otter.Options[string, *cacheItem]{
 		MaximumSize: DefaultCacheMaximumSize,
-		// Use a long expiry since we manage expiration manually
 		ExpiryCalculator: otter.ExpiryWriting[string, *cacheItem](DefaultCacheExpiry),
 	})
 
-	return &CacheManager{
-		cache:           cache,
-		defaultExpiry:   defaultExpiration,
-		cleanupInterval: cleanupInterval,
-	}
+	return &CacheManager{cache: cache}
 }
 
 // Set stores a value in cache with expiration.
@@ -108,6 +100,13 @@ func (cm *CacheManager) ItemCount() int {
 	return cm.cache.EstimatedSize()
 }
 
+// Shutdown invalidates every cached entry when the DI container shuts down.
+func (cm *CacheManager) Shutdown() error {
+	cm.cache.InvalidateAll()
+
+	return nil
+}
+
 // CacheStats provides cache statistics.
 type CacheStats struct {
 	Items     int     `json:"items"`
@@ -132,10 +131,4 @@ func (cm *CacheManager) Stats() CacheStats {
 		MissCount: stats.Misses,
 		HitRate:   hitRate,
 	}
-}
-
-// FlushExpired removes all expired items by iterating and checking.
-func (cm *CacheManager) FlushExpired() {
-	// Otter doesn't provide iteration, so we rely on lazy expiration checks in Get
-	// and the internal cleanup mechanisms
 }

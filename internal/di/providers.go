@@ -12,13 +12,33 @@ import (
 // then invokes the provider packages for lazy service creation.
 //
 // This is the single entry point for service registration, mirroring
-// BuildFlow's di.RegisterAllServices pattern.
+// BuildFlow's di.RegisterAllServices pattern. A selected profile that does
+// not exist in the config is a Rejection at the composition root — it used
+// to fall back to factory defaults silently, so a typo'd --profile produced
+// a full run with no profile applied.
 func RegisterAllServices(injector do.Injector, cfg *types.Config, settings RunSettings) error {
 	do.ProvideValue(injector, cfg)
 	do.ProvideValue(injector, settings)
 
+	if settings.Profile != "" && !cfg.HasProfile(settings.Profile) {
+		return errorfamily.NewRejection(
+			"di.unknown_profile",
+			"profile "+settings.Profile+" does not exist in the configuration",
+		)
+	}
+
 	AdaptersPackage(injector)
 	CleanerPackage(injector)
+
+	// Cleaner providers resolve adapters.NixStore lazily, so the alias only
+	// needs to exist before the first invocation, not before CleanerPackage.
+	if err := do.As[*adapters.NixAdapter, adapters.NixStore](injector); err != nil {
+		return errorfamily.WrapRejection(
+			err,
+			"di.alias_nix_store",
+			"failed to alias the nix adapter to its consumer-facing interface",
+		)
+	}
 
 	return nil
 }

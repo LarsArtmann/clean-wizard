@@ -51,7 +51,7 @@ func TestRateLimiter_Wait(t *testing.T) {
 func TestCacheManager(t *testing.T) {
 	t.Parallel()
 
-	cm := adapters.NewCacheManager(5*time.Minute, 10*time.Minute)
+	cm := adapters.NewCacheManager()
 	require.NotNil(t, cm)
 
 	// Test Set and Get
@@ -78,7 +78,7 @@ func TestCacheManager(t *testing.T) {
 func TestCacheManager_Expiration(t *testing.T) {
 	t.Parallel()
 
-	cm := adapters.NewCacheManager(100*time.Millisecond, 1*time.Minute)
+	cm := adapters.NewCacheManager()
 	require.NotNil(t, cm)
 
 	cm.Set("expire_key", "expire_value", 50*time.Millisecond)
@@ -99,7 +99,7 @@ func TestCacheManager_Expiration(t *testing.T) {
 func TestCacheManager_Clear(t *testing.T) {
 	t.Parallel()
 
-	cm := adapters.NewCacheManager(5*time.Minute, 10*time.Minute)
+	cm := adapters.NewCacheManager()
 	require.NotNil(t, cm)
 
 	// Add multiple items

@@ -2,6 +2,18 @@ package types
 
 import "github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 
+// HasProfile reports whether the named profile exists in the configuration.
+// A nil config has no profiles.
+func (c *Config) HasProfile(profileName string) bool {
+	if c == nil {
+		return false
+	}
+
+	_, ok := c.Profiles[profileName]
+
+	return ok
+}
+
 // SettingsForProfile returns the operation settings configured for the named profile.
 // The settings blocks of all operations in the profile are merged into a single
 // view; when several operations define the same settings section the first

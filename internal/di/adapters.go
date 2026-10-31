@@ -6,9 +6,9 @@ import (
 )
 
 // AdaptersPackage registers the external-system adapters that production
-// cleaners consume as DI services and aliases each concrete adapter to its
-// consumer-facing interface via do.As. Consumers resolve interfaces (e.g.
-// adapters.NixStore), keeping implementations swappable.
+// cleaners consume as DI services. The consumer-facing interface alias
+// (adapters.NixStore) is declared by RegisterAllServices; consumers resolve
+// interfaces, keeping implementations swappable.
 //
 // CacheManager, HTTPClient, and RateLimiter deliberately have NO registration:
 // no production code consumes them yet (ADR-0003). Registering services
@@ -18,14 +18,14 @@ var AdaptersPackage = do.Package( //nolint:gochecknoglobals
 	registerAdapters,
 )
 
-// registerAdapters provides the concrete adapters and declares their interface
-// aliases. Aliasing happens eagerly at registration time (do.As validates the
-// type relationship); the adapters themselves stay lazy singletons.
+// registerAdapters provides the concrete adapters; the consumer-facing
+// interface alias is declared by RegisterAllServices so an invalid alias
+// surfaces as a classified error instead of a panic (do.MustAs panics,
+// do.As returns).
 func registerAdapters(injector do.Injector) {
 	do.Provide(injector, func(i do.Injector) (*adapters.NixAdapter, error) {
 		return adapters.NewNixAdapter(0, 0), nil
 	})
-	do.MustAs[*adapters.NixAdapter, adapters.NixStore](injector)
 }
 
 // The nix adapter participates in container health checks (doctor command):
