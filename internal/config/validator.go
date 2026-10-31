@@ -6,6 +6,7 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	"github.com/LarsArtmann/clean-wizard/internal/logger"
 	businessrules "github.com/LarsArtmann/go-business-rules/v2"
 )
 
@@ -74,7 +75,10 @@ func (cv *ConfigValidator) ValidateConfig(cfg *types.Config) *ValidationResult {
 	start := time.Now()
 
 	ruleSet := cv.buildConfigRules(cfg)
-	outcome := businessrules.NewValidator().AddRules(ruleSet.rules...).Build()
+	outcome := businessrules.NewValidator().
+		AddRules(ruleSet.rules...).
+		WithListener(logRuleTiming).
+		Build()
 
 	result := mapViolations(ruleSet, outcome)
 	result.Duration = time.Since(start)
@@ -99,4 +103,25 @@ func (cv *ConfigValidator) ValidateField(field string, value any) error {
 	default:
 		return fmt.Errorf("unknown field: %s", field)
 	}
+}
+
+// logRuleTiming emits one Debug line per evaluated rule (passes and failures
+// alike) with its duration, so debug-level runs expose per-rule timing
+// without changing any API or adding cost when debug logging is off.
+func logRuleTiming(event businessrules.Event) {
+	evaluated, ok := event.(businessrules.RuleEvaluated)
+	if !ok {
+		return
+	}
+
+	status := "passed"
+	if !evaluated.Passed() {
+		status = "failed"
+	}
+
+	logger.Debug("config rule evaluated",
+		"rule", evaluated.RuleName,
+		"status", status,
+		"duration", evaluated.Duration,
+	)
 }

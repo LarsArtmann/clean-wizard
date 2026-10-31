@@ -11,6 +11,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/execution"
+	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/progress"
 	"github.com/LarsArtmann/clean-wizard/internal/report"
@@ -139,10 +140,6 @@ func runScanCommand(
 		}
 	}
 
-	if profile != "" {
-		fmt.Printf("⚠️  Warning: --profile %q is not yet supported for scan; showing all available cleaners\n", profile)
-	}
-
 	cfg, err := loadConfigFromPath(configPath)
 	if err != nil {
 		return errorfamily.WrapRejection(err, "scan.config_load", "failed to load config")
@@ -167,6 +164,20 @@ func runScanCommand(
 	}
 
 	availableCleaners := getAvailableConfigs(ctx, registry)
+
+	// A selected profile narrows the scan to the cleaners it lists; its
+	// settings already shape each cleaner's scan behavior via the DI registry.
+	if profile != "" {
+		availableCleaners = filterCleanersByProfile(availableCleaners, cfg, profile)
+		if len(availableCleaners) == 0 {
+			return errorfamily.Newf(
+				errorfamily.Rejection,
+				"scan.profile_no_cleaners",
+				"profile %q selects no known cleaners",
+				profile,
+			)
+		}
+	}
 
 	if graphFormat != "" {
 		if err := report.WritePipelineGraph(
@@ -460,4 +471,32 @@ func outputScanJSON(results []ScanResult, totalBytes uint64, totalItems uint) er
 	fmt.Println(string(jsonBytes))
 
 	return nil
+}
+
+// filterCleanersByProfile narrows scan targets to the cleaners the profile
+// lists. Unknown profile operation names are ignored (the profile may name
+// display-only operations); an empty result means the profile matched nothing.
+func filterCleanersByProfile(
+	configs []CleanerConfig,
+	cfg *types.Config,
+	profileName string,
+) []CleanerConfig {
+	profile, ok := cfg.Profiles[profileName]
+	if !ok {
+		return configs
+	}
+
+	wanted := make(map[string]bool, len(profile.Operations))
+	for _, operation := range profile.Operations {
+		wanted[operation.Name] = true
+	}
+
+	filtered := make([]CleanerConfig, 0, len(wanted))
+	for _, cfgItem := range configs {
+		if wanted[cfgItem.Name] {
+			filtered = append(filtered, cfgItem)
+		}
+	}
+
+	return filtered
 }
