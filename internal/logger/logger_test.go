@@ -28,8 +28,8 @@ func TestInit(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			Init(tt.development)
-			require.NotNil(t, L, "logger should be initialized")
-			require.NotNil(t, StdLogger, "slog logger should be initialized")
+			require.NotNil(t, L(), "logger should be initialized")
+			require.NotNil(t, Slog(), "slog logger should be initialized")
 		})
 	}
 }
@@ -65,7 +65,7 @@ func TestInitWithLevel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			InitWithLevel(tt.level, tt.development)
-			require.NotNil(t, L, "logger should be initialized")
+			require.NotNil(t, L(), "logger should be initialized")
 		})
 	}
 }
@@ -148,7 +148,8 @@ func TestSetLevel(t *testing.T) {
 
 func TestSetLevel_Uninitialized(t *testing.T) {
 	// Reset logger to nil
-	L = nil
+	instance.Store(nil)
+	stdPointer.Store(nil)
 
 	// Should not panic even when logger is nil
 	assert.NotPanics(t, func() { SetLevel("debug") })
@@ -274,7 +275,8 @@ func TestNilLoggerSafety(t *testing.T) {
 	defer func() { L = originalL }()
 
 	// Set to nil
-	L = nil
+	instance.Store(nil)
+	stdPointer.Store(nil)
 
 	// All these should not panic
 	assert.NotPanics(t, func() { Debug("test") })
@@ -290,14 +292,14 @@ func TestNilLoggerSafety(t *testing.T) {
 func TestDevelopmentVsProduction(t *testing.T) {
 	t.Run("development", func(t *testing.T) {
 		Init(true)
-		assert.NotNil(t, L)
-		assert.NotNil(t, StdLogger)
+		assert.NotNil(t, L())
+		assert.NotNil(t, Slog())
 	})
 
 	t.Run("production", func(t *testing.T) {
 		Init(false)
-		assert.NotNil(t, L)
-		assert.NotNil(t, StdLogger)
+		assert.NotNil(t, L())
+		assert.NotNil(t, Slog())
 	})
 }
 
@@ -327,7 +329,7 @@ func TestCharmbraceletIntegration(t *testing.T) {
 	Init(true)
 
 	// Test that we can use charmbracelet/log specific features
-	assert.NotNil(t, L)
+	assert.NotNil(t, L())
 
 	// Test level setting via charmbracelet/log API
 	L.SetLevel(log.DebugLevel)

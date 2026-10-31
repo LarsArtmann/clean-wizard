@@ -20,10 +20,10 @@ func swapDebugLogger(t *testing.T) *bytes.Buffer {
 
 	var buf bytes.Buffer
 
-	original := logger.StdLogger
-	logger.StdLogger = slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	original := logger.Slog()
+	logger.SetSlog(slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug})))
 
-	t.Cleanup(func() { logger.StdLogger = original })
+	t.Cleanup(func() { logger.SetSlog(original) })
 
 	return &buf
 }

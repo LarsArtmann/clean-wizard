@@ -4,6 +4,11 @@
 // to provide beautiful, colorful, structured logging throughout the application.
 // It integrates seamlessly with the existing charmbracelet ecosystem (huh, lipgloss, bubbletea).
 //
+// The process loggers live in atomic pointers, not bare globals: parallel
+// tests (and any future concurrent init) swap or read them without data
+// races. Init/InitWithLevel are still the single production write points;
+// SetSlog exists for tests that capture log output.
+//
 // Usage:
 //
 //	import "github.com/LarsArtmann/clean-wizard/internal/logger"
@@ -21,17 +26,28 @@ package logger
 import (
 	"log/slog"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"charm.land/log/v2"
 )
 
-// L is the global logger instance.
-// Use this for all logging throughout the application.
-var L *log.Logger //nolint:gochecknoglobals
+// Process logger storage. Atomic pointers keep concurrent Init/reads
+// race-free; the exported accessor functions are the only supported reads.
+var (
+	instance   atomic.Pointer[log.Logger]  //nolint:gochecknoglobals
+	stdPointer atomic.Pointer[slog.Logger] //nolint:gochecknoglobals
+)
 
-// StdLogger provides a standard slog.Logger for interoperability.
-var StdLogger *slog.Logger //nolint:gochecknoglobals
+// L returns the process logger, or nil before the first Init.
+func L() *log.Logger { return instance.Load() }
+
+// Slog returns the slog interoperability logger, or nil before the first Init.
+func Slog() *slog.Logger { return stdPointer.Load() }
+
+// SetSlog replaces the slog interoperability logger. Production code should
+// not call this; it exists so tests can capture log output.
+func SetSlog(l *slog.Logger) { stdPointer.Store(l) }
 
 // Level strings for configuration parsing.
 const (
@@ -67,7 +83,7 @@ func setupLogger(level log.Level, development bool) {
 		formatter = log.TextFormatter
 	}
 
-	L = log.NewWithOptions(os.Stdout, log.Options{ //nolint:exhaustruct
+	created := log.NewWithOptions(os.Stdout, log.Options{ //nolint:exhaustruct_v5
 		Level:           level,
 		Formatter:       formatter,
 		ReportTimestamp: true,
@@ -75,7 +91,8 @@ func setupLogger(level log.Level, development bool) {
 		Prefix:          "clean-wizard",
 	})
 
-	StdLogger = slog.New(L)
+	instance.Store(created)
+	stdPointer.Store(slog.New(created))
 }
 
 // Init initializes the global logger.
@@ -112,36 +129,36 @@ func Sync() {
 
 // Debug logs a debug message.
 func Debug(msg string, keyvals ...any) {
-	if L != nil {
-		L.Debug(msg, keyvals...)
+	if l := L(); l != nil {
+		l.Debug(msg, keyvals...)
 	}
 }
 
 // Info logs an info message.
 func Info(msg string, keyvals ...any) {
-	if L != nil {
-		L.Info(msg, keyvals...)
+	if l := L(); l != nil {
+		l.Info(msg, keyvals...)
 	}
 }
 
 // Warn logs a warning message.
 func Warn(msg string, keyvals ...any) {
-	if L != nil {
-		L.Warn(msg, keyvals...)
+	if l := L(); l != nil {
+		l.Warn(msg, keyvals...)
 	}
 }
 
 // Error logs an error message.
 func Error(msg string, keyvals ...any) {
-	if L != nil {
-		L.Error(msg, keyvals...)
+	if l := L(); l != nil {
+		l.Error(msg, keyvals...)
 	}
 }
 
 // Fatal logs a fatal message and exits.
 func Fatal(msg string, keyvals ...any) {
-	if L != nil {
-		L.Fatal(msg, keyvals...)
+	if l := L(); l != nil {
+		l.Fatal(msg, keyvals...)
 	} else {
 		os.Exit(1)
 	}
@@ -149,8 +166,8 @@ func Fatal(msg string, keyvals ...any) {
 
 // With creates a child logger with additional fields.
 func With(keyvals ...any) *log.Logger {
-	if L != nil {
-		return L.With(keyvals...)
+	if l := L(); l != nil {
+		return l.With(keyvals...)
 	}
 
 	return nil
@@ -158,16 +175,17 @@ func With(keyvals ...any) *log.Logger {
 
 // WithPrefix creates a child logger with a sub-scope name.
 func WithPrefix(name string) *log.Logger {
-	if L != nil {
-		return L.WithPrefix(name)
+	if l := L(); l != nil {
+		return l.WithPrefix(name)
 	}
-	// Return a new logger that discards output when L is nil
+
+	// Return a new logger that discards output when uninitialized.
 	return log.New(os.Stdout)
 }
 
 // CleanerLogger returns a logger for a specific cleaner.
 func CleanerLogger(name string) *log.Logger {
-	if L != nil {
+	if L() != nil {
 		return WithPrefix("cleaner").With("cleaner_name", name)
 	}
 
@@ -176,14 +194,12 @@ func CleanerLogger(name string) *log.Logger {
 
 // SetLevel changes the log level at runtime.
 func SetLevel(level string) {
-	if L == nil {
-		return
+	if l := L(); l != nil {
+		l.SetLevel(levelFromString(level))
 	}
-
-	L.SetLevel(levelFromString(level))
 }
 
 // GetSlogLogger returns the standard slog.Logger for interoperability.
 func GetSlogLogger() *slog.Logger {
-	return StdLogger
+	return Slog()
 }

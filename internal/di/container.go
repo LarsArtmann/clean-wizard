@@ -42,7 +42,7 @@ func New() (*Container, func()) {
 			return
 		}
 
-		slogger := logger.StdLogger
+		slogger := logger.Slog()
 		if slogger == nil {
 			slogger = slog.Default()
 		}
