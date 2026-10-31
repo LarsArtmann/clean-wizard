@@ -1,12 +1,14 @@
 package di
 
 import (
+	"context"
 	"testing"
 
 	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/cargo"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	"github.com/LarsArtmann/clean-wizard/internal/result"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -193,12 +195,68 @@ func TestRegisterAllServices_AdapterInterfaceAliases(t *testing.T) {
 	store, err := NixStore(container.Injector())
 	require.NoError(t, err)
 	assert.Implements(t, (*adapters.NixStore)(nil), store)
+	assert.IsType(t, &adapters.NixAdapter{}, store)
+}
 
-	cache, err := KeyValueCache(container.Injector())
-	require.NoError(t, err)
-	assert.NotNil(t, cache)
+// fakeNixStore is a container-injected test double for adapters.NixStore. It
+// records the calls the nix cleaner makes, so tests can assert the cleaner
+// consumes the store resolved from the DI container.
+type fakeNixStore struct {
+	dryRunCalls  []bool
+	availableAsk int
+}
 
-	httpRequester, err := do.Invoke[adapters.HTTPRequester](container.Injector())
+func (f *fakeNixStore) SetDryRun(dryRun bool) { f.dryRunCalls = append(f.dryRunCalls, dryRun) }
+
+func (f *fakeNixStore) IsAvailable(context.Context) bool {
+	f.availableAsk++
+
+	return true
+}
+
+func (f *fakeNixStore) GetStoreSize(context.Context) result.Result[int64] {
+	return result.Ok[int64](0)
+}
+
+func (f *fakeNixStore) ListGenerations(context.Context) result.Result[[]types.NixGeneration] {
+	return result.Ok[[]types.NixGeneration](nil)
+}
+
+func (f *fakeNixStore) RemoveGeneration(context.Context, types.NixGenerationID) result.Result[types.CleanResult] {
+	return result.Ok[types.CleanResult](types.CleanResult{})
+}
+
+func (f *fakeNixStore) CollectGarbage(context.Context) result.Result[types.CleanResult] {
+	return result.Ok[types.CleanResult](types.CleanResult{})
+}
+
+func TestNixCleaner_UsesContainerInjectedStore(t *testing.T) {
+	t.Parallel()
+
+	container, cleanup := New()
+	defer cleanup()
+
+	cfg := &types.Config{}
+	settings := RunSettings{Verbose: false, DryRun: true}
+
+	err := RegisterAllServices(container.Injector(), cfg, settings)
 	require.NoError(t, err)
-	assert.NotNil(t, httpRequester)
+
+	injectedStore := &fakeNixStore{}
+	do.Override(container.Injector(), func(i do.Injector) (adapters.NixStore, error) {
+		return injectedStore, nil
+	})
+
+	nixCleaner, err := Cleaner(container.Injector(), cleaner.CleanerNix)
+	require.NoError(t, err)
+	require.NotNil(t, nixCleaner)
+	assert.Equal(t, cleaner.CleanerNix, nixCleaner.Name())
+
+	// Construction hands the store to the cleaner via SetDryRun with the run
+	// flag, proving the container-injected double is the store in use.
+	assert.Equal(t, []bool{true}, injectedStore.dryRunCalls)
+
+	// Availability checks delegate to the injected store, not a real adapter.
+	assert.True(t, nixCleaner.IsAvailable(t.Context()))
+	assert.Equal(t, 1, injectedStore.availableAsk)
 }

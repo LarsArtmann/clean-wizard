@@ -3,6 +3,7 @@ package factory
 import (
 	"path/filepath"
 
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/buildcache"
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/cargo"
@@ -112,9 +113,25 @@ func validateConstructor(c cleaner.Cleaner, settings *operations.OperationSettin
 	return c, nil
 }
 
-// Nix builds the Nix generations cleaner (keep count from settings).
+// Nix builds the Nix generations cleaner (keep count from settings) backed by
+// the default real Nix adapter.
 func Nix(verbose, dryRun bool, settings *operations.OperationSettings) (cleaner.Cleaner, error) {
-	return validateConstructor(nix.NewNixCleaner(verbose, dryRun, resolveNixKeepCount(settings)...), settings)
+	return NixWithStore(verbose, dryRun, nil, settings)
+}
+
+// NixWithStore builds the Nix generations cleaner (keep count from settings)
+// backed by the given store. A nil store falls back to the real Nix adapter.
+// The DI container calls this variant to inject the container-resolved
+// adapters.NixStore, keeping store implementations swappable.
+func NixWithStore(
+	verbose, dryRun bool,
+	store adapters.NixStore,
+	settings *operations.OperationSettings,
+) (cleaner.Cleaner, error) {
+	return validateConstructor(
+		nix.NewNixCleanerWithStore(verbose, dryRun, store, resolveNixKeepCount(settings)...),
+		settings,
+	)
 }
 
 // Homebrew builds the Homebrew cleaner (cleanup mode from settings).
