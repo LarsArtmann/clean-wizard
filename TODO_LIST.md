@@ -1,6 +1,6 @@
 # TODO LIST
 
-**Last Updated:** 2026-10-02
+**Last Updated:** 2026-10-31
 **Focus:** Actionable items for the next 2-4 weeks
 **Source:** Verified against code on 2026-08-10; harvested from 2026-07-06 through 2026-08-05 status reports
 
@@ -41,7 +41,11 @@
 | 30 | Rewrite `ValidationMiddleware.validateChangeBusinessRules` if-chains as go-business-rules tagged rules (same engine as config validation; enables change-level severities)                                                                                                                                                                                                 | MED    | MED    | 2026-09-23 businessrules adoption |
 | 31 | Use go-business-rules `RuleEvaluated` events for per-rule timing in `-v` verbose output (zero-cost when no listeners)                                                                                                                                                                                                                                                      | LOW    | LOW    | 2026-09-23 businessrules adoption |
 | 29 | Fix `nix flake check` treefmt-check: sandboxed goimports tries to download go1.27 toolchain (offline sandbox → DNS refused); wire go_1_27 into the treefmt formatter closure (`nix fmt` itself is green)                                                                                                                                                                   | MED    | MED    | 2026-09-23 error-family migration |
+| 35 | Move `githistory` command onto the DI/registry path (currently hand-wires `githistory.NewGitHistoryCleaner` at `githistory.go:283,587`, bypassing the container used by clean/scan)                                                                                                                        | MED    | MED    | 2026-10-31 samber/do audit |
+| 36 | Relocate `OverrideRegistry`/`OverrideSettings` from `internal/di/test_helpers.go` into `_test.go` or delete (DO-3 hygiene; no consumers outside di's own tests)                                                                            | LOW    | LOW    | 2026-10-31 samber/do audit |
 | 32 | Adopt cmdguard (`github.com/larsartmann/cmdguard/v4`) as the CLI framework — construction-time validation (missing handlers, duplicate commands, invalid flags) + zero-panic error contract replace the hand-rolled usage-error plumbing (`SetFlagErrorFunc`, `exactArgsClassified`, `cli.*` codes); keep `errorfamily.ExitCode` at the boundary and fang rendering intact | HIGH   | HIGH   | 2026-10-02 cmdguard adoption      |
+| 33 | Wire the DI adapter seam for real — nix provider resolves `adapters.NixStore` from the container (currently constructed inline via nil-store fallback); consume-or-delete the dead CacheManager/HTTPClient/RateLimiter registrations (zero consumers)                                                                                                                       | HIGH   | MED    | 2026-10-31 samber/do audit |
+| 34 | Add `clean-wizard doctor` health command — implement `do.HealthcheckerWithContext` on adapters (NixAdapter → `nix --version`), run `injector.HealthCheckWithContext`, map failures through `errorfamily.ExitCode`; zero health-check wiring exists today (samber/do v2 subsystem completely unused) | HIGH   | MED    | 2026-10-31 samber/do audit |
 
 ## Low Priority / Polish
 
