@@ -30,7 +30,7 @@ func swapDebugLogger(t *testing.T) *bytes.Buffer {
 
 // TestCleanupLogsShutdownErrorsAtDebug verifies the deferred cleanup logs a
 // failing service's shutdown error at Debug instead of silently discarding it.
-func TestCleanupLogsShutdownErrorsAtDebug(t *testing.T) {
+func TestCleanupLogsShutdownErrorsAtDebug(t *testing.T) { //nolint:paralleltest // captures the package-global logger; parallel runs would interleave log capture
 	buf := swapDebugLogger(t)
 
 	container, cleanup := New()
@@ -51,7 +51,7 @@ func TestCleanupLogsShutdownErrorsAtDebug(t *testing.T) {
 }
 
 // TestCleanupSilentWhenNoShutdownErrors keeps the happy path log-free.
-func TestCleanupSilentWhenNoShutdownErrors(t *testing.T) {
+func TestCleanupSilentWhenNoShutdownErrors(t *testing.T) { //nolint:paralleltest // captures the package-global logger; parallel runs would interleave log capture
 	buf := swapDebugLogger(t)
 
 	container, cleanup := New()

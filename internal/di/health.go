@@ -111,7 +111,7 @@ type HealthSummary struct {
 
 // Summarize reduces a report to counts for exit-code decisions.
 func Summarize(entries []HealthEntry) HealthSummary {
-	summary := HealthSummary{Total: len(entries)}
+	summary := HealthSummary{Total: len(entries), Unhealthy: 0}
 
 	for _, entry := range entries {
 		if !entry.Healthy() {

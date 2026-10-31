@@ -13,6 +13,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Static test errors (err113: no dynamic error construction in tests).
+var (
+	errNixProbeFailed = errors.New("nix probe failed")
+	errSummaryBoom    = errors.New("boom")
+)
+
 // newRegisteredContainer builds a container with all production services.
 func newRegisteredContainer(t *testing.T) (*Container, func()) {
 	t.Helper()
@@ -56,7 +62,7 @@ func TestHealthReport_MergesHealthCheckFailureIntoAlias(t *testing.T) {
 	container, cleanup := newRegisteredContainer(t)
 	defer cleanup()
 
-	unhealthy := &fakeNixStore{healthErr: errors.New("nix probe failed")}
+	unhealthy := &fakeNixStore{healthErr: errNixProbeFailed}
 	do.Override(container.Injector(), func(i do.Injector) (adapters.NixStore, error) {
 		return unhealthy, nil
 	})
@@ -83,7 +89,7 @@ func TestSummarize_CountsUnhealthy(t *testing.T) {
 
 	entries := []HealthEntry{
 		{Service: "a"},
-		{Service: "b", Error: errors.New("boom")},
+		{Service: "b", Error: errSummaryBoom},
 		{Service: "c"},
 	}
 

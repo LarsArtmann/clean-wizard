@@ -7,8 +7,8 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
-	"github.com/samber/do/v2"
 	errorfamily "github.com/larsartmann/go-error-family"
+	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

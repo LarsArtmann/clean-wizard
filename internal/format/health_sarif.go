@@ -35,7 +35,7 @@ func HealthOutcomesToSARIF(outcomes []HealthOutcome) ([]byte, error) {
 		family := errorfamily.Classify(outcome.Err)
 
 		f, err := finding.NewBuilder(
-			finding.RuleName(outcome.Service + ".unhealthy"),
+			finding.RuleName(outcome.Service+".unhealthy"),
 			finding.ToolName(sarifToolName),
 			outcome.Err.Error(),
 			finding.SeverityError,

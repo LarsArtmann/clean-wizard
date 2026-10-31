@@ -2,8 +2,8 @@ package commands
 
 import (
 	"context"
-	"encoding/json/v2"
 	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"os"
 

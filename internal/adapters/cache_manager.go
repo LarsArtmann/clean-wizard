@@ -35,7 +35,7 @@ type CacheManager struct {
 // cleanup loop.
 func NewCacheManager() *CacheManager {
 	cache := otter.Must(&otter.Options[string, *cacheItem]{
-		MaximumSize: DefaultCacheMaximumSize,
+		MaximumSize:      DefaultCacheMaximumSize,
 		ExpiryCalculator: otter.ExpiryWriting[string, *cacheItem](DefaultCacheExpiry),
 	})
 
