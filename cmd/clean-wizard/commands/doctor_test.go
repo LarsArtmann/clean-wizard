@@ -56,7 +56,7 @@ func TestEnforceCleanHealthGate_BlocksOnUnhealthyContainer(t *testing.T) {
 	err := enforceCleanHealthGate(t.Context(), container.Injector())
 
 	require.Error(t, err)
-	assert.ErrorIs(t, err, di.ErrDoctorUnhealthy)
+	assert.ErrorIs(t, err, ErrDoctorUnhealthy)
 	assert.Equal(t, errorfamily.Infrastructure, errorfamily.Classify(err))
 	assert.Equal(t, 69, errorfamily.ExitCode(err))
 }
@@ -76,7 +76,7 @@ func TestBuildDoctorJSON_ShapeSnapshot(t *testing.T) {
 
 	report := []di.HealthEntry{
 		{Service: "cleaner.nix"},
-		{Service: "adapters.NixStore", Error: di.ErrDoctorUnhealthy},
+		{Service: "adapters.NixStore", Error: ErrDoctorUnhealthy},
 	}
 
 	data, err := buildDoctorJSON(report)

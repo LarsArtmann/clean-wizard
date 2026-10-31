@@ -99,6 +99,17 @@ func TestRegisterAllServices_RegistersCleanerRegistry(t *testing.T) {
 	assert.NotNil(t, c)
 }
 
+// OverrideRegistry replaces the cleaner registry in the DI container with a
+// test double. It exists only for tests, so it lives in the test build.
+func OverrideRegistry(injector do.Injector, replacement *cleaner.Registry) {
+	do.OverrideValue(injector, replacement)
+}
+
+// OverrideSettings replaces the run settings in the DI container with test values.
+func OverrideSettings(injector do.Injector, settings RunSettings) {
+	do.OverrideValue(injector, settings)
+}
+
 func TestOverrideRegistry_ReplacesRegistry(t *testing.T) {
 	t.Parallel()
 

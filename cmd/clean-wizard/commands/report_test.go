@@ -27,6 +27,7 @@ func TestCleanReportJSONExclusivity(t *testing.T) {
 		false,
 		true,
 		true,
+		false,
 		"",
 		"",
 		"",

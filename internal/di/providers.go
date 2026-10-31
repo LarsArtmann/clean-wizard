@@ -35,12 +35,16 @@ var CleanerPackage = do.Package( //nolint:gochecknoglobals
 // resolveProfileOperationSettings returns the merged OperationSettings of the
 // selected profile. When no profile was selected (preset or interactive cleaner
 // selection) it returns nil so cleaners fall back to their factory defaults.
+//
+// NOTE (domain semantics, do not "fix"): the (nil, nil) return is the
+// deliberate "no profile selected" signal, not a missing-value error — nil
+// settings is the factory's documented default input.
 func resolveProfileOperationSettings(
 	injector do.Injector,
 	settings RunSettings,
 ) (*operations.OperationSettings, error) {
 	if settings.Profile == "" {
-		return nil, nil
+		return nil, nil //nolint:nilnil // "no profile" is a valid state, not a missing value — nil settings means factory defaults
 	}
 
 	cfg, err := do.Invoke[*types.Config](injector)
