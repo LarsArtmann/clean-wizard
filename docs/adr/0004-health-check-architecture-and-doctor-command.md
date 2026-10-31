@@ -14,7 +14,7 @@ health command. samber/do v2.1.0 ships the whole subsystem unused.
 
 Two design questions had to be answered before wiring anything:
 
-1. What does "healthy" mean for a *cleaner-targeted* CLI, where
+1. What does "healthy" mean for a _cleaner-targeted_ CLI, where
    `Cleaner.IsAvailable(ctx)` already reports tool availability?
 2. Which services implement health checks, and how are failures surfaced?
 
@@ -22,13 +22,13 @@ Two design questions had to be answered before wiring anything:
 
 ### 1. Two probes, two domains (do not merge)
 
-| Probe                       | Domain           | `false`/error means                | CLI effect        |
-| --------------------------- | ---------------- | ---------------------------------- | ----------------- |
-| `Cleaner.IsAvailable(ctx)`  | scan outcome     | "this cleaner is not applicable"   | cleaner *skipped*, exit 0 |
-| `adapters.X.HealthCheck(ctx)` | container fault | "the system is broken"             | classified Infrastructure, exit 69 |
+| Probe                         | Domain          | `false`/error means              | CLI effect                         |
+| ----------------------------- | --------------- | -------------------------------- | ---------------------------------- |
+| `Cleaner.IsAvailable(ctx)`    | scan outcome    | "this cleaner is not applicable" | cleaner _skipped_, exit 0          |
+| `adapters.X.HealthCheck(ctx)` | container fault | "the system is broken"           | classified Infrastructure, exit 69 |
 
 Both happen to probe `nix --version` today, but they answer different
-questions: availability is a *result*; a failed health check is an *error*.
+questions: availability is a _result_; a failed health check is an _error_.
 Documented in `docs/DOMAIN_LANGUAGE.md` (IsAvailable / HealthCheck / Doctor).
 
 ### 2. Health checks live on adapters, and lazy services must be materialized
@@ -37,8 +37,8 @@ Documented in `docs/DOMAIN_LANGUAGE.md` (IsAvailable / HealthCheck / Doctor).
   `ContextHealthchecker` mirror so `internal/adapters` stays free of the DI
   library; `internal/di` asserts the do-side contract).
 - **Critical samber/do semantics:** `serviceLazy.healthcheck` returns nil when
-  the service was never invoked — an unbuilt container reports *everything
-  healthy*. `di.HealthReport` therefore materializes every service
+  the service was never invoked — an unbuilt container reports _everything
+  healthy_. `di.HealthReport` therefore materializes every service
   (config, run settings, NixStore alias, registry, all 13 cleaners) before
   running `injector.HealthCheckWithContext`. Construction failures merge into
   the failing service's entry.
@@ -96,9 +96,9 @@ itself a failure.
 
 `internal/di/bench_test.go`, AMD RYZEN AI MAX+ 395, go1.27, `-benchtime 30x`:
 
-| Benchmark                       | ns/op   | What it measures                                        |
-| ------------------------------- | ------- | ------------------------------------------------------- |
-| `BenchmarkRegisterAllServices`  | ~86k    | container create + register all lazy services           |
+| Benchmark                          | ns/op | What it measures                                        |
+| ---------------------------------- | ----- | ------------------------------------------------------- |
+| `BenchmarkRegisterAllServices`     | ~86k  | container create + register all lazy services           |
 | `BenchmarkRegistryMaterialization` | ~275k | registration + resolve all 13 cleaners + registry build |
 
 Both are sub-millisecond: the lazy per-cleaner registry costs nothing
@@ -110,12 +110,12 @@ magnitude.
 
 Baseline (audit §6) → post-remediation:
 
-| Quality           | Before | After | Why                                                                            |
-| ----------------- | ------ | ----- | ------------------------------------------------------------------------------ |
-| Service-Oriented  | 6/10   | 9/10  | Every DI service has a consumer; the container matches documented architecture |
-| Composable        | 8/10   | 9/10  | Store seam is real (do.Override + fake), factory takes dependencies explicitly |
-| Resilient         | 7/10   | 8/10  | Health checks classified; clean can gate on container health; honest estimates |
-| Self-Health       | 1/10   | 8/10  | doctor (human/json/sarif, exit 69), Healthchecker impls, pre-run gate          |
+| Quality          | Before | After | Why                                                                            |
+| ---------------- | ------ | ----- | ------------------------------------------------------------------------------ |
+| Service-Oriented | 6/10   | 9/10  | Every DI service has a consumer; the container matches documented architecture |
+| Composable       | 8/10   | 9/10  | Store seam is real (do.Override + fake), factory takes dependencies explicitly |
+| Resilient        | 7/10   | 8/10  | Health checks classified; clean can gate on container health; honest estimates |
+| Self-Health      | 1/10   | 8/10  | doctor (human/json/sarif, exit 69), Healthchecker impls, pre-run gate          |
 
 Not 10/10: doctor covers adapter-level health only (per-cleaner deep probes
 remain scan-domain), and the CLI framework (cobra) is not yet cmdguard

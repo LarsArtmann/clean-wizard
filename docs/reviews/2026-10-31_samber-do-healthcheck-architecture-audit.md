@@ -11,12 +11,12 @@
 
 **Are we using samber/do v2 + health checks superbly? No — the DI core is genuinely good, but health checks do not exist, and a third of the registered services are dead code.**
 
-| Quality          | Score | One-line verdict                                                                    |
-| ---------------- | ----- | ----------------------------------------------------------------------------------- |
-| Service-Oriented | 6/10  | Right patterns, but only 2 of 6 commands use DI and 3 of 4 adapter services are dead |
-| Composable       | 8/10  | Textbook: `do.Package`, named services, `do.MustAs` aliasing, shared factory table  |
+| Quality          | Score | One-line verdict                                                                      |
+| ---------------- | ----- | ------------------------------------------------------------------------------------- |
+| Service-Oriented | 6/10  | Right patterns, but only 2 of 6 commands use DI and 3 of 4 adapter services are dead  |
+| Composable       | 8/10  | Textbook: `do.Package`, named services, `do.MustAs` aliasing, shared factory table    |
 | Resilient        | 7/10  | Classified errors + retries at execution layer; but zero `Shutdowner` implementations |
-| Self-Health      | 1/10  | Zero `Healthchecker` impls, zero `injector.HealthCheck()` calls, no doctor command  |
+| Self-Health      | 1/10  | Zero `Healthchecker` impls, zero `injector.HealthCheck()` calls, no doctor command    |
 
 **Headline answers:**
 
@@ -30,15 +30,15 @@
 
 All `do` imports live in `internal/di/` (9 files). Production surface:
 
-| File               | Role                                                                       |
-| ------------------ | -------------------------------------------------------------------------- |
-| `container.go`     | `Container` wrapper; `New() (*Container, func())`; `Shutdown()`             |
-| `providers.go`     | `RegisterAllServices` + `CleanerPackage` var + profile-settings resolution |
-| `adapters.go`      | `AdaptersPackage` — 4 providers + `do.MustAs` aliases + 2 accessors        |
-| `cleaners.go`      | Per-cleaner named services (`cleaner.<name>`) + registry-from-providers     |
-| `accessors.go`     | Typed accessors: `Config`, `Settings`, `CleanerRegistry`, `Cleaner`        |
-| `options.go`       | `RunSettings` struct (eager value)                                         |
-| `test_helpers.go`  | `OverrideRegistry`/`OverrideSettings` (⚠ see F-6)                          |
+| File              | Role                                                                       |
+| ----------------- | -------------------------------------------------------------------------- |
+| `container.go`    | `Container` wrapper; `New() (*Container, func())`; `Shutdown()`            |
+| `providers.go`    | `RegisterAllServices` + `CleanerPackage` var + profile-settings resolution |
+| `adapters.go`     | `AdaptersPackage` — 4 providers + `do.MustAs` aliases + 2 accessors        |
+| `cleaners.go`     | Per-cleaner named services (`cleaner.<name>`) + registry-from-providers    |
+| `accessors.go`    | Typed accessors: `Config`, `Settings`, `CleanerRegistry`, `Cleaner`        |
+| `options.go`      | `RunSettings` struct (eager value)                                         |
+| `test_helpers.go` | `OverrideRegistry`/`OverrideSettings` (⚠ see F-6)                          |
 
 **Consumers:** exactly two commands build a container — `clean` (`cmd/clean-wizard/commands/clean.go:172-183`) and `scan` (`scan.go:151-162`). The other four commands (`init`, `profile`, `config`, `githistory`) never touch DI; `githistory` constructs its cleaner directly (`githistory.go:283`, `githistory.go:587`).
 
@@ -48,14 +48,14 @@ All `do` imports live in `internal/di/` (9 files). Production surface:
 
 ## 3. DO-1 → DO-6 Anti-Pattern Scorecard
 
-| ID    | Rule                                             | Verdict    | Evidence                                                                                                                                                   |
-| ----- | ------------------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DO-1  | No `Must*` in runtime paths                      | ✅ PASS    | Production accessors use `do.Invoke`/`do.InvokeNamed` with error propagation (`accessors.go`, `cleaners.go`). `do.MustAs` fires only at registration setup (`adapters.go:24,29,34,39`) — setup, not runtime. `do.MustInvoke` appears only in `container_shutdown_test.go:43`. |
-| DO-2  | Every `do.New()` has a reachable `Shutdown()`    | ✅ PASS    | Single production `do.New()` (`container.go:29`), wrapped in the returned cleanup fn; both commands `defer cleanup()` (`clean.go:173`, `scan.go:152`). Test injectors either defer `Shutdown` (`providers_profile_test.go`) or hold no instantiated services (`di_test.go:146,155` — error-path tests). |
-| DO-3  | No `Override*` outside tests                     | ⚠️ MINOR   | `OverrideRegistry`/`OverrideSettings` (`test_helpers.go:11,17`) wrap `do.OverrideValue` in a **non-test file**, and have no consumers outside `internal/di`'s own tests. Move to `_test.go` or delete (F-6). |
-| DO-4  | No package-level injector                        | ✅ PASS    | No global `do.Injector` anywhere; a fresh container per command invocation, passed by parameter.                                                            |
-| DO-5  | No `Invoke` inside loops                         | ✅ BY DESIGN | `cleaners.go:54` invokes named services in a loop — but each iteration resolves a *distinct* named service; hoisting is impossible and this is the intended aggregation pattern. Documented here so a future linter run doesn't "fix" it. |
-| DO-6  | Shutdown is self-contained, no cross-service access | ✅ PASS (trivially) | No service implements a `Shutdowner*` interface yet, so nothing can violate it. The contract is already established and tested (`container_shutdown_test.go` failingShutdowner path) — future implementations must keep shutdown local. |
+| ID   | Rule                                                | Verdict             | Evidence                                                                                                                                                                                                                                                                                                |
+| ---- | --------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DO-1 | No `Must*` in runtime paths                         | ✅ PASS             | Production accessors use `do.Invoke`/`do.InvokeNamed` with error propagation (`accessors.go`, `cleaners.go`). `do.MustAs` fires only at registration setup (`adapters.go:24,29,34,39`) — setup, not runtime. `do.MustInvoke` appears only in `container_shutdown_test.go:43`.                           |
+| DO-2 | Every `do.New()` has a reachable `Shutdown()`       | ✅ PASS             | Single production `do.New()` (`container.go:29`), wrapped in the returned cleanup fn; both commands `defer cleanup()` (`clean.go:173`, `scan.go:152`). Test injectors either defer `Shutdown` (`providers_profile_test.go`) or hold no instantiated services (`di_test.go:146,155` — error-path tests). |
+| DO-3 | No `Override*` outside tests                        | ⚠️ MINOR             | `OverrideRegistry`/`OverrideSettings` (`test_helpers.go:11,17`) wrap `do.OverrideValue` in a **non-test file**, and have no consumers outside `internal/di`'s own tests. Move to `_test.go` or delete (F-6).                                                                                            |
+| DO-4 | No package-level injector                           | ✅ PASS             | No global `do.Injector` anywhere; a fresh container per command invocation, passed by parameter.                                                                                                                                                                                                        |
+| DO-5 | No `Invoke` inside loops                            | ✅ BY DESIGN        | `cleaners.go:54` invokes named services in a loop — but each iteration resolves a _distinct_ named service; hoisting is impossible and this is the intended aggregation pattern. Documented here so a future linter run doesn't "fix" it.                                                               |
+| DO-6 | Shutdown is self-contained, no cross-service access | ✅ PASS (trivially) | No service implements a `Shutdowner*` interface yet, so nothing can violate it. The contract is already established and tested (`container_shutdown_test.go` failingShutdowner path) — future implementations must keep shutdown local.                                                                 |
 
 **Structural smells:** none. No service-locator passing (injector stops at the command boundary), no injector stored inside services.
 
@@ -81,7 +81,7 @@ All `do` imports live in `internal/di/` (9 files). Production surface:
 - `NotAvailableError` + `errorfamily.Classify` → Infrastructure → "skipped" classification (`internal/execution/results.go`).
 - `adapters.NixStore` knows how to detect the nix binary.
 
-**Gap analysis:** availability is discovered *lazily during scan*, per-cleaner, as a bool (no failure *reason* surfaced to the container), and never as a container-level, parallelizable, timeout-bounded health report. samber/do would give that for free: implement `HealthcheckerWithContext` on a small adapter wrapper, call `injector.HealthCheckWithContext(ctx)` once, and render the `map[string]error` — with per-service errors instead of bools, a global timeout, and exit-code integration via `errorfamily`.
+**Gap analysis:** availability is discovered _lazily during scan_, per-cleaner, as a bool (no failure _reason_ surfaced to the container), and never as a container-level, parallelizable, timeout-bounded health report. samber/do would give that for free: implement `HealthcheckerWithContext` on a small adapter wrapper, call `injector.HealthCheckWithContext(ctx)` once, and render the `map[string]error` — with per-service errors instead of bools, a global timeout, and exit-code integration via `errorfamily`.
 
 ### 4.4 Concrete design (recommended)
 
@@ -104,17 +104,17 @@ func (a *NixAdapter) HealthCheck(ctx context.Context) error {
 
 New command `clean-wizard doctor`: builds the container exactly like `clean`/`scan`, runs `HealthReport`, prints ✅/❌ per service, maps failures through `errorfamily.ExitCode` (Infrastructure → 69). JSON/SARIF output can reuse `format.FindingsToSARIF` with `category: health`.
 
-**Complementary, not redundant:** keep `Cleaner.IsAvailable` for scan semantics (a cleaner being unavailable is a *normal scan outcome*, not a system fault), and use DI health checks for *infrastructure* truth (binary present, HTTP reachability, config resolvable). The doctor command surfaces both: container health per service, plus per-cleaner availability with reasons.
+**Complementary, not redundant:** keep `Cleaner.IsAvailable` for scan semantics (a cleaner being unavailable is a _normal scan outcome_, not a system fault), and use DI health checks for _infrastructure_ truth (binary present, HTTP reachability, config resolvable). The doctor command surfaces both: container health per service, plus per-cleaner availability with reasons.
 
 ---
 
 ## 5. Finding: the DI adapter services are dead code
 
-This is the most important structural finding. The wiring *looks* like the documented architecture ("the nix cleaner consumes `adapters.NixStore`" — AGENTS.md), but the production path never resolves any of the four registered services:
+This is the most important structural finding. The wiring _looks_ like the documented architecture ("the nix cleaner consumes `adapters.NixStore`" — AGENTS.md), but the production path never resolves any of the four registered services:
 
 1. **Nix:** `factory.Nix` (`internal/cleaner/factory/factory.go:116-118`) calls `nix.NewNixCleaner(verbose, dryRun, ...)` → `NewNixCleanerWithStore(..., nil, ...)` → `store == nil` → constructs `adapters.NewNixAdapter(0, 0)` **inline** (`internal/cleaner/nix/nix.go:68-70`). The DI-registered `NixStore` service (`adapters.go:21-24`) is never invoked by any production code.
 2. **CacheManager, HTTPClient, RateLimiter:** registered + aliased (`adapters.go:26-39`), consumed by **nothing** — project-wide grep for `KeyValueCache`/`HTTPRequester`/`adapters.Limiter` outside `internal/adapters` + `internal/di` returns zero matches. The only references are `internal/di`'s own tests asserting the services exist.
-3. **Doc drift:** AGENTS.md says "the nix cleaner consumes `adapters.NixStore`, not `*NixAdapter`". Literally true (it consumes the *interface type*) but misleading — the *DI service* is bypassed via the nil-store fallback. The interface seam exists for tests (`NewNixCleanerWithStore` with a mock), not for DI.
+3. **Doc drift:** AGENTS.md says "the nix cleaner consumes `adapters.NixStore`, not `*NixAdapter`". Literally true (it consumes the _interface type_) but misleading — the _DI service_ is bypassed via the nil-store fallback. The interface seam exists for tests (`NewNixCleanerWithStore` with a mock), not for DI.
 
 **Why this matters more than usual:** dead DI services actively lie about the architecture. A reader (or future agent) assumes adapters are injected and swappable through the container, refactors accordingly, and gets burned. Either consume the services or delete the registrations.
 
@@ -156,7 +156,7 @@ Or cleaner: extend `factory.CleanerConstructorFunc` to accept resolved dependenc
 - ✅ Every resolution failure is wrapped with `errorfamily` (Rejection) with `di.*` codes (`accessors.go`, `cleaners.go`, `providers.go:48`) — DI failures get classified exit codes at the CLI boundary like every other error.
 - ✅ Retry + backoff live at the execution layer (`internal/execution/retry.go`), not the DI layer — correct placement.
 - ✅ Shutdown failure handling is thoughtful: logged at Debug, never masks command outcome, silent on happy path (`container.go:31-43`, both paths tested in `container_shutdown_test.go`).
-- ❌ No service implements any `Shutdowner*` — yet some hold resources: `HTTPClient` wraps a resty client (connection pool), `CacheManager` wraps an otter cache. For short-lived CLI processes this is benign, but the resilience story is incomplete: the container *can* shut things down gracefully and *nothing uses it* except tests.
+- ❌ No service implements any `Shutdowner*` — yet some hold resources: `HTTPClient` wraps a resty client (connection pool), `CacheManager` wraps an otter cache. For short-lived CLI processes this is benign, but the resilience story is incomplete: the container _can_ shut things down gracefully and _nothing uses it_ except tests.
 - ❌ Availability failures are discovered at scan time with bool granularity; no container-level health surface to fail fast before a run (§4).
 
 ### 6.4 Self-Health — 1/10
@@ -167,29 +167,29 @@ The subsystem exists in the library, the domain has availability primitives, the
 
 ## 7. Minor Findings
 
-| ID   | Severity | Finding                                                                                                                                                                |
-| ---- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F-1  | Info     | `CacheManager.cleanupInterval` (`cache_manager.go:32,49`) is stored and never used; `FlushExpired()` (`cache_manager.go:138-141`) is an empty body. Dead fields on a dead (in DI terms) service. |
-| F-2  | Info     | Lint `ireturn` warnings on accessors returning interfaces are **intentional and correct** for DI accessors (return the seam, not the impl). Accepted tradeoff — suppress with `//nolint:ireturn` + reason or configure exclusions. |
-| F-3  | Info     | `resolveProfileOperationSettings` returns `(nil, nil)` when no profile is selected (`providers.go:42-44`) — flagged `nilnil` by lint, but it is deliberate domain semantics (no profile → factory defaults). Document with a comment, don't "fix". |
-| F-4  | Low      | `do.MustAs` panics on misconfiguration. At registration time this is acceptable (DO-1 exception: setup paths), but `do.As` (error-returning) + a classified Rejection would make `RegisterAllServices`' error signature honest. |
-| F-5  | Low      | AGENTS.md adapter-pattern bullet needs a correction (§5.3): interface seam exists for tests, DI service bypassed in production.                                                            |
-| F-6  | Medium   | `test_helpers.go` ships `do.OverrideValue` wrappers in a production file with zero external consumers (DO-3 hygiene). Move into `di_test.go` or delete.                            |
-| F-7  | Low      | `RegisterAllServices` error return is constant `nil` — make it validate or simplify the signature.                                                                               |
+| ID  | Severity | Finding                                                                                                                                                                                                                                            |
+| --- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-1 | Info     | `CacheManager.cleanupInterval` (`cache_manager.go:32,49`) is stored and never used; `FlushExpired()` (`cache_manager.go:138-141`) is an empty body. Dead fields on a dead (in DI terms) service.                                                   |
+| F-2 | Info     | Lint `ireturn` warnings on accessors returning interfaces are **intentional and correct** for DI accessors (return the seam, not the impl). Accepted tradeoff — suppress with `//nolint:ireturn` + reason or configure exclusions.                 |
+| F-3 | Info     | `resolveProfileOperationSettings` returns `(nil, nil)` when no profile is selected (`providers.go:42-44`) — flagged `nilnil` by lint, but it is deliberate domain semantics (no profile → factory defaults). Document with a comment, don't "fix". |
+| F-4 | Low      | `do.MustAs` panics on misconfiguration. At registration time this is acceptable (DO-1 exception: setup paths), but `do.As` (error-returning) + a classified Rejection would make `RegisterAllServices`' error signature honest.                    |
+| F-5 | Low      | AGENTS.md adapter-pattern bullet needs a correction (§5.3): interface seam exists for tests, DI service bypassed in production.                                                                                                                    |
+| F-6 | Medium   | `test_helpers.go` ships `do.OverrideValue` wrappers in a production file with zero external consumers (DO-3 hygiene). Move into `di_test.go` or delete.                                                                                            |
+| F-7 | Low      | `RegisterAllServices` error return is constant `nil` — make it validate or simplify the signature.                                                                                                                                                 |
 
 ---
 
 ## 8. Prioritized Recommendations
 
-| Priority | Action                                                                                                                                                             | Effort  | Payoff                                                          |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- | --------------------------------------------------------------- |
-| **P0**   | Wire the adapter seam for real: nix provider resolves `adapters.NixStore` from DI (§5 fix sketch); decide consume-or-delete for CacheManager/HTTPClient/RateLimiter   | ~2h     | Kills the dead-service lie; makes the documented architecture true |
+| Priority | Action                                                                                                                                                                                                            | Effort    | Payoff                                                                          |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------- |
+| **P0**   | Wire the adapter seam for real: nix provider resolves `adapters.NixStore` from DI (§5 fix sketch); decide consume-or-delete for CacheManager/HTTPClient/RateLimiter                                               | ~2h       | Kills the dead-service lie; makes the documented architecture true              |
 | **P0**   | Implement `do.HealthcheckerWithContext` on `NixAdapter` (→ `nix --version` exec) and optionally `HTTPClient`; add `clean-wizard doctor` running `injector.HealthCheckWithContext` + `errorfamily.ExitCode` (§4.4) | ~half-day | The entire self-health story; fail-fast before runs; scriptable `doctor --json` |
-| **P1**   | Move `githistory` onto the DI/registry path                                                                                                                         | ~2h     | Service orientation becomes consistent across cleaner commands   |
-| **P1**   | Relocate/delete `OverrideRegistry`/`OverrideSettings` (F-6)                                                                                                         | 10min   | DO-3 hygiene                                                     |
-| **P2**   | Set `do.RootOptions.HealthCheckGlobalTimeout` when doctor lands; consider per-run health gate in `clean` (`--check-health` flag)                                      | ~1h     | Bounded, predictable health checks                               |
-| **P2**   | Implement `ShutdownerWithError` on `CacheManager`/`HTTPClient` (flush + close idle conns) so the tested shutdown contract has real users                             | ~1h     | Lifecycle completeness                                           |
-| **P2**   | Fix `RegisterAllServices` signature (F-7) + AGENTS.md doc drift (F-5)                                                                                               | 30min   | Honesty of the composition root                                  |
+| **P1**   | Move `githistory` onto the DI/registry path                                                                                                                                                                       | ~2h       | Service orientation becomes consistent across cleaner commands                  |
+| **P1**   | Relocate/delete `OverrideRegistry`/`OverrideSettings` (F-6)                                                                                                                                                       | 10min     | DO-3 hygiene                                                                    |
+| **P2**   | Set `do.RootOptions.HealthCheckGlobalTimeout` when doctor lands; consider per-run health gate in `clean` (`--check-health` flag)                                                                                  | ~1h       | Bounded, predictable health checks                                              |
+| **P2**   | Implement `ShutdownerWithError` on `CacheManager`/`HTTPClient` (flush + close idle conns) so the tested shutdown contract has real users                                                                          | ~1h       | Lifecycle completeness                                                          |
+| **P2**   | Fix `RegisterAllServices` signature (F-7) + AGENTS.md doc drift (F-5)                                                                                                                                             | 30min     | Honesty of the composition root                                                 |
 
 ---
 

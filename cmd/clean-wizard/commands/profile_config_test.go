@@ -21,7 +21,6 @@ func withTestConfigHome(t *testing.T) string {
 }
 
 func TestRunProfileListCommand_EmptyConfig(t *testing.T) {
-
 	withTestConfigHome(t)
 
 	err := runProfileListCommand(nil, nil)
@@ -30,7 +29,6 @@ func TestRunProfileListCommand_EmptyConfig(t *testing.T) {
 }
 
 func TestRunProfileShowCommand_RejectsMissingProfile(t *testing.T) {
-
 	withTestConfigHome(t)
 
 	err := runProfileShowCommand(nil, []string{"does-not-exist"}, false)
@@ -40,7 +38,6 @@ func TestRunProfileShowCommand_RejectsMissingProfile(t *testing.T) {
 }
 
 func TestRunProfileCreateAndDelete_RoundTrip(t *testing.T) {
-
 	configPath := withTestConfigHome(t)
 
 	err := runProfileCreateCommand(nil, nil, "test-profile", "created by test")
@@ -59,7 +56,6 @@ func TestRunProfileCreateAndDelete_RoundTrip(t *testing.T) {
 }
 
 func TestRunProfileDeleteCommand_RejectsMissingProfile(t *testing.T) {
-
 	withTestConfigHome(t)
 
 	err := runProfileDeleteCommand(nil, []string{"ghost"}, true)
@@ -69,7 +65,6 @@ func TestRunProfileDeleteCommand_RejectsMissingProfile(t *testing.T) {
 }
 
 func TestRunConfigShowCommand_MissingConfigFallsBackToDefaults(t *testing.T) {
-
 	withTestConfigHome(t)
 
 	err := runConfigShowCommand(nil, nil, false)
@@ -78,7 +73,6 @@ func TestRunConfigShowCommand_MissingConfigFallsBackToDefaults(t *testing.T) {
 }
 
 func TestRunConfigValidateCommand_MissingConfigFallsBackToDefaults(t *testing.T) {
-
 	withTestConfigHome(t)
 
 	err := runConfigValidateCommand(nil, nil, "")

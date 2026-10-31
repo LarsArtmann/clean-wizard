@@ -30,16 +30,16 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 
 ### 1. Nix Cleaner ❄️
 
-| Aspect                     | Status                 | Details                                                          |
-| -------------------------- | ---------------------- | ---------------------------------------------------------------- |
-| **Overall**                | ✅ FULLY_FUNCTIONAL    | Core feature, well-tested                                        |
-| **Availability Detection** | ✅ Working             | Checks for `nix` command                                         |
-| **Generation Listing**     | ⚠️ PARTIALLY_FUNCTIONAL | Returns mock data when Nix unavailable; real data when available |
-| **Generation Cleanup**     | ✅ Working             | Removes old generations, keeps current + N others                |
-| **Garbage Collection**     | ✅ Working             | Runs `nix-collect-garbage` after cleanup                         |
+| Aspect                     | Status                 | Details                                                                                                                                                                                            |
+| -------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Overall**                | ✅ FULLY_FUNCTIONAL    | Core feature, well-tested                                                                                                                                                                          |
+| **Availability Detection** | ✅ Working             | Checks for `nix` command                                                                                                                                                                           |
+| **Generation Listing**     | ⚠️ PARTIALLY_FUNCTIONAL | Returns mock data when Nix unavailable; real data when available                                                                                                                                   |
+| **Generation Cleanup**     | ✅ Working             | Removes old generations, keeps current + N others                                                                                                                                                  |
+| **Garbage Collection**     | ✅ Working             | Runs `nix-collect-garbage` after cleanup                                                                                                                                                           |
 | **Dry Run Mode**           | ✅ Working             | Honest estimates: dry-run reports items truthfully, marks reclaimable bytes Unknown (generation deletion frees profile links only; GC frees store paths and is measured before/after in real runs) |
-| **Size Estimation**        | ✅ Honest              | Fabricated 50MB/generation constant removed 2026-10-31; unknown sizes report `SizeEstimateStatusUnknown` instead of invented numbers |
-| **Configurability**        | ✅ Working             | Configurable keep count (default: 5)                             |
+| **Size Estimation**        | ✅ Honest              | Fabricated 50MB/generation constant removed 2026-10-31; unknown sizes report `SizeEstimateStatusUnknown` instead of invented numbers                                                               |
+| **Configurability**        | ✅ Working             | Configurable keep count (default: 5)                                                                                                                                                               |
 
 **Notes:**
 
@@ -405,22 +405,22 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 
 ## Architecture Highlights
 
-| Pattern                    | Status              | Details                                                  |
-| -------------------------- | ------------------- | -------------------------------------------------------- |
-| **Registry Pattern**       | ✅ FULLY_FUNCTIONAL | Thread-safe cleaner registry                             |
-| **Factory Functions**      | ✅ FULLY_FUNCTIONAL | `DefaultRegistryWithConfig(verbose, dryRun)`             |
-| **Result Type**            | ✅ FULLY_FUNCTIONAL | Generic `result.Result[T]` type                          |
+| Pattern                    | Status              | Details                                                                                                                                            |
+| -------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Registry Pattern**       | ✅ FULLY_FUNCTIONAL | Thread-safe cleaner registry                                                                                                                       |
+| **Factory Functions**      | ✅ FULLY_FUNCTIONAL | `DefaultRegistryWithConfig(verbose, dryRun)`                                                                                                       |
+| **Result Type**            | ✅ FULLY_FUNCTIONAL | Generic `result.Result[T]` type                                                                                                                    |
 | **Adapter Pattern**        | ✅ FULLY_FUNCTIONAL | Nix adapter via DI interface alias (`adapters.NixStore`); HTTP/Cache/RateLimiter interfaces exist unregistered until a consumer appears (ADR-0003) |
-| **Middleware**             | ✅ FULLY_FUNCTIONAL | Validation middleware                                    |
-| **Type-Safe Enums**        | ✅ FULLY_FUNCTIONAL | Compile-time enum safety (19 enums, 27 CacheType values) |
-| **Dependency Injection**   | ✅ FULLY_FUNCTIONAL | `samber/do v2` DI container with typed accessors         |
-| **Workflow Orchestration** | ✅ FULLY_FUNCTIONAL | `Azure/go-workflow` DAG engine with parallel execution   |
-| **Error Classification**   | ✅ FULLY_FUNCTIONAL | `go-error-family` 5-family behavioral classification     |
-| **Retry Support**          | ✅ FULLY_FUNCTIONAL | Exponential backoff with `RetryProfile` presets          |
-| **CLI Exit Codes**         | ✅ FULLY_FUNCTIONAL | BSD sysexits via `errorfamily.ExitCode()`                |
-| **AgeBasedCleaner**        | ✅ FULLY_FUNCTIONAL | Interface for age-based filtering                        |
-| **Parallel Execution**     | ✅ FULLY_FUNCTIONAL | Concurrent cleaner execution via workflow DAG            |
-| **Metrics Collection**     | ✅ FULLY_FUNCTIONAL | Observability and performance tracking                   |
+| **Middleware**             | ✅ FULLY_FUNCTIONAL | Validation middleware                                                                                                                              |
+| **Type-Safe Enums**        | ✅ FULLY_FUNCTIONAL | Compile-time enum safety (19 enums, 27 CacheType values)                                                                                           |
+| **Dependency Injection**   | ✅ FULLY_FUNCTIONAL | `samber/do v2` DI container with typed accessors                                                                                                   |
+| **Workflow Orchestration** | ✅ FULLY_FUNCTIONAL | `Azure/go-workflow` DAG engine with parallel execution                                                                                             |
+| **Error Classification**   | ✅ FULLY_FUNCTIONAL | `go-error-family` 5-family behavioral classification                                                                                               |
+| **Retry Support**          | ✅ FULLY_FUNCTIONAL | Exponential backoff with `RetryProfile` presets                                                                                                    |
+| **CLI Exit Codes**         | ✅ FULLY_FUNCTIONAL | BSD sysexits via `errorfamily.ExitCode()`                                                                                                          |
+| **AgeBasedCleaner**        | ✅ FULLY_FUNCTIONAL | Interface for age-based filtering                                                                                                                  |
+| **Parallel Execution**     | ✅ FULLY_FUNCTIONAL | Concurrent cleaner execution via workflow DAG                                                                                                      |
+| **Metrics Collection**     | ✅ FULLY_FUNCTIONAL | Observability and performance tracking                                                                                                             |
 
 ---
 

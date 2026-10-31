@@ -7,26 +7,26 @@ Every term below should mean the **same thing** to everyone who reads it.
 
 ## Glossary
 
-| Term              | Definition                                                                                            | Context                                   |
-| ----------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| Cleaner           | A unit that cleans a specific target (Nix store, Homebrew cache, Go build cache, etc.)                | Core abstraction; 13 registered           |
-| Registry          | Thread-safe map of cleaner names to instances; resolved from the DI container                         | `internal/cleaner/registry.go`            |
-| Workflow          | A DAG of cleaning steps compiled from selected cleaners and executed in parallel by go-workflow       | `internal/execution/workflow.go`          |
-| Step              | A single cleaner's execution within a workflow; produces a `StepResult`                               | `internal/execution/results.go`           |
-| Scan              | Non-destructive estimation pass: discovers available cleaners and estimates reclaimable space         | `scan` command                            |
-| Clean             | Destructive pass: executes selected cleaners to reclaim space                                         | `clean` command                           |
-| Dry-Run           | Preview mode: no files are deleted; cleaners report what they _would_ clean                           | `--dry-run` flag                          |
-| CacheType         | Enum identifying a specific cache kind (27 values: Spotlight, Xcode, GOCACHE, Pip, NixCache, etc.)    | `internal/domain/operation_settings.go`   |
-| OperationType     | Enum identifying a cleaner category (Nix, Homebrew, Docker, Go, Cargo, etc.)                          | `internal/domain/operation_types.go`      |
-| OperationSettings | Per-cleaner configuration struct (cache types, age thresholds, keep counts, paths)                    | `internal/domain/operation_settings.go`   |
-| RunSettings       | Per-invocation settings (verbose, dry-run, max concurrency) injected via DI                           | `internal/di/options.go`                  |
-| RetryProfile      | Preset retry configuration (Default, Aggressive, Conservative, None) controlling backoff and attempts | `internal/execution/retry.go`             |
-| ErrorFamily       | Behavioral error classification (Rejection, Conflict, Transient, Corruption, Infrastructure)          | `go-error-family` library                 |
-| NotAvailableError | Typed error indicating a cleaner's target tool is not installed; classifies as Infrastructure         | `internal/cleaner/cleaner.go`             |
-| ValidationError   | Typed error for invalid configuration or input; classifies as Rejection                               | `internal/domain/operation_validation.go` |
-| IsAvailable       | Scan-domain availability probe on a cleaner: false means the cleaner is *skipped* (a result, exit 0)  | `Cleaner.IsAvailable(ctx)`                |
-| HealthCheck       | Container-domain fault probe on a DI service: error means the system is *unhealthy* (exit 69)         | `adapters.NixAdapter.HealthCheck`, `doctor` |
-| Doctor            | Health surface: materializes every DI service, runs container health checks, reports per-service      | `doctor` command, `di.HealthReport`       |
+| Term              | Definition                                                                                            | Context                                     |
+| ----------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Cleaner           | A unit that cleans a specific target (Nix store, Homebrew cache, Go build cache, etc.)                | Core abstraction; 13 registered             |
+| Registry          | Thread-safe map of cleaner names to instances; resolved from the DI container                         | `internal/cleaner/registry.go`              |
+| Workflow          | A DAG of cleaning steps compiled from selected cleaners and executed in parallel by go-workflow       | `internal/execution/workflow.go`            |
+| Step              | A single cleaner's execution within a workflow; produces a `StepResult`                               | `internal/execution/results.go`             |
+| Scan              | Non-destructive estimation pass: discovers available cleaners and estimates reclaimable space         | `scan` command                              |
+| Clean             | Destructive pass: executes selected cleaners to reclaim space                                         | `clean` command                             |
+| Dry-Run           | Preview mode: no files are deleted; cleaners report what they _would_ clean                           | `--dry-run` flag                            |
+| CacheType         | Enum identifying a specific cache kind (27 values: Spotlight, Xcode, GOCACHE, Pip, NixCache, etc.)    | `internal/domain/operation_settings.go`     |
+| OperationType     | Enum identifying a cleaner category (Nix, Homebrew, Docker, Go, Cargo, etc.)                          | `internal/domain/operation_types.go`        |
+| OperationSettings | Per-cleaner configuration struct (cache types, age thresholds, keep counts, paths)                    | `internal/domain/operation_settings.go`     |
+| RunSettings       | Per-invocation settings (verbose, dry-run, max concurrency) injected via DI                           | `internal/di/options.go`                    |
+| RetryProfile      | Preset retry configuration (Default, Aggressive, Conservative, None) controlling backoff and attempts | `internal/execution/retry.go`               |
+| ErrorFamily       | Behavioral error classification (Rejection, Conflict, Transient, Corruption, Infrastructure)          | `go-error-family` library                   |
+| NotAvailableError | Typed error indicating a cleaner's target tool is not installed; classifies as Infrastructure         | `internal/cleaner/cleaner.go`               |
+| ValidationError   | Typed error for invalid configuration or input; classifies as Rejection                               | `internal/domain/operation_validation.go`   |
+| IsAvailable       | Scan-domain availability probe on a cleaner: false means the cleaner is _skipped_ (a result, exit 0)  | `Cleaner.IsAvailable(ctx)`                  |
+| HealthCheck       | Container-domain fault probe on a DI service: error means the system is _unhealthy_ (exit 69)         | `adapters.NixAdapter.HealthCheck`, `doctor` |
+| Doctor            | Health surface: materializes every DI service, runs container health checks, reports per-service      | `doctor` command, `di.HealthReport`         |
 
 ## Entities
 

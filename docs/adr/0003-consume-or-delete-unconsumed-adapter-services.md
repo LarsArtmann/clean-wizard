@@ -13,12 +13,12 @@ The 2026-10-31 samber/do health-check architecture audit
 finding F-2) found that 3 of the 4 DI-registered adapter services had zero
 consumers:
 
-| Service                    | Interface alias       | Production consumers |
-| -------------------------- | --------------------- | -------------------- |
-| `*adapters.NixAdapter`     | `adapters.NixStore`   | 0 (worse: the nix cleaner bypassed DI and constructed its adapter inline, `internal/cleaner/nix/nix.go:69`) |
-| `*adapters.CacheManager`   | `adapters.KeyValueCache` | 0 |
-| `*adapters.HTTPClient`     | `adapters.HTTPRequester` | 0 |
-| `*adapters.RateLimiter`    | `adapters.Limiter`    | 0 |
+| Service                  | Interface alias          | Production consumers                                                                                        |
+| ------------------------ | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `*adapters.NixAdapter`   | `adapters.NixStore`      | 0 (worse: the nix cleaner bypassed DI and constructed its adapter inline, `internal/cleaner/nix/nix.go:69`) |
+| `*adapters.CacheManager` | `adapters.KeyValueCache` | 0                                                                                                           |
+| `*adapters.HTTPClient`   | `adapters.HTTPRequester` | 0                                                                                                           |
+| `*adapters.RateLimiter`  | `adapters.Limiter`       | 0                                                                                                           |
 
 A DI container that registers services nobody resolves is not an
 architecture — it is a claim about an architecture. Docs said

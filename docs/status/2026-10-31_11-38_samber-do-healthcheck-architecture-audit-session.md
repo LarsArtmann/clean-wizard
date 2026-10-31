@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The question was *"Are we using samber/do v2 + health checks superbly?"* The honest answer: **the DI core is genuinely well-built (DO-1/2/4/6 all pass, lifecycle tested), but health checks are 0% wired, and 3 of 4 registered adapter services are dead code that misrepresents the architecture.** The audit turned up one systemic lie (the adapter-pattern-via-DI claim), one missing subsystem (the entire samber/do health API), and a prioritized fix path. Findings are ticketed; no production code was changed this session — by design (audit deliverable), but the gap between "found" and "fixed" is now the main outstanding work.
+The question was _"Are we using samber/do v2 + health checks superbly?"_ The honest answer: **the DI core is genuinely well-built (DO-1/2/4/6 all pass, lifecycle tested), but health checks are 0% wired, and 3 of 4 registered adapter services are dead code that misrepresents the architecture.** The audit turned up one systemic lie (the adapter-pattern-via-DI claim), one missing subsystem (the entire samber/do health API), and a prioritized fix path. Findings are ticketed; no production code was changed this session — by design (audit deliverable), but the gap between "found" and "fixed" is now the main outstanding work.
 
 Scores delivered: Service-Oriented 6/10 · Composable 8/10 · Resilient 7/10 · Self-Health 1/10.
 
@@ -16,28 +16,28 @@ Scores delivered: Service-Oriented 6/10 · Composable 8/10 · Resilient 7/10 · 
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-| - | ---- | -------- |
-| 1 | Skill-driven audit methodology loaded and followed (`samber-do-best-practices` SKILL.md, DO-1→DO-6 checklist, quick reference) | Session start |
-| 2 | Complete inventory of all `do`-importing files (9, all in `internal/di/`) and all consumers (only `clean.go`, `scan.go`) | `rg` sweeps, §2 of report |
-| 3 | DO-1→DO-6 scorecard with per-rule evidence: DO-1/2/4/6 PASS, DO-3 MINOR (Override helpers in production file, zero external consumers), DO-5 by-design (documented, don't fix) | Report §3 |
-| 4 | samber/do v2.1.0 health API verified **from module source**, not docs: `Healthchecker`, `HealthcheckerWithContext`, `Scope.HealthCheck[WithContext]` (parallel, `map[string]error`, `HealthCheckGlobalTimeout`), `do.HealthCheck[T]` | `di_lifecycle.go`, `scope.go` reads |
-| 5 | Health check audit: **zero** `Healthchecker` impls, zero `injector.HealthCheck()` calls, no doctor/health command (`main.go:18-23` = 6 commands, none health-related) | Report §4 |
-| 6 | Smoking gun confirmed: factory `Nix` → `NewNixCleaner` → `NewNixCleanerWithStore(..., nil, ...)` → inline `adapters.NewNixAdapter(0,0)` bypasses the DI-registered `NixStore` (`internal/cleaner/nix/nix.go:68-70`); `KeyValueCache`/`HTTPRequester`/`Limiter` have zero consumers project-wide | Report §5 |
-| 7 | Detailed audit report written: 201 lines, scorecard, findings F-1→F-7, prioritized recommendations P0/P1/P2 with effort estimates, concrete code sketches for the doctor command and adapter-seam fix | `docs/reviews/2026-10-31_samber-do-healthcheck-architecture-audit.md` |
-| 8 | AGENTS.md doc drift fixed on sight: adapter-pattern bullet now states the interface seam is test-only and DI services are unresolved; new bullet records that health checks are unwired | `AGENTS.md` Architecture Patterns section |
-| 9 | TODO items #33 (wire adapter seam, HIGH/MED), #34 (doctor command, HIGH/MED), #35 (githistory → DI path, MED/MED), #36 (Override helpers relocation, LOW/LOW) filed with source column | `TODO_LIST.md` |
-| 10 | Verification: `GOEXPERIMENT=jsonv2 go build ./...` + `go test ./... -short` both green (exit 0), including all 11 `internal/di` tests (registration, overrides, error paths, shutdown-logging both paths) | Session end |
-| 11 | Quality assessment across the four asked dimensions with scores and per-dimension evidence (§6 of report) | Report |
+| #  | Item                                                                                                                                                                                                                                                                                            | Evidence                                                              |
+| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 1  | Skill-driven audit methodology loaded and followed (`samber-do-best-practices` SKILL.md, DO-1→DO-6 checklist, quick reference)                                                                                                                                                                  | Session start                                                         |
+| 2  | Complete inventory of all `do`-importing files (9, all in `internal/di/`) and all consumers (only `clean.go`, `scan.go`)                                                                                                                                                                        | `rg` sweeps, §2 of report                                             |
+| 3  | DO-1→DO-6 scorecard with per-rule evidence: DO-1/2/4/6 PASS, DO-3 MINOR (Override helpers in production file, zero external consumers), DO-5 by-design (documented, don't fix)                                                                                                                  | Report §3                                                             |
+| 4  | samber/do v2.1.0 health API verified **from module source**, not docs: `Healthchecker`, `HealthcheckerWithContext`, `Scope.HealthCheck[WithContext]` (parallel, `map[string]error`, `HealthCheckGlobalTimeout`), `do.HealthCheck[T]`                                                            | `di_lifecycle.go`, `scope.go` reads                                   |
+| 5  | Health check audit: **zero** `Healthchecker` impls, zero `injector.HealthCheck()` calls, no doctor/health command (`main.go:18-23` = 6 commands, none health-related)                                                                                                                           | Report §4                                                             |
+| 6  | Smoking gun confirmed: factory `Nix` → `NewNixCleaner` → `NewNixCleanerWithStore(..., nil, ...)` → inline `adapters.NewNixAdapter(0,0)` bypasses the DI-registered `NixStore` (`internal/cleaner/nix/nix.go:68-70`); `KeyValueCache`/`HTTPRequester`/`Limiter` have zero consumers project-wide | Report §5                                                             |
+| 7  | Detailed audit report written: 201 lines, scorecard, findings F-1→F-7, prioritized recommendations P0/P1/P2 with effort estimates, concrete code sketches for the doctor command and adapter-seam fix                                                                                           | `docs/reviews/2026-10-31_samber-do-healthcheck-architecture-audit.md` |
+| 8  | AGENTS.md doc drift fixed on sight: adapter-pattern bullet now states the interface seam is test-only and DI services are unresolved; new bullet records that health checks are unwired                                                                                                         | `AGENTS.md` Architecture Patterns section                             |
+| 9  | TODO items #33 (wire adapter seam, HIGH/MED), #34 (doctor command, HIGH/MED), #35 (githistory → DI path, MED/MED), #36 (Override helpers relocation, LOW/LOW) filed with source column                                                                                                          | `TODO_LIST.md`                                                        |
+| 10 | Verification: `GOEXPERIMENT=jsonv2 go build ./...` + `go test ./... -short` both green (exit 0), including all 11 `internal/di` tests (registration, overrides, error paths, shutdown-logging both paths)                                                                                       | Session end                                                           |
+| 11 | Quality assessment across the four asked dimensions with scores and per-dimension evidence (§6 of report)                                                                                                                                                                                       | Report                                                                |
 
 ## b) PARTIALLY DONE
 
-| # | Item | Done | Missing |
-| - | ---- | ---- | ------- |
-| 1 | Ticketing of audit findings | P0/P1 recommendations filed as TODO #33-36 | Minor findings F-1 (dead `cleanupInterval` field + empty `FlushExpired()`), F-4 (`do.MustAs` → error-returning `do.As`), F-7 (`RegisterAllServices` constant-nil error signature) exist **only in the report**, not in `TODO_LIST.md` — they will rot there |
-| 2 | DO-5 protection | Documented in the report (§3) so humans know it's intentional | No explanatory comment in `internal/di/cleaners.go:54` itself — a future agent or linter sweep without the report will "fix" the loop-`InvokeNamed` and break the aggregation |
-| 3 | Doc-drift cleanup | `AGENTS.md` corrected | `docs/ARCHITECTURE.md`, `docs/adapters.md`, `FEATURES.md` likely repeat the aspirational adapter claim — not checked this session (out of the audit's scope decision) |
-| 4 | Self-critique | Done (this section) | Improvements not yet applied (see e) |
+| # | Item                        | Done                                                          | Missing                                                                                                                                                                                                                                                     |
+| - | --------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | Ticketing of audit findings | P0/P1 recommendations filed as TODO #33-36                    | Minor findings F-1 (dead `cleanupInterval` field + empty `FlushExpired()`), F-4 (`do.MustAs` → error-returning `do.As`), F-7 (`RegisterAllServices` constant-nil error signature) exist **only in the report**, not in `TODO_LIST.md` — they will rot there |
+| 2 | DO-5 protection             | Documented in the report (§3) so humans know it's intentional | No explanatory comment in `internal/di/cleaners.go:54` itself — a future agent or linter sweep without the report will "fix" the loop-`InvokeNamed` and break the aggregation                                                                               |
+| 3 | Doc-drift cleanup           | `AGENTS.md` corrected                                         | `docs/ARCHITECTURE.md`, `docs/adapters.md`, `FEATURES.md` likely repeat the aspirational adapter claim — not checked this session (out of the audit's scope decision)                                                                                       |
+| 4 | Self-critique               | Done (this section)                                           | Improvements not yet applied (see e)                                                                                                                                                                                                                        |
 
 ## c) NOT STARTED
 
@@ -71,6 +71,7 @@ Nothing was destroyed this session — but two honest entries:
 Ordered by impact. Items 1-9 come directly from this session's findings; 10-14 from minors surfaced during it; 15+ are the pre-existing backlog rows this session touched or confirmed still open.
 
 **From this audit (do first):**
+
 1. Wire the nix provider to resolve `adapters.NixStore` from DI — makes the documented architecture true (TODO #33, ~2h)
 2. Consume-or-delete `CacheManager`/`HTTPClient`/`RateLimiter` registrations — kill dead DI services (#33 second half)
 3. Implement `do.HealthcheckerWithContext` on `NixAdapter` (exec `nix --version`, wrap `NotAvailableError` on failure)
@@ -140,4 +141,4 @@ Ordered by impact. Items 1-9 come directly from this session's findings; 10-14 f
 
 ---
 
-*Verification: build + short test suite green at session end; all file:line references re-checked against the working tree; no production code modified this session (AGENTS.md, TODO_LIST.md, and the report are the only changes).*
+_Verification: build + short test suite green at session end; all file:line references re-checked against the working tree; no production code modified this session (AGENTS.md, TODO_LIST.md, and the report are the only changes)._
