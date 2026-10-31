@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "threshold": 1,
+  "recordedAt": "2026-09-28T20:34:22.565930326Z",
+  "entries": [
+    {
+      "hash": "29b9879a4345c98f",
+      "files": [
+        "diagnose/rules_network.go",
+        "diagnose/postgres/rules_postgres.go"
+      ],
+      "tokens": 4
+    },
+    {
+      "hash": "c4cf23c2580ecbf2",
+      "files": [
+        "error.go",
+        "bridge/bridge.go"
+      ],
+      "tokens": 6
+    },
+    {
+      "hash": "f5aa721ca6b28b15",
+      "files": [
+        "diagnose/git/rules_git.go",
+        "diagnose/helpers.go"
+      ],
+      "tokens": 4
+    }
+  ]
+}

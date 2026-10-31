@@ -1,0 +1,151 @@
+# GoReleaser configuration
+# Documentation: https://goreleaser.com
+
+version: 2
+
+project_name: go-finding
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: go-finding
+    main: ./cmd/go-finding
+    binary: go-finding
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: windows
+        goarch: arm64
+    tags:
+      - netgo
+      - osusergo
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: default
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{- title .Os }}_{{- if eq .Arch "amd64" }}x86_64
+        {{- else if eq .Arch "386" }}i386
+        {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+signs:
+  - cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    args:
+      - sign-blob
+      - "--bundle=${signature}"
+      - "--yes"
+      - "${artifact}"
+    artifacts: all
+    output: true
+
+sboms:
+  - artifacts: archive
+
+brews:
+  - name: go-finding
+    skip_upload: true
+    homepage: "https://github.com/LarsArtmann/go-finding"
+    description: "Code finding tool for Go projects"
+    license: MIT
+    repository:
+      owner: LarsArtmann
+      name: homebrew-tap
+    directory: Formula
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@larsartmann.com
+    install: |
+      bin.install "go-finding"
+    test: |
+      system "#{bin}/go-finding --version"
+
+nix:
+  - name: go-finding
+    skip_upload: auto
+    repository:
+      owner: LarsArtmann
+      name: nur-packages
+    homepage: "https://github.com/LarsArtmann/go-finding"
+    description: "Code finding tool for Go projects"
+    license: mit
+    formatter: nixfmt
+    path: pkgs/go-finding/default.nix
+    install: |
+      mkdir -p $out/bin
+      cp -vr ./{{ .Binary }} $out/bin/go-finding
+
+nfpms:
+  - id: default
+    package_name: go-finding
+    file_name_template: "{{ .ConventionalFileName }}"
+    homepage: "https://github.com/LarsArtmann/go-finding"
+    description: "Code finding tool for Go projects"
+    license: MIT
+    maintainer: "Lars Artmann <lars@larsartmann.com>"
+    formats:
+      - deb
+      - rpm
+      - apk
+
+scoops:
+  - name: go-finding
+    skip_upload: true
+    repository:
+      owner: LarsArtmann
+      name: homebrew-tap
+    directory: Scoop
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@larsartmann.com
+    homepage: "https://github.com/LarsArtmann/go-finding"
+    description: "Code finding tool for Go projects"
+    license: MIT
+
+release:
+  github:
+    owner: LarsArtmann
+    name: go-finding
+  draft: false
+  prerelease: auto
+  name_template: "go-finding v{{.Version}}"

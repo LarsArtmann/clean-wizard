@@ -1,0 +1,26 @@
+# This repository is a published Go LIBRARY: the root package IS the public
+# API (github.com/larsartmann/go-error-family), imported by 50+ downstream
+# projects. Moving it into /pkg/ or /internal/ would change the import path —
+# a breaking restructure. The "flat" exclusion preset disables the layout
+# rules (root-package-files, root-main-go, cmd/internal/pkg-directory) that
+# reject a deliberately-flat library package. All other rule categories
+# (security, naming, documentation, configuration) stay active.
+#
+# NOTE: BuildFlow's embedded go-structure-linter snapshot ignores this file
+# (its provider predates project-config support), so go-structure-linter is
+# also skipped in .buildflow.yml. Run the CLI directly to use this config:
+#   go-structure-linter .
+presets:
+  - flat
+suppressions:
+  # The go directive is the MINIMUM version for consumers of a published
+  # library. Pinning it to the latest patch (1.26.7) would force every
+  # downstream module to that patch level for no language-feature need.
+  - rule: go-version
+    file: go.mod
+    reason: library go.mod declares a consumer-friendly minimum floor, not the dev toolchain
+  # MockCommandRunner is exported production API for test injection
+  # (documented in AGENTS.md), not a test fixture misplaced outside testdata/.
+  - rule: testdata-directory
+    file: diagnose/mock.go
+    reason: exported mock-injection API, not a test fixture

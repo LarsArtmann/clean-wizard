@@ -1,0 +1,117 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.html
+
+# Dependency directories
+vendor/
+node_modules/
+
+# Go workspace (committed — multi-module workspace for development)
+# go.work and go.work.sum are tracked for collaborative development
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+/coverage
+
+# Build artifacts
+/go-finding
+/govet
+/basic
+/builder
+/dist/
+
+# Generated docs
+/API.md
+
+# Profiling
+*.prof
+*.pdb
+
+# Benchmark regression tracking (temporary files only; baseline is committed)
+.bench-baseline.txt
+.bench-current.txt
+
+# Copy/paste detection report
+/report/jscpd-report.json
+
+# Sensitive files
+*.db
+*.prof
+*.pdb
+
+# Personal tool configs
+git-town.toml
+# Nix build output
+/result
+
+# Stray Go toolchain download (GOROOT fallback once dumped ./go here; trash it)
+/go/
+
+# Override buildflow-managed ignores: go.work is tracked for multi-module dev
+!go.work
+!go.work.sum
+
+# >>> buildflow-managed (.gitignore) >>>
+# Auto-managed by buildflow. Edit outside these markers; this block is regenerated on `buildflow --fix`.
+
+## Secrets and environment
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+## Databases
+*.db-shm
+*.db-wal
+
+## Operating systems
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+## Logs and temporaries
+*.log
+*.tmp
+*.temp
+
+## Buildflow artifacts
+audit-log.*
+workflow-audit-log.*
+.buildflow-workflow-baseline.json
+
+## Reports and coverage
+reports/
+
+## Go
+go.work
+go.work.sum
+
+## Nix
+result-*
+.envrc
+.direnv/
+# <<< buildflow-managed (.gitignore) <<<
+
+.buildflow-resume.json

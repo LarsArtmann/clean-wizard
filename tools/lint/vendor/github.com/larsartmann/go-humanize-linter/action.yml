@@ -1,0 +1,87 @@
+name: "go-humanize-linter"
+description: "Detect hand-rolled reimplementations of go-humanize in your Go code"
+branding:
+  icon: "search"
+  color: "blue"
+
+inputs:
+  path:
+    description: "Directory or package path to scan"
+    required: false
+    default: "."
+  enable:
+    description: "Comma-separated rule IDs to enable (e.g. H001,H003). Default: all enabled."
+    required: false
+    default: ""
+  disable:
+    description: "Comma-separated rule IDs to disable (e.g. H004)"
+    required: false
+    default: ""
+  format:
+    description: "Output format: text, json, or sarif"
+    required: false
+    default: "text"
+  min-confidence:
+    description: "Minimum confidence level to report: low, medium, high, full"
+    required: false
+    default: "low"
+  verify-suppressions:
+    description: "Report stale or misspelled //nolint:gohumanize directives"
+    required: false
+    default: "false"
+  save-baseline:
+    description: "Path to save the current findings as a baseline JSON file (for later --behavior-delta comparison). Empty disables."
+    required: false
+    default: ""
+  behavior-delta:
+    description: "Path to a previously saved baseline JSON file. The action exits non-zero if findings have been added or removed since the baseline. Empty disables."
+    required: false
+    default: ""
+  version:
+    description: "Version of go-humanize-linter to install (e.g. v0.4.0)"
+    required: false
+    default: "latest"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v7
+      with:
+        go-version: "1.27"
+
+    - name: Install go-humanize-linter
+      shell: bash
+      env:
+        GOEXPERIMENT: jsonv2
+      run: go install github.com/larsartmann/go-humanize-linter/cmd/go-humanize-linter@${{ inputs.version }}
+
+    - name: Run go-humanize-linter
+      shell: bash
+      env:
+        GOEXPERIMENT: jsonv2
+      run: |
+        args=()
+        if [ -n "${{ inputs.enable }}" ]; then
+          for id in $(echo "${{ inputs.enable }}" | tr ',' ' '); do
+            args+=(--enable "$id")
+          done
+        fi
+        if [ -n "${{ inputs.disable }}" ]; then
+          for id in $(echo "${{ inputs.disable }}" | tr ',' ' '); do
+            args+=(--disable "$id")
+          done
+        fi
+        args+=(--format "${{ inputs.format }}")
+        args+=(--min-confidence "${{ inputs.min-confidence }}")
+        if [ "${{ inputs.verify-suppressions }}" = "true" ]; then
+          args+=(--verify-suppressions)
+        fi
+        if [ -n "${{ inputs.save-baseline }}" ]; then
+          args+=(--save-baseline "${{ inputs.save-baseline }}")
+        fi
+        if [ -n "${{ inputs.behavior-delta }}" ]; then
+          args+=(--behavior-delta "${{ inputs.behavior-delta }}")
+        fi
+        args+=("${{ inputs.path }}")
+        go-humanize-linter "${args[@]}"

@@ -1,0 +1,122 @@
+version: 3
+
+components:
+  core:
+    in: "."
+  gotoken:
+    in: "gotoken"
+  lockutil:
+    in: "lockutil"
+  examples:
+    in:
+      - "examples"
+      - "examples/**"
+  pipeline:
+    in: "pipeline"
+  pipeline-goast:
+    in: "pipeline/goast"
+  pipeline-internal:
+    in: "pipeline/internal/**"
+  pipeline-examples:
+    in:
+      - "pipeline/examples"
+      - "pipeline/examples/**"
+  analysis:
+    in: "analysis"
+  toolsdk:
+    in: "toolsdk"
+
+  cli:
+    in: "cmd/go-finding"
+  cli-detectors:
+    in: "cmd/go-finding/internal/detectors"
+
+deps:
+  core:
+    mayDependOn:
+      - gotoken
+      - lockutil
+    anyVendorDeps: true
+
+  gotoken:
+    anyVendorDeps: true
+
+  lockutil:
+    anyVendorDeps: true
+
+  examples:
+    mayDependOn:
+      - core
+      - gotoken
+      - lockutil
+      - pipeline
+    anyVendorDeps: true
+
+  pipeline:
+    mayDependOn:
+      - core
+      - gotoken
+      - lockutil
+    anyVendorDeps: true
+
+  pipeline-goast:
+    mayDependOn:
+      - core
+      - gotoken
+      - lockutil
+      - pipeline
+    anyVendorDeps: true
+
+  pipeline-internal:
+    mayDependOn:
+      - core
+      - gotoken
+      - lockutil
+      - pipeline
+    anyVendorDeps: true
+
+  pipeline-examples:
+    mayDependOn:
+      - core
+      - gotoken
+      - lockutil
+      - pipeline
+    anyVendorDeps: true
+
+  analysis:
+    mayDependOn:
+      - core
+    anyVendorDeps: true
+
+  toolsdk:
+    mayDependOn:
+      - core
+    anyVendorDeps: true
+
+  cli:
+    mayDependOn:
+      - core
+      - gotoken
+      - lockutil
+      - pipeline
+      - pipeline-goast
+      - analysis
+      - cli-detectors
+    anyVendorDeps: true
+
+  cli-detectors:
+    mayDependOn:
+      - core
+      - pipeline
+    anyVendorDeps: true
+
+commonComponents:
+  - gotoken
+  - lockutil
+
+excludeFiles:
+  - "_test\\.go$"
+  - "/testdata/"
+
+allow:
+  depOnAnyVendor: true

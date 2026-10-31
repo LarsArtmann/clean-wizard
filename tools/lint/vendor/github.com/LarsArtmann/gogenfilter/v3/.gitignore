@@ -1,0 +1,148 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with 'go test -c'
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+node_modules/
+
+# Go workspace file
+go.work
+
+# Build directories
+/bin/
+/dist/
+/build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+# Lighthouse CI results
+.lighthouseci/
+
+# Website build output
+/website/dist/
+/website/.astro/
+/website/.vercel/
+/website/.netlify/
+
+# Build artifacts
+/gogenfilter
+/gendocs
+/md-go-validator-bin
+/go-output/
+/md-go-validator/
+
+# Test coverage
+/coverage
+
+# Sensitive files
+*.db
+
+# Copy/paste detection
+/report/
+/reports/
+
+# Dedup tool artifacts
+.auto-deduplicate/
+.auto-deduplicate.lock
+
+# Templ generated files
+*_templ.go
+# Keep templ test fixture tracked (needed by integration tests)
+!testdata/templ/page_templ.go
+
+# Build artifacts
+/v3
+# Copy/paste detection report
+/report/jscpd-report.json
+# Nix build output
+/result
+
+# >>> buildflow-managed (.gitignore) >>>
+# Auto-managed by buildflow. Edit outside these markers; this block is regenerated on `buildflow --fix`.
+
+## Secrets and environment
+*.pem
+*.key
+
+## Databases
+*.db-shm
+*.db-wal
+
+## Operating systems
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+## Buildflow artifacts
+audit-log.*
+workflow-audit-log.*
+.buildflow-workflow-baseline.json
+
+## Go
+go.work.sum
+
+## Nix
+result-*
+.envrc
+.direnv/
+
+## Javascript and typescript
+*.tsbuildinfo
+.next/
+.nuxt/
+.docusaurus/
+.eslintcache
+.cache/
+.parcel-cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+## Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.ipynb_checkpoints/
+.hypothesis/
+cython_debug/
+.coverage
+htmlcov/
+# <<< buildflow-managed (.gitignore) <<<

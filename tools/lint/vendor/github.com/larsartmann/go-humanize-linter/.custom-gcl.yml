@@ -1,0 +1,14 @@
+# Build configuration for `golangci-lint custom`.
+# Produces ./custom-gcl with the gohumanize module plugin compiled in.
+#
+# Plugin dependencies (plugin-module-register, go-humanize-linter) are
+# resolved from the plugin module's go.mod — no separate version pinning
+# needed here.
+#
+# Runtime configuration: see .golangci.custom.yml
+# Usage: golangci-lint custom && ./custom-gcl run -c .golangci.custom.yml ./...
+version: v2.15.0
+plugins:
+  - module: github.com/larsartmann/go-humanize-linter
+    import: github.com/larsartmann/go-humanize-linter/plugin
+    path: .

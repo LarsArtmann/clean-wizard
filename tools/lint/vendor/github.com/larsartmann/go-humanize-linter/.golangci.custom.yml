@@ -1,0 +1,39 @@
+# Example .golangci.yml for users who build a custom golangci-lint binary
+# with the gohumanize module plugin compiled in.
+#
+# Usage:
+#   golangci-lint custom           # builds ./custom-gcl (reads .custom-gcl.yml)
+#   ./custom-gcl run ./...         # runs all linters including gohumanize
+#
+# The critical section is linters.settings.custom.gohumanize — without it,
+# golangci-lint reports "unknown linters: gohumanize" even though the plugin
+# is compiled into the binary.
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: none
+  enable:
+    - gohumanize
+    # Add standard linters you also want:
+    # - errcheck
+    # - govet
+    # - staticcheck
+
+  settings:
+    custom:
+      gohumanize:
+        type: "module"
+        description: "Detect hand-rolled reimplementations of github.com/dustin/go-humanize"
+        original-url: github.com/LarsArtmann/go-humanize-linter
+        settings:
+# Optional: only run specific rules (comma-separated)
+# enable: "H001,H003"
+# Optional: skip specific rules (comma-separated)
+# disable: "H004"
+# Optional: minimum confidence to report (low, medium, high, full)
+# minConfidence: "medium"
+# Optional: report //nolint:gohumanize directives that suppress zero findings
+# verifySuppressions: true

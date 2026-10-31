@@ -1,0 +1,6 @@
+# Enforce consistent line endings across all platforms
+* text=auto eol=lf
+
+# Language statistics exclusions (keep GitHub's language bar accurate)
+docs/status/*.md linguist-documentation
+reports/** linguist-generated

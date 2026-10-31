@@ -1,0 +1,347 @@
+version: "2"
+run:
+  timeout: 5m
+  go: 1.26.7
+  build-tags:
+    - goexperiment.arenas
+    - goexperiment.goroutineleakprofile
+    - goexperiment.jsonv2
+    - goexperiment.runtimesecret
+    - goexperiment.simd
+  allow-parallel-runners: true
+  allow-serial-runners: true
+  issues-exit-code: 1
+output:
+  formats: {}
+linters:
+  enable:
+    - arangolint
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - clickhouselint
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - embeddedstructfieldcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct_v5
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godoclint
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard_v2
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - ireturn
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - modernize
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl_v5
+    - zerologlint
+  settings:
+    cyclop:
+      max-complexity: 12
+    depguard:
+      rules:
+        no-encoding-json-v2:
+          deny:
+            - desc: requires GOEXPERIMENT=jsonv2 — reverted by policy 2026-07-23, use encoding/json (AGENTS.md)
+              pkg: encoding/json/v2
+    dupl:
+      threshold: 100
+    errcheck:
+      exclude-functions:
+        - (*os.File).Close
+        - (io.Closer).Close
+        - (*sql.DB).Close
+        - (*sql.Rows).Close
+        - (*sql.Stmt).Close
+        - (net.Conn).Close
+        - (*net.TCPConn).Close
+        - (*net.UDPConn).Close
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Print
+        - fmt.Printf
+        - fmt.Println
+        - (*strings.Builder).WriteString
+        - (*bytes.Buffer).WriteString
+    exhaustruct_v5:
+      ignore-patterns:
+        - os/exec.Cmd
+        - os/exec.ExitError
+        - net.Dialer
+        - github.com/larsartmann/go-error-family.HandleConfig
+        - github.com/larsartmann/go-error-family.HandleResult
+        - github.com/larsartmann/go-error-family.MessageTemplate
+        - github.com/larsartmann/go-error-family.RetryPolicy
+        - github.com/larsartmann/go-error-family.jsonError
+        - github.com/larsartmann/go-error-family.DiagnosticFinding
+        - github.com/larsartmann/go-error-family.Registry
+        - github.com/larsartmann/go-error-family.familyInfo
+        - github.com/larsartmann/go-error-family/diagnose.DiagnosticResult
+        - github.com/larsartmann/go-error-family/diagnose.Fix
+        - github.com/larsartmann/go-error-family/diagnose.Runner
+        - github.com/larsartmann/go-error-family/diagnose.RuleSpec
+        - github.com/larsartmann/go-error-family/diagnose.MockCommandRunner
+        - github.com/larsartmann/go-error-family/diagnose.MockResponse
+        - github.com/larsartmann/go-error-family/diagnose.ruleResult
+        - github.com/larsartmann/go-error-family/diagnose.staticRule
+        - github.com/larsartmann/go-error-family/agent.AgentResult
+        - github.com/larsartmann/go-error-family/agent.Config
+        - github.com/larsartmann/go-error-family/examples/checkout.Store
+    funlen:
+      lines: 200
+      statements: 100
+    ginkgolinter:
+      forbid-focus-container: true
+      forbid-spec-pollution: true
+    gocognit:
+      min-complexity: 25
+    goconst:
+      ignore-tests: true
+      min-len: 4
+      min-occurrences: 5
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+    gocyclo:
+      min-complexity: 20
+    gomoddirectives:
+      replace-local: true
+    gosec:
+      excludes:
+        - G304
+        - G115
+    ireturn:
+      allow:
+        - error
+        - empty
+        - anon
+        - stdlib
+        - generic
+    makezero:
+      always: true
+    mnd:
+      ignored-files:
+        - family\.go
+    nestif:
+      min-complexity: 6
+    revive:
+      rules:
+        - disabled: true
+          name: exported
+        - disabled: true
+          name: package-comments
+    tagalign:
+      align: false
+      order:
+        - binding
+        - json
+        - yaml
+        - xml
+        - toml
+        - validate
+        - mapstructure
+      sort: true
+    testifylint:
+      disable:
+        - go-require
+      enable-all: true
+    varnamelen:
+      ignore-map-index-ok: true
+      ignore-names:
+        - err
+        - ok
+        - tt
+        - fn
+        - t
+        - i
+        - m
+        - g
+        - a
+        - b
+        - v
+        - tc
+        - f
+        - w
+        - ag
+        - r
+      ignore-type-assert-ok: true
+    wrapcheck:
+      ignore-sigs:
+        - .Errorf(
+        - errors.New(
+        - errors.Unwrap(
+        - errors.Join(
+        - .Wrap(
+        - .Wrapf(
+        - .WithMessage(
+        - .WithMessagef(
+        - .WithStack(
+  exclusions:
+    generated: lax
+    rules:
+      - path: _test\.go
+        linters:
+          - goconst
+          - dupl
+          - errcheck
+          - paralleltest
+          - revive
+          - exhaustruct
+          - err113
+          - testpackage
+          - fatcontext
+          - funlen
+          - containedctx
+          - cyclop
+          - gocyclo
+          - gocognit
+          - maintidx
+          - gochecknoglobals
+          - forcetypeassert
+          - gosec
+          - wrapcheck
+          - ireturn
+          - recvcheck
+          - contextcheck
+          - exhaustive
+          - exhaustruct_v5
+      - path: diagnose/
+        linters:
+          - wrapcheck
+          - noctx
+      - path: diagnose/rules_filesystem\.go
+        text: G304
+        linters:
+          - gosec
+      - path: agent/
+        linters:
+          - wrapcheck
+      - path: bridge/
+        linters:
+          - wrapcheck
+      - path: examples/
+        linters:
+          - gosec
+          - forbidigo
+      - path: _test\.go
+        text: unused
+        linters:
+          - unused
+    paths:
+      - \.gen\.go$
+      - _mock\.go$
+      - _templ\.go$
+      - diagnose/
+      - diagnose/git/
+      - mock_.*\.go$
+      - vendor/
+formatters:
+  enable:
+    - gci
+    - goimports
+    - gofumpt
+    - golines
+  settings:
+    golines:
+      max-len: 120
+  exclusions:
+    generated: lax
+    paths:
+      - _mock\.go$
+      - _templ\.go$
+      - diagnose/
+      - diagnose/git/
+      - mock_.*\.go$
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 10

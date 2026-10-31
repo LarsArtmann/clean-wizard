@@ -1,0 +1,44 @@
+# github.com/LarsArtmann/gogenfilter/v3 v3.6.1
+## explicit; go 1.26
+github.com/LarsArtmann/gogenfilter/v3
+# github.com/bmatcuk/doublestar/v4 v4.10.3
+## explicit; go 1.16
+github.com/bmatcuk/doublestar/v4
+# github.com/go-faster/errors v0.8.0
+## explicit; go 1.20
+github.com/go-faster/errors
+# github.com/go-faster/jx v1.2.0
+## explicit; go 1.18
+github.com/go-faster/jx
+github.com/go-faster/jx/internal/byteseq
+# github.com/go-faster/yaml v0.4.6
+## explicit; go 1.18
+github.com/go-faster/yaml
+# github.com/larsartmann/go-error-family v0.12.0
+## explicit; go 1.27
+github.com/larsartmann/go-error-family
+# github.com/larsartmann/go-finding v1.15.0
+## explicit; go 1.27
+github.com/larsartmann/go-finding
+github.com/larsartmann/go-finding/lockutil
+# github.com/larsartmann/go-humanize-linter v0.5.0
+## explicit; go 1.27
+github.com/larsartmann/go-humanize-linter
+# github.com/larsartmann/go-linter-sdk v0.4.0
+## explicit; go 1.27
+github.com/larsartmann/go-linter-sdk
+# github.com/segmentio/asm v1.2.1
+## explicit; go 1.18
+github.com/segmentio/asm/base64
+github.com/segmentio/asm/cpu
+github.com/segmentio/asm/cpu/arm
+github.com/segmentio/asm/cpu/arm64
+github.com/segmentio/asm/cpu/cpuid
+github.com/segmentio/asm/cpu/x86
+github.com/segmentio/asm/internal/unsafebytes
+# go.uber.org/multierr v1.11.0
+## explicit; go 1.19
+go.uber.org/multierr
+# golang.org/x/sys v0.49.0
+## explicit; go 1.26.0
+golang.org/x/sys/cpu

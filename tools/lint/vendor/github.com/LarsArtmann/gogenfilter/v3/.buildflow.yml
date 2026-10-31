@@ -1,0 +1,11 @@
+# BuildFlow Configuration
+# See: https://github.com/larsartmann/buildflow
+# detection.go is ~471 lines (detector table + constants).
+max_file_size: 500
+
+# Only FIXME/BUG-class markers fail.
+todo_min_severity: error
+
+exclude:
+  - website
+  - docs

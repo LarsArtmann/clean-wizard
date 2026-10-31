@@ -1,0 +1,5 @@
+# BuildFlow Configuration
+# See: https://github.com/larsartmann/buildflow
+# No non-default settings. The Go toolchain is pinned by flake.nix (go_1_27) and
+# go.mod (go 1.27); encoding/json/v2 is a standard package as of Go 1.27, so no
+# GOEXPERIMENT override is needed here.

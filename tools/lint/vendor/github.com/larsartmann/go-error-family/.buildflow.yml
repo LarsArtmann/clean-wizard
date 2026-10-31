@@ -1,0 +1,34 @@
+# Note on GOEXPERIMENT: do NOT add an `env:` override here — BuildFlow's
+# ApplyConfigEnv never overrides shell-exported values, and this machine
+# exports GOEXPERIMENT=jsonv2 globally (required by the BuildFlow repo
+# itself). The no-json/v2 policy is enforced instead by a depguard deny rule
+# in .golangci.yml, which fails lint locally, in BuildFlow, and in CI.
+skip_steps:
+  # go-auto-upgrade's `fix` command runs the jsonv1tov2 migrator, which
+  # rewrites encoding/json → encoding/json/v2 whenever GOEXPERIMENT=jsonv2 is
+  # active (it is, machine-globally). For this library that rewrite violates
+  # the documented no-json/v2 policy (v0.8.0 reverted it: GOEXPERIMENT was
+  # the #1 adoption barrier) and breaks the hermetic nix builds and CI. This
+  # skip stops the fleet-wide `buildflow --fix` orchestrator from re-breaking
+  # the repo on every pass.
+  - go-auto-upgrade
+  # pnpm-audit UNSKIPPED 2026-10-07: upstream issue #19's fix shipped —
+  # the audit runs in the lockfile's directory (lockfileDir), so the
+  # website/ Node project audits against its own pnpm-lock.yaml.
+  # Dependabot ALERTS still detect website vulnerabilities, but Dependabot's
+  # automatic security-update jobs fail on this repo (npm updater vs pnpm v9
+  # lockfile + overrides — every job since 2026-09-15 errored out), so the
+  # working remediation check is manual: `nix develop -c pnpm audit` in
+  # website/. Last clean: 2026-09-18 (8 transitive vulns in devalue, fast-uri,
+  # js-yaml, svgo fixed via `pnpm update --depth Infinity`).
+  # POLICY, deliberate: the published protocol types keep string-typed
+  # fields/parameters. branching-flow's phantom analyzer flags every one of
+  # them, and adopting its suggestions would be a breaking API change the
+  # maintainers reject by design — this skip is a standing design opinion,
+  # not a bug workaround. (The analyzer's old ignore-directive gap in
+  # pkg/phantom is fixed upstream as of v0.6.x — IsIgnored is now honored —
+  # so per-field ignores are available if the policy ever narrows.)
+  # Upstream: https://github.com/LarsArtmann/BuildFlow/issues/23 — the phantom
+  # analyzer parses `phantom` ignore directives (core ENUM) but never consults
+  # IsIgnored, so directives are silently dropped.
+  - branching-flow

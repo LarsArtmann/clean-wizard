@@ -76,7 +76,7 @@ workflow-audit-log.*
 *.dll
 *.so
 *.dylib
-vendor/
+/vendor/
 go.work
 go.work.sum
 
