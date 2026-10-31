@@ -270,9 +270,9 @@ func TestLevelValidation(t *testing.T) {
 // TestNilLoggerSafety tests that functions handle nil logger gracefully.
 func TestNilLoggerSafety(t *testing.T) {
 	// Save original logger
-	originalL := L
+	originalL := L()
 
-	defer func() { L = originalL }()
+	defer func() { instance.Store(originalL) }()
 
 	// Set to nil
 	instance.Store(nil)
@@ -332,11 +332,11 @@ func TestCharmbraceletIntegration(t *testing.T) {
 	assert.NotNil(t, L())
 
 	// Test level setting via charmbracelet/log API
-	L.SetLevel(log.DebugLevel)
-	assert.Equal(t, log.DebugLevel, L.GetLevel())
+	L().SetLevel(log.DebugLevel)
+	assert.Equal(t, log.DebugLevel, L().GetLevel())
 
-	L.SetLevel(log.InfoLevel)
-	assert.Equal(t, log.InfoLevel, L.GetLevel())
+	L().SetLevel(log.InfoLevel)
+	assert.Equal(t, log.InfoLevel, L().GetLevel())
 }
 
 // TestSlogIntegration verifies slog integration.
@@ -344,11 +344,11 @@ func TestSlogIntegration(t *testing.T) {
 	Init(true)
 
 	// Test that slog logger works
-	require.NotNil(t, StdLogger)
+	require.NotNil(t, Slog())
 
 	// Test slog methods
 	assert.NotPanics(t, func() {
-		StdLogger.Info("slog info message")
-		StdLogger.Debug("slog debug message")
+		Slog().Info("slog info message")
+		Slog().Debug("slog debug message")
 	})
 }
