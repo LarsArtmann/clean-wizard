@@ -230,10 +230,12 @@ func boolToSafeMode(b bool) enums.SafeMode {
 	return enums.SafeModeFromBool(b)
 }
 
-// Save saves the configuration to file.
+// Save saves the configuration to file. It resolves the path through
+// DefaultConfigPath (CONFIG_PATH-aware) so the write target always matches
+// where Load reads — a $HOME hardcode here previously desynchronized the two
+// when CONFIG_PATH was set.
 func Save(config *types.Config) error {
-	// Set configuration path
-	configPath := filepath.Join(os.Getenv("HOME"), configName+"."+configType)
+	configPath := DefaultConfigPath()
 
 	// Ensure config directory exists
 	configDir := filepath.Dir(configPath)

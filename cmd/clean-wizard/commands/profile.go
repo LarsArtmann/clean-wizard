@@ -101,7 +101,9 @@ func runProfileShowCommand(_ *cobra.Command, args []string, detailed bool) error
 				fmt.Printf("   • %s\n", name)
 			}
 
-			return nil
+			// A missing profile is a user input error: exit non-zero so
+			// scripts notice, instead of the previous silent success.
+			return errorfamily.NewRejection("profile.not_found", "profile "+profileName+" does not exist")
 		}
 	}
 
@@ -264,7 +266,9 @@ func runProfileDeleteCommand(_ *cobra.Command, args []string, force bool) error 
 	if !ok {
 		fmt.Printf("❌ Profile '%s' not found\n", profileName)
 
-		return nil
+		// A missing profile is a user input error: exit non-zero so scripts
+		// notice, instead of the previous silent success.
+		return errorfamily.NewRejection("profile.not_found", "profile "+profileName+" does not exist")
 	}
 
 	// Don't allow deleting the last profile
@@ -272,7 +276,10 @@ func runProfileDeleteCommand(_ *cobra.Command, args []string, force bool) error 
 		fmt.Println("❌ Cannot delete the last profile.")
 		fmt.Println("   At least one profile must exist.")
 
-		return nil
+		return errorfamily.NewRejection(
+			"profile.last_delete",
+			"cannot delete the last profile; at least one must exist",
+		)
 	}
 
 	// Confirm deletion
