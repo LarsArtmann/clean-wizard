@@ -24,6 +24,9 @@ Every term below should mean the **same thing** to everyone who reads it.
 | ErrorFamily       | Behavioral error classification (Rejection, Conflict, Transient, Corruption, Infrastructure)          | `go-error-family` library                 |
 | NotAvailableError | Typed error indicating a cleaner's target tool is not installed; classifies as Infrastructure         | `internal/cleaner/cleaner.go`             |
 | ValidationError   | Typed error for invalid configuration or input; classifies as Rejection                               | `internal/domain/operation_validation.go` |
+| IsAvailable       | Scan-domain availability probe on a cleaner: false means the cleaner is *skipped* (a result, exit 0)  | `Cleaner.IsAvailable(ctx)`                |
+| HealthCheck       | Container-domain fault probe on a DI service: error means the system is *unhealthy* (exit 69)         | `adapters.NixAdapter.HealthCheck`, `doctor` |
+| Doctor            | Health surface: materializes every DI service, runs container health checks, reports per-service      | `doctor` command, `di.HealthReport`       |
 
 ## Entities
 
