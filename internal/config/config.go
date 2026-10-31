@@ -109,7 +109,17 @@ func parseConfig(k *koanf.Koanf) (*types.Config, error) {
 
 	// Unmarshal basic fields
 	config.Version = k.String("version")
-	config.SafeMode = boolToSafeMode(k.Bool("safe_mode"))
+
+	// safe_mode roundtrips as the symbolic enum string ("ENABLED"/"DISABLED"/
+	// "STRICT"); k.Bool parses any non-bool string as false, silently flipping
+	// a saved ENABLED config to unsafe mode on reload. Decode through the
+	// enum's YAML hook, falling back to the bool form for legacy files.
+	if raw := k.Get("safe_mode"); raw != nil {
+		node := &yamlv3.Node{Kind: yamlv3.ScalarNode, Value: fmt.Sprint(raw)} //nolint:exhaustruct_v5
+		if err := config.SafeMode.UnmarshalYAML(node); err != nil {
+			config.SafeMode = boolToSafeMode(k.Bool("safe_mode"))
+		}
+	}
 	config.MaxDiskUsage = k.Int("max_disk_usage_percent")
 	config.Protected = k.Strings("protected")
 

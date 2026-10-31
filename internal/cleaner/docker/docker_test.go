@@ -215,7 +215,16 @@ func TestDockerCleaner_Scan(t *testing.T) {
 
 	result := cleaner.Scan(context.Background())
 
-	// Scan may not find any items if Docker is not installed or no resources exist
+	// Without docker installed, Scan reports the Infrastructure error like
+	// Clean does; with docker installed, it succeeds with whatever it finds.
+	if !cleaner.IsAvailable(context.Background()) {
+		if result.IsOk() {
+			t.Fatal("Scan() = ok without docker; want a not-available error")
+		}
+
+		return
+	}
+
 	if result.IsErr() {
 		t.Fatalf("Scan() error = %v", result.Error())
 	}

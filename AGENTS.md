@@ -173,8 +173,9 @@ Key files:
 
 - ~~`internal/domain/` is a god package (23 files)~~ RESOLVED 2026-09-23: split into `enums/`, `operations/`, `types/` (task 27)
 - ~~`internal/cleaner/` has 50+ files flat (no sub-packages)~~ RESOLVED 2026-09-23: split into 14 per-domain sub-packages + factory (task 28)
-- Settings only flow when a `--profile` is selected; preset/interactive runs (and the nix/cargo/projects/git-history/golangci-lint cleaners whose constructors take no settings params) still use factory defaults. `NixGenerationsSettings.DryRun`/`Optimize` and `BuildCacheSettings.ToolTypes` have no constructor consumption yet
-- Logger uses mutable package-level globals (`L`, `StdLogger`) — causes test race conditions
+- Settings only flow when a `--profile` is selected; preset/interactive runs (and the nix/cargo/projects/git-history/golangci-lint cleaners whose constructors take no settings params) still use factory defaults. `scan --profile` additionally FILTERS scan targets to the profile's cleaners (2026-10-31). `NixGenerationsSettings.DryRun`/`Optimize` and `BuildCacheSettings.ToolTypes` have no constructor consumption yet
+- Logger globals are race-safe atomic accessors since 2026-10-31 (`logger.L()`, `logger.Slog()`, `logger.SetSlog` for test capture; `Init`/`InitWithLevel` are the only production writers). A DI-injected logger was assessed and rejected: config sits BELOW di in the dependency DAG and cannot receive container services
+- `config.Save` resolves its path via `DefaultConfigPath()` (CONFIG_PATH-aware) and `parseConfig` decodes `safe_mode` through the enum's YAML hook — both fixed 2026-10-31; before, Save hardcoded `$HOME` (desync vs Load) and `k.Bool("ENABLED")` silently flipped saved ENABLED configs to unsafe mode on reload
 
 ## Test Facts
 

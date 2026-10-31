@@ -91,3 +91,32 @@ itself a failure.
 - Boundary glossary: `docs/DOMAIN_LANGUAGE.md`
 - Related: ADR-0003 (container truth), ticket #56 (ExecWithTimeout —
   HealthCheck deliberately uses its own exec path)
+
+## Appendix: startup measurement (T27, 2026-10-31)
+
+`internal/di/bench_test.go`, AMD RYZEN AI MAX+ 395, go1.27, `-benchtime 30x`:
+
+| Benchmark                       | ns/op   | What it measures                                        |
+| ------------------------------- | ------- | ------------------------------------------------------- |
+| `BenchmarkRegisterAllServices`  | ~86k    | container create + register all lazy services           |
+| `BenchmarkRegistryMaterialization` | ~275k | registration + resolve all 13 cleaners + registry build |
+
+Both are sub-millisecond: the lazy per-cleaner registry costs nothing
+measurable at startup, and eager materialization would save nothing. The
+lazy design stays; re-measure only if the registry grows an order of
+magnitude.
+
+## Architecture re-score (T27.03, post-remediation)
+
+Baseline (audit §6) → post-remediation:
+
+| Quality           | Before | After | Why                                                                            |
+| ----------------- | ------ | ----- | ------------------------------------------------------------------------------ |
+| Service-Oriented  | 6/10   | 9/10  | Every DI service has a consumer; the container matches documented architecture |
+| Composable        | 8/10   | 9/10  | Store seam is real (do.Override + fake), factory takes dependencies explicitly |
+| Resilient         | 7/10   | 8/10  | Health checks classified; clean can gate on container health; honest estimates |
+| Self-Health       | 1/10   | 8/10  | doctor (human/json/sarif, exit 69), Healthchecker impls, pre-run gate          |
+
+Not 10/10: doctor covers adapter-level health only (per-cleaner deep probes
+remain scan-domain), and the CLI framework (cobra) is not yet cmdguard
+(TODO 32, deferred with checklist in TODO_LIST).
