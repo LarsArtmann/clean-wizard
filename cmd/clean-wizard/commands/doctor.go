@@ -16,7 +16,7 @@ import (
 
 // ErrDoctorUnhealthy is the classified Infrastructure sentinel for a failed
 // doctor run: errorfamily.ExitCode maps it to sysexits 69 at the CLI boundary.
-var ErrDoctorUnhealthy = errorfamily.NewInfrastructure(
+var ErrDoctorUnhealthy error = errorfamily.NewInfrastructure(
 	"doctor.unhealthy",
 	"one or more DI services failed construction or health check",
 )
@@ -24,7 +24,7 @@ var ErrDoctorUnhealthy = errorfamily.NewInfrastructure(
 // ErrDoctorJSONWithSARIF rejects --json combined with --sarif: both are
 // machine channels and their outputs would silently disagree about what the
 // run "output" is.
-var ErrDoctorJSONWithSARIF = errorfamily.NewRejection(
+var ErrDoctorJSONWithSARIF error = errorfamily.NewRejection(
 	"doctor.json_sarif_conflict",
 	"--json and --sarif are mutually exclusive; both are machine channels",
 )

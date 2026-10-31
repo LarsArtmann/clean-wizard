@@ -20,13 +20,13 @@ import (
 // context around these stay plain fmt.Errorf: classification flows through the
 // error chain, and an explicit family wrapper would override the sentinel's own.
 var (
-	ErrNoGitRepositoriesFound = errorfamily.NewRejection("githistory.no_repositories", "no git repositories found")
-	ErrGitNotAvailable        = errorfamily.NewInfrastructure(
+	ErrNoGitRepositoriesFound error = errorfamily.NewRejection("githistory.no_repositories", "no git repositories found")
+	ErrGitNotAvailable error        = errorfamily.NewInfrastructure(
 		"githistory.git_not_available",
 		"not a git repository or git not available",
 	)
-	ErrSafetyChecksFailed = errorfamily.NewConflict("githistory.safety_checks_failed", "safety checks failed")
-	ErrNotAGitRepository  = errorfamily.NewRejection("githistory.not_a_git_repository", "not a git repository")
+	ErrSafetyChecksFailed error = errorfamily.NewConflict("githistory.safety_checks_failed", "safety checks failed")
+	ErrNotAGitRepository error  = errorfamily.NewRejection("githistory.not_a_git_repository", "not a git repository")
 )
 
 // NewGitHistoryCommand creates the git-history subcommand.

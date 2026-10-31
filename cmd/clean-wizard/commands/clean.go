@@ -26,12 +26,12 @@ const (
 
 // Classified errors for clean command.
 var (
-	ErrNoCleanersAvailable  = errorfamily.NewRejection("clean.no_cleaners", "no cleaners available on this system")
-	ErrNoConfigPathProvided = errorfamily.NewRejection("clean.no_config_path", "no config path provided")
+	ErrNoCleanersAvailable error  = errorfamily.NewRejection("clean.no_cleaners", "no cleaners available on this system")
+	ErrNoConfigPathProvided error = errorfamily.NewRejection("clean.no_config_path", "no config path provided")
 	// ErrReportWithJSON rejects --report combined with --json: the HTML report
 	// is a human artifact; JSON mode is a machine channel and the two would
 	// silently disagree about what the run "output" is.
-	ErrReportWithJSON = errorfamily.NewRejection(
+	ErrReportWithJSON error = errorfamily.NewRejection(
 		"clean.report_json_conflict",
 		"--report and --json are mutually exclusive; the HTML report is a human artifact and cannot ride along with machine output",
 	)

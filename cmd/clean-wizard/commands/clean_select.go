@@ -12,8 +12,8 @@ import (
 
 // Classified sentinel errors for clean_select.
 var (
-	ErrProfileNotFound   = errorfamily.NewRejection("clean.profile_not_found", "profile not found")
-	ErrProfileNoCleaners = errorfamily.NewRejection("clean.profile_no_cleaners", "profile has no available cleaners")
+	ErrProfileNotFound error   = errorfamily.NewRejection("clean.profile_not_found", "profile not found")
+	ErrProfileNoCleaners error = errorfamily.NewRejection("clean.profile_no_cleaners", "profile has no available cleaners")
 )
 
 // destructiveCleaners are excluded from "standard" mode because they are
