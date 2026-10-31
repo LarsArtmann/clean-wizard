@@ -120,6 +120,7 @@ func parseConfig(k *koanf.Koanf) (*types.Config, error) {
 			config.SafeMode = boolToSafeMode(k.Bool("safe_mode"))
 		}
 	}
+
 	config.MaxDiskUsage = k.Int("max_disk_usage_percent")
 	config.Protected = k.Strings("protected")
 

@@ -101,7 +101,7 @@ func runDoctorCommand(opts doctorOptions) error {
 		DryRun:         false,
 		MaxConcurrency: 0,
 		Profile:        "",
-	} //nolint:exhaustruct_v5 // doctor reads no profile
+	}
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
 		return errorfamily.WrapRejection(err, "doctor.di_register", "failed to register DI services")
 	}

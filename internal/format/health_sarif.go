@@ -1,7 +1,6 @@
 package format
 
 import (
-	"fmt"
 	"strconv"
 
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -69,5 +68,5 @@ func HealthOutcomesToSARIF(outcomes []HealthOutcome) ([]byte, error) {
 // healthLocationURI names the service itself as the finding location; DI
 // services have no single on-disk artifact.
 func healthLocationURI(serviceName string) finding.FilePath {
-	return finding.FilePath(fmt.Sprintf("service://%s", serviceName))
+	return finding.FilePath("service://" + serviceName)
 }

@@ -134,8 +134,9 @@ func (r *progressRecorder) dump() string {
 
 	var msgSb133 strings.Builder
 	for _, e := range r.all() {
-		msgSb133.WriteString(fmt.Sprintf("\n  %+v", e))
+		fmt.Fprintf(&msgSb133, "\n  %+v", e)
 	}
+
 	msg += msgSb133.String()
 
 	return msg

@@ -63,6 +63,7 @@ var _ = Describe("Tempfiles cleaner", func() {
 
 			cleaner, err := tempfiles.NewTempFilesCleaner(true, true, "7d", nil, []string{fakeTmp})
 			Expect(err).ToNot(HaveOccurred())
+
 			scan := cleaner.Scan(ctx)
 
 			Expect(scan.IsOk()).To(BeTrue())
@@ -72,6 +73,7 @@ var _ = Describe("Tempfiles cleaner", func() {
 		It("reports no items when the temp root is empty", func() {
 			cleaner, err := tempfiles.NewTempFilesCleaner(true, true, "7d", nil, []string{fakeTmp})
 			Expect(err).ToNot(HaveOccurred())
+
 			scan := cleaner.Scan(ctx)
 
 			Expect(scan.IsOk()).To(BeTrue())
@@ -85,12 +87,13 @@ var _ = Describe("Tempfiles cleaner", func() {
 
 			cleaner, err := tempfiles.NewTempFilesCleaner(true, true, "7d", nil, []string{fakeTmp})
 			Expect(err).ToNot(HaveOccurred())
+
 			cleaned := cleaner.Clean(ctx)
 
 			Expect(cleaned.IsOk()).To(BeTrue())
 
 			_, statErr := os.Stat(seeded)
-			Expect(statErr).To(BeNil(), "dry-run must not delete files")
+			Expect(statErr).ToNot(HaveOccurred(), "dry-run must not delete files")
 		})
 	})
 })

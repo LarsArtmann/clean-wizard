@@ -27,7 +27,7 @@ func newHealthTestContainer(t *testing.T) *di.Container {
 			DryRun:         true,
 			MaxConcurrency: 0,
 			Profile:        "",
-		}, //nolint:exhaustruct_v5 // test defaults
+		},
 	)
 	require.NoError(t, err)
 
