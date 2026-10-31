@@ -15,22 +15,22 @@ var settingsFactory = map[OperationType]func() *OperationSettings{ //nolint:goch
 	OperationTypeNodePackages:                 defaultNodePackagesSettings,
 	OperationTypeGoPackages:                   defaultGoPackagesSettings,
 	OperationTypeCargoPackages:                defaultCargoPackagesSettings,
-	OperationTypeBuildCache:                   func() *OperationSettings { return &OperationSettings{BuildCache: defaultBuildCacheSettings()} }, //nolint:exhaustruct
+	OperationTypeBuildCache:                   func() *OperationSettings { return &OperationSettings{BuildCache: defaultBuildCacheSettings()} }, //nolint:exhaustruct_v5
 	OperationTypeDocker:                       defaultDockerSettings,
 	OperationTypeSystemCache:                  defaultSystemCacheSettings,
 	OperationTypeSystemTemp:                   defaultSystemTempSettings,
 	OperationTypeProjectsManagementAutomation: defaultProjectsManagementAutomationSettings,
 	OperationTypeProjectExecutables:           defaultProjectExecutablesSettings,
 	OperationTypeCompiledBinaries:             defaultCompiledBinariesSettings,
-	OperationTypeGitHistory:                   func() *OperationSettings { return &OperationSettings{GitHistory: &GitHistorySettings{}} }, //nolint:exhaustruct
-	OperationTypeGolangciLintCache:            func() *OperationSettings { return &OperationSettings{} },                                  //nolint:exhaustruct
+	OperationTypeGitHistory:                   func() *OperationSettings { return &OperationSettings{GitHistory: &GitHistorySettings{}} }, //nolint:exhaustruct_v5
+	OperationTypeGolangciLintCache:            func() *OperationSettings { return &OperationSettings{} },                                  //nolint:exhaustruct_v5
 }
 
 // DefaultSettings returns default settings for given operation type.
 func DefaultSettings(opType OperationType) *OperationSettings {
 	factory, ok := settingsFactory[opType]
 	if !ok {
-		return &OperationSettings{} //nolint:exhaustruct
+		return &OperationSettings{} //nolint:exhaustruct_v5
 	}
 
 	settings := factory()
@@ -44,7 +44,7 @@ func DefaultSettings(opType OperationType) *OperationSettings {
 }
 
 func defaultNixGenerationsSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		NixGenerations: &NixGenerationsSettings{
 			Generations: 1,
 			Optimize:    enums.OptimizationModeDisabled,
@@ -54,7 +54,7 @@ func defaultNixGenerationsSettings() *OperationSettings {
 }
 
 func defaultTempFilesSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		TempFiles: &TempFilesSettings{
 			OlderThan: "7d",
 			Excludes:  []string{"/tmp/keep"},
@@ -63,15 +63,15 @@ func defaultTempFilesSettings() *OperationSettings {
 }
 
 func defaultHomebrewSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
-		Homebrew: &HomebrewSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
+		Homebrew: &HomebrewSettings{ //nolint:exhaustruct_v5
 			UnusedOnly: enums.HomebrewModeUnusedOnly,
 		},
 	}
 }
 
 func defaultNodePackagesSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		NodePackages: &NodePackagesSettings{
 			PackageManagers: []enums.PackageManagerType{
 				enums.PackageManagerNpm,
@@ -84,7 +84,7 @@ func defaultNodePackagesSettings() *OperationSettings {
 }
 
 func defaultGoPackagesSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		GoPackages: &GoPackagesSettings{
 			CleanCache:      enums.CacheCleanupEnabled,
 			CleanTestCache:  enums.CacheCleanupEnabled,
@@ -96,7 +96,7 @@ func defaultGoPackagesSettings() *OperationSettings {
 }
 
 func defaultCargoPackagesSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		CargoPackages: &CargoPackagesSettings{
 			Autoclean: enums.CacheCleanupEnabled,
 		},
@@ -104,7 +104,7 @@ func defaultCargoPackagesSettings() *OperationSettings {
 }
 
 func defaultDockerSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		Docker: &DockerSettings{
 			PruneMode: enums.DockerPruneAll,
 		},
@@ -112,7 +112,7 @@ func defaultDockerSettings() *OperationSettings {
 }
 
 func defaultSystemCacheSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		SystemCache: &SystemCacheSettings{
 			CacheTypes: getDefaultSystemCacheTypes(),
 			OlderThan:  "30d",
@@ -121,7 +121,7 @@ func defaultSystemCacheSettings() *OperationSettings {
 }
 
 func defaultSystemTempSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		SystemTemp: &SystemTempSettings{
 			Paths:     []string{"/tmp", "/var/tmp"},
 			OlderThan: "30d",
@@ -130,7 +130,7 @@ func defaultSystemTempSettings() *OperationSettings {
 }
 
 func defaultProjectsManagementAutomationSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
 		ProjectsManagementAutomation: &ProjectsManagementAutomationSettings{
 			ClearCache: enums.CacheCleanupEnabled,
 		},
@@ -138,16 +138,16 @@ func defaultProjectsManagementAutomationSettings() *OperationSettings {
 }
 
 func defaultProjectExecutablesSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
-		ProjectExecutables: &ProjectExecutablesSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
+		ProjectExecutables: &ProjectExecutablesSettings{ //nolint:exhaustruct_v5
 			ExcludeExtensions: []string{".sh"},
 		},
 	}
 }
 
 func defaultCompiledBinariesSettings() *OperationSettings {
-	return &OperationSettings{ //nolint:exhaustruct
-		CompiledBinaries: &CompiledBinariesSettings{ //nolint:exhaustruct
+	return &OperationSettings{ //nolint:exhaustruct_v5
+		CompiledBinaries: &CompiledBinariesSettings{ //nolint:exhaustruct_v5
 			MinSizeMB: 10,
 			OlderThan: "0",
 		},

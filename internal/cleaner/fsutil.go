@@ -459,7 +459,7 @@ type CleanCounters struct {
 // NewCleanCounters returns counters with startTime set to time.Now().
 // Counters are populated incrementally by Record* methods.
 func NewCleanCounters() CleanCounters {
-	return CleanCounters{startTime: time.Now()} //nolint:exhaustruct
+	return CleanCounters{startTime: time.Now()} //nolint:exhaustruct_v5
 }
 
 // Duration returns the elapsed time since the counters were created.

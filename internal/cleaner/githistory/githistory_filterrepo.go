@@ -53,7 +53,7 @@ func DetectFilterRepoProvider() FilterRepoProvider {
 
 // ResetDetector resets the cached detector (for testing).
 func ResetDetector() {
-	detector = filterRepoDetector{} //nolint:exhaustruct
+	detector = filterRepoDetector{} //nolint:exhaustruct_v5
 }
 
 func detectProvider() FilterRepoProvider {

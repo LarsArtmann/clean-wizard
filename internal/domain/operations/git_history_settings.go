@@ -64,7 +64,7 @@ type GitHistorySettings struct {
 
 // DefaultGitHistorySettings returns the default settings.
 func DefaultGitHistorySettings() GitHistorySettings {
-	return GitHistorySettings{ //nolint:exhaustruct
+	return GitHistorySettings{ //nolint:exhaustruct_v5
 		MinSizeMB:         1,
 		MaxFiles:          100,
 		CreateBackup:      true,

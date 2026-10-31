@@ -407,7 +407,7 @@ func unmarshalOperationSettings(
 		return
 	}
 
-	settings := &operations.OperationSettings{} //nolint:exhaustruct
+	settings := &operations.OperationSettings{} //nolint:exhaustruct_v5
 	if err := yamlv3.Unmarshal(settingsYAML, settings); err != nil {
 		logger.Error("Failed to unmarshal operation settings",
 			"error", err,
@@ -447,7 +447,7 @@ func newProfile(name, description string, operations []types.CleanupOperation) *
 func GetDefaultConfig() *types.Config {
 	now := GetCurrentTime()
 
-	return &types.Config{ //nolint:exhaustruct
+	return &types.Config{ //nolint:exhaustruct_v5
 		Version:      CurrentFormatVersion.String(),
 		SafeMode:     enums.SafeModeEnabled, // Default to safe mode
 		MaxDiskUsage: DefaultMaxDiskUsage,

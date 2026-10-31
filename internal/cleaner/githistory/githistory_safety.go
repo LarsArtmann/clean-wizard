@@ -43,7 +43,7 @@ func (c *GitHistorySafetyChecker) Check(ctx context.Context) *types.GitHistorySa
 	ctx, cancel := context.WithTimeout(ctx, SafetyCheckTimeout)
 	defer cancel()
 
-	report := &types.GitHistorySafetyReport{ //nolint:exhaustruct
+	report := &types.GitHistorySafetyReport{ //nolint:exhaustruct_v5
 		Warnings: []string{},
 		Blockers: []string{},
 	}

@@ -308,7 +308,7 @@ func buildScanResults(wr *execution.WorkflowResult, available []CleanerConfig) [
 	results := make([]ScanResult, 0, len(available))
 	for _, cfg := range available {
 		regName := getRegistryName(cfg.Type)
-		sr := ScanResult{ //nolint:exhaustruct
+		sr := ScanResult{ //nolint:exhaustruct_v5
 			Name:         cfg.Name,
 			RegistryName: regName,
 			Description:  cfg.Description,

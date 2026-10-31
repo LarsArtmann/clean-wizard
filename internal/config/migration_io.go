@@ -97,7 +97,7 @@ func MigrateConfigFile(
 			"configuration format "+from.String()+" is newer than this binary supports ("+CurrentFormatVersion.String()+"); upgrade clean-wizard",
 		)
 	case from.Compare(CurrentFormatVersion) == 0:
-		return MigrationReport{AlreadyCurrent: true}, nil //nolint:exhaustruct
+		return MigrationReport{AlreadyCurrent: true}, nil //nolint:exhaustruct_v5
 	}
 
 	plan, err := PlanMigration(from)
@@ -234,7 +234,7 @@ func applyMigration(
 		return restore(err, "failed to write migrated configuration; original configuration restored from backup")
 	}
 
-	report := MigrationReport{ //nolint:exhaustruct
+	report := MigrationReport{ //nolint:exhaustruct_v5
 		Records:    preview.Records,
 		Diff:       preview.Diff,
 		BackupPath: backup.BackupPath(configPath),
@@ -273,7 +273,7 @@ func cloneConfig(config *types.Config) (*types.Config, error) {
 		)
 	}
 
-	clone := &types.Config{}                              //nolint:exhaustruct
+	clone := &types.Config{}                              //nolint:exhaustruct_v5
 	if err := yamlv3.Unmarshal(data, clone); err != nil { //nolint:musttag // types.Config carries yaml tags
 		return nil, errorfamily.WrapCorruption(
 			err,

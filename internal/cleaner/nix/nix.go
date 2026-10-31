@@ -22,8 +22,6 @@ const (
 	NixMockStoreSizeGB = 300
 	// NixMaxGenerationsToKeep is the maximum allowed generations to keep.
 	NixMaxGenerationsToKeep = 10
-	// NixDryRunBytesPerGeneration is the estimated bytes freed per generation in dry-run mode.
-	NixDryRunBytesPerGeneration = 50 * cleaner.BytesPerMB
 
 	// Mock generation IDs for testing when Nix is unavailable.
 	mockGenerationIDCurrent = 300
@@ -229,16 +227,7 @@ func (nc *NixCleaner) CleanOldGenerations(
 
 	if nc.GetDryRun() {
 		// Use real store size to calculate average generation size
-		storeSize := nc.GetStoreSize(ctx)
-		// Calculate average generation size (avoid division by zero)
-		var avgSize int64
-		if len(generations) > 0 {
-			avgSize = storeSize / int64(len(generations))
-		}
-		// Estimate bytes to free based on average generation size
-		estimatedBytes := avgSize * int64(toRemove)
-
-		return nc.dryRunCleanResult(toRemove, estimatedBytes)
+		return nc.dryRunCleanResult(toRemove)
 	}
 
 	// Real cleaning implementation
@@ -278,18 +267,20 @@ func (nc *NixCleaner) CleanOldGenerations(
 		return result.Ok(combinedResult)
 	}
 
-	// Dry-run or no generations to remove - use centralized conversion
-	estimatedBytes := int64(toRemove) * NixDryRunBytesPerGeneration
-
-	return nc.dryRunCleanResult(toRemove, estimatedBytes)
+	return nc.dryRunCleanResult(toRemove)
 }
 
-// dryRunCleanResult builds the dry-run CleanResult for removing toRemove generations.
-func (nc *NixCleaner) dryRunCleanResult(toRemove int, estimatedBytes int64) result.Result[types.CleanResult] {
-	cleanResult := conversions.NewCleanResult(
+// dryRunCleanResult builds the dry-run CleanResult for removing toRemove
+// generations. The size estimate is honestly Unknown: deleting generations
+// removes profile symlinks only — /nix/store paths are freed by garbage
+// collection, and per-generation reclaimable bytes cannot be known without
+// closure diffing. The real run measures before/after disk usage precisely.
+func (nc *NixCleaner) dryRunCleanResult(toRemove int) result.Result[types.CleanResult] {
+	cleanResult := conversions.NewCleanResultWithSizeEstimate(
 		enums.StrategyDryRunType,
 		toRemove,
-		estimatedBytes,
+		0,
+		types.SizeEstimate{Known: 0, Status: enums.SizeEstimateStatusUnknown},
 	)
 
 	return result.Ok(cleanResult)

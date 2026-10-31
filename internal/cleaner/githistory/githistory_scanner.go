@@ -31,7 +31,7 @@ type GitHistoryScannerOption func(*GitHistoryScanner)
 
 // NewGitHistoryScanner creates a new git history scanner.
 func NewGitHistoryScanner(repoPath string, opts ...GitHistoryScannerOption) *GitHistoryScanner {
-	s := &GitHistoryScanner{ //nolint:exhaustruct
+	s := &GitHistoryScanner{ //nolint:exhaustruct_v5
 		repoPath:     repoPath,
 		minSizeBytes: 1024 * 1024, // Default 1MB
 		excludeExts:  make(map[string]bool),
@@ -248,40 +248,40 @@ func (s *GitHistoryScanner) parseBlobLine(
 	seenPaths map[string]bool,
 ) (types.GitHistoryFile, bool) {
 	if line == "" {
-		return types.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct_v5
 	}
 
 	parts := strings.Fields(line)
 	if len(parts) < 3 {
-		return types.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct_v5
 	}
 
 	objHash := parts[0]
 	objType := parts[1]
 
 	if objType != "blob" {
-		return types.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct_v5
 	}
 
 	path, hasPath := objectPaths[objHash]
 	if !hasPath || path == "" {
-		return types.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct_v5
 	}
 
 	if seenPaths[path] {
-		return types.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct_v5
 	}
 
 	seenPaths[path] = true
 
 	size, err := strconv.ParseInt(parts[2], 10, 64)
 	if err != nil || size < s.minSizeBytes {
-		return types.GitHistoryFile{}, false //nolint:exhaustruct
+		return types.GitHistoryFile{}, false //nolint:exhaustruct_v5
 	}
 
 	ext := strings.ToLower(filepath.Ext(path))
 
-	return types.GitHistoryFile{ //nolint:exhaustruct
+	return types.GitHistoryFile{ //nolint:exhaustruct_v5
 		Path:      path,
 		SizeBytes: size,
 		BlobHash:  objHash,

@@ -129,7 +129,7 @@ func (cc *CargoCleaner) Clean(ctx context.Context) result.Result[types.CleanResu
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
+		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct_v5
 
 		return result.Ok(cleanResult)
 	}

@@ -26,7 +26,7 @@ func (ecl *EnhancedConfigLoader) applyValidation(
 
 	switch level {
 	case enums.ValidationLevelNoneType:
-		return &ValidationResult{IsValid: true, Timestamp: time.Now()} //nolint:exhaustruct
+		return &ValidationResult{IsValid: true, Timestamp: time.Now()} //nolint:exhaustruct_v5
 	case enums.ValidationLevelBasicType:
 		return ecl.validator.ValidateConfig(config) // Use existing validator
 	case enums.ValidationLevelComprehensiveType:
@@ -69,7 +69,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(
 
 	// Require explicit profiles (no auto-generation)
 	if len(config.Profiles) == 0 {
-		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
+		result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct_v5
 			Field:    "profiles",
 			Rule:     "strict",
 			Value:    config.Profiles,
@@ -91,7 +91,7 @@ func (ecl *EnhancedConfigLoader) applyStrictValidation(
 
 	for _, required := range requiredPaths {
 		if !ecl.isPathProtected(config.Protected, required) {
-			result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct
+			result.Errors = append(result.Errors, ValidationError{ //nolint:exhaustruct_v5
 				Field:    "protected",
 				Rule:     "strict",
 				Value:    config.Protected,
@@ -142,7 +142,7 @@ func (ecl *EnhancedConfigLoader) formatValidationErrors(errors []ValidationError
 
 // createSafeModeWarning creates a warning for safe mode with critical risk operations.
 func (ecl *EnhancedConfigLoader) createSafeModeWarning() *ValidationWarning {
-	return &ValidationWarning{ //nolint:exhaustruct
+	return &ValidationWarning{ //nolint:exhaustruct_v5
 		Field:      "safe_mode", //nolint:goconst
 		Message:    "Safe mode is enabled but configuration contains critical risk operations",
 		Suggestion: "Consider disabling safe mode or reviewing critical operations",
@@ -151,7 +151,7 @@ func (ecl *EnhancedConfigLoader) createSafeModeWarning() *ValidationWarning {
 
 // createProfilesWarning creates a warning for excessive profile count.
 func (ecl *EnhancedConfigLoader) createProfilesWarning() *ValidationWarning {
-	return &ValidationWarning{ //nolint:exhaustruct
+	return &ValidationWarning{ //nolint:exhaustruct_v5
 		Field:      "profiles",
 		Message:    "Large number of profiles may impact performance",
 		Suggestion: "Consider consolidating profiles or reducing count below 20",

@@ -99,7 +99,7 @@ func (os *OperationSettings) validateNixGenerationsSettings() error {
 	}
 
 	if os.NixGenerations.Generations < 0 || os.NixGenerations.Generations > 10 {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   "nix_generations.generations",
 			Message: "generations must be between 0 and 10 (0 = keep only current)",
 			Value:   os.NixGenerations.Generations,
@@ -115,7 +115,7 @@ func (os *OperationSettings) validateTempFilesSettings() error {
 	}
 
 	if os.TempFiles.OlderThan == "" {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   tempFilesOlderThanField,
 			Message: "older_than is required",
 			Value:   os.TempFiles.OlderThan,
@@ -123,7 +123,7 @@ func (os *OperationSettings) validateTempFilesSettings() error {
 	}
 
 	if _, err := ParseCustomDuration(os.TempFiles.OlderThan); err != nil {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   tempFilesOlderThanField,
 			Message: "older_than must be a valid duration (e.g., '7d', '24h')",
 			Value:   os.TempFiles.OlderThan,
@@ -139,7 +139,7 @@ func (os *OperationSettings) validateSystemTempSettings() error {
 	}
 
 	if len(os.SystemTemp.Paths) == 0 {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   "system_temp.paths",
 			Message: "paths are required",
 			Value:   os.SystemTemp.Paths,
@@ -155,7 +155,7 @@ func (os *OperationSettings) validateDockerSettings() error {
 	}
 
 	if !os.Docker.PruneMode.IsValid() {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field: "docker.prune_mode",
 			Message: "prune_mode must be a valid value (ALL, IMAGES, CONTAINERS, " +
 				"VOLUMES, or BUILDS), got: " + os.Docker.PruneMode.String(),
@@ -172,7 +172,7 @@ func (os *OperationSettings) validateGoPackagesSettings() error {
 	}
 
 	if !os.GoPackages.CleanCache.IsValid() {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   "go_packages.clean_cache",
 			Message: "clean_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanCache.String(),
 			Value:   os.GoPackages.CleanCache.String(),
@@ -180,7 +180,7 @@ func (os *OperationSettings) validateGoPackagesSettings() error {
 	}
 
 	if !os.GoPackages.CleanTestCache.IsValid() {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   "go_packages.clean_test_cache",
 			Message: "clean_test_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanTestCache.String(),
 			Value:   os.GoPackages.CleanTestCache.String(),
@@ -188,7 +188,7 @@ func (os *OperationSettings) validateGoPackagesSettings() error {
 	}
 
 	if !os.GoPackages.CleanModCache.IsValid() {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   "go_packages.clean_mod_cache",
 			Message: "clean_mod_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanModCache.String(),
 			Value:   os.GoPackages.CleanModCache.String(),
@@ -196,7 +196,7 @@ func (os *OperationSettings) validateGoPackagesSettings() error {
 	}
 
 	if !os.GoPackages.CleanBuildCache.IsValid() {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   "go_packages.clean_build_cache",
 			Message: "clean_build_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanBuildCache.String(),
 			Value:   os.GoPackages.CleanBuildCache.String(),
@@ -204,7 +204,7 @@ func (os *OperationSettings) validateGoPackagesSettings() error {
 	}
 
 	if !os.GoPackages.CleanLintCache.IsValid() {
-		return &ValidationError{ //nolint:exhaustruct
+		return &ValidationError{ //nolint:exhaustruct_v5
 			Field:   "go_packages.clean_lint_cache",
 			Message: "clean_lint_cache must be DISABLED or ENABLED, got: " + os.GoPackages.CleanLintCache.String(),
 			Value:   os.GoPackages.CleanLintCache.String(),
@@ -221,7 +221,7 @@ func (os *OperationSettings) validateSystemCacheSettings() error {
 
 	for i, cacheType := range os.SystemCache.CacheTypes {
 		if !cacheType.IsValid() {
-			return &ValidationError{ //nolint:exhaustruct
+			return &ValidationError{ //nolint:exhaustruct_v5
 				Field: fmt.Sprintf("system_cache.cache_types[%d]", i),
 				Message: "cache_type must be a valid value (SPOTLIGHT, XCODE, COCOAPODS, " +
 					"HOMEBREW, PIP, NPM, YARN, or CCACHE), got: " + cacheType.String(),
@@ -240,7 +240,7 @@ func (os *OperationSettings) validateBuildCacheSettings() error {
 
 	for i, toolType := range os.BuildCache.ToolTypes {
 		if !toolType.IsValid() {
-			return &ValidationError{ //nolint:exhaustruct
+			return &ValidationError{ //nolint:exhaustruct_v5
 				Field:   fmt.Sprintf("build_cache.tool_types[%d]", i),
 				Message: "tool_type must be a valid value (GO, RUST, NODE, PYTHON, JAVA, or SCALA), got: " + toolType.String(),
 				Value:   toolType.String(),

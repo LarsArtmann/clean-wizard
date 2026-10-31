@@ -80,7 +80,7 @@ func NewProjectExecutablesCleaner(
 		excludeExtensions = []string{".sh"}
 	}
 
-	cleaner := &ProjectExecutablesCleaner{ //nolint:exhaustruct
+	cleaner := &ProjectExecutablesCleaner{ //nolint:exhaustruct_v5
 		CleanerBase:       cleaner.NewCleanerBase(verbose, dryRun),
 		excludeExtensions: excludeExtensions,
 		excludePatterns:   excludePatterns,

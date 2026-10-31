@@ -44,7 +44,7 @@ func CleanResultsToJSON(
 	results map[string]types.CleanResult, duration time.Duration,
 	dryRun bool, skipped, failed map[string]error,
 ) ([]byte, error) {
-	output := JSONOutput{ //nolint:exhaustruct
+	output := JSONOutput{ //nolint:exhaustruct_v5
 		Success:      len(failed) == 0,
 		CleanedAt:    time.Now(),
 		DurationMs:   duration.Milliseconds(),
@@ -62,7 +62,7 @@ func CleanResultsToJSON(
 		output.ItemsFailed += result.ItemsFailed
 		output.FreedBytes += result.SizeEstimate.Value()
 
-		cleanerResult := CleanerResult{ //nolint:exhaustruct
+		cleanerResult := CleanerResult{ //nolint:exhaustruct_v5
 			Name:         name,
 			ItemsRemoved: result.ItemsRemoved,
 			ItemsFailed:  result.ItemsFailed,
@@ -77,7 +77,7 @@ func CleanResultsToJSON(
 	// Process skipped cleaners
 	for name, err := range skipped {
 		family := errorfamily.Classify(err)
-		output.Cleaners = append(output.Cleaners, CleanerResult{ //nolint:exhaustruct
+		output.Cleaners = append(output.Cleaners, CleanerResult{ //nolint:exhaustruct_v5
 			Name:      name,
 			Status:    "skipped",
 			Error:     err.Error(),
@@ -90,7 +90,7 @@ func CleanResultsToJSON(
 	// Process failed cleaners
 	for name, err := range failed {
 		family := errorfamily.Classify(err)
-		output.Cleaners = append(output.Cleaners, CleanerResult{ //nolint:exhaustruct
+		output.Cleaners = append(output.Cleaners, CleanerResult{ //nolint:exhaustruct_v5
 			Name:      name,
 			Status:    "failed",
 			Error:     err.Error(),

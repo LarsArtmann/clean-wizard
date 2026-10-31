@@ -163,7 +163,7 @@ func NewCompiledBinariesCleaner(
 		}
 	}
 
-	cleaner := &CompiledBinariesCleaner{ //nolint:exhaustruct
+	cleaner := &CompiledBinariesCleaner{ //nolint:exhaustruct_v5
 		CleanerBase:     cleaner.NewCleanerBase(verbose, dryRun),
 		minSizeMB:       minSizeMB,
 		olderThan:       olderThan,

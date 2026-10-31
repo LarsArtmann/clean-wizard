@@ -117,7 +117,7 @@ func (gc *GoCleaner) Clean(ctx context.Context) result.Result[types.CleanResult]
 	}
 
 	startTime := time.Now()
-	stats := CleanStats{} //nolint:exhaustruct
+	stats := CleanStats{} //nolint:exhaustruct_v5
 
 	for _, cacheType := range gc.caches.EnabledTypes() {
 		cleaner, ok := gc.cleaners[cacheType]
@@ -163,7 +163,7 @@ func (gc *GoCleaner) dryRunClean(ctx context.Context) result.Result[types.CleanR
 		itemsRemoved,
 		int64(totalBytes),
 	)
-	cleanResult.SizeEstimate = types.SizeEstimate{Known: totalBytes} //nolint:exhaustruct
+	cleanResult.SizeEstimate = types.SizeEstimate{Known: totalBytes} //nolint:exhaustruct_v5
 
 	return result.Ok(cleanResult)
 }

@@ -304,7 +304,7 @@ func (npmc *NodePackageManagerCleaner) Clean(
 			itemsRemoved,
 			totalBytes,
 		)
-		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct
+		cleanResult.SizeEstimate = types.SizeEstimate{Known: uint64(totalBytes)} //nolint:exhaustruct_v5
 
 		return result.Ok(cleanResult)
 	}

@@ -87,7 +87,7 @@ func (scc *SystemCacheCleaner) cleanUvCache(
 	}
 
 	bytesFreed := int64(0)
-	sizeEstimate := types.SizeEstimate{Status: enums.SizeEstimateStatusUnknown} //nolint:exhaustruct
+	sizeEstimate := types.SizeEstimate{Status: enums.SizeEstimateStatusUnknown} //nolint:exhaustruct_v5
 
 	if dirErr == nil {
 		afterSize := cleaner.GetDirSize(cacheDir)

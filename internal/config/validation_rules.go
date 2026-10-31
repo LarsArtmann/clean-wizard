@@ -84,7 +84,7 @@ func withSuggestion( //nolint:ireturn // rules are consumed through the Rule int
 func mapViolations(
 	set *configRuleSet, outcome businessrules.ValidationResultError,
 ) *ValidationResult {
-	result := &ValidationResult{ //nolint:exhaustruct
+	result := &ValidationResult{ //nolint:exhaustruct_v5
 		IsValid:   true,
 		Errors:    []ValidationError{},
 		Warnings:  []ValidationWarning{},
@@ -247,7 +247,7 @@ func (cv *ConfigValidator) addFieldRules(set *configRuleSet, cfg *types.Config) 
 				return cv.validateMaxDiskUsage(cfg.MaxDiskUsage)
 			}),
 		diskUsageSuggestion(cv.rules.MaxDiskUsage, minUsage, maxUsage),
-	), cfg.MaxDiskUsage, &ValidationContext{ //nolint:exhaustruct
+	), cfg.MaxDiskUsage, &ValidationContext{ //nolint:exhaustruct_v5
 		MinValue: minUsage,
 		MaxValue: maxUsage,
 	})
@@ -322,7 +322,7 @@ func (cv *ConfigValidator) addCrossFieldRules(set *configRuleSet, cfg *types.Con
 				return errors.New("Critical risk operations enabled while safe_mode is false")
 			}),
 		"Enable safe_mode or review critical risk operations",
-	), nil, &ValidationContext{ //nolint:exhaustruct
+	), nil, &ValidationContext{ //nolint:exhaustruct_v5
 		Metadata: map[string]string{
 			"max_risk_level": cv.findMaxRiskLevel(cfg).String(),
 			"safe_mode":      fmt.Sprintf("%v", cfg.SafeMode), //nolint:goconst
@@ -355,7 +355,7 @@ func (cv *ConfigValidator) addCrossFieldRules(set *configRuleSet, cfg *types.Con
 					return nil
 				}),
 			"Consider splitting operations into multiple profiles",
-		), len(profile.Operations), &ValidationContext{ //nolint:exhaustruct
+		), len(profile.Operations), &ValidationContext{ //nolint:exhaustruct_v5
 			Metadata: map[string]string{
 				"operation_count": strconv.Itoa(len(profile.Operations)),
 				"max_operations":  strconv.Itoa(maxOperations),
@@ -456,7 +456,7 @@ func (cv *ConfigValidator) addSecurityRules(set *configRuleSet, cfg *types.Confi
 						return errors.New("Protecting root directory '/' may prevent system operations")
 					}),
 				"Consider protecting specific system directories instead",
-			), path, &ValidationContext{ //nolint:exhaustruct
+			), path, &ValidationContext{ //nolint:exhaustruct_v5
 				Metadata: map[string]string{"protected_path": path},
 			})
 		}

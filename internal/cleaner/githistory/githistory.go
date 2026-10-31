@@ -48,7 +48,7 @@ type GitHistoryCleanerOption func(*GitHistoryCleaner)
 
 // NewGitHistoryCleaner creates a new GitHistoryCleaner.
 func NewGitHistoryCleaner(opts ...GitHistoryCleanerOption) *GitHistoryCleaner {
-	c := &GitHistoryCleaner{ //nolint:exhaustruct
+	c := &GitHistoryCleaner{ //nolint:exhaustruct_v5
 		repoPath:     ".",
 		minSizeMB:    GitHistoryDefaultMinSizeMB,
 		maxFiles:     GitHistoryDefaultMaxFiles,
@@ -289,7 +289,7 @@ func (c *GitHistoryCleaner) executeClean(
 	ctx context.Context,
 	_ int64,
 ) result.Result[types.CleanResult] {
-	execResult, err := c.executor.Execute(ctx, ExecuteOptions{ //nolint:exhaustruct
+	execResult, err := c.executor.Execute(ctx, ExecuteOptions{ //nolint:exhaustruct_v5
 		FilesToRemove: c.selectedFiles,
 		CreateBackup:  c.createBackup,
 	})

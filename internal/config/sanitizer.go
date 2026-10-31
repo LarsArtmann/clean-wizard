@@ -112,7 +112,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *types.Config, validationResult *V
 
 	// Update validation result with sanitization info
 	if validationResult != nil {
-		validationResult.Sanitized = &ValidationSanitizedData{ //nolint:exhaustruct
+		validationResult.Sanitized = &ValidationSanitizedData{ //nolint:exhaustruct_v5
 			FieldsModified: result.SanitizedFields,
 			RulesApplied:   []string{"basic_sanitization", "default_values"},
 			Metadata: map[string]string{
@@ -131,7 +131,7 @@ func (cs *ConfigSanitizer) SanitizeConfig(cfg *types.Config, validationResult *V
 					warning.Original,
 					warning.Sanitized,
 				),
-				Context: &ValidationContext{ //nolint:exhaustruct
+				Context: &ValidationContext{ //nolint:exhaustruct_v5
 					Metadata: map[string]string{
 						"original":  fmt.Sprintf("%v", warning.Original),
 						"sanitized": fmt.Sprintf("%v", warning.Sanitized),
@@ -218,7 +218,7 @@ func (r *SanitizationResult) addChange(field string, original, sanitized any, re
 }
 
 func (r *SanitizationResult) addWarning(field string, original, sanitized any, reason string) {
-	r.Warnings = append(r.Warnings, SanitizationWarning{ //nolint:exhaustruct
+	r.Warnings = append(r.Warnings, SanitizationWarning{ //nolint:exhaustruct_v5
 		Field:     field,
 		Original:  original,
 		Sanitized: sanitized,

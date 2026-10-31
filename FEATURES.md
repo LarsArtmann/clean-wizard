@@ -37,8 +37,8 @@ Clean Wizard is a system cleanup tool designed to safely remove old files, packa
 | **Generation Listing**     | ⚠️ PARTIALLY_FUNCTIONAL | Returns mock data when Nix unavailable; real data when available |
 | **Generation Cleanup**     | ✅ Working             | Removes old generations, keeps current + N others                |
 | **Garbage Collection**     | ✅ Working             | Runs `nix-collect-garbage` after cleanup                         |
-| **Dry Run Mode**           | ✅ Working             | Estimates 50MB per generation                                    |
-| **Size Estimation**        | 🧪 MOCKED              | Uses hardcoded 50MB estimate per generation                      |
+| **Dry Run Mode**           | ✅ Working             | Honest estimates: dry-run reports items truthfully, marks reclaimable bytes Unknown (generation deletion frees profile links only; GC frees store paths and is measured before/after in real runs) |
+| **Size Estimation**        | ✅ Honest              | Fabricated 50MB/generation constant removed 2026-10-31; unknown sizes report `SizeEstimateStatusUnknown` instead of invented numbers |
 | **Configurability**        | ✅ Working             | Configurable keep count (default: 5)                             |
 
 **Notes:**

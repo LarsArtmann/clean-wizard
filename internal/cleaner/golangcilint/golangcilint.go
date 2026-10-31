@@ -74,7 +74,7 @@ func parseCacheStatus(output string) (*cacheStatus, error) {
 		return nil, fmt.Errorf("unexpected output format: %s", output)
 	}
 
-	status := &cacheStatus{} //nolint:exhaustruct
+	status := &cacheStatus{} //nolint:exhaustruct_v5
 
 	for _, line := range lines {
 		if after, ok := strings.CutPrefix(line, "Dir:"); ok {
@@ -174,7 +174,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[t
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			enums.StrategyConservativeType,
 			0, int64(0),
-			types.SizeEstimate{Status: enums.SizeEstimateStatusUnknown}, //nolint:exhaustruct
+			types.SizeEstimate{Status: enums.SizeEstimateStatusUnknown}, //nolint:exhaustruct_v5
 		))
 	}
 
@@ -194,7 +194,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[t
 		return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 			enums.StrategyDryRunType,
 			len(items), totalSize,
-			types.SizeEstimate{Known: uint64(totalSize)}, //nolint:exhaustruct
+			types.SizeEstimate{Known: uint64(totalSize)}, //nolint:exhaustruct_v5
 		))
 	}
 
@@ -241,7 +241,7 @@ func (glcc *GolangciLintCacheCleaner) Clean(ctx context.Context) result.Result[t
 	return result.Ok(conversions.NewCleanResultWithSizeEstimate(
 		enums.StrategyConservativeType,
 		1, bytesFreed,
-		types.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct
+		types.SizeEstimate{Known: uint64(bytesFreed)}, //nolint:exhaustruct_v5
 	))
 }
 

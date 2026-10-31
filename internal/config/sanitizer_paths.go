@@ -39,7 +39,7 @@ func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *types.Config, result *San
 
 		// Validate absolute path requirement
 		if !filepath.IsAbs(path) {
-			result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct
+			result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct_v5
 				Field:     fmt.Sprintf("protected[%d]", i),
 				Original:  original,
 				Sanitized: path,
@@ -52,7 +52,7 @@ func (cs *ConfigSanitizer) sanitizeProtectedPaths(cfg *types.Config, result *San
 		// Validate existence if enabled
 		if cs.rules.ValidateExists {
 			if _, err := os.Stat(path); os.IsNotExist(err) {
-				result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct
+				result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct_v5
 					Field:     fmt.Sprintf("protected[%d]", i),
 					Original:  original,
 					Sanitized: path,

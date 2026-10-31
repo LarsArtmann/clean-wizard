@@ -22,10 +22,6 @@ const (
 	NixDryRunStoreSizeGB = 50
 	// NixGCPostDelay is the delay after garbage collection to allow async operations.
 	NixGCPostDelay = 500 * time.Millisecond
-	// NixDryRunGenerationSizeMB is the estimated size per generation in dry-run mode.
-	NixDryRunGenerationSizeMB = 50
-	// NixDryRunGCSizeMB is the estimated size freed from GC in dry-run mode.
-	NixDryRunGCSizeMB = 100
 
 	// Byte conversion constants.
 	bytesPerMB = 1024 * 1024
@@ -49,7 +45,7 @@ type NixAdapter struct {
 
 // NewNixAdapter creates Nix adapter with configuration.
 func NewNixAdapter(timeout time.Duration, retries int) *NixAdapter {
-	return &NixAdapter{ //nolint:exhaustruct
+	return &NixAdapter{ //nolint:exhaustruct_v5
 		timeout: timeout,
 		retries: retries,
 	}
@@ -130,13 +126,15 @@ func (n *NixAdapter) GetStoreSize(ctx context.Context) result.Result[int64] {
 // Uses the modern "nix store gc" command (Nix 2.4+).
 // In dry-run mode, returns a success result without actually running garbage collection.
 func (n *NixAdapter) CollectGarbage(ctx context.Context) result.Result[types.CleanResult] {
+	// Dry-run GC: the freed size depends on unique closures and cannot be
+	// known before the run, so the estimate is honestly Unknown; the real run
+	// measures before/after disk usage.
 	if n.dryRun {
-		estimatedFreed := int64(NixDryRunGCSizeMB * bytesPerMB)
-		cleanResult := conversions.NewCleanResultWithTiming(
+		cleanResult := conversions.NewCleanResultWithSizeEstimate(
 			enums.StrategyAggressiveType,
 			1,
-			estimatedFreed,
 			0,
+			types.SizeEstimate{Known: 0, Status: enums.SizeEstimateStatusUnknown},
 		)
 
 		return result.Ok(cleanResult)
@@ -207,15 +205,15 @@ func (n *NixAdapter) RemoveGeneration(
 	ctx context.Context,
 	genID types.NixGenerationID,
 ) result.Result[types.CleanResult] {
-	// In dry-run mode, return success without actually removing
+	// In dry-run mode, return success without actually removing. The size
+	// estimate is honestly Unknown: generation deletion removes profile
+	// symlinks only; store paths are freed by garbage collection.
 	if n.dryRun {
-		// Return a success result with estimated bytes freed
-		estimatedFreed := int64(NixDryRunGenerationSizeMB * bytesPerMB)
-		cleanResult := conversions.NewCleanResultWithTiming(
+		cleanResult := conversions.NewCleanResultWithSizeEstimate(
 			enums.StrategyConservativeType,
 			1,
-			estimatedFreed,
 			0,
+			types.SizeEstimate{Known: 0, Status: enums.SizeEstimateStatusUnknown},
 		)
 
 		return result.Ok(cleanResult)

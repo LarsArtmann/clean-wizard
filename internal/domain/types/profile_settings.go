@@ -42,7 +42,7 @@ func (c *Config) SettingsForProfile(profileName string) *operations.OperationSet
 		}
 
 		if merged == nil {
-			merged = &operations.OperationSettings{} //nolint:exhaustruct
+			merged = &operations.OperationSettings{} //nolint:exhaustruct_v5
 		}
 
 		mergeMissingSettings(merged, opSettings)

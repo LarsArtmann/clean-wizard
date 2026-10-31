@@ -224,7 +224,7 @@ func (vm *ValidationMiddleware) ValidateConfigChange(
 	ctx context.Context,
 	current, proposed *types.Config,
 ) *ConfigChangeResult {
-	changeResult := &ConfigChangeResult{ //nolint:exhaustruct
+	changeResult := &ConfigChangeResult{ //nolint:exhaustruct_v5
 		IsValid:   true,
 		Changes:   []ConfigChange{},
 		Warnings:  []ValidationWarning{},
@@ -250,7 +250,7 @@ func (vm *ValidationMiddleware) ValidateConfigChange(
 	err := vm.validateChangeBusinessRules(changes)
 	if err != nil {
 		changeResult.IsValid = false
-		changeResult.Errors = append(changeResult.Errors, ValidationError{ //nolint:exhaustruct
+		changeResult.Errors = append(changeResult.Errors, ValidationError{ //nolint:exhaustruct_v5
 			Field:    "business_rules",
 			Rule:     "validation",
 			Value:    err.Error(),
@@ -270,7 +270,7 @@ func (vm *ValidationMiddleware) ValidateProfileOperation(
 	profileName, operationName string,
 	settings *operations.OperationSettings,
 ) *ProfileOperationResult {
-	result := &ProfileOperationResult{ //nolint:exhaustruct
+	result := &ProfileOperationResult{ //nolint:exhaustruct_v5
 		IsValid:   true,
 		Timestamp: time.Now(),
 	}

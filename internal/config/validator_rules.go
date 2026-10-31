@@ -83,29 +83,29 @@ func getDefaultValidationRules() *ConfigValidationRules {
 	maxProfiles := 10
 	maxOps := 20
 
-	return &ConfigValidationRules{ //nolint:exhaustruct
-		MaxDiskUsage: &ValidationRule[int]{ //nolint:exhaustruct
+	return &ConfigValidationRules{ //nolint:exhaustruct_v5
+		MaxDiskUsage: &ValidationRule[int]{ //nolint:exhaustruct_v5
 			Required: true,
 			Min:      &minUsage,
 			Max:      &maxUsage,
 			Message:  "Max disk usage must be between 10% and 95%",
 		},
-		MinProtectedPaths: &ValidationRule[int]{ //nolint:exhaustruct
+		MinProtectedPaths: &ValidationRule[int]{ //nolint:exhaustruct_v5
 			Required: true,
 			Min:      &minPaths,
 			Message:  "At least one protected path is required",
 		},
-		MaxProfiles: &ValidationRule[int]{ //nolint:exhaustruct
+		MaxProfiles: &ValidationRule[int]{ //nolint:exhaustruct_v5
 			Required: false,
 			Min:      &maxProfiles,
 			Message:  "Consider limiting profiles to maintain clarity",
 		},
-		MaxOperations: &ValidationRule[int]{ //nolint:exhaustruct
+		MaxOperations: &ValidationRule[int]{ //nolint:exhaustruct_v5
 			Required: false,
 			Min:      &maxOps,
 			Message:  "Consider limiting operations per profile for better maintainability",
 		},
-		ProfileNamePattern: &ValidationRule[string]{ //nolint:exhaustruct
+		ProfileNamePattern: &ValidationRule[string]{ //nolint:exhaustruct_v5
 			Required: true,
 			Pattern:  "^[a-zA-Z0-9_-]+$",
 			Message:  "Profile names must be alphanumeric with underscores and hyphens",

@@ -67,7 +67,7 @@ func findMigration(from FormatVersion) (Migration, bool) {
 		}
 	}
 
-	return Migration{}, false //nolint:exhaustruct
+	return Migration{}, false //nolint:exhaustruct_v5
 }
 
 // MigrationRecord captures what one migration step changed.

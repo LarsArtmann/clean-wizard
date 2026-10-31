@@ -191,7 +191,7 @@ func selectSetupMode() (string, error) {
 
 func maybeSelectCustomCleaners(setupMode string) (*customCleanerOptions, error) {
 	if setupMode != setupModeCustom {
-		return &customCleanerOptions{}, nil //nolint:exhaustruct
+		return &customCleanerOptions{}, nil //nolint:exhaustruct_v5
 	}
 
 	var opts customCleanerOptions

@@ -27,7 +27,7 @@ type Info struct {
 
 // Get returns the current version info.
 func Get() Info {
-	info := Info{ //nolint:exhaustruct
+	info := Info{ //nolint:exhaustruct_v5
 		Version: version,
 		Commit:  commit,
 		Date:    date,

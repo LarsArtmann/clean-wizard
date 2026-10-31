@@ -24,7 +24,7 @@ func (cs *ConfigSanitizer) sanitizeSystemTempSettings(
 
 			// Validate absolute path requirement
 			if !filepath.IsAbs(path) {
-				result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct
+				result.Warnings = append(result.Warnings, SanitizationWarning{ //nolint:exhaustruct_v5
 					Field:     fmt.Sprintf("%s.paths[%d]", fieldPrefix, i),
 					Original:  original,
 					Sanitized: path,

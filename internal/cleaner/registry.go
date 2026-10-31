@@ -36,7 +36,7 @@ type Registry struct {
 
 // NewRegistry creates a new cleaner registry.
 func NewRegistry() *Registry {
-	return &Registry{ //nolint:exhaustruct
+	return &Registry{ //nolint:exhaustruct_v5
 		cleaners: make(map[string]Cleaner),
 	}
 }
