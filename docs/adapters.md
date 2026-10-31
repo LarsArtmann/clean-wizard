@@ -16,7 +16,7 @@ func GetEnvDuration(key string, defaultValue time.Duration) time.Duration
 func GetEnvInt(key string, defaultValue int) int
 func GetEnvWithDefault(key, defaultValue string) string
 type CacheManager struct{ ... }
-func NewCacheManager(defaultExpiration, cleanupInterval time.Duration) *CacheManager
+func NewCacheManager() *CacheManager
 type CacheStats struct{ ... }
 type EnvironmentConfig struct{ ... }
 func LoadEnvironmentConfig() (*EnvironmentConfig, error)

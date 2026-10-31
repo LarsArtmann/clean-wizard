@@ -583,11 +583,21 @@ func confirmAction(
 }
 
 // ScanRepoForDisplay is a helper to get scan results formatted for display.
+//
+// NOTE (deliberate, do not "fix"): the githistory cleaner is constructed
+// per-repository at runtime through newGitHistoryCleaner, not resolved from
+// the DI registry — its lifecycle (one repo per invocation, parameters from
+// CLI flags) does not fit the singleton-per-cleaner registry that backs the
+// profile-driven clean/scan workflows. Every construction site routes through
+// newGitHistoryCleaner so the parameter mapping stays in one place.
 func ScanRepoForDisplay(ctx context.Context, repoPath string, minSizeMB int) (*ScanDisplay, error) {
-	c := githistory.NewGitHistoryCleaner(
-		githistory.WithGitHistoryRepoPath(repoPath),
-		githistory.WithGitHistoryMinSizeMB(minSizeMB),
-		githistory.WithGitHistoryVerbose(false),
+	c := newGitHistoryCleaner(
+		repoPath,
+		minSizeMB,
+		githistory.GitHistoryDefaultMaxFiles,
+		false,
+		false,
+		false,
 	)
 
 	if !c.IsAvailable(ctx) {

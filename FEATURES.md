@@ -410,7 +410,7 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
 | **Registry Pattern**       | ✅ FULLY_FUNCTIONAL | Thread-safe cleaner registry                             |
 | **Factory Functions**      | ✅ FULLY_FUNCTIONAL | `DefaultRegistryWithConfig(verbose, dryRun)`             |
 | **Result Type**            | ✅ FULLY_FUNCTIONAL | Generic `result.Result[T]` type                          |
-| **Adapter Pattern**        | ✅ FULLY_FUNCTIONAL | External tool adapters (Nix, Exec, HTTP, Cache)          |
+| **Adapter Pattern**        | ✅ FULLY_FUNCTIONAL | Nix adapter via DI interface alias (`adapters.NixStore`); HTTP/Cache/RateLimiter interfaces exist unregistered until a consumer appears (ADR-0003) |
 | **Middleware**             | ✅ FULLY_FUNCTIONAL | Validation middleware                                    |
 | **Type-Safe Enums**        | ✅ FULLY_FUNCTIONAL | Compile-time enum safety (19 enums, 27 CacheType values) |
 | **Dependency Injection**   | ✅ FULLY_FUNCTIONAL | `samber/do v2` DI container with typed accessors         |
@@ -432,9 +432,9 @@ All 19 iota-based enums consolidated onto unified `enum_macros.go` helpers (52% 
    - Depends on tool most users won't have
    - Effectively non-functional
 
-2. **Cleaners use hardcoded defaults instead of config profiles** ⚠️
-   - User YAML settings don't reach individual cleaner constructors
-   - Pre-existing issue; DI container wraps the factory rather than per-cleaner providers
+2. **Profile settings reach cleaners only when --profile is selected** ✅ (resolved 2026-09-23)
+   - Per-cleaner DI providers resolve the selected profile's merged OperationSettings
+   - Preset/interactive runs intentionally use factory defaults
 
 ### Minor Issues
 
