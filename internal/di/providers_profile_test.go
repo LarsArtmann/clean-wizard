@@ -8,6 +8,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/samber/do/v2"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -115,17 +116,18 @@ func TestRegisterAllServices_ProfileSettingsReachRegistry(t *testing.T) {
 		assert.Contains(t, names, cleaner.CleanerDocker)
 	})
 
-	t.Run("unknown profile falls back to defaults", func(t *testing.T) {
+	t.Run("unknown profile is rejected at the composition root", func(t *testing.T) {
 		t.Parallel()
 
 		container, cleanup := New()
 		defer cleanup()
 
+		// A typo'd --profile used to fall back to factory defaults silently;
+		// since 2026-10-31 it is a Rejection so the run never proceeds with
+		// settings the user did not ask for.
 		err := RegisterAllServices(container.Injector(), cfg, RunSettings{Profile: "weekly"})
-		require.NoError(t, err)
-
-		registry, err := CleanerRegistry(container.Injector())
-		require.NoError(t, err)
-		assert.NotEmpty(t, registry.Names())
+		require.Error(t, err)
+		assert.Equal(t, errorfamily.Rejection, errorfamily.Classify(err))
+		assert.Equal(t, "di.unknown_profile", errorfamily.Code(err))
 	})
 }

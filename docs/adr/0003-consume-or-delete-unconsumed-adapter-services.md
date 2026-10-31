@@ -61,6 +61,16 @@ real consumer exists — re-adding one service is a 3-line change in
 - `internal/adapters` carries unused-but-tested exported types until a
   consumer appears; acceptable for an internal library package.
 
+## Lifecycle decision (same-day addition, T11)
+
+`samber-do-auditlog` was evaluated and **deferred**: it pays off for
+long-lived services where registration/invocation diffs matter. clean-wizard
+builds a per-command container that lives for one command run; the only
+shutdown-bearing types are CacheManager (invalidate entries) and HTTPClient
+(close idle connections), both of which now implement `Shutdown() error`
+(guarded in `internal/adapters/lifecycle.go`). Re-evaluate if clean-wizard
+gains a daemon mode or shared long-lived container.
+
 ## References
 
 - Audit: `docs/reviews/2026-10-31_samber-do-healthcheck-architecture-audit.md` (F-2)

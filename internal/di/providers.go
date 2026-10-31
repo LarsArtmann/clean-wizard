@@ -1,6 +1,7 @@
 package di
 
 import (
+	"github.com/LarsArtmann/clean-wizard/internal/adapters"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/operations"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	errorfamily "github.com/larsartmann/go-error-family"

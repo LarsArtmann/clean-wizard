@@ -9,6 +9,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/cargo"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
 	"github.com/LarsArtmann/clean-wizard/internal/result"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/samber/do/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -189,6 +190,36 @@ func TestRegisterAllServices_ResolvesSingleCleanerFromContainer(t *testing.T) {
 
 	_, err = Cleaner(container.Injector(), "does-not-exist")
 	assert.Error(t, err)
+}
+
+func TestRegisterAllServices_RejectsUnknownProfile(t *testing.T) {
+	t.Parallel()
+
+	container, cleanup := New()
+	defer cleanup()
+
+	cfg := &types.Config{Profiles: map[string]*types.Profile{}}
+	settings := RunSettings{Profile: "typo-profile"}
+
+	err := RegisterAllServices(container.Injector(), cfg, settings)
+
+	require.Error(t, err)
+	assert.Equal(t, errorfamily.Rejection, errorfamily.Classify(err))
+	assert.Equal(t, "di.unknown_profile", errorfamily.Code(err))
+}
+
+func TestRegisterAllServices_AcceptsKnownProfile(t *testing.T) {
+	t.Parallel()
+
+	container, cleanup := New()
+	defer cleanup()
+
+	cfg := &types.Config{Profiles: map[string]*types.Profile{"real": {}}}
+	settings := RunSettings{Profile: "real"}
+
+	err := RegisterAllServices(container.Injector(), cfg, settings)
+
+	require.NoError(t, err)
 }
 
 func TestRegisterAllServices_AdapterInterfaceAliases(t *testing.T) {
