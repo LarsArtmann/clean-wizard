@@ -22,6 +22,7 @@ func TestRunCleanCommand_DryRun_JSON(t *testing.T) {
 		false, // verbose
 		true,  // jsonOutput
 		true,  // skipConfirmation
+		false, // checkHealth
 		"",    // mode
 		"",    // profile
 		"",    // configPath

@@ -58,6 +58,7 @@ func NewCleanCommand() *cobra.Command {
 		progressFlag     bool
 		tuiFlag          bool
 		reportPath       string
+		checkHealth      bool
 	)
 
 	cmd := &cobra.Command{
@@ -72,6 +73,7 @@ func NewCleanCommand() *cobra.Command {
 				verbose,
 				jsonOutput,
 				skipConfirmation,
+				checkHealth,
 				mode,
 				profile,
 				configPath,
@@ -104,6 +106,8 @@ func NewCleanCommand() *cobra.Command {
 		"EXPERIMENTAL: render live progress in an interactive BubbleTea TUI (ctrl+c aborts the run)")
 	cmd.Flags().StringVar(&reportPath, "report", "",
 		"Write a self-contained interactive HTML report to this path (off with --json)")
+	cmd.Flags().BoolVar(&checkHealth, "check-health", false,
+		"Abort before any cleaning when a DI service fails its health check (exit 69); see 'clean-wizard doctor'")
 
 	return cmd
 }
@@ -148,7 +152,7 @@ func printCleanStart(dryRun bool) {
 func runCleanCommand(
 	_ *cobra.Command,
 	_ []string,
-	dryRun, verbose, jsonOutput, skipConfirmation bool,
+	dryRun, verbose, jsonOutput, skipConfirmation, checkHealth bool,
 	mode, profile, configPath string,
 	retries int, retryProfile string,
 	concurrency int,
@@ -175,6 +179,12 @@ func runCleanCommand(
 	settings := di.RunSettings{Verbose: verbose, DryRun: dryRun, MaxConcurrency: concurrency, Profile: profile}
 	if err := di.RegisterAllServices(container.Injector(), cfg, settings); err != nil {
 		return errorfamily.WrapRejection(err, "clean.di_register", "failed to register DI services")
+	}
+
+	if checkHealth {
+		if err := enforceCleanHealthGate(ctx, container.Injector()); err != nil {
+			return err
+		}
 	}
 
 	registry, err := di.CleanerRegistry(container.Injector())

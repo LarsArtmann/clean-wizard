@@ -204,9 +204,12 @@ func TestRegisterAllServices_AdapterInterfaceAliases(t *testing.T) {
 type fakeNixStore struct {
 	dryRunCalls  []bool
 	availableAsk int
+	healthErr    error
 }
 
 func (f *fakeNixStore) SetDryRun(dryRun bool) { f.dryRunCalls = append(f.dryRunCalls, dryRun) }
+
+func (f *fakeNixStore) HealthCheck(context.Context) error { return f.healthErr }
 
 func (f *fakeNixStore) IsAvailable(context.Context) bool {
 	f.availableAsk++

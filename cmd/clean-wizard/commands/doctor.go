@@ -10,6 +10,7 @@ import (
 	"github.com/LarsArtmann/clean-wizard/internal/di"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	errorfamily "github.com/larsartmann/go-error-family"
+	"github.com/samber/do/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -155,6 +156,23 @@ func printDoctorReport(report []di.HealthEntry) {
 	fmt.Printf("✅ All %d service(s) healthy\n", summary.Total)
 }
 
+// enforceCleanHealthGate aborts a clean run when the container is unhealthy.
+// Opt-in via --check-health; failures are classified Infrastructure so the
+// CLI exits 69 instead of half-executing a clean with broken services.
+func enforceCleanHealthGate(ctx context.Context, injector do.Injector) error {
+	report, err := di.HealthReport(ctx, injector)
+	if err != nil {
+		return errorfamily.WrapInfrastructure(err, "clean.health_report", "failed to run pre-run health checks")
+	}
+
+	summary := di.Summarize(report)
+	if summary.Unhealthy == 0 {
+		return nil
+	}
+
+	return fmt.Errorf("refusing to clean with unhealthy services: %w", di.UnhealthyError(summary))
+}
+
 // shortServiceName trims the Go module path from a fully-qualified DI service
 // name for display ("github.com/m/p/adapters.NixAdapter" → "adapters.NixAdapter").
 func shortServiceName(serviceName string) string {
@@ -167,29 +185,42 @@ func shortServiceName(serviceName string) string {
 	return serviceName
 }
 
-// outputDoctorJSON writes the health report as JSON. Per-entry family/code/
-// retryable enrichment mirrors the clean/scan JSON schemas.
+// healthJSONOutput is the doctor --json document shape. Field enrichment
+// (family/code/retryable) mirrors the clean/scan JSON schemas.
+type healthJSONService struct {
+	Service   string `json:"service"`
+	Healthy   bool   `json:"healthy"`
+	Error     string `json:"error,omitempty"`
+	Family    string `json:"family,omitempty"`
+	Code      string `json:"code,omitempty"`
+	Retryable bool   `json:"retryable,omitempty"`
+}
+
+type healthJSONSummary struct {
+	Total     int  `json:"total"`
+	Unhealthy int  `json:"unhealthy"`
+	Healthy   bool `json:"healthy"`
+}
+
+type healthJSONOutput struct {
+	Services []healthJSONService `json:"services"`
+	Summary  healthJSONSummary   `json:"summary"`
+}
+
+// outputDoctorJSON writes the health report as JSON.
 func outputDoctorJSON(report []di.HealthEntry) error {
-	type healthJSONService struct {
-		Service   string `json:"service"`
-		Healthy   bool   `json:"healthy"`
-		Error     string `json:"error,omitempty"`
-		Family    string `json:"family,omitempty"`
-		Code      string `json:"code,omitempty"`
-		Retryable bool   `json:"retryable,omitempty"`
+	jsonBytes, err := buildDoctorJSON(report)
+	if err != nil {
+		return err
 	}
 
-	type healthJSONSummary struct {
-		Total     int  `json:"total"`
-		Unhealthy int  `json:"unhealthy"`
-		Healthy   bool `json:"healthy"`
-	}
+	fmt.Println(string(jsonBytes))
 
-	type healthJSONOutput struct {
-		Services []healthJSONService `json:"services"`
-		Summary  healthJSONSummary   `json:"summary"`
-	}
+	return nil
+}
 
+// buildDoctorJSON renders the health report as indented JSON bytes.
+func buildDoctorJSON(report []di.HealthEntry) ([]byte, error) {
 	jsonServices := make([]healthJSONService, 0, len(report))
 	for _, entry := range report {
 		service := healthJSONService{
@@ -220,12 +251,10 @@ func outputDoctorJSON(report []di.HealthEntry) error {
 
 	jsonBytes, err := json.Marshal(output, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	if err != nil {
-		return errorfamily.WrapCorruption(err, "doctor.json_output", "failed to generate doctor JSON output")
+		return nil, errorfamily.WrapCorruption(err, "doctor.json_output", "failed to generate doctor JSON output")
 	}
 
-	fmt.Println(string(jsonBytes))
-
-	return nil
+	return jsonBytes, nil
 }
 
 // writeDoctorSARIF writes health findings as a SARIF document to a path (or
