@@ -21,6 +21,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewProfileCommand())
 	rootCmd.AddCommand(commands.NewConfigCommand())
 	rootCmd.AddCommand(commands.NewGitHistoryCommand())
+	rootCmd.AddCommand(commands.NewDoctorCommand())
 
 	info := version.Get()
 
