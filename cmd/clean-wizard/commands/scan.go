@@ -10,8 +10,8 @@ import (
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/di"
-	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
+	"github.com/LarsArtmann/clean-wizard/internal/execution"
 	"github.com/LarsArtmann/clean-wizard/internal/format"
 	"github.com/LarsArtmann/clean-wizard/internal/progress"
 	"github.com/LarsArtmann/clean-wizard/internal/report"

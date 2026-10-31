@@ -170,8 +170,22 @@
           treefmt = {
             programs = {
               nixfmt.enable = true;
-              gofmt.enable = true;
-              goimports.enable = true;
+              gofmt = {
+                enable = true;
+                package = pkgs.go_1_27;
+              };
+              goimports = {
+                enable = true;
+                # goimports resolves `go` from PATH; with an older go it tries
+                # to download the go1.27 toolchain the module requires, which
+                # dies in the offline sandbox (ticketed TODO #29). The wrapper
+                # script puts go_1_27 on PATH first, so toolchain resolution
+                # stays local inside the sandbox.
+                package = pkgs.writeShellScriptBin "goimports" ''
+                  export PATH="${pkgs.go_1_27}/bin:$PATH"
+                  exec "${pkgs.gotools}/bin/goimports" "$@"
+                '';
+              };
             };
           };
         };
