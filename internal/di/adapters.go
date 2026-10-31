@@ -28,6 +28,10 @@ func registerAdapters(injector do.Injector) {
 	do.MustAs[*adapters.NixAdapter, adapters.NixStore](injector)
 }
 
+// The nix adapter participates in container health checks (doctor command):
+// the alias service forwards HealthCheck to the concrete adapter.
+var _ do.HealthcheckerWithContext = (*adapters.NixAdapter)(nil)
+
 // NixStore resolves the Nix store interface from the DI container.
 func NixStore(i do.Injector) (adapters.NixStore, error) {
 	return do.Invoke[adapters.NixStore](i)

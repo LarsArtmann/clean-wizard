@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/LarsArtmann/clean-wizard/internal/cleaner"
 	"github.com/LarsArtmann/clean-wizard/internal/conversions"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/enums"
 	"github.com/LarsArtmann/clean-wizard/internal/domain/types"
@@ -315,4 +317,36 @@ func (n *NixAdapter) IsAvailable(ctx context.Context) bool {
 	versionCmd := n.execWithTimeout(ctx, "nix", "--version")
 
 	return versionCmd.Run() == nil
+}
+
+// ContextHealthchecker mirrors do.HealthcheckerWithContext so the adapters
+// package stays free of the DI library while still proving the contract its
+// services must satisfy for container health checks.
+type ContextHealthchecker interface {
+	HealthCheck(context.Context) error
+}
+
+var _ ContextHealthchecker = (*NixAdapter)(nil)
+
+// HealthCheck reports whether the nix binary can be executed. It is the
+// container-domain fault signal consumed by do health checks; the scan-domain
+// availability signal is IsAvailable. Both probe `nix --version`, but only
+// HealthCheck carries a classified not-available error for the doctor surface.
+func (n *NixAdapter) HealthCheck(ctx context.Context) error {
+	timeout := n.timeout
+	if timeout == 0 {
+		timeout = DefaultTimeout
+	}
+
+	checkCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	// Own exec path: adapters.ExecWithTimeout is broken for deadline-less
+	// contexts (ticketed #56) and must not gain new callers.
+	cmd := exec.CommandContext(checkCtx, "nix", "--version")
+	if err := cmd.Run(); err != nil {
+		return cleaner.NewNotAvailableError("nix", fmt.Sprintf("nix --version failed: %v", err))
+	}
+
+	return nil
 }
