@@ -251,6 +251,12 @@ linters:
           - cyclop
           - gosec
           - wrapcheck
+      # The commands package is the presentation layer: fmt.Print* to stdout
+      # is the CLI's job (lipgloss styles are composed into those prints).
+      # Machine channels (JSON/SARIF) marshal through format/ instead.
+      - path: cmd/clean-wizard/commands/.*\.go
+        linters:
+          - forbidigo
       - path: .*_test\.go
         text: unused-parameter|empty-block
         linters:

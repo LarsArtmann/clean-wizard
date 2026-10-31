@@ -288,6 +288,7 @@ func TestNixCleaner_UsesContainerInjectedStore(t *testing.T) {
 	require.NoError(t, err)
 
 	injectedStore := &fakeNixStore{}
+
 	do.Override(container.Injector(), func(i do.Injector) (adapters.NixStore, error) {
 		return injectedStore, nil
 	})

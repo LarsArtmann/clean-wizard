@@ -32,7 +32,7 @@ type Container struct {
 // failures are logged at Debug (they must never mask the command's real
 // outcome, but should be visible when diagnosing leaked resources).
 func New() (*Container, func()) {
-	injector := do.NewWithOpts(&do.InjectorOpts{ //nolint:exhaustruct_v5 // zero hooks/parallelism are the intended defaults; only the health timeout differs
+	injector := do.NewWithOpts(&do.InjectorOpts{ //nolint:exhaustruct_v5 // zero-value defaults intended
 		HealthCheckGlobalTimeout: DefaultHealthCheckGlobalTimeout,
 	})
 

@@ -55,7 +55,7 @@ func registerCleanerProviders(injector do.Injector) {
 
 // buildNixCleaner constructs the nix cleaner with the container-resolved
 // adapters.NixStore instead of the inline real adapter.
-func buildNixCleaner( //nolint:ireturn // returning the cleaner interface is the DI contract
+func buildNixCleaner( //nolint:ireturn // DI returns interfaces by design
 	injector do.Injector,
 	settings RunSettings,
 	operationSettings *operations.OperationSettings,

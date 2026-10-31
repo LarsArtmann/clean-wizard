@@ -22,7 +22,7 @@ func newHealthTestContainer(t *testing.T) *di.Container {
 	err := di.RegisterAllServices(
 		container.Injector(),
 		&types.Config{},
-		di.RunSettings{Verbose: false, DryRun: true, MaxConcurrency: 0, Profile: ""}, //nolint:exhaustruct // test defaults
+		di.RunSettings{Verbose: false, DryRun: true, MaxConcurrency: 0, Profile: ""}, //nolint:exhaustruct_v5 // test defaults
 	)
 	require.NoError(t, err)
 

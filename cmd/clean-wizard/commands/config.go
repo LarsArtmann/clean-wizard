@@ -132,7 +132,7 @@ func writeMigrationSarif(sarifOut string, report config.MigrationReport) error {
 	}
 
 	if sarifOut == "-" {
-		fmt.Println(string(data)) //nolint:forbidigo
+		fmt.Println(string(data))
 
 		return nil
 	}

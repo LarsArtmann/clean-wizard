@@ -63,6 +63,7 @@ func TestHealthReport_MergesHealthCheckFailureIntoAlias(t *testing.T) {
 	defer cleanup()
 
 	unhealthy := &fakeNixStore{healthErr: errNixProbeFailed}
+
 	do.Override(container.Injector(), func(i do.Injector) (adapters.NixStore, error) {
 		return unhealthy, nil
 	})
@@ -73,6 +74,7 @@ func TestHealthReport_MergesHealthCheckFailureIntoAlias(t *testing.T) {
 	aliasName := do.NameOf[adapters.NixStore]()
 
 	var aliasEntry *HealthEntry
+
 	for i := range report {
 		if report[i].Service == aliasName {
 			aliasEntry = &report[i]
