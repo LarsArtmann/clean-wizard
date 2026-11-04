@@ -16,7 +16,7 @@ require (
 	github.com/knadh/koanf/parsers/yaml v1.1.1
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.4.1
-	github.com/larsartmann/go-atomic-write v0.6.1
+	github.com/larsartmann/go-atomic-write v0.6.2
 	github.com/larsartmann/go-error-family v0.12.0
 	github.com/larsartmann/go-finding v1.15.0
 	github.com/larsartmann/go-finding/pipeline v1.15.0
