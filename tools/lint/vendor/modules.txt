@@ -1,7 +1,7 @@
 # github.com/LarsArtmann/gogenfilter/v3 v3.6.1
 ## explicit; go 1.26
 github.com/LarsArtmann/gogenfilter/v3
-# github.com/bmatcuk/doublestar/v4 v4.10.3
+# github.com/bmatcuk/doublestar/v4 v4.10.4
 ## explicit; go 1.16
 github.com/bmatcuk/doublestar/v4
 # github.com/go-faster/errors v0.8.0
