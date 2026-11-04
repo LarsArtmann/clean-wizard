@@ -21,8 +21,9 @@ type FilterConfig func(*Filter) error
 func WithFilterOptions(opts ...FilterOption) (FilterConfig, error) {
 	for _, opt := range opts {
 		if !opt.IsValid() {
-			return nil, &FilterConfigError{ //nolint:exhaustruct
-				Code: CodeInvalidFilterOption, Option: opt,
+			return nil, &FilterConfigError{ //nolint:exhaustruct_v5 // wrapped error, only Code + Option set
+				Code:   CodeInvalidFilterOption,
+				Option: opt,
 			}
 		}
 	}
@@ -112,7 +113,7 @@ type Filter struct {
 //
 //	filter, err = NewFilter() // disabled, always returns (false, nil)
 func NewFilter(configs ...FilterConfig) (*Filter, error) {
-	//nolint:exhaustruct // sqlcDerived is atomic.Pointer, zero-valued by design
+	//nolint:exhaustruct_v5 // sqlcDerived is atomic.Pointer, zero-valued by design
 	filter := &Filter{
 		options:         make(map[FilterOption]struct{}),
 		includePatterns: make([]string, 0),
@@ -134,7 +135,7 @@ func NewFilter(configs ...FilterConfig) (*Filter, error) {
 	}
 
 	if len(errs) > 0 {
-		return nil, &FilterConfigError{ //nolint:exhaustruct
+		return nil, &FilterConfigError{ //nolint:exhaustruct_v5 // wrapped error, only Code + Err set
 			Code: CodeInvalidFilterOption,
 			Err:  errors.Join(errs...),
 		}
@@ -328,6 +329,7 @@ func (f *Filter) FilterDetailedAndContent(filePath string) (FilterResult, []byte
 	if err != nil {
 		return FilterResult{
 			Filtered: false, Reason: ReasonNotFiltered, Path: filePath, Trace: "",
+			//nolint:erraudit // context_loss FP: *FileReadError embeds filePath (Path field + branded message), prefix must stay brand-first
 		}, nil, err
 	}
 

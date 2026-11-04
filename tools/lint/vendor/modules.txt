@@ -1,5 +1,5 @@
-# github.com/LarsArtmann/gogenfilter/v3 v3.6.1
-## explicit; go 1.26
+# github.com/LarsArtmann/gogenfilter/v3 v3.7.0
+## explicit; go 1.27
 github.com/LarsArtmann/gogenfilter/v3
 # github.com/bmatcuk/doublestar/v4 v4.10.4
 ## explicit; go 1.16

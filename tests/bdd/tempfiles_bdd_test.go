@@ -4,20 +4,12 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"testing"
 	"time"
 
 	"github.com/LarsArtmann/clean-wizard/internal/cleaner/tempfiles"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
-
-func TestTempfilesBDD(t *testing.T) {
-	t.Parallel()
-
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Tempfiles Cleaner Suite")
-}
 
 var _ = Describe("Tempfiles cleaner", func() {
 	var (

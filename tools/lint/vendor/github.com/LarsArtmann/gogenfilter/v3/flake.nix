@@ -3,15 +3,19 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
-    treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
+
+    # go-standard (flakeModules.go-standard) composes treefmt-nix + systems
+    # internally — this repo no longer declares them as direct inputs.
+    go-nix-helpers = {
+      url = "github:LarsArtmann/go-nix-helpers";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    systems.url = "github:nix-systems/default";
+
     md-go-validator = {
       url = "github:LarsArtmann/md-go-validator";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -20,43 +24,102 @@
 
   outputs =
     inputs@{
-      self,
       flake-parts,
-      treefmt-nix,
-      systems,
       md-go-validator,
       ...
     }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import systems;
+    let
+      lib = inputs.nixpkgs.lib;
 
-      imports = [
-        treefmt-nix.flakeModule
-      ];
+      # Same fileset the hand-rolled package used: Go sources minus ./plugin,
+      # plus the module manifests, test fixtures, and README.
+      goFiles = lib.fileset.difference (lib.fileset.fileFilter (file: file.hasExt "go") ./.) ./plugin;
+      packageSrc = lib.fileset.toSource {
+        root = ./.;
+        fileset = lib.fileset.unions [
+          ./go.mod
+          ./go.sum
+          ./README.md
+          ./testhelpers
+          ./testdata
+          goFiles
+        ];
+      };
+
+      # md-go-validator's own flake still builds with go 1.26 while its
+      # go.mod requires >= 1.27, so we build it here with the go 1.27
+      # module builder against the pinned input source. Shared between the
+      # devShell and the validate-docs app — same arguments, same derivation.
+      mkMdgo =
+        pkgs:
+        let
+          mdgoVersion = md-go-validator.shortRev or "dev";
+        in
+        pkgs.buildGo127Module {
+          pname = "md-go-validator";
+          version = mdgoVersion;
+          src = md-go-validator.outPath or md-go-validator;
+          vendorHash = "sha256-fYZoTXM7uPiV174Mp6/HgUNKwNih/BzjnCMjHwdcAOE=";
+          proxyVendor = true;
+          GOEXPERIMENT = "jsonv2";
+          doCheck = false;
+          ldflags = [
+            "-s"
+            "-w"
+            "-X main.version=${mdgoVersion}"
+          ];
+          meta = {
+            description = "Validate code blocks embedded in Markdown and MDX documentation files";
+            mainProgram = "md-go-validator";
+          };
+        };
+    in
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+
+      go-standard = {
+        pname = "gogenfilter";
+        description = "Go library for detecting and filtering auto-generated code files";
+        goPkgAttr = "go_1_27";
+        # Linux only: the proxy-vendored go-modules FOD hashes differently on
+        # darwin (aarch64-darwin got sha256-cf2KvkrLsfTHaqdmzBZ4YB28uGwWiQVLPfgprlGP/1c=);
+        # until go-standard grows per-platform vendor hashes, restrict systems.
+        systems = [
+          "x86_64-linux"
+          "aarch64-linux"
+        ];
+        src = packageSrc;
+        vendorHash = "sha256-cf2KvkrLsfTHaqdmzBZ4YB28uGwWiQVLPfgprlGP/1c=";
+        # Match the hand-rolled build: vendoring via the module proxy.
+        proxyVendor = true;
+        enableTestCheck = true;
+        enableGofumpt = true;
+        enableGoimports = true;
+        enableNixfmt = true;
+        extraMeta = {
+          homepage = "https://gogenfilter.lars.software";
+          platforms = lib.platforms.unix ++ lib.platforms.windows;
+        };
+        devShellExtraPackages = pkgs: [
+          pkgs.gofumpt
+          pkgs.golines
+          pkgs.gotools
+          pkgs.trash-cli
+          (mkMdgo pkgs)
+        ];
+        devShellHook = ''
+          echo "gogenfilter dev shell — $(go version)"
+        '';
+      };
 
       perSystem =
         {
-          config,
           pkgs,
-          system,
           ...
         }:
         let
-          inherit (pkgs) lib;
-          goPkg = pkgs.go_1_26;
-
-          goFiles = lib.fileset.fileFilter (file: file.hasExt "go") ./.;
-          src = lib.fileset.toSource {
-            root = ./.;
-            fileset = lib.fileset.unions [
-              ./go.mod
-              ./go.sum
-              ./README.md
-              ./testhelpers
-              ./testdata
-              goFiles
-            ];
-          };
+          goPkg = pkgs.go_1_27;
+          mdgo = mkMdgo pkgs;
 
           mkApp =
             name: description: runtimeInputs: text:
@@ -71,80 +134,18 @@
               program = lib.getExe script;
               meta.description = description;
             };
-
-          pkg = pkgs.buildGoModule {
-            pname = "gogenfilter";
-            version = self.rev or self.dirtyRev or "dev";
-            inherit src;
-            go = goPkg;
-            vendorHash = "sha256-x4cy+Lyr68u7CrLuUq/fHP/qOmj8j43BD/drOkY8g50=";
-            proxyVendor = true;
-            meta = with pkgs.lib; {
-              description = "Go library for detecting and filtering auto-generated code files";
-              license = licenses.mit;
-              homepage = "https://gogenfilter.lars.software";
-              platforms = platforms.unix ++ platforms.windows;
-              maintainers = [
-                {
-                  name = "Lars Artmann";
-                  github = "LarsArtmann";
-                }
-              ];
-            };
-          };
-
-          mdgo = md-go-validator.packages.${system}.default.overrideAttrs (_: {
-            vendorHash = "sha256-oNZTI5SywT9C4guLdULUwvSlJ9KhNHurg7fqhyxDB7k=";
-          });
         in
         {
+          # golines on top of go-standard's enabled programs
+          # (gofumpt/goimports/nixfmt).
           treefmt = {
             projectRootFile = "go.mod";
-            programs = {
-              gofumpt.enable = true;
-              goimports.enable = true;
-              golines.enable = true;
-              nixfmt.enable = true;
-            };
+            programs.golines.enable = true;
           };
 
-          checks.format = config.treefmt.build.check self;
-          devShells.default = pkgs.mkShell {
-            packages = [
-              goPkg
-              pkgs.golangci-lint
-              pkgs.gofumpt
-              pkgs.golines
-              pkgs.gopls
-              pkgs.gotools
-              pkgs.govulncheck
-              pkgs.trash-cli
-              mdgo
-            ];
-
-            GOWORK = "off";
-
-            shellHook = ''
-              echo "gogenfilter dev shell — $(go version)"
-            '';
-          };
-
-          devShells.ci = pkgs.mkShellNoCC {
-            packages = [
-              goPkg
-              pkgs.golangci-lint
-            ];
-
-            GOWORK = "off";
-          };
-
-          checks = {
-            build = pkg;
-            test = pkg.overrideAttrs (_: {
-              doCheck = true;
-            });
-          };
-
+          # All bespoke apps survive verbatim; go-standard's generic
+          # default/test/lint apps are mkDefault, so these win where names
+          # collide.
           apps = {
             test = mkApp "test" "Run the Go test suite" [ goPkg ] ''
               go test ./... -count=1 "$@"
@@ -197,10 +198,5 @@
                 '';
           };
         };
-
-      flake.overlays.default = final: _prev: {
-        gogenfilter = self.packages.${final.stdenv.system}.default;
-      };
-
     };
 }
