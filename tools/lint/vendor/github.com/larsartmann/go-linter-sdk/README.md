@@ -10,7 +10,7 @@ Every Go linter reinvents the same scaffolding — a rule interface, a registry,
 
 **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/go-linter-sdk)**
 
-> **Status: Early, adopted, proven.** The `Rule`/`Registry`/`Detector` core is stable and tested (98.7% coverage, race-clean), and six LarsArtmann-internal repos already import it (pinned at `v0.3.1`). The value proposition — eliminating converter code — is **verified at the source level** (2026-10-11): no consumer retains a custom Issue/Violation converter layer; one deleted its violation hierarchy (~4,700 LOC), three were born native. Details and per-repo evidence: [`docs/ADOPTION.md`](docs/ADOPTION.md).
+> **Status: Early, adopted, proven.** The `Rule`/`Registry`/`Detector` core is stable and tested (98.7% coverage, race-clean), and six LarsArtmann repositories already import it. The value proposition — eliminating converter code — is **verified at the source level** (2026-10-11): no consumer retains a custom Issue/Violation converter layer; one deleted its violation hierarchy (~4,700 LOC), three were born native. Details and per-repo evidence: [`docs/ADOPTION.md`](docs/ADOPTION.md).
 
 ---
 
@@ -114,7 +114,10 @@ func init() {
 }
 
 func main() {
-    report, _ := registry.Run(context.Background(), ".")
+    report, err := registry.Run(context.Background(), ".")
+    if err != nil {
+        panic(err) // a rule failed (see "Errors" for attribution)
+    }
     os.Exit(linter.ExitCodeFromReport(report))
 }
 ```
@@ -272,7 +275,7 @@ For the reasoning behind Register's panic-on-duplicate contract, see
 | `Rule` interface  | `ID()` / `Name()` / `Description()` / `Category()` / `Severity()` / `IsEnabledByDefault()` / `Check(ctx, dir) ([]Finding, error)` |
 | `RuleFunc` struct | Adapter: combines a `RuleMeta` header with a `Run` closure to satisfy `Rule`. Enabled by default.                                 |
 | `RuleMeta` struct | Declarative identity: `ID` (required, stable), `Name`, `Description`, `Cat`, `Sev`                                                |
-| `Category`        | Open `string` type. 8 recommended values (`CategoryDesign`, ...); define your own for domain-specific taxonomies                  |
+| `Category`        | Open `string` type. 11 recommended values (`CategoryDesign`, ...); define your own for domain-specific taxonomies                 |
 | `Registry`        | Holds rules; thread-safe with `sync.RWMutex`                                                                                      |
 
 ### Functions
@@ -297,6 +300,28 @@ For the reasoning behind Register's panic-on-duplicate contract, see
 | `RuleFunc.NewFinding(msg, pos)`     | `*finding.Builder`       | Pre-stamped builder from rule metadata (rule ID, tool name, severity, category)                       |
 | `RuleMeta.Validate()`               | `error`                  | Check required fields (ID, Name, Description, Cat) before construction                                |
 
+### Errors
+
+Rule failures are wrapped so you can attribute them: `errors.AsType[*RuleError](err)`
+extracts the failing rule's ID; `errors.Is(err, ErrRuleFailed)` is the boolean
+check. In `ContinueOnError()` mode, `Registry.Run` joins failures from multiple
+rules — `RuleErrors(err)` recovers them all:
+
+```go
+report, err := registry.Run(ctx, dir, linter.ContinueOnError())
+for _, ruleErr := range linter.RuleErrors(err) {
+    fmt.Fprintf(os.Stderr, "rule %s failed: %v\n", ruleErr.RuleID, ruleErr.Cause)
+}
+```
+
+| Symbol              | Purpose                                                           |
+| ------------------- | ----------------------------------------------------------------- |
+| `*RuleError`        | Wraps a rule failure; `RuleID` names the failing rule             |
+| `RuleErrors(err)`   | Extract every `*RuleError` from a joined or wrapped error         |
+| `ErrRuleFailed`     | Sentinel matched by `errors.Is` for any rule failure              |
+| `NewRuleError(...)` | Wrap a cause as a `*RuleError` when implementing your own runner  |
+| `ErrMissingFields`  | Sentinel wrapped into `Register`'s panic on empty identity fields |
+
 ---
 
 ## Design notes
@@ -304,7 +329,7 @@ For the reasoning behind Register's panic-on-duplicate contract, see
 - **Depends only on `go-finding`** (the ecosystem hub) so any consumer — CLI, library, LSP server, golangci-lint plugin — can adopt it without coupling.
 - **Rules emit `finding.Finding` directly.** No intermediate Violation/Issue type. No converter layer. This is the core design decision.
 - **Dual identity: `ID()` + `Name()`.** `ID()` is the stable identifier (never changes, used for dedup/suppression/filtering); `Name()` is the display name (mutable). Every rule must declare an explicit ID.
-- **`Category` is an open type.** The 8 built-in constants are recommendations. Define your own for domain-specific taxonomies: `linter.Category("api")`.
+- **`Category` is an open type.** The 11 built-in constants are recommendations. Define your own for domain-specific taxonomies: `linter.Category("api")`.
 - **`Registry.Register` panics on duplicate IDs or empty identity fields** — duplicate or missing rule IDs/Names/Descriptions/Categories are programming errors that should surface at startup.
 - **Two execution paths.** `Registry.Run` for standalone CLI (sequential, fail-fast or `ContinueOnError`); `DetectorsFromRegistry` for go-finding/pipeline (parallel, per-rule isolation).
 - **Per-finding Confidence and FixStrategy.** Use `finding.NewBuilder(...).WithConfidence(...).WithFixStrategy(...)` to set these per finding — more expressive than rule-level defaults.
@@ -337,7 +362,8 @@ Example consumers in this repo:
 - `examples/naked-return-guard` — pilot port of `branching-flow`'s `nakedreturn` rule (156 LOC of analyzer + Detection type + converter became one self-contained `RuleFunc`)
 - `examples/oops-redundant-guard` — pilot port of `erraudit`'s `oops_redundant_guard` rule (detection core + go/analysis autofixer + violation bridge became one self-contained `RuleFunc`)
 
-Direct consumers in the LarsArtmann ecosystem (all pinned at `v0.3.1`; verified 2026-10-11):
+Direct consumers in the LarsArtmann ecosystem (verified 2026-10-11; integration
+pattern and converter status per repo in [`docs/ADOPTION.md`](docs/ADOPTION.md)):
 
 - `go-structure-linter` — the original pilot target
 - `samber-linter`
@@ -346,13 +372,19 @@ Direct consumers in the LarsArtmann ecosystem (all pinned at `v0.3.1`; verified 
 - `project-meta/linter`
 - `BuildFlow/execution` — the orchestrator depends on the SDK directly
 
-Roughly 60 further modules import it indirectly. Importing is not the same as
-migrating: the SDK's value proposition is that a consumer deletes its converter
-package, and that has not yet been independently verified for any of them.
+Roughly 60 further modules import it indirectly. The core promise — no consumer
+retains a custom Issue/Violation converter layer — holds across all six direct
+consumers, verified at the source level on 2026-10-11: three were born native,
+two physically deleted their converter code, one keeps a documented
+`go/analysis` integration by design.
 
 ## Status
 
-Early but adopted. The `Rule`/`Registry`/`Detector` core is stable. The migration story is proven by `examples/no-go-mod` (a pilot port of `go-structure-linter`'s `NoGoModRule`), `examples/naked-return-guard` (a pilot port of `branching-flow`'s `nakedreturn` rule), and `examples/oops-redundant-guard` (a pilot port of `erraudit`'s `oops_redundant_guard` rule). Six internal repos now import the SDK (see [Consumers](#consumers)); the remaining unverified claim is converter-package deletion, not adoption.
+Early but adopted. The `Rule`/`Registry`/`Detector` core is stable, and the
+migration story is proven twice over: by the three pilot ports under
+[`examples/`](examples/) and, since 2026-10-11, by source-level verification
+that no direct consumer retains a custom Issue/Violation converter layer (see
+[Consumers](#consumers) and [`docs/ADOPTION.md`](docs/ADOPTION.md)).
 
 ## Support & security
 

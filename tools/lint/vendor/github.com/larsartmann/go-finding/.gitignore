@@ -115,3 +115,9 @@ result-*
 # <<< buildflow-managed (.gitignore) <<<
 
 .buildflow-resume.json
+
+# go.work is tracked for multi-module dev; these un-ignore rules MUST stay
+# after the buildflow-managed block above (gitignore: last matching rule wins,
+# and `buildflow --fix` regenerates that block).
+!go.work
+!go.work.sum

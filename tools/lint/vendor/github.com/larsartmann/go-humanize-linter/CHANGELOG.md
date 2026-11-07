@@ -19,6 +19,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nothing yet.
 
+## [0.6.0] - 2026-11-04
+
+### Changed
+
+- **BREAKING (default behavior): all registry rules now emit findings at `SeverityError` (was `SeverityWarning`), so every consumer's default severity gate fails the run on a hand-rolled humanize reimplementation.** The severity source turned out to be the shared finding builder (`makeFindingWithConfidence`), not the per-rule `RuleMeta.Sev` fields — those were documentation — so the flip is one construction site plus the 11 meta fields; `H0SUP` (suppression diagnostics, separate builder) stays advisory on purpose. This is a deliberate, owner-approved exception to the "detect-only tools sit below the error gate" contract (BuildFlow gotcha #156): the linter is detect-only, the fix is a human decision, and the escape hatch is the linter's own `//nolint:gohumanize[:Hxxx]` suppression (function-level, ADR 0006). Consumers wanting the old advisory behavior keep their confidence filters (`--min-confidence` unchanged); severity-based tooling (SARIF `level`, golangci output class) now renders `error`. Consumer wiring note: BuildFlow elevates the full rule set via `error_rules` as belt-and-suspenders for pre-v0.6.0 binaries and pins `SeverityError` in its SDK detector test.
+
+### Fixed
+
+- H004 no longer flags functions whose bodies already delegate to
+  `english.Plural` or `english.PluralWord`. The signature-only heuristic
+  (parameters named `singular`/`plural`) previously reported legitimate
+  wrappers — zero-suppression or int64-to-uint64 boundary helpers — as
+  manual pluralization.
+
 ## [0.5.0] - 2026-10-23
 
 ### Changed
