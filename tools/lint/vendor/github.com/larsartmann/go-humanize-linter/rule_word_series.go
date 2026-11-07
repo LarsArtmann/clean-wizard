@@ -32,7 +32,7 @@ func RuleWordSeries() linter.RuleFunc {
 			Name:        "manual-word-series",
 			Description: "Manual word-series joining — use english.WordSeries / english.OxfordWordSeries instead of hand-rolled 'a, b, and c' assembly",
 			Cat:         linter.CategoryStyle,
-			Sev:         finding.SeverityWarning,
+			Sev:         finding.SeverityError,
 			ToolName:    toolName,
 		},
 		Run: func(_ context.Context, dir string) ([]finding.Finding, error) {

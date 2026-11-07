@@ -26,6 +26,11 @@ const (
 // Deliberately NOT derived from the finding's fix data (BeforeCode/AfterCode
 // or the Edits list): a fix's internal shape may be refined without changing
 // the finding's identity.
+//
+// The ID inherits the path form of pos.File verbatim: a detector walking an
+// absolute working directory produces checkout-dependent IDs that no other
+// machine (or invocation lane) reproduces. Normalize positions against the
+// analysis root with [Relativize] before persisting IDs as baseline keys.
 func GenerateID(toolName ToolName, rule RuleName, pos Position) ID {
 	if pos.Line == 0 {
 		// Hash-based for position-less findings.

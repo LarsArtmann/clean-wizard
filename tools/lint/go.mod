@@ -3,9 +3,9 @@ module github.com/LarsArtmann/clean-wizard/tools/lint
 go 1.27
 
 require (
-	github.com/larsartmann/go-finding v1.15.0
-	github.com/larsartmann/go-humanize-linter v0.5.0
-	github.com/larsartmann/go-linter-sdk v0.4.0
+	github.com/larsartmann/go-finding v1.15.1
+	github.com/larsartmann/go-humanize-linter v0.6.0
+	github.com/larsartmann/go-linter-sdk v0.4.1
 )
 
 require (
