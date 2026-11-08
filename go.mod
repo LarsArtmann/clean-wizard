@@ -18,8 +18,8 @@ require (
 	github.com/knadh/koanf/v2 v2.4.1
 	github.com/larsartmann/go-atomic-write v0.6.2
 	github.com/larsartmann/go-error-family v0.12.0
-	github.com/larsartmann/go-finding v1.15.0
-	github.com/larsartmann/go-finding/pipeline v1.15.0
+	github.com/larsartmann/go-finding v1.15.1
+	github.com/larsartmann/go-finding/pipeline v1.15.1
 	github.com/larsartmann/go-output v0.38.7
 	github.com/larsartmann/go-output/daghtml v0.38.7
 	github.com/larsartmann/go-output/graph v0.38.7
@@ -69,7 +69,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/gofrs/flock v0.13.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20261103193413-97e8293de3c4 // indirect
+	github.com/google/pprof v0.0.0-20261105003125-4bf881d7fb0b // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/knadh/koanf/maps v0.1.3 // indirect
 	github.com/larsartmann/go-branded-id v0.7.0 // indirect
