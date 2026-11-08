@@ -7,7 +7,7 @@ require (
 	charm.land/lipgloss/v2 v2.0.6
 	charm.land/log/v2 v2.0.1
 	github.com/Azure/go-workflow v0.1.13
-	github.com/LarsArtmann/go-business-rules/v2 v2.2.0
+	github.com/LarsArtmann/go-business-rules/v2 v2.2.1
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/charmbracelet/fang v1.0.0
