@@ -35,8 +35,10 @@ CHANGELOG entry.)
 
 ### Release
 
-None open. (#14 completed 2026-10-11: v0.4.0 tagged after green CI on the
-exact commit; pkg.go.dev verified. Logged in `CHANGELOG.md`.)
+None open. (#19 pkg.go.dev verification completed 2026-10-15: the site serves
+v0.4.0 as Latest with the frozen v0.4.0 README — verified mechanically from
+the page's raw HTML (breadcrumb `go-linter-sdk@v0.4.0`, `Version: v0.4.0`,
+`Published: Oct 11, 2026`); no "Request a version" escalation was needed.)
 
 ### Dependency hygiene
 
