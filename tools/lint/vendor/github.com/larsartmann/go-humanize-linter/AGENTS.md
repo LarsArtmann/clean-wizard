@@ -48,7 +48,7 @@ AST-based linter detecting hand-rolled reimplementations of `dustin/go-humanize`
 
 ## Rule IDs
 
-H001-H012 (H011 reserved for a future manual-si-parse rule), stable identifiers for suppression matching and filter config. Exported as `RuleIDH001`-`RuleIDH010` and `RuleIDH012` constants in `rules.go`. `RuleIDH0SUP` is the exported pseudo-rule ID for suppression verification.
+H001-H012 (H011 reserved for a future manual-si-parse rule), stable identifiers for suppression matching and filter config. Exported as `RuleIDH001`-`RuleIDH010` and `RuleIDH012` constants in `rules.go`. `RuleIDH0SUP` is the exported pseudo-rule ID for suppression verification. **Since v0.6.0 all registry rules emit `SeverityError` findings** (fleet gating default — the severity source is `makeFindingWithConfidence`, not the metas; `H0SUP` stays warning).
 
 **H0SUP** is a pseudo-rule ID (not in `AllRules()`, not filterable by `--enable`/`--disable`) used by `--verify-suppressions` for suppression-verification diagnostics.
 

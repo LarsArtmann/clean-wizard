@@ -25,7 +25,7 @@ func RuleFtoa() linter.RuleFunc {
 			Name:        "manual-ftoa",
 			Description: "Manual float formatting with trailing-zero stripping — use humanize.Ftoa instead of nested strings.TrimRight",
 			Cat:         linter.CategoryStyle,
-			Sev:         finding.SeverityWarning,
+			Sev:         finding.SeverityError,
 			ToolName:    toolName,
 		},
 		Run: func(_ context.Context, dir string) ([]finding.Finding, error) {

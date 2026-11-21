@@ -31,7 +31,7 @@ func RuleParseComma() linter.RuleFunc {
 			Name:        "manual-comma-parse",
 			Description: "Manual comma-grouped number parsing — use humanize.ParseComma / humanize.ParseCommaf instead of comma-stripping before strconv parsing",
 			Cat:         linter.CategoryStyle,
-			Sev:         finding.SeverityWarning,
+			Sev:         finding.SeverityError,
 			ToolName:    toolName,
 		},
 		Run: func(_ context.Context, dir string) ([]finding.Finding, error) {

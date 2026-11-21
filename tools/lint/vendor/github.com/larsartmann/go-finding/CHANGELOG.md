@@ -14,7 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Nothing yet.
+- **`finding.Relativize`**: rewrites findings whose `Position.File` is an
+  absolute path under a given root into root-relative slash paths and
+  regenerates their IDs, making IDs checkout-independent — the CLI lane
+  (relative target) and the SDK/orchestrator lane (absolute working
+  directory) now produce the same ID for the same source fact, and IDs stop
+  embedding host paths like `/home/...`. Pure copy semantics (input slice
+  untouched); already-relative and outside-root paths pass through
+  unchanged; line-0 hash IDs regenerate to host-stable hashes.
+  `GenerateID` now documents that IDs inherit the caller's path form and
+  points at `Relativize` (issue #47).
 
 ### Fixed
 
@@ -1070,7 +1079,8 @@ All APIs deprecated since v0.6.0–v0.9.0 have been removed. See `docs/MIGRATION
 
 ---
 
-[Unreleased]: https://github.com/larsartmann/go-finding/compare/v1.14.0...HEAD
+[Unreleased]: https://github.com/larsartmann/go-finding/compare/v1.15.0...HEAD
+[1.15.0]: https://github.com/larsartmann/go-finding/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/larsartmann/go-finding/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/larsartmann/go-finding/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/larsartmann/go-finding/compare/v1.11.0...v1.12.0

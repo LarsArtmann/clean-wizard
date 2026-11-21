@@ -30,7 +30,7 @@ func RuleBytes() linter.RuleFunc {
 			Name:        "manual-bytes-format",
 			Description: "Manual byte-size formatting — use humanize.Bytes or humanize.IBytes instead of dividing by 1024 and formatting unit strings",
 			Cat:         linter.CategoryStyle,
-			Sev:         finding.SeverityWarning,
+			Sev:         finding.SeverityError,
 			ToolName:    toolName,
 		},
 		Run: func(_ context.Context, dir string) ([]finding.Finding, error) {

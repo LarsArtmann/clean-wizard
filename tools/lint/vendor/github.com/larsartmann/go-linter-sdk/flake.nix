@@ -62,7 +62,7 @@
               inherit src;
               pname = "go-linter-sdk";
               version = "dev";
-              vendorHash = "sha256-oK66kB5PJEC1z0iDpNkqG1KAJFe2qkAlhknRGBVyj0M=";
+              vendorHash = "sha256-V17evQAiM0w1uLUnYBHGKUGgzjUqS8AFIz8TnXMAZ6M=";
               inherit doCheck;
             };
 

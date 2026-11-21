@@ -1,7 +1,12 @@
 version: "2"
 run:
   timeout: 5m
-  go: 1.27.0
+  go: "1.27"
+  build-tags:
+    - goexperiment.arenas
+    - goexperiment.goroutineleakprofile
+    - goexperiment.runtimesecret
+    - goexperiment.simd
   allow-parallel-runners: true
   allow-serial-runners: true
   issues-exit-code: 1
@@ -9,13 +14,11 @@ output:
   formats: {}
 linters:
   enable:
-    - arangolint
     - asasalint
     - asciicheck
     - bidichk
     - bodyclose
     - canonicalheader
-    - clickhouselint
     - containedctx
     - contextcheck
     - copyloopvar
@@ -140,6 +143,22 @@ linters:
         - fmt.Println
         - (*strings.Builder).WriteString
         - (*bytes.Buffer).WriteString
+    exhaustruct_v5:
+      ignore-patterns:
+        - net/http.Client
+        - net/http.Server
+        - net/http.Request
+        - net/http.Response
+        - net/http.Transport
+        - net/http.Cookie
+        - net.TCPAddr
+        - net.Dialer
+        - log/slog.HandlerOptions
+        - sync.WaitGroup
+        - bytes.Buffer
+        - time.Ticker
+        - time.Timer
+        - os/exec.Cmd
     funlen:
       lines: 120
       statements: 80
@@ -148,6 +167,10 @@ linters:
       forbid-spec-pollution: true
     gocognit:
       min-complexity: 35
+    goconst:
+      ignore-tests: true
+      min-len: 4
+      min-occurrences: 5
     gocritic:
       disabled-checks:
         - ifElseChain
@@ -219,6 +242,17 @@ linters:
           severity: warning
         - name: unused-receiver
           severity: warning
+    tagalign:
+      align: false
+      order:
+        - binding
+        - json
+        - yaml
+        - xml
+        - toml
+        - validate
+        - mapstructure
+      sort: true
     testifylint:
       disable:
         - go-require
@@ -247,6 +281,17 @@ linters:
           - goconst
           - wrapcheck
           - unparam
+          - testpackage
+          - gochecknoglobals
+          - funlen
+          - cyclop
+          - forcetypeassert
+          - gosec
+          - errcheck
+          - ireturn
+          - recvcheck
+          - contextcheck
+          - exhaustive
       - path: _test\.go
         text: unused
         linters:
@@ -276,5 +321,5 @@ formatters:
       - _templ\.go$
       - vendor/
 issues:
-  max-issues-per-linter: 100
-  max-same-issues: 5
+  max-issues-per-linter: 0
+  max-same-issues: 0
