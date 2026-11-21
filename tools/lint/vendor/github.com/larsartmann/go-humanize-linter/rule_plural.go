@@ -17,6 +17,11 @@ import (
 //   - Has parameters named "singular" and "plural" (explicit reimplementation)
 //   - OR contains an `if x == 1` / `if x != 1` conditional where the branches
 //     return different string values (the classic plural switch)
+//
+// A function whose body already delegates to english.Plural or
+// english.PluralWord is a legitimate wrapper (zero-suppression, type
+// conversion at the boundary), not a reimplementation — the signature-only
+// heuristic must not flag it.
 func RulePlural() linter.RuleFunc {
 	return linter.RuleFunc{
 		Meta: linter.RuleMeta{
@@ -24,7 +29,7 @@ func RulePlural() linter.RuleFunc {
 			Name:        "manual-plural",
 			Description: "Manual pluralization — use github.com/dustin/go-humanize/english.Plural or english.PluralWord instead of if-n==1 switches",
 			Cat:         linter.CategoryStyle,
-			Sev:         finding.SeverityWarning,
+			Sev:         finding.SeverityError,
 			ToolName:    toolName,
 		},
 		Run: func(_ context.Context, dir string) ([]finding.Finding, error) {
@@ -42,6 +47,10 @@ func detectPlural(fset *token.FileSet, _ *ast.File, fn *ast.FuncDecl, filePath s
 	// health checks, validation, and code generation triggers a false positive.
 	if equalsOne && !namedParams && !funcReturnsString(fn) {
 		equalsOne = false
+	}
+
+	if namedParams && !equalsOne && delegatesToEnglishPlural(fn) {
+		return nil
 	}
 
 	if !namedParams && !equalsOne {
@@ -70,4 +79,42 @@ func detectPlural(fset *token.FileSet, _ *ast.File, fn *ast.FuncDecl, filePath s
 			confidence,
 		),
 	}
+}
+
+// delegatesToEnglishPlural reports whether the function body already calls
+// english.Plural or english.PluralWord: such a function delegates instead of
+// reimplementing, so the signature-only heuristic must stay silent.
+func delegatesToEnglishPlural(fn *ast.FuncDecl) bool {
+	if fn.Body == nil {
+		return false
+	}
+
+	delegates := false
+
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+
+		sel, ok := call.Fun.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+
+		pkg, ok := sel.X.(*ast.Ident)
+		if !ok {
+			return true
+		}
+
+		if pkg.Name == "english" && (sel.Sel.Name == "Plural" || sel.Sel.Name == "PluralWord") {
+			delegates = true
+
+			return false
+		}
+
+		return true
+	})
+
+	return delegates
 }

@@ -17,14 +17,14 @@ github.com/go-faster/yaml
 # github.com/larsartmann/go-error-family v0.12.0
 ## explicit; go 1.27
 github.com/larsartmann/go-error-family
-# github.com/larsartmann/go-finding v1.15.0
+# github.com/larsartmann/go-finding v1.15.1
 ## explicit; go 1.27
 github.com/larsartmann/go-finding
 github.com/larsartmann/go-finding/lockutil
-# github.com/larsartmann/go-humanize-linter v0.5.0
+# github.com/larsartmann/go-humanize-linter v0.6.0
 ## explicit; go 1.27
 github.com/larsartmann/go-humanize-linter
-# github.com/larsartmann/go-linter-sdk v0.4.0
+# github.com/larsartmann/go-linter-sdk v0.4.1
 ## explicit; go 1.27
 github.com/larsartmann/go-linter-sdk
 # github.com/segmentio/asm v1.2.1

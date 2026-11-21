@@ -228,7 +228,7 @@ func makeFindingWithConfidence(
 	b := findingTemplate.Builder(
 		finding.RuleName(ruleID),
 		message,
-		finding.SeverityWarning,
+		finding.SeverityError,
 		finding.Pos(finding.FilePath(filePath), line, col),
 	).WithConfidence(conf)
 

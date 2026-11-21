@@ -26,7 +26,7 @@ func RuleRelTime() linter.RuleFunc {
 			Name:        "manual-reltime-format",
 			Description: "Manual relative-time formatting — use humanize.RelTime or humanize.Time instead of switch/case on duration thresholds",
 			Cat:         linter.CategoryStyle,
-			Sev:         finding.SeverityWarning,
+			Sev:         finding.SeverityError,
 			ToolName:    toolName,
 		},
 		Run: func(_ context.Context, dir string) ([]finding.Finding, error) {

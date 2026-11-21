@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **`go-finding` bumped to v1.15.0** (transitive `go-error-family` v0.11.0 →
+  v0.12.0) on master after the v0.4.0 tag. Source-compatible upstream change:
+  go-finding v1.15.0 adds the `DetectorV2` coverage channel (`DetectResult`
+  carrying `FilesScanned`/`SkippedModules`); the plain `Detector` interface
+  this SDK implements is unchanged, so no SDK API moved. CI green on the bump
+  commit (`154c20a`, 2026-10-15). Recorded here because the bump arrived via
+  an auto-commit with no narrative; `go.mod` remains the single version
+  source of truth.
+
 ## [0.4.0] - 2026-10-11
 
 First release on the Go 1.27 toolchain. Consumers should read the toolchain

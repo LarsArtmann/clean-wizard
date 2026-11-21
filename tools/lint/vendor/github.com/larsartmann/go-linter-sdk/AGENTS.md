@@ -44,7 +44,7 @@ Core types in package `linter`:
 - **`DetectorFromRegistry`** — adapts a registry to a single `finding.Detector` for BuildFlow integration. Reads working dir from context.
 - **`DetectorsFromRegistry`** — returns `[]finding.Detector` (one per rule) for `go-finding/pipeline` integration with per-rule parallelism, timeouts, and error isolation. Each detector is named after the rule's ID.
 - **`ExitCodeFromReport`** — binary: 0 if clean, 1 if any findings.
-- **`Category`** is an open `string` type. The 8 built-in constants are recommendations; consumers can define custom categories (`Category("api")`).
+- **`Category`** is an open `string` type. The 11 built-in constants are recommendations; consumers can define custom categories (`Category("api")`).
 - **`finding.Confidence` and `finding.FixStrategy`** are per-finding, set via `finding.NewBuilder(...).WithConfidence(...).WithFixStrategy(...)`. More expressive than rule-level defaults.
 
 ### Error Wrapping Pattern
@@ -156,6 +156,16 @@ GIT_CONFIG_VALUE_0="https://github.com/"` if global git config is read-only
     commit the result before pushing.
   - pkg.go.dev freezes the tagged README; v0.3.1 exists mostly to refresh it
     (docs-only releases are fine for that — PATCH version).
+  - **2026-10-11 deviation, recorded honestly:** the concurrent release
+    session pushed the v0.4.0 tag ~2 minutes BEFORE its CI run finished. The
+    run came back green (all 9 jobs) on the exact tagged commit, so the
+    outcome satisfies the rule's verification standard — but the sequencing
+    was luck, not discipline, and re-luck is not a strategy. If that run had
+    been red, the tag would have needed retracting
+    (`git push origin :refs/tags/v0.4.0` + proxy propagation mess). Keep the
+    rule: push the commit, wait for green, THEN push the tag; commit+tag in
+    one `git push` only when the delta vs the last green commit is docs-only
+    and locally actionlint-validated.
 - **`dprint.json` re-exists (re-added 2026-09-09) but is NOT wired into treefmt.**
   It is a standalone formatter config; wiring it into treefmt would fetch wasm
   plugins from the network at runtime and break hermetic `nix flake check` (only
@@ -198,6 +208,18 @@ GIT_CONFIG_VALUE_0="https://github.com/"` if global git config is read-only
      daemon commits but never pushes; pushing manually at end-of-session is
      now a mandatory step. (Option (c), daemon-pushes-on-green-CI, stays off
      the table while branch protection might ever be enabled.)
+- **User decisions recorded 2026-10-15 (ratifying the v0.4.0 release):**
+  1. **Version policy: keep the `0.x` prefix; the MINOR-vs-PATCH slot choice
+     within 0.x is delegated** ("just keep 0.* in front, everything else I do
+     not care about"). v0.4.0 stands; the 2026-09-09 slot rules remain the
+     working default.
+  2. **Concurrent release races: risk accepted (status quo).** No lock policy;
+     the 2026-10-11 tag-before-CI incident remains a recorded deviation, not
+     a process change.
+  3. **Consumer bump wave executed 2026-10-15** — all six consumers at v0.4.0
+     (cmdguard/lint and project-meta/linter bumped here; the other four were
+     already bumped by their own sessions). Evidence:
+     `docs/ADOPTION.md` 2026-10-15 snapshot.
 - **Auto-git daemon manages commits.** The daemon commits automatically with
   generated messages (sometimes low-quality). Do not rewrite history to fix
   them — `CHANGELOG.md` is the narrative of record. Focus on keeping the
@@ -237,8 +259,8 @@ GIT_CONFIG_VALUE_0="https://github.com/"` if global git config is read-only
 
 ## Consumers
 
-Six direct consumers at `v0.3.1` (verified 2026-10-11 via `go.mod` grep plus a
-project-dependency-graph scan of `~/projects`; roughly 60 further indirect
+Six direct consumers at `v0.4.0` (bump wave executed 2026-10-15 with
+build + `go test` + `go mod verify` gates; roughly 60 further indirect
 importers):
 
 | Consumer              | Notes                                       |
